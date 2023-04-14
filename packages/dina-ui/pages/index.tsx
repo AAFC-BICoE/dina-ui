@@ -256,6 +256,11 @@ export function Home() {
                     <SeqdbMessage id="seqBatchListTitle" />
                   </a>
                 </Link>
+                <Link href="/seqdb/seq-submission/list" passHref={true}>
+                  <a>
+                    <SeqdbMessage id="seqSubmissionListTitle" />
+                  </a>
+                </Link>
                 <Link href="/seqdb/sequencing-facility/list">
                   <a>
                     <SeqdbMessage id="sequencingFacilityListTitle" />
