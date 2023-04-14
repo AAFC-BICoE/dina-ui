@@ -12,6 +12,9 @@ import { useEffect } from "react";
 import { LoadingSpinner, useQuery } from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import QueryBuilderNumberSearch from "./QueryBuilderNumberSearch";
+import QueryBuilderDateSearch from "./QueryBuilderDateSearch";
+import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
+import QueryBuilderTextSearch from "./QueryBuilderTextSearch";
 
 interface QueryRowTextSearchProps {
   /**
@@ -115,13 +118,15 @@ export default function QueryRowManagedAttributeSearch({
     }
   );
 
+  const managedAttributeSelected = managedAttributeOptions?.find(
+    (managedAttribute) =>
+      managedAttribute.value === managedAttributeState.selectedManagedAttribute
+  );
+
   // Determine the type of the selected managed attribute.
-  const managedAttributeType =
-    managedAttributeOptions?.find(
-      (managedAttribute) =>
-        managedAttribute.value ===
-        managedAttributeState.selectedManagedAttribute
-    )?.type ?? "";
+  const managedAttributeType = managedAttributeSelected?.acceptedValues
+    ? "PICK_LIST"
+    : managedAttributeSelected?.type ?? "";
 
   const supportedOperatorsForType: (type: string) => string[] = (type) => {
     switch (type) {
@@ -159,21 +164,48 @@ export default function QueryRowManagedAttributeSearch({
 
   // Determine the value input to display based on the type.
   const supportedValueForType = (type: string) => {
+    const commonProps = {
+      matchType: managedAttributeState.selectedOperator,
+      value: managedAttributeState.searchValue,
+      setValue: (userInput) =>
+        setManagedAttributeState({
+          ...managedAttributeState,
+          searchValue: userInput ?? ""
+        })
+    };
     switch (type) {
       case "INTEGER":
       case "DECIMAL":
+        return <QueryBuilderNumberSearch {...commonProps} />;
+      case "DATE":
+        return <QueryBuilderDateSearch {...commonProps} />;
+      case "PICK_LIST":
+        const pickListOptions =
+          managedAttributeSelected?.acceptedValues?.map((pickOption) => ({
+            value: pickOption,
+            label: pickOption
+          })) ?? [];
         return (
-          <QueryBuilderNumberSearch
-            matchType={managedAttributeState.selectedOperator}
-            value={managedAttributeState.searchValue}
-            setValue={(numberValue) =>
+          <Select
+            options={pickListOptions}
+            className={`flex-grow-1 me-2 ps-0`}
+            value={pickListOptions?.find(
+              (pickOption) =>
+                pickOption.value === managedAttributeState.searchValue
+            )}
+            placeholder={"Select pick list option..."}
+            onChange={(pickListOption) =>
               setManagedAttributeState({
                 ...managedAttributeState,
-                searchValue: numberValue ?? ""
+                searchValue: pickListOption?.value ?? ""
               })
             }
           />
         );
+      case "BOOL":
+        return <QueryBuilderBooleanSearch {...commonProps} />;
+      case "STRING":
+        return <QueryBuilderTextSearch {...commonProps} />;
       default:
         return <></>;
     }
@@ -190,11 +222,7 @@ export default function QueryRowManagedAttributeSearch({
       <Select<ManagedAttributeOption>
         options={managedAttributeOptions}
         className={`flex-grow-1 me-2 ps-0`}
-        value={managedAttributeOptions?.find(
-          (managedAttribute) =>
-            managedAttribute.value ===
-            managedAttributeState.selectedManagedAttribute
-        )}
+        value={managedAttributeSelected}
         placeholder={"Select managed attribute to search against..."}
         onChange={(selected) =>
           setManagedAttributeState({
