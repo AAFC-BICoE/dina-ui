@@ -414,6 +414,11 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="seqBatchListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/seq-submission/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="seqSubmissionListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/sequencing-facility/list" passHref={true}>
         <NavDropdown.Item>
           <SeqdbMessage id="sequencingFacilityListTitle" />
@@ -427,11 +432,6 @@ function NavSequenceDropdown({ formatMessage }) {
       <Link href="/seqdb/thermocycler-profile/list" passHref={true}>
         <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
           <SeqdbMessage id="thermocyclerProfileListTitle" />
-        </NavDropdown.Item>
-      </Link>
-      <Link href="/seqdb/seq-submission/list" passHref={true}>
-        <NavDropdown.Item>
-          <SeqdbMessage id="seqSubmissionListTitle" />
         </NavDropdown.Item>
       </Link>
     </NavDropdown>
