@@ -9,6 +9,7 @@ import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 import { ManagedAttributeValues } from "./ManagedAttribute";
 
 import { JsonValue } from "type-fest";
+import { Protocol } from "./Protocol";
 
 export interface CollectingEventAttributes {
   type: "collecting-event";
@@ -62,6 +63,7 @@ export interface CollectingEventAttributes {
   selectedSections?: string[];
   extensionValues?: any;
   extensionValuesForm?: any;
+  protocol?: Protocol;
 }
 
 export enum GeographicPlaceNameSource {

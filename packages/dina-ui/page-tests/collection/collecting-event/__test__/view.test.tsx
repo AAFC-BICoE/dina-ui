@@ -22,11 +22,11 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
 };
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
+const mockGet = jest.fn(async (model) => {
   // The get request will return the existing collecting-event.
   if (
     model ===
-    "collection-api/collecting-event/100?include=collectors,attachment,collectionMethod"
+    "collection-api/collecting-event/100?include=collectors,attachment,collectionMethod,protocol"
   ) {
     return { data: TEST_COLLECTION_EVENT };
   } else if (model === "agent-api/person") {
@@ -38,12 +38,12 @@ const mockGet = jest.fn(async model => {
   }
 });
 
-const mockBulkGet = jest.fn(async paths => {
+const mockBulkGet = jest.fn(async (paths) => {
   if (!paths.length) {
     return [];
   }
   if ((paths[0] as string).startsWith("/person/")) {
-    return paths.map(path => ({
+    return paths.map((path) => ({
       id: path.replace("/person/", ""),
       type: "agent",
       displayName: "person a"
