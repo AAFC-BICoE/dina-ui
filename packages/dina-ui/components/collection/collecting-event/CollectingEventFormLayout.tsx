@@ -17,7 +17,8 @@ import {
   useDinaFormContext,
   FieldSpy,
   DataEntryField,
-  useQuery
+  useQuery,
+  ResourceSelectField
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
@@ -34,6 +35,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   COLLECTING_EVENT_COMPONENT_NAME,
+  Protocol,
   Vocabulary
 } from "../../../types/collection-api";
 import {
@@ -928,6 +930,21 @@ export function CollectingEventFormLayout({
                 />
               )}
             </Field>
+            <ResourceSelectField<Protocol>
+              name="protocol"
+              filter={filterBy(["name"], {
+                extraFilters: [
+                  {
+                    selector: "protocolType",
+                    comparison: "==",
+                    arguments: "collection_method"
+                  }
+                ]
+              })}
+              model="collection-api/protocol"
+              optionLabel={(protocol) => protocol.name}
+              omitNullOption={false}
+            />
             <AutoSuggestTextField<CollectingEvent>
               name="substrate"
               customName={"collectingEventSubstrate"}
