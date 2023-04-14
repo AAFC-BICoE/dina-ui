@@ -23,6 +23,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "agent-api/person":
     case "seqdb-api/thermocycler-profile":
     case "user-api/group":
+    case "seqdb-api/pcr-batch-item":
     case "seqdb-api/pcr-batch/" + PCR_BATCH_ID + "/attachment":
       return { data: [] };
     case "seqdb-api/pcr-batch/" + PCR_BATCH_ID:
