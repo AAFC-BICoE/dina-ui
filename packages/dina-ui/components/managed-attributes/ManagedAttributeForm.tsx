@@ -13,7 +13,6 @@ import { PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import { useState } from "react";
-import { boolean } from "zod";
 import { GroupSelectField } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import {

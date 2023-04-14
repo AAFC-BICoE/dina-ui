@@ -1,7 +1,7 @@
 import { DateView } from "common-ui";
 import Link from "next/link";
 import { Metadata, Person } from "../../../types/objectstore-api";
-import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
+import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
 
@@ -46,7 +46,10 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
     },
     // Show the entire value of the metadata map in a key-value table:
     managedAttributes: ({ original: { value } }) => (
-      <ManagedAttributesViewer values={value} />
+      <ManagedAttributesViewer
+        values={value}
+        managedAttributeApiPath="objectstore-api/managed-attribute"
+      />
     )
   }
 };

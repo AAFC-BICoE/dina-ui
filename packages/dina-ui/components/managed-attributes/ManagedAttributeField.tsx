@@ -10,8 +10,8 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../../dina-ui/types/collection-api";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { ManagedAttribute } from "../../types/collection-api";
 
 export interface ManagedAttributeFieldProps {
   attribute: PersistedResource<ManagedAttribute>;

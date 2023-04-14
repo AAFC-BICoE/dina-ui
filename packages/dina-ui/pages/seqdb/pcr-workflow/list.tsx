@@ -68,7 +68,8 @@ export default function PCRWorkflowListPage() {
           queryTableProps={{
             columns: TABLE_COLUMNS,
             path: "seqdb-api/pcr-batch",
-            include: "primerForward,primerReverse"
+            include: "primerForward,primerReverse",
+            filter: { isCompleted: false }
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
