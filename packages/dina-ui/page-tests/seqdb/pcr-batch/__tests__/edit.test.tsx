@@ -19,6 +19,7 @@ const TEST_PCRBATCH: PersistedResource<PcrBatch> = {
   type: "pcr-batch",
   name: "test pcr batch",
   group: "cnc",
+  isCompleted: false,
   createdBy: "poffm",
   primerForward: {
     id: FORWARD_PRIMER_UUID,
@@ -208,6 +209,7 @@ describe("PcrBatch edit page", () => {
           resource: {
             createdBy: "poffm",
             group: "cnc",
+            isCompleted: false,
             id: PCR_BATCH_UUID,
             name: "test pcr batch",
             primerForward: {

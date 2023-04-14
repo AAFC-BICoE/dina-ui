@@ -1,8 +1,8 @@
 import { DinaForm, FieldView, useApiClient, useIsMounted } from "common-ui";
 import { toPairs } from "lodash";
-import { ManagedAttribute } from "../../../types/collection-api";
+import { ManagedAttribute } from "../../types/collection-api";
 import { useEffect, useState } from "react";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface ManagedAttributesViewerProps {
   /**
@@ -10,10 +10,12 @@ export interface ManagedAttributesViewerProps {
    * Key is Managed Attribute UUID and value is the Managed Attribute value object.
    */
   values?: Record<string, string | null | undefined> | null;
+  managedAttributeApiPath: string;
 }
 
 export function ManagedAttributesViewer({
-  values
+  values,
+  managedAttributeApiPath
 }: ManagedAttributesViewerProps) {
   const { apiClient } = useApiClient();
   const [allAttrKeyNameMap, setAllAttrKeyNameMap] = useState<{
@@ -24,7 +26,7 @@ export function ManagedAttributesViewer({
   useEffect(() => {
     async function fetchAllManagedAttributes() {
       const { data } = await apiClient.get<ManagedAttribute[]>(
-        "objectstore-api/managed-attribute?fields=key,name",
+        `${managedAttributeApiPath}?fields=key,name`,
         {}
       );
       const attrKeyNameMap = data.reduce(
