@@ -78,8 +78,6 @@ describe("CollectingEvent details page", () => {
     // Wait for the page to load.
     await new Promise(setImmediate);
     wrapper.update();
-    await new Promise(setImmediate);
-    wrapper.update();
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
