@@ -322,6 +322,9 @@ function PcrBatchFormFields({
 }: PcrBatchFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { values } = useFormikContext<any>();
+  const [selectedRegion, setSelectedRegion] = useState<Region>(
+    initialValues.region
+  );
 
   // When the storage unit type is changed, the storage unit needs to be cleared.
   const StorageUnitTypeSelectorComponent = connect(
@@ -396,6 +399,7 @@ function PcrBatchFormFields({
           model="seqdb-api/region"
           optionLabel={(region) => region.name}
           readOnlyLink="/seqdb/region/view?id="
+          onChange={(value) => setSelectedRegion(value as Region)}
         />
       </div>
       <div className="row">
@@ -404,22 +408,26 @@ function PcrBatchFormFields({
           name="primerForward"
           filter={(input) => ({
             ...filterBy(["name"])(input),
-            direction: { EQ: "F" }
+            direction: { EQ: "F" },
+            "region.id": { EQ: selectedRegion?.id }
           })}
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
+          isDisabled={!(selectedRegion && selectedRegion.id)}
         />
         <ResourceSelectField<PcrPrimer>
           className="col-md-6"
           name="primerReverse"
           filter={(input) => ({
             ...filterBy(["name"])(input),
-            direction: { EQ: "R" }
+            direction: { EQ: "R" },
+            "region.id": { EQ: selectedRegion?.id }
           })}
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
+          isDisabled={!(selectedRegion && selectedRegion.id)}
         />
         <TextField className="col-md-6" name="thermocycler" />
         <TextField className="col-md-6" name="objective" />
