@@ -66,22 +66,27 @@ export function useIndexMapping({
           if (path && path.includes(prefix)) {
             attrPrefix = path.substring(prefix.length + 1);
           }
-          result.push({
-            label: attrPrefix ? attrPrefix + "." + key.name : key.name,
-            value: key.path
-              ? key.path + "." + key.name
-              : key.name === "id"
-              ? "data." + key.name
-              : key.name,
-            type: key.type,
-            path: key.path,
 
-            // Additional options for the field:
-            distinctTerm: key.distinct_term_agg,
-            prefixSupport: key?.fields?.includes("prefix") ?? false,
-            infixSupport: key?.fields?.includes("infix") ?? false,
-            suffixSupport: key?.fields?.includes("prefix_reverse") ?? false
-          });
+          // Manually remove managed attributes from here, they are handled using the dynamic
+          // mapping config. See the dynamicFieldMapping.
+          if (path !== "data.attributes.managedAttributes") {
+            result.push({
+              label: attrPrefix ? attrPrefix + "." + key.name : key.name,
+              value: key.path
+                ? key.path + "." + key.name
+                : key.name === "id"
+                ? "data." + key.name
+                : key.name,
+              type: key.type,
+              path: key.path,
+
+              // Additional options for the field:
+              distinctTerm: key.distinct_term_agg,
+              prefixSupport: key?.fields?.includes("prefix") ?? false,
+              infixSupport: key?.fields?.includes("infix") ?? false,
+              suffixSupport: key?.fields?.includes("prefix_reverse") ?? false
+            });
+          }
         });
 
       // Read relationship attributes.

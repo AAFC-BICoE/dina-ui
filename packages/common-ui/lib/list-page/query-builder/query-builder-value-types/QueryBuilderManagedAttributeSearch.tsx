@@ -1,10 +1,4 @@
 import React, { useState } from "react";
-import {
-  includedTypeQuery,
-  matchQuery,
-  termQuery,
-  existsQuery
-} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
@@ -158,7 +152,7 @@ export default function QueryRowManagedAttributeSearch({
       case "PICK_LIST":
         return ["equals", "notEquals", "empty", "notEmpty"];
       case "BOOL":
-        return ["equals"];
+        return ["equals", "empty", "notEmpty"];
       case "STRING":
         return ["exactMatch", "partialMatch", "notEquals", "empty", "notEmpty"];
       default:
@@ -205,7 +199,7 @@ export default function QueryRowManagedAttributeSearch({
         return (
           <Select
             options={pickListOptions}
-            className={`flex-grow-1 ps-0`}
+            className={`col ps-0`}
             value={pickListOptions?.find(
               (pickOption) =>
                 pickOption.value === managedAttributeState.searchValue
@@ -251,11 +245,11 @@ export default function QueryRowManagedAttributeSearch({
   }
 
   return (
-    <div className="d-flex">
+    <div className="row">
       {/* Managed Attribute Selection */}
       <Select<ManagedAttributeOption>
         options={managedAttributeOptions}
-        className={`flex-grow-1 me-2 ps-0`}
+        className={`col me-2 ms-2 ps-0`}
         value={managedAttributeSelected}
         placeholder={"Select managed attribute to search against..."}
         onChange={(selected) =>
@@ -272,7 +266,7 @@ export default function QueryRowManagedAttributeSearch({
       {operatorOptions.length !== 0 ? (
         <Select<ManagedAttributeOperatorOption>
           options={operatorOptions}
-          className={`flex-grow-1 me-2 ps-0`}
+          className={`col me-2 ps-0`}
           value={selectedOperator}
           onChange={(selected) =>
             setManagedAttributeState({
@@ -286,7 +280,7 @@ export default function QueryRowManagedAttributeSearch({
       )}
 
       {/* Value Searching (changes based ont he type selected) */}
-      <div className="flex-grow-1 ps-0">
+      <div className="col ps-0">
         {supportedValueForType(managedAttributeType)}
       </div>
     </div>
