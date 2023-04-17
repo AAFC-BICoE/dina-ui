@@ -228,4 +228,5 @@ export interface DynamicField {
  */
 export interface RelationshipDynamicField extends DynamicField {
   referencedBy: string;
+  referencedType: string;
 }

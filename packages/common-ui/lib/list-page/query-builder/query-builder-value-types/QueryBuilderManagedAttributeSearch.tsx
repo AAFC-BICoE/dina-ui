@@ -205,7 +205,7 @@ export default function QueryRowManagedAttributeSearch({
         return (
           <Select
             options={pickListOptions}
-            className={`flex-grow-1 me-2 ps-0`}
+            className={`flex-grow-1 ps-0`}
             value={pickListOptions?.find(
               (pickOption) =>
                 pickOption.value === managedAttributeState.searchValue
@@ -305,10 +305,6 @@ export function transformManagedAttributeToDSL({
   // Parse the managed attribute search options.
   const managedAttributeSearchValue: ManagedAttributeSearchStates =
     JSON.parse(value);
-
-  // console.log(fieldPath);
-  // console.log(managedAttributeSearchValue);
-  // console.log(fieldInfo);
 
   const commonProps = {
     fieldPath:

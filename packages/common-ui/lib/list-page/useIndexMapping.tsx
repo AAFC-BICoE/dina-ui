@@ -137,7 +137,8 @@ export function useIndexMapping({
             result.push({
               dynamicField: relationshipFieldMapping,
               parentName: relationshipFieldMapping.referencedBy,
-              parentPath: relationshipFieldMapping.referencedBy,
+              parentPath: "included",
+              parentType: relationshipFieldMapping.referencedType,
               value: relationshipFieldMapping.path,
               distinctTerm: false,
               label: relationshipFieldMapping.label,
