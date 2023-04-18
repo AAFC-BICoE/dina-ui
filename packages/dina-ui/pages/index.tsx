@@ -91,11 +91,6 @@ export function Home() {
                     <DinaMessage id="collectingEventListTitle" />
                   </a>
                 </Link>
-                <Link href="/collection/collection-method/list">
-                  <a>
-                    <DinaMessage id="collectionMethodListTitle" />
-                  </a>
-                </Link>
                 <Link href="/collection/collection/list">
                   <a>
                     <DinaMessage id="collectionListTitle" />
@@ -308,16 +303,6 @@ export function Home() {
                     </a>
                   </Link>
                   {/* Permissions link here */}
-                  <Link href="/collection/preparation-method/list">
-                    <a>
-                      <DinaMessage id="title_preparationMethod" />
-                    </a>
-                  </Link>
-                  <Link href="/collection/preparation-type/list">
-                    <a>
-                      <DinaMessage id="preparationTypeListTitle" />
-                    </a>
-                  </Link>
                   <Link href="/collection/protocol/list">
                     <a>
                       <DinaMessage id="protocolListTitle" />
