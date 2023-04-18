@@ -235,9 +235,9 @@ function NavCollectionDropdown({ formatMessage }) {
           <DinaMessage id="collectingEventListTitle" />
         </NavDropdown.Item>
       </Link>
-      <Link href="/collection/collection-method/list" passHref={true}>
+      <Link href="/collection/collection/list" passHref={true}>
         <NavDropdown.Item>
-          <DinaMessage id="collectionMethodListTitle" />
+          <DinaMessage id="collectionListTitle" />
         </NavDropdown.Item>
       </Link>
       {/* Controlled Vocabulary submenu */}
@@ -251,9 +251,9 @@ function NavCollectionDropdown({ formatMessage }) {
         className="submenu"
         variant="light"
       >
-        <Link href="/collection/collection/list" passHref={true}>
+        <Link href="/collection/collection-method/list" passHref={true}>
           <NavDropdown.Item>
-            <DinaMessage id="collectionListTitle" />
+            <DinaMessage id="collectionMethodListTitle" />
           </NavDropdown.Item>
         </Link>
         <Link href="/collection/preparation-method/list" passHref={true}>

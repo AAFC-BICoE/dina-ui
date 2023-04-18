@@ -120,7 +120,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
   collectionMethodListTitle: "Collection Method",
   collectionMethodNameLabel: "Collection Method Name",
-  collectionSectionTitle: "Collections",
+  collectionSectionTitle: "Collection",
   collectionViewTitle: "Collection",
   collectorGroupAgentsLabel: "Collector Group Agents",
   collectorGroupListTitle: "Collector Group",
