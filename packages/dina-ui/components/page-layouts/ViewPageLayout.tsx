@@ -52,6 +52,8 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
     // Override page elements:
     editButton?: (formProps: ResourceFormProps<T>) => ReactNode;
     deleteButton?: (formProps: ResourceFormProps<T>) => ReactNode;
+    showEditButton?: boolean;
+    showDeleteButton?: boolean;
     /** Show the link to the "revisions" page if there is one. */
     showRevisionsLink?: boolean;
 
@@ -92,6 +94,8 @@ export function ViewPageLayout<T extends KitsuResource>({
   nameField = "name",
   editButton,
   deleteButton,
+  showDeleteButton = true,
+  showEditButton = true,
   mainClass = "container",
   showRevisionsLink,
   showRevisionsLinkAtBottom,
@@ -162,7 +166,8 @@ export function ViewPageLayout<T extends KitsuResource>({
                     byPassView={true}
                   />
                 )}
-                {canEdit &&
+                {showEditButton &&
+                  canEdit &&
                   (editButton?.(formProps) ?? (
                     <EditButton entityId={id} entityLink={entityLink} />
                   ))}
@@ -173,7 +178,8 @@ export function ViewPageLayout<T extends KitsuResource>({
                     </a>
                   </Link>
                 )}
-                {canDelete &&
+                {showDeleteButton &&
+                  canDelete &&
                   (deleteButton ? (
                     deleteButton(formProps)
                   ) : (
