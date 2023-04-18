@@ -142,14 +142,25 @@ export default function QueryRowManagedAttributeSearch({
     switch (type) {
       case "INTEGER":
       case "DECIMAL":
-      case "DATE":
         return [
           "equals",
           "notEquals",
           "greaterThan",
-          "greaterThanOrEqual",
+          "greaterThanOrEqualTo",
           "lessThan",
-          "lessThanOrEqual",
+          "lessThanOrEqualTo",
+          "empty",
+          "notEmpty"
+        ];
+      case "DATE":
+        return [
+          "equals",
+          "notEquals",
+          "contains",
+          "greaterThan",
+          "greaterThanOrEqualTo",
+          "lessThan",
+          "lessThanOrEqualTo",
           "empty",
           "notEmpty"
         ];
