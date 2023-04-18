@@ -302,13 +302,36 @@ export default function MaterialSampleListPage() {
               }
             ],
             relationshipFields: [
+              // Assemblage
+              {
+                type: "managedAttribute",
+                label: "managedAttributes",
+                component: "ASSEMBLAGE",
+                path: "included.attributes.managedAttributes",
+                referencedBy: "assemblages",
+                referencedType: "assemblage",
+                apiEndpoint: "collection-api/managed-attribute"
+              },
+
+              // Collecting Event
               {
                 type: "managedAttribute",
                 label: "managedAttributes",
                 component: "COLLECTING_EVENT",
-                path: "attributes.managedAttributes",
+                path: "included.attributes.managedAttributes",
                 referencedBy: "collectingEvent",
                 referencedType: "collecting-event",
+                apiEndpoint: "collection-api/managed-attribute"
+              },
+
+              // Determination
+              {
+                type: "managedAttribute",
+                label: "managedAttributes",
+                component: "DETERMINATION",
+                path: "included.attributes.determination.managedAttributes",
+                referencedBy: "organism",
+                referencedType: "organism",
                 apiEndpoint: "collection-api/managed-attribute"
               }
             ]

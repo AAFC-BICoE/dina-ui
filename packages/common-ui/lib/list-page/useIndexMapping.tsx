@@ -144,7 +144,10 @@ export function useIndexMapping({
               parentName: relationshipFieldMapping.referencedBy,
               parentPath: "included",
               parentType: relationshipFieldMapping.referencedType,
-              value: relationshipFieldMapping.path,
+              value:
+                relationshipFieldMapping.path +
+                "_" +
+                relationshipFieldMapping.referencedBy,
               distinctTerm: false,
               label: relationshipFieldMapping.label,
               path: relationshipFieldMapping.path,

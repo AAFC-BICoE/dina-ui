@@ -3,7 +3,7 @@ import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
-import { LoadingSpinner, useQuery } from "common-ui";
+import { useQuery } from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
@@ -69,6 +69,9 @@ export default function QueryRowManagedAttributeSearch({
 }: QueryRowTextSearchProps) {
   const { formatMessage } = useIntl();
 
+  const [managedAttributeSearchValue, setManagedAttributeSearchValue] =
+    useState<string>("");
+
   const [managedAttributeOptions, setManagedAttributeOptions] =
     useState<ManagedAttributeOption[]>();
 
@@ -99,15 +102,16 @@ export default function QueryRowManagedAttributeSearch({
   }, [value]);
 
   // If component is provided, add a filter for it.
-  const filter = managedAttributeConfig?.dynamicField?.component
-    ? {
-        managedAttributeComponent: managedAttributeConfig.dynamicField.component
-      }
-    : undefined;
   const query = useQuery<ManagedAttribute[]>(
     {
       path: managedAttributeConfig?.dynamicField?.apiEndpoint ?? "",
-      filter
+      filter: {
+        rsql:
+          `name==*${managedAttributeSearchValue}*` +
+          (managedAttributeConfig?.dynamicField?.component
+            ? `;managedAttributeComponent==${managedAttributeConfig.dynamicField.component}`
+            : "")
+      }
     },
     {
       onSuccess: ({ data }) => {
@@ -211,9 +215,20 @@ export default function QueryRowManagedAttributeSearch({
                 searchValue: pickListOption?.value ?? ""
               })
             }
+            isLoading={query.loading}
           />
         );
       case "BOOL":
+        // Automatically set the boolean value to true if it's not preset.
+        if (
+          managedAttributeState.searchValue !== "true" &&
+          managedAttributeState.searchValue !== "false"
+        ) {
+          setManagedAttributeState({
+            ...managedAttributeState,
+            searchValue: "true"
+          });
+        }
         return <QueryBuilderBooleanSearch {...commonProps} />;
       case "STRING":
         return <QueryBuilderTextSearch {...commonProps} />;
@@ -239,11 +254,6 @@ export default function QueryRowManagedAttributeSearch({
     });
   }
 
-  // If loading, just render a spinner.
-  if (query.loading) {
-    return <LoadingSpinner loading={true} />;
-  }
-
   return (
     <div className="row">
       {/* Managed Attribute Selection */}
@@ -257,9 +267,14 @@ export default function QueryRowManagedAttributeSearch({
             ...managedAttributeState,
             selectedManagedAttribute: selected?.value ?? "",
             selectedOperator: "",
-            selectedType: ""
+            selectedType: "",
+            searchValue: ""
           })
         }
+        onInputChange={(inputValue) =>
+          setManagedAttributeSearchValue(inputValue)
+        }
+        inputValue={managedAttributeSearchValue}
       />
 
       {/* Operator */}
@@ -292,7 +307,6 @@ export default function QueryRowManagedAttributeSearch({
  * made.
  */
 export function transformManagedAttributeToDSL({
-  fieldPath,
   value,
   fieldInfo
 }: TransformToDSLProps): any {
@@ -302,7 +316,9 @@ export function transformManagedAttributeToDSL({
 
   const commonProps = {
     fieldPath:
-      fieldPath + "." + managedAttributeSearchValue.selectedManagedAttribute,
+      fieldInfo?.path +
+      "." +
+      managedAttributeSearchValue.selectedManagedAttribute,
     operation: managedAttributeSearchValue.selectedOperator,
     queryType: "",
     value: managedAttributeSearchValue.searchValue,
