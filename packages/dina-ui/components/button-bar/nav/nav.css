@@ -8,6 +8,10 @@ body {
   margin-top: -5px;
 }
 
+.submenu > .dropdown-menu {
+  margin-left: -5px;
+}
+
 .submenu > button {
   background-color: #ffffff;
   border-color: #ffffff;
@@ -15,7 +19,9 @@ body {
   color: #212529;
   font-size: 1rem;
   height: 31px;
-  padding: 0.25rem 1rem;
+  padding-left: 0.9rem;
+  padding-right: 1rem;
+  padding-top: 3px;
 }
 
 .submenu.show > .btn-light.dropdown-toggle {
