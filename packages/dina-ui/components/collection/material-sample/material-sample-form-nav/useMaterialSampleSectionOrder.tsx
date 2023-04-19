@@ -1,7 +1,6 @@
 import { uniq, compact } from "lodash";
 import { useDinaIntl } from "../../../../intl/dina-ui-intl";
 import {
-  ACQUISITION_EVENT_COMPONENT_NAME,
   ASSOCIATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
   MATERIAL_SAMPLE_FORM_LEGEND,
@@ -49,10 +48,6 @@ export function useMaterialSampleSectionOrder({
     [COLLECTING_EVENT_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableCollectingEvent,
       setEnabled: dataComponentState.setEnableCollectingEvent
-    },
-    [ACQUISITION_EVENT_COMPONENT_NAME]: {
-      disabled: !dataComponentState.enableAcquisitionEvent,
-      setEnabled: dataComponentState.setEnableAcquisitionEvent
     },
     [PREPARATIONS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enablePreparations,

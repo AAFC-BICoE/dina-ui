@@ -1,5 +1,4 @@
 import { RevisionRowConfigsByType } from "./revision-row-config";
-import { ACQUISITION_EVENT_REVISION_ROW_CONFIG } from "./revision-row-configs/acquisition-event-revision-config";
 import { ASSEMBLAGE_REVISION_ROW_CONFIG } from "./revision-row-configs/assemblage-revision-config";
 import { COLLECTING_EVENT_REVISION_ROW_CONFIG } from "./revision-row-configs/collectingevent-revision-config";
 import { COLLECTION_METHOD_REVISION_ROW_CONFIG } from "./revision-row-configs/collection-method-revision-config";
@@ -28,7 +27,6 @@ export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
   collection: COLLECTION_REVISION_ROW_CONFIG,
   project: PROJECT_REVISION_ROW_CONFIG,
   institution: INSTITUTION_REVISION_ROW_CONFIG,
-  "acquisition-event": ACQUISITION_EVENT_REVISION_ROW_CONFIG,
   "storage-unit": STORAGE_UNIT_REVISION_ROW_CONFIG,
   "collection-method": COLLECTION_METHOD_REVISION_ROW_CONFIG,
   "preparation-method": PREPARATION_METHOD_REVISION_ROW_CONFIG,

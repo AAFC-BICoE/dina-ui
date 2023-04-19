@@ -37,7 +37,6 @@ import {
   useDinaIntl
 } from "../../../../dina-ui/intl/dina-ui-intl";
 import {
-  ACQUISITION_EVENT_COMPONENT_NAME,
   ASSOCIATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
   FIELD_EXTENSIONS_COMPONENT_NAME,
@@ -108,7 +107,6 @@ export function FormTemplateEditPageLoaded({
     getComponentOrderFromTemplate(fetchedFormTemplate)
   );
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
-  const acqEventFormRef = useRef<FormikProps<any>>(null);
   const pageTitle = id
     ? "editMaterialSampleFormTemplate"
     : "createMaterialSampleFormTemplate";
@@ -120,7 +118,7 @@ export function FormTemplateEditPageLoaded({
     allMaterialSampleComponentValues.associations = [{}];
   }
 
-  // collecting event and acquisition components need to be isolated for useMaterialSample hook
+  // collecting event components need to be isolated for useMaterialSample hook
   const collectingEventInitialValues =
     getComponentValues(
       COLLECTING_EVENT_COMPONENT_NAME,
@@ -131,13 +129,6 @@ export function FormTemplateEditPageLoaded({
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
-
-  const acquisitionEventInitialValues =
-    getComponentValues(
-      ACQUISITION_EVENT_COMPONENT_NAME,
-      fetchedFormTemplate,
-      false
-    ) ?? {};
 
   // Get Split Configuration Settings
   const splitConfigurationInitialValues =
@@ -163,11 +154,9 @@ export function FormTemplateEditPageLoaded({
   // Generate the material sample save hook to use for the form.
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
-    acqEventTemplateInitialValues: acquisitionEventInitialValues,
     colEventTemplateInitialValues: collectingEventInitialValues,
     materialSampleTemplateInitialValues: allMaterialSampleComponentValues,
     colEventFormRef: collectingEvtFormRef,
-    acquisitionEventFormRef: acqEventFormRef,
     splitConfigurationInitialState: !_.isUndefined(
       splitConfigurationInitialValues
     )
@@ -188,24 +177,12 @@ export function FormTemplateEditPageLoaded({
       ...collectingEventCheckboxes
     };
 
-    // Get acquisition event checkboxes and values
-    const {
-      templateCheckboxes: acquisitionEventCheckboxes,
-      ...acquisitionEventFormRefValues
-    } = acqEventFormRef?.current?.values || {};
-    submittedValues.templateCheckboxes = {
-      ...submittedValues.templateCheckboxes,
-      ...acquisitionEventCheckboxes
-    };
-
-    // Include the collecting event and acquisition event values.
+    // Include the collecting event values.
     const allSubmittedValues: FormTemplate & FormTemplateComponents = {
       ...submittedValues
     };
     allSubmittedValues.collectingEvent = collectinEventFormRefValues ?? {};
     allSubmittedValues.collectingEvent.group = allSubmittedValues.group;
-    allSubmittedValues.acquisitionEvent = acquisitionEventFormRefValues ?? {};
-    allSubmittedValues.acquisitionEvent.group = allSubmittedValues.group;
 
     const dataComponentsStateMap =
       getDataComponentsStateMap(dataComponentState);
@@ -245,12 +222,6 @@ export function FormTemplateEditPageLoaded({
                   item.defaultValue = _.get(
                     allSubmittedValues,
                     `collectingEvent.${field.id}`
-                  );
-                  break;
-                case ACQUISITION_EVENT_COMPONENT_NAME:
-                  item.defaultValue = _.get(
-                    allSubmittedValues,
-                    `acquisitionEvent.${field.id}`
                   );
                   break;
                 case SPLIT_CONFIGURATION_COMPONENT_NAME:
@@ -391,8 +362,6 @@ function getDataComponentsStateMap(dataComponentState) {
     dataComponentState.enableSplitConfiguration;
   dataComponentEnabledMap[IDENTIFIER_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MATERIAL_SAMPLE_INFO_COMPONENT_NAME] = true;
-  dataComponentEnabledMap[ACQUISITION_EVENT_COMPONENT_NAME] =
-    dataComponentState.enableAcquisitionEvent;
   dataComponentEnabledMap[ASSOCIATIONS_COMPONENT_NAME] =
     dataComponentState.enableAssociations;
   dataComponentEnabledMap[COLLECTING_EVENT_COMPONENT_NAME] =

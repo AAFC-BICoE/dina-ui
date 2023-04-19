@@ -2,11 +2,7 @@ import { InputResource, KitsuResource } from "kitsu";
 import { isNil, set, toPairs } from "lodash";
 import { useMemo } from "react";
 import { VisibleManagedAttributesConfig } from "../..";
-import {
-  AcquisitionEvent,
-  CollectingEvent,
-  MaterialSample
-} from "../../../types/collection-api";
+import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
 import {
   MaterialSampleFormTemplateConfig,
   TemplateFieldMap
@@ -19,7 +15,6 @@ import {
 export interface MaterialSampleFormTemplateProps {
   materialSampleInitialValues: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
-  acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
   visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
@@ -74,11 +69,6 @@ export function useMaterialSampleFormTemplateProps<
       "collecting-event",
       actionDefinition.formTemplate.COLLECTING_EVENT?.templateFields
     );
-    const acquisitionEvent =
-      getInitialValuesFromTemplateFields<AcquisitionEvent>(
-        "acquisition-event",
-        actionDefinition.formTemplate.ACQUISITION_EVENT?.templateFields
-      );
 
     if (collectingEvent.id) {
       materialSampleInitialValues.collectingEvent = {
@@ -88,24 +78,14 @@ export function useMaterialSampleFormTemplateProps<
     } else {
       set(collectingEvent, "geoReferenceAssertions[0].isPrimary", true);
     }
-    if (acquisitionEvent.id) {
-      materialSampleInitialValues.acquisitionEvent = {
-        type: "acquisition-event",
-        id: acquisitionEvent.id
-      };
-    }
 
     const collectingEventInitialValues = collectingEvent.id
       ? undefined
       : collectingEvent;
-    const acquisitionEventInitialValues = acquisitionEvent.id
-      ? undefined
-      : acquisitionEvent;
 
     const config: MaterialSampleFormTemplateProps = {
       materialSampleInitialValues,
       collectingEventInitialValues,
-      acquisitionEventInitialValues,
       visibleManagedAttributeKeys: {
         materialSample: actionDefinition.managedAttributesOrder,
         collectingEvent: actionDefinition.collectingEventManagedAttributesOrder,
