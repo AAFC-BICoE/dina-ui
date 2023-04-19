@@ -35,7 +35,8 @@ import {
   Head,
   Nav,
   PersonSelectField,
-  StorageUnitSelectField
+  StorageUnitSelectField,
+  VocabularySelectField
 } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
@@ -374,6 +375,13 @@ function PcrBatchFormFields({
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
+        <VocabularySelectField
+          className="col-md-6"
+          name="batchType"
+          path="seqdb-api/vocabulary/pcrBatchType"
+        />
+      </div>
+      <div className="row">
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
@@ -382,6 +390,7 @@ function PcrBatchFormFields({
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
         />
+        <TextField className="col-md-6" name="thermocycler" />
       </div>
       <div className="row">
         <PersonSelectField
@@ -421,18 +430,11 @@ function PcrBatchFormFields({
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
         />
-        <TextField className="col-md-6" name="thermocycler" />
+
         <TextField className="col-md-6" name="objective" />
         <TextField className="col-md-6" name="positiveControl" />
         <TextField className="col-md-6" name="reactionVolume" />
         <DateField className="col-md-6" name="reactionDate" />
-        <ResourceSelectField<Protocol>
-          className="col-md-6"
-          name="protocol"
-          filter={filterBy(["name"])}
-          model="collection-api/protocol"
-          optionLabel={(protocol) => protocol.name}
-        />
         <StorageUnitTypeSelectorComponent />
         <StorageUnitSelectField
           resourceProps={{
@@ -453,6 +455,13 @@ function PcrBatchFormFields({
           }}
           restrictedField={"data.relationships.storageUnitType.data.id"}
           restrictedFieldValue={values?.storageUnitType?.id}
+        />
+        <ResourceSelectField<Protocol>
+          className="col-md-6"
+          name="protocol"
+          filter={filterBy(["name"])}
+          model="collection-api/protocol"
+          optionLabel={(protocol) => protocol.name}
         />
       </div>
       {initialValues.id ? (
