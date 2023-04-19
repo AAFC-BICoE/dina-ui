@@ -8,8 +8,12 @@ body {
   margin-top: -5px;
 }
 
-.submenu > .dropdown-menu {
-  margin-left: -5px;
+.submenu > .dropend .dropdown-menu[data-bs-popper] {
+  top: 0;
+  right: auto;
+  left: 100%;
+  margin-top: 0;
+  margin-left: 0;
 }
 
 .submenu > button {
