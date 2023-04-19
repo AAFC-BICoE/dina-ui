@@ -72,7 +72,7 @@ export function SangerSampleSelectionStep({
         })(""),
         include: "materialSample",
         page: {
-          limit: 100
+          limit: 1000 // Maximum page size.
         }
       })
       .then((response) => {
