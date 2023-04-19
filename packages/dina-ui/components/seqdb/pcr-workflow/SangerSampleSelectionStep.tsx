@@ -70,7 +70,10 @@ export function SangerSampleSelectionStep({
             }
           ]
         })(""),
-        include: "materialSample"
+        include: "materialSample",
+        page: {
+          limit: 100
+        }
       })
       .then((response) => {
         const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
