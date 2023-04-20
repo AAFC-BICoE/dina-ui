@@ -190,12 +190,12 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_partialMatch" }),
       cardinality: 1
     },
-    prefix: {
-      label: formatMessage({ id: "queryBuilder_operator_prefix" }),
+    startsWith: {
+      label: formatMessage({ id: "queryBuilder_operator_startsWith" }),
       cardinality: 1
     },
-    suffix: {
-      label: formatMessage({ id: "queryBuilder_operator_suffix" }),
+    endsWith: {
+      label: formatMessage({ id: "queryBuilder_operator_endsWith" }),
       cardinality: 1
     },
     equals: {
@@ -378,9 +378,9 @@ function generateBuilderConfig(
           operators: [
             "exactMatch",
             "partialMatch",
-            "prefix", // Only displayed if supported on the mapping.
+            "startsWith", // Only displayed if supported on the mapping.
             "contains", // Only displayed if supported on the mapping.
-            "suffix", // Only displayed if supported on the mapping.
+            "endsWith", // Only displayed if supported on the mapping.
             "notEquals",
             "empty",
             "notEmpty"

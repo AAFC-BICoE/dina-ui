@@ -96,11 +96,11 @@ describe("QueryBuilderTextSearch", () => {
       });
     });
 
-    describe("Prefix operation", () => {
+    describe("startsWith operation", () => {
       test("With relationship as field", async () => {
         expect(
           transformTextSearchToDSL({
-            operation: "prefix",
+            operation: "startsWith",
             value: "text search",
             fieldInfo: {
               label: "name",
@@ -113,7 +113,7 @@ describe("QueryBuilderTextSearch", () => {
               distinctTerm: true
             } as any,
             fieldPath: "included.attributes.name",
-            queryType: "prefix"
+            queryType: "startsWith"
           })
         ).toMatchSnapshot();
       });
@@ -121,7 +121,7 @@ describe("QueryBuilderTextSearch", () => {
       test("With relationship containing complex path as field", async () => {
         expect(
           transformTextSearchToDSL({
-            operation: "prefix",
+            operation: "startsWith",
             value: "text",
             fieldInfo: {
               label: "determination.scientificName",
@@ -133,7 +133,7 @@ describe("QueryBuilderTextSearch", () => {
               value: "organism.determination.scientificName"
             } as any,
             fieldPath: "included.attributes.determination.scientificName",
-            queryType: "prefix"
+            queryType: "startsWith"
           })
         ).toMatchSnapshot();
       });
@@ -141,11 +141,11 @@ describe("QueryBuilderTextSearch", () => {
       test("Normal field", async () => {
         expect(
           transformTextSearchToDSL({
-            operation: "prefix",
+            operation: "startsWith",
             value: "text search",
             fieldInfo: {} as any,
             fieldPath: "data.attributes.textField",
-            queryType: "prefix"
+            queryType: "startsWith"
           })
         ).toMatchSnapshot();
       });
@@ -206,11 +206,11 @@ describe("QueryBuilderTextSearch", () => {
       });
     });
 
-    describe("Suffix operation", () => {
+    describe("EndsWith operation", () => {
       test("With relationship as field", async () => {
         expect(
           transformTextSearchToDSL({
-            operation: "suffix",
+            operation: "endsWith",
             value: "text search",
             fieldInfo: {
               label: "name",
@@ -223,7 +223,7 @@ describe("QueryBuilderTextSearch", () => {
               distinctTerm: true
             } as any,
             fieldPath: "included.attributes.name",
-            queryType: "suffix"
+            queryType: "endsWith"
           })
         ).toMatchSnapshot();
       });
@@ -231,7 +231,7 @@ describe("QueryBuilderTextSearch", () => {
       test("With relationship containing complex path as field", async () => {
         expect(
           transformTextSearchToDSL({
-            operation: "suffix",
+            operation: "endsWith",
             value: "text",
             fieldInfo: {
               label: "determination.scientificName",
@@ -243,7 +243,7 @@ describe("QueryBuilderTextSearch", () => {
               value: "organism.determination.scientificName"
             } as any,
             fieldPath: "included.attributes.determination.scientificName",
-            queryType: "suffix"
+            queryType: "endsWith"
           })
         ).toMatchSnapshot();
       });
@@ -251,11 +251,11 @@ describe("QueryBuilderTextSearch", () => {
       test("Normal field", async () => {
         expect(
           transformTextSearchToDSL({
-            operation: "suffix",
+            operation: "endsWith",
             value: "text search",
             fieldInfo: {} as any,
             fieldPath: "data.attributes.textField",
-            queryType: "suffix"
+            queryType: "endsWith"
           })
         ).toMatchSnapshot();
       });
