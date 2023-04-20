@@ -357,6 +357,25 @@ function PcrBatchFormFields({
     }
   );
 
+  // When the region is changed, it should clear the forward and reverse primer.
+  const RegionSelectorComponent = connect(({ formik: { setFieldValue } }) => {
+    return (
+      <ResourceSelectField<Region>
+        className="col-md-6"
+        name="region"
+        filter={filterBy(["name"])}
+        model="seqdb-api/region"
+        optionLabel={(region) => region.name}
+        readOnlyLink="/seqdb/region/view?id="
+        onChange={(value) => {
+          setSelectedRegion(value as Region);
+          setFieldValue("primerForward", null);
+          setFieldValue("primerReverse", null);
+        }}
+      />
+    );
+  });
+
   return (
     <div>
       <div className="row">
@@ -401,15 +420,7 @@ function PcrBatchFormFields({
           name="experimenters"
           isMulti={true}
         />
-        <ResourceSelectField<Region>
-          className="col-md-6"
-          name="region"
-          filter={filterBy(["name"])}
-          model="seqdb-api/region"
-          optionLabel={(region) => region.name}
-          readOnlyLink="/seqdb/region/view?id="
-          onChange={(value) => setSelectedRegion(value as Region)}
-        />
+        <RegionSelectorComponent />
       </div>
       <div className="row">
         <ResourceSelectField<PcrPrimer>
