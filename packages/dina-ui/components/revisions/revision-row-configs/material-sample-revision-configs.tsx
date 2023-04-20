@@ -3,7 +3,6 @@ import Link from "next/link";
 import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
-  AcquisitionEvent,
   CollectingEvent,
   Collection,
   MaterialSample,
@@ -11,7 +10,7 @@ import {
 } from "../../../types/collection-api";
 import { Project } from "../../../types/collection-api/resources/Project";
 import { Metadata, Person } from "../../../types/objectstore-api";
-import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
+import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
 import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
@@ -27,7 +26,10 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
     customValueCells: {
       // Show the entire value of the metadata map in a key-value table:
       managedAttributes: ({ original: { value } }) => (
-        <ManagedAttributesViewer values={value} />
+        <ManagedAttributesViewer
+          values={value}
+          managedAttributeApiPath="collection-api/managed-attribute"
+        />
       ),
 
       // Try to render object / array fields visually instead of the default JSON:
@@ -105,15 +107,6 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           reference={value}
           name={() => <DinaMessage id="viewDetails" />}
           href="/collection/collecting-event/view?id="
-        />
-      ),
-      acquisitionEvent: ({ original: { value } }) => (
-        <ReferenceLink<AcquisitionEvent>
-          baseApiPath="collection-api"
-          type="acquisition-event"
-          reference={value}
-          name={() => <DinaMessage id="viewDetails" />}
-          href="/collection/acquisition-event/view?id="
         />
       ),
       storageUnit: ({ original: { value } }) => (

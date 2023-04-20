@@ -4,8 +4,6 @@ import { default as ReactSwitch, default as Switch } from "react-switch";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
-  AcquisitionEvent,
-  ACQUISITION_EVENT_COMPONENT_NAME,
   ASSOCIATIONS_COMPONENT_NAME,
   blankMaterialSample,
   CollectingEvent,
@@ -32,17 +30,6 @@ function testCollectionEvent(): Partial<CollectingEvent> {
   };
 }
 
-function testAcquisitionEvent(): Partial<AcquisitionEvent> {
-  return {
-    id: "1",
-    type: "acquisition-event",
-    group: "test group",
-    createdBy: "poffm",
-    createdOn: "2021-11-15",
-    receptionRemarks: "test reception remarks"
-  };
-}
-
 function testMaterialSample(): InputResource<MaterialSample> {
   return {
     id: "1",
@@ -53,10 +40,6 @@ function testMaterialSample(): InputResource<MaterialSample> {
       id: "1",
       type: "collecting-event"
     },
-    acquisitionEvent: {
-      id: "1",
-      type: "acquisition-event"
-    },
     attachment: [{ id: "attach-1", type: "metadata" }],
     ...blankMaterialSample()
   };
@@ -66,15 +49,9 @@ const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod":
+    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol":
       // Populate the linker table:
       return { data: testCollectionEvent() };
-    case "collection-api/acquisition-event/1":
-      // Populate the linker table:
-      return { data: testAcquisitionEvent() };
-    case "collection-api/acquisition-event":
-      // Populate the linker table:
-      return { data: [testAcquisitionEvent()] };
     case "collection-api/material-sample/1":
       return { data: testMaterialSample() };
     case "collection-api/material-sample":
@@ -230,10 +207,6 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              acquisitionEvent: {
-                id: null,
-                type: "acquisition-event"
-              },
               associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
@@ -308,10 +281,6 @@ describe("Material Sample Edit Page", () => {
           // New material-sample:
           {
             resource: {
-              acquisitionEvent: {
-                id: null,
-                type: "acquisition-event"
-              },
               associations: [],
               collectingEvent: {
                 id: "1",
@@ -670,12 +639,6 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
     ).toEqual(false);
-    // expect(
-    //   wrapper
-    //     .find(".enable-acquisition-event")
-    //     .find(ReactSwitch)
-    //     .prop("checked")
-    // ).toEqual(false);
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
@@ -911,178 +874,6 @@ describe("Material Sample Edit Page", () => {
       ]
     });
   });
-
-  // it("Creates a material sample with a new Acquisition Event", async () => {
-  //   const wrapper = mountWithAppContext(
-  //     <MaterialSampleForm onSaved={mockOnSaved} />,
-  //     testCtx
-  //   );
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // Enable Collecting Event and catalogue info form sections:
-  //   wrapper
-  //     .find(".enable-acquisition-event")
-  //     .find(Switch)
-  //     .prop<any>("onChange")(true);
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   wrapper
-  //     .find(".receptionRemarks-field textarea")
-  //     .simulate("change", { target: { value: "new acq event remarks" } });
-
-  //   wrapper.find("form").simulate("submit");
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // Saves the Acq Event and the Material Sample:
-  //   expect(mockSave.mock.calls).toEqual([
-  //     [
-  //       [
-  //         {
-  //           resource: {
-  //             receptionRemarks: "new acq event remarks",
-  //             type: "acquisition-event",
-  //           },
-  //           type: "acquisition-event",
-  //         },
-  //       ],
-  //       {
-  //         apiBaseUrl: "/collection-api",
-  //       },
-  //     ],
-  //     [
-  //       [
-  //         {
-  //           resource: expect.objectContaining({
-  //             acquisitionEvent: {
-  //               id: "11111111-1111-1111-1111-111111111111",
-  //               type: "acquisition-event",
-  //             },
-  //           }),
-  //           type: "material-sample",
-  //         },
-  //       ],
-  //       { apiBaseUrl: "/collection-api" },
-  //     ],
-  //   ]);
-  // });
-
-  // it("Created a material sample linked to an existing Acquisition event", async () => {
-  //   const wrapper = mountWithAppContext(
-  //     <MaterialSampleForm onSaved={mockOnSaved} />,
-  //     testCtx
-  //   );
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // Enable Collecting Event and catalogue info form sections:
-  //   wrapper.find("form").simulate("submit");
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // Saves the Material Sample:
-  //   expect(mockSave.mock.calls).toEqual([
-  //     [
-  //       [
-  //         {
-  //           resource: expect.objectContaining({
-  //             acquisitionEvent: {
-  //               id: "1",
-  //               type: "acquisition-event",
-  //             },
-  //           }),
-  //           type: "material-sample",
-  //         },
-  //       ],
-  //       {
-  //         apiBaseUrl: "/collection-api",
-  //       },
-  //     ],
-  //   ]);
-  // });
-
-  // it("Lets you remove the attached Acquisition Event", async () => {
-  //   const wrapper = mountWithAppContext(
-  //     <MaterialSampleForm
-  //       materialSample={testMaterialSample()}
-  //       onSaved={mockOnSaved}
-  //     />,
-  //     testCtx
-  //   );
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // Existing AcquisitionEvent should show up:
-  //   expect(
-  //     wrapper.find(".receptionRemarks-field textarea").prop("value")
-  //   ).toEqual("test reception remarks");
-
-  //   wrapper
-  //     .find(
-  //       "#" +
-  //         ACQUISITION_EVENT_COMPONENT_NAME +
-  //         " button.detach-resource-button"
-  //     )
-  //     .simulate("click");
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // Existing AcquisitionEvent should be gone:
-  //   expect(
-  //     wrapper.find(".receptionRemarks-field textarea").prop("value")
-  //   ).toEqual("");
-
-  //   // Set the new Acquisition Event's receptionRemarks:
-  //   wrapper
-  //     .find(".receptionRemarks-field textarea")
-  //     .simulate("change", { target: { value: "new remarks value" } });
-
-  //   wrapper.find("form").simulate("submit");
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   expect(mockSave.mock.calls).toEqual([
-  //     [
-  //       [
-  //         {
-  //           resource: {
-  //             receptionRemarks: "new remarks value",
-  //             type: "acquisition-event",
-  //           },
-  //           type: "acquisition-event",
-  //         },
-  //       ],
-  //       { apiBaseUrl: "/collection-api" },
-  //     ],
-  //     [
-  //       [
-  //         {
-  //           resource: {
-  //             id: "1",
-  //             type: "material-sample",
-  //             acquisitionEvent: {
-  //               id: "11111111-1111-1111-1111-111111111111",
-  //               type: "acquisition-event",
-  //             },
-  //             relationships: {},
-  //           },
-  //           type: "material-sample",
-  //         },
-  //       ],
-  //       { apiBaseUrl: "/collection-api" },
-  //     ],
-  //   ]);
-  // });
 
   it("Submits a new Material Sample with a duplicate sample name: Shows an error", async () => {
     const wrapper = mountWithAppContext(

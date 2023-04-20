@@ -28,6 +28,7 @@ const GRID_COL_SIZE = 8;
 const PCR_BATCH: PcrBatch = {
   name: "pcr-batch-name",
   type: "pcr-batch",
+  isCompleted: false,
   id: PCR_BATCH_ID,
   storageRestriction: {
     layout: {
@@ -41,6 +42,7 @@ const PCR_BATCH: PcrBatch = {
 const PCR_BATCH_NO_STORAGE: PcrBatch = {
   name: "pcr-batch-name",
   type: "pcr-batch",
+  isCompleted: false,
   id: PCR_BATCH_ID
 };
 

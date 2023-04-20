@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 0 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(222, 252, 222); border-radius: 5px; padding-left: 5px;\\">Good Band</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 1 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(222, 252, 222); border-radius: 5px; padding-left: 5px;\\">Good Band</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 2 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(222, 252, 222); border-radius: 5px; padding-left: 5px;\\">Good Band</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 3 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(222, 252, 222); border-radius: 5px; padding-left: 5px;\\">Good Band</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 4 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(222, 252, 222); border-radius: 5px; padding-left: 5px;\\">Good Band</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 5 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(255, 250, 205); border-radius: 5px; padding-left: 5px;\\">Weak Band</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 6 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(255, 250, 205); border-radius: 5px; padding-left: 5px;\\">Weak Band</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 7 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(255, 250, 205); border-radius: 5px; padding-left: 5px;\\">Weak Band</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 8 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(255, 250, 205); border-radius: 5px; padding-left: 5px;\\">Weak Band</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 9 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(255, 250, 205); border-radius: 5px; padding-left: 5px;\\">Weak Band</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 10 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(234, 206, 222); border-radius: 5px; padding-left: 5px;\\">Multiple Bands</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 11 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(234, 206, 222); border-radius: 5px; padding-left: 5px;\\">Multiple Bands</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 12 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(234, 206, 222); border-radius: 5px; padding-left: 5px;\\">Multiple Bands</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 13 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(234, 206, 222); border-radius: 5px; padding-left: 5px;\\">Multiple Bands</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 14 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(234, 206, 222); border-radius: 5px; padding-left: 5px;\\">Multiple Bands</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 15 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(255, 192, 203); border-radius: 5px; padding-left: 5px;\\">Contaminated</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 16 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(255, 192, 203); border-radius: 5px; padding-left: 5px;\\">Contaminated</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 17 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(255, 192, 203); border-radius: 5px; padding-left: 5px;\\">Contaminated</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 18 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(255, 192, 203); border-radius: 5px; padding-left: 5px;\\">Contaminated</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 19 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(255, 192, 203); border-radius: 5px; padding-left: 5px;\\">Contaminated</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 20 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(220, 220, 220); border-radius: 5px; padding-left: 5px;\\">Smear</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 21 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(220, 220, 220); border-radius: 5px; padding-left: 5px;\\">Smear</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 22 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(220, 220, 220); border-radius: 5px; padding-left: 5px;\\">Smear</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 23 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(220, 220, 220); border-radius: 5px; padding-left: 5px;\\">Smear</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 24 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(220, 220, 220); border-radius: 5px; padding-left: 5px;\\">Smear</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 25 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(146, 168, 209); border-radius: 5px; padding-left: 5px;\\">Custom Result</div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 26 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(146, 168, 209); border-radius: 5px; padding-left: 5px;\\"></div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 27 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(146, 168, 209); border-radius: 5px; padding-left: 5px;\\"></div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 28 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(146, 168, 209); border-radius: 5px; padding-left: 5px;\\"></div></div>"`;
+
+exports[`PcrReactionTable component Table renders correctly with mocked API calls: result band for row number: 29 1`] = `"<div class=\\"rt-td\\" role=\\"gridcell\\" style=\\"flex: 100 0 auto; width: 100px;\\"><div style=\\"background-color: rgb(146, 168, 209); border-radius: 5px; padding-left: 5px;\\"></div></div>"`;

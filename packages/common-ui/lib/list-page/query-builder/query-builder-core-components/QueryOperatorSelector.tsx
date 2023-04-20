@@ -54,13 +54,16 @@ export function QueryOperatorSelector({
   // Some options are displayed only if it is supported.
   const operationOptions = options
     ?.filter((option) => {
-      if (option.key === "prefix" && !selectedFieldMapping?.prefixSupport) {
+      if (
+        option.key === "startsWith" &&
+        !selectedFieldMapping?.startsWithSupport
+      ) {
         return false;
       }
       if (option.key === "contains" && !selectedFieldMapping?.infixSupport) {
         return false;
       }
-      if (option.key === "suffix" && !selectedFieldMapping?.suffixSupport) {
+      if (option.key === "endsWith" && !selectedFieldMapping?.endsWithSupport) {
         return false;
       }
       return true;

@@ -5,8 +5,34 @@ body {
   color: #666666;
 }
 .dropdown:hover .dropdown-menu {
-  display: block;
   margin-top: -5px;
+}
+
+.submenu > .dropend .dropdown-menu[data-bs-popper] {
+  top: 0;
+  right: auto;
+  left: 100%;
+  margin-top: 0;
+  margin-left: 0;
+}
+
+.submenu > button {
+  background-color: #ffffff;
+  border-color: #ffffff;
+  font-weight: 400;
+  color: #212529;
+  font-size: 1rem;
+  height: 31px;
+  padding-left: 0.9rem;
+  padding-right: 1rem;
+  padding-top: 3px;
+}
+
+.submenu.show > .btn-light.dropdown-toggle {
+  background-color: #e9ecef;
+  border-color: #e9ecef;
+  font-weight: 400;
+  color: #212529;
 }
 
 .ftr-urlt-lnk li {
