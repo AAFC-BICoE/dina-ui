@@ -98,7 +98,7 @@ export function transformTextSearchToDSL({
         : matchQuery(fieldPath, value);
 
     // Prefix partial match
-    case "prefix":
+    case "startsWith":
       return prefixQuery(fieldPath, value, parentType);
 
     // Infix partial match
@@ -106,7 +106,7 @@ export function transformTextSearchToDSL({
       return infixQuery(fieldPath, value, parentType);
 
     // Suffix partial match
-    case "suffix":
+    case "endsWith":
       return suffixQuery(fieldPath, value, parentType);
 
     // Not equals match type.

@@ -169,6 +169,62 @@ Object {
 }
 `;
 
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function EndsWith operation Normal field 1`] = `
+Object {
+  "prefix": Object {
+    "data.attributes.textField.prefix_reverse": "hcraes txet",
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function EndsWith operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.name.prefix_reverse": "hcraes txet",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function EndsWith operation With relationship containing complex path as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.determination.scientificName.prefix_reverse": "txet",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation Normal field 1`] = `
 Object {
   "match": Object {
@@ -450,7 +506,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Prefix operation Normal field 1`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith operation Normal field 1`] = `
 Object {
   "prefix": Object {
     "data.attributes.textField.prefix": "text search",
@@ -458,7 +514,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Prefix operation With relationship as field 1`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith operation With relationship as field 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -482,7 +538,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Prefix operation With relationship containing complex path as field 1`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith operation With relationship containing complex path as field 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -492,62 +548,6 @@ Object {
           Object {
             "prefix": Object {
               "included.attributes.determination.scientificName.prefix": "text",
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "organism",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Suffix operation Normal field 1`] = `
-Object {
-  "prefix": Object {
-    "data.attributes.textField.prefix_reverse": "hcraes txet",
-  },
-}
-`;
-
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Suffix operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "prefix": Object {
-              "included.attributes.name.prefix_reverse": "hcraes txet",
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collection",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Suffix operation With relationship containing complex path as field 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "prefix": Object {
-              "included.attributes.determination.scientificName.prefix_reverse": "txet",
             },
           },
           Object {
