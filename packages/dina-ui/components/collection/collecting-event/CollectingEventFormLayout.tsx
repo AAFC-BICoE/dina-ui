@@ -17,7 +17,8 @@ import {
   useDinaFormContext,
   FieldSpy,
   DataEntryField,
-  useQuery
+  useQuery,
+  ResourceSelectField
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
@@ -34,6 +35,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   COLLECTING_EVENT_COMPONENT_NAME,
+  Protocol,
   Vocabulary
 } from "../../../types/collection-api";
 import {
@@ -49,7 +51,7 @@ import {
   SourceAdministrativeLevel
 } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { AllowAttachmentsConfig } from "../../object-store";
-import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
+import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import {
   nominatimAddressDetailSearch,
@@ -928,6 +930,21 @@ export function CollectingEventFormLayout({
                 />
               )}
             </Field>
+            <ResourceSelectField<Protocol>
+              name="protocol"
+              filter={filterBy(["name"], {
+                extraFilters: [
+                  {
+                    selector: "protocolType",
+                    comparison: "==",
+                    arguments: "collection_method"
+                  }
+                ]
+              })}
+              model="collection-api/protocol"
+              optionLabel={(protocol) => protocol.name}
+              omitNullOption={false}
+            />
             <AutoSuggestTextField<CollectingEvent>
               name="substrate"
               customName={"collectingEventSubstrate"}
@@ -992,7 +1009,9 @@ export function CollectingEventFormLayout({
             readOnly={readOnly}
             isTemplate={isTemplate}
             blockOptionsEndpoint={`collection-api/extension`}
-            blockOptionsFilter={"COLLECTING_EVENT"}
+            blockOptionsFilter={{
+              "extension.fields.dinaComponent": "COLLECTING_EVENT"
+            }}
           />
         </DinaFormSection>
       </div>

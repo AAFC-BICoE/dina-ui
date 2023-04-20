@@ -1,14 +1,10 @@
 import {
   filterBy,
-  MetaWithTotal,
   ResourceSelectField,
   ResourceSelectFieldProps,
   useAccount,
-  useAutocompleteSearchButFallbackToRsqlApiSearch,
-  useQuery,
-  withResponse
+  useAutocompleteSearchButFallbackToRsqlApiSearch
 } from "common-ui";
-import { useField } from "formik";
 import { SetOptional } from "type-fest";
 import { useAddPersonModal } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -41,7 +37,6 @@ export function CollectionMethodSelectField(
 export function CollectionSelectField(
   props: SetOptional<ResourceSelectFieldProps<Collection>, ProvidedProps>
 ) {
-  const [{ value }] = useField(props.name);
   const { isAdmin, groupNames } = useAccount();
 
   const filter = filterBy(
@@ -60,31 +55,20 @@ export function CollectionSelectField(
       : undefined
   );
 
-  const collectionQuery = useQuery<Collection[], MetaWithTotal>({
-    path: "collection-api/collection",
-    filter: filter("")
-  });
-
-  return withResponse(collectionQuery, ({ data, meta }) => {
-    // Disable this input when the collection set is the only one available:
-    const collectionCannotBeChanged =
-      !isAdmin && meta?.totalResourceCount === 1 && data[0].id === value?.id;
-
-    return (
-      <ResourceSelectField<Collection>
-        key={String(isAdmin)}
-        readOnlyLink="/collection/collection/view?id="
-        filter={filter}
-        model="collection-api/collection"
-        optionLabel={(coll) =>
-          `${coll.name || coll.id}${coll.code ? ` (${coll.code})` : ""}`
-        }
-        isDisabled={collectionCannotBeChanged}
-        omitNullOption={true}
-        {...props}
-      />
-    );
-  });
+  return (
+    <ResourceSelectField<Collection>
+      key={String(isAdmin)}
+      readOnlyLink="/collection/collection/view?id="
+      filter={filter}
+      model="collection-api/collection"
+      optionLabel={(coll) =>
+        `${coll.name || coll.id}${coll.code ? ` (${coll.code})` : ""}`
+      }
+      cannotBeChanged={true}
+      omitNullOption={true}
+      {...props}
+    />
+  );
 }
 
 export function InstitutionSelectField(

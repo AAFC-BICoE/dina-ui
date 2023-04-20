@@ -9,7 +9,7 @@ export interface PcrBatchAttributes {
   type: "pcr-batch";
   name: string;
   group?: string;
-
+  isCompleted: boolean;
   createdBy?: string;
   createdOn?: string;
 

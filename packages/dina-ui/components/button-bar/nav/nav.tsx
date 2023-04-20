@@ -18,6 +18,9 @@ import Col from "react-bootstrap/Col";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
 import axios from "axios";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
@@ -207,6 +210,13 @@ function menuDisplayControl() {
 function NavCollectionDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
+  const {
+    show: submenuShow,
+    showDropdown: submenuShowDropdown,
+    hideDropdown: submenuHideDropdown,
+    onKeyDown: submenuOnKeyDown,
+    onKeyDownLastItem: submenuOnKeyDownLastItem
+  } = menuDisplayControl();
   return (
     <NavDropdown
       title={formatMessage("collectionSectionTitle")}
@@ -225,16 +235,38 @@ function NavCollectionDropdown({ formatMessage }) {
           <DinaMessage id="collectingEventListTitle" />
         </NavDropdown.Item>
       </Link>
-      <Link href="/collection/collection-method/list" passHref={true}>
-        <NavDropdown.Item>
-          <DinaMessage id="collectionMethodListTitle" />
-        </NavDropdown.Item>
-      </Link>
       <Link href="/collection/collection/list" passHref={true}>
         <NavDropdown.Item>
           <DinaMessage id="collectionListTitle" />
         </NavDropdown.Item>
       </Link>
+      {/* Controlled Vocabulary submenu */}
+      <DropdownButton
+        title={formatMessage("controlledVocabularyTitle")}
+        drop={"end"}
+        onMouseOverCapture={submenuShowDropdown}
+        onKeyDown={submenuOnKeyDown}
+        onMouseLeave={submenuHideDropdown}
+        show={submenuShow}
+        className="submenu"
+        variant="light"
+      >
+        <Link href="/collection/collection-method/list" passHref={true}>
+          <NavDropdown.Item>
+            <DinaMessage id="collectionMethodListTitle" />
+          </NavDropdown.Item>
+        </Link>
+        <Link href="/collection/preparation-method/list" passHref={true}>
+          <NavDropdown.Item>
+            <DinaMessage id="title_preparationMethod" />
+          </NavDropdown.Item>
+        </Link>
+        <Link href="/collection/preparation-type/list" passHref={true}>
+          <NavDropdown.Item onKeyDown={submenuOnKeyDownLastItem}>
+            <DinaMessage id="preparationTypeListTitle" />
+          </NavDropdown.Item>
+        </Link>
+      </DropdownButton>
       <Link href="/collection/material-sample/list" passHref={true}>
         <NavDropdown.Item>
           <DinaMessage id="materialSampleListTitle" />
@@ -409,6 +441,16 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="regionListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/seq-batch/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="seqBatchListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/seqdb/seq-submission/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="seqSubmissionListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/sequencing-facility/list" passHref={true}>
         <NavDropdown.Item>
           <SeqdbMessage id="sequencingFacilityListTitle" />
@@ -462,17 +504,6 @@ function NavDinaManagementDropdown({ formatMessage }) {
         </NavDropdown.Item>
       </Link>
       {/* Permission page here. */}
-      <Link href="/collection/preparation-method/list" passHref={true}>
-        <NavDropdown.Item>
-          <DinaMessage id="title_preparationMethod" />
-        </NavDropdown.Item>
-      </Link>
-      <Link href="/collection/preparation-type/list" passHref={true}>
-        <NavDropdown.Item>
-          <DinaMessage id="preparationTypeListTitle" />
-        </NavDropdown.Item>
-      </Link>
-
       <Link href="/collection/protocol/list" passHref={true}>
         <NavDropdown.Item>
           <DinaMessage id="protocolListTitle" />

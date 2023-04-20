@@ -132,5 +132,9 @@ export const SEQDB_MESSAGES_ENGLISH = {
   sampleVersion: "Sample Version",
   specimenIdentifier: "Specimen Identifier",
   result: "Result",
-  noUlRnxProtocolData: "No valid protocol data of ulRnx."
+  noUlRnxProtocolData: "No valid protocol data of ulRnx.",
+  addSeqSubmissionTitle: "Add SEQ Submission",
+  editSeqSubmissionTitle: "Edit SEQ Submission",
+  seqSubmissionListTitle: "SEQ Submission",
+  pcrReactionTitle: "PCR Reaction"
 };

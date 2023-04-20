@@ -11,7 +11,7 @@ import {
 } from "../../../types/collection-api";
 import { Project } from "../../../types/collection-api/resources/Project";
 import { Metadata, Person } from "../../../types/objectstore-api";
-import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
+import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
 import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
@@ -27,7 +27,10 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
     customValueCells: {
       // Show the entire value of the metadata map in a key-value table:
       managedAttributes: ({ original: { value } }) => (
-        <ManagedAttributesViewer values={value} />
+        <ManagedAttributesViewer
+          values={value}
+          managedAttributeApiPath="collection-api/managed-attribute"
+        />
       ),
 
       // Try to render object / array fields visually instead of the default JSON:
@@ -185,7 +188,9 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           legend={<></>}
           name={"extensionValuesForm"}
           blockOptionsEndpoint={`collection-api/extension`}
-          dinaComponent={"MATERIAL_SAMPLE"}
+          blockOptionsFilter={{
+            "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
+          }}
         />
       ),
       // Don't render this one because it isn't an editable field:

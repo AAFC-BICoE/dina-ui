@@ -63,7 +63,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return { data: [TEST_GROUP_1] };
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/321?include=collectors,attachment,collectionMethod":
+    case "collection-api/collecting-event/321?include=collectors,attachment,collectionMethod,protocol":
       return { data: testCollectionEvent() };
     case "collection-api/acquisition-event":
       return { data: [testAcquisitionEvent()] };
@@ -292,11 +292,11 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "identifiers-section",
           visible: true,
           items: [
-            { defaultValue: undefined, name: "collection", visible: false },
+            { defaultValue: undefined, name: "collection", visible: true },
             {
               defaultValue: undefined,
               name: "materialSampleName",
-              visible: false
+              visible: true
             },
             {
               defaultValue: undefined,
@@ -1082,7 +1082,7 @@ describe("Form template edit page", () => {
                 {
                   defaultValue: "aafc",
                   name: "group",
-                  visible: false
+                  visible: true
                 },
                 {
                   defaultValue: undefined,
@@ -1115,11 +1115,11 @@ describe("Form template edit page", () => {
               name: "identifiers-section",
               visible: true,
               items: [
-                { defaultValue: undefined, name: "collection", visible: false },
+                { defaultValue: undefined, name: "collection", visible: true },
                 {
                   defaultValue: undefined,
                   name: "materialSampleName",
-                  visible: false
+                  visible: true
                 },
                 {
                   defaultValue: undefined,

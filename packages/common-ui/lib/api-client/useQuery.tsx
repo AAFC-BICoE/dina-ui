@@ -165,7 +165,9 @@ export function withResponseOrDisabled<
   TMeta = undefined
 >(
   { loading, error, response, isDisabled }: QueryState<TData, TMeta>,
-  responseRenderer: () => JSX.Element | null
+  responseRenderer: (
+    response?: KitsuResponse<TData, TMeta>
+  ) => JSX.Element | null
 ): JSX.Element | null {
   if (loading) {
     return <LoadingSpinner loading={true} />;
@@ -179,7 +181,7 @@ export function withResponseOrDisabled<
     return <div className="alert alert-danger">{message}</div>;
   }
   if (response || isDisabled) {
-    return responseRenderer();
+    return responseRenderer(response);
   }
   return null;
 }

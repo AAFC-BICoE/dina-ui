@@ -5,7 +5,7 @@ import {
   CollectingEvent
 } from "../../../types/collection-api/";
 import { Metadata, Person } from "../../../types/objectstore-api";
-import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
+import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
 import { DataEntryViewer } from "common-ui/lib/formik-connected/data-entry/DataEntryViewer";
@@ -86,7 +86,10 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           </div>
         )) ?? null,
       managedAttributes: ({ original: { value } }) => (
-        <ManagedAttributesViewer values={value} />
+        <ManagedAttributesViewer
+          values={value}
+          managedAttributeApiPath="collection-api/managed-attribute"
+        />
       ),
       geographicPlaceNameSourceDetail: ({ original: { value } }) => (
         <KeyValueTable
@@ -103,7 +106,9 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           legend={<></>}
           name={"extensionValuesForm"}
           blockOptionsEndpoint={`collection-api/extension`}
-          dinaComponent={"COLLECTING_EVENT"}
+          blockOptionsFilter={{
+            "extension.fields.dinaComponent": "COLLECTING_EVENT"
+          }}
         />
       )
     }

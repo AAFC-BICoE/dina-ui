@@ -19,8 +19,8 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 jest.mock("next/router", () => ({
   useRouter: () => ({
     push: mockPush,
-    query: mockQuery,
-  }),
+    query: mockQuery
+  })
 }));
 
 /** Mock next.js' router "push" function for navigating pages. */
@@ -34,7 +34,7 @@ const mockGet = jest.fn(async (model) => {
   // The get request will return the existing collecting-event.
   if (
     model ===
-    "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod"
+    "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod,protocol"
   ) {
     return { data: testCollectingEvent() };
   } else if (model === "agent-api/person") {
@@ -67,14 +67,14 @@ const mockBulkGet = jest.fn(async (paths) => {
   if ((paths[0] as string).startsWith("/person/")) {
     return paths.map((path) => ({
       id: path.replace("/person/", ""),
-      type: "agent",
+      type: "agent"
     }));
   }
   if ((paths[0] as string).startsWith("/metadata/")) {
     return paths.map((path) => ({
       id: path.replace("/metadata/", ""),
       type: "metadata",
-      originalFilename: "test-file",
+      originalFilename: "test-file"
     }));
   }
   console.warn("No mock value for bulkGet paths: ", paths);
@@ -82,7 +82,7 @@ const mockBulkGet = jest.fn(async (paths) => {
 
 const apiContext: any = {
   apiClient: { get: mockGet, axios: { patch: mockPatch } },
-  bulkGet: mockBulkGet,
+  bulkGet: mockBulkGet
 };
 
 describe("collecting-event edit page", () => {
@@ -98,20 +98,20 @@ describe("collecting-event edit page", () => {
             attributes: {
               startEventDateTime: "12/21/2019T16:00",
               endEventDateTime: "12/22/2019T16:00",
-              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
             },
             id: "1",
-            type: "collecting-event",
+            type: "collecting-event"
           },
-          status: 201,
-        },
-      ] as OperationsResponse,
+          status: 201
+        }
+      ] as OperationsResponse
     });
 
     mockQuery = {};
 
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
-      apiContext,
+      apiContext
     });
     // Wait for the page to load.
     await new Promise(setImmediate);
@@ -126,16 +126,16 @@ describe("collecting-event edit page", () => {
     wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
       target: {
         name: "verbatimEventDateTime",
-        value: "From 2019,12,21 4pm to 2019,12,22 5pm",
-      },
+        value: "From 2019,12,21 4pm to 2019,12,22 5pm"
+      }
     });
 
     // Edit the otherRecordNumbers
     wrapper.find(".otherRecordNumbers-field textarea").simulate("change", {
       target: {
         name: "otherRecordNumbers",
-        value: "12\n23",
-      },
+        value: "12\n23"
+      }
     });
 
     // Submit the form.
@@ -155,17 +155,17 @@ describe("collecting-event edit page", () => {
               publiclyReleasable: true, // Default value
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
               otherRecordNumbers: ["12", "23"],
-              geoReferenceAssertions: [{ isPrimary: true }],
+              geoReferenceAssertions: [{ isPrimary: true }]
             },
             relationships: {
               attachment: {
-                data: [],
-              },
+                data: []
+              }
             },
             id: "00000000-0000-0000-0000-000000000000",
-            type: "collecting-event",
-          },
-        },
+            type: "collecting-event"
+          }
+        }
       ],
       expect.anything()
     );
@@ -181,18 +181,18 @@ describe("collecting-event edit page", () => {
         {
           data: {
             attributes: {
-              startEventDateTime: "12/21/2019T16:00",
+              startEventDateTime: "12/21/2019T16:00"
             },
             id: "1",
-            type: "collecting-event",
+            type: "collecting-event"
           },
-          status: 201,
-        },
-      ] as OperationsResponse,
+          status: 201
+        }
+      ] as OperationsResponse
     });
 
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
-      apiContext,
+      apiContext
     });
 
     await new Promise(setImmediate);
@@ -202,8 +202,8 @@ describe("collecting-event edit page", () => {
     wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
       target: {
         name: "verbatimEventDateTime",
-        value: "From 2019,12,21 4pm to 2019,12,22 5pm",
-      },
+        value: "From 2019,12,21 4pm to 2019,12,22 5pm"
+      }
     });
 
     wrapper
@@ -239,23 +239,23 @@ describe("collecting-event edit page", () => {
                     isPrimary: true,
                     dwcCoordinateUncertaintyInMeters: "5",
                     dwcDecimalLatitude: "45.394728",
-                    dwcDecimalLongitude: "-75.701452",
-                  },
+                    dwcDecimalLongitude: "-75.701452"
+                  }
                 ],
-                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
+                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
               }),
               relationships: {
                 attachment: {
-                  data: [],
-                },
+                  data: []
+                }
               },
               id: "00000000-0000-0000-0000-000000000000",
-              type: "collecting-event",
-            },
-          },
+              type: "collecting-event"
+            }
+          }
         ],
-        expect.anything(),
-      ],
+        expect.anything()
+      ]
     ]);
   });
 
@@ -265,15 +265,15 @@ describe("collecting-event edit page", () => {
       data: [
         {
           data: testCollectingEvent(),
-          status: 201,
-        },
-      ] as OperationsResponse,
+          status: 201
+        }
+      ] as OperationsResponse
     });
 
     mockQuery = { id: 1 };
 
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
-      apiContext,
+      apiContext
     });
 
     // The page should load initially with a loading spinner.
@@ -292,8 +292,8 @@ describe("collecting-event edit page", () => {
     wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
       target: {
         name: "verbatimEventDateTime",
-        value: "From 2019,12,21 4pm to 2019,12,22 6pm",
-      },
+        value: "From 2019,12,21 4pm to 2019,12,22 6pm"
+      }
     });
 
     // Submit the form.
@@ -317,31 +317,31 @@ describe("collecting-event edit page", () => {
                 {
                   isPrimary: true,
                   dwcDecimalLongitude: 10,
-                  georeferencedBy: ["1"],
-                },
+                  georeferencedBy: ["1"]
+                }
               ],
               group: "test group",
               startEventDateTime: "2019-11-11",
-              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm",
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
             },
             id: "1",
             relationships: {
               attachment: {
                 data: [
                   { id: "88888", type: "metadata" },
-                  { id: "99999", type: "metadata" },
-                ],
+                  { id: "99999", type: "metadata" }
+                ]
               },
               collectors: {
                 data: [
                   { id: "111", type: "person" },
-                  { id: "222", type: "person" },
-                ],
-              },
+                  { id: "222", type: "person" }
+                ]
+              }
             },
-            type: "collecting-event",
-          },
-        },
+            type: "collecting-event"
+          }
+        }
       ],
       expect.anything()
     );
@@ -356,18 +356,18 @@ describe("collecting-event edit page", () => {
             {
               detail: "Test Error Detail",
               status: "422",
-              title: "Test Error Title",
-            },
+              title: "Test Error Title"
+            }
           ],
-          status: 422,
-        },
-      ] as OperationsResponse,
+          status: 422
+        }
+      ] as OperationsResponse
     }));
 
     mockQuery = {};
 
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
-      apiContext,
+      apiContext
     });
 
     // Wait for the page to load.
@@ -377,7 +377,7 @@ describe("collecting-event edit page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     wrapper.find(".group-field Select").prop<any>("onChange")([
-      { label: "group", value: "test group" },
+      { label: "group", value: "test group" }
     ]);
 
     // Submit the form.
@@ -394,7 +394,7 @@ describe("collecting-event edit page", () => {
   it("Lets you set the primary GeoReferenceAssertion.", async () => {
     mockQuery = {};
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
-      apiContext,
+      apiContext
     });
 
     await new Promise(setImmediate);
@@ -435,20 +435,20 @@ describe("collecting-event edit page", () => {
             attributes: {
               startEventDateTime: "12/21/2019T16:00",
               endEventDateTime: "12/22/2019T16:00",
-              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
             },
             id: "1",
-            type: "collecting-event",
+            type: "collecting-event"
           },
-          status: 201,
-        },
-      ] as OperationsResponse,
+          status: 201
+        }
+      ] as OperationsResponse
     });
 
     mockQuery = {};
 
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
-      apiContext,
+      apiContext
     });
 
     await new Promise(setImmediate);
@@ -472,17 +472,17 @@ describe("collecting-event edit page", () => {
           path: "collecting-event",
           value: {
             attributes: expect.objectContaining({
-              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimCoordinateSystem: null
             }),
             relationships: {
               attachment: {
-                data: [],
-              },
+                data: []
+              }
             },
             id: "00000000-0000-0000-0000-000000000000",
-            type: "collecting-event",
-          },
-        },
+            type: "collecting-event"
+          }
+        }
       ],
       expect.anything()
     );
@@ -500,20 +500,20 @@ function testCollectingEvent(): CollectingEvent {
     group: "test group",
     collectors: [
       { id: "111", type: "agent" },
-      { id: "222", type: "agent" },
+      { id: "222", type: "agent" }
     ],
     otherRecordNumbers: ["12", "13", "14"],
     geoReferenceAssertions: [
       {
         isPrimary: true,
         dwcDecimalLongitude: 10,
-        georeferencedBy: ["1"],
-      },
+        georeferencedBy: ["1"]
+      }
     ],
     attachment: [
       { id: "88888", type: "metadata" },
-      { id: "99999", type: "metadata" },
-    ],
+      { id: "99999", type: "metadata" }
+    ]
   };
 }
 
@@ -523,7 +523,7 @@ function testAgent(): Person {
     email: "testperson@a.b",
     id: "1",
     type: "person",
-    uuid: "323423-23423-234",
+    uuid: "323423-23423-234"
   };
 }
 
@@ -534,6 +534,6 @@ function testSrs(): SRS {
 function testCoordinates(): CoordinateSystem {
   return {
     coordinateSystem: ["decimal degrees", " degrees decimal"],
-    type: "coordinate-system",
+    type: "coordinate-system"
   };
 }

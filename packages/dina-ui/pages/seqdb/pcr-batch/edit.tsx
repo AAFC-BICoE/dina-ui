@@ -1,30 +1,34 @@
 import {
   BackButton,
   ButtonBar,
+  CheckBoxField,
   DateField,
   DinaForm,
   DinaFormProps,
   DinaFormSubmitParams,
+  FieldSet,
   filterBy,
   LoadingSpinner,
+  Operation,
   ResourceSelectField,
   SubmitButton,
   TextField,
   useAccount,
+  useApiClient,
   useDinaFormContext,
   useQuery,
   withResponse,
   withResponseOrDisabled
 } from "common-ui";
+import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
-import { useFormikContext, connect } from "formik";
+import { assign, cloneDeep } from "lodash";
 import { useRouter } from "next/router";
 import {
-  StorageUnitType,
-  StorageUnit,
-  Protocol
-} from "packages/dina-ui/types/collection-api";
-import { ReactNode } from "react";
+  PcrReactionTable,
+  usePcrReactionData
+} from "../../../components/seqdb/pcr-workflow/PcrReactionTable";
+import { ReactNode, useState } from "react";
 import {
   AttachmentsField,
   GroupSelectField,
@@ -37,12 +41,18 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Person } from "../../../types/agent-api";
 import {
+  MaterialSample,
+  Protocol,
+  StorageUnit,
+  StorageUnitType
+} from "../../../types/collection-api";
+import {
   PcrBatch,
+  PcrBatchItem,
   PcrPrimer,
-  ThermocyclerProfile,
-  Region
+  Region,
+  ThermocyclerProfile
 } from "../../../types/seqdb-api";
-import { cloneDeep } from "lodash";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
   return useQuery<PcrBatch>(
@@ -91,6 +101,7 @@ export default function PcrBatchEditPage() {
 
 export interface PcrBatchFormProps {
   pcrBatch?: PersistedResource<PcrBatch>;
+  results?: { [key: string]: string };
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
   buttonBar?: ReactNode;
   readOnlyOverride?: boolean;
@@ -108,6 +119,7 @@ export function PcrBatchForm({
   readOnlyOverride
 }: PcrBatchFormProps) {
   const { username } = useAccount();
+  const { doOperations } = useApiClient();
 
   const initialValues = pcrBatch || {
     // TODO let the back-end set this:
@@ -115,10 +127,37 @@ export function PcrBatchForm({
     type: "pcr-batch"
   };
 
+  async function savePcrReactionResults(submittedValues: any) {
+    const results = submittedValues.results;
+    delete submittedValues.results;
+
+    const resultsWithId = Object.keys(results).map((id) => ({
+      id,
+      value: results[id]
+    }));
+    if (resultsWithId.length > 0) {
+      // Using the results, generate the operations.
+      const operations = resultsWithId.map<Operation>((result) => ({
+        op: "PATCH",
+        path: "pcr-batch-item/" + result.id,
+        value: {
+          id: result.id,
+          type: "pcr-batch-item",
+          attributes: {
+            result: result.value
+          }
+        }
+      }));
+
+      await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
+    }
+  }
+
   async function onSubmit({
     submittedValues,
     api: { save }
-  }: DinaFormSubmitParams<PcrBatch>) {
+  }: DinaFormSubmitParams<PcrBatch & { [key: string]: string }>) {
+    savePcrReactionResults(submittedValues);
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
@@ -216,8 +255,18 @@ export function LoadExternalDataForPcrBatchForm({
   dinaFormProps,
   buttonBar
 }: LoadExternalDataForPcrBatchFormProps) {
+  const {
+    loading: loadingReactionData,
+    pcrBatchItems,
+    materialSamples
+  } = usePcrReactionData(dinaFormProps?.initialValues?.id);
+
   // Create a copy of the initial value so we don't change the prop version.
-  const initialValues = cloneDeep(dinaFormProps.initialValues);
+  const initialValues = assign(cloneDeep(dinaFormProps.initialValues), {
+    results: Object.fromEntries(
+      pcrBatchItems.map((obj) => [obj.id, obj.result])
+    )
+  });
 
   // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
   const storageUnitQuery = useQuery<StorageUnit>(
@@ -242,7 +291,7 @@ export function LoadExternalDataForPcrBatchForm({
   }
 
   // Display loading indicator if not ready.
-  if (storageUnitQuery.loading) {
+  if (storageUnitQuery.loading || loadingReactionData) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -253,13 +302,24 @@ export function LoadExternalDataForPcrBatchForm({
       initialValues={initialValues}
     >
       {buttonBar}
-      <PcrBatchFormFields />
+      <PcrBatchFormFields
+        pcrBatchItems={pcrBatchItems}
+        materialSamples={materialSamples}
+      />
     </DinaForm>
   ));
 }
 
+interface PcrBatchFormFieldsProps {
+  pcrBatchItems: PcrBatchItem[];
+  materialSamples: MaterialSample[];
+}
+
 /** Re-usable field layout between edit and view pages. */
-export function PcrBatchFormFields() {
+function PcrBatchFormFields({
+  pcrBatchItems,
+  materialSamples
+}: PcrBatchFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { values } = useFormikContext<any>();
 
@@ -300,6 +360,16 @@ export function PcrBatchFormFields() {
           name="group"
           enableStoredDefaultGroup={true}
           className="col-md-6"
+        />
+        <CheckBoxField
+          name="isCompleted"
+          className="gap-3 col-md-6"
+          overridecheckboxProps={{
+            style: {
+              height: "30px",
+              width: "30px"
+            }
+          }}
         />
       </div>
       <div className="row">
@@ -386,6 +456,14 @@ export function PcrBatchFormFields() {
           restrictedFieldValue={values?.storageUnitType?.id}
         />
       </div>
+      {initialValues.id ? (
+        <FieldSet legend={<DinaMessage id="pcrReactionTitle" />}>
+          <PcrReactionTable
+            pcrBatchItems={pcrBatchItems}
+            materialSamples={materialSamples}
+          />
+        </FieldSet>
+      ) : undefined}
       <AttachmentsField
         name="attachment"
         attachmentPath={`seqdb-api/pcr-batch/${initialValues.id}/attachment`}

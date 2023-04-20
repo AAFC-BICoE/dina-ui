@@ -35,7 +35,7 @@ export function useIndexMapping(indexName: string) {
   async function fetchQueryFieldsByIndex(searchIndexName) {
     try {
       const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
-        params: { indexName: searchIndexName },
+        params: { indexName: searchIndexName }
       });
 
       const result: ESIndexMapping[] = [];
@@ -59,7 +59,12 @@ export function useIndexMapping(indexName: string) {
               : key.name,
             type: key.type,
             path: key.path,
+
+            // Additional options for the field:
             distinctTerm: key.distinct_term_agg,
+            prefixSupport: key?.fields?.includes("prefix") ?? false,
+            infixSupport: key?.fields?.includes("infix") ?? false,
+            suffixSupport: key?.fields?.includes("prefix_reverse") ?? false
           });
         });
 
@@ -83,10 +88,19 @@ export function useIndexMapping(indexName: string) {
             parentName: relationship.referencedBy,
             parentType: relationship.value,
             parentPath: relationship.path,
+
+            // Additional options for the field:
             distinctTerm: relationshipAttribute.distinct_term_agg,
+            prefixSupport:
+              relationshipAttribute?.fields?.includes("prefix") ?? false,
+            infixSupport:
+              relationshipAttribute?.fields?.includes("infix") ?? false,
+            suffixSupport:
+              relationshipAttribute?.fields?.includes("prefix_reverse") ?? false
           });
         });
       });
+
       return result;
     } catch (error) {
       return undefined;

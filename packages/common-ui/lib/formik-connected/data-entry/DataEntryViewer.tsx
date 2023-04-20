@@ -11,7 +11,6 @@ import { DataEntry, DataEntryProps } from "./DataEntry";
 export interface DataEntryViewerProps extends DataEntryProps {
   extensionValues?: any;
   disableDinaForm?: boolean;
-  dinaComponent: string;
 }
 
 export function DataEntryViewer({
@@ -20,7 +19,7 @@ export function DataEntryViewer({
   name,
   disableDinaForm,
   blockOptionsEndpoint,
-  dinaComponent
+  blockOptionsFilter
 }: DataEntryViewerProps) {
   const processedExtensionValues = disableDinaForm
     ? extensionValues
@@ -30,11 +29,10 @@ export function DataEntryViewer({
     <DataEntry
       legend={legend}
       name={name}
-      initialValues={processedExtensionValues}
       blockOptionsEndpoint={blockOptionsEndpoint}
-      blockOptionsFilter={dinaComponent}
       readOnly={true}
       width={"100%"}
+      blockOptionsFilter={blockOptionsFilter}
     />
   ) : (
     <DinaForm
@@ -44,11 +42,10 @@ export function DataEntryViewer({
       <DataEntry
         legend={legend}
         name={name}
-        initialValues={processedExtensionValues}
         blockOptionsEndpoint={blockOptionsEndpoint}
-        blockOptionsFilter={dinaComponent}
         readOnly={true}
         width={"100%"}
+        blockOptionsFilter={blockOptionsFilter}
       />
     </DinaForm>
   );
