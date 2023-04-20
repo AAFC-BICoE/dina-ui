@@ -60,7 +60,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   pcrBatchViewTitle: "View PCR Batch",
   pcrPrimerListTitle: "PCR Primers",
   pcrPrimerViewTitle: "PCR Primer",
-  pcrReaction: "PCR Reaction Step",
+  pcrReaction: "PCR Reaction Results",
   plpDetailsFormTitle: "Add New Shearing/Size Selection Details",
   plpEditModeLabel: "Edit",
   plpShearingModeLabel: "Shearing Details",
