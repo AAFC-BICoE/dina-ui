@@ -183,6 +183,7 @@ export function PcrReactionTable({
       columns={PCR_REACTION_COLUMN}
       data={sortBy(pcrBatchItems, "cellNumber")}
       minRows={1}
+      pageSize={1000} // Maximum that the API will return.
       showPagination={false}
       sortable={false}
     />
