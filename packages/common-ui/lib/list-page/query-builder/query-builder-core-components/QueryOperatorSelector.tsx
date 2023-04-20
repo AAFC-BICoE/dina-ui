@@ -51,7 +51,7 @@ export function QueryOperatorSelector({
       if (option.key === "prefix" && !selectedFieldMapping?.prefixSupport) {
         return false;
       }
-      if (option.key === "contains" && !selectedFieldMapping?.infixSupport) {
+      if (option.key === "contains" && !selectedFieldMapping?.containsSupport) {
         return false;
       }
       if (option.key === "suffix" && !selectedFieldMapping?.suffixSupport) {

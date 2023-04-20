@@ -95,7 +95,7 @@ export interface ESIndexMapping {
    *
    * Example: Hexapoda can be matched with "pod".
    */
-  infixSupport: boolean;
+  containsSupport: boolean;
 
   /**
    * If enabled it will allow the user to search based on the ending of a word.

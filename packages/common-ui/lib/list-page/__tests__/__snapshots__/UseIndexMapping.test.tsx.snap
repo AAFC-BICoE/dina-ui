@@ -7,7 +7,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
       Array [
         Object {
           "distinctTerm": true,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "materialSampleType",
           "path": "data.attributes",
           "prefixSupport": false,
@@ -17,7 +17,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "createdOn",
           "path": "data.attributes",
           "prefixSupport": false,
@@ -27,7 +27,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": true,
+          "containsSupport": true,
           "label": "materialSampleName",
           "path": "data.attributes",
           "prefixSupport": true,
@@ -37,7 +37,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "preparationDate",
           "path": "data.attributes",
           "prefixSupport": false,
@@ -47,7 +47,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "tags",
           "path": "data.attributes",
           "prefixSupport": false,
@@ -57,7 +57,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "createdBy",
           "path": "data.attributes",
           "prefixSupport": false,
@@ -67,7 +67,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "createdBy",
           "parentName": "collectingEvent",
           "parentPath": "included",
@@ -80,7 +80,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "createdOn",
           "parentName": "collectingEvent",
           "parentPath": "included",
@@ -93,7 +93,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "tags",
           "parentName": "collectingEvent",
           "parentPath": "included",
@@ -106,7 +106,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "habitat",
           "parentName": "collectingEvent",
           "parentPath": "included",
@@ -119,7 +119,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "substrate",
           "parentName": "collectingEvent",
           "parentPath": "included",
@@ -132,7 +132,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "dwcOtherRecordNumbers",
           "parentName": "collectingEvent",
           "parentPath": "included",
@@ -145,7 +145,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "dwcRecordNumber",
           "parentName": "collectingEvent",
           "parentPath": "included",
@@ -158,7 +158,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "startEventDateTime",
           "parentName": "collectingEvent",
           "parentPath": "included",
@@ -171,7 +171,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "endEventDateTime",
           "parentName": "collectingEvent",
           "parentPath": "included",
@@ -184,7 +184,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": true,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "name",
           "parentName": "preparationMethod",
           "parentPath": "included",
@@ -197,7 +197,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "name",
           "parentName": "storageUnit",
           "parentPath": "included",
@@ -210,7 +210,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "determination.verbatimScientificName",
           "parentName": "organism",
           "parentPath": "included",
@@ -223,7 +223,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "determination.scientificName",
           "parentName": "organism",
           "parentPath": "included",
@@ -236,7 +236,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "determination.typeStatus",
           "parentName": "organism",
           "parentPath": "included",
@@ -249,7 +249,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": true,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "name",
           "parentName": "collection",
           "parentPath": "included",
@@ -262,7 +262,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": true,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "code",
           "parentName": "collection",
           "parentPath": "included",
@@ -275,7 +275,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": undefined,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "name",
           "parentName": "assemblages",
           "parentPath": "included",
@@ -288,7 +288,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
         },
         Object {
           "distinctTerm": true,
-          "infixSupport": false,
+          "containsSupport": false,
           "label": "name",
           "parentName": "preparationType",
           "parentPath": "included",

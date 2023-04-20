@@ -194,6 +194,10 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_prefix" }),
       cardinality: 1
     },
+    containsText: {
+      label: formatMessage({ id: "queryBuilder_operator_contains" }),
+      cardinality: 1
+    },
     suffix: {
       label: formatMessage({ id: "queryBuilder_operator_suffix" }),
       cardinality: 1
@@ -230,7 +234,7 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_lessThanOrEqual" }),
       cardinality: 1
     },
-    contains: {
+    containsDate: {
       label: formatMessage({ id: "queryBuilder_operator_contains" }),
       cardinality: 1
     },
@@ -379,7 +383,7 @@ function generateBuilderConfig(
             "exactMatch",
             "partialMatch",
             "prefix", // Only displayed if supported on the mapping.
-            "contains", // Only displayed if supported on the mapping.
+            "containsText", // Only displayed if supported on the mapping.
             "suffix", // Only displayed if supported on the mapping.
             "notEquals",
             "empty",
@@ -421,7 +425,7 @@ function generateBuilderConfig(
           operators: [
             "equals",
             "notEquals",
-            "contains",
+            "containsDate",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",

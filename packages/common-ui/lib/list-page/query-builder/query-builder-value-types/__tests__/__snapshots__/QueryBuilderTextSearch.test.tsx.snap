@@ -8,7 +8,7 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
 </QueryRowTextSearch>"
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Contains (Infix) operation Normal field 1`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function ContainsText (Infix) operation Normal field 1`] = `
 Object {
   "match": Object {
     "data.attributes.textField.infix": Object {
@@ -18,7 +18,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Contains (Infix) operation With relationship as field 1`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function ContainsText (Infix) operation With relationship as field 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -44,7 +44,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Contains (Infix) operation With relationship containing complex path as field 1`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function ContainsText (Infix) operation With relationship containing complex path as field 1`] = `
 Object {
   "nested": Object {
     "path": "included",

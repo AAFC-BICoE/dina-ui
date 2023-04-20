@@ -63,7 +63,7 @@ export function useIndexMapping(indexName: string) {
             // Additional options for the field:
             distinctTerm: key.distinct_term_agg,
             prefixSupport: key?.fields?.includes("prefix") ?? false,
-            infixSupport: key?.fields?.includes("infix") ?? false,
+            containsSupport: key?.fields?.includes("infix") ?? false,
             suffixSupport: key?.fields?.includes("prefix_reverse") ?? false
           });
         });
@@ -93,7 +93,7 @@ export function useIndexMapping(indexName: string) {
             distinctTerm: relationshipAttribute.distinct_term_agg,
             prefixSupport:
               relationshipAttribute?.fields?.includes("prefix") ?? false,
-            infixSupport:
+            containsSupport:
               relationshipAttribute?.fields?.includes("infix") ?? false,
             suffixSupport:
               relationshipAttribute?.fields?.includes("prefix_reverse") ?? false
