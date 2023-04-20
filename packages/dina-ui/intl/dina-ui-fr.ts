@@ -3,10 +3,7 @@ import { DINAUI_MESSAGES_ENGLISH } from "./dina-ui-en";
 export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   LETTER: "Lettre",
   NUMERICAL: "Numérique",
-  acquisitionEvent: "Événement d’acquisition",
-  acquisitionEventListTitle: "Événements d’acquisition",
   actionType: "Type d’action",
-  addAcquisitionEventTitle: "Ajouter un événement d’acquisition",
   addAnother: "Ajouter un autre {typeName}",
   addAnotherIdentifier: "Ajouter un autre identifiant",
   addAssemblageTitle: "Ajouter un assemblage",
@@ -190,7 +187,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   duplicate: "Dupliquer",
   duplicateFilesFound: "fichiers en double trouvés",
   duplicatePrimaryIdFound: "Copie du document d'identité principal trouvée ",
-  editAcquisitionEventTitle: "Modifier Événement d'acquisition",
   editAssemblageTitle: "Modifier un assemblage",
   editCataloguedObjectTitle: "Modifier un objet catalogué",
   editCollectingEventTitle: "Modifier l’événement de collecte",

@@ -45,7 +45,10 @@ export function usePcrReactionData(pcrBatchId?: string) {
               }
             ]
           })(""),
-          include: "materialSample"
+          include: "materialSample",
+          page: {
+            limit: 1000 // Maximum page limit
+          }
         })
         .then((response) => {
           const batchItems: PersistedResource<PcrBatchItem>[] =
@@ -180,6 +183,7 @@ export function PcrReactionTable({
       columns={PCR_REACTION_COLUMN}
       data={sortBy(pcrBatchItems, "cellNumber")}
       minRows={1}
+      pageSize={1000} // Maximum that the API will return.
       showPagination={false}
       sortable={false}
     />
