@@ -116,11 +116,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
   collection: "Collection",
-  collectionListTitle: "Collections",
+  collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
   collectionMethodListTitle: "Collection Method",
   collectionMethodNameLabel: "Collection Method Name",
-  collectionSectionTitle: "Collections",
+  collectionSectionTitle: "Collection",
   collectionViewTitle: "Collection",
   collectorGroupAgentsLabel: "Collector Group Agents",
   collectorGroupListTitle: "Collector Group",
@@ -874,5 +874,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   formTemplatePublic_tooltip:
     "Form template is visible to everyone that is part of the {group} group.",
   formTemplateGroupVisibility_tooltip:
-    "Please select a group for this form template, this will determine the visibility."
+    "Please select a group for this form template, this will determine the visibility.",
+  controlledVocabularyTitle: "Controlled Vocabulary"
 };
