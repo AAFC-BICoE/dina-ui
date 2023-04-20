@@ -242,7 +242,9 @@ function generateBuilderConfig(
       cardinality: 1
     },
     greaterThanOrEqualTo: {
-      label: formatMessage({ id: "queryBuilder_operator_greaterThanOrEqual" }),
+      label: formatMessage({
+        id: "queryBuilder_operator_greaterThanOrEqualTo"
+      }),
       cardinality: 1
     },
     lessThan: {
@@ -250,7 +252,7 @@ function generateBuilderConfig(
       cardinality: 1
     },
     lessThanOrEqualTo: {
-      label: formatMessage({ id: "queryBuilder_operator_lessThanOrEqual" }),
+      label: formatMessage({ id: "queryBuilder_operator_lessThanOrEqualTo" }),
       cardinality: 1
     },
     contains: {

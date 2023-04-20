@@ -321,9 +321,15 @@ export function transformManagedAttributeToDSL({
   value,
   fieldInfo
 }: TransformToDSLProps): any {
-  // Parse the managed attribute search options.
+  // Parse the managed attribute search options. Trim the search value.
   const managedAttributeSearchValue: ManagedAttributeSearchStates =
     JSON.parse(value);
+  managedAttributeSearchValue.searchValue =
+    managedAttributeSearchValue.searchValue.trim();
+
+  if (!managedAttributeSearchValue.searchValue) {
+    return undefined;
+  }
 
   const commonProps = {
     fieldPath:
