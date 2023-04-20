@@ -156,7 +156,7 @@ export default function QueryRowManagedAttributeSearch({
         return [
           "equals",
           "notEquals",
-          "contains",
+          "containsDate",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",

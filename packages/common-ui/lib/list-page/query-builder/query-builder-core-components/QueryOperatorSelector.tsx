@@ -60,7 +60,10 @@ export function QueryOperatorSelector({
       ) {
         return false;
       }
-      if (option.key === "contains" && !selectedFieldMapping?.containsSupport) {
+      if (
+        option.key === "containsText" &&
+        !selectedFieldMapping?.containsSupport
+      ) {
         return false;
       }
       if (option.key === "endsWith" && !selectedFieldMapping?.endsWithSupport) {

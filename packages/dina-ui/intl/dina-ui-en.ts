@@ -652,7 +652,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_conjunction_and: "AND",
   queryBuilder_conjunction_or: "OR",
   queryBuilder_field_placeholder: "Select a field to search against...",
-  queryBuilder_operator_contains: "Contains",
+  queryBuilder_operator_containsDate: "Contains",
   queryBuilder_operator_empty: "Empty",
   queryBuilder_operator_equals: "Equals",
   queryBuilder_operator_exactMatch: "Exact match",

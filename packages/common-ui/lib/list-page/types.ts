@@ -171,7 +171,7 @@ export interface TransformToDSLProps {
    * The operation being performed.
    *
    * For example:
-   * "equals", "notEquals", "contains"
+   * "equals", "notEquals", "containsText"
    *
    * Operators are defined in the QueryBuilderConfig file.
    */

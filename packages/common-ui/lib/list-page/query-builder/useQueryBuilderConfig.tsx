@@ -218,7 +218,7 @@ function generateBuilderConfig(
       cardinality: 1
     },
     containsText: {
-      label: formatMessage({ id: "queryBuilder_operator_contains" }),
+      label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
       cardinality: 1
     },
     endsWith: {
@@ -260,7 +260,7 @@ function generateBuilderConfig(
       cardinality: 1
     },
     containsDate: {
-      label: formatMessage({ id: "queryBuilder_operator_contains" }),
+      label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
       cardinality: 1
     },
     uuid: {
