@@ -111,9 +111,9 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                   label: "managedAttributes",
                   path: "data.attributes.managedAttributes",
                   type: "managedAttribute",
-                  prefixSupport: false,
+                  startsWithSupport: false,
                   infixSupport: false,
-                  suffixSupport: false
+                  endsWithSupport: false
                 }
               })
             ).toMatchSnapshot();
@@ -152,9 +152,9 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                   label: "managedAttributes",
                   path: "included.attributes.managedAttributes",
                   type: "managedAttribute",
-                  prefixSupport: false,
+                  startsWithSupport: false,
                   infixSupport: false,
-                  suffixSupport: false
+                  endsWithSupport: false
                 }
               })
             ).toMatchSnapshot();
