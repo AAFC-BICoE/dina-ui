@@ -20,7 +20,9 @@ interface UseIndexMappingWrapperProps {
 function UseIndexMappingWrapper({
   indexMapRetrieved
 }: UseIndexMappingWrapperProps) {
-  const { indexMap } = useIndexMapping(INDEX_NAME);
+  const { indexMap } = useIndexMapping({
+    indexName: INDEX_NAME
+  });
 
   useEffect(() => {
     if (indexMap) {

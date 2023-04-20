@@ -67,6 +67,17 @@ export default function TransactionListPage() {
         <QueryPage
           indexName={"dina_loan_transaction_index"}
           columns={TABLE_COLUMNS}
+          dynamicFieldMapping={{
+            fields: [
+              {
+                type: "managedAttribute",
+                label: "managedAttributes",
+                path: "data.attributes.managedAttributes",
+                apiEndpoint: "loan-transaction-api/managed-attribute"
+              }
+            ],
+            relationshipFields: []
+          }}
         />
       </main>
       <Footer />
