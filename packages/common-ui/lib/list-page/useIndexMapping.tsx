@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "..";
-import { ESIndexMapping } from "./types";
+import { DynamicFieldsMappingConfig, ESIndexMapping } from "./types";
+
+export interface UseIndexMappingProps {
+  indexName: string;
+
+  /**
+   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
+   * be searched against. It will also define the path and data component if required.
+   *
+   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
+   * or grouped terms.
+   */
+  dynamicFieldMapping?: DynamicFieldsMappingConfig;
+}
 
 /**
  * Custom hook for retrieving the index mapping.
@@ -10,7 +23,10 @@ import { ESIndexMapping } from "./types";
  *
  * @param indexName The index to retrieve. Example: `dina-material-sample-index`
  */
-export function useIndexMapping(indexName: string) {
+export function useIndexMapping({
+  indexName,
+  dynamicFieldMapping
+}: UseIndexMappingProps) {
   const { apiClient } = useApiClient();
 
   // State to store the index map after it has been retrieved.
@@ -19,7 +35,7 @@ export function useIndexMapping(indexName: string) {
   // Retrieve the index mapping on the first hook load.
   useEffect(() => {
     async function getIndexMapping() {
-      const mapping = await fetchQueryFieldsByIndex(indexName);
+      const mapping = await fetchQueryFieldsByIndex();
       setIndexMap(mapping);
     }
     getIndexMapping();
@@ -32,10 +48,10 @@ export function useIndexMapping(indexName: string) {
    * @param searchIndexName index to retrieve from.
    * @returns ESIndexMapping[]
    */
-  async function fetchQueryFieldsByIndex(searchIndexName) {
+  async function fetchQueryFieldsByIndex() {
     try {
       const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
-        params: { indexName: searchIndexName }
+        params: { indexName }
       });
 
       const result: ESIndexMapping[] = [];
@@ -50,22 +66,27 @@ export function useIndexMapping(indexName: string) {
           if (path && path.includes(prefix)) {
             attrPrefix = path.substring(prefix.length + 1);
           }
-          result.push({
-            label: attrPrefix ? attrPrefix + "." + key.name : key.name,
-            value: key.path
-              ? key.path + "." + key.name
-              : key.name === "id"
-              ? "data." + key.name
-              : key.name,
-            type: key.type,
-            path: key.path,
 
-            // Additional options for the field:
-            distinctTerm: key.distinct_term_agg,
-            startsWithSupport: key?.fields?.includes("prefix") ?? false,
-            containsSupport: key?.fields?.includes("infix") ?? false,
-            endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
-          });
+          // Manually remove managed attributes from here, they are handled using the dynamic
+          // mapping config. See the dynamicFieldMapping.
+          if (path !== "data.attributes.managedAttributes") {
+            result.push({
+              label: attrPrefix ? attrPrefix + "." + key.name : key.name,
+              value: key.path
+                ? key.path + "." + key.name
+                : key.name === "id"
+                ? "data." + key.name
+                : key.name,
+              type: key.type,
+              path: key.path,
+
+              // Additional options for the field:
+              distinctTerm: key.distinct_term_agg,
+              startsWithSupport: key?.fields?.includes("prefix") ?? false,
+              containsSupport: key?.fields?.includes("infix") ?? false,
+              endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
+            });
+          }
         });
 
       // Read relationship attributes.
@@ -100,6 +121,44 @@ export function useIndexMapping(indexName: string) {
           });
         });
       });
+
+      // Inject dynamic field mapping config into these.
+      if (dynamicFieldMapping) {
+        dynamicFieldMapping.fields.forEach((fieldMapping) => {
+          result.push({
+            dynamicField: fieldMapping,
+            value: fieldMapping.path,
+            distinctTerm: false,
+            label: fieldMapping.label,
+            path: fieldMapping.path,
+            type: fieldMapping.type,
+            prefixSupport: false,
+            infixSupport: false,
+            suffixSupport: false
+          });
+        });
+        dynamicFieldMapping.relationshipFields.forEach(
+          (relationshipFieldMapping) => {
+            result.push({
+              dynamicField: relationshipFieldMapping,
+              parentName: relationshipFieldMapping.referencedBy,
+              parentPath: "included",
+              parentType: relationshipFieldMapping.referencedType,
+              value:
+                relationshipFieldMapping.path +
+                "_" +
+                relationshipFieldMapping.referencedBy,
+              distinctTerm: false,
+              label: relationshipFieldMapping.label,
+              path: relationshipFieldMapping.path,
+              type: relationshipFieldMapping.type,
+              prefixSupport: false,
+              infixSupport: false,
+              suffixSupport: false
+            });
+          }
+        );
+      }
 
       return result;
     } catch (error) {
