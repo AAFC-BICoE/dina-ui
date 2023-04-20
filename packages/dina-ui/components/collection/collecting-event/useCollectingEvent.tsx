@@ -26,7 +26,7 @@ export function useCollectingEventQuery(id?: string | null) {
   // TODO disable the fetch query when the ID is undefined.
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
-      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod`
+      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod,protocol`
     },
     {
       // Return undefined when ID is undefined:

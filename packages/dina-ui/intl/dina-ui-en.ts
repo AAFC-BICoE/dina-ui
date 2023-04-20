@@ -4,10 +4,7 @@
 export const DINAUI_MESSAGES_ENGLISH = {
   LETTER: "Letter",
   NUMERICAL: "Numerical",
-  acquisitionEvent: "Acquisition Event",
-  acquisitionEventListTitle: "Acquisition Events",
   actionType: "Action Type",
-  addAcquisitionEventTitle: "Add Acquisition Event",
   addAnother: "Add Another {typeName}",
   addAnotherIdentifier: "Add Another Identifier",
   addAssemblageTitle: "Add Assemblage",
@@ -116,11 +113,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
   collection: "Collection",
-  collectionListTitle: "Collections",
+  collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
   collectionMethodListTitle: "Collection Method",
   collectionMethodNameLabel: "Collection Method Name",
-  collectionSectionTitle: "Collections",
+  collectionSectionTitle: "Collection",
   collectionViewTitle: "Collection",
   collectorGroupAgentsLabel: "Collector Group Agents",
   collectorGroupListTitle: "Collector Group",
@@ -186,7 +183,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   duplicate: "Duplicate",
   duplicateFilesFound: "duplicate files found",
   duplicatePrimaryIdFound: "Duplicate Primary ID Found",
-  editAcquisitionEventTitle: "Edit Acquisition Event",
   editAssemblageTitle: "Edit Assemblage",
   editCataloguedObjectTitle: "Edit Catalogued Object",
   editCollectingEventTitle: "Edit Collecting Event",
@@ -667,8 +663,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_operator_notEmpty: "Not empty",
   queryBuilder_operator_notEquals: "Not equals",
   queryBuilder_operator_partialMatch: "Partial match",
-  queryBuilder_operator_prefix: "Prefix",
-  queryBuilder_operator_suffix: "Suffix",
+  queryBuilder_operator_startsWith: "Starts with",
+  queryBuilder_operator_endsWith: "Ends with",
   queryBuilder_value_false: "False",
   queryBuilder_value_number_placeholder: "Enter number search value...",
   queryBuilder_value_text_placeholder: "Enter text search value...",
@@ -874,5 +870,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   formTemplatePublic_tooltip:
     "Form template is visible to everyone that is part of the {group} group.",
   formTemplateGroupVisibility_tooltip:
-    "Please select a group for this form template, this will determine the visibility."
+    "Please select a group for this form template, this will determine the visibility.",
+  controlledVocabularyTitle: "Controlled Vocabulary"
 };

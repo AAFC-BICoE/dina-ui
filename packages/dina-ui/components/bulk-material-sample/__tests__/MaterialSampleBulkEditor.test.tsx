@@ -11,7 +11,6 @@ import { default as ReactSwitch, default as Switch } from "react-switch";
 import { AttachmentsEditor } from "../..";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
-  ACQUISITION_EVENT_COMPONENT_NAME,
   ASSOCIATIONS_COMPONENT_NAME,
   blankMaterialSample,
   COLLECTING_EVENT_COMPONENT_NAME,
@@ -32,12 +31,6 @@ const TEST_COLLECTING_EVENT = {
   id: "col-event-1",
   type: "collecting-event",
   dwcVerbatimLocality: "test initial locality"
-};
-
-const TEST_ACQUISITION_EVENT = {
-  id: "acq-event-1",
-  type: "acquisition-event",
-  receptionRemarks: "test reception remarks"
 };
 
 const TEST_COLLECTION_1 = {
@@ -414,44 +407,6 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "managedAttributes.attachmentsConfig.allowExisting",
-              visible: false
-            }
-          ]
-        }
-      ]
-    },
-    {
-      name: "acquisition-event-component",
-      visible: false,
-      order: 3,
-      sections: [
-        {
-          name: "acquisition-event-reception-section",
-          visible: true,
-          items: [
-            {
-              name: "group",
-              visible: false,
-              defaultValue: "aafc"
-            },
-            { defaultValue: undefined, name: "receivedFrom", visible: false },
-            { defaultValue: undefined, name: "receivedDate", visible: false },
-            {
-              defaultValue: undefined,
-              name: "receptionRemarks",
-              visible: false
-            }
-          ]
-        },
-        {
-          name: "acquisition-event-isolation-section",
-          visible: true,
-          items: [
-            { defaultValue: undefined, name: "isolatedBy", visible: false },
-            { defaultValue: undefined, name: "isolatedOn", visible: false },
-            {
-              defaultValue: undefined,
-              name: "isolationRemarks",
               visible: false
             }
           ]
@@ -842,7 +797,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           materialSampleName: "material-sample-500"
         }
       };
-    case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod":
+    case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod,protocol":
       return { data: TEST_COLLECTING_EVENT };
     case "collection-api/storage-unit":
       if (params?.filter?.rsql === "parentStorageUnit.uuid==su-1") {
@@ -873,7 +828,6 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/vocabulary/associationType":
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
-    case "collection-api/acquisition-event":
     case "collection-api/vocabulary/materialSampleType":
       return { data: [] };
   }
@@ -1096,23 +1050,6 @@ const TEST_SAMPLES_SAME_COLLECTING_EVENT: InputResource<MaterialSample>[] = [
     id: "2",
     type: "material-sample",
     collectingEvent: TEST_COLLECTING_EVENT
-  }
-];
-
-const TEST_SAMPLES_SAME_COL_AND_ACQ_EVENTS: InputResource<MaterialSample>[] = [
-  {
-    ...blankMaterialSample(),
-    id: "1",
-    type: "material-sample",
-    collectingEvent: TEST_COLLECTING_EVENT,
-    acquisitionEvent: TEST_ACQUISITION_EVENT
-  },
-  {
-    ...blankMaterialSample(),
-    id: "2",
-    type: "material-sample",
-    collectingEvent: TEST_COLLECTING_EVENT,
-    acquisitionEvent: TEST_ACQUISITION_EVENT
   }
 ];
 
@@ -2741,41 +2678,7 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
-  it("Disables the nested Collecting event and Acquisition Events forms in the individual sample tabs.", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleBulkEditor
-        onSaved={mockOnSaved}
-        samples={TEST_SAMPLES_SAME_COL_AND_ACQ_EVENTS}
-      />,
-      testCtx
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // The individual sample tab has read-only Col and Acq Event forms (no input elements):
-    wrapper.find("li.sample-tab-0").simulate("click");
-    expect(
-      wrapper
-        .find(
-          ".sample-tabpanel-0 #" +
-            COLLECTING_EVENT_COMPONENT_NAME +
-            " .dwcVerbatimLocality-field input"
-        )
-        .exists()
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(
-          ".sample-tabpanel-0 #" +
-            ACQUISITION_EVENT_COMPONENT_NAME +
-            " .receptionRemarks-field input"
-        )
-        .exists()
-    ).toEqual(false);
-  });
-
-  it("Allows adding NEW nested Collecting and Acquisition Events in the individual sample tabs.", async () => {
+  it("Allows adding NEW nested Collecting the individual sample tabs.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -2795,11 +2698,6 @@ describe("MaterialSampleBulkEditor", () => {
       .find(".sample-tabpanel-0 .enable-collecting-event")
       .find(ReactSwitch)
       .prop<any>("onChange")(true);
-    // Enable the acquisition event section:
-    // wrapper
-    //   .find(".sample-tabpanel-0 .enable-acquisition-event")
-    //   .find(ReactSwitch)
-    //   .prop<any>("onChange")(true);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -2811,13 +2709,6 @@ describe("MaterialSampleBulkEditor", () => {
           " .dwcVerbatimLocality-field input"
       )
       .simulate("change", { target: { value: "test locality" } });
-    // wrapper
-    //   .find(
-    //     ".sample-tabpanel-0 #" +
-    //       ACQUISITION_EVENT_COMPONENT_NAME +
-    //       " .receptionRemarks-field textarea"
-    //   )
-    //   .simulate("change", { target: { value: "test remarks" } });
 
     // Save the samples:
     wrapper.find("button.bulk-save-button").simulate("click");
@@ -2839,28 +2730,11 @@ describe("MaterialSampleBulkEditor", () => {
         ],
         { apiBaseUrl: "/collection-api" }
       ],
-      // Creates the new Acq Event:
-      // [
-      //   [
-      //     {
-      //       resource: {
-      //         receptionRemarks: "test remarks",
-      //         type: "acquisition-event"
-      //       },
-      //       type: "acquisition-event"
-      //     }
-      //   ],
-      //   { apiBaseUrl: "/collection-api" }
-      // ],
       [
         [
           // Creates the first sample with the attached events:
           {
             resource: expect.objectContaining({
-              // acquisitionEvent: {
-              //   id: "11111",
-              //   type: "acquisition-event"
-              // },
               collectingEvent: {
                 id: "11111",
                 type: "collecting-event"
@@ -2872,10 +2746,6 @@ describe("MaterialSampleBulkEditor", () => {
           // Creates the next 2 samples without the attached events:
           {
             resource: expect.objectContaining({
-              // acquisitionEvent: {
-              //   id: null,
-              //   type: "acquisition-event"
-              // },
               collectingEvent: {
                 id: null,
                 type: "collecting-event"
@@ -2886,10 +2756,6 @@ describe("MaterialSampleBulkEditor", () => {
           },
           {
             resource: expect.objectContaining({
-              // acquisitionEvent: {
-              //   id: null,
-              //   type: "acquisition-event"
-              // },
               collectingEvent: {
                 id: null,
                 type: "collecting-event"
@@ -2903,132 +2769,6 @@ describe("MaterialSampleBulkEditor", () => {
       ]
     ]);
   });
-
-  // Form Template Collecting Event does not work for now. Add test back later.
-  // it("Allows selecting a Form Template to show/hide fields in the bulk and single task.", async () => {
-  //   const wrapper = mountWithAppContext(
-  //     <MaterialSampleBulkEditor
-  //       onSaved={mockOnSaved}
-  //       samples={TEST_NEW_SAMPLES}
-  //     />,
-  //     testCtx
-  //   );
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // Select a custom view:
-  //   wrapper
-  //     .find(".form-template-select")
-  //     .find(ResourceSelect)
-  //     .prop<any>("onChange")(TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES);
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // Enable Collecting Event:
-  //   wrapper
-  //     .find(".tabpanel-EDIT_ALL .enable-collecting-event")
-  //     .find(ReactSwitch)
-  //     .prop<any>("onChange")(true);
-  //   // Enable Organism and Determination:
-  //   wrapper
-  //     .find(".tabpanel-EDIT_ALL .enable-organisms")
-  //     .find(ReactSwitch)
-  //     .prop<any>("onChange")(true);
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-  //   wrapper.find(".determination-section button.add-button").simulate("click");
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // The bulk edit tab shows the managed attributes from the FormTemplate:
-  //   // For Material Sample:
-  //   expect(
-  //     wrapper
-  //       .find(
-  //         ".tabpanel-EDIT_ALL #" +
-  //           MANAGED_ATTRIBUTES_COMPONENT_NAME +
-  //           " .managedAttributes_sample_attribute_1-field input"
-  //       )
-  //       .exists()
-  //   ).toEqual(true);
-  //   // For Collecting Event:
-  //   expect(
-  //     wrapper
-  //       .find(
-  //         ".tabpanel-EDIT_ALL #" +
-  //           COLLECTING_EVENT_COMPONENT_NAME +
-  //           " .managedAttributes_collecting_event_attribute_1-field input"
-  //       )
-  //       .exists()
-  //   ).toEqual(true);
-  //   // For Determination:
-  //   expect(
-  //     wrapper
-  //       .find(
-  //         ".tabpanel-EDIT_ALL #" +
-  //           MANAGED_ATTRIBUTES_COMPONENT_NAME +
-  //           " .managedAttributes_sample_attribute_1-field input"
-  //       )
-  //       .exists()
-  //   ).toEqual(true);
-
-  //   // Switch to the first individual sample tab:
-  //   wrapper.find("li.sample-tab-0").simulate("click");
-
-  //   // Enable Collecting Event:
-  //   wrapper
-  //     .find(".sample-tabpanel-0 .enable-collecting-event")
-  //     .find(ReactSwitch)
-  //     .prop<any>("onChange")(true);
-  //   // Enable Organism and Determination:
-  //   wrapper
-  //     .find(".sample-tabpanel-0 .enable-organisms")
-  //     .find(ReactSwitch)
-  //     .prop<any>("onChange")(true);
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-  //   wrapper
-  //     .find(".sample-tabpanel-0 .determination-section button.add-button")
-  //     .simulate("click");
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // The individual sample tab tab shows the managed attributes from the FormTemplate:
-  //   // For Material Sample:
-  //   expect(
-  //     wrapper
-  //       .find(
-  //         ".sample-tabpanel-0 #" +
-  //           MANAGED_ATTRIBUTES_COMPONENT_NAME +
-  //           " .managedAttributes_sample_attribute_1-field input"
-  //       )
-  //       .exists()
-  //   ).toEqual(true);
-  //   // For Collecting Event:
-  //   expect(
-  //     wrapper
-  //       .find(
-  //         ".sample-tabpanel-0 #" +
-  //           COLLECTING_EVENT_COMPONENT_NAME +
-  //           " .managedAttributes_collecting_event_attribute_1-field input"
-  //       )
-  //       .exists()
-  //   ).toEqual(true);
-  //   // For Determination:
-  //   expect(
-  //     wrapper
-  //       .find(
-  //         ".sample-tabpanel-0 #" +
-  //           MANAGED_ATTRIBUTES_COMPONENT_NAME +
-  //           " .managedAttributes_sample_attribute_1-field input"
-  //       )
-  //       .exists()
-  //   ).toEqual(true);
-  // });
 
   it("Allows selecting a Form Template to show/hide fields in the bulk and single tabs for material sample section.", async () => {
     const wrapper = mountWithAppContext(

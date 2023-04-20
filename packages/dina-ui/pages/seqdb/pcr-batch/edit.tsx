@@ -1,48 +1,59 @@
 import {
   BackButton,
   ButtonBar,
+  CheckBoxField,
   DateField,
   DinaForm,
   DinaFormProps,
   DinaFormSubmitParams,
+  FieldSet,
   filterBy,
   LoadingSpinner,
+  Operation,
   ResourceSelectField,
   SubmitButton,
   TextField,
   useAccount,
+  useApiClient,
   useDinaFormContext,
   useQuery,
   withResponse,
   withResponseOrDisabled
 } from "common-ui";
+import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
-import { useFormikContext, connect } from "formik";
+import { assign, cloneDeep } from "lodash";
 import { useRouter } from "next/router";
 import {
-  StorageUnitType,
-  StorageUnit,
-  Protocol
-} from "packages/dina-ui/types/collection-api";
-import { ReactNode } from "react";
+  PcrReactionTable,
+  usePcrReactionData
+} from "../../../components/seqdb/pcr-workflow/PcrReactionTable";
+import { ReactNode, useState } from "react";
 import {
   AttachmentsField,
   GroupSelectField,
   Head,
   Nav,
   PersonSelectField,
-  StorageUnitSelectField
+  StorageUnitSelectField,
+  VocabularySelectField
 } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Person } from "../../../types/agent-api";
 import {
+  MaterialSample,
+  Protocol,
+  StorageUnit,
+  StorageUnitType
+} from "../../../types/collection-api";
+import {
   PcrBatch,
+  PcrBatchItem,
   PcrPrimer,
-  ThermocyclerProfile,
-  Region
+  Region,
+  ThermocyclerProfile
 } from "../../../types/seqdb-api";
-import { cloneDeep } from "lodash";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
   return useQuery<PcrBatch>(
@@ -91,6 +102,7 @@ export default function PcrBatchEditPage() {
 
 export interface PcrBatchFormProps {
   pcrBatch?: PersistedResource<PcrBatch>;
+  results?: { [key: string]: string };
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
   buttonBar?: ReactNode;
   readOnlyOverride?: boolean;
@@ -108,6 +120,7 @@ export function PcrBatchForm({
   readOnlyOverride
 }: PcrBatchFormProps) {
   const { username } = useAccount();
+  const { doOperations } = useApiClient();
 
   const initialValues = pcrBatch || {
     // TODO let the back-end set this:
@@ -115,10 +128,37 @@ export function PcrBatchForm({
     type: "pcr-batch"
   };
 
+  async function savePcrReactionResults(submittedValues: any) {
+    const results = submittedValues.results;
+    delete submittedValues.results;
+
+    const resultsWithId = Object.keys(results).map((id) => ({
+      id,
+      value: results[id]
+    }));
+    if (resultsWithId.length > 0) {
+      // Using the results, generate the operations.
+      const operations = resultsWithId.map<Operation>((result) => ({
+        op: "PATCH",
+        path: "pcr-batch-item/" + result.id,
+        value: {
+          id: result.id,
+          type: "pcr-batch-item",
+          attributes: {
+            result: result.value
+          }
+        }
+      }));
+
+      await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
+    }
+  }
+
   async function onSubmit({
     submittedValues,
     api: { save }
-  }: DinaFormSubmitParams<PcrBatch>) {
+  }: DinaFormSubmitParams<PcrBatch & { [key: string]: string }>) {
+    savePcrReactionResults(submittedValues);
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
@@ -216,8 +256,18 @@ export function LoadExternalDataForPcrBatchForm({
   dinaFormProps,
   buttonBar
 }: LoadExternalDataForPcrBatchFormProps) {
+  const {
+    loading: loadingReactionData,
+    pcrBatchItems,
+    materialSamples
+  } = usePcrReactionData(dinaFormProps?.initialValues?.id);
+
   // Create a copy of the initial value so we don't change the prop version.
-  const initialValues = cloneDeep(dinaFormProps.initialValues);
+  const initialValues = assign(cloneDeep(dinaFormProps.initialValues), {
+    results: Object.fromEntries(
+      pcrBatchItems.map((obj) => [obj.id, obj.result])
+    )
+  });
 
   // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
   const storageUnitQuery = useQuery<StorageUnit>(
@@ -242,7 +292,7 @@ export function LoadExternalDataForPcrBatchForm({
   }
 
   // Display loading indicator if not ready.
-  if (storageUnitQuery.loading) {
+  if (storageUnitQuery.loading || loadingReactionData) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -253,15 +303,29 @@ export function LoadExternalDataForPcrBatchForm({
       initialValues={initialValues}
     >
       {buttonBar}
-      <PcrBatchFormFields />
+      <PcrBatchFormFields
+        pcrBatchItems={pcrBatchItems}
+        materialSamples={materialSamples}
+      />
     </DinaForm>
   ));
 }
 
+interface PcrBatchFormFieldsProps {
+  pcrBatchItems: PcrBatchItem[];
+  materialSamples: MaterialSample[];
+}
+
 /** Re-usable field layout between edit and view pages. */
-export function PcrBatchFormFields() {
+function PcrBatchFormFields({
+  pcrBatchItems,
+  materialSamples
+}: PcrBatchFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { values } = useFormikContext<any>();
+  const [selectedRegion, setSelectedRegion] = useState<Region>(
+    initialValues.region
+  );
 
   // When the storage unit type is changed, the storage unit needs to be cleared.
   const StorageUnitTypeSelectorComponent = connect(
@@ -293,6 +357,25 @@ export function PcrBatchFormFields() {
     }
   );
 
+  // When the region is changed, it should clear the forward and reverse primer.
+  const RegionSelectorComponent = connect(({ formik: { setFieldValue } }) => {
+    return (
+      <ResourceSelectField<Region>
+        className="col-md-6"
+        name="region"
+        filter={filterBy(["name"])}
+        model="seqdb-api/region"
+        optionLabel={(region) => region.name}
+        readOnlyLink="/seqdb/region/view?id="
+        onChange={(value) => {
+          setSelectedRegion(value as Region);
+          setFieldValue("primerForward", null);
+          setFieldValue("primerReverse", null);
+        }}
+      />
+    );
+  });
+
   return (
     <div>
       <div className="row">
@@ -301,9 +384,26 @@ export function PcrBatchFormFields() {
           enableStoredDefaultGroup={true}
           className="col-md-6"
         />
+        <CheckBoxField
+          name="isCompleted"
+          className="gap-3 col-md-6"
+          overridecheckboxProps={{
+            style: {
+              height: "30px",
+              width: "30px"
+            }
+          }}
+        />
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
+        <VocabularySelectField
+          className="col-md-6"
+          name="batchType"
+          path="seqdb-api/vocabulary/pcrBatchType"
+        />
+      </div>
+      <div className="row">
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
@@ -312,6 +412,7 @@ export function PcrBatchFormFields() {
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
         />
+        <TextField className="col-md-6" name="thermocycler" />
       </div>
       <div className="row">
         <PersonSelectField
@@ -319,14 +420,7 @@ export function PcrBatchFormFields() {
           name="experimenters"
           isMulti={true}
         />
-        <ResourceSelectField<Region>
-          className="col-md-6"
-          name="region"
-          filter={filterBy(["name"])}
-          model="seqdb-api/region"
-          optionLabel={(region) => region.name}
-          readOnlyLink="/seqdb/region/view?id="
-        />
+        <RegionSelectorComponent />
       </div>
       <div className="row">
         <ResourceSelectField<PcrPrimer>
@@ -334,35 +428,32 @@ export function PcrBatchFormFields() {
           name="primerForward"
           filter={(input) => ({
             ...filterBy(["name"])(input),
-            direction: { EQ: "F" }
+            direction: { EQ: "F" },
+            "region.id": { EQ: selectedRegion?.id }
           })}
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
+          isDisabled={!(selectedRegion && selectedRegion.id)}
         />
         <ResourceSelectField<PcrPrimer>
           className="col-md-6"
           name="primerReverse"
           filter={(input) => ({
             ...filterBy(["name"])(input),
-            direction: { EQ: "R" }
+            direction: { EQ: "R" },
+            "region.id": { EQ: selectedRegion?.id }
           })}
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
+          isDisabled={!(selectedRegion && selectedRegion.id)}
         />
-        <TextField className="col-md-6" name="thermocycler" />
+
         <TextField className="col-md-6" name="objective" />
         <TextField className="col-md-6" name="positiveControl" />
         <TextField className="col-md-6" name="reactionVolume" />
         <DateField className="col-md-6" name="reactionDate" />
-        <ResourceSelectField<Protocol>
-          className="col-md-6"
-          name="protocol"
-          filter={filterBy(["name"])}
-          model="collection-api/protocol"
-          optionLabel={(protocol) => protocol.name}
-        />
         <StorageUnitTypeSelectorComponent />
         <StorageUnitSelectField
           resourceProps={{
@@ -384,7 +475,22 @@ export function PcrBatchFormFields() {
           restrictedField={"data.relationships.storageUnitType.data.id"}
           restrictedFieldValue={values?.storageUnitType?.id}
         />
+        <ResourceSelectField<Protocol>
+          className="col-md-6"
+          name="protocol"
+          filter={filterBy(["name"])}
+          model="collection-api/protocol"
+          optionLabel={(protocol) => protocol.name}
+        />
       </div>
+      {initialValues.id ? (
+        <FieldSet legend={<DinaMessage id="pcrReactionTitle" />}>
+          <PcrReactionTable
+            pcrBatchItems={pcrBatchItems}
+            materialSamples={materialSamples}
+          />
+        </FieldSet>
+      ) : undefined}
       <AttachmentsField
         name="attachment"
         attachmentPath={`seqdb-api/pcr-batch/${initialValues.id}/attachment`}

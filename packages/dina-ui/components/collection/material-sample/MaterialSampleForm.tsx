@@ -28,12 +28,6 @@ import {
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
-  AcquisitionEventFormLayout,
-  useAcquisitionEvent
-} from "../../../pages/collection/acquisition-event/edit";
-import {
-  AcquisitionEvent,
-  ACQUISITION_EVENT_COMPONENT_NAME,
   ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
   COLLECTING_EVENT_COMPONENT_NAME,
@@ -52,7 +46,6 @@ import {
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { AllowAttachmentsConfig } from "../../object-store";
-import { AcquisitionEventLinker } from "../AcquisitionEventLinker";
 import { AssociationsField } from "../AssociationsField";
 import { CollectingEventBriefDetails } from "../collecting-event/CollectingEventBriefDetails";
 import { TabbedResourceLinker } from "../TabbedResourceLinker";
@@ -76,7 +69,6 @@ export interface VisibleManagedAttributesConfig {
 export interface MaterialSampleFormProps {
   materialSample?: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
-  acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
 
   onSaved?: (id: string) => Promise<void>;
 
@@ -155,7 +147,6 @@ export interface MaterialSampleFormProps {
 export function MaterialSampleForm({
   materialSample,
   collectingEventInitialValues,
-  acquisitionEventInitialValues,
   navOrder,
   onChangeNavOrder,
   onSaved,
@@ -188,12 +179,9 @@ export function MaterialSampleForm({
   const {
     initialValues,
     nestedCollectingEventForm,
-    nestedAcqEventForm,
     dataComponentState,
     colEventId,
     setColEventId,
-    acqEventId,
-    setAcqEventId,
     onSubmit,
     loading
   } =
@@ -203,7 +191,6 @@ export function MaterialSampleForm({
       collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
       materialSample,
       collectingEventInitialValues,
-      acquisitionEventInitialValues,
       onSaved,
       isTemplate,
       reduceRendering,
@@ -214,10 +201,6 @@ export function MaterialSampleForm({
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
     // enabledFields?.collectingEvent.includes("id")
-    false
-  );
-  const templateAttachesAcquisitionEvent = Boolean(
-    // enabledFields?.acquisitionEvent.includes("id")
     false
   );
   const attachmentsField = "attachment";
@@ -273,37 +256,6 @@ export function MaterialSampleForm({
           targetType="materialSample"
         />
       ),
-    // TODO: Remove this block when Acquisition Event is confirmed to be removed entirely
-    // [ACQUISITION_EVENT_COMPONENT_NAME]: (id) =>
-    //   dataComponentState.enableAcquisitionEvent && (
-    //     <TabbedResourceLinker<AcquisitionEvent>
-    //       fieldSetId={id}
-    //       legend={<DinaMessage id="acquisitionEvent" />}
-    //       briefDetails={(acqEvent) => (
-    //         <DinaForm initialValues={acqEvent} readOnly={true}>
-    //           <AcquisitionEventFormLayout />
-    //         </DinaForm>
-    //       )}
-    //       linkerTabContent={
-    //         reduceRendering ? null : (
-    //           <AcquisitionEventLinker
-    //             onAcquisitionEventSelect={(acqEventToLink) => {
-    //               setAcqEventId(acqEventToLink.id);
-    //             }}
-    //           />
-    //         )
-    //       }
-    //       nestedForm={nestedAcqEventForm}
-    //       useResourceQuery={useAcquisitionEvent}
-    //       setResourceId={setAcqEventId}
-    //       disableLinkerTab={templateAttachesAcquisitionEvent}
-    //       readOnlyLink="/collection/acquisition-event/view?id="
-    //       resourceId={acqEventId}
-    //       fieldName="acquisitionEvent"
-    //       targetType="materialSample"
-    //       hideLinkerTab={hideLinkerTab}
-    //     />
-    //   ),
     [PREPARATIONS_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
       dataComponentState.enablePreparations && <PreparationField id={id} />,
@@ -471,6 +423,7 @@ export function MaterialSampleForm({
                 <div className="row">
                   <div className="col-md-6">
                     <GroupSelectField
+                      disableTemplateCheckbox={true}
                       name="group"
                       enableStoredDefaultGroup={enableStoredDefaultGroup}
                     />

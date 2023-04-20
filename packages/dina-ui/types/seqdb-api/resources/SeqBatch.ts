@@ -9,6 +9,7 @@ export interface SeqBatchAttributes {
   type: "seq-batch";
   name: string;
   group?: string;
+  sequencingType?: string;
   reactionDate?: string;
   storageRestriction?: any;
   createdBy?: string;

@@ -12,7 +12,7 @@ import { ORIENTATION_OPTIONS } from "../../../../dina-ui/pages/object-store/meta
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { License, Metadata } from "../../../types/objectstore-api";
 import { GroupLabel } from "../../group-select/GroupFieldView";
-import { ManagedAttributesViewer } from "../managed-attributes/ManagedAttributesViewer";
+import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -77,7 +77,10 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           collapserId="managed-attributes"
           title={formatMessage("metadataManagedAttributesLabel")}
         >
-          <ManagedAttributesViewer values={metadata.managedAttributes} />
+          <ManagedAttributesViewer
+            values={metadata.managedAttributes}
+            managedAttributeApiPath="objectstore-api/managed-attribute"
+          />
         </CollapsableSection>
       )}
       <MetadataAttributeGroup

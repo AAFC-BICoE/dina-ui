@@ -7,7 +7,6 @@ import {
   useAccount,
   useDinaFormContext
 } from "common-ui";
-import { useState } from "react";
 import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { SeqBatch } from "../../../../dina-ui/types/seqdb-api";
 import { SeqSubmission } from "../../../../dina-ui/types/seqdb-api/resources/SeqSubmission";
@@ -25,10 +24,15 @@ export default function PreparationTypeDetailsPage() {
           <SeqSubmissionFields />
         </DinaForm>
       )}
-      query={(id) => ({ path: `seqdb-api/seq-submission/${id}` })}
+      query={(id) => ({
+        path: `seqdb-api/seq-submission/${id}`,
+        include: "seqBatch,submittedBy"
+      })}
       entityLink="/seqdb/seq-submission"
       type="seq-submission"
       apiBaseUrl="/seqdb-api"
+      showDeleteButton={false}
+      showEditButton={false}
     />
   );
 }
@@ -37,9 +41,7 @@ export function SeqSubmissionFields() {
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
   const { isAdmin, groupNames } = useAccount();
-  const [group, setGroup] = useState(
-    groupNames && groupNames.length > 0 ? groupNames[0] : ""
-  );
+  const group = groupNames && groupNames.length > 0 ? groupNames[0] : "";
   return (
     <div>
       <div className="row">

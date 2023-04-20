@@ -46,14 +46,7 @@ import {
 } from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  AcquisitionEventFormLayout,
-  useAcquisitionEvent
-} from "../../../pages/collection/acquisition-event/edit";
-import {
-  ACQUISITION_EVENT_COMPONENT_NAME,
-  MaterialSample
-} from "../../../types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
@@ -81,11 +74,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       ? highestMaterialSampleQuery.response?.data?.collectingEvent?.id
       : materialSampleQuery.response?.data?.collectingEvent?.id
   );
-
-  // TODO: Remove this block when Acquisition Event is confirmed to be removed entirely
-  // const acqEventQuery = useAcquisitionEvent(
-  //   materialSampleQuery.response?.data?.acquisitionEvent?.id
-  // );
 
   const collectingEventParentLink = (
     <Link href={`/collection/material-sample/view?id=${highestParentId}`}>
@@ -287,28 +275,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     </FieldSet>
                   );
                 })}
-                {
-                  // TODO: Remove this block when Acquisition Event is confirmed to be removed entirely
-                  /* {withResponse(acqEventQuery, ({ data: acqEvent }) => (
-                  <FieldSet
-                    id={ACQUISITION_EVENT_COMPONENT_NAME}
-                    legend={<DinaMessage id="acquisitionEvent" />}
-                  >
-                    <DinaForm initialValues={acqEvent} readOnly={true}>
-                      <div className="mb-3 d-flex justify-content-end align-items-center">
-                        <Link
-                          href={`/collection/acquisition-event/view?id=${acqEvent.id}`}
-                        >
-                          <a>
-                            <DinaMessage id="detailsPageLink" />
-                          </a>
-                        </Link>
-                      </div>
-                      <AcquisitionEventFormLayout />
-                    </DinaForm>
-                  </FieldSet>
-                ))} */
-                }
                 {hasPreparations && <PreparationField />}
                 {hasOrganism && <OrganismsField name="organism" />}
                 {hasInheritedDetermination && (
