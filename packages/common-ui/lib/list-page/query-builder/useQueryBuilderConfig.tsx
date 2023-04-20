@@ -217,6 +217,10 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_startsWith" }),
       cardinality: 1
     },
+    containsText: {
+      label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
+      cardinality: 1
+    },
     endsWith: {
       label: formatMessage({ id: "queryBuilder_operator_endsWith" }),
       cardinality: 1
@@ -255,8 +259,8 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_lessThanOrEqualTo" }),
       cardinality: 1
     },
-    contains: {
-      label: formatMessage({ id: "queryBuilder_operator_contains" }),
+    containsDate: {
+      label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
       cardinality: 1
     },
     uuid: {
@@ -434,7 +438,7 @@ function generateBuilderConfig(
             "exactMatch",
             "partialMatch",
             "startsWith", // Only displayed if supported on the mapping.
-            "contains", // Only displayed if supported on the mapping.
+            "containsText", // Only displayed if supported on the mapping.
             "endsWith", // Only displayed if supported on the mapping.
             "notEquals",
             "empty",
@@ -476,7 +480,7 @@ function generateBuilderConfig(
           operators: [
             "equals",
             "notEquals",
-            "contains",
+            "containsDate",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",

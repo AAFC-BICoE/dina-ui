@@ -175,7 +175,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator contains 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator containsDate 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -282,7 +282,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator contains 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator containsDate 1`] = `
 Object {
   "nested": Object {
     "path": "included",

@@ -642,7 +642,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   queryBuilder_conjunction_and: "ET",
   queryBuilder_conjunction_or: "OU",
   queryBuilder_field_placeholder: "Sélectionner le champ à rechercher",
-  queryBuilder_operator_contains: "Contient",
+  queryBuilder_operator_containsDate: "Contient",
   queryBuilder_operator_empty: "Vide",
   queryBuilder_operator_equals: "Est égal à",
   queryBuilder_operator_exactMatch: "Correspondance exacte",

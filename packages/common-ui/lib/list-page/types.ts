@@ -95,7 +95,7 @@ export interface ESIndexMapping {
    *
    * Example: Hexapoda can be matched with "pod".
    */
-  infixSupport: boolean;
+  containsSupport: boolean;
 
   /**
    * If enabled it will allow the user to search based on the ending of a word.
@@ -171,7 +171,7 @@ export interface TransformToDSLProps {
    * The operation being performed.
    *
    * For example:
-   * "equals", "notEquals", "contains"
+   * "equals", "notEquals", "containsText"
    *
    * Operators are defined in the QueryBuilderConfig file.
    */

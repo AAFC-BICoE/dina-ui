@@ -33,7 +33,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
         operators: [
           "equals",
           "notEquals",
-          "contains",
+          "containsDate",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -112,7 +112,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                   path: "data.attributes.managedAttributes",
                   type: "managedAttribute",
                   startsWithSupport: false,
-                  infixSupport: false,
+                  containsSupport: false,
                   endsWithSupport: false
                 }
               })
@@ -153,7 +153,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                   path: "included.attributes.managedAttributes",
                   type: "managedAttribute",
                   startsWithSupport: false,
-                  infixSupport: false,
+                  containsSupport: false,
                   endsWithSupport: false
                 }
               })

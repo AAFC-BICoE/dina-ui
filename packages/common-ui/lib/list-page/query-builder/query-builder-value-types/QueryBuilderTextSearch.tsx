@@ -102,7 +102,7 @@ export function transformTextSearchToDSL({
       return prefixQuery(fieldPath, value, parentType);
 
     // Infix partial match
-    case "contains":
+    case "containsText":
       return infixQuery(fieldPath, value, parentType);
 
     // Suffix partial match

@@ -151,11 +151,11 @@ describe("QueryBuilderTextSearch", () => {
       });
     });
 
-    describe("Contains (Infix) operation", () => {
+    describe("ContainsText (Infix) operation", () => {
       test("With relationship as field", async () => {
         expect(
           transformTextSearchToDSL({
-            operation: "contains",
+            operation: "containsText",
             value: "text search",
             fieldInfo: {
               label: "name",
@@ -168,7 +168,7 @@ describe("QueryBuilderTextSearch", () => {
               distinctTerm: true
             } as any,
             fieldPath: "included.attributes.name",
-            queryType: "contains"
+            queryType: "containsText"
           })
         ).toMatchSnapshot();
       });
@@ -176,7 +176,7 @@ describe("QueryBuilderTextSearch", () => {
       test("With relationship containing complex path as field", async () => {
         expect(
           transformTextSearchToDSL({
-            operation: "contains",
+            operation: "containsText",
             value: "text",
             fieldInfo: {
               label: "determination.scientificName",
@@ -188,7 +188,7 @@ describe("QueryBuilderTextSearch", () => {
               value: "organism.determination.scientificName"
             } as any,
             fieldPath: "included.attributes.determination.scientificName",
-            queryType: "contains"
+            queryType: "containsText"
           })
         ).toMatchSnapshot();
       });
@@ -196,11 +196,11 @@ describe("QueryBuilderTextSearch", () => {
       test("Normal field", async () => {
         expect(
           transformTextSearchToDSL({
-            operation: "contains",
+            operation: "containsText",
             value: "text search",
             fieldInfo: {} as any,
             fieldPath: "data.attributes.textField",
-            queryType: "contains"
+            queryType: "containsText"
           })
         ).toMatchSnapshot();
       });
