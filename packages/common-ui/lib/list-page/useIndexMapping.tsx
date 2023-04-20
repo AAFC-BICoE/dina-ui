@@ -132,9 +132,9 @@ export function useIndexMapping({
             label: fieldMapping.label,
             path: fieldMapping.path,
             type: fieldMapping.type,
-            prefixSupport: false,
+            startsWithSupport: false,
             infixSupport: false,
-            suffixSupport: false
+            endsWithSupport: false
           });
         });
         dynamicFieldMapping.relationshipFields.forEach(
@@ -152,9 +152,9 @@ export function useIndexMapping({
               label: relationshipFieldMapping.label,
               path: relationshipFieldMapping.path,
               type: relationshipFieldMapping.type,
-              prefixSupport: false,
+              startsWithSupport: false,
               infixSupport: false,
-              suffixSupport: false
+              endsWithSupport: false
             });
           }
         );
