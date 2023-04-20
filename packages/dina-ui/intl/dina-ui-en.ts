@@ -4,10 +4,7 @@
 export const DINAUI_MESSAGES_ENGLISH = {
   LETTER: "Letter",
   NUMERICAL: "Numerical",
-  acquisitionEvent: "Acquisition Event",
-  acquisitionEventListTitle: "Acquisition Events",
   actionType: "Action Type",
-  addAcquisitionEventTitle: "Add Acquisition Event",
   addAnother: "Add Another {typeName}",
   addAnotherIdentifier: "Add Another Identifier",
   addAssemblageTitle: "Add Assemblage",
@@ -186,7 +183,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   duplicate: "Duplicate",
   duplicateFilesFound: "duplicate files found",
   duplicatePrimaryIdFound: "Duplicate Primary ID Found",
-  editAcquisitionEventTitle: "Edit Acquisition Event",
   editAssemblageTitle: "Edit Assemblage",
   editCataloguedObjectTitle: "Edit Catalogued Object",
   editCollectingEventTitle: "Edit Collecting Event",

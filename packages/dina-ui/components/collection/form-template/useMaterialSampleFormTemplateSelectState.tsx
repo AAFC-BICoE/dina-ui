@@ -1,7 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ACQUISITION_EVENT_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
   FormTemplate
 } from "../../../types/collection-api";
@@ -92,21 +91,12 @@ export function useMaterialSampleFormTemplateSelectState({
     materialSampleComponent.associations = [];
   }
 
-  // collecting event and acquisition components need to be isolated for useMaterialSample hook
+  // collecting event need to be isolated for useMaterialSample hook
   const collectingEventComponent = getComponentValues(
     COLLECTING_EVENT_COMPONENT_NAME,
     sampleFormTemplate,
     false
   );
-  const acquisitionEventComponent = getComponentValues(
-    ACQUISITION_EVENT_COMPONENT_NAME,
-    sampleFormTemplate,
-    false
-  );
-  const hasAcquisitionEvent =
-    Object.keys(acquisitionEventComponent.templateCheckboxes).length > 0
-      ? true
-      : false;
   const hasCollectingEvent =
     Object.keys(collectingEventComponent.templateCheckboxes).length > 0
       ? true
@@ -124,10 +114,7 @@ export function useMaterialSampleFormTemplateSelectState({
       COLLECTING_EVENT: hasCollectingEvent
         ? getFormTemplateSchema(collectingEventComponent)
         : undefined,
-      MATERIAL_SAMPLE: getFormTemplateSchema(materialSampleComponent),
-      ACQUISITION_EVENT: hasAcquisitionEvent
-        ? getFormTemplateSchema(acquisitionEventComponent)
-        : undefined
+      MATERIAL_SAMPLE: getFormTemplateSchema(materialSampleComponent)
     },
     type: "material-sample-form-template"
   };
@@ -145,13 +132,11 @@ export function useMaterialSampleFormTemplateSelectState({
   const {
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues
+    collectingEventInitialValues
   }: {
     visibleManagedAttributeKeys?: VisibleManagedAttributesConfig | undefined;
     materialSampleInitialValues: any;
     collectingEventInitialValues?: any;
-    acquisitionEventInitialValues?: any;
   } = useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
 
   // Delete unused variables from the initial values.
@@ -160,8 +145,6 @@ export function useMaterialSampleFormTemplateSelectState({
   delete materialSampleInitialValues?.managedAttributesOrder;
   delete collectingEventInitialValues?.templateCheckboxes;
   delete collectingEventInitialValues?.templateFields;
-  delete acquisitionEventInitialValues?.templateCheckboxes;
-  delete acquisitionEventInitialValues?.templateFields;
 
   return {
     sampleFormTemplate,
@@ -170,8 +153,7 @@ export function useMaterialSampleFormTemplateSelectState({
     setNavOrder,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues
+    collectingEventInitialValues
   };
 }
 function getFormTemplateSchema(component: any) {

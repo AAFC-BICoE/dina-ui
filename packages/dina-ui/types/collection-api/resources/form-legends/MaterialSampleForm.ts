@@ -8,8 +8,6 @@ export const MATERIAL_SAMPLE_INFO_COMPONENT_NAME: string =
   "material-sample-info-component";
 export const COLLECTING_EVENT_COMPONENT_NAME: string =
   "collecting-event-component";
-export const ACQUISITION_EVENT_COMPONENT_NAME: string =
-  "acquisition-event-component";
 export const PREPARATIONS_COMPONENT_NAME: string = "preparations-component";
 export const ORGANISMS_COMPONENT_NAME: string = "organisms-component";
 export const ASSOCIATIONS_COMPONENT_NAME: string = "associations-component";
@@ -350,50 +348,6 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
       }
     ]
   },
-  // TODO: Remove this block when Acquisition Event is confirmed to be removed entirely
-  // {
-  //   id: ACQUISITION_EVENT_COMPONENT_NAME,
-  //   labelKey: "acquisitionEvent",
-  //   maxGridSizeX: 2,
-  //   switchClassName: "enable-acquisition-event",
-  //   sections: [
-  //     {
-  //       id: "acquisition-event-reception-section",
-  //       labelKey: "reception",
-  //       maxGridSizeX: 2,
-  //       items: [
-  //         {
-  //           id: "group"
-  //         },
-  //         {
-  //           id: "receivedFrom"
-  //         },
-  //         {
-  //           id: "receivedDate"
-  //         },
-  //         {
-  //           id: "receptionRemarks"
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       id: "acquisition-event-isolation-section",
-  //       labelKey: "isolation",
-  //       maxGridSizeX: 2,
-  //       items: [
-  //         {
-  //           id: "isolatedBy"
-  //         },
-  //         {
-  //           id: "isolatedOn"
-  //         },
-  //         {
-  //           id: "isolationRemarks"
-  //         }
-  //       ]
-  //     }
-  //   ]
-  // },
   {
     id: PREPARATIONS_COMPONENT_NAME,
     labelKey: "preparations",

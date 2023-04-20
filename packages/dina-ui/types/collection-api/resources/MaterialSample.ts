@@ -2,7 +2,6 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { InputResource, KitsuResource, KitsuResourceLink } from "kitsu";
 import { BLANK_PREPARATION, BLANK_RESTRICTION } from "../../../components";
 import { ManagedAttributeValues } from "./ManagedAttribute";
-import { AcquisitionEvent } from "./AcquisitionEvent";
 import { Assemblage } from "./Assemblage";
 import { CollectingEvent } from "./CollectingEvent";
 import { Collection } from "./Collection";
@@ -108,7 +107,6 @@ export interface MaterialSampleRelationships {
   storageUnit?: StorageUnit;
   projects?: Project[];
   assemblages?: Assemblage[];
-  acquisitionEvent?: AcquisitionEvent;
 }
 
 interface MaterialSampleChildren extends MaterialSample {
