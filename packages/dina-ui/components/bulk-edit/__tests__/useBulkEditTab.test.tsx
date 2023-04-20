@@ -27,8 +27,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     setSampleFormTemplateUUID,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues
+    collectingEventInitialValues
   } = useMaterialSampleFormTemplateSelectState({});
 
   const [selectedTab, setSelectedTab] = useState<
@@ -53,8 +52,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     selectedTab,
     sampleFormTemplate,
     materialSampleInitialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues
+    collectingEventInitialValues
   );
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
@@ -92,7 +90,6 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/collection-method":
     case "collection-api/collecting-event":
     case "collection-api/material-sample":
-    case "collection-api/acquisition-event":
     case "collection-api/managed-attribute":
     case "collection-api/material-sample-type":
     case "collection-api/project":

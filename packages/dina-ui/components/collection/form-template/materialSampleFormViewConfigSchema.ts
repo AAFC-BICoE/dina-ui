@@ -24,8 +24,7 @@ export const materialSampleFormTemplateSchema = z.object({
   collectingEventManagedAttributesOrder: z.string().array().optional(),
   formTemplate: z.object({
     COLLECTING_EVENT: formTemplateSchema.optional(),
-    MATERIAL_SAMPLE: formTemplateSchema.optional(),
-    ACQUISITION_EVENT: formTemplateSchema.optional()
+    MATERIAL_SAMPLE: formTemplateSchema.optional()
   })
 });
 

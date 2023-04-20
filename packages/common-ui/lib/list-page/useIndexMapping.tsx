@@ -62,9 +62,9 @@ export function useIndexMapping(indexName: string) {
 
             // Additional options for the field:
             distinctTerm: key.distinct_term_agg,
-            prefixSupport: key?.fields?.includes("prefix") ?? false,
+            startsWithSupport: key?.fields?.includes("prefix") ?? false,
             containsSupport: key?.fields?.includes("infix") ?? false,
-            suffixSupport: key?.fields?.includes("prefix_reverse") ?? false
+            endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
           });
         });
 
@@ -91,11 +91,11 @@ export function useIndexMapping(indexName: string) {
 
             // Additional options for the field:
             distinctTerm: relationshipAttribute.distinct_term_agg,
-            prefixSupport:
+            startsWithSupport:
               relationshipAttribute?.fields?.includes("prefix") ?? false,
             containsSupport:
               relationshipAttribute?.fields?.includes("infix") ?? false,
-            suffixSupport:
+            endsWithSupport:
               relationshipAttribute?.fields?.includes("prefix_reverse") ?? false
           });
         });

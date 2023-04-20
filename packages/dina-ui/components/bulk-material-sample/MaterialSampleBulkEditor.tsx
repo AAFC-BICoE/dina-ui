@@ -54,8 +54,7 @@ export function MaterialSampleBulkEditor({
     setSampleFormTemplateUUID,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues
+    collectingEventInitialValues
   } = useMaterialSampleFormTemplateSelectState({
     temporaryFormTemplateUUID: initialFormTemplateUUID
   });
@@ -82,8 +81,7 @@ export function MaterialSampleBulkEditor({
     selectedTab,
     sampleFormTemplate,
     materialSampleInitialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues
+    collectingEventInitialValues
   );
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
@@ -190,8 +188,7 @@ export function initializeRefHookFormProps(
     | undefined,
   formTemplate: FormTemplate | undefined,
   materialSampleInitialValues,
-  collectingEventInitialValues,
-  acquisitionEventInitialValues
+  collectingEventInitialValues
 ) {
   // Make sure the samples list doesn't change during this component's lifecycle:
   const samples = useMemo(() => samplesProp, []);
@@ -214,7 +211,6 @@ export function initializeRefHookFormProps(
     ...formTemplateProps,
     materialSample: materialSampleInitialValues ?? initialValues,
     collectingEventInitialValues,
-    acquisitionEventInitialValues,
     showChangedIndicatorsInNestedForms: true
   });
 
@@ -257,7 +253,7 @@ function getSampleHooks(
         materialSample: resource,
         // Reduce the off-screen tabs rendering for better performance:
         reduceRendering: key !== selectedTab?.key,
-        // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
+        // Don't allow editing existing Col events in the individual sample tabs to avoid conflicts.
         disableNestedFormEdits: true,
         visibleManagedAttributeKeys
       }),
@@ -385,7 +381,7 @@ function useBulkSampleSave({
         }
 
         // TODO get rid of these try/catches when we can save
-        // the Col Event + Acq event + material sample all at once.
+        // the Col Event + material sample all at once.
         try {
           const saveOp = await saveHook.prepareSampleSaveOperation({
             submittedValues: formik.values,
