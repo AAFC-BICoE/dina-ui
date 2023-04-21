@@ -58,8 +58,10 @@ export function SangerPcrReactionStep({
         });
         const newItems = [...pcrBatchItems];
         for (const rst of savedResult) {
-          const id = rst.data.id;
-          const result = rst.data.attributes.result;
+          /* tslint:disable-next-line */
+          const id = rst.data["id"];
+          /* tslint:disable-next-line */
+          const result = rst.data["attributes"].result;
           const found = newItems.find((itm) => itm.id === id);
           if (found) {
             found.result = result;
