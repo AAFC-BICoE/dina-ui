@@ -8,7 +8,6 @@ import { useRouter } from "next/router";
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
   editMode: boolean;
-  setEditMode?: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave?: (newValue: boolean) => void;
 }
@@ -16,7 +15,6 @@ export interface SangerPcrReactionProps {
 export function SangerPcrReactionStep({
   pcrBatchId,
   editMode,
-  setEditMode,
   performSave,
   setPerformSave
 }: SangerPcrReactionProps) {
