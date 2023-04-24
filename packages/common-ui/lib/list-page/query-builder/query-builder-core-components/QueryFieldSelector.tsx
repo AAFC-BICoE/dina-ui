@@ -147,6 +147,7 @@ export function QueryFieldSelector({
 
   return (
     <div style={{ width: "100%" }}>
+      {/* Field Selection */}
       <Select
         options={queryRowOptions as any}
         className={`flex-grow-1 me-2 ps-0`}

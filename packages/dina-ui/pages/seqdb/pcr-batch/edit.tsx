@@ -35,7 +35,8 @@ import {
   Head,
   Nav,
   PersonSelectField,
-  StorageUnitSelectField
+  StorageUnitSelectField,
+  VocabularySelectField
 } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
@@ -322,6 +323,9 @@ function PcrBatchFormFields({
 }: PcrBatchFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { values } = useFormikContext<any>();
+  const [selectedRegion, setSelectedRegion] = useState<Region>(
+    initialValues.region
+  );
 
   // When the storage unit type is changed, the storage unit needs to be cleared.
   const StorageUnitTypeSelectorComponent = connect(
@@ -353,6 +357,25 @@ function PcrBatchFormFields({
     }
   );
 
+  // When the region is changed, it should clear the forward and reverse primer.
+  const RegionSelectorComponent = connect(({ formik: { setFieldValue } }) => {
+    return (
+      <ResourceSelectField<Region>
+        className="col-md-6"
+        name="region"
+        filter={filterBy(["name"])}
+        model="seqdb-api/region"
+        optionLabel={(region) => region.name}
+        readOnlyLink="/seqdb/region/view?id="
+        onChange={(value) => {
+          setSelectedRegion(value as Region);
+          setFieldValue("primerForward", null);
+          setFieldValue("primerReverse", null);
+        }}
+      />
+    );
+  });
+
   return (
     <div>
       <div className="row">
@@ -374,6 +397,13 @@ function PcrBatchFormFields({
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
+        <VocabularySelectField
+          className="col-md-6"
+          name="batchType"
+          path="seqdb-api/vocabulary/pcrBatchType"
+        />
+      </div>
+      <div className="row">
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
@@ -382,6 +412,7 @@ function PcrBatchFormFields({
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
         />
+        <TextField className="col-md-6" name="thermocycler" />
       </div>
       <div className="row">
         <PersonSelectField
@@ -389,14 +420,7 @@ function PcrBatchFormFields({
           name="experimenters"
           isMulti={true}
         />
-        <ResourceSelectField<Region>
-          className="col-md-6"
-          name="region"
-          filter={filterBy(["name"])}
-          model="seqdb-api/region"
-          optionLabel={(region) => region.name}
-          readOnlyLink="/seqdb/region/view?id="
-        />
+        <RegionSelectorComponent />
       </div>
       <div className="row">
         <ResourceSelectField<PcrPrimer>
@@ -404,36 +428,32 @@ function PcrBatchFormFields({
           name="primerForward"
           filter={(input) => ({
             ...filterBy(["name"])(input),
-            direction: { EQ: "F" }
+            direction: { EQ: "F" },
+            "region.id": { EQ: selectedRegion?.id }
           })}
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
+          isDisabled={!(selectedRegion && selectedRegion.id)}
         />
         <ResourceSelectField<PcrPrimer>
           className="col-md-6"
           name="primerReverse"
           filter={(input) => ({
             ...filterBy(["name"])(input),
-            direction: { EQ: "R" }
+            direction: { EQ: "R" },
+            "region.id": { EQ: selectedRegion?.id }
           })}
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
+          isDisabled={!(selectedRegion && selectedRegion.id)}
         />
-        <TextField className="col-md-6" name="thermocycler" />
+
         <TextField className="col-md-6" name="objective" />
         <TextField className="col-md-6" name="positiveControl" />
         <TextField className="col-md-6" name="reactionVolume" />
         <DateField className="col-md-6" name="reactionDate" />
-        <ResourceSelectField<Protocol>
-          className="col-md-6"
-          name="protocol"
-          filter={filterBy(["name"])}
-          model="collection-api/protocol"
-          optionLabel={(protocol) => protocol.name}
-          readOnlyLink="/collection/protocol/view?id="
-        />
         <StorageUnitTypeSelectorComponent />
         <StorageUnitSelectField
           resourceProps={{
@@ -454,6 +474,13 @@ function PcrBatchFormFields({
           }}
           restrictedField={"data.relationships.storageUnitType.data.id"}
           restrictedFieldValue={values?.storageUnitType?.id}
+        />
+        <ResourceSelectField<Protocol>
+          className="col-md-6"
+          name="protocol"
+          filter={filterBy(["name"])}
+          model="collection-api/protocol"
+          optionLabel={(protocol) => protocol.name}
         />
       </div>
       {initialValues.id ? (

@@ -14,7 +14,7 @@ import {
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
-import { ESIndexMapping } from "../types";
+import { DynamicFieldsMappingConfig, ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
 import { QueryConjunctionSwitch } from "./query-builder-core-components/QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./query-builder-core-components/QueryFieldSelector";
@@ -27,6 +27,9 @@ import QueryBuilderDateSearch, {
   transformDateSearchToDSL,
   validateDate
 } from "./query-builder-value-types/QueryBuilderDateSearch";
+import QueryRowManagedAttributeSearch, {
+  transformManagedAttributeToDSL
+} from "./query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
 } from "./query-builder-value-types/QueryBuilderNumberSearch";
@@ -81,6 +84,7 @@ function getQueryBuilderTypeFromIndexType(
     case "text":
     case "date":
     case "boolean":
+    case "managedAttribute":
       return type;
 
     // Elastic search contains many different number fields.
@@ -129,15 +133,34 @@ export interface CustomViewField {
   type: string;
 }
 
+export interface UseQueryBuilderConfigProps {
+  indexName: string;
+
+  /**
+   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
+   * be searched against. It will also define the path and data component if required.
+   *
+   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
+   * or grouped terms.
+   */
+  dynamicFieldMapping?: DynamicFieldsMappingConfig;
+
+  customViewFields?: CustomViewField[];
+}
+
 /**
  * Custom hook for generating the query builder hook. It should only be generated once.
  */
-export function useQueryBuilderConfig(
-  indexName: string,
-  customViewFields?: CustomViewField[]
-) {
+export function useQueryBuilderConfig({
+  indexName,
+  dynamicFieldMapping,
+  customViewFields
+}: UseQueryBuilderConfigProps) {
   // Load index map using the index name.
-  const { indexMap } = useIndexMapping(indexName);
+  const { indexMap } = useIndexMapping({
+    indexName,
+    dynamicFieldMapping
+  });
   const { formatMessage } = useIntl();
 
   const [queryBuilderConfig, setQueryBuilderConfig] = useState<Config>();
@@ -190,12 +213,16 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_partialMatch" }),
       cardinality: 1
     },
-    prefix: {
-      label: formatMessage({ id: "queryBuilder_operator_prefix" }),
+    startsWith: {
+      label: formatMessage({ id: "queryBuilder_operator_startsWith" }),
       cardinality: 1
     },
-    suffix: {
-      label: formatMessage({ id: "queryBuilder_operator_suffix" }),
+    containsText: {
+      label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
+      cardinality: 1
+    },
+    endsWith: {
+      label: formatMessage({ id: "queryBuilder_operator_endsWith" }),
       cardinality: 1
     },
     equals: {
@@ -219,7 +246,9 @@ function generateBuilderConfig(
       cardinality: 1
     },
     greaterThanOrEqualTo: {
-      label: formatMessage({ id: "queryBuilder_operator_greaterThanOrEqual" }),
+      label: formatMessage({
+        id: "queryBuilder_operator_greaterThanOrEqualTo"
+      }),
       cardinality: 1
     },
     lessThan: {
@@ -227,15 +256,20 @@ function generateBuilderConfig(
       cardinality: 1
     },
     lessThanOrEqualTo: {
-      label: formatMessage({ id: "queryBuilder_operator_lessThanOrEqual" }),
+      label: formatMessage({ id: "queryBuilder_operator_lessThanOrEqualTo" }),
       cardinality: 1
     },
-    contains: {
-      label: formatMessage({ id: "queryBuilder_operator_contains" }),
+    containsDate: {
+      label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
       cardinality: 1
     },
     uuid: {
       label: "UUID",
+      cardinality: 1
+    },
+    // Special case not to display any operators.
+    noOperator: {
+      label: "noOperator",
       cardinality: 1
     }
   };
@@ -366,6 +400,31 @@ function generateBuilderConfig(
           fieldInfo: indexSettings
         });
       }
+    },
+    managedAttribute: {
+      ...BasicConfig.widgets.text,
+      type: "managedAttribute",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowManagedAttributeSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          managedAttributeConfig={
+            (factoryProps?.fieldDefinition?.fieldSettings as any)
+              ?.mapping as ESIndexMapping
+          }
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformManagedAttributeToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
     }
   };
 
@@ -378,9 +437,9 @@ function generateBuilderConfig(
           operators: [
             "exactMatch",
             "partialMatch",
-            "prefix", // Only displayed if supported on the mapping.
-            "contains", // Only displayed if supported on the mapping.
-            "suffix", // Only displayed if supported on the mapping.
+            "startsWith", // Only displayed if supported on the mapping.
+            "containsText", // Only displayed if supported on the mapping.
+            "endsWith", // Only displayed if supported on the mapping.
             "notEquals",
             "empty",
             "notEmpty"
@@ -421,7 +480,7 @@ function generateBuilderConfig(
           operators: [
             "equals",
             "notEquals",
-            "contains",
+            "containsDate",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",
@@ -456,6 +515,15 @@ function generateBuilderConfig(
       widgets: {
         boolean: {
           operators: ["equals", "empty", "notEmpty"]
+        }
+      }
+    },
+    managedAttribute: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        managedAttribute: {
+          operators: ["noOperator"]
         }
       }
     }

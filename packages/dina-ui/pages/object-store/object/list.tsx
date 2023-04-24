@@ -156,6 +156,17 @@ export default function MetadataListPage() {
             <SplitPagePanel>
               <QueryPage
                 indexName={"dina_object_store_index"}
+                dynamicFieldMapping={{
+                  fields: [
+                    {
+                      type: "managedAttribute",
+                      label: "managedAttributes",
+                      path: "data.attributes.managedAttributes",
+                      apiEndpoint: "objectstore-api/managed-attribute"
+                    }
+                  ],
+                  relationshipFields: []
+                }}
                 columns={METADATA_TABLE_COLUMNS}
                 bulkDeleteButtonProps={{
                   typeName: "metadata",

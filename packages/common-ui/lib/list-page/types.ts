@@ -88,21 +88,21 @@ export interface ESIndexMapping {
    *
    * Example: Hexapoda can be matched with "hex".
    */
-  prefixSupport: boolean;
+  startsWithSupport: boolean;
 
   /**
    * If enabled it will allow the user to search based in the middle of a word.
    *
    * Example: Hexapoda can be matched with "pod".
    */
-  infixSupport: boolean;
+  containsSupport: boolean;
 
   /**
    * If enabled it will allow the user to search based on the ending of a word.
    *
    * Example: Hexapoda can be matched with "poda".
    */
-  suffixSupport: boolean;
+  endsWithSupport: boolean;
 
   /**
    * The path for the attribute without the attribute name. This path does not include the parent
@@ -139,6 +139,11 @@ export interface ESIndexMapping {
    * Example: preparation-method
    */
   parentType?: string;
+
+  /**
+   * Only provided if it was added using a dynamic field config.
+   */
+  dynamicField?: DynamicField;
 }
 
 /**
@@ -166,7 +171,7 @@ export interface TransformToDSLProps {
    * The operation being performed.
    *
    * For example:
-   * "equals", "notEquals", "contains"
+   * "equals", "notEquals", "containsText"
    *
    * Operators are defined in the QueryBuilderConfig file.
    */
@@ -183,4 +188,45 @@ export interface TransformToDSLProps {
    * The elastic search mapping for the field.
    */
   fieldInfo?: ESIndexMapping;
+}
+
+export type DynamicFieldType = "managedAttribute" | "fieldExtension";
+
+export interface DynamicFieldsMappingConfig {
+  /** Attribute level dynamic fields */
+  fields: DynamicField[];
+
+  /** Dynamic fields for relationships */
+  relationshipFields: RelationshipDynamicField[];
+}
+
+export interface DynamicField {
+  /**
+   * Option label that should be used.
+   */
+  label: string;
+
+  type: DynamicFieldType;
+
+  path: string;
+
+  /**
+   * Endpoint where these dynamic fields can be retrieved to list.
+   *
+   * Example: "collection-api/managed-attribute"
+   */
+  apiEndpoint: string;
+
+  /**
+   * Optional field to indicate which Managed Attributes or Field Extensions should be listed.
+   */
+  component?: string;
+}
+
+/**
+ * Configuration for where the Dynamic Field can be found within the relationship index mapping.
+ */
+export interface RelationshipDynamicField extends DynamicField {
+  referencedBy: string;
+  referencedType: string;
 }

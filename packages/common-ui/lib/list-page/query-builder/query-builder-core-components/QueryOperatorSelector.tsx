@@ -33,6 +33,12 @@ export function QueryOperatorSelector({
   setOperator,
   selectedFieldMapping
 }: QueryOperatorSelectorProps) {
+  // Do not render if no operators are available, specifically the managed attributes.
+  if (options?.length === 1 && options[0].key === "noOperator") {
+    setOperator?.("noOperator");
+    return <></>;
+  }
+
   /* istanbul ignore next */
   const customStyles = {
     placeholder: (provided, _) => ({
@@ -48,13 +54,19 @@ export function QueryOperatorSelector({
   // Some options are displayed only if it is supported.
   const operationOptions = options
     ?.filter((option) => {
-      if (option.key === "prefix" && !selectedFieldMapping?.prefixSupport) {
+      if (
+        option.key === "startsWith" &&
+        !selectedFieldMapping?.startsWithSupport
+      ) {
         return false;
       }
-      if (option.key === "contains" && !selectedFieldMapping?.infixSupport) {
+      if (
+        option.key === "containsText" &&
+        !selectedFieldMapping?.containsSupport
+      ) {
         return false;
       }
-      if (option.key === "suffix" && !selectedFieldMapping?.suffixSupport) {
+      if (option.key === "endsWith" && !selectedFieldMapping?.endsWithSupport) {
         return false;
       }
       return true;
