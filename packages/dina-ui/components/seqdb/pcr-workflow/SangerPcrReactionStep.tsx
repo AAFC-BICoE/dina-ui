@@ -21,7 +21,7 @@ export function SangerPcrReactionStep({
 }: SangerPcrReactionProps) {
   const { doOperations } = useApiClient();
   const formRef: Ref<FormikProps<Partial<PcrBatchItem>>> = useRef(null);
-  const { loading, materialSamples, pcrBatchItems } =
+  const { loading, materialSamples, pcrBatchItems, setPcrBatchItems } =
     usePcrReactionData(pcrBatchId);
 
   // Check if a save was requested from the top level button bar.
@@ -53,7 +53,21 @@ export function SangerPcrReactionStep({
           }
         }));
 
-        await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
+        const savedResult = await doOperations(operations, {
+          apiBaseUrl: "/seqdb-api"
+        });
+        const newItems = [...pcrBatchItems];
+        for (const rst of savedResult) {
+          /* tslint:disable-next-line */
+          const id = rst.data["id"];
+          /* tslint:disable-next-line */
+          const result = rst.data["attributes"].result;
+          const found = newItems.find((itm) => itm.id === id);
+          if (found) {
+            found.result = result;
+          }
+        }
+        setPcrBatchItems(newItems);
       }
     }
 
