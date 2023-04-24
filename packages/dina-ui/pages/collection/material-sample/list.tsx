@@ -293,6 +293,7 @@ export default function MaterialSampleListPage() {
           indexName={"dina_material_sample_index"}
           dynamicFieldMapping={{
             fields: [
+              // Managed Attributes
               {
                 type: "managedAttribute",
                 label: "managedAttributes",
@@ -300,11 +301,22 @@ export default function MaterialSampleListPage() {
                 path: "data.attributes.managedAttributes",
                 apiEndpoint: "collection-api/managed-attribute"
               },
+
+              // Field Extensions
               {
                 type: "fieldExtension",
                 label: "fieldExtensions",
                 component: "MATERIAL_SAMPLE",
                 path: "data.attributes.extensionValues",
+                apiEndpoint: "collection-api/extension"
+              },
+
+              // Restrictions
+              {
+                type: "fieldExtension",
+                label: "restrictions",
+                component: "RESTRICTION",
+                path: "data.attributes.restrictionFieldsExtension",
                 apiEndpoint: "collection-api/extension"
               }
             ],
@@ -349,17 +361,6 @@ export default function MaterialSampleListPage() {
                 referencedBy: "organism",
                 referencedType: "organism",
                 apiEndpoint: "collection-api/managed-attribute"
-              },
-
-              // Restrictions
-              {
-                type: "fieldExtension",
-                label: "fieldExtensions",
-                component: "RESTRICTION",
-                path: "included.attributes.extensionValues",
-                referencedBy: "restriction",
-                referencedType: "restriction",
-                apiEndpoint: "collection-api/extension"
               }
             ]
           }}

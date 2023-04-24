@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { ESIndexMapping, TransformToDSLProps } from "../../types";
-import QueryBuilderTextSearch from "./QueryBuilderTextSearch";
+import QueryBuilderTextSearch, {
+  transformTextSearchToDSL
+} from "./QueryBuilderTextSearch";
 import Select from "react-select";
 import { useIntl } from "react-intl";
 import { SelectOption, useQuery } from "common-ui";
@@ -127,20 +129,23 @@ export default function QueryRowFieldExtensionSearch({
     value: option
   }));
 
-  const selectedExtension = extensionOptions?.find(
-    (fieldExtensionPackage) =>
-      fieldExtensionPackage.value === fieldExtensionState.selectedExtension
-  );
+  const selectedExtension =
+    extensionOptions?.find(
+      (fieldExtensionPackage) =>
+        fieldExtensionPackage.value === fieldExtensionState.selectedExtension
+    ) ?? null;
 
-  const selectedField = selectedExtension?.fieldOptions?.find(
-    (fieldExtension) =>
-      fieldExtension.value === fieldExtensionState.selectedField
-  );
+  const selectedField =
+    selectedExtension?.fieldOptions?.find(
+      (fieldExtension) =>
+        fieldExtension.value === fieldExtensionState.selectedField
+    ) ?? null;
 
   // Currently selected option, if no option can be found just select the first one.
-  const selectedOperator = operatorOptions?.find(
-    (operator) => operator.value === fieldExtensionState.selectedOperator
-  );
+  const selectedOperator =
+    operatorOptions?.find(
+      (operator) => operator.value === fieldExtensionState.selectedOperator
+    ) ?? null;
 
   // If field extension has accepted values, get all the available options for the dropdown menu.
   const pickListOptions =
@@ -167,9 +172,10 @@ export default function QueryRowFieldExtensionSearch({
         placeholder={"Select field extension package to search against..."}
         onChange={(selected) =>
           setFieldExtensionState({
-            ...fieldExtensionState,
             selectedExtension: selected?.value ?? "",
-            selectedField: ""
+            selectedField: "",
+            searchValue: "",
+            selectedOperator: ""
           })
         }
         onInputChange={(inputValue) => setExtensionSearchValue(inputValue)}
@@ -261,7 +267,8 @@ export default function QueryRowFieldExtensionSearch({
  * made.
  */
 export function transformFieldExtensionToDSL({
-  value
+  value,
+  fieldInfo
 }: TransformToDSLProps): any {
   // Parse the field extension search options. Trim the search value.
   const fieldExtensionSearchValue: FieldExtensionSearchStates =
@@ -272,4 +279,20 @@ export function transformFieldExtensionToDSL({
   if (!fieldExtensionSearchValue.searchValue) {
     return undefined;
   }
+
+  return transformTextSearchToDSL({
+    fieldPath:
+      fieldInfo?.path +
+      "." +
+      fieldExtensionSearchValue.selectedExtension +
+      "." +
+      fieldExtensionSearchValue.selectedField,
+    operation: fieldExtensionSearchValue.selectedOperator,
+    queryType: "",
+    value: fieldExtensionSearchValue.searchValue,
+    fieldInfo: {
+      ...fieldInfo,
+      distinctTerm: true
+    } as ESIndexMapping
+  });
 }

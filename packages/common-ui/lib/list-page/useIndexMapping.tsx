@@ -71,7 +71,8 @@ export function useIndexMapping({
           // they are handled using the dynamic mapping config. See the dynamicFieldMapping.
           if (
             path !== "data.attributes.managedAttributes" &&
-            path !== "data.attribute.extensionValues"
+            !path.startsWith("data.attributes.extensionValues") &&
+            !path.startsWith("data.attributes.restrictionFieldsExtension")
           ) {
             result.push({
               label: attrPrefix ? attrPrefix + "." + key.name : key.name,
