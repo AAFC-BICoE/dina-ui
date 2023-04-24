@@ -1,20 +1,19 @@
 import {
-  filterBy,
-  QueryPage,
-  useAccount,
-  useApiClient,
+  DoOperationsError,
   LoadingSpinner,
-  DoOperationsError
+  QueryPage,
+  filterBy,
+  useAccount,
+  useApiClient
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { useState, useEffect } from "react";
-import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
-import { pick, compact, uniq } from "lodash";
-import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
-import { ELASTIC_SEARCH_COLUMN } from "../../collection/material-sample/MaterialSampleRelationshipColumns";
+import { compact, pick, uniq } from "lodash";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
+import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
+import { ELASTIC_SEARCH_COLUMN } from "../../collection/material-sample/MaterialSampleRelationshipColumns";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -37,11 +36,7 @@ export function SangerSampleSelectionStep({
   setPerformSave
 }: SangerSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
-  const { formatMessage } = useDinaIntl();
   const { username } = useAccount();
-  const router = useRouter();
-
-  const thisStep = router.query.step ? Number(router.query.step) : 0;
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -51,7 +46,7 @@ export function SangerSampleSelectionStep({
       await onSaved(2);
     }
 
-    if (performSave && thisStep === 1) {
+    if (performSave) {
       performSaveInternal();
     }
   }, [performSave]);

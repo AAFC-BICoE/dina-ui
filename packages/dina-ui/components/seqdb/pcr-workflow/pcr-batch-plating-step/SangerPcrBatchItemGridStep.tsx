@@ -6,7 +6,6 @@ import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
 import { useEffect } from "react";
 import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
 import { PersistedResource } from "kitsu";
-import { useRouter } from "next/router";
 
 export interface PCRBatchItemGridProps {
   pcrBatchId: string;
@@ -52,9 +51,6 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
     pcrBatch
   });
 
-  const router = useRouter();
-  const thisStep = router?.query?.step ? Number(router.query.step) : 0;
-
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
     async function performSaveInternal() {
@@ -63,7 +59,7 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
       await onSaved(3);
     }
 
-    if (performSave && thisStep === 2) {
+    if (performSave) {
       performSaveInternal();
     }
   }, [performSave]);

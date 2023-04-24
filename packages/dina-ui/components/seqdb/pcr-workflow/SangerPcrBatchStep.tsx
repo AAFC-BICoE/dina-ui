@@ -34,6 +34,7 @@ export function SangerPcrBatchStep({
   }, [pcrBatchId]);
 
   async function onSavedInternal(resource: PersistedResource<PcrBatch>) {
+    setPerformSave(false);
     await onSaved(1, resource);
   }
 

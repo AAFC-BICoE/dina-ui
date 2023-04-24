@@ -167,10 +167,6 @@ const testCtx = {
 
 const mockOnSaved = jest.fn();
 
-jest.mock("next/router", () => ({
-  useRouter: () => ({ query: { step: 2 } })
-}));
-
 describe("SangerPcrBatchItemGridStep component", () => {
   beforeEach(jest.clearAllMocks);
 
