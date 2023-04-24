@@ -299,6 +299,13 @@ export default function MaterialSampleListPage() {
                 component: "MATERIAL_SAMPLE",
                 path: "data.attributes.managedAttributes",
                 apiEndpoint: "collection-api/managed-attribute"
+              },
+              {
+                type: "fieldExtension",
+                label: "fieldExtensions",
+                component: "MATERIAL_SAMPLE",
+                path: "data.attributes.extensionValues",
+                apiEndpoint: "collection-api/extension"
               }
             ],
             relationshipFields: [
@@ -323,6 +330,15 @@ export default function MaterialSampleListPage() {
                 referencedType: "collecting-event",
                 apiEndpoint: "collection-api/managed-attribute"
               },
+              {
+                type: "fieldExtension",
+                label: "fieldExtensions",
+                component: "COLLECTING_EVENT",
+                path: "included.attributes.extensionValues",
+                referencedBy: "collectingEvent",
+                referencedType: "collecting-event",
+                apiEndpoint: "collection-api/extension"
+              },
 
               // Determination
               {
@@ -333,6 +349,17 @@ export default function MaterialSampleListPage() {
                 referencedBy: "organism",
                 referencedType: "organism",
                 apiEndpoint: "collection-api/managed-attribute"
+              },
+
+              // Restrictions
+              {
+                type: "fieldExtension",
+                label: "fieldExtensions",
+                component: "RESTRICTION",
+                path: "included.attributes.extensionValues",
+                referencedBy: "restriction",
+                referencedType: "restriction",
+                apiEndpoint: "collection-api/extension"
               }
             ]
           }}

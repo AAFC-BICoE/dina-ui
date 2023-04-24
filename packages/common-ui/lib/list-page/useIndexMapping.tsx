@@ -67,9 +67,12 @@ export function useIndexMapping({
             attrPrefix = path.substring(prefix.length + 1);
           }
 
-          // Manually remove managed attributes from here, they are handled using the dynamic
-          // mapping config. See the dynamicFieldMapping.
-          if (path !== "data.attributes.managedAttributes") {
+          // Manually remove managed attributes and extension fields from here,
+          // they are handled using the dynamic mapping config. See the dynamicFieldMapping.
+          if (
+            path !== "data.attributes.managedAttributes" &&
+            path !== "data.attribute.extensionValues"
+          ) {
             result.push({
               label: attrPrefix ? attrPrefix + "." + key.name : key.name,
               value: key.path

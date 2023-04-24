@@ -88,6 +88,7 @@ function getQueryBuilderTypeFromIndexType(
     case "date":
     case "boolean":
     case "managedAttribute":
+    case "fieldExtension":
       return type;
 
     // Elastic search contains many different number fields.
