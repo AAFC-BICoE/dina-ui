@@ -11,9 +11,7 @@ import QueryBuilderNumberSearch, {
 import QueryBuilderDateSearch, {
   transformDateSearchToDSL
 } from "./QueryBuilderDateSearch";
-import QueryBuilderBooleanSearch, {
-  transformBooleanSearchToDSL
-} from "./QueryBuilderBooleanSearch";
+import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./QueryBuilderTextSearch";

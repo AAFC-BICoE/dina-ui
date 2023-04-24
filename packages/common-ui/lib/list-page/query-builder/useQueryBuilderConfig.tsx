@@ -27,6 +27,9 @@ import QueryBuilderDateSearch, {
   transformDateSearchToDSL,
   validateDate
 } from "./query-builder-value-types/QueryBuilderDateSearch";
+import QueryRowFieldExtensionSearch, {
+  transformFieldExtensionToDSL
+} from "./query-builder-value-types/QueryBuilderFieldExtensionSearch";
 import QueryRowManagedAttributeSearch, {
   transformManagedAttributeToDSL
 } from "./query-builder-value-types/QueryBuilderManagedAttributeSearch";
@@ -425,6 +428,31 @@ function generateBuilderConfig(
           fieldInfo: indexSettings
         });
       }
+    },
+    fieldExtension: {
+      ...BasicConfig.widgets.text,
+      type: "fieldExtension",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowFieldExtensionSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          fieldExtensionConfig={
+            (factoryProps?.fieldDefinition?.fieldSettings as any)
+              ?.mapping as ESIndexMapping
+          }
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformFieldExtensionToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
     }
   };
 
@@ -523,6 +551,15 @@ function generateBuilderConfig(
       defaultOperator: "noOperator",
       widgets: {
         managedAttribute: {
+          operators: ["noOperator"]
+        }
+      }
+    },
+    fieldExtension: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        fieldExtension: {
           operators: ["noOperator"]
         }
       }
