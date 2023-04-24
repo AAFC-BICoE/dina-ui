@@ -47,14 +47,21 @@ export default function SangerWorkFlowSequencingRunPage() {
     });
   }, [currentStep]);
 
-  async function finishSeqBatchStep(
-    seqBatchSaved: PersistedResource<SeqBatch>
+  async function onSaved(
+    nextStep: number,
+    seqBatchSaved?: PersistedResource<SeqBatch>
   ) {
-    setCurrentStep(1);
-    setSeqBatchId(seqBatchSaved.id);
+    setCurrentStep(nextStep);
+    if (seqBatchSaved) {
+      setSeqBatchId(seqBatchSaved.id);
+    }
     await router.push({
       pathname: router.pathname,
-      query: { ...router.query, seqBatchId: seqBatchSaved.id, step: "1" }
+      query: {
+        ...router.query,
+        seqBatchId: seqBatchSaved ? seqBatchSaved.id : seqBatchId,
+        step: "" + nextStep
+      }
     });
   }
 
@@ -142,7 +149,7 @@ export default function SangerWorkFlowSequencingRunPage() {
           <SangerSeqBatchStep
             seqBatchId={seqBatchId}
             seqBatch={seqBatchQueryState.response?.data}
-            onSaved={finishSeqBatchStep}
+            onSaved={onSaved}
             editMode={editMode}
             setEditMode={setEditMode}
             performSave={performSave}
@@ -154,7 +161,7 @@ export default function SangerWorkFlowSequencingRunPage() {
             <SangerSeqReactionStep
               seqBatch={seqBatchQueryState.response?.data}
               editMode={editMode}
-              setEditMode={setEditMode}
+              onSaved={onSaved}
               performSave={performSave}
               setPerformSave={setPerformSave}
             />
