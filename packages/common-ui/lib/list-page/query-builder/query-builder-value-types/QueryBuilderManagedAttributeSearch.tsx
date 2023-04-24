@@ -210,7 +210,9 @@ export default function QueryRowManagedAttributeSearch({
               (pickOption) =>
                 pickOption.value === managedAttributeState.searchValue
             )}
-            placeholder={"Select pick list option..."}
+            placeholder={formatMessage({
+              id: "queryBuilder_pickList_placeholder"
+            })}
             onChange={(pickListOption) =>
               setManagedAttributeState({
                 ...managedAttributeState,
@@ -261,9 +263,11 @@ export default function QueryRowManagedAttributeSearch({
       {/* Managed Attribute Selection */}
       <Select<ManagedAttributeOption>
         options={managedAttributeOptions}
-        className={`col me-2 ms-2 ps-0`}
+        className={`col me-1 ms-2 ps-0`}
         value={managedAttributeSelected}
-        placeholder={"Select managed attribute to search against..."}
+        placeholder={formatMessage({
+          id: "queryBuilder_managedAttribute_placeholder"
+        })}
         onChange={(selected) =>
           setManagedAttributeState({
             ...managedAttributeState,
@@ -283,7 +287,7 @@ export default function QueryRowManagedAttributeSearch({
       {operatorOptions.length !== 0 ? (
         <Select<SelectOption<string>>
           options={operatorOptions}
-          className={`col me-2 ps-0`}
+          className={`col me-1 ps-0`}
           value={selectedOperator}
           onChange={(selected) =>
             setManagedAttributeState({

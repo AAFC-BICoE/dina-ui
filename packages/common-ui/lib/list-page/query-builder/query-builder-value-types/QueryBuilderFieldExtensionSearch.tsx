@@ -167,9 +167,11 @@ export default function QueryRowFieldExtensionSearch({
       {/* Extension Selector */}
       <Select<FieldExtensionPackageOption>
         options={extensionOptions}
-        className={`col me-2 ms-2 ps-0`}
+        className={`col me-1 ms-2 ps-0`}
         value={selectedExtension}
-        placeholder={"Select field extension package to search against..."}
+        placeholder={formatMessage({
+          id: "queryBuilder_extension_placeholder"
+        })}
         onChange={(selected) =>
           setFieldExtensionState({
             selectedExtension: selected?.value ?? "",
@@ -187,9 +189,11 @@ export default function QueryRowFieldExtensionSearch({
         <>
           <Select<FieldExtensionOption>
             options={selectedExtension?.fieldOptions}
-            className={`col me-2 ms-2 ps-0`}
+            className={`col me-1 ps-0`}
             value={selectedField}
-            placeholder={"Select field extension to search against..."}
+            placeholder={formatMessage({
+              id: "queryBuilder_extension_field_placeholder"
+            })}
             onChange={(selected) =>
               setFieldExtensionState({
                 ...fieldExtensionState,
@@ -209,7 +213,7 @@ export default function QueryRowFieldExtensionSearch({
         <>
           <Select<SelectOption<string>>
             options={operatorOptions}
-            className={`col me-2 ps-0`}
+            className={`col me-1 ps-0`}
             value={selectedOperator}
             onChange={(selected) =>
               setFieldExtensionState({
@@ -230,7 +234,9 @@ export default function QueryRowFieldExtensionSearch({
                     (pickOption) =>
                       pickOption.value === fieldExtensionState.searchValue
                   )}
-                  placeholder={"Select pick list option..."}
+                  placeholder={formatMessage({
+                    id: "queryBuilder_pickList_placeholder"
+                  })}
                   onChange={(pickListOption) =>
                     setFieldExtensionState({
                       ...fieldExtensionState,
