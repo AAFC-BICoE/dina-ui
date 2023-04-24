@@ -7,16 +7,21 @@ import {
   DoOperationsError
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import { useState, useEffect } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
 import { pick, compact, uniq } from "lodash";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { ELASTIC_SEARCH_COLUMN } from "../../collection/material-sample/MaterialSampleRelationshipColumns";
+import { useRouter } from "next/router";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
+  onSaved: (
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<PcrBatch>
+  ) => Promise<void>;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
@@ -26,6 +31,7 @@ export interface SangerSampleSelectionStepProps {
 export function SangerSampleSelectionStep({
   pcrBatchId,
   editMode,
+  onSaved,
   setEditMode,
   performSave,
   setPerformSave
@@ -33,15 +39,19 @@ export function SangerSampleSelectionStep({
   const { apiClient, bulkGet, save } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { username } = useAccount();
+  const router = useRouter();
+
+  const thisStep = router.query.step ? Number(router.query.step) : 0;
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
     async function performSaveInternal() {
       await savePcrBatchItems();
       setPerformSave(false);
+      await onSaved(2);
     }
 
-    if (performSave) {
+    if (performSave && thisStep === 1) {
       performSaveInternal();
     }
   }, [performSave]);
@@ -209,7 +219,7 @@ export function SangerSampleSelectionStep({
     } finally {
       // Clear the previously selected resources.
       setPreviouslySelectedResources([]);
-      setEditMode(false);
+      // setEditMode(false);
     }
   }
 

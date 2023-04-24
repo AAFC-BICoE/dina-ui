@@ -45,14 +45,21 @@ export default function PCRWorkFlowRunPage() {
     });
   }, [currentStep]);
 
-  async function finishPcrBatchStep(
-    pcrBatchSaved: PersistedResource<PcrBatch>
+  async function onSaved(
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<PcrBatch>
   ) {
-    setCurrentStep(1);
-    setPcrBatchId(pcrBatchSaved.id);
+    setCurrentStep(nextStep);
+    if (pcrBatchSaved) {
+      setPcrBatchId(pcrBatchSaved.id);
+    }
     await router.push({
       pathname: router.pathname,
-      query: { ...router.query, pcrBatchId: pcrBatchSaved.id, step: "1" }
+      query: {
+        ...router.query,
+        pcrBatchId: pcrBatchSaved ? pcrBatchSaved.id : pcrBatchId,
+        step: "" + nextStep
+      }
     });
   }
 
@@ -143,7 +150,7 @@ export default function PCRWorkFlowRunPage() {
           <SangerPcrBatchStep
             pcrBatchId={pcrBatchId}
             pcrBatch={pcrBatch.response?.data}
-            onSaved={finishPcrBatchStep}
+            onSaved={onSaved}
             editMode={editMode}
             setEditMode={setEditMode}
             performSave={performSave}
@@ -154,6 +161,7 @@ export default function PCRWorkFlowRunPage() {
           {pcrBatchId && (
             <SangerSampleSelectionStep
               pcrBatchId={pcrBatchId}
+              onSaved={onSaved}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}
@@ -166,6 +174,7 @@ export default function PCRWorkFlowRunPage() {
             <PCRBatchItemGrid
               pcrBatchId={pcrBatchId}
               pcrBatch={pcrBatch.response.data}
+              onSaved={onSaved}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}

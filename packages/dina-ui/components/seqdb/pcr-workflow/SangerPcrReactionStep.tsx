@@ -3,6 +3,7 @@ import { FormikProps } from "formik";
 import { Ref, useEffect, useRef } from "react";
 import { PcrBatchItem } from "../../../types/seqdb-api";
 import { PcrReactionTable, usePcrReactionData } from "./PcrReactionTable";
+import { useRouter } from "next/router";
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
@@ -23,10 +24,12 @@ export function SangerPcrReactionStep({
   const formRef: Ref<FormikProps<Partial<PcrBatchItem>>> = useRef(null);
   const { loading, materialSamples, pcrBatchItems } =
     usePcrReactionData(pcrBatchId);
+  const router = useRouter();
+  const thisStep = router.query.step ? Number(router.query.step) : 0;
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
-    if (performSave && !!pcrBatchId) {
+    if (performSave && !!pcrBatchId && thisStep === 3) {
       performSaveInternal();
     }
   }, [performSave]);
@@ -54,15 +57,13 @@ export function SangerPcrReactionStep({
         }));
 
         await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
+        setEditMode?.(false);
       }
     }
 
     // Leave edit mode...
     if (!!setPerformSave) {
       setPerformSave(false);
-    }
-    if (!!setEditMode) {
-      setEditMode(false);
     }
   }
 

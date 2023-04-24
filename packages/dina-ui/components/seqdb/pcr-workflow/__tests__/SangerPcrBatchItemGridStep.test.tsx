@@ -165,6 +165,12 @@ const testCtx = {
   }
 };
 
+const mockOnSaved = jest.fn();
+
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { step: 2 } })
+}));
+
 describe("SangerPcrBatchItemGridStep component", () => {
   beforeEach(jest.clearAllMocks);
 
@@ -177,6 +183,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
         setEditMode={noop}
         performSave={false}
         setPerformSave={noop}
+        onSaved={jest.fn()}
       />,
       testCtx
     );
@@ -216,6 +223,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
         setEditMode={noop}
         performSave={false}
         setPerformSave={noop}
+        onSaved={mockOnSaved}
       />,
       testCtx
     );
@@ -238,6 +246,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
           setEditMode={noop}
           performSave={false}
           setPerformSave={noop}
+          onSaved={mockOnSaved}
         />
       )
     });
@@ -260,6 +269,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
         setEditMode={noop}
         performSave={false}
         setPerformSave={noop}
+        onSaved={mockOnSaved}
       />,
       testCtx
     );
@@ -277,6 +287,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
           setEditMode={noop}
           performSave={false}
           setPerformSave={noop}
+          onSaved={mockOnSaved}
         />
       )
     });
@@ -305,6 +316,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
         setEditMode={noop}
         performSave={false}
         setPerformSave={noop}
+        onSaved={mockOnSaved}
       />,
       testCtx
     );
@@ -322,6 +334,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
           setEditMode={noop}
           performSave={false}
           setPerformSave={noop}
+          onSaved={mockOnSaved}
         />
       )
     });
@@ -388,6 +401,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
           setEditMode={noop}
           performSave={true} // Perform save...
           setPerformSave={noop}
+          onSaved={mockOnSaved}
         />
       )
     });
@@ -456,6 +470,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
         setEditMode={noop}
         performSave={false}
         setPerformSave={noop}
+        onSaved={mockOnSaved}
       />,
       testCtx
     );
@@ -481,6 +496,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
           setEditMode={noop}
           performSave={false}
           setPerformSave={noop}
+          onSaved={mockOnSaved}
         />
       )
     });
@@ -504,6 +520,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
           setEditMode={noop}
           performSave={true} // Perform save...
           setPerformSave={noop}
+          onSaved={mockOnSaved}
         />
       )
     });
@@ -546,6 +563,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
         setEditMode={noop}
         performSave={false}
         setPerformSave={noop}
+        onSaved={mockOnSaved}
       />,
       testCtx
     );

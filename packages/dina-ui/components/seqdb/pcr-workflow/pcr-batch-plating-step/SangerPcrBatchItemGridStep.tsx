@@ -5,10 +5,16 @@ import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
 import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
 import { useEffect } from "react";
 import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
+import { PersistedResource } from "kitsu";
+import { useRouter } from "next/router";
 
 export interface PCRBatchItemGridProps {
   pcrBatchId: string;
   pcrBatch: PcrBatch;
+  onSaved: (
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<PcrBatch>
+  ) => Promise<void>;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
@@ -19,6 +25,7 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
   const {
     pcrBatchId,
     pcrBatch,
+    onSaved,
     editMode,
     setEditMode,
     performSave,
@@ -42,19 +49,21 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
     gridIsPopulated
   } = usePCRBatchItemGridControls({
     pcrBatchId,
-    pcrBatch,
-    editMode
+    pcrBatch
   });
+
+  const router = useRouter();
+  const thisStep = router?.query?.step ? Number(router.query.step) : 0;
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
     async function performSaveInternal() {
       await gridSubmit();
       setPerformSave(false);
-      setEditMode(false);
+      await onSaved(3);
     }
 
-    if (performSave) {
+    if (performSave && thisStep === 2) {
       performSaveInternal();
     }
   }, [performSave]);
