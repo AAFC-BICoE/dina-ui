@@ -78,7 +78,7 @@ export function usePcrReactionData(pcrBatchId?: string) {
     });
   }
 
-  return { pcrBatchItems, materialSamples, loading };
+  return { pcrBatchItems, setPcrBatchItems, materialSamples, loading };
 }
 
 export interface PcrReactionTableProps {
