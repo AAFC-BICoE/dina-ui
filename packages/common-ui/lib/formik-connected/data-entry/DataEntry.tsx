@@ -8,6 +8,7 @@ import { Button } from "react-bootstrap";
 import {
   BulkEditTabContextI,
   FieldSet,
+  LoadingSpinner,
   SelectOption,
   useApiClient,
   useBulkEditTabContext,
@@ -58,7 +59,8 @@ export function DataEntry({
     : blockOptionsQuery?.response?.data.map((data) => {
         return {
           label: data.extension.name,
-          value: data.extension.key
+          value: data.extension.key,
+          fields: data.extension.fields
         };
       });
 
@@ -170,6 +172,9 @@ export function DataEntry({
       );
     };
   }
+  if (blockOptionsQuery?.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
   return (
     <FieldSet legend={legend} wrapLegend={legendWrapper()} id={id}>
       {
@@ -193,7 +198,6 @@ export function DataEntry({
                       isVocabularyBasedEnabledForType
                     }
                     extensionValues={extensionValues}
-                    blockOptionsQuery={blockOptionsQuery}
                     blockOptions={blockOptions}
                     unitsOptions={vocabQuery?.vocabOptions}
                     typeOptions={
