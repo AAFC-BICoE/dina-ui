@@ -3,7 +3,7 @@ import { ESIndexMapping, TransformToDSLProps } from "../../types";
 import QueryBuilderTextSearch from "./QueryBuilderTextSearch";
 import Select from "react-select";
 import { useIntl } from "react-intl";
-import { useQuery } from "common-ui";
+import { SelectOption, useQuery } from "common-ui";
 import { FieldExtension } from "../../../../../dina-ui/types/collection-api/resources/FieldExtension";
 
 interface QueryRowTextSearchProps {
@@ -24,19 +24,12 @@ interface QueryRowTextSearchProps {
   fieldExtensionConfig?: ESIndexMapping;
 }
 
-export interface FieldExtensionOption {
-  label: string;
-  value: string;
+export interface FieldExtensionPackageOption extends SelectOption<string> {
+  fieldOptions: FieldExtensionOption[];
 }
 
-export interface FieldExtensionPackageOption {
-  label: string;
-  value: string;
-}
-
-export interface FieldExtensionOperatorOption {
-  label: string;
-  value: string;
+export interface FieldExtensionOption extends SelectOption<string> {
+  acceptedValues?: string[];
 }
 
 export interface FieldExtensionSearchStates {
@@ -76,8 +69,6 @@ export default function QueryRowFieldExtensionSearch({
     FieldExtensionPackageOption[]
   >([]);
   const [extensionSearchValue, setExtensionSearchValue] = useState<string>("");
-
-  const [fieldOptions, setFieldOptions] = useState<FieldExtensionOption[]>([]);
   const [fieldSearchValue, setFieldSearchValue] = useState<string>("");
 
   // Convert the state in this component to a value that can be stored in the Query Builder.
@@ -99,7 +90,6 @@ export default function QueryRowFieldExtensionSearch({
     {
       path: fieldExtensionConfig?.dynamicField?.apiEndpoint ?? "",
       filter: {
-        // "extension.name": `*${extensionSearchValue}*`,
         "extension.fields.dinaComponent":
           fieldExtensionConfig?.dynamicField?.component ?? ""
       }
@@ -109,7 +99,15 @@ export default function QueryRowFieldExtensionSearch({
         setExtensionOptions(
           data.map<FieldExtensionPackageOption>((fieldExtension) => ({
             label: fieldExtension?.extension?.name ?? "",
-            value: fieldExtension?.extension?.key ?? ""
+            value: fieldExtension?.extension?.key ?? "",
+            fieldOptions:
+              fieldExtension?.extension?.fields?.map<FieldExtensionOption>(
+                (field) => ({
+                  label: field?.name,
+                  value: field?.key,
+                  acceptedValues: field?.acceptedValues
+                })
+              )
           }))
         );
       },
@@ -124,7 +122,7 @@ export default function QueryRowFieldExtensionSearch({
     "notEquals",
     "empty",
     "notEmpty"
-  ].map<FieldExtensionOperatorOption>((option) => ({
+  ].map<SelectOption<string>>((option) => ({
     label: formatMessage({ id: "queryBuilder_operator_" + option }),
     value: option
   }));
@@ -134,7 +132,7 @@ export default function QueryRowFieldExtensionSearch({
       fieldExtensionPackage.value === fieldExtensionState.selectedExtension
   );
 
-  const selectedField = fieldOptions?.find(
+  const selectedField = selectedExtension?.fieldOptions?.find(
     (fieldExtension) =>
       fieldExtension.value === fieldExtensionState.selectedField
   );
@@ -143,6 +141,21 @@ export default function QueryRowFieldExtensionSearch({
   const selectedOperator = operatorOptions?.find(
     (operator) => operator.value === fieldExtensionState.selectedOperator
   );
+
+  // If field extension has accepted values, get all the available options for the dropdown menu.
+  const pickListOptions =
+    selectedField?.acceptedValues?.map<SelectOption<string>>((pickOption) => ({
+      value: pickOption,
+      label: pickOption
+    })) ?? [];
+
+  // Automatically set the operator.
+  if (!selectedOperator && operatorOptions?.[0]) {
+    setFieldExtensionState({
+      ...fieldExtensionState,
+      selectedOperator: operatorOptions?.[0].value ?? ""
+    });
+  }
 
   return (
     <div className="row">
@@ -164,47 +177,81 @@ export default function QueryRowFieldExtensionSearch({
       />
 
       {/* Field Selector */}
-      <Select<FieldExtensionOption>
-        options={fieldOptions}
-        className={`col me-2 ms-2 ps-0`}
-        value={selectedField}
-        placeholder={"Select field extension to search against..."}
-        onChange={(selected) =>
-          setFieldExtensionState({
-            ...fieldExtensionState,
-            selectedField: selected?.value ?? ""
-          })
-        }
-        onInputChange={(inputValue) => setFieldSearchValue(inputValue)}
-        inputValue={fieldSearchValue}
-      />
+      {selectedExtension ? (
+        <>
+          <Select<FieldExtensionOption>
+            options={selectedExtension?.fieldOptions}
+            className={`col me-2 ms-2 ps-0`}
+            value={selectedField}
+            placeholder={"Select field extension to search against..."}
+            onChange={(selected) =>
+              setFieldExtensionState({
+                ...fieldExtensionState,
+                selectedField: selected?.value ?? ""
+              })
+            }
+            onInputChange={(inputValue) => setFieldSearchValue(inputValue)}
+            inputValue={fieldSearchValue}
+          />
+        </>
+      ) : (
+        <></>
+      )}
 
       {/* Operator Selector */}
-      <Select<FieldExtensionOperatorOption>
-        options={operatorOptions}
-        className={`col me-2 ps-0`}
-        value={selectedOperator}
-        onChange={(selected) =>
-          setFieldExtensionState({
-            ...fieldExtensionState,
-            selectedOperator: selected?.value ?? ""
-          })
-        }
-      />
+      {selectedField ? (
+        <>
+          <Select<SelectOption<string>>
+            options={operatorOptions}
+            className={`col me-2 ps-0`}
+            value={selectedOperator}
+            onChange={(selected) =>
+              setFieldExtensionState({
+                ...fieldExtensionState,
+                selectedOperator: selected?.value ?? ""
+              })
+            }
+          />
 
-      {/* Search Value */}
-      <div className="col ps-0">
-        <QueryBuilderTextSearch
-          matchType={fieldExtensionState.selectedOperator}
-          value={fieldExtensionState.searchValue}
-          setValue={(userInput) =>
-            setFieldExtensionState({
-              ...fieldExtensionState,
-              searchValue: userInput ?? ""
-            })
-          }
-        />
-      </div>
+          {/* Search Value */}
+          <div className="col ps-0">
+            {selectedField?.acceptedValues ? (
+              <>
+                <Select<SelectOption<string>>
+                  options={pickListOptions}
+                  className={`col ps-0`}
+                  value={pickListOptions?.find(
+                    (pickOption) =>
+                      pickOption.value === fieldExtensionState.searchValue
+                  )}
+                  placeholder={"Select pick list option..."}
+                  onChange={(pickListOption) =>
+                    setFieldExtensionState({
+                      ...fieldExtensionState,
+                      searchValue: pickListOption?.value ?? ""
+                    })
+                  }
+                />
+              </>
+            ) : (
+              <>
+                <QueryBuilderTextSearch
+                  matchType={fieldExtensionState.selectedOperator}
+                  value={fieldExtensionState.searchValue}
+                  setValue={(userInput) =>
+                    setFieldExtensionState({
+                      ...fieldExtensionState,
+                      searchValue: userInput ?? ""
+                    })
+                  }
+                />
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
@@ -213,8 +260,16 @@ export default function QueryRowFieldExtensionSearch({
  * Using the query row for a field extension search, generate the elastic search request to be
  * made.
  */
-export function transformFieldExtensionToDSL({}: //  value,
-//  fieldInfo
-TransformToDSLProps): any {
-  return undefined;
+export function transformFieldExtensionToDSL({
+  value
+}: TransformToDSLProps): any {
+  // Parse the field extension search options. Trim the search value.
+  const fieldExtensionSearchValue: FieldExtensionSearchStates =
+    JSON.parse(value);
+  fieldExtensionSearchValue.searchValue =
+    fieldExtensionSearchValue.searchValue.trim();
+
+  if (!fieldExtensionSearchValue.searchValue) {
+    return undefined;
+  }
 }

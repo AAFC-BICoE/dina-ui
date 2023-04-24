@@ -3,7 +3,7 @@ import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
-import { useQuery } from "common-ui";
+import { SelectOption, useQuery } from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
@@ -34,16 +34,9 @@ interface QueryRowTextSearchProps {
   managedAttributeConfig?: ESIndexMapping;
 }
 
-export interface ManagedAttributeOption {
-  label: string;
-  value: string;
+export interface ManagedAttributeOption extends SelectOption<string> {
   type: string;
   acceptedValues?: string[] | null;
-}
-
-export interface ManagedAttributeOperatorOption {
-  label: string;
-  value: string;
 }
 
 export interface ManagedAttributeSearchStates {
@@ -174,9 +167,9 @@ export default function QueryRowManagedAttributeSearch({
   };
 
   // Generate the operator options
-  const operatorOptions = supportedOperatorsForType(
-    managedAttributeType
-  ).map<ManagedAttributeOperatorOption>((option) => ({
+  const operatorOptions = supportedOperatorsForType(managedAttributeType).map<
+    SelectOption<string>
+  >((option) => ({
     label: formatMessage({ id: "queryBuilder_operator_" + option }),
     value: option
   }));
@@ -259,7 +252,7 @@ export default function QueryRowManagedAttributeSearch({
   if (!selectedOperator && operatorOptions?.[0]) {
     setManagedAttributeState({
       ...managedAttributeState,
-      selectedOperator: operatorOptions?.[0].value
+      selectedOperator: operatorOptions?.[0]?.value ?? ""
     });
   }
 
@@ -288,7 +281,7 @@ export default function QueryRowManagedAttributeSearch({
 
       {/* Operator */}
       {operatorOptions.length !== 0 ? (
-        <Select<ManagedAttributeOperatorOption>
+        <Select<SelectOption<string>>
           options={operatorOptions}
           className={`col me-2 ps-0`}
           value={selectedOperator}
