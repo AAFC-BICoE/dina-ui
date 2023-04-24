@@ -291,6 +291,51 @@ export default function MaterialSampleListPage() {
         </ButtonBar>
         <QueryPage
           indexName={"dina_material_sample_index"}
+          dynamicFieldMapping={{
+            fields: [
+              {
+                type: "managedAttribute",
+                label: "managedAttributes",
+                component: "MATERIAL_SAMPLE",
+                path: "data.attributes.managedAttributes",
+                apiEndpoint: "collection-api/managed-attribute"
+              }
+            ],
+            relationshipFields: [
+              // Assemblage
+              {
+                type: "managedAttribute",
+                label: "managedAttributes",
+                component: "ASSEMBLAGE",
+                path: "included.attributes.managedAttributes",
+                referencedBy: "assemblages",
+                referencedType: "assemblage",
+                apiEndpoint: "collection-api/managed-attribute"
+              },
+
+              // Collecting Event
+              {
+                type: "managedAttribute",
+                label: "managedAttributes",
+                component: "COLLECTING_EVENT",
+                path: "included.attributes.managedAttributes",
+                referencedBy: "collectingEvent",
+                referencedType: "collecting-event",
+                apiEndpoint: "collection-api/managed-attribute"
+              },
+
+              // Determination
+              {
+                type: "managedAttribute",
+                label: "managedAttributes",
+                component: "DETERMINATION",
+                path: "included.attributes.determination.managedAttributes",
+                referencedBy: "organism",
+                referencedType: "organism",
+                apiEndpoint: "collection-api/managed-attribute"
+              }
+            ]
+          }}
           columns={columns}
           bulkDeleteButtonProps={{
             typeName: "material-sample",

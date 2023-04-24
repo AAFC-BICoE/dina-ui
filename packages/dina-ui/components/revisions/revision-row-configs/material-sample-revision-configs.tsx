@@ -3,7 +3,6 @@ import Link from "next/link";
 import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
-  AcquisitionEvent,
   CollectingEvent,
   Collection,
   MaterialSample,
@@ -108,15 +107,6 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           reference={value}
           name={() => <DinaMessage id="viewDetails" />}
           href="/collection/collecting-event/view?id="
-        />
-      ),
-      acquisitionEvent: ({ original: { value } }) => (
-        <ReferenceLink<AcquisitionEvent>
-          baseApiPath="collection-api"
-          type="acquisition-event"
-          reference={value}
-          name={() => <DinaMessage id="viewDetails" />}
-          href="/collection/acquisition-event/view?id="
         />
       ),
       storageUnit: ({ original: { value } }) => (

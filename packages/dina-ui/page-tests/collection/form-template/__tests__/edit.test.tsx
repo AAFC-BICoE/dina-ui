@@ -6,8 +6,6 @@ import { getComponentOrderFromTemplate } from "../../../../components/form-templ
 import { FormTemplateEditPageLoaded } from "../../../../pages/collection/form-template/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
-  AcquisitionEvent,
-  ACQUISITION_EVENT_COMPONENT_NAME,
   ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
   COLLECTING_EVENT_COMPONENT_NAME,
@@ -48,15 +46,6 @@ function testCollectionEvent(): Partial<CollectingEvent> {
   };
 }
 
-function testAcquisitionEvent(): Partial<AcquisitionEvent> {
-  return {
-    id: "987",
-    type: "acquisition-event",
-    group: "test group",
-    receptionRemarks: "test reception remarks"
-  };
-}
-
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "user-api/group":
@@ -65,10 +54,6 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return { data: [testCollectionEvent()] };
     case "collection-api/collecting-event/321?include=collectors,attachment,collectionMethod,protocol":
       return { data: testCollectionEvent() };
-    case "collection-api/acquisition-event":
-      return { data: [testAcquisitionEvent()] };
-    case "collection-api/acquisition-event/987":
-      return { data: testAcquisitionEvent() };
     case "collection-api/preparation-type":
       return { data: [TEST_PREP_TYPE] };
     case "agent-api/person":
@@ -153,8 +138,6 @@ async function mountForm(
     wrapper.find(".enable-organisms").find(ReactSwitch);
   const scheduledActionsSwitch = () =>
     wrapper.find(".enable-scheduled-actions").find(ReactSwitch);
-  const acquisitionEventSwitch = () =>
-    wrapper.find(".enable-acquisition-event").find(ReactSwitch);
   const associationsSwitch = () =>
     wrapper.find(".enable-associations").find(ReactSwitch);
 
@@ -195,9 +178,6 @@ async function mountForm(
     await toggleDataComponent(scheduledActionsSwitch(), val);
   }
 
-  async function toggleAcquisitionEvent(val: boolean) {
-    await toggleDataComponent(acquisitionEventSwitch(), val);
-  }
   async function toggleAssociations(val: boolean) {
     await toggleDataComponent(associationsSwitch(), val);
   }
@@ -225,14 +205,12 @@ async function mountForm(
     toggleStorage,
     toggleOrganisms,
     toggleScheduledActions,
-    toggleAcquisitionEvent,
     toggleAssociations,
     colEventSwitch,
     catalogSwitch,
     storageSwitch,
     scheduledActionsSwitch,
     organismsSwitch,
-    acquisitionEventSwitch,
     associationsSwitch,
     fillOutRequiredFields,
     submitForm
@@ -241,7 +219,7 @@ async function mountForm(
 
 /**
  * Form Template used for tests.
- * Nav Order has collecting event and acquisition event swapped compared to default
+ * Nav Order has collecting event swapped compared to default
  */
 const formTemplate: PersistedResource<FormTemplate> = {
   id: "123",

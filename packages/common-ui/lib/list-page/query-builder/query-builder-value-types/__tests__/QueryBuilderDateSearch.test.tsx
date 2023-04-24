@@ -42,18 +42,18 @@ describe("QueryBuilderDateSearch", () => {
   });
 
   describe("transformDateSearchToDSL function", () => {
-    describe("Contains operation", () => {
+    describe("ContainsDate operation", () => {
       test("With relationship as field", async () => {
         expect(
           transformDateSearchToDSL({
-            operation: "contains",
+            operation: "containsDate",
             value: "1998",
             fieldInfo: {
               parentType: "collection",
               parentName: "collection"
             } as any,
             fieldPath: "includes.name",
-            queryType: "contains"
+            queryType: "containsDate"
           })
         ).toMatchSnapshot();
       });
@@ -62,33 +62,33 @@ describe("QueryBuilderDateSearch", () => {
         // Contains the year only.
         expect(
           transformDateSearchToDSL({
-            operation: "contains",
+            operation: "containsDate",
             value: "1998",
             fieldInfo: {} as any,
             fieldPath: "data.attributes.dateField",
-            queryType: "contains"
+            queryType: "containsDate"
           })
         ).toMatchSnapshot();
 
         // Contains the year and month only.
         expect(
           transformDateSearchToDSL({
-            operation: "contains",
+            operation: "containsDate",
             value: "1998-05",
             fieldInfo: {} as any,
             fieldPath: "data.attributes.dateField",
-            queryType: "contains"
+            queryType: "containsDate"
           })
         ).toMatchSnapshot();
 
         // Contains the full date.
         expect(
           transformDateSearchToDSL({
-            operation: "contains",
+            operation: "containsDate",
             value: "1998-05-19",
             fieldInfo: {} as any,
             fieldPath: "data.attributes.dateField",
-            queryType: "contains"
+            queryType: "containsDate"
           })
         ).toMatchSnapshot();
       });

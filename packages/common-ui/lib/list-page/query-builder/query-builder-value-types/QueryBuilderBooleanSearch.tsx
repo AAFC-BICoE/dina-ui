@@ -50,7 +50,7 @@ export default function QueryBuilderBooleanSearch({
         <Select
           value={selectedOption}
           options={QueryBuilderBooleanOptions as any}
-          className="me-1 flex-fill"
+          className="flex-fill"
           onChange={(selected) => setValue?.(selected?.value ?? "true")}
         />
       )}

@@ -89,7 +89,7 @@ export function transformDateSearchToDSL({
 
   switch (operation) {
     // Contains / less than / greater than / less than or equal to / greater than or equal to.
-    case "contains":
+    case "containsDate":
     case "greaterThan":
     case "greaterThanOrEqualTo":
     case "lessThan":
@@ -272,7 +272,7 @@ export function transformDateSearchToDSL({
  */
 function buildDateRangeObject(matchType, value) {
   switch (matchType) {
-    case "contains":
+    case "containsDate":
       const YEAR_REGEX = /^\d{4}$/;
       const MONTH_REGEX = /^\d{4}-\d{2}$/;
 

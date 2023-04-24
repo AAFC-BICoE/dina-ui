@@ -1,0 +1,1802 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must": Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": "",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level with operator equals 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.managedAttributes.attributeName.keyword": "true",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level with operator notEmpty 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "exists": Object {
+        "field": "data.attributes.managedAttributes.attributeName",
+      },
+    },
+    "must_not": Object {
+      "term": Object {
+        "data.attributes.managedAttributes.attributeName.keyword": "",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "should": Array [
+            Object {
+              "bool": Object {
+                "must_not": Object {
+                  "nested": Object {
+                    "path": "included",
+                    "query": Object {
+                      "bool": Object {
+                        "must": Array [
+                          Object {
+                            "exists": Object {
+                              "field": "included.attributes.managedAttributes.attributeName",
+                            },
+                          },
+                          Object {
+                            "term": Object {
+                              "included.type": "collecting-event",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            Object {
+              "nested": Object {
+                "path": "included",
+                "query": Object {
+                  "bool": Object {
+                    "must": Array [
+                      Object {
+                        "term": Object {
+                          "included.attributes.managedAttributes.attributeName.keyword": "",
+                        },
+                      },
+                      Object {
+                        "term": Object {
+                          "included.type": "collecting-event",
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level with operator equals 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.managedAttributes.attributeName.keyword": "true",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level with operator notEmpty 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+          Object {
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
+            },
+          },
+        ],
+        "must_not": Object {
+          "term": Object {
+            "included.attributes.managedAttributes.attributeName.keyword": "",
+          },
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator containsDate 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19||/d",
+      "lte": "1998-05-19||/d",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "exists": Object {
+        "field": "data.attributes.managedAttributes.attributeName",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator equals 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.managedAttributes.attributeName": "1998-05-19",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator greaterThan 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gt": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator greaterThanOrEqualTo 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gte": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator lessThan 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lt": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator lessThanOrEqualTo 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lte": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator notEmpty 1`] = `
+Object {
+  "exists": Object {
+    "field": "data.attributes.managedAttributes.attributeName",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName": "1998-05-19",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator containsDate 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19||/d",
+                "lte": "1998-05-19||/d",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "exists": Object {
+                        "field": "included.attributes.managedAttributes.attributeName",
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.type": "collecting-event",
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator equals 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.managedAttributes.attributeName": "1998-05-19",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator greaterThan 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gt": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator greaterThanOrEqualTo 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator lessThan 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lt": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator lessThanOrEqualTo 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator notEmpty 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "term": Object {
+                  "included.attributes.managedAttributes.attributeName": "1998-05-19",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.managedAttributes.attributeName",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "exists": Object {
+        "field": "data.attributes.managedAttributes.attributeName",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator equals 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.managedAttributes.attributeName": "3.5",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator greaterThan 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gt": "3.5",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator greaterThanOrEqualTo 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gte": "3.5",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator lessThan 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lt": "3.5",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator lessThanOrEqualTo 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lte": "3.5",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator notEmpty 1`] = `
+Object {
+  "exists": Object {
+    "field": "data.attributes.managedAttributes.attributeName",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName": "3.5",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "exists": Object {
+                        "field": "included.attributes.managedAttributes.attributeName",
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.type": "collecting-event",
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator equals 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.managedAttributes.attributeName": "3.5",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator greaterThan 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gt": "3.5",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator greaterThanOrEqualTo 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gte": "3.5",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator lessThan 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lt": "3.5",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator lessThanOrEqualTo 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lte": "3.5",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator notEmpty 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "term": Object {
+                  "included.attributes.managedAttributes.attributeName": "3.5",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.managedAttributes.attributeName",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "exists": Object {
+        "field": "data.attributes.managedAttributes.attributeName",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator equals 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.managedAttributes.attributeName": "42",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator greaterThan 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gt": "42",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator greaterThanOrEqualTo 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gte": "42",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator lessThan 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lt": "42",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator lessThanOrEqualTo 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lte": "42",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator notEmpty 1`] = `
+Object {
+  "exists": Object {
+    "field": "data.attributes.managedAttributes.attributeName",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName": "42",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "exists": Object {
+                        "field": "included.attributes.managedAttributes.attributeName",
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.type": "collecting-event",
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator equals 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.managedAttributes.attributeName": "42",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator greaterThan 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gt": "42",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator greaterThanOrEqualTo 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gte": "42",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator lessThan 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lt": "42",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator lessThanOrEqualTo 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lte": "42",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator notEmpty 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "term": Object {
+                  "included.attributes.managedAttributes.attributeName": "42",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.managedAttributes.attributeName",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must": Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": "",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level with operator equals 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.managedAttributes.attributeName.keyword": "3.5",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level with operator notEmpty 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "exists": Object {
+        "field": "data.attributes.managedAttributes.attributeName",
+      },
+    },
+    "must_not": Object {
+      "term": Object {
+        "data.attributes.managedAttributes.attributeName.keyword": "",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level with operator notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": "3.5",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "should": Array [
+            Object {
+              "bool": Object {
+                "must_not": Object {
+                  "nested": Object {
+                    "path": "included",
+                    "query": Object {
+                      "bool": Object {
+                        "must": Array [
+                          Object {
+                            "exists": Object {
+                              "field": "included.attributes.managedAttributes.attributeName",
+                            },
+                          },
+                          Object {
+                            "term": Object {
+                              "included.type": "collecting-event",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            Object {
+              "nested": Object {
+                "path": "included",
+                "query": Object {
+                  "bool": Object {
+                    "must": Array [
+                      Object {
+                        "term": Object {
+                          "included.attributes.managedAttributes.attributeName.keyword": "",
+                        },
+                      },
+                      Object {
+                        "term": Object {
+                          "included.type": "collecting-event",
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level with operator equals 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.managedAttributes.attributeName.keyword": "3.5",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level with operator notEmpty 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+          Object {
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
+            },
+          },
+        ],
+        "must_not": Object {
+          "term": Object {
+            "included.attributes.managedAttributes.attributeName.keyword": "",
+          },
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level with operator notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "term": Object {
+                  "included.attributes.managedAttributes.attributeName.keyword": "3.5",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.managedAttributes.attributeName",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must": Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": "",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator exactMatch 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.managedAttributes.attributeName.keyword": "stringValue",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator notEmpty 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "exists": Object {
+        "field": "data.attributes.managedAttributes.attributeName",
+      },
+    },
+    "must_not": Object {
+      "term": Object {
+        "data.attributes.managedAttributes.attributeName.keyword": "",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": "stringValue",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator partialMatch 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.managedAttributes.attributeName.keyword": "stringValue",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator empty 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "should": Array [
+            Object {
+              "bool": Object {
+                "must_not": Object {
+                  "nested": Object {
+                    "path": "included",
+                    "query": Object {
+                      "bool": Object {
+                        "must": Array [
+                          Object {
+                            "exists": Object {
+                              "field": "included.attributes.managedAttributes.attributeName",
+                            },
+                          },
+                          Object {
+                            "term": Object {
+                              "included.type": "collecting-event",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            Object {
+              "nested": Object {
+                "path": "included",
+                "query": Object {
+                  "bool": Object {
+                    "must": Array [
+                      Object {
+                        "term": Object {
+                          "included.attributes.managedAttributes.attributeName.keyword": "",
+                        },
+                      },
+                      Object {
+                        "term": Object {
+                          "included.type": "collecting-event",
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator exactMatch 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.managedAttributes.attributeName.keyword": "stringValue",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator notEmpty 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+          Object {
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
+            },
+          },
+        ],
+        "must_not": Object {
+          "term": Object {
+            "included.attributes.managedAttributes.attributeName.keyword": "",
+          },
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator notEquals 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "term": Object {
+                  "included.attributes.managedAttributes.attributeName.keyword": "stringValue",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.managedAttributes.attributeName",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator partialMatch 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.managedAttributes.attributeName.keyword": "stringValue",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;

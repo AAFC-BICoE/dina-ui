@@ -1,4 +1,3 @@
-export * from "./resources/AcquisitionEvent";
 export * from "./resources/Assemblage";
 export * from "./resources/CollectingEvent";
 export * from "./resources/Collection";

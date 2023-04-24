@@ -132,22 +132,27 @@ input[type="number"]::-webkit-outer-spin-button {
   border: 1px solid #d3d7cf !important;
 }
 
+.rule--body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .rule--field {
-  float: left;
-  min-width: 200px;
-  width: 40%;
+  flex: 0.5;
 }
 
 .rule--operator {
-  float: left;
-  min-width: 200px;
-  width: 20%;
+  flex: 0.5;
+}
+
+.rule--operator:empty {
+  display: none;
 }
 
 .rule--value {
-  float: left;
-  min-width: 200px;
-  width: calc(40% - 15px);
+  flex: 1;
+  padding-right: 5px;
 }
 
 .rule--widget, .widget--widget {
