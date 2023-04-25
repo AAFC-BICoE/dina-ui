@@ -9,9 +9,11 @@ import {
   useApiClient,
   useGroupedCheckBoxes,
   useIsMounted,
-  useQuery,
-  withResponse
+  useQuery
 } from "common-ui";
+import { FormikContextType } from "formik";
+import { PersistedResource } from "kitsu";
+import { compact, pick, toPairs, uniqBy } from "lodash";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
@@ -30,23 +32,24 @@ import {
   SeqReaction
 } from "../../../types/seqdb-api";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
-import { FormikContextType } from "formik";
-import { toPairs, uniqBy, compact, pick } from "lodash";
 
 export interface SangerSeqReactionStepProps {
   seqBatch?: SeqBatch;
   editMode: boolean;
-  setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
+  onSaved: (
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<SeqBatch>
+  ) => Promise<void>;
 }
 
 export function SangerSeqReactionStep({
   seqBatch,
   editMode,
-  setEditMode,
   performSave,
-  setPerformSave
+  setPerformSave,
+  onSaved
 }: SangerSeqReactionStepProps) {
   const { apiClient, save } = useApiClient();
   const { formatMessage } = useDinaIntl();
@@ -78,6 +81,7 @@ export function SangerSeqReactionStep({
     async function performSaveInternal() {
       await saveSeqReactions();
       setPerformSave(false);
+      await onSaved(2);
     }
 
     if (performSave) {
@@ -149,7 +153,6 @@ export function SangerSeqReactionStep({
     }
     // Clear the previously selected resources.
     setPreviouslySelectedResourcesIDMap({});
-    setEditMode(false);
   }
 
   /**

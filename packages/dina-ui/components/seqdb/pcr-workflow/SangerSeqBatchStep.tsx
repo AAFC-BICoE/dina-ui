@@ -7,7 +7,10 @@ import { useEffect } from "react";
 export interface SangerSeqBatchStepProps {
   seqBatchId?: string;
   seqBatch?: SeqBatch;
-  onSaved: (resource: PersistedResource<SeqBatch>) => Promise<void>;
+  onSaved: (
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<SeqBatch>
+  ) => Promise<void>;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
@@ -31,8 +34,8 @@ export function SangerSeqBatchStep({
   }, [seqBatchId]);
 
   async function onSavedInternal(resource: PersistedResource<SeqBatch>) {
-    await onSaved(resource);
-    setEditMode(false);
+    setPerformSave(false);
+    await onSaved(1, resource);
   }
 
   const buttonBar = (
