@@ -1,6 +1,7 @@
 import {
   BackButton,
   ButtonBar,
+  CheckBoxField,
   DateField,
   DinaForm,
   DinaFormProps,
@@ -271,6 +272,16 @@ export function SeqBatchFormFields() {
           name="group"
           enableStoredDefaultGroup={true}
           className="col-md-6"
+        />
+        <CheckBoxField
+          name="isCompleted"
+          className="gap-3 col-md-6"
+          overridecheckboxProps={{
+            style: {
+              height: "30px",
+              width: "30px"
+            }
+          }}
         />
       </div>
       <div className="row">

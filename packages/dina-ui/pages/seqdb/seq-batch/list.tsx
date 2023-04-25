@@ -54,7 +54,8 @@ export default function SeqBatchListPage() {
           queryTableProps={{
             columns: TABLE_COLUMNS,
             path: "seqdb-api/seq-batch",
-            include: "primerForward,primerReverse"
+            include: "primerForward,primerReverse",
+            filter: { isCompleted: false }
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
