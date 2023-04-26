@@ -1,6 +1,8 @@
 import {
   BackButton,
   ButtonBar,
+  CollapsibleGroup,
+  CollapsibleSection,
   CustomQueryPageView,
   DeleteButton,
   DinaForm,
@@ -190,6 +192,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     }
                   )}
                 </div>
+
+                <CollapsibleGroup>
+                  <CollapsibleSection id="1" headerKey="transactions">
+                    <h1>test</h1>
+                  </CollapsibleSection>
+                </CollapsibleGroup>
+
                 <MaterialSampleIdentifiersSection />
                 {materialSample.parentMaterialSample && (
                   <SamplesView
