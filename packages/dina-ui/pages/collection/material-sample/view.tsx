@@ -1,7 +1,6 @@
 import {
   BackButton,
   ButtonBar,
-  CollapsibleGroup,
   CollapsibleSection,
   CustomQueryPageView,
   DeleteButton,
@@ -54,6 +53,7 @@ import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
 import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
+import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -83,6 +83,34 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     </Link>
   );
 
+  const transactionQueryDSL: any = {
+    bool: {
+      must: [
+        {
+          nested: {
+            path: "included",
+            query: {
+              bool: {
+                must: [
+                  {
+                    term: {
+                      "included.id": id
+                    }
+                  },
+                  {
+                    term: {
+                      "included.type": "material-sample"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  };
+
   const transactionElasticQuery = useElasticSearchQuery({
     indexName: "dina_loan_transaction_index",
     queryDSL: {
@@ -97,33 +125,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           order: "desc"
         }
       },
-      query: {
-        bool: {
-          must: [
-            {
-              nested: {
-                path: "included",
-                query: {
-                  bool: {
-                    must: [
-                      {
-                        term: {
-                          "included.id": id
-                        }
-                      },
-                      {
-                        term: {
-                          "included.type": "material-sample"
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          ]
-        }
-      }
+      query: transactionQueryDSL
     }
   });
 
@@ -192,12 +194,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     }
                   )}
                 </div>
-
-                <CollapsibleGroup>
-                  <CollapsibleSection id="1" headerKey="transactions">
-                    <h1>test</h1>
-                  </CollapsibleSection>
-                </CollapsibleGroup>
 
                 <MaterialSampleIdentifiersSection />
                 {materialSample.parentMaterialSample && (
@@ -331,6 +327,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     />
                   </div>
                 </div>
+
+                <MaterialSampleTransactionList
+                  transactionQueryDSL={transactionQueryDSL}
+                />
+
                 <div className="mb-3">
                   <Field name="id">
                     {({ field: { value: materialSampleId } }) => (

@@ -1,27 +1,7 @@
 import { startCase } from "lodash";
-import { PropsWithChildren } from "react";
-import { Accordion, AccordionProps } from "react-bootstrap";
+import { PropsWithChildren, useState, createContext, useContext } from "react";
+import { Accordion } from "react-bootstrap";
 import { useIntl } from "react-intl";
-
-export interface CollapsibleGroupProps {
-  /**
-   * Override the default set props of the react-bootstrap accordion component.
-   *
-   * See: https://react-bootstrap.github.io/components/accordion/#accordion-props
-   */
-  accordionProps?: AccordionProps;
-}
-
-export function CollapsibleGroup({
-  children,
-  accordionProps
-}: PropsWithChildren<CollapsibleGroupProps>) {
-  return (
-    <Accordion {...accordionProps} className="mb-4">
-      {children}
-    </Accordion>
-  );
-}
 
 export interface CollapsibleSectionProps {
   /**
@@ -36,22 +16,34 @@ export interface CollapsibleSectionProps {
   headerKey: string;
 
   /**
-   * Callback fired before the component expands.
+   * Remove additional padding from the Collapsible Section body. This can be used to make tables
+   * and other components flush with the expanded panel.
+   *
+   * Default is false.
    */
-  onEnter?: () => void;
-
-  /**
-   * Callback fired before the component collapses.
-   */
-  onExit?: () => void;
+  removePadding?: boolean;
 }
+
+interface CollapsibleSectionContextType {
+  isAccordionOpen: boolean;
+}
+
+const CollapsibleSectionContext =
+  createContext<CollapsibleSectionContextType | null>(null);
 
 export function CollapsibleSection({
   children,
   id,
-  headerKey
+  headerKey,
+  removePadding = false
 }: PropsWithChildren<CollapsibleSectionProps>) {
   const { formatMessage, messages } = useIntl();
+
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+
+  const handleAccordionSelect = (eventKey) => {
+    setIsAccordionOpen(eventKey !== null);
+  };
 
   // Try to use dina messages first, if not just use the string directly.
   const headerLabel = messages[headerKey]
@@ -59,11 +51,32 @@ export function CollapsibleSection({
     : startCase(headerKey);
 
   return (
-    <Accordion.Item eventKey={id}>
-      <Accordion.Header style={{ marginTop: "0px" }}>
-        {headerLabel}
-      </Accordion.Header>
-      <Accordion.Body>{children}</Accordion.Body>
-    </Accordion.Item>
+    <CollapsibleSectionContext.Provider value={{ isAccordionOpen }}>
+      <Accordion className="mb-3" onSelect={handleAccordionSelect}>
+        <Accordion.Item eventKey={id}>
+          <Accordion.Header style={{ marginTop: "0px" }}>
+            {headerLabel}
+          </Accordion.Header>
+          <Accordion.Body style={{ padding: removePadding ? "0px" : "15px" }}>
+            {children}
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
+    </CollapsibleSectionContext.Provider>
   );
+}
+
+/**
+ * Hook that can be used inside of an accordion's body to determine if it's opened or not.
+ */
+export function useCollapsibleSection(): [boolean] {
+  const context = useContext(CollapsibleSectionContext);
+
+  if (!context) {
+    throw new Error(
+      "useCollapsibleSection must be used within a CollapsibleSection"
+    );
+  }
+
+  return [context.isAccordionOpen];
 }

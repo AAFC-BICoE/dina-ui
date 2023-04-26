@@ -230,9 +230,24 @@ input[type="number"]::-webkit-outer-spin-button {
 /*
  * Accordion Styles
  */
-.accordion-header > button {
-  color: black !important;
-  background-color: white !important;
+.accordion-button {
+  font-size: 1.7rem !important;
+  font-weight: 600;
+  background-color: white;
+}
+
+.accordion-button:hover {
+  background-color: #f8f8f8 !important;
+}
+
+.accordion-button:active {
+  background-color: #ebebeb !important;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #333333 !important;
+  background-color: white;
+  font-weight: 600;
 }
 
 .accordion-header>button::after {
