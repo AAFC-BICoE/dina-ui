@@ -3,7 +3,7 @@ import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
-import { useQuery } from "common-ui";
+import { SelectOption, useQuery } from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
@@ -11,9 +11,7 @@ import QueryBuilderNumberSearch, {
 import QueryBuilderDateSearch, {
   transformDateSearchToDSL
 } from "./QueryBuilderDateSearch";
-import QueryBuilderBooleanSearch, {
-  transformBooleanSearchToDSL
-} from "./QueryBuilderBooleanSearch";
+import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./QueryBuilderTextSearch";
@@ -36,16 +34,9 @@ interface QueryRowTextSearchProps {
   managedAttributeConfig?: ESIndexMapping;
 }
 
-export interface ManagedAttributeOption {
-  label: string;
-  value: string;
+export interface ManagedAttributeOption extends SelectOption<string> {
   type: string;
   acceptedValues?: string[] | null;
-}
-
-export interface ManagedAttributeOperatorOption {
-  label: string;
-  value: string;
 }
 
 export interface ManagedAttributeSearchStates {
@@ -176,9 +167,9 @@ export default function QueryRowManagedAttributeSearch({
   };
 
   // Generate the operator options
-  const operatorOptions = supportedOperatorsForType(
-    managedAttributeType
-  ).map<ManagedAttributeOperatorOption>((option) => ({
+  const operatorOptions = supportedOperatorsForType(managedAttributeType).map<
+    SelectOption<string>
+  >((option) => ({
     label: formatMessage({ id: "queryBuilder_operator_" + option }),
     value: option
   }));
@@ -219,7 +210,9 @@ export default function QueryRowManagedAttributeSearch({
               (pickOption) =>
                 pickOption.value === managedAttributeState.searchValue
             )}
-            placeholder={"Select pick list option..."}
+            placeholder={formatMessage({
+              id: "queryBuilder_pickList_placeholder"
+            })}
             onChange={(pickListOption) =>
               setManagedAttributeState({
                 ...managedAttributeState,
@@ -261,7 +254,7 @@ export default function QueryRowManagedAttributeSearch({
   if (!selectedOperator && operatorOptions?.[0]) {
     setManagedAttributeState({
       ...managedAttributeState,
-      selectedOperator: operatorOptions?.[0].value
+      selectedOperator: operatorOptions?.[0]?.value ?? ""
     });
   }
 
@@ -270,9 +263,11 @@ export default function QueryRowManagedAttributeSearch({
       {/* Managed Attribute Selection */}
       <Select<ManagedAttributeOption>
         options={managedAttributeOptions}
-        className={`col me-2 ms-2 ps-0`}
+        className={`col me-1 ms-2 ps-0`}
         value={managedAttributeSelected}
-        placeholder={"Select managed attribute to search against..."}
+        placeholder={formatMessage({
+          id: "queryBuilder_managedAttribute_placeholder"
+        })}
         onChange={(selected) =>
           setManagedAttributeState({
             ...managedAttributeState,
@@ -290,9 +285,9 @@ export default function QueryRowManagedAttributeSearch({
 
       {/* Operator */}
       {operatorOptions.length !== 0 ? (
-        <Select<ManagedAttributeOperatorOption>
+        <Select<SelectOption<string>>
           options={operatorOptions}
-          className={`col me-2 ps-0`}
+          className={`col me-1 ps-0`}
           value={selectedOperator}
           onChange={(selected) =>
             setManagedAttributeState({

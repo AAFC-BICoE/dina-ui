@@ -12,7 +12,6 @@ import { CellGrid } from "./ContainerGrid";
 interface SeqSelectCoordinatesControlsProps {
   seqBatchId: string;
   seqBatch: SeqBatch;
-  editMode: boolean;
 }
 
 export interface SeqReactionSample {
@@ -26,8 +25,7 @@ export interface SeqReactionSample {
 
 export function useSeqSelectCoordinatesControls({
   seqBatchId,
-  seqBatch,
-  editMode
+  seqBatch
 }: SeqSelectCoordinatesControlsProps) {
   const { save, bulkGet } = useContext(ApiClientContext);
 
@@ -167,7 +165,7 @@ export function useSeqSelectCoordinatesControls({
       include: "pcrBatchItem"
     },
     {
-      deps: [lastSave, editMode],
+      deps: [lastSave],
       onSuccess: async ({ data: seqReactions }) => {
         setItemsLoading(true);
         const seqReactionAndPcrBatchItem = compact(
@@ -205,8 +203,7 @@ export function useSeqSelectCoordinatesControls({
             };
           })
         );
-      },
-      disabled: editMode
+      }
     }
   );
 

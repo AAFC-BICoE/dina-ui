@@ -8,7 +8,6 @@ import { CellGrid } from "./ContainerGrid";
 interface ContainerGridProps {
   pcrBatchId: string;
   pcrBatch: PcrBatch;
-  editMode: boolean;
 }
 
 export interface PcrBatchItemSample {
@@ -21,8 +20,7 @@ export interface PcrBatchItemSample {
 
 export function usePCRBatchItemGridControls({
   pcrBatchId,
-  pcrBatch,
-  editMode
+  pcrBatch
 }: ContainerGridProps) {
   const { save, bulkGet } = useContext(ApiClientContext);
 
@@ -160,7 +158,7 @@ export function usePCRBatchItemGridControls({
       include: "materialSample"
     },
     {
-      deps: [lastSave, editMode],
+      deps: [lastSave],
       onSuccess: async ({ data: pcrBatchItem }) => {
         setItemsLoading(true);
         setPcrBatchItems(
@@ -171,8 +169,7 @@ export function usePCRBatchItemGridControls({
             wellRow: item.wellRow
           }))
         );
-      },
-      disabled: editMode
+      }
     }
   );
 

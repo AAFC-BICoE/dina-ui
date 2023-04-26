@@ -1,22 +1,26 @@
 import {
-  filterBy,
-  QueryPage,
-  useAccount,
-  useApiClient,
+  DoOperationsError,
   LoadingSpinner,
-  DoOperationsError
+  QueryPage,
+  filterBy,
+  useAccount,
+  useApiClient
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useState, useEffect } from "react";
+import { compact, pick, uniq } from "lodash";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
-import { pick, compact, uniq } from "lodash";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { ELASTIC_SEARCH_COLUMN } from "../../collection/material-sample/MaterialSampleRelationshipColumns";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
+  onSaved: (
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<PcrBatch>
+  ) => Promise<void>;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
@@ -26,12 +30,12 @@ export interface SangerSampleSelectionStepProps {
 export function SangerSampleSelectionStep({
   pcrBatchId,
   editMode,
+  onSaved,
   setEditMode,
   performSave,
   setPerformSave
 }: SangerSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
-  const { formatMessage } = useDinaIntl();
   const { username } = useAccount();
 
   // Check if a save was requested from the top level button bar.
@@ -39,6 +43,7 @@ export function SangerSampleSelectionStep({
     async function performSaveInternal() {
       await savePcrBatchItems();
       setPerformSave(false);
+      await onSaved(2);
     }
 
     if (performSave) {
@@ -209,7 +214,7 @@ export function SangerSampleSelectionStep({
     } finally {
       // Clear the previously selected resources.
       setPreviouslySelectedResources([]);
-      setEditMode(false);
+      // setEditMode(false);
     }
   }
 

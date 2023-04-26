@@ -7,7 +7,6 @@ import { PcrReactionTable, usePcrReactionData } from "./PcrReactionTable";
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
   editMode: boolean;
-  setEditMode?: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave?: (newValue: boolean) => void;
 }
@@ -15,7 +14,6 @@ export interface SangerPcrReactionProps {
 export function SangerPcrReactionStep({
   pcrBatchId,
   editMode,
-  setEditMode,
   performSave,
   setPerformSave
 }: SangerPcrReactionProps) {
@@ -74,9 +72,6 @@ export function SangerPcrReactionStep({
     // Leave edit mode...
     if (!!setPerformSave) {
       setPerformSave(false);
-    }
-    if (!!setEditMode) {
-      setEditMode(false);
     }
   }
 
