@@ -384,6 +384,9 @@ function PcrBatchFormFields({
           enableStoredDefaultGroup={true}
           className="col-md-6"
         />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="name" />
         <CheckBoxField
           name="isCompleted"
           className="gap-3 col-md-6"
@@ -394,16 +397,12 @@ function PcrBatchFormFields({
             }
           }}
         />
-      </div>
-      <div className="row">
-        <TextField className="col-md-6" name="name" />
         <VocabularySelectField
           className="col-md-6"
           name="batchType"
           path="seqdb-api/vocabulary/pcrBatchType"
         />
-      </div>
-      <div className="row">
+        <RegionSelectorComponent />
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
@@ -424,9 +423,13 @@ function PcrBatchFormFields({
           name="experimenters"
           isMulti={true}
         />
-        <RegionSelectorComponent />
-      </div>
-      <div className="row">
+        <ResourceSelectField<Protocol>
+          className="col-md-6"
+          name="protocol"
+          filter={filterBy(["name"])}
+          model="collection-api/protocol"
+          optionLabel={(protocol) => protocol.name}
+        />
         <ResourceSelectField<PcrPrimer>
           className="col-md-6"
           name="primerForward"
@@ -478,13 +481,6 @@ function PcrBatchFormFields({
           }}
           restrictedField={"data.relationships.storageUnitType.data.id"}
           restrictedFieldValue={values?.storageUnitType?.id}
-        />
-        <ResourceSelectField<Protocol>
-          className="col-md-6"
-          name="protocol"
-          filter={filterBy(["name"])}
-          model="collection-api/protocol"
-          optionLabel={(protocol) => protocol.name}
         />
       </div>
       {initialValues.id ? (
