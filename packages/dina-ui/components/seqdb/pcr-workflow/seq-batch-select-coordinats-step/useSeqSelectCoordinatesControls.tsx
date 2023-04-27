@@ -115,7 +115,7 @@ export function useSeqSelectCoordinatesControls({
       });
 
       setGridState({
-        availableItems: seqBatchItemsNoCoords?.sort(itemSort),
+        availableItems: seqBatchItemsNoCoords?.sort(sortByMaterialSampleName),
         cellGrid: newCellGrid,
         movedItems: []
       });
@@ -162,7 +162,8 @@ export function useSeqSelectCoordinatesControls({
       })(""),
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
-      include: "pcrBatchItem"
+      include: "pcrBatchItem",
+      sort: "pcrBatchItem"
     },
     {
       deps: [lastSave],
@@ -281,7 +282,7 @@ export function useSeqSelectCoordinatesControls({
         // availableItems: newAvailableItems.sort(itemSort),
         availableItems: newAvailableItems
           ?.filter((item) => item)
-          .sort(itemSort),
+          .sort(sortByMaterialSampleName),
         cellGrid: newCellGrid,
         movedItems: newMovedItems
       };
@@ -380,7 +381,7 @@ export function useSeqSelectCoordinatesControls({
 
     const { availableItems, cellGrid } = gridState;
     const items = [...availableItems, ...Object.values(cellGrid)].sort(
-      itemSort
+      sortByMaterialSampleName
     );
     moveItems(items, "A_1");
   }
@@ -404,7 +405,7 @@ export function useSeqSelectCoordinatesControls({
   };
 }
 
-function itemSort(a, b) {
+function sortByMaterialSampleName(a, b) {
   const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
     (s) => s.sampleName.match(/[^\d]+|\d+/g) || []
   );
