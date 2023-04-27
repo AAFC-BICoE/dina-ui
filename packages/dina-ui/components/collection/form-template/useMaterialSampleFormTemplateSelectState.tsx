@@ -15,6 +15,7 @@ import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTempl
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient } from "../../../../common-ui/lib";
 import { useRouter } from "next/router";
+import { useAccount } from "common-ui";
 
 export const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
 
@@ -36,6 +37,7 @@ export interface UseMaterialSampleFormTemplateSelectStateProps {
 export function useMaterialSampleFormTemplateSelectState({
   temporaryFormTemplateUUID
 }: UseMaterialSampleFormTemplateSelectStateProps) {
+  const { username } = useAccount();
   const { apiClient } = useApiClient();
   const router = useRouter();
   const formTemplateId = router?.query?.formTemplateId?.toString();
@@ -45,7 +47,7 @@ export function useMaterialSampleFormTemplateSelectState({
   // UUID stored in local storage.
   const [sampleFormTemplateUUID, setSampleFormTemplateUUID] = useLocalStorage<
     string | undefined
-  >(SAMPLE_FORM_TEMPLATE_KEY, undefined);
+  >(`${username}.${SAMPLE_FORM_TEMPLATE_KEY}`, undefined);
 
   // The retrieved form template, changes when the UUID has changed.
   const [sampleFormTemplate, setSampleFormTemplate] =
