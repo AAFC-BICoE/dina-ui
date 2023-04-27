@@ -412,7 +412,11 @@ function PcrBatchFormFields({
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
         />
-        <TextField className="col-md-6" name="thermocycler" />
+        <TextField
+          className="col-md-6"
+          name="thermocycler"
+          customName="thermocyclerUnit"
+        />
       </div>
       <div className="row">
         <PersonSelectField
