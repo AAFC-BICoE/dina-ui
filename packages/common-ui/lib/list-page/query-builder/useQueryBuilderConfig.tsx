@@ -163,8 +163,7 @@ export function useQueryBuilderConfig({
   // Load index map using the index name.
   const { indexMap } = useIndexMapping({
     indexName,
-    dynamicFieldMapping,
-    disabled: customViewFields !== undefined
+    dynamicFieldMapping
   });
   const { formatMessage } = useIntl();
 
