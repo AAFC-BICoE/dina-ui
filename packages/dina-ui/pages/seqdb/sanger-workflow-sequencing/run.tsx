@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SangerSeqReactionStep } from "../../../components/seqdb/seq-workflow/SangerSeqReactionStep";
-import { SeqBatchSelectCoordinatesStep } from "../../../components/seqdb/seq-workflow/seq-batch-select-coordinats-step/SeqBatchSelectCoordinatesStep";
+import { SeqBatchSelectCoordinatesStep } from "../../../components/seqdb/seq-workflow/SeqBatchSelectCoordinatesStep";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";

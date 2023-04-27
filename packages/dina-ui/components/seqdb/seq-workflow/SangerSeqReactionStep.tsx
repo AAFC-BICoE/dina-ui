@@ -80,11 +80,11 @@ export function SangerSeqReactionStep({
   useEffect(() => {
     async function performSaveInternal() {
       await saveSeqReactions();
-      setPerformSave(false);
       await onSaved(2);
     }
 
     if (performSave) {
+      setPerformSave(false);
       performSaveInternal();
     }
   }, [performSave]);
