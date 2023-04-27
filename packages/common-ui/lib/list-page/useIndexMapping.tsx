@@ -13,6 +13,12 @@ export interface UseIndexMappingProps {
    * or grouped terms.
    */
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
+
+  /**
+   * If enabled, an empty indexMap is provided. This is used mainly for the QueryPage to not load
+   * the mapping request since it's not need for custom views.
+   */
+  disabled?: boolean;
 }
 
 /**
@@ -25,7 +31,8 @@ export interface UseIndexMappingProps {
  */
 export function useIndexMapping({
   indexName,
-  dynamicFieldMapping
+  dynamicFieldMapping,
+  disabled = false
 }: UseIndexMappingProps) {
   const { apiClient } = useApiClient();
 
@@ -35,8 +42,12 @@ export function useIndexMapping({
   // Retrieve the index mapping on the first hook load.
   useEffect(() => {
     async function getIndexMapping() {
-      const mapping = await fetchQueryFieldsByIndex();
-      setIndexMap(mapping);
+      if (disabled) {
+        setIndexMap([]);
+      } else {
+        const mapping = await fetchQueryFieldsByIndex();
+        setIndexMap(mapping);
+      }
     }
     getIndexMapping();
   }, []);
