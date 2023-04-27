@@ -2,15 +2,21 @@ import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
 import useVocabularyOptions from "../../../../dina-ui/components/collection/useVocabularyOptions";
 import { ProtocolElement } from "../../../../dina-ui/types/collection-api";
-import { FieldExtension } from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
+import {
+  ExtensionField,
+  FieldExtension,
+  FieldExtensionValue
+} from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import {
   BulkEditTabContextI,
   FieldSet,
+  LoadingSpinner,
   SelectOption,
   useApiClient,
   useBulkEditTabContext,
+  useBulkGet,
   useQuery
 } from "../..";
 import {
@@ -19,6 +25,7 @@ import {
 } from "../../../../dina-ui/intl/dina-ui-intl";
 import { DataBlock } from "./DataBlock";
 import { DataEntryFieldProps } from "./DataEntryField";
+import { forOwn, groupBy } from "lodash";
 
 /* tslint:disable-next-line */
 export interface DataEntryProps extends DataEntryFieldProps {}
@@ -45,23 +52,69 @@ export function DataEntry({
   let extensionValues =
     formik?.values?.[name] ?? getBulkContextExtensionValues(bulkContext, name);
 
-  const blockOptionsQuery: any = isVocabularyBasedEnabledForBlock
-    ? useVocabularyOptions({
+  function queryBlockOptions() {
+    if (readOnly) {
+      const ids: string[] = [];
+      forOwn(extensionValues, (extensionValue, extensionKey) => {
+        forOwn(extensionValue.rows, (_fieldValue, fieldKey) => {
+          ids.push(`${extensionKey}.${fieldKey}`);
+        });
+      });
+      // Bulk get individual extension values in readOnly
+      return useBulkGet<FieldExtensionValue>({
+        ids,
+        listPath: "collection-api/field-extension-value"
+      });
+    }
+    if (isVocabularyBasedEnabledForBlock) {
+      return useVocabularyOptions({
         path: blockOptionsEndpoint
-      })
-    : useQuery<FieldExtension[]>({
+      });
+    } else {
+      return useQuery<FieldExtension[]>({
         path: blockOptionsEndpoint,
         filter: blockOptionsFilter
       });
-  const blockOptions = isVocabularyBasedEnabledForBlock
-    ? blockOptionsQuery?.vocabOptions
-    : blockOptionsQuery?.response?.data.map((data) => {
-        return {
-          label: data.extension.name,
-          value: data.extension.key
-        };
+    }
+  }
+  const blockOptionsQuery: any = queryBlockOptions();
+  function getBlockOptions() {
+    if (readOnly) {
+      const nestedExtensionFieldValue = groupBy(
+        blockOptionsQuery.data,
+        (extensionFieldValue: FieldExtensionValue) =>
+          extensionFieldValue.extensionKey
+      );
+      const options: any = [];
+      forOwn(nestedExtensionFieldValue, (fieldExtensionValue) => {
+        const blockOption = fieldExtensionValue.reduce(
+          (acc, cur: FieldExtensionValue) => {
+            acc.label = cur.extensionName;
+            acc.value = cur.extensionKey;
+            acc.fields.push(cur.field);
+            return acc;
+          },
+          { value: "", label: "", fields: [] } as {
+            value: string;
+            label: string;
+            fields: ExtensionField[];
+          }
+        );
+        options.push(blockOption);
       });
-
+      return options;
+    }
+    if (isVocabularyBasedEnabledForBlock) {
+      return blockOptionsQuery?.vocabOptions;
+    } else {
+      return blockOptionsQuery?.response?.data.map((data) => ({
+        label: data.extension.name,
+        value: data.extension.key,
+        fields: data.extension.fields
+      }));
+    }
+  }
+  const blockOptions = getBlockOptions();
   const [queriedTypeOptions, setQueriedTypeOptions] = useState<
     SelectOption<string>[]
   >([]);
@@ -170,6 +223,9 @@ export function DataEntry({
       );
     };
   }
+  if (blockOptionsQuery?.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
   return (
     <FieldSet legend={legend} wrapLegend={legendWrapper()} id={id}>
       {
@@ -193,7 +249,6 @@ export function DataEntry({
                       isVocabularyBasedEnabledForType
                     }
                     extensionValues={extensionValues}
-                    blockOptionsQuery={blockOptionsQuery}
                     blockOptions={blockOptions}
                     unitsOptions={vocabQuery?.vocabOptions}
                     typeOptions={
