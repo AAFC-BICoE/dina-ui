@@ -273,6 +273,9 @@ export function SeqBatchFormFields() {
           enableStoredDefaultGroup={true}
           className="col-md-6"
         />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="name" />
         <CheckBoxField
           name="isCompleted"
           className="gap-3 col-md-6"
@@ -283,16 +286,11 @@ export function SeqBatchFormFields() {
             }
           }}
         />
-      </div>
-      <div className="row">
-        <TextField className="col-md-6" name="name" />
         <VocabularySelectField
           className="col-md-6"
           name="sequencingType"
           path="seqdb-api/vocabulary/sequencingType"
         />
-      </div>
-      <div className="row">
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
@@ -306,8 +304,6 @@ export function SeqBatchFormFields() {
           name="experimenters"
           isMulti={true}
         />
-      </div>
-      <div className="row">
         <DateField className="col-md-6" name="reactionDate" />
         <ResourceSelectField<Region>
           className="col-md-6"
@@ -317,8 +313,13 @@ export function SeqBatchFormFields() {
           optionLabel={(region) => region.name}
           readOnlyLink="/seqdb/region/view?id="
         />
-      </div>
-      <div className="row">
+        <ResourceSelectField<Protocol>
+          className="col-md-6"
+          name="protocol"
+          filter={filterBy(["name"])}
+          model="collection-api/protocol"
+          optionLabel={(protocol) => protocol.name}
+        />
         <div className="col-md-6">
           <StorageUnitTypeSelectorComponent />
         </div>
@@ -341,15 +342,6 @@ export function SeqBatchFormFields() {
             }}
             restrictedField={"data.relationships.storageUnitType.data.id"}
             restrictedFieldValue={values?.storageUnitType?.id}
-          />
-        </div>
-        <div className="row">
-          <ResourceSelectField<Protocol>
-            className="col-md-6"
-            name="protocol"
-            filter={filterBy(["name"])}
-            model="collection-api/protocol"
-            optionLabel={(protocol) => protocol.name}
           />
         </div>
       </div>
