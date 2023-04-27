@@ -2,14 +2,10 @@ import { filterBy, ResourceSelect, useAccount } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { FormTemplate } from "../../../types/collection-api";
-import { useLocalStorage } from "@rehooks/local-storage";
-import { useEffect } from "react";
 export interface MaterialSampleFormTemplateSelectProps {
   value?: PersistedResource<FormTemplate>;
   onChange: (newValue: string) => void;
 }
-
-export const USERNAME_KEY = "sampleFormTemplateUsernameKey";
 
 export function MaterialSampleFormTemplateSelect({
   onChange,
@@ -32,22 +28,6 @@ export function MaterialSampleFormTemplateSelect({
         }
       : undefined
   );
-
-  // Store username that selected form template in local storage
-  const [formTemplateUser, setFormTemplateUser] = useLocalStorage<
-    string | undefined
-  >(USERNAME_KEY, undefined);
-
-  useEffect(() => {
-    if (formTemplateUser === undefined && username) {
-      setFormTemplateUser(username);
-    }
-    if (formTemplateUser && formTemplateUser !== username) {
-      value = undefined;
-      onChange("");
-      setFormTemplateUser(username);
-    }
-  }, []);
 
   return (
     <label className="d-flex align-items-center gap-2 form-template-select">
