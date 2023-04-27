@@ -328,9 +328,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </div>
                 </div>
 
-                <MaterialSampleTransactionList
-                  transactionQueryDSL={transactionQueryDSL}
-                />
+                <CollapsibleSection id="transactions" headerKey="transactions">
+                  <MaterialSampleTransactionList
+                    transactionQueryDSL={transactionQueryDSL}
+                  />
+                </CollapsibleSection>
 
                 <div className="mb-3">
                   <Field name="id">
