@@ -54,6 +54,12 @@ export function useIndexMapping({
         params: { indexName }
       });
 
+      // Fields that are dynamic do not need to be listed here.
+      const fieldsToSkip =
+        dynamicFieldMapping?.fields?.map<string>(
+          (fieldMapping) => fieldMapping.path
+        ) ?? [];
+
       const result: ESIndexMapping[] = [];
 
       // Read index attributes.
@@ -67,9 +73,9 @@ export function useIndexMapping({
             attrPrefix = path.substring(prefix.length + 1);
           }
 
-          // Manually remove managed attributes from here, they are handled using the dynamic
-          // mapping config. See the dynamicFieldMapping.
-          if (path !== "data.attributes.managedAttributes") {
+          // Manually remove managed attributes and extension fields from here,
+          // they are handled using the dynamic mapping config. See the dynamicFieldMapping.
+          if (!fieldsToSkip.some((skipPath) => path.startsWith(skipPath))) {
             result.push({
               label: attrPrefix ? attrPrefix + "." + key.name : key.name,
               value: key.path

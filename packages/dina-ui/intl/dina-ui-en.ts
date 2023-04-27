@@ -652,6 +652,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_conjunction_and: "AND",
   queryBuilder_conjunction_or: "OR",
   queryBuilder_field_placeholder: "Select a field to search against...",
+  queryBuilder_managedAttribute_placeholder:
+    "Select managed attribute to search against...",
+  queryBuilder_extension_field_placeholder:
+    "Select extension field to search against...",
+  queryBuilder_extension_placeholder: "Select extension to search against...",
+  queryBuilder_pickList_placeholder: "Select an accepted value...",
   queryBuilder_operator_containsDate: "Contains",
   queryBuilder_operator_empty: "Empty",
   queryBuilder_operator_equals: "Equals",

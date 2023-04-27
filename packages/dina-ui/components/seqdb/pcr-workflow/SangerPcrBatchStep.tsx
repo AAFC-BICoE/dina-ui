@@ -7,7 +7,10 @@ import { useEffect } from "react";
 export interface SangerPcrBatchStepProps {
   pcrBatchId?: string;
   pcrBatch?: PcrBatch;
-  onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
+  onSaved: (
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<PcrBatch>
+  ) => Promise<void>;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
@@ -31,8 +34,8 @@ export function SangerPcrBatchStep({
   }, [pcrBatchId]);
 
   async function onSavedInternal(resource: PersistedResource<PcrBatch>) {
-    await onSaved(resource);
-    setEditMode(false);
+    setPerformSave(false);
+    await onSaved(1, resource);
   }
 
   const buttonBar = (

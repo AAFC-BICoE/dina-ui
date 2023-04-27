@@ -1,0 +1,291 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the empty operator. 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.extensionValues.extension.field",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must": Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": "",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the exactMatch operator. 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.extensionValues.extension.field.keyword": "test123",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the notEmpty operator. 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "exists": Object {
+        "field": "data.attributes.extensionValues.extension.field",
+      },
+    },
+    "must_not": Object {
+      "term": Object {
+        "data.attributes.extensionValues.extension.field.keyword": "",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the notEquals operator. 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": "test123",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.extensionValues.extension.field",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the partialMatch operator. 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.extensionValues.extension.field.keyword": "test123",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the empty operator. 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "should": Array [
+            Object {
+              "bool": Object {
+                "must_not": Object {
+                  "nested": Object {
+                    "path": "included",
+                    "query": Object {
+                      "bool": Object {
+                        "must": Array [
+                          Object {
+                            "exists": Object {
+                              "field": "included.attributes.extensionValues.extension.field",
+                            },
+                          },
+                          Object {
+                            "term": Object {
+                              "included.type": "collecting-event",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            Object {
+              "nested": Object {
+                "path": "included",
+                "query": Object {
+                  "bool": Object {
+                    "must": Array [
+                      Object {
+                        "term": Object {
+                          "included.attributes.extensionValues.extension.field.keyword": "",
+                        },
+                      },
+                      Object {
+                        "term": Object {
+                          "included.type": "collecting-event",
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the exactMatch operator. 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.extensionValues.extension.field.keyword": "test123",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the notEmpty operator. 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+          Object {
+            "exists": Object {
+              "field": "included.attributes.extensionValues.extension.field",
+            },
+          },
+        ],
+        "must_not": Object {
+          "term": Object {
+            "included.attributes.extensionValues.extension.field.keyword": "",
+          },
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the notEquals operator. 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "term": Object {
+                  "included.attributes.extensionValues.extension.field.keyword": "test123",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.extensionValues.extension.field",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the partialMatch operator. 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.extensionValues.extension.field.keyword": "test123",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;

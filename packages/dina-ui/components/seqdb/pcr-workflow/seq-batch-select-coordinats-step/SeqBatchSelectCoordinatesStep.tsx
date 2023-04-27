@@ -1,10 +1,10 @@
 import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
+import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
+import { useEffect } from "react";
 import { ContainerGrid } from "./ContainerGrid";
 import { DraggableSeqReactionList } from "./DraggableSeqReactionList";
 import { useSeqSelectCoordinatesControls } from "./useSeqSelectCoordinatesControls";
-import { useEffect } from "react";
-import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
 
 export interface SeqBatchSelectCoordinatesStepProps {
   seqBatchId: string;
@@ -44,8 +44,7 @@ export function SeqBatchSelectCoordinatesStep(
     gridIsPopulated
   } = useSeqSelectCoordinatesControls({
     seqBatchId,
-    seqBatch,
-    editMode
+    seqBatch
   });
 
   // Check if a save was requested from the top level button bar.
