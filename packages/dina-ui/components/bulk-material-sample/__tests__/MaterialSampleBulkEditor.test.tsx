@@ -1090,7 +1090,7 @@ const TEST_SAMPLES_SAME_HOST_ORGANISM: InputResource<MaterialSample>[] = [
 ];
 
 describe("MaterialSampleBulkEditor", () => {
-  beforeEach(() => deleteFromStorage(SAMPLE_FORM_TEMPLATE_KEY));
+  beforeEach(() => deleteFromStorage("test-user." + SAMPLE_FORM_TEMPLATE_KEY));
   beforeEach(jest.clearAllMocks);
 
   it("Bulk creates material samples.", async () => {
