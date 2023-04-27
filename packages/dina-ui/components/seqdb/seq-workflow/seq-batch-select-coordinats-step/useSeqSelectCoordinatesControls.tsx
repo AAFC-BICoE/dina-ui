@@ -16,7 +16,9 @@ interface SeqSelectCoordinatesControlsProps {
 
 export interface SeqReactionSample {
   seqReactionId?: string;
+  seqBatchId?: string;
   pcrBatchItemId?: string;
+  seqPrimerId?: string;
   wellRow?: string;
   wellColumn?: number;
   sampleId?: string;
@@ -92,12 +94,9 @@ export function useSeqSelectCoordinatesControls({
             (sample) => sample.id === reaction.sampleId
           );
           return {
-            seqReactionId: reaction.seqReactionId,
-            pcrBatchItemId: reaction.pcrBatchItemId,
+            ...reaction,
             sampleId: foundSample?.id,
-            sampleName: foundSample?.materialSampleName ?? foundSample?.id,
-            wellColumn: reaction.wellColumn,
-            wellRow: reaction.wellRow
+            sampleName: foundSample?.materialSampleName ?? foundSample?.id
           };
         });
 
@@ -162,7 +161,7 @@ export function useSeqSelectCoordinatesControls({
       })(""),
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
-      include: "pcrBatchItem"
+      include: "pcrBatchItem,seqBatch,seqPrimer"
     },
     {
       deps: [lastSave],
@@ -170,9 +169,11 @@ export function useSeqSelectCoordinatesControls({
         setItemsLoading(true);
         const seqReactionAndPcrBatchItem = compact(
           seqReactions.map((item) => ({
+            seqBatchId: item.seqBatch?.id,
+            seqPrimerId: item.seqPrimer?.id,
             seqReactionId: item.id,
-            pcrBatchItemId: item?.pcrBatchItem?.id,
-            wellColumn: item?.wellColumn,
+            pcrBatchItemId: item.pcrBatchItem?.id,
+            wellColumn: item.wellColumn,
             wellRow: item.wellRow
           }))
         );
@@ -195,11 +196,9 @@ export function useSeqSelectCoordinatesControls({
               (item) => item.id === rec.pcrBatchItemId
             );
             return {
-              seqReactionId: rec.seqReactionId,
+              ...rec,
               pcrBatchItemId: pcrBatchItem?.id,
-              sampleId: pcrBatchItem?.materialSample?.id,
-              wellColumn: rec.wellColumn,
-              wellRow: rec.wellRow
+              sampleId: pcrBatchItem?.materialSample?.id
             };
           })
         );
@@ -354,7 +353,27 @@ export function useSeqSelectCoordinatesControls({
             type: "seq-reaction",
             id: item.seqReactionId,
             wellColumn: item.wellColumn ?? null,
-            wellRow: item.wellRow ?? null
+            wellRow: item.wellRow ?? null,
+            relationships: {
+              seqBatch: {
+                data: {
+                  id: item.seqBatchId,
+                  type: "seq-batch"
+                }
+              },
+              pcrBatchItem: {
+                data: {
+                  id: item.pcrBatchItemId,
+                  type: "pcr-batch-item"
+                }
+              },
+              seqPrimer: {
+                data: {
+                  id: item.seqPrimerId,
+                  type: "pcr-primer"
+                }
+              }
+            }
           } as SeqReaction,
           type: "seq-reaction"
         };
