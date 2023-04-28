@@ -11,6 +11,7 @@ export * from "./bulk-data-editor/encode-resource-cell";
 export * from "./bulk-data-editor/resource-select-cell";
 export * from "./bulk-edit/useBulkEditTabField";
 export * from "./bulk-edit/bulk-context";
+export * from "./collapser/Collapsible";
 export * from "./collapser/useCollapser";
 export * from "./field-header/FieldHeader";
 export * from "./date/DateView";

@@ -27,3 +27,11 @@ export type ExtensionValue = {
   extTerm?: string;
   value?: string;
 };
+
+export type FieldExtensionValue = {
+  type: "field-extension-value";
+  id: string;
+  extensionName: string;
+  extensionKey: string;
+  field: ExtensionField;
+};

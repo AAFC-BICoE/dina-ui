@@ -63,7 +63,8 @@ export default function SangerWorkflowSequencingListPage() {
           id="sanger-workflow-sequencing-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/seq-batch"
+            path: "seqdb-api/seq-batch",
+            filter: { isCompleted: false }
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

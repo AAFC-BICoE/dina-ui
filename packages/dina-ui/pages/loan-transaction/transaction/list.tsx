@@ -12,7 +12,7 @@ import { Transaction } from "packages/dina-ui/types/loan-transaction-api";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const TABLE_COLUMNS: TableColumn<Transaction>[] = [
+export const TRANSACTION_TABLE_COLUMNS: TableColumn<Transaction>[] = [
   {
     Cell: ({ original: { data, id } }) => (
       <Link href={`/loan-transaction/transaction/view?id=${id}`}>
@@ -66,7 +66,7 @@ export default function TransactionListPage() {
         </ButtonBar>
         <QueryPage
           indexName={"dina_loan_transaction_index"}
-          columns={TABLE_COLUMNS}
+          columns={TRANSACTION_TABLE_COLUMNS}
           dynamicFieldMapping={{
             fields: [
               {
