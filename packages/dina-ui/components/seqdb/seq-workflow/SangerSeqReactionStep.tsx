@@ -9,7 +9,8 @@ import {
   useApiClient,
   useGroupedCheckBoxes,
   useIsMounted,
-  useQuery
+  useQuery,
+  useStringComparator
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
@@ -63,6 +64,7 @@ export function SangerSeqReactionStep({
   const [selectedRegion, setSelectedRegion] = useState<Region>();
   const [selectedResources, setSelectedResources] = useState<SeqReaction[]>([]);
   const isMounted = useIsMounted();
+  const { compareByStringAndNumber } = useStringComparator();
 
   // The map key is pcrBatchItem.id + "_" + seqPrimer.id
   // the map value is the real UUID from the database.
@@ -173,20 +175,8 @@ export function SangerSeqReactionStep({
         const sampleName2 =
           (b.pcrBatchItem?.materialSample as MaterialSample)
             ?.materialSampleName ?? "";
-        return sortByMaterialSampleName(sampleName1, sampleName2);
+        return compareByStringAndNumber(sampleName1, sampleName2);
       });
-    }
-  }
-
-  function sortByMaterialSampleName(a: string, b: string) {
-    const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
-      (s) => s.match(/[^\d]+|\d+/g) || []
-    );
-
-    if (aAlpha === bAlpha) {
-      return Number(aNum) > Number(bNum) ? 1 : -1;
-    } else {
-      return (aAlpha ?? "") > (bAlpha ?? "") ? 1 : -1;
     }
   }
 
@@ -319,7 +309,7 @@ export function SangerSeqReactionStep({
             (a.materialSample as MaterialSample)?.materialSampleName ?? "";
           const sampleName2 =
             (b.materialSample as MaterialSample)?.materialSampleName ?? "";
-          return sortByMaterialSampleName(sampleName1, sampleName2);
+          return compareByStringAndNumber(sampleName1, sampleName2);
         });
 
         setAvailableItems(data);

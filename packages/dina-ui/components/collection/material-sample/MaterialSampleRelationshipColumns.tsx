@@ -37,8 +37,7 @@ export const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
     },
     label: "determination.scientificName",
     accessor: "included",
-    isKeyword: true,
-    sortable: false
+    isKeyword: true
   }
 ];
 
