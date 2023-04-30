@@ -3,12 +3,19 @@ export function useStringComparator() {
     const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
       (s) => s.match(/[^\d]+|\d+/g) || []
     );
-
+    let rst = 0;
     if (aAlpha === bAlpha) {
-      return Number(aNum) > Number(bNum) ? 1 : -1;
+      rst =
+        Number(aNum) > Number(bNum) ? 1 : Number(aNum) < Number(bNum) ? -1 : 0;
     } else {
-      return (aAlpha ?? "") > (bAlpha ?? "") ? 1 : -1;
+      rst =
+        (aAlpha ?? "") > (bAlpha ?? "")
+          ? 1
+          : (aAlpha ?? "") < (bAlpha ?? "")
+          ? -1
+          : 0;
     }
+    return rst;
   }
   return { compareByStringAndNumber };
 }
