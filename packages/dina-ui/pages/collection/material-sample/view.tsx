@@ -53,7 +53,7 @@ import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
 import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
-import { useMaterialSampleRelationshipColumns } from "packages/dina-ui/components/collection/material-sample/useMaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
