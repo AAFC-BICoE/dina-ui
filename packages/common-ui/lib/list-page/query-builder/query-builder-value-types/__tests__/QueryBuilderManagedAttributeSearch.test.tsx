@@ -95,7 +95,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                 queryType: "", // Not used.
                 value: `{"searchValue":"${
                   (testValue as TestValueStructure).testValue
-                }","selectedOperator":"${operator}","selectedManagedAttribute":"attributeName","selectedType":"${
+                }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
                   (testValue as TestValueStructure).type
                 }"}`,
                 fieldInfo: {
@@ -130,7 +130,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                 queryType: "", // Not used.
                 value: `{"searchValue":"${
                   (testValue as TestValueStructure).testValue
-                }","selectedOperator":"${operator}","selectedManagedAttribute":"attributeName","selectedType":"${
+                }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
                   (testValue as TestValueStructure).type
                 }"}`,
                 fieldInfo: {
