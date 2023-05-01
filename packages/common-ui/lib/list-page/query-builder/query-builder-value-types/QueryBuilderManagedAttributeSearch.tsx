@@ -3,7 +3,7 @@ import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
-import { SelectOption, useQuery } from "common-ui";
+import { filterBy, ResourceSelect, SelectOption, useQuery } from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
@@ -15,6 +15,9 @@ import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./QueryBuilderTextSearch";
+import { get } from "lodash";
+import { PersistedResource } from "kitsu";
+import { format } from "path/posix";
 
 interface QueryRowTextSearchProps {
   /**
@@ -41,7 +44,7 @@ export interface ManagedAttributeOption extends SelectOption<string> {
 
 export interface ManagedAttributeSearchStates {
   /** The key of the selected managed attribute to search against. */
-  selectedManagedAttribute: string;
+  selectedManagedAttribute?: PersistedResource<ManagedAttribute>;
 
   /** The type of the selected managed attribute. */
   selectedType: string;
@@ -63,9 +66,6 @@ export default function QueryRowManagedAttributeSearch({
   const [managedAttributeSearchValue, setManagedAttributeSearchValue] =
     useState<string>("");
 
-  const [managedAttributeOptions, setManagedAttributeOptions] =
-    useState<ManagedAttributeOption[]>();
-
   const [managedAttributeState, setManagedAttributeState] =
     useState<ManagedAttributeSearchStates>(() =>
       value
@@ -73,7 +73,7 @@ export default function QueryRowManagedAttributeSearch({
         : {
             searchValue: "",
             selectedOperator: "",
-            selectedManagedAttribute: "",
+            selectedManagedAttribute: undefined,
             selectedType: ""
           }
     );
@@ -92,42 +92,13 @@ export default function QueryRowManagedAttributeSearch({
     }
   }, [value]);
 
-  // If component is provided, add a filter for it.
-  const query = useQuery<ManagedAttribute[]>(
-    {
-      path: managedAttributeConfig?.dynamicField?.apiEndpoint ?? "",
-      filter: {
-        rsql:
-          `name==*${managedAttributeSearchValue}*` +
-          (managedAttributeConfig?.dynamicField?.component
-            ? `;managedAttributeComponent==${managedAttributeConfig.dynamicField.component}`
-            : "")
-      }
-    },
-    {
-      onSuccess: ({ data }) => {
-        setManagedAttributeOptions(
-          data.map<ManagedAttributeOption>((managedAttribute) => ({
-            label: managedAttribute.name,
-            value: managedAttribute.key,
-            type: managedAttribute.vocabularyElementType,
-            acceptedValues: managedAttribute.acceptedValues
-          }))
-        );
-      },
-      disabled: managedAttributeConfig?.dynamicField === undefined
-    }
-  );
-
-  const managedAttributeSelected = managedAttributeOptions?.find(
-    (managedAttribute) =>
-      managedAttribute.value === managedAttributeState.selectedManagedAttribute
-  );
+  const managedAttributeSelected =
+    managedAttributeState.selectedManagedAttribute;
 
   // Determine the type of the selected managed attribute.
   const managedAttributeType = managedAttributeSelected?.acceptedValues
     ? "PICK_LIST"
-    : managedAttributeSelected?.type ?? "";
+    : managedAttributeSelected?.vocabularyElementType ?? "";
 
   const supportedOperatorsForType: (type: string) => string[] = (type) => {
     switch (type) {
@@ -219,7 +190,6 @@ export default function QueryRowManagedAttributeSearch({
                 searchValue: pickListOption?.value ?? ""
               })
             }
-            isLoading={query.loading}
           />
         );
       case "BOOL":
@@ -261,26 +231,45 @@ export default function QueryRowManagedAttributeSearch({
   return (
     <div className="row">
       {/* Managed Attribute Selection */}
-      <Select<ManagedAttributeOption>
-        options={managedAttributeOptions}
-        className={`col me-1 ms-2 ps-0`}
-        value={managedAttributeSelected}
+      <ResourceSelect<ManagedAttribute>
+        filter={(input) => ({
+          ...filterBy(["name"])(input),
+          ...(managedAttributeConfig?.dynamicField?.component
+            ? {
+                managedAttributeComponent:
+                  managedAttributeConfig?.dynamicField?.component
+              }
+            : {})
+        })}
+        model={managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""}
+        optionLabel={(attribute) =>
+          get(attribute, "name") ||
+          get(attribute, "key") ||
+          get(attribute, "id") ||
+          ""
+        }
+        isMulti={false}
         placeholder={formatMessage({
           id: "queryBuilder_managedAttribute_placeholder"
         })}
-        onChange={(selected) =>
+        pageSize={15}
+        onChange={(newValue) =>
           setManagedAttributeState({
             ...managedAttributeState,
-            selectedManagedAttribute: selected?.value ?? "",
+            selectedManagedAttribute:
+              newValue as PersistedResource<ManagedAttribute>,
             selectedOperator: "",
             selectedType: "",
             searchValue: ""
           })
         }
-        onInputChange={(inputValue) =>
-          setManagedAttributeSearchValue(inputValue)
-        }
-        inputValue={managedAttributeSearchValue}
+        value={managedAttributeSelected}
+        selectProps={{
+          controlShouldRenderValue: true,
+          isClearable: false,
+          className: `col me-1 ms-2 ps-0`
+        }}
+        omitNullOption={true}
       />
 
       {/* Operator */}
@@ -330,7 +319,7 @@ export function transformManagedAttributeToDSL({
     fieldPath:
       fieldInfo?.path +
       "." +
-      managedAttributeSearchValue.selectedManagedAttribute,
+      managedAttributeSearchValue.selectedManagedAttribute?.key,
     operation: managedAttributeSearchValue.selectedOperator,
     queryType: "",
     value: managedAttributeSearchValue.searchValue,
