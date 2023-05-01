@@ -718,6 +718,13 @@ export function QueryPage<TData extends KitsuResource>({
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
+  function getTrProps(_state, rowInfo, _instance) {
+    return {
+      style: {
+        opacity: rowInfo?.row?.["data.attributes.materialSampleState"] && 0.4
+      }
+    };
+  }
   return (
     <>
       {!viewMode && (
@@ -823,6 +830,7 @@ export function QueryPage<TData extends KitsuResource>({
                 // Table customization props
                 {...resolvedReactTableProps}
                 className="-striped react-table-overflow"
+                getTrProps={getTrProps}
                 TbodyComponent={
                   error
                     ? () => (

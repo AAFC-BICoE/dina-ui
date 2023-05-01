@@ -244,6 +244,14 @@ export default function MaterialSampleListPage() {
     // Created On
     dateCell("createdOn", "data.attributes.createdOn"),
 
+    // Material Sample State
+    {
+      label: "materialSampleState",
+      accessor: "data.attributes.materialSampleState",
+      isKeyword: true,
+      show: false
+    },
+
     // Action buttons for each row.
     ...[
       {
