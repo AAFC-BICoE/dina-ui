@@ -167,7 +167,7 @@ Object {
         },
         Object {
           "terms": Object {
-            "data.attributes.group": Array [
+            "data.attributes.group.keyword": Array [
               "aafc",
               "cnc",
               "seqdb",
@@ -218,7 +218,7 @@ Object {
         },
         Object {
           "term": Object {
-            "data.attributes.group": "aafc",
+            "data.attributes.group.keyword": "aafc",
           },
         },
       ],

@@ -2,7 +2,6 @@ import { filterBy, ResourceSelect, useAccount } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { FormTemplate } from "../../../types/collection-api";
-
 export interface MaterialSampleFormTemplateSelectProps {
   value?: PersistedResource<FormTemplate>;
   onChange: (newValue: string) => void;
@@ -46,7 +45,9 @@ export function MaterialSampleFormTemplateSelect({
             ...filterByGroup("")
           })}
           filterList={(item) =>
-            item?.restrictToCreatedBy === false || item?.createdBy === username
+            !item?.id ||
+            item?.restrictToCreatedBy === false ||
+            item?.createdBy === username
           }
           optionLabel={(view) => view.name || view.id}
           model="collection-api/form-template"
