@@ -26,7 +26,7 @@ export function useMaterialSampleRelationshipColumns() {
       ),
       label: "materialSampleName",
       accessor: "data.attributes.materialSampleName",
-      sortMethod: (a: any, b: any, desc: any): number => {
+      sortMethod: (a: any, b: any): number => {
         return compareByStringAndNumber(a, b);
       },
       isKeyword: true
