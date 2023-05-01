@@ -20,7 +20,7 @@ import {
 import { ExifView, MetadataDetails } from "../../../components/object-store";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { useMaterialSampleRelationshipColumns } from "packages/dina-ui/components/collection/material-sample/useMaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {

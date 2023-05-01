@@ -40,7 +40,7 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { pick, compact } from "lodash";
-import { useMaterialSampleRelationshipColumns } from "packages/dina-ui/components/collection/material-sample/useMaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
