@@ -3,6 +3,7 @@ import { MaterialSample } from "../../../types/collection-api";
 import { NotPubliclyReleasableWarning } from "../../tag-editor/NotPubliclyReleasableWarning";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { useDinaFormContext } from "../../../../common-ui/lib/formik-connected/DinaForm";
+import { DinaFormSection } from "common-ui";
 
 export interface MaterialSampleBreadCrumbProps {
   disableLastLink?: boolean;
@@ -12,22 +13,38 @@ export interface MaterialSampleBreadCrumbProps {
    * This should be used in forms to add new data, not in search forms like list pages.
    */
   enableStoredDefaultGroup?: boolean;
+
+  enableGroupSelectField?: boolean;
 }
 
 export function MaterialSampleBreadCrumb({
   disableLastLink,
   materialSample,
-  enableStoredDefaultGroup
+  enableStoredDefaultGroup,
+  enableGroupSelectField
 }: MaterialSampleBreadCrumbProps) {
   const parentPath = [...(materialSample.hierarchy?.slice(1) ?? [])];
 
   const displayName = materialSample.materialSampleName;
-  const { readOnly } = useDinaFormContext();
+  const customStyle = {
+    option: (base) => {
+      return {
+        ...base,
+        ...{ fontWeight: "normal" }
+      };
+    },
+    control: (base) => {
+      return {
+        ...base,
+        ...{ fontWeight: "normal" }
+      };
+    }
+  };
   return (
     <>
       {/* Current Material Sample Name */}
       <h1 id="wb-cont" className="d-flex justify-content-between">
-        <strong className={readOnly ? undefined : "align-self-end mb-3"}>
+        <strong>
           {!disableLastLink ? (
             <Link
               href={`/collection/material-sample/view?id=${materialSample.id}`}
@@ -41,15 +58,20 @@ export function MaterialSampleBreadCrumb({
             </div>
           )}
         </strong>
-        <h6 className="col-md-2">
-          <GroupSelectField
-            disableTemplateCheckbox={true}
-            name="group"
-            enableStoredDefaultGroup={enableStoredDefaultGroup}
-            readOnlyHideLabel={true}
-            removeBottomMargin={true}
-          />
-        </h6>
+        {enableGroupSelectField && (
+          <h5 className="col-md-2 align-self-end mb-0">
+            <DinaFormSection horizontal={"flex"}>
+              <GroupSelectField
+                disableTemplateCheckbox={true}
+                name="group"
+                enableStoredDefaultGroup={enableStoredDefaultGroup}
+                readOnlyHideLabel={true}
+                removeBottomMargin={true}
+                styles={customStyle}
+              />
+            </DinaFormSection>
+          </h5>
+        )}
       </h1>
 
       {/* Material Sample Parents */}
