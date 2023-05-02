@@ -1,3 +1,4 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   DinaForm,
   FieldHeader,
@@ -65,6 +66,9 @@ export function SangerSeqReactionStep({
   const [selectedResources, setSelectedResources] = useState<SeqReaction[]>([]);
   const isMounted = useIsMounted();
   const { compareByStringAndNumber } = useStringComparator();
+  const [seqReactionSortOrder, setSeqReactionSortOrder] = useLocalStorage<
+    string[]
+  >(`seqReactionSortOrder-${seqBatch?.id}`);
 
   // The map key is pcrBatchItem.id + "_" + seqPrimer.id
   // the map value is the real UUID from the database.
@@ -90,6 +94,12 @@ export function SangerSeqReactionStep({
       performSaveInternal();
     }
   }, [performSave]);
+
+  // Save ordering when selected Seq Reactions changed.
+  // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
+  useEffect(() => {
+    setSeqReactionSortOrder(compact(selectedResources.map((item) => item.id)));
+  }, [selectedResources]);
 
   async function saveSeqReactions() {
     // The map key is pcrBatchItem.id + "_" + seqPrimer.id
@@ -166,20 +176,6 @@ export function SangerSeqReactionStep({
     }
   }, [editMode]);
 
-  function sortSeqReactions(seqReactions: SeqReaction[]) {
-    if (seqReactions) {
-      seqReactions.sort((a, b) => {
-        const sampleName1 =
-          (a.pcrBatchItem?.materialSample as MaterialSample)
-            ?.materialSampleName ?? "";
-        const sampleName2 =
-          (b.pcrBatchItem?.materialSample as MaterialSample)
-            ?.materialSampleName ?? "";
-        return compareByStringAndNumber(sampleName1, sampleName2);
-      });
-    }
-  }
-
   const fetchSeqReactions = async () => {
     const { data: seqReactions } = await apiClient.get<SeqReaction[]>(
       "/seqdb-api/seq-reaction",
@@ -255,7 +251,6 @@ export function SangerSeqReactionStep({
         tempId.push(item.seqPrimer?.id);
         item.id = compact(tempId).join("_");
       }
-      sortSeqReactions(seqReactions);
       setRemovableItems(seqReactions);
       setSelectedResources(seqReactions);
     }
@@ -504,7 +499,6 @@ export function SangerSeqReactionStep({
       [...selectedResources, ...selectedObjects],
       "id"
     );
-    sortSeqReactions(selectedResourcesAppended);
     setSelectedResources(selectedResourcesAppended);
     setRemovableItems(selectedResourcesAppended);
 
@@ -534,7 +528,6 @@ export function SangerSeqReactionStep({
     });
 
     setRemovableItems(unselectedObjects);
-    sortSeqReactions(unselectedObjects);
     setSelectedResources(unselectedObjects);
     formik.setFieldValue("itemIdsToDelete", {});
   }
