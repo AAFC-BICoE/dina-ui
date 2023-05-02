@@ -151,14 +151,6 @@ export function CollectionFormFields({ title }) {
 
   return (
     <div>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-          showAllGroups={true}
-        />
-      </div>
       <h1 id="wb-cont">
         <DinaMessage id={title} />
       </h1>
@@ -180,10 +172,18 @@ export function CollectionFormFields({ title }) {
           className="col-md-6"
           label={formatMessage("parentCollectionLabel")}
         />
+        <TextField className="col-md-6" name="code" noSpace={true} />
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="code" noSpace={true} />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+            showAllGroups={true}
+          />
+        )}
       </div>
       <div className="row">
         <TextField
