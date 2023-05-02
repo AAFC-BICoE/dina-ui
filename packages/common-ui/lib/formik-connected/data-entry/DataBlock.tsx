@@ -6,8 +6,6 @@ import {
   CheckBoxField,
   CreatableSelectField,
   FieldWrapperProps,
-  LoadingSpinner,
-  QueryState,
   SelectField
 } from "../../../../common-ui/lib";
 import { DataRow } from "../../../../dina-ui/components";
@@ -23,8 +21,7 @@ export interface DataBlockProps extends FieldWrapperProps {
   isVocabularyBasedEnabledForType?: boolean;
   blockKey: string;
   extensionValues: any;
-  blockOptionsQuery?: QueryState<any, any>;
-  blockOptions?: any[];
+  blockOptions: any[];
   unitsOptions?: any[];
   typeOptions?: any[];
 }
@@ -39,7 +36,6 @@ export function DataBlock({
   isVocabularyBasedEnabledForType = false,
   blockKey,
   extensionValues,
-  blockOptionsQuery,
   blockOptions,
   unitsOptions,
   typeOptions,
@@ -59,15 +55,16 @@ export function DataBlock({
     useState<any>([]);
 
   function onBlockSelectChange(selected, formikCtx, oldValue?) {
-    const selectedFieldExtension = blockOptionsQuery?.response?.data.find(
-      (data) => data.extension.key === selected
+    const selectedFieldExtension = blockOptions?.find(
+      (data) => data.value === selected
     );
-    const selectedExtensionFieldsOptions =
-      selectedFieldExtension?.extension.fields.map((data) => ({
+    const selectedExtensionFieldsOptions = selectedFieldExtension?.fields?.map(
+      (data) => ({
         label: data.name,
         value: data.key,
         descriptions: data.multilingualDescription?.descriptions
-      }));
+      })
+    );
     setDynamicSelectedTypeOptions(selectedExtensionFieldsOptions);
 
     // Clear block rows if new block option selected
@@ -97,14 +94,11 @@ export function DataBlock({
   }
   // Make SelectField component load initial values if they exist
   useEffect(() => {
-    if (extensionValues && blockOptionsQuery?.response) {
+    if (extensionValues) {
       onBlockSelectChange(extensionValues[blockKey].select, formik);
     }
-  }, [blockOptionsQuery?.response]);
+  }, []);
 
-  if (blockOptionsQuery?.loading) {
-    return <LoadingSpinner loading={true} />;
-  }
   return (
     <div>
       {
