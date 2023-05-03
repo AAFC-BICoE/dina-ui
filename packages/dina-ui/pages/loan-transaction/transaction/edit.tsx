@@ -40,7 +40,7 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { pick, compact } from "lodash";
-import { ELASTIC_SEARCH_COLUMN } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -220,6 +220,7 @@ export function TransactionFormLayout({
   const [selectedResourcesView, setSelectedResourcesView] = useState<
     MaterialSample[]
   >([]);
+  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
 
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get

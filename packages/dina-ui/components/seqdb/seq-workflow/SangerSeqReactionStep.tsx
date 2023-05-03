@@ -1,3 +1,4 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   DinaForm,
   FieldHeader,
@@ -9,7 +10,8 @@ import {
   useApiClient,
   useGroupedCheckBoxes,
   useIsMounted,
-  useQuery
+  useQuery,
+  useStringComparator
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
@@ -51,7 +53,7 @@ export function SangerSeqReactionStep({
   setPerformSave,
   onSaved
 }: SangerSeqReactionStepProps) {
-  const { apiClient, save } = useApiClient();
+  const { apiClient, save, bulkGet } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { isAdmin, groupNames, username } = useAccount();
   const [searchResult, setSearchResults] = useState<PcrBatchItem[]>([]);
@@ -63,6 +65,10 @@ export function SangerSeqReactionStep({
   const [selectedRegion, setSelectedRegion] = useState<Region>();
   const [selectedResources, setSelectedResources] = useState<SeqReaction[]>([]);
   const isMounted = useIsMounted();
+  const { compareByStringAndNumber } = useStringComparator();
+  const [seqReactionSortOrder, setSeqReactionSortOrder] = useLocalStorage<
+    string[]
+  >(`seqReactionSortOrder-${seqBatch?.id}`);
 
   // The map key is pcrBatchItem.id + "_" + seqPrimer.id
   // the map value is the real UUID from the database.
@@ -80,14 +86,20 @@ export function SangerSeqReactionStep({
   useEffect(() => {
     async function performSaveInternal() {
       await saveSeqReactions();
-      setPerformSave(false);
       await onSaved(2);
     }
 
     if (performSave) {
+      setPerformSave(false);
       performSaveInternal();
     }
   }, [performSave]);
+
+  // Save ordering when selected Seq Reactions changed.
+  // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
+  useEffect(() => {
+    setSeqReactionSortOrder(compact(selectedResources.map((item) => item.id)));
+  }, [selectedResources]);
 
   async function saveSeqReactions() {
     // The map key is pcrBatchItem.id + "_" + seqPrimer.id
@@ -171,30 +183,56 @@ export function SangerSeqReactionStep({
         filter: {
           "seqBatch.uuid": seqBatch?.id as string
         },
-        include: ["pcrBatchItem", "seqPrimer"].join(",")
+        include: ["pcrBatchItem", "seqPrimer"].join(","),
+        sort: "pcrBatchItem",
+        page: { limit: 1000 }
       }
     );
 
-    for (const item of seqReactions) {
-      if (!!item.pcrBatchItem?.id) {
-        const { data: pcrBatchItem } = await apiClient.get<PcrBatchItem>(
-          `/seqdb-api/pcr-batch-item/${item.pcrBatchItem.id}`,
-          {
-            include: "materialSample"
-          }
+    const pcrBatchItems = compact(
+      await bulkGet<PcrBatchItem, true>(
+        seqReactions?.map(
+          (item) =>
+            `/pcr-batch-item/${item.pcrBatchItem?.id}?include=materialSample`
+        ),
+        {
+          apiBaseUrl: "/seqdb-api",
+          returnNullForMissingResource: true
+        }
+      )
+    );
+
+    const materialSamples = compact(
+      await bulkGet<MaterialSample, true>(
+        pcrBatchItems?.map(
+          (item) => `/material-sample/${item.materialSample?.id}`
+        ),
+        {
+          apiBaseUrl: "/collection-api",
+          returnNullForMissingResource: true
+        }
+      )
+    );
+
+    seqReactions.map((item) => {
+      if (item.pcrBatchItem && item.pcrBatchItem?.id) {
+        item.pcrBatchItem = pcrBatchItems.find(
+          (pbi) => pbi.id === item.pcrBatchItem?.id
         );
-        item.pcrBatchItem = pcrBatchItem;
-        if (!!pcrBatchItem?.materialSample?.id) {
-          const { data: materialSample } = await apiClient.get<MaterialSample>(
-            `collection-api/material-sample/${pcrBatchItem.materialSample.id}`,
-            {}
+        if (
+          item.pcrBatchItem?.materialSample &&
+          item.pcrBatchItem.materialSample.id
+        ) {
+          const foundSample = materialSamples.find(
+            (sample) => sample.id === item.pcrBatchItem?.materialSample?.id
           );
-          if (!!materialSample) {
-            (item.pcrBatchItem as PcrBatchItem).materialSample = materialSample;
-          }
+          (
+            item.pcrBatchItem.materialSample as MaterialSample
+          ).materialSampleName = foundSample?.materialSampleName;
         }
       }
-    }
+      return item;
+    });
 
     if (isMounted.current) {
       setPreviouslySelectedResourcesIDMap(
@@ -213,10 +251,37 @@ export function SangerSeqReactionStep({
         tempId.push(item.seqPrimer?.id);
         item.id = compact(tempId).join("_");
       }
+      sortSeqReactions(seqReactions);
       setRemovableItems(seqReactions);
       setSelectedResources(seqReactions);
     }
   };
+
+  function sortSeqReactions(reactions: SeqReaction[]) {
+    if (seqReactionSortOrder) {
+      const sorted = seqReactionSortOrder.map((reactionId) =>
+        reactions.find((item) => {
+          const tempId: (string | undefined)[] = [];
+          tempId.push(item.pcrBatchItem?.id);
+          tempId.push(item.seqPrimer?.id);
+          const id = compact(tempId).join("_");
+          return id === reactionId;
+        })
+      );
+      reactions.forEach((item) => {
+        const tempId: (string | undefined)[] = [];
+        tempId.push(item.pcrBatchItem?.id);
+        tempId.push(item.seqPrimer?.id);
+        const id = compact(tempId).join("_");
+        if (seqReactionSortOrder.indexOf(id) === -1) {
+          sorted.push(item);
+        }
+      });
+      return compact(sorted);
+    } else {
+      return compact(reactions);
+    }
+  }
 
   //#region of PCR Batch Item table
   // Checkbox for the first table that lists the search results
@@ -234,22 +299,41 @@ export function SangerSeqReactionStep({
       include: ["pcrBatch", "materialSample"].join(","),
       filter: {
         "pcrBatch.uuid": selectedPcrBatch?.id as string
-      }
+      },
+      page: { limit: 1000 }
     },
     {
       disabled: !selectedPcrBatch,
       onSuccess: async ({ data }) => {
-        for (const item of data) {
-          if (item && item.materialSample && item.materialSample.id) {
-            const { data: materialSample } =
-              await apiClient.get<MaterialSample>(
-                `collection-api/material-sample/${item.materialSample.id}`,
-                {}
-              );
+        const materialSamples = compact(
+          await bulkGet<MaterialSample, true>(
+            data?.map((item) => `/material-sample/${item.materialSample?.id}`),
+            {
+              apiBaseUrl: "/collection-api",
+              returnNullForMissingResource: true
+            }
+          )
+        );
+
+        data.map((item) => {
+          if (item.materialSample && item.materialSample.id) {
+            const foundSample = materialSamples.find(
+              (sample) => sample.id === item.materialSample?.id
+            );
             (item.materialSample as MaterialSample).materialSampleName =
-              materialSample?.materialSampleName;
+              foundSample?.materialSampleName;
           }
-        }
+          return item;
+        });
+
+        data.sort((a, b) => {
+          const sampleName1 =
+            (a.materialSample as MaterialSample)?.materialSampleName ?? "";
+          const sampleName2 =
+            (b.materialSample as MaterialSample)?.materialSampleName ?? "";
+          return compareByStringAndNumber(sampleName1, sampleName2);
+        });
+
         setAvailableItems(data);
         setSearchResults(data);
       }
@@ -309,6 +393,7 @@ export function SangerSeqReactionStep({
         columns={PCR_BATCH_ITEM_COLUMN}
         data={pcrBatchItemQuery?.response?.data}
         minRows={1}
+        pageSize={1000}
         showPagination={false}
         loading={pcrBatchItemQuery?.loading}
         sortable={false}
@@ -441,7 +526,6 @@ export function SangerSeqReactionStep({
       [...selectedResources, ...selectedObjects],
       "id"
     );
-
     setSelectedResources(selectedResourcesAppended);
     setRemovableItems(selectedResourcesAppended);
 
@@ -577,6 +661,7 @@ export function SangerSeqReactionStep({
             columns={SELECTED_RESOURCE_HEADER}
             data={selectedResources}
             minRows={1}
+            pageSize={1000}
             showPagination={false}
             sortable={false}
           />
@@ -594,6 +679,7 @@ export function SangerSeqReactionStep({
           columns={SELECTED_RESOURCE_HEADER}
           data={selectedResources}
           minRows={1}
+          pageSize={1000}
           showPagination={false}
           sortable={false}
         />
