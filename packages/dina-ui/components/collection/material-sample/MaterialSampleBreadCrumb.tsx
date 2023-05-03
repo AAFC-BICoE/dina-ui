@@ -13,16 +13,14 @@ export interface MaterialSampleBreadCrumbProps {
    * This should be used in forms to add new data, not in search forms like list pages.
    */
   enableStoredDefaultGroup?: boolean;
-
-  enableGroupSelectField?: boolean;
 }
 
 export function MaterialSampleBreadCrumb({
   disableLastLink,
   materialSample,
-  enableStoredDefaultGroup,
-  enableGroupSelectField
+  enableStoredDefaultGroup
 }: MaterialSampleBreadCrumbProps) {
+  const { readOnly } = useDinaFormContext();
   const parentPath = [...(materialSample.hierarchy?.slice(1) ?? [])];
 
   const displayName = materialSample.materialSampleName;
@@ -58,8 +56,8 @@ export function MaterialSampleBreadCrumb({
             </div>
           )}
         </strong>
-        {enableGroupSelectField && (
-          <h5 className="col-md-2 align-self-end mb-0">
+        {!readOnly ? (
+          <h6 className="col-md-6 align-self-end mb-0">
             <DinaFormSection horizontal={"flex"}>
               <GroupSelectField
                 disableTemplateCheckbox={true}
@@ -70,7 +68,9 @@ export function MaterialSampleBreadCrumb({
                 styles={customStyle}
               />
             </DinaFormSection>
-          </h5>
+          </h6>
+        ) : (
+          <span>{materialSample?.group?.toUpperCase()}</span>
         )}
       </h1>
 

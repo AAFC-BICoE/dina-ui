@@ -130,8 +130,12 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
   );
 }
 
+export interface CollectionFormFieldsProps {
+  title?: any;
+}
+
 /** Re-usable field layout between edit and view pages. */
-export function CollectionFormFields({ title }) {
+export function CollectionFormFields({ title }: CollectionFormFieldsProps) {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const typeOptions: SelectOption<string | undefined>[] = [
@@ -151,9 +155,11 @@ export function CollectionFormFields({ title }) {
 
   return (
     <div>
-      <h1 id="wb-cont">
-        <DinaMessage id={title} />
-      </h1>
+      {title && (
+        <h1 id="wb-cont">
+          <DinaMessage id={title} />
+        </h1>
+      )}
       <div className="row">
         {/* <ResourceSelectField<Institution>
           name="institution"

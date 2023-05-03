@@ -89,24 +89,24 @@ export function ProtocolForm({ fetchedProtocol, onSaved }: ProtocolFormProps) {
 }
 
 export function ProtocolFormLayout() {
-  const { initialValues } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   return (
     <>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
       <div className="row">
         <TextField
           className="col-md-6 protocolName"
           name="name"
           label={formatMessage("protocolNameLabel")}
         />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
       </div>
       <div className="row">
         <VocabularySelectField

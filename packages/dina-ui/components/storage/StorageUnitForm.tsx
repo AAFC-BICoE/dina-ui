@@ -131,14 +131,7 @@ export function StorageUnitFormFields({
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
-      <div className="row">
-        <div className="col-md-6 d-flex ">
+        <div className="col-md-6">
           {!readOnly && !initialValues.id && (
             <ToggleField
               className="me-4"
@@ -147,6 +140,10 @@ export function StorageUnitFormFields({
               label={formatMessage("multipleUnits")}
             />
           )}
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-md-6 d-flex ">
           {!showTextAreaInput && (
             <TextField
               className="flex-grow-1"
@@ -154,7 +151,6 @@ export function StorageUnitFormFields({
               label={formatMessage("storageUnitName")}
             />
           )}
-
           {showTextAreaInput && (
             <StringArrayField
               className="flex-grow-1"
@@ -163,6 +159,20 @@ export function StorageUnitFormFields({
             />
           )}
         </div>
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
+      </div>
+      <div className="row">
+        <TextField
+          className="col-md-6"
+          name="barcode"
+          label={formatMessage("field_barcode")}
+        />
         <ResourceSelectField<StorageUnitType>
           className="col-md-6"
           model="collection-api/storage-unit-type"
@@ -171,13 +181,6 @@ export function StorageUnitFormFields({
           filter={filterBy(["name"])}
           omitNullOption={true}
           readOnlyLink="/collection/storage-unit-type/view?id="
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="col-md-6"
-          name="barcode"
-          label={formatMessage("field_barcode")}
         />
       </div>
       {readOnly ? (

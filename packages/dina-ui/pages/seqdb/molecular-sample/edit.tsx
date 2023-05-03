@@ -39,7 +39,7 @@ export function useMolecularSample(id?: string) {
           apiBaseUrl: "/collection-api",
           idField: "materialSample.id",
           joinField: "materialSample",
-          path: sample => `material-sample/${sample.materialSample.id}`
+          path: (sample) => `material-sample/${sample.materialSample.id}`
         }
       ]
     }
@@ -141,14 +141,14 @@ export function MolecularSampleFields() {
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
-      <div className="row">
         <TextField className="col-md-6" name="name" />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
       </div>
       <div className="row">
         <ResourceSelectField<Product>
@@ -156,7 +156,7 @@ export function MolecularSampleFields() {
           className="col-md-6"
           filter={filterBy(["name"])}
           model="seqdb-api/product"
-          optionLabel={it => it.name}
+          optionLabel={(it) => it.name}
           readOnlyLink="/seqdb/product/view?id="
         />
         <ResourceSelectField<MaterialSample>
@@ -173,7 +173,7 @@ export function MolecularSampleFields() {
             ]
           })}
           model="collection-api/material-sample"
-          optionLabel={it => it.materialSampleName || it.id}
+          optionLabel={(it) => it.materialSampleName || it.id}
           readOnlyLink="/collection/material-sample/view?id="
         />
       </div>
