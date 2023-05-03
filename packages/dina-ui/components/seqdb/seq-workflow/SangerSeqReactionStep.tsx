@@ -251,10 +251,37 @@ export function SangerSeqReactionStep({
         tempId.push(item.seqPrimer?.id);
         item.id = compact(tempId).join("_");
       }
+      sortSeqReactions(seqReactions);
       setRemovableItems(seqReactions);
       setSelectedResources(seqReactions);
     }
   };
+
+  function sortSeqReactions(reactions: SeqReaction[]) {
+    if (seqReactionSortOrder) {
+      const sorted = seqReactionSortOrder.map((reactionId) =>
+        reactions.find((item) => {
+          const tempId: (string | undefined)[] = [];
+          tempId.push(item.pcrBatchItem?.id);
+          tempId.push(item.seqPrimer?.id);
+          const id = compact(tempId).join("_");
+          return id === reactionId;
+        })
+      );
+      reactions.forEach((item) => {
+        const tempId: (string | undefined)[] = [];
+        tempId.push(item.pcrBatchItem?.id);
+        tempId.push(item.seqPrimer?.id);
+        const id = compact(tempId).join("_");
+        if (seqReactionSortOrder.indexOf(id) === -1) {
+          sorted.push(item);
+        }
+      });
+      return compact(sorted);
+    } else {
+      return compact(reactions);
+    }
+  }
 
   //#region of PCR Batch Item table
   // Checkbox for the first table that lists the search results
