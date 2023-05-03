@@ -418,6 +418,7 @@ export function MaterialSampleForm({
                   disableLastLink={true}
                   materialSample={materialSample as any}
                   enableStoredDefaultGroup={enableStoredDefaultGroup}
+                  enableGroupSelectField={true}
                 />
               )}
               {!isTemplate && !materialSample?.materialSampleName && (
