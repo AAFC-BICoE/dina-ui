@@ -268,14 +268,16 @@ export function SeqBatchFormFields() {
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
+        <TextField className="col-md-6" name="name" />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
       </div>
       <div className="row">
-        <TextField className="col-md-6" name="name" />
         <CheckBoxField
           name="isCompleted"
           className="gap-3 col-md-6"

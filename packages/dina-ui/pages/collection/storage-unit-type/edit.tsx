@@ -160,14 +160,14 @@ export function StorageUnitTypeFormFields() {
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
-      <div className="row">
         <TextField className="col-md-6" name="name" />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
         <ToggleField className="col-md-3" name="isInseperable" />
         <ToggleField className="col-md-3" name="enableGrid" />
       </div>
@@ -195,9 +195,10 @@ export function StorageUnitTypeFormFields() {
               customName="fillDirection"
               className="col-md-6"
               options={FILL_DIRECTION_OPTIONS_LABELS}
-              readOnlyRender={selectedvalue => {
+              readOnlyRender={(selectedvalue) => {
                 const option = FILL_DIRECTION_OPTIONS_LABELS.find(
-                  optionLabel => optionLabel.value.toString() === selectedvalue
+                  (optionLabel) =>
+                    optionLabel.value.toString() === selectedvalue
                 );
                 return option?.label;
               }}

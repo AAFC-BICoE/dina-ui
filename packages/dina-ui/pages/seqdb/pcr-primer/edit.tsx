@@ -12,7 +12,8 @@ import {
   TextField,
   useQuery,
   withResponse,
-  RadioButtonsField
+  RadioButtonsField,
+  useDinaFormContext
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -103,15 +104,9 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
 }
 
 export function PcrPrimerFormFields() {
+  const { readOnly } = useDinaFormContext();
   return (
     <div>
-      <div className="row">
-        <GroupSelectField
-          className="col-md-2"
-          name="group"
-          enableStoredDefaultGroup={true}
-        />
-      </div>
       <div className="row">
         <SelectField
           className="col-md-2"
@@ -130,6 +125,13 @@ export function PcrPrimerFormFields() {
           optionLabel={(region) => region.name}
         />
         <TextField className="col-md-2" name="name" />
+        {!readOnly && (
+          <GroupSelectField
+            className="col-md-2"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
+        )}
         <NumberField className="col-md-2" name="lotNumber" />
         <TextField className="col-md-2" name="targetSpecies" />
         <TextField className="col-md-2" name="purification" />

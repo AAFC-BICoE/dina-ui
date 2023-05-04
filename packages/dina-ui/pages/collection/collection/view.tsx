@@ -7,7 +7,7 @@ import { CollectionFormFields } from "./edit";
 export default function CollectionDetailsPage() {
   return (
     <ViewPageLayout<Collection>
-      form={props => (
+      form={(props) => (
         <DinaForm<Collection>
           {...props}
           initialValues={{
@@ -20,10 +20,10 @@ export default function CollectionDetailsPage() {
             )
           }}
         >
-          <CollectionFormFields title={"collectionViewTitle"} />
+          <CollectionFormFields />
         </DinaForm>
       )}
-      query={id => ({
+      query={(id) => ({
         path: `collection-api/collection/${id}`,
         include: "institution,parentCollection"
       })}

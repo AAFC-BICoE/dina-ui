@@ -7,7 +7,8 @@ import {
   SubmitButton,
   TextField,
   useQuery,
-  withResponse
+  withResponse,
+  useDinaFormContext
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -133,22 +134,22 @@ export function PreparationTypeForm({
 
 export function PreparationTypeFormLayout() {
   const { formatMessage } = useDinaIntl();
-
+  const { readOnly } = useDinaFormContext();
   return (
     <div>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
       <div className="row">
         <TextField
           className="col-md-6 preparationTypeName"
           name="name"
           label={formatMessage("preparationTypeNameLabel")}
         />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
       </div>
       <div className="row">
         <TextField

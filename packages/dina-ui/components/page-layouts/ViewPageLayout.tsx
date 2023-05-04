@@ -2,6 +2,7 @@ import {
   BackButton,
   ButtonBar,
   DeleteButton,
+  DinaFormSection,
   EditButton,
   JsonApiQuerySpec,
   QueryOptions,
@@ -13,7 +14,7 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import { castArray, get } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { Footer, Head, Nav } from "..";
+import { Footer, GroupSelectField, Head, Nav } from "..";
 import { HasDinaMetaInfo } from "../../types/DinaJsonMetaInfo";
 import Link from "next/link";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -143,6 +144,7 @@ export function ViewPageLayout<T extends KitsuResource>({
                 : get(data, currentField)),
             ""
           );
+          const group = get(data, "group")?.toUpperCase();
           // if title is array, only take first element
           if (Array.isArray(title)) {
             title = title[0];
@@ -193,9 +195,12 @@ export function ViewPageLayout<T extends KitsuResource>({
                     />
                   ))}
               </ButtonBar>
-              <h1 id="wb-cont">
-                {title}
-                {tooltipNode}
+              <h1 id="wb-cont" className="d-flex justify-content-between">
+                <span>
+                  {title}
+                  {tooltipNode}
+                </span>
+                <span>{group}</span>
               </h1>
               {form(formProps)}
               {showRevisionsLinkAtBottom && (
