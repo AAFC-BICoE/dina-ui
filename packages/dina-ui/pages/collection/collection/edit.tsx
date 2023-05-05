@@ -130,8 +130,12 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
   );
 }
 
+export interface CollectionFormFieldsProps {
+  title?: any;
+}
+
 /** Re-usable field layout between edit and view pages. */
-export function CollectionFormFields({ title }) {
+export function CollectionFormFields({ title }: CollectionFormFieldsProps) {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const typeOptions: SelectOption<string | undefined>[] = [
@@ -151,17 +155,11 @@ export function CollectionFormFields({ title }) {
 
   return (
     <div>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-          showAllGroups={true}
-        />
-      </div>
-      <h1 id="wb-cont">
-        <DinaMessage id={title} />
-      </h1>
+      {title && (
+        <h1 id="wb-cont">
+          <DinaMessage id={title} />
+        </h1>
+      )}
       <div className="row">
         {/* <ResourceSelectField<Institution>
           name="institution"
@@ -180,10 +178,18 @@ export function CollectionFormFields({ title }) {
           className="col-md-6"
           label={formatMessage("parentCollectionLabel")}
         />
+        <TextField className="col-md-6" name="code" noSpace={true} />
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="code" noSpace={true} />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+            showAllGroups={true}
+          />
+        )}
       </div>
       <div className="row">
         <TextField

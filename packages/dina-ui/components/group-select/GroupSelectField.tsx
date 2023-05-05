@@ -29,6 +29,8 @@ interface GroupSelectFieldProps extends Omit<SelectFieldProps<any>, "options"> {
    * This should be used in forms to add new data, not in search forms like list pages.
    */
   enableStoredDefaultGroup?: boolean;
+
+  readOnlyHideLabel?: boolean;
 }
 
 export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
@@ -36,6 +38,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     showAnyOption,
     showAllGroups,
     enableStoredDefaultGroup = false,
+    readOnlyHideLabel,
     ...selectFieldProps
   } = groupSelectFieldProps;
 
@@ -77,9 +80,9 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   return (
     <SelectField
       // Re-initialize the component if the labels change:
-      key={groupSelectOptions.map(option => option.label).join()}
+      key={groupSelectOptions.map((option) => option.label).join()}
       {...selectFieldProps}
-      readOnlyRender={groupName =>
+      readOnlyRender={(groupName) =>
         groupName ? <GroupLabel groupName={groupName} /> : <div />
       }
       onChange={(newValue: string | null | undefined, formik) => {
@@ -87,7 +90,8 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
         selectFieldProps.onChange?.(newValue, formik);
       }}
       options={options}
-      selectProps={{ isDisabled: hasOnlyOneOption, isClearable: true }}
+      selectProps={{ isDisabled: hasOnlyOneOption, isClearable: false }}
+      hideLabel={readOnlyHideLabel && readOnly}
     />
   );
 }
@@ -140,7 +144,7 @@ export function useAvailableGroupOptions({
     }
   );
 
-  const groupOptions = response?.data?.map(group => ({
+  const groupOptions = response?.data?.map((group) => ({
     label: group.labels[locale] ?? group.name,
     value: group.name
   }));
@@ -148,7 +152,7 @@ export function useAvailableGroupOptions({
   const groupSelectOptions =
     groupOptions ??
     // If no labelled groups are available, fallback to unlabelled group names from useAccount:
-    selectableGroupNames.map(name => ({ label: name, value: name })) ??
+    selectableGroupNames.map((name) => ({ label: name, value: name })) ??
     [];
 
   return { groupSelectOptions };

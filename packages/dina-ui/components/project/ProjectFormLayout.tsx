@@ -24,10 +24,10 @@ export function ProjectFormLayout() {
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
+        <TextField
+          className="col-md-6 status"
+          name="status"
+          label={formatMessage("field_projectStatus")}
         />
       </div>
       <div className="row">
@@ -36,17 +36,19 @@ export function ProjectFormLayout() {
           name="name"
           label={formatMessage("field_projectName")}
         />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
+      </div>
+      <div className="row">
         <DateField
           className="col-md-6 startDate"
           name="startDate"
           label={formatMessage("field_startDate")}
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="col-md-6 status"
-          name="status"
-          label={formatMessage("field_projectStatus")}
         />
         <DateField
           className="col-md-6 endDate"

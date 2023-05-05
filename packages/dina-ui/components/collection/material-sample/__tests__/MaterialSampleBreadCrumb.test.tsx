@@ -32,11 +32,11 @@ describe("MaterialSampleBreadCrumb component", () => {
 
     // Under the title, should be all of the parents of this selected record.
     expect(
-      wrapper.find("li.breadcrumb-item").map(node => node.text().trim())
+      wrapper.find("li.breadcrumb-item").map((node) => node.text().trim())
     ).toEqual(["B", "C"]);
 
     /* It will have 2 links,  the 3th is plain text for current sample */
-    expect(wrapper.find("a").map(node => node.prop("href"))).toEqual([
+    expect(wrapper.find("a").map((node) => node.prop("href"))).toEqual([
       "/collection/material-sample/view?id=B",
       "/collection/material-sample/view?id=C"
     ]);
@@ -44,15 +44,19 @@ describe("MaterialSampleBreadCrumb component", () => {
 
   it("Renders the breadcrumb path from the hierarchy, lastLink enabled", async () => {
     const wrapper = mountWithAppContext(
-      <MaterialSampleBreadCrumb materialSample={materialSampleWithHierarchy} />
+      <DinaForm initialValues={{}}>
+        <MaterialSampleBreadCrumb
+          materialSample={materialSampleWithHierarchy}
+        />
+      </DinaForm>
     );
     /* It will have 3 items , last one is current sample */
     expect(
-      wrapper.find("li.breadcrumb-item").map(node => node.text().trim())
+      wrapper.find("li.breadcrumb-item").map((node) => node.text().trim())
     ).toEqual(["B", "C"]);
 
     /* It will have 3 links */
-    expect(wrapper.find("a").map(node => node.prop("href"))).toEqual([
+    expect(wrapper.find("a").map((node) => node.prop("href"))).toEqual([
       "/collection/material-sample/view?id=A",
       "/collection/material-sample/view?id=B",
       "/collection/material-sample/view?id=C"

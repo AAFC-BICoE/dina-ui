@@ -1,4 +1,9 @@
-import { filterBy, ResourceSelectField, TextField } from "common-ui";
+import {
+  filterBy,
+  ResourceSelectField,
+  TextField,
+  useDinaFormContext
+} from "common-ui";
 import { GroupSelectField } from "..";
 import { Region } from "../../types/seqdb-api/resources/Region";
 import { FieldArray } from "formik";
@@ -14,11 +19,18 @@ export function ThermocyclerProfileFormFields({
   return (
     <div>
       <div className="row">
-        <GroupSelectField
+        <TextField
           className="col-md-2"
-          name="group"
-          enableStoredDefaultGroup={true}
+          name="name"
+          label="Thermocycler Profile Name"
         />
+        {!readOnly && (
+          <GroupSelectField
+            className="col-md-2"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
+        )}
       </div>
       <div className="row">
         <ResourceSelectField<Region>
@@ -28,11 +40,6 @@ export function ThermocyclerProfileFormFields({
           label="Gene Region"
           model="seqdb-api/region"
           optionLabel={(region) => region.name}
-        />
-        <TextField
-          className="col-md-2"
-          name="name"
-          label="Thermocycler Profile Name"
         />
         <TextField className="col-md-2" name="application" />
         <TextField className="col-md-2" name="cycles" />
