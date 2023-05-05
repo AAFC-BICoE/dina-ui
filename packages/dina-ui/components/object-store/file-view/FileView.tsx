@@ -1,4 +1,9 @@
-import { LoadingSpinner, useAccount } from "../../../../common-ui";
+import {
+  LoadingSpinner,
+  useAccount,
+  useApiClient,
+  useQuery
+} from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ComponentType, ReactNode, useEffect, useState } from "react";
@@ -54,13 +59,31 @@ export function FileView({
   const router = useRouter();
   const { getCurrentToken } = useAccount();
   const [token, setToken] = useState<string | undefined>(undefined);
+  const { apiClient } = useApiClient();
+  const newFilePath = filePath.replace("/api", "");
+  const [imageData, setImageData] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     async function refreshToken() {
       const newToken = await getCurrentToken();
       setToken(newToken);
-    }
 
+      // axios post request
+      try {
+        await apiClient.axios
+          .get(newFilePath, { responseType: "arraybuffer" })
+          .then((response) => {
+            const data = `data:${
+              response.headers["content-type"]
+            };base64,${Buffer.from(response.data, "binary").toString(
+              "base64"
+            )}`;
+            setImageData(data);
+          });
+      } catch (error) {
+        return error;
+      }
+    }
     // Get the latest token for the preview.
     refreshToken();
   }, []);
@@ -135,7 +158,7 @@ export function FileView({
               isImage ? (
                 <img
                   alt={imgAlt ?? `File path : ${filePath}`}
-                  src={authenticatedFilePath}
+                  src={imageData}
                   style={{ height: imgHeight }}
                   onError={(event) =>
                     (event.currentTarget.style.display = "none")
