@@ -96,12 +96,6 @@ export function SangerSeqReactionStep({
     }
   }, [performSave]);
 
-  // Save ordering when selected Seq Reactions changed.
-  // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
-  useEffect(() => {
-    setSeqReactionSortOrder(compact(selectedResources.map((item) => item.id)));
-  }, [selectedResources]);
-
   async function saveSeqReactions() {
     // The map key is pcrBatchItem.id + "_" + seqPrimer.id
     // The map value is a instance of SeqReaction
@@ -252,12 +246,13 @@ export function SangerSeqReactionStep({
         tempId.push(item.seqPrimer?.id);
         item.id = compact(tempId).join("_");
       }
-      sortSeqReactions(seqReactions);
-      setRemovableItems(seqReactions);
-      setSelectedResources(seqReactions);
+      const sorted = sortSeqReactions(seqReactions);
+      setRemovableItems(sorted);
+      setSelectedResources(sorted);
     }
   };
 
+  // Sort Seq Reactions based on the preserved order in local storage
   function sortSeqReactions(reactions: SeqReaction[]) {
     if (seqReactionSortOrder) {
       const sorted = seqReactionSortOrder.map((reactionId) =>
@@ -325,14 +320,6 @@ export function SangerSeqReactionStep({
               foundSample?.materialSampleName;
           }
           return item;
-        });
-
-        data.sort((a, b) => {
-          const sampleName1 =
-            (a.materialSample as MaterialSample)?.materialSampleName ?? "";
-          const sampleName2 =
-            (b.materialSample as MaterialSample)?.materialSampleName ?? "";
-          return compareByStringAndNumber(sampleName1, sampleName2);
         });
 
         setAvailableItems(data);
@@ -527,6 +514,11 @@ export function SangerSeqReactionStep({
       [...selectedResources, ...selectedObjects],
       "id"
     );
+    // Save ordering when add Seq Reactions.
+    // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
+    setSeqReactionSortOrder(
+      compact(selectedResourcesAppended.map((item) => item.id))
+    );
     setSelectedResources(selectedResourcesAppended);
     setRemovableItems(selectedResourcesAppended);
 
@@ -556,6 +548,9 @@ export function SangerSeqReactionStep({
     });
 
     setRemovableItems(unselectedObjects);
+    // Save ordering when remove Seq Reactions.
+    // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
+    setSeqReactionSortOrder(compact(unselectedObjects.map((item) => item.id)));
     setSelectedResources(unselectedObjects);
     formik.setFieldValue("itemIdsToDelete", {});
   }
