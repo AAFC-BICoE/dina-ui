@@ -263,13 +263,6 @@ export function TransactionFormLayout({
 
   return (
     <div>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          className="col-sm-6"
-          enableStoredDefaultGroup={true}
-        />
-      </div>
       <FieldSet legend={<DinaMessage id="transactionDetails" />}>
         {readOnly ? (
           <div className="d-flex gap-2 mb-3">
@@ -318,6 +311,16 @@ export function TransactionFormLayout({
           </div>
         )}
         <div className="row">
+          <TextField className="col-md-6" name="transactionNumber" />
+          {!readOnly && (
+            <GroupSelectField
+              name="group"
+              className="col-sm-6"
+              enableStoredDefaultGroup={true}
+            />
+          )}
+        </div>
+        <div className="row">
           <div className="col-md-6">
             <AutoSuggestTextField<Transaction>
               name="transactionType"
@@ -335,7 +338,6 @@ export function TransactionFormLayout({
               }}
               blankSearchBackend={"json-api"}
             />
-            <TextField name="transactionNumber" />
           </div>
           <div className="col-md-6">
             <StringArrayField name="otherIdentifiers" />

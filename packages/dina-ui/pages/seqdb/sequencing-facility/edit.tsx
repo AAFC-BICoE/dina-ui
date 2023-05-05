@@ -9,7 +9,8 @@ import {
   useQuery,
   useStringArrayConverter,
   withResponse,
-  FieldSet
+  FieldSet,
+  useDinaFormContext
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -164,16 +165,19 @@ function SequencingFacilityForm({
 export function SequencingFacilityFormFields({
   formValues
 }: SequencingFacilityProps) {
+  const { readOnly } = useDinaFormContext();
   return (
     <div>
       <FieldSet legend={<></>}>
         <div className="row">
-          <GroupSelectField
-            className="col-md-6"
-            name="group"
-            enableStoredDefaultGroup={true}
-          />
           <TextField className="col-md-6" name="name" />
+          {!readOnly && (
+            <GroupSelectField
+              className="col-md-6"
+              name="group"
+              enableStoredDefaultGroup={true}
+            />
+          )}
         </div>
       </FieldSet>
       <SequencingFacilityContacts formValues={formValues} />

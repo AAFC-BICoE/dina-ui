@@ -176,6 +176,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <MaterialSampleBreadCrumb
                   materialSample={materialSample}
                   disableLastLink={true}
+                  enableGroupSelectField={true}
                 />
                 <div className="d-flex flex-row gap-2">
                   <TagsAndRestrictionsSection />
