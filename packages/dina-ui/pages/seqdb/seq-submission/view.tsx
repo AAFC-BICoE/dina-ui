@@ -45,17 +45,17 @@ export function SeqSubmissionFields() {
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          className="col-md-4"
-          name="group"
-          enableStoredDefaultGroup={true}
-        />
-      </div>
-      <div className="row">
         <TextField className="col-md-6" name="name" />
-        <PersonSelectField className="col-md-6" name="submittedBy" />
+        {!readOnly && (
+          <GroupSelectField
+            className="col-md-6"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
+        )}
       </div>
       <div className="row">
+        <PersonSelectField className="col-md-6" name="submittedBy" />
         <ResourceSelectField<SeqBatch>
           name="seqBatch"
           label={formatMessage("seqBatch")}
