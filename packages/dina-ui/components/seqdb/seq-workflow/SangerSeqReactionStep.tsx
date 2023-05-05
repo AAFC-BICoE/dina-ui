@@ -382,6 +382,11 @@ export function SangerSeqReactionStep({
     }
   ];
 
+  function setSelectedResourcesAndSaveOrder(seqReactions: SeqReaction[]) {
+    setSelectedResources(seqReactions);
+    setSeqReactionSortOrder(compact(seqReactions.map((item) => item.id)));
+  }
+
   const pcrBatchTable = (
     <div className="d-flex align-items-start col-md-5">
       <ReactTable<PcrBatchItem>
@@ -524,10 +529,7 @@ export function SangerSeqReactionStep({
     );
     // Save ordering when add Seq Reactions.
     // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
-    setSeqReactionSortOrder(
-      compact(selectedResourcesAppended.map((item) => item.id))
-    );
-    setSelectedResources(selectedResourcesAppended);
+    setSelectedResourcesAndSaveOrder(selectedResourcesAppended);
     setRemovableItems(selectedResourcesAppended);
 
     // Deselect the search results.
@@ -663,7 +665,7 @@ export function SangerSeqReactionStep({
           <SeqReactionDndTable
             editMode={true}
             selectedSeqReactions={selectedResources}
-            setSelectedSeqReactions={setSelectedResources}
+            setSelectedSeqReactions={setSelectedResourcesAndSaveOrder}
           />
         </div>
       </div>

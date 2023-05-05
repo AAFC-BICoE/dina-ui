@@ -13,7 +13,7 @@ import {
   SeqReaction,
   pcrBatchItemResultColor
 } from "packages/dina-ui/types/seqdb-api";
-import { FC, useRef, useEffect, HTMLProps } from "react";
+import { HTMLProps, useEffect, useRef } from "react";
 import { useDrag, useDrop } from "react-dnd-cjs";
 
 const ITEM_DRAG_KEY = "DND_SEQ_REACTION";
@@ -34,14 +34,14 @@ export function SeqReactionDndTable({
   setSelectedSeqReactions,
   editMode
 }: SeqReactionDnDTableProps) {
-  const reorderRow = (draggedRowIndex: number, targetRowIndex: number) => {
+  function reorderRow(draggedRowIndex: number, targetRowIndex: number) {
     selectedSeqReactions.splice(
       targetRowIndex,
       0,
       selectedSeqReactions.splice(draggedRowIndex, 1)[0] as SeqReaction
     );
     setSelectedSeqReactions([...selectedSeqReactions]);
-  };
+  }
 
   // Checkbox for second table where selected/to be deleted items are displayed
   const {
@@ -176,14 +176,18 @@ export function SeqReactionDndTable({
   );
 }
 
-const DraggableRow: FC<{
+function DraggableRow({
+  row,
+  reorderRow,
+  editMode
+}: {
   editMode: boolean;
   row: Row<SeqReaction>;
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
-}> = ({ row, reorderRow, editMode }) => {
+}) {
   const [, dropRef] = useDrop({
     accept: ITEM_DRAG_KEY,
-    drop: (draggedRow) => reorderRow((draggedRow as any).index, row.index),
+    drop: (draggedRow) => reorderRow((draggedRow as any).row.index, row.index),
     canDrop: () => editMode
   });
 
@@ -215,7 +219,7 @@ const DraggableRow: FC<{
       ))}
     </tr>
   );
-};
+}
 
 function IndeterminateCheckbox({
   indeterminate,
