@@ -50,6 +50,7 @@
   border-right: 1px solid rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: inset 0 0 0 0 transparent;
+  font-weight: var(--bs-body-font-weight);
 }
 
 .ReactTable8 tbody {

@@ -8,6 +8,7 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import { FieldHeader, useGroupedCheckBoxes } from "packages/common-ui/lib";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import {
   SeqReaction,
   pcrBatchItemResultColor
@@ -48,7 +49,8 @@ export function SeqReactionDndTable({
     CheckBoxHeader: DeselectCheckBoxHeader,
     setAvailableItems: setRemovableItems
   } = useGroupedCheckBoxes({
-    fieldName: "itemIdsToDelete"
+    fieldName: "itemIdsToDelete",
+    defaultAvailableItems: selectedSeqReactions
   });
 
   const SELECTED_RESOURCE_SELECT_ALL_HEADER: ColumnDef<SeqReaction>[] = editMode
@@ -151,14 +153,24 @@ export function SeqReactionDndTable({
         ))}
       </thead>
       <tbody>
-        {table.getRowModel().rows.map((row) => (
-          <DraggableRow
-            key={row.id}
-            row={row}
-            reorderRow={reorderRow}
-            editMode={editMode}
-          />
-        ))}
+        {table.getRowModel().rows.length === 0 ? (
+          <tr>
+            <td colSpan={table.getAllColumns().length} className="text-center">
+              <DinaMessage id="noRowsFound" />
+            </td>
+          </tr>
+        ) : (
+          table
+            .getRowModel()
+            .rows.map((row) => (
+              <DraggableRow
+                key={row.id}
+                row={row}
+                reorderRow={reorderRow}
+                editMode={editMode}
+              />
+            ))
+        )}
       </tbody>
     </table>
   );

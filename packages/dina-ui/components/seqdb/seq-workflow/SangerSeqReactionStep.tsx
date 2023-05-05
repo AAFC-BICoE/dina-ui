@@ -322,6 +322,14 @@ export function SangerSeqReactionStep({
           return item;
         });
 
+        data.sort((a, b) => {
+          const sampleName1 =
+            (a.materialSample as MaterialSample)?.materialSampleName ?? "";
+          const sampleName2 =
+            (b.materialSample as MaterialSample)?.materialSampleName ?? "";
+          return compareByStringAndNumber(sampleName1, sampleName2);
+        });
+
         setAvailableItems(data);
         setSearchResults(data);
       }
