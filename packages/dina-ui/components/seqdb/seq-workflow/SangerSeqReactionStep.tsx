@@ -34,6 +34,7 @@ import {
   SeqReaction
 } from "../../../types/seqdb-api";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
+import { SeqReactionDndTable } from "./seq-reaction-step/SeqReactionDndTable";
 
 export interface SangerSeqReactionStepProps {
   seqBatch?: SeqBatch;
@@ -656,14 +657,10 @@ export function SangerSeqReactionStep({
           </div>
         </div>
         <div className="d-flex align-items-start col-md-6">
-          <ReactTable<SeqReaction>
-            className="react-table-overflow w-100"
-            columns={SELECTED_RESOURCE_HEADER}
-            data={selectedResources}
-            minRows={1}
-            pageSize={1000}
-            showPagination={false}
-            sortable={false}
+          <SeqReactionDndTable
+            editMode={true}
+            selectedSeqReactions={selectedResources}
+            setSelectedSeqReactions={setSelectedResources}
           />
         </div>
       </div>
