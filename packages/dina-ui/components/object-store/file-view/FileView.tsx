@@ -58,38 +58,29 @@ export function FileView({
 }: FileViewProps) {
   const router = useRouter();
   const { getCurrentToken } = useAccount();
-  const [token, setToken] = useState<string | undefined>(undefined);
   const { apiClient } = useApiClient();
   const newFilePath = filePath.replace("/api", "");
-  const [imageData, setImageData] = useState<string | undefined>(undefined);
+  const [imageURL, setImageURL] = useState<string>();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    async function refreshToken() {
-      const newToken = await getCurrentToken();
-      setToken(newToken);
-
+    async function fetchImageURL() {
       // axios post request
       try {
         await apiClient.axios
-          .get(newFilePath, { responseType: "arraybuffer" })
+          .get(newFilePath, { responseType: "blob" })
           .then((response) => {
-            const data = `data:${
-              response.headers["content-type"]
-            };base64,${Buffer.from(response.data, "binary").toString(
-              "base64"
-            )}`;
-            setImageData(data);
+            const data = URL.createObjectURL(response.data);
+            setImageURL(data);
+            setLoading(false);
           });
       } catch (error) {
+        setLoading(false);
         return error;
       }
     }
-    // Get the latest token for the preview.
-    refreshToken();
+    fetchImageURL();
   }, []);
-
-  // Add the auth token to the requested file path:
-  const authenticatedFilePath = `${filePath}?access_token=${token}`;
 
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
@@ -123,7 +114,7 @@ export function FileView({
     }
   }
 
-  if (token === undefined) {
+  if (loading) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -158,7 +149,7 @@ export function FileView({
               isImage ? (
                 <img
                   alt={imgAlt ?? `File path : ${filePath}`}
-                  src={imageData}
+                  src={imageURL}
                   style={{ height: imgHeight }}
                   onError={(event) =>
                     (event.currentTarget.style.display = "none")
@@ -166,13 +157,15 @@ export function FileView({
                 />
               ) : (
                 <FileViewer
-                  filePath={authenticatedFilePath}
+                  filePath={imageURL}
                   fileType={fileType}
                   unsupportedComponent={() => (
                     <div>
-                      <Link href={authenticatedFilePath} passHref={true}>
-                        <a>{filePath}</a>
-                      </Link>
+                      {imageURL && (
+                        <Link href={imageURL} passHref={true}>
+                          <a>{filePath}</a>
+                        </Link>
+                      )}
                     </div>
                   )}
                 />
