@@ -1,7 +1,8 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import { ApiClientContext, filterBy, useQuery } from "common-ui";
-import { omitBy, compact, isEmpty } from "lodash";
+import { compact, isEmpty, omitBy } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useContext, useRef, useState, useEffect, useMemo } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   PcrBatchItem,
   SeqBatch,
@@ -16,7 +17,9 @@ interface SeqSelectCoordinatesControlsProps {
 
 export interface SeqReactionSample {
   seqReactionId?: string;
+  seqBatchId?: string;
   pcrBatchItemId?: string;
+  seqPrimerId?: string;
   wellRow?: string;
   wellColumn?: number;
   sampleId?: string;
@@ -51,6 +54,10 @@ export function useSeqSelectCoordinatesControls({
     useState<SeqReactionSample[]>();
 
   const [isStorage, setIsStorage] = useState<boolean>(false);
+
+  const [seqReactionSortOrder, setSeqReactionSortOrder] = useLocalStorage<
+    string[]
+  >(`seqReactionSortOrder-${seqBatch?.id}`);
 
   const [gridState, setGridState] = useState({
     // Available SeqBatchItems with no well coordinates.
@@ -92,12 +99,9 @@ export function useSeqSelectCoordinatesControls({
             (sample) => sample.id === reaction.sampleId
           );
           return {
-            seqReactionId: reaction.seqReactionId,
-            pcrBatchItemId: reaction.pcrBatchItemId,
+            ...reaction,
             sampleId: foundSample?.id,
-            sampleName: foundSample?.materialSampleName ?? foundSample?.id,
-            wellColumn: reaction.wellColumn,
-            wellRow: reaction.wellRow
+            sampleName: foundSample?.materialSampleName ?? foundSample?.id
           };
         });
 
@@ -115,13 +119,39 @@ export function useSeqSelectCoordinatesControls({
       });
 
       setGridState({
-        availableItems: seqBatchItemsNoCoords?.sort(itemSort),
+        availableItems: sortAvailableItems(seqBatchItemsNoCoords), // seqBatchItemsNoCoords?.sort(itemSort),
         cellGrid: newCellGrid,
         movedItems: []
       });
       setItemsLoading(false);
     });
   }, [seqReactionSamples]);
+
+  function sortAvailableItems(reactionSamples: SeqReactionSample[]) {
+    if (seqReactionSortOrder) {
+      const sorted = seqReactionSortOrder.map((reactionId) =>
+        reactionSamples.find((item) => {
+          const tempId: (string | undefined)[] = [];
+          tempId.push(item.pcrBatchItemId);
+          tempId.push(item.seqPrimerId);
+          const id = compact(tempId).join("_");
+          return id === reactionId;
+        })
+      );
+      reactionSamples.forEach((item) => {
+        const tempId: (string | undefined)[] = [];
+        tempId.push(item.pcrBatchItemId);
+        tempId.push(item.seqPrimerId);
+        const id = compact(tempId).join("_");
+        if (seqReactionSortOrder.indexOf(id) === -1) {
+          sorted.push(item);
+        }
+      });
+      return compact(sorted);
+    } else {
+      return compact(reactionSamples);
+    }
+  }
 
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
@@ -162,7 +192,7 @@ export function useSeqSelectCoordinatesControls({
       })(""),
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
-      include: "pcrBatchItem"
+      include: "pcrBatchItem,seqBatch,seqPrimer"
     },
     {
       deps: [lastSave],
@@ -170,9 +200,11 @@ export function useSeqSelectCoordinatesControls({
         setItemsLoading(true);
         const seqReactionAndPcrBatchItem = compact(
           seqReactions.map((item) => ({
+            seqBatchId: item.seqBatch?.id,
+            seqPrimerId: item.seqPrimer?.id,
             seqReactionId: item.id,
-            pcrBatchItemId: item?.pcrBatchItem?.id,
-            wellColumn: item?.wellColumn,
+            pcrBatchItemId: item.pcrBatchItem?.id,
+            wellColumn: item.wellColumn,
             wellRow: item.wellRow
           }))
         );
@@ -195,11 +227,9 @@ export function useSeqSelectCoordinatesControls({
               (item) => item.id === rec.pcrBatchItemId
             );
             return {
-              seqReactionId: rec.seqReactionId,
+              ...rec,
               pcrBatchItemId: pcrBatchItem?.id,
-              sampleId: pcrBatchItem?.materialSample?.id,
-              wellColumn: rec.wellColumn,
-              wellRow: rec.wellRow
+              sampleId: pcrBatchItem?.materialSample?.id
             };
           })
         );
@@ -279,9 +309,7 @@ export function useSeqSelectCoordinatesControls({
 
       return {
         // availableItems: newAvailableItems.sort(itemSort),
-        availableItems: newAvailableItems
-          ?.filter((item) => item)
-          .sort(itemSort),
+        availableItems: sortAvailableItems(newAvailableItems), // newAvailableItems?.filter((item) => item).sort(itemSort),
         cellGrid: newCellGrid,
         movedItems: newMovedItems
       };
@@ -354,7 +382,27 @@ export function useSeqSelectCoordinatesControls({
             type: "seq-reaction",
             id: item.seqReactionId,
             wellColumn: item.wellColumn ?? null,
-            wellRow: item.wellRow ?? null
+            wellRow: item.wellRow ?? null,
+            relationships: {
+              seqBatch: {
+                data: {
+                  id: item.seqBatchId,
+                  type: "seq-batch"
+                }
+              },
+              pcrBatchItem: {
+                data: {
+                  id: item.pcrBatchItemId,
+                  type: "pcr-batch-item"
+                }
+              },
+              seqPrimer: {
+                data: {
+                  id: item.seqPrimerId,
+                  type: "pcr-primer"
+                }
+              }
+            }
           } as SeqReaction,
           type: "seq-reaction"
         };
@@ -379,9 +427,7 @@ export function useSeqSelectCoordinatesControls({
     if (gridIsPopulated) return;
 
     const { availableItems, cellGrid } = gridState;
-    const items = [...availableItems, ...Object.values(cellGrid)].sort(
-      itemSort
-    );
+    const items = [...availableItems, ...Object.values(cellGrid)];
     moveItems(items, "A_1");
   }
 
@@ -402,16 +448,4 @@ export function useSeqSelectCoordinatesControls({
     isStorage,
     gridIsPopulated
   };
-}
-
-function itemSort(a, b) {
-  const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
-    (s) => s.sampleName.match(/[^\d]+|\d+/g) || []
-  );
-
-  if (aAlpha === bAlpha) {
-    return Number(aNum) > Number(bNum) ? 1 : -1;
-  } else {
-    return aAlpha > bAlpha ? 1 : -1;
-  }
 }
