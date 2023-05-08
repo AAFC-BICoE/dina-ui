@@ -139,24 +139,24 @@ export function ManagedAttributeFormLayout({
   );
   return (
     <>
-      {withGroup ? (
-        <div className="row">
-          <GroupSelectField
-            className="col-md-6"
-            name="group"
-            enableStoredDefaultGroup={true}
-          />
-        </div>
-      ) : undefined}
       <div className="row">
         <TextField
           className="col-md-6"
           name="name"
           readOnly={uuid !== undefined && uuid !== "undefined"}
         />
+        {withGroup && !readOnly && (
+          <GroupSelectField
+            className="col-md-6"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
+        )}
+      </div>
+      <div className="row">
+        {componentField}
         <TextField className="col-md-6" name="key" readOnly={true} />
       </div>
-      <div className="row">{componentField}</div>
       <div className="row">
         <SelectField
           className="col-md-6"

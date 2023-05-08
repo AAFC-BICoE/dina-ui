@@ -41,16 +41,12 @@ const FILTER_ATTRIBUTES: FilterAttribute[] = [
 export default function PCRWorkflowListPage() {
   const { formatMessage } = useSeqdbIntl();
 
-  const title = formatMessage("pcrWorkflowListTitle");
-
   return (
     <div>
-      <Head title={title} />
+      <Head title={formatMessage("pcrWorkflowListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1 id="wb-cont">
-          <SeqdbMessage id="pcrWorkflowListTitle" />
-        </h1>
+        <h1 id="wb-cont">{formatMessage("pcrWorkflowListTitle")}</h1>
         <ButtonBar>
           <Link href={`/seqdb/pcr-workflow/run`}>
             <a className="btn btn-primary">
@@ -60,6 +56,7 @@ export default function PCRWorkflowListPage() {
         </ButtonBar>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
+            isCompleted: false,
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
@@ -68,8 +65,7 @@ export default function PCRWorkflowListPage() {
           queryTableProps={{
             columns: TABLE_COLUMNS,
             path: "seqdb-api/pcr-batch",
-            include: "primerForward,primerReverse",
-            filter: { isCompleted: false }
+            include: "primerForward,primerReverse"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

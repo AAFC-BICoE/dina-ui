@@ -379,14 +379,14 @@ function PcrBatchFormFields({
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
-      <div className="row">
         <TextField className="col-md-6" name="name" />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
         <CheckBoxField
           name="isCompleted"
           className="gap-3 col-md-6"

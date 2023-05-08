@@ -417,9 +417,11 @@ export function MaterialSampleForm({
                 <MaterialSampleBreadCrumb
                   disableLastLink={true}
                   materialSample={materialSample as any}
+                  enableStoredDefaultGroup={enableStoredDefaultGroup}
+                  enableGroupSelectField={true}
                 />
               )}
-              {!isTemplate && (
+              {!isTemplate && !materialSample?.materialSampleName && (
                 <div className="row">
                   <div className="col-md-6">
                     <GroupSelectField

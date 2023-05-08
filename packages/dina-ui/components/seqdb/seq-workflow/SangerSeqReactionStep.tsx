@@ -251,10 +251,38 @@ export function SangerSeqReactionStep({
         tempId.push(item.seqPrimer?.id);
         item.id = compact(tempId).join("_");
       }
-      setRemovableItems(seqReactions);
-      setSelectedResources(seqReactions);
+      const sorted = sortSeqReactions(seqReactions);
+      setRemovableItems(sorted);
+      setSelectedResources(sorted);
     }
   };
+
+  // Sort Seq Reactions based on the preserved order in local storage
+  function sortSeqReactions(reactions: SeqReaction[]) {
+    if (seqReactionSortOrder) {
+      const sorted = seqReactionSortOrder.map((reactionId) =>
+        reactions.find((item) => {
+          const tempId: (string | undefined)[] = [];
+          tempId.push(item.pcrBatchItem?.id);
+          tempId.push(item.seqPrimer?.id);
+          const id = compact(tempId).join("_");
+          return id === reactionId;
+        })
+      );
+      reactions.forEach((item) => {
+        const tempId: (string | undefined)[] = [];
+        tempId.push(item.pcrBatchItem?.id);
+        tempId.push(item.seqPrimer?.id);
+        const id = compact(tempId).join("_");
+        if (seqReactionSortOrder.indexOf(id) === -1) {
+          sorted.push(item);
+        }
+      });
+      return compact(sorted);
+    } else {
+      return compact(reactions);
+    }
+  }
 
   //#region of PCR Batch Item table
   // Checkbox for the first table that lists the search results
@@ -499,6 +527,11 @@ export function SangerSeqReactionStep({
       [...selectedResources, ...selectedObjects],
       "id"
     );
+    // Save ordering when add Seq Reactions.
+    // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
+    setSeqReactionSortOrder(
+      compact(selectedResourcesAppended.map((item) => item.id))
+    );
     setSelectedResources(selectedResourcesAppended);
     setRemovableItems(selectedResourcesAppended);
 
@@ -528,6 +561,9 @@ export function SangerSeqReactionStep({
     });
 
     setRemovableItems(unselectedObjects);
+    // Save ordering when remove Seq Reactions.
+    // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
+    setSeqReactionSortOrder(compact(unselectedObjects.map((item) => item.id)));
     setSelectedResources(unselectedObjects);
     formik.setFieldValue("itemIdsToDelete", {});
   }
