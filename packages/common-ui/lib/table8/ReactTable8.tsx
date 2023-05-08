@@ -6,7 +6,7 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import { KitsuResource } from "kitsu";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { useDrag, useDrop } from "react-dnd-cjs";
 
 export function ReactTable8<TData extends KitsuResource>({
@@ -20,6 +20,7 @@ export function ReactTable8<TData extends KitsuResource>({
   columns: ColumnDef<TData>[];
   enableDnd?: boolean;
 }) {
+  const { formatMessage } = useDinaIntl();
   function reorderRow(draggedRowIndex: number, targetRowIndex: number) {
     data.splice(targetRowIndex, 0, data.splice(draggedRowIndex, 1)[0] as TData);
     setData([...data]);
@@ -67,7 +68,7 @@ export function ReactTable8<TData extends KitsuResource>({
         {table.getRowModel().rows.length === 0 ? (
           <tr>
             <td colSpan={table.getAllColumns().length} className="text-center">
-              <DinaMessage id="noRowsFound" />
+              {formatMessage("noRowsFound")}
             </td>
           </tr>
         ) : (
