@@ -37,15 +37,13 @@ const FILTER_ATTRIBUTES: FilterAttribute[] = [
 export default function SangerWorkflowSequencingListPage() {
   const { formatMessage } = useSeqdbIntl();
 
-  const title = formatMessage("sangerWorkflowSequencingListTitle");
-
   return (
     <div>
-      <Head title={title} />
+      <Head title={formatMessage("sangerWorkflowSequencingListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
-          <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
+          {formatMessage("sangerWorkflowSequencingListTitle")}
         </h1>
         <ButtonBar>
           <Link href={`/seqdb/sanger-workflow-sequencing/run`}>
@@ -56,6 +54,7 @@ export default function SangerWorkflowSequencingListPage() {
         </ButtonBar>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
+            isCompleted: false,
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
@@ -63,8 +62,7 @@ export default function SangerWorkflowSequencingListPage() {
           id="sanger-workflow-sequencing-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/seq-batch",
-            filter: { isCompleted: false }
+            path: "seqdb-api/seq-batch"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
