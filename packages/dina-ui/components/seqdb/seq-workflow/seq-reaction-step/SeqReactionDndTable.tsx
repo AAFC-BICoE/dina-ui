@@ -1,22 +1,17 @@
 import {
   ColumnDef,
-  ColumnDefBase,
-  Row,
-  RowData,
-  flexRender,
   getCoreRowModel,
   useReactTable
 } from "@tanstack/react-table";
-import { FieldHeader, useGroupedCheckBoxes } from "packages/common-ui/lib";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import {
+  FieldHeader,
+  ReactTable8,
+  useGroupedCheckBoxes
+} from "packages/common-ui/lib";
 import {
   SeqReaction,
   pcrBatchItemResultColor
 } from "packages/dina-ui/types/seqdb-api";
-import { HTMLProps, useEffect, useRef } from "react";
-import { useDrag, useDrop } from "react-dnd-cjs";
-
-const ITEM_DRAG_KEY = "DND_SEQ_REACTION";
 
 export interface SeqReactionDnDTableProps {
   selectedSeqReactions: SeqReaction[];
@@ -24,25 +19,11 @@ export interface SeqReactionDnDTableProps {
   editMode: boolean;
 }
 
-export interface DndColumnDef<TData extends RowData, TValue = unknown>
-  extends ColumnDefBase<TData, TValue> {
-  enableDnd: boolean;
-}
-
 export function SeqReactionDndTable({
   selectedSeqReactions,
   setSelectedSeqReactions,
   editMode
 }: SeqReactionDnDTableProps) {
-  function reorderRow(draggedRowIndex: number, targetRowIndex: number) {
-    selectedSeqReactions.splice(
-      targetRowIndex,
-      0,
-      selectedSeqReactions.splice(draggedRowIndex, 1)[0] as SeqReaction
-    );
-    setSelectedSeqReactions([...selectedSeqReactions]);
-  }
-
   // Checkbox for second table where selected/to be deleted items are displayed
   const {
     CheckBoxField: DeselectCheckBox,
@@ -135,103 +116,11 @@ export function SeqReactionDndTable({
   });
 
   return (
-    <table className="ReactTable8 w-100">
-      <thead>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id}>
-            {headerGroup.headers.map((header) => (
-              <th key={header.id} colSpan={header.colSpan}>
-                {header.isPlaceholder
-                  ? null
-                  : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody>
-        {table.getRowModel().rows.length === 0 ? (
-          <tr>
-            <td colSpan={table.getAllColumns().length} className="text-center">
-              <DinaMessage id="noRowsFound" />
-            </td>
-          </tr>
-        ) : (
-          table
-            .getRowModel()
-            .rows.map((row) => (
-              <DraggableRow
-                key={row.id}
-                row={row}
-                reorderRow={reorderRow}
-                editMode={editMode}
-              />
-            ))
-        )}
-      </tbody>
-    </table>
+    <ReactTable8<SeqReaction>
+      columns={seqReactionColumns}
+      data={selectedSeqReactions}
+      setData={setSelectedSeqReactions}
+      enableDnd={true}
+    />
   );
-}
-
-function DraggableRow({
-  row,
-  reorderRow,
-  editMode
-}: {
-  editMode: boolean;
-  row: Row<SeqReaction>;
-  reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
-}) {
-  const [, dropRef] = useDrop({
-    accept: ITEM_DRAG_KEY,
-    drop: (draggedRow) => reorderRow((draggedRow as any).row.index, row.index),
-    canDrop: () => editMode
-  });
-
-  const [{ isDragging }, dragRef, previewRef] = useDrag({
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    }),
-    item: { row, type: ITEM_DRAG_KEY },
-    canDrag: editMode
-  });
-
-  return (
-    <tr
-      // ref={previewRef} //previewRef could go here
-      ref={(el) => {
-        dropRef(el);
-        dragRef(el);
-        previewRef(el);
-      }}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: isDragging ? "grabbing" : "grab"
-      }}
-    >
-      {row.getVisibleCells().map((cell) => (
-        <td key={cell.id}>
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </td>
-      ))}
-    </tr>
-  );
-}
-
-function IndeterminateCheckbox({
-  indeterminate,
-  ...rest
-}: { indeterminate?: boolean } & HTMLProps<HTMLInputElement>) {
-  const ref = useRef<HTMLInputElement>(null!);
-
-  useEffect(() => {
-    if (typeof indeterminate === "boolean") {
-      ref.current.indeterminate = !rest.checked && indeterminate;
-    }
-  }, [ref, indeterminate]);
-
-  return <input type="checkbox" ref={ref} {...rest} />;
 }
