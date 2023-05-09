@@ -16,6 +16,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { useState } from "react";
 import { TableColumn } from "common-ui/lib/list-page/types";
+import { RowInfo } from "react-table";
 
 export interface SampleListLayoutProps {
   onSelect?: (sample: PersistedResource<MaterialSample>) => void;
@@ -244,6 +245,14 @@ export default function MaterialSampleListPage() {
     // Created On
     dateCell("createdOn", "data.attributes.createdOn"),
 
+    // Material Sample State
+    {
+      label: "materialSampleState",
+      accessor: "data.attributes.materialSampleState",
+      isKeyword: true,
+      show: false
+    },
+
     // Action buttons for each row.
     ...[
       {
@@ -273,6 +282,19 @@ export default function MaterialSampleListPage() {
     ]
   ];
 
+  function rowStyling(
+    _finalState: any,
+    rowInfo?: RowInfo,
+    _column?: undefined,
+    _instance?: any
+  ) {
+    return {
+      style: {
+        opacity: rowInfo?.row?.["data.attributes.materialSampleState"] && 0.4
+      }
+    };
+  }
+
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
@@ -290,6 +312,7 @@ export default function MaterialSampleListPage() {
           </Link>
         </ButtonBar>
         <QueryPage
+          rowStyling={rowStyling}
           indexName={"dina_material_sample_index"}
           dynamicFieldMapping={{
             fields: [
