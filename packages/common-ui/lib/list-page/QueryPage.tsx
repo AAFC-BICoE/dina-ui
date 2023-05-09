@@ -1,7 +1,7 @@
 import { KitsuResource, PersistedResource } from "kitsu";
 import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { TableProps, SortingRule } from "react-table";
+import ReactTable, { TableProps, SortingRule, RowInfo } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
@@ -184,6 +184,16 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * configuration which is required for generating the elastic search query.
    */
   customViewFields?: CustomViewField[];
+
+  /**
+   * Styling to be applied to each row of the React Table
+   */
+  rowStyling?: (
+    finalState: any,
+    rowInfo?: RowInfo,
+    column?: undefined,
+    instance?: any
+  ) => any;
 }
 
 const GROUP_STORAGE_KEY = "groupStorage";
@@ -216,7 +226,8 @@ export function QueryPage<TData extends KitsuResource>({
   viewMode,
   customViewQuery,
   customViewElasticSearchQuery,
-  customViewFields
+  customViewFields,
+  rowStyling
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
@@ -823,6 +834,7 @@ export function QueryPage<TData extends KitsuResource>({
                 // Table customization props
                 {...resolvedReactTableProps}
                 className="-striped react-table-overflow"
+                getTrProps={rowStyling}
                 TbodyComponent={
                   error
                     ? () => (
