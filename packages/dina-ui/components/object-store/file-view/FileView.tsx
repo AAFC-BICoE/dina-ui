@@ -67,13 +67,12 @@ export function FileView({
     async function fetchImageURL() {
       // axios post request
       try {
-        await apiClient.axios
-          .get(newFilePath, { responseType: "blob" })
-          .then((response) => {
-            const data = URL.createObjectURL(response.data);
-            setImageURL(data);
-            setLoading(false);
-          });
+        const response = await apiClient.axios.get(newFilePath, {
+          responseType: "blob"
+        });
+        const data = URL.createObjectURL(response.data);
+        setImageURL(data);
+        setLoading(false);
       } catch (error) {
         setLoading(false);
         return error;
