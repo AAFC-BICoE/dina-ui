@@ -54,7 +54,7 @@ export function DraggableSeqReactionBox({
                 <>
                   {coordinates}
                   <br />
-                  {seqReactionSample.sampleName}
+                  {`${seqReactionSample.sampleName} (${seqReactionSample.primerName}|${seqReactionSample.primerDirection})`}
                 </>
               </div>
             )}
@@ -69,7 +69,7 @@ export function DraggableSeqReactionBox({
           }}
         >
           <span className="sample-box-text">
-            {seqReactionSample.sampleName}
+            {`${seqReactionSample.sampleName} (${seqReactionSample.primerName}|${seqReactionSample.primerDirection})`}
           </span>
         </div>
       </RcTooltip>
