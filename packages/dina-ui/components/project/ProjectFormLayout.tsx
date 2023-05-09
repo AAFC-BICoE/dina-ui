@@ -8,7 +8,7 @@ import {
 import { AttachmentsField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
-import { ELASTIC_SEARCH_COLUMN } from "../collection/material-sample/MaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
@@ -20,14 +20,15 @@ export function ProjectFormLayout() {
     uuid,
     "data.relationships.projects.data.id"
   );
+  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
 
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
+        <TextField
+          className="col-md-6 status"
+          name="status"
+          label={formatMessage("field_projectStatus")}
         />
       </div>
       <div className="row">
@@ -36,17 +37,19 @@ export function ProjectFormLayout() {
           name="name"
           label={formatMessage("field_projectName")}
         />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
+      </div>
+      <div className="row">
         <DateField
           className="col-md-6 startDate"
           name="startDate"
           label={formatMessage("field_startDate")}
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="col-md-6 status"
-          name="status"
-          label={formatMessage("field_projectStatus")}
         />
         <DateField
           className="col-md-6 endDate"

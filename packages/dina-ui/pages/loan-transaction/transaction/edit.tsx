@@ -40,7 +40,7 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { pick, compact } from "lodash";
-import { ELASTIC_SEARCH_COLUMN } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -220,6 +220,7 @@ export function TransactionFormLayout({
   const [selectedResourcesView, setSelectedResourcesView] = useState<
     MaterialSample[]
   >([]);
+  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
 
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
@@ -262,13 +263,6 @@ export function TransactionFormLayout({
 
   return (
     <div>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          className="col-sm-6"
-          enableStoredDefaultGroup={true}
-        />
-      </div>
       <FieldSet legend={<DinaMessage id="transactionDetails" />}>
         {readOnly ? (
           <div className="d-flex gap-2 mb-3">
@@ -317,6 +311,16 @@ export function TransactionFormLayout({
           </div>
         )}
         <div className="row">
+          <TextField className="col-md-6" name="transactionNumber" />
+          {!readOnly && (
+            <GroupSelectField
+              name="group"
+              className="col-sm-6"
+              enableStoredDefaultGroup={true}
+            />
+          )}
+        </div>
+        <div className="row">
           <div className="col-md-6">
             <AutoSuggestTextField<Transaction>
               name="transactionType"
@@ -334,7 +338,6 @@ export function TransactionFormLayout({
               }}
               blankSearchBackend={"json-api"}
             />
-            <TextField name="transactionNumber" />
           </div>
           <div className="col-md-6">
             <StringArrayField name="otherIdentifiers" />

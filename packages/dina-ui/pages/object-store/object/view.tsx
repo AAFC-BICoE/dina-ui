@@ -20,7 +20,7 @@ import {
 import { ExifView, MetadataDetails } from "../../../components/object-store";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { ELASTIC_SEARCH_COLUMN } from "../../../../dina-ui/components/collection/material-sample/MaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -37,7 +37,7 @@ export default function MetadataViewPage({
   reloadLastSearch
 }: MetadataViewPageProps) {
   const router = useRouter();
-
+  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
   const uuid = String(router.query.id);
 
   const { loading, response } = useMetadataViewQuery(uuid);

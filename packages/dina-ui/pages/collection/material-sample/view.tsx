@@ -52,12 +52,13 @@ import { GenerateLabelDropdownButton } from "../../../components/collection/mate
 import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
 import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
-import { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
 import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
+import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
-
+  const { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW } =
+    useMaterialSampleRelationshipColumns();
   const id = router.query.id?.toString();
 
   const materialSampleQuery = useMaterialSampleQuery(id);
@@ -175,6 +176,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <MaterialSampleBreadCrumb
                   materialSample={materialSample}
                   disableLastLink={true}
+                  enableGroupSelectField={true}
                 />
                 <div className="d-flex flex-row gap-2">
                   <TagsAndRestrictionsSection />

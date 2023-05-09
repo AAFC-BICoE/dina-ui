@@ -3,7 +3,8 @@ import {
   FieldHeader,
   filterBy,
   useApiClient,
-  useDinaFormContext
+  useDinaFormContext,
+  useStringComparator
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { sortBy } from "lodash";
@@ -21,6 +22,7 @@ export function usePcrReactionData(pcrBatchId?: string) {
   const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>([]);
   const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const { compareByStringAndNumber } = useStringComparator();
 
   const { apiClient, bulkGet } = useApiClient();
 
@@ -55,7 +57,6 @@ export function usePcrReactionData(pcrBatchId?: string) {
             response.data?.filter(
               (item) => item?.materialSample?.id !== undefined
             );
-          setPcrBatchItems(batchItems);
           fetchMaterialSamples(batchItems);
         });
     }
@@ -73,9 +74,25 @@ export function usePcrReactionData(pcrBatchId?: string) {
       ),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
+      sortPcrBatchItems(batchItems, response);
+      setPcrBatchItems(batchItems);
       setMaterialSamples(response);
       setLoading(false);
     });
+  }
+
+  function sortPcrBatchItems(items: PcrBatchItem[], samples: MaterialSample[]) {
+    if (items) {
+      items.sort((a, b) => {
+        const sampleName1 =
+          samples.find((sample) => sample.id === a.materialSample?.id)
+            ?.materialSampleName ?? "";
+        const sampleName2 =
+          samples.find((sample) => sample.id === b.materialSample?.id)
+            ?.materialSampleName ?? "";
+        return compareByStringAndNumber(sampleName1, sampleName2);
+      });
+    }
   }
 
   return { pcrBatchItems, setPcrBatchItems, materialSamples, loading };

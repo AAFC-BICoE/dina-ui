@@ -6,6 +6,7 @@ import {
   LabelView,
   SubmitButton,
   TextField,
+  useDinaFormContext,
   useQuery,
   withResponse
 } from "common-ui";
@@ -93,15 +94,18 @@ function ProductForm({ product, router }: ProductFormProps) {
 
 export function ProductFormFields() {
   const { formatMessage } = useSeqdbIntl();
-
+  const { readOnly } = useDinaFormContext();
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          className="col-md-2"
-          name="group"
-          enableStoredDefaultGroup={true}
-        />
+        <TextField className="col-md-2" name="name" />
+        {!readOnly && (
+          <GroupSelectField
+            className="col-md-2"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
+        )}
       </div>
       <div className="row">
         <LabelView
@@ -111,7 +115,6 @@ export function ProductFormFields() {
         />
       </div>
       <div className="row">
-        <TextField className="col-md-2" name="name" />
         <TextField
           className="col-md-2"
           name="upc"

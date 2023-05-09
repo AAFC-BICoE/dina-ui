@@ -26,7 +26,7 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttributesEditor } from "../../../components/managed-attributes/ManagedAttributesEditor";
-import { ELASTIC_SEARCH_COLUMN } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 
 interface AssemblageFormProps {
   fetchedAssemblage?: Assemblage;
@@ -173,7 +173,7 @@ export function AssemblageFormLayout() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const uuid = String(router?.query?.id);
-
+  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
   const customViewQuery = generateUUIDTree(
     uuid,
     "data.relationships.assemblages.data.id"
@@ -182,18 +182,18 @@ export function AssemblageFormLayout() {
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
-      <div className="row">
         <TextField
           className="col-md-6 name"
           name="name"
           label={formatMessage("field_assemblageName")}
         />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
       </div>
       <div className="row">
         <TextField

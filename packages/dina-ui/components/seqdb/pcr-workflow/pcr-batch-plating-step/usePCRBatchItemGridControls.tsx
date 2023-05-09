@@ -1,4 +1,9 @@
-import { ApiClientContext, filterBy, useQuery } from "common-ui";
+import {
+  ApiClientContext,
+  filterBy,
+  useQuery,
+  useStringComparator
+} from "common-ui";
 import { omitBy, compact, isEmpty } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useContext, useRef, useState, useEffect, useMemo } from "react";
@@ -25,6 +30,7 @@ export function usePCRBatchItemGridControls({
   const { save, bulkGet } = useContext(ApiClientContext);
 
   const [itemsLoading, setItemsLoading] = useState<boolean>(true);
+  const { compareByStringAndNumber } = useStringComparator();
 
   // Whether the grid is submitting.
   const [submitting, setSubmitting] = useState(false);
@@ -335,6 +341,12 @@ export function usePCRBatchItemGridControls({
     setSubmitting(false);
   }
 
+  function itemSort(a, b) {
+    const sampleName1 = a.sampleName;
+    const sampleName2 = b.sampleName;
+    return compareByStringAndNumber(sampleName1, sampleName2);
+  }
+
   function clearGrid() {
     moveItems(Object.values(gridState.cellGrid));
   }
@@ -368,16 +380,4 @@ export function usePCRBatchItemGridControls({
     isStorage,
     gridIsPopulated
   };
-}
-
-function itemSort(a, b) {
-  const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
-    (s) => s.sampleName.match(/[^\d]+|\d+/g) || []
-  );
-
-  if (aAlpha === bAlpha) {
-    return Number(aNum) > Number(bNum) ? 1 : -1;
-  } else {
-    return aAlpha > bAlpha ? 1 : -1;
-  }
 }

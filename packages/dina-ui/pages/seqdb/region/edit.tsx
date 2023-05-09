@@ -5,6 +5,7 @@ import {
   DinaFormOnSubmit,
   SubmitButton,
   TextField,
+  useDinaFormContext,
   useQuery,
   withResponse
 } from "common-ui";
@@ -87,20 +88,21 @@ function RegionForm({ region, router }: RegionFormProps) {
 }
 
 export function RegionFormFields() {
+  const { readOnly } = useDinaFormContext();
   return (
     <div>
       <div className="row">
-        <GroupSelectField
-          className="col-md-6"
-          name="group"
-          enableStoredDefaultGroup={true}
-        />
-      </div>
-      <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="symbol" />
+        {!readOnly && (
+          <GroupSelectField
+            className="col-md-6"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
+        )}
       </div>
       <div className="row">
+        <TextField className="col-md-6" name="symbol" />
         <TextField className="col-md-6" name="description" />
       </div>
     </div>
