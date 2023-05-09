@@ -17,18 +17,19 @@ export interface SeqReactionDnDTableProps {
   selectedSeqReactions: SeqReaction[];
   setSelectedSeqReactions: (seqReactions: SeqReaction[]) => void;
   editMode: boolean;
+  className?: string;
 }
 
 export function SeqReactionDndTable({
   selectedSeqReactions,
   setSelectedSeqReactions,
-  editMode
+  editMode,
+  className
 }: SeqReactionDnDTableProps) {
   // Checkbox for second table where selected/to be deleted items are displayed
   const {
     CheckBoxField: DeselectCheckBox,
-    CheckBoxHeader: DeselectCheckBoxHeader,
-    setAvailableItems: setRemovableItems
+    CheckBoxHeader: DeselectCheckBoxHeader
   } = useGroupedCheckBoxes({
     fieldName: "itemIdsToDelete",
     defaultAvailableItems: selectedSeqReactions
@@ -117,10 +118,11 @@ export function SeqReactionDndTable({
 
   return (
     <ReactTable8<SeqReaction>
+      className={className}
       columns={seqReactionColumns}
       data={selectedSeqReactions}
       setData={setSelectedSeqReactions}
-      enableDnd={true}
+      enableDnd={editMode}
     />
   );
 }

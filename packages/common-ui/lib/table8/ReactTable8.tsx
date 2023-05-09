@@ -13,17 +13,21 @@ export function ReactTable8<TData extends KitsuResource>({
   data,
   setData,
   columns,
-  enableDnd = false
+  enableDnd = false,
+  className
 }: {
-  data: TData[];
-  setData: (data: TData[]) => void;
   columns: ColumnDef<TData>[];
+  data: TData[];
+  setData?: (data?: TData[]) => void;
   enableDnd?: boolean;
+  className?: string;
 }) {
   const { formatMessage } = useIntl();
   function reorderRow(draggedRowIndex: number, targetRowIndex: number) {
     data.splice(targetRowIndex, 0, data.splice(draggedRowIndex, 1)[0] as TData);
-    setData([...data]);
+    if (!!setData) {
+      setData([...data]);
+    }
   }
 
   const table = useReactTable<TData>({
@@ -34,7 +38,7 @@ export function ReactTable8<TData extends KitsuResource>({
   });
 
   return (
-    <table className="ReactTable8 w-100">
+    <table className={`ReactTable8 w-100 ${className}`}>
       <thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
@@ -74,11 +78,18 @@ export function ReactTable8<TData extends KitsuResource>({
         ) : (
           table
             .getRowModel()
-            .rows.map((row) =>
+            .rows.map((row, index) =>
               enableDnd ? (
-                <DraggableRow row={row} reorderRow={reorderRow} />
+                <DraggableRow
+                  row={row}
+                  reorderRow={reorderRow}
+                  className={index % 2 === 0 ? "-odd" : "-even"}
+                />
               ) : (
-                <DefaultRow row={row} />
+                <DefaultRow
+                  row={row}
+                  className={index % 2 === 0 ? "-odd" : "-even"}
+                />
               )
             )
         )}
@@ -87,9 +98,15 @@ export function ReactTable8<TData extends KitsuResource>({
   );
 }
 
-function DefaultRow<TData extends KitsuResource>({ row }: { row: Row<TData> }) {
+function DefaultRow<TData extends KitsuResource>({
+  row,
+  className
+}: {
+  row: Row<TData>;
+  className?: string;
+}) {
   return (
-    <tr key={row.id}>
+    <tr key={row.id} className={className}>
       {row.getVisibleCells().map((cell) => {
         return (
           <td key={cell.id}>
@@ -105,10 +122,12 @@ const ITEM_DRAG_KEY = "ReactTable8RowDndKey";
 
 function DraggableRow<TData extends KitsuResource>({
   row,
-  reorderRow
+  reorderRow,
+  className
 }: {
   row: Row<TData>;
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
+  className?: string;
 }) {
   const [, dropRef] = useDrop({
     accept: ITEM_DRAG_KEY,
@@ -126,6 +145,7 @@ function DraggableRow<TData extends KitsuResource>({
 
   return (
     <tr
+      className={className}
       ref={(el) => {
         dropRef(el);
         dragRef(el);
