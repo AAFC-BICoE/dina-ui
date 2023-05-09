@@ -1,8 +1,4 @@
-import {
-  ColumnDef,
-  getCoreRowModel,
-  useReactTable
-} from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   FieldHeader,
   ReactTable8,
@@ -108,13 +104,6 @@ export function SeqReactionDndTable({
       enableSorting: false
     }
   ];
-
-  const table = useReactTable<SeqReaction>({
-    data: selectedSeqReactions,
-    columns: seqReactionColumns,
-    getCoreRowModel: getCoreRowModel(),
-    getRowId: (row) => row.id ?? ""
-  });
 
   return (
     <ReactTable8<SeqReaction>
