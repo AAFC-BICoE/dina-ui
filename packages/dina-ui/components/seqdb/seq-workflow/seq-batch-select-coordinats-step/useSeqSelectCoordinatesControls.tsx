@@ -19,7 +19,9 @@ export interface SeqReactionSample {
   seqReactionId?: string;
   seqBatchId?: string;
   pcrBatchItemId?: string;
-  seqPrimerId?: string;
+  primerId?: string;
+  primerName?: string;
+  primerDirection?: string;
   wellRow?: string;
   wellColumn?: number;
   sampleId?: string;
@@ -133,7 +135,7 @@ export function useSeqSelectCoordinatesControls({
         reactionSamples.find((item) => {
           const tempId: (string | undefined)[] = [];
           tempId.push(item.pcrBatchItemId);
-          tempId.push(item.seqPrimerId);
+          tempId.push(item.primerId);
           const id = compact(tempId).join("_");
           return id === reactionId;
         })
@@ -141,7 +143,7 @@ export function useSeqSelectCoordinatesControls({
       reactionSamples.forEach((item) => {
         const tempId: (string | undefined)[] = [];
         tempId.push(item.pcrBatchItemId);
-        tempId.push(item.seqPrimerId);
+        tempId.push(item.primerId);
         const id = compact(tempId).join("_");
         if (seqReactionSortOrder.indexOf(id) === -1) {
           sorted.push(item);
@@ -199,14 +201,19 @@ export function useSeqSelectCoordinatesControls({
       onSuccess: async ({ data: seqReactions }) => {
         setItemsLoading(true);
         const seqReactionAndPcrBatchItem = compact(
-          seqReactions.map((item) => ({
-            seqBatchId: item.seqBatch?.id,
-            seqPrimerId: item.seqPrimer?.id,
-            seqReactionId: item.id,
-            pcrBatchItemId: item.pcrBatchItem?.id,
-            wellColumn: item.wellColumn,
-            wellRow: item.wellRow
-          }))
+          seqReactions.map(
+            (item) =>
+              ({
+                seqBatchId: item.seqBatch?.id,
+                primerId: item.seqPrimer?.id,
+                primerDirection: item.seqPrimer?.direction,
+                primerName: item.seqPrimer?.name,
+                seqReactionId: item.id,
+                pcrBatchItemId: item.pcrBatchItem?.id,
+                wellColumn: item.wellColumn,
+                wellRow: item.wellRow
+              } as SeqReactionSample)
+          )
         );
         const pcrBatchItems = compact(
           await bulkGet<PcrBatchItem, true>(
@@ -398,7 +405,7 @@ export function useSeqSelectCoordinatesControls({
               },
               seqPrimer: {
                 data: {
-                  id: item.seqPrimerId,
+                  id: item.primerId,
                   type: "pcr-primer"
                 }
               }
