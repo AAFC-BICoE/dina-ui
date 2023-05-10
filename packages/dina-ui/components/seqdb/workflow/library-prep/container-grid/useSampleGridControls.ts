@@ -1,4 +1,4 @@
-import { ApiClientContext, useQuery } from "common-ui";
+import { ApiClientContext, useQuery, useStringComparator } from "common-ui";
 import { omitBy } from "lodash";
 import { useContext, useRef, useState } from "react";
 import {
@@ -42,6 +42,8 @@ export function useSampleGridControls({
 
   const [lastSave, setLastSave] = useState<number>();
 
+  const { compareByStringAndNumber } = useStringComparator();
+
   const [gridState, setGridState] = useState({
     // Available samples with no well coordinates.
     availableSamples: [] as MolecularSample[],
@@ -69,7 +71,7 @@ export function useSampleGridControls({
           setSamplesLoading(true);
 
           const libraryPrepsWithCoords = libraryPreps.filter(
-            prep => prep.wellRow && prep.wellColumn
+            (prep) => prep.wellRow && prep.wellColumn
           );
 
           const newCellGrid: CellGrid = {};
@@ -82,7 +84,7 @@ export function useSampleGridControls({
           }
 
           const sampleIdsWithCoords = libraryPrepsWithCoords
-            .map(prep => prep.molecularSample.id)
+            .map((prep) => prep.molecularSample.id)
             .join();
 
           const { data: selectionStepSrsNoCoords } = await apiClient.get<
@@ -104,7 +106,7 @@ export function useSampleGridControls({
           });
 
           const newAvailableSamples = selectionStepSrsNoCoords
-            .map(sr => sr.molecularSample)
+            .map((sr) => sr.molecularSample)
             .sort(sampleSort);
 
           setGridState({
@@ -117,14 +119,22 @@ export function useSampleGridControls({
       }
     );
 
+  function sampleSort(a, b) {
+    const name1 = a.name ?? "";
+    const name2 = b.name ?? "";
+    return compareByStringAndNumber(name1, name2);
+  }
+
   function moveSamples(samples: MolecularSample[], coords?: string) {
     setGridState(({ availableSamples, cellGrid, movedSamples }) => {
       // Remove the sample from the grid.
-      const newCellGrid: CellGrid = omitBy(cellGrid, s => samples.includes(s));
+      const newCellGrid: CellGrid = omitBy(cellGrid, (s) =>
+        samples.includes(s)
+      );
 
       // Remove the sample from the availables samples.
       let newAvailableSamples = availableSamples.filter(
-        s => !samples.includes(s)
+        (s) => !samples.includes(s)
       );
       const newMovedSamples = [...movedSamples];
 
@@ -242,15 +252,15 @@ export function useSampleGridControls({
         ? libraryPrepsResponse.data
         : [];
 
-      const libraryPrepsToSave = movedSamples.map(movedSample => {
+      const libraryPrepsToSave = movedSamples.map((movedSample) => {
         // Get the coords from the cell grid.
         const coords = Object.keys(cellGrid).find(
-          key => cellGrid[key] === movedSample
+          (key) => cellGrid[key] === movedSample
         );
 
         // Get this sample's library prep, or create a new one if it doesn't exist yet.
         const existingPrep = existingLibraryPreps.find(
-          prep => prep.molecularSample.id === movedSample.id
+          (prep) => prep.molecularSample.id === movedSample.id
         );
         const libraryPrep: LibraryPrep = existingPrep
           ? { ...existingPrep }
@@ -274,7 +284,7 @@ export function useSampleGridControls({
         return libraryPrep;
       });
 
-      const saveArgs = libraryPrepsToSave.map(prep => ({
+      const saveArgs = libraryPrepsToSave.map((prep) => ({
         resource: prep,
         type: "library-prep"
       }));
@@ -315,16 +325,4 @@ export function useSampleGridControls({
     selectedSamples,
     setFillMode
   };
-}
-
-function sampleSort(a, b) {
-  const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
-    s => s.name.match(/[^\d]+|\d+/g) || []
-  );
-
-  if (aAlpha === bAlpha) {
-    return Number(aNum) > Number(bNum) ? 1 : -1;
-  } else {
-    return aAlpha > bAlpha ? 1 : -1;
-  }
 }

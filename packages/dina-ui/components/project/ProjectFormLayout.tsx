@@ -8,7 +8,7 @@ import {
 import { AttachmentsField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
-import { ELASTIC_SEARCH_COLUMN } from "../collection/material-sample/MaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
@@ -20,6 +20,7 @@ export function ProjectFormLayout() {
     uuid,
     "data.relationships.projects.data.id"
   );
+  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
 
   return (
     <div>

@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
-import { ELASTIC_SEARCH_COLUMN } from "../../collection/material-sample/MaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -37,6 +37,7 @@ export function SangerSampleSelectionStep({
 }: SangerSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
   const { username } = useAccount();
+  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {

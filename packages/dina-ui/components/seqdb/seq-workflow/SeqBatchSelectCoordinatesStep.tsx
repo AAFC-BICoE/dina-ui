@@ -2,9 +2,9 @@ import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
 import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
 import { useEffect } from "react";
-import { ContainerGrid } from "./ContainerGrid";
-import { DraggableSeqReactionList } from "./DraggableSeqReactionList";
-import { useSeqSelectCoordinatesControls } from "./useSeqSelectCoordinatesControls";
+import { ContainerGrid } from "./seq-batch-select-coordinats-step/ContainerGrid";
+import { DraggableSeqReactionList } from "./seq-batch-select-coordinats-step/DraggableSeqReactionList";
+import { useSeqSelectCoordinatesControls } from "./seq-batch-select-coordinats-step/useSeqSelectCoordinatesControls";
 
 export interface SeqBatchSelectCoordinatesStepProps {
   seqBatchId: string;
