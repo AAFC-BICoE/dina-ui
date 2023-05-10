@@ -25,7 +25,8 @@ export function ReactTable8<TData>({
   className,
   showPagination = false,
   showPaginationTop = false,
-  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
+  defaultSorting
 }: {
   columns: ColumnDef<TData>[];
   data: TData[];
@@ -35,6 +36,7 @@ export function ReactTable8<TData>({
   showPagination?: boolean;
   showPaginationTop?: boolean;
   pageSizeOptions?: number[];
+  defaultSorting?: SortingState;
 }) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -58,7 +60,10 @@ export function ReactTable8<TData>({
     getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4()),
     getPaginationRowModel:
       showPagination || showPaginationTop ? getPaginationRowModel() : undefined,
-    initialState: { pagination: { pageSize: pageSizeOptions[0], pageIndex: 0 } }
+    initialState: {
+      pagination: { pageSize: pageSizeOptions[0], pageIndex: 0 },
+      sorting: defaultSorting
+    }
   });
 
   return (

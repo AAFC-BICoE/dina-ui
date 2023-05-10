@@ -2,6 +2,7 @@ import {
   ApiClientContext,
   DateView,
   FieldHeader,
+  ReactTable8,
   useCollapser
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -143,29 +144,34 @@ function MetadataAttributeGroup({
 
   return (
     <CollapsableSection collapserId={title} title={title}>
-      <ReactTable
+      <ReactTable8
         className="-striped"
         columns={[
           {
-            Cell: ({ original: { name } }) => (
+            id: "name",
+            cell: ({
+              row: {
+                original: { name }
+              }
+            }) => (
               <strong>
                 <FieldHeader name={name} />
               </strong>
             ),
-            Header: <DinaMessage id="attributeLabel" />,
-            accessor: "name"
+            header: () => <DinaMessage id="attributeLabel" />
           },
           {
+            id: "managedAttributeValue",
             // The cell can render either JSX or a primitive (string/number etc.).
-            Cell: ({ original: { value } }) =>
-              value?.props ? <>{value}</> : String(value ?? ""),
-            Header: <DinaMessage id="managedAttributeValueLabel" />,
-            accessor: "value"
+            cell: ({
+              row: {
+                original: { value }
+              }
+            }) => (value?.props ? <>{value}</> : String(value ?? "")),
+            header: () => <DinaMessage id="managedAttributeValueLabel" />
           }
         ]}
         data={data}
-        pageSize={data.length || 1}
-        showPagination={false}
       />
     </CollapsableSection>
   );
