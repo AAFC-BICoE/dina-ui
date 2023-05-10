@@ -51,9 +51,9 @@ export function FileView({
   preview
 }: FileViewProps) {
   const { apiClient } = useApiClient();
-  const [imageURL, setImageURL] = useState<string>();
+  const [objectURL, setObjectURL] = useState<string>();
   const [loading, setLoading] = useState<boolean>(true);
-  async function fetchImageBlob(path) {
+  async function fetchObjectBlob(path) {
     return await apiClient.axios.get(path, {
       responseType: "blob"
     });
@@ -63,9 +63,9 @@ export function FileView({
     async function fetchImageURL() {
       // axios post request
       try {
-        const response = await fetchImageBlob(filePath);
+        const response = await fetchObjectBlob(filePath);
         const data = window.URL.createObjectURL(response.data);
-        setImageURL(data);
+        setObjectURL(data);
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -92,7 +92,7 @@ export function FileView({
   async function handleDownloadLink(path?: string) {
     if (path) {
       try {
-        const response = await fetchImageBlob(path);
+        const response = await fetchObjectBlob(path);
         const url = window.URL.createObjectURL(response.data);
         const link = document.createElement("a");
         link.href = url;
@@ -114,7 +114,7 @@ export function FileView({
     <div className="file-viewer-wrapper text-center">
       {showFile ? (
         <a
-          href={imageURL}
+          href={objectURL}
           target="_blank"
           style={{
             color: "inherit",
@@ -130,7 +130,7 @@ export function FileView({
             isImage ? (
               <img
                 alt={imgAlt ?? `File path : ${filePath}`}
-                src={imageURL}
+                src={objectURL}
                 style={{ height: imgHeight }}
                 onError={(event) =>
                   (event.currentTarget.style.display = "none")
@@ -138,12 +138,12 @@ export function FileView({
               />
             ) : (
               <FileViewer
-                filePath={imageURL}
+                filePath={objectURL}
                 fileType={fileType}
                 unsupportedComponent={() => (
                   <div>
-                    {imageURL && (
-                      <Link href={imageURL} passHref={true}>
+                    {objectURL && (
+                      <Link href={objectURL} passHref={true}>
                         <a>{filePath}</a>
                       </Link>
                     )}
