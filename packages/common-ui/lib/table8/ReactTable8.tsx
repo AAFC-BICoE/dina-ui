@@ -36,7 +36,7 @@ export function ReactTable8<TData>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getRowId: (row) => (row.id ? row.id : uuidv4())
+    getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4())
   });
 
   return (
