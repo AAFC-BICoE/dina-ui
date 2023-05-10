@@ -8,13 +8,8 @@ jest.mock("next/dynamic", () => () => {
   };
 });
 
-const MOCK_AXIOS_REPONSE = "test data";
 const mockGet = jest.fn((path) => {
-  if (path === "doc.pdf") {
-    return {
-      data: MOCK_AXIOS_REPONSE
-    };
-  }
+  return path;
 });
 const apiContext: any = {
   apiClient: { get: mockGet, axios: { get: mockGet } }
@@ -34,13 +29,13 @@ describe("FileView component", () => {
   });
 
   it("Renders a pdf.", async () => {
+    window.URL.createObjectURL = jest.fn(() => "doc.pdf");
     const wrapper = mountWithAppContext(
       <FileView filePath="doc.pdf" fileType="pdf" />,
       { apiContext }
     );
     await new Promise(setImmediate);
     wrapper.update();
-    // console.log(wrapper.debug());
     // It should just pass the file path and type to the FileViewer component.
     expect(wrapper.find("MockDynamicComponent").prop("filePath")).toContain(
       "doc.pdf"
