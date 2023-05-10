@@ -1,8 +1,13 @@
-import { LoadingSpinner, useApiClient } from "../../../../common-ui";
+import {
+  LoadingSpinner,
+  useApiClient,
+  useAccount
+} from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ComponentType, ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export type DownLoadLinks = {
   original?: string;
@@ -52,6 +57,8 @@ export function FileView({
 }: FileViewProps) {
   const { apiClient } = useApiClient();
   const [objectURL, setObjectURL] = useState<string>();
+  const router = useRouter();
+  const { getCurrentToken } = useAccount();
   const [loading, setLoading] = useState<boolean>(true);
   async function fetchObjectBlob(path) {
     return await apiClient.axios.get(path, {
@@ -91,18 +98,8 @@ export function FileView({
    */
   async function handleDownloadLink(path?: string) {
     if (path) {
-      try {
-        const response = await fetchObjectBlob(path);
-        const url = window?.URL?.createObjectURL(response.data);
-        const link = document?.createElement("a");
-        link.href = url;
-        link?.setAttribute("download", path); // or any other extension
-        document?.body?.appendChild(link);
-        link?.click();
-        window?.URL?.revokeObjectURL(url);
-      } catch (error) {
-        return error;
-      }
+      const currentToken = await getCurrentToken();
+      router.push(`${path}?access_token=${currentToken}`);
     }
   }
 
