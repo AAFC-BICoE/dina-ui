@@ -27,7 +27,7 @@ const apiContext: any = {
 };
 
 describe("Thumbnail cell component", () => {
-  global.URL.createObjectURL = jest.fn(() => MOCK_AXIOS_REPONSE);
+  window.URL.createObjectURL = jest.fn(() => MOCK_AXIOS_REPONSE);
 
   it("Using data from the API, display the thumbnail", async () => {
     const wrapper = mountWithAppContext(

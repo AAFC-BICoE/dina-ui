@@ -56,21 +56,21 @@ export function FileView({
   shownTypeIndicator,
   preview
 }: FileViewProps) {
-  const router = useRouter();
-  const { getCurrentToken } = useAccount();
   const { apiClient } = useApiClient();
-  const newFilePath = filePath.replace("/api", "");
   const [imageURL, setImageURL] = useState<string>();
   const [loading, setLoading] = useState<boolean>(true);
+  async function fetchImageBlob(path) {
+    return await apiClient.axios.get(path, {
+      responseType: "blob"
+    });
+  }
 
   useEffect(() => {
     async function fetchImageURL() {
       // axios post request
       try {
-        const response = await apiClient.axios.get(newFilePath, {
-          responseType: "blob"
-        });
-        const data = URL.createObjectURL(response.data);
+        const response = await fetchImageBlob(filePath);
+        const data = window.URL.createObjectURL(response.data);
         setImageURL(data);
         setLoading(false);
       } catch (error) {
@@ -108,8 +108,18 @@ export function FileView({
    */
   async function handleDownloadLink(path?: string) {
     if (path) {
-      const currentToken = await getCurrentToken();
-      router.push(`${path}?access_token=${currentToken}`);
+      try {
+        const response = await fetchImageBlob(path);
+        const url = window.URL.createObjectURL(response.data);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", path); // or any other extension
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        return error;
+      }
     }
   }
 
