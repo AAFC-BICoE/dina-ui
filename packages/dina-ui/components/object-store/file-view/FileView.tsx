@@ -60,11 +60,11 @@ export function FileView({
   }
 
   useEffect(() => {
-    async function fetchImageURL() {
+    async function fetchObjectURL() {
       // axios post request
       try {
         const response = await fetchObjectBlob(filePath);
-        const data = window.URL.createObjectURL(response.data);
+        const data = window?.URL?.createObjectURL(response.data);
         setObjectURL(data);
         setLoading(false);
       } catch (error) {
@@ -72,7 +72,7 @@ export function FileView({
         return error;
       }
     }
-    fetchImageURL();
+    fetchObjectURL();
   }, []);
 
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
