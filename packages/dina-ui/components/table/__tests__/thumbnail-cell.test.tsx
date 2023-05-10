@@ -11,16 +11,10 @@ const METADATA_RESPONSE = {
     }
   }
 };
-const MOCK_AXIOS_REPONSE = "test data";
+const MOCK_AXIOS_REPONSE =
+  "/objectstore-api/file/aafc/bd5d7e17-9fd6-4863-a0bf-8050659ab201/thumbnail";
 const mockGet = jest.fn((path) => {
-  if (
-    path ===
-    "/objectstore-api/file/aafc/bd5d7e17-9fd6-4863-a0bf-8050659ab201/thumbnail"
-  ) {
-    return {
-      data: MOCK_AXIOS_REPONSE
-    };
-  }
+  return path;
 });
 const apiContext: any = {
   apiClient: { get: mockGet, axios: { get: mockGet } }
