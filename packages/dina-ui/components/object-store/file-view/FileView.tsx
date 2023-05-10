@@ -93,13 +93,13 @@ export function FileView({
     if (path) {
       try {
         const response = await fetchObjectBlob(path);
-        const url = window.URL.createObjectURL(response.data);
-        const link = document.createElement("a");
+        const url = window?.URL?.createObjectURL(response.data);
+        const link = document?.createElement("a");
         link.href = url;
-        link.setAttribute("download", path); // or any other extension
-        document.body.appendChild(link);
-        link.click();
-        window.URL.revokeObjectURL(url);
+        link?.setAttribute("download", path); // or any other extension
+        document?.body?.appendChild(link);
+        link?.click();
+        window?.URL?.revokeObjectURL(url);
       } catch (error) {
         return error;
       }
