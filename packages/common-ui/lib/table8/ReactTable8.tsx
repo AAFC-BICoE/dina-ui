@@ -1,15 +1,17 @@
 import {
   ColumnDef,
-  Row,
+  SortingState,
   flexRender,
   getCoreRowModel,
-  useReactTable,
-  SortDirection
+  getSortedRowModel,
+  useReactTable
 } from "@tanstack/react-table";
-import { useDrag, useDrop } from "react-dnd-cjs";
-import { useIntl } from "react-intl";
 import classnames from "classnames";
+import { useState } from "react";
+
+import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
+import { DefaultRow, DraggableRow } from "./RowComponents";
 
 export function ReactTable8<TData>({
   data,
@@ -25,6 +27,8 @@ export function ReactTable8<TData>({
   className?: string;
 }) {
   const { formatMessage } = useIntl();
+  const [sorting, setSorting] = useState<SortingState>([]);
+
   function reorderRow(draggedRowIndex: number, targetRowIndex: number) {
     data.splice(targetRowIndex, 0, data.splice(draggedRowIndex, 1)[0] as TData);
     if (!!setData) {
@@ -36,6 +40,11 @@ export function ReactTable8<TData>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting
+    },
+    onSortingChange: setSorting,
     getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4())
   });
 
@@ -101,72 +110,5 @@ export function ReactTable8<TData>({
         )}
       </tbody>
     </table>
-  );
-}
-
-function DefaultRow<TData>({
-  row,
-  className
-}: {
-  row: Row<TData>;
-  className?: string;
-}) {
-  return (
-    <tr key={row.id} className={className}>
-      {row.getVisibleCells().map((cell) => {
-        return (
-          <td key={cell.id}>
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-          </td>
-        );
-      })}
-    </tr>
-  );
-}
-
-const ITEM_DRAG_KEY = "ReactTable8RowDndKey";
-
-function DraggableRow<TData>({
-  row,
-  reorderRow,
-  className
-}: {
-  row: Row<TData>;
-  reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
-  className?: string;
-}) {
-  const [, dropRef] = useDrop({
-    accept: ITEM_DRAG_KEY,
-    drop: (draggedRow) => reorderRow((draggedRow as any).row.index, row.index),
-    canDrop: () => true
-  });
-
-  const [{ isDragging }, dragRef, previewRef] = useDrag({
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    }),
-    item: { row, type: ITEM_DRAG_KEY },
-    canDrag: true
-  });
-
-  return (
-    <tr
-      className={className}
-      ref={(el) => {
-        dropRef(el);
-        dragRef(el);
-        previewRef(el);
-      }}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: isDragging ? "grabbing" : "grab"
-      }}
-    >
-      {row.getVisibleCells().map((cell) => (
-        <td key={cell.id}>
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </td>
-      ))}
-    </tr>
   );
 }
