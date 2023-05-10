@@ -1,14 +1,8 @@
-import {
-  LoadingSpinner,
-  useAccount,
-  useApiClient,
-  useQuery
-} from "../../../../common-ui";
+import { LoadingSpinner, useApiClient } from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ComponentType, ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 export type DownLoadLinks = {
   original?: string;
@@ -86,17 +80,6 @@ export function FileView({
 
   const showFile = !isSpreadsheet;
 
-  // split file path into array
-  const filePathArray = filePath.split("/");
-
-  // fileId is last element of array
-  const fileId = filePathArray[filePathArray.length - 1];
-  const isDerivative = filePath.includes("derivative").toString();
-  const fileBucket = filePathArray[4];
-
-  // build link to file-viewer page
-  const fileViewerLink = `/object-store/file-viewer`;
-
   if (preview || (!isImage && fileType !== "pdf")) {
     clickToDownload = false;
   }
@@ -130,58 +113,46 @@ export function FileView({
   return (
     <div className="file-viewer-wrapper text-center">
       {showFile ? (
-        <Link
-          href={{
-            pathname: fileViewerLink,
-            query: {
-              bucket: fileBucket,
-              fileId,
-              fileType,
-              isDerivative,
-              isImage
-            }
+        <a
+          href={imageURL}
+          target="_blank"
+          style={{
+            color: "inherit",
+            textDecoration: "none",
+            pointerEvents: clickToDownload ? undefined : "none",
+            display: "block",
+            marginLeft: "auto",
+            marginRight: "auto",
+            width: "fit-content"
           }}
         >
-          <a
-            target="_blank"
-            style={{
-              color: "inherit",
-              textDecoration: "none",
-              pointerEvents: clickToDownload ? undefined : "none",
-              display: "block",
-              marginLeft: "auto",
-              marginRight: "auto",
-              width: "fit-content"
-            }}
-          >
-            {showFile ? (
-              isImage ? (
-                <img
-                  alt={imgAlt ?? `File path : ${filePath}`}
-                  src={imageURL}
-                  style={{ height: imgHeight }}
-                  onError={(event) =>
-                    (event.currentTarget.style.display = "none")
-                  }
-                />
-              ) : (
-                <FileViewer
-                  filePath={imageURL}
-                  fileType={fileType}
-                  unsupportedComponent={() => (
-                    <div>
-                      {imageURL && (
-                        <Link href={imageURL} passHref={true}>
-                          <a>{filePath}</a>
-                        </Link>
-                      )}
-                    </div>
-                  )}
-                />
-              )
-            ) : null}
-          </a>
-        </Link>
+          {showFile ? (
+            isImage ? (
+              <img
+                alt={imgAlt ?? `File path : ${filePath}`}
+                src={imageURL}
+                style={{ height: imgHeight }}
+                onError={(event) =>
+                  (event.currentTarget.style.display = "none")
+                }
+              />
+            ) : (
+              <FileViewer
+                filePath={imageURL}
+                fileType={fileType}
+                unsupportedComponent={() => (
+                  <div>
+                    {imageURL && (
+                      <Link href={imageURL} passHref={true}>
+                        <a>{filePath}</a>
+                      </Link>
+                    )}
+                  </div>
+                )}
+              />
+            )
+          ) : null}
+        </a>
       ) : (
         <DinaMessage id="previewNotAvailable" />
       )}
