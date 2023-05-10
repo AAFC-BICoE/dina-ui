@@ -3,13 +3,15 @@ import {
   Row,
   flexRender,
   getCoreRowModel,
-  useReactTable
+  useReactTable,
+  SortDirection
 } from "@tanstack/react-table";
-import { KitsuResource } from "kitsu";
 import { useDrag, useDrop } from "react-dnd-cjs";
 import { useIntl } from "react-intl";
+import classnames from "classnames";
+import { v4 as uuidv4 } from "uuid";
 
-export function ReactTable8<TData extends KitsuResource>({
+export function ReactTable8<TData>({
   data,
   setData,
   columns,
@@ -34,7 +36,7 @@ export function ReactTable8<TData extends KitsuResource>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getRowId: (row) => row.id ?? ""
+    getRowId: (row) => (row.id ? row.id : uuidv4())
   });
 
   return (
@@ -43,12 +45,20 @@ export function ReactTable8<TData extends KitsuResource>({
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <th key={header.id} colSpan={header.colSpan}>
+              <th
+                key={header.id}
+                colSpan={header.colSpan}
+                className={classnames(
+                  header.column.getCanSort() && "-cursor-pointer",
+                  header.column.getIsSorted() === "asc" && "-sort-asc",
+                  header.column.getIsSorted() === "desc" && "-sort-desc"
+                )}
+              >
                 {header.isPlaceholder ? null : (
                   <div
                     {...{
                       className: header.column.getCanSort()
-                        ? "cursor-pointer select-none"
+                        ? "-cursor-pointer select-none"
                         : "",
                       onClick: header.column.getToggleSortingHandler()
                     }}
@@ -57,10 +67,6 @@ export function ReactTable8<TData extends KitsuResource>({
                       header.column.columnDef.header,
                       header.getContext()
                     )}
-                    {{
-                      asc: " 🔼",
-                      desc: " 🔽"
-                    }[header.column.getIsSorted() as string] ?? null}
                   </div>
                 )}
               </th>
@@ -98,7 +104,7 @@ export function ReactTable8<TData extends KitsuResource>({
   );
 }
 
-function DefaultRow<TData extends KitsuResource>({
+function DefaultRow<TData>({
   row,
   className
 }: {
@@ -120,7 +126,7 @@ function DefaultRow<TData extends KitsuResource>({
 
 const ITEM_DRAG_KEY = "ReactTable8RowDndKey";
 
-function DraggableRow<TData extends KitsuResource>({
+function DraggableRow<TData>({
   row,
   reorderRow,
   className

@@ -53,6 +53,19 @@
   font-weight: var(--bs-body-font-weight);
 }
 
+.ReactTable8 thead th.-sort-asc,
+.ReactTable8 thead td.-sort-asc {
+  box-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.6);
+}
+.ReactTable8 thead th.-sort-desc,
+.ReactTable8 thead td.-sort-desc {
+  box-shadow: inset 0 -3px 0 0 rgba(0, 0, 0, 0.6);
+}
+.ReactTable8 thead th.-cursor-pointer,
+.ReactTable8 thead td.-cursor-pointer {
+  cursor: pointer;
+}
+
 .ReactTable8 tbody {
   overflow: auto;
 }
