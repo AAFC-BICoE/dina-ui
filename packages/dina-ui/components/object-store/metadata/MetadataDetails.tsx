@@ -8,7 +8,6 @@ import {
 import { PersistedResource } from "kitsu";
 import { find, get } from "lodash";
 import { ReactNode, useContext, useEffect, useState } from "react";
-import ReactTable from "react-table";
 import { ORIENTATION_OPTIONS } from "../../../../dina-ui/pages/object-store/metadata/edit";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { License, Metadata } from "../../../types/objectstore-api";
@@ -158,7 +157,9 @@ function MetadataAttributeGroup({
                 <FieldHeader name={name} />
               </strong>
             ),
-            header: () => <DinaMessage id="attributeLabel" />
+            accessorKey: "name",
+            header: () => <DinaMessage id="attributeLabel" />,
+            enableSorting: true
           },
           {
             id: "managedAttributeValue",
@@ -168,7 +169,9 @@ function MetadataAttributeGroup({
                 original: { value }
               }
             }) => (value?.props ? <>{value}</> : String(value ?? "")),
-            header: () => <DinaMessage id="managedAttributeValueLabel" />
+            header: () => <DinaMessage id="managedAttributeValueLabel" />,
+            accessorKey: "value",
+            enableSorting: true
           }
         ]}
         data={data}
