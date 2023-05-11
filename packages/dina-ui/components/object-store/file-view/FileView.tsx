@@ -106,9 +106,9 @@ export function FileView({
     }
   }
 
-  if (loading) {
-    return <LoadingSpinner loading={true} />;
-  }
+  // if (loading) {
+  //   return <LoadingSpinner loading={true} />;
+  // }
 
   return (
     <div className="file-viewer-wrapper text-center">
@@ -142,11 +142,9 @@ export function FileView({
                 fileType={fileType}
                 unsupportedComponent={() => (
                   <div>
-                    {objectURL && (
-                      <Link href={objectURL} passHref={true}>
-                        <a>{filePath}</a>
-                      </Link>
-                    )}
+                    <Link href={objectURL as any} passHref={true}>
+                      <a>{filePath}</a>
+                    </Link>
                   </div>
                 )}
               />
