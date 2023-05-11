@@ -106,9 +106,9 @@ export function FileView({
     }
   }
 
-  // if (loading) {
-  //   return <LoadingSpinner loading={true} />;
-  // }
+  if (loading) {
+    return <LoadingSpinner loading={true} />;
+  }
 
   return (
     <div className="file-viewer-wrapper text-center">
