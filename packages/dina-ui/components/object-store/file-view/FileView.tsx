@@ -66,15 +66,11 @@ export function FileView({
   useEffect(() => {
     async function fetchObjectURL() {
       // axios post request
-      try {
-        const response = await fetchObjectBlob(filePath);
-        const data = window?.URL?.createObjectURL(response.data);
-        setObjectURL(data);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        return error;
-      }
+      const response = await fetchObjectBlob(filePath);
+      const data = window?.URL?.createObjectURL(response.data);
+      setObjectURL(data);
+      window?.URL?.revokeObjectURL(data);
+      setLoading(false);
     }
     if (showFile) {
       fetchObjectURL();
