@@ -1,4 +1,4 @@
-import { LoadingSpinner, useApiClient } from "../../../../common-ui";
+import { LoadingSpinner, useApiClient, useQuery } from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ComponentType, ReactNode, useEffect, useState } from "react";
@@ -52,7 +52,7 @@ export function FileView({
 }: FileViewProps) {
   const { apiClient } = useApiClient();
   const [objectURL, setObjectURL] = useState<string>();
-  const [loading, setLoading] = useState<boolean>(true);
+  // const [loading, setLoading] = useState<boolean>(true);
   async function fetchObjectBlob(path) {
     return await apiClient.axios.get(path, {
       responseType: "blob"
@@ -62,20 +62,13 @@ export function FileView({
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
 
   const showFile = !isSpreadsheet;
-
-  useEffect(() => {
-    async function fetchObjectURL() {
-      // axios post request
-      const response = await fetchObjectBlob(filePath);
-      const data = window?.URL?.createObjectURL(response.data);
-      setObjectURL(data);
-      window?.URL?.revokeObjectURL(data);
-      setLoading(false);
-    }
-    if (showFile) {
-      fetchObjectURL();
-    }
-  }, []);
+  function onSuccess(response) {
+    setObjectURL(window?.URL?.createObjectURL(response));
+  }
+  const resp = useQuery(
+    { path: filePath, responseType: "blob" },
+    { onSuccess }
+  );
 
   if (preview || (!isImage && fileType !== "pdf")) {
     clickToDownload = false;
@@ -103,7 +96,7 @@ export function FileView({
     }
   }
 
-  if (loading) {
+  if (resp?.loading) {
     return <LoadingSpinner loading={true} />;
   }
 

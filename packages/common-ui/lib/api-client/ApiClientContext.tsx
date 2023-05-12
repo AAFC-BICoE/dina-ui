@@ -22,6 +22,7 @@ import {
   SuccessfulOperation
 } from "./operations-types";
 import DataLoader from "dataloader";
+import { ResponseType } from "axios";
 
 export interface BulkGetOptions<TReturnNull extends boolean = false> {
   apiBaseUrl?: string;
@@ -423,13 +424,14 @@ export class CustomDinaKitsu extends Kitsu {
    * e.g. "seqdb-api/index-set/1/ngsindexes" becomes "seqdb-api/index-set/1".
    * Override the 'get' method so it works with our long URLs:
    */
-  async get(path: string, params: GetParams = {}) {
+  async get(path: string, params: GetParams = {}, responseType?: ResponseType) {
     const paramsNet = omit(params, "header");
     try {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },
         params: paramsNet,
-        paramsSerializer: (p) => query(p)
+        paramsSerializer: (p) => query(p),
+        responseType
       });
 
       const deserialized = await deserialise(data);

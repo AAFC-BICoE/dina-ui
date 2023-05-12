@@ -2,6 +2,7 @@
 
 import { AxiosInstance } from "axios";
 import { JsonValue, SetRequired } from "type-fest";
+import { ResponseType } from "axios";
 
 declare module "kitsu" {
   // export default Kitsu;
@@ -18,7 +19,8 @@ declare module "kitsu" {
 
     public get<TData, TMeta = undefined>(
       path: string,
-      params: GetParams
+      params: GetParams,
+      responseType?: ResponseType
     ): Promise<KitsuResponse<TData, TMeta>>;
 
     public patch(...args: any[]): Promise<any>;
