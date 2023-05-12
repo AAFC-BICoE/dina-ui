@@ -424,8 +424,8 @@ export class CustomDinaKitsu extends Kitsu {
    * e.g. "seqdb-api/index-set/1/ngsindexes" becomes "seqdb-api/index-set/1".
    * Override the 'get' method so it works with our long URLs:
    */
-  async get(path: string, params: GetParams = {}, responseType?: ResponseType) {
-    const paramsNet = omit(params, "header");
+  async get(path: string, params: GetParams = {}) {
+    const { responseType, ...paramsNet } = omit(params, "header");
     try {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },

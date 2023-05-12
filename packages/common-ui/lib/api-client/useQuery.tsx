@@ -13,7 +13,6 @@ import { ResponseType } from "axios";
 export interface JsonApiQuerySpec extends GetParams {
   path: string;
   header?: {};
-  responseType?: ResponseType;
 }
 
 /** Query hook state. */
@@ -71,15 +70,11 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     const { path, fields, filter, sort, include, page, header, responseType } =
       querySpec;
     const getParams = omitBy<GetParams>(
-      { fields, filter, sort, include, page, header },
+      { fields, filter, sort, include, page, header, responseType },
       isUndefined
     );
 
-    const response = await apiClient.get<TData, TMeta>(
-      path,
-      getParams,
-      responseType
-    );
+    const response = await apiClient.get<TData, TMeta>(path, getParams);
 
     if (!response) {
       // This warning may appear in tests where apiClient.get hasn't been mocked:

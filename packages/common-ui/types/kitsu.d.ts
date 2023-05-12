@@ -19,8 +19,7 @@ declare module "kitsu" {
 
     public get<TData, TMeta = undefined>(
       path: string,
-      params: GetParams,
-      responseType?: ResponseType
+      params: GetParams
     ): Promise<KitsuResponse<TData, TMeta>>;
 
     public patch(...args: any[]): Promise<any>;
@@ -61,6 +60,9 @@ declare module "kitsu" {
 
     /** Custom headers for the request */
     header?: {};
+
+    /** Response type that the request should be formatted as. "arraybuffer" | "blob" | "document" | "json" | "text" | "stream" */
+    responseType?: ResponseType;
   }
 
   /** Parameter for requesting sparse fields. */
