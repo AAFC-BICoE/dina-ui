@@ -58,6 +58,10 @@ export function FileView({
       responseType: "blob"
     });
   }
+  const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
+  const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
+
+  const showFile = !isSpreadsheet;
 
   useEffect(() => {
     async function fetchObjectURL() {
@@ -72,13 +76,10 @@ export function FileView({
         return error;
       }
     }
-    fetchObjectURL();
+    if (showFile) {
+      fetchObjectURL();
+    }
   }, []);
-
-  const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
-  const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
-
-  const showFile = !isSpreadsheet;
 
   if (preview || (!isImage && fileType !== "pdf")) {
     clickToDownload = false;
