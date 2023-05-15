@@ -18,6 +18,11 @@ export interface PcrBatchAttributes {
   experimenters?: Person[];
 
   storageRestriction?: any;
+  positiveControl?: string;
+  reactionVolume?: string;
+  reactionDate?: string;
+  thermocycler?: string;
+  objective?: string;
 }
 
 export interface PcrBatchRelationships {

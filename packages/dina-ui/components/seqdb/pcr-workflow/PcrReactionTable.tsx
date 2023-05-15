@@ -101,11 +101,13 @@ export function usePcrReactionData(pcrBatchId?: string) {
 export interface PcrReactionTableProps {
   pcrBatchItems: PcrBatchItem[];
   materialSamples: MaterialSample[];
+  readOnlyOverride?: boolean;
 }
 
 export function PcrReactionTable({
   pcrBatchItems,
-  materialSamples
+  materialSamples,
+  readOnlyOverride = true
 }: PcrReactionTableProps) {
   const { readOnly } = useDinaFormContext();
 
@@ -158,7 +160,7 @@ export function PcrReactionTable({
     },
     {
       Cell: ({ original }) => {
-        return !readOnly ? (
+        return !(readOnlyOverride || readOnly) ? (
           <div>
             <AutoSuggestTextField
               name={"results[" + original?.id + "]"}
