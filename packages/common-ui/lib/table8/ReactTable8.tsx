@@ -1,5 +1,6 @@
 import {
   ColumnDef,
+  ExpandedState,
   Row,
   SortingState,
   flexRender,
@@ -34,6 +35,7 @@ export interface ReactTable8Props<TData> {
   showPaginationTop?: boolean;
   pageSizeOptions?: number[];
   defaultSorted?: SortingState;
+  defaultExpanded?: ExpandedState;
   // A function to reander the SubComponent in the expended area.
   renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement;
   // A function that returns true, the the row is extendable
@@ -50,6 +52,7 @@ export function ReactTable8<TData>({
   showPaginationTop = false,
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   defaultSorted,
+  defaultExpanded,
   renderSubComponent,
   getRowCanExpand
 }: ReactTable8Props<TData>) {
@@ -81,7 +84,8 @@ export function ReactTable8<TData>({
     getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4()),
     initialState: {
       pagination: { pageSize: pageSizeOptions[0], pageIndex: 0 },
-      sorting: defaultSorted
+      sorting: defaultSorted,
+      expanded: defaultExpanded
     }
   });
 

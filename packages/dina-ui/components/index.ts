@@ -73,3 +73,4 @@ export * from "./collection/material-sample/RestrictionField";
 export * from "./page/PageLayout";
 export * from "./page/ButtonBarLayout";
 export * from "common-ui/lib/formik-connected/data-entry/DataRow";
+export * from "./collection/material-sample/organisms-table/OrganismsTable";
