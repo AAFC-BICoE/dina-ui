@@ -1,5 +1,6 @@
 :imagesdir: ./images/dina_design_guidelines 
-= Dina Design Guidelines
+
+= UI Design Guidelines
 
 == Page Layout
 
@@ -40,6 +41,6 @@ image::DINA_design_guidelines_header.png[]
 
 . This is the main header text, depending on the page it will display:
 .. List page: The plural name of the entity (eg. Assemblages)
-.. View/Edit page: The name/identifier of the entity itself being edited. UUIDs should only be used if a name/identifier is nto set.
+.. View/Edit page: The name/identifier of the entity itself being edited. UUIDs should only be used if a name/identifier is not set.
 . Tooltips can be added to the right to describe the entity itself. Should be referenced from the DINA user docs.
 . Group name will be displayed on the right only for viewing and editing records. It should be all capital letters.
