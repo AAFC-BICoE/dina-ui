@@ -211,7 +211,7 @@ export function isValidManagedAttribute(
  * @returns number
  */
 export function convertNumber(value: any): number | null {
-  if (value !== null && value !== undefined) {
+  if (value !== null && value !== undefined && value !== "" && !isNaN(+value)) {
     return +value;
   } else {
     return null;

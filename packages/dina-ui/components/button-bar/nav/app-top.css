@@ -401,6 +401,14 @@
   .app-name {
     font-size: 34px;
   }
+  body {
+    padding: 0;
+  }
+  header,
+  footer,
+  .btn-bar {
+    display: none !important;
+  }
 }
 
 /***** **** *** ** * | END OF THE CSS FOR THE NEW APP TOP 2017-08-29 | * ** *** **** *****/
