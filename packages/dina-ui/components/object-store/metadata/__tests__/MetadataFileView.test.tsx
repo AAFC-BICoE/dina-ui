@@ -38,39 +38,55 @@ const TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE = {
   fileIdentifier: "7baa76e3-8c35-4e4a-95b2-0209268a6cc7",
   fileExtension: ".cr2"
 };
+const mockGet = jest.fn((path) => {
+  return path;
+});
+const apiContext: any = {
+  apiClient: { get: mockGet, axios: { get: mockGet } }
+};
 
 describe("MetadataFileView component", () => {
   it("Displays the LARGE_IMAGE derivative when there is one.", async () => {
+    window.URL.createObjectURL = jest.fn(
+      () =>
+        "/objectstore-api/file/dao/derivative/529755e1-7d36-478c-b29b-679385de155b"
+    );
     const wrapper = mountWithAppContext(
       <MetadataFileView
         metadata={TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE as Metadata}
-      />
+      />,
+      { apiContext }
     );
 
     await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.find("img").prop("src")).toContain(
-      "/api/objectstore-api/file/dao/derivative/529755e1-7d36-478c-b29b-679385de155b"
+      "/objectstore-api/file/dao/derivative/529755e1-7d36-478c-b29b-679385de155b"
     );
   });
 
   it("Displays the main Metadata's fileIdentifier by default.", async () => {
+    window.URL.createObjectURL = jest.fn(
+      () => "/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7"
+    );
     const wrapper = mountWithAppContext(
-      <MetadataFileView metadata={TEST_METADATA as Metadata} />
+      <MetadataFileView metadata={TEST_METADATA as Metadata} />,
+      { apiContext }
     );
 
     await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.find("img").prop("src")).toContain(
-      "/api/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7"
+      "/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7"
     );
   });
 
   it("Displays the shown file's type and caption.", async () => {
     const wrapper1 = mountWithAppContext(
-      <MetadataFileView metadata={TEST_METADATA as Metadata} />
+      <MetadataFileView metadata={TEST_METADATA as Metadata} />,
+      { apiContext }
     );
 
     await new Promise(setImmediate);
@@ -82,11 +98,11 @@ describe("MetadataFileView component", () => {
     expect(wrapper1.find(".metadata-caption").text()).toEqual(
       "Caption: test caption 1"
     );
-
     const wrapper2 = mountWithAppContext(
       <MetadataFileView
         metadata={TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE as Metadata}
-      />
+      />,
+      { apiContext }
     );
 
     await new Promise(setImmediate);
