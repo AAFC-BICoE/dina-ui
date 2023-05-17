@@ -21,8 +21,8 @@ image::DINA_design_guidelines_order_components.png[Navigation, button bar, heade
 The components on a page should follow this order: 
 
 1. Navigation Bar
-2. Button Bar
-3. Header
+2. Header
+3. Button Bar
 4. Main Content
 5. Footer
 
@@ -32,5 +32,14 @@ image::DINA_design_guidelines_button_bar.png[]
 
 The Back button should always be positioned on the left side and displayed as a link since it serves as a navigation element. 
 
-Action buttons like `Edit`, `Create`, `Delete` and `Revision history` should be placed on the right side.
+Action buttons like `Edit`, `Create`, `Delete` and `Revisions` should be placed on the right side.
 
+== Header
+
+image::DINA_design_guidelines_header.png[]
+
+. This is the main header text, depending on the page it will display:
+.. List page: The plural name of the entity (eg. Assemblages)
+.. View/Edit page: The name/identifier of the entity itself being edited. UUIDs should only be used if a name/identifier is nto set.
+. Tooltips can be added to the right to describe the entity itself. Should be referenced from the DINA user docs.
+. Group name will be displayed on the right only for viewing and editing records. It should be all capital letters.
