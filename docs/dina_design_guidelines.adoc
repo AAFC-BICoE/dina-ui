@@ -1,0 +1,36 @@
+:imagesdir: ./images/dina_design_guidelines 
+= Dina Design Guidelines
+
+== Page Layout
+
+image::DINA_design_guidelines_page_layout.png[Navigation, button bar, header, and main content are all aligned together]
+
+All page components should be aligned with the navigation and footer elements. The `PageLayout` component should be used as the root element to enforce this structure:
+
+[source]
+----
+<PageLayout titleId="splitSubsampleTitle" buttonBarContent={buttonBar}>
+  ... Main content of the page
+</PageLayout>
+----
+
+== Order of Components
+
+image::DINA_design_guidelines_order_components.png[Navigation, button bar, header, and main content are all aligned together]
+
+The components on a page should follow this order: 
+
+1. Navigation Bar
+2. Button Bar
+3. Header
+4. Main Content
+5. Footer
+
+== Button Bar
+
+image::DINA_design_guidelines_button_bar.png[]
+
+The Back button should always be positioned on the left side and displayed as a link since it serves as a navigation element. 
+
+Action buttons like `Edit`, `Create`, `Delete` and `Revision history` should be placed on the right side.
+
