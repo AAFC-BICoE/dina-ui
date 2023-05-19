@@ -2,6 +2,7 @@
 
 import { AxiosInstance } from "axios";
 import { JsonValue, SetRequired } from "type-fest";
+import { ResponseType } from "axios";
 
 declare module "kitsu" {
   // export default Kitsu;
@@ -59,6 +60,9 @@ declare module "kitsu" {
 
     /** Custom headers for the request */
     header?: {};
+
+    /** Response type that the request should be formatted as. "arraybuffer" | "blob" | "document" | "json" | "text" | "stream" */
+    responseType?: ResponseType;
   }
 
   /** Parameter for requesting sparse fields. */
