@@ -1,28 +1,97 @@
 import {
   ColumnDef,
+  ExpandedState,
+  OnChangeFn,
+  PaginationState,
   Row,
+  SortingState,
+  Updater,
+  VisibilityState,
   flexRender,
   getCoreRowModel,
+  getExpandedRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
   useReactTable
 } from "@tanstack/react-table";
-import { KitsuResource } from "kitsu";
-import { useDrag, useDrop } from "react-dnd-cjs";
-import { useIntl } from "react-intl";
+import classnames from "classnames";
+import { Fragment, useState, useMemo } from "react";
 
-export function ReactTable8<TData extends KitsuResource>({
+import { useIntl } from "react-intl";
+import { v4 as uuidv4 } from "uuid";
+import { Pagination } from "./Pagination";
+import { DefaultRow, DraggableRow } from "./RowComponents";
+import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
+
+export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
+
+export interface ReactTable8Props<TData> {
+  // Columns definations, ref: https://tanstack.com/table/v8/docs/api/core/column
+  columns: ColumnDef<TData>[];
+  data: TData[];
+  // When DnD is enabled, need to call setData() after DnD
+  setData?: (data?: TData[]) => void;
+  // Enable row drag and drop
+  enableDnd?: boolean;
+  enableSorting?: boolean;
+  enableMultiSort?: boolean;
+  manualSorting?: boolean;
+  className?: string;
+  // handle pagination manually
+  manualPagination?: boolean;
+  pageSize?: number;
+  pageCount?: number;
+  page?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+  // Show pagination on the bottom
+  showPagination?: boolean;
+  // Show pagination on the top
+  showPaginationTop?: boolean;
+  pageSizeOptions?: number[];
+  defaultSorted?: SortingState;
+  onSortingChange?: (sorting: SortingState) => void;
+  defaultExpanded?: ExpandedState;
+  // A function to reander the SubComponent in the expended area.
+  renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement;
+  // A function that returns true, the the row is extendable
+  getRowCanExpand?: (row: Row<TData>) => boolean;
+  // Styling to be applied to each row of the React Table
+  rowStyling?: (row?: Row<TData>) => any;
+  loading?: boolean;
+  columnVisibility?: VisibilityState;
+}
+
+export function ReactTable8<TData>({
   data,
   setData,
   columns,
   enableDnd = false,
-  className
-}: {
-  columns: ColumnDef<TData>[];
-  data: TData[];
-  setData?: (data?: TData[]) => void;
-  enableDnd?: boolean;
-  className?: string;
-}) {
+  enableSorting = true,
+  enableMultiSort = false,
+  className,
+  showPagination = false,
+  showPaginationTop = false,
+  manualPagination = false,
+  pageSize,
+  pageCount,
+  page,
+  onPageChange,
+  onPageSizeChange,
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
+  defaultSorted,
+  onSortingChange,
+  manualSorting = false,
+  defaultExpanded,
+  renderSubComponent,
+  getRowCanExpand,
+  rowStyling,
+  loading = false,
+  columnVisibility
+}: ReactTable8Props<TData>) {
   const { formatMessage } = useIntl();
+  const [sorting, setSorting] = useState<SortingState>(defaultSorted ?? []);
+
   function reorderRow(draggedRowIndex: number, targetRowIndex: number) {
     data.splice(targetRowIndex, 0, data.splice(draggedRowIndex, 1)[0] as TData);
     if (!!setData) {
@@ -30,137 +99,156 @@ export function ReactTable8<TData extends KitsuResource>({
     }
   }
 
+  function onPaginationChangeInternal(updater) {
+    const newState = updater(table.getState().pagination);
+    if (pageSize !== newState.pageSize && onPageSizeChange !== undefined) {
+      onPageSizeChange(newState.pageSize);
+    } else if (page !== newState.pageIndex && onPageChange !== undefined) {
+      onPageChange(newState.pageIndex);
+    }
+  }
+
+  function onSortingChangeInternal(updator) {
+    const newState = updator(table.getState().sorting);
+    if (onSortingChange !== undefined) onSortingChange(newState);
+    setSorting(newState);
+  }
+
   const table = useReactTable<TData>({
     data,
     columns,
+    defaultColumn: { minSize: 0, size: 0 },
     getCoreRowModel: getCoreRowModel(),
-    getRowId: (row) => row.id ?? ""
+    getSortedRowModel: getSortedRowModel(),
+    getRowCanExpand,
+    getExpandedRowModel:
+      renderSubComponent && getRowCanExpand ? getExpandedRowModel() : undefined,
+    getPaginationRowModel:
+      (showPagination || showPaginationTop) && manualPagination !== true
+        ? getPaginationRowModel()
+        : undefined,
+    pageCount:
+      (showPagination || showPaginationTop) && manualPagination
+        ? pageCount
+        : undefined,
+    state: {
+      pagination: manualPagination
+        ? { pageIndex: page ?? 0, pageSize: pageSize ?? pageSizeOptions[0] }
+        : undefined,
+      sorting,
+      columnVisibility
+    },
+    onSortingChange: onSortingChangeInternal,
+    getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4()),
+    initialState: {
+      expanded: defaultExpanded
+    },
+    onPaginationChange: manualPagination
+      ? onPaginationChangeInternal
+      : undefined,
+    enableSorting,
+    enableMultiSort,
+    manualPagination,
+    manualSorting
   });
 
   return (
-    <table className={`ReactTable8 w-100 ${className}`}>
-      <thead>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id}>
-            {headerGroup.headers.map((header) => (
-              <th key={header.id} colSpan={header.colSpan}>
-                {header.isPlaceholder ? null : (
-                  <div
-                    {...{
-                      className: header.column.getCanSort()
-                        ? "cursor-pointer select-none"
-                        : "",
-                      onClick: header.column.getToggleSortingHandler()
-                    }}
-                  >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                    {{
-                      asc: " 🔼",
-                      desc: " 🔽"
-                    }[header.column.getIsSorted() as string] ?? null}
-                  </div>
+    <div className={`ReactTable8 ${className}`}>
+      {showPaginationTop && (
+        <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+      )}
+      <table className="w-100">
+        <thead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th
+                  key={header.id}
+                  colSpan={header.colSpan}
+                  className={classnames(
+                    header.column.getCanSort() && "-cursor-pointer",
+                    header.column.getIsSorted() === "asc" && "-sort-asc",
+                    header.column.getIsSorted() === "desc" && "-sort-desc"
+                  )}
+                  style={{
+                    width:
+                      header.column.columnDef.size === 0
+                        ? "auto"
+                        : header.column.columnDef.size
+                  }}
+                >
+                  {header.isPlaceholder ? null : (
+                    <div
+                      {...{
+                        className: header.column.getCanSort()
+                          ? "-cursor-pointer select-none"
+                          : "",
+                        onClick: header.column.getToggleSortingHandler()
+                      }}
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </div>
+                  )}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {loading ? (
+            <tr>
+              <td
+                colSpan={table.getAllColumns().length}
+                className="text-center"
+              >
+                <LoadingSpinner loading={true} />
+              </td>
+            </tr>
+          ) : table.getRowModel().rows.length === 0 ? (
+            <tr>
+              <td
+                colSpan={table.getAllColumns().length}
+                className="text-center"
+              >
+                {formatMessage({ id: "noRowsFound" })}
+              </td>
+            </tr>
+          ) : (
+            table.getRowModel().rows.map((row, index) => (
+              <Fragment key={index}>
+                {enableDnd ? (
+                  <DraggableRow
+                    row={row}
+                    reorderRow={reorderRow}
+                    className={index % 2 === 0 ? "-odd" : "-even"}
+                    style={rowStyling ? rowStyling(row) : undefined}
+                  />
+                ) : (
+                  <DefaultRow
+                    row={row}
+                    className={index % 2 === 0 ? "-odd" : "-even"}
+                    style={rowStyling ? rowStyling(row) : undefined}
+                  />
                 )}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody>
-        {table.getRowModel().rows.length === 0 ? (
-          <tr>
-            <td colSpan={table.getAllColumns().length} className="text-center">
-              {formatMessage({ id: "noRowsFound" })}
-            </td>
-          </tr>
-        ) : (
-          table
-            .getRowModel()
-            .rows.map((row, index) =>
-              enableDnd ? (
-                <DraggableRow
-                  row={row}
-                  reorderRow={reorderRow}
-                  className={index % 2 === 0 ? "-odd" : "-even"}
-                />
-              ) : (
-                <DefaultRow
-                  row={row}
-                  className={index % 2 === 0 ? "-odd" : "-even"}
-                />
-              )
-            )
-        )}
-      </tbody>
-    </table>
-  );
-}
-
-function DefaultRow<TData extends KitsuResource>({
-  row,
-  className
-}: {
-  row: Row<TData>;
-  className?: string;
-}) {
-  return (
-    <tr key={row.id} className={className}>
-      {row.getVisibleCells().map((cell) => {
-        return (
-          <td key={cell.id}>
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-          </td>
-        );
-      })}
-    </tr>
-  );
-}
-
-const ITEM_DRAG_KEY = "ReactTable8RowDndKey";
-
-function DraggableRow<TData extends KitsuResource>({
-  row,
-  reorderRow,
-  className
-}: {
-  row: Row<TData>;
-  reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
-  className?: string;
-}) {
-  const [, dropRef] = useDrop({
-    accept: ITEM_DRAG_KEY,
-    drop: (draggedRow) => reorderRow((draggedRow as any).row.index, row.index),
-    canDrop: () => true
-  });
-
-  const [{ isDragging }, dragRef, previewRef] = useDrag({
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    }),
-    item: { row, type: ITEM_DRAG_KEY },
-    canDrag: true
-  });
-
-  return (
-    <tr
-      className={className}
-      ref={(el) => {
-        dropRef(el);
-        dragRef(el);
-        previewRef(el);
-      }}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: isDragging ? "grabbing" : "grab"
-      }}
-    >
-      {row.getVisibleCells().map((cell) => (
-        <td key={cell.id}>
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </td>
-      ))}
-    </tr>
+                {row.getIsExpanded() && (
+                  <tr>
+                    {/* 2nd row is a custom 1 cell row that contains the extended area */}
+                    <td colSpan={row.getVisibleCells().length}>
+                      {renderSubComponent?.({ row })}
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
+            ))
+          )}
+        </tbody>
+      </table>
+      {showPagination && (
+        <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+      )}
+    </div>
   );
 }
