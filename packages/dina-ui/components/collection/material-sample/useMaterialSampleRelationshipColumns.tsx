@@ -68,9 +68,7 @@ export function useMaterialSampleRelationshipColumns() {
       ),
       header: () => <FieldHeader name="materialSampleName" />,
       accessorKey: "data.attributes.materialSampleName",
-      sortingFn: (a: any, b: any): number => {
-        return compareByStringAndNumber(a, b);
-      },
+      sortingFn: "alphanumeric",
       isKeyword: true
     },
     {
