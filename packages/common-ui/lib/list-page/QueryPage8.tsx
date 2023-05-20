@@ -161,6 +161,20 @@ export interface QueryPage8Props<TData extends KitsuResource> {
   onSortedChange?: (newSort: SortingState) => void;
 
   /**
+   * Event when user select data from left to the right table
+   * @param selectedData
+   * @returns
+   */
+  onSelect?: (selectedData: TData[]) => void;
+
+  /**
+   * Event when user remove data from the right table.
+   * @param deselectedData
+   * @returns
+   */
+  onDeselect?: (deselectedData: TData[]) => void;
+
+  /**
    * Boolean flag to display only the result table when true
    */
   viewMode?: boolean;
@@ -221,7 +235,9 @@ export function QueryPage8<TData extends KitsuResource>({
   customViewElasticSearchQuery,
   customViewFields,
   rowStyling,
-  enableDnd = false
+  enableDnd = false,
+  onSelect,
+  onDeselect
 }: QueryPage8Props<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
@@ -460,6 +476,7 @@ export function QueryPage8<TData extends KitsuResource>({
       "id"
     );
 
+    onSelect?.(selectedObjects);
     setSelectedResources(selectedResourcesAppended);
     setRemovableItems(selectedResourcesAppended);
 
@@ -496,6 +513,7 @@ export function QueryPage8<TData extends KitsuResource>({
       });
     });
 
+    onDeselect?.(unselectedObjects);
     setRemovableItems(unselectedObjects);
     setSelectedResources(unselectedObjects);
     formik.setFieldValue("itemIdsToDelete", {});
@@ -873,6 +891,7 @@ export function QueryPage8<TData extends KitsuResource>({
                     />
                   </span>
                   <ReactTable8<TData>
+                    loading={loading}
                     columns={columnsSelected}
                     data={selectedResources ?? []}
                     setData={(data) =>

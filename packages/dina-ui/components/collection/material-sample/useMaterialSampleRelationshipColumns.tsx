@@ -69,7 +69,8 @@ export function useMaterialSampleRelationshipColumns() {
       header: () => <FieldHeader name="materialSampleName" />,
       accessorKey: "data.attributes.materialSampleName",
       sortingFn: "alphanumeric",
-      isKeyword: true
+      isKeyword: true,
+      enableSorting: true
     },
     {
       id: "scientificName",

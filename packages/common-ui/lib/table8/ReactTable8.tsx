@@ -98,18 +98,16 @@ export function ReactTable8<TData>({
 
   function onPaginationChangeInternal(updater) {
     const newState = updater(table.getState().pagination);
-    if (pageSize !== newState.pageSize && onPageSizeChange !== undefined) {
-      onPageSizeChange(newState.pageSize);
-    } else if (page !== newState.pageIndex && onPageChange !== undefined) {
-      onPageChange(newState.pageIndex);
+    if (pageSize !== newState.pageSize) {
+      onPageSizeChange?.(newState.pageSize);
+    } else if (page !== newState.pageIndex) {
+      onPageChange?.(newState.pageIndex);
     }
   }
 
   function onSortingChangeInternal(updator) {
     const newState = updator(table.getState().sorting);
-    if (onSortingChange !== undefined) {
-      onSortingChange(newState);
-    }
+    onSortingChange?.(newState);
     setSorting(newState);
   }
 

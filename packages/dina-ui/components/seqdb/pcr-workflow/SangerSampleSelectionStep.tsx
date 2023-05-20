@@ -1,3 +1,4 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   DoOperationsError,
   LoadingSpinner,
@@ -7,7 +8,7 @@ import {
   useApiClient
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { compact, pick, uniq } from "lodash";
+import { compact, pick, uniq, difference, concat } from "lodash";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
@@ -60,6 +61,61 @@ export function SangerSampleSelectionStep({
   const [selectedResources, setSelectedResources] = useState<
     MaterialSample[] | undefined
   >(undefined);
+
+  const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
+    string[]
+  >(`pcrWorkflowMaterialSampleSortOrder-${pcrBatchId}`);
+
+  /**
+   * When the page is first loaded, check if saved samples has already been chosen and reload them.
+   */
+  useEffect(() => {
+    fetchSampledIds();
+  }, [editMode]);
+
+  function setSelectedResourcesAndSaveOrder(materialSmaples: MaterialSample[]) {
+    setSelectedResources(materialSmaples);
+    setMaterialSampleSortOrder(compact(materialSmaples.map((item) => item.id)));
+  }
+
+  // Sort MaterialSamples based on the preserved order in local storage
+  function sortMaterialSamples(samples: MaterialSample[]) {
+    if (materialSampleSortOrder) {
+      const sorted = materialSampleSortOrder.map((sampleId) =>
+        samples.find((item) => item.id === sampleId)
+      );
+      samples.forEach((item) => {
+        if (materialSampleSortOrder.indexOf(item.id ?? "unknown") === -1) {
+          sorted.push(item);
+        }
+      });
+      return compact(sorted);
+    } else {
+      return compact(samples);
+    }
+  }
+
+  function onSelectMaterial(selected: MaterialSample[]) {
+    const ids = compact(
+      uniq(
+        concat(
+          materialSampleSortOrder,
+          selected.map((material) => material.id)
+        )
+      )
+    );
+    setMaterialSampleSortOrder(ids);
+  }
+
+  function onDeselectMaterial(unselected: MaterialSample[]) {
+    const ids = uniq(
+      difference(
+        materialSampleSortOrder,
+        compact(unselected.map((material) => material.id))
+      )
+    );
+    setMaterialSampleSortOrder(ids);
+  }
 
   /**
    * Retrieve all of the PCR Batch Items that are associated with the PCR Batch from step 1.
@@ -123,17 +179,10 @@ export function SangerSampleSelectionStep({
       if (materialSamplesTransformed.length === 0) {
         setEditMode(true);
       }
-
-      setSelectedResources(materialSamplesTransformed ?? []);
+      const sorted = sortMaterialSamples(materialSamplesTransformed);
+      setSelectedResources(sorted);
     });
   }
-
-  /**
-   * When the page is first loaded, check if saved samples has already been chosen and reload them.
-   */
-  useEffect(() => {
-    fetchSampledIds();
-  }, [editMode]);
 
   async function savePcrBatchItems() {
     try {
@@ -239,9 +288,11 @@ export function SangerSampleSelectionStep({
         columns={ELASTIC_SEARCH_COLUMN8}
         selectionMode={editMode}
         selectionResources={selectedResources}
-        setSelectionResources={setSelectedResources}
+        setSelectionResources={setSelectedResourcesAndSaveOrder}
         viewMode={!editMode}
         enableDnd={true}
+        onDeselect={onSelectMaterial}
+        onSelect={onDeselectMaterial}
       />
     </div>
   );
