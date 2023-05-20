@@ -78,7 +78,7 @@ export function useMaterialSampleRelationshipColumns() {
           original: { included }
         }
       }) => {
-        const organisms = included.organism ?? [];
+        const organisms = included?.organism ?? [];
         const materialSample: MaterialSample = {
           type: "material-sample",
           organism: organisms

@@ -241,6 +241,7 @@ export function SangerSampleSelectionStep({
         selectionResources={selectedResources}
         setSelectionResources={setSelectedResources}
         viewMode={!editMode}
+        enableDnd={true}
       />
     </div>
   );

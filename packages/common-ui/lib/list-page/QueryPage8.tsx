@@ -45,7 +45,7 @@ import {
 } from "./query-builder/useQueryBuilderConfig";
 import { DynamicFieldsMappingConfig, TableColumn8 } from "./types";
 
-const DEFAULT_PAGE_SIZE: number = 5;
+const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
   {
     id: "createdOn",
@@ -185,6 +185,8 @@ export interface QueryPage8Props<TData extends KitsuResource> {
    * Styling to be applied to each row of the React Table
    */
   rowStyling?: (row: Row<TData>) => any;
+
+  enableDnd?: boolean;
 }
 
 const GROUP_STORAGE_KEY = "groupStorage";
@@ -218,7 +220,8 @@ export function QueryPage8<TData extends KitsuResource>({
   customViewQuery,
   customViewElasticSearchQuery,
   customViewFields,
-  rowStyling
+  rowStyling,
+  enableDnd = false
 }: QueryPage8Props<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
@@ -840,7 +843,6 @@ export function QueryPage8<TData extends KitsuResource>({
                 className="-striped react-table-overflow"
                 rowStyling={rowStyling}
                 showPagination={true}
-                pageSizeOptions={[5, 10, 20]}
               />
             </div>
             {selectionMode && (
@@ -873,6 +875,9 @@ export function QueryPage8<TData extends KitsuResource>({
                   <ReactTable8<TData>
                     columns={columnsSelected}
                     data={selectedResources ?? []}
+                    enableDnd={enableDnd}
+                    enableSorting={!enableDnd}
+                    showPagination={!enableDnd}
                   />
                 </div>
               </>

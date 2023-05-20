@@ -150,7 +150,8 @@ export function ReactTable8<TData>({
     getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4()),
     initialState: {
       expanded: defaultExpanded,
-      sorting: defaultSorted
+      sorting: defaultSorted,
+      pagination: { pageSize }
     },
     enableSorting,
     enableMultiSort,
