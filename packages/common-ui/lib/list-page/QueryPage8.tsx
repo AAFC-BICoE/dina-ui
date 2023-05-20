@@ -875,6 +875,9 @@ export function QueryPage8<TData extends KitsuResource>({
                   <ReactTable8<TData>
                     columns={columnsSelected}
                     data={selectedResources ?? []}
+                    setData={(data) =>
+                      setSelectedResources && setSelectedResources(data ?? [])
+                    }
                     enableDnd={enableDnd}
                     enableSorting={!enableDnd}
                     showPagination={!enableDnd}
