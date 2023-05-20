@@ -829,7 +829,10 @@ export function QueryPage8<TData extends KitsuResource>({
                 onPageChange={onPageChanged}
                 onPageSizeChange={onPageSizeChanged}
                 // Sorting props
-                manualSorting={true}
+                manualSorting={
+                  viewMode && selectedResources?.length ? false : true
+                }
+                enableSorting={true}
                 onSortingChange={onSortChange}
                 defaultSorted={sortingRules}
                 // Table customization props

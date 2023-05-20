@@ -1,7 +1,7 @@
 import {
   DoOperationsError,
   LoadingSpinner,
-  QueryPage,
+  QueryPage8,
   filterBy,
   useAccount,
   useApiClient
@@ -37,7 +37,7 @@ export function SangerSampleSelectionStep({
 }: SangerSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
   const { username } = useAccount();
-  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
+  const { ELASTIC_SEARCH_COLUMN8 } = useMaterialSampleRelationshipColumns();
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -107,7 +107,10 @@ export function SangerSampleSelectionStep({
     ).then((response) => {
       const materialSamplesTransformed = compact(response).map((resource) => ({
         data: {
-          attributes: pick(resource, ["materialSampleName"])
+          attributes: pick(resource, [
+            "materialSampleName",
+            "dwcOtherCatalogNumbers"
+          ])
         },
         id: resource.id,
         type: resource.type,
@@ -231,9 +234,9 @@ export function SangerSampleSelectionStep({
           <SeqdbMessage id="selectedSamplesTitle" />
         </strong>
       )}
-      <QueryPage<MaterialSample>
+      <QueryPage8<any>
         indexName={"dina_material_sample_index"}
-        columns={ELASTIC_SEARCH_COLUMN}
+        columns={ELASTIC_SEARCH_COLUMN8}
         selectionMode={editMode}
         selectionResources={selectedResources}
         setSelectionResources={setSelectedResources}

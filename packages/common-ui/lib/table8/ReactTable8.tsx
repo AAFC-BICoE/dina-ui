@@ -110,11 +110,24 @@ export function ReactTable8<TData>({
 
   function onSortingChangeInternal(updator) {
     const newState = updator(table.getState().sorting);
-    if (onSortingChange !== undefined) onSortingChange(newState);
+    if (onSortingChange !== undefined) {
+      onSortingChange(newState);
+    }
     setSorting(newState);
   }
 
-  const table = useReactTable<TData>({
+  const tableState = manualPagination
+    ? {
+        pagination: {
+          pageIndex: page ?? 0,
+          pageSize: pageSize ?? pageSizeOptions[0]
+        },
+        sorting,
+        columnVisibility
+      }
+    : { sorting, columnVisibility };
+
+  const tableOption = {
     data,
     columns,
     defaultColumn: { minSize: 0, size: 0 },
@@ -131,26 +144,27 @@ export function ReactTable8<TData>({
       (showPagination || showPaginationTop) && manualPagination
         ? pageCount
         : undefined,
-    state: {
-      pagination: manualPagination
-        ? { pageIndex: page ?? 0, pageSize: pageSize ?? pageSizeOptions[0] }
-        : undefined,
-      sorting,
-      columnVisibility
-    },
-    onSortingChange: onSortingChangeInternal,
+    state: tableState,
+
     getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4()),
     initialState: {
       expanded: defaultExpanded
     },
-    onPaginationChange: manualPagination
-      ? onPaginationChangeInternal
-      : undefined,
     enableSorting,
     enableMultiSort,
     manualPagination,
     manualSorting
-  });
+  };
+  if (manualPagination) {
+    Object.assign(tableOption, {
+      onPaginationChange: onPaginationChangeInternal
+    });
+  }
+  if (manualSorting) {
+    Object.assign(tableOption, { onSortingChange: onSortingChangeInternal });
+  }
+
+  const table = useReactTable<TData>(tableOption);
 
   return (
     <div className={`ReactTable8 ${className}`}>
@@ -179,12 +193,12 @@ export function ReactTable8<TData>({
                 >
                   {header.isPlaceholder ? null : (
                     <div
-                      {...{
-                        className: header.column.getCanSort()
+                      className={
+                        header.column.getCanSort()
                           ? "-cursor-pointer select-none"
-                          : "",
-                        onClick: header.column.getToggleSortingHandler()
-                      }}
+                          : ""
+                      }
+                      onClick={header.column.getToggleSortingHandler()}
                     >
                       {flexRender(
                         header.column.columnDef.header,

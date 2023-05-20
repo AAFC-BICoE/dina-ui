@@ -3,6 +3,7 @@ import {
   dateCell,
   DeleteButton,
   EditButton,
+  FieldHeader,
   stringArrayCell,
   useStringComparator
 } from "common-ui";
@@ -53,20 +54,20 @@ export function useMaterialSampleRelationshipColumns() {
     }
   ];
 
-  const ELASTIC_SEARCH_COLUMN8: TableColumn8<MaterialSample>[] = [
+  const ELASTIC_SEARCH_COLUMN8: TableColumn8<any>[] = [
     {
       id: "materialSampleName",
       cell: ({ row: { original } }) => (
         <Link href={`/collection/material-sample/view?id=${original.id}`}>
           <a>
-            {original.materialSampleName ||
-              original.dwcOtherCatalogNumbers?.join?.(", ") ||
+            {original.data.attributes.materialSampleName ||
+              original.data.attributes.dwcOtherCatalogNumbers?.join?.(", ") ||
               original.id}
           </a>
         </Link>
       ),
-      label: "materialSampleName",
-      accessorKey: "materialSampleName",
+      header: () => <FieldHeader name="materialSampleName" />,
+      accessorKey: "data.attributes.materialSampleName",
       sortingFn: (a: any, b: any): number => {
         return compareByStringAndNumber(a, b);
       },
@@ -74,8 +75,12 @@ export function useMaterialSampleRelationshipColumns() {
     },
     {
       id: "scientificName",
-      cell: ({ row: { original } }) => {
-        const organisms = original.organism ?? [];
+      cell: ({
+        row: {
+          original: { included }
+        }
+      }) => {
+        const organisms = included.organism ?? [];
         const materialSample: MaterialSample = {
           type: "material-sample",
           organism: organisms
@@ -83,7 +88,7 @@ export function useMaterialSampleRelationshipColumns() {
         const scientificName = getScientificNames(materialSample);
         return <div className="stringArray-cell">{scientificName}</div>;
       },
-      label: "determination.scientificName",
+      header: () => <FieldHeader name="determination.scientificName" />,
       isKeyword: true,
       enableSorting: false
     }
