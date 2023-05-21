@@ -3,11 +3,11 @@ import {
   FieldHeader,
   ReactTable8,
   useGroupedCheckBoxes
-} from "packages/common-ui/lib";
+} from "../../../../../common-ui/lib";
 import {
   SeqReaction,
   pcrBatchItemResultColor
-} from "packages/dina-ui/types/seqdb-api";
+} from "../../../../../dina-ui/types/seqdb-api";
 
 export interface SeqReactionDnDTableProps {
   selectedSeqReactions: SeqReaction[];
@@ -54,7 +54,7 @@ export function SeqReactionDndTable({
       accessorFn: (row) =>
         row.pcrBatchItem?.materialSample?.materialSampleName ?? "",
       header: () => <FieldHeader name={"sampleName"} />,
-      enableSorting: true
+      enableSorting: false
     },
     {
       id: "result",

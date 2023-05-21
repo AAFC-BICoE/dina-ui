@@ -89,7 +89,8 @@
 .ReactTable8.-striped tr.-odd {
   background: rgba(0, 0, 0, 0.03);
 }
-.ReactTable8 tbody tr:hover {
+.ReactTable8 tbody tr:hover,
+.ReactTable8.-striped tr.-odd:hover {
   background-color: rgb(222, 252, 222);
 }
 
@@ -188,4 +189,31 @@
 }
 .ReactTable8 .-pagination .-pageSizeOptions {
   margin: 3px 10px;
+}
+
+.ReactTable8 .rt-expander {
+  display: inline-block;
+  position: relative;
+  margin: 0;
+  color: transparent;
+  margin: 0 10px;
+}
+.ReactTable8 .rt-expander:after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%) rotate(-90deg);
+  transform: translate(-50%, -50%) rotate(-90deg);
+  border-left: 5.04px solid transparent;
+  border-right: 5.04px solid transparent;
+  border-top: 7px solid rgba(0, 0, 0, 0.8);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+}
+.ReactTable8 .rt-expander.-open:after {
+  -webkit-transform: translate(-50%, -50%) rotate(0);
+  transform: translate(-50%, -50%) rotate(0);
 }

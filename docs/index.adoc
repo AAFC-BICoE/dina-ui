@@ -8,6 +8,8 @@ React based user interface for the DINA project.
 
 include::stack.adoc[]
 
+include::dina_design_guidelines.adoc[]
+
 include::dev_tools.adoc[]
 
 include::getting_started.adoc[]

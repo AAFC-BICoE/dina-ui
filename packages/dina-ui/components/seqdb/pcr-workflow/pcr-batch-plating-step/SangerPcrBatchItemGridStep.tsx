@@ -1,11 +1,12 @@
 import { LoadingSpinner } from "common-ui";
+import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
+import Link from "next/link";
+import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
+import { useEffect } from "react";
 import { ContainerGrid } from "./ContainerGrid";
 import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
 import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
-import { useEffect } from "react";
-import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
-import { PersistedResource } from "kitsu";
 
 export interface PCRBatchItemGridProps {
   pcrBatchId: string;
@@ -70,14 +71,40 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
 
   if (!isStorage) {
     return (
-      <div className="alert alert-warning mt-3">
-        Storage definition must be set to use the container grid.
+      <div className="mt-3">
+        <div className="row mb-2">
+          <div className="col-12 text-end">
+            <Link href={`/seqdb/pcr-workflow/worksheet?id=${pcrBatchId}`}>
+              <a target="_blank" className="btn btn-primary">
+                Worksheet
+              </a>
+            </Link>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-12">
+            <div className="alert alert-warning">
+              Storage definition must be set to use the container grid.
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="mt-3">
+      {!editMode && (
+        <div className="row">
+          <div className="col-12 text-end">
+            <Link href={`/seqdb/pcr-workflow/worksheet?id=${pcrBatchId}`}>
+              <a target="_blank" className="btn btn-primary">
+                Worksheet
+              </a>
+            </Link>
+          </div>
+        </div>
+      )}
       {editMode && (
         <div className="row">
           <div className="col-3" />
