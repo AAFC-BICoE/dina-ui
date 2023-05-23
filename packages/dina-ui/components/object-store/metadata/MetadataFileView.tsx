@@ -24,14 +24,14 @@ export function MetadataFileView({
 
   const fileId = fileToDisplay.fileIdentifier;
 
-  const filePath = `/api/objectstore-api/file/${fileToDisplay.bucket}/${
+  const filePath = `/objectstore-api/file/${fileToDisplay.bucket}/${
     // Add derivative/ before the fileIdentifier if the file to display is a derivative.
     fileToDisplay.type === "derivative" ? "derivative/" : ""
   }${fileId}`;
 
   const downloadLinks: DownLoadLinks = {};
 
-  const COMMON_LINK_ROOT = "/api/objectstore-api/file/";
+  const COMMON_LINK_ROOT = "/objectstore-api/file/";
 
   const largeImgDerivative = metadata.derivatives?.find(
     (it) => it.derivativeType === "LARGE_IMAGE"

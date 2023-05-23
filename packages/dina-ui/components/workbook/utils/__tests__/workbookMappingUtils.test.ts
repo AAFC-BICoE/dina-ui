@@ -196,7 +196,7 @@ describe("workbookMappingUtils functions", () => {
 
   it("convertNumber", () => {
     expect(convertNumber("100")).toEqual(100);
-    expect(convertNumber("ssss")).toBeNaN();
+    expect(convertNumber("ssss")).toBeNull();
     expect(convertNumber(false)).toEqual(0);
     expect(convertNumber(true)).toEqual(1);
     expect(convertNumber(null)).toBeNull();

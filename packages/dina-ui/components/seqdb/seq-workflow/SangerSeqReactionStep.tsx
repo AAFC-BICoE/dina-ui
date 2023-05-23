@@ -164,12 +164,10 @@ export function SangerSeqReactionStep({
   }
 
   /**
-   * When the page is first loaded, check if saved samples has already been chosen and reload them.
+   * fetch data when the page is first loaded or editMode changed.
    */
   useEffect(() => {
-    if (editMode || !selectedResources || selectedResources.length === 0) {
-      fetchSeqReactions();
-    }
+    fetchSeqReactions();
   }, [editMode]);
 
   const fetchSeqReactions = async () => {

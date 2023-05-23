@@ -1,17 +1,20 @@
 import { Row, flexRender } from "@tanstack/react-table";
+import { CSSProperties } from "react";
 import { useDrag, useDrop } from "react-dnd-cjs";
 
 const ITEM_DRAG_KEY = "ReactTable8RowDndKey";
 
 export function DefaultRow<TData>({
   row,
-  className
+  className,
+  style
 }: {
   row: Row<TData>;
   className?: string;
+  style?: CSSProperties;
 }) {
   return (
-    <tr key={row.id} className={className}>
+    <tr key={row.id} className={className} style={style}>
       {row.getVisibleCells().map((cell) => {
         return (
           <td key={cell.id}>
@@ -26,11 +29,13 @@ export function DefaultRow<TData>({
 export function DraggableRow<TData>({
   row,
   reorderRow,
-  className
+  className,
+  style
 }: {
   row: Row<TData>;
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
   className?: string;
+  style?: CSSProperties;
 }) {
   const [, dropRef] = useDrop({
     accept: ITEM_DRAG_KEY,
@@ -55,8 +60,11 @@ export function DraggableRow<TData>({
         previewRef(el);
       }}
       style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: isDragging ? "grabbing" : "grab"
+        ...{
+          opacity: isDragging ? 0.5 : 1,
+          cursor: isDragging ? "grabbing" : "grab"
+        },
+        ...style
       }}
     >
       {row.getVisibleCells().map((cell) => (

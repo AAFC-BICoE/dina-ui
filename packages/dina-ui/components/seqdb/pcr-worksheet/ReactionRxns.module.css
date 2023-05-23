@@ -1,0 +1,24 @@
+.fieldGroup {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+.fieldGroup > div:first-child {
+  grid-area: 1 / 1 / 2 / 2;
+  padding-right: 1rem;
+}
+.fieldGroup > div:nth-child(2) {
+  grid-area: 1 / 2 / 2 / 3;
+  padding-left: 1rem;
+}
+.fieldGroup > div {
+  display: flex;
+}
+
+.fieldGroup > div > label {
+  margin-right: 1rem;
+  white-space: nowrap;
+}
+
+.rxnsFormular {
+  padding: 0.4rem 0.5rem;
+}

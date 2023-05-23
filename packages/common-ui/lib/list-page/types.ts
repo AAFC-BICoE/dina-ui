@@ -1,3 +1,4 @@
+import { AccessorColumnDef, ColumnDef } from "@tanstack/react-table";
 import { KitsuResource } from "kitsu";
 import { Column } from "react-table";
 
@@ -41,6 +42,39 @@ export interface TableColumn<TData extends KitsuResource>
    */
   additionalAccessors?: string[];
 }
+
+export type TableColumn8<TData> = ColumnDef<TData> & {
+  /**
+   * Elastic search path to the attribute.
+   *
+   * Example: `data.attributes.name`
+   */
+  attributePath?: string;
+
+  /**
+   * This field is used to find the relationship in the included section.
+   */
+  relationshipType?: string;
+
+  /**
+   * Is this attribute considered a keyword in elastic search. Required for filtering and sorting.
+   */
+  isKeyword?: boolean;
+
+  /**
+   * The QueryPage will only display the accessors that are displayed on the result table. However,
+   * if you have custom cells that receive other fields you will need to add them to this list so
+   * elastic search includes the fields in the result.
+   *
+   * Example: `data.attributes.name`
+   *
+   * Please note that duplicate fields are automatically removed so you don't need to worry about
+   * having unique accessors.
+   */
+  additionalAccessors?: string[];
+
+  isColumnVisible?: boolean;
+};
 
 /**
  * The full path will be generated for elastic using a combination of the parent path and
