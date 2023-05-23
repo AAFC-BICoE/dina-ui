@@ -332,7 +332,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
       sections: [
         {
           name: "general-section",
-          visible: true,
+          visible: false,
           items: [
             { defaultValue: undefined, name: "tags", visible: false },
             {
