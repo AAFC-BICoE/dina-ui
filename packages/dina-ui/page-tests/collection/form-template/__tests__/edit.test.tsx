@@ -332,7 +332,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
       sections: [
         {
           name: "general-section",
-          visible: false,
+          visible: true,
           items: [
             { defaultValue: undefined, name: "tags", visible: false },
             {
@@ -934,7 +934,7 @@ describe("Form template edit page", () => {
 
     // All switches should be unchecked:
     expect(switches.map((node) => node.prop("checked"))).toEqual(
-      switches.map(() => false)
+      switches.map(() => true)
     );
   });
 

@@ -17,7 +17,7 @@ jobs:
         # Lists all of the available tests and splits it into a number of groups.
       - id: set-test-chunks
         name: split tests into chunks
-        run: echo "test-chunks=$(npx jest --listTests --json | jq -cM '[_nwise(length / 3 | floor)]')" >> $GITHUB_OUTPUT
+        run: echo "test-chunks=$(npx jest --listTests --json | jq -cM '[_nwise(length / 5 | floor)]')" >> $GITHUB_OUTPUT
 
       - id: set-test-chunk-ids
         name: Set Chunk IDs
