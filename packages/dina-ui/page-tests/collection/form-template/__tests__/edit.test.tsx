@@ -934,7 +934,7 @@ describe("Form template edit page", () => {
 
     // All switches should be unchecked:
     expect(switches.map((node) => node.prop("checked"))).toEqual(
-      switches.map(() => true)
+      switches.map(() => false)
     );
   });
 
