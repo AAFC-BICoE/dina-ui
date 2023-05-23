@@ -5,9 +5,9 @@ export interface ReportTemplateAttributes {
   type: "report-template";
   name: string;
   group: string;
-  createdOn: string;
+  createdOn?: string;
   createdBy: string;
-  multilingualDescription: MultilingualDescription;
+  multilingualDescription?: MultilingualDescription;
   templateFilename: string;
   outputMediaType: string;
   includesBarcode: boolean;
