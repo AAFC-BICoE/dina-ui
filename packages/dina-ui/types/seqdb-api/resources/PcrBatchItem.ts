@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { PcrBatch } from "./PcrBatch";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { MaterialSample } from "../../collection-api";
 
 /**
  * The result for the PcrBatch item can be any string provided by the user. The enums below is
@@ -52,7 +53,7 @@ export interface PcrBatchItemAttributes {
 
 export interface PcrBatchItemRelationships {
   pcrBatch?: PcrBatch;
-  materialSample?: ResourceIdentifierObject;
+  materialSample?: MaterialSample;
 }
 
 export type PcrBatchItem = KitsuResource &
