@@ -791,8 +791,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   tags: "Tags",
   target: "Target",
   template: "Template",
-  template_AAFC_Beaver_ZT410: "AAFC_Beaver_ZT410",
-  template_AAFC_Zebra_ZT410: "AAFC_Zebra_ZT410",
   thisWillRemoveYourTemplate:
     "This will remove your selected template fields and default values.",
   thumbnail: "Thumbnail",
