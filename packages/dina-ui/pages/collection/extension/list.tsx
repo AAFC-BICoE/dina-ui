@@ -1,7 +1,7 @@
-import { ColumnDefinition, FieldHeader, useQuery } from "common-ui";
+import { FieldHeader, ReactTable8, useQuery } from "common-ui";
 import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import ReactTable, { Column } from "react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   ExtensionField,
   FieldExtension
@@ -11,11 +11,24 @@ import { useState } from "react";
 import { find } from "lodash";
 
 function getTableColumn(locale: string) {
-  const TABLE_COLUMNS: ColumnDefinition<ExtensionField>[] = [
-    "key",
-    "name",
+  const TABLE_COLUMNS: ColumnDef<ExtensionField>[] = [
     {
-      Cell: ({ original: { multilingualDescription } }) => {
+      id: "key",
+      accessorKey: "key",
+      header: () => <FieldHeader name={"key"} />
+    },
+    {
+      id: "name",
+      accessorKey: "name",
+      header: () => <FieldHeader name={"name"} />
+    },
+    {
+      id: "multilingualDescription",
+      cell: ({
+        row: {
+          original: { multilingualDescription }
+        }
+      }) => {
         const desc =
           find(
             multilingualDescription?.descriptions || [],
@@ -23,29 +36,15 @@ function getTableColumn(locale: string) {
           )?.desc || "";
         return desc;
       },
-      accessor: "multilingualDescription"
+      header: () => <FieldHeader name={"multilingualDescription"} />
     },
-    "dinaComponent"
+    {
+      id: "dinaComponent",
+      accessorKey: "dinaComponent",
+      header: () => <FieldHeader name={"dinaComponent"} />
+    }
   ];
-
-  return TABLE_COLUMNS.map<Column>((column) => {
-    const { fieldName, customHeader } =
-      typeof column === "string"
-        ? {
-            customHeader: undefined,
-            fieldName: column
-          }
-        : {
-            customHeader: column.Header,
-            fieldName: String(column.accessor)
-          };
-
-    const Header = customHeader ?? <FieldHeader name={fieldName} />;
-    return {
-      Header,
-      ...(typeof column === "string" ? { accessor: column } : { ...column })
-    };
-  });
+  return TABLE_COLUMNS;
 }
 
 export default function FieldListPage() {
@@ -95,12 +94,11 @@ export default function FieldListPage() {
             {formatMessage("totalExtenstionFieldsCount")}:{" "}
             {fields?.length ?? response?.data?.[0].extension.fields.length}{" "}
           </span>
-          <ReactTable
+          <ReactTable8<ExtensionField>
             key={fields?.length}
             className="-striped"
             columns={getTableColumn(locale)}
-            data={fields ?? response?.data?.[0].extension.fields}
-            minRows={1}
+            data={fields ?? response?.data?.[0]?.extension?.fields ?? []}
             showPagination={true}
             showPaginationTop={true}
           />
