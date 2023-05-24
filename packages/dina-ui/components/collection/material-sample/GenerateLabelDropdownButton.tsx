@@ -3,10 +3,11 @@ import Dropdown from "react-bootstrap/Dropdown";
 import Button from "react-bootstrap/Button";
 import React, { useState } from "react";
 import { PersistedResource } from "kitsu";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { ReportTemplate } from "packages/dina-ui/types/report-label-api";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import { ReportTemplate } from "../../../../dina-ui/types/report-label-api";
 import Select from "react-select";
-import { useAccount, useQuery } from "packages/common-ui/lib";
+import { useAccount, useQuery } from "../../../../common-ui/lib";
+import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
 
 interface ReportTemplateOption {
   label: string;
@@ -33,8 +34,10 @@ export function GenerateLabelDropdownButton({
   const [reportTemplateOptions, setReportTemplateOptions] = useState<
     ReportTemplateOption[]
   >([]);
+  const [generatingReport, setGeneratingReport] = useState<boolean>(false);
   const { groupNames } = useAccount();
-  const resp = useQuery<ReportTemplate[]>(
+  const { apiClient } = useApiClient();
+  useQuery<ReportTemplate[]>(
     {
       path: "report-label-api/report-template",
       filter: {
@@ -57,43 +60,70 @@ export function GenerateLabelDropdownButton({
     }
   );
 
-  // /**
-  //  * Asynchronous POST request to reports_labels_api. Used to retrieve PDF
-  //  *
-  //  * @param data material sample data for reports_labels_api
-  //  * @param template twig template selected by user
-  //  */
-  // async function generateLabel() {
-  //   if (!template) {
-  //     return;
-  //   }
+  /**
+   * Asynchronous POST request to reports_labels_api. Used to retrieve PDF
+   */
+  async function generateLabel() {
+    if (!reportTemplate) {
+      return;
+    }
+    setGeneratingReport(true);
+    const payloadHeaders = Object.keys(materialSample);
+    const payloadData = Object.values(materialSample).map((value) => {
+      if (value === null || value === undefined) {
+        return "";
+      }
+      return typeof value !== "string" ? JSON.stringify(value) : value;
+    });
 
-  //   // axios post request
-  //   try {
-  //     await apiClient.axios
-  //       .post(
-  //         `/report-label-api/labels/v1.0/?template=${template.value}&format=pdf`,
-  //         data,
-  //         { responseType: "blob" }
-  //       )
-  //       .then((response) => {
-  //         window.open(URL.createObjectURL(response.data)); // open pdf in new tab
+    const postData = {
+      data: {
+        type: "report-request",
+        attributes: {
+          group: "aafc",
+          reportTemplateUUID: "2cdbbce9-7a15-4745-9b3f-bff7f4ee19b0",
+          payload: {
+            headers: payloadHeaders,
+            data: [payloadData]
+          }
+        }
+      }
+    };
 
-  //         // Download PDF. Keep this for now in case client wants to change behavior
-  //         // const url = window.URL.createObjectURL(new Blob([response.data]));
-  //         // const link = document.createElement("a");
-  //         // link.href = url;
-  //         // link.setAttribute(
-  //         //   "download",
-  //         //   `${materialSample?.materialSampleName}.pdf`
-  //         // ); // or any other extension
-  //         // document.body.appendChild(link);
-  //         // link.click();
-  //       });
-  //   } catch (error) {
-  //     return error;
-  //   }
-  // }
+    // try {
+
+    //   // .then((response) => {
+    //   //   window.open(URL.createObjectURL(response.data)); // open pdf in new tab
+
+    //   //   // Download PDF. Keep this for now in case client wants to change behavior
+    //   //   // const url = window.URL.createObjectURL(new Blob([response.data]));
+    //   //   // const link = document.createElement("a");
+    //   //   // link.href = url;
+    //   //   // link.setAttribute(
+    //   //   //   "download",
+    //   //   //   `${materialSample?.materialSampleName}.pdf`
+    //   //   // ); // or any other extension
+    //   //   // document.body.appendChild(link);
+    //   //   // link.click();
+    //   // });
+    // } catch (error) {
+    //   setLoading(false);
+    //   return error;
+    // }
+    const response = await apiClient.axios.post(
+      "report-label-api/report-request",
+      postData,
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json"
+        }
+      }
+    );
+    // const resp = useQuery(
+    //   { path: `report-label-api/file/${response?.data?.data?.id}`, responseType: "blob" }
+    // );
+    setGeneratingReport(false);
+  }
 
   const CustomMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
@@ -121,11 +151,15 @@ export function GenerateLabelDropdownButton({
             value={reportTemplate}
           />
           <Button
-            // onClick={generateLabel}
+            onClick={generateLabel}
             className="mt-3"
-            disabled={reportTemplate === undefined}
+            disabled={reportTemplate === undefined || generatingReport}
           >
-            <DinaMessage id="generateLabel" />
+            {generatingReport ? (
+              "Generating Report..."
+            ) : (
+              <DinaMessage id="generateLabel" />
+            )}
           </Button>
         </div>
       );
