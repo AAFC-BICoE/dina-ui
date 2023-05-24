@@ -14,10 +14,16 @@ jobs:
           cache: 'yarn'
       - run: yarn install 
 
-        # Lists all of the available tests and splits it into a number of groups.
+        # Steps being performed here:
+        # npx jest --listTests: List all of the available tests.
+        # shuf: Shuffle the list randomly.
+        # awk NF: Remove additional empty lines.
+        # jq -R .: Convert each line to a JSON string.
+        # jq -s .: Combine them all into a single JSON array.
+        # jq -cM ...: This part will split it into 6 groups. The last group will probably not have enough to fill the full group.
       - id: set-test-chunks
         name: split tests into chunks
-        run: echo "test-chunks=$(npx jest --listTests --json | jq -cM '[_nwise(length / 5 | floor)]')" >> $GITHUB_OUTPUT
+        run: echo "test-chunks=$(npx jest --listTests | shuf | awk NF | jq -R . | jq -s . | jq -cM '[_nwise(length / 5 | floor)]')" >> $GITHUB_OUTPUT
 
       - id: set-test-chunk-ids
         name: Set Chunk IDs
