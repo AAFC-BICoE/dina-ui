@@ -8,6 +8,11 @@ import { ReportTemplate } from "packages/dina-ui/types/report-label-api";
 import Select from "react-select";
 import { useAccount, useQuery } from "packages/common-ui/lib";
 
+interface ReportTemplateOption {
+  label: string;
+  value: string;
+}
+
 type CustomMenuProps = {
   children?: React.ReactNode;
   style?: React.CSSProperties;
@@ -22,21 +27,35 @@ interface GenerateLabelDropdownButtonProps {
 export function GenerateLabelDropdownButton({
   materialSample
 }: GenerateLabelDropdownButtonProps) {
-  const [template, setTemplate] = useState<string>();
+  const [reportTemplate, setReportTemplate] = useState<
+    ReportTemplateOption | undefined
+  >();
+  const [reportTemplateOptions, setReportTemplateOptions] = useState<
+    ReportTemplateOption[]
+  >([]);
   const { groupNames } = useAccount();
-  const resp = useQuery<ReportTemplate[]>({
-    path: "report-label-api/report-template",
-    filter: {
-      rsql: `group=in=(${groupNames})`
-    }
-  });
-  const options = resp?.response?.data?.map((reportTemplate) => ({
-    label: reportTemplate.name,
-    value: reportTemplate.id
-  }));
+  const resp = useQuery<ReportTemplate[]>(
+    {
+      path: "report-label-api/report-template",
+      filter: {
+        rsql: `group=in=(${groupNames})`
+      }
+    },
+    {
+      onSuccess: async ({ data }) => {
+        const generatedOptions = data.map((template) => ({
+          label: template?.name ?? "",
+          value: template?.id ?? ""
+        }));
+        setReportTemplateOptions(generatedOptions);
 
-  // data for POST request
-  const data = [materialSample];
+        // If options are available, just set the first one automatically.
+        if (generatedOptions.length > 0) {
+          setReportTemplate(generatedOptions[0]);
+        }
+      }
+    }
+  );
 
   // /**
   //  * Asynchronous POST request to reports_labels_api. Used to retrieve PDF
@@ -92,18 +111,19 @@ export function GenerateLabelDropdownButton({
           <strong>
             <DinaMessage id="selectTemplate" />
           </strong>
-          <Select
+          <Select<ReportTemplateOption>
             className="mt-2"
             name="template"
-            options={options}
-            onChange={(selection) => setTemplate(selection?.value)}
+            options={reportTemplateOptions}
+            onChange={(selection) => selection && setReportTemplate(selection)}
             autoFocus={true}
             isClearable={true}
+            value={reportTemplate}
           />
           <Button
             // onClick={generateLabel}
             className="mt-3"
-            disabled={template === undefined}
+            disabled={reportTemplate === undefined}
           >
             <DinaMessage id="generateLabel" />
           </Button>
