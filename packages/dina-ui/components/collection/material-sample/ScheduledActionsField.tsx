@@ -135,14 +135,14 @@ export function ScheduledActionsField({
             cell: ({ row }) => (
               <div className={`d-flex gap-3`}>
                 <FormikButton
-                  className="btn btn-primary mb-3 edit-button"
+                  className="btn btn-primary edit-button"
                   buttonProps={buttonProps}
                   onClick={() => openRowEditor(row)}
                 >
                   <DinaMessage id="editButtonText" />
                 </FormikButton>
                 <FormikButton
-                  className="btn btn-danger mb-3 remove-button"
+                  className="btn btn-danger remove-button"
                   buttonProps={buttonProps}
                   onClick={(_, form) => removeAction(form, row.index)}
                 >

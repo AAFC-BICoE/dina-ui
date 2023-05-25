@@ -239,13 +239,19 @@ export function ReactTable8<TData>({
                   <DraggableRow
                     row={row}
                     reorderRow={reorderRow}
-                    className={index % 2 === 0 ? "-odd" : "-even"}
+                    className={classnames(
+                      `index-${index}`,
+                      index % 2 === 0 ? "-odd" : "-even"
+                    )}
                     style={rowStyling ? rowStyling(row) : undefined}
                   />
                 ) : (
                   <DefaultRow
                     row={row}
-                    className={index % 2 === 0 ? "-odd" : "-even"}
+                    className={classnames(
+                      `index-${index}`,
+                      index % 2 === 0 ? "-odd" : "-even"
+                    )}
                     style={rowStyling ? rowStyling(row) : undefined}
                   />
                 )}
