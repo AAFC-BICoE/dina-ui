@@ -1,3 +1,4 @@
+import { ColumnDef } from "@tanstack/react-table";
 import {
   AutoSuggestTextField,
   BackButton,
@@ -10,6 +11,7 @@ import {
   NumberField,
   QueryPage,
   RadioButtonsField,
+  ReactTable8,
   StringArrayField,
   SubmitButton,
   TextField,
@@ -21,9 +23,6 @@ import {
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { TabbedArrayField } from "../../../components/collection/TabbedArrayField";
-import { TagSelectField } from "../../../components/tag-editor/TagSelectField";
-import { Person } from "../../../types/objectstore-api";
 import {
   AttachmentsField,
   GroupSelectField,
@@ -31,16 +30,18 @@ import {
   Nav,
   PersonSelectField
 } from "../../../components";
+import { TabbedArrayField } from "../../../components/collection/TabbedArrayField";
 import { ManagedAttributesEditor } from "../../../components/managed-attributes/ManagedAttributesEditor";
+import { TagSelectField } from "../../../components/tag-editor/TagSelectField";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
-import ReactTable, { Column } from "react-table";
+import { Person } from "../../../types/objectstore-api";
+import { compact, pick } from "lodash";
 import Link from "next/link";
-import { SeqdbMessage } from "../../../intl/seqdb-intl";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { useState, Dispatch, SetStateAction, useEffect } from "react";
-import { pick, compact } from "lodash";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -410,36 +411,39 @@ export function TransactionFormLayout({
       {readOnly ? (
         <FieldSpy<AgentRole[]> fieldName="agentRoles">
           {(agentRoles) => {
-            const tableColumns: Column<AgentRole>[] = [
+            const tableColumns: ColumnDef<AgentRole>[] = [
               {
                 id: "roles",
-                accessor: (it) => it.roles?.join(", "),
-                Header: <strong>{formatMessage("agentRole")}</strong>,
-                width: 300
+                accessorFn: (it) => it.roles?.join(", "),
+                header: () => <strong>{formatMessage("agentRole")}</strong>,
+                size: 300
               },
               {
                 id: "agentName",
-                accessor: (it) =>
-                  typeof it.agent === "object" && it?.agent?.id ? (
-                    <Link href={`/person/view?id=${it.agent.id}`}>
+                cell: ({ row }) =>
+                  typeof row.original?.agent === "object" &&
+                  row.original?.agent?.id ? (
+                    <Link href={`/person/view?id=${row.original?.agent?.id}`}>
                       <a>
-                        <PersonName id={it.agent.id} />
+                        <PersonName id={row.original?.agent?.id} />
                       </a>
                     </Link>
                   ) : (
-                    it.agent
+                    row.original?.agent
                   ),
-                Header: <strong>{formatMessage("agentName")}</strong>,
-                width: 300
+                header: () => <strong>{formatMessage("agentName")}</strong>,
+                size: 300
               },
               {
-                accessor: "date",
-                Header: <strong>{formatMessage("date")}</strong>,
-                width: 150
+                id: "transactionDate",
+                accessorKey: "date",
+                header: () => <strong>{formatMessage("date")}</strong>,
+                size: 150
               },
               {
-                accessor: "remarks",
-                Header: <strong>{formatMessage("agentRemarks")}</strong>
+                id: "remarks",
+                accessorKey: "remarks",
+                header: () => <strong>{formatMessage("agentRemarks")}</strong>
               }
             ];
 
@@ -450,19 +454,9 @@ export function TransactionFormLayout({
                   fieldName="agentRoles"
                 >
                   <div className="mb-3">
-                    <style>{`
-                      /* Render line breaks in the table.*/
-                      .ReactTable .rt-td {
-                        white-space: pre-wrap !important;
-                      }
-                    `}</style>
-                    <ReactTable
+                    <ReactTable8<AgentRole>
                       columns={tableColumns}
                       data={agentRoles}
-                      minRows={1}
-                      showPagination={false}
-                      sortable={false}
-                      pageSize={agentRoles?.length || 1}
                       className="-striped"
                     />
                   </div>

@@ -124,14 +124,23 @@ export function ReactTable8<TData>({
       }
     : { state: { sorting, columnVisibility } };
 
-  const paginationRowModelOption =
-    (showPagination || showPaginationTop) && manualPagination !== true
-      ? { getPaginationRowModel: getPaginationRowModel() }
+  const getExpandedRowModelOption =
+    renderSubComponent && getRowCanExpand
+      ? { getExpandedRowModel: getExpandedRowModel() }
       : {};
-  const pageCountOption =
-    (showPagination || showPaginationTop) && manualPagination
-      ? { pageCount }
-      : {};
+
+  const onPaginationChangeOption = manualPagination
+    ? {
+        onPaginationChange: onPaginationChangeInternal,
+        pageCount
+      }
+    : {
+        getPaginationRowModel: getPaginationRowModel()
+      };
+
+  const onSortingChangeOption = manualSorting
+    ? { onSortingChange: onSortingChangeInternal }
+    : { onSortingChange: setSorting };
 
   const tableOption = {
     data,
@@ -140,30 +149,22 @@ export function ReactTable8<TData>({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getRowCanExpand,
-    getExpandedRowModel:
-      renderSubComponent && getRowCanExpand ? getExpandedRowModel() : undefined,
-    ...paginationRowModelOption,
-    ...pageCountOption,
-    ...tableStateOption,
+
     getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4()),
     initialState: {
       expanded: defaultExpanded,
       sorting: defaultSorted,
-      pagination: { pageSize }
+      pagination: { pageSize: pageSize ?? pageSizeOptions[0] }
     },
     enableSorting,
     enableMultiSort,
     manualPagination,
-    manualSorting
+    manualSorting,
+    ...getExpandedRowModelOption,
+    ...tableStateOption,
+    ...onPaginationChangeOption,
+    ...onSortingChangeOption
   };
-  if (manualPagination) {
-    Object.assign(tableOption, {
-      onPaginationChange: onPaginationChangeInternal
-    });
-  }
-  Object.assign(tableOption, {
-    onSortingChange: manualSorting ? onSortingChangeInternal : setSorting
-  });
 
   const table = useReactTable<TData>(tableOption);
 
