@@ -119,6 +119,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
                 name="experimenters"
                 isMulti={true}
                 isDisabled={true}
+                placeholder=""
               />
               <DateField
                 className="col-sm-12"
@@ -153,6 +154,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
                 optionLabel={(region) => region.name}
                 readOnlyLink="/seqdb/region/view?id="
                 isDisabled={true}
+                placeholder=""
               />
             </div>
             <div className="row">
