@@ -27,6 +27,7 @@ export function ThermocyclerProfileWorksheetElement({
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
           isDisabled={true}
+          placeholder=""
         />
       </DinaFormSection>
       <div className={styles["step-container"]}>
