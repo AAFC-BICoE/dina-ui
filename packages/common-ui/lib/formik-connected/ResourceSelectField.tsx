@@ -63,7 +63,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
               invalid={invalid}
               onChange={onChangeInternal}
               value={value}
-              placeholder={placeholder}
+              placeholder={placeholder ?? resourceSelectProps?.placeholder}
             />
           </div>
         );
