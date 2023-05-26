@@ -6,6 +6,8 @@ import { ColumnDefinition } from "../table/QueryTable";
 import { useGroupedCheckBoxes } from "./GroupedCheckBoxFields";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { useFormikContext } from "formik";
+import { ReactTable8 } from "../table8/ReactTable8";
+import { ColumnDef } from "@tanstack/react-table";
 
 export interface PlaceSectionsSelectionFieldProps extends FieldWrapperProps {
   isDisabled?: boolean;
@@ -39,61 +41,44 @@ export function PlaceSectionsSelectionField(
     setCustomGeographicPlaceCheckboxState
   });
 
-  const PLACE_SECTIONS_TABLE_READONLY_COLUMNS: ColumnDefinition<SourceAdministrativeLevel>[] =
+  const PLACE_SECTIONS_TABLE_READONLY_COLUMNS: ColumnDef<SourceAdministrativeLevel>[] =
     [
       {
-        accessor: "name",
-        sortable: false
+        id: "name",
+        accessorKey: "name",
+        header: () => <FieldHeader name="name" />,
+        enableSorting: false
       }
     ];
 
-  const PLACE_SECTIONS_TABLE_COLUMNS: ColumnDefinition<SourceAdministrativeLevel>[] =
-    [
-      ...PLACE_SECTIONS_TABLE_READONLY_COLUMNS,
-      ...(!hideSelectionCheckBox
-        ? [
-            {
-              Cell: ({ original: section }) => {
-                const disableCustomGeographicPlace =
-                  !!customPlaceValue && !section.id && section.shortId !== 0;
-                return (
-                  <CheckBoxField
-                    key={section.id}
-                    resource={section}
-                    disabled={disableCustomGeographicPlace}
-                    setCustomGeographicPlaceCheckboxState={
-                      !section.id
-                        ? setCustomGeographicPlaceCheckboxState
-                        : undefined
-                    }
-                  />
-                );
-              },
-              Header: CheckBoxHeader,
-              sortable: false
-            }
-          ]
-        : [])
-    ];
-
-  const mappedColumns = PLACE_SECTIONS_TABLE_COLUMNS.map<Column>((column) => {
-    const { fieldName, customHeader } =
-      typeof column === "string"
-        ? {
-            customHeader: undefined,
-            fieldName: column
+  const PLACE_SECTIONS_TABLE_COLUMNS: ColumnDef<SourceAdministrativeLevel>[] = [
+    ...PLACE_SECTIONS_TABLE_READONLY_COLUMNS,
+    ...(!hideSelectionCheckBox
+      ? [
+          {
+            id: "select",
+            cell: ({ row: { original: section } }) => {
+              const disableCustomGeographicPlace =
+                !!customPlaceValue && !section.id && section.shortId !== 0;
+              return (
+                <CheckBoxField
+                  key={section.id}
+                  resource={section}
+                  disabled={disableCustomGeographicPlace}
+                  setCustomGeographicPlaceCheckboxState={
+                    !section.id
+                      ? setCustomGeographicPlaceCheckboxState
+                      : undefined
+                  }
+                />
+              );
+            },
+            header: () => <CheckBoxHeader />,
+            enableSorting: false
           }
-        : {
-            customHeader: column.Header,
-            fieldName: String(column.accessor)
-          };
-
-    const Header = customHeader ?? <FieldHeader name={fieldName} />;
-    return {
-      Header,
-      ...(typeof column === "string" ? { accessor: column } : { ...column })
-    };
-  });
+        ]
+      : [])
+  ];
 
   const defaultReadOnlyRender = (
     value?: SourceAdministrativeLevel[] | null
@@ -118,11 +103,10 @@ export function PlaceSectionsSelectionField(
     >
       {() => {
         return (
-          <ReactTable
+          <ReactTable8<SourceAdministrativeLevel>
             className="-striped"
-            columns={mappedColumns}
+            columns={PLACE_SECTIONS_TABLE_COLUMNS}
             data={displayData}
-            minRows={1}
             showPagination={false}
           />
         );
