@@ -217,3 +217,7 @@
   -webkit-transform: translate(-50%, -50%) rotate(0);
   transform: translate(-50%, -50%) rotate(0);
 }
+
+.react-table-overflow tbody td {
+  overflow: visible !important;
+}
