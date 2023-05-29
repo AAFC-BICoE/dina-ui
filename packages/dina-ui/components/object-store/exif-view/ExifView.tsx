@@ -1,4 +1,4 @@
-import { KeyValueTable, useCollapser } from "common-ui";
+import { KeyValueTable8, useCollapser } from "common-ui";
 import { ReactNode } from "react";
 import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -44,7 +44,7 @@ export function ExifView({ objectUpload }: ObjectUploadProps) {
         title={formatMessage("exifProperties")}
         key={objectUpload.fileIdentifier}
       >
-        <KeyValueTable data={objectUpload.exif} />
+        <KeyValueTable8 data={objectUpload.exif} />
       </CollapsableSection>
     );
   }
