@@ -121,3 +121,22 @@ jobs:
           push: true
           tags: aafcbicoe/dina-ui:${{ env.VERSION_TAG }}
           provenance: false
+
+  build-docs:
+    runs-on: ubuntu-latest
+   # if: ${{ github.ref == 'refs/heads/master' }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Building ascii docs
+        run: |
+          yarn docs
+          
+      - name: Deploy GitHub Pages (only on master branch)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: generated-docs
+          
