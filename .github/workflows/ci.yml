@@ -1,30 +1,82 @@
 name: Java CI
-
 on: [push]
-
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
-
+    outputs:
+      test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+      test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '16'
           cache: 'yarn'
-      - name: yarn test and build
+      - run: yarn install 
+
+        # Steps being performed here:
+        # npx jest --listTests: List all of the available tests.
+        # shuf: Shuffle the list randomly.
+        # awk NF: Remove additional empty lines.
+        # jq -R .: Convert each line to a JSON string.
+        # jq -s .: Combine them all into a single JSON array.
+        # jq -cM ...: This part will split it into 6 groups. The last group will probably not have enough to fill the full group.
+      - id: set-test-chunks
+        name: split tests into chunks
+        run: echo "test-chunks=$(npx jest --listTests | shuf | awk NF | jq -R . | jq -s . | jq -cM '[_nwise(length / 5 | floor)]')" >> $GITHUB_OUTPUT
+
+      - id: set-test-chunk-ids
+        name: Set Chunk IDs
+        run: echo "test-chunk-ids=$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')" >> $GITHUB_OUTPUT
+        env:
+          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+
+  test-chunk:
+    runs-on: ubuntu-latest
+    name: Run tests (Chunk ${{ matrix.chunk }})
+    needs:
+      - setup
+    strategy:
+      matrix:
+        chunk: ${{ fromJson(needs.setup.outputs['test-chunk-ids']) }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'yarn'
+      - run: yarn install
+      - name: Run all tests in chunk
+        run: echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npx jest
+        env:
+          CHUNKS: ${{ needs.setup.outputs['test-chunks'] }}
+
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' }}
+    needs:
+      - setup
+      - test-chunk
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'yarn'
+
+      - name: Install
         run: |
           yarn install
-          yarn test:coverage;
+
+      - name: Build UI project
+        run: |
           yarn workspace dina-ui build
 
       - name: Extract Version
-        if: ${{ github.ref == 'refs/heads/master' }}
         run: |
           jq -r ".version" packages/dina-ui/package.json > version.txt
 
       - name: Store artifacts
-        if: ${{ github.ref == 'refs/heads/master' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts
@@ -33,6 +85,7 @@ jobs:
             packages/dina-ui/out
             Dockerfile
             version.txt
+
   push:
     name: Build Docker Image and Push to DockerHub
     needs: [build]
@@ -68,3 +121,28 @@ jobs:
           push: true
           tags: aafcbicoe/dina-ui:${{ env.VERSION_TAG }}
           provenance: false
+
+  build-docs:
+    runs-on: ubuntu-latest
+    # if: ${{ github.ref == 'refs/heads/master' }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Building ascii docs
+        run: |
+          yarn install
+          yarn docs
+      
+      - name: Copy images for UI dev docs
+        run: |
+          mkdir generated-docs/images
+          cp -r ./docs/images generated-docs
+          
+      - name: Deploy GitHub Pages (only on master branch)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: generated-docs
+          
