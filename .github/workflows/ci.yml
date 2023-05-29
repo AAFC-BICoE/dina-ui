@@ -132,7 +132,7 @@ jobs:
           node-version: '16'
       - name: Building ascii docs
         run: |
-          yarn docs
+          yarn install docs
           
       - name: Deploy GitHub Pages (only on master branch)
         uses: peaceiris/actions-gh-pages@v3
