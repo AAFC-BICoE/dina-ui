@@ -1,4 +1,5 @@
 import {
+  ButtonBar,
   ColumnDefinition,
   dateCell,
   DateView,
@@ -186,19 +187,19 @@ export function RevisionsPage({
       <>
         <Head title={pageTitle} />
         <Nav />
-        <main className="container-fluid">
+        <main className="container-fluid px-5">
           <h1 id="wb-cont">{pageTitle}</h1>
-          <div className="mb-3">
+          <ButtonBar>
             <Link
               href={`${detailsPageLink}/${
                 isExternalResourceMetadata ? "external-resource-view" : "view"
               }?id=${resource.id}`}
             >
-              <a>
+              <a className="back-button my-auto me-auto">
                 <DinaMessage id="detailsPageLink" />
               </a>
             </Link>
-          </div>
+          </ButtonBar>
           <RevisionsPageLayout
             auditSnapshotPath={auditSnapshotPath}
             instanceId={`${resourceType}/${id}`}

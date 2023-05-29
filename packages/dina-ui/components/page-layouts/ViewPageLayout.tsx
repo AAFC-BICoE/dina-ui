@@ -97,7 +97,7 @@ export function ViewPageLayout<T extends KitsuResource>({
   deleteButton,
   showDeleteButton = true,
   showEditButton = true,
-  mainClass = "container",
+  mainClass = "container-fluid px-5",
   showRevisionsLink,
   showRevisionsLinkAtBottom,
   tooltipNode,
@@ -153,6 +153,14 @@ export function ViewPageLayout<T extends KitsuResource>({
           return (
             <>
               <Head title={title} />
+              
+              <h1 id="wb-cont" className="d-flex justify-content-between">
+                <span>
+                  {title}
+                  {tooltipNode}
+                </span>
+                <span>{group}</span>
+              </h1>
               <ButtonBar className="gap-2">
                 {specialListUrl ? (
                   <Link href={specialListUrl}>
@@ -195,13 +203,6 @@ export function ViewPageLayout<T extends KitsuResource>({
                     />
                   ))}
               </ButtonBar>
-              <h1 id="wb-cont" className="d-flex justify-content-between">
-                <span>
-                  {title}
-                  {tooltipNode}
-                </span>
-                <span>{group}</span>
-              </h1>
               {form(formProps)}
               {showRevisionsLinkAtBottom && (
                 <Link href={`${entityLink}/revisions?id=${id}`}>
