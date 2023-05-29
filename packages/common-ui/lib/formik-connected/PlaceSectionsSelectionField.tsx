@@ -1,13 +1,11 @@
-import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
-import { SourceAdministrativeLevel } from "../../../dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
-import React, { Dispatch, SetStateAction } from "react";
-import ReactTable, { Column } from "react-table";
-import { ColumnDefinition } from "../table/QueryTable";
-import { useGroupedCheckBoxes } from "./GroupedCheckBoxFields";
-import { FieldHeader } from "../field-header/FieldHeader";
-import { useFormikContext } from "formik";
-import { ReactTable8 } from "../table8/ReactTable8";
 import { ColumnDef } from "@tanstack/react-table";
+import { useFormikContext } from "formik";
+import { Dispatch, SetStateAction } from "react";
+import { SourceAdministrativeLevel } from "../../../dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import { FieldHeader } from "../field-header/FieldHeader";
+import { ReactTable8 } from "../table8/ReactTable8";
+import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
+import { useGroupedCheckBoxes } from "./GroupedCheckBoxFields";
 
 export interface PlaceSectionsSelectionFieldProps extends FieldWrapperProps {
   isDisabled?: boolean;
