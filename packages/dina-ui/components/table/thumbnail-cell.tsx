@@ -65,7 +65,7 @@ export function thumbnailCell8({
       const bucket = get<string | undefined>(original, bucketField);
 
       const fileId = `${fileIdentifier}/thumbnail`;
-      const filePath = `/api/objectstore-api/file/${bucket}/${fileId}`;
+      const filePath = `/objectstore-api/file/${bucket}/${fileId}`;
       const resourceExternalURL =
         original?.data?.attributes?.resourceExternalURL;
 
