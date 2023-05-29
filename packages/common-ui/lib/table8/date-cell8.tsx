@@ -1,6 +1,6 @@
 import { DateView } from "../date/DateView";
 import { get } from "lodash";
-import { TableColumn, TableColumn8 } from "../list-page/types";
+import { TableColumn8 } from "../list-page/types";
 import { FieldHeader } from "../field-header/FieldHeader";
 
 /** Renders a date cell into a table in a user-friendly / readable format. */
