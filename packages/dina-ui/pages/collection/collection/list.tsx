@@ -10,6 +10,7 @@ import Link from "next/link";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection } from "../../../types/collection-api";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 const COLLECTION_TABLE_COLUMNS: ColumnDefinition<Collection>[] = [
   {
@@ -35,18 +36,20 @@ const COLLECTION_FILTER_ATTRIBUTES: FilterAttribute[] = [
 
 export default function CollectionListPage() {
   const { formatMessage } = useDinaIntl();
+  const buttonBarContent = <CreateButton entityLink="/collection/collection" />
 
   return (
-    <div>
-      <Head title={formatMessage("collectionListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="collectionListTitle" />
-        </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/collection" />
-        </ButtonBar>
+    <PageLayout
+    titleId="collectionListTitle"
+    headingTooltip={{
+      id: "Needs tooltip",
+      link: "https://aafc-bicoe.github.io/dina-documentation/#collection",
+      linkText: "fromDinaUserGuide",
+      placement: "right"
+    }}
+    buttonBarContent={buttonBarContent}
+  >
+
         <ListPageLayout
           additionalFilters={filterForm => ({
             // Apply group filter:
@@ -71,7 +74,6 @@ export default function CollectionListPage() {
             </div>
           )}
         />
-      </main>
-    </div>
+    </PageLayout>
   );
 }
