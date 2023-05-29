@@ -49,7 +49,7 @@ export default function CollectionEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid px-5">
         {id ? (
           withResponse(collectionQuery, ({ data }) => (
             <CollectionForm collection={data} router={router} />
