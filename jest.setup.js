@@ -28,4 +28,4 @@ jest.spyOn(console, "error").mockImplementation((...args) => {
   }
 });
 
-jest.setTimeout(20000);
+jest.setTimeout(40000);

@@ -1,28 +1,29 @@
+import { ColumnDef, Row } from "@tanstack/react-table";
 import {
   AutoSuggestTextField,
-  AutoSuggestTextFieldProps,
   DateField,
   DinaForm,
   DinaFormSection,
+  FieldHeader,
   FieldSet,
   FieldSpy,
   FormikButton,
   JsonApiQuerySpec,
   OnFormikSubmit,
+  ReactTable8,
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { FastField, FormikContextType } from "formik";
+import { FormikContextType } from "formik";
 import { isEmpty } from "lodash";
 import { Fragment, ReactNode, useState } from "react";
-import ReactTable, { CellInfo, Column } from "react-table";
 import * as yup from "yup";
 import { UserSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
-  ScheduledAction,
-  SCHEDULED_ACTIONS_COMPONENT_NAME
+  SCHEDULED_ACTIONS_COMPONENT_NAME,
+  ScheduledAction
 } from "../../../types/collection-api";
 
 /** Type-safe object with all ScheduledAction fields. */
@@ -65,13 +66,14 @@ export function ScheduledActionsField({
   const { formatMessage } = useDinaIntl();
 
   const [actionToEdit, setActionToEdit] = useState<
-    "NEW" | { index: number; viewIndex: number } | null
+    "NEW" | { index: number } | null
   >(null);
 
   const isEditing = !!actionToEdit;
 
-  function openRowEditor(row: CellInfo) {
-    setActionToEdit({ index: row.index, viewIndex: row.viewIndex });
+  function openRowEditor(row: Row<ScheduledAction>) {
+    row.getToggleExpandedHandler()();
+    setActionToEdit({ index: row.index });
   }
 
   function removeAction(
@@ -90,14 +92,27 @@ export function ScheduledActionsField({
 
   const buttonProps = () => ({ disabled: isEditing, style: { width: "7rem" } });
 
-  const actionColumns: Column[] = [
-    { accessor: "actionType", Header: formatMessage("actionType") },
-    { accessor: "date", Header: formatMessage("date") },
-    { accessor: "actionStatus", Header: formatMessage("status") },
+  const actionColumns: ColumnDef<ScheduledAction>[] = [
     {
-      accessor: "assignedTo",
-      Header: formatMessage("assignedTo"),
-      Cell: (row) => (
+      id: "actionType",
+      accessorKey: "actionType",
+      header: () => <FieldHeader name={formatMessage("actionType")} />
+    },
+    {
+      id: "date",
+      accessorKey: "date",
+      header: () => <FieldHeader name={formatMessage("date")} />
+    },
+    {
+      id: "actionStatus",
+      accessorKey: "actionStatus",
+      header: () => <FieldHeader name={formatMessage("status")} />
+    },
+    {
+      id: "assignedTo",
+      accessorKey: "assignedTo",
+      header: () => <FieldHeader name={formatMessage("assignedTo")} />,
+      cell: ({ row }) => (
         <DinaFormSection readOnly={true}>
           <UserSelectField
             name={`${fieldName}[${row.index}].assignedTo`}
@@ -106,22 +121,28 @@ export function ScheduledActionsField({
         </DinaFormSection>
       )
     },
-    { accessor: "remarks", Header: formatMessage("remarks") },
+    {
+      id: "remarks",
+      accessorKey: "remarks",
+      header: () => <FieldHeader name={formatMessage("remarks")} />
+    },
     ...(readOnly
       ? []
       : [
           {
-            Cell: (row) => (
-              <div className={`d-flex gap-3 index-${row.index}`}>
+            id: "action",
+            size: 270,
+            cell: ({ row }) => (
+              <div className={`d-flex gap-3`}>
                 <FormikButton
-                  className="btn btn-primary mb-3 edit-button"
+                  className="btn btn-primary edit-button"
                   buttonProps={buttonProps}
                   onClick={() => openRowEditor(row)}
                 >
                   <DinaMessage id="editButtonText" />
                 </FormikButton>
                 <FormikButton
-                  className="btn btn-danger mb-3 remove-button"
+                  className="btn btn-danger remove-button"
                   buttonProps={buttonProps}
                   onClick={(_, form) => removeAction(form, row.index)}
                 >
@@ -169,33 +190,30 @@ export function ScheduledActionsField({
             return (
               <>
                 {hasActions && (
-                  <ReactTable
+                  <ReactTable8<ScheduledAction>
                     columns={actionColumns}
                     defaultSorted={[{ id: "date", desc: true }]}
                     data={scheduledActions}
-                    minRows={scheduledActions.length}
                     showPagination={false}
                     className="-striped mb-2"
-                    // Implement the edit feature:
-                    ExpanderComponent={() => null}
-                    expanded={
-                      typeof actionToEdit === "object"
-                        ? { [actionToEdit?.viewIndex ?? -1]: true }
-                        : undefined
-                    }
-                    SubComponent={(row) => (
+                    getRowCanExpand={() => true}
+                    renderSubComponent={({ row }) => (
                       <div className="m-2">
                         <ScheduledActionSubForm
                           actionToEdit={row.original}
                           defaultDate={defaultDate}
                           onSaveAction={saveAction}
                           onCancelClick={
-                            hasActions ? () => setActionToEdit(null) : undefined
+                            hasActions
+                              ? () => {
+                                  setActionToEdit(null);
+                                  row.getToggleExpandedHandler()();
+                                }
+                              : undefined
                           }
                         />
                       </div>
                     )}
-                    sortable={false}
                   />
                 )}
                 {readOnly ? null : !hasActions || actionToEdit === "NEW" ? (
@@ -209,7 +227,7 @@ export function ScheduledActionsField({
                 ) : (
                   <FormikButton
                     className="btn btn-primary mb-3 add-new-button"
-                    buttonProps={() => ({ style: { width: "10rem" } })}
+                    buttonProps={buttonProps}
                     onClick={() => setActionToEdit("NEW")}
                   >
                     <DinaMessage id="addNew" />

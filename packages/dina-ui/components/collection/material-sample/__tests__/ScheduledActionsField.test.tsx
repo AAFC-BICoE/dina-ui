@@ -4,7 +4,7 @@ import { ScheduledActionsField } from "../ScheduledActionsField";
 
 const mockOnSubmit = jest.fn();
 
-const mockBulkGet = jest.fn<any, any>(async paths => {
+const mockBulkGet = jest.fn<any, any>(async (paths) => {
   if (!paths.length) {
     return [];
   }
@@ -13,7 +13,7 @@ const mockBulkGet = jest.fn<any, any>(async paths => {
 const testCtx = {
   apiContext: {
     apiClient: {
-      get: path => {
+      get: (path) => {
         switch (path) {
           case "user-api/user":
           case "collection-api/material-sample":
@@ -71,8 +71,8 @@ describe("ScheduledActionsField", () => {
     });
 
     // The table is shown now:
-    expect(wrapper.find(".ReactTable").exists()).toEqual(true);
-    expect(wrapper.find(".ReactTable .rt-tbody .rt-tr").length).toEqual(1);
+    expect(wrapper.find(".ReactTable8").exists()).toEqual(true);
+    expect(wrapper.find(".ReactTable8 tbody tr").length).toEqual(1);
 
     // Add a second Action:
     wrapper.find("button.add-new-button").simulate("click");
@@ -111,10 +111,10 @@ describe("ScheduledActionsField", () => {
       ]
     });
 
-    expect(wrapper.find(".ReactTable .rt-tbody .rt-tr").length).toEqual(2);
+    expect(wrapper.find(".ReactTable8 tbody tr").length).toEqual(2);
 
     // Edit the first action:
-    wrapper.find(".ReactTable .index-0 button.edit-button").simulate("click");
+    wrapper.find(".ReactTable8 .index-0 button.edit-button").simulate("click");
     wrapper
       .find(".remarks-field textarea")
       .simulate("change", { target: { value: "edited-remarks-1" } });
@@ -145,7 +145,9 @@ describe("ScheduledActionsField", () => {
     });
 
     // Remove the second action:
-    wrapper.find(".ReactTable .index-1 button.remove-button").simulate("click");
+    wrapper
+      .find(".ReactTable8 .index-1 button.remove-button")
+      .simulate("click");
 
     wrapper.find("form").simulate("submit");
 

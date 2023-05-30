@@ -4,6 +4,7 @@ import {
   FieldSet,
   FieldSpy,
   LoadingSpinner,
+  ReactTable8,
   Tooltip,
   useBulkGet,
   useDinaFormContext,
@@ -14,9 +15,8 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { uniqBy } from "lodash";
 import Link from "next/link";
 import { ReactNode } from "react";
-import ReactTable from "react-table";
 import { AllowAttachmentsConfig, AttachmentSection } from "..";
-import { thumbnailCell } from "../..";
+import { thumbnailCell, thumbnailCell8 } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
@@ -54,7 +54,7 @@ export function AttachmentsField(props: AttachmentsFieldProps) {
           <AttachmentsEditor
             {...props}
             value={metadatas}
-            onChange={newMetadatas =>
+            onChange={(newMetadatas) =>
               form.setFieldValue(props.name, newMetadatas)
             }
           />
@@ -78,7 +78,7 @@ export function AttachmentsEditor({
   allowNewFieldName,
   hideAddAttchmentBtn,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true },
-  wrapContent = content => content,
+  wrapContent = (content) => content,
   name
 }: AttachmentsEditorProps) {
   const { isTemplate, readOnly } = useDinaFormContext();
@@ -91,22 +91,22 @@ export function AttachmentsEditor({
   });
 
   const { data: metadatas, loading } = useBulkGet<Metadata>({
-    ids: value.map(it => it.id),
+    ids: value.map((it) => it.id),
     listPath: "objectstore-api/metadata"
   });
 
   async function addAttachedMetadatas(newIds: string[]) {
     onChange(
       uniqBy(
-        [...value, ...newIds.map(it => ({ id: it, type: "metadata" }))],
-        val => val.id
+        [...value, ...newIds.map((it) => ({ id: it, type: "metadata" }))],
+        (val) => val.id
       )
     );
     closeModal();
   }
 
   function removeMetadata(removedId: string) {
-    const newMetadatas = value.filter(it => it.id !== removedId);
+    const newMetadatas = value.filter((it) => it.id !== removedId);
     onChange(newMetadatas);
   }
 
@@ -160,16 +160,16 @@ export function AttachmentsEditor({
             <>
               {value.length ? (
                 <div className="mb-3">
-                  <ReactTable
+                  <ReactTable8
                     columns={[
-                      thumbnailCell({
+                      thumbnailCell8({
                         bucketField: "bucket",
                         fileIdentifierField: "fileIdentifier"
                       }),
                       {
-                        accessor: "originalFilename",
-                        Header: <FieldHeader name="originalFilename" />,
-                        Cell: ({ original: metadata }) => {
+                        id: "originalFilename",
+                        header: () => <FieldHeader name="originalFilename" />,
+                        cell: ({ row: { original: metadata } }) => {
                           // When this Metadata has been deleted, show a "deleted" message in this cell:
                           if (Object.keys(metadata).length === 2) {
                             return (
@@ -193,14 +193,22 @@ export function AttachmentsEditor({
                         }
                       },
                       ...["acCaption", "xmpMetadataDate", "acTags"].map(
-                        accessor => ({
-                          accessor,
-                          Header: <FieldHeader name={accessor} />
+                        (accessor) => ({
+                          id: accessor,
+                          accessorKey: accessor,
+                          header: () => <FieldHeader name={accessor} />
                         })
                       ),
                       {
-                        Header: <FieldHeader name={formatMessage("remove")} />,
-                        Cell: ({ original: { id: mId } }) => (
+                        id: "actionColumn",
+                        header: () => (
+                          <FieldHeader name={formatMessage("remove")} />
+                        ),
+                        cell: ({
+                          row: {
+                            original: { id: mId }
+                          }
+                        }) => (
                           <button
                             className="btn btn-dark remove-attachment"
                             onClick={() => removeMetadata(mId)}
@@ -212,8 +220,6 @@ export function AttachmentsEditor({
                       }
                     ]}
                     data={metadatas ?? []}
-                    minRows={metadatas?.length ?? 0}
-                    showPagination={false}
                   />
                 </div>
               ) : null}
