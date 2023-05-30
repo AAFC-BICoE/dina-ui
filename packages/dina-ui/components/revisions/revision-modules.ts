@@ -17,7 +17,7 @@ import { STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG } from "./revision-row-configs/st
 import { TRANSACTION_REVISION_ROW_CONFIG } from "./revision-row-configs/transacton-revision-config";
 
 /** Custom revision row behavior for Object Store Resources. */
-export const OBJECT_STORE_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType =
+export const OBJECT_STORE_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType8 =
   { metadata: METADATA_REVISION_ROW_CONFIG };
 
 /** Custom revision row behavior for Collection Module Resources. */
