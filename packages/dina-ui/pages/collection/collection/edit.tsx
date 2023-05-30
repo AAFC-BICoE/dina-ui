@@ -116,17 +116,13 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
   return (
     <DinaForm<Collection> initialValues={initialValues} onSubmit={onSubmit}>
       {buttonBar}
-      <CollectionFormFields title={title} />
+      <CollectionFormFields />
     </DinaForm>
   );
 }
 
-export interface CollectionFormFieldsProps {
-  title?: any;
-}
-
 /** Re-usable field layout between edit and view pages. */
-export function CollectionFormFields({ title }: CollectionFormFieldsProps) {
+export function CollectionFormFields() {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const typeOptions: SelectOption<string | undefined>[] = [
