@@ -73,15 +73,18 @@ export function GenerateLabelDropdownButton({
       if (value === null || value === undefined) {
         return "";
       }
-      return typeof value !== "string" ? JSON.stringify(value) : value;
+      const stringify =
+        typeof value !== "string" ? `"${JSON.stringify(value)}"` : value;
+      const ret = stringify.replace(/,/g, ";");
+      return ret;
     });
 
     const postData = {
       data: {
         type: "report-request",
         attributes: {
-          group: "aafc",
-          reportTemplateUUID: "2cdbbce9-7a15-4745-9b3f-bff7f4ee19b0",
+          group: groupNames?.[0],
+          reportTemplateUUID: reportTemplate.value,
           payload: {
             headers: payloadHeaders,
             data: [payloadData]
@@ -90,39 +93,36 @@ export function GenerateLabelDropdownButton({
       }
     };
 
-    // try {
-
-    //   // .then((response) => {
-    //   //   window.open(URL.createObjectURL(response.data)); // open pdf in new tab
-
-    //   //   // Download PDF. Keep this for now in case client wants to change behavior
-    //   //   // const url = window.URL.createObjectURL(new Blob([response.data]));
-    //   //   // const link = document.createElement("a");
-    //   //   // link.href = url;
-    //   //   // link.setAttribute(
-    //   //   //   "download",
-    //   //   //   `${materialSample?.materialSampleName}.pdf`
-    //   //   // ); // or any other extension
-    //   //   // document.body.appendChild(link);
-    //   //   // link.click();
-    //   // });
-    // } catch (error) {
-    //   setLoading(false);
-    //   return error;
-    // }
-    const response = await apiClient.axios.post(
-      "report-label-api/report-request",
-      postData,
-      {
-        headers: {
-          "Content-Type": "application/vnd.api+json"
+    try {
+      const reportTemplatePostResponse = await apiClient.axios.post(
+        "report-label-api/report-request",
+        postData,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json"
+          }
         }
-      }
-    );
-    // const resp = useQuery(
-    //   { path: `report-label-api/file/${response?.data?.data?.id}`, responseType: "blob" }
-    // );
-    setGeneratingReport(false);
+      );
+      const reportRequestGetResponse = await apiClient.axios.get(
+        `report-label-api/file/${reportTemplatePostResponse?.data?.data?.id}`,
+        { responseType: "blob" }
+      );
+      const url = window?.URL.createObjectURL(reportRequestGetResponse?.data);
+      const link = document?.createElement("a");
+      link.href = url;
+      const filePath = reportRequestGetResponse?.config?.url;
+      const fileName = !filePath
+        ? "report.csv"
+        : filePath.substring(filePath.lastIndexOf("/") + 1);
+      link?.setAttribute("download", fileName); // or any other extension
+      document?.body?.appendChild(link);
+      link?.click();
+      window?.URL?.revokeObjectURL(url);
+      setGeneratingReport(false);
+    } catch (error) {
+      setGeneratingReport(false);
+      return error;
+    }
   }
 
   const CustomMenu = React.forwardRef(
