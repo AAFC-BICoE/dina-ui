@@ -12,10 +12,11 @@ import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Head, Nav } from "../../../components";
+import { Head, Nav, ViewPageLayout } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Project } from "../../../types/collection-api/resources/Project";
 import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 interface ProjectFormProps {
   fetchedProject?: Project;
@@ -40,14 +41,8 @@ export default function ProjectEditPage() {
   });
 
   return (
-    <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
-      <main className="container">
+    <PageLayout titleId={title}>
         <div>
-          <h1 id="wb-cont">
-            <DinaMessage id={title} />
-          </h1>
           {id ? (
             withResponse(query, ({ data }) => (
               <ProjectForm fetchedProject={data} onSaved={goToViewPage} />
@@ -56,8 +51,7 @@ export default function ProjectEditPage() {
             <ProjectForm onSaved={goToViewPage} />
           )}
         </div>
-      </main>
-    </div>
+    </PageLayout>
   );
 }
 

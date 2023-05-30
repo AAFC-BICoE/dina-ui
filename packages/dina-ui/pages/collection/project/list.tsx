@@ -7,6 +7,7 @@ import {
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 const PROJECT_FILTER_ATTRIBUTES = ["name", "status", "multilingualDescription"];
 const PROJECT_TABLE_COLUMNS = [
@@ -24,16 +25,7 @@ export default function collectionMethodListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
-    <div>
-      <Head title={formatMessage("projectListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="projectListTitle" />
-        </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/project" />
-        </ButtonBar>
+    <PageLayout titleId="projectListTitle" buttonBarContent = {<CreateButton entityLink="/collection/project" />}>
         <ListPageLayout
           filterAttributes={PROJECT_FILTER_ATTRIBUTES}
           id="project-list"
@@ -48,8 +40,7 @@ export default function collectionMethodListPage() {
             ]
           }}
         />
-      </main>
       <Footer />
-    </div>
+    </PageLayout>
   );
 }
