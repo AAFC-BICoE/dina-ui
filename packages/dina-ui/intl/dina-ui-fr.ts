@@ -761,8 +761,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   tags: "Étiquettes",
   target: "Cible",
   template: "Modèle",
-  template_AAFC_Beaver_ZT410: "AAFC_Beaver_ZT410",
-  template_AAFC_Zebra_ZT410: "AAFC_Zebra_ZT410",
   thisWillRemoveYourTemplate:
     "Cette opération supprimera les champs du modèle sélectionnés et les valeurs par défaut.",
   thumbnail: "Vignette",
