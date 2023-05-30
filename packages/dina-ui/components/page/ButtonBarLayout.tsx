@@ -20,7 +20,7 @@ export default function ButtonBarLayout({ children }) {
           }
         `}
       </style>
-      <div className="btn-bar container-fluid px-5 d-flex mb-4">{children}</div>
+      <div className="btn-bar container-fluid d-flex mb-4">{children}</div>
     </>
   );
 }

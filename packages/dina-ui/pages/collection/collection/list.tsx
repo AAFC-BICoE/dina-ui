@@ -36,44 +36,37 @@ const COLLECTION_FILTER_ATTRIBUTES: FilterAttribute[] = [
 
 export default function CollectionListPage() {
   const { formatMessage } = useDinaIntl();
-  const buttonBarContent = <CreateButton entityLink="/collection/collection" />
+  const buttonBarContent = <CreateButton entityLink="/collection/collection" />;
 
   return (
     <PageLayout
-    titleId="collectionListTitle"
-    headingTooltip={{
-      id: "Needs tooltip",
-      link: "https://aafc-bicoe.github.io/dina-documentation/#collection",
-      linkText: "fromDinaUserGuide",
-      placement: "right"
-    }}
-    buttonBarContent={buttonBarContent}
-  >
-
-        <ListPageLayout
-          additionalFilters={filterForm => ({
-            // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-          })}
-          filterAttributes={COLLECTION_FILTER_ATTRIBUTES}
-          id="collection-list"
-          queryTableProps={{
-            columns: COLLECTION_TABLE_COLUMNS,
-            path: "collection-api/collection"
-          }}
-          filterFormchildren={({ submitForm }) => (
-            <div className="mb-3">
-              <div style={{ width: "300px" }}>
-                <GroupSelectField
-                  onChange={() => setImmediate(submitForm)}
-                  name="group"
-                  showAnyOption={true}
-                  showAllGroups={true}
-                />
-              </div>
+      titleId="collectionListTitle"
+      buttonBarContent={buttonBarContent}
+    >
+      <ListPageLayout
+        additionalFilters={(filterForm) => ({
+          // Apply group filter:
+          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+        })}
+        filterAttributes={COLLECTION_FILTER_ATTRIBUTES}
+        id="collection-list"
+        queryTableProps={{
+          columns: COLLECTION_TABLE_COLUMNS,
+          path: "collection-api/collection"
+        }}
+        filterFormchildren={({ submitForm }) => (
+          <div className="mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+                showAllGroups={true}
+              />
             </div>
-          )}
-        />
+          </div>
+        )}
+      />
     </PageLayout>
   );
 }

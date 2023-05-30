@@ -1,6 +1,5 @@
 import {
   BackButton,
-  ButtonBar,
   DateField,
   DinaForm,
   DinaFormSubmitParams,
@@ -15,21 +14,17 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
-import {
-  GroupSelectField,
-  Head,
-  Nav,
-  IdentifierFields
-} from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Collection, Institution } from "../../../types/collection-api";
+import { GroupSelectField, IdentifierFields } from "../../../components";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { Collection } from "../../../types/collection-api";
 import { toPairs, fromPairs } from "lodash";
 import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
+import PageLayout from "../../../components/page/PageLayout";
+import ButtonBarLayout from "../../../components/page/ButtonBarLayout";
 
 export default function CollectionEditPage() {
   const router = useRouter();
-  const { formatMessage } = useDinaIntl();
 
   const {
     query: { id }
@@ -46,19 +41,15 @@ export default function CollectionEditPage() {
   const title = id ? "editCollectionTitle" : "addCollectionTitle";
 
   return (
-    <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
-      <main className="container-fluid px-5">
-        {id ? (
-          withResponse(collectionQuery, ({ data }) => (
-            <CollectionForm collection={data} router={router} />
-          ))
-        ) : (
-          <CollectionForm router={router} />
-        )}
-      </main>
-    </div>
+    <PageLayout titleId={title}>
+      {id ? (
+        withResponse(collectionQuery, ({ data }) => (
+          <CollectionForm collection={data} router={router} />
+        ))
+      ) : (
+        <CollectionForm router={router} />
+      )}
+    </PageLayout>
   );
 }
 
@@ -113,13 +104,13 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
   }
 
   const buttonBar = (
-    <ButtonBar>
+    <ButtonBarLayout>
       <BackButton
         entityId={collection?.id}
         entityLink="/collection/collection"
       />
       <SubmitButton className="ms-auto" />
-    </ButtonBar>
+    </ButtonBarLayout>
   );
 
   return (
@@ -155,11 +146,6 @@ export function CollectionFormFields({ title }: CollectionFormFieldsProps) {
 
   return (
     <div>
-      {title && (
-        <h1 id="wb-cont">
-          <DinaMessage id={title} />
-        </h1>
-      )}
       <div className="row">
         {/* <ResourceSelectField<Institution>
           name="institution"

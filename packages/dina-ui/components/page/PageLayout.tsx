@@ -63,9 +63,6 @@ export default function PageLayout({
     <>
       <Head title={title} />
       <Nav marginBottom={false} />
-
-
-
       <main className="container-fluid px-5" role="main">
         {/* Display the title as a heading in the main content. */}
         {displayHeading && (
@@ -74,10 +71,10 @@ export default function PageLayout({
             {headingTooltip && <Tooltip {...headingTooltip} />}
           </h1>
         )}
-      {/* Button Bar */}
-      {buttonBarContent && (
-        <ButtonBarLayout>{buttonBarContent}</ButtonBarLayout>
-      )}
+        {/* Button Bar */}
+        {buttonBarContent && (
+          <ButtonBarLayout>{buttonBarContent}</ButtonBarLayout>
+        )}
         {children}
       </main>
       <Footer />
