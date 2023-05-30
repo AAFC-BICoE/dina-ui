@@ -37,7 +37,7 @@ export interface DinaFormContextI {
    * If a [number, number] is passed then those are the bootstrap grid columns for the label and value.
    * "true" defaults to [6, 6].
    */
-  horizontal?: boolean | [number, number] | "flex";
+  horizontal?: boolean | [number, number] | "flex" | number;
 
   /** The initial form values passed into Formik. */
   initialValues?: any;

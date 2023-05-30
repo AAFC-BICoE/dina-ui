@@ -1,0 +1,18 @@
+.cycles-container {
+  display: flex;
+  padding-right: 1rem;
+}
+
+.step-container {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+.step-container label {
+  white-space: nowrap;
+  margin-right: 1.5rem;
+}
+
+.step {
+  display: flex;
+  padding-right: 1rem;
+}

@@ -1,22 +1,25 @@
+import { Row } from "@tanstack/react-table";
 import {
   ButtonBar,
   ColumnDefinition,
   CreateButton,
   dateCell,
+  dateCell8,
   DeleteButton,
+  FieldHeader,
   FilterAttribute,
   ListPageLayout,
-  QueryPage,
-  stringArrayCell
+  QueryPage8,
+  stringArrayCell,
+  stringArrayCell8
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
+import { TableColumn8 } from "packages/common-ui/lib/list-page/types";
+import { useState } from "react";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
-import { useState } from "react";
-import { TableColumn } from "common-ui/lib/list-page/types";
-import { RowInfo } from "react-table";
 
 export interface SampleListLayoutProps {
   onSelect?: (sample: PersistedResource<MaterialSample>) => void;
@@ -186,10 +189,15 @@ export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
 
   // Columns for the elastic search list page.
-  const columns: TableColumn<MaterialSample>[] = [
+  const columns: TableColumn8<any>[] = [
     // Material Sample Name
     {
-      Cell: ({ original: { id, data } }) => (
+      id: "materialSampleName",
+      cell: ({
+        row: {
+          original: { id, data }
+        }
+      }) => (
         <Link
           href={`/collection/material-sample/view?id=${id}`}
           passHref={true}
@@ -201,62 +209,71 @@ export default function MaterialSampleListPage() {
           </a>
         </Link>
       ),
-      label: "materialSampleName",
-      accessor: "data.attributes.materialSampleName",
+      header: () => <FieldHeader name="materialSampleName" />,
+      accessorKey: "data.attributes.materialSampleName",
       isKeyword: true
     },
 
     // Collection Name (External Relationship)
     {
-      Cell: ({ original: { included } }) =>
+      id: "collectionName",
+      cell: ({
+        row: {
+          original: { included }
+        }
+      }) =>
         included?.collection?.id ? (
           <Link
             href={`/collection/collection/view?id=${included?.collection?.id}`}
           >
-            {included?.collection?.attributes?.name}
+            <a>{included?.collection?.attributes?.name}</a>
           </Link>
         ) : null,
-      label: "collection.name",
-      accessor: "included.attributes.name",
+      header: () => <FieldHeader name="collection.name" />,
+      accessorKey: "included.attributes.name",
       relationshipType: "collection",
       isKeyword: true
     },
 
     // List of catalogue numbers
-    stringArrayCell(
+    stringArrayCell8(
       "dwcOtherCatalogNumbers",
       "data.attributes.dwcOtherCatalogNumbers"
     ),
 
     // Material Sample Type
     {
-      label: "materialSampleType",
-      accessor: "data.attributes.materialSampleType",
+      id: "materialSampleType",
+      header: () => <FieldHeader name="materialSampleType" />,
+      accessorKey: "data.attributes.materialSampleType",
       isKeyword: true
     },
 
     // Created By
     {
-      label: "createdBy",
-      accessor: "data.attributes.createdBy",
+      id: "createdBy",
+      header: () => <FieldHeader name="createdBy" />,
+      accessorKey: "data.attributes.createdBy",
       isKeyword: true
     },
 
     // Created On
-    dateCell("createdOn", "data.attributes.createdOn"),
+    dateCell8("createdOn", "createdOn", "data.attributes.createdOn"),
 
     // Material Sample State
     {
-      label: "materialSampleState",
-      accessor: "data.attributes.materialSampleState",
+      id: "materialSampleState",
+      header: () => <FieldHeader name="materialSampleState" />,
+      accessorKey: "data.attributes.materialSampleState",
       isKeyword: true,
-      show: false
+      isColumnVisible: false
     },
 
     // Action buttons for each row.
     ...[
       {
-        Cell: ({ original: sample }) => (
+        id: "actionColumn",
+        cell: ({ row: { original: sample } }) => (
           <div className="d-flex">
             <Link href={`/collection/material-sample/view?id=${sample.id}`}>
               <a className="btn btn-link">
@@ -276,21 +293,15 @@ export default function MaterialSampleListPage() {
             />
           </div>
         ),
-        Header: "",
-        sortable: false
+        enableSorting: false
       }
     ]
   ];
 
-  function rowStyling(
-    _finalState: any,
-    rowInfo?: RowInfo,
-    _column?: undefined,
-    _instance?: any
-  ) {
+  function rowStyling(row: Row<MaterialSample>) {
     return {
       style: {
-        opacity: rowInfo?.row?.["data.attributes.materialSampleState"] && 0.4
+        opacity: row?.original?.materialSampleState && 0.4
       }
     };
   }
@@ -311,7 +322,7 @@ export default function MaterialSampleListPage() {
             </a>
           </Link>
         </ButtonBar>
-        <QueryPage
+        <QueryPage8
           rowStyling={rowStyling}
           indexName={"dina_material_sample_index"}
           dynamicFieldMapping={{

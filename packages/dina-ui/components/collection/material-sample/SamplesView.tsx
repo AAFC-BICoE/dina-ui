@@ -1,17 +1,19 @@
 import {
   CommonMessage,
-  dateCell,
   DeleteButton,
   EditButton,
+  FieldHeader,
   FieldSet,
-  LimitOffsetPageSpec
+  LimitOffsetPageSpec,
+  ReactTable8,
+  dateCell8
 } from "common-ui";
 import Link from "next/link";
 import { useState } from "react";
-import ReactTable from "react-table";
 import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
+import { ColumnDef } from "@tanstack/react-table";
 
 export interface SamplesViewProps {
   samples?: Partial<MaterialSample>[];
@@ -23,32 +25,45 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
   const defaultSort = [];
   const { formatMessage } = useDinaIntl();
 
-  const CHILD_SAMPLES_COLUMNS = [
+  const CHILD_SAMPLES_COLUMNS: ColumnDef<Partial<MaterialSample>>[] = [
     {
-      Cell: ({ original: { id, materialSampleName } }) => (
+      id: "materialSampleName",
+      cell: ({
+        row: {
+          original: { id, materialSampleName }
+        }
+      }) => (
         <Link href={`/collection/material-sample/view?id=${id}`}>
           <a>{materialSampleName}</a>
         </Link>
       ),
-      accessor: "id",
-      Header: formatMessage("field_materialSampleName")
+      accessorKey: "id",
+      header: () => <FieldHeader name="materialSampleName" />
     },
     {
-      accessor: "materialSampleType",
-      sortable: false,
-      Header: formatMessage("field_materialSampleType")
+      id: "materialSampleType",
+      accessorKey: "materialSampleType",
+      enableSorting: false,
+      header: () => <FieldHeader name="materialSampleType" />
+    },
+    dateCell8("createdOn", "createdOn", "createdOn"),
+    {
+      id: "tags",
+      cell: ({
+        row: {
+          original: { tags }
+        }
+      }) => <>{tags?.join(", ")}</>,
+      accessorKey: "tags",
+      header: () => <FieldHeader name="tags" />
     },
     {
-      ...dateCell("createdOn"),
-      Header: formatMessage("field_createdOn")
-    },
-    {
-      Cell: ({ original: { tags } }) => <>{tags?.join(", ")}</>,
-      accessor: "tags",
-      Header: formatMessage("tags")
-    },
-    {
-      Cell: ({ original: { id, materialSampleName, materialSampleType } }) => (
+      id: "actions",
+      cell: ({
+        row: {
+          original: { id, materialSampleName, materialSampleType }
+        }
+      }) => (
         <div className="d-flex">
           <EditButton
             className="mx-2"
@@ -57,7 +72,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
             style={{ width: "5rem" }}
           />
           <SplitMaterialSampleDropdownButton
-            ids={[id]}
+            ids={[id ?? "unknown"]}
             disabled={!materialSampleName}
             materialSampleType={materialSampleType}
           />
@@ -69,8 +84,9 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
           />
         </div>
       ),
-      Header: formatMessage("actions"),
-      sortable: false
+      size: 300,
+      header: () => <FieldHeader name="actions" />,
+      enableSorting: false
     }
   ];
 
@@ -91,16 +107,11 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
   const shouldShowPagination = !!totalCount && totalCount > 25;
   return (
     <FieldSet legend={fieldSetId}>
-      <ReactTable
+      <ReactTable8<Partial<MaterialSample>>
         columns={CHILD_SAMPLES_COLUMNS}
         className="-striped react-table-overflow"
-        data={samples}
+        data={samples ?? []}
         defaultSorted={sortingRules}
-        minRows={1}
-        pageSizeOptions={[25, 50, 100, 200, 500]}
-        pages={numberOfPages}
-        ofText={<CommonMessage id="of" />}
-        rowsText={formatMessage("rows")}
         showPagination={shouldShowPagination}
       />
     </FieldSet>

@@ -79,12 +79,12 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
                   <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
                     <div className=\\"mt-3\\">
                       <label className=\\"numberToCreate-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
-                        <div className=\\"field-label mb-2\\">
+                        <div className=\\"field-label label-col mb-2\\" style={[undefined]}>
                           <strong>
                             Material Samples to Create
                           </strong>
                         </div>
-                        <div className={[undefined]} style={{...}}>
+                        <div className=\\"field-col\\" style={{...}}>
                           <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
                             <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
                               <input className=\\"form-control\\" type=\\"number\\" min={1} max={500} size={4} step={1} onKeyDown={[Function: onKeyDown]} onChange={[Function: onChange]} onClick={[Function: onClick]} disabled={false} value={1} />

@@ -4,6 +4,8 @@ import {
   FieldHeader,
   filterBy,
   FormikButton,
+  LoadingSpinner,
+  ReactTable8,
   ResourceSelectField,
   TextField,
   useAccount,
@@ -16,12 +18,10 @@ import {
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { compact, pick, toPairs, uniqBy } from "lodash";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useEffect, useMemo, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import ReactTable from "react-table";
 import { v4 as uuidv4 } from "uuid";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
@@ -34,6 +34,8 @@ import {
   SeqReaction
 } from "../../../types/seqdb-api";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
+import { SeqReactionDndTable } from "./seq-reaction-step/SeqReactionDndTable";
+import { ColumnDef } from "@tanstack/react-table";
 
 export interface SangerSeqReactionStepProps {
   seqBatch?: SeqBatch;
@@ -162,12 +164,10 @@ export function SangerSeqReactionStep({
   }
 
   /**
-   * When the page is first loaded, check if saved samples has already been chosen and reload them.
+   * fetch data when the page is first loaded or editMode changed.
    */
   useEffect(() => {
-    if (editMode || !selectedResources || selectedResources.length === 0) {
-      fetchSeqReactions();
-    }
+    fetchSeqReactions();
   }, [editMode]);
 
   const fetchSeqReactions = async () => {
@@ -246,7 +246,6 @@ export function SangerSeqReactionStep({
         item.id = compact(tempId).join("_");
       }
       const sorted = sortSeqReactions(seqReactions);
-      setRemovableItems(sorted);
       setSelectedResources(sorted);
     }
   };
@@ -321,70 +320,88 @@ export function SangerSeqReactionStep({
           return item;
         });
 
+        data.sort((a, b) => {
+          const sampleName1 =
+            (a.materialSample as MaterialSample)?.materialSampleName ?? "";
+          const sampleName2 =
+            (b.materialSample as MaterialSample)?.materialSampleName ?? "";
+          return compareByStringAndNumber(sampleName1, sampleName2);
+        });
+
         setAvailableItems(data);
         setSearchResults(data);
       }
     }
   );
 
-  const PCR_BATCH_ITEM_COLUMN: TableColumn<PcrBatchItem>[] = [
+  const PCR_BATCH_ITEM_COLUMN: ColumnDef<PcrBatchItem>[] = [
     {
-      Cell: ({ original: resource }) => (
-        <SelectCheckBox key={resource.id} resource={resource} />
+      id: "pcrBatchItemId",
+      cell: ({ row }) => (
+        <SelectCheckBox key={row.original.id} resource={row.original} />
       ),
-      Header: SelectCheckBoxHeader,
-      sortable: false
+      header: () => <SelectCheckBoxHeader />,
+      enableSorting: false
     },
     {
-      Cell: ({ original }) =>
-        original?.materialSample?.materialSampleName ||
-        original?.materialSample.id ||
+      id: "materialSampleName",
+      cell: ({ row }) =>
+        row.original?.materialSample?.materialSampleName ||
+        row.original?.materialSample?.id ||
         "",
-      Header: <FieldHeader name={"sampleName"} />,
-      sortable: false
+      header: () => <FieldHeader name={"sampleName"} />,
+      enableSorting: false
     },
     {
-      Cell: ({ original }) => (
+      id: "result",
+      cell: ({ row }) => (
         <div
           style={{
-            backgroundColor: "#" + pcrBatchItemResultColor(original?.result),
+            backgroundColor:
+              "#" + pcrBatchItemResultColor(row.original?.result),
             borderRadius: "5px",
             paddingLeft: "5px"
           }}
         >
-          {original?.result ?? ""}
+          {row.original?.result ?? ""}
         </div>
       ),
-      Header: <FieldHeader name={"result"} />,
-      sortable: false
+      header: () => <FieldHeader name={"result"} />,
+      enableSorting: false
     },
     {
-      Cell: ({ original }) =>
-        original?.wellRow === null || original?.wellColumn === null
+      id: "welColumn",
+      cell: ({ row }) =>
+        row.original?.wellRow === null || row.original?.wellColumn === null
           ? ""
-          : original.wellRow + "" + original.wellColumn,
-      Header: <FieldHeader name={"wellCoordinates"} />,
-      sortable: false
+          : row.original.wellRow + "" + row.original.wellColumn,
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      enableSorting: false
     },
     {
-      Cell: ({ original }) => original?.cellNumber || "",
-      Header: <FieldHeader name={"tubeNumber"} />,
-      sortable: false
+      id: "tubeNumber",
+      cell: ({ row }) => row.original?.cellNumber || "",
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      enableSorting: false
     }
   ];
 
+  function setSelectedResourcesAndSaveOrder(seqReactions: SeqReaction[]) {
+    setSelectedResources(seqReactions);
+    setSeqReactionSortOrder(compact(seqReactions.map((item) => item.id)));
+  }
+
   const pcrBatchTable = (
     <div className="d-flex align-items-start col-md-5">
-      <ReactTable<PcrBatchItem>
-        className="w-100"
-        columns={PCR_BATCH_ITEM_COLUMN}
-        data={pcrBatchItemQuery?.response?.data}
-        minRows={1}
-        pageSize={1000}
-        showPagination={false}
-        loading={pcrBatchItemQuery?.loading}
-        sortable={false}
-      />
+      {pcrBatchItemQuery?.loading ? (
+        <LoadingSpinner loading={true} />
+      ) : (
+        <ReactTable8<PcrBatchItem>
+          className="w-100 -striped"
+          columns={PCR_BATCH_ITEM_COLUMN}
+          data={pcrBatchItemQuery?.response?.data ?? []}
+        />
+      )}
     </div>
   );
 
@@ -392,86 +409,6 @@ export function SangerSeqReactionStep({
   const formKey = useMemo(() => uuidv4(), []);
 
   //#endregion of PCR Batch item table
-
-  //#region of Gene Region and Primer
-
-  // Checkbox for second table where selected/to be deleted items are displayed
-  const {
-    CheckBoxField: DeselectCheckBox,
-    CheckBoxHeader: DeselectCheckBoxHeader,
-    setAvailableItems: setRemovableItems
-  } = useGroupedCheckBoxes({
-    fieldName: "itemIdsToDelete"
-  });
-  const SELECTED_RESOURCE_SELECT_ALL_HEADER = editMode
-    ? [
-        {
-          Cell: ({ original: resource }) => (
-            <DeselectCheckBox
-              key={`${resource.pcrBatchItem.id}_${resource.seqPrimer.id}`}
-              resource={resource}
-            />
-          ),
-          Header: DeselectCheckBoxHeader,
-          sortable: false
-        }
-      ]
-    : [];
-  const SELECTED_RESOURCE_HEADER = [
-    ...SELECTED_RESOURCE_SELECT_ALL_HEADER,
-    {
-      Cell: ({ original }) =>
-        original?.pcrBatchItem?.materialSample?.materialSampleName ||
-        original?.pcrBatchItem?.materialSample?.id ||
-        "",
-      Header: <FieldHeader name={"sampleName"} />,
-      sortable: false
-    },
-    {
-      Cell: ({ original }) => (
-        <div
-          style={{
-            backgroundColor:
-              "#" + pcrBatchItemResultColor(original?.pcrBatchItem?.result),
-            borderRadius: "5px",
-            paddingLeft: "5px"
-          }}
-        >
-          {original?.pcrBatchItem?.result ?? ""}
-        </div>
-      ),
-      Header: <FieldHeader name={"result"} />,
-      sortable: false
-    },
-    {
-      Cell: ({ original }) =>
-        original?.pcrBatchItem?.wellRow === null ||
-        original?.pcrBatchItem?.wellColumn === null
-          ? ""
-          : original.pcrBatchItem?.wellRow +
-            "" +
-            original.pcrBatchItem?.wellColumn,
-      Header: <FieldHeader name={"wellCoordinates"} />,
-      sortable: false
-    },
-    {
-      Cell: ({ original }) => original?.pcrBatchItem?.cellNumber || "",
-      Header: <FieldHeader name={"tubeNumber"} />,
-      sortable: false
-    },
-    {
-      Cell: ({ original }) => original?.seqPrimer?.name || "",
-      Header: <FieldHeader name={"primer"} />,
-      sortable: false
-    },
-    {
-      Cell: ({ original }) => original?.seqPrimer?.direction || "",
-      Header: <FieldHeader name={"direction"} />,
-      sortable: false
-    }
-  ];
-
-  //#endregion of Gene Region and Primer
 
   /**
    * Used for selection mode only.
@@ -515,12 +452,7 @@ export function SangerSeqReactionStep({
     );
     // Save ordering when add Seq Reactions.
     // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
-    setSeqReactionSortOrder(
-      compact(selectedResourcesAppended.map((item) => item.id))
-    );
-    setSelectedResources(selectedResourcesAppended);
-    setRemovableItems(selectedResourcesAppended);
-
+    setSelectedResourcesAndSaveOrder(selectedResourcesAppended);
     // Deselect the search results.
     formik.setFieldValue("itemIdsToSelect", {});
   }
@@ -546,7 +478,6 @@ export function SangerSeqReactionStep({
       });
     });
 
-    setRemovableItems(unselectedObjects);
     // Save ordering when remove Seq Reactions.
     // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
     setSeqReactionSortOrder(compact(unselectedObjects.map((item) => item.id)));
@@ -651,14 +582,11 @@ export function SangerSeqReactionStep({
           </div>
         </div>
         <div className="d-flex align-items-start col-md-6">
-          <ReactTable<SeqReaction>
-            className="react-table-overflow w-100"
-            columns={SELECTED_RESOURCE_HEADER}
-            data={selectedResources}
-            minRows={1}
-            pageSize={1000}
-            showPagination={false}
-            sortable={false}
+          <SeqReactionDndTable
+            className="-striped"
+            editMode={true}
+            selectedSeqReactions={selectedResources}
+            setSelectedSeqReactions={setSelectedResourcesAndSaveOrder}
           />
         </div>
       </div>
@@ -669,14 +597,11 @@ export function SangerSeqReactionStep({
         <SeqdbMessage id="selectPcrBatchTitle" />
       </strong>
       <div className="row">
-        <ReactTable<SeqReaction>
-          className="react-table-overflow col-md-12"
-          columns={SELECTED_RESOURCE_HEADER}
-          data={selectedResources}
-          minRows={1}
-          pageSize={1000}
-          showPagination={false}
-          sortable={false}
+        <SeqReactionDndTable
+          className="react-table-overflow col-md-12 -striped"
+          editMode={false}
+          selectedSeqReactions={selectedResources}
+          setSelectedSeqReactions={setSelectedResourcesAndSaveOrder}
         />
       </div>
     </DinaForm>

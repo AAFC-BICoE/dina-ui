@@ -1,6 +1,8 @@
+import { ColumnDef } from "@tanstack/react-table";
 import {
   AutoSuggestTextField,
   FieldHeader,
+  ReactTable8,
   filterBy,
   useApiClient,
   useDinaFormContext,
@@ -9,7 +11,6 @@ import {
 import { PersistedResource } from "kitsu";
 import { sortBy } from "lodash";
 import { useEffect, useState } from "react";
-import ReactTable, { Column } from "react-table";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   PcrBatchItem,
@@ -101,64 +102,60 @@ export function usePcrReactionData(pcrBatchId?: string) {
 export interface PcrReactionTableProps {
   pcrBatchItems: PcrBatchItem[];
   materialSamples: MaterialSample[];
+  readOnlyOverride?: boolean;
 }
 
 export function PcrReactionTable({
   pcrBatchItems,
-  materialSamples
+  materialSamples,
+  readOnlyOverride = true
 }: PcrReactionTableProps) {
   const { readOnly } = useDinaFormContext();
 
-  const PCR_REACTION_COLUMN: Column<PcrBatchItem>[] = [
+  const PCR_REACTION_COLUMN: ColumnDef<PcrBatchItem>[] = [
     {
-      Cell: ({ original }) => {
-        if (original?.wellRow === null || original?.wellColumn === null)
-          return <></>;
-
-        return <>{original.wellRow + "" + original.wellColumn}</>;
-      },
-      Header: <FieldHeader name={"wellCoordinates"} />,
-      sortable: false
+      id: "wellCoordinates",
+      cell: ({ row }) => (
+        <>
+          {row.original?.wellRow === null || row.original?.wellColumn === null
+            ? ""
+            : `${row.original.wellRow}${row.original.wellColumn}`}
+        </>
+      ),
+      header: () => <FieldHeader name={"wellCoordinates"} />
     },
     {
-      Cell: ({ original }) => {
-        if (original?.cellNumber === undefined) return <></>;
-
-        return <>{original.cellNumber}</>;
-      },
       id: "tubeNumber",
-      Header: <FieldHeader name={"tubeNumber"} />,
-      sortable: false
+      cell: ({ row: { original } }) =>
+        original?.cellNumber === undefined ? <></> : <>{original.cellNumber}</>,
+      header: () => <FieldHeader name={"tubeNumber"} />
     },
     {
-      Cell: ({ original }) => {
+      id: "materialSampleName",
+      cell: ({ row: { original } }) => {
         const fetchedMaterialSample = materialSamples.find(
           (materialSample) => materialSample.id === original?.materialSample?.id
         );
-
         if (!fetchedMaterialSample) return <></>;
-
         return <p>{fetchedMaterialSample.materialSampleName}</p>;
       },
-      Header: <FieldHeader name={"materialSampleName"} />,
-      sortable: false
+      header: () => <FieldHeader name={"materialSampleName"} />
     },
     {
-      Cell: ({ original }) => {
+      id: "scientificName",
+      cell: ({ row: { original } }) => {
         const fetchedMaterialSample = materialSamples.find(
           (materialSample) => materialSample.id === original?.materialSample?.id
         );
-
         if (!fetchedMaterialSample) return <></>;
-
         return <>{getScientificNames(fetchedMaterialSample)}</>;
       },
-      Header: <FieldHeader name={"scientificName"} />,
-      sortable: false
+      header: () => <FieldHeader name={"scientificName"} />
     },
     {
-      Cell: ({ original }) => {
-        return !readOnly ? (
+      id: "result",
+      cell: ({ row: { original } }) => {
+        return !(readOnlyOverride || readOnly) ? (
           <div>
             <AutoSuggestTextField
               name={"results[" + original?.id + "]"}
@@ -189,20 +186,15 @@ export function PcrReactionTable({
           </div>
         );
       },
-      Header: <FieldHeader name={"result"} />,
-      sortable: false
+      header: () => <FieldHeader name={"result"} />
     }
   ];
 
   return (
-    <ReactTable<PcrBatchItem>
-      className="react-table-overflow"
+    <ReactTable8<PcrBatchItem>
+      className="-striped"
       columns={PCR_REACTION_COLUMN}
       data={sortBy(pcrBatchItems, "cellNumber")}
-      minRows={1}
-      pageSize={1000} // Maximum that the API will return.
-      showPagination={false}
-      sortable={false}
     />
   );
 }

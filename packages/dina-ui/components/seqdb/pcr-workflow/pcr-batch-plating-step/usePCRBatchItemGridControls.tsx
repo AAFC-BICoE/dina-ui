@@ -1,12 +1,13 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   filterBy,
   useQuery,
   useStringComparator
 } from "common-ui";
-import { omitBy, compact, isEmpty } from "lodash";
+import { compact, isEmpty, omitBy } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useContext, useRef, useState, useEffect, useMemo } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { CellGrid } from "./ContainerGrid";
 
@@ -51,6 +52,10 @@ export function usePCRBatchItemGridControls({
   const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItemSample[]>();
 
   const [isStorage, setIsStorage] = useState<boolean>(false);
+
+  const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
+    string[]
+  >(`pcrWorkflowMaterialSampleSortOrder-${pcrBatchId}`);
 
   const [gridState, setGridState] = useState({
     // Available PcrBatchItems with no well coordinates.
@@ -114,13 +119,31 @@ export function usePCRBatchItemGridControls({
       });
 
       setGridState({
-        availableItems: pcrBatchItemsNoCoords?.sort(itemSort),
+        availableItems: sortAvailableItems(pcrBatchItemsNoCoords),
         cellGrid: newCellGrid,
         movedItems: []
       });
       setItemsLoading(false);
     });
   }, [pcrBatchItems]);
+
+  function sortAvailableItems(batchItemSamples: PcrBatchItemSample[]) {
+    if (materialSampleSortOrder) {
+      const sorted = materialSampleSortOrder.map((sampleId) =>
+        batchItemSamples.find((item) => item.sampleId === sampleId)
+      );
+      batchItemSamples.forEach((item) => {
+        if (
+          materialSampleSortOrder.indexOf(item.sampleId ?? "unknown") === -1
+        ) {
+          sorted.push(item);
+        }
+      });
+      return compact(sorted);
+    } else {
+      return compact(batchItemSamples);
+    }
+  }
 
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get

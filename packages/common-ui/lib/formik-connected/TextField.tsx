@@ -9,6 +9,7 @@ import React from "react";
 
 export interface TextFieldProps extends FieldWrapperProps {
   readOnly?: boolean;
+  disabled?: boolean;
   multiLines?: boolean;
   inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
   placeholder?: string;
@@ -33,6 +34,7 @@ export interface TextFieldProps extends FieldWrapperProps {
 export function TextField(props: TextFieldProps) {
   const {
     readOnly,
+    disabled,
     multiLines,
     inputProps: inputPropsExternal,
     customInput,
@@ -51,7 +53,7 @@ export function TextField(props: TextFieldProps) {
           onChangeExternal?.(formik, props.name, newValue);
         }
 
-        const onKeyDown = e => {
+        const onKeyDown = (e) => {
           const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
           const CTRL_ALLOWED_CHARS_REGEXP =
             /^(Backspace|Delete|ArrowLeft|ArrowRight)$/;
@@ -76,9 +78,10 @@ export function TextField(props: TextFieldProps) {
             { "is-invalid": invalid },
             inputPropsExternal?.className
           ),
-          onChange: event => onChangeInternal(event.target.value),
+          onChange: (event) => onChangeInternal(event.target.value),
           value: value || "",
           readOnly,
+          disabled,
           onKeyDown
         };
 
@@ -89,7 +92,9 @@ export function TextField(props: TextFieldProps) {
           customInput?.(inputPropsInternal, formik) ??
           (multiLines ? (
             <TextareaAutosize
-              minRows={4}
+              minRows={
+                (inputPropsExternal as TextareaHTMLAttributes<any>)?.rows || 2
+              }
               {...(inputPropsInternal as TextareaAutosizeProps)}
             />
           ) : (

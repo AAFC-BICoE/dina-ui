@@ -1,8 +1,9 @@
-import { TableColumn } from "common-ui/lib/list-page/types";
+import { TableColumn, TableColumn8 } from "common-ui/lib/list-page/types";
 import {
   dateCell,
   DeleteButton,
   EditButton,
+  FieldHeader,
   stringArrayCell,
   useStringComparator
 } from "common-ui";
@@ -50,6 +51,45 @@ export function useMaterialSampleRelationshipColumns() {
       accessor: "included",
       isKeyword: true,
       sortable: false
+    }
+  ];
+
+  const ELASTIC_SEARCH_COLUMN8: TableColumn8<any>[] = [
+    {
+      id: "materialSampleName",
+      cell: ({ row: { original } }) => (
+        <Link href={`/collection/material-sample/view?id=${original.id}`}>
+          <a>
+            {original.data.attributes.materialSampleName ||
+              original.data.attributes.dwcOtherCatalogNumbers?.join?.(", ") ||
+              original.id}
+          </a>
+        </Link>
+      ),
+      header: () => <FieldHeader name="materialSampleName" />,
+      accessorKey: "data.attributes.materialSampleName",
+      sortingFn: "alphanumeric",
+      isKeyword: true,
+      enableSorting: true
+    },
+    {
+      id: "scientificName",
+      cell: ({
+        row: {
+          original: { included }
+        }
+      }) => {
+        const organisms = included?.organism ?? [];
+        const materialSample: MaterialSample = {
+          type: "material-sample",
+          organism: organisms
+        };
+        const scientificName = getScientificNames(materialSample);
+        return <div className="stringArray-cell">{scientificName}</div>;
+      },
+      header: () => <FieldHeader name="determination.scientificName" />,
+      isKeyword: true,
+      enableSorting: false
     }
   ];
 
@@ -105,5 +145,9 @@ export function useMaterialSampleRelationshipColumns() {
     }
   ];
 
-  return { ELASTIC_SEARCH_COLUMN, ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW };
+  return {
+    ELASTIC_SEARCH_COLUMN,
+    ELASTIC_SEARCH_COLUMN8,
+    ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW
+  };
 }

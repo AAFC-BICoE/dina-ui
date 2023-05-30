@@ -5,7 +5,7 @@ import { Metadata } from "../../../../types/objectstore-api";
 import { AttachmentSection } from "../AttachmentSection";
 import { AttachmentsField } from "../AttachmentsField";
 
-const mockBulkGet = jest.fn<any, any>(async paths => {
+const mockBulkGet = jest.fn<any, any>(async (paths) => {
   if (paths.length === 0) {
     return [];
   }
@@ -16,7 +16,7 @@ const mockBulkGet = jest.fn<any, any>(async paths => {
   }));
 });
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "objectstore-api/metadata":
       return { data: TEST_METADATAS };
@@ -73,7 +73,7 @@ describe("AttachmentsField component", () => {
     wrapper.update();
 
     // The Metadatas should have been added:
-    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(2);
+    expect(wrapper.find("tbody tr").length).toEqual(2);
 
     wrapper.find("form").simulate("submit");
 
@@ -130,7 +130,7 @@ describe("AttachmentsField component", () => {
     wrapper.update();
 
     // The 2 unique Metadatas should have been added:
-    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(2);
+    expect(wrapper.find("tbody tr").length).toEqual(2);
 
     wrapper.find("form").simulate("submit");
 
@@ -170,7 +170,7 @@ describe("AttachmentsField component", () => {
     wrapper.update();
 
     // Renders 2 rows initially:
-    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(2);
+    expect(wrapper.find("tbody tr").length).toEqual(2);
 
     wrapper.find("button.remove-attachment").first().simulate("click");
 

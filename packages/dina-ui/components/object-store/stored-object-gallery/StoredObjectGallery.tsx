@@ -78,7 +78,7 @@ function GalleryItem({
   const { id } = metadata;
 
   const fileId = `${fileIdentifier}/thumbnail`;
-  const filePath = `/api/objectstore-api/file/${bucket}/${fileId}`;
+  const filePath = `/objectstore-api/file/${bucket}/${fileId}`;
 
   const { formatMessage } = useDinaIntl();
 

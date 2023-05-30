@@ -1,9 +1,8 @@
-import { LoadingSpinner, useAccount } from "../../../../common-ui";
+import { LoadingSpinner, useApiClient, useQuery } from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ComponentType, ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 export type DownLoadLinks = {
   original?: string;
@@ -51,38 +50,25 @@ export function FileView({
   shownTypeIndicator,
   preview
 }: FileViewProps) {
-  const router = useRouter();
-  const { getCurrentToken } = useAccount();
-  const [token, setToken] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    async function refreshToken() {
-      const newToken = await getCurrentToken();
-      setToken(newToken);
-    }
-
-    // Get the latest token for the preview.
-    refreshToken();
-  }, []);
-
-  // Add the auth token to the requested file path:
-  const authenticatedFilePath = `${filePath}?access_token=${token}`;
-
+  const { apiClient } = useApiClient();
+  const [objectURL, setObjectURL] = useState<string>();
+  // const [loading, setLoading] = useState<boolean>(true);
+  async function fetchObjectBlob(path) {
+    return await apiClient.axios.get(path, {
+      responseType: "blob"
+    });
+  }
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
 
   const showFile = !isSpreadsheet;
-
-  // split file path into array
-  const filePathArray = filePath.split("/");
-
-  // fileId is last element of array
-  const fileId = filePathArray[filePathArray.length - 1];
-  const isDerivative = filePath.includes("derivative").toString();
-  const fileBucket = filePathArray[4];
-
-  // build link to file-viewer page
-  const fileViewerLink = `/object-store/file-viewer`;
+  function onSuccess(response) {
+    setObjectURL(window?.URL?.createObjectURL(response));
+  }
+  const resp = useQuery(
+    { path: filePath, responseType: "blob" },
+    { onSuccess }
+  );
 
   if (preview || (!isImage && fileType !== "pdf")) {
     clickToDownload = false;
@@ -95,68 +81,66 @@ export function FileView({
    */
   async function handleDownloadLink(path?: string) {
     if (path) {
-      const currentToken = await getCurrentToken();
-      router.push(`${path}?access_token=${currentToken}`);
+      try {
+        const response = await fetchObjectBlob(path);
+        const url = window?.URL?.createObjectURL(response.data);
+        const link = document?.createElement("a");
+        link.href = url;
+        link?.setAttribute("download", path); // or any other extension
+        document?.body?.appendChild(link);
+        link?.click();
+        window?.URL?.revokeObjectURL(url);
+      } catch (error) {
+        return error;
+      }
     }
   }
 
-  if (token === undefined) {
+  if (resp?.loading) {
     return <LoadingSpinner loading={true} />;
   }
 
   return (
     <div className="file-viewer-wrapper text-center">
       {showFile ? (
-        <Link
-          href={{
-            pathname: fileViewerLink,
-            query: {
-              bucket: fileBucket,
-              fileId,
-              fileType,
-              isDerivative,
-              isImage
-            }
+        <a
+          href={objectURL}
+          target="_blank"
+          style={{
+            color: "inherit",
+            textDecoration: "none",
+            pointerEvents: clickToDownload ? undefined : "none",
+            display: "block",
+            marginLeft: "auto",
+            marginRight: "auto",
+            width: "fit-content"
           }}
         >
-          <a
-            target="_blank"
-            style={{
-              color: "inherit",
-              textDecoration: "none",
-              pointerEvents: clickToDownload ? undefined : "none",
-              display: "block",
-              marginLeft: "auto",
-              marginRight: "auto",
-              width: "fit-content"
-            }}
-          >
-            {showFile ? (
-              isImage ? (
-                <img
-                  alt={imgAlt ?? `File path : ${filePath}`}
-                  src={authenticatedFilePath}
-                  style={{ height: imgHeight }}
-                  onError={(event) =>
-                    (event.currentTarget.style.display = "none")
-                  }
-                />
-              ) : (
-                <FileViewer
-                  filePath={authenticatedFilePath}
-                  fileType={fileType}
-                  unsupportedComponent={() => (
-                    <div>
-                      <Link href={authenticatedFilePath} passHref={true}>
-                        <a>{filePath}</a>
-                      </Link>
-                    </div>
-                  )}
-                />
-              )
-            ) : null}
-          </a>
-        </Link>
+          {showFile ? (
+            isImage ? (
+              <img
+                alt={imgAlt ?? `File path : ${filePath}`}
+                src={objectURL}
+                style={{ height: imgHeight }}
+                onError={(event) =>
+                  (event.currentTarget.style.display = "none")
+                }
+              />
+            ) : (
+              <FileViewer
+                filePath={objectURL}
+                fileType={fileType}
+                unsupportedComponent={() => (
+                  <div>
+                    <Link href={objectURL as any} passHref={true}>
+                      <a>{filePath}</a>
+                    </Link>
+                  </div>
+                )}
+              />
+            )
+          ) : null}
+        </a>
       ) : (
         <DinaMessage id="previewNotAvailable" />
       )}
