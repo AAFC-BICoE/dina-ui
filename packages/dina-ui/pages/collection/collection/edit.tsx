@@ -75,8 +75,6 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
     query: { id }
   } = router;
 
-  const title = id ? "editCollectionTitle" : "addCollectionTitle";
-
   async function onSubmit({
     submittedValues,
     api: { save }
