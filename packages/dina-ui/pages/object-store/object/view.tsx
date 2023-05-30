@@ -117,7 +117,6 @@ export default function MetadataViewPage({
                     groupSelectorName="bucket"
                   />
                   <MetadataDetails metadata={metadata} />
-                  dddd
                   <ExifView objectUpload={metadata.objectUpload} />
                   {customViewQuery && (
                     <CustomQueryPageView
