@@ -15,10 +15,7 @@ import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { AuditSnapshot } from "../../types/objectstore-api";
-import {
-  RevisionRowConfigsByType,
-  RevisionRowConfigsByType8
-} from "./revision-row-config";
+import { RevisionRowConfigsByType8 } from "./revision-row-config";
 
 interface RevisionsPageLayout8Props {
   /** Audit snapshot path, including the base API path. */

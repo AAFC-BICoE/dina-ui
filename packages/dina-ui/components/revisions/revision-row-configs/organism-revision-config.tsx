@@ -1,10 +1,11 @@
 import { Organism } from "../../../types/collection-api";
-import { RevisionRowConfig } from "../revision-row-config";
+import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
 import { determinationRevision } from "./material-sample-revision-configs";
 
-export const ORGANISM_REVISION_ROW_CONFIG: RevisionRowConfig<Organism> = {
+export const ORGANISM_REVISION_ROW_CONFIG: RevisionRowConfig8<Organism> = {
   name: ({ id, determination, lifeStage }) => {
-    const primaryDetermination = determination?.find(it => it.isPrimary) ?? {};
+    const primaryDetermination =
+      determination?.find((it) => it.isPrimary) ?? {};
     const name =
       primaryDetermination.verbatimScientificName ||
       primaryDetermination.scientificName;
@@ -12,6 +13,10 @@ export const ORGANISM_REVISION_ROW_CONFIG: RevisionRowConfig<Organism> = {
     return <>{name || lifeStage || id}</>;
   },
   customValueCells: {
-    determination: ({ original: { value } }) => determinationRevision(value)
+    determination: ({
+      row: {
+        original: { value }
+      }
+    }) => determinationRevision(value)
   }
 };

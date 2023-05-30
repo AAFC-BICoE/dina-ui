@@ -7,10 +7,10 @@ import {
 import { Metadata, Person } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
-import { RevisionRowConfig } from "../revision-row-config";
+import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
 import { DataEntryViewer } from "common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 
-export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingEvent> =
+export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig8<CollectingEvent> =
   {
     name: ({ id }) => (
       <Link href={`/collection/collecting-event/view?id=${id}`}>
@@ -19,7 +19,11 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
     ),
     customValueCells: {
       // Link to the collector:
-      collectors: ({ original: { value: relation } }) => {
+      collectors: ({
+        row: {
+          original: { value: relation }
+        }
+      }) => {
         return relation?.map((rel, index) => (
           <div key={index}>
             <ReferenceLink<Person>
@@ -32,7 +36,11 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           </div>
         ));
       },
-      collectionMethod: ({ original: { value } }) => (
+      collectionMethod: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <ReferenceLink<CollectionMethod>
           baseApiPath="collection-api"
           type="collection-method"
@@ -41,7 +49,11 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           href="/collection/collection-method/view?id="
         />
       ),
-      attachment: ({ original: { value } }) => (
+      attachment: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <div>
           {value?.map(
             (relation, index) =>
@@ -59,7 +71,11 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           )}
         </div>
       ),
-      geoReferenceAssertions: ({ original: { value: assertions } }) =>
+      geoReferenceAssertions: ({
+        row: {
+          original: { value: assertions }
+        }
+      }) =>
         assertions?.map((assertion, index) => (
           <div className="pb-2" key={index}>
             <strong>{index + 1}:</strong>
@@ -85,13 +101,21 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
             />
           </div>
         )) ?? null,
-      managedAttributes: ({ original: { value } }) => (
+      managedAttributes: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <ManagedAttributesViewer
           values={value}
           managedAttributeApiPath="collection-api/managed-attribute"
         />
       ),
-      geographicPlaceNameSourceDetail: ({ original: { value } }) => (
+      geographicPlaceNameSourceDetail: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <KeyValueTable
           data={value}
           customValueCells={{
@@ -100,7 +124,11 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           }}
         />
       ),
-      extensionValues: ({ original: { value } }) => (
+      extensionValues: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <DataEntryViewer
           extensionValues={value}
           legend={<></>}

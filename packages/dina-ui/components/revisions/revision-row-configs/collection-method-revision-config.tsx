@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { allLangsDescriptionCell } from "common-ui";
+import { allLangsDescriptionCell, allLangsDescriptionCell8 } from "common-ui";
 import { CollectionMethod } from "../../../types/collection-api/resources/CollectionMethod";
-import { RevisionRowConfig } from "../revision-row-config";
+import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
 
-export const COLLECTION_METHOD_REVISION_ROW_CONFIG: RevisionRowConfig<CollectionMethod> =
+export const COLLECTION_METHOD_REVISION_ROW_CONFIG: RevisionRowConfig8<CollectionMethod> =
   {
     name: ({ id, name }) => (
       <Link href={`/collection/collection-method/view?id=${id}`}>
@@ -11,8 +11,8 @@ export const COLLECTION_METHOD_REVISION_ROW_CONFIG: RevisionRowConfig<Collection
       </Link>
     ),
     customValueCells: {
-      multilingualDescription: allLangsDescriptionCell(
+      multilingualDescription: allLangsDescriptionCell8(
         "multilingualDescription"
-      ).Cell
+      ).cell
     }
   };

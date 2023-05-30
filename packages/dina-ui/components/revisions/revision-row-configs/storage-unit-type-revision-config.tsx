@@ -1,9 +1,9 @@
-import { allLangsDescriptionCell } from "common-ui";
+import { allLangsDescriptionCell, allLangsDescriptionCell8 } from "common-ui";
 import Link from "next/link";
 import { StorageUnitType } from "../../../types/collection-api";
-import { RevisionRowConfig } from "../revision-row-config";
+import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
 
-export const STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<StorageUnitType> =
+export const STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig8<StorageUnitType> =
   {
     name: ({ id, name }) => (
       <Link href={`/collection/storage-unit-type/view?id=${id}`}>
@@ -11,8 +11,8 @@ export const STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<StorageUni
       </Link>
     ),
     customValueCells: {
-      multilingualDescription: allLangsDescriptionCell(
+      multilingualDescription: allLangsDescriptionCell8(
         "multilingualDescription"
-      ).Cell
+      ).cell
     }
   };

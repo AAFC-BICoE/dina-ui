@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { allLangsDescriptionCell } from "common-ui";
+import { allLangsDescriptionCell, allLangsDescriptionCell8 } from "common-ui";
 import { ManagedAttribute } from "../../../types/collection-api";
-import { RevisionRowConfig } from "../revision-row-config";
+import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
 
-export const MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<ManagedAttribute> =
+export const MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig8<ManagedAttribute> =
   {
     name: ({ id, name, key }) => (
       <Link href={`/collection/managed-attribute/edit?id=${id}`}>
@@ -11,8 +11,8 @@ export const MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<Manag
       </Link>
     ),
     customValueCells: {
-      multilingualDescription: allLangsDescriptionCell(
+      multilingualDescription: allLangsDescriptionCell8(
         "multilingualDescription"
-      ).Cell
+      ).cell
     }
   };

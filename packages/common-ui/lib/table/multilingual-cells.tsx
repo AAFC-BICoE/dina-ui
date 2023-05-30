@@ -95,6 +95,25 @@ export function allLangsDescriptionCell(accessor: string) {
   };
 }
 
+export function allLangsDescriptionCell8(accessorKey: string) {
+  return {
+    cell: ({
+      row: {
+        original: { value }
+      }
+    }) =>
+      value?.descriptions?.map(
+        (desc, index) =>
+          desc?.desc && (
+            <div className="pb-2" key={index}>
+              <strong>{desc?.lang}: </strong> {desc?.desc}
+            </div>
+          )
+      ) ?? null,
+    accessorKey
+  };
+}
+
 /**
  * Used for multilingual titles which contain an English and French version of the
  * title.
@@ -156,9 +175,13 @@ export function titleCell(accessor: string) {
 /**
  * Shows the multilingual title in all languages.
  */
-export function allLangsTitleCell(accessor: string) {
+export function allLangsTitleCell(accessorKey: string) {
   return {
-    Cell: ({ original: { value } }) =>
+    cell: ({
+      row: {
+        original: { value }
+      }
+    }) =>
       value?.titles?.map(
         (title, index) =>
           title?.title && (
@@ -167,7 +190,7 @@ export function allLangsTitleCell(accessor: string) {
             </div>
           )
       ) ?? null,
-    accessor
+    accessor: accessorKey
   };
 }
 

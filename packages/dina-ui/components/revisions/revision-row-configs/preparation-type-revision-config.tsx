@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { allLangsDescriptionCell } from "common-ui";
+import { allLangsDescriptionCell, allLangsDescriptionCell8 } from "common-ui";
 import { PreparationType } from "../../../types/collection-api";
-import { RevisionRowConfig } from "../revision-row-config";
+import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
 
-export const PREPARATION_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<PreparationType> =
+export const PREPARATION_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig8<PreparationType> =
   {
     name: ({ id, name }) => (
       <Link href={`/collection/preparation-type/view?id=${id}`}>
@@ -11,8 +11,8 @@ export const PREPARATION_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<Preparation
       </Link>
     ),
     customValueCells: {
-      multilingualDescription: allLangsDescriptionCell(
+      multilingualDescription: allLangsDescriptionCell8(
         "multilingualDescription"
-      ).Cell
+      ).cell
     }
   };
