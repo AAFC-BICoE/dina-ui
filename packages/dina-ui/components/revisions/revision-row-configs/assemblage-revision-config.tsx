@@ -7,10 +7,10 @@ import Link from "next/link";
 import { Assemblage } from "../../../types/collection-api";
 import { Metadata } from "../../../types/objectstore-api";
 import { ReferenceLink } from "../ReferenceLink";
-import { RevisionRowConfig8 } from "../revision-row-config";
+import { RevisionRowConfig } from "../revision-row-config";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 
-export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig8<Assemblage> = {
+export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
   name: ({ id, name }) => (
     <Link href={`/collection/assemblage/view?id=${id}`}>
       <a>{name || id}</a>

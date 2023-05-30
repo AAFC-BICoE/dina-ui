@@ -1,6 +1,7 @@
 import { KeyValueTable } from "common-ui";
+import { DataEntryViewer } from "common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import Link from "next/link";
-import { DinaUser } from "../../../types/user-api/resources/DinaUser";
+import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   CollectingEvent,
@@ -10,13 +11,12 @@ import {
 } from "../../../types/collection-api";
 import { Project } from "../../../types/collection-api/resources/Project";
 import { Metadata, Person } from "../../../types/objectstore-api";
+import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
-import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
-import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
-import { DataEntryViewer } from "common-ui/lib/formik-connected/data-entry/DataEntryViewer";
+import { RevisionRowConfig } from "../revision-row-config";
 
-export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig8<MaterialSample> =
+export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSample> =
   {
     name: (ms) => (
       <Link href={`/collection/material-sample/view?id=${ms.id}`}>

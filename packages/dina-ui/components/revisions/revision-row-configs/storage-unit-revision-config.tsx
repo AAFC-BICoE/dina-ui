@@ -1,9 +1,9 @@
+import Link from "next/link";
 import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
 import { ReferenceLink } from "../ReferenceLink";
-import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
-import Link from "next/link";
+import { RevisionRowConfig } from "../revision-row-config";
 
-export const STORAGE_UNIT_REVISION_ROW_CONFIG: RevisionRowConfig8<StorageUnit> =
+export const STORAGE_UNIT_REVISION_ROW_CONFIG: RevisionRowConfig<StorageUnit> =
   {
     name: ({ id, name }) => (
       <Link href={`/collection/storage-unit/view?id=${id}`}>

@@ -2,7 +2,7 @@ import {
   ColumnDefinition,
   dateCell,
   DateView,
-  KeyValueTable,
+  KeyValueTable8,
   ListPageLayout,
   useFieldLabels,
   useQuery,
@@ -15,9 +15,7 @@ import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { AuditSnapshot } from "../../types/objectstore-api";
-import { ReferenceLink } from "./ReferenceLink";
 import { RevisionRowConfigsByType } from "./revision-row-config";
-import { DinaUser } from "../../types/user-api";
 
 interface RevisionsPageLayoutProps {
   /** Audit snapshot path, including the base API path. */
@@ -81,7 +79,7 @@ export function RevisionsPageLayout({
       Cell: ({ original: { changedProperties } }) => (
         <div style={{ whiteSpace: "normal" }}>
           {changedProperties
-            ?.map(fieldName => getFieldLabel({ name: fieldName }).fieldLabel)
+            ?.map((fieldName) => getFieldLabel({ name: fieldName }).fieldLabel)
             ?.join(", ")}
         </div>
       ),
@@ -121,13 +119,15 @@ export function RevisionsPageLayout({
                   <h4>
                     <DinaMessage id="changedProperties" />
                   </h4>
-                  <KeyValueTable
+                  <KeyValueTable8
                     data={changed}
                     customValueCells={{
                       // createdOn is on almost every DTO, so handle it automatically here:
-                      createdOn: ({ original: { value } }) => (
-                        <DateView date={value} />
-                      ),
+                      createdOn: ({
+                        row: {
+                          original: { value }
+                        }
+                      }) => <DateView date={value} />,
                       ...revisionRowConfigsByType?.[type]?.customValueCells
                     }}
                     tableClassName="no-hover-highlight"
@@ -175,7 +175,7 @@ export function RevisionsPage({
 
   const query = useQuery<KitsuResource>({ path: `${queryPath}/${id}` });
 
-  return withResponse(query, response => {
+  return withResponse(query, (response) => {
     const resource = response.data;
 
     const pageTitle = formatMessage("revisionsListTitle", {

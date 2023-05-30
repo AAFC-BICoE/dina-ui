@@ -1,8 +1,8 @@
-import { RevisionsPage8 } from "packages/dina-ui/components/revisions/RevisionsPageLayout8";
+import { RevisionsPage } from "../../../components/revisions/RevisionsPageLayout";
 import { LOAN_TRANSACTION_MODULE_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
 
 export default () => (
-  <RevisionsPage8
+  <RevisionsPage
     auditSnapshotPath="loan-transaction-api/audit-snapshot"
     detailsPageLink="/loan-transaction/transaction/"
     queryPath="loan-transaction-api/transaction"

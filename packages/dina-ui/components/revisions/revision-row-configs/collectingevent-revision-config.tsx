@@ -1,16 +1,16 @@
 import { DateView, KeyValueTable } from "common-ui";
+import { DataEntryViewer } from "common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import Link from "next/link";
 import {
-  CollectionMethod,
-  CollectingEvent
+  CollectingEvent,
+  CollectionMethod
 } from "../../../types/collection-api/";
 import { Metadata, Person } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
-import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
-import { DataEntryViewer } from "common-ui/lib/formik-connected/data-entry/DataEntryViewer";
+import { RevisionRowConfig } from "../revision-row-config";
 
-export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig8<CollectingEvent> =
+export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingEvent> =
   {
     name: ({ id }) => (
       <Link href={`/collection/collecting-event/view?id=${id}`}>

@@ -1,8 +1,8 @@
 import { Organism } from "../../../types/collection-api";
-import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
+import { RevisionRowConfig } from "../revision-row-config";
 import { determinationRevision } from "./material-sample-revision-configs";
 
-export const ORGANISM_REVISION_ROW_CONFIG: RevisionRowConfig8<Organism> = {
+export const ORGANISM_REVISION_ROW_CONFIG: RevisionRowConfig<Organism> = {
   name: ({ id, determination, lifeStage }) => {
     const primaryDetermination =
       determination?.find((it) => it.isPrimary) ?? {};

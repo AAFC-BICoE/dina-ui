@@ -16,8 +16,9 @@ export function DefaultRow<TData>({
   return (
     <tr key={row.id} className={className} style={style}>
       {row.getVisibleCells().map((cell) => {
+        const cellClassNames = cell.column.columnDef.meta?.className;
         return (
-          <td key={cell.id}>
+          <td key={cell.id} className={cellClassNames}>
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </td>
         );

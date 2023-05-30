@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Metadata, Person } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
-import { RevisionRowConfig8 } from "../revision-row-config";
+import { RevisionRowConfig } from "../revision-row-config";
 
-export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig8<Metadata> = {
+export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
   name: ({ id, originalFilename }) => (
     <Link href={`/object-store/object/view?id=${id}`}>
       <a>{originalFilename}</a>

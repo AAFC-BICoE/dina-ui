@@ -2,7 +2,7 @@ import {
   ColumnDefinition,
   dateCell,
   DateView,
-  KeyValueTable8,
+  KeyValueTable,
   ListPageLayout,
   useFieldLabels,
   useQuery,
@@ -15,9 +15,11 @@ import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { AuditSnapshot } from "../../types/objectstore-api";
-import { RevisionRowConfigsByType8 } from "./revision-row-config";
+import { ReferenceLink } from "./ReferenceLink";
+import { RevisionRowConfigsByType } from "./revision-row-config";
+import { DinaUser } from "../../types/user-api";
 
-interface RevisionsPageLayout8Props {
+interface RevisionsPageLayoutProps {
   /** Audit snapshot path, including the base API path. */
   auditSnapshotPath: string;
 
@@ -28,15 +30,15 @@ interface RevisionsPageLayout8Props {
   instanceId?: string;
 
   /** Custom revision table row renderering per type: */
-  revisionRowConfigsByType?: RevisionRowConfigsByType8;
+  revisionRowConfigsByType?: RevisionRowConfigsByType;
 }
 
-export function RevisionsPageLayout8({
+export function RevisionsPageLayout({
   auditSnapshotPath,
   revisionRowConfigsByType,
   author,
   instanceId
-}: RevisionsPageLayout8Props) {
+}: RevisionsPageLayoutProps) {
   const { getFieldLabel } = useFieldLabels();
 
   const REVISION_TABLE_COLUMNS: ColumnDefinition<KitsuResource>[] = [
@@ -119,15 +121,13 @@ export function RevisionsPageLayout8({
                   <h4>
                     <DinaMessage id="changedProperties" />
                   </h4>
-                  <KeyValueTable8
+                  <KeyValueTable
                     data={changed}
                     customValueCells={{
                       // createdOn is on almost every DTO, so handle it automatically here:
-                      createdOn: ({
-                        row: {
-                          original: { value }
-                        }
-                      }) => <DateView date={value} />,
+                      createdOn: ({ original: { value } }) => (
+                        <DateView date={value} />
+                      ),
                       ...revisionRowConfigsByType?.[type]?.customValueCells
                     }}
                     tableClassName="no-hover-highlight"
@@ -146,7 +146,7 @@ export function RevisionsPageLayout8({
   );
 }
 
-export interface RevisionsPage8Props {
+export interface RevisionsPageProps {
   /** API query path e.g. objectstore-api/metadata */
   queryPath: string;
   /** Audit snapshot path, including the base API path. */
@@ -156,18 +156,18 @@ export interface RevisionsPage8Props {
   detailsPageLink: string;
   /** Name field (default is "name") */
   nameField?: string;
-  revisionRowConfigsByType?: RevisionRowConfigsByType8;
+  revisionRowConfigsByType?: RevisionRowConfigsByType;
 }
 
 /** Revisions page with header/footer and query based on "id" from the URL query string. */
-export function RevisionsPage8({
+export function RevisionsPage({
   queryPath,
   auditSnapshotPath,
   resourceType,
   nameField = "name",
   detailsPageLink,
   revisionRowConfigsByType
-}: RevisionsPage8Props) {
+}: RevisionsPageProps) {
   const { formatMessage } = useDinaIntl();
 
   const router = useRouter();
@@ -199,7 +199,7 @@ export function RevisionsPage8({
               </a>
             </Link>
           </div>
-          <RevisionsPageLayout8
+          <RevisionsPageLayout
             auditSnapshotPath={auditSnapshotPath}
             instanceId={`${resourceType}/${id}`}
             revisionRowConfigsByType={revisionRowConfigsByType}

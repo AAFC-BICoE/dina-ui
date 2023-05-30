@@ -1,9 +1,9 @@
+import { allLangsDescriptionCell8 } from "common-ui";
 import Link from "next/link";
-import { allLangsDescriptionCell, allLangsDescriptionCell8 } from "common-ui";
 import { PreparationMethod } from "../../../types/collection-api";
-import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
+import { RevisionRowConfig } from "../revision-row-config";
 
-export const PREPARATION_METHOD_REVISION_ROW_CONFIG: RevisionRowConfig8<PreparationMethod> =
+export const PREPARATION_METHOD_REVISION_ROW_CONFIG: RevisionRowConfig<PreparationMethod> =
   {
     name: ({ id, name }) => (
       <Link href={`/collection/preparation-method/view?id=${id}`}>

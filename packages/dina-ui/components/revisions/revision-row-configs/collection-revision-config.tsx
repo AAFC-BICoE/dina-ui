@@ -1,14 +1,10 @@
-import {
-  allLangsDescriptionCell,
-  allLangsDescriptionCell8,
-  KeyValueTable
-} from "common-ui";
+import { allLangsDescriptionCell8, KeyValueTable } from "common-ui";
+import Link from "next/link";
 import { Collection } from "../../../types/collection-api";
 import { ReferenceLink } from "../ReferenceLink";
-import { RevisionRowConfig, RevisionRowConfig8 } from "../revision-row-config";
-import Link from "next/link";
+import { RevisionRowConfig } from "../revision-row-config";
 
-export const COLLECTION_REVISION_ROW_CONFIG: RevisionRowConfig8<Collection> = {
+export const COLLECTION_REVISION_ROW_CONFIG: RevisionRowConfig<Collection> = {
   name: ({ id, name, code }) => (
     <Link href={`/collection/collection/view?id=${id}`}>
       <a>{name || code || id}</a>

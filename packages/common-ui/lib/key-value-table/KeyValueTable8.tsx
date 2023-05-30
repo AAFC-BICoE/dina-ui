@@ -83,7 +83,7 @@ export function KeyValueTable8({
           header: () => valueHeader,
           accessorKey: "value",
           meta: {
-            cellClassName: "value-cell"
+            className: "value-cell"
           }
         }
       ]}
