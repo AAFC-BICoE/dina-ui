@@ -6,7 +6,7 @@ Run `yarn test` from the top-level dina-ui repo.
 
 == Run individual tests
 
-Either 
+
 
 * From VS Code: Install the https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner[Jest Runner] extension, which adds Run/Debug buttons to your test files.
 
