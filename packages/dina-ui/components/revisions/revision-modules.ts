@@ -1,3 +1,4 @@
+import { RevisionRowConfigsByType8 } from "./revision-row-config";
 import { RevisionRowConfigsByType } from "./revision-row-config";
 import { ASSEMBLAGE_REVISION_ROW_CONFIG } from "./revision-row-configs/assemblage-revision-config";
 import { COLLECTING_EVENT_REVISION_ROW_CONFIG } from "./revision-row-configs/collectingevent-revision-config";
@@ -36,7 +37,7 @@ export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
   organism: ORGANISM_REVISION_ROW_CONFIG
 };
 
-export const LOAN_TRANSACTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType =
+export const LOAN_TRANSACTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType8 =
   {
     transaction: TRANSACTION_REVISION_ROW_CONFIG
   };

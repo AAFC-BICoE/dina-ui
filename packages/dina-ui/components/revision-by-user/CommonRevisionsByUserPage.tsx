@@ -1,13 +1,13 @@
 import { DinaForm, DinaFormOnSubmit, SubmitButton, TextField } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "..";
-import { RevisionsPageLayout } from "../revisions/RevisionsPageLayout";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { RevisionRowConfigsByType } from "../revisions/revision-row-config";
+import { RevisionsPageLayout8 } from "../revisions/RevisionsPageLayout8";
+import { RevisionRowConfigsByType8 } from "../revisions/revision-row-config";
 
 export type RevisionsByUserPageProps = {
   snapshotPath: string;
-  revisionRowConfigsByType: RevisionRowConfigsByType;
+  revisionRowConfigsByType: RevisionRowConfigsByType8;
 };
 
 export default function RevisionsByUserPage({
@@ -31,7 +31,7 @@ export default function RevisionsByUserPage({
         {
           // Only show the revisions table if the author is set:
           author && (
-            <RevisionsPageLayout
+            <RevisionsPageLayout8
               auditSnapshotPath={snapshotPath}
               author={author}
               revisionRowConfigsByType={revisionRowConfigsByType}

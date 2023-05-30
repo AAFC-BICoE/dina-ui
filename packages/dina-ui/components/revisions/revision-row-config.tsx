@@ -1,5 +1,6 @@
 import { ComponentType } from "react";
 import { CellInfo } from "react-table";
+import { CellContext, ColumnDefTemplate } from "@tanstack/react-table";
 
 // Custom Revision table row rendering per type
 
@@ -11,4 +12,14 @@ export interface RevisionRowConfig<T> {
 
   /** Custom renderers for complex cell values. */
   customValueCells?: Record<string, ComponentType<CellInfo>>;
+}
+
+export type RevisionRowConfigsByType8 = Record<string, RevisionRowConfig8<any>>;
+
+export interface RevisionRowConfig8<T> {
+  /** The name/link shown in the "Resource Name" column. */
+  name?: ComponentType<T>;
+
+  /** Custom renderers for complex cell values. */
+  customValueCells?: Record<string, ColumnDefTemplate<CellContext<any, any>>>;
 }

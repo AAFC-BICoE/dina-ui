@@ -1,56 +1,75 @@
+import { KeyValueTable, KeyValueTable8 } from "common-ui";
 import Link from "next/link";
-import { KeyValueTable } from "common-ui";
 import { Transaction } from "../../../types/loan-transaction-api";
-import { RevisionRowConfig } from "../revision-row-config";
+import { Person } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
-import { Person } from "../../../types/objectstore-api";
+import { RevisionRowConfig8 } from "../revision-row-config";
 
-export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig<Transaction> = {
-  name: ({ id, transactionNumber }) => (
-    <Link href={`/loan-transaction/transaction/view?id=${id}`}>
-      <a>{transactionNumber || id}</a>
-    </Link>
-  ),
-  customValueCells: {
-    shipment: ({ original: { value: shipment } }) => (
-      <KeyValueTable
-        data={shipment}
-        customValueCells={{
-          address: ({ original: { value: address } }) => (
-            <KeyValueTable data={address} />
-          )
-        }}
-      />
+export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig8<Transaction> =
+  {
+    name: ({ id, transactionNumber }) => (
+      <Link href={`/loan-transaction/transaction/view?id=${id}`}>
+        <a>{transactionNumber || id}</a>
+      </Link>
     ),
-    managedAttributes: ({ original: { value } }) => (
-      <ManagedAttributesViewer
-        values={value}
-        managedAttributeApiPath="loan-transaction-api/managed-attribute"
-      />
-    ),
-    // Computed value; don't show audits.
-    involvedAgents: () => null,
-    agentRoles: ({ original: { value: agentRoles } }) => (
-      <div>
-        {agentRoles?.map((agentRole, index) => (
-          <KeyValueTable
-            key={index}
-            data={agentRole}
-            customValueCells={{
-              agent: ({ original: { value: personUuid } }) => (
-                <ReferenceLink<Person>
-                  type="person"
-                  baseApiPath="agent-api"
-                  reference={{ id: personUuid, type: "person" }}
-                  name={(person) => person.displayName ?? person.id}
-                  href="/person/view?id="
-                />
-              )
-            }}
-          />
-        ))}
-      </div>
-    )
-  }
-};
+    customValueCells: {
+      shipment: ({
+        row: {
+          original: { value: shipment }
+        }
+      }) => (
+        <KeyValueTable8
+          data={shipment}
+          customValueCells={{
+            address: ({
+              row: {
+                original: { value: address }
+              }
+            }) => <KeyValueTable data={address} />
+          }}
+        />
+      ),
+      managedAttributes: ({
+        row: {
+          original: { value }
+        }
+      }) => (
+        <ManagedAttributesViewer
+          values={value}
+          managedAttributeApiPath="loan-transaction-api/managed-attribute"
+        />
+      ),
+      // Computed value; don't show audits.
+      involvedAgents: () => null,
+      agentRoles: ({
+        row: {
+          original: { value: agentRoles }
+        }
+      }) => (
+        <div>
+          {agentRoles?.map((agentRole, index) => (
+            <KeyValueTable8
+              key={index}
+              data={agentRole}
+              customValueCells={{
+                agent: ({
+                  row: {
+                    original: { value: personUuid }
+                  }
+                }) => (
+                  <ReferenceLink<Person>
+                    type="person"
+                    baseApiPath="agent-api"
+                    reference={{ id: personUuid, type: "person" }}
+                    name={(person) => person.displayName ?? person.id}
+                    href="/person/view?id="
+                  />
+                )
+              }}
+            />
+          ))}
+        </div>
+      )
+    }
+  };

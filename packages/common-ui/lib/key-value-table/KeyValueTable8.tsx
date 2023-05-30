@@ -60,7 +60,7 @@ export function KeyValueTable8({
         // Render the value as a string, or the custom cell component if one is defined:
         {
           cell: (props) => {
-            const CustomCell = customValueCells?.[props.column.id];
+            const CustomCell = customValueCells?.[props.row.original.field];
             if (CustomCell) {
               return (
                 <ErrorBoundary
