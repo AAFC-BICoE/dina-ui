@@ -21,7 +21,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
                 }
               
     </style>
-    <div className=\\"btn-bar container-fluid px-5 d-flex mb-4\\">
+    <div className=\\"btn-bar container-fluid d-flex mb-4\\">
       <BackButton entityLink=\\"/collection/material-sample\\" entityId=\\"a503d31d-8203-4766-af85-db271e087853\\">
         <ForwardRef(LinkComponent) href=\\"/collection/material-sample/view?id=a503d31d-8203-4766-af85-db271e087853\\">
           <a className=\\"back-button my-auto \\" onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"/collection/material-sample/view?id=a503d31d-8203-4766-af85-db271e087853\\">
