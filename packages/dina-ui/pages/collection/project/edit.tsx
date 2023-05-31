@@ -16,7 +16,7 @@ import { Head, Nav, ViewPageLayout } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Project } from "../../../types/collection-api/resources/Project";
 import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "../../../components/page/PageLayout"; 
 
 interface ProjectFormProps {
   fetchedProject?: Project;

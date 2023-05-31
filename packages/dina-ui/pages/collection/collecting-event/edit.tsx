@@ -21,7 +21,7 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "../../../components/page/PageLayout"; 
 
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;
