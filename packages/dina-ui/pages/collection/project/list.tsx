@@ -40,7 +40,6 @@ export default function collectionMethodListPage() {
             ]
           }}
         />
-      <Footer />
     </PageLayout>
   );
 }

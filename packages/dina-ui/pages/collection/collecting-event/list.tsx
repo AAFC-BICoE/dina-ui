@@ -69,7 +69,6 @@ export default function CollectingEventListPage() {
             </div>
           )}
         />
-      <Footer />
     </PageLayout>
   );
 }

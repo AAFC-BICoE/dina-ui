@@ -53,7 +53,6 @@ export default function CollectingEventEditPage() {
             <CollectingEventForm />
           </div>
         )}
-      <Footer />
     </PageLayout>
   );
 }
