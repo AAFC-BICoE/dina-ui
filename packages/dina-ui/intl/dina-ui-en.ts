@@ -875,5 +875,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Form template is visible to everyone that is part of the {group} group.",
   formTemplateGroupVisibility_tooltip:
     "Please select a group for this form template, this will determine the visibility.",
-  controlledVocabularyTitle: "Controlled Vocabulary"
+  controlledVocabularyTitle: "Controlled Vocabulary",
+  generatingReport: "Generating Report..."
 };

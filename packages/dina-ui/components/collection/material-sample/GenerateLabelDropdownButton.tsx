@@ -156,7 +156,7 @@ export function GenerateLabelDropdownButton({
             disabled={reportTemplate === undefined || generatingReport}
           >
             {generatingReport ? (
-              "Generating Report..."
+              <DinaMessage id="generatingReport" />
             ) : (
               <DinaMessage id="generateLabel" />
             )}
