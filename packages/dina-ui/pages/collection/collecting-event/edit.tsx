@@ -21,6 +21,7 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import PageLayout from "../../../components/page/PageLayout"; 
 
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;
@@ -38,30 +39,21 @@ export default function CollectingEventEditPage() {
   const collectingEventQuery = useCollectingEventQuery(id?.toString());
 
   return (
-    <div>
+    <PageLayout
+    titleId ={formatMessage(title)}>
       <Head title={formatMessage(title)} />
-      <Nav />
-      <main className="container-fluid">
         {id ? (
           <div>
-            <h1 id="wb-cont">
-              <DinaMessage id={title} />
-            </h1>
             {withResponse(collectingEventQuery, ({ data }) => (
               <CollectingEventForm collectingEvent={data} />
             ))}
           </div>
         ) : (
           <div>
-            <h1>
-              <DinaMessage id={title} />
-            </h1>
             <CollectingEventForm />
           </div>
         )}
-      </main>
-      <Footer />
-    </div>
+    </PageLayout>
   );
 }
 
