@@ -19,6 +19,7 @@ import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
+import { boolean } from "mathjs";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
@@ -57,6 +58,7 @@ export interface ReactTable8Props<TData> {
   rowStyling?: (row?: Row<TData>) => any;
   loading?: boolean;
   columnVisibility?: VisibilityState;
+  highlightRow?: boolean;
 }
 
 export function ReactTable8<TData>({
@@ -84,7 +86,8 @@ export function ReactTable8<TData>({
   getRowCanExpand,
   rowStyling,
   loading = false,
-  columnVisibility
+  columnVisibility,
+  highlightRow = true
 }: ReactTable8Props<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -169,7 +172,13 @@ export function ReactTable8<TData>({
   const table = useReactTable<TData>(tableOption);
 
   return (
-    <div className={`ReactTable8 ${className}`}>
+    <div
+      className={classnames(
+        "ReactTable8",
+        className,
+        highlightRow ? "-highlight" : ""
+      )}
+    >
       {showPaginationTop && (
         <Pagination table={table} pageSizeOptions={pageSizeOptions} />
       )}
@@ -239,13 +248,19 @@ export function ReactTable8<TData>({
                   <DraggableRow
                     row={row}
                     reorderRow={reorderRow}
-                    className={index % 2 === 0 ? "-odd" : "-even"}
+                    className={classnames(
+                      `index-${index}`,
+                      index % 2 === 0 ? "-odd" : "-even"
+                    )}
                     style={rowStyling ? rowStyling(row) : undefined}
                   />
                 ) : (
                   <DefaultRow
                     row={row}
-                    className={index % 2 === 0 ? "-odd" : "-even"}
+                    className={classnames(
+                      `index-${index}`,
+                      index % 2 === 0 ? "-odd" : "-even"
+                    )}
                     style={rowStyling ? rowStyling(row) : undefined}
                   />
                 )}

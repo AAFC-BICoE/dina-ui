@@ -1,6 +1,7 @@
 import { KeyValueTable } from "common-ui";
+import { DataEntryViewer } from "common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import Link from "next/link";
-import { DinaUser } from "../../../types/user-api/resources/DinaUser";
+import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   CollectingEvent,
@@ -10,11 +11,10 @@ import {
 } from "../../../types/collection-api";
 import { Project } from "../../../types/collection-api/resources/Project";
 import { Metadata, Person } from "../../../types/objectstore-api";
+import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
-import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
-import { DataEntryViewer } from "common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 
 export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSample> =
   {
@@ -25,7 +25,11 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
     ),
     customValueCells: {
       // Show the entire value of the metadata map in a key-value table:
-      managedAttributes: ({ original: { value } }) => (
+      managedAttributes: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <ManagedAttributesViewer
           values={value}
           managedAttributeApiPath="collection-api/managed-attribute"
@@ -33,7 +37,11 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
       ),
 
       // Try to render object / array fields visually instead of the default JSON:
-      attachment: ({ original: { value } }) => (
+      attachment: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <div>
           {value?.map(
             (relation) =>
@@ -51,7 +59,11 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           )}
         </div>
       ),
-      preparationProtocol: ({ original: { value } }) => (
+      preparationProtocol: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <ReferenceLink<Protocol>
           baseApiPath="collection-api"
           type="protocol"
@@ -60,7 +72,11 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           href="/collection/protocol/view?id="
         />
       ),
-      collection: ({ original: { value } }) => (
+      collection: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <ReferenceLink<Collection>
           baseApiPath="collection-api"
           type="collection"
@@ -69,7 +85,11 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           href="/collection/collection/view?id="
         />
       ),
-      projects: ({ original: { value } }) => (
+      projects: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <div>
           {value?.map(
             (project) =>
@@ -87,8 +107,16 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           )}
         </div>
       ),
-      materialSampleType: ({ original: { value } }) => value,
-      preparedBy: ({ original: { value: relation } }) =>
+      materialSampleType: ({
+        row: {
+          original: { value }
+        }
+      }) => value,
+      preparedBy: ({
+        row: {
+          original: { value: relation }
+        }
+      }) =>
         relation.map((rel, index) => (
           <div key={index}>
             <ReferenceLink<Person>
@@ -100,7 +128,11 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
             />
           </div>
         )),
-      collectingEvent: ({ original: { value } }) => (
+      collectingEvent: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <ReferenceLink<CollectingEvent>
           baseApiPath="collection-api"
           type="collecting-event"
@@ -109,7 +141,11 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           href="/collection/collecting-event/view?id="
         />
       ),
-      storageUnit: ({ original: { value } }) => (
+      storageUnit: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <ReferenceLink<StorageUnit>
           baseApiPath="collection-api"
           type="storage-unit"
@@ -118,18 +154,22 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           href="/collection/storage-unit/view?id="
         />
       ),
-      associations: ({ original: { value } }) =>
+      associations: ({
+        row: {
+          original: { value }
+        }
+      }) =>
         value?.map((assoc, index) => (
           <div className="pb-2" key={index}>
             <strong>{index + 1}:</strong>
             <KeyValueTable
               data={assoc}
               customValueCells={{
-                associatedSample: ({ value: id }) => (
+                associatedSample: ({ getValue }) => (
                   <ReferenceLink<MaterialSample>
                     baseApiPath="collection-api"
                     type="material-sample"
-                    reference={{ id }}
+                    reference={{ id: getValue() }}
                     name={(sample) => sample.materialSampleName ?? sample.id}
                     href="/collection/material-sample/view?id="
                   />
@@ -138,15 +178,27 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
             />
           </div>
         )),
-      determination: ({ original: { value } }) => determinationRevision(value),
-      scheduledActions: ({ original: { value } }) =>
+      determination: ({
+        row: {
+          original: { value }
+        }
+      }) => determinationRevision(value),
+      scheduledActions: ({
+        row: {
+          original: { value }
+        }
+      }) =>
         value?.map((action, index) => (
           <div className="pb-2" key={index}>
             <strong>{index + 1}:</strong>
             <KeyValueTable
               data={action}
               customValueCells={{
-                assignedTo: ({ original: { value: user } }) =>
+                assignedTo: ({
+                  row: {
+                    original: { value: user }
+                  }
+                }) =>
                   user && (
                     <ReferenceLink<DinaUser>
                       baseApiPath="user-api"
@@ -160,19 +212,34 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
             />
           </div>
         )),
-      hostOrganism: ({ original: { value } }) => <KeyValueTable data={value} />,
-      organism: ({ original: { value: orgs } }) =>
+      hostOrganism: ({
+        row: {
+          original: { value }
+        }
+      }) => <KeyValueTable data={value} />,
+      organism: ({
+        row: {
+          original: { value: orgs }
+        }
+      }) =>
         orgs?.map((org, index) => (
           <KeyValueTable
             key={index}
             data={org}
             customValueCells={{
-              detertmination: ({ original: { value: dets } }) =>
-                determinationRevision(dets)
+              detertmination: ({
+                row: {
+                  original: { value: dets }
+                }
+              }) => determinationRevision(dets)
             }}
           />
         )),
-      extensionValues: ({ original: { value } }) => (
+      extensionValues: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <DataEntryViewer
           extensionValues={value}
           legend={<></>}
@@ -196,12 +263,14 @@ export function determinationRevision(value) {
       <KeyValueTable
         data={det}
         customValueCells={{
-          scientificNameDetails: ({ value: details }) => (
-            <KeyValueTable data={details} />
+          scientificNameDetails: ({ getValue }) => (
+            <KeyValueTable data={getValue()} />
           ),
-          managedAttributes: ({ value: data }) => <KeyValueTable data={data} />,
-          determiner: ({ value: ids }) =>
-            ids?.map((id) => (
+          managedAttributes: ({ getValue }) => (
+            <KeyValueTable data={getValue()} />
+          ),
+          determiner: ({ getValue }) =>
+            getValue()?.map((id) => (
               <div key={id}>
                 <ReferenceLink<Person>
                   baseApiPath="agent-api"

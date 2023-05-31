@@ -10,11 +10,11 @@ describe("KeyValueTable component", () => {
 
     const wrapper = mountWithAppContext(<KeyValueTable data={object} />);
 
-    expect(wrapper.find(".key-cell.rt-td").at(0).text()).toEqual("Key A");
-    expect(wrapper.find(".key-cell.rt-td").at(1).text()).toEqual("Key B");
+    expect(wrapper.find(".key-cell").at(0).text()).toEqual("Key A");
+    expect(wrapper.find(".key-cell").at(1).text()).toEqual("Key B");
 
-    expect(wrapper.find(".value-cell.rt-td").at(0).text()).toEqual("value A");
-    expect(wrapper.find(".value-cell.rt-td").at(1).text()).toEqual("value B");
+    expect(wrapper.find(".value-cell").at(0).text()).toEqual("value A");
+    expect(wrapper.find(".value-cell").at(1).text()).toEqual("value B");
   });
 
   it("Renders custom value cells", () => {
@@ -26,16 +26,16 @@ describe("KeyValueTable component", () => {
     const wrapper = mountWithAppContext(
       <KeyValueTable
         customValueCells={{
-          keyB: ({ value }) => value.toUpperCase()
+          keyB: ({ getValue }) => getValue().toUpperCase()
         }}
         data={object}
       />
     );
 
     // keyA unaffected:
-    expect(wrapper.find(".value-cell.rt-td").at(0).text()).toEqual("value A");
+    expect(wrapper.find(".value-cell").at(0).text()).toEqual("value A");
 
     // keyB uppercased:
-    expect(wrapper.find(".value-cell.rt-td").at(1).text()).toEqual("VALUE B");
+    expect(wrapper.find(".value-cell").at(1).text()).toEqual("VALUE B");
   });
 });

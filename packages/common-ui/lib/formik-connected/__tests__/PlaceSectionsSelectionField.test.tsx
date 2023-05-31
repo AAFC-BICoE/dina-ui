@@ -46,20 +46,20 @@ describe("PlaceSectionSelectionField component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const rows = wrapper.find(".rt-tr-group");
+    const rows = wrapper.find("tbody tr");
     expect(rows.length).toEqual(4);
     expect(
       rows
         .first()
-        .find(".rt-td")
-        .map(cell => cell.text())
+        .find("td")
+        .map((cell) => cell.text())
     ).toEqual(["Ottawa"]);
 
     expect(
       rows
         .last()
-        .find(".rt-td")
-        .map(cell => cell.text())
+        .find("td")
+        .map((cell) => cell.text())
     ).toEqual(["Eastern Ontario"]);
   });
 });

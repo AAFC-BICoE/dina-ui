@@ -1,5 +1,5 @@
-import { LOAN_TRANSACTION_MODULE_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
 import { RevisionsPage } from "../../../components/revisions/RevisionsPageLayout";
+import { LOAN_TRANSACTION_MODULE_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
 
 export default () => (
   <RevisionsPage

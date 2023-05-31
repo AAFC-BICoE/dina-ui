@@ -5,6 +5,47 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
   <h1 id=\\"wb-cont\\">
     Split Material Sample
   </h1>
+  <ButtonBarLayout>
+    <style>
+      
+                .btn-bar {
+                  position: sticky;
+                  width: 100%;
+                  left: 0;
+                  top: 0;
+                  min-width: 60px;
+                  background: #f3f3f3;
+                  border-bottom: 1px solid #d3d7cf;
+                  z-index: 900;
+                  padding: 10px;
+                }
+              
+    </style>
+    <div className=\\"btn-bar container-fluid d-flex mb-4\\">
+      <BackButton entityLink=\\"/collection/material-sample\\" entityId=\\"a503d31d-8203-4766-af85-db271e087853\\">
+        <ForwardRef(LinkComponent) href=\\"/collection/material-sample/view?id=a503d31d-8203-4766-af85-db271e087853\\">
+          <a className=\\"back-button my-auto \\" onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"/collection/material-sample/view?id=a503d31d-8203-4766-af85-db271e087853\\">
+            <FormattedMessage id=\\"backToReadOnlyPage\\">
+              <FormattedMessage defaultMessage=\\" \\" id=\\"backToReadOnlyPage\\">
+                Back to read-only page
+              </FormattedMessage>
+            </FormattedMessage>
+          </a>
+        </ForwardRef(LinkComponent)>
+      </BackButton>
+      <FormikConnect(SubmitButtonInternal) className=\\"ms-auto\\">
+        <SubmitButtonInternal className=\\"ms-auto\\" formik={{...}}>
+          <button className=\\"btn ms-auto btn-primary\\" style={{...}} onClick={[Function: onClick]} type=\\"submit\\">
+            <FormattedMessage id=\\"splitButton\\">
+              <FormattedMessage defaultMessage=\\" \\" id=\\"splitButton\\">
+                Split
+              </FormattedMessage>
+            </FormattedMessage>
+          </button>
+        </SubmitButtonInternal>
+      </FormikConnect(SubmitButtonInternal)>
+    </div>
+  </ButtonBarLayout>
   <div className=\\"row\\">
     <div className=\\"col-md-5\\">
       <h4 className=\\"mt-2\\">

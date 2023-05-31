@@ -1,4 +1,8 @@
-import { allLangsDescriptionCell, allLangsTitleCell } from "common-ui";
+import {
+  allLangsDescriptionCell,
+  allLangsDescriptionCell8,
+  allLangsTitleCell
+} from "common-ui";
 import Link from "next/link";
 import { Assemblage } from "../../../types/collection-api";
 import { Metadata } from "../../../types/objectstore-api";
@@ -13,7 +17,11 @@ export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
     </Link>
   ),
   customValueCells: {
-    attachment: ({ original: { value } }) => (
+    attachment: ({
+      row: {
+        original: { value }
+      }
+    }) => (
       <div>
         {value?.map(
           (relation) =>
@@ -31,12 +39,16 @@ export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
         )}
       </div>
     ),
-    multilingualTitle: allLangsTitleCell("multilingualTitle").Cell,
-    multilingualDescription: allLangsDescriptionCell("multilingualDescription")
-      .Cell,
+    multilingualTitle: allLangsTitleCell("multilingualTitle").cell,
+    multilingualDescription: allLangsDescriptionCell8("multilingualDescription")
+      .cell,
 
     // Show the entire value of the metadata map in a key-value table:
-    managedAttributes: ({ original: { value } }) => (
+    managedAttributes: ({
+      row: {
+        original: { value }
+      }
+    }) => (
       <ManagedAttributesViewer
         values={value}
         managedAttributeApiPath="collection-api/managed-attribute"
