@@ -51,7 +51,6 @@ export * from "./intl/common-ui-intl";
 export * from "./intl/IntlSupport";
 export * from "./intl/LanguageSelector";
 export * from "./key-value-table/KeyValueTable";
-export * from "./key-value-table/KeyValueTable8";
 export * from "./LabelView";
 export * from "./list-page-layout/FilterForm";
 export * from "./list-page-layout/ListPageLayout";

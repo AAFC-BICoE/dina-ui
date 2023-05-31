@@ -3,7 +3,7 @@ import {
   ColumnDefinition,
   dateCell,
   DateView,
-  KeyValueTable8,
+  KeyValueTable,
   ListPageLayout,
   useFieldLabels,
   useQuery,
@@ -120,7 +120,7 @@ export function RevisionsPageLayout({
                   <h4>
                     <DinaMessage id="changedProperties" />
                   </h4>
-                  <KeyValueTable8
+                  <KeyValueTable
                     data={changed}
                     customValueCells={{
                       // createdOn is on almost every DTO, so handle it automatically here:

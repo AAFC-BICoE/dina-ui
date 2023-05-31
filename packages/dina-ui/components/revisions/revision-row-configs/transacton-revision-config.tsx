@@ -1,4 +1,4 @@
-import { KeyValueTable, KeyValueTable8 } from "common-ui";
+import { KeyValueTable } from "common-ui";
 import Link from "next/link";
 import { Transaction } from "../../../types/loan-transaction-api";
 import { Person } from "../../../types/objectstore-api";
@@ -18,7 +18,7 @@ export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig<Transaction> = {
         original: { value: shipment }
       }
     }) => (
-      <KeyValueTable8
+      <KeyValueTable
         data={shipment}
         customValueCells={{
           address: ({
@@ -48,7 +48,7 @@ export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig<Transaction> = {
     }) => (
       <div>
         {agentRoles?.map((agentRole, index) => (
-          <KeyValueTable8
+          <KeyValueTable
             key={index}
             data={agentRole}
             customValueCells={{

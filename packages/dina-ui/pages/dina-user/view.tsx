@@ -4,7 +4,7 @@ import {
   DinaForm,
   EditButton,
   FieldView,
-  KeyValueTable8,
+  KeyValueTable,
   useAccount,
   useQuery,
   withResponse
@@ -119,7 +119,7 @@ export function RolesPerGroupTable({
         </h2>
       )}
       {!hideTable && (
-        <KeyValueTable8
+        <KeyValueTable
           data={stringRolesPerGroup}
           attributeCell={({
             row: {

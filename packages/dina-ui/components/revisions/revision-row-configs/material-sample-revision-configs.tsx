@@ -165,11 +165,11 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
             <KeyValueTable
               data={assoc}
               customValueCells={{
-                associatedSample: ({ value: id }) => (
+                associatedSample: ({ getValue }) => (
                   <ReferenceLink<MaterialSample>
                     baseApiPath="collection-api"
                     type="material-sample"
-                    reference={{ id }}
+                    reference={{ id: getValue() }}
                     name={(sample) => sample.materialSampleName ?? sample.id}
                     href="/collection/material-sample/view?id="
                   />
@@ -263,12 +263,14 @@ export function determinationRevision(value) {
       <KeyValueTable
         data={det}
         customValueCells={{
-          scientificNameDetails: ({ value: details }) => (
-            <KeyValueTable data={details} />
+          scientificNameDetails: ({ getValue }) => (
+            <KeyValueTable data={getValue()} />
           ),
-          managedAttributes: ({ value: data }) => <KeyValueTable data={data} />,
-          determiner: ({ value: ids }) =>
-            ids?.map((id) => (
+          managedAttributes: ({ getValue }) => (
+            <KeyValueTable data={getValue()} />
+          ),
+          determiner: ({ getValue }) =>
+            getValue()?.map((id) => (
               <div key={id}>
                 <ReferenceLink<Person>
                   baseApiPath="agent-api"

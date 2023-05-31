@@ -82,8 +82,8 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
             <KeyValueTable
               data={assertion}
               customValueCells={{
-                georeferencedBy: ({ value: ids }) =>
-                  ids?.map((id) => (
+                georeferencedBy: ({ getValue }) =>
+                  getValue()?.map((id) => (
                     <div key={id}>
                       <ReferenceLink<Person>
                         baseApiPath="agent-api"
@@ -94,9 +94,11 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
                       />
                     </div>
                   )) ?? null,
-                createdOn: ({ original: { value } }) => (
-                  <DateView date={value} />
-                )
+                createdOn: ({
+                  row: {
+                    original: { value }
+                  }
+                }) => <DateView date={value} />
               }}
             />
           </div>
@@ -119,8 +121,10 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
         <KeyValueTable
           data={value}
           customValueCells={{
-            stateProvince: (sp) => <KeyValueTable data={sp.value} />,
-            country: (c) => <KeyValueTable data={c.value} />
+            stateProvince: ({ getValue }) => (
+              <KeyValueTable data={getValue()} />
+            ),
+            country: ({ getValue }) => <KeyValueTable data={getValue()} />
           }}
         />
       ),
