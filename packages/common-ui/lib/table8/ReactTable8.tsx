@@ -58,7 +58,7 @@ export interface ReactTable8Props<TData> {
   rowStyling?: (row?: Row<TData>) => any;
   loading?: boolean;
   columnVisibility?: VisibilityState;
-  highlightRow: boolean;
+  highlightRow?: boolean;
 }
 
 export function ReactTable8<TData>({
