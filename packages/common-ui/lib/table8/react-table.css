@@ -89,8 +89,8 @@
 .ReactTable8.-striped tr.-odd {
   background: rgba(0, 0, 0, 0.03);
 }
-.ReactTable8 tbody tr:hover,
-.ReactTable8.-striped tr.-odd:hover {
+.ReactTable8.-highlight tbody tr:hover,
+.ReactTable8.-highlight.-striped tr.-odd:hover {
   background-color: rgb(222, 252, 222);
 }
 

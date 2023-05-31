@@ -1,4 +1,4 @@
-import { allLangsDescriptionCell } from "common-ui";
+import { allLangsDescriptionCell8 } from "common-ui";
 import Link from "next/link";
 import { Project } from "../../../types/collection-api";
 import { Metadata } from "../../../types/objectstore-api";
@@ -12,10 +12,14 @@ export const PROJECT_REVISION_ROW_CONFIG: RevisionRowConfig<Project> = {
     </Link>
   ),
   customValueCells: {
-    attachment: ({ original: { value } }) => (
+    attachment: ({
+      row: {
+        original: { value }
+      }
+    }) => (
       <div>
         {value?.map(
-          relation =>
+          (relation) =>
             relation && (
               <div>
                 <ReferenceLink<Metadata>
@@ -30,7 +34,7 @@ export const PROJECT_REVISION_ROW_CONFIG: RevisionRowConfig<Project> = {
         )}
       </div>
     ),
-    multilingualDescription: allLangsDescriptionCell("multilingualDescription")
-      .Cell
+    multilingualDescription: allLangsDescriptionCell8("multilingualDescription")
+      .cell
   }
 };

@@ -1,5 +1,5 @@
+import { allLangsDescriptionCell8 } from "common-ui";
 import Link from "next/link";
-import { allLangsDescriptionCell } from "common-ui";
 import { PreparationType } from "../../../types/collection-api";
 import { RevisionRowConfig } from "../revision-row-config";
 
@@ -11,8 +11,8 @@ export const PREPARATION_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<Preparation
       </Link>
     ),
     customValueCells: {
-      multilingualDescription: allLangsDescriptionCell(
+      multilingualDescription: allLangsDescriptionCell8(
         "multilingualDescription"
-      ).Cell
+      ).cell
     }
   };

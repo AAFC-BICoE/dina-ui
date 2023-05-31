@@ -13,11 +13,27 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
   ),
   customValueCells: {
     // Date Fields:
-    createdDate: ({ original: { value } }) => <DateView date={value} />,
-    xmpMetadataDate: ({ original: { value } }) => <DateView date={value} />,
-    acDigitizationDate: ({ original: { value } }) => <DateView date={value} />,
+    createdDate: ({
+      row: {
+        original: { value }
+      }
+    }) => <DateView date={value} />,
+    xmpMetadataDate: ({
+      row: {
+        original: { value }
+      }
+    }) => <DateView date={value} />,
+    acDigitizationDate: ({
+      row: {
+        original: { value }
+      }
+    }) => <DateView date={value} />,
     // Link to the Metadata creator:
-    acMetadataCreator: ({ original: { value: relation } }) => {
+    acMetadataCreator: ({
+      row: {
+        original: { value: relation }
+      }
+    }) => {
       return (
         relation && (
           <ReferenceLink<Person>
@@ -31,7 +47,11 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
       );
     },
     // Link to the doc creator:
-    dcCreator: ({ original: { value: relation } }) => {
+    dcCreator: ({
+      row: {
+        original: { value: relation }
+      }
+    }) => {
       return (
         relation && (
           <ReferenceLink<Person>
@@ -45,7 +65,11 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
       );
     },
     // Show the entire value of the metadata map in a key-value table:
-    managedAttributes: ({ original: { value } }) => (
+    managedAttributes: ({
+      row: {
+        original: { value }
+      }
+    }) => (
       <ManagedAttributesViewer
         values={value}
         managedAttributeApiPath="objectstore-api/managed-attribute"

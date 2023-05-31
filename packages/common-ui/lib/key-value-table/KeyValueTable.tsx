@@ -1,23 +1,22 @@
-import { DefaultTd, FieldHeader } from "common-ui";
-import { isArray, toPairs } from "lodash";
-import { ComponentType } from "react";
-import ReactTable, { CellInfo, TableCellRenderer } from "react-table";
+import { CellContext, ColumnDefTemplate } from "@tanstack/react-table";
+import classNames from "classnames";
+import { FieldHeader, ReactTable8 } from "common-ui";
+import { toPairs } from "lodash";
+import { ErrorBoundary } from "react-error-boundary";
 import { ReadOnlyValue } from "../formik-connected/FieldView";
 import { CommonMessage } from "../intl/common-ui-intl";
-import { ErrorBoundary } from "react-error-boundary";
-import classNames from "classnames";
 
 export interface KeyValueTableProps {
   /** The object whose keys and values are to be shown. */
   data: Record<string, any>;
 
   /** The value cell Component for a specific field can be overriden for displaying complex object types. */
-  customValueCells?: Record<string, ComponentType<CellInfo>>;
+  customValueCells?: Record<string, ColumnDefTemplate<CellContext<any, any>>>;
 
   attributeHeader?: JSX.Element;
   valueHeader?: JSX.Element;
 
-  attributeCell?: TableCellRenderer;
+  attributeCell?: ColumnDefTemplate<CellContext<any, any>>;
   tableClassName?: string;
 }
 
@@ -26,9 +25,13 @@ export function KeyValueTable({
   customValueCells,
   data,
   attributeHeader = <CommonMessage id="attributeLabel" />,
-  attributeCell = ({ original: { field } }) => (
+  attributeCell = ({
+    row: {
+      original: { field }
+    }
+  }) => (
     <strong>
-      <FieldHeader name={field} />
+      <FieldHeader name={field ?? ""} />
     </strong>
   ),
   valueHeader = <CommonMessage id="valueLabel" />,
@@ -41,21 +44,24 @@ export function KeyValueTable({
   }));
 
   return (
-    <ReactTable
+    <ReactTable8
       className={classNames("-striped", tableClassName)}
+      highlightRow={false}
       columns={[
         // Render the intl name of the field, or by default a title-case field:
         {
-          Cell: attributeCell,
-          Header: attributeHeader,
-          className: "key-cell",
-          accessor: "field",
-          width: 200
+          cell: attributeCell,
+          header: () => attributeHeader,
+          accessorKey: "field",
+          size: 200,
+          meta: {
+            className: "key-cell"
+          }
         },
         // Render the value as a string, or the custom cell component if one is defined:
         {
-          Cell: props => {
-            const CustomCell = customValueCells?.[props.original.field];
+          cell: (props) => {
+            const CustomCell = customValueCells?.[props.row.original.field];
             if (CustomCell) {
               return (
                 <ErrorBoundary
@@ -73,17 +79,17 @@ export function KeyValueTable({
               );
             }
 
-            return <ReadOnlyValue value={props.value} />;
+            return <ReadOnlyValue value={props.getValue()} />;
           },
-          Header: valueHeader,
-          accessor: "value",
-          className: "value-cell"
+          header: () => valueHeader,
+          accessorKey: "value",
+          meta: {
+            className: "value-cell"
+          }
         }
       ]}
       data={entries}
-      pageSize={entries.length || 1}
       showPagination={false}
-      TdComponent={DefaultTd}
     />
   );
 }

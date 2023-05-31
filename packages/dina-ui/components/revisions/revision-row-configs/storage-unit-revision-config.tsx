@@ -1,7 +1,7 @@
+import Link from "next/link";
 import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
-import Link from "next/link";
 
 export const STORAGE_UNIT_REVISION_ROW_CONFIG: RevisionRowConfig<StorageUnit> =
   {
@@ -11,7 +11,11 @@ export const STORAGE_UNIT_REVISION_ROW_CONFIG: RevisionRowConfig<StorageUnit> =
       </Link>
     ),
     customValueCells: {
-      storageUnitType: ({ original: { value } }) => (
+      storageUnitType: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <ReferenceLink<StorageUnitType>
           type="storage-unit-type"
           baseApiPath="collection-api"
@@ -20,7 +24,11 @@ export const STORAGE_UNIT_REVISION_ROW_CONFIG: RevisionRowConfig<StorageUnit> =
           href="/collection/storage-unit-type/view?id="
         />
       ),
-      parentStorageUnit: ({ original: { value } }) => (
+      parentStorageUnit: ({
+        row: {
+          original: { value }
+        }
+      }) => (
         <ReferenceLink<StorageUnitType>
           type="storage-unit"
           baseApiPath="collection-api"

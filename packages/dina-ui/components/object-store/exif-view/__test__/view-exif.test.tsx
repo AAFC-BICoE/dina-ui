@@ -1,7 +1,7 @@
 import { AccountContextI } from "common-ui";
 import { noop } from "lodash";
-import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import { ExifView } from "../ExifView";
 
 const exifData = new Map().set("date original created", "2000, Jan 8");
@@ -46,11 +46,9 @@ describe("View Exif page", () => {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });
 
-    expect(
-      wrapper.find("div.key-cell.rt-td").contains("Date Original Created")
-    ).toBe(true);
-    expect(wrapper.find("div.value-cell.rt-td").contains("2000, Jan 8")).toBe(
+    expect(wrapper.find("td.key-cell").contains("Date Original Created")).toBe(
       true
     );
+    expect(wrapper.find("td.value-cell").contains("2000, Jan 8")).toBe(true);
   });
 });

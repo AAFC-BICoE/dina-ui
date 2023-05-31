@@ -1,7 +1,7 @@
-import { allLangsDescriptionCell, KeyValueTable } from "common-ui";
+import { allLangsDescriptionCell8, KeyValueTable } from "common-ui";
+import Link from "next/link";
 import { Institution } from "../../../types/collection-api";
 import { RevisionRowConfig } from "../revision-row-config";
-import Link from "next/link";
 
 export const INSTITUTION_REVISION_ROW_CONFIG: RevisionRowConfig<Institution> = {
   name: ({ name, id }) => (
@@ -10,14 +10,18 @@ export const INSTITUTION_REVISION_ROW_CONFIG: RevisionRowConfig<Institution> = {
     </Link>
   ),
   customValueCells: {
-    identifiers: ({ original: { value: identifiers } }) =>
+    identifiers: ({
+      row: {
+        original: { value: identifiers }
+      }
+    }) =>
       identifiers?.map((identifier, index) => (
         <div className="pb-2" key={index}>
           <strong>{index + 1}:</strong>
           <KeyValueTable data={identifier} />
         </div>
       )),
-    multilingualDescription: allLangsDescriptionCell("multilingualDescription")
-      .Cell
+    multilingualDescription: allLangsDescriptionCell8("multilingualDescription")
+      .cell
   }
 };

@@ -121,7 +121,11 @@ export function RolesPerGroupTable({
       {!hideTable && (
         <KeyValueTable
           data={stringRolesPerGroup}
-          attributeCell={({ original: { field } }) => (
+          attributeCell={({
+            row: {
+              original: { field }
+            }
+          }) => (
             <strong>
               <GroupLabel groupName={field} />
             </strong>
