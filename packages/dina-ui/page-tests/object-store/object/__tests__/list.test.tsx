@@ -4,7 +4,7 @@ import {
   BulkSelectableFormValues,
   BULK_EDIT_IDS_KEY,
   DinaForm,
-  QueryPage
+  QueryPage8
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { Group } from "../../../../types/user-api";
@@ -248,7 +248,7 @@ describe("Metadata List Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(QueryPage).find(".rt-td").exists()).toEqual(true);
+    expect(wrapper.find(QueryPage8).find("td").exists()).toEqual(true);
   });
 
   it("Provides a toggle to see the gallery view.", async () => {
