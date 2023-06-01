@@ -28,7 +28,7 @@ export default function CollectingEventDetailsPage() {
       entityLink="/collection/collecting-event"
       type="collecting-event"
       apiBaseUrl="/collection-api"
-      mainClass="container-fluid"
+      mainClass="container-fluid px-5"
       showRevisionsLink={true}
     />
   );

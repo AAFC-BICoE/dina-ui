@@ -8,6 +8,7 @@ import {
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 export default function CollectingEventListPage() {
   const { formatMessage } = useDinaIntl();
@@ -41,41 +42,36 @@ export default function CollectingEventListPage() {
   ];
 
   return (
-    <div>
+    <PageLayout
+      titleId="collectingEventListTitle"
+      buttonBarContent={
+        <CreateButton entityLink="/collection/collecting-event" />
+      }
+    >
       <Head title={formatMessage("collectingEventListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="collectingEventListTitle" />
-        </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/collecting-event" />
-        </ButtonBar>
-        <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-          })}
-          filterAttributes={COLLECTING_EVENT_FILTER_ATTRIBUTES}
-          id="collecting-event-list"
-          queryTableProps={{
-            columns: COLLECTING_EVENT_TABLE_COLUMNS,
-            path: "collection-api/collecting-event"
-          }}
-          filterFormchildren={({ submitForm }) => (
-            <div className="mb-3">
-              <div style={{ width: "300px" }}>
-                <GroupSelectField
-                  onChange={() => setImmediate(submitForm)}
-                  name="group"
-                  showAnyOption={true}
-                />
-              </div>
+      <ListPageLayout
+        additionalFilters={(filterForm) => ({
+          // Apply group filter:
+          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+        })}
+        filterAttributes={COLLECTING_EVENT_FILTER_ATTRIBUTES}
+        id="collecting-event-list"
+        queryTableProps={{
+          columns: COLLECTING_EVENT_TABLE_COLUMNS,
+          path: "collection-api/collecting-event"
+        }}
+        filterFormchildren={({ submitForm }) => (
+          <div className="mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+              />
             </div>
-          )}
-        />
-      </main>
-      <Footer />
-    </div>
+          </div>
+        )}
+      />
+    </PageLayout>
   );
 }
