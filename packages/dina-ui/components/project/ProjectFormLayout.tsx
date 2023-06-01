@@ -20,7 +20,7 @@ export function ProjectFormLayout() {
     uuid,
     "data.relationships.projects.data.id"
   );
-  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
+  const { ELASTIC_SEARCH_COLUMN8 } = useMaterialSampleRelationshipColumns();
 
   return (
     <div>
@@ -84,7 +84,7 @@ export function ProjectFormLayout() {
       {readOnly && (
         <CustomQueryPageView
           titleKey="attachedMaterialSamples"
-          columns={ELASTIC_SEARCH_COLUMN}
+          columns={ELASTIC_SEARCH_COLUMN8}
           indexName={"dina_material_sample_index"}
           viewMode={readOnly}
           customViewQuery={readOnly ? customViewQuery : undefined}

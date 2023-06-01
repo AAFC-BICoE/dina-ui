@@ -37,7 +37,7 @@ export default function MetadataViewPage({
   reloadLastSearch
 }: MetadataViewPageProps) {
   const router = useRouter();
-  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
+  const { ELASTIC_SEARCH_COLUMN8 } = useMaterialSampleRelationshipColumns();
   const uuid = String(router.query.id);
 
   const { loading, response } = useMetadataViewQuery(uuid);
@@ -121,7 +121,7 @@ export default function MetadataViewPage({
                   {customViewQuery && (
                     <CustomQueryPageView
                       titleKey="attachedMaterialSamples"
-                      columns={ELASTIC_SEARCH_COLUMN}
+                      columns={ELASTIC_SEARCH_COLUMN8}
                       indexName={"dina_material_sample_index"}
                       viewMode={customViewQuery ? true : false}
                       customViewQuery={customViewQuery ?? undefined}

@@ -1,4 +1,9 @@
-import { useCollapsibleSection, QueryPage, LoadingSpinner } from "common-ui";
+import {
+  useCollapsibleSection,
+  QueryPage,
+  LoadingSpinner,
+  QueryPage8
+} from "common-ui";
 import { TRANSACTION_TABLE_COLUMNS } from "../../pages/loan-transaction/transaction/list";
 
 export interface TransactionTable {
@@ -14,7 +19,7 @@ export function MaterialSampleTransactionList({ transactionQueryDSL }) {
   }
 
   return (
-    <QueryPage
+    <QueryPage8
       indexName="dina_loan_transaction_index"
       customViewElasticSearchQuery={transactionQueryDSL}
       customViewFields={[]}

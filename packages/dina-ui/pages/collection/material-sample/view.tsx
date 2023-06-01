@@ -57,7 +57,7 @@ import { useMaterialSampleRelationshipColumns } from "../../../components/collec
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
-  const { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW } =
+  const { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW8 } =
     useMaterialSampleRelationshipColumns();
   const id = router.query.id?.toString();
 
@@ -208,7 +208,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 {/* Custom Query View */}
                 <CustomQueryPageView
                   indexName="dina_material_sample_index"
-                  columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
+                  columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW8}
                   localStorageKey="material-sample-children"
                   customQueryOptions={[
                     {

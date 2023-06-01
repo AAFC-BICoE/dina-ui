@@ -1,6 +1,12 @@
 import { KitsuResource } from "kitsu";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { FieldSet, QueryPage, QueryPageProps } from "..";
+import {
+  FieldSet,
+  QueryPage,
+  QueryPage8,
+  QueryPage8Props,
+  QueryPageProps
+} from "..";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../dina-ui/intl/dina-ui-en";
 import Select from "react-select";
 import { JsonTree } from "react-awesome-query-builder";
@@ -45,7 +51,7 @@ export interface CustomQueryOption {
 }
 
 export interface CustomQueryPageViewProps<TData extends KitsuResource>
-  extends QueryPageProps<TData> {
+  extends QueryPage8Props<TData> {
   /**
    * Legend title to be displayed in the card view. Does not need to be provided if
    * customQueryOptions are provided. The title will be the label of the selected customQueryOption
@@ -159,7 +165,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
     >
       {customQuerySelected ? (
         <>
-          <QueryPage<TData>
+          <QueryPage8<TData>
             {...queryPageProps}
             customViewQuery={customQuerySelected.customQuery}
             customViewFields={customQuerySelected.customViewFields ?? []}
@@ -171,7 +177,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
         </>
       ) : (
         <>
-          <QueryPage<TData> viewMode={true} {...queryPageProps} />
+          <QueryPage8<TData> viewMode={true} {...queryPageProps} />
         </>
       )}
     </FieldSet>
