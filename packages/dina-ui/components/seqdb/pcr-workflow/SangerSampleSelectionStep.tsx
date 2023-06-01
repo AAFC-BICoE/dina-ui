@@ -291,8 +291,8 @@ export function SangerSampleSelectionStep({
         setSelectionResources={setSelectedResourcesAndSaveOrder}
         viewMode={!editMode}
         enableDnd={true}
-        onDeselect={onSelectMaterial}
-        onSelect={onDeselectMaterial}
+        onDeselect={(unselected) => onSelectMaterial(unselected)}
+        onSelect={(selected) => onDeselectMaterial(selected)}
       />
     </div>
   );
