@@ -41,10 +41,9 @@ export function MetadataFileView({
   );
 
   downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
-
   // populate the thumbnail link
   if (thumbnailImgDerivative) {
-    downloadLinks.thumbNail = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata?.fileIdentifier}/thumbnail`;
+    downloadLinks.thumbNail = `${COMMON_LINK_ROOT}${metadata.bucket}/derivative/${thumbnailImgDerivative?.fileIdentifier}`;
   }
 
   // populate the large data link

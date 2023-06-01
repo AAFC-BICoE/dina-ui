@@ -53,8 +53,7 @@ export function ExistingObjectsAttacher({
       sortable: false
     },
     thumbnailCell({
-      bucketField: "bucket",
-      fileIdentifierField: "fileIdentifier"
+      bucketField: "bucket"
     }),
     {
       Cell: ({ original: { id, originalFilename } }) =>

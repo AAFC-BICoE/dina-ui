@@ -59,8 +59,7 @@ export default function MetadataListPage() {
 
   const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
     thumbnailCell({
-      bucketField: "data.attributes.bucket",
-      fileIdentifierField: "data.attributes.fileIdentifier"
+      bucketField: "data.attributes.bucket"
     }),
     {
       Cell: ({ original: { id, data } }) =>
@@ -111,6 +110,13 @@ export default function MetadataListPage() {
       sortable: false,
       width: 200
     }
+    // {
+    //   accessor: "included.attributes",
+    //   isKeyword: true,
+    //   show: false,
+    //   relationshipType: "derivative",
+    //   additionalAccessors: []
+    // },
   ];
 
   // Workaround to make sure react-table doesn't unmount TBodyComponent
