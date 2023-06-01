@@ -189,6 +189,7 @@ export default function PCRWorkFlowRunPage() {
               editMode={editMode}
               performSave={performSave}
               setPerformSave={setPerformSave}
+              setEditMode={setEditMode}
             />
           )}
         </TabPanel>
