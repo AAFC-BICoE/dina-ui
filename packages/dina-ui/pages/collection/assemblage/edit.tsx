@@ -173,7 +173,7 @@ export function AssemblageFormLayout() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const uuid = String(router?.query?.id);
-  const { ELASTIC_SEARCH_COLUMN8 } = useMaterialSampleRelationshipColumns();
+  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
   const customViewQuery = generateUUIDTree(
     uuid,
     "data.relationships.assemblages.data.id"
@@ -241,7 +241,7 @@ export function AssemblageFormLayout() {
       {readOnly && (
         <CustomQueryPageView
           titleKey="attachedMaterialSamples"
-          columns={ELASTIC_SEARCH_COLUMN8}
+          columns={ELASTIC_SEARCH_COLUMN}
           indexName={"dina_material_sample_index"}
           viewMode={readOnly}
           customViewQuery={readOnly ? customViewQuery : undefined}

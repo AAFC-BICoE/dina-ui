@@ -221,7 +221,7 @@ export function TransactionFormLayout({
   const [selectedResourcesView, setSelectedResourcesView] = useState<
     MaterialSample[]
   >([]);
-  const { ELASTIC_SEARCH_COLUMN8 } = useMaterialSampleRelationshipColumns();
+  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
 
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
@@ -398,7 +398,7 @@ export function TransactionFormLayout({
         <div className="mb-3">
           <QueryPage<MaterialSample>
             indexName={"dina_material_sample_index"}
-            columns={ELASTIC_SEARCH_COLUMN8}
+            columns={ELASTIC_SEARCH_COLUMN}
             selectionMode={!readOnly}
             selectionResources={
               readOnly ? selectedResourcesView : selectedResources
