@@ -258,7 +258,7 @@ export default function MaterialSampleListPage() {
     },
 
     // Created On
-    dateCell8("createdOn", "createdOn", "data.attributes.createdOn"),
+    dateCell8("createdOn", "data.attributes.createdOn"),
 
     // Material Sample State
     {

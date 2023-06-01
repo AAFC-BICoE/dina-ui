@@ -46,7 +46,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
       enableSorting: false,
       header: () => <FieldHeader name="materialSampleType" />
     },
-    dateCell8("createdOn", "createdOn", "createdOn"),
+    dateCell8("createdOn", "createdOn"),
     {
       id: "tags",
       cell: ({
