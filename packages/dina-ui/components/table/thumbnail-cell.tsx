@@ -1,9 +1,10 @@
+import { KitsuResource } from "kitsu";
 import { get } from "lodash";
+import Link from "next/link";
+import { TableColumn8 } from "packages/common-ui/lib/list-page/types";
+import { FaExternalLinkAlt } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";
-import { FaExternalLinkAlt } from "react-icons/fa";
-import Link from "next/link";
-import { ColumnDef } from "@tanstack/react-table";
 
 export function thumbnailCell({ fileIdentifierField, bucketField }) {
   return {
@@ -51,23 +52,23 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
   };
 }
 
-export function thumbnailCell8({
+export function thumbnailCell8<TData extends KitsuResource>({
   fileIdentifierField,
   bucketField
-}): ColumnDef<any> {
+}): TableColumn8<TData> {
   return {
     id: "thumbnailColumn",
     cell: ({ row: { original } }) => {
       const fileIdentifier = get<string | undefined>(
-        original,
+        original as any,
         fileIdentifierField
       );
-      const bucket = get<string | undefined>(original, bucketField);
+      const bucket = get<string | undefined>(original as any, bucketField);
 
       const fileId = `${fileIdentifier}/thumbnail`;
       const filePath = `/objectstore-api/file/${bucket}/${fileId}`;
-      const resourceExternalURL =
-        original?.data?.attributes?.resourceExternalURL;
+      const resourceExternalURL = (original as any)?.data?.attributes
+        ?.resourceExternalURL;
 
       return resourceExternalURL ? (
         <div className="d-flex h-100">
@@ -89,14 +90,14 @@ export function thumbnailCell8({
         <SmallThumbnail filePath={filePath} />
       );
     },
-    header: () => <DinaMessage id="thumbnail" />
+    header: () => <DinaMessage id="thumbnail" />,
 
-    // // These fields are required in the elastic search response for this cell to work.
-    // additionalAccessors: [
-    //   "data.attributes.resourceExternalURL",
-    //   fileIdentifierField,
-    //   bucketField
-    // ]
+    // These fields are required in the elastic search response for this cell to work.
+    additionalAccessors: [
+      "data.attributes.resourceExternalURL",
+      fileIdentifierField,
+      bucketField
+    ]
   };
 }
 

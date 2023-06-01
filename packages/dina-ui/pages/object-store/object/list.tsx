@@ -1,16 +1,17 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
-  dateCell,
+  dateCell8,
+  FieldHeader,
   FilterAttribute,
   filterBy,
-  QueryPage,
+  QueryPage8,
   SplitPagePanel,
-  stringArrayCell
+  stringArrayCell8
 } from "common-ui";
 import Link from "next/link";
-import { TableColumn } from "common-ui/lib/list-page/types";
+import { TableColumn8 } from "packages/common-ui/lib/list-page/types";
 import { Component, useMemo, useState } from "react";
-import { Head, Nav, thumbnailCell } from "../../../components";
+import { Head, Nav, thumbnailCell8 } from "../../../components";
 import {
   MetadataPreview,
   StoredObjectGallery
@@ -57,42 +58,53 @@ export default function MetadataListPage() {
     ? [8, 4]
     : [12, 0];
 
-  const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
-    thumbnailCell({
+  const METADATA_TABLE_COLUMNS: TableColumn8<Metadata>[] = [
+    thumbnailCell8({
       bucketField: "data.attributes.bucket",
       fileIdentifierField: "data.attributes.fileIdentifier"
     }),
     {
-      Cell: ({ original: { id, data } }) =>
-        data?.attributes?.originalFilename ? (
-          <Link href={`/object-store/object/view?id=${id}`} passHref={true}>
-            <a id={`file-name-${id}`}>{data?.attributes?.originalFilename}</a>
+      cell: ({ row: { original } }) =>
+        (original as any).data?.attributes?.originalFilename ? (
+          <Link
+            href={`/object-store/object/view?id=${original.id}`}
+            passHref={true}
+          >
+            <a id={`file-name-${original.id}`}>
+              {(original as any).data?.attributes?.originalFilename}
+            </a>
           </Link>
         ) : null,
-      label: "originalFilename",
-      accessor: "data.attributes.originalFilename",
+      header: () => <FieldHeader name="originalFilename" />,
+      accessorKey: "data.attributes.originalFilename",
       isKeyword: true
     },
     {
-      label: "acCaption",
-      accessor: "data.attributes.acCaption",
+      header: () => <FieldHeader name="acCaption" />,
+      accessorKey: "data.attributes.acCaption",
       isKeyword: true
     },
-    dateCell("acDigitizationDate", "data.attributes.acDigitizationDate"),
-    dateCell("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
+    dateCell8("acDigitizationDate", "data.attributes.acDigitizationDate"),
+    dateCell8("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
     {
-      Cell: ({ original: { included } }) => (
-        <>{included?.acMetadataCreator?.attributes?.displayName}</>
+      cell: ({ row: { original } }) => (
+        <>
+          {
+            (original as any).included?.acMetadataCreator?.attributes
+              ?.displayName
+          }
+        </>
       ),
-      label: "acMetadataCreator.displayName",
+      header: () => <FieldHeader name="acMetadataCreator.displayName" />,
       relationshipType: "person",
-      accessor: "included.attributes.displayName",
+      accessorKey: "included.attributes.displayName",
       isKeyword: true,
-      sortable: false
+      enableSorting: false
     },
-    stringArrayCell("acTags", "data.attributes.acTags"),
+    stringArrayCell8("acTags", "data.attributes.acTags"),
     {
-      Cell: ({ original }) => (
+      id: "action",
+      cell: ({ row: { original } }) => (
         <div className="d-flex h-100">
           <button
             className="btn btn-info m-auto preview-button"
@@ -103,13 +115,13 @@ export default function MetadataListPage() {
           </button>
         </div>
       ),
-      Header: (
+      header: () => (
         <div id="acPreviewLinksHeader">
           <DinaMessage id="viewPreviewButtonText" />
         </div>
       ),
-      sortable: false,
-      width: 200
+      enableSorting: false,
+      size: 200
     }
   ];
 
@@ -154,7 +166,7 @@ export default function MetadataListPage() {
         <div className="row">
           <div className={`table-section col-${tableSectionWidth}`}>
             <SplitPagePanel>
-              <QueryPage
+              <QueryPage8
                 indexName={"dina_object_store_index"}
                 dynamicFieldMapping={{
                   fields: [
