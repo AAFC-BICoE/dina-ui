@@ -791,8 +791,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   tags: "Tags",
   target: "Target",
   template: "Template",
-  template_AAFC_Beaver_ZT410: "AAFC_Beaver_ZT410",
-  template_AAFC_Zebra_ZT410: "AAFC_Zebra_ZT410",
   thisWillRemoveYourTemplate:
     "This will remove your selected template fields and default values.",
   thumbnail: "Thumbnail",
@@ -877,5 +875,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Form template is visible to everyone that is part of the {group} group.",
   formTemplateGroupVisibility_tooltip:
     "Please select a group for this form template, this will determine the visibility.",
-  controlledVocabularyTitle: "Controlled Vocabulary"
+  controlledVocabularyTitle: "Controlled Vocabulary",
+  generatingReport: "Generating Report..."
 };
