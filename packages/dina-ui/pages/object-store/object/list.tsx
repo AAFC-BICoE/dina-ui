@@ -4,7 +4,7 @@ import {
   FieldHeader,
   FilterAttribute,
   filterBy,
-  QueryPage8,
+  QueryPage,
   SplitPagePanel,
   stringArrayCell8
 } from "common-ui";
@@ -166,7 +166,7 @@ export default function MetadataListPage() {
         <div className="row">
           <div className={`table-section col-${tableSectionWidth}`}>
             <SplitPagePanel>
-              <QueryPage8
+              <QueryPage
                 indexName={"dina_object_store_index"}
                 dynamicFieldMapping={{
                   fields: [

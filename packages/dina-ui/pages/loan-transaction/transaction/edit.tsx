@@ -9,7 +9,7 @@ import {
   FieldSet,
   FieldSpy,
   NumberField,
-  QueryPage8,
+  QueryPage,
   RadioButtonsField,
   ReactTable8,
   StringArrayField,
@@ -396,7 +396,7 @@ export function TransactionFormLayout({
           </>
         )}
         <div className="mb-3">
-          <QueryPage8<MaterialSample>
+          <QueryPage<MaterialSample>
             indexName={"dina_material_sample_index"}
             columns={ELASTIC_SEARCH_COLUMN8}
             selectionMode={!readOnly}

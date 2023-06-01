@@ -2,15 +2,12 @@ import {
   ButtonBar,
   CreateButton,
   FieldHeader,
-  QueryPage8,
-  booleanCell,
+  QueryPage,
   booleanCell8,
-  dateCell,
   dateCell8,
-  stringArrayCell,
   stringArrayCell8
 } from "common-ui";
-import { TableColumn, TableColumn8 } from "common-ui/lib/list-page/types";
+import { TableColumn8 } from "common-ui/lib/list-page/types";
 import Link from "next/link";
 import { Transaction } from "packages/dina-ui/types/loan-transaction-api";
 import { Footer, Head, Nav } from "../../../components";
@@ -70,7 +67,7 @@ export default function TransactionListPage() {
         <ButtonBar>
           <CreateButton entityLink="/loan-transaction/transaction" />
         </ButtonBar>
-        <QueryPage8
+        <QueryPage
           indexName={"dina_loan_transaction_index"}
           columns={TRANSACTION_TABLE_COLUMNS}
           dynamicFieldMapping={{

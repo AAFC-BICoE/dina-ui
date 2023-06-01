@@ -1,18 +1,12 @@
-import { KitsuResource } from "kitsu";
-import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import {
-  FieldSet,
-  QueryPage,
-  QueryPage8,
-  QueryPage8Props,
-  QueryPageProps
-} from "..";
-import { DINAUI_MESSAGES_ENGLISH } from "../../../dina-ui/intl/dina-ui-en";
-import Select from "react-select";
-import { JsonTree } from "react-awesome-query-builder";
-import { useMemo, useState } from "react";
-import { CustomViewField } from "../list-page/query-builder/useQueryBuilderConfig";
 import { useLocalStorage } from "@rehooks/local-storage";
+import { KitsuResource } from "kitsu";
+import { useMemo, useState } from "react";
+import { JsonTree } from "react-awesome-query-builder";
+import Select from "react-select";
+import { FieldSet, QueryPage, QueryPageProps } from "..";
+import { DINAUI_MESSAGES_ENGLISH } from "../../../dina-ui/intl/dina-ui-en";
+import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { CustomViewField } from "../list-page/query-builder/useQueryBuilderConfig";
 
 export interface CustomQueryOption {
   /**
@@ -51,7 +45,7 @@ export interface CustomQueryOption {
 }
 
 export interface CustomQueryPageViewProps<TData extends KitsuResource>
-  extends QueryPage8Props<TData> {
+  extends QueryPageProps<TData> {
   /**
    * Legend title to be displayed in the card view. Does not need to be provided if
    * customQueryOptions are provided. The title will be the label of the selected customQueryOption
@@ -165,7 +159,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
     >
       {customQuerySelected ? (
         <>
-          <QueryPage8<TData>
+          <QueryPage<TData>
             {...queryPageProps}
             customViewQuery={customQuerySelected.customQuery}
             customViewFields={customQuerySelected.customViewFields ?? []}
@@ -177,7 +171,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
         </>
       ) : (
         <>
-          <QueryPage8<TData> viewMode={true} {...queryPageProps} />
+          <QueryPage<TData> viewMode={true} {...queryPageProps} />
         </>
       )}
     </FieldSet>

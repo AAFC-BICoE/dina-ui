@@ -9,7 +9,7 @@ import {
   FieldHeader,
   FilterAttribute,
   ListPageLayout,
-  QueryPage8,
+  QueryPage,
   stringArrayCell,
   stringArrayCell8
 } from "common-ui";
@@ -294,7 +294,7 @@ export default function MaterialSampleListPage() {
             </a>
           </Link>
         </ButtonBar>
-        <QueryPage8
+        <QueryPage
           rowStyling={rowStyling}
           indexName={"dina_material_sample_index"}
           dynamicFieldMapping={{

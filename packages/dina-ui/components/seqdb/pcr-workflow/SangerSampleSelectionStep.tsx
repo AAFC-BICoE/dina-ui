@@ -2,7 +2,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   DoOperationsError,
   LoadingSpinner,
-  QueryPage8,
+  QueryPage,
   filterBy,
   useAccount,
   useApiClient
@@ -283,7 +283,7 @@ export function SangerSampleSelectionStep({
           <SeqdbMessage id="selectedSamplesTitle" />
         </strong>
       )}
-      <QueryPage8<any>
+      <QueryPage<any>
         indexName={"dina_material_sample_index"}
         columns={ELASTIC_SEARCH_COLUMN8}
         selectionMode={editMode}
