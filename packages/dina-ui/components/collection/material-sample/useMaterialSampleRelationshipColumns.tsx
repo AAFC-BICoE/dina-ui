@@ -54,14 +54,16 @@ export function useMaterialSampleRelationshipColumns() {
     }
   ];
 
-  const ELASTIC_SEARCH_COLUMN8: TableColumn8<any>[] = [
+  const ELASTIC_SEARCH_COLUMN8: TableColumn8<MaterialSample>[] = [
     {
       id: "materialSampleName",
       cell: ({ row: { original } }) => (
         <Link href={`/collection/material-sample/view?id=${original.id}`}>
           <a>
-            {original.data.attributes.materialSampleName ||
-              original.data.attributes.dwcOtherCatalogNumbers?.join?.(", ") ||
+            {(original as any).data.attributes.materialSampleName ||
+              (original as any).data.attributes.dwcOtherCatalogNumbers?.join?.(
+                ", "
+              ) ||
               original.id}
           </a>
         </Link>
@@ -74,12 +76,8 @@ export function useMaterialSampleRelationshipColumns() {
     },
     {
       id: "scientificName",
-      cell: ({
-        row: {
-          original: { included }
-        }
-      }) => {
-        const organisms = included?.organism ?? [];
+      cell: ({ row: { original } }) => {
+        const organisms = (original as any).included?.organism ?? [];
         const materialSample: MaterialSample = {
           type: "material-sample",
           organism: organisms

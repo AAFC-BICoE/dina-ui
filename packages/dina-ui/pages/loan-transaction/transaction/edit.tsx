@@ -9,7 +9,7 @@ import {
   FieldSet,
   FieldSpy,
   NumberField,
-  QueryPage,
+  QueryPage8,
   RadioButtonsField,
   ReactTable8,
   StringArrayField,
@@ -22,7 +22,11 @@ import {
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
+import { compact, pick } from "lodash";
+import Link from "next/link";
 import { useRouter } from "next/router";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import {
   AttachmentsField,
   GroupSelectField,
@@ -31,17 +35,13 @@ import {
   PersonSelectField
 } from "../../../components";
 import { TabbedArrayField } from "../../../components/collection/TabbedArrayField";
+import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 import { ManagedAttributesEditor } from "../../../components/managed-attributes/ManagedAttributesEditor";
 import { TagSelectField } from "../../../components/tag-editor/TagSelectField";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
 import { Person } from "../../../types/objectstore-api";
-import { compact, pick } from "lodash";
-import Link from "next/link";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
-import { SeqdbMessage } from "../../../intl/seqdb-intl";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -221,7 +221,7 @@ export function TransactionFormLayout({
   const [selectedResourcesView, setSelectedResourcesView] = useState<
     MaterialSample[]
   >([]);
-  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
+  const { ELASTIC_SEARCH_COLUMN8 } = useMaterialSampleRelationshipColumns();
 
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
@@ -396,9 +396,9 @@ export function TransactionFormLayout({
           </>
         )}
         <div className="mb-3">
-          <QueryPage<MaterialSample>
+          <QueryPage8<MaterialSample>
             indexName={"dina_material_sample_index"}
-            columns={ELASTIC_SEARCH_COLUMN}
+            columns={ELASTIC_SEARCH_COLUMN8}
             selectionMode={!readOnly}
             selectionResources={
               readOnly ? selectedResourcesView : selectedResources
