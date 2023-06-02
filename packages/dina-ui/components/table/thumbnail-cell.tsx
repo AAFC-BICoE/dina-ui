@@ -10,10 +10,10 @@ export function thumbnailCell({ bucketField }) {
     Cell: ({ original }) => {
       const bucket = get<string | undefined>(original, bucketField);
       const derivativeType =
-        original.included.derivative.attributes.derivativeType;
+        original?.included?.derivative?.attributes?.derivativeType;
       const filePath =
         derivativeType === "THUMBNAIL_IMAGE"
-          ? `/objectstore-api/file/${bucket}/derivative/${original.included.derivative.attributes.fileIdentifier}`
+          ? `/objectstore-api/file/${bucket}/derivative/${original?.included?.derivative?.attributes?.fileIdentifier}`
           : "";
       const resourceExternalURL =
         original?.data?.attributes?.resourceExternalURL;
@@ -27,7 +27,7 @@ export function thumbnailCell({ bucketField }) {
           </Link>
 
           <Link
-            href={`/object-store/object/external-resource-view?id=${original.id}`}
+            href={`/object-store/object/external-resource-view?id=${original?.id}`}
           >
             <a className="m-auto">
               <DinaMessage id="detailsPageLink" />
