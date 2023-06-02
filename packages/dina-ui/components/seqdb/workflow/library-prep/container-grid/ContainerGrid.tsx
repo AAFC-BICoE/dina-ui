@@ -2,7 +2,7 @@ import { useDrop } from "react-dnd-cjs";
 import { ColumnDef } from "@tanstack/react-table";
 import { ContainerType, MolecularSample } from "../../../../../types/seqdb-api";
 import { DraggableSampleBox, SAMPLE_BOX_DRAG_KEY } from "./DraggableSampleBox";
-import { FieldHeader, ReactTable8 } from "packages/common-ui/lib";
+import { FieldHeader, ReactTable8 } from "../../../../../../common-ui/";
 
 interface ContainerGridProps {
   containerType: ContainerType;

@@ -8,7 +8,7 @@ import {
 import { useState, useEffect, useMemo } from "react";
 import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
 import RcTooltip from "rc-tooltip";
-import { ReactTable8 } from "packages/common-ui/lib";
+import { ReactTable8 } from "../../../../../common-ui/lib";
 
 interface ContainerGridProps {
   pcrBatch: PcrBatch;

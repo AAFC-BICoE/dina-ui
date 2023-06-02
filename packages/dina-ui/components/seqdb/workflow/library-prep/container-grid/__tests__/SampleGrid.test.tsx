@@ -80,7 +80,7 @@ describe("SampleGrid component", () => {
   beforeEach(() => {
     jest.resetAllMocks();
 
-    mockGet.mockImplementation(async path => {
+    mockGet.mockImplementation(async (path) => {
       // Mock the samples with libraryPreps:
       if (path === "seqdb-api/library-prep-batch/5/libraryPreps") {
         return {
@@ -95,8 +95,8 @@ describe("SampleGrid component", () => {
       }
     });
 
-    mockSave.mockImplementation(async ops => {
-      return ops.map(op => op.resource);
+    mockSave.mockImplementation(async (ops) => {
+      return ops.map((op) => op.resource);
     });
   });
 
@@ -110,7 +110,7 @@ describe("SampleGrid component", () => {
     wrapper.update();
 
     // There should be 12 columns
-    expect(wrapper.find(".rt-th").map(node => node.text())).toEqual([
+    expect(wrapper.find("th").map((node) => node.text())).toEqual([
       "",
       "1",
       "2",
@@ -128,9 +128,7 @@ describe("SampleGrid component", () => {
 
     // There should be 8 rows
     expect(
-      wrapper
-        .find(".rt-tbody .rt-tr")
-        .map(node => node.find(".rt-td").first().text())
+      wrapper.find("tbody tr").map((node) => node.find("td").first().text())
     ).toEqual(["A", "B", "C", "D", "E", "F", "G", "H"]);
   });
 
@@ -143,7 +141,7 @@ describe("SampleGrid component", () => {
     expect(
       wrapper
         .find(".available-sample-list .list-group-item .sample-box-text")
-        .map(node => node.text())
+        .map((node) => node.text())
     ).toEqual(["SAMP600", "SAMP800", "ZSAMP1000"]);
   });
 
@@ -153,16 +151,16 @@ describe("SampleGrid component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const rows = wrapper.find(".rt-tbody .rt-tr");
+    const rows = wrapper.find("tbody tr");
 
     // Expect the sample in 1A:
     expect(
-      rows.first().find(".rt-td").at(1).find(".sample-box-text").text()
+      rows.first().find("td").at(1).find(".sample-box-text").text()
     ).toEqual("SAMP200");
     // Expect the sample in 2B:
-    expect(
-      rows.at(1).find(".rt-td").at(2).find(".sample-box-text").text()
-    ).toEqual("SAMP400");
+    expect(rows.at(1).find("td").at(2).find(".sample-box-text").text()).toEqual(
+      "SAMP400"
+    );
   });
 
   it("Lets you change the fill mode.", async () => {
@@ -194,11 +192,7 @@ describe("SampleGrid component", () => {
 
     wrapper.update();
 
-    const gridCell = wrapper
-      .find(".rt-tbody .rt-tr")
-      .at(5)
-      .find(".rt-td")
-      .at(3);
+    const gridCell = wrapper.find("tbody tr").at(5).find("td").at(3);
     expect(gridCell.find(".sample-box-text").text()).toEqual("SAMP600");
     // The background color should be yellow:
     expect(
@@ -250,7 +244,7 @@ describe("SampleGrid component", () => {
     expect(
       wrapper
         .find(".available-sample-list li .sample-box-text")
-        .map(node => node.text())
+        .map((node) => node.text())
     ).toEqual(["SAMP200", "SAMP600", "SAMP800", "ZSAMP1000"]);
   });
 
@@ -529,7 +523,7 @@ describe("SampleGrid component", () => {
     expect(
       wrapper
         .find(".available-sample-list .sample-box-text")
-        .map(node => node.text())
+        .map((node) => node.text())
     ).toEqual(["SAMP800", "ZSAMP1000"]);
 
     // Submit the grid changes:
