@@ -8,6 +8,8 @@ import {
   StorageUnitBreadCrumb
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import PageLayout from "../../../components/page/PageLayout";
+
 
 const STORAGE_UNIT_FILTER_ATTRIBUTES = ["name", "createdBy", "barcode"];
 const STORAGE_UNIT_TABLE_COLUMNS = [
@@ -46,16 +48,8 @@ export default function storageUnitListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
-    <div>
-      <Head title={formatMessage("storageUnitListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="storageUnitListTitle" />
-        </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/storage-unit" />
-        </ButtonBar>
+    <PageLayout titleId="storageUnitListTitle"
+    buttonBarContent = {<CreateButton entityLink="/collection/storage-unit" />}>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Apply group filter:
@@ -80,8 +74,6 @@ export default function storageUnitListPage() {
             </div>
           )}
         />
-      </main>
-      <Footer />
-    </div>
+    </PageLayout>
   );
 }

@@ -10,6 +10,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
 import { writeStorage } from "@rehooks/local-storage";
+import PageLayout from "../../../components/page/PageLayout";
 
 export function useStorageUnit(id?: string) {
   return useQuery<StorageUnit>(
@@ -57,13 +58,7 @@ export default function StorageUnitEditPage() {
   }
 
   return (
-    <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
-      <div className="container">
-        <h1 id="wb-cont">
-          <DinaMessage id={title} />
-        </h1>
+    <PageLayout titleId ={title}>
         {id ? (
           withResponse(storageUnitQuery, ({ data }) => (
             <>
@@ -85,7 +80,6 @@ export default function StorageUnitEditPage() {
         ) : (
           <StorageUnitForm onSaved={goToViewPage} />
         )}
-      </div>
-    </div>
+    </PageLayout>
   );
 }
