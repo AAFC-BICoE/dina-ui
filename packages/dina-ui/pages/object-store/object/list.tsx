@@ -110,13 +110,6 @@ export default function MetadataListPage() {
       sortable: false,
       width: 200
     }
-    // {
-    //   accessor: "included.attributes",
-    //   isKeyword: true,
-    //   show: false,
-    //   relationshipType: "derivative",
-    //   additionalAccessors: []
-    // },
   ];
 
   // Workaround to make sure react-table doesn't unmount TBodyComponent

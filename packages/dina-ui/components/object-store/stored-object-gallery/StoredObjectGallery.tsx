@@ -75,10 +75,11 @@ function GalleryItem({
 }: GalleryItemProps) {
   const { acCaption, originalFilename, bucket } = metadata?.data?.attributes;
   const { id } = metadata;
-  const derivativeType = metadata.included.derivative.attributes.derivativeType;
+  const derivativeType =
+    metadata?.included?.derivative?.attributes?.derivativeType;
   const filePath =
     derivativeType === "THUMBNAIL_IMAGE"
-      ? `/objectstore-api/file/${bucket}/derivative/${metadata.included.derivative.attributes.fileIdentifier}`
+      ? `/objectstore-api/file/${bucket}/derivative/${metadata?.included?.derivative?.attributes?.fileIdentifier}`
       : "";
 
   const { formatMessage } = useDinaIntl();
