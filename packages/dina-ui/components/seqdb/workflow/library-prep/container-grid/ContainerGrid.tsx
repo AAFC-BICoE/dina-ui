@@ -1,7 +1,8 @@
 import { useDrop } from "react-dnd-cjs";
-import ReactTable, { Column } from "react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { ContainerType, MolecularSample } from "../../../../../types/seqdb-api";
 import { DraggableSampleBox, SAMPLE_BOX_DRAG_KEY } from "./DraggableSampleBox";
+import { FieldHeader, ReactTable8 } from "packages/common-ui/lib";
 
 interface ContainerGridProps {
   containerType: ContainerType;
@@ -26,25 +27,26 @@ export function ContainerGrid({
   movedSamples,
   onDrop
 }: ContainerGridProps) {
-  const columns: Column[] = [];
+  const columns: ColumnDef<MolecularSample>[] = [];
 
   // Add the letter column.
   columns.push({
-    Cell: ({ index }) => (
+    id: "col-index",
+    cell: ({ row: { index } }) => (
       <div style={{ padding: "7px 5px" }}>
         {String.fromCharCode(index + 65)}
       </div>
     ),
-    resizable: false,
-    sortable: false
+    enableSorting: false
   });
 
   for (let col = 0; col < containerType.numberOfColumns; col++) {
     const columnLabel = String(col + 1);
 
     columns.push({
-      Cell: ({ index: row }) => {
-        const rowLabel = String.fromCharCode(row + 65);
+      id: `col-${columnLabel}`,
+      cell: ({ row: { index } }) => {
+        const rowLabel = String.fromCharCode(index + 65);
         const coords = `${rowLabel}_${columnLabel}`;
 
         return (
@@ -57,9 +59,8 @@ export function ContainerGrid({
           </span>
         );
       },
-      Header: columnLabel,
-      resizable: false,
-      sortable: false
+      header: () => <FieldHeader name={columnLabel} />,
+      enableSorting: false
     });
   }
 
@@ -69,14 +70,13 @@ export function ContainerGrid({
   return (
     <div>
       <style>{`
-        .rt-td {
+        .ReactTable8 td {
           padding: 0 !important;
         }
       `}</style>
-      <ReactTable
+      <ReactTable8<MolecularSample>
         columns={columns}
         data={tableData}
-        minRows={0}
         showPagination={false}
       />
     </div>
@@ -86,7 +86,7 @@ export function ContainerGrid({
 function GridCell({ onDrop, sample, movedSamples }: GridCellProps) {
   const [, drop] = useDrop({
     accept: SAMPLE_BOX_DRAG_KEY,
-    drop: item => onDrop(item as any)
+    drop: (item) => onDrop(item as any)
   });
 
   return (

@@ -1,5 +1,5 @@
 import { useDrop } from "react-dnd-cjs";
-import ReactTable, { Column } from "react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { PcrBatch } from "../../../../types/seqdb-api";
 import {
   DraggablePCRBatchItemBox,
@@ -8,6 +8,7 @@ import {
 import { useState, useEffect, useMemo } from "react";
 import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
 import RcTooltip from "rc-tooltip";
+import { ReactTable8 } from "packages/common-ui/lib";
 
 interface ContainerGridProps {
   pcrBatch: PcrBatch;
@@ -49,22 +50,24 @@ export function ContainerGrid({
   }, [pcrBatch]);
 
   // Generate table columns, only when the row/column number changes.
-  const tableColumns: Column[] = useMemo(() => {
-    const columns: Column[] = [];
+  const tableColumns: ColumnDef<any>[] = useMemo(() => {
+    const columns: ColumnDef<any>[] = [];
 
     // Add the letter column.
     columns.push({
-      Cell: ({ index }) => (
+      id: "col-index",
+      cell: ({ row: { index } }) => (
         <div style={{ padding: "7px 5px", textAlign: "center" }}>
           {String.fromCharCode(index + 65)}
         </div>
       ),
-      resizable: false,
-      sortable: false,
-      width: 40,
-      style: {
-        background: "white",
-        boxShadow: "11px 0px 9px 0px rgba(0,0,0,0.1)"
+      enableSorting: false,
+      size: 40,
+      meta: {
+        style: {
+          background: "white",
+          boxShadow: "11px 0px 9px 0px rgba(0,0,0,0.1)"
+        }
       }
     });
 
@@ -73,8 +76,9 @@ export function ContainerGrid({
       const columnLabel = <div style={{ textAlign: "center" }}>{column}</div>;
 
       columns.push({
-        Cell: ({ index: row }) => {
-          const rowLabel = String.fromCharCode(row + 65);
+        id: `col-${column}`,
+        cell: ({ row: { index } }) => {
+          const rowLabel = String.fromCharCode(index + 65);
           const coords = `${rowLabel}_${column}`;
 
           return (
@@ -91,9 +95,8 @@ export function ContainerGrid({
             </span>
           );
         },
-        Header: columnLabel,
-        resizable: false,
-        sortable: false
+        header: () => columnLabel,
+        enableSorting: false
       });
     }
 
@@ -110,10 +113,9 @@ export function ContainerGrid({
           padding: 0 !important;
         }
       `}</style>
-      <ReactTable
+      <ReactTable8<any>
         columns={tableColumns}
         data={tableData}
-        minRows={0}
         showPagination={false}
       />
     </div>
