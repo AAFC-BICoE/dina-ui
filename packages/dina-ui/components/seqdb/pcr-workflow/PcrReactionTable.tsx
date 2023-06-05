@@ -195,6 +195,8 @@ export function PcrReactionTable({
       className="-striped"
       columns={PCR_REACTION_COLUMN}
       data={sortBy(pcrBatchItems, "cellNumber")}
+      manualPagination={true}
+      pageSize={1000}
     />
   );
 }
