@@ -9,6 +9,7 @@ import {
 import Select from "react-select";
 import { useState } from "react";
 import { find } from "lodash";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 function getTableColumn(locale: string) {
   const TABLE_COLUMNS: ColumnDef<ExtensionField>[] = [
@@ -71,13 +72,7 @@ export default function FieldListPage() {
   };
 
   return (
-    <div>
-      <Head title={formatMessage("extensionListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="extensionListTitle" />
-        </h1>
+    <PageLayout titleId="extensionListTitle">
         <div className="d-flex flex-column">
           <span style={{ fontWeight: "bold" }} className="mt-3">
             {" "}
@@ -103,7 +98,6 @@ export default function FieldListPage() {
             showPaginationTop={true}
           />
         </div>
-      </main>
-    </div>
+    </PageLayout>
   );
 }

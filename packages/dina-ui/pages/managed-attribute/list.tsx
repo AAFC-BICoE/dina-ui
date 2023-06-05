@@ -15,6 +15,7 @@ import {
   ManagedAttribute,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../types/collection-api";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 export default function ManagedAttributesListPage() {
   const { formatMessage } = useDinaIntl();
@@ -25,15 +26,7 @@ export default function ManagedAttributesListPage() {
   );
 
   return (
-    <div>
-      <Head title={formatMessage("managedAttributes")} />
-      <Nav />
-      <main role="main">
-        <Container fluid={true} className="px-5">
-          <h1 id="wb-cont">
-            <DinaMessage id="managedAttributes" />
-          </h1>
-
+    <PageLayout titleId="managedAttributes">
           <Tabs
             selectedIndex={currentStep}
             onSelect={setCurrentStep}
@@ -55,10 +48,7 @@ export default function ManagedAttributesListPage() {
               <TransactionAttributeListView />
             </TabPanel>
           </Tabs>
-        </Container>
-      </main>
-      <Footer />
-    </div>
+    </PageLayout>
   );
 }
 
@@ -69,7 +59,7 @@ interface CreateButtonProps {
 function CreateNewSection({ href }: CreateButtonProps) {
   return (
     <Card bg="light" className="mb-4">
-      <Card.Body>
+      <Card.Body className="ms-auto">
         <Link href={href} passHref={true}>
           <Button variant="info" className="mx-1 my-1">
             <DinaMessage id="createNewLabel" />

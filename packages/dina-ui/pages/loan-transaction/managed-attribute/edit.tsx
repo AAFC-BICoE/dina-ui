@@ -11,6 +11,7 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/collection-api";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -47,10 +48,7 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   };
 
   return (
-    <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
-      <main className="container">
+    <PageLayout titleId= {formatMessage(title)}>
         {id ? (
           <div>
             <h1 id="wb-cont">
@@ -71,9 +69,7 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
             <ManagedAttributeForm {...formProps} />
           </div>
         )}
-      </main>
-      <Footer />
-    </div>
+    </PageLayout>
   );
 }
 
