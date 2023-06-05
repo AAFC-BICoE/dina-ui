@@ -3,11 +3,8 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import {
-  Footer,
-  Head,
   ManagedAttributeForm,
-  ManagedAttributeFormProps,
-  Nav
+  ManagedAttributeFormProps
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -69,23 +66,18 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
 
   return (
     <PageLayout titleId={formatMessage(title)}>
-        {id ? (
-          <div>
-            {withResponse(query, ({ data }) => (
-              <ManagedAttributeForm
-                {...formProps}
-                fetchedManagedAttribute={data}
-              />
-            ))}
-          </div>
-        ) : (
-          <div>
-            <h1>
-              <DinaMessage id="addManagedAttributeTitle" />
-            </h1>
-            <ManagedAttributeForm {...formProps} />
-          </div>
-        )}
+      {id ? (
+        <div>
+          {withResponse(query, ({ data }) => (
+            <ManagedAttributeForm
+              {...formProps}
+              fetchedManagedAttribute={data}
+            />
+          ))}
+        </div>
+      ) : (
+        <ManagedAttributeForm {...formProps} />
+      )}
     </PageLayout>
   );
 }
