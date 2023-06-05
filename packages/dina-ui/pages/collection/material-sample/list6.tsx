@@ -251,35 +251,7 @@ export default function MaterialSampleListPage() {
       accessor: "data.attributes.materialSampleState",
       isKeyword: true,
       show: false
-    },
-
-    // Action buttons for each row.
-    ...[
-      {
-        Cell: ({ original: sample }) => (
-          <div className="d-flex">
-            <Link href={`/collection/material-sample/view?id=${sample.id}`}>
-              <a className="btn btn-link">
-                <DinaMessage id="view" />
-              </a>
-            </Link>
-            <Link href={`/collection/material-sample/edit?id=${sample.id}`}>
-              <a className="btn btn-link">
-                <DinaMessage id="editButtonText" />
-              </a>
-            </Link>
-            <DeleteButton
-              replaceClassName="btn btn-link"
-              type="material-sample"
-              id={sample.id}
-              options={{ apiBaseUrl: "/collection-api" }}
-            />
-          </div>
-        ),
-        Header: "",
-        sortable: false
-      }
-    ]
+    }
   ];
 
   function rowStyling(

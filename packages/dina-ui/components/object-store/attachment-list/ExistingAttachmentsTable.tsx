@@ -55,8 +55,7 @@ export function ExistingAttachmentsTable({
       sortable: false
     },
     thumbnailCell({
-      bucketField: "metadata.bucket",
-      fileIdentifierField: "metadata.fileIdentifier"
+      bucketField: "metadata.bucket"
     }),
     {
       Cell: ({ original: { id, metadata } }) => {

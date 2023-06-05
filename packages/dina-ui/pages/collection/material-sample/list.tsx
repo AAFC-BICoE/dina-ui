@@ -267,35 +267,7 @@ export default function MaterialSampleListPage() {
       accessorKey: "data.attributes.materialSampleState",
       isKeyword: true,
       isColumnVisible: false
-    },
-
-    // Action buttons for each row.
-    ...[
-      {
-        id: "actionColumn",
-        cell: ({ row: { original: sample } }) => (
-          <div className="d-flex">
-            <Link href={`/collection/material-sample/view?id=${sample.id}`}>
-              <a className="btn btn-link">
-                <DinaMessage id="view" />
-              </a>
-            </Link>
-            <Link href={`/collection/material-sample/edit?id=${sample.id}`}>
-              <a className="btn btn-link">
-                <DinaMessage id="editButtonText" />
-              </a>
-            </Link>
-            <DeleteButton
-              replaceClassName="btn btn-link"
-              type="material-sample"
-              id={sample.id}
-              options={{ apiBaseUrl: "/collection-api" }}
-            />
-          </div>
-        ),
-        enableSorting: false
-      }
-    ]
+    }
   ];
 
   function rowStyling(row: Row<MaterialSample>) {

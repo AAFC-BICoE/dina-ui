@@ -3,14 +3,12 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import {
-  Footer,
-  Head,
   ManagedAttributeForm,
-  ManagedAttributeFormProps,
-  Nav
+  ManagedAttributeFormProps
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/collection-api";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -47,34 +45,21 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   };
 
   return (
-    <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
-      <main className="container">
-        {id ? (
-          <div>
-            <h1 id="wb-cont">
-              <DinaMessage id="editManagedAttributeTitle" />
-            </h1>
-            {withResponse(query, ({ data }) => (
-              <ManagedAttributeForm
-                {...formProps}
-                fetchedManagedAttribute={data}
-                withGroup={false}
-              />
-            ))}
-          </div>
-        ) : (
-          <div>
-            <h1>
-              <DinaMessage id="addManagedAttributeTitle" />
-            </h1>
-            <ManagedAttributeForm {...formProps} withGroup={false} />
-          </div>
-        )}
-      </main>
-      <Footer />
-    </div>
+    <PageLayout titleId={formatMessage(title)}>
+      {id ? (
+        <div>
+          {withResponse(query, ({ data }) => (
+            <ManagedAttributeForm
+              {...formProps}
+              fetchedManagedAttribute={data}
+              withGroup={false}
+            />
+          ))}
+        </div>
+      ) : (
+        <ManagedAttributeForm {...formProps} withGroup={false} />
+      )}
+    </PageLayout>
   );
 }
 

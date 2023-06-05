@@ -8,6 +8,7 @@ import {
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 export default function CollectingEventListPage() {
   const { formatMessage } = useDinaIntl();
@@ -41,16 +42,10 @@ export default function CollectingEventListPage() {
   ];
 
   return (
-    <div>
+    <PageLayout
+    titleId = "collectingEventListTitle"
+    buttonBarContent = {<CreateButton entityLink="/collection/collecting-event" />}>
       <Head title={formatMessage("collectingEventListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="collectingEventListTitle" />
-        </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/collecting-event" />
-        </ButtonBar>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Apply group filter:
@@ -74,8 +69,6 @@ export default function CollectingEventListPage() {
             </div>
           )}
         />
-      </main>
-      <Footer />
-    </div>
+    </PageLayout>
   );
 }

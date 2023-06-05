@@ -2,29 +2,17 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import Dropdown from "react-bootstrap/Dropdown";
 import Button from "react-bootstrap/Button";
 import React, { useState } from "react";
-import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
-import { DINAUI_MESSAGES_ENGLISH } from "../../../../dina-ui/intl/dina-ui-en";
 import { PersistedResource } from "kitsu";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import { ReportTemplate } from "../../../../dina-ui/types/report-label-api";
 import Select from "react-select";
+import { useAccount, useQuery } from "../../../../common-ui/lib";
+import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
 
-type TemplateType = "AAFC_Beaver_ZT410.twig" | "AAFC_Zebra_ZT410.twig";
-
-interface Template {
-  label: keyof typeof DINAUI_MESSAGES_ENGLISH;
-  value: TemplateType;
+interface ReportTemplateOption {
+  label: string;
+  value: string;
 }
-
-const TEMPLATE_TYPE_OPTIONS: Template[] = [
-  {
-    label: "template_AAFC_Beaver_ZT410",
-    value: "AAFC_Beaver_ZT410.twig"
-  },
-  {
-    label: "template_AAFC_Zebra_ZT410",
-    value: "AAFC_Zebra_ZT410.twig"
-  }
-];
 
 type CustomMenuProps = {
   children?: React.ReactNode;
@@ -40,60 +28,102 @@ interface GenerateLabelDropdownButtonProps {
 export function GenerateLabelDropdownButton({
   materialSample
 }: GenerateLabelDropdownButtonProps) {
+  const [reportTemplate, setReportTemplate] = useState<
+    ReportTemplateOption | undefined
+  >();
+  const [reportTemplateOptions, setReportTemplateOptions] = useState<
+    ReportTemplateOption[]
+  >([]);
+  const [generatingReport, setGeneratingReport] = useState<boolean>(false);
+  const { groupNames } = useAccount();
   const { apiClient } = useApiClient();
-  const { formatMessage } = useDinaIntl();
+  useQuery<ReportTemplate[]>(
+    {
+      path: "report-label-api/report-template",
+      filter: {
+        rsql: `group=in=(${groupNames})`
+      }
+    },
+    {
+      onSuccess: async ({ data }) => {
+        const generatedOptions = data.map((template) => ({
+          label: template?.name ?? "",
+          value: template?.id ?? ""
+        }));
+        setReportTemplateOptions(generatedOptions);
 
-  const [template, setTemplate] = useState<Template | undefined>();
-
-  // data for POST request
-  const data = [materialSample];
+        // If options are available, just set the first one automatically.
+        if (generatedOptions.length > 0) {
+          setReportTemplate(generatedOptions[0]);
+        }
+      }
+    }
+  );
 
   /**
    * Asynchronous POST request to reports_labels_api. Used to retrieve PDF
-   *
-   * @param data material sample data for reports_labels_api
-   * @param template twig template selected by user
    */
   async function generateLabel() {
-    if (!template) {
+    if (!reportTemplate) {
       return;
     }
+    setGeneratingReport(true);
+    const payloadHeaders = Object.keys(materialSample);
+    const payloadData = Object.values(materialSample).map((value) => {
+      if (value === null || value === undefined) {
+        return "";
+      }
+      const stringify =
+        typeof value !== "string" ? `"${JSON.stringify(value)}"` : value;
+      const ret = stringify.replace(/,/g, ";");
+      return ret;
+    });
 
-    // axios post request
+    const postData = {
+      data: {
+        type: "report-request",
+        attributes: {
+          group: groupNames?.[0],
+          reportTemplateUUID: reportTemplate.value,
+          payload: {
+            headers: payloadHeaders,
+            data: [payloadData]
+          }
+        }
+      }
+    };
+
     try {
-      await apiClient.axios
-        .post(
-          `/report-label-api/labels/v1.0/?template=${template.value}&format=pdf`,
-          data,
-          { responseType: "blob" }
-        )
-        .then((response) => {
-          window.open(URL.createObjectURL(response.data)); // open pdf in new tab
-
-          // Download PDF. Keep this for now in case client wants to change behavior
-          // const url = window.URL.createObjectURL(new Blob([response.data]));
-          // const link = document.createElement("a");
-          // link.href = url;
-          // link.setAttribute(
-          //   "download",
-          //   `${materialSample?.materialSampleName}.pdf`
-          // ); // or any other extension
-          // document.body.appendChild(link);
-          // link.click();
-        });
+      const reportTemplatePostResponse = await apiClient.axios.post(
+        "report-label-api/report-request",
+        postData,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json"
+          }
+        }
+      );
+      const reportRequestGetResponse = await apiClient.axios.get(
+        `report-label-api/file/${reportTemplatePostResponse?.data?.data?.id}`,
+        { responseType: "blob" }
+      );
+      const url = window?.URL.createObjectURL(reportRequestGetResponse?.data);
+      const link = document?.createElement("a");
+      link.href = url;
+      const filePath = reportRequestGetResponse?.config?.url;
+      const fileName = !filePath
+        ? "report.csv"
+        : filePath.substring(filePath.lastIndexOf("/") + 1);
+      link?.setAttribute("download", fileName); // or any other extension
+      document?.body?.appendChild(link);
+      link?.click();
+      window?.URL?.revokeObjectURL(url);
+      setGeneratingReport(false);
     } catch (error) {
+      setGeneratingReport(false);
       return error;
     }
   }
-
-  function toOption(templateSelected: Template) {
-    return {
-      label: formatMessage(templateSelected.label),
-      value: templateSelected
-    };
-  }
-
-  const dropdownOptionsTranslated = TEMPLATE_TYPE_OPTIONS.map(toOption) ?? [];
 
   const CustomMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
@@ -111,21 +141,25 @@ export function GenerateLabelDropdownButton({
           <strong>
             <DinaMessage id="selectTemplate" />
           </strong>
-          <Select<{ label: string; value?: Template }>
+          <Select<ReportTemplateOption>
             className="mt-2"
             name="template"
-            options={dropdownOptionsTranslated}
-            onChange={(selection) => setTemplate(selection?.value)}
+            options={reportTemplateOptions}
+            onChange={(selection) => selection && setReportTemplate(selection)}
             autoFocus={true}
-            value={template && toOption(template)}
             isClearable={true}
+            value={reportTemplate}
           />
           <Button
             onClick={generateLabel}
             className="mt-3"
-            disabled={template === undefined}
+            disabled={reportTemplate === undefined || generatingReport}
           >
-            <DinaMessage id="generateLabel" />
+            {generatingReport ? (
+              <DinaMessage id="generatingReport" />
+            ) : (
+              <DinaMessage id="generateLabel" />
+            )}
           </Button>
         </div>
       );
