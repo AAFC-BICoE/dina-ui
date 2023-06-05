@@ -5,17 +5,16 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
 
-export function thumbnailCell({ fileIdentifierField, bucketField }) {
+export function thumbnailCell({ bucketField }) {
   return {
     Cell: ({ original }) => {
-      const fileIdentifier = get<string | undefined>(
-        original,
-        fileIdentifierField
-      );
       const bucket = get<string | undefined>(original, bucketField);
-
-      const fileId = `${fileIdentifier}/thumbnail`;
-      const filePath = `/objectstore-api/file/${bucket}/${fileId}`;
+      const derivativeType =
+        original?.included?.derivative?.attributes?.derivativeType;
+      const filePath =
+        derivativeType === "THUMBNAIL_IMAGE"
+          ? `/objectstore-api/file/${bucket}/derivative/${original?.included?.derivative?.attributes?.fileIdentifier}`
+          : "";
       const resourceExternalURL =
         original?.data?.attributes?.resourceExternalURL;
 
@@ -28,7 +27,7 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
           </Link>
 
           <Link
-            href={`/object-store/object/external-resource-view?id=${original.id}`}
+            href={`/object-store/object/external-resource-view?id=${original?.id}`}
           >
             <a className="m-auto">
               <DinaMessage id="detailsPageLink" />
@@ -41,11 +40,11 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
     },
     sortable: false,
     Header: <DinaMessage id="thumbnail" />,
-
     // These fields are required in the elastic search response for this cell to work.
     additionalAccessors: [
+      "included.attributes.fileIdentifier",
+      "included.attributes.derivativeType",
       "data.attributes.resourceExternalURL",
-      fileIdentifierField,
       bucketField
     ]
   };
