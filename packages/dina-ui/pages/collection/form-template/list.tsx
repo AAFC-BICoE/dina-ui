@@ -12,6 +12,7 @@ import Link from "next/link";
 import { FormTemplate } from "../../../types/collection-api";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 const FILTER_ATTRIBUTES = ["name", "createdBy"];
 
@@ -67,16 +68,8 @@ export default function MaterialSampleFormTemplateListPage() {
   ];
 
   return (
-    <div>
-      <Head title={formatMessage("materialSampleFormTemplates")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="materialSampleFormTemplates" />
-        </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/form-template" />
-        </ButtonBar>
+    <PageLayout titleId="materialSampleFormTemplates"
+    buttonBarContent = {<CreateButton entityLink="/collection/form-template" />}>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Display all user form templates and public to the group templates.
@@ -106,8 +99,6 @@ export default function MaterialSampleFormTemplateListPage() {
             </div>
           )}
         />
-      </main>
-      <Footer />
-    </div>
+    </PageLayout>
   );
 }
