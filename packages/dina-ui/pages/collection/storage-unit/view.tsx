@@ -11,19 +11,19 @@ import { StorageUnit } from "../../../types/collection-api";
 export default function StorageUnitDetailsPage() {
   return (
     <ViewPageLayout<StorageUnit>
-      form={props => (
+      form={(props) => (
         <DinaForm<StorageUnit> {...props}>
           <StorageUnitFormFields />
         </DinaForm>
       )}
-      query={id => ({
+      query={(id) => ({
         path: `collection-api/storage-unit/${id}?include=parentStorageUnit,storageUnitChildren,storageUnitType,hierarchy`
       })}
       entityLink="/collection/storage-unit"
       type="storage-unit"
       apiBaseUrl="/collection-api"
-      editButton={formProps => <StorageEditButton {...formProps} />}
-      deleteButton={formProps =>
+      editButton={(formProps) => <StorageEditButton {...formProps} />}
+      deleteButton={(formProps) =>
         hasChildren(formProps.initialValues) ? null : (
           <DeleteButton
             id={formProps.initialValues.id}
@@ -33,8 +33,8 @@ export default function StorageUnitDetailsPage() {
           />
         )
       }
-      nameField={unit => storageUnitDisplayName(unit)}
-      showRevisionsLinkAtBottom={true}
+      nameField={(unit) => storageUnitDisplayName(unit)}
+      showRevisionsLink={true}
     />
   );
 }
