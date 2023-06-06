@@ -60,8 +60,7 @@ export default function MetadataListPage() {
 
   const METADATA_TABLE_COLUMNS: TableColumn8<Metadata>[] = [
     thumbnailCell8({
-      bucketField: "data.attributes.bucket",
-      fileIdentifierField: "data.attributes.fileIdentifier"
+      bucketField: "data.attributes.bucket"
     }),
     {
       cell: ({ row: { original } }) =>

@@ -163,8 +163,7 @@ export function AttachmentsEditor({
                   <ReactTable8
                     columns={[
                       thumbnailCell8({
-                        bucketField: "bucket",
-                        fileIdentifierField: "fileIdentifier"
+                        bucketField: "bucket"
                       }),
                       {
                         id: "originalFilename",
