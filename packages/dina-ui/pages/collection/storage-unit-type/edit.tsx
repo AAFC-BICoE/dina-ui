@@ -20,6 +20,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection, StorageUnitType } from "../../../types/collection-api";
 import { useFormikContext } from "formik";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
+import PageLayout from "../../../components/page/PageLayout";
 
 export default function StorageUnitTypeEditPage() {
   const router = useRouter();
@@ -41,13 +42,7 @@ export default function StorageUnitTypeEditPage() {
   }
 
   return (
-    <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
-      <div className="container">
-        <h1 id="wb-cont">
-          <DinaMessage id={title} />
-        </h1>
+    <PageLayout titleId= {formatMessage(title)}>
         {id ? (
           withResponse(storageUnitTypeQuery, ({ data }) => (
             <StorageUnitTypeForm
@@ -58,8 +53,7 @@ export default function StorageUnitTypeEditPage() {
         ) : (
           <StorageUnitTypeForm onSaved={goToViewPage} />
         )}
-      </div>
-    </div>
+    </PageLayout>
   );
 }
 
