@@ -34,7 +34,7 @@ export default function StorageUnitDetailsPage() {
         )
       }
       nameField={unit => storageUnitDisplayName(unit)}
-      showRevisionsLinkAtBottom={true} //Perhaps revisions should be at top, though this currently casues a padding issue.
+      showRevisionsLink={true} //Perhaps revisions should be at top, though this currently casues a padding issue.
     />
   );
 }
