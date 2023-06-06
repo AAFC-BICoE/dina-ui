@@ -1,17 +1,16 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
-  dateCell8,
-  FieldHeader,
+  dateCell,
   FilterAttribute,
   filterBy,
   QueryPage,
   SplitPagePanel,
-  stringArrayCell8
+  stringArrayCell
 } from "common-ui";
 import Link from "next/link";
-import { TableColumn8 } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "common-ui/lib/list-page/types";
 import { Component, useMemo, useState } from "react";
-import { Head, Nav, thumbnailCell8 } from "../../../components";
+import { Head, Nav, thumbnailCell } from "../../../components";
 import {
   MetadataPreview,
   StoredObjectGallery
@@ -58,52 +57,41 @@ export default function MetadataListPage() {
     ? [8, 4]
     : [12, 0];
 
-  const METADATA_TABLE_COLUMNS: TableColumn8<Metadata>[] = [
-    thumbnailCell8({
+  const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
+    thumbnailCell({
       bucketField: "data.attributes.bucket"
     }),
     {
-      cell: ({ row: { original } }) =>
-        (original as any).data?.attributes?.originalFilename ? (
-          <Link
-            href={`/object-store/object/view?id=${original.id}`}
-            passHref={true}
-          >
-            <a id={`file-name-${original.id}`}>
-              {(original as any).data?.attributes?.originalFilename}
-            </a>
+      Cell: ({ original: { id, data } }) =>
+        data?.attributes?.originalFilename ? (
+          <Link href={`/object-store/object/view?id=${id}`} passHref={true}>
+            <a id={`file-name-${id}`}>{data?.attributes?.originalFilename}</a>
           </Link>
         ) : null,
-      header: () => <FieldHeader name="originalFilename" />,
-      accessorKey: "data.attributes.originalFilename",
+      label: "originalFilename",
+      accessor: "data.attributes.originalFilename",
       isKeyword: true
     },
     {
-      header: () => <FieldHeader name="acCaption" />,
-      accessorKey: "data.attributes.acCaption",
+      label: "acCaption",
+      accessor: "data.attributes.acCaption",
       isKeyword: true
     },
-    dateCell8("acDigitizationDate", "data.attributes.acDigitizationDate"),
-    dateCell8("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
+    dateCell("acDigitizationDate", "data.attributes.acDigitizationDate"),
+    dateCell("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
     {
-      cell: ({ row: { original } }) => (
-        <>
-          {
-            (original as any).included?.acMetadataCreator?.attributes
-              ?.displayName
-          }
-        </>
+      Cell: ({ original: { included } }) => (
+        <>{included?.acMetadataCreator?.attributes?.displayName}</>
       ),
-      header: () => <FieldHeader name="acMetadataCreator.displayName" />,
+      label: "acMetadataCreator.displayName",
       relationshipType: "person",
-      accessorKey: "included.attributes.displayName",
+      accessor: "included.attributes.displayName",
       isKeyword: true,
-      enableSorting: false
+      sortable: false
     },
-    stringArrayCell8("acTags", "data.attributes.acTags"),
+    stringArrayCell("acTags", "data.attributes.acTags"),
     {
-      id: "action",
-      cell: ({ row: { original } }) => (
+      Cell: ({ original }) => (
         <div className="d-flex h-100">
           <button
             className="btn btn-info m-auto preview-button"
@@ -114,13 +102,13 @@ export default function MetadataListPage() {
           </button>
         </div>
       ),
-      header: () => (
+      Header: (
         <div id="acPreviewLinksHeader">
           <DinaMessage id="viewPreviewButtonText" />
         </div>
       ),
-      enableSorting: false,
-      size: 200
+      sortable: false,
+      width: 200
     }
   ];
 

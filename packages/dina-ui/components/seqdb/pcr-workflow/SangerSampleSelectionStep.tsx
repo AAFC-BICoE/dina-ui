@@ -2,7 +2,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   DoOperationsError,
   LoadingSpinner,
-  QueryPage,
+  QueryPage8,
   filterBy,
   useAccount,
   useApiClient
@@ -38,7 +38,7 @@ export function SangerSampleSelectionStep({
 }: SangerSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
   const { username } = useAccount();
-  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
+  const { ELASTIC_SEARCH_COLUMN8 } = useMaterialSampleRelationshipColumns();
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -283,16 +283,16 @@ export function SangerSampleSelectionStep({
           <SeqdbMessage id="selectedSamplesTitle" />
         </strong>
       )}
-      <QueryPage<any>
+      <QueryPage8<any>
         indexName={"dina_material_sample_index"}
-        columns={ELASTIC_SEARCH_COLUMN}
+        columns={ELASTIC_SEARCH_COLUMN8}
         selectionMode={editMode}
         selectionResources={selectedResources}
         setSelectionResources={setSelectedResourcesAndSaveOrder}
         viewMode={!editMode}
         enableDnd={true}
-        onDeselect={(unselected) => onSelectMaterial(unselected)}
-        onSelect={(selected) => onDeselectMaterial(selected)}
+        onDeselect={onSelectMaterial}
+        onSelect={onDeselectMaterial}
       />
     </div>
   );

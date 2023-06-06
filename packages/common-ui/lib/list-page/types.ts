@@ -43,7 +43,7 @@ export interface TableColumn<TData extends KitsuResource>
   additionalAccessors?: string[];
 }
 
-export type TableColumn8<TData extends KitsuResource> = ColumnDef<TData> & {
+export type TableColumn8<TData> = ColumnDef<TData> & {
   /**
    * Elastic search path to the attribute.
    *

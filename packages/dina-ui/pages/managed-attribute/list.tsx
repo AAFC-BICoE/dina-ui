@@ -27,27 +27,27 @@ export default function ManagedAttributesListPage() {
 
   return (
     <PageLayout titleId="managedAttributes">
-      <Tabs
-        selectedIndex={currentStep}
-        onSelect={setCurrentStep}
-        id="managedAttributeListTab"
-        className="mb-3"
-      >
-        <TabList>
-          <Tab>{formatMessage("collectionListTitle")}</Tab>
-          <Tab>{formatMessage("objectStoreTitle")}</Tab>
-          <Tab>{formatMessage("loanTransactionsSectionTitle")}</Tab>
-        </TabList>
-        <TabPanel>
-          <CollectionAttributeListView />
-        </TabPanel>
-        <TabPanel>
-          <ObjectStoreAttributeListView />
-        </TabPanel>
-        <TabPanel>
-          <TransactionAttributeListView />
-        </TabPanel>
-      </Tabs>
+          <Tabs
+            selectedIndex={currentStep}
+            onSelect={setCurrentStep}
+            id="managedAttributeListTab"
+            className="mb-3"
+          >
+            <TabList>
+              <Tab>{formatMessage("collectionListTitle")}</Tab>
+              <Tab>{formatMessage("objectStoreTitle")}</Tab>
+              <Tab>{formatMessage("loanTransactionsSectionTitle")}</Tab>
+            </TabList>
+            <TabPanel>
+              <CollectionAttributeListView />
+            </TabPanel>
+            <TabPanel>
+              <ObjectStoreAttributeListView />
+            </TabPanel>
+            <TabPanel>
+              <TransactionAttributeListView />
+            </TabPanel>
+          </Tabs>
     </PageLayout>
   );
 }

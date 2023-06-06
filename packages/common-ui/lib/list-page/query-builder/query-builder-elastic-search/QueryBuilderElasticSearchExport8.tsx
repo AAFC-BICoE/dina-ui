@@ -181,7 +181,7 @@ export function applyPagination(
  * @param sortingRules All of the sorting rules from the query table.
  * @param columns The columns that are being displayed on the table.
  */
-export function applySortingRules<TData extends KitsuResource>(
+export function applySortingRules<TData>(
   elasticSearchQuery: any,
   sortingRules: SortingState,
   columns: TableColumn8<TData>[]

@@ -35,13 +35,8 @@ export function useIndexMapping({
   // Retrieve the index mapping on the first hook load.
   useEffect(() => {
     async function getIndexMapping() {
-      try {
-        const mapping = await fetchQueryFieldsByIndex();
-        setIndexMap(mapping);
-      } catch (error) {
-        // Handle the error here, e.g., log it or display an error message.
-        console.error(error);
-      }
+      const mapping = await fetchQueryFieldsByIndex();
+      setIndexMap(mapping);
     }
     getIndexMapping();
   }, []);

@@ -2,11 +2,10 @@ import {
   DinaForm,
   filterBy,
   LoadingSpinner,
-  ReactTable8,
   ResourceSelectField,
   SubmitButton
 } from "common-ui";
-import { ColumnDef } from "@tanstack/react-table";
+import ReactTable, { Column } from "react-table";
 import { SeqdbMessage } from "../../../../../intl/seqdb-intl";
 import {
   LibraryPrep,
@@ -43,7 +42,7 @@ export function IndexGrid(props: IndexGridProps) {
     const libraryPreps = libraryPrepsResponse.data;
 
     const libraryPrepsWithCoords = libraryPreps.filter(
-      (prep) => prep.wellRow && prep.wellColumn
+      prep => prep.wellRow && prep.wellColumn
     );
 
     const cellGrid: { [key: string]: LibraryPrep } = {};
@@ -51,12 +50,11 @@ export function IndexGrid(props: IndexGridProps) {
       cellGrid[`${prep.wellRow}_${prep.wellColumn}`] = prep;
     }
 
-    const columns: ColumnDef<any>[] = [];
+    const columns: Column[] = [];
 
     // Add the primer column:
     columns.push({
-      id: "indexColumn",
-      cell: ({ row: { index } }) => {
+      Cell: ({ index }) => {
         const rowLetter = String.fromCharCode(index + 65);
 
         return (
@@ -67,7 +65,7 @@ export function IndexGrid(props: IndexGridProps) {
                 hideLabel={true}
                 filter={filterBy(["name"])}
                 name={`indexI5s[${rowLetter}]`}
-                optionLabel={(primer) => primer.name}
+                optionLabel={primer => primer.name}
                 model={`seqdb-api/index-set/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
@@ -75,16 +73,16 @@ export function IndexGrid(props: IndexGridProps) {
           )
         );
       },
-      enableSorting: false
+      resizable: false,
+      sortable: false
     });
 
     for (let col = 0; col < containerType.numberOfColumns; col++) {
       const columnLabel = String(col + 1);
 
       columns.push({
-        id: `column-${col}`,
-        cell: ({ row: { index } }) => {
-          const rowLabel = String.fromCharCode(index + 65);
+        Cell: ({ index: row }) => {
+          const rowLabel = String.fromCharCode(row + 65);
           const coords = `${rowLabel}_${columnLabel}`;
           const prep = cellGrid[coords];
 
@@ -108,7 +106,7 @@ export function IndexGrid(props: IndexGridProps) {
             </div>
           ) : null;
         },
-        header: () =>
+        Header: () =>
           libraryPrepBatch.indexSet && (
             <>
               {columnLabel}
@@ -116,13 +114,14 @@ export function IndexGrid(props: IndexGridProps) {
                 hideLabel={true}
                 filter={filterBy(["name"])}
                 name={`indexI7s[${columnLabel}]`}
-                optionLabel={(primer) => primer.name}
+                optionLabel={primer => primer.name}
                 model={`seqdb-api/index-set/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </>
           ),
-        enableSorting: false
+        resizable: false,
+        sortable: false
       });
     }
 
@@ -144,9 +143,10 @@ export function IndexGrid(props: IndexGridProps) {
         <div>
           <SubmitButton className="mb-3" />
         </div>
-        <ReactTable8<any>
+        <ReactTable
           columns={columns}
           data={tableData}
+          minRows={0}
           showPagination={false}
         />
       </DinaForm>

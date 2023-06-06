@@ -59,7 +59,6 @@ export interface ReactTable8Props<TData> {
   loading?: boolean;
   columnVisibility?: VisibilityState;
   highlightRow?: boolean;
-  TbodyComponent?: React.ElementType;
 }
 
 export function ReactTable8<TData>({
@@ -88,8 +87,7 @@ export function ReactTable8<TData>({
   rowStyling,
   loading = false,
   columnVisibility,
-  highlightRow = true,
-  TbodyComponent
+  highlightRow = true
 }: ReactTable8Props<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -178,7 +176,7 @@ export function ReactTable8<TData>({
       className={classnames(
         "ReactTable8",
         className,
-        highlightRow && !TbodyComponent ? "-highlight" : ""
+        highlightRow ? "-highlight" : ""
       )}
     >
       {showPaginationTop && (
@@ -241,12 +239,6 @@ export function ReactTable8<TData>({
                 className="text-center"
               >
                 {formatMessage({ id: "noRowsFound" })}
-              </td>
-            </tr>
-          ) : !!TbodyComponent ? (
-            <tr>
-              <td colSpan={table.getAllColumns().length}>
-                <TbodyComponent />
               </td>
             </tr>
           ) : (
