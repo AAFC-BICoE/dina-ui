@@ -33,25 +33,6 @@ const TEST_MANAGED_ATTRIBUTES = [
   }
 ];
 
-const MOCK_INDEX_MAPPING_RESP = {
-  data: {
-    indexName: "dina_material_sample_index",
-    attributes: [
-      {
-        name: "materialSampleName",
-        type: "text",
-        path: "data.attributes"
-      },
-      {
-        name: "dwcOtherCatalogNumbers",
-        type: "text",
-        path: "data.attributes"
-      }
-    ],
-    relationships: []
-  }
-};
-
 const mockBulkGet = jest.fn(async (paths) =>
   paths.map((path) => {
     switch (path) {
@@ -68,28 +49,11 @@ const mockBulkGet = jest.fn(async (paths) =>
 );
 
 const mockGet = jest.fn(async (path) => {
-  switch (path) {
-    case "search-api/search-ws/mapping":
-      return MOCK_INDEX_MAPPING_RESP;
-    case "objectstore-api/managed-attribute":
-      return { data: TEST_MANAGED_ATTRIBUTES };
-    case "objectstore-api/metadata/b794d633-5a37-4628-977c-3a8c9067f7df":
-      return { data: TEST_METADATA };
-    case "/objectstore-api/file/testbucket/cf99c285-0353-4fed-a15d-ac963e0514f3":
-      return new Blob(["dummyData"], { type: "application/json" });
-    case "user-api/group":
-      return {};
-  }
+  if (path.startWith("objectstore-api/managed-attribute"))
+    return { data: TEST_MANAGED_ATTRIBUTES };
+  else return { data: TEST_METADATA };
 });
-const apiContext: any = {
-  apiClient: {
-    get: mockGet,
-    axios: {
-      get: mockGet
-    }
-  },
-  bulkGet: mockBulkGet
-};
+const apiContext: any = { apiClient: { get: mockGet }, bulkGet: mockBulkGet };
 
 // Pretend the metadata id was passed in the URL:
 jest.mock("next/router", () => ({
@@ -97,9 +61,14 @@ jest.mock("next/router", () => ({
 }));
 
 describe("Single Stored Object details page", () => {
-  // beforeEach(() => {
-  //   jest.resetAllMocks()
-  // });
+  beforeEach(() => {
+    mockGet.mockReset();
+    mockGet.mockImplementation(async (path: string) => {
+      if (path.startsWith("objectstore-api/managed-attribute"))
+        return { data: TEST_MANAGED_ATTRIBUTES };
+      else return { data: TEST_METADATA };
+    });
+  });
 
   it("Renders the page.", async () => {
     const wrapper = mountWithAppContext(
@@ -109,7 +78,7 @@ describe("Single Stored Object details page", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
-    await new Promise(setImmediate);
+
     expect(wrapper.find(".metadata-caption").text()).toEqual(
       "Caption: Test Caption"
     );

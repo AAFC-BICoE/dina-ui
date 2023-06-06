@@ -248,7 +248,7 @@ describe("Metadata List Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(QueryPage).find("td").exists()).toEqual(true);
+    expect(wrapper.find(QueryPage).find(".rt-td").exists()).toEqual(true);
   });
 
   it("Provides a toggle to see the gallery view.", async () => {

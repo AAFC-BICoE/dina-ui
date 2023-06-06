@@ -295,10 +295,12 @@ describe("SangerPcrBatchItemGridStep component", () => {
     expect(wrapper.find(".COLUMN-radio").props()).toHaveProperty("checked");
 
     // Should be 8 (+1 for the column displaying the row letters)
-    expect(wrapper.find("thead tr").children()).toHaveLength(GRID_COL_SIZE + 1);
+    expect(wrapper.find(".rt-thead .rt-tr").children()).toHaveLength(
+      GRID_COL_SIZE + 1
+    );
 
     // Should be 5 (React Table renders the header separately so it's not counted here.)
-    expect(wrapper.find("tbody").children()).toHaveLength(GRID_ROW_SIZE);
+    expect(wrapper.find(".rt-tbody").children()).toHaveLength(GRID_ROW_SIZE);
   });
 
   it("Move all functionality", async () => {

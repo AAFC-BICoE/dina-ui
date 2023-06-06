@@ -73,31 +73,31 @@ export default function FieldListPage() {
 
   return (
     <PageLayout titleId="extensionListTitle">
-      <div className="d-flex flex-column">
-        <span style={{ fontWeight: "bold" }} className="mt-3">
-          {" "}
-          {formatMessage("selectAnExtenstion")}{" "}
-        </span>
-        <Select
-          options={extensionOptions}
-          onChange={onExtensionSelectionChanged}
-          defaultValue={extensionOptions?.[0]}
-        />
+        <div className="d-flex flex-column">
+          <span style={{ fontWeight: "bold" }} className="mt-3">
+            {" "}
+            {formatMessage("selectAnExtenstion")}{" "}
+          </span>
+          <Select
+            options={extensionOptions}
+            onChange={onExtensionSelectionChanged}
+            defaultValue={extensionOptions?.[0]}
+          />
 
-        <span style={{ fontWeight: "bold" }} className="mt-3">
-          {" "}
-          {formatMessage("totalExtenstionFieldsCount")}:{" "}
-          {fields?.length ?? response?.data?.[0].extension.fields.length}{" "}
-        </span>
-        <ReactTable8<ExtensionField>
-          key={fields?.length}
-          className="-striped"
-          columns={getTableColumn(locale)}
-          data={fields ?? response?.data?.[0]?.extension?.fields ?? []}
-          showPagination={true}
-          showPaginationTop={true}
-        />
-      </div>
+          <span style={{ fontWeight: "bold" }} className="mt-3">
+            {" "}
+            {formatMessage("totalExtenstionFieldsCount")}:{" "}
+            {fields?.length ?? response?.data?.[0].extension.fields.length}{" "}
+          </span>
+          <ReactTable8<ExtensionField>
+            key={fields?.length}
+            className="-striped"
+            columns={getTableColumn(locale)}
+            data={fields ?? response?.data?.[0]?.extension?.fields ?? []}
+            showPagination={true}
+            showPaginationTop={true}
+          />
+        </div>
     </PageLayout>
   );
 }

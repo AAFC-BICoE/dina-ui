@@ -1,12 +1,10 @@
 import { TableColumn, TableColumn8 } from "common-ui/lib/list-page/types";
 import {
   dateCell,
-  dateCell8,
   DeleteButton,
   EditButton,
   FieldHeader,
   stringArrayCell,
-  stringArrayCell8,
   useStringComparator
 } from "common-ui";
 import { MaterialSample } from "../../../types/collection-api";
@@ -16,17 +14,54 @@ import Link from "next/link";
 
 export function useMaterialSampleRelationshipColumns() {
   const { compareByStringAndNumber } = useStringComparator();
+  const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
+    {
+      Cell: ({ original: { id, data } }) => (
+        <Link href={`/collection/material-sample/view?id=${id}`}>
+          <a>
+            {data?.attributes?.materialSampleName ||
+              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+              id}
+          </a>
+        </Link>
+      ),
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      sortMethod: (a: any, b: any): number => {
+        return compareByStringAndNumber(a, b);
+      },
+      isKeyword: true
+    },
+    {
+      Cell: ({ original }) => {
+        let organisms: any[] | undefined = original.included?.organism;
+        if (organisms?.[0].attributes) {
+          organisms = organisms.map((organism) => {
+            return { ...organism, ...organism.attributes };
+          });
+        }
+        const materialSample: MaterialSample = {
+          type: "material-sample",
+          organism: organisms
+        };
+        const scientificName = getScientificNames(materialSample);
+        return <div className="stringArray-cell">{scientificName}</div>;
+      },
+      label: "determination.scientificName",
+      accessor: "included",
+      isKeyword: true,
+      sortable: false
+    }
+  ];
 
-  const ELASTIC_SEARCH_COLUMN: TableColumn8<MaterialSample>[] = [
+  const ELASTIC_SEARCH_COLUMN8: TableColumn8<any>[] = [
     {
       id: "materialSampleName",
       cell: ({ row: { original } }) => (
         <Link href={`/collection/material-sample/view?id=${original.id}`}>
           <a>
-            {(original as any).data.attributes.materialSampleName ||
-              (original as any).data.attributes.dwcOtherCatalogNumbers?.join?.(
-                ", "
-              ) ||
+            {original.data.attributes.materialSampleName ||
+              original.data.attributes.dwcOtherCatalogNumbers?.join?.(", ") ||
               original.id}
           </a>
         </Link>
@@ -39,8 +74,12 @@ export function useMaterialSampleRelationshipColumns() {
     },
     {
       id: "scientificName",
-      cell: ({ row: { original } }) => {
-        const organisms = (original as any).included?.organism ?? [];
+      cell: ({
+        row: {
+          original: { included }
+        }
+      }) => {
+        const organisms = included?.organism ?? [];
         const materialSample: MaterialSample = {
           type: "material-sample",
           organism: organisms
@@ -54,65 +93,61 @@ export function useMaterialSampleRelationshipColumns() {
     }
   ];
 
-  const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn8<MaterialSample>[] = [
+  const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn<MaterialSample>[] = [
     {
-      cell: ({ row: { original } }) => (
-        <Link href={`/collection/material-sample/view?id=${original.id}`}>
+      Cell: ({ original: { id, data } }) => (
+        <Link href={`/collection/material-sample/view?id=${id}`}>
           <a>
-            {(original as any).data?.attributes?.materialSampleName ||
-              (
-                original as any
-              ).data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-              original.id}
+            {data?.attributes?.materialSampleName ||
+              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+              id}
           </a>
         </Link>
       ),
-      header: () => <FieldHeader name="materialSampleName" />,
-      accessorKey: "data.attributes.materialSampleName",
-      sortingFn: (a: any, b: any): number => {
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      sortMethod: (a: any, b: any): number => {
         return compareByStringAndNumber(a, b);
       },
       isKeyword: true
     },
     {
-      accessorKey: "data.attributes.materialSampleType",
-      header: () => <FieldHeader name="materialSampleType" />,
+      accessor: "data.attributes.materialSampleType",
+      label: "materialSampleType",
       isKeyword: true
     },
-    dateCell8("createdOn", "data.attributes.createdOn"),
-    stringArrayCell8("tags", "data.attributes.tags"),
+    dateCell("createdOn", "data.attributes.createdOn"),
+    stringArrayCell("tags", "data.attributes.tags"),
     {
-      id: "action",
-      cell: ({ row: { original } }) => (
+      Cell: ({ original: { id, data } }) => (
         <div className="d-flex">
           <EditButton
             className="mx-2"
-            entityId={original.id as string}
+            entityId={id as string}
             entityLink="collection/material-sample"
             style={{ width: "5rem" }}
           />
           <SplitMaterialSampleDropdownButton
-            ids={[original.id ?? "unknown"]}
-            disabled={!(original as any).data?.attributes?.materialSampleName}
-            materialSampleType={
-              (original as any).data?.attributes?.materialSampleType
-            }
+            ids={[id]}
+            disabled={!data?.attributes?.materialSampleName}
+            materialSampleType={data?.attributes?.materialSampleType}
           />
           <DeleteButton
-            id={original.id as string}
+            id={id as string}
             options={{ apiBaseUrl: "/collection-api" }}
             type="material-sample"
             reload={true}
           />
         </div>
       ),
-      header: () => <FieldHeader name="actions" />,
-      enableSorting: false
+      label: "actions",
+      sortable: false
     }
   ];
 
   return {
     ELASTIC_SEARCH_COLUMN,
+    ELASTIC_SEARCH_COLUMN8,
     ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW
   };
 }

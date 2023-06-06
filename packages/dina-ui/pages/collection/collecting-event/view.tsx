@@ -3,7 +3,7 @@ import { useCollectingEventQuery, ViewPageLayout } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
-import { getColumnDefinition } from "../material-sample/list";
+import { getColumnDefinition } from "../material-sample/list6";
 
 export default function CollectingEventDetailsPage() {
   return (
