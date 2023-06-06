@@ -12,6 +12,7 @@ import Link from "next/link";
 import { FormTemplate } from "../../../types/collection-api";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 const FILTER_ATTRIBUTES = ["name", "createdBy"];
 
@@ -67,47 +68,39 @@ export default function MaterialSampleFormTemplateListPage() {
   ];
 
   return (
-    <div>
-      <Head title={formatMessage("materialSampleFormTemplates")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="materialSampleFormTemplates" />
-        </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/form-template" />
-        </ButtonBar>
-        <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            // Display all user form templates and public to the group templates.
-            ...(filterForm.group
-              ? {
-                  rsql: `group==${filterForm.group};(createdBy==${username},restrictToCreatedBy==false)`
-                }
-              : {
-                  rsql: `group=in=(${groupNames});(createdBy==${username},restrictToCreatedBy==false)`
-                })
-          })}
-          filterAttributes={FILTER_ATTRIBUTES}
-          id="material-sample-form-template-list"
-          queryTableProps={{
-            columns: TABLE_COLUMNS,
-            path: "collection-api/form-template"
-          }}
-          filterFormchildren={({ submitForm }) => (
-            <div className="mb-3">
-              <div style={{ width: "300px" }}>
-                <GroupSelectField
-                  onChange={() => setImmediate(submitForm)}
-                  name="group"
-                  showAnyOption={true}
-                />
-              </div>
+    <PageLayout
+      titleId="materialSampleFormTemplates"
+      buttonBarContent={<CreateButton entityLink="/collection/form-template" />}
+    >
+      <ListPageLayout
+        additionalFilters={(filterForm) => ({
+          // Display all user form templates and public to the group templates.
+          ...(filterForm.group
+            ? {
+                rsql: `group==${filterForm.group};(createdBy==${username},restrictToCreatedBy==false)`
+              }
+            : {
+                rsql: `group=in=(${groupNames});(createdBy==${username},restrictToCreatedBy==false)`
+              })
+        })}
+        filterAttributes={FILTER_ATTRIBUTES}
+        id="material-sample-form-template-list"
+        queryTableProps={{
+          columns: TABLE_COLUMNS,
+          path: "collection-api/form-template"
+        }}
+        filterFormchildren={({ submitForm }) => (
+          <div className="mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+              />
             </div>
-          )}
-        />
-      </main>
-      <Footer />
-    </div>
+          </div>
+        )}
+      />
+    </PageLayout>
   );
 }

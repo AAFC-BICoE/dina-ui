@@ -9,6 +9,7 @@ import {
 import Select from "react-select";
 import { useState } from "react";
 import { find } from "lodash";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 function getTableColumn(locale: string) {
   const TABLE_COLUMNS: ColumnDef<ExtensionField>[] = [
@@ -71,39 +72,32 @@ export default function FieldListPage() {
   };
 
   return (
-    <div>
-      <Head title={formatMessage("extensionListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="extensionListTitle" />
-        </h1>
-        <div className="d-flex flex-column">
-          <span style={{ fontWeight: "bold" }} className="mt-3">
-            {" "}
-            {formatMessage("selectAnExtenstion")}{" "}
-          </span>
-          <Select
-            options={extensionOptions}
-            onChange={onExtensionSelectionChanged}
-            defaultValue={extensionOptions?.[0]}
-          />
+    <PageLayout titleId="extensionListTitle">
+      <div className="d-flex flex-column">
+        <span style={{ fontWeight: "bold" }} className="mt-3">
+          {" "}
+          {formatMessage("selectAnExtenstion")}{" "}
+        </span>
+        <Select
+          options={extensionOptions}
+          onChange={onExtensionSelectionChanged}
+          defaultValue={extensionOptions?.[0]}
+        />
 
-          <span style={{ fontWeight: "bold" }} className="mt-3">
-            {" "}
-            {formatMessage("totalExtenstionFieldsCount")}:{" "}
-            {fields?.length ?? response?.data?.[0].extension.fields.length}{" "}
-          </span>
-          <ReactTable8<ExtensionField>
-            key={fields?.length}
-            className="-striped"
-            columns={getTableColumn(locale)}
-            data={fields ?? response?.data?.[0]?.extension?.fields ?? []}
-            showPagination={true}
-            showPaginationTop={true}
-          />
-        </div>
-      </main>
-    </div>
+        <span style={{ fontWeight: "bold" }} className="mt-3">
+          {" "}
+          {formatMessage("totalExtenstionFieldsCount")}:{" "}
+          {fields?.length ?? response?.data?.[0].extension.fields.length}{" "}
+        </span>
+        <ReactTable8<ExtensionField>
+          key={fields?.length}
+          className="-striped"
+          columns={getTableColumn(locale)}
+          data={fields ?? response?.data?.[0]?.extension?.fields ?? []}
+          showPagination={true}
+          showPaginationTop={true}
+        />
+      </div>
+    </PageLayout>
   );
 }

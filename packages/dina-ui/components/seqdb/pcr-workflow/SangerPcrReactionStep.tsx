@@ -9,13 +9,15 @@ export interface SangerPcrReactionProps {
   editMode: boolean;
   performSave: boolean;
   setPerformSave?: (newValue: boolean) => void;
+  setEditMode: (newValue: boolean) => void;
 }
 
 export function SangerPcrReactionStep({
   pcrBatchId,
   editMode,
   performSave,
-  setPerformSave
+  setPerformSave,
+  setEditMode
 }: SangerPcrReactionProps) {
   const { doOperations } = useApiClient();
   const formRef: Ref<FormikProps<Partial<PcrBatchItem>>> = useRef(null);
@@ -26,6 +28,7 @@ export function SangerPcrReactionStep({
   useEffect(() => {
     if (performSave && !!pcrBatchId) {
       performSaveInternal();
+      setEditMode(false);
     }
   }, [performSave]);
 

@@ -6,13 +6,20 @@ const METADATA_RESPONSE = {
   type: "metadata",
   data: {
     attributes: {
-      bucket: "aafc",
-      fileIdentifier: "bd5d7e17-9fd6-4863-a0bf-8050659ab201"
+      bucket: "aafc"
+    }
+  },
+  included: {
+    derivative: {
+      attributes: {
+        derivativeType: "THUMBNAIL_IMAGE",
+        fileIdentifier: "bd5d7e17-9fd6-4863-a0bf-8050659ab201"
+      }
     }
   }
 };
 const MOCK_AXIOS_REPONSE =
-  "/objectstore-api/file/aafc/bd5d7e17-9fd6-4863-a0bf-8050659ab201/thumbnail";
+  "/objectstore-api/file/aafc/derivative/bd5d7e17-9fd6-4863-a0bf-8050659ab201";
 const mockGet = jest.fn((path) => {
   return path;
 });
@@ -26,8 +33,7 @@ describe("Thumbnail cell component", () => {
   it("Using data from the API, display the thumbnail", async () => {
     const wrapper = mountWithAppContext(
       thumbnailCell({
-        bucketField: "data.attributes.bucket",
-        fileIdentifierField: "data.attributes.fileIdentifier"
+        bucketField: "data.attributes.bucket"
       }).Cell({ original: METADATA_RESPONSE }),
       { apiContext }
     );

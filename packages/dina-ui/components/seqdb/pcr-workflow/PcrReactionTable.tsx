@@ -108,7 +108,7 @@ export interface PcrReactionTableProps {
 export function PcrReactionTable({
   pcrBatchItems,
   materialSamples,
-  readOnlyOverride = true
+  readOnlyOverride = false
 }: PcrReactionTableProps) {
   const { readOnly } = useDinaFormContext();
 
@@ -192,7 +192,7 @@ export function PcrReactionTable({
 
   return (
     <ReactTable8<PcrBatchItem>
-      className="-striped"
+      className="-striped react-table-overflow"
       columns={PCR_REACTION_COLUMN}
       data={sortBy(pcrBatchItems, "cellNumber")}
     />
