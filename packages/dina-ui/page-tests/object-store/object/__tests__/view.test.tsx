@@ -81,7 +81,15 @@ const mockGet = jest.fn(async (path) => {
       return {};
   }
 });
-const apiContext: any = { apiClient: { get: mockGet }, bulkGet: mockBulkGet };
+const apiContext: any = {
+  apiClient: {
+    get: mockGet,
+    axios: {
+      get: mockGet
+    }
+  },
+  bulkGet: mockBulkGet
+};
 
 // Pretend the metadata id was passed in the URL:
 jest.mock("next/router", () => ({
