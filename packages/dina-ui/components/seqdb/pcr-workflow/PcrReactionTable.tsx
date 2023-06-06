@@ -11,17 +11,22 @@ import {
 import { PersistedResource } from "kitsu";
 import { sortBy } from "lodash";
 import { useEffect, useState } from "react";
-import { MaterialSample } from "../../../types/collection-api";
+import { MaterialSampleSummary } from "../../../types/collection-api";
 import {
   PcrBatchItem,
   PcrBatchItemDropdownResults,
   pcrBatchItemResultColor
 } from "../../../types/seqdb-api";
-import { getScientificNames } from "../../collection/material-sample/organismUtils";
+import {
+  getMaterialSampleSummaryScientificNames,
+  getScientificNames
+} from "../../collection/material-sample/organismUtils";
 
 export function usePcrReactionData(pcrBatchId?: string) {
   const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>([]);
-  const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>([]);
+  const [materialSampleSummaries, setMaterialSampleSummaries] = useState<
+    MaterialSampleSummary[]
+  >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { compareByStringAndNumber } = useStringComparator();
 
@@ -68,21 +73,23 @@ export function usePcrReactionData(pcrBatchId?: string) {
       setLoading(false);
       return;
     }
-    bulkGet<MaterialSample>(
+    bulkGet<MaterialSampleSummary>(
       batchItems.map(
-        (item) =>
-          "/material-sample/" + item?.materialSample?.id + "?include=organism"
+        (item) => "/material-sample-summary/" + item?.materialSample?.id
       ),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
       sortPcrBatchItems(batchItems, response);
       setPcrBatchItems(batchItems);
-      setMaterialSamples(response);
+      setMaterialSampleSummaries(response);
       setLoading(false);
     });
   }
 
-  function sortPcrBatchItems(items: PcrBatchItem[], samples: MaterialSample[]) {
+  function sortPcrBatchItems(
+    items: PcrBatchItem[],
+    samples: MaterialSampleSummary[]
+  ) {
     if (items) {
       items.sort((a, b) => {
         const sampleName1 =
@@ -96,12 +103,17 @@ export function usePcrReactionData(pcrBatchId?: string) {
     }
   }
 
-  return { pcrBatchItems, setPcrBatchItems, materialSamples, loading };
+  return {
+    pcrBatchItems,
+    setPcrBatchItems,
+    materialSamples: materialSampleSummaries,
+    loading
+  };
 }
 
 export interface PcrReactionTableProps {
   pcrBatchItems: PcrBatchItem[];
-  materialSamples: MaterialSample[];
+  materialSamples: MaterialSampleSummary[];
   readOnlyOverride?: boolean;
 }
 
@@ -148,7 +160,10 @@ export function PcrReactionTable({
           (materialSample) => materialSample.id === original?.materialSample?.id
         );
         if (!fetchedMaterialSample) return <></>;
-        return <>{getScientificNames(fetchedMaterialSample)}</>;
+        const scientificName = getMaterialSampleSummaryScientificNames(
+          fetchedMaterialSample.effectiveDeterminations
+        );
+        return <>{scientificName}</>;
       },
       header: () => <FieldHeader name={"scientificName"} />
     },

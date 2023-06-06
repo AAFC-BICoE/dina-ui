@@ -1,4 +1,5 @@
 import {
+  Determination,
   MaterialSample,
   Organism
 } from "packages/dina-ui/types/collection-api";
@@ -49,4 +50,19 @@ function getDeterminations(organisms: Organism[]) {
   });
 
   return determinationList.join(", ");
+}
+
+export function getMaterialSampleSummaryScientificNames(
+  determinations: Determination[] | undefined
+): string {
+  if (!determinations) {
+    return "";
+  }
+  const scientificNames = determinations.map((determination) => {
+    if (determination.isPrimary) {
+      return determination.scientificName;
+    }
+  });
+
+  return scientificNames.join(", ");
 }
