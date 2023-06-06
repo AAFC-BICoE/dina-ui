@@ -73,7 +73,7 @@ describe("IndexGrid component", () => {
   beforeEach(() => {
     jest.resetAllMocks();
 
-    mockGet.mockImplementation(async path => {
+    mockGet.mockImplementation(async (path) => {
       if (path === "seqdb-api/library-prep-batch/10/libraryPreps") {
         return { data: MOCK_LIBRARY_PREPS };
       }
@@ -81,8 +81,8 @@ describe("IndexGrid component", () => {
       return { data: [] };
     });
 
-    mockSave.mockImplementation(async ops => {
-      return ops.map(op => op.resource);
+    mockSave.mockImplementation(async (ops) => {
+      return ops.map((op) => op.resource);
     });
   });
 
@@ -95,15 +95,15 @@ describe("IndexGrid component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(
-      wrapper.find(".rt-tbody .rt-tr").at(1).find(".rt-td").at(2).text()
-    ).toEqual("SAMP1");
-    expect(
-      wrapper.find(".rt-tbody .rt-tr").at(1).find(".rt-td").at(3).text()
-    ).toEqual("SAMP2" + "i5: test index 1" + "i7: test index 2");
-    expect(
-      wrapper.find(".rt-tbody .rt-tr").at(2).find(".rt-td").at(3).text()
-    ).toEqual("SAMP4");
+    expect(wrapper.find("tbody tr").at(1).find("td").at(2).text()).toEqual(
+      "SAMP1"
+    );
+    expect(wrapper.find("tbody tr").at(1).find("td").at(3).text()).toEqual(
+      "SAMP2" + "i5: test index 1" + "i7: test index 2"
+    );
+    expect(wrapper.find("tbody tr").at(2).find("td").at(3).text()).toEqual(
+      "SAMP4"
+    );
   });
 
   it("Renders a warning message when the index set or container type is null.", async () => {
@@ -131,18 +131,18 @@ describe("IndexGrid component", () => {
 
     // Change column 2's i7 values.
     wrapper
-      .find(".rt-tr")
+      .find("thead tr")
       .first()
-      .find(".rt-th")
+      .find("th")
       .at(2)
       .find(ResourceSelect)
       .prop<any>("onChange")({ id: "100", name: "test ngs index 100" });
 
     // Change row C's i5 values.
     wrapper
-      .find(".rt-tbody .rt-tr")
+      .find("tbody tr")
       .at(2)
-      .find(".rt-td")
+      .find("td")
       .first()
       .find(ResourceSelect)
       .prop<any>("onChange")({ id: "200", name: "test ngs index 200" });

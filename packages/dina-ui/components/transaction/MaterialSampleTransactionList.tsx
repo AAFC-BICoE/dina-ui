@@ -1,4 +1,4 @@
-import { useCollapsibleSection, QueryPage, LoadingSpinner } from "common-ui";
+import { useCollapsibleSection, LoadingSpinner, QueryPage } from "common-ui";
 import { TRANSACTION_TABLE_COLUMNS } from "../../pages/loan-transaction/transaction/list";
 
 export interface TransactionTable {

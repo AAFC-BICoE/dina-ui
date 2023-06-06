@@ -16,7 +16,7 @@ import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdown
 import { ColumnDef } from "@tanstack/react-table";
 
 export interface SamplesViewProps {
-  samples?: Partial<MaterialSample>[];
+  samples?: MaterialSample[];
   fieldSetId: JSX.Element;
 }
 
@@ -25,7 +25,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
   const defaultSort = [];
   const { formatMessage } = useDinaIntl();
 
-  const CHILD_SAMPLES_COLUMNS: ColumnDef<Partial<MaterialSample>>[] = [
+  const CHILD_SAMPLES_COLUMNS: ColumnDef<MaterialSample>[] = [
     {
       id: "materialSampleName",
       cell: ({
@@ -46,7 +46,10 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
       enableSorting: false,
       header: () => <FieldHeader name="materialSampleType" />
     },
-    dateCell8("createdOn", "createdOn", "createdOn"),
+    {
+      id: "createOn",
+      ...dateCell8("createdOn", "createdOn")
+    },
     {
       id: "tags",
       cell: ({
@@ -107,7 +110,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
   const shouldShowPagination = !!totalCount && totalCount > 25;
   return (
     <FieldSet legend={fieldSetId}>
-      <ReactTable8<Partial<MaterialSample>>
+      <ReactTable8<MaterialSample>
         columns={CHILD_SAMPLES_COLUMNS}
         className="-striped react-table-overflow"
         data={samples ?? []}
