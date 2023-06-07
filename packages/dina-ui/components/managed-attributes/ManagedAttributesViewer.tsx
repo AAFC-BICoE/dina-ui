@@ -25,19 +25,24 @@ export function ManagedAttributesViewer({
   // Call API to fetch all ManagedAttributes
   useEffect(() => {
     async function fetchAllManagedAttributes() {
-      const { data } = await apiClient.get<ManagedAttribute[]>(
-        `${managedAttributeApiPath}?fields=key,name`,
-        {}
-      );
-      const attrKeyNameMap = data.reduce(
-        (accu, obj) => ({
-          ...accu,
-          [obj.key]: obj.name
-        }),
-        {} as { [key: string]: string }
-      );
-      if (isMounted.current) {
-        setAllAttrKeyNameMap(attrKeyNameMap);
+      try {
+        const { data } = await apiClient.get<ManagedAttribute[]>(
+          `${managedAttributeApiPath}?fields=key,name`,
+          {}
+        );
+        const attrKeyNameMap = data.reduce(
+          (accu, obj) => ({
+            ...accu,
+            [obj.key]: obj.name
+          }),
+          {} as { [key: string]: string }
+        );
+        if (isMounted.current) {
+          setAllAttrKeyNameMap(attrKeyNameMap);
+        }
+      } catch (error) {
+        // Handle the error here, e.g., log it or display an error message.
+        console.error(error);
       }
     }
     fetchAllManagedAttributes();

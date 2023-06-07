@@ -43,32 +43,35 @@ export default function CollectingEventListPage() {
 
   return (
     <PageLayout
-    titleId = "collectingEventListTitle"
-    buttonBarContent = {<CreateButton entityLink="/collection/collecting-event" />}>
+      titleId="collectingEventListTitle"
+      buttonBarContent={
+        <CreateButton entityLink="/collection/collecting-event" />
+      }
+    >
       <Head title={formatMessage("collectingEventListTitle")} />
-        <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-          })}
-          filterAttributes={COLLECTING_EVENT_FILTER_ATTRIBUTES}
-          id="collecting-event-list"
-          queryTableProps={{
-            columns: COLLECTING_EVENT_TABLE_COLUMNS,
-            path: "collection-api/collecting-event"
-          }}
-          filterFormchildren={({ submitForm }) => (
-            <div className="mb-3">
-              <div style={{ width: "300px" }}>
-                <GroupSelectField
-                  onChange={() => setImmediate(submitForm)}
-                  name="group"
-                  showAnyOption={true}
-                />
-              </div>
+      <ListPageLayout
+        additionalFilters={(filterForm) => ({
+          // Apply group filter:
+          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+        })}
+        filterAttributes={COLLECTING_EVENT_FILTER_ATTRIBUTES}
+        id="collecting-event-list"
+        queryTableProps={{
+          columns: COLLECTING_EVENT_TABLE_COLUMNS,
+          path: "collection-api/collecting-event"
+        }}
+        filterFormchildren={({ submitForm }) => (
+          <div className="mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+              />
             </div>
-          )}
-        />
+          </div>
+        )}
+      />
     </PageLayout>
   );
 }

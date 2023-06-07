@@ -1,37 +1,36 @@
+import { useLocalStorage } from "@rehooks/local-storage";
+import { Row, SortingState, VisibilityState } from "@tanstack/react-table";
+import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { useCallback, useState } from "react";
+import { compact, toPairs, uniqBy } from "lodash";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
-import ReactTable, { TableProps, SortingRule, RowInfo } from "react-table";
+import { SortingRule } from "react-table";
+import { v4 as uuidv4 } from "uuid";
+import { FormikButton, ReactTable8, ReactTable8Props, useAccount } from "..";
+import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
-import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import {
-  defaultQueryTree,
-  emptyQueryTree,
-  QueryBuilderMemo
-} from "./query-builder/QueryBuilder";
-import { DefaultTBody } from "../table/QueryTable";
-import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
+  CheckBoxFieldProps,
+  useGroupedCheckBoxes
+} from "../formik-connected/GroupedCheckBoxFields";
+import { CommonMessage } from "../intl/common-ui-intl";
 import {
   BulkDeleteButton,
   BulkDeleteButtonProps,
   BulkEditButton,
   BulkSplitButton
 } from "../list-page-layout/bulk-buttons";
-import { CommonMessage } from "../intl/common-ui-intl";
-import {
-  CheckBoxFieldProps,
-  useGroupedCheckBoxes
-} from "../formik-connected/GroupedCheckBoxFields";
-import { v4 as uuidv4 } from "uuid";
-import { MultiSortTooltip } from "./MultiSortTooltip";
-import { toPairs, uniqBy } from "lodash";
-import { FormikButton, useAccount } from "..";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
-import { useEffect } from "react";
-import { DynamicFieldsMappingConfig, TableColumn } from "./types";
-import { FormikContextType } from "formik";
-import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
+import { MultiSortTooltip } from "./MultiSortTooltip";
+import {
+  QueryBuilderMemo,
+  defaultQueryTree,
+  emptyQueryTree
+} from "./query-builder/QueryBuilder";
 import {
   applyGroupFilters,
   applyPagination,
@@ -39,18 +38,15 @@ import {
   applySortingRules,
   applySourceFiltering,
   elasticSearchFormatExport
-} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport8";
 import {
   CustomViewField,
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
-import React from "react";
-import { GroupSelectField } from "../../../dina-ui/components";
-import { useMemo } from "react";
-import { useLocalStorage } from "@rehooks/local-storage";
+import { DynamicFieldsMappingConfig, TableColumn8 } from "./types";
 
 const DEFAULT_PAGE_SIZE: number = 25;
-const DEFAULT_SORT: SortingRule[] = [
+const DEFAULT_SORT: SortingState = [
   {
     id: "createdOn",
     desc: true
@@ -68,7 +64,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Columns to render on the table. This will also be used to map the data to a specific column.
    */
-  columns: TableColumn<TData>[];
+  columns: TableColumn8<TData>[];
 
   /**
    * Used for the listing page to understand which columns can be provided. Filters are generated
@@ -96,7 +92,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * By default, the QueryPage will try sorting using `createdOn` attribute. You can override this
    * setting by providing your own default sort.
    */
-  defaultSort?: SortingRule[];
+  defaultSort?: SortingState;
 
   /**
    * By default, the page size is 25 (25 items can be displayed per page). If you set this to zero
@@ -123,11 +119,11 @@ export interface QueryPageProps<TData extends KitsuResource> {
   bulkSplitPath?: string;
 
   reactTableProps?:
-    | Partial<TableProps>
+    | Partial<ReactTable8Props<TData>>
     | ((
         responseData: PersistedResource<TData>[] | undefined,
         CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>
-      ) => Partial<TableProps>);
+      ) => Partial<ReactTable8Props<TData>>);
 
   /**
    * When enabled, the user will see the results table with a selection table.
@@ -162,7 +158,21 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * @param SortingRule[] rules for sorting. Contains the id (column name) and
    *        sorting order.
    */
-  onSortedChange?: (newSort: SortingRule[]) => void;
+  onSortedChange?: (newSort: SortingState) => void;
+
+  /**
+   * Event when user select data from left to the right table
+   * @param selectedData
+   * @returns
+   */
+  onSelect?: (selectedData: TData[]) => void;
+
+  /**
+   * Event when user remove data from the right table.
+   * @param deselectedData
+   * @returns
+   */
+  onDeselect?: (deselectedData: TData[]) => void;
 
   /**
    * Boolean flag to display only the result table when true
@@ -188,12 +198,9 @@ export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Styling to be applied to each row of the React Table
    */
-  rowStyling?: (
-    finalState: any,
-    rowInfo?: RowInfo,
-    column?: undefined,
-    instance?: any
-  ) => any;
+  rowStyling?: (row: Row<TData>) => any;
+
+  enableDnd?: boolean;
 }
 
 const GROUP_STORAGE_KEY = "groupStorage";
@@ -227,7 +234,10 @@ export function QueryPage<TData extends KitsuResource>({
   customViewQuery,
   customViewElasticSearchQuery,
   customViewFields,
-  rowStyling
+  rowStyling,
+  enableDnd = false,
+  onSelect,
+  onDeselect
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
@@ -466,6 +476,7 @@ export function QueryPage<TData extends KitsuResource>({
       "id"
     );
 
+    onSelect?.(selectedObjects);
     setSelectedResources(selectedResourcesAppended);
     setRemovableItems(selectedResourcesAppended);
 
@@ -502,6 +513,7 @@ export function QueryPage<TData extends KitsuResource>({
       });
     });
 
+    onDeselect?.(unselectedObjects);
     setRemovableItems(unselectedObjects);
     setSelectedResources(unselectedObjects);
     formik.setFieldValue("itemIdsToDelete", {});
@@ -578,19 +590,35 @@ export function QueryPage<TData extends KitsuResource>({
         )
       : reactTableProps;
 
-  const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
+  const columnVisibility = compact(
+    columns.map((col) =>
+      col.isColumnVisible === false
+        ? { id: col.id, visibility: false }
+        : undefined
+    )
+  ).reduce<VisibilityState>(
+    (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
+    {}
+  );
+
+  const resolvedReactTableProps: Partial<ReactTable8Props<TData>> = {
+    defaultSorted: sortingRules,
+    columnVisibility,
+    ...computedReactTableProps
+  };
 
   // Columns generated for the search results.
-  const columnsResults: TableColumn<TData>[] = [
+  const columnsResults: TableColumn8<TData>[] = [
     ...(showRowCheckboxes || selectionMode
       ? [
           {
-            Cell: ({ original: resource }) => (
+            id: "selectColumn",
+            cell: ({ row: { original: resource } }) => (
               <SelectCheckBox key={resource.id} resource={resource} />
             ),
-            Header: SelectCheckBoxHeader,
-            sortable: false,
-            width: 200
+            header: () => <SelectCheckBoxHeader />,
+            enableSorting: false,
+            size: 200
           }
         ]
       : []),
@@ -598,50 +626,22 @@ export function QueryPage<TData extends KitsuResource>({
   ];
 
   // Columns generated for the selected resources, only in selection mode.
-  const columnsSelected: TableColumn<TData>[] = [
+  const columnsSelected: TableColumn8<TData>[] = [
     ...(selectionMode
       ? [
           {
-            Cell: ({ original: resource }) => (
+            id: "columnSelected",
+            cell: ({ row: { original: resource } }) => (
               <DeselectCheckBox key={resource.id} resource={resource} />
             ),
-            Header: DeselectCheckBoxHeader,
-            sortable: false,
-            width: 200
+            header: () => <DeselectCheckBoxHeader />,
+            enableSorting: false,
+            size: 200
           }
         ]
       : []),
     ...columns
   ];
-
-  const mappedResultsColumns = columnsResults.map((column) => {
-    const { fieldName, customHeader } = {
-      customHeader: column.Header,
-      fieldName: String(column.label)
-    };
-
-    const Header = customHeader ?? <FieldHeader name={fieldName} />;
-
-    return {
-      Header,
-      ...column
-    };
-  });
-
-  const mappedSelectedColumns = columnsSelected.map((column) => {
-    // The "columns" prop can be a string or a react-table Column type.
-    const { fieldName, customHeader } = {
-      customHeader: column.Header,
-      fieldName: String(column.label)
-    };
-
-    const Header = customHeader ?? <FieldHeader name={fieldName} />;
-
-    return {
-      Header,
-      ...column
-    };
-  });
 
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
@@ -685,7 +685,7 @@ export function QueryPage<TData extends KitsuResource>({
    *
    * @param newPageSize
    */
-  const onPageSizeChange = useCallback((newPageSize: number) => {
+  const onPageSizeChanged = useCallback((newPageSize: number) => {
     setPageOffset(0);
     setPageSize(newPageSize);
     setLoading(true);
@@ -718,7 +718,7 @@ export function QueryPage<TData extends KitsuResource>({
    *
    * @param newPage
    */
-  const onPageChange = useCallback(
+  const onPageChanged = useCallback(
     (newPage: number) => {
       setPageOffset(pageSize * newPage);
       setLoading(true);
@@ -798,71 +798,69 @@ export function QueryPage<TData extends KitsuResource>({
                 </span>
 
                 {/* Multi sort tooltip - Only shown if it's possible to sort */}
-                {resolvedReactTableProps?.sortable !== false && (
+                {!resolvedReactTableProps?.enableMultiSort && (
                   <MultiSortTooltip />
                 )}
               </div>
-              <ReactTable
+              {error && (
+                <div
+                  className="alert alert-danger"
+                  style={{
+                    whiteSpace: "pre-line"
+                  }}
+                >
+                  <p>
+                    {error.errors?.map((e) => e.detail).join("\n") ??
+                      String(error)}
+                  </p>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => {
+                      const newSort = defaultSort ?? DEFAULT_SORT;
+                      setError(undefined);
+                      onSortChange(newSort);
+                    }}
+                  >
+                    <CommonMessage id="resetSort" />
+                  </button>
+                </div>
+              )}
+              <ReactTable8<TData>
                 // Column and data props
-                columns={mappedResultsColumns}
+                columns={columnsResults}
                 data={
-                  viewMode
+                  (viewMode
                     ? customViewFields
                       ? searchResults
                       : selectedResources
-                    : searchResults
+                    : searchResults) ?? []
                 }
-                minRows={1}
                 // Loading Table props
                 loading={loading}
                 // Pagination props
-                manual={viewMode && selectedResources?.length ? false : true}
+                manualPagination={
+                  viewMode && selectedResources?.length ? false : true
+                }
                 pageSize={pageSize}
-                pages={totalRecords ? Math.ceil(totalRecords / pageSize) : 0}
+                pageCount={
+                  totalRecords ? Math.ceil(totalRecords / pageSize) : 0
+                }
                 page={pageOffset / pageSize}
-                onPageChange={onPageChange}
-                onPageSizeChange={onPageSizeChange}
-                pageText={<CommonMessage id="page" />}
-                noDataText={<CommonMessage id="noRowsFound" />}
-                ofText={<CommonMessage id="of" />}
-                rowsText={formatMessage({ id: "rows" })}
-                previousText={<CommonMessage id="previous" />}
-                nextText={<CommonMessage id="next" />}
+                onPageChange={onPageChanged}
+                onPageSizeChange={onPageSizeChanged}
                 // Sorting props
-                onSortedChange={onSortChange}
-                sorted={sortingRules}
+                manualSorting={
+                  viewMode && selectedResources?.length ? false : true
+                }
+                enableSorting={true}
+                onSortingChange={onSortChange}
+                defaultSorted={sortingRules}
                 // Table customization props
                 {...resolvedReactTableProps}
                 className="-striped react-table-overflow"
-                getTrProps={rowStyling}
-                TbodyComponent={
-                  error
-                    ? () => (
-                        <div
-                          className="alert alert-danger"
-                          style={{
-                            whiteSpace: "pre-line"
-                          }}
-                        >
-                          <p>
-                            {error.errors?.map((e) => e.detail).join("\n") ??
-                              String(error)}
-                          </p>
-                          <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={() => {
-                              const newSort = defaultSort ?? DEFAULT_SORT;
-                              setError(undefined);
-                              onSortChange(newSort);
-                            }}
-                          >
-                            <CommonMessage id="resetSort" />
-                          </button>
-                        </div>
-                      )
-                    : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
-                }
+                rowStyling={rowStyling}
+                showPagination={true}
               />
             </div>
             {selectionMode && (
@@ -892,16 +890,16 @@ export function QueryPage<TData extends KitsuResource>({
                       values={{ totalCount: selectedResources?.length ?? 0 }}
                     />
                   </span>
-                  <ReactTable
-                    columns={mappedSelectedColumns}
-                    data={selectedResources}
-                    minRows={1}
-                    pageText={<CommonMessage id="page" />}
-                    noDataText={<CommonMessage id="noRowsFound" />}
-                    ofText={<CommonMessage id="of" />}
-                    rowsText={formatMessage({ id: "rows" })}
-                    previousText={<CommonMessage id="previous" />}
-                    nextText={<CommonMessage id="next" />}
+                  <ReactTable8<TData>
+                    loading={loading}
+                    columns={columnsSelected}
+                    data={selectedResources ?? []}
+                    setData={(data) =>
+                      setSelectedResources && setSelectedResources(data ?? [])
+                    }
+                    enableDnd={enableDnd}
+                    enableSorting={!enableDnd}
+                    showPagination={!enableDnd}
                   />
                 </div>
               </>

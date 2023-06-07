@@ -25,21 +25,24 @@ export default function collectionMethodListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
-    <PageLayout titleId="projectListTitle" buttonBarContent = {<CreateButton entityLink="/collection/project" />}>
-        <ListPageLayout
-          filterAttributes={PROJECT_FILTER_ATTRIBUTES}
-          id="project-list"
-          queryTableProps={{
-            columns: PROJECT_TABLE_COLUMNS,
-            path: "collection-api/project",
-            defaultSort: [
-              {
-                id: "name",
-                desc: false
-              }
-            ]
-          }}
-        />
+    <PageLayout
+      titleId="projectListTitle"
+      buttonBarContent={<CreateButton entityLink="/collection/project" />}
+    >
+      <ListPageLayout
+        filterAttributes={PROJECT_FILTER_ATTRIBUTES}
+        id="project-list"
+        queryTableProps={{
+          columns: PROJECT_TABLE_COLUMNS,
+          path: "collection-api/project",
+          defaultSort: [
+            {
+              id: "name",
+              desc: false
+            }
+          ]
+        }}
+      />
     </PageLayout>
   );
 }

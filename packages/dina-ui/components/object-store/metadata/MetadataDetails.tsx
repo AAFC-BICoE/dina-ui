@@ -38,9 +38,9 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       `objectstore-api/license?filter[url]=${metadata.xmpRightsWebStatement}`,
       {}
     );
-    const licenses: License[] = selectedLicense.data;
+    const licenses: License[] = selectedLicense?.data;
 
-    return licenses.length > 0
+    return licenses && licenses.length > 0
       ? licenses[0].titles[locale] ?? licenses[0]?.url
       : undefined;
   }

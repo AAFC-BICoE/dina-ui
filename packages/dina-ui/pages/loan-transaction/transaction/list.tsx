@@ -1,53 +1,56 @@
 import {
   ButtonBar,
   CreateButton,
-  dateCell,
-  stringArrayCell,
+  FieldHeader,
   QueryPage,
-  booleanCell
+  booleanCell8,
+  dateCell8,
+  stringArrayCell8
 } from "common-ui";
+import { TableColumn8 } from "common-ui/lib/list-page/types";
 import Link from "next/link";
-import { TableColumn } from "common-ui/lib/list-page/types";
 import { Transaction } from "packages/dina-ui/types/loan-transaction-api";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-export const TRANSACTION_TABLE_COLUMNS: TableColumn<Transaction>[] = [
+export const TRANSACTION_TABLE_COLUMNS: TableColumn8<Transaction>[] = [
   {
-    Cell: ({ original: { data, id } }) => (
-      <Link href={`/loan-transaction/transaction/view?id=${id}`}>
-        <a>{data?.attributes?.transactionNumber || id}</a>
+    cell: ({ row: { original } }) => (
+      <Link href={`/loan-transaction/transaction/view?id=${original.id}`}>
+        <a>
+          {(original as any).data?.attributes?.transactionNumber || original.id}
+        </a>
       </Link>
     ),
-    label: "transactionNumber",
-    accessor: "data.attributes.transactionNumber",
+    header: () => <FieldHeader name="transactionNumber" />,
+    accessorKey: "data.attributes.transactionNumber",
     isKeyword: true
   },
   {
-    label: "transactionType",
-    accessor: "data.attributes.transactionType",
+    header: () => <FieldHeader name="transactionType" />,
+    accessorKey: "data.attributes.transactionType",
     isKeyword: true
   },
   {
-    label: "materialDirection",
-    accessor: "data.attributes.materialDirection",
+    header: () => <FieldHeader name="materialDirection" />,
+    accessorKey: "data.attributes.materialDirection",
     isKeyword: true
   },
-  stringArrayCell("otherIdentifiers", "data.attributes.otherIdentifiers"),
-  booleanCell("materialToBeReturned", "data.attributes.materialToBeReturned"),
+  stringArrayCell8("otherIdentifiers", "data.attributes.otherIdentifiers"),
+  booleanCell8("materialToBeReturned", "data.attributes.materialToBeReturned"),
   {
-    label: "purpose",
-    accessor: "data.attributes.purpose",
+    header: () => <FieldHeader name="purpose" />,
+    accessorKey: "data.attributes.purpose",
     isKeyword: true
   },
   {
-    label: "status",
-    accessor: "data.attributes.status",
+    header: () => <FieldHeader name="status" />,
+    accessorKey: "data.attributes.status",
     isKeyword: true
   },
-  dateCell("openedDate", "data.attributes.openedDate"),
-  dateCell("closedDate", "data.attributes.closedDate"),
-  dateCell("dueDate", "data.attributes.dueDate")
+  dateCell8("openedDate", "data.attributes.openedDate"),
+  dateCell8("closedDate", "data.attributes.closedDate"),
+  dateCell8("dueDate", "data.attributes.dueDate")
 ];
 
 export default function TransactionListPage() {
