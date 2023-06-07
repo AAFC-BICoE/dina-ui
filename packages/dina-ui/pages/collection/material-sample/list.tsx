@@ -9,7 +9,7 @@ import {
   FieldHeader,
   FilterAttribute,
   ListPageLayout,
-  QueryPage8,
+  QueryPage,
   stringArrayCell,
   stringArrayCell8
 } from "common-ui";
@@ -258,7 +258,7 @@ export default function MaterialSampleListPage() {
     },
 
     // Created On
-    dateCell8("createdOn", "createdOn", "data.attributes.createdOn"),
+    dateCell8("createdOn", "data.attributes.createdOn"),
 
     // Material Sample State
     {
@@ -294,7 +294,7 @@ export default function MaterialSampleListPage() {
             </a>
           </Link>
         </ButtonBar>
-        <QueryPage8
+        <QueryPage
           rowStyling={rowStyling}
           indexName={"dina_material_sample_index"}
           dynamicFieldMapping={{

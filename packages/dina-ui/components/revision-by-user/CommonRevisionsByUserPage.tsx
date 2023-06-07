@@ -4,6 +4,7 @@ import { Footer, Head, Nav } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { RevisionsPageLayout } from "../revisions/RevisionsPageLayout";
 import { RevisionRowConfigsByType } from "../revisions/revision-row-config";
+import PageLayout from "../../components/page/PageLayout";
 
 export type RevisionsByUserPageProps = {
   snapshotPath: string;
@@ -23,10 +24,7 @@ export default function RevisionsByUserPage({
 
   return (
     <>
-      <Head title={pageTitle} />
-      <Nav />
-      <main className="container-fluid">
-        <h1>{pageTitle}</h1>
+    <PageLayout titleId={pageTitle}>
         <AuthorFilterForm />
         {
           // Only show the revisions table if the author is set:
@@ -38,8 +36,7 @@ export default function RevisionsByUserPage({
             />
           )
         }
-      </main>
-      <Footer />
+      </PageLayout>
     </>
   );
 }

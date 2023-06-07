@@ -5,7 +5,7 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { FieldWrapper } from "..";
 import { MaterialSampleLink } from "../../../dina-ui/components";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list6";
+import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
 
 export function AssociatedMaterialSampleSearchBoxField({
   showSearchBtn,
