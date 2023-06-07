@@ -68,37 +68,39 @@ export default function MaterialSampleFormTemplateListPage() {
   ];
 
   return (
-    <PageLayout titleId="materialSampleFormTemplates"
-    buttonBarContent = {<CreateButton entityLink="/collection/form-template" />}>
-        <ListPageLayout
-          additionalFilters={(filterForm) => ({
-            // Display all user form templates and public to the group templates.
-            ...(filterForm.group
-              ? {
-                  rsql: `group==${filterForm.group};(createdBy==${username},restrictToCreatedBy==false)`
-                }
-              : {
-                  rsql: `group=in=(${groupNames});(createdBy==${username},restrictToCreatedBy==false)`
-                })
-          })}
-          filterAttributes={FILTER_ATTRIBUTES}
-          id="material-sample-form-template-list"
-          queryTableProps={{
-            columns: TABLE_COLUMNS,
-            path: "collection-api/form-template"
-          }}
-          filterFormchildren={({ submitForm }) => (
-            <div className="mb-3">
-              <div style={{ width: "300px" }}>
-                <GroupSelectField
-                  onChange={() => setImmediate(submitForm)}
-                  name="group"
-                  showAnyOption={true}
-                />
-              </div>
+    <PageLayout
+      titleId="materialSampleFormTemplates"
+      buttonBarContent={<CreateButton entityLink="/collection/form-template" />}
+    >
+      <ListPageLayout
+        additionalFilters={(filterForm) => ({
+          // Display all user form templates and public to the group templates.
+          ...(filterForm.group
+            ? {
+                rsql: `group==${filterForm.group};(createdBy==${username},restrictToCreatedBy==false)`
+              }
+            : {
+                rsql: `group=in=(${groupNames});(createdBy==${username},restrictToCreatedBy==false)`
+              })
+        })}
+        filterAttributes={FILTER_ATTRIBUTES}
+        id="material-sample-form-template-list"
+        queryTableProps={{
+          columns: TABLE_COLUMNS,
+          path: "collection-api/form-template"
+        }}
+        filterFormchildren={({ submitForm }) => (
+          <div className="mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+              />
             </div>
-          )}
-        />
+          </div>
+        )}
+      />
     </PageLayout>
   );
 }

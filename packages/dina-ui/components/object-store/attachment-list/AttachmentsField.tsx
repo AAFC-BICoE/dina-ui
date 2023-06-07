@@ -163,8 +163,7 @@ export function AttachmentsEditor({
                   <ReactTable8
                     columns={[
                       thumbnailCell8({
-                        bucketField: "bucket",
-                        fileIdentifierField: "fileIdentifier"
+                        bucketField: "bucket"
                       }),
                       {
                         id: "originalFilename",
@@ -187,7 +186,10 @@ export function AttachmentsEditor({
                             <Link
                               href={`/object-store/object/view?id=${metadata.id}`}
                             >
-                              <a>{metadata?.originalFilename ?? metadata.id}</a>
+                              <a>
+                                {(metadata as any)?.originalFilename ??
+                                  metadata.id}
+                              </a>
                             </Link>
                           );
                         }
@@ -211,7 +213,7 @@ export function AttachmentsEditor({
                         }) => (
                           <button
                             className="btn btn-dark remove-attachment"
-                            onClick={() => removeMetadata(mId)}
+                            onClick={() => removeMetadata(mId ?? "unknown")}
                             type="button"
                           >
                             <DinaMessage id="remove" />
