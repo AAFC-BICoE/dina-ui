@@ -56,7 +56,7 @@ export function thumbnailCell8<TData extends KitsuResource>({
 }): TableColumn8<TData> {
   return {
     id: "thumbnailColumn",
-    cell: ({ row: original }) => {
+    cell: ({ row: { original } }) => {
       const bucket = get<string | undefined>(original as any, bucketField);
       const derivativeType = (original as any)?.included?.derivative?.attributes
         ?.derivativeType;
