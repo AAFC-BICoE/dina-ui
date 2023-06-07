@@ -102,10 +102,12 @@ export function ReactTable8<TData>({
   }
 
   function onPaginationChangeInternal(updater) {
+    const { pageIndex: oldPageIndex, pageSize: oldPageSize } =
+      table.getState().pagination;
     const newState = updater(table.getState().pagination);
-    if (pageSize !== newState.pageSize) {
+    if (oldPageSize !== newState.pageSize) {
       onPageSizeChange?.(newState.pageSize);
-    } else if (page !== newState.pageIndex) {
+    } else if (oldPageIndex !== newState.pageIndex) {
       onPageChange?.(newState.pageIndex);
     }
   }
