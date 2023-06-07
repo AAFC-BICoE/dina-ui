@@ -8,7 +8,10 @@ import {
   useStringComparator
 } from "common-ui";
 import { MaterialSample } from "../../../types/collection-api";
-import { getScientificNames } from "./organismUtils";
+import {
+  getMaterialSampleSummaryScientificNames,
+  getScientificNames
+} from "./organismUtils";
 import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
 import Link from "next/link";
 
@@ -54,18 +57,20 @@ export function useMaterialSampleRelationshipColumns() {
     }
   ];
 
-  const ELASTIC_SEARCH_COLUMN8: TableColumn8<any>[] = [
+  const PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8: TableColumn8<any>[] = [
     {
       id: "materialSampleName",
-      cell: ({ row: { original } }) => (
-        <Link href={`/collection/material-sample/view?id=${original.id}`}>
-          <a>
-            {original.data.attributes.materialSampleName ||
-              original.data.attributes.dwcOtherCatalogNumbers?.join?.(", ") ||
-              original.id}
-          </a>
-        </Link>
-      ),
+      cell: ({ row: { original } }) => {
+        const materialSampleName =
+          original?.type === "material-sample"
+            ? original?.data?.attributes?.materialSampleName
+            : original?.materialSampleName;
+        return (
+          <Link href={`/collection/material-sample/view?id=${original?.id}`}>
+            <a>{materialSampleName || original?.id}</a>
+          </Link>
+        );
+      },
       header: () => <FieldHeader name="materialSampleName" />,
       accessorKey: "data.attributes.materialSampleName",
       sortingFn: "alphanumeric",
@@ -74,18 +79,11 @@ export function useMaterialSampleRelationshipColumns() {
     },
     {
       id: "scientificName",
-      cell: ({
-        row: {
-          original: { included }
-        }
-      }) => {
-        const organisms = included?.organism ?? [];
-        const materialSample: MaterialSample = {
-          type: "material-sample",
-          organism: organisms
-        };
-        const scientificName = getScientificNames(materialSample);
-        return <div className="stringArray-cell">{scientificName}</div>;
+      cell: ({ row: { original } }) => {
+        const scientificNames = getMaterialSampleSummaryScientificNames(
+          original.effectiveDeterminations
+        );
+        return <div className="stringArray-cell">{scientificNames}</div>;
       },
       header: () => <FieldHeader name="determination.scientificName" />,
       isKeyword: true,
@@ -147,7 +145,7 @@ export function useMaterialSampleRelationshipColumns() {
 
   return {
     ELASTIC_SEARCH_COLUMN,
-    ELASTIC_SEARCH_COLUMN8,
+    PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8,
     ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW
   };
 }

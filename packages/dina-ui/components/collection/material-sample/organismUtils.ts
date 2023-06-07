@@ -60,7 +60,11 @@ export function getMaterialSampleSummaryScientificNames(
   }
   const scientificNames = determinations.map((determination) => {
     if (determination.isPrimary) {
-      return determination.scientificName;
+      if (determination.scientificName) {
+        return determination.scientificName;
+      } else if (determination.verbatimScientificName) {
+        return determination.verbatimScientificName;
+      }
     }
   });
 
