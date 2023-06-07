@@ -19,7 +19,6 @@ import Link from "next/link";
 
 export function useMaterialSampleRelationshipColumns() {
   const { compareByStringAndNumber } = useStringComparator();
-
   const PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8: TableColumn8<any>[] = [
     {
       id: "materialSampleName",
@@ -47,6 +46,43 @@ export function useMaterialSampleRelationshipColumns() {
           original.effectiveDeterminations
         );
         return <div className="stringArray-cell">{scientificNames}</div>;
+      },
+      header: () => <FieldHeader name="determination.scientificName" />,
+      isKeyword: true,
+      enableSorting: false
+    }
+  ];
+
+  const ELASTIC_SEARCH_COLUMN: TableColumn8<MaterialSample>[] = [
+    {
+      id: "materialSampleName",
+      cell: ({ row: { original } }) => (
+        <Link href={`/collection/material-sample/view?id=${original.id}`}>
+          <a>
+            {(original as any).data.attributes.materialSampleName ||
+              (original as any).data.attributes.dwcOtherCatalogNumbers?.join?.(
+                ", "
+              ) ||
+              original.id}
+          </a>
+        </Link>
+      ),
+      header: () => <FieldHeader name="materialSampleName" />,
+      accessorKey: "data.attributes.materialSampleName",
+      sortingFn: "alphanumeric",
+      isKeyword: true,
+      enableSorting: true
+    },
+    {
+      id: "scientificName",
+      cell: ({ row: { original } }) => {
+        const organisms = (original as any).included?.organism ?? [];
+        const materialSample: MaterialSample = {
+          type: "material-sample",
+          organism: organisms
+        };
+        const scientificName = getScientificNames(materialSample);
+        return <div className="stringArray-cell">{scientificName}</div>;
       },
       header: () => <FieldHeader name="determination.scientificName" />,
       isKeyword: true,
