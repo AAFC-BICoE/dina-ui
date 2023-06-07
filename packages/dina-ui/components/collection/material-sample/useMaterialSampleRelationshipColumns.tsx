@@ -9,7 +9,7 @@ import {
   stringArrayCell8,
   useStringComparator
 } from "common-ui";
-import { MaterialSample } from "../../../types/collection-api";
+import { Determination, MaterialSample } from "../../../types/collection-api";
 import {
   getMaterialSampleSummaryScientificNames,
   getScientificNames
@@ -19,6 +19,7 @@ import Link from "next/link";
 
 export function useMaterialSampleRelationshipColumns() {
   const { compareByStringAndNumber } = useStringComparator();
+
   const PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8: TableColumn8<any>[] = [
     {
       id: "materialSampleName",
@@ -42,14 +43,28 @@ export function useMaterialSampleRelationshipColumns() {
     {
       id: "scientificName",
       cell: ({ row: { original } }) => {
-        const scientificNames = getMaterialSampleSummaryScientificNames(
-          original.effectiveDeterminations
-        );
+        let scientificNames: string = "";
+
+        if (original?.type === "material-sample") {
+          let determinations: Determination[] = [];
+          original?.included?.organism.forEach((organism) => {
+            determinations = determinations.concat(
+              organism.attributes.determination
+            );
+          });
+          scientificNames =
+            getMaterialSampleSummaryScientificNames(determinations);
+        } else {
+          scientificNames = getMaterialSampleSummaryScientificNames(
+            original?.effectiveDeterminations
+          );
+        }
         return <div className="stringArray-cell">{scientificNames}</div>;
       },
       header: () => <FieldHeader name="determination.scientificName" />,
       isKeyword: true,
-      enableSorting: false
+      enableSorting: false,
+      accessorKey: "included.attributes.determination"
     }
   ];
 
