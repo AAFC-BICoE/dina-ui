@@ -69,15 +69,22 @@ export function thumbnailCell8<TData extends KitsuResource>({
           : "";
       const resourceExternalURL = (original as any)?.data?.attributes
         ?.resourceExternalURL;
-
+      const hasExternalResourceDerivative =
+        resourceExternalURL && (original as any)?.included?.derivative;
       return resourceExternalURL ? (
         <div className="d-flex h-100">
-          <Link href={resourceExternalURL} passHref={true}>
-            <a target="_blank" className="m-auto h5">
-              <FaExternalLinkAlt />
-            </a>
-          </Link>
-
+          {hasExternalResourceDerivative ? (
+            <FaExternalLinkAlt className="m-auto h5" />
+          ) : (
+            <Link href={resourceExternalURL} passHref={true}>
+              <a target="_blank" className="m-auto h5">
+                <FaExternalLinkAlt />
+              </a>
+            </Link>
+          )}
+          {hasExternalResourceDerivative && (
+            <SmallThumbnail filePath={filePath} />
+          )}
           <Link
             href={`/object-store/object/external-resource-view?id=${original?.id}`}
           >
