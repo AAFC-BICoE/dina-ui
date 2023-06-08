@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
   ClientSideJoinSpec,
+  DEFAULT_PAGE_SIZE_OPTIONS,
   JsonApiQuerySpec,
   LimitOffsetPageSpec,
   MetaWithTotal,
@@ -67,6 +68,8 @@ export interface QueryTable8Props<TData extends KitsuResource> {
   /** Default page size. */
   defaultPageSize?: number;
 
+  pageSizeOptions?: number[];
+
   /** The columns to show in the table. */
   columns: ColumnDefinition8<TData>[];
 
@@ -106,13 +109,13 @@ export interface QueryTable8Props<TData extends KitsuResource> {
 }
 
 const DEFAULT_PAGE_SIZE = 25;
-
 /**
  * Table component that fetches data from the backend API.
  */
 export function QueryTable8<TData extends KitsuResource>({
   columns,
   defaultPageSize = DEFAULT_PAGE_SIZE,
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   defaultSort = [],
   deps,
   fields,
@@ -135,6 +138,10 @@ export function QueryTable8<TData extends KitsuResource>({
 
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
+
+  if (pageSizeOptions.indexOf(defaultPageSize) < 0) {
+    defaultPageSize = pageSizeOptions[0];
+  }
 
   // JSONAPI page spec.
   const [page, setPage] = useState<LimitOffsetPageSpec>({
@@ -193,7 +200,7 @@ export function QueryTable8<TData extends KitsuResource>({
     sort
   };
 
-  const mappedColumns = columns.map((column) => {
+  const mappedColumns: ColumnDef<TData>[] = columns.map((column) => {
     // The "columns" prop can be a string or a react-table Column type.
 
     const header = () =>
@@ -268,14 +275,12 @@ export function QueryTable8<TData extends KitsuResource>({
     >
       <div className="d-flex align-items-end mb-1">
         {!omitPaging && (
-          <>
-            <span>
-              <CommonMessage
-                id="tableTotalCount"
-                values={{ totalCount: formatNumber(totalCount) }}
-              />
-            </span>
-          </>
+          <span>
+            <CommonMessage
+              id="tableTotalCount"
+              values={{ totalCount: formatNumber(totalCount) }}
+            />
+          </span>
         )}
         <div className="ms-auto">
           {topRightCorner}
@@ -285,28 +290,20 @@ export function QueryTable8<TData extends KitsuResource>({
         </div>
       </div>
       <ReactTable8<TData>
-        // FilterComponent={({ filter: headerFilter, onChange }) => (
-        //   <input
-        //     className="w-100"
-        //     placeholder="Search..."
-        //     value={headerFilter ? headerFilter.value : ""}
-        //     onChange={(event) => onChange(event.target.value)}
-        //   />
-        // )}
         className="-striped"
         columns={mappedColumns}
         data={(displayData as TData[]) ?? []}
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}
         manualPagination={true}
+        manualSorting={true}
         pageCount={numberOfPages}
-        // onFetchData={onFetchData}
         showPaginationTop={shouldShowPagination && !hideTopPagination}
         showPagination={shouldShowPagination}
         onPageSizeChange={onPageSizeChangeInternal}
         onPageChange={onPageChangeInternal}
         onSortingChange={onSortingChangeInternal}
-        // onSortedChange={onSortedChange}
+        pageSizeOptions={pageSizeOptions}
         {...resolvedReactTableProps}
         TbodyComponent={
           error

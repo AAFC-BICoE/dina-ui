@@ -219,28 +219,40 @@ describe("QueryTable component", () => {
     wrapper.update();
 
     // Click the "Next" button.
-    wrapper.find(".-next button").first().simulate("click");
+    wrapper.find("div.-next button").first().simulate("click");
 
     // Wait for the second query to load.
     await new Promise(setImmediate);
+    wrapper.update();
+
+    // Click the "Next" button.
+    wrapper.find("div.-next button").first().simulate("click");
+
+    // Wait for the second query to load.
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Click the "Previous" button.
-    wrapper.find(".-previous button").first().simulate("click");
+    wrapper.find("div.-previous button").first().simulate("click");
+
+    // Wait for the second query to load.
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Clicking "Previous" should enable the loading screen.
-    expect(wrapper.find(".-loading.-active").exists()).toEqual(true);
+    expect(wrapper.find(LoadingSpinner).exists()).toEqual(true);
 
     // Wait for the "Previous" request to finish.
     await new Promise(setImmediate);
     wrapper.update();
 
-    const rows = wrapper.find(".rt-tr-group");
+    const rows = wrapper.find("tbody tr");
 
     // The first page should start with todo #0.
     expect(
       rows
         .first()
-        .find(".rt-td")
+        .find("td")
         .map((cell) => cell.text())
     ).toEqual(["0", "todo 0", "todo description 0"]);
 
@@ -248,7 +260,7 @@ describe("QueryTable component", () => {
     expect(
       rows
         .last()
-        .find(".rt-td")
+        .find(".td")
         .map((cell) => cell.text())
     ).toEqual(["24", "todo 24", "todo description 24"]);
   });

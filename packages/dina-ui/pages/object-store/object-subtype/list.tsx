@@ -1,33 +1,40 @@
 import {
   ButtonBar,
-  ColumnDefinition,
+  ColumnDefinition8,
   CreateButton,
-  dateCell,
-  QueryTable,
-  QueryTableProps
+  dateCell8,
+  FieldHeader,
+  QueryTable8,
+  QueryTable8Props
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
-const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
+const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition8<ObjectSubtype>[] = [
   {
-    Cell: ({ original: { id, acSubtype } }) => (
+    cell: ({
+      row: {
+        original: { id, acSubtype }
+      }
+    }) => (
       <Link href={`/object-store/object-subtype/edit?id=${id}`}>
         <a>{acSubtype}</a>
       </Link>
     ),
-    accessor: "acSubtype"
+    accessorKey: "acSubtype",
+    header: () => <FieldHeader name="acSubtype" />
   },
   "dcType",
   "createdBy",
-  dateCell("createdOn")
+  dateCell8("createdOn")
 ];
 
-const queryTableProps: QueryTableProps<ObjectSubtype> = {
+const queryTableProps: QueryTable8Props<ObjectSubtype> = {
   columns: OBJECTSUBTYPE_TABLE_COLUMNS,
-  path: "objectstore-api/object-subtype"
+  path: "objectstore-api/object-subtype",
+  pageSizeOptions: [2, 4, 8]
 };
 
 export default function ObjectSubtypeListPage() {
@@ -44,8 +51,8 @@ export default function ObjectSubtypeListPage() {
         <ButtonBar>
           <CreateButton entityLink="/object-store/object-subtype" />
         </ButtonBar>
-        <div style={{ maxWidth: "50rem" }}>
-          <QueryTable {...queryTableProps} />
+        <div className="w-100">
+          <QueryTable8 {...queryTableProps} />
         </div>
       </main>
       <Footer />
