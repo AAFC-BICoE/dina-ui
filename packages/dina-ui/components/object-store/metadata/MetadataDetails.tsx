@@ -72,7 +72,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             : formatMessage("metadataUploadDetailsLabel")
         }
       />
-      {!isExternalResource && (
+      {true && (
         <CollapsableSection
           collapserId="managed-attributes"
           title={formatMessage("metadataManagedAttributesLabel")}
