@@ -1,21 +1,80 @@
 import { TableColumn, TableColumn8 } from "common-ui/lib/list-page/types";
 import {
-  dateCell,
   dateCell8,
   DeleteButton,
   EditButton,
   FieldHeader,
-  stringArrayCell,
   stringArrayCell8,
   useStringComparator
 } from "common-ui";
-import { MaterialSample } from "../../../types/collection-api";
-import { getScientificNames } from "./organismUtils";
+import { Determination, MaterialSample } from "../../../types/collection-api";
+import { getDeterminations, getScientificNames } from "./organismUtils";
 import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
 import Link from "next/link";
 
 export function useMaterialSampleRelationshipColumns() {
   const { compareByStringAndNumber } = useStringComparator();
+
+  const PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8: TableColumn8<any>[] = [
+    {
+      id: "materialSampleName",
+      cell: ({ row: { original } }) => {
+        const materialSampleName =
+          original?.type === "material-sample"
+            ? original?.data?.attributes?.materialSampleName
+            : original?.materialSampleName;
+        return (
+          <Link href={`/collection/material-sample/view?id=${original?.id}`}>
+            <a>{materialSampleName || original?.id}</a>
+          </Link>
+        );
+      },
+      header: () => <FieldHeader name="materialSampleName" />,
+      accessorKey: "data.attributes.materialSampleName",
+      sortingFn: "alphanumeric",
+      isKeyword: true,
+      enableSorting: true
+    },
+    {
+      id: "scientificName",
+      cell: ({ row: { original } }) => {
+        let scientificNames: string = "";
+
+        if (original?.type === "material-sample") {
+          let determinations: Determination[] = [];
+          original?.included?.organism.forEach((org) => {
+            determinations = determinations.concat(
+              org.attributes.determination
+            );
+          });
+          const organism = original?.included?.organism?.map((org) => ({
+            id: org?.id,
+            type: org?.type,
+            determination: org?.attributes?.determination,
+            isTarget: org?.attributes?.isTarget
+          }));
+          const materialSample: MaterialSample = {
+            type: "material-sample",
+            materialSampleName: original?.data?.attributes?.materialSampleName,
+            organism
+          };
+          scientificNames = getScientificNames(materialSample);
+        } else {
+          scientificNames = getDeterminations(
+            original?.effectiveDeterminations
+          );
+        }
+        return <div className="stringArray-cell">{scientificNames}</div>;
+      },
+      header: () => <FieldHeader name="determination.scientificName" />,
+      isKeyword: true,
+      enableSorting: false,
+      additionalAccessors: [
+        "included.attributes.determination",
+        "included.attributes.isTarget"
+      ]
+    }
+  ];
 
   const ELASTIC_SEARCH_COLUMN: TableColumn8<MaterialSample>[] = [
     {
@@ -113,6 +172,7 @@ export function useMaterialSampleRelationshipColumns() {
 
   return {
     ELASTIC_SEARCH_COLUMN,
+    PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8,
     ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW
   };
 }
