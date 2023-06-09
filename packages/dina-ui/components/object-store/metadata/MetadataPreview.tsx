@@ -7,7 +7,7 @@ import {
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ExifView } from "../exif-view/ExifView";
 import { MetadataDetails } from "./MetadataDetails";
-import { MetadataFileView } from "./MetadataFileView";
+import { MetadataFileView, getFileToDisplay } from "./MetadataFileView";
 import { useMetadataViewQuery } from "./useMetadata";
 
 interface MetadataPreviewProps {
@@ -32,6 +32,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
 
   if (response) {
     const metadata = response.data;
+    const fileToDisplay = getFileToDisplay(metadata);
 
     return (
       <div className="metadata-preview">
@@ -55,6 +56,9 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
               <DinaMessage id="revisionsButtonText" />
             </a>
           </Link>
+          {metadata.resourceExternalURL && metadata.derivatives && (
+            <MetadataFileView metadata={metadata} />
+          )}
           {metadata.fileIdentifier && (
             <>
               <MetadataFileView metadata={metadata} />

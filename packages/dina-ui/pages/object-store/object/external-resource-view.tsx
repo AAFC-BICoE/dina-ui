@@ -11,6 +11,7 @@ import { useMetadataViewQuery } from "../../../components/object-store/metadata/
 import { Footer, Head, Nav } from "../../../components";
 import { MetadataDetails } from "../../../components/object-store";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 
 export default function ExternalResourceMetadataViewPage() {
   const router = useRouter();
@@ -59,6 +60,7 @@ export default function ExternalResourceMetadataViewPage() {
           {buttonBar}
           <div className="container">
             <DinaForm initialValues={metadata} readOnly={true}>
+              {metadata.derivatives && <MetadataFileView metadata={metadata} />}
               <MetadataDetails metadata={metadata} />
             </DinaForm>
           </div>

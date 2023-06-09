@@ -31,6 +31,7 @@ import {
   ObjectSubtype
 } from "../../../types/objectstore-api";
 import { DCTYPE_OPTIONS, ORIENTATION_OPTIONS } from "../metadata/edit";
+import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 
 export default function ExternalResourceMetadataPage() {
   const { formatMessage } = useDinaIntl();
@@ -71,7 +72,10 @@ export default function ExternalResourceMetadataPage() {
               <DinaMessage id="editExternalResourceTitle" />
             </h1>
             {withResponse(query, ({ data }) => (
-              <ExternalResourceMetadataForm metadata={data} router={router} />
+              <div>
+                {data.derivatives && <MetadataFileView metadata={data} />}
+                <ExternalResourceMetadataForm metadata={data} router={router} />
+              </div>
             ))}
           </div>
         ) : (

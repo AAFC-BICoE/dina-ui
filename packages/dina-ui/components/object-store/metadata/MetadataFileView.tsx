@@ -9,6 +9,22 @@ export interface MetadataFileViewProps {
   preview?: boolean;
 }
 
+export function getFileToDisplay(metadata) {
+  const largeImageDerivative = metadata?.derivatives?.find(
+    (it) => it.derivativeType === "LARGE_IMAGE"
+  );
+  const thumbnailImageDerivative = metadata?.derivatives?.find(
+    (it) => it.derivativeType === "THUMBNAIL_IMAGE"
+  );
+  if (largeImageDerivative) {
+    return largeImageDerivative;
+  } else if (thumbnailImageDerivative) {
+    return thumbnailImageDerivative;
+  } else {
+    return metadata;
+  }
+}
+
 /** Displays the file for the given metadata. */
 export function MetadataFileView({
   metadata,
@@ -17,11 +33,8 @@ export function MetadataFileView({
 }: MetadataFileViewProps) {
   const { formatMessage } = useDinaIntl();
 
-  // If there is a linked "LARGE_IMAGE" Derivative then render it:
-  const fileToDisplay =
-    metadata.derivatives?.find((it) => it.derivativeType === "LARGE_IMAGE") ??
-    metadata;
-
+  // If there is a linked "LARGE_IMAGE" Derivative then render it, fall back to "THUMBNAIL_IMAGE", then to metadata:
+  const fileToDisplay = getFileToDisplay(metadata);
   const fileId = fileToDisplay.fileIdentifier;
 
   const filePath = `/objectstore-api/file/${fileToDisplay.bucket}/${
