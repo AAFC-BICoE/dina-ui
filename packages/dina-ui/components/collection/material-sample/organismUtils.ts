@@ -41,11 +41,13 @@ export function getDeterminations(determinations: Determination[] | undefined) {
   }
   const scientificNames: string[] = [];
   determinations.forEach((determination) => {
-    if (determination.isPrimary) {
-      if (determination.scientificName) {
-        scientificNames.push(determination.scientificName);
-      } else if (determination.verbatimScientificName) {
-        scientificNames.push(determination.verbatimScientificName);
+    if (determination) {
+      if (determination.isPrimary) {
+        if (determination.scientificName) {
+          scientificNames.push(determination.scientificName);
+        } else if (determination.verbatimScientificName) {
+          scientificNames.push(determination.verbatimScientificName);
+        }
       }
     }
   });
