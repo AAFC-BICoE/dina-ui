@@ -16,45 +16,26 @@ import {
 export function getScientificNames(materialSample: MaterialSample) {
   const organisms = materialSample.organism as Organism[];
   if (!organisms) return "";
-
-  const targetOrganism = organisms.filter(
+  const targetOrganism: Organism | undefined = organisms?.find(
     (organism) => organism.isTarget === true
   );
 
+  let determinations: Determination[] = [];
+
   // Check if a target organism is found or if all the organisms will need to be checked.
-  if (targetOrganism.length === 1) {
-    return getDeterminations(targetOrganism);
+  if (targetOrganism?.determination) {
+    determinations = determinations.concat(targetOrganism.determination);
   } else {
-    return getDeterminations(organisms);
-  }
-}
-
-function getDeterminations(organisms: Organism[]) {
-  // List of everything to be displayed.
-  const determinationList: string[] = [];
-
-  const primaryDeterminations = organisms.map(
-    (organism) => organism.determination
-  );
-
-  primaryDeterminations.forEach((determinations) => {
-    determinations?.forEach((determination) => {
-      if (determination.isPrimary) {
-        if (determination?.scientificName) {
-          determinationList.push(determination.scientificName);
-        } else if (determination?.verbatimScientificName) {
-          determinationList.push(determination.verbatimScientificName);
-        }
+    organisms.forEach((organism) => {
+      if (organism?.determination) {
+        determinations = determinations.concat(organism.determination);
       }
     });
-  });
-
-  return determinationList.join(", ");
+  }
+  return getDeterminations(determinations);
 }
 
-export function getMaterialSampleSummaryScientificNames(
-  determinations: Determination[] | undefined
-): string {
+export function getDeterminations(determinations: Determination[] | undefined) {
   if (!determinations) {
     return "";
   }

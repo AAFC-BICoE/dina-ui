@@ -1,19 +1,14 @@
 import { TableColumn, TableColumn8 } from "common-ui/lib/list-page/types";
 import {
-  dateCell,
   dateCell8,
   DeleteButton,
   EditButton,
   FieldHeader,
-  stringArrayCell,
   stringArrayCell8,
   useStringComparator
 } from "common-ui";
 import { Determination, MaterialSample } from "../../../types/collection-api";
-import {
-  getMaterialSampleSummaryScientificNames,
-  getScientificNames
-} from "./organismUtils";
+import { getDeterminations, getScientificNames } from "./organismUtils";
 import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
 import Link from "next/link";
 
@@ -47,15 +42,25 @@ export function useMaterialSampleRelationshipColumns() {
 
         if (original?.type === "material-sample") {
           let determinations: Determination[] = [];
-          original?.included?.organism.forEach((organism) => {
+          original?.included?.organism.forEach((org) => {
             determinations = determinations.concat(
-              organism.attributes.determination
+              org.attributes.determination
             );
           });
-          scientificNames =
-            getMaterialSampleSummaryScientificNames(determinations);
+          const organism = original?.included?.organism?.map((org) => ({
+            id: org?.id,
+            type: org?.type,
+            determination: org?.attributes?.determination,
+            isTarget: org?.attributes?.isTarget
+          }));
+          const materialSample: MaterialSample = {
+            type: "material-sample",
+            materialSampleName: original?.data?.attributes?.materialSampleName,
+            organism
+          };
+          scientificNames = getScientificNames(materialSample);
         } else {
-          scientificNames = getMaterialSampleSummaryScientificNames(
+          scientificNames = getDeterminations(
             original?.effectiveDeterminations
           );
         }
@@ -64,7 +69,10 @@ export function useMaterialSampleRelationshipColumns() {
       header: () => <FieldHeader name="determination.scientificName" />,
       isKeyword: true,
       enableSorting: false,
-      accessorKey: "included.attributes.determination"
+      additionalAccessors: [
+        "included.attributes.determination",
+        "included.attributes.isTarget"
+      ]
     }
   ];
 
