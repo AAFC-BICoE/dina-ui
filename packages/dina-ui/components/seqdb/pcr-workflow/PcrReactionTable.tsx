@@ -17,10 +17,7 @@ import {
   PcrBatchItemDropdownResults,
   pcrBatchItemResultColor
 } from "../../../types/seqdb-api";
-import {
-  getMaterialSampleSummaryScientificNames,
-  getScientificNames
-} from "../../collection/material-sample/organismUtils";
+import { getDeterminations } from "../../collection/material-sample/organismUtils";
 
 export function usePcrReactionData(pcrBatchId?: string) {
   const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>([]);
@@ -160,7 +157,7 @@ export function PcrReactionTable({
           (materialSample) => materialSample.id === original?.materialSample?.id
         );
         if (!fetchedMaterialSample) return <></>;
-        const scientificName = getMaterialSampleSummaryScientificNames(
+        const scientificName = getDeterminations(
           fetchedMaterialSample.effectiveDeterminations
         );
         return <>{scientificName}</>;
