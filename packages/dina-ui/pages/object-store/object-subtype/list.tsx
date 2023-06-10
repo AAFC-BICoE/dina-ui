@@ -33,8 +33,7 @@ const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition8<ObjectSubtype>[] = [
 
 const queryTableProps: QueryTable8Props<ObjectSubtype> = {
   columns: OBJECTSUBTYPE_TABLE_COLUMNS,
-  path: "objectstore-api/object-subtype",
-  pageSizeOptions: [2, 4, 8]
+  path: "objectstore-api/object-subtype"
 };
 
 export default function ObjectSubtypeListPage() {
