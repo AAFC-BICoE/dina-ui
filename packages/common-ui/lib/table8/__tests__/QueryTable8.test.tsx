@@ -137,6 +137,7 @@ describe("QueryTable component", () => {
       <QueryTable8<Todo>
         path="todo"
         defaultPageSize={40}
+        pageSizeOptions={[40, 80]}
         columns={["id", "name", "description"]}
       />,
       { apiContext }
@@ -225,19 +226,8 @@ describe("QueryTable component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Click the "Next" button.
-    wrapper.find("div.-next button").first().simulate("click");
-
-    // Wait for the second query to load.
-    await new Promise(setImmediate);
-    wrapper.update();
-
     // Click the "Previous" button.
     wrapper.find("div.-previous button").first().simulate("click");
-
-    // Wait for the second query to load.
-    await new Promise(setImmediate);
-    wrapper.update();
 
     // Clicking "Previous" should enable the loading screen.
     expect(wrapper.find(LoadingSpinner).exists()).toEqual(true);
@@ -260,7 +250,7 @@ describe("QueryTable component", () => {
     expect(
       rows
         .last()
-        .find(".td")
+        .find("td")
         .map((cell) => cell.text())
     ).toEqual(["24", "todo 24", "todo description 24"]);
   });
@@ -300,7 +290,7 @@ describe("QueryTable component", () => {
       objectContaining({ sort: anything() })
     );
 
-    const nameHeader = wrapper.find(".name-field-header");
+    const nameHeader = wrapper.find("thead tr").childAt(1).childAt(0);
 
     // Click the "name" header.
     nameHeader.simulate("click");
@@ -330,14 +320,14 @@ describe("QueryTable component", () => {
     // Wait for the initial request to finish.
     await new Promise(setImmediate);
 
+    const nameHeader = wrapper.find("thead tr").childAt(1).childAt(0);
     // Click the "name" header.
-    wrapper.find(".name-field-header").simulate("click");
+    nameHeader.simulate("click");
     await new Promise(setImmediate);
 
+    const descHeader = wrapper.find("thead tr").childAt(2).childAt(0);
     // Shift-click the "description" header.
-    wrapper
-      .find(".description-field-header")
-      .simulate("click", { shiftKey: true });
+    descHeader.simulate("click", { shiftKey: true });
     await new Promise(setImmediate);
 
     // This request should be sorted by name and description.
@@ -359,6 +349,7 @@ describe("QueryTable component", () => {
       <QueryTable8<Todo>
         path="todo"
         defaultPageSize={5}
+        pageSizeOptions={[5, 10, 20]}
         columns={["id", "name", "description"]}
       />,
       { apiContext }
@@ -375,26 +366,26 @@ describe("QueryTable component", () => {
     );
 
     // Expect 5 rows.
-    expect(wrapper.find(".rt-tr-group").length).toEqual(5);
+    expect(wrapper.find("tbody tr").length).toEqual(5);
 
     // Select a new page size of 100.
     wrapper
-      .find(".-pagination select")
+      .find(".-pageSizeOptions select")
       .first()
-      .simulate("change", { target: { value: 100 } });
+      .simulate("change", { target: { value: 10 } });
 
     // Wait for the second request to finish.
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The second request should have a pageSize of 100.
+    // The second request should have a pageSize of 10.
     expect(mockGet).lastCalledWith(
       "todo",
-      objectContaining({ page: { limit: 100, offset: 0 } })
+      objectContaining({ page: { limit: 10, offset: 0 } })
     );
 
     // Expect 100 rows.
-    expect(wrapper.find(".rt-tr-group").length).toEqual(100);
+    expect(wrapper.find("tbody tr").length).toEqual(10);
 
     // There should have been two requests:
     // - The initial request with page size of 5.
@@ -472,9 +463,9 @@ describe("QueryTable component", () => {
       "id",
       "name",
       {
+        id: "upperCaseName",
         header: () => <div>UPPERCASE NAME</div>,
         accessorFn: (row) => row.name.toUpperCase(),
-        id: "upperCaseName",
         enableSorting: false
       }
     ];
@@ -490,12 +481,10 @@ describe("QueryTable component", () => {
     wrapper.update();
 
     // Expect correct header name in the third header.
-    expect(wrapper.find(".rt-resizable-header-content").at(2).text()).toEqual(
-      "UPPERCASE NAME"
-    );
+    expect(wrapper.find("thead tr th").at(2).text()).toEqual("UPPERCASE NAME");
 
     // Expect correct custom cell content in the 3rd data cell.
-    expect(wrapper.find(".rt-td").at(2).text()).toEqual("TODO 0");
+    expect(wrapper.find("tbody td").at(2).text()).toEqual("TODO 0");
   });
 
   it("Scrolls to the top of the table when the page is changed.", async () => {
@@ -543,7 +532,6 @@ describe("QueryTable component", () => {
     // Making sure there are data before proceed to next step
     await new Promise(setImmediate);
     wrapper.update();
-
     expect(wrapper.find(".pagination-top").exists()).toEqual(true);
     expect(wrapper.find(".pagination-bottom").exists()).toEqual(true);
   });
@@ -562,10 +550,13 @@ describe("QueryTable component", () => {
       { apiContext }
     );
 
-    // It should just pass the prop to ReactTable.
-    expect(wrapper.find(ReactTable8).prop("onPageSizeChange")).toBe(
-      mockOnPageSizeChange
-    );
+    await new Promise(setImmediate);
+    wrapper.update();
+    wrapper
+      .find(".-pageSizeOptions select")
+      .at(0)
+      .simulate("change", { target: { value: "50", name: "50" } });
+    expect(mockOnPageSizeChange).toHaveBeenCalled();
   });
 
   it("Provides an 'onSortedChange' callback prop.", async () => {
@@ -581,11 +572,9 @@ describe("QueryTable component", () => {
       />,
       { apiContext }
     );
-
-    // It should just pass the prop to ReactTable.
-    expect(wrapper.find(ReactTable8).prop("onSortedChange")).toBe(
-      mockOnSortedChange
-    );
+    const nameHeader = wrapper.find("thead tr").childAt(1).childAt(0);
+    nameHeader.simulate("click");
+    expect(mockOnSortedChange).toHaveBeenCalled();
   });
 
   it("Shows the total records count.", async () => {
@@ -616,7 +605,6 @@ describe("QueryTable component", () => {
     // Wait for the initial request to finish and the result to render.
     await new Promise(setImmediate);
     wrapper.update();
-
     expect(
       wrapper
         .find(".alert.alert-danger")
@@ -697,8 +685,11 @@ describe("QueryTable component", () => {
     const wrapper = mountWithAppContext(
       <QueryTable8<Todo>
         path="todo"
-        columns={[{ accessorKey: "name" }]}
+        columns={[
+          { id: "name", header: () => <div>name</div>, accessorKey: "name" }
+        ]}
         defaultPageSize={30}
+        pageSizeOptions={[30, 60, 90]}
         reactTableProps={({ response }) => ({
           TbodyComponent: () => {
             return (
@@ -715,7 +706,6 @@ describe("QueryTable component", () => {
     // Wait for the initial request to finish and the result to render.
     await new Promise(setImmediate);
     wrapper.update();
-
     expect(wrapper.find(".test-body").text()).toEqual("Response length is: 30");
   });
 });

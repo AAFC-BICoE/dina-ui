@@ -85,12 +85,6 @@ export interface QueryTable8Props<TData extends KitsuResource> {
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
 
-  onPageSizeChange?: (newSize: number) => void;
-
-  onPageChange?: (newPage: number) => void;
-
-  onSortingChange?: (newSort: SortingState) => void;
-
   /**
    * Override internal react-table props.
    * Pass in either the props or a function that provides the props.
@@ -125,9 +119,6 @@ export function QueryTable8<TData extends KitsuResource>({
   loading: loadingProp,
   omitPaging,
   onSuccess,
-  onPageSizeChange,
-  onPageChange,
-  onSortingChange,
   path,
   hideTopPagination,
   reactTableProps,
@@ -163,7 +154,11 @@ export function QueryTable8<TData extends KitsuResource>({
       window.scrollTo(0, divWrapperRef.current.offsetTop);
     }
     setPage({ offset: newOffset, limit: page.limit });
-    onPageChange?.(pageNumber);
+    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+      typeof reactTableProps === "function"
+        ? reactTableProps(queryState)
+        : reactTableProps;
+    tableProps?.onPageChange?.(pageNumber);
   }
 
   function onPageSizeChangeInternal(newSize: number) {
@@ -178,12 +173,20 @@ export function QueryTable8<TData extends KitsuResource>({
       window.scrollTo(0, divWrapperRef.current.offsetTop);
     }
     setPage({ offset: newOffset, limit: newSize });
-    onPageSizeChange?.(newSize);
+    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+      typeof reactTableProps === "function"
+        ? reactTableProps(queryState)
+        : reactTableProps;
+    tableProps?.onPageSizeChange?.(newSize);
   }
 
   function onSortingChangeInternal(newSorting: SortingState) {
     setSortingRules(newSorting);
-    onSortingChange?.(newSorting);
+    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+      typeof reactTableProps === "function"
+        ? reactTableProps(queryState)
+        : reactTableProps;
+    tableProps?.onSortingChange?.(newSorting);
   }
 
   // Get the new sort order in JSONAPI format. e.g. "name,-description".
@@ -296,6 +299,8 @@ export function QueryTable8<TData extends KitsuResource>({
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}
         manualPagination={true}
+        enableSorting={true}
+        enableMultiSort={true}
         manualSorting={true}
         pageCount={numberOfPages}
         showPaginationTop={shouldShowPagination && !hideTopPagination}

@@ -186,7 +186,9 @@ export function ReactTable8<TData>({
       )}
     >
       {showPaginationTop && (
-        <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+        <div className="pagination-top">
+          <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+        </div>
       )}
       <table className="w-100">
         <thead>
@@ -238,6 +240,12 @@ export function ReactTable8<TData>({
                 <LoadingSpinner loading={true} />
               </td>
             </tr>
+          ) : !!TbodyComponent ? (
+            <tr>
+              <td colSpan={table.getAllColumns().length}>
+                <TbodyComponent />
+              </td>
+            </tr>
           ) : table.getRowModel().rows.length === 0 ? (
             <tr>
               <td
@@ -245,12 +253,6 @@ export function ReactTable8<TData>({
                 className="text-center"
               >
                 {formatMessage({ id: "noRowsFound" })}
-              </td>
-            </tr>
-          ) : !!TbodyComponent ? (
-            <tr>
-              <td colSpan={table.getAllColumns().length}>
-                <TbodyComponent />
               </td>
             </tr>
           ) : (
@@ -290,7 +292,9 @@ export function ReactTable8<TData>({
         </tbody>
       </table>
       {showPagination && (
-        <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+        <div className="pagination-bottom">
+          <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+        </div>
       )}
     </div>
   );
