@@ -64,7 +64,15 @@ export default function MetadataListPage() {
     }),
     {
       cell: ({ row: { original } }) =>
-        (original as any).data?.attributes?.originalFilename ? (
+        (original as any)?.data?.attributes?.resourceExternalURL ? (
+          <Link
+            href={`/object-store/object/external-resource-view?id=${original?.id}`}
+          >
+            <a className="m-auto">
+              <DinaMessage id="detailsPageLink" />
+            </a>
+          </Link>
+        ) : (original as any).data?.attributes?.originalFilename ? (
           <Link
             href={`/object-store/object/view?id=${original.id}`}
             passHref={true}
