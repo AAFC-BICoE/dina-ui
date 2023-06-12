@@ -11,7 +11,10 @@ import { PersistedResource } from "kitsu";
 import { compact, pick, uniq, difference, concat } from "lodash";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import {
+  MaterialSample,
+  MaterialSampleSummary
+} from "../../../../dina-ui/types/collection-api";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
@@ -38,7 +41,8 @@ export function SangerSampleSelectionStep({
 }: SangerSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
   const { username } = useAccount();
-  const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
+  const { PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8 } =
+    useMaterialSampleRelationshipColumns();
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -59,7 +63,7 @@ export function SangerSampleSelectionStep({
 
   // The selected resources to be used for the QueryPage.
   const [selectedResources, setSelectedResources] = useState<
-    MaterialSample[] | undefined
+    MaterialSampleSummary[] | undefined
   >(undefined);
 
   const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
@@ -73,13 +77,15 @@ export function SangerSampleSelectionStep({
     fetchSampledIds();
   }, [editMode]);
 
-  function setSelectedResourcesAndSaveOrder(materialSmaples: MaterialSample[]) {
-    setSelectedResources(materialSmaples);
-    setMaterialSampleSortOrder(compact(materialSmaples.map((item) => item.id)));
+  function setSelectedResourcesAndSaveOrder(
+    materialSamples: MaterialSampleSummary[]
+  ) {
+    setSelectedResources(materialSamples);
+    setMaterialSampleSortOrder(compact(materialSamples.map((item) => item.id)));
   }
 
   // Sort MaterialSamples based on the preserved order in local storage
-  function sortMaterialSamples(samples: MaterialSample[]) {
+  function sortMaterialSamples(samples: MaterialSampleSummary[]) {
     if (materialSampleSortOrder) {
       const sorted = materialSampleSortOrder.map((sampleId) =>
         samples.find((item) => item.id === sampleId)
@@ -157,29 +163,15 @@ export function SangerSampleSelectionStep({
    * @param sampleIds array of UUIDs.
    */
   async function fetchSamples(sampleIds: string[]) {
-    await bulkGet<MaterialSample>(
-      sampleIds.map((id) => `/material-sample/${id}?include=organism`),
+    await bulkGet<MaterialSampleSummary>(
+      sampleIds.map((id) => `/material-sample-summary/${id}`),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      const materialSamplesTransformed = compact(response).map((resource) => ({
-        data: {
-          attributes: pick(resource, [
-            "materialSampleName",
-            "dwcOtherCatalogNumbers"
-          ])
-        },
-        id: resource.id,
-        type: resource.type,
-        included: {
-          organism: resource.organism
-        }
-      }));
-
       // If there is nothing stored yet, automatically go to edit mode.
-      if (materialSamplesTransformed.length === 0) {
+      if (response.length === 0) {
         setEditMode(true);
       }
-      const sorted = sortMaterialSamples(materialSamplesTransformed);
+      const sorted = sortMaterialSamples(response);
       setSelectedResources(sorted);
     });
   }
@@ -285,7 +277,7 @@ export function SangerSampleSelectionStep({
       )}
       <QueryPage<any>
         indexName={"dina_material_sample_index"}
-        columns={ELASTIC_SEARCH_COLUMN}
+        columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8}
         selectionMode={editMode}
         selectionResources={selectedResources}
         setSelectionResources={setSelectedResourcesAndSaveOrder}
