@@ -1,4 +1,5 @@
 import {
+  BackToListButton,
   ButtonBar,
   DateField,
   DinaForm,
@@ -180,6 +181,7 @@ function ExternalResourceMetadataForm({
 
   const buttonBar = (
     <ButtonBar>
+      <BackToListButton entityLink="/object-store/object" />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
   );

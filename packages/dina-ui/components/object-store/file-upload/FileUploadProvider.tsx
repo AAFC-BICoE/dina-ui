@@ -11,6 +11,7 @@ export interface FileUploadContextI {
 export interface UploadFileParams {
   files: IFileWithMeta[];
   group: string;
+  isDerivative?: boolean;
 }
 
 const FileUploadContext = createContext<FileUploadContextI | null>(null);
@@ -30,7 +31,7 @@ export function FileUploadProviderImpl({ children }) {
   const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useDinaIntl();
 
-  async function uploadFiles({ files, group }: UploadFileParams) {
+  async function uploadFiles({ files, group, isDerivative }: UploadFileParams) {
     const uploadRespsT: ObjectUpload[] = [];
     for (const { file } of files) {
       // Wrap the file in a FormData:
@@ -39,7 +40,9 @@ export function FileUploadProviderImpl({ children }) {
 
       // Upload the file:
       const response = await apiClient.axios.post(
-        `/objectstore-api/file/${group}`,
+        isDerivative
+          ? `/objectstore-api/file/${group}/derivative`
+          : `/objectstore-api/file/${group}`,
         formData,
         {
           transformResponse: (data) =>
