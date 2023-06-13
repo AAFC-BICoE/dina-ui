@@ -51,11 +51,11 @@ export default function UploadPage() {
     const uploadRespsT = await uploadFiles({
       files: acceptedFiles,
       group,
-      isDerivative: router.query.derivativeType ? true : false
+      isDerivative: router?.query?.derivativeType ? true : false
     });
 
     // Handle linking derivative to metadata object
-    if (router.query.derivativeType) {
+    if (router?.query?.derivativeType) {
       const derivativeObjectUpload = uploadRespsT[0];
       await apiClient.axios.post(
         `/objectstore-api/derivative`,
