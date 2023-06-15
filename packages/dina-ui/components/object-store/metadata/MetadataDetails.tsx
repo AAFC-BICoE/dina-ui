@@ -72,7 +72,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             : formatMessage("metadataUploadDetailsLabel")
         }
       />
-      {true && (
+      {
         <CollapsableSection
           collapserId="managed-attributes"
           title={formatMessage("metadataManagedAttributesLabel")}
@@ -82,7 +82,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             managedAttributeApiPath="objectstore-api/managed-attribute"
           />
         </CollapsableSection>
-      )}
+      }
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
