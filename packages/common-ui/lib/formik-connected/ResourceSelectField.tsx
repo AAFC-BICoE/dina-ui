@@ -102,7 +102,7 @@ export function ReadOnlyResourceLink<TData extends KitsuResource>({
             {readOnlyLink && resource ? (
               <Link href={readOnlyLink + resource.id}>{valueText ?? ""}</Link>
             ) : (
-              <Link href={"/collection/protocol/view?id=" + resource.id}>{valueText ?? ""}</Link>
+              valueText
             )}
             {index === resources.length - 1 ? "" : ", "}
           </Fragment>
