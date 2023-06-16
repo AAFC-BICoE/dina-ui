@@ -364,7 +364,10 @@ export function QueryPage<TData extends KitsuResource>({
             },
             included: rslt._source?.included?.reduce(
               (includedAccumulator, currentIncluded) => {
-                if (currentIncluded?.type === "organism") {
+                if (
+                  currentIncluded?.type === "organism" ||
+                  currentIncluded?.type === "derivative"
+                ) {
                   if (!includedAccumulator[currentIncluded?.type]) {
                     return (
                       (includedAccumulator[currentIncluded?.type] = [

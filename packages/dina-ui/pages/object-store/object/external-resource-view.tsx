@@ -62,7 +62,9 @@ export default function ExternalResourceMetadataViewPage() {
           {buttonBar}
           <div className="container">
             <DinaForm initialValues={metadata} readOnly={true}>
-              {metadata.derivatives && <MetadataFileView metadata={metadata} />}
+              {metadata.derivatives && (
+                <MetadataFileView metadata={metadata} imgHeight="15rem" />
+              )}
               <MetadataDetails metadata={metadata} />
             </DinaForm>
           </div>
