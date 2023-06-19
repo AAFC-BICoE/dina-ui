@@ -5,10 +5,13 @@ import { ComponentType, ReactNode } from "react";
 import { SortingRule } from "react-table";
 import {
   CheckBoxFieldProps,
+  ColumnDefinition8,
   DinaForm,
   FilterAttribute,
   MetaWithTotal,
   QueryTable,
+  QueryTable8,
+  QueryTable8Props,
   QueryTableProps,
   useGroupedCheckBoxes
 } from "..";
@@ -19,6 +22,7 @@ import {
   BulkEditButton
 } from "./bulk-buttons";
 import { FilterForm } from "./FilterForm";
+import { SortingState } from "@tanstack/react-table";
 
 export interface ListPageLayoutProps<TData extends KitsuResource> {
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
@@ -27,8 +31,8 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
   queryTableProps:
-    | QueryTableProps<TData>
-    | ((context: ListPageLayoutContext<TData>) => QueryTableProps<TData>);
+    | QueryTable8Props<TData>
+    | ((context: ListPageLayoutContext<TData>) => QueryTable8Props<TData>);
   wrapTable?: (children: ReactNode) => ReactNode;
 
   /** Adds the bulk edit button and the row checkboxes. */
@@ -68,7 +72,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   // Default sort and page-size from the QueryTable. These are only used on the initial
   // QueryTable render, and are saved in localStorage when the table's sort or page-size is changed.
   const [storedDefaultSort, setStoredDefaultSort] =
-    useLocalStorage<SortingRule[]>(tableSortKey);
+    useLocalStorage<SortingState>(tableSortKey);
   const defaultSort = storedDefaultSort ??
     defaultSortProp ?? [{ id: "createdOn", desc: true }];
 
@@ -119,16 +123,18 @@ export function ListPageLayout<TData extends KitsuResource>({
       ? queryTableProps({ CheckBoxField })
       : queryTableProps;
 
-  const columns = [
+  const columns: ColumnDefinition8<TData>[] = [
     ...(showRowCheckboxes
       ? [
           {
-            Cell: ({ original: resource }) => (
+            cell: ({ row: { original: resource } }) => (
               <CheckBoxField key={resource.id} resource={resource} />
             ),
-            Header: CheckBoxHeader,
-            sortable: false,
-            width: 200
+            header: () => CheckBoxHeader,
+            enableSorting: false,
+            size: 200,
+            accessorKey: "checkbox",
+            id: "checkbox"
           }
         ]
       : []),
@@ -141,7 +147,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   }
 
   const tableElement = (
-    <QueryTable<TData>
+    <QueryTable8<TData>
       defaultPageSize={defaultPageSize ?? undefined}
       defaultSort={defaultSort ?? undefined}
       filter={filterParam}

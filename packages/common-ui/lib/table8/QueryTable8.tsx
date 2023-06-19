@@ -16,6 +16,7 @@ import { QueryState } from "../api-client/useQuery";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
+import { SortingRule } from "react-table";
 
 /**
  * Column props with extra props designed specifically for our application on top of it.
@@ -85,6 +86,10 @@ export interface QueryTable8Props<TData extends KitsuResource> {
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
 
+  onPageSizeChange?: (newSize: number) => void;
+
+  onSortedChange?: (newSort: SortingState) => void;
+
   /**
    * Override internal react-table props.
    * Pass in either the props or a function that provides the props.
@@ -119,6 +124,8 @@ export function QueryTable8<TData extends KitsuResource>({
   loading: loadingProp,
   omitPaging,
   onSuccess,
+  onPageSizeChange,
+  onSortedChange,
   path,
   hideTopPagination,
   reactTableProps,
@@ -305,9 +312,9 @@ export function QueryTable8<TData extends KitsuResource>({
         pageCount={numberOfPages}
         showPaginationTop={shouldShowPagination && !hideTopPagination}
         showPagination={shouldShowPagination}
-        onPageSizeChange={onPageSizeChangeInternal}
+        onPageSizeChange={onPageSizeChange ?? onPageSizeChangeInternal}
         onPageChange={onPageChangeInternal}
-        onSortingChange={onSortingChangeInternal}
+        onSortingChange={onSortedChange ?? onSortingChangeInternal}
         pageSizeOptions={pageSizeOptions}
         {...resolvedReactTableProps}
         TbodyComponent={
