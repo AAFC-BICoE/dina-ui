@@ -42,7 +42,7 @@ export function useMaterialSampleRelationshipColumns() {
 
         if (original?.type === "material-sample") {
           let determinations: Determination[] = [];
-          original?.included?.organism.forEach((org) => {
+          original?.included?.organism?.forEach((org) => {
             determinations = determinations.concat(
               org.attributes.determination
             );
