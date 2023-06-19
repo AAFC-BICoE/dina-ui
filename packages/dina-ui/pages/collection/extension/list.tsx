@@ -14,11 +14,6 @@ import PageLayout from "packages/dina-ui/components/page/PageLayout";
 function getTableColumn(locale: string) {
   const TABLE_COLUMNS: ColumnDef<ExtensionField>[] = [
     {
-      id: "key",
-      accessorKey: "key",
-      header: () => <FieldHeader name={"key"} />
-    },
-    {
       id: "name",
       accessorKey: "name",
       header: () => <FieldHeader name={"name"} />
@@ -38,6 +33,11 @@ function getTableColumn(locale: string) {
         return desc;
       },
       header: () => <FieldHeader name={"multilingualDescription"} />
+    },
+    {
+      id: "unit",
+      accessorKey: "unit",
+      header: () => <FieldHeader name={"unit"} />
     },
     {
       id: "dinaComponent",
