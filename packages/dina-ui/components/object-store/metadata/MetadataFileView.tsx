@@ -16,13 +16,21 @@ export function getFileToDisplay(metadata) {
   const thumbnailImageDerivative = metadata?.derivatives?.find(
     (it) => it.derivativeType === "THUMBNAIL_IMAGE"
   );
+
   if (largeImageDerivative) {
     return largeImageDerivative;
-  } else if (thumbnailImageDerivative) {
-    return thumbnailImageDerivative;
-  } else {
+  }
+
+  if (metadata.fileIdentifier) {
     return metadata;
   }
+
+  // Thumbnail should only take place if original file cannot be displayed (e.g. external file)
+  if (thumbnailImageDerivative) {
+    return thumbnailImageDerivative;
+  }
+
+  return metadata;
 }
 
 /** Displays the file for the given metadata. */
@@ -53,7 +61,11 @@ export function MetadataFileView({
     (it) => it.derivativeType === "THUMBNAIL_IMAGE"
   );
 
-  downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
+  // External resources do not have original files.
+  if (!metadata.resourceExternalURL) {
+    downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
+  }
+
   // populate the thumbnail link
   if (thumbnailImgDerivative) {
     downloadLinks.thumbNail = `${COMMON_LINK_ROOT}${metadata.bucket}/derivative/${thumbnailImgDerivative?.fileIdentifier}`;
