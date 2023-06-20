@@ -73,7 +73,9 @@ export default function ExternalResourceMetadataPage() {
             </h1>
             {withResponse(query, ({ data }) => (
               <div>
-                {data.derivatives && <MetadataFileView metadata={data} />}
+                {data.derivatives && (
+                  <MetadataFileView metadata={data} imgHeight="15rem" />
+                )}
                 <ExternalResourceMetadataForm metadata={data} router={router} />
               </div>
             ))}

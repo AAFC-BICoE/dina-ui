@@ -16,8 +16,37 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   acCaption: "test caption"
 };
 
-const mockGet = jest.fn();
-const apiContext: any = { apiClient: { get: mockGet } };
+const mockGet = jest.fn(async (path) => {
+  if (
+    path === "objectstore-api/metadata/b794d633-5a37-4628-977c-3a8c9067f7df"
+  ) {
+    return { data: TEST_METADATA };
+  } else if (path === "objectstore-api/managed-attribute?fields=key,name") {
+    return { data: [{ managedAttributeKey1: "Value 1" }] };
+  } else if (
+    path ===
+    "objectstore-api/license?filter[url]=https://open.canada.ca/en/open-government-licence-canada"
+  ) {
+    return {
+      data: [
+        {
+          id: "open-government-licence-canada",
+          type: "license",
+          url: "https://open.canada.ca/en/open-government-licence-canada",
+          titles: {
+            en: "Open Government Licence - Canada",
+            fr: "Licence du gouvernement ouvert – Canada"
+          }
+        }
+      ]
+    };
+  }
+});
+const apiContext: any = {
+  apiClient: {
+    get: mockGet
+  }
+};
 
 // Pretend the metadata id was passed in the URL:
 jest.mock("next/router", () => ({
@@ -25,11 +54,6 @@ jest.mock("next/router", () => ({
 }));
 
 describe("Stored Object external resource view page", () => {
-  beforeEach(() => {
-    mockGet.mockReset();
-    mockGet.mockImplementation(async () => ({ data: TEST_METADATA }));
-  });
-
   it("Renders the page.", async () => {
     const wrapper = mountWithAppContext(<ExternalResourceMetadataViewPage />, {
       apiContext
