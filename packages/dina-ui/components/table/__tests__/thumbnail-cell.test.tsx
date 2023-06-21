@@ -10,12 +10,14 @@ const METADATA_RESPONSE = {
     }
   },
   included: {
-    derivative: {
-      attributes: {
-        derivativeType: "THUMBNAIL_IMAGE",
-        fileIdentifier: "bd5d7e17-9fd6-4863-a0bf-8050659ab201"
+    derivative: [
+      {
+        attributes: {
+          derivativeType: "THUMBNAIL_IMAGE",
+          fileIdentifier: "bd5d7e17-9fd6-4863-a0bf-8050659ab201"
+        }
       }
-    }
+    ]
   }
 };
 const MOCK_AXIOS_REPONSE =
