@@ -5,6 +5,7 @@ import { TableColumn8 } from "packages/common-ui/lib/list-page/types";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";
+import { Derivative } from "../../types/objectstore-api";
 
 export function thumbnailCell({ bucketField }) {
   return {
@@ -58,26 +59,33 @@ export function thumbnailCell8<TData extends KitsuResource>({
     id: "thumbnailColumn",
     cell: ({ row: { original } }) => {
       const bucket = get<string | undefined>(original as any, bucketField);
-      const derivativeType = (original as any)?.included?.derivative?.attributes
-        ?.derivativeType;
-      const filePath =
-        derivativeType === "THUMBNAIL_IMAGE"
-          ? `/objectstore-api/file/${bucket}/derivative/${
-              (original as any)?.included?.derivative?.attributes
-                ?.fileIdentifier
-            }`
-          : "";
+      const derivatives: any[] | undefined = (original as any)?.included
+        ?.derivative;
+      const thumbnailDerivative = derivatives?.find(
+        (derivative) =>
+          derivative.attributes.derivativeType === "THUMBNAIL_IMAGE"
+      );
+      const filePath = thumbnailDerivative
+        ? `/objectstore-api/file/${bucket}/derivative/${thumbnailDerivative.attributes.fileIdentifier}`
+        : "";
       const resourceExternalURL = (original as any)?.data?.attributes
         ?.resourceExternalURL;
-
+      const hasExternalResourceDerivative =
+        resourceExternalURL && (original as any)?.included?.derivative;
       return resourceExternalURL ? (
         <div className="d-flex h-100">
-          <Link href={resourceExternalURL} passHref={true}>
-            <a target="_blank" className="m-auto h5">
-              <FaExternalLinkAlt />
-            </a>
-          </Link>
-
+          {hasExternalResourceDerivative ? (
+            <FaExternalLinkAlt className="m-auto h5" />
+          ) : (
+            <Link href={resourceExternalURL} passHref={true}>
+              <a target="_blank" className="m-auto h5">
+                <FaExternalLinkAlt />
+              </a>
+            </Link>
+          )}
+          {hasExternalResourceDerivative && (
+            <SmallThumbnail filePath={filePath} />
+          )}
           <Link
             href={`/object-store/object/external-resource-view?id=${original?.id}`}
           >
@@ -97,6 +105,7 @@ export function thumbnailCell8<TData extends KitsuResource>({
       "included.attributes.fileIdentifier",
       "included.attributes.derivativeType",
       "data.attributes.resourceExternalURL",
+      "data.relationships.derivatives",
       bucketField
     ]
   };
