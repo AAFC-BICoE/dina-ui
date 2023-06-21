@@ -1,5 +1,5 @@
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { thumbnailCell } from "../thumbnail-cell";
+import { ThumbnailCell } from "../thumbnail-cell";
 
 const METADATA_RESPONSE = {
   id: "45e290e9-2be4-45a6-b95c-8d375ad77b78",
@@ -32,7 +32,7 @@ describe("Thumbnail cell component", () => {
 
   it("Using data from the API, display the thumbnail", async () => {
     const wrapper = mountWithAppContext(
-      thumbnailCell({
+      ThumbnailCell({
         bucketField: "data.attributes.bucket"
       }).Cell({ original: METADATA_RESPONSE }),
       { apiContext }

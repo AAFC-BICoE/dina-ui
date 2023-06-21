@@ -11,7 +11,7 @@ import {
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
-import { thumbnailCell } from "../..";
+import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 
@@ -54,8 +54,9 @@ export function ExistingAttachmentsTable({
       Header: CheckBoxHeader,
       sortable: false
     },
-    thumbnailCell({
-      bucketField: "metadata.bucket"
+    ThumbnailCell({
+      bucketField: "metadata.bucket",
+      isJsonApiQuery: true
     }),
     {
       Cell: ({ original: { id, metadata } }) => {
@@ -178,6 +179,7 @@ export function ExistingAttachmentsTable({
         reactTableProps={{ sortable: false }}
         defaultPageSize={10000}
         onSuccess={(res) => setAvailableMetadatas(res.data)}
+        include="derivatives"
         ariaLabel="Existing attachments"
       />
     </DinaForm>

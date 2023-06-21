@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { TableColumn8 } from "packages/common-ui/lib/list-page/types";
 import { Component, useMemo, useState } from "react";
-import { Head, Nav, thumbnailCell8 } from "../../../components";
+import { Head, Nav, ThumbnailCell8 } from "../../../components";
 import {
   MetadataPreview,
   StoredObjectGallery
@@ -59,7 +59,7 @@ export default function MetadataListPage() {
     : [12, 0];
 
   const METADATA_TABLE_COLUMNS: TableColumn8<Metadata>[] = [
-    thumbnailCell8({
+    ThumbnailCell8({
       bucketField: "data.attributes.bucket"
     }),
     {

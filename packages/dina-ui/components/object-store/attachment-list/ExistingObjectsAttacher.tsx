@@ -10,7 +10,7 @@ import {
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
-import { thumbnailCell } from "../..";
+import { ThumbnailCell } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { METADATA_FILTER_ATTRIBUTES } from "../../../pages/object-store/object/list";
 import { Metadata } from "../../../types/objectstore-api";
@@ -52,8 +52,9 @@ export function ExistingObjectsAttacher({
       Header: CheckBoxHeader,
       sortable: false
     },
-    thumbnailCell({
-      bucketField: "bucket"
+    ThumbnailCell({
+      bucketField: "bucket",
+      isJsonApiQuery: true
     }),
     {
       Cell: ({ original: { id, originalFilename } }) =>
@@ -102,6 +103,7 @@ export function ExistingObjectsAttacher({
           {children}
         </MetadataListWrapper>
       )}
+      include="derivatives"
     />
   );
 }

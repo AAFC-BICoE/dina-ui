@@ -16,7 +16,7 @@ import { uniqBy } from "lodash";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { AllowAttachmentsConfig, AttachmentSection } from "..";
-import { thumbnailCell, thumbnailCell8 } from "../..";
+import { ThumbnailCell, ThumbnailCell8 } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
@@ -92,7 +92,7 @@ export function AttachmentsEditor({
 
   const { data: metadatas, loading } = useBulkGet<Metadata>({
     ids: value.map((it) => it.id),
-    listPath: "objectstore-api/metadata"
+    listPath: "objectstore-api/metadata?include=derivatives"
   });
 
   async function addAttachedMetadatas(newIds: string[]) {
@@ -162,8 +162,9 @@ export function AttachmentsEditor({
                 <div className="mb-3">
                   <ReactTable8
                     columns={[
-                      thumbnailCell8({
-                        bucketField: "bucket"
+                      ThumbnailCell8({
+                        bucketField: "bucket",
+                        isJsonApiQuery: true
                       }),
                       {
                         id: "originalFilename",

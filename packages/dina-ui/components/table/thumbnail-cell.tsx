@@ -7,27 +7,58 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";
 import { Derivative } from "../../types/objectstore-api";
 
-export function thumbnailCell({ bucketField }) {
+export interface ThumbnailCellProps {
+  bucketField: string;
+  isJsonApiQuery?: boolean;
+}
+
+export function ThumbnailCell({
+  bucketField,
+  isJsonApiQuery
+}: ThumbnailCellProps) {
   return {
     Cell: ({ original }) => {
-      const bucket = get<string | undefined>(original, bucketField);
-      const derivativeType =
-        original?.included?.derivative?.attributes?.derivativeType;
-      const filePath =
-        derivativeType === "THUMBNAIL_IMAGE"
-          ? `/objectstore-api/file/${bucket}/derivative/${original?.included?.derivative?.attributes?.fileIdentifier}`
+      const bucket = get(original as any, bucketField);
+      let derivatives: any[] | undefined = (original as any)?.included
+        ?.derivative;
+      let thumbnailDerivative = derivatives?.find(
+        (derivative) =>
+          derivative.attributes.derivativeType === "THUMBNAIL_IMAGE"
+      );
+      let filePath = thumbnailDerivative
+        ? `/objectstore-api/file/${bucket}/derivative/${thumbnailDerivative.attributes.fileIdentifier}`
+        : "";
+      let resourceExternalURL = (original as any)?.data?.attributes
+        ?.resourceExternalURL;
+      let hasExternalResourceDerivative =
+        resourceExternalURL && (original as any)?.included?.derivative;
+      if (isJsonApiQuery) {
+        derivatives = (original as any)?.derivatives;
+        thumbnailDerivative = derivatives?.find(
+          (derivative) => derivative.derivativeType === "THUMBNAIL_IMAGE"
+        );
+        filePath = thumbnailDerivative
+          ? `/objectstore-api/file/${bucket}/derivative/${thumbnailDerivative.fileIdentifier}`
           : "";
-      const resourceExternalURL =
-        original?.data?.attributes?.resourceExternalURL;
-
+        resourceExternalURL = (original as any)?.data?.attributes
+          ?.resourceExternalURL;
+        hasExternalResourceDerivative =
+          resourceExternalURL && (original as any)?.included?.derivative;
+      }
       return resourceExternalURL ? (
         <div className="d-flex h-100">
-          <Link href={resourceExternalURL} passHref={true}>
-            <a target="_blank" className="m-auto h5">
-              <FaExternalLinkAlt />
-            </a>
-          </Link>
-
+          {hasExternalResourceDerivative ? (
+            <FaExternalLinkAlt className="m-auto h5" />
+          ) : (
+            <Link href={resourceExternalURL} passHref={true}>
+              <a target="_blank" className="m-auto h5">
+                <FaExternalLinkAlt />
+              </a>
+            </Link>
+          )}
+          {hasExternalResourceDerivative && (
+            <SmallThumbnail filePath={filePath} />
+          )}
           <Link
             href={`/object-store/object/external-resource-view?id=${original?.id}`}
           >
@@ -47,31 +78,51 @@ export function thumbnailCell({ bucketField }) {
       "included.attributes.fileIdentifier",
       "included.attributes.derivativeType",
       "data.attributes.resourceExternalURL",
+      "data.relationships.derivatives",
       bucketField
     ]
   };
 }
 
-export function thumbnailCell8<TData extends KitsuResource>({
-  bucketField
-}): TableColumn8<TData> {
+export interface ThumbnailCell8Props {
+  bucketField: string;
+  isJsonApiQuery?: boolean;
+}
+
+export function ThumbnailCell8<TData extends KitsuResource>({
+  bucketField,
+  isJsonApiQuery
+}: ThumbnailCell8Props): TableColumn8<TData> {
   return {
     id: "thumbnailColumn",
     cell: ({ row: { original } }) => {
-      const bucket = get<string | undefined>(original as any, bucketField);
-      const derivatives: any[] | undefined = (original as any)?.included
+      const bucket = get(original as any, bucketField);
+      let derivatives: any[] | undefined = (original as any)?.included
         ?.derivative;
-      const thumbnailDerivative = derivatives?.find(
+      let thumbnailDerivative = derivatives?.find(
         (derivative) =>
           derivative.attributes.derivativeType === "THUMBNAIL_IMAGE"
       );
-      const filePath = thumbnailDerivative
+      let filePath = thumbnailDerivative
         ? `/objectstore-api/file/${bucket}/derivative/${thumbnailDerivative.attributes.fileIdentifier}`
         : "";
-      const resourceExternalURL = (original as any)?.data?.attributes
+      let resourceExternalURL = (original as any)?.data?.attributes
         ?.resourceExternalURL;
-      const hasExternalResourceDerivative =
+      let hasExternalResourceDerivative =
         resourceExternalURL && (original as any)?.included?.derivative;
+      if (isJsonApiQuery) {
+        derivatives = (original as any)?.derivatives;
+        thumbnailDerivative = derivatives?.find(
+          (derivative) => derivative.derivativeType === "THUMBNAIL_IMAGE"
+        );
+        filePath = thumbnailDerivative
+          ? `/objectstore-api/file/${bucket}/derivative/${thumbnailDerivative.fileIdentifier}`
+          : "";
+        resourceExternalURL = (original as any)?.data?.attributes
+          ?.resourceExternalURL;
+        hasExternalResourceDerivative =
+          resourceExternalURL && (original as any)?.included?.derivative;
+      }
       return resourceExternalURL ? (
         <div className="d-flex h-100">
           {hasExternalResourceDerivative ? (
