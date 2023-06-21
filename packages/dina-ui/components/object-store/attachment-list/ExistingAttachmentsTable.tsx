@@ -164,7 +164,7 @@ export function ExistingAttachmentsTable({
             idField: "id",
             joinField: "metadata",
             path: (metadataRef) =>
-              `metadata/${metadataRef.id}?include=acMetadataCreator`
+              `metadata/${metadataRef.id}?include=acMetadataCreator,derivatives`
           },
           {
             apiBaseUrl: "/agent-api",
@@ -179,7 +179,6 @@ export function ExistingAttachmentsTable({
         reactTableProps={{ sortable: false }}
         defaultPageSize={10000}
         onSuccess={(res) => setAvailableMetadatas(res.data)}
-        include="derivatives"
         ariaLabel="Existing attachments"
       />
     </DinaForm>

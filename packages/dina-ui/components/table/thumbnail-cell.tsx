@@ -33,7 +33,9 @@ export function ThumbnailCell({
       let hasExternalResourceDerivative =
         resourceExternalURL && (original as any)?.included?.derivative;
       if (isJsonApiQuery) {
-        derivatives = (original as any)?.derivatives;
+        derivatives = (original as any)?.metadata
+          ? (original as any)?.metadata.derivatives
+          : (original as any)?.derivatives;
         thumbnailDerivative = derivatives?.find(
           (derivative) => derivative.derivativeType === "THUMBNAIL_IMAGE"
         );
@@ -111,7 +113,9 @@ export function ThumbnailCell8<TData extends KitsuResource>({
       let hasExternalResourceDerivative =
         resourceExternalURL && (original as any)?.included?.derivative;
       if (isJsonApiQuery) {
-        derivatives = (original as any)?.derivatives;
+        derivatives = (original as any)?.metadata
+          ? (original as any)?.metadata.derivatives
+          : (original as any)?.derivatives;
         thumbnailDerivative = derivatives?.find(
           (derivative) => derivative.derivativeType === "THUMBNAIL_IMAGE"
         );

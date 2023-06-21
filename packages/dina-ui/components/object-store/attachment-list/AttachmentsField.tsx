@@ -214,7 +214,12 @@ export function AttachmentsEditor({
                         }) => (
                           <button
                             className="btn btn-dark remove-attachment"
-                            onClick={() => removeMetadata(mId ?? "unknown")}
+                            onClick={() =>
+                              removeMetadata(
+                                mId?.replace("?include=derivatives", "") ??
+                                  "unknown"
+                              )
+                            }
                             type="button"
                           >
                             <DinaMessage id="remove" />
