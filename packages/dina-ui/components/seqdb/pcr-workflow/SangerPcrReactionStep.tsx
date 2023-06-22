@@ -1,14 +1,16 @@
 import { DinaForm, LoadingSpinner, Operation, useApiClient } from "common-ui";
 import { FormikProps } from "formik";
 import { Ref, useEffect, useRef } from "react";
-import { PcrBatchItem } from "../../../types/seqdb-api";
+import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { PcrReactionTable, usePcrReactionData } from "./PcrReactionTable";
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
   editMode: boolean;
   performSave: boolean;
-  setPerformSave?: (newValue: boolean) => void;
+  setPerformSave: (newValue: boolean) => void;
+  performComplete: boolean;
+  setPerformComplete: (newValue: boolean) => void;
   setEditMode: (newValue: boolean) => void;
 }
 
@@ -17,20 +19,24 @@ export function SangerPcrReactionStep({
   editMode,
   performSave,
   setPerformSave,
+  performComplete,
+  setPerformComplete,
   setEditMode
 }: SangerPcrReactionProps) {
-  const { doOperations } = useApiClient();
+  const { doOperations, save } = useApiClient();
   const formRef: Ref<FormikProps<Partial<PcrBatchItem>>> = useRef(null);
   const { loading, materialSamples, pcrBatchItems, setPcrBatchItems } =
     usePcrReactionData(pcrBatchId);
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
-    if (performSave && !!pcrBatchId) {
+    console.log("perform save: " + performSave);
+    console.log("perform complete: " + performComplete);
+    if ((performComplete || performSave) && !!pcrBatchId) {
       performSaveInternal();
       setEditMode(false);
     }
-  }, [performSave]);
+  }, [performSave, performComplete]);
 
   async function performSaveInternal() {
     if (formRef && (formRef as any)?.current?.values?.results) {
@@ -72,11 +78,32 @@ export function SangerPcrReactionStep({
       }
     }
 
+    if (performComplete) {
+      await save<PcrBatch>([
+        {
+          resource: {
+            id: pcrBatchId,
+            isCompleted: true,
+            type: "pcr-batch"
+          } as any,
+          type: "pcr-batch"
+        }
+      ], {
+        apiBaseUrl: "/seqdb-api"
+      });
+    }
+
     // Leave edit mode...
     if (!!setPerformSave) {
       setPerformSave(false);
     }
+
+    if (!!setPerformComplete){
+      setPerformComplete(false);
+    }
   }
+
+
 
   // Load the result based on the API request with the pcr-batch-item.
   const initialValues = {
