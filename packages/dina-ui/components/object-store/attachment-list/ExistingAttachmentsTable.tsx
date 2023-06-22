@@ -11,7 +11,7 @@ import {
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
-import { thumbnailCell } from "../..";
+import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 
@@ -54,8 +54,9 @@ export function ExistingAttachmentsTable({
       Header: CheckBoxHeader,
       sortable: false
     },
-    thumbnailCell({
-      bucketField: "metadata.bucket"
+    ThumbnailCell({
+      bucketField: "metadata.bucket",
+      isJsonApiQuery: true
     }),
     {
       Cell: ({ original: { id, metadata } }) => {
@@ -163,7 +164,7 @@ export function ExistingAttachmentsTable({
             idField: "id",
             joinField: "metadata",
             path: (metadataRef) =>
-              `metadata/${metadataRef.id}?include=acMetadataCreator`
+              `metadata/${metadataRef.id}?include=acMetadataCreator,derivatives`
           },
           {
             apiBaseUrl: "/agent-api",

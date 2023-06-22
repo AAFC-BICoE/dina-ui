@@ -50,17 +50,18 @@ export function ContainerGrid({
         const coords = `${rowLabel}_${columnLabel}`;
 
         return (
-          <span className={`well-${coords}`}>
+          <div className={`well-${coords}`} style={{ height: "40px" }}>
             <GridCell
               movedSamples={movedSamples}
               onDrop={({ sample: newSample }) => onDrop(newSample, coords)}
               sample={cellGrid[coords]}
             />
-          </span>
+          </div>
         );
       },
       header: () => <FieldHeader name={columnLabel} />,
-      enableSorting: false
+      enableSorting: false,
+      size: 150
     });
   }
 
