@@ -900,6 +900,7 @@ export function QueryPage<TData extends KitsuResource>({
                     enableDnd={enableDnd}
                     enableSorting={!enableDnd}
                     showPagination={!enableDnd}
+                    manualPagination={true}
                   />
                 </div>
               </>
