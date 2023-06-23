@@ -10,7 +10,8 @@ import {
 import Link from "next/link";
 import PageLayout from "../../../components/page/PageLayout";
 import { KitsuResource } from "kitsu";
-import { Assemblage } from "packages/dina-ui/types/collection-api";
+import { Assemblage } from "../../../types/collection-api";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 const ASSEMBLAGE_FILTER_ATTRIBUTES = ["name"];
 const ASSEMBLAGE_TABLE_COLUMNS: ColumnDefinition8<Assemblage>[] = [
@@ -20,7 +21,8 @@ const ASSEMBLAGE_TABLE_COLUMNS: ColumnDefinition8<Assemblage>[] = [
         original: { id, name }
       }
     }) => <Link href={`/collection/assemblage/view?id=${id}`}>{name}</Link>,
-    accessorKey: "name"
+    accessorKey: "name",
+    header: () => <DinaMessage id="field_name" />
   },
   titleCell8("multilingualTitle"),
   descriptionCell8("multilingualDescription")

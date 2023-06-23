@@ -6,6 +6,7 @@ import {
   MultilingualDescription,
   MultilingualTitle
 } from "packages/dina-ui/types/common/";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 /**
  * Points to the translation key, used for the language badge.
@@ -135,7 +136,8 @@ export function descriptionCell8(accessorKey: string) {
         <div />
       );
     },
-    accessorKey
+    accessorKey,
+    header: () => <DinaMessage id="multilingualDescription" />
   };
 }
 
@@ -288,7 +290,8 @@ export function titleCell8(accessorKey: string) {
         <div />
       );
     },
-    accessorKey
+    accessorKey,
+    header: () => <DinaMessage id="multilingualTitle" />
   };
 }
 
