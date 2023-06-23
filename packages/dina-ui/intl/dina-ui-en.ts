@@ -509,6 +509,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
   literalGeoreferencedByLabel: "Georeferenced By",
   load: "Load",
+  loading: "Loading",
   loanTransaction: "Transaction",
   loanTransactionManagedAttributeListTitle:
     "Loans and Transactions Managed Attributes",
@@ -706,6 +707,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAndCopyToNext: "Save & Copy To Next",
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveAndGoToViewPageButton: "Save & Go To View Page",
+  saveAndMarkAsComplete: "Save and Mark as Complete",
   saveAsDefault: "Save as Default",
   saveChanges: "Save changes",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",

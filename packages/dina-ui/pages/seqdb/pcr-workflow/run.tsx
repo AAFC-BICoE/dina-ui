@@ -103,7 +103,7 @@ export default function PCRWorkFlowRunPage() {
                   role="status"
                   aria-hidden="true"
                 />
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden"><DinaMessage id="loading" /></span>
               </>
             ) : (
               <DinaMessage id="save" />
@@ -126,7 +126,7 @@ export default function PCRWorkFlowRunPage() {
                   role="status"
                   aria-hidden="true"
                 />
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden"><DinaMessage id="loading" /></span>
               </>
             ) : (
               <DinaMessage id="save" />
@@ -153,7 +153,7 @@ export default function PCRWorkFlowRunPage() {
                   </>
                 ) : (
                   null
-                )}Save and Mark as Completed</Dropdown.Item>
+                )}<DinaMessage id="saveAndMarkAsComplete" /></Dropdown.Item>
                </Dropdown.Menu>
             </Dropdown>
 
