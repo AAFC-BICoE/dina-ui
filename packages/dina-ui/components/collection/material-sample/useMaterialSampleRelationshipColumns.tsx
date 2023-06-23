@@ -1,4 +1,4 @@
-import { TableColumn, TableColumn8 } from "common-ui/lib/list-page/types";
+import { TableColumn8 } from "common-ui/lib/list-page/types";
 import {
   dateCell8,
   DeleteButton,

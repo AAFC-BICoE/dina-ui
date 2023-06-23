@@ -1,22 +1,29 @@
 import {
   CreateButton,
   descriptionCell,
+  descriptionCell8,
   titleCell,
-  ListPageLayout
+  titleCell8,
+  ListPageLayout,
+  ColumnDefinition8
 } from "common-ui";
 import Link from "next/link";
 import PageLayout from "../../../components/page/PageLayout";
+import { KitsuResource } from "kitsu";
+import { Assemblage } from "packages/dina-ui/types/collection-api";
 
 const ASSEMBLAGE_FILTER_ATTRIBUTES = ["name"];
-const ASSEMBLAGE_TABLE_COLUMNS = [
+const ASSEMBLAGE_TABLE_COLUMNS: ColumnDefinition8<Assemblage>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
-      <Link href={`/collection/assemblage/view?id=${id}`}>{name}</Link>
-    ),
-    accessor: "name"
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => <Link href={`/collection/assemblage/view?id=${id}`}>{name}</Link>,
+    accessorKey: "name"
   },
-  titleCell("multilingualTitle"),
-  descriptionCell("multilingualDescription")
+  titleCell8("multilingualTitle"),
+  descriptionCell8("multilingualDescription")
 ];
 
 export default function assemblageListPage() {

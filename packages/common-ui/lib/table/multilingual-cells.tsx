@@ -78,6 +78,68 @@ export function descriptionCell(accessor: string) {
 }
 
 /**
+ * Used for multilingual descriptions which contain an English and French version of the
+ * description.
+ */
+export function descriptionCell8(accessorKey: string) {
+  return {
+    cell: ({ row: { original } }) => {
+      const { locale } = useContext(intlContext);
+
+      // Retrieve the current language being used.
+      const language = locale;
+
+      // Get the descriptions provided.
+      const multilingualDescription: MultilingualDescription | null = get(
+        original,
+        accessorKey
+      );
+
+      // If no descriptions are provided, just leave the cell blank.
+      if (
+        multilingualDescription?.descriptions == null ||
+        multilingualDescription?.descriptions.length === 0
+      ) {
+        return <div />;
+      }
+
+      // Remove any blank descriptions.
+      const descriptionPairs = multilingualDescription?.descriptions.filter(
+        (description) => description.desc !== ""
+      );
+
+      // Loop through all of the descriptions provided, the preferred one is always the currently used language.
+      for (const description of descriptionPairs) {
+        if (description.lang === language) {
+          return (
+            <div>
+              <span className="description list-inline-item">
+                {description.desc}
+              </span>
+              {languageBadge(description.lang)}
+            </div>
+          );
+        }
+      }
+
+      // Preferred language could not be found above. Use another language and make sure it's indicated.
+      // There is also the possibility that this is blank.
+      return descriptionPairs.length !== 0 && descriptionPairs[0] !== null ? (
+        <div>
+          <span className="description list-inline-item">
+            {descriptionPairs[0].desc}
+          </span>
+          {languageBadge(descriptionPairs[0].lang)}
+        </div>
+      ) : (
+        <div />
+      );
+    },
+    accessorKey
+  };
+}
+
+/**
  * Shows the multilingual description in all languages.
  */
 export function allLangsDescriptionCell(accessor: string) {
@@ -173,6 +235,64 @@ export function titleCell(accessor: string) {
 }
 
 /**
+ * Used for multilingual titles which contain an English and French version of the
+ * title.
+ */
+export function titleCell8(accessorKey: string) {
+  return {
+    cell: ({ row: { original } }) => {
+      const { locale } = useContext(intlContext);
+
+      // Retrieve the current language being used.
+      const language = locale;
+
+      // Get the titles provided.
+      const multilingualTitle: MultilingualTitle | null = get(
+        original,
+        accessorKey
+      );
+
+      // If no titles are provided, just leave the cell blank.
+      if (
+        multilingualTitle?.titles == null ||
+        multilingualTitle?.titles.length === 0
+      ) {
+        return <div />;
+      }
+
+      // Remove any blank titles.
+      const titlePairs = multilingualTitle?.titles.filter(
+        (titleItem) => titleItem.title !== ""
+      );
+
+      // Loop through all of the titles provided, the preferred one is always the currently used language.
+      for (const titlePair of titlePairs) {
+        if (titlePair.lang === language) {
+          return (
+            <div>
+              <span className="title list-inline-item">{titlePair.title}</span>
+              {languageBadge(titlePair.lang)}
+            </div>
+          );
+        }
+      }
+
+      // Preferred language could not be found above. Use another language and make sure it's indicated.
+      // There is also the possibility that this is blank.
+      return titlePairs.length !== 0 && titlePairs[0] !== null ? (
+        <div>
+          <span className="title list-inline-item">{titlePairs[0].title}</span>
+          {languageBadge(titlePairs[0].lang)}
+        </div>
+      ) : (
+        <div />
+      );
+    },
+    accessorKey
+  };
+}
+
+/**
  * Shows the multilingual title in all languages.
  */
 export function allLangsTitleCell(accessorKey: string) {
@@ -190,7 +310,7 @@ export function allLangsTitleCell(accessorKey: string) {
             </div>
           )
       ) ?? null,
-    accessor: accessorKey
+    accessorKey
   };
 }
 
