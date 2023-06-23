@@ -42,7 +42,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Person } from "../../../types/agent-api";
 import {
-  MaterialSample,
+  MaterialSampleSummary,
   Protocol,
   StorageUnit,
   StorageUnitType
@@ -313,7 +313,7 @@ export function LoadExternalDataForPcrBatchForm({
 
 interface PcrBatchFormFieldsProps {
   pcrBatchItems: PcrBatchItem[];
-  materialSamples: MaterialSample[];
+  materialSamples: MaterialSampleSummary[];
 }
 
 /** Re-usable field layout between edit and view pages. */

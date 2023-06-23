@@ -1,6 +1,7 @@
 import {
   ColumnDef,
   ExpandedState,
+  PaginationState,
   Row,
   SortingState,
   VisibilityState,
@@ -73,7 +74,7 @@ export function ReactTable8<TData>({
   showPagination = false,
   showPaginationTop = false,
   manualPagination = false,
-  pageSize,
+  pageSize: initPageSize,
   pageCount,
   page,
   onPageChange,
@@ -93,6 +94,10 @@ export function ReactTable8<TData>({
 }: ReactTable8Props<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
+    pageIndex: page ?? 0,
+    pageSize: initPageSize ?? pageSizeOptions[0]
+  });
 
   function reorderRow(draggedRowIndex: number, targetRowIndex: number) {
     data.splice(targetRowIndex, 0, data.splice(draggedRowIndex, 1)[0] as TData);
@@ -102,12 +107,15 @@ export function ReactTable8<TData>({
   }
 
   function onPaginationChangeInternal(updater) {
+    const { pageIndex: oldPageIndex, pageSize: oldPageSize } =
+      table.getState().pagination;
     const newState = updater(table.getState().pagination);
-    if (pageSize !== newState.pageSize) {
+    if (oldPageSize !== newState.pageSize) {
       onPageSizeChange?.(newState.pageSize);
-    } else if (page !== newState.pageIndex) {
+    } else if (oldPageIndex !== newState.pageIndex) {
       onPageChange?.(newState.pageIndex);
     }
+    setPagination(newState);
   }
 
   function onSortingChangeInternal(updator) {
@@ -119,10 +127,7 @@ export function ReactTable8<TData>({
   const tableStateOption = manualPagination
     ? {
         state: {
-          pagination: {
-            pageIndex: page ?? 0,
-            pageSize: pageSize ?? pageSizeOptions[0]
-          },
+          pagination: { pageIndex, pageSize },
           sorting,
           columnVisibility
         }
@@ -158,8 +163,7 @@ export function ReactTable8<TData>({
     getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4()),
     initialState: {
       expanded: defaultExpanded,
-      sorting: defaultSorted,
-      pagination: { pageSize: pageSize ?? pageSizeOptions[0] }
+      sorting: defaultSorted
     },
     enableSorting,
     enableMultiSort,
@@ -182,7 +186,9 @@ export function ReactTable8<TData>({
       )}
     >
       {showPaginationTop && (
-        <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+        <div className="pagination-top">
+          <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+        </div>
       )}
       <table className="w-100">
         <thead>
@@ -234,6 +240,12 @@ export function ReactTable8<TData>({
                 <LoadingSpinner loading={true} />
               </td>
             </tr>
+          ) : !!TbodyComponent ? (
+            <tr>
+              <td colSpan={table.getAllColumns().length}>
+                <TbodyComponent />
+              </td>
+            </tr>
           ) : table.getRowModel().rows.length === 0 ? (
             <tr>
               <td
@@ -241,12 +253,6 @@ export function ReactTable8<TData>({
                 className="text-center"
               >
                 {formatMessage({ id: "noRowsFound" })}
-              </td>
-            </tr>
-          ) : !!TbodyComponent ? (
-            <tr>
-              <td colSpan={table.getAllColumns().length}>
-                <TbodyComponent />
               </td>
             </tr>
           ) : (
@@ -286,7 +292,9 @@ export function ReactTable8<TData>({
         </tbody>
       </table>
       {showPagination && (
-        <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+        <div className="pagination-bottom">
+          <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+        </div>
       )}
     </div>
   );

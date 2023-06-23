@@ -82,7 +82,7 @@ export function ContainerGrid({
           const coords = `${rowLabel}_${column}`;
 
           return (
-            <span className={`well-${coords}`}>
+            <div className={`well-${coords}`} style={{ height: "40px" }}>
               <GridCell
                 movedItems={movedItems}
                 onDrop={({ seqReactionSample: newItem }) =>
@@ -92,11 +92,12 @@ export function ContainerGrid({
                 editMode={editMode}
                 coordinates={coords.replace("_", "")}
               />
-            </span>
+            </div>
           );
         },
         header: () => columnLabel,
-        enableSorting: false
+        enableSorting: false,
+        size: 150
       });
     }
 

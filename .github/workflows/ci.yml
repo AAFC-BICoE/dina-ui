@@ -53,7 +53,6 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/master' }}
     needs:
       - setup
       - test-chunk
@@ -73,10 +72,12 @@ jobs:
           yarn workspace dina-ui build
 
       - name: Extract Version
+        if: ${{ github.ref == 'refs/heads/master' }}
         run: |
           jq -r ".version" packages/dina-ui/package.json > version.txt
 
       - name: Store artifacts
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts

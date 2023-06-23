@@ -30,8 +30,6 @@ export function SangerPcrReactionStep({
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
-    console.log("perform save: " + performSave);
-    console.log("perform complete: " + performComplete);
     if ((performComplete || performSave) && !!pcrBatchId) {
       performSaveInternal();
       setEditMode(false);

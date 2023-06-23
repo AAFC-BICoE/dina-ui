@@ -207,8 +207,8 @@ export function PcrReactionTable({
       className="-striped react-table-overflow"
       columns={PCR_REACTION_COLUMN}
       data={sortBy(pcrBatchItems, "cellNumber")}
+      showPagination={false}
       manualPagination={true}
-      pageSize={1000}
     />
   );
 }
