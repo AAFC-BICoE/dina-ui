@@ -109,3 +109,4 @@ export * from "./table8/stringArray-cell8";
 export * from "./table8/date-cell8";
 export * from "./table8/booleanCell8";
 export * from "./list-page/QueryPage";
+export * from "./table8/QueryTable8";

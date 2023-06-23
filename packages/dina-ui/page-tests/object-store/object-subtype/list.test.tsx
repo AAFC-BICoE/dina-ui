@@ -1,4 +1,4 @@
-import { QueryTable } from "common-ui";
+import { QueryTable8 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import ObjectSubtypeListPage from "../../../pages/object-store/object-subtype/list";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
@@ -51,7 +51,7 @@ describe("Object subtype list page", () => {
     expect(wrapper.containsMatchingElement(<a>Drawing</a>)).toEqual(true);
     expect(
       wrapper
-        .find(QueryTable)
+        .find(QueryTable8)
         .find(
           'ForwardRef(LinkComponent)[href$="/object-subtype/edit?id=6c524135-3c3e-41c1-a057-45afb4e3e7be"]'
         )
