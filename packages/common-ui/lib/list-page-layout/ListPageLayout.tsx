@@ -137,7 +137,7 @@ export function ListPageLayout<TData extends KitsuResource>({
             header: () => CheckBoxHeader,
             enableSorting: false,
             size: 200,
-            accessorKey: "checkbox"
+            id: "checkbox_column"
           }
         ]
       : []),

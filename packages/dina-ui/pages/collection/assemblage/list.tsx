@@ -1,15 +1,12 @@
 import {
   CreateButton,
-  descriptionCell,
   descriptionCell8,
-  titleCell,
   titleCell8,
   ListPageLayout,
   ColumnDefinition8
 } from "common-ui";
 import Link from "next/link";
 import PageLayout from "../../../components/page/PageLayout";
-import { KitsuResource } from "kitsu";
 import { Assemblage } from "../../../types/collection-api";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 
