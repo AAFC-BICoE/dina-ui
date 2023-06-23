@@ -208,6 +208,7 @@ export function PcrReactionTable({
       columns={PCR_REACTION_COLUMN}
       data={sortBy(pcrBatchItems, "cellNumber")}
       showPagination={false}
+      manualPagination={true}
     />
   );
 }

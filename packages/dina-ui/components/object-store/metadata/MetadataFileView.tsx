@@ -9,6 +9,30 @@ export interface MetadataFileViewProps {
   preview?: boolean;
 }
 
+export function getFileToDisplay(metadata) {
+  const largeImageDerivative = metadata?.derivatives?.find(
+    (it) => it.derivativeType === "LARGE_IMAGE"
+  );
+  const thumbnailImageDerivative = metadata?.derivatives?.find(
+    (it) => it.derivativeType === "THUMBNAIL_IMAGE"
+  );
+
+  if (largeImageDerivative) {
+    return largeImageDerivative;
+  }
+
+  if (metadata.fileIdentifier) {
+    return metadata;
+  }
+
+  // Thumbnail should only take place if original file cannot be displayed (e.g. external file)
+  if (thumbnailImageDerivative) {
+    return thumbnailImageDerivative;
+  }
+
+  return metadata;
+}
+
 /** Displays the file for the given metadata. */
 export function MetadataFileView({
   metadata,
@@ -17,11 +41,8 @@ export function MetadataFileView({
 }: MetadataFileViewProps) {
   const { formatMessage } = useDinaIntl();
 
-  // If there is a linked "LARGE_IMAGE" Derivative then render it:
-  const fileToDisplay =
-    metadata.derivatives?.find((it) => it.derivativeType === "LARGE_IMAGE") ??
-    metadata;
-
+  // If there is a linked "LARGE_IMAGE" Derivative then render it, fall back to "THUMBNAIL_IMAGE", then to metadata:
+  const fileToDisplay = getFileToDisplay(metadata);
   const fileId = fileToDisplay.fileIdentifier;
 
   const filePath = `/objectstore-api/file/${fileToDisplay.bucket}/${
@@ -40,7 +61,11 @@ export function MetadataFileView({
     (it) => it.derivativeType === "THUMBNAIL_IMAGE"
   );
 
-  downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
+  // External resources do not have original files.
+  if (!metadata.resourceExternalURL) {
+    downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
+  }
+
   // populate the thumbnail link
   if (thumbnailImgDerivative) {
     downloadLinks.thumbNail = `${COMMON_LINK_ROOT}${metadata.bucket}/derivative/${thumbnailImgDerivative?.fileIdentifier}`;

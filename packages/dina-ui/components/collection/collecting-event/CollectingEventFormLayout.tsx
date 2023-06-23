@@ -942,6 +942,7 @@ export function CollectingEventFormLayout({
               model="collection-api/protocol"
               optionLabel={(protocol) => protocol.name}
               omitNullOption={false}
+              readOnlyLink="/collection/protocol/view?id="
             />
             <AutoSuggestTextField<CollectingEvent>
               name="substrate"

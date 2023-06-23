@@ -85,8 +85,12 @@ export function FileView({
         const response = await fetchObjectBlob(path);
         const url = window?.URL?.createObjectURL(response.data);
         const link = document?.createElement("a");
+        const content: string = response.headers["content-disposition"];
+        const filename = content
+          .slice(content.indexOf("filename=") + "filename=".length)
+          .replaceAll('"', "");
         link.href = url;
-        link?.setAttribute("download", path); // or any other extension
+        link?.setAttribute("download", filename); // or any other extension
         document?.body?.appendChild(link);
         link?.click();
         window?.URL?.revokeObjectURL(url);
