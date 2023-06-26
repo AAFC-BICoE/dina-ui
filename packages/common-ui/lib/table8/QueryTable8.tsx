@@ -216,8 +216,10 @@ export function QueryTable8<TData extends KitsuResource>({
     const header = () =>
       typeof column === "string" ? (
         <FieldHeader name={column} />
-      ) : (
+      ) : column.header ? (
         column.header
+      ) : (
+        <FieldHeader name={""} />
       );
 
     const mappedColumnDef: ColumnDef<TData> = {

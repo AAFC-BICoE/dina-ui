@@ -1,8 +1,9 @@
 import {
   ButtonBar,
-  ColumnDefinition,
-  dateCell,
+  ColumnDefinition8,
+  dateCell8,
   DateView,
+  FieldHeader,
   KeyValueTable,
   ListPageLayout,
   useFieldLabels,
@@ -39,14 +40,20 @@ export function RevisionsPageLayout({
   instanceId
 }: RevisionsPageLayoutProps) {
   const { getFieldLabel } = useFieldLabels();
-
-  const REVISION_TABLE_COLUMNS: ColumnDefinition<KitsuResource>[] = [
-    ...// Only show resourceName column when not searching by instanceId:
-    (instanceId
+  const REVISION_TABLE_COLUMNS: ColumnDefinition8<KitsuResource>[] = [
+    {
+      cell: ({ row }) => {
+        expanderWithLabel(row);
+      },
+      accessorKey: "resourceType",
+      id: "resource-type-cell"
+    },
+    // Only show resourceName column when not searching by instanceId:
+    ...(instanceId
       ? []
       : [
           {
-            Cell: ({ original }) => {
+            cell: ({ row: { original } }) => {
               const snapshot: AuditSnapshot = original;
               const [type] = snapshot.instanceId.split("/");
               const ResourceName = revisionRowConfigsByType?.[type]?.name;
@@ -60,31 +67,34 @@ export function RevisionsPageLayout({
                 return <span title={name}>{name}</span>;
               }
             },
-            accessor: "resourceName",
-            className: "resource-name-cell"
+            accessorKey: "resourceName",
+            header: () => <FieldHeader name="resourceName" />,
+            id: "resource-name-cell"
           },
           {
-            Cell: ({ original }) => {
+            cell: ({ row: { original } }) => {
               const snapshot: AuditSnapshot = original;
               const [type] = snapshot.instanceId.split("/");
               return typeof type === "string" ? startCase(type) : "";
             },
-            accessor: "resourceType",
-            className: "resource-type-cell"
+            accessorKey: "resourceType",
+            header: () => <FieldHeader name="resourceType" />,
+            id: "resource-type-cell"
           }
         ]),
     "version",
-    dateCell("commitDateTime"),
+    dateCell8("commitDateTime"),
     "snapshotType",
     {
-      Cell: ({ original: { changedProperties } }) => (
+      cell: ({ row: { original } }) => (
         <div style={{ whiteSpace: "normal" }}>
-          {changedProperties
+          {(original as any)?.changedProperties
             ?.map((fieldName) => getFieldLabel({ name: fieldName }).fieldLabel)
             ?.join(", ")}
         </div>
       ),
-      accessor: "changedProperties"
+      accessorKey: "changedProperties",
+      header: () => <FieldHeader name={"changedProperties"} />
     },
     "author"
   ];
@@ -107,10 +117,11 @@ export function RevisionsPageLayout({
           },
           path: auditSnapshotPath,
           reactTableProps: {
-            ExpanderComponent: ExpanderWithLabel,
+            getRowCanExpand: () => true,
+            // ExpanderComponent: ExpanderWithLabel,
             // Pop-out component to show the changes for a single revision:
-            SubComponent: ({ original }) => {
-              const snapshot: AuditSnapshot = original;
+            renderSubComponent: ({ row: { original } }) => {
+              const snapshot: AuditSnapshot = original as any;
               const changed = pick(snapshot.state, snapshot.changedProperties);
 
               const [type] = snapshot.instanceId.split("/");
@@ -138,7 +149,7 @@ export function RevisionsPageLayout({
             },
             defaultSorted: [],
             // Revisions are not sortable, they are pre-sorted by commit datetime.
-            sortable: false,
+            enableSorting: false,
             className: "no-hover-highlight"
           }
         }}
@@ -213,15 +224,21 @@ export function RevisionsPage({
 }
 
 /** "Show changes" button to show all changes of a revision. */
-function ExpanderWithLabel({ isExpanded }) {
+function expanderWithLabel(row) {
   return (
-    <button className="btn btn-info" style={{ pointerEvents: "none" }}>
+    <button
+      className="btn btn-info"
+      style={{ pointerEvents: "none" }}
+      onClick={row.getToggleExpandedHandler()}
+    >
       <span>
         <strong>
           <DinaMessage id="showChanges" />
         </strong>
       </span>
-      <span className={`rt-expander ${isExpanded ? "-open" : false}`}>•</span>
+      <span className={`rt-expander ${row.getIsExpanded() ? "-open" : false}`}>
+        •
+      </span>
     </button>
   );
 }
