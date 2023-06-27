@@ -3,12 +3,12 @@ import {
   descriptionCell8,
   titleCell8,
   ListPageLayout,
-  ColumnDefinition8
+  ColumnDefinition8,
+  FieldHeader
 } from "common-ui";
 import Link from "next/link";
 import PageLayout from "../../../components/page/PageLayout";
 import { Assemblage } from "../../../types/collection-api";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 const ASSEMBLAGE_FILTER_ATTRIBUTES = ["name"];
 const ASSEMBLAGE_TABLE_COLUMNS: ColumnDefinition8<Assemblage>[] = [
@@ -19,7 +19,7 @@ const ASSEMBLAGE_TABLE_COLUMNS: ColumnDefinition8<Assemblage>[] = [
       }
     }) => <Link href={`/collection/assemblage/view?id=${id}`}>{name}</Link>,
     accessorKey: "name",
-    header: () => <DinaMessage id="field_name" />
+    header: () => <FieldHeader name="name" />
   },
   titleCell8("multilingualTitle"),
   descriptionCell8("multilingualDescription")
