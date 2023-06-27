@@ -1,27 +1,29 @@
 import {
-  ButtonBar,
-  ColumnDefinition,
+  ColumnDefinition8,
   CreateButton,
-  dateCell,
+  dateCell8,
   FilterAttribute,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { GroupSelectField, Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { GroupSelectField } from "../../../components";
 import { Collection } from "../../../types/collection-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
-const COLLECTION_TABLE_COLUMNS: ColumnDefinition<Collection>[] = [
+const COLLECTION_TABLE_COLUMNS: ColumnDefinition8<Collection>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/collection/collection/view?id=${id}`}>{name || id}</Link>
     ),
-    accessor: "name"
+    accessorKey: "name"
   },
   "code",
   "createdBy",
-  dateCell("createdOn")
+  dateCell8("createdOn")
 ];
 
 const COLLECTION_FILTER_ATTRIBUTES: FilterAttribute[] = [
@@ -35,7 +37,6 @@ const COLLECTION_FILTER_ATTRIBUTES: FilterAttribute[] = [
 ];
 
 export default function CollectionListPage() {
-  const { formatMessage } = useDinaIntl();
   const buttonBarContent = <CreateButton entityLink="/collection/collection" />;
 
   return (
