@@ -5,8 +5,8 @@ import { useIntl } from "react-intl";
 import {
   MultilingualDescription,
   MultilingualTitle
-} from "packages/dina-ui/types/common/";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+} from "../../../dina-ui/types/common/";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl"; // "packages/dina-ui/intl/dina-ui-intl"
 
 /**
  * Points to the translation key, used for the language badge.
