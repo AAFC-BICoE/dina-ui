@@ -2,6 +2,7 @@ import {
   ColumnDefinition8,
   CreateButton,
   dateCell8,
+  FieldHeader,
   FilterAttribute,
   ListPageLayout
 } from "common-ui";
@@ -19,7 +20,8 @@ const COLLECTION_TABLE_COLUMNS: ColumnDefinition8<Collection>[] = [
     }) => (
       <Link href={`/collection/collection/view?id=${id}`}>{name || id}</Link>
     ),
-    accessorKey: "name"
+    accessorKey: "name",
+    header: () => <FieldHeader name="name" />
   },
   "code",
   "createdBy",
