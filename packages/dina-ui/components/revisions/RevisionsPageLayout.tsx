@@ -43,10 +43,26 @@ export function RevisionsPageLayout({
   const REVISION_TABLE_COLUMNS: ColumnDefinition8<KitsuResource>[] = [
     {
       cell: ({ row }) => {
-        expanderWithLabel(row);
+        return (
+          <button
+            className="btn btn-info me-1 ms-1"
+            style={{ width: "max-content" }}
+            onClick={row.getToggleExpandedHandler()}
+          >
+            <span>
+              <strong>
+                <DinaMessage id="showChanges" />
+              </strong>
+            </span>
+            <span
+              className={`rt-expander ${row.getIsExpanded() ? "-open" : false}`}
+            >
+              •
+            </span>
+          </button>
+        );
       },
-      accessorKey: "resourceType",
-      id: "resource-type-cell"
+      id: "show_changes_button"
     },
     // Only show resourceName column when not searching by instanceId:
     ...(instanceId
@@ -221,24 +237,4 @@ export function RevisionsPage({
       </>
     );
   });
-}
-
-/** "Show changes" button to show all changes of a revision. */
-function expanderWithLabel(row) {
-  return (
-    <button
-      className="btn btn-info"
-      style={{ pointerEvents: "none" }}
-      onClick={row.getToggleExpandedHandler()}
-    >
-      <span>
-        <strong>
-          <DinaMessage id="showChanges" />
-        </strong>
-      </span>
-      <span className={`rt-expander ${row.getIsExpanded() ? "-open" : false}`}>
-        •
-      </span>
-    </button>
-  );
 }
