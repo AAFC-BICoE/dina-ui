@@ -212,15 +212,17 @@ export function QueryTable8<TData extends KitsuResource>({
 
   const mappedColumns: ColumnDef<TData>[] = columns.map((column) => {
     // The "columns" prop can be a string or a react-table Column type.
-
-    const header = () =>
-      typeof column === "string" ? (
-        <FieldHeader name={column} />
-      ) : column.header ? (
-        column.header
-      ) : (
-        <FieldHeader name={""} />
-      );
+    const header = () => {
+      if (typeof column === "string") {
+        return <FieldHeader name={column} />;
+      } else if (column.header) {
+        return column.header;
+      } else if ((column as any).accessorKey) {
+        return <FieldHeader name={(column as any).accessorKey} />;
+      } else {
+        return <FieldHeader name={""} />;
+      }
+    };
 
     const mappedColumnDef: ColumnDef<TData> = {
       header,
