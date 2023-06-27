@@ -1,14 +1,16 @@
 import {
   ButtonBar,
+  ColumnDefinition8,
   CreateButton,
-  dateCell,
+  dateCell8,
   ListPageLayout,
-  stringArrayCell
+  stringArrayCell8
 } from "common-ui";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { CollectingEvent } from "packages/dina-ui/types/collection-api";
 
 export default function CollectingEventListPage() {
   const { formatMessage } = useDinaIntl();
@@ -18,27 +20,31 @@ export default function CollectingEventListPage() {
     "dwcFieldNumber",
     "dwcRecordNumber"
   ];
-  const COLLECTING_EVENT_TABLE_COLUMNS = [
+  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition8<CollectingEvent>[] = [
     {
-      Cell: ({ original: { id } }) => (
+      cell: ({
+        row: {
+          original: { id }
+        }
+      }) => (
         <Link href={`/collection/collecting-event/view?id=${id}`}>
           <a>
             <DinaMessage id="viewDetails" />
           </a>
         </Link>
       ),
-      accessor: "id",
-      Header: <DinaMessage id="viewDetails" />,
-      sortable: false
+      accessorKey: "id",
+      header: () => <DinaMessage id="viewDetails" />,
+      enableSorting: false
     },
     "dwcFieldNumber",
     "dwcRecordNumber",
-    stringArrayCell("otherRecordNumbers"),
+    stringArrayCell8("otherRecordNumbers"),
     "createdBy",
     "startEventDateTime",
     "endEventDateTime",
     "verbatimEventDateTime",
-    dateCell("createdOn")
+    dateCell8("createdOn")
   ];
 
   return (
