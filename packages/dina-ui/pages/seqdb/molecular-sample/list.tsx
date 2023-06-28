@@ -1,20 +1,29 @@
-import { ButtonBar, CreateButton, dateCell, ListPageLayout } from "common-ui";
+import {
+  ButtonBar,
+  ColumnDefinition8,
+  CreateButton,
+  dateCell8,
+  ListPageLayout
+} from "common-ui";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
+import { MolecularSample } from "../../../types/seqdb-api";
 
 const FILTER_ATTRIBUTES = ["name", "createdBy"];
-const TABLE_COLUMNS = [
+const TABLE_COLUMNS: ColumnDefinition8<MolecularSample>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
-      <Link href={`/seqdb/molecular-sample/view?id=${id}`}>{name}</Link>
-    ),
-    accessor: "name"
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => <Link href={`/seqdb/molecular-sample/view?id=${id}`}>{name}</Link>,
+    accessorKey: "name"
   },
   "sampleType",
   "group",
   "createdBy",
-  dateCell("createdOn")
+  dateCell8("createdOn")
 ];
 
 export default function MolecularSampleListPage() {
@@ -32,7 +41,7 @@ export default function MolecularSampleListPage() {
           <CreateButton entityLink="/seqdb/molecular-sample" />
         </ButtonBar>
         <ListPageLayout
-          additionalFilters={filterForm => ({
+          additionalFilters={(filterForm) => ({
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}

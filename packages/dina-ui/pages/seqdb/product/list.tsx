@@ -1,27 +1,31 @@
 import {
   ButtonBar,
-  ColumnDefinition,
+  ColumnDefinition8,
   CreateButton,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { groupCell, Head, Nav } from "../../../components";
+import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
-const PRODUCT_TABLE_COLUMNS: ColumnDefinition<Product>[] = [
+const PRODUCT_TABLE_COLUMNS: ColumnDefinition8<Product>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/seqdb/product/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),
-    accessor: "name"
+    accessorKey: "name"
   },
-  groupCell("group"),
+  groupCell8("group"),
   {
-    Header: "UPC",
-    accessor: "upc"
+    header: "UPC",
+    accessorKey: "upc"
   },
   "type",
   "description"

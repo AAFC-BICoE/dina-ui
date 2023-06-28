@@ -1,3 +1,4 @@
+import { DefaultRow } from "../../../../common-ui/lib";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { RevisionsPageLayout } from "../RevisionsPageLayout";
 
@@ -20,7 +21,7 @@ const TEST_SNAPSHOTS = [
   }
 ];
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   if (path === "objectstore-api/audit-snapshots") {
     return {
       data: TEST_SNAPSHOTS
@@ -40,8 +41,7 @@ describe("RevisionsPageLayout component", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
-
     // Renders the 2 rows:
-    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(2);
+    expect(wrapper.find(DefaultRow).length).toEqual(2);
   });
 });

@@ -1,7 +1,7 @@
 import {
   ButtonBar,
-  ColumnDefinition,
-  dateCell,
+  ColumnDefinition8,
+  dateCell8,
   FilterAttribute,
   ListPageLayout
 } from "common-ui";
@@ -10,21 +10,25 @@ import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 
-const TABLE_COLUMNS: ColumnDefinition<PcrBatch>[] = [
+const TABLE_COLUMNS: ColumnDefinition8<PcrBatch>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/seqdb/pcr-workflow/run?pcrBatchId=${id}`}>
         {name || id}
       </Link>
     ),
-    accessor: "name",
-    Header: () => <SeqdbMessage id="pcrBatchName" />
+    accessorKey: "name",
+    header: () => <SeqdbMessage id="pcrBatchName" />
   },
   "group",
   "primerForward.name",
   "primerReverse.name",
   "createdBy",
-  dateCell("createdOn")
+  dateCell8("createdOn")
 ];
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [

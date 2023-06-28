@@ -9,10 +9,8 @@ import {
   DinaForm,
   FilterAttribute,
   MetaWithTotal,
-  QueryTable,
   QueryTable8,
   QueryTable8Props,
-  QueryTableProps,
   useGroupedCheckBoxes
 } from "..";
 import { rsql } from "../filter-builder/rsql";
