@@ -115,14 +115,14 @@ export function ExistingObjectsAttacher({
       queryTableProps={{
         columns: METADATA_TABLE_COLUMNS,
         path: "objectstore-api/metadata",
-        onSuccess: (res) => setAvailableMetadatas(res.data)
+        onSuccess: (res) => setAvailableMetadatas(res.data),
+        include: "derivatives"
       }}
       wrapTable={(children) => (
         <MetadataListWrapper onAttachButtonClick={submitMetadataIds}>
           {children}
         </MetadataListWrapper>
       )}
-      include="derivatives"
     />
   );
 }

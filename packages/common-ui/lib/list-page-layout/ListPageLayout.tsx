@@ -40,9 +40,6 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
 
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
-
-  // Include param for query table
-  include?: string;
 }
 
 interface ListPageLayoutContext<TData extends KitsuResource> {
@@ -62,8 +59,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   queryTableProps,
   wrapTable = (children) => children,
   bulkDeleteButtonProps,
-  bulkEditPath,
-  include
+  bulkEditPath
 }: ListPageLayoutProps<TData>) {
   const tablePageSizeKey = `${id}_tablePageSize`;
   const tableSortKey = `${id}_tableSort`;
@@ -165,7 +161,6 @@ export function ListPageLayout<TData extends KitsuResource>({
           )}
         </div>
       }
-      include={include}
       columns={columns}
       onSuccess={onSuccess}
     />
