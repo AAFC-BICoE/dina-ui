@@ -1,23 +1,27 @@
 import {
   ButtonBar,
-  ColumnDefinition,
+  ColumnDefinition8,
   CreateButton,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { groupCell, Head, Nav } from "../../../components";
+import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 
-const WORKFLOW_TABLE_COLUMNS: ColumnDefinition<any>[] = [
+const WORKFLOW_TABLE_COLUMNS: ColumnDefinition8<any>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/seqdb/workflow/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),
-    accessor: "name"
+    accessorKey: "name"
   },
-  groupCell("group"),
+  groupCell8("group"),
   "createdOn",
   "chainTemplate.name"
 ];

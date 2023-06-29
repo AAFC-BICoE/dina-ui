@@ -1,33 +1,41 @@
 import {
   ButtonBar,
-  ColumnDefinition,
+  ColumnDefinition8,
   CreateButton,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { groupCell, Head, Nav } from "../../../components";
+import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { ThermocyclerProfile } from "../../../types/seqdb-api/resources/ThermocyclerProfile";
 
-const THEROMOCYCLERPROFILE_TABLE_COLUMNS: ColumnDefinition<ThermocyclerProfile>[] =
+const THEROMOCYCLERPROFILE_TABLE_COLUMNS: ColumnDefinition8<ThermocyclerProfile>[] =
   [
     {
-      Cell: ({ original: { region } }) =>
+      cell: ({
+        row: {
+          original: { region }
+        }
+      }) =>
         region ? (
           <Link href={`/seqdb/region/view?id=${region.id}`}>
             <a>{region.name}</a>
           </Link>
         ) : null,
-      accessor: "region.name"
+      accessorKey: "region.name"
     },
-    groupCell("group"),
+    groupCell8("group"),
     {
-      Cell: ({ original: { id, name } }) => (
+      cell: ({
+        row: {
+          original: { id, name }
+        }
+      }) => (
         <Link href={`/seqdb/thermocycler-profile/view?id=${id}`}>
           <a>{name}</a>
         </Link>
       ),
-      accessor: "name"
+      accessorKey: "name"
     },
     "application",
     "step3"

@@ -17,6 +17,7 @@ export interface SequencingFacilityAddress {
 
 export interface SequencingFacilityAttributes {
   type: "sequencing-facility";
+  name?: string;
   group?: string;
   createdBy?: string;
   createdOn?: string;
