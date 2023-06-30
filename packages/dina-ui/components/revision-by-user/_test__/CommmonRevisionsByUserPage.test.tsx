@@ -1,3 +1,4 @@
+import { DefaultRow } from "../../../../common-ui/lib";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { OBJECT_STORE_MODULE_REVISION_ROW_CONFIG } from "../../revisions/revision-modules";
 import RevisionsByUserPage, {
@@ -23,7 +24,7 @@ const TEST_SNAPSHOTS = [
   }
 ];
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   if (path === "objectstore-api/audit-snapshot") {
     return {
       data: TEST_SNAPSHOTS
@@ -56,12 +57,10 @@ describe("MetadataRevisionListPage", () => {
     wrapper.update();
 
     // Renders the 2 revision rows:
-    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(2);
+    expect(wrapper.find(DefaultRow).length).toEqual(2);
 
     // Renders the metadata's resource name cell:
-    expect(wrapper.find(".resource-name-cell a").first().text()).toEqual(
-      "my-image-1.png"
-    );
+    expect(wrapper.find("name a").first().text()).toEqual("my-image-1.png");
   });
 
   it("Provides a search input for author.", async () => {
