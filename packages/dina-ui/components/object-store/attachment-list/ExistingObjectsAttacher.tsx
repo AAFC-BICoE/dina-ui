@@ -51,7 +51,7 @@ export function ExistingObjectsAttacher({
       cell: ({ row: { original: metadata } }) => (
         <CheckBoxField key={metadata.id} resource={metadata} />
       ),
-      header: () => CheckBoxHeader,
+      header: () => <CheckBoxHeader />,
       enableSorting: false,
       id: "checkbox_column"
     },
