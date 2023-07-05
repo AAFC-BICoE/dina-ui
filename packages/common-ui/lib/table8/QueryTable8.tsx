@@ -185,9 +185,11 @@ export function QueryTable8<TData extends KitsuResource>({
         ? reactTableProps(queryState)
         : reactTableProps;
     tableProps?.onPageSizeChange?.(newSize);
+    onPageSizeChange?.(newSize);
   }
 
   function onSortingChangeInternal(newSorting: SortingState) {
+    onSortedChange?.(newSorting);
     setSortingRules(newSorting);
     const tableProps: Partial<ReactTable8Props<TData>> | undefined =
       typeof reactTableProps === "function"
@@ -316,9 +318,9 @@ export function QueryTable8<TData extends KitsuResource>({
         pageCount={numberOfPages}
         showPaginationTop={shouldShowPagination && !hideTopPagination}
         showPagination={shouldShowPagination}
-        onPageSizeChange={onPageSizeChange ?? onPageSizeChangeInternal}
+        onPageSizeChange={onPageSizeChangeInternal}
         onPageChange={onPageChangeInternal}
-        onSortingChange={onSortedChange ?? onSortingChangeInternal}
+        onSortingChange={onSortingChangeInternal}
         pageSizeOptions={pageSizeOptions}
         {...resolvedReactTableProps}
         TbodyComponent={
