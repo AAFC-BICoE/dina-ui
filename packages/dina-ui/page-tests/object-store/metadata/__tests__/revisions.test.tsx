@@ -1,5 +1,6 @@
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import MetadataRevisionListPage from "../../../../pages/object-store/metadata/revisions";
+import { DefaultRow } from "../../../../../common-ui/lib";
 
 const TEST_SNAPSHOTS = [
   {
@@ -20,7 +21,7 @@ const TEST_SNAPSHOTS = [
   }
 ];
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   if (
     path === "objectstore-api/metadata/471bf855-f5da-492a-a58e-922238e5a257"
   ) {
@@ -59,6 +60,6 @@ describe("MetadataRevisionListPage", () => {
     );
 
     // Renders the 2 revision rows:
-    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(2);
+    expect(wrapper.find(DefaultRow).length).toEqual(2);
   });
 });

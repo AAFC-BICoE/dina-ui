@@ -1,24 +1,28 @@
 import {
   ButtonBar,
-  ColumnDefinition,
+  ColumnDefinition8,
   CreateButton,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { groupCell, Head, Nav } from "../../../components";
+import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
-const REGION_TABLE_COLUMNS: ColumnDefinition<Region>[] = [
+const REGION_TABLE_COLUMNS: ColumnDefinition8<Region>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/seqdb/region/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),
-    accessor: "name"
+    accessorKey: "name"
   },
-  groupCell("group"),
+  groupCell8("group"),
   "description",
   "symbol"
 ];

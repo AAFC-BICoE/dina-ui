@@ -1,32 +1,40 @@
 import {
   ButtonBar,
-  ColumnDefinition,
+  ColumnDefinition8,
   CreateButton,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { groupCell, Head, Nav } from "../../../components";
+import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 
-const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition<PcrPrimer>[] = [
+const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition8<PcrPrimer>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/seqdb/pcr-primer/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),
-    accessor: "name"
+    accessorKey: "name"
   },
-  groupCell("group"),
+  groupCell8("group"),
   {
-    Cell: ({ original: { region } }) =>
+    cell: ({
+      row: {
+        original: { region }
+      }
+    }) =>
       region ? (
         <Link href={`/seqdb/region/view?id=${region.id}`}>
           <a>{region.name}</a>
         </Link>
       ) : null,
-    accessor: "region.name"
+    accessorKey: "region.name"
   },
   "type",
   "lotNumber",

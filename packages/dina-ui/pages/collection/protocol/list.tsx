@@ -1,4 +1,10 @@
-import { ButtonBar, CreateButton, dateCell, ListPageLayout } from "common-ui";
+import {
+  ButtonBar,
+  ColumnDefinition8,
+  CreateButton,
+  dateCell8,
+  ListPageLayout
+} from "common-ui";
 import Link from "next/link";
 import {
   Footer,
@@ -8,27 +14,34 @@ import {
   VocabularyReadOnlyView
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { Protocol } from "../../../types/collection-api";
 
 const PROTOCOL_FILTER_ATTRIBUTES = ["name"];
-const PROTOCOL_TABLE_COLUMNS = [
+const PROTOCOL_TABLE_COLUMNS: ColumnDefinition8<Protocol>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
-      <Link href={`/collection/protocol/view?id=${id}`}>{name}</Link>
-    ),
-    accessor: "name"
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => <Link href={`/collection/protocol/view?id=${id}`}>{name}</Link>,
+    accessorKey: "name"
   },
   {
-    Cell: ({ original: { protocolType } }) => (
+    cell: ({
+      row: {
+        original: { protocolType }
+      }
+    }) => (
       <VocabularyReadOnlyView
         path={"collection-api/vocabulary/protocolType"}
         value={protocolType}
       />
     ),
-    accessor: "protocolType"
+    accessorKey: "protocolType"
   },
   "group",
   "createdBy",
-  dateCell("createdOn")
+  dateCell8("createdOn")
 ];
 
 export default function protocolListPage() {

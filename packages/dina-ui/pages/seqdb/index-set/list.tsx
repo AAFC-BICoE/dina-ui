@@ -1,6 +1,6 @@
-import { ColumnDefinition, ListPageLayout } from "common-ui";
+import { ColumnDefinition, ColumnDefinition8, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import { groupCell, Head, Nav } from "../../../components";
+import { groupCell, groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { IndexSet } from "../../../types/seqdb-api";
 
@@ -10,17 +10,21 @@ const INDEX_SET_FILTER_ATTRIBUTES = [
   "reverseadapter"
 ];
 
-const INDEX_SET_TABLE_COLUMNS: ColumnDefinition<IndexSet>[] = [
+const INDEX_SET_TABLE_COLUMNS: ColumnDefinition8<IndexSet>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/seqdb/index-set/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),
-    Header: "Name",
-    accessor: "name"
+    header: "Name",
+    accessorKey: "name"
   },
-  groupCell("group"),
+  groupCell8("group"),
   "forwardAdapter",
   "reverseAdapter"
 ];

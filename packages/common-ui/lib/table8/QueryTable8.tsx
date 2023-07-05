@@ -185,9 +185,11 @@ export function QueryTable8<TData extends KitsuResource>({
         ? reactTableProps(queryState)
         : reactTableProps;
     tableProps?.onPageSizeChange?.(newSize);
+    onPageSizeChange?.(newSize);
   }
 
   function onSortingChangeInternal(newSorting: SortingState) {
+    onSortedChange?.(newSorting);
     setSortingRules(newSorting);
     const tableProps: Partial<ReactTable8Props<TData>> | undefined =
       typeof reactTableProps === "function"
@@ -212,13 +214,17 @@ export function QueryTable8<TData extends KitsuResource>({
 
   const mappedColumns: ColumnDef<TData>[] = columns.map((column) => {
     // The "columns" prop can be a string or a react-table Column type.
-
-    const header = () =>
-      typeof column === "string" ? (
-        <FieldHeader name={column} />
-      ) : (
-        column.header
-      );
+    const header = () => {
+      if (typeof column === "string") {
+        return <FieldHeader name={column} />;
+      } else if (column.header) {
+        return column.header;
+      } else if ((column as any).accessorKey) {
+        return <FieldHeader name={(column as any).accessorKey} />;
+      } else {
+        return <FieldHeader name={""} />;
+      }
+    };
 
     const mappedColumnDef: ColumnDef<TData> = {
       header,
@@ -312,9 +318,9 @@ export function QueryTable8<TData extends KitsuResource>({
         pageCount={numberOfPages}
         showPaginationTop={shouldShowPagination && !hideTopPagination}
         showPagination={shouldShowPagination}
-        onPageSizeChange={onPageSizeChange ?? onPageSizeChangeInternal}
+        onPageSizeChange={onPageSizeChangeInternal}
         onPageChange={onPageChangeInternal}
-        onSortingChange={onSortedChange ?? onSortingChangeInternal}
+        onSortingChange={onSortingChangeInternal}
         pageSizeOptions={pageSizeOptions}
         {...resolvedReactTableProps}
         TbodyComponent={

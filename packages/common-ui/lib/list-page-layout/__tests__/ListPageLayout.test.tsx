@@ -1,5 +1,5 @@
 import ReactTable from "react-table";
-import { QueryTable } from "../..";
+import { QueryTable8, ReactTable8 } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ListPageLayout } from "../ListPageLayout";
 
@@ -73,14 +73,18 @@ describe("ListPageLayout component", () => {
 
     const testSort = [{ id: "type", desc: false }];
 
-    wrapper.find(ReactTable).prop<any>("onSortedChange")(testSort, null, null);
-    wrapper.find(ReactTable).prop<any>("onPageSizeChange")(5, null);
+    wrapper.find(ReactTable8).prop<any>("onSortingChange")(
+      testSort,
+      null,
+      null
+    );
+    wrapper.find(ReactTable8).prop<any>("onPageSizeChange")(5, null);
 
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(QueryTable).prop("defaultSort")).toEqual(testSort);
-    expect(wrapper.find(QueryTable).prop("defaultPageSize")).toEqual(5);
+    expect(wrapper.find(QueryTable8).prop("defaultSort")).toEqual(testSort);
+    expect(wrapper.find(QueryTable8).prop("defaultPageSize")).toEqual(5);
   });
 
   it("Allows a passed additionalFilters prop.", async () => {
@@ -100,7 +104,7 @@ describe("ListPageLayout component", () => {
       { apiContext: mockApiCtx }
     );
 
-    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
+    expect(wrapper.find(QueryTable8).prop("filter")).toEqual({
       attr1: "a",
       rsql: "attr2==b"
     });
