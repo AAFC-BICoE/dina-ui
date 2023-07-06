@@ -62,7 +62,8 @@ export function DataBlock({
       (data) => ({
         label: data.name,
         value: data.key,
-        descriptions: data.multilingualDescription?.descriptions
+        descriptions: data.multilingualDescription?.descriptions,
+        unit: data.unit
       })
     );
     setDynamicSelectedTypeOptions(selectedExtensionFieldsOptions);
