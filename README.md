@@ -19,7 +19,8 @@ Other dependency versions can be found here: https://github.com/AAFC-BICoE/dina-
 
 ## Documentation
 
-https://aafc-bicoe.github.io/dina-ui/
+- DINA [User Guide](https://aafc-bicoe.github.io/dina-documentation/)
+- dina-ui [documentation](https://aafc-bicoe.github.io/dina-ui/)
 
 ## Install the Package
 
