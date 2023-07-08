@@ -28,6 +28,7 @@ export * from "./collection/material-sample/MaterialSampleInfoSection";
 export * from "./collection/material-sample/MaterialSampleForm";
 export * from "./collection/material-sample/next-sample-functions";
 export * from "./collection/material-sample/OrganismsField";
+export * from "./collection/material-sample/OrganismsField8";
 export * from "./collection/material-sample/OrganismStateField";
 export * from "./collection/material-sample/PreparationField";
 export * from "./collection/material-sample/SamplesView";

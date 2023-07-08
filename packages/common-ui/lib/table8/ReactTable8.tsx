@@ -1,6 +1,7 @@
 import {
   ColumnDef,
   ExpandedState,
+  OnChangeFn,
   PaginationState,
   Row,
   SortingState,
@@ -55,6 +56,8 @@ export interface ReactTable8Props<TData> {
   renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement;
   // A function that returns true, the the row is extendable
   getRowCanExpand?: (row: Row<TData>) => boolean;
+  // A function is called when expanded state changes.
+  onExpandedChange?: OnChangeFn<ExpandedState>;
   // Styling to be applied to each row of the React Table
   rowStyling?: (row?: Row<TData>) => any;
   loading?: boolean;
@@ -86,6 +89,7 @@ export function ReactTable8<TData>({
   defaultExpanded,
   renderSubComponent,
   getRowCanExpand,
+  onExpandedChange,
   rowStyling,
   loading = false,
   columnVisibility,
@@ -122,6 +126,11 @@ export function ReactTable8<TData>({
     const newState = updator(table.getState().sorting);
     onSortingChange?.(newState);
     setSorting(newState);
+  }
+
+  function onExpandedChangeInternal(updator) {
+    const newState = updator(table.getState().expanded);
+    onExpandedChange?.(newState);
   }
 
   const tableStateOption = manualPagination
@@ -169,6 +178,7 @@ export function ReactTable8<TData>({
     enableMultiSort,
     manualPagination,
     manualSorting,
+    onExpandedChange: onExpandedChangeInternal,
     ...getExpandedRowModelOption,
     ...tableStateOption,
     ...onPaginationChangeOption,
@@ -257,7 +267,7 @@ export function ReactTable8<TData>({
             </tr>
           ) : (
             table.getRowModel().rows.map((row, index) => (
-              <Fragment key={index}>
+              <Fragment key={row.id ?? index}>
                 {enableDnd ? (
                   <DraggableRow
                     row={row}

@@ -30,7 +30,7 @@ import {
   MaterialSampleInfoSection,
   MaterialSampleStateWarning,
   Nav,
-  OrganismsField,
+  OrganismsField8,
   PreparationField,
   PREPARATION_FIELDS,
   ProjectSelectSection,
@@ -283,7 +283,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   );
                 })}
                 {hasPreparations && <PreparationField />}
-                {hasOrganism && <OrganismsField name="organism" />}
+                {hasOrganism && <OrganismsField8 name="organism" />}
                 {hasInheritedDetermination && (
                   <div className="row">
                     <div className="col-md-6">
