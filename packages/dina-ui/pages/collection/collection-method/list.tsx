@@ -1,23 +1,29 @@
 import {
   ButtonBar,
+  ColumnDefinition8,
   CreateButton,
-  descriptionCell,
+  descriptionCell8,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { CollectionMethod } from "../../../types/collection-api";
 
 const COLLECTION_METHOD_FILTER_ATTRIBUTES = ["name"];
-const COLLECTION_METHOD_TABLE_COLUMNS = [
+const COLLECTION_METHOD_TABLE_COLUMNS: ColumnDefinition8<CollectionMethod>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/collection/collection-method/view?id=${id}`}>{name}</Link>
     ),
-    accessor: "name"
+    accessorKey: "name"
   },
   "group",
-  descriptionCell("multilingualDescription")
+  descriptionCell8("multilingualDescription")
 ];
 
 export default function collectionMethodListPage() {
@@ -35,7 +41,7 @@ export default function collectionMethodListPage() {
           <CreateButton entityLink="/collection/collection-method" />
         </ButtonBar>
         <ListPageLayout
-          additionalFilters={filterForm => ({
+          additionalFilters={(filterForm) => ({
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}

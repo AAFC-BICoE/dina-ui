@@ -5,7 +5,8 @@ import {
   LoadingSpinner,
   generateUUIDTree,
   BackButton,
-  CustomQueryPageView
+  CustomQueryPageView,
+  UploadDerivativeButton
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -74,11 +75,14 @@ export default function MetadataViewPage({
           reloadLastSearch={reloadLastSearch ?? true}
         />
         {canEdit && (
-          <Link href={`/object-store/metadata/edit?id=${uuid}`}>
-            <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
-              <DinaMessage id="editButtonText" />
-            </a>
-          </Link>
+          <>
+            <Link href={`/object-store/metadata/edit?id=${uuid}`}>
+              <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
+                <DinaMessage id="editButtonText" />
+              </a>
+            </Link>
+            <UploadDerivativeButton acDerivedFrom={uuid} />
+          </>
         )}
         <Link href={`/object-store/metadata/revisions?id=${uuid}`}>
           <a className="btn btn-info">

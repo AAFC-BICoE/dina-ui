@@ -45,6 +45,11 @@ export interface TableColumn<TData extends KitsuResource>
 
 export type TableColumn8<TData extends KitsuResource> = ColumnDef<TData> & {
   /**
+   * User-friendly column to be displayed. You can use a DinaMessage key for internationalization.
+   */
+  label?: string;
+
+  /**
    * Elastic search path to the attribute.
    *
    * Example: `data.attributes.name`

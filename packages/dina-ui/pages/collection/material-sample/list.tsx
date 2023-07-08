@@ -2,6 +2,7 @@ import { Row } from "@tanstack/react-table";
 import {
   ButtonBar,
   ColumnDefinition,
+  ColumnDefinition8,
   CreateButton,
   dateCell,
   dateCell8,
@@ -68,6 +69,50 @@ export const getColumnDefinition = () => {
   ];
 };
 
+/**
+ * This getColumnDefinition is used for the QueryTable, not the new elastic search stuff.
+ *
+ * The old version of the listing is still when searching for associated samples.
+ */
+export function getColumnDefinition8(): ColumnDefinition8<MaterialSample>[] {
+  return [
+    {
+      cell: ({
+        row: {
+          original: { id, materialSampleName, dwcOtherCatalogNumbers }
+        }
+      }) => (
+        <Link
+          href={`/collection/material-sample/view?id=${id}`}
+          passHref={true}
+        >
+          <a>
+            {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
+          </a>
+        </Link>
+      ),
+      accessorKey: "materialSampleName"
+    },
+    {
+      cell: ({
+        row: {
+          original: { collection }
+        }
+      }) =>
+        collection?.id ? (
+          <Link href={`/collection/collection/view?id=${collection?.id}`}>
+            {collection?.name}
+          </Link>
+        ) : null,
+      accessorKey: "collection.name"
+    },
+    stringArrayCell8("dwcOtherCatalogNumbers"),
+    { accessorKey: "materialSampleType" },
+    "createdBy",
+    dateCell8("createdOn")
+  ];
+}
+
 export function SampleListLayout({
   onSelect,
   classNames,
@@ -92,12 +137,12 @@ export function SampleListLayout({
   const [queryKey, setQueryKey] = useState("");
 
   // The old style columns, but add the action buttons at the end.
-  const columns: ColumnDefinition<MaterialSample>[] = [
-    ...getColumnDefinition(),
+  const columns: ColumnDefinition8<MaterialSample>[] = [
+    ...getColumnDefinition8(),
     ...(onSelect
       ? [
           {
-            Cell: ({ original: sample }) => (
+            cell: ({ row: { original: sample } }) => (
               <div className="d-flex">
                 <button
                   type="button"
@@ -108,13 +153,13 @@ export function SampleListLayout({
                 </button>
               </div>
             ),
-            Header: formatMessage("actions"),
-            sortable: false
+            header: formatMessage("actions"),
+            enableSorting: false
           }
         ]
       : [
           {
-            Cell: ({ original: sample }) => (
+            cell: ({ row: { original: sample } }) => (
               <div className="d-flex">
                 <Link href={`/collection/material-sample/view?id=${sample.id}`}>
                   <a className="btn btn-link">
@@ -135,8 +180,8 @@ export function SampleListLayout({
                 />
               </div>
             ),
-            Header: "",
-            sortable: false
+            header: "",
+            enableSorting: false
           }
         ])
   ];

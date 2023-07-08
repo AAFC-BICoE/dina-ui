@@ -146,5 +146,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   view: "View",
   viewDetails: "View Details",
   warning: "Warning",
-  yes: "Yes"
+  yes: "Yes",
+  thumbnailImage: "Thumbnail Image",
+  largeImage: "Large Image",
+  uploadDerivative: "Upload Derivative"
 };

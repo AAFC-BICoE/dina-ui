@@ -1,63 +1,74 @@
-import { ButtonBar, CreateButton, dateCell, ListPageLayout } from "common-ui";
+import {
+  ColumnDefinition8,
+  CreateButton,
+  dateCell8,
+  ListPageLayout
+} from "common-ui";
 import Link from "next/link";
 import {
-  Footer,
   GroupSelectField,
-  Head,
-  KeepContentsTogetherToggleForm,
-  Nav
+  KeepContentsTogetherToggleForm
 } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import PageLayout from "../../../components/page/PageLayout";
+import { StorageUnitType } from "../../../types/collection-api";
 
 const STORAGE_UNIT_TYPE_FILTER_ATTRIBUTES = ["name", "createdBy"];
-const STORAGE_UNIT_TYPE_TABLE_COLUMNS = [
+const STORAGE_UNIT_TYPE_TABLE_COLUMNS: ColumnDefinition8<StorageUnitType>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/collection/storage-unit-type/view?id=${id}`}>{name}</Link>
     ),
-    accessor: "name"
+    accessorKey: "name"
   },
   "group",
   {
-    Cell: ({ original }) => (
-      <KeepContentsTogetherToggleForm initialValues={original} />
+    cell: ({ row: { original } }) => (
+      <KeepContentsTogetherToggleForm initialValues={original as any} />
     ),
-    accessor: "isInseperable"
+    accessorKey: "isInseperable"
   },
   "createdBy",
-  dateCell("createdOn")
+  dateCell8("createdOn")
 ];
 
 export default function StorageUnitTypeListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
-    <PageLayout titleId={formatMessage("storageUnitTypeListTitle")}
-    buttonBarContent = {<CreateButton entityLink="/collection/storage-unit-type" />} >
-        <ListPageLayout
-          additionalFilters={filterForm => ({
-            // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-          })}
-          filterAttributes={STORAGE_UNIT_TYPE_FILTER_ATTRIBUTES}
-          id="storage-unit-type-list"
-          queryTableProps={{
-            columns: STORAGE_UNIT_TYPE_TABLE_COLUMNS,
-            path: "collection-api/storage-unit-type"
-          }}
-          filterFormchildren={({ submitForm }) => (
-            <div className="mb-3">
-              <div style={{ width: "300px" }}>
-                <GroupSelectField
-                  onChange={() => setImmediate(submitForm)}
-                  name="group"
-                  showAnyOption={true}
-                />
-              </div>
+    <PageLayout
+      titleId={formatMessage("storageUnitTypeListTitle")}
+      buttonBarContent={
+        <CreateButton entityLink="/collection/storage-unit-type" />
+      }
+    >
+      <ListPageLayout
+        additionalFilters={(filterForm) => ({
+          // Apply group filter:
+          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+        })}
+        filterAttributes={STORAGE_UNIT_TYPE_FILTER_ATTRIBUTES}
+        id="storage-unit-type-list"
+        queryTableProps={{
+          columns: STORAGE_UNIT_TYPE_TABLE_COLUMNS,
+          path: "collection-api/storage-unit-type"
+        }}
+        filterFormchildren={({ submitForm }) => (
+          <div className="mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+              />
             </div>
-          )}
-        />
+          </div>
+        )}
+      />
     </PageLayout>
   );
 }

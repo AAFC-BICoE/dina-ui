@@ -3,7 +3,8 @@ import {
   ButtonBar,
   DeleteButton,
   DinaForm,
-  LoadingSpinner
+  LoadingSpinner,
+  UploadDerivativeButton
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -35,6 +36,7 @@ export default function ExternalResourceMetadataViewPage() {
             <DinaMessage id="editButtonText" />
           </a>
         </Link>
+        <UploadDerivativeButton acDerivedFrom={id} />
         <Link
           href={`/object-store/metadata/revisions?id=${id}&isExternalResourceMetadata=true`}
         >

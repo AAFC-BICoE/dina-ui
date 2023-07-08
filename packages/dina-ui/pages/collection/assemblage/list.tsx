@@ -1,22 +1,28 @@
 import {
   CreateButton,
-  descriptionCell,
-  titleCell,
-  ListPageLayout
+  descriptionCell8,
+  titleCell8,
+  ListPageLayout,
+  ColumnDefinition8,
+  FieldHeader
 } from "common-ui";
 import Link from "next/link";
 import PageLayout from "../../../components/page/PageLayout";
+import { Assemblage } from "../../../types/collection-api";
 
 const ASSEMBLAGE_FILTER_ATTRIBUTES = ["name"];
-const ASSEMBLAGE_TABLE_COLUMNS = [
+const ASSEMBLAGE_TABLE_COLUMNS: ColumnDefinition8<Assemblage>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
-      <Link href={`/collection/assemblage/view?id=${id}`}>{name}</Link>
-    ),
-    accessor: "name"
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => <Link href={`/collection/assemblage/view?id=${id}`}>{name}</Link>,
+    accessorKey: "name",
+    header: () => <FieldHeader name="name" />
   },
-  titleCell("multilingualTitle"),
-  descriptionCell("multilingualDescription")
+  titleCell8("multilingualTitle"),
+  descriptionCell8("multilingualDescription")
 ];
 
 export default function assemblageListPage() {

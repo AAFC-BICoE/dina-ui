@@ -311,8 +311,13 @@ export function transformManagedAttributeToDSL({
   managedAttributeSearchValue.searchValue =
     managedAttributeSearchValue.searchValue.trim();
 
-  if (!managedAttributeSearchValue.searchValue) {
-    return undefined;
+  if (
+    managedAttributeSearchValue.selectedOperator !== "empty" &&
+    managedAttributeSearchValue.selectedOperator !== "notEmpty"
+  ) {
+    if (!managedAttributeSearchValue.searchValue) {
+      return undefined;
+    }
   }
 
   const commonProps = {

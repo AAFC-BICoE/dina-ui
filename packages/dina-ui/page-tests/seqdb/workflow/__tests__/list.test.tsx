@@ -42,9 +42,6 @@ describe("Workflow list page.", () => {
 
     expect(wrapper.containsMatchingElement(<a>Mat's chain 1</a>)).toEqual(true);
     expect(wrapper.containsMatchingElement(<a>Mat's chain 2</a>)).toEqual(true);
-
-    expect(
-      wrapper.containsMatchingElement(<div>Mat's chain template</div>)
-    ).toEqual(true);
+    expect(wrapper.contains("Mat's chain template")).toEqual(true);
   });
 });

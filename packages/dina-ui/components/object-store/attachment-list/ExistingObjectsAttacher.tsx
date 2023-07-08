@@ -1,6 +1,8 @@
 import {
   ColumnDefinition,
+  ColumnDefinition8,
   dateCell,
+  dateCell8,
   DinaForm,
   FormikButton,
   ListPageLayout,
@@ -10,7 +12,7 @@ import {
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
-import { ThumbnailCell } from "../..";
+import { ThumbnailCell, ThumbnailCell8 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { METADATA_FILTER_ATTRIBUTES } from "../../../pages/object-store/object/list";
 import { Metadata } from "../../../types/objectstore-api";
@@ -44,32 +46,49 @@ export function ExistingObjectsAttacher({
       await onMetadataIdsSubmitted(metadataIds);
     };
 
-  const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
+  const METADATA_TABLE_COLUMNS: ColumnDefinition8<Metadata>[] = [
     {
-      Cell: ({ original: metadata }) => (
+      cell: ({ row: { original: metadata } }) => (
         <CheckBoxField key={metadata.id} resource={metadata} />
       ),
-      Header: CheckBoxHeader,
-      sortable: false
+      header: () => <CheckBoxHeader />,
+      enableSorting: false,
+      id: "checkbox_column"
     },
-    ThumbnailCell({
+    ThumbnailCell8({
       bucketField: "bucket",
       isJsonApiQuery: true
     }),
     {
-      Cell: ({ original: { id, originalFilename } }) =>
-        originalFilename ? (
+      cell: ({
+        row: {
+          original: { id, originalFilename, resourceExternalURL }
+        }
+      }) =>
+        resourceExternalURL ? (
+          <Link href={`/object-store/object/external-resource-view?id=${id}`}>
+            <a className="m-auto">
+              <DinaMessage id="detailsPageLink" />
+            </a>
+          </Link>
+        ) : originalFilename ? (
           <Link href={`/object-store/object/view?id=${id}`}>
             {originalFilename}
           </Link>
         ) : null,
-      accessor: "originalFilename"
+      accessorKey: "originalFilename",
+      header: () => <DinaMessage id="field_originalFilename" />
     },
     "acCaption",
-    dateCell("xmpMetadataDate"),
+    dateCell8("xmpMetadataDate"),
     {
-      Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
-      accessor: "acTags"
+      cell: ({
+        row: {
+          original: { acTags }
+        }
+      }) => <>{acTags?.join(", ")}</>,
+      accessorKey: "acTags",
+      header: () => <DinaMessage id="field_acTags" />
     }
   ];
 
@@ -96,14 +115,14 @@ export function ExistingObjectsAttacher({
       queryTableProps={{
         columns: METADATA_TABLE_COLUMNS,
         path: "objectstore-api/metadata",
-        onSuccess: (res) => setAvailableMetadatas(res.data)
+        onSuccess: (res) => setAvailableMetadatas(res.data),
+        include: "derivatives"
       }}
       wrapTable={(children) => (
         <MetadataListWrapper onAttachButtonClick={submitMetadataIds}>
           {children}
         </MetadataListWrapper>
       )}
-      include="derivatives"
     />
   );
 }

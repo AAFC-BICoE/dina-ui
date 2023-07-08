@@ -13,6 +13,7 @@ import {
   DinaMessage,
   useDinaIntl
 } from "../../../../dina-ui/intl/dina-ui-intl";
+import { useEffect, useState } from "react";
 
 export function getFieldName(
   fieldArrayName: string,
@@ -51,6 +52,7 @@ export function DataRow({
   const unitSelectFieldName = `${name}.unit`;
   const vocabularyBasedFieldName = `${name}.vocabularyBased`;
   const formik = useFormikContext<any>();
+  const [selectedType, setSelectedType] = useState<any>();
 
   function onCreatableSelectFieldChange(value, formikCtx) {
     if (isVocabularyBasedEnabledForType) {
@@ -60,6 +62,21 @@ export function DataRow({
       );
     }
   }
+
+  function onTypeSelectFieldChange(value) {
+    setSelectedType(find(typeOptions, (item) => item.value === value));
+  }
+
+  // Load initial values
+  useEffect(() => {
+    if (readOnly && typeOptions?.length) {
+      typeOptions.forEach((typeOption) => {
+        if (unitSelectFieldName.includes(typeOption.value)) {
+          formik.setFieldValue(unitSelectFieldName, typeOption.unit);
+        }
+      });
+    }
+  }, [typeOptions]);
 
   const rowsPath = name.substring(0, name.lastIndexOf("."));
   const currentRows = get(formik.values, rowsPath);
@@ -80,7 +97,7 @@ export function DataRow({
 
   return (
     <div className="d-flex">
-      <div style={{ width: "15rem", marginLeft: "12rem" }}>
+      <div style={{ width: "15rem" }}>
         {typesAddable ? (
           <CreatableSelectField
             options={typeOptions}
@@ -103,6 +120,7 @@ export function DataRow({
                 disableTemplateCheckbox={true}
                 hideLabel={rowIndex !== 0}
                 readOnlyBold={true}
+                onChange={onTypeSelectFieldChange}
               />
             </div>
 
@@ -135,7 +153,6 @@ export function DataRow({
           </div>
         )}
       </div>
-
       <div style={{ width: "15rem", marginLeft: "3rem" }}>
         <TextField
           name={valueTextFieldName}
@@ -145,7 +162,7 @@ export function DataRow({
           hideLabel={rowIndex !== 0}
         />
       </div>
-      {unitsOptions && (
+      {unitsOptions ? (
         <div style={{ width: "15rem", marginLeft: "3rem" }}>
           {unitsAddable ? (
             <CreatableSelectField
@@ -166,6 +183,18 @@ export function DataRow({
               hideLabel={rowIndex !== 0}
             />
           )}
+        </div>
+      ) : (
+        <div style={{ width: "15rem", marginLeft: "3rem" }}>
+          <TextField
+            name={unitSelectFieldName}
+            removeBottomMargin={true}
+            label={<DinaMessage id="unit" />}
+            disableTemplateCheckbox={true}
+            hideLabel={rowIndex !== 0}
+            readOnly={true}
+            placeholder={selectedType?.unit ?? ""}
+          />
         </div>
       )}
       {isVocabularyBasedEnabledForType && (

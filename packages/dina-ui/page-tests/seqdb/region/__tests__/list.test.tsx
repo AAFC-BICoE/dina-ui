@@ -1,4 +1,4 @@
-import { QueryTable } from "common-ui";
+import { QueryTable8 } from "common-ui";
 import RegionListPage from "../../../../pages/seqdb/region/list";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
@@ -68,7 +68,7 @@ describe("Region list page", () => {
       "seqdb-api/region",
       expect.objectContaining({ filter: { rsql: "name==*omni*" } })
     );
-    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
+    expect(wrapper.find(QueryTable8).prop("filter")).toEqual({
       rsql: "name==*omni*"
     });
   });

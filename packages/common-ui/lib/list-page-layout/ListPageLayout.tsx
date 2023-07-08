@@ -5,11 +5,12 @@ import { ComponentType, ReactNode } from "react";
 import { SortingRule } from "react-table";
 import {
   CheckBoxFieldProps,
+  ColumnDefinition8,
   DinaForm,
   FilterAttribute,
   MetaWithTotal,
-  QueryTable,
-  QueryTableProps,
+  QueryTable8,
+  QueryTable8Props,
   useGroupedCheckBoxes
 } from "..";
 import { rsql } from "../filter-builder/rsql";
@@ -19,6 +20,7 @@ import {
   BulkEditButton
 } from "./bulk-buttons";
 import { FilterForm } from "./FilterForm";
+import { SortingState } from "@tanstack/react-table";
 
 export interface ListPageLayoutProps<TData extends KitsuResource> {
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
@@ -27,8 +29,8 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
   queryTableProps:
-    | QueryTableProps<TData>
-    | ((context: ListPageLayoutContext<TData>) => QueryTableProps<TData>);
+    | QueryTable8Props<TData>
+    | ((context: ListPageLayoutContext<TData>) => QueryTable8Props<TData>);
   wrapTable?: (children: ReactNode) => ReactNode;
 
   /** Adds the bulk edit button and the row checkboxes. */
@@ -36,9 +38,6 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
 
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
-
-  // Include param for query table
-  include?: string;
 }
 
 interface ListPageLayoutContext<TData extends KitsuResource> {
@@ -58,8 +57,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   queryTableProps,
   wrapTable = (children) => children,
   bulkDeleteButtonProps,
-  bulkEditPath,
-  include
+  bulkEditPath
 }: ListPageLayoutProps<TData>) {
   const tablePageSizeKey = `${id}_tablePageSize`;
   const tableSortKey = `${id}_tableSort`;
@@ -72,7 +70,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   // Default sort and page-size from the QueryTable. These are only used on the initial
   // QueryTable render, and are saved in localStorage when the table's sort or page-size is changed.
   const [storedDefaultSort, setStoredDefaultSort] =
-    useLocalStorage<SortingRule[]>(tableSortKey);
+    useLocalStorage<SortingState>(tableSortKey);
   const defaultSort = storedDefaultSort ??
     defaultSortProp ?? [{ id: "createdOn", desc: true }];
 
@@ -123,16 +121,17 @@ export function ListPageLayout<TData extends KitsuResource>({
       ? queryTableProps({ CheckBoxField })
       : queryTableProps;
 
-  const columns = [
+  const columns: ColumnDefinition8<TData>[] = [
     ...(showRowCheckboxes
       ? [
           {
-            Cell: ({ original: resource }) => (
+            cell: ({ row: { original: resource } }) => (
               <CheckBoxField key={resource.id} resource={resource} />
             ),
-            Header: CheckBoxHeader,
-            sortable: false,
-            width: 200
+            header: () => CheckBoxHeader,
+            enableSorting: false,
+            size: 200,
+            id: "checkbox_column"
           }
         ]
       : []),
@@ -145,7 +144,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   }
 
   const tableElement = (
-    <QueryTable<TData>
+    <QueryTable8<TData>
       defaultPageSize={defaultPageSize ?? undefined}
       defaultSort={defaultSort ?? undefined}
       filter={filterParam}
@@ -160,7 +159,6 @@ export function ListPageLayout<TData extends KitsuResource>({
           )}
         </div>
       }
-      include={include}
       columns={columns}
       onSuccess={onSuccess}
     />

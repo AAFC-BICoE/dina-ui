@@ -1,7 +1,7 @@
 import {
   ButtonBar,
-  ColumnDefinition,
-  dateCell,
+  ColumnDefinition8,
+  dateCell8,
   FilterAttribute,
   ListPageLayout
 } from "common-ui";
@@ -10,19 +10,23 @@ import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqBatch } from "../../../types/seqdb-api";
 
-const TABLE_COLUMNS: ColumnDefinition<SeqBatch>[] = [
+const TABLE_COLUMNS: ColumnDefinition8<SeqBatch>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/seqdb/sanger-workflow-sequencing/run?seqBatchId=${id}`}>
         {name || id}
       </Link>
     ),
-    accessor: "name",
-    Header: () => <SeqdbMessage id="seqBatchName" />
+    accessorKey: "name",
+    header: () => <SeqdbMessage id="seqBatchName" />
   },
   "group",
   "createdBy",
-  dateCell("createdOn")
+  dateCell8("createdOn")
 ];
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [

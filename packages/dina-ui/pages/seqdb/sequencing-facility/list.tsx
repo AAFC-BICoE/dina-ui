@@ -1,25 +1,29 @@
 import {
   ButtonBar,
-  ColumnDefinition,
+  ColumnDefinition8,
   CreateButton,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { groupCell, Head, Nav } from "../../../components";
+import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SequencingFacility } from "../../../types/seqdb-api/resources/SequencingFacility";
 
-const SUBMISSION_FACILITY_TABLE_COLUMNS: ColumnDefinition<SequencingFacility>[] =
+const SUBMISSION_FACILITY_TABLE_COLUMNS: ColumnDefinition8<SequencingFacility>[] =
   [
     {
-      Cell: ({ original: { id, name } }) => (
+      cell: ({
+        row: {
+          original: { id, name }
+        }
+      }) => (
         <Link href={`/seqdb/sequencing-facility/view?id=${id}`}>
           <a>{name || id}</a>
         </Link>
       ),
-      accessor: "name"
+      accessorKey: "name"
     },
-    groupCell("group")
+    groupCell8("group")
   ];
 
 const SUBMISSION_FACILITY_FILTER_ATTRIBUTES = ["name"];

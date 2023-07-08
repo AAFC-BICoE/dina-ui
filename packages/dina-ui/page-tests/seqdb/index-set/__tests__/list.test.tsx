@@ -1,3 +1,4 @@
+import { DefaultRow } from "../../../../../common-ui/lib";
 import IndexSetListPage from "../../../../pages/seqdb/index-set/list";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { IndexSet } from "../../../../types/seqdb-api";
@@ -45,8 +46,6 @@ describe("Index set list page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".rt-tbody .rt-td").first().text()).toEqual(
-      "index set 1"
-    );
+    expect(wrapper.find(DefaultRow).first().text()).toEqual("index set 1");
   });
 });

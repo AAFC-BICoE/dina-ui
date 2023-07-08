@@ -1,12 +1,10 @@
-import { ColumnDefinition, descriptionCell, ListPageLayout } from "common-ui";
+import { ColumnDefinition8, descriptionCell8, ListPageLayout } from "common-ui";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import Container from "react-bootstrap/Container";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../components";
 import { DINAUI_MESSAGES_ENGLISH } from "../../intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
@@ -15,7 +13,7 @@ import {
   ManagedAttribute,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../types/collection-api";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "../../components/page/PageLayout";
 
 export default function ManagedAttributesListPage() {
   const { formatMessage } = useDinaIntl();
@@ -75,20 +73,24 @@ function CollectionAttributeListView() {
 
   const COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
-  const COLLECTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<
+  const COLLECTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition8<
     ManagedAttribute<CollectionModuleType>
   >[] = [
     {
-      Cell: ({ original: { id, name } }) => (
+      cell: ({
+        row: {
+          original: { id, name }
+        }
+      }) => (
         <Link href={`/collection/managed-attribute/view?id=${id}`}>
           <a>{name}</a>
         </Link>
       ),
-      Header: "Name",
-      accessor: "name"
+      header: "Name",
+      accessorKey: "name"
     },
     {
-      Cell: ({ original }) => {
+      cell: ({ row: { original } }) => {
         const ma: ManagedAttribute<CollectionModuleType> = original;
         return (
           <div>
@@ -100,10 +102,14 @@ function CollectionAttributeListView() {
           </div>
         );
       },
-      accessor: "managedAttributeComponent"
+      accessorKey: "managedAttributeComponent"
     },
     {
-      Cell: ({ original: { acceptedValues, vocabularyElementType } }) => {
+      cell: ({
+        row: {
+          original: { acceptedValues, vocabularyElementType }
+        }
+      }) => {
         const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
           acceptedValues?.length
             ? "field_vocabularyElementType_picklist_label"
@@ -113,18 +119,20 @@ function CollectionAttributeListView() {
 
         return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
       },
-      accessor: "vocabularyElementType",
+      accessorKey: "vocabularyElementType",
       // The API sorts alphabetically by key, not displayed intl-ized value,
       // so the displayed order wouldn't make sense.
-      sortable: false
+      enableSorting: false
     },
     {
-      Cell: ({ original: { acceptedValues } }) => (
-        <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>
-      ),
-      accessor: "acceptedValues"
+      cell: ({
+        row: {
+          original: { acceptedValues }
+        }
+      }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
+      accessorKey: "acceptedValues"
     },
-    descriptionCell("multilingualDescription"),
+    descriptionCell8("multilingualDescription"),
     "createdBy"
   ];
 
@@ -152,20 +160,28 @@ function CollectionAttributeListView() {
 function ObjectStoreAttributeListView() {
   const OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
-  const OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] =
+  const OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition8<ManagedAttribute>[] =
     [
       {
-        Cell: ({ original: { id, name } }) => (
+        cell: ({
+          row: {
+            original: { id, name }
+          }
+        }) => (
           <Link href={`/object-store/managed-attribute/view?id=${id}`}>
             <a>{name}</a>
           </Link>
         ),
-        Header: "Name",
-        accessor: "name"
+        header: "Name",
+        accessorKey: "name"
       },
-      descriptionCell("multilingualDescription"),
+      descriptionCell8("multilingualDescription"),
       {
-        Cell: ({ original: { acceptedValues, vocabularyElementType } }) => {
+        cell: ({
+          row: {
+            original: { acceptedValues, vocabularyElementType }
+          }
+        }) => {
           const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
             acceptedValues?.length
               ? "field_vocabularyElementType_picklist_label"
@@ -175,16 +191,18 @@ function ObjectStoreAttributeListView() {
 
           return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
         },
-        accessor: "vocabularyElementType",
+        accessorKey: "vocabularyElementType",
         // The API sorts alphabetically by key, not displayed intl-ized value,
         // so the displayed order wouldn't make sense.
-        sortable: false
+        enableSorting: false
       },
       {
-        Cell: ({ original: { acceptedValues } }) => (
-          <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>
-        ),
-        accessor: "acceptedValues"
+        cell: ({
+          row: {
+            original: { acceptedValues }
+          }
+        }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
+        accessorKey: "acceptedValues"
       },
       "createdBy"
     ];
@@ -213,19 +231,27 @@ function ObjectStoreAttributeListView() {
 function TransactionAttributeListView() {
   const TRANSACTION_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
-  const TRANSACTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] =
+  const TRANSACTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition8<ManagedAttribute>[] =
     [
       {
-        Cell: ({ original: { id, name } }) => (
+        cell: ({
+          row: {
+            original: { id, name }
+          }
+        }) => (
           <Link href={`/loan-transaction/managed-attribute/view?id=${id}`}>
             <a>{name}</a>
           </Link>
         ),
-        Header: "Name",
-        accessor: "name"
+        header: "Name",
+        accessorKey: "name"
       },
       {
-        Cell: ({ original: { acceptedValues, vocabularyElementType } }) => {
+        cell: ({
+          row: {
+            original: { acceptedValues, vocabularyElementType }
+          }
+        }) => {
           const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
             acceptedValues?.length
               ? "field_vocabularyElementType_picklist_label"
@@ -235,18 +261,20 @@ function TransactionAttributeListView() {
 
           return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
         },
-        accessor: "vocabularyElementType",
+        accessorKey: "vocabularyElementType",
         // The API sorts alphabetically by key, not displayed intl-ized value,
         // so the displayed order wouldn't make sense.
-        sortable: false
+        enableSorting: false
       },
       {
-        Cell: ({ original: { acceptedValues } }) => (
-          <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>
-        ),
-        accessor: "acceptedValues"
+        cell: ({
+          row: {
+            original: { acceptedValues }
+          }
+        }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
+        accessorKey: "acceptedValues"
       },
-      descriptionCell("multilingualDescription"),
+      descriptionCell8("multilingualDescription"),
       "createdBy"
     ];
 

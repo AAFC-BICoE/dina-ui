@@ -1,20 +1,33 @@
-import { CreateButton, ListPageLayout, dateCell } from "common-ui";
+import {
+  ColumnDefinition8,
+  CreateButton,
+  ListPageLayout,
+  dateCell8
+} from "common-ui";
 import Link from "next/link";
 import { GroupSelectField } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
+import { PreparationMethod } from "../../../types/collection-api";
 
 const PREPARATION_METHOD_FILTER_ATTRIBUTES = ["name"];
-const PREPARATION_METHOD_TABLE_COLUMNS = [
-  {
-    Cell: ({ original: { id, name } }) => (
-      <Link href={`/collection/preparation-method/view?id=${id}`}>{name}</Link>
-    ),
-    accessor: "name"
-  },
-  "group",
-  "createdBy",
-  dateCell("createdOn")
-];
+const PREPARATION_METHOD_TABLE_COLUMNS: ColumnDefinition8<PreparationMethod>[] =
+  [
+    {
+      cell: ({
+        row: {
+          original: { id, name }
+        }
+      }) => (
+        <Link href={`/collection/preparation-method/view?id=${id}`}>
+          {name}
+        </Link>
+      ),
+      accessorKey: "name"
+    },
+    "group",
+    "createdBy",
+    dateCell8("createdOn")
+  ];
 
 export default function preparationMethodListPage() {
   const buttonBarContent = (

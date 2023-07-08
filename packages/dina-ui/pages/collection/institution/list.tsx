@@ -1,8 +1,8 @@
 import {
   ButtonBar,
-  ColumnDefinition,
+  ColumnDefinition8,
   CreateButton,
-  dateCell,
+  dateCell8,
   FilterAttribute,
   ListPageLayout
 } from "common-ui";
@@ -11,15 +11,19 @@ import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Institution } from "../../../types/collection-api";
 
-const TABLE_COLUMNS: ColumnDefinition<Institution>[] = [
+const TABLE_COLUMNS: ColumnDefinition8<Institution>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => (
       <Link href={`/collection/institution/view?id=${id}`}>{name || id}</Link>
     ),
-    accessor: "name"
+    accessorKey: "name"
   },
   "createdBy",
-  dateCell("createdOn")
+  dateCell8("createdOn")
 ];
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [

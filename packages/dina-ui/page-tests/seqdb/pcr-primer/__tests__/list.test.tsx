@@ -1,4 +1,4 @@
-import { QueryTable } from "common-ui";
+import { QueryTable8 } from "common-ui";
 import PcrPrimerListPage from "../../../../pages/seqdb/pcr-primer/list";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
@@ -68,7 +68,7 @@ describe("PcrPrimer list page", () => {
       "seqdb-api/pcr-primer",
       expect.objectContaining({ filter: { rsql: "name==*101F*" } })
     );
-    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
+    expect(wrapper.find(QueryTable8).prop("filter")).toEqual({
       rsql: "name==*101F*"
     });
   });

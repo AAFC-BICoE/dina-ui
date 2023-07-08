@@ -1,38 +1,46 @@
 import {
-  ButtonBar,
   CreateButton,
   ListPageLayout,
-  dateCell,
-  ColumnDefinition,
-  booleanCell,
   useAccount,
-  Tooltip
+  Tooltip,
+  ColumnDefinition8,
+  booleanCell8,
+  dateCell8,
+  FieldHeader
 } from "common-ui";
 import Link from "next/link";
 import { FormTemplate } from "../../../types/collection-api";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { GroupSelectField } from "../../../components";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import PageLayout from "../../../components/page/PageLayout";
 
 const FILTER_ATTRIBUTES = ["name", "createdBy"];
 
 export default function MaterialSampleFormTemplateListPage() {
-  const { formatMessage } = useDinaIntl();
   const { groupNames, username } = useAccount();
 
-  const TABLE_COLUMNS: ColumnDefinition<FormTemplate>[] = [
+  const TABLE_COLUMNS: ColumnDefinition8<FormTemplate>[] = [
     {
-      Cell: ({ original: { id, name } }) => (
+      cell: ({
+        row: {
+          original: { id, name }
+        }
+      }) => (
         <Link href={`/collection/form-template/edit?id=${id}`}>{name}</Link>
       ),
-      accessor: "name"
+      accessorKey: "name",
+      header: () => <FieldHeader name="name" />
     },
     "group",
-    booleanCell("field_restrictToCreatedBy", "restrictToCreatedBy"),
+    booleanCell8("restrictToCreatedBy"),
     "createdBy",
-    dateCell("createdOn"),
+    dateCell8("createdOn"),
     {
-      Cell: ({ original: { id, createdBy } }) => (
+      cell: ({
+        row: {
+          original: { id, createdBy }
+        }
+      }) => (
         <div className="list-inline">
           {createdBy === username ? (
             <Link href={`/collection/form-template/edit?id=${id}`}>
@@ -62,8 +70,8 @@ export default function MaterialSampleFormTemplateListPage() {
           </Link>
         </div>
       ),
-      Header: "",
-      sortable: false
+      id: "buttons",
+      enableSorting: false
     }
   ];
 

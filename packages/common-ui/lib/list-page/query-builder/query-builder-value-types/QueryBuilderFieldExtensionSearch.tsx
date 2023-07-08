@@ -282,8 +282,13 @@ export function transformFieldExtensionToDSL({
   fieldExtensionSearchValue.searchValue =
     fieldExtensionSearchValue.searchValue.trim();
 
-  if (!fieldExtensionSearchValue.searchValue) {
-    return undefined;
+  if (
+    fieldExtensionSearchValue.selectedOperator !== "empty" &&
+    fieldExtensionSearchValue.selectedOperator !== "notEmpty"
+  ) {
+    if (!fieldExtensionSearchValue.searchValue) {
+      return undefined;
+    }
   }
 
   return transformTextSearchToDSL({

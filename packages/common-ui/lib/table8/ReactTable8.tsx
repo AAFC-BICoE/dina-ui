@@ -52,9 +52,9 @@ export interface ReactTable8Props<TData> {
   defaultSorted?: SortingState;
   onSortingChange?: (sorting: SortingState) => void;
   defaultExpanded?: ExpandedState;
-  // A function to reander the SubComponent in the expended area.
+  // A function to render the SubComponent in the expanded area.
   renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement;
-  // A function that returns true, the the row is extendable
+  // A function that returns true, the the row is expandable
   getRowCanExpand?: (row: Row<TData>) => boolean;
   // A function is called when expanded state changes.
   onExpandedChange?: OnChangeFn<ExpandedState>;

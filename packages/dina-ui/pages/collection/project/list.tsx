@@ -1,24 +1,26 @@
 import {
-  ButtonBar,
+  ColumnDefinition8,
   CreateButton,
-  descriptionCell,
+  descriptionCell8,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import PageLayout from "../../../components/page/PageLayout";
+import { PreparationType } from "../../../types/collection-api";
 
 const PROJECT_FILTER_ATTRIBUTES = ["name", "status", "multilingualDescription"];
-const PROJECT_TABLE_COLUMNS = [
+const PROJECT_TABLE_COLUMNS: ColumnDefinition8<PreparationType>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
-      <Link href={`/collection/project/view?id=${id}`}>{name}</Link>
-    ),
-    accessor: "name"
+    cell: ({
+      row: {
+        original: { id, name }
+      }
+    }) => <Link href={`/collection/project/view?id=${id}`}>{name}</Link>,
+    accessorKey: "name"
   },
   "status",
-  descriptionCell("multilingualDescription")
+  descriptionCell8("multilingualDescription")
 ];
 
 export default function collectionMethodListPage() {

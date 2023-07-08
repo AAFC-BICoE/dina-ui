@@ -33,6 +33,17 @@ export function groupCell(accessor: string) {
   };
 }
 
+/** Renders the Group label in the QueryTable. */
+export function groupCell8(accessorKey: string) {
+  return {
+    cell: ({ row: { original } }) => {
+      const groupName = original[accessorKey];
+      return <GroupLabel groupName={groupName} />;
+    },
+    accessorKey
+  };
+}
+
 /** Returns the group label from the back-end. Returns the raw name for loading and error states. */
 function useGroupLabel(groupName: string) {
   const { locale } = useDinaIntl();
