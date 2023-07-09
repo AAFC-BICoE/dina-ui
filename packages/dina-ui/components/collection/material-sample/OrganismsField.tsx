@@ -359,9 +359,6 @@ function OrganismsTable({
             </div>
           );
         }}
-        // TbodyComponent={TbodyComponent}
-        // getTbodyProps={() => ({ onSortStart, onSortEnd })}
-        // onExpandedChange={onExpandedChange}
         showPagination={false}
         className="-striped"
       />
