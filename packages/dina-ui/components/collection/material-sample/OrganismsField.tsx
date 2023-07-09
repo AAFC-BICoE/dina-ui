@@ -383,7 +383,7 @@ function OrganismExpanderComponent({ row }: { row: Row<Organism> }) {
         "btn btn-light expand-organism",
         `${isExpanded ? "is" : "not"}-expanded`
       )}
-      // style={{backgroundColor: "inherit" }}
+      style={{ backgroundColor: "inherit" }}
       type="button"
       onClick={row.getToggleExpandedHandler()}
     >
