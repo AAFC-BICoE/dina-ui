@@ -1,26 +1,21 @@
+import { ColumnDef, Row } from "@tanstack/react-table";
 import classNames from "classnames";
 import {
+  FieldHeader,
   FieldSet,
   FormikButton,
   NumberField,
+  ReactTable8,
   ToggleField,
   useDinaFormContext,
   useFieldLabels
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { get, isEmpty, keys } from "lodash";
-import { ORGANISMS_COMPONENT_NAME } from "../../../types/collection-api";
-import { useState, useEffect } from "react";
-import { GiHamburgerMenu } from "react-icons/gi";
-import {
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-  SortEnd
-} from "react-sortable-hoc";
-import ReactTable, { Column } from "react-table";
+import { useEffect, useState } from "react";
 import { BulkEditTabWarning, OrganismStateField } from "../..";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { ORGANISMS_COMPONENT_NAME } from "../../../types/collection-api";
 import { Organism } from "../../../types/collection-api/resources/Organism";
 
 export interface OrganismsFieldProps {
@@ -91,7 +86,7 @@ export function OrganismsField({
         showWarningWhenValuesAreTheSame={true}
       >
         <FieldArray name={name}>
-          {({ form, remove, move }) => {
+          {({ form, remove }) => {
             const organisms: (Organism | null | undefined)[] =
               get(form.values, name) || [];
 
@@ -193,7 +188,6 @@ export function OrganismsField({
                       organismsQuantity={organismsQuantity}
                       onRemoveClick={removeOrganism}
                       onTargetChecked={targetChecked}
-                      onRowMove={move}
                     />
                   ) : (
                     <OrganismStateField
@@ -219,7 +213,6 @@ interface OrganismsTableProps {
   namePrefix: string;
   onRemoveClick: (index: number) => void;
   onTargetChecked: (index: number) => void;
-  onRowMove: (from: number, to: number) => void;
   useTargetOrganism: boolean;
 }
 
@@ -229,12 +222,16 @@ function OrganismsTable({
   namePrefix,
   onRemoveClick,
   onTargetChecked,
-  onRowMove,
   useTargetOrganism
 }: OrganismsTableProps) {
-  const { formatMessage } = useDinaIntl();
   const { getFieldLabel } = useFieldLabels();
   const { isTemplate, readOnly, initialValues } = useDinaFormContext();
+  /** Only show up to the organismsQuantity number */
+  const [visibleTableData, setVisibleTableData] = useState<Organism[]>(
+    [...new Array(organismsQuantity)].map(
+      (_, index) => organisms[index] || { type: "organism", isTarget: false }
+    )
+  );
 
   const initialLength = Number(get(initialValues, namePrefix)?.length) || 1;
 
@@ -257,67 +254,52 @@ function OrganismsTable({
     onRemoveClick(index);
   }
 
-  function onExpandedChange(newExpanded: Record<number, boolean>) {
-    // Disable expand change in template mode:
-    if (isTemplate) {
-      return;
-    }
-    setExpanded(newExpanded);
-  }
-
-  function onSortStart(_, event: unknown) {
-    setExpanded({});
-    if (event instanceof MouseEvent) {
-      document.body.style.cursor = "grabbing";
-    }
-  }
-
-  function onSortEnd(se: SortEnd) {
-    document.body.style.cursor = "inherit";
-    onRowMove(se.oldIndex, se.newIndex);
-  }
-
-  const tableColumns: Column<Organism>[] = [
-    ...(readOnly
-      ? []
-      : [
-          {
-            Header: "",
-            Cell: () => <RowSortHandle />,
-            width: 60
-          }
-        ]),
+  const tableColumns: ColumnDef<Organism>[] = [
+    {
+      id: "expander",
+      header: () => null,
+      cell: ({ row }) => <OrganismExpanderComponent row={row} />,
+      size: 80
+    },
     {
       id: "determination",
-      Cell: ({ original: o }) => {
+      cell: ({ row: { original: o } }) => {
         const primaryDet = o?.determination?.find((it) => it.isPrimary);
         const { scientificName, verbatimScientificName } = primaryDet ?? {};
 
         const cellText = verbatimScientificName || scientificName;
         return <span className="organism-determination-cell">{cellText}</span>;
       },
-      Header: formatMessage("determinationPrimary")
+      header: () => <FieldHeader name="determinationPrimary" />
     },
-    ...["lifeStage", "sex"].map<Column<Organism>>((accessor) => ({
-      accessor,
-      className: `${accessor}-cell`,
-      Header: getFieldLabel({ name: accessor }).fieldLabel
-    })),
-    {
-      Header: "",
-      Cell: ({ index }) => (
-        <>
-          {!isTemplate && !readOnly && (
-            <FormikButton
-              className="btn btn-dark remove-organism-button"
-              onClick={() => handleRemoveClick(index)}
-            >
-              <DinaMessage id="removeOrganism" />
-            </FormikButton>
-          )}
-        </>
+    ...["lifeStage", "sex"].map<ColumnDef<Organism>>((accessorKey) => ({
+      accessorKey,
+      meta: { className: `${accessorKey}-cell` },
+      header: () => (
+        <FieldHeader name={getFieldLabel({ name: accessorKey }).fieldLabel} />
       )
-    }
+    })),
+    ...(readOnly
+      ? []
+      : [
+          {
+            id: "actionColumn",
+            header: () => <></>,
+            cell: ({ row: { index } }) => (
+              <>
+                {!isTemplate && !readOnly && (
+                  <FormikButton
+                    className="btn btn-dark remove-organism-button"
+                    onClick={() => handleRemoveClick(index)}
+                  >
+                    <DinaMessage id="removeOrganism" />
+                  </FormikButton>
+                )}
+              </>
+            ),
+            size: 200
+          }
+        ])
   ];
 
   if (useTargetOrganism) {
@@ -332,21 +314,16 @@ function OrganismsTable({
       readOnly: true
     };
     tableColumns.splice(1, 0, {
-      Header: formatMessage("isTargetHeader"),
+      header: () => <FieldHeader name="isTargetHeader" />,
       id: "isTarget",
-      Cell: ({ original: o }) => {
-        const isTarget: boolean = o?.isTarget;
+      cell: ({ row: { original: o } }) => {
+        const isTarget: boolean = o?.isTarget ?? false;
         const checkMark = <input {...checkboxProps} checked={isTarget} />;
 
         return <span className="organism-target-cell">{checkMark}</span>;
       }
     });
   }
-
-  /** Only show up to the organismsQuantity number */
-  const visibleTableData: Organism[] = [...new Array(organismsQuantity)].map(
-    (_, index) => organisms[index] || { type: "organism", isTarget: false }
-  );
 
   return (
     <>
@@ -355,20 +332,15 @@ function OrganismsTable({
           min-width: 4rem !important;
         }
       `}</style>
-      <ReactTable
+      <ReactTable8<Organism>
         columns={tableColumns}
+        enableDnd={!readOnly && !isTemplate}
+        setData={(data) => setVisibleTableData(data ?? [])}
         data={visibleTableData}
-        sortable={false}
-        minRows={organismsQuantity}
-        pageSize={organismsQuantity || 1}
-        ExpanderComponent={OrganismExpanderComponent}
-        expanded={expanded}
-        TbodyComponent={TbodyComponent}
-        getTbodyProps={() => ({ onSortStart, onSortEnd })}
-        onExpandedChange={onExpandedChange}
-        showPagination={false}
-        SubComponent={(row) => {
-          const isOdd = (row.index + 1) % 2 === 1;
+        enableSorting={false}
+        getRowCanExpand={() => true}
+        renderSubComponent={({ row, index }) => {
+          const isOdd = ((index ?? 0) + 1) % 2 === 1;
 
           // Add zebra striping to the subcomponent background:
           const backgroundColor = isOdd ? "rgba(0,0,0,0.03)" : undefined;
@@ -377,7 +349,7 @@ function OrganismsTable({
             <div className={isOdd ? "-odd" : ""} style={{ backgroundColor }}>
               <div className="p-3">
                 <OrganismStateField
-                  index={row.index}
+                  index={index ?? 0}
                   namePrefix={`${namePrefix}[${row.index}].`}
                   individualEntry={true}
                   useTargetOrganism={useTargetOrganism}
@@ -387,16 +359,22 @@ function OrganismsTable({
             </div>
           );
         }}
+        // TbodyComponent={TbodyComponent}
+        // getTbodyProps={() => ({ onSortStart, onSortEnd })}
+        // onExpandedChange={onExpandedChange}
+        showPagination={false}
         className="-striped"
       />
     </>
   );
 }
 
-function OrganismExpanderComponent({ isExpanded, index }) {
+function OrganismExpanderComponent({ row }: { row: Row<Organism> }) {
   const { errors } = useFormikContext();
 
-  const prefix = `organism[${index}]`;
+  const prefix = `organism[${row.index}]`;
+
+  const isExpanded = row.getIsExpanded();
 
   const hasError =
     !isEmpty(get(errors, prefix)) ||
@@ -408,8 +386,9 @@ function OrganismExpanderComponent({ isExpanded, index }) {
         "btn btn-light expand-organism",
         `${isExpanded ? "is" : "not"}-expanded`
       )}
-      style={{ pointerEvents: "none", backgroundColor: "inherit" }}
+      // style={{backgroundColor: "inherit" }}
       type="button"
+      onClick={row.getToggleExpandedHandler()}
     >
       <div>
         <span className={`rt-expander ${isExpanded ? "-open" : false}`}>•</span>
@@ -422,41 +401,3 @@ function OrganismExpanderComponent({ isExpanded, index }) {
     </button>
   );
 }
-
-function TbodyComponent(props) {
-  return (
-    <SortableTBody
-      onSortStart={props.onSortStart}
-      onSortEnd={props.onSortEnd}
-      helperClass="d-flex"
-      useDragHandle={true}
-      axis="y"
-      {...props}
-    />
-  );
-}
-
-const SortableTBody = SortableContainer(({ children, ...bodyProps }) => {
-  const [rows, otherChildren] = children;
-  const { readOnly } = useDinaFormContext();
-
-  return (
-    <div {...bodyProps} className="rt-tbody">
-      {rows.map((row, index) => (
-        <SortableTRow
-          key={row.key}
-          {...row.props}
-          disabled={readOnly}
-          index={index}
-        />
-      ))}
-      {otherChildren}
-    </div>
-  );
-});
-
-const SortableTRow = SortableElement(({ children }) => <>{children}</>);
-
-const RowSortHandle = SortableHandle(() => (
-  <GiHamburgerMenu cursor="grab" size="2.5em" />
-));
