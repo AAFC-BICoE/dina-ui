@@ -1,7 +1,6 @@
 import {
   ColumnDef,
   ExpandedState,
-  OnChangeFn,
   PaginationState,
   Row,
   SortingState,
@@ -21,7 +20,6 @@ import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
-import { boolean } from "mathjs";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
