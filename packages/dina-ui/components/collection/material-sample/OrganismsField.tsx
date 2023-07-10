@@ -233,24 +233,21 @@ function OrganismsTable({
     )
   );
 
-  const initialLength = Number(get(initialValues, namePrefix)?.length) || 1;
-
-  /** Number-to-boolean map for when all organisms are expanded. */
-  const expandAll = [...new Array(initialLength)].reduce<
-    Record<number, boolean>
-  >((prev, _, index) => ({ ...prev, [index]: true }), {});
+  const expandAll = visibleTableData.reduce<Record<number, boolean>>(
+    (prev, curr) => ({ ...prev, [curr.id + ""]: true }),
+    {}
+  );
 
   /** Number-to-boolean map for when only the first organism is expanded. */
-  const expandFirstOnly = { 0: organismsQuantity === 1 };
+  const expandFirstOnly = {
+    [visibleTableData[0]?.id + ""]: organismsQuantity === 1
+  };
 
   const initialExpanded: Record<number, boolean> = readOnly
     ? expandAll
     : expandFirstOnly;
 
-  const [expanded, setExpanded] = useState(initialExpanded);
-
   function handleRemoveClick(index: number) {
-    setExpanded({});
     onRemoveClick(index);
   }
 
@@ -339,6 +336,7 @@ function OrganismsTable({
         data={visibleTableData}
         enableSorting={false}
         getRowCanExpand={() => true}
+        defaultExpanded={initialExpanded}
         renderSubComponent={({ row, index }) => {
           const isOdd = ((index ?? 0) + 1) % 2 === 1;
 
