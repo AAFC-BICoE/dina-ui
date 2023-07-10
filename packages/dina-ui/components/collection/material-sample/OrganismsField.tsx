@@ -86,7 +86,7 @@ export function OrganismsField({
         showWarningWhenValuesAreTheSame={true}
       >
         <FieldArray name={name}>
-          {({ form, remove }) => {
+          {({ form, remove, move }) => {
             const organisms: (Organism | null | undefined)[] =
               get(form.values, name) || [];
 
@@ -188,6 +188,7 @@ export function OrganismsField({
                       organismsQuantity={organismsQuantity}
                       onRemoveClick={removeOrganism}
                       onTargetChecked={targetChecked}
+                      onRowMove={move}
                     />
                   ) : (
                     <OrganismStateField
@@ -213,6 +214,7 @@ interface OrganismsTableProps {
   namePrefix: string;
   onRemoveClick: (index: number) => void;
   onTargetChecked: (index: number) => void;
+  onRowMove: (from: number, to: number) => void;
   useTargetOrganism: boolean;
 }
 
@@ -222,30 +224,11 @@ function OrganismsTable({
   namePrefix,
   onRemoveClick,
   onTargetChecked,
+  onRowMove,
   useTargetOrganism
 }: OrganismsTableProps) {
   const { getFieldLabel } = useFieldLabels();
   const { isTemplate, readOnly, initialValues } = useDinaFormContext();
-  /** Only show up to the organismsQuantity number */
-  const [visibleTableData, setVisibleTableData] = useState<Organism[]>(
-    [...new Array(organismsQuantity)].map(
-      (_, index) => organisms[index] || { type: "organism", isTarget: false }
-    )
-  );
-
-  const expandAll = visibleTableData.reduce<Record<number, boolean>>(
-    (prev, curr) => ({ ...prev, [curr.id + ""]: true }),
-    {}
-  );
-
-  /** Number-to-boolean map for when only the first organism is expanded. */
-  const expandFirstOnly = {
-    [visibleTableData[0]?.id + ""]: organismsQuantity === 1
-  };
-
-  const initialExpanded: Record<number, boolean> = readOnly
-    ? expandAll
-    : expandFirstOnly;
 
   function handleRemoveClick(index: number) {
     onRemoveClick(index);
@@ -322,6 +305,25 @@ function OrganismsTable({
     });
   }
 
+  /** Only show up to the organismsQuantity number */
+  const visibleTableData: Organism[] = [...new Array(organismsQuantity)].map(
+    (_, index) => organisms[index] || { type: "organism", isTarget: false }
+  );
+
+  const expandAll = visibleTableData.reduce<Record<number, boolean>>(
+    (prev, curr) => ({ ...prev, [curr.id + ""]: true }),
+    {}
+  );
+
+  /** Number-to-boolean map for when only the first organism is expanded. */
+  const expandFirstOnly = {
+    [visibleTableData[0]?.id + ""]: organismsQuantity === 1
+  };
+
+  const initialExpanded: Record<number, boolean> = readOnly
+    ? expandAll
+    : expandFirstOnly;
+
   return (
     <>
       <style>{`
@@ -332,7 +334,7 @@ function OrganismsTable({
       <ReactTable8<Organism>
         columns={tableColumns}
         enableDnd={!readOnly && !isTemplate}
-        setData={(data) => setVisibleTableData(data ?? [])}
+        onRowMove={onRowMove}
         data={visibleTableData}
         enableSorting={false}
         getRowCanExpand={() => true}

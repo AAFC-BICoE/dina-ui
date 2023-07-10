@@ -36,13 +36,14 @@ export function DraggableRow<TData>({
   style
 }: {
   row: Row<TData>;
-  reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
+  reorderRow?: (draggedRowIndex: number, targetRowIndex: number) => void;
   className?: string;
   style?: CSSProperties;
 }) {
   const [, dropRef] = useDrop({
     accept: ITEM_DRAG_KEY,
-    drop: (draggedRow) => reorderRow((draggedRow as any).row.index, row.index),
+    drop: (draggedRow) =>
+      reorderRow?.((draggedRow as any).row.index, row.index),
     canDrop: () => true
   });
 

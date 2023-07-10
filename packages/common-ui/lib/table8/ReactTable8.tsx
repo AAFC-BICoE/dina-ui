@@ -27,8 +27,8 @@ export interface ReactTable8Props<TData> {
   // Columns definations, ref: https://tanstack.com/table/v8/docs/api/core/column
   columns: ColumnDef<TData>[];
   data: TData[];
-  // When DnD is enabled, need to call setData() after DnD
-  setData?: (data?: TData[]) => void;
+  // When DnD is enabled, need to call onRowMove() after DnD
+  onRowMove?: (from: number, to: number) => void;
   // Enable row drag and drop
   enableDnd?: boolean;
   enableSorting?: boolean;
@@ -67,7 +67,7 @@ export interface ReactTable8Props<TData> {
 
 export function ReactTable8<TData>({
   data,
-  setData,
+  onRowMove,
   columns,
   enableDnd = false,
   enableSorting = true,
@@ -100,13 +100,6 @@ export function ReactTable8<TData>({
     pageIndex: page ?? 0,
     pageSize: initPageSize ?? pageSizeOptions[0]
   });
-
-  function reorderRow(draggedRowIndex: number, targetRowIndex: number) {
-    data.splice(targetRowIndex, 0, data.splice(draggedRowIndex, 1)[0] as TData);
-    if (!!setData) {
-      setData([...data]);
-    }
-  }
 
   function onPaginationChangeInternal(updater) {
     const { pageIndex: oldPageIndex, pageSize: oldPageSize } =
@@ -263,7 +256,7 @@ export function ReactTable8<TData>({
                 {enableDnd ? (
                   <DraggableRow
                     row={row}
-                    reorderRow={reorderRow}
+                    reorderRow={onRowMove}
                     className={classnames(
                       `index-${index}`,
                       index % 2 === 0 ? "-odd" : "-even"
