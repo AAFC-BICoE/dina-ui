@@ -1530,7 +1530,7 @@ describe("Material Sample Edit Page", () => {
 
     // Renders the initial lifestage values:
     expect(
-      wrapper.find(".rt-td.lifeStage-cell").map((cell) => cell.text())
+      wrapper.find("td.lifeStage-cell").map((cell) => cell.text())
     ).toEqual(["lifestage 1", "lifestage 2", "lifestage 3"]);
 
     // Expand the 3rd organism:
