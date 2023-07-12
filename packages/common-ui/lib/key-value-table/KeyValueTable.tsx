@@ -10,7 +10,7 @@ export interface KeyValueTableProps {
   /** The object whose keys and values are to be shown. */
   data: Record<string, any>;
 
-  /** The value cell Component for a specific field can be overriden for displaying complex object types. */
+  /** The value cell Component for a specific field can be overridden for displaying complex object types. */
   customValueCells?: Record<string, ColumnDefTemplate<CellContext<any, any>>>;
 
   attributeHeader?: JSX.Element;
@@ -90,6 +90,7 @@ export function KeyValueTable({
       ]}
       data={entries}
       showPagination={false}
+      manualPagination={true}
     />
   );
 }
