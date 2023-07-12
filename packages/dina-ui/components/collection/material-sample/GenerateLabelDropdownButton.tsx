@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import React, { useState } from "react";
 import { PersistedResource } from "kitsu";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { ReportTemplate } from "../../../../dina-ui/types/report-label-api";
+import { ReportTemplate } from "../../../types/dina-export-api";
 import Select from "react-select";
 import { useAccount, useQuery } from "../../../../common-ui/lib";
 import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
@@ -39,7 +39,7 @@ export function GenerateLabelDropdownButton({
   const { apiClient } = useApiClient();
   useQuery<ReportTemplate[]>(
     {
-      path: "report-label-api/report-template",
+      path: "dina-export-api/report-template",
       filter: {
         rsql: `group=in=(${groupNames})`
       }
@@ -61,7 +61,7 @@ export function GenerateLabelDropdownButton({
   );
 
   /**
-   * Asynchronous POST request to reports_labels_api. Used to retrieve PDF
+   * Asynchronous POST request to retrieve PDF
    */
   async function generateLabel() {
     if (!reportTemplate) {
@@ -95,7 +95,7 @@ export function GenerateLabelDropdownButton({
 
     try {
       const reportTemplatePostResponse = await apiClient.axios.post(
-        "report-label-api/report-request",
+        "dina-export-api/report-request",
         postData,
         {
           headers: {
@@ -104,7 +104,7 @@ export function GenerateLabelDropdownButton({
         }
       );
       const reportRequestGetResponse = await apiClient.axios.get(
-        `report-label-api/file/${reportTemplatePostResponse?.data?.data?.id}`,
+        `dina-export-api/file/${reportTemplatePostResponse?.data?.data?.id}`,
         { responseType: "blob" }
       );
       const url = window?.URL.createObjectURL(reportRequestGetResponse?.data);
