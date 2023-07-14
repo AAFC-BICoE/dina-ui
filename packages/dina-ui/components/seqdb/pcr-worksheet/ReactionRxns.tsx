@@ -143,7 +143,9 @@ export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
             </tbody>
             <tfoot>
               <tr>
-                <th>Total</th>
+                <th>
+                  <DinaMessage id="total" />
+                </th>
                 <th />
                 <th>{totalUlRxn}</th>
                 <th>{totalUl}</th>

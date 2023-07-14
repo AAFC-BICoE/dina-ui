@@ -1,0 +1,138 @@
+import { useApiClient } from "packages/common-ui/lib";
+import { PcrBatchItem, SeqReaction } from "packages/dina-ui/types/seqdb-api";
+import { useState, useEffect } from "react";
+import { compact } from "lodash";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { useLocalStorage } from "@rehooks/local-storage";
+
+export function useSeqReactionState(seqBatchId?: string) {
+  const [selectedResources, setSelectedResources] = useState<SeqReaction[]>([]);
+  const { apiClient, save, bulkGet } = useApiClient();
+  // The map key is pcrBatchItem.id + "_" + seqPrimer.id
+  // the map value is the real UUID from the database.
+  const [
+    previouslySelectedResourcesIDMap,
+    setPreviouslySelectedResourcesIDMap
+  ] = useState<{ [key: string]: string }>({} as { [key: string]: string });
+  const [seqReactionSortOrder, setSeqReactionSortOrder] = useLocalStorage<
+    string[]
+  >(`seqReactionSortOrder-${seqBatchId}`);
+
+  useEffect(() => {
+    fetchSeqReactions();
+  }, [seqBatchId]);
+
+  // Sort Seq Reactions based on the preserved order in local storage
+  function sortSeqReactions(reactions: SeqReaction[]) {
+    if (seqReactionSortOrder) {
+      const sorted = seqReactionSortOrder.map((reactionId) =>
+        reactions.find((item) => {
+          const tempId: (string | undefined)[] = [];
+          tempId.push(item.pcrBatchItem?.id);
+          tempId.push(item.seqPrimer?.id);
+          const id = compact(tempId).join("_");
+          return id === reactionId;
+        })
+      );
+      reactions.forEach((item) => {
+        const tempId: (string | undefined)[] = [];
+        tempId.push(item.pcrBatchItem?.id);
+        tempId.push(item.seqPrimer?.id);
+        const id = compact(tempId).join("_");
+        if (seqReactionSortOrder.indexOf(id) === -1) {
+          sorted.push(item);
+        }
+      });
+      return compact(sorted);
+    } else {
+      return compact(reactions);
+    }
+  }
+
+  const fetchSeqReactions = async () => {
+    const { data: seqReactions } = await apiClient.get<SeqReaction[]>(
+      "/seqdb-api/seq-reaction",
+      {
+        filter: {
+          "seqBatch.uuid": seqBatchId as string
+        },
+        include: ["pcrBatchItem", "seqPrimer"].join(","),
+        sort: "pcrBatchItem",
+        page: { limit: 1000 }
+      }
+    );
+
+    const pcrBatchItems = compact(
+      await bulkGet<PcrBatchItem, true>(
+        seqReactions?.map(
+          (item) =>
+            `/pcr-batch-item/${item.pcrBatchItem?.id}?include=materialSample`
+        ),
+        {
+          apiBaseUrl: "/seqdb-api",
+          returnNullForMissingResource: true
+        }
+      )
+    );
+
+    const materialSamples = compact(
+      await bulkGet<MaterialSample, true>(
+        pcrBatchItems?.map(
+          (item) => `/material-sample/${item.materialSample?.id}`
+        ),
+        {
+          apiBaseUrl: "/collection-api",
+          returnNullForMissingResource: true
+        }
+      )
+    );
+
+    seqReactions.map((item) => {
+      if (item.pcrBatchItem && item.pcrBatchItem?.id) {
+        item.pcrBatchItem = pcrBatchItems.find(
+          (pbi) => pbi.id === item.pcrBatchItem?.id
+        );
+        if (
+          item.pcrBatchItem?.materialSample &&
+          item.pcrBatchItem.materialSample.id
+        ) {
+          const foundSample = materialSamples.find(
+            (sample) => sample.id === item.pcrBatchItem?.materialSample?.id
+          );
+          (
+            item.pcrBatchItem.materialSample as MaterialSample
+          ).materialSampleName = foundSample?.materialSampleName;
+        }
+      }
+      return item;
+    });
+
+    setPreviouslySelectedResourcesIDMap(
+      compact(seqReactions).reduce(
+        (accu, obj) => ({
+          ...accu,
+          [`${obj.pcrBatchItem?.id}_${obj.seqPrimer?.id}`]: obj.id
+        }),
+        {} as { [key: string]: string }
+      )
+    );
+
+    for (const item of seqReactions) {
+      const tempId: (string | undefined)[] = [];
+      tempId.push(item.pcrBatchItem?.id);
+      tempId.push(item.seqPrimer?.id);
+      item.id = compact(tempId).join("_");
+    }
+    const sorted = sortSeqReactions(seqReactions);
+    setSelectedResources(sorted);
+  };
+
+  return {
+    selectedResources,
+    setSelectedResources,
+    previouslySelectedResourcesIDMap,
+    setPreviouslySelectedResourcesIDMap,
+    seqReactionSortOrder,
+    setSeqReactionSortOrder
+  };
+}
