@@ -1,17 +1,17 @@
 import {
-  ColumnDefinition,
-  dateCell,
+  ColumnDefinition8,
+  dateCell8,
   DinaForm,
   FieldHeader,
   FormikButton,
-  QueryTable,
+  QueryTable8,
   Tooltip,
   useGroupedCheckBoxes
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
-import { ThumbnailCell } from "../..";
+import { ThumbnailCell8 } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 
@@ -46,20 +46,25 @@ export function ExistingAttachmentsTable({
 
   const { openMetadataEditorModal } = useBulkMetadataEditModal();
 
-  const ATTACHMENT_TABLE_COLUMNS: ColumnDefinition<any>[] = [
+  const ATTACHMENT_TABLE_COLUMNS: ColumnDefinition8<any>[] = [
     {
-      Cell: ({ original: metadata }) => (
+      id: "select",
+      cell: ({ row: { original: metadata } }) => (
         <CheckBoxField key={metadata.id} resource={metadata} />
       ),
-      Header: CheckBoxHeader,
-      sortable: false
+      header: () => <CheckBoxHeader />,
+      enableSorting: false
     },
-    ThumbnailCell({
+    ThumbnailCell8({
       bucketField: "metadata.bucket",
       isJsonApiQuery: true
     }),
     {
-      Cell: ({ original: { id, metadata } }) => {
+      cell: ({
+        row: {
+          original: { id, metadata }
+        }
+      }) => {
         // When this Metadata has been deleted, show a "deleted" message in this cell:
         if (!metadata) {
           return (
@@ -76,21 +81,26 @@ export function ExistingAttachmentsTable({
           </Link>
         ) : null;
       },
-      accessor: "metadata.originalFilename",
-      Header: <FieldHeader name="originalFilename" />
+      accessorKey: "metadata.originalFilename",
+      header: () => <FieldHeader name="originalFilename" />
     },
     {
-      accessor: "metadata.acCaption",
-      Header: <FieldHeader name="acCaption" />
+      accessorKey: "metadata.acCaption",
+      header: () => <FieldHeader name="acCaption" />
     },
     {
-      ...dateCell("metadata.xmpMetadataDate"),
-      Header: <FieldHeader name="xmpMetadataDate" />
+      id: "metataDate",
+      ...dateCell8("metadata.xmpMetadataDate"),
+      header: () => <FieldHeader name="xmpMetadataDate" />
     },
     {
-      Cell: ({ original: { metadata } }) => <>{metadata?.acTags?.join(", ")}</>,
-      accessor: "metadata.acTags",
-      Header: <FieldHeader name="acTags" />
+      cell: ({
+        row: {
+          original: { metadata }
+        }
+      }) => <>{metadata?.acTags?.join(", ")}</>,
+      accessorKey: "metadata.acTags",
+      header: () => <FieldHeader name="acTags" />
     }
   ];
 
@@ -156,7 +166,7 @@ export function ExistingAttachmentsTable({
           )}
         </div>
       </div>
-      <QueryTable
+      <QueryTable8
         columns={ATTACHMENT_TABLE_COLUMNS}
         joinSpecs={[
           {
@@ -176,7 +186,7 @@ export function ExistingAttachmentsTable({
         ]}
         omitPaging={true}
         path={attachmentPath}
-        reactTableProps={{ sortable: false }}
+        reactTableProps={{ enableSorting: false }}
         defaultPageSize={10000}
         onSuccess={(res) => setAvailableMetadatas(res.data)}
         ariaLabel="Existing attachments"
