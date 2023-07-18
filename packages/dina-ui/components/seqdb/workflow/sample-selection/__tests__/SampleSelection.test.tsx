@@ -72,7 +72,7 @@ const TEST_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
 const TEST_CHAIN_STEP_TEMPLATES = [TEST_CHAIN_STEP_TEMPLATE];
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
+const mockGet = jest.fn(async (model) => {
   if (model === "seqdb-api/molecular-sample") {
     return { data: TEST_SAMPLES };
   } else if (model === "seqdb-api/step-resource") {
@@ -175,12 +175,12 @@ describe("MolecularSample Selection UI", () => {
 
     // Select samples 3 to 5.
     wrapper
-      .find(".available-samples .rt-tbody input[type='checkbox']")
+      .find(".available-samples tbody input[type='checkbox']")
       .at(2)
       .prop<any>("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
-      .find(".available-samples .rt-tbody input[type='checkbox']")
+      .find(".available-samples tbody input[type='checkbox']")
       .at(4)
       .prop<any>("onClick")({
       shiftKey: true,
@@ -284,12 +284,12 @@ describe("MolecularSample Selection UI", () => {
 
     // Deselect/delete the second to fourth stepResources.
     wrapper
-      .find(".selected-samples .rt-tbody input[type='checkbox']")
+      .find(".selected-samples tbody input[type='checkbox']")
       .at(1)
       .prop<any>("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
-      .find(".selected-samples .rt-tbody input[type='checkbox']")
+      .find(".selected-samples tbody input[type='checkbox']")
       .at(3)
       .prop<any>("onClick")({
       shiftKey: true,

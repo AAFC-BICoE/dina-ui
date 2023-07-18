@@ -1,12 +1,12 @@
 import {
-  ColumnDefinition,
+  ColumnDefinition8,
   FilterGroupModel,
   FormikButton,
-  QueryTable,
+  QueryTable8,
   rsql,
   useDinaFormContext
 } from "common-ui";
-import { KitsuResourceLink, PersistedResource } from "kitsu";
+import { KitsuResourceLink } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
 import { Promisable } from "type-fest";
@@ -29,41 +29,41 @@ export function StorageSearchSelector({
   const [filter, setFilter] = useState<FilterGroupModel | null>();
   const { readOnly } = useDinaFormContext();
 
-  const tableColumns: ColumnDefinition<StorageUnit>[] = [
+  const tableColumns: ColumnDefinition8<StorageUnit>[] = [
     {
-      Cell: ({ original }) => (
+      cell: ({ row: { original } }) => (
         <Link href={`/collection/storage-unit/view?id=${original.id}`}>
           <a target="_blank">{storageUnitDisplayName(original)}</a>
         </Link>
       ),
-      width: 400,
-      accessor: "name"
+      size: 400,
+      accessorKey: "name"
     },
     {
-      Cell: ({ original }) => (
+      cell: ({ row: { original } }) => (
         <StorageUnitBreadCrumb
           storageUnit={original}
           // Do not repeat the unit name because it's in the "name" column:
           hideThisUnit={true}
         />
       ),
-      accessor: "location",
-      sortable: false
+      accessorKey: "location",
+      enableSorting: false
     },
     {
-      Cell: ({ original }) => (
+      cell: ({ row: { original } }) => (
         <FormikButton
           className="btn btn-primary select-storage"
           onClick={async () =>
-            await onChange({ id: original.id, type: original.type })
+            await onChange({ id: original.id ?? "", type: original.type })
           }
         >
           <DinaMessage id="select" />
         </FormikButton>
       ),
-      width: 250,
-      accessor: "select",
-      sortable: false
+      size: 250,
+      accessorKey: "select",
+      enableSorting: false
     }
   ];
 
@@ -75,13 +75,13 @@ export function StorageSearchSelector({
         }
       `}</style>
       <StorageFilter onChange={setFilter} />
-      <QueryTable
+      <QueryTable8
         columns={tableColumns}
         path="collection-api/storage-unit"
         include="hierarchy,storageUnitType"
         // Sort by newest:
         defaultSort={[{ id: "createdOn", desc: true }]}
-        reactTableProps={() => ({ sortable: false })}
+        reactTableProps={() => ({ enableSorting: false })}
         filter={{
           rsql: rsql({
             type: "FILTER_GROUP",

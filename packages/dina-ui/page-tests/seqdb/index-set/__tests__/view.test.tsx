@@ -39,7 +39,7 @@ const TEST_NGS_INDEXES: NgsIndex[] = [
 ];
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   if (path === "seqdb-api/index-set/100") {
     return { data: TEST_INDEX_SET };
   }
@@ -81,6 +81,6 @@ describe("Index Set View Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
     // The table shows the ngs indexes:
-    expect(wrapper.find(".rt-tbody .rt-td").first().text()).toEqual("index 1");
+    expect(wrapper.find("tbody td").first().text()).toEqual("index 1");
   });
 });
