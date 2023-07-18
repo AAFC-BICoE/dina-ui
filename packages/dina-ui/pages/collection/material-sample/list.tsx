@@ -36,38 +36,45 @@ export interface SampleListLayoutProps {
  *
  * The old version of the listing is still when searching for associated samples.
  */
-export const getColumnDefinition = () => {
-  return [
-    {
-      Cell: ({
-        original: { id, materialSampleName, dwcOtherCatalogNumbers }
-      }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-        >
-          <a>
-            {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-          </a>
-        </Link>
-      ),
-      accessor: "materialSampleName"
-    },
-    {
-      Cell: ({ original: { collection } }) =>
-        collection?.id ? (
-          <Link href={`/collection/collection/view?id=${collection?.id}`}>
-            {collection?.name}
+export const getColumnDefinition: () => ColumnDefinition8<MaterialSample>[] =
+  () => {
+    return [
+      {
+        cell: ({
+          row: {
+            original: { id, materialSampleName, dwcOtherCatalogNumbers }
+          }
+        }) => (
+          <Link
+            href={`/collection/material-sample/view?id=${id}`}
+            passHref={true}
+          >
+            <a>
+              {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
+            </a>
           </Link>
-        ) : null,
-      accessor: "collection.name"
-    },
-    stringArrayCell("dwcOtherCatalogNumbers"),
-    { accessor: "materialSampleType" },
-    "createdBy",
-    dateCell("createdOn")
-  ];
-};
+        ),
+        accessorKey: "materialSampleName"
+      },
+      {
+        cell: ({
+          row: {
+            original: { collection }
+          }
+        }) =>
+          collection?.id ? (
+            <Link href={`/collection/collection/view?id=${collection?.id}`}>
+              {collection?.name}
+            </Link>
+          ) : null,
+        accessorKey: "collection.name"
+      },
+      stringArrayCell8("dwcOtherCatalogNumbers"),
+      { accessorKey: "materialSampleType" },
+      "createdBy",
+      dateCell8("createdOn")
+    ];
+  };
 
 /**
  * This getColumnDefinition is used for the QueryTable, not the new elastic search stuff.

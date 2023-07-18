@@ -1,9 +1,10 @@
-import { DinaForm, FieldSet, QueryTable } from "common-ui";
+import { DinaForm, FieldSet, QueryTable, QueryTable8 } from "common-ui";
 import { useCollectingEventQuery, ViewPageLayout } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import { getColumnDefinition } from "../material-sample/list";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
 
 export default function CollectingEventDetailsPage() {
   return (
@@ -12,7 +13,7 @@ export default function CollectingEventDetailsPage() {
         <DinaForm<CollectingEvent> {...props}>
           <CollectingEventFormLayout />
           <FieldSet legend={<DinaMessage id="materialSamples" />}>
-            <QueryTable
+            <QueryTable8<MaterialSample>
               path="collection-api/material-sample"
               include="collection"
               columns={getColumnDefinition()}
