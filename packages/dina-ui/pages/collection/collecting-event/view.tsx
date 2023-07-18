@@ -1,10 +1,10 @@
-import { DinaForm, FieldSet, QueryTable, QueryTable8 } from "common-ui";
-import { useCollectingEventQuery, ViewPageLayout } from "../../../components";
+import { DinaForm, FieldSet, QueryTable8 } from "common-ui";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { ViewPageLayout, useCollectingEventQuery } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import { getColumnDefinition } from "../material-sample/list";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
 
 export default function CollectingEventDetailsPage() {
   return (
