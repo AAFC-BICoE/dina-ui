@@ -76,50 +76,6 @@ export const getColumnDefinition: () => ColumnDefinition8<MaterialSample>[] =
     ];
   };
 
-/**
- * This getColumnDefinition is used for the QueryTable, not the new elastic search stuff.
- *
- * The old version of the listing is still when searching for associated samples.
- */
-export function getColumnDefinition8(): ColumnDefinition8<MaterialSample>[] {
-  return [
-    {
-      cell: ({
-        row: {
-          original: { id, materialSampleName, dwcOtherCatalogNumbers }
-        }
-      }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-        >
-          <a>
-            {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-          </a>
-        </Link>
-      ),
-      accessorKey: "materialSampleName"
-    },
-    {
-      cell: ({
-        row: {
-          original: { collection }
-        }
-      }) =>
-        collection?.id ? (
-          <Link href={`/collection/collection/view?id=${collection?.id}`}>
-            {collection?.name}
-          </Link>
-        ) : null,
-      accessorKey: "collection.name"
-    },
-    stringArrayCell8("dwcOtherCatalogNumbers"),
-    { accessorKey: "materialSampleType" },
-    "createdBy",
-    dateCell8("createdOn")
-  ];
-}
-
 export function SampleListLayout({
   onSelect,
   classNames,
@@ -145,7 +101,7 @@ export function SampleListLayout({
 
   // The old style columns, but add the action buttons at the end.
   const columns: ColumnDefinition8<MaterialSample>[] = [
-    ...getColumnDefinition8(),
+    ...getColumnDefinition(),
     ...(onSelect
       ? [
           {
