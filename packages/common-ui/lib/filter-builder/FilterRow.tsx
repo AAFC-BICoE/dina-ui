@@ -97,7 +97,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     };
 
     return (
-      <div className="list-inline" style={{ display: "flex" }}>
+      <div className="list-inline" style={{ display: "flex-shrink" }}>
         <div className="list-inline-item" style={{ width: 320 }}>
           <Select<FilterAttributeOption>
             aria-label="Filter Attribute"
