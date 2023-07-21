@@ -2,8 +2,6 @@ import {
   ColumnDef,
   ColumnFiltersState,
   ExpandedState,
-  FilterFn,
-  OnChangeFn,
   PaginationState,
   Row,
   SortingState,
@@ -22,9 +20,9 @@ import { Fragment, useState } from "react";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
+import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
-import { FilterInput } from "./FilterInput";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
