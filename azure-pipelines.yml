@@ -45,7 +45,6 @@ steps:
   displayName: Setting up certificates
 
 - script: |
-    cd dina-local-deployment
     docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
   displayName: 'Start DockerCompose'
 
@@ -56,6 +55,7 @@ steps:
 
 - bash: |
     pwd
+    cd ..
     ls -la
     pa11y-ci --config wcag/.pa11yci
 
