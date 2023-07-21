@@ -9,6 +9,12 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+resources:
+  repositories:
+  - repository: local-deployement-repo
+    type: github
+    name: AAFC-BICoE/dina-local-deployment
+
 steps:
 - task: NodeTool@0
   inputs:
@@ -18,4 +24,28 @@ steps:
 - script: |
     npm install -g pa11y-ci
   displayName: 'Install pa11y-ci'
-  
+
+- checkout: local-deployement-repo
+
+# - script: |
+#     sudo sh -c "echo '192.19.33.9 dina.local' >> /etc/hosts"
+#     sudo sh -c "echo '192.19.33.9 api.dina.local' >> /etc/hosts"
+#     sudo sh -c "echo '192.19.33.9 keycloak.dina.local' >> /etc/hosts"
+#   displayName: 'Setting up hosts name'
+
+# - script: |
+#     sudo apt-get install wget libnss3-tools -y
+#     wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64
+#     sudo chmod +x mkcert-v1.4.3-linux-amd64
+#     sudo mv mkcert-v1.4.3-linux-amd64 /usr/bin/mkcert
+#     mkcert --install
+#     mkcert -cert-file  $(Pipeline.Workspace)/s/certs/dina-local-cert.pem -key-file $(Pipeline.Workspace)/s/certs/dina-local-key.pem "dina.local" "api.dina.local" "keycloak.dina.local"
+#   displayName: Setting up certificates
+
+# - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
+#   displayName: 'Start DockerCompose'
+
+# - bash: |
+#     echo Try to connect to Keycloak endpoint ...
+#     curl --head -X GET --retry 25 --retry-delay 1 https://dina.local/auth
+#   displayName: 'Waiting for Keycloak ...'
