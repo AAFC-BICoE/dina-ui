@@ -27,6 +27,7 @@ steps:
   displayName: 'Install pa11y-ci'
 
 - checkout: local-deployement-repo
+  path: dina-local-deployment
 
 - script: |
     sudo sh -c "echo '192.19.33.9 dina.local' >> /etc/hosts"
@@ -40,10 +41,12 @@ steps:
     sudo chmod +x mkcert-v1.4.3-linux-amd64
     sudo mv mkcert-v1.4.3-linux-amd64 /usr/bin/mkcert
     mkcert --install
-    mkcert -cert-file  $(Pipeline.Workspace)/s/certs/dina-local-cert.pem -key-file $(Pipeline.Workspace)/s/certs/dina-local-key.pem "dina.local" "api.dina.local" "keycloak.dina.local"
+    mkcert -cert-file  $(Pipeline.Workspace)/dina-local-deployment/s/certs/dina-local-cert.pem -key-file $(Pipeline.Workspace)/dina-local-deployment/s/certs/dina-local-key.pem "dina.local" "api.dina.local" "keycloak.dina.local"
   displayName: Setting up certificates
 
-- bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
+- script: |
+    cd dina-local-deployment
+    docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
   displayName: 'Start DockerCompose'
 
 - bash: |
