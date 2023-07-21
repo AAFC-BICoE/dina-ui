@@ -13,6 +13,7 @@ resources:
   repositories:
   - repository: local-deployement-repo
     type: github
+    endpoint: AAFC-BICoE
     name: AAFC-BICoE/dina-local-deployment
 
 steps:
