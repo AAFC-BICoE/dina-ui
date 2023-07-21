@@ -23,7 +23,7 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
-    npm install -g pa11y-ci
+    npm install -g pa11y-ci pa11y-ci-reporter-html
   displayName: 'Install pa11y-ci'
 
 - checkout: local-deployement-repo
@@ -52,6 +52,7 @@ steps:
   displayName: 'Waiting for Keycloak ...'
 
 - bash: |
+    pwd
     ls -la
     pa11y-ci --config wcag/.pa11yci
 
