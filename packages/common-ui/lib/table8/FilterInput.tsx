@@ -1,6 +1,5 @@
-import { Column, Table } from "@tanstack/react-table";
-import { useMemo } from "react";
-import { DebouncedInput } from "./debounced-input";
+import { Column } from "@tanstack/react-table";
+import { DebouncedInput } from "./DebouncedInput";
 
 export function FilterInput({ column }: { column: Column<any, unknown> }) {
   const columnFilterValue = column.getFilterValue();
