@@ -41,7 +41,7 @@ steps:
     sudo chmod +x mkcert-v1.4.3-linux-amd64
     sudo mv mkcert-v1.4.3-linux-amd64 /usr/bin/mkcert
     mkcert --install
-    mkcert -cert-file  $(Pipeline.Workspace)/dina-local-deployment/s/certs/dina-local-cert.pem -key-file $(Pipeline.Workspace)/dina-local-deployment/s/certs/dina-local-key.pem "dina.local" "api.dina.local" "keycloak.dina.local"
+    mkcert -cert-file  $(Pipeline.Workspace)/dina-local-deployment/certs/dina-local-cert.pem -key-file $(Pipeline.Workspace)/dina-local-deployment/certs/dina-local-key.pem "dina.local" "api.dina.local" "keycloak.dina.local"
   displayName: Setting up certificates
 
 - script: |
