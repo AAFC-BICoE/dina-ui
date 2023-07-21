@@ -51,6 +51,10 @@ steps:
     curl --head -X GET --retry 25 --retry-delay 1 https://dina.local/auth
   displayName: 'Waiting for Keycloak ...'
 
+- bash: |
+    ls -la
+    pa11y-ci --config wcag/.pa11yci
+
 - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
   displayName: 'Stop DockerCompose'
   
