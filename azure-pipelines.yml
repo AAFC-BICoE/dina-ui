@@ -14,3 +14,8 @@ steps:
   inputs:
     versionSpec: '16.x'
   displayName: 'Install Node.js'
+
+- script: |
+    npm install pa11y-ci
+  displayName: 'Install pa11y-ci'
+  
