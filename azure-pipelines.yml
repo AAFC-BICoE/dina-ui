@@ -16,6 +16,6 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
-    npm install pa11y-ci
+    npm install -g pa11y-ci
   displayName: 'Install pa11y-ci'
   
