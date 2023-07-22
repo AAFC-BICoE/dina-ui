@@ -1,17 +1,14 @@
 import { Row } from "@tanstack/react-table";
 import {
   ButtonBar,
-  ColumnDefinition,
   ColumnDefinition8,
   CreateButton,
-  dateCell,
   dateCell8,
   DeleteButton,
   FieldHeader,
   FilterAttribute,
   ListPageLayout,
   QueryPage,
-  stringArrayCell,
   StringArrayCell8
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -36,82 +33,45 @@ export interface SampleListLayoutProps {
  *
  * The old version of the listing is still when searching for associated samples.
  */
-export const getColumnDefinition = () => {
-  return [
-    {
-      Cell: ({
-        original: { id, materialSampleName, dwcOtherCatalogNumbers }
-      }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-        >
-          <a>
-            {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-          </a>
-        </Link>
-      ),
-      accessor: "materialSampleName"
-    },
-    {
-      Cell: ({ original: { collection } }) =>
-        collection?.id ? (
-          <Link href={`/collection/collection/view?id=${collection?.id}`}>
-            {collection?.name}
+export const getColumnDefinition: () => ColumnDefinition8<MaterialSample>[] =
+  () => {
+    return [
+      {
+        cell: ({
+          row: {
+            original: { id, materialSampleName, dwcOtherCatalogNumbers }
+          }
+        }) => (
+          <Link
+            href={`/collection/material-sample/view?id=${id}`}
+            passHref={true}
+          >
+            <a>
+              {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
+            </a>
           </Link>
-        ) : null,
-      accessor: "collection.name"
-    },
-    stringArrayCell("dwcOtherCatalogNumbers"),
-    { accessor: "materialSampleType" },
-    "createdBy",
-    dateCell("createdOn")
-  ];
-};
-
-/**
- * This getColumnDefinition is used for the QueryTable, not the new elastic search stuff.
- *
- * The old version of the listing is still when searching for associated samples.
- */
-export function getColumnDefinition8(): ColumnDefinition8<MaterialSample>[] {
-  return [
-    {
-      cell: ({
-        row: {
-          original: { id, materialSampleName, dwcOtherCatalogNumbers }
-        }
-      }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-        >
-          <a>
-            {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-          </a>
-        </Link>
-      ),
-      accessorKey: "materialSampleName"
-    },
-    {
-      cell: ({
-        row: {
-          original: { collection }
-        }
-      }) =>
-        collection?.id ? (
-          <Link href={`/collection/collection/view?id=${collection?.id}`}>
-            {collection?.name}
-          </Link>
-        ) : null,
-      accessorKey: "collection.name"
-    },
-    StringArrayCell8("dwcOtherCatalogNumbers"),
-    { accessorKey: "materialSampleType" },
-    "createdBy",
-    dateCell8("createdOn")
-  ];
-}
+        ),
+        accessorKey: "materialSampleName"
+      },
+      {
+        cell: ({
+          row: {
+            original: { collection }
+          }
+        }) =>
+          collection?.id ? (
+            <Link href={`/collection/collection/view?id=${collection?.id}`}>
+              {collection?.name}
+            </Link>
+          ) : null,
+        accessorKey: "collection.name"
+      },
+      StringArrayCell8("dwcOtherCatalogNumbers"),
+      { accessorKey: "materialSampleType" },
+      "createdBy",
+      dateCell8("createdOn")
+    ];
+  };
 
 export function SampleListLayout({
   onSelect,
@@ -138,7 +98,7 @@ export function SampleListLayout({
 
   // The old style columns, but add the action buttons at the end.
   const columns: ColumnDefinition8<MaterialSample>[] = [
-    ...getColumnDefinition8(),
+    ...getColumnDefinition(),
     ...(onSelect
       ? [
           {

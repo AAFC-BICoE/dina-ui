@@ -16,6 +16,7 @@ export function dateCell8<TData extends KitsuResource>(
     },
     header: () => <FieldHeader name={label} />,
     isKeyword: false,
-    accessorKey: accessorKey ?? label
+    accessorKey: accessorKey ?? label,
+    id: label
   };
 }

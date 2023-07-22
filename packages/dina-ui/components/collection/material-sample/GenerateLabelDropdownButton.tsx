@@ -68,26 +68,25 @@ export function GenerateLabelDropdownButton({
       return;
     }
     setGeneratingReport(true);
-    const payloadHeaders = Object.keys(materialSample);
-    const payloadData = Object.values(materialSample).map((value) => {
-      if (value === null || value === undefined) {
-        return "";
-      }
-      const stringify =
-        typeof value !== "string" ? `"${JSON.stringify(value)}"` : value;
-      const ret = stringify.replace(/,/g, ";");
-      return ret;
-    });
 
-    const postData = {
+    const postPayload = {
       data: {
         type: "report-request",
         attributes: {
           group: groupNames?.[0],
           reportTemplateUUID: reportTemplate.value,
           payload: {
-            headers: payloadHeaders,
-            data: [payloadData]
+            elements: [
+              {
+                barcode: {
+                  id: materialSample.barcode ?? "",
+                  content: materialSample.materialSampleName ?? ""
+                },
+                data: {
+                  attributes: materialSample
+                }
+              }
+            ]
           }
         }
       }
@@ -96,7 +95,7 @@ export function GenerateLabelDropdownButton({
     try {
       const reportTemplatePostResponse = await apiClient.axios.post(
         "dina-export-api/report-request",
-        postData,
+        postPayload,
         {
           headers: {
             "Content-Type": "application/vnd.api+json"
@@ -112,9 +111,14 @@ export function GenerateLabelDropdownButton({
       link.href = url;
       const filePath = reportRequestGetResponse?.config?.url;
       const fileName = !filePath
-        ? "report.csv"
+        ? "report"
         : filePath.substring(filePath.lastIndexOf("/") + 1);
-      link?.setAttribute("download", fileName); // or any other extension
+      link?.setAttribute(
+        "download",
+        `${materialSample.materialSampleName ?? fileName}_${
+          reportTemplate.label
+        }`
+      );
       document?.body?.appendChild(link);
       link?.click();
       window?.URL?.revokeObjectURL(url);

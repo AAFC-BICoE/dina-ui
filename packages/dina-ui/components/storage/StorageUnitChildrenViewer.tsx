@@ -1,8 +1,10 @@
 import {
   ColumnDefinition,
+  ColumnDefinition8,
   FieldSet,
   MetaWithTotal,
   QueryTable,
+  QueryTable8,
   useApiClient,
   useDinaFormContext,
   useQuery,
@@ -186,21 +188,27 @@ export function StorageUnitContents({
   storageUnit,
   onEmptyMaterialSamples
 }: StorageUnitContentsProps) {
-  const materialSampleColumns: ColumnDefinition<MaterialSample>[] = [
+  const materialSampleColumns: ColumnDefinition8<MaterialSample>[] = [
     {
-      Cell: ({
-        original: { id, materialSampleName, dwcOtherCatalogNumbers }
+      cell: ({
+        row: {
+          original: { id, materialSampleName, dwcOtherCatalogNumbers }
+        }
       }) => (
         <Link href={`/collection/material-sample/view?id=${id}`}>
           {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
         </Link>
       ),
-      accessor: "materialSampleName"
+      accessorKey: "materialSampleName"
     },
     "materialSampleType",
     {
-      Cell: ({ original: { tags } }) => <>{tags?.join(", ")}</>,
-      accessor: "tags"
+      cell: ({
+        row: {
+          original: { tags }
+        }
+      }) => <>{tags?.join(", ")}</>,
+      accessorKey: "tags"
     }
   ];
 
@@ -228,7 +236,7 @@ export function StorageUnitContents({
           <DinaMessage id="materialSamples" />
         </strong>
 
-        <QueryTable
+        <QueryTable8
           columns={materialSampleColumns}
           path="collection-api/material-sample"
           filter={{
