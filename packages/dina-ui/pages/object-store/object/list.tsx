@@ -6,7 +6,7 @@ import {
   filterBy,
   QueryPage,
   SplitPagePanel,
-  StringArrayCell8
+  stringArrayCell8
 } from "common-ui";
 import Link from "next/link";
 import { TableColumn8 } from "packages/common-ui/lib/list-page/types";
@@ -108,7 +108,7 @@ export default function MetadataListPage() {
       isKeyword: true,
       enableSorting: false
     },
-    StringArrayCell8("acTags", "data.attributes.acTags"),
+    stringArrayCell8("acTags", "data.attributes.acTags"),
     {
       id: "action",
       cell: ({ row: { original } }) => (

@@ -106,7 +106,7 @@ export * from "./util/useMaterialSampleNameComparator";
 export * from "./table8/ReactTable8";
 export * from "./table8/Pagination";
 export * from "./table8/RowComponents";
-export * from "./table8/StringArrayCell8";
+export * from "./table8/stringArrayCell8";
 export * from "./table8/DateCell8";
 export * from "./table8/BooleanCell8";
 export * from "./list-page/QueryPage";
