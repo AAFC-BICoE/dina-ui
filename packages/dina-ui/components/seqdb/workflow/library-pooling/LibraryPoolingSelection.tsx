@@ -1,5 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { ColumnFiltersState } from "@tanstack/react-table";
+import { debounce } from "lodash";
 import {
   ColumnDefinition8,
   DinaForm,
@@ -66,11 +67,19 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
 
   const [nameFilter, setNameFilter] = useState<string>("");
 
-  function onNameFilterInputChange(filters: ColumnFiltersState) {
-    setNameFilter(
-      "" + (filters.find((filter) => filter.id === "name")?.value ?? "")
+  // function onNameFilterInputChange(filters: ColumnFiltersState) {
+  //   setNameFilter(
+  //     "" + (filters.find((filter) => filter.id === "name")?.value ?? "")
+  //   );
+  // }
+  const onNameFilterInputChange: (filters: ColumnFiltersState) => void =
+    debounce(
+      (filters) =>
+        setNameFilter(
+          "" + (filters.find((filter) => filter.id === "name")?.value ?? "")
+        ),
+      1000
     );
-  }
 
   const batchFilter: FilterParam = {
     rsql: `name=='*${nameFilter}*' ${hideUsedItems ? "and dateUsed==null" : ""}`

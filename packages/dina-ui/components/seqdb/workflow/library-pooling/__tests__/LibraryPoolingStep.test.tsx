@@ -134,9 +134,10 @@ function getWrapper() {
 describe("LibraryPoolingStep component", () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    jest.restoreAllMocks();
 
     /** Mock Kitsu "get" method. */
-    mockGet.mockImplementation(async path => {
+    mockGet.mockImplementation(async (path) => {
       if (path === "seqdb-api/library-prep-batch") {
         return { data: TEST_LIBRARY_PREP_BATCHS };
       } else if (path === "seqdb-api/library-pool") {
@@ -150,8 +151,8 @@ describe("LibraryPoolingStep component", () => {
       }
     });
 
-    mockSave.mockImplementation(async ops => {
-      return ops.map(op => op.resource);
+    mockSave.mockImplementation(async (ops) => {
+      return ops.map((op) => op.resource);
     });
   });
 
@@ -161,15 +162,11 @@ describe("LibraryPoolingStep component", () => {
     // Await initial queries.
     await new Promise(setImmediate);
     wrapper.update();
-
     // The library prep batch table should render.
-    expect(
-      wrapper
-        .find(
-          ".library-pool-content-selection-table .rt-td[children='test batch 2']"
-        )
-        .exists()
-    ).toEqual(true);
+    const tds = wrapper
+      .find(".library-pool-content-selection-table tbody td")
+      .map((td) => td.text());
+    expect(tds.indexOf("test batch 2") > -1).toEqual(true);
 
     // Switch to the library pools tab:
     wrapper
@@ -181,21 +178,16 @@ describe("LibraryPoolingStep component", () => {
     wrapper.update();
 
     // The library pool table should render.
-    expect(
-      wrapper
-        .find(
-          ".library-pool-content-selection-table .rt-td[children='test pool 2']"
-        )
-        .exists()
-    ).toEqual(true);
+    const tds2 = wrapper
+      .find(".library-pool-content-selection-table tbody td")
+      .map((td) => td.text());
+    expect(tds2.indexOf("test pool 2") > -1).toEqual(true);
 
     // The library pool content table should render.
-    expect(
-      wrapper
-        .find(".library-pool-content-table .rt-td")
-        .findWhere(node => node.text().includes("test pool 1"))
-        .exists()
-    ).toEqual(true);
+    const tds3 = wrapper
+      .find(".library-pool-content-table tbody td")
+      .map((td) => td.text());
+    expect(tds3.indexOf("test pool 1") > -1).toEqual(true);
   });
 
   it("Lets you select library prep batchs as pooled libraries.", async () => {
@@ -208,14 +200,14 @@ describe("LibraryPoolingStep component", () => {
     // Select batchs 1 to 3.
     wrapper
       .find(
-        ".library-pool-content-selection-table .rt-tbody input[type='checkbox']"
+        ".library-pool-content-selection-table tbody input[type='checkbox']"
       )
       .at(0)
       .prop<any>("onClick")({ target: { checked: true } });
     wrapper.update();
     wrapper
       .find(
-        ".library-pool-content-selection-table .rt-tbody input[type='checkbox']"
+        ".library-pool-content-selection-table tbody input[type='checkbox']"
       )
       .at(2)
       .prop<any>("onClick")({
@@ -295,12 +287,12 @@ describe("LibraryPoolingStep component", () => {
 
     // Select contents 1 to 3.
     wrapper
-      .find(".library-pool-content-table .rt-tbody input[type='checkbox']")
+      .find(".library-pool-content-table tbody input[type='checkbox']")
       .at(0)
       .prop<any>("onClick")({ target: { checked: true } });
     wrapper.update();
     wrapper
-      .find(".library-pool-content-table .rt-tbody input[type='checkbox']")
+      .find(".library-pool-content-table tbody input[type='checkbox']")
       .at(2)
       .prop<any>("onClick")({
       shiftKey: true,
@@ -348,7 +340,7 @@ describe("LibraryPoolingStep component", () => {
 
   it("Renders the library pool details form when there is no existing library pool for this workflow", async () => {
     // Don't return the library pool step resource:
-    mockGet.mockImplementation(async model => {
+    mockGet.mockImplementation(async (model) => {
       if (model === "seqdb-api/library-prep-batch") {
         return { data: TEST_LIBRARY_PREP_BATCHS };
       } else if (model === "seqdb-api/library-pool") {
@@ -375,7 +367,7 @@ describe("LibraryPoolingStep component", () => {
       });
 
     // Return a library pool step resource:
-    mockGet.mockImplementation(async model => {
+    mockGet.mockImplementation(async (model) => {
       if (model === "seqdb-api/library-prep-batch") {
         return { data: TEST_LIBRARY_PREP_BATCHS };
       } else if (model === "seqdb-api/library-pool") {
@@ -541,7 +533,7 @@ describe("LibraryPoolingStep component", () => {
     // Un-debounce the header filter's onChange function.
     jest
       .spyOn(require("lodash"), "debounce")
-      .mockImplementation(fn => fn as any);
+      .mockImplementation((fn) => fn as any);
 
     const wrapper = getWrapper();
 
@@ -551,10 +543,10 @@ describe("LibraryPoolingStep component", () => {
 
     wrapper
       .find(
-        ".library-pool-content-selection-table .rt-th input[placeholder='Search...']"
+        ".library-pool-content-selection-table th input[placeholder='Search...']"
       )
       .prop<any>("onChange")({
-      target: { name: "header-input", value: "test search name" }
+      target: { value: "test search name" }
     });
 
     // Await new queries:

@@ -1,27 +1,36 @@
-import { InputHTMLAttributes, useEffect, useState } from "react";
+import { debounce } from "lodash";
+import { InputHTMLAttributes, useEffect, useRef, useState } from "react";
 
 export function DebouncedInput({
   value: initialValue,
   onChange,
-  debounce = 500,
+  debounceTime = 500,
   ...props
 }: {
   value: string | number;
   onChange: (value: string | number) => void;
-  debounce?: number;
+  debounceTime?: number;
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "onChange">) {
   const [value, setValue] = useState(initialValue);
+
+  const debouncedOnChange = useRef(
+    debounce((valueParam) => {
+      onChange(valueParam);
+    }, debounceTime)
+  ).current;
+
+  useEffect(() => {
+    return () => {
+      debouncedOnChange.cancel();
+    };
+  }, [debouncedOnChange]);
 
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      onChange(value);
-    }, debounce);
-
-    return () => clearTimeout(timeout);
+    debouncedOnChange(value);
   }, [value]);
 
   return (
