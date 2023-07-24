@@ -8,6 +8,7 @@ import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { ApiClientContext } from "./ApiClientContext";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 import { ResponseType } from "axios";
+import Link from "next/link";
 
 /** Attributes that compose a JsonApi query. */
 export interface JsonApiQuerySpec extends GetParams {
@@ -145,8 +146,15 @@ export function withResponse<
       error instanceof Error
         ? `${error.name}: ${error.message}`
         : error?.errors?.map((e) => e.detail).join("\n") ?? String(error);
-
-    return <div className="alert alert-danger">{message}</div>;
+    const errorDetails = (error as any)?.cause?.data?.errors?.[0];
+    return (
+      <div className="alert alert-danger">
+        {`${message}. `}
+        {errorDetails?.links?.about && (
+          <Link href={errorDetails?.links?.about}>Audit Snapshot Link</Link>
+        )}
+      </div>
+    );
   }
   if (response) {
     return responseRenderer(response);

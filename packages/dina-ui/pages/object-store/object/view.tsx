@@ -6,7 +6,8 @@ import {
   generateUUIDTree,
   BackButton,
   CustomQueryPageView,
-  UploadDerivativeButton
+  UploadDerivativeButton,
+  withResponse
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -40,118 +41,114 @@ export default function MetadataViewPage({
   const router = useRouter();
   const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
   const uuid = String(router.query.id);
-
-  const { loading, response } = useMetadataViewQuery(uuid);
-
-  const preview = false;
-
-  if (loading) {
+  const query = useMetadataViewQuery(uuid);
+  if (query?.loading) {
     return <LoadingSpinner loading={true} />;
   }
 
-  if (response) {
-    const metadata = response.data;
-    const customViewQuery = metadata?.id
-      ? generateUUIDTree(metadata?.id, "data.relationships.attachment.data.id")
-      : undefined;
+  const metadata = query?.response?.data;
+  const customViewQuery = metadata?.id
+    ? generateUUIDTree(metadata?.id, "data.relationships.attachment.data.id")
+    : undefined;
 
-    // Check the request to see if a permission provider is present.
-    const permissionsProvided = metadata.meta?.permissionsProvider;
+  // Check the request to see if a permission provider is present.
+  const permissionsProvided = metadata?.meta?.permissionsProvider;
 
-    const canEdit = permissionsProvided
-      ? metadata.meta?.permissions?.includes("update") ?? false
-      : true;
-    const canDelete = permissionsProvided
-      ? metadata.meta?.permissions?.includes("delete") ?? false
-      : true;
+  const canEdit = permissionsProvided
+    ? metadata?.meta?.permissions?.includes("update") ?? false
+    : true;
+  const canDelete = permissionsProvided
+    ? metadata?.meta?.permissions?.includes("delete") ?? false
+    : true;
 
-    const buttonBar = (
-      <ButtonBar>
-        <BackButton
-          byPassView={true}
-          className="me-auto"
-          entityId={uuid}
-          entityLink="/object-store/object"
-          reloadLastSearch={reloadLastSearch ?? true}
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton
+        byPassView={true}
+        className="me-auto"
+        entityId={uuid}
+        entityLink="/object-store/object"
+        reloadLastSearch={reloadLastSearch ?? true}
+      />
+      {canEdit && (
+        <>
+          <Link href={`/object-store/metadata/edit?id=${uuid}`}>
+            <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
+              <DinaMessage id="editButtonText" />
+            </a>
+          </Link>
+          <UploadDerivativeButton acDerivedFrom={uuid} />
+        </>
+      )}
+      <Link href={`/object-store/metadata/revisions?id=${uuid}`}>
+        <a className="btn btn-info">
+          <DinaMessage id="revisionsButtonText" />
+        </a>
+      </Link>
+      {canDelete && (
+        <DeleteButton
+          className="ms-5"
+          id={uuid}
+          options={{ apiBaseUrl: "/objectstore-api" }}
+          postDeleteRedirect="/object-store/object/list?reloadLastSearch"
+          type="metadata"
         />
-        {canEdit && (
-          <>
-            <Link href={`/object-store/metadata/edit?id=${uuid}`}>
-              <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
-                <DinaMessage id="editButtonText" />
-              </a>
-            </Link>
-            <UploadDerivativeButton acDerivedFrom={uuid} />
-          </>
-        )}
-        <Link href={`/object-store/metadata/revisions?id=${uuid}`}>
-          <a className="btn btn-info">
-            <DinaMessage id="revisionsButtonText" />
-          </a>
-        </Link>
-        {canDelete && (
-          <DeleteButton
-            className="ms-5"
-            id={uuid}
-            options={{ apiBaseUrl: "/objectstore-api" }}
-            postDeleteRedirect="/object-store/object/list?reloadLastSearch"
-            type="metadata"
-          />
-        )}
-      </ButtonBar>
-    );
+      )}
+    </ButtonBar>
+  );
 
-    return (
-      <div>
-        <Head title={metadata.originalFilename} />
-        <Nav />
-        <style>{OBJECT_DETAILS_PAGE_CSS}</style>
-        <main className="container-fluid">
-          {buttonBar}
-          <div className="row">
-            <div className="col-md-4">
-              <MetadataFileView metadata={metadata} preview={preview} />
-            </div>
-            <div className="col-md-8">
-              <div className="container">
-                <DinaForm initialValues={metadata} readOnly={true}>
-                  <NotPubliclyReleasableWarning />
-                  <TagsAndRestrictionsSection
-                    tagsFieldName="acTags"
-                    groupSelectorName="bucket"
-                  />
-                  <MetadataDetails metadata={metadata} />
-                  <ExifView objectUpload={metadata.objectUpload} />
-                  {customViewQuery && (
-                    <CustomQueryPageView
-                      titleKey="attachedMaterialSamples"
-                      columns={ELASTIC_SEARCH_COLUMN}
-                      indexName={"dina_material_sample_index"}
-                      viewMode={customViewQuery ? true : false}
-                      customViewQuery={customViewQuery ?? undefined}
-                      customViewFields={
-                        customViewQuery
-                          ? [
-                              {
-                                fieldName:
-                                  "data.relationships.attachment.data.id",
-                                type: "uuid"
-                              }
-                            ]
-                          : undefined
-                      }
+  return (
+    <div>
+      <Head title={metadata?.originalFilename} />
+      <Nav />
+      <style>{OBJECT_DETAILS_PAGE_CSS}</style>
+      <main className="container-fluid">
+        {buttonBar}
+        {withResponse(query, (response) => {
+          return (
+            <div className="row">
+              <div className="col-md-4">
+                <MetadataFileView metadata={response.data} preview={false} />
+              </div>
+              <div className="col-md-8">
+                <div className="container">
+                  <DinaForm initialValues={response.data} readOnly={true}>
+                    <NotPubliclyReleasableWarning />
+                    <TagsAndRestrictionsSection
+                      tagsFieldName="acTags"
+                      groupSelectorName="bucket"
                     />
-                  )}
-                </DinaForm>
+                    <MetadataDetails metadata={response.data} />
+                    <ExifView objectUpload={response.data.objectUpload} />
+                    {customViewQuery && (
+                      <CustomQueryPageView
+                        titleKey="attachedMaterialSamples"
+                        columns={ELASTIC_SEARCH_COLUMN}
+                        indexName={"dina_material_sample_index"}
+                        viewMode={customViewQuery ? true : false}
+                        customViewQuery={customViewQuery ?? undefined}
+                        customViewFields={
+                          customViewQuery
+                            ? [
+                                {
+                                  fieldName:
+                                    "data.relationships.attachment.data.id",
+                                  type: "uuid"
+                                }
+                              ]
+                            : undefined
+                        }
+                      />
+                    )}
+                  </DinaForm>
+                </div>
               </div>
             </div>
-          </div>
-          {buttonBar}
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  return null;
+          );
+        })}
+        {buttonBar}
+      </main>
+      <Footer />
+    </div>
+  );
 }
