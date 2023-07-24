@@ -13,7 +13,7 @@ describe("PcrReactionTable component", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
         <PcrReactionTable
-          materialSamples={MATERIAL_SAMPLES}
+          materialSamples={MATERIAL_SAMPLES as any}
           pcrBatchItems={PCR_BATCH_ITEMS}
         />
       </DinaForm>
