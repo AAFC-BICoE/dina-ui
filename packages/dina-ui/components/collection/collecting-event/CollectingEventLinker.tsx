@@ -1,10 +1,10 @@
 import {
-  ColumnDefinition,
+  ColumnDefinition8,
   FilterForm,
   FormikButton,
-  QueryTable,
+  QueryTable8,
   rsql,
-  stringArrayCell
+  stringArrayCell8
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { FilterParam } from "kitsu";
@@ -33,20 +33,24 @@ export interface CollectingEventLinkerProps {
 export function CollectingEventLinker({
   onCollectingEventSelect
 }: CollectingEventLinkerProps) {
-  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
+  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition8<CollectingEvent>[] = [
     "dwcFieldNumber",
-    stringArrayCell("otherRecordNumbers"),
+    stringArrayCell8("otherRecordNumbers"),
     "createdBy",
     {
-      Cell: ({ original: { dwcVerbatimLocality } }) => (
-        <>{dwcVerbatimLocality}</>
-      ),
-      Header: <DinaMessage id="locationLabel" />,
-      sortable: false
+      id: "locationLabel",
+      cell: ({
+        row: {
+          original: { dwcVerbatimLocality }
+        }
+      }) => <>{dwcVerbatimLocality}</>,
+      header: () => <DinaMessage id="locationLabel" />,
+      enableSorting: false
     },
     "startEventDateTime",
     {
-      Cell: ({ original: collectingEvent }) => (
+      id: "action",
+      cell: ({ row: { original: collectingEvent } }) => (
         <div className="d-flex">
           <Link
             href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
@@ -66,8 +70,8 @@ export function CollectingEventLinker({
           </FormikButton>
         </div>
       ),
-      Header: "",
-      sortable: false
+      header: () => null,
+      enableSorting: false
     }
   ];
 
@@ -110,7 +114,7 @@ export function CollectingEventLinker({
         </FilterForm>
       </div>
       <div className="mb-3" style={{ maxHeight: "50rem", overflowY: "scroll" }}>
-        <QueryTable
+        <QueryTable8
           path="collection-api/collecting-event"
           columns={COLLECTING_EVENT_TABLE_COLUMNS}
           filter={filterParam}

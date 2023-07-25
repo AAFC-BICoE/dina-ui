@@ -81,8 +81,8 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the partialMatch operator. 1`] = `
 Object {
-  "term": Object {
-    "data.attributes.extensionValues.extension.field.keyword": "test123",
+  "match": Object {
+    "data.attributes.extensionValues.extension.field": "test123",
   },
 }
 `;
@@ -274,8 +274,8 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.attributes.extensionValues.extension.field.keyword": "test123",
+            "match": Object {
+              "included.attributes.extensionValues.extension.field": "test123",
             },
           },
           Object {
