@@ -14,7 +14,7 @@ import { TableColumn8 } from "../list-page/types";
  * @param accessorKey Accessor for elastic search.
  * @returns The cell to be displayed.
  */
-export function booleanCell8<TData extends KitsuResource>(
+export function booleanCell<TData extends KitsuResource>(
   label: string,
   accessorKey?: string
 ): TableColumn8<TData> {

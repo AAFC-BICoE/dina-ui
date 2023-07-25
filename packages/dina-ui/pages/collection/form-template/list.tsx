@@ -4,7 +4,7 @@ import {
   useAccount,
   Tooltip,
   ColumnDefinition8,
-  booleanCell8,
+  booleanCell,
   dateCell8,
   FieldHeader
 } from "common-ui";
@@ -32,7 +32,7 @@ export default function MaterialSampleFormTemplateListPage() {
       header: () => <FieldHeader name="name" />
     },
     "group",
-    booleanCell8("restrictToCreatedBy"),
+    booleanCell("restrictToCreatedBy"),
     "createdBy",
     dateCell8("createdOn"),
     {

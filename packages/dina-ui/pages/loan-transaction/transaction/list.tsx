@@ -3,7 +3,7 @@ import {
   CreateButton,
   FieldHeader,
   QueryPage,
-  booleanCell8,
+  booleanCell,
   dateCell8,
   stringArrayCell8
 } from "common-ui";
@@ -37,7 +37,7 @@ export const TRANSACTION_TABLE_COLUMNS: TableColumn8<Transaction>[] = [
     isKeyword: true
   },
   stringArrayCell8("otherIdentifiers", "data.attributes.otherIdentifiers"),
-  booleanCell8("materialToBeReturned", "data.attributes.materialToBeReturned"),
+  booleanCell("materialToBeReturned", "data.attributes.materialToBeReturned"),
   {
     header: () => <FieldHeader name="purpose" />,
     accessorKey: "data.attributes.purpose",
