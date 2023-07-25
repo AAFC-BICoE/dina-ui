@@ -3,7 +3,7 @@ import {
   ColumnDefinition8,
   CreateButton,
   ListPageLayout,
-  dateCell8
+  dateCell
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
@@ -36,7 +36,7 @@ const AGENT_TABLE_COLUMNS: ColumnDefinition8<Person>[] = [
     accessorKey: "aliases"
   },
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function AgentListPage() {

@@ -1,6 +1,6 @@
 import {
   ColumnDefinition8,
-  dateCell8,
+  dateCell,
   DinaForm,
   FormikButton,
   ListPageLayout,
@@ -78,7 +78,7 @@ export function ExistingObjectsAttacher({
       header: () => <DinaMessage id="field_originalFilename" />
     },
     "acCaption",
-    dateCell8("xmpMetadataDate"),
+    dateCell("xmpMetadataDate"),
     {
       cell: ({
         row: {

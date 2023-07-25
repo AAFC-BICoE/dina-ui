@@ -2,7 +2,7 @@ import {
   ColumnDefinition8,
   CreateButton,
   ListPageLayout,
-  dateCell8
+  dateCell
 } from "common-ui";
 import Link from "next/link";
 import { GroupSelectField, StorageUnitBreadCrumb } from "../../../components";
@@ -39,7 +39,7 @@ const STORAGE_UNIT_TABLE_COLUMNS: ColumnDefinition8<StorageUnit>[] = [
   },
   "group",
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function storageUnitListPage() {

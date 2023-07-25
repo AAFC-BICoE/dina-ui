@@ -1,6 +1,6 @@
 import {
   ColumnDefinition8,
-  dateCell8,
+  dateCell,
   DinaForm,
   FieldHeader,
   FormikButton,
@@ -90,7 +90,7 @@ export function ExistingAttachmentsTable({
     },
     {
       id: "metataDate",
-      ...dateCell8("metadata.xmpMetadataDate"),
+      ...dateCell("metadata.xmpMetadataDate"),
       header: () => <FieldHeader name="xmpMetadataDate" />
     },
     {

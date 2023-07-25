@@ -2,7 +2,7 @@ import {
   ButtonBar,
   ColumnDefinition8,
   CreateButton,
-  dateCell8,
+  dateCell,
   ListPageLayout,
   stringArrayCell8
 } from "common-ui";
@@ -44,7 +44,7 @@ export default function CollectingEventListPage() {
     "startEventDateTime",
     "endEventDateTime",
     "verbatimEventDateTime",
-    dateCell8("createdOn")
+    dateCell("createdOn")
   ];
 
   return (

@@ -3,7 +3,7 @@ import {
   ButtonBar,
   ColumnDefinition8,
   CreateButton,
-  dateCell8,
+  dateCell,
   DeleteButton,
   FieldHeader,
   FilterAttribute,
@@ -69,7 +69,7 @@ export const getColumnDefinition: () => ColumnDefinition8<MaterialSample>[] =
       stringArrayCell8("dwcOtherCatalogNumbers"),
       { accessorKey: "materialSampleType" },
       "createdBy",
-      dateCell8("createdOn")
+      dateCell("createdOn")
     ];
   };
 
@@ -263,7 +263,7 @@ export default function MaterialSampleListPage() {
     },
 
     // Created On
-    dateCell8("createdOn", "data.attributes.createdOn"),
+    dateCell("createdOn", "data.attributes.createdOn"),
 
     // Material Sample State
     {

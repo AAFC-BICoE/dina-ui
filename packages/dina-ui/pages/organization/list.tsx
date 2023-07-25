@@ -3,7 +3,7 @@ import {
   ColumnDefinition8,
   CreateButton,
   ListPageLayout,
-  dateCell8,
+  dateCell,
   stringArrayCell8
 } from "common-ui";
 import Link from "next/link";
@@ -36,7 +36,7 @@ const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition8<Organization>[] = [
   },
   stringArrayCell8("aliases"),
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function OrganizationListPage() {

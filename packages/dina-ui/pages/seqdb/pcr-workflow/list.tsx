@@ -1,7 +1,7 @@
 import {
   ButtonBar,
   ColumnDefinition8,
-  dateCell8,
+  dateCell,
   FilterAttribute,
   ListPageLayout
 } from "common-ui";
@@ -28,7 +28,7 @@ const TABLE_COLUMNS: ColumnDefinition8<PcrBatch>[] = [
   "primerForward.name",
   "primerReverse.name",
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [

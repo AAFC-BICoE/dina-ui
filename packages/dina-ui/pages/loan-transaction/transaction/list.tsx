@@ -4,7 +4,7 @@ import {
   FieldHeader,
   QueryPage,
   booleanCell,
-  dateCell8,
+  dateCell,
   stringArrayCell8
 } from "common-ui";
 import { TableColumn8 } from "common-ui/lib/list-page/types";
@@ -48,9 +48,9 @@ export const TRANSACTION_TABLE_COLUMNS: TableColumn8<Transaction>[] = [
     accessorKey: "data.attributes.status",
     isKeyword: true
   },
-  dateCell8("openedDate", "data.attributes.openedDate"),
-  dateCell8("closedDate", "data.attributes.closedDate"),
-  dateCell8("dueDate", "data.attributes.dueDate")
+  dateCell("openedDate", "data.attributes.openedDate"),
+  dateCell("closedDate", "data.attributes.closedDate"),
+  dateCell("dueDate", "data.attributes.dueDate")
 ];
 
 export default function TransactionListPage() {

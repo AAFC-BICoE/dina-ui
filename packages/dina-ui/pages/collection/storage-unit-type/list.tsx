@@ -1,7 +1,7 @@
 import {
   ColumnDefinition8,
   CreateButton,
-  dateCell8,
+  dateCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
@@ -33,7 +33,7 @@ const STORAGE_UNIT_TYPE_TABLE_COLUMNS: ColumnDefinition8<StorageUnitType>[] = [
     accessorKey: "isInseperable"
   },
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function StorageUnitTypeListPage() {

@@ -2,7 +2,7 @@ import {
   ButtonBar,
   ColumnDefinition8,
   CreateButton,
-  dateCell8,
+  dateCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
@@ -23,7 +23,7 @@ const TABLE_COLUMNS: ColumnDefinition8<MolecularSample>[] = [
   "sampleType",
   "group",
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function MolecularSampleListPage() {

@@ -1,7 +1,7 @@
 import {
   ColumnDefinition8,
   CreateButton,
-  dateCell8,
+  dateCell,
   FieldHeader,
   FilterAttribute,
   ListPageLayout
@@ -25,7 +25,7 @@ const COLLECTION_TABLE_COLUMNS: ColumnDefinition8<Collection>[] = [
   },
   "code",
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 const COLLECTION_FILTER_ATTRIBUTES: FilterAttribute[] = [

@@ -1,6 +1,6 @@
 import { TableColumn8 } from "common-ui/lib/list-page/types";
 import {
-  dateCell8,
+  dateCell,
   DeleteButton,
   EditButton,
   FieldHeader,
@@ -138,7 +138,7 @@ export function useMaterialSampleRelationshipColumns() {
       header: () => <FieldHeader name="materialSampleType" />,
       isKeyword: true
     },
-    dateCell8("createdOn", "data.attributes.createdOn"),
+    dateCell("createdOn", "data.attributes.createdOn"),
     stringArrayCell8("tags", "data.attributes.tags"),
     {
       id: "action",

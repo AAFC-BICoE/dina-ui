@@ -2,7 +2,7 @@ import {
   ColumnDefinition8,
   CreateButton,
   ListPageLayout,
-  dateCell8
+  dateCell
 } from "common-ui";
 import Link from "next/link";
 import { GroupSelectField } from "../../../components";
@@ -26,7 +26,7 @@ const PREPARATION_METHOD_TABLE_COLUMNS: ColumnDefinition8<PreparationMethod>[] =
     },
     "group",
     "createdBy",
-    dateCell8("createdOn")
+    dateCell("createdOn")
   ];
 
 export default function preparationMethodListPage() {

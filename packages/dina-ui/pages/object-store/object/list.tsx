@@ -1,6 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
-  dateCell8,
+  dateCell,
   FieldHeader,
   FilterAttribute,
   filterBy,
@@ -91,8 +91,8 @@ export default function MetadataListPage() {
       accessorKey: "data.attributes.acCaption",
       isKeyword: true
     },
-    dateCell8("acDigitizationDate", "data.attributes.acDigitizationDate"),
-    dateCell8("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
+    dateCell("acDigitizationDate", "data.attributes.acDigitizationDate"),
+    dateCell("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
     {
       cell: ({ row: { original } }) => (
         <>

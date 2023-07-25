@@ -1,7 +1,7 @@
 import {
   ButtonBar,
   ColumnDefinition8,
-  dateCell8,
+  dateCell,
   DateView,
   FieldHeader,
   KeyValueTable,
@@ -99,7 +99,7 @@ export function RevisionsPageLayout({
           }
         ]),
     "version",
-    dateCell8("commitDateTime"),
+    dateCell("commitDateTime"),
     "snapshotType",
     {
       cell: ({ row: { original } }) => (

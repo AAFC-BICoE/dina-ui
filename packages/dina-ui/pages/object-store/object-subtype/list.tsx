@@ -2,7 +2,7 @@ import {
   ButtonBar,
   ColumnDefinition8,
   CreateButton,
-  dateCell8,
+  dateCell,
   FieldHeader,
   QueryTable8,
   QueryTable8Props
@@ -28,7 +28,7 @@ const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition8<ObjectSubtype>[] = [
   },
   "dcType",
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 const queryTableProps: QueryTable8Props<ObjectSubtype> = {

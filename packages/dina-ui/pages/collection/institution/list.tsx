@@ -2,7 +2,7 @@ import {
   ButtonBar,
   ColumnDefinition8,
   CreateButton,
-  dateCell8,
+  dateCell,
   FilterAttribute,
   ListPageLayout
 } from "common-ui";
@@ -23,7 +23,7 @@ const TABLE_COLUMNS: ColumnDefinition8<Institution>[] = [
     accessorKey: "name"
   },
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [

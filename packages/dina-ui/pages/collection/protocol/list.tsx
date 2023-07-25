@@ -2,7 +2,7 @@ import {
   ButtonBar,
   ColumnDefinition8,
   CreateButton,
-  dateCell8,
+  dateCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
@@ -41,7 +41,7 @@ const PROTOCOL_TABLE_COLUMNS: ColumnDefinition8<Protocol>[] = [
   },
   "group",
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function protocolListPage() {

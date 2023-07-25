@@ -5,7 +5,7 @@ import {
   Tooltip,
   ColumnDefinition8,
   booleanCell,
-  dateCell8,
+  dateCell,
   FieldHeader
 } from "common-ui";
 import Link from "next/link";
@@ -34,7 +34,7 @@ export default function MaterialSampleFormTemplateListPage() {
     "group",
     booleanCell("restrictToCreatedBy"),
     "createdBy",
-    dateCell8("createdOn"),
+    dateCell("createdOn"),
     {
       cell: ({
         row: {
