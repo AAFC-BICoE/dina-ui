@@ -1,4 +1,3 @@
-import ReactTable from "react-table";
 import { QueryTable, ReactTable8 } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ListPageLayout } from "../ListPageLayout";
