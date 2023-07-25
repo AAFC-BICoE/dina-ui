@@ -250,7 +250,7 @@ function OrganismsTable({
         const cellText = verbatimScientificName || scientificName;
         return <span className="organism-determination-cell">{cellText}</span>;
       },
-      header: () => <FieldHeader name="determinationPrimary" />
+      header: () => <DinaMessage id="determinationPrimary" />
     },
     ...["lifeStage", "sex"].map<ColumnDef<Organism>>((accessorKey) => ({
       accessorKey,
@@ -294,7 +294,7 @@ function OrganismsTable({
       readOnly: true
     };
     tableColumns.splice(1, 0, {
-      header: () => <FieldHeader name="isTargetHeader" />,
+      header: () => <DinaMessage id="isTargetHeader" />,
       id: "isTarget",
       cell: ({ row: { original: o } }) => {
         const isTarget: boolean = o?.isTarget ?? false;

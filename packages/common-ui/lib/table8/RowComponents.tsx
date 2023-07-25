@@ -52,7 +52,7 @@ export function DraggableRow<TData>({
       isDragging: monitor.isDragging()
     }),
     item: { row, type: ITEM_DRAG_KEY },
-    canDrag: () => !row.getIsExpanded()
+    canDrag: () => true
   });
 
   return (
