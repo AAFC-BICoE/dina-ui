@@ -1,9 +1,10 @@
 import {
-  ColumnDefinition,
+  ColumnDefinition8,
   DinaForm,
+  FieldHeader,
   FilterForm,
   FormikButton,
-  QueryTable,
+  QueryTable8,
   rsql,
   useGroupedCheckBoxes
 } from "common-ui";
@@ -46,16 +47,19 @@ export function SampleSelection(props: StepRendererProps) {
 
   const SAMPLE_FILTER_ATTRIBUTES = ["name"];
 
-  const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
+  const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition8<any>[] = [
     {
-      Cell: ({ original: { id, name } }) => (
-        <Link href={`/seqdb/molecular-sample/view?id=${id}`}>{name}</Link>
-      ),
-      accessor: "name"
+      cell: ({
+        row: {
+          original: { id, name }
+        }
+      }) => <Link href={`/seqdb/molecular-sample/view?id=${id}`}>{name}</Link>,
+      accessorKey: "name"
     },
     "version",
     {
-      Cell: ({ original: molecularSample }) => (
+      id: "select",
+      cell: ({ row: { original: molecularSample } }) => (
         <div className="row" key={molecularSample.id}>
           <FormikButton
             className="btn btn-primary btn-sm col-6 single-select-button"
@@ -74,36 +78,37 @@ export function SampleSelection(props: StepRendererProps) {
           </div>
         </div>
       ),
-      Header: SampleSelectCheckBoxHeader,
-      sortable: false
+      header: () => <SampleSelectCheckBoxHeader />,
+      enableSorting: false
     }
   ];
 
-  const SELECTED_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
+  const SELECTED_SAMPLE_COLUMNS: ColumnDefinition8<StepResource>[] = [
     {
-      Cell: ({ original: row }) => (
+      cell: ({ row: { original: row } }) => (
         <Link
           href={`/seqdb/molecular-sample/view?id=${row?.molecularSample?.id}`}
         >
           {row?.molecularSample?.name}
         </Link>
       ),
-      accessor: "molecularSample.name",
-      Header: "Name"
+      accessorKey: "molecularSample.name",
+      header: () => <FieldHeader name="Name" />
     },
     {
-      Header: "Version",
-      accessor: "molecularSample.version"
+      header: () => <FieldHeader name="Version" />,
+      accessorKey: "molecularSample.version"
     },
     {
-      Cell: ({ original: sr }) => (
-        <div className="row" key={sr.id}>
+      id: "select",
+      cell: ({ row: { original } }) => (
+        <div className="row" key={original.id}>
           <FormikButton
             className="btn btn-dark btn-sm col-6 single-deselect-button"
             onClick={async (_, formik) => {
-              await deleteStepResources([sr]);
+              await deleteStepResources([original as any]);
               formik.setFieldValue(
-                `stepResourceIdsToDelete[${sr.id}]`,
+                `stepResourceIdsToDelete[${original.id}]`,
                 undefined
               );
             }}
@@ -111,12 +116,12 @@ export function SampleSelection(props: StepRendererProps) {
             <SeqdbMessage id="deselectButtonText" />
           </FormikButton>
           <div className="col-6">
-            <SampleDeselectCheckBox resource={sr} />
+            <SampleDeselectCheckBox resource={original} />
           </div>
         </div>
       ),
-      Header: SampleDeselectCheckBoxHeader,
-      sortable: false
+      header: () => <SampleDeselectCheckBoxHeader />,
+      enableSorting: false
     }
   ];
 
@@ -157,11 +162,11 @@ export function SampleSelection(props: StepRendererProps) {
               <strong>
                 <SeqdbMessage id="availableSamplesTitle" />
               </strong>
-              <QueryTable
+              <QueryTable8
                 columns={SELECTABLE_SAMPLE_COLUMNS}
                 defaultPageSize={100}
                 filter={filter}
-                onSuccess={response => setAvailableSamples(response.data)}
+                onSuccess={(response) => setAvailableSamples(response.data)}
                 path="seqdb-api/molecular-sample"
               />
             </div>
@@ -189,7 +194,7 @@ export function SampleSelection(props: StepRendererProps) {
               <strong>
                 <SeqdbMessage id="selectedSamplesTitle" />
               </strong>
-              <QueryTable<StepResource>
+              <QueryTable8<StepResource>
                 columns={SELECTED_SAMPLE_COLUMNS}
                 defaultPageSize={100}
                 deps={[lastSave]}
@@ -198,7 +203,7 @@ export function SampleSelection(props: StepRendererProps) {
                   "chainStepTemplate.uuid": step.id
                 }}
                 include="molecularSample"
-                onSuccess={res => setStepResources(res.data)}
+                onSuccess={(res) => setStepResources(res.data)}
                 path="seqdb-api/step-resource"
               />
             </div>

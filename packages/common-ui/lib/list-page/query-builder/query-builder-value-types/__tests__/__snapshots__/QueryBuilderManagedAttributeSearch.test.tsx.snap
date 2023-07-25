@@ -1592,8 +1592,8 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator partialMatch 1`] = `
 Object {
-  "term": Object {
-    "data.attributes.managedAttributes.attributeName.keyword": "stringValue",
+  "match": Object {
+    "data.attributes.managedAttributes.attributeName": "stringValue",
   },
 }
 `;
@@ -1785,8 +1785,8 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.attributes.managedAttributes.attributeName.keyword": "stringValue",
+            "match": Object {
+              "included.attributes.managedAttributes.attributeName": "stringValue",
             },
           },
           Object {

@@ -11,6 +11,7 @@ export interface ReportTemplateAttributes {
   templateFilename: string;
   outputMediaType: string;
   includesBarcode: boolean;
+  templateOutputMediaType: string;
 }
 
 export type ReportTemplate = KitsuResource & ReportTemplateAttributes;

@@ -330,7 +330,8 @@ export function transformManagedAttributeToDSL({
     value: managedAttributeSearchValue.searchValue,
     fieldInfo: {
       ...fieldInfo,
-      distinctTerm: true
+      distinctTerm:
+        managedAttributeSearchValue.selectedOperator !== "partialMatch"
     } as ESIndexMapping
   };
 

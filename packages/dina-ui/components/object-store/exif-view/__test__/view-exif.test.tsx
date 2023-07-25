@@ -4,7 +4,22 @@ import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import { ExifView } from "../ExifView";
 
-const exifData = new Map().set("date original created", "2000, Jan 8");
+const exifData = new Map()
+  .set("date original created", "2000, Jan 8")
+  .set("shutter speed", "1/200")
+  .set("exposure", "0.5")
+  .set("compensation", "-0.5")
+  .set("aperture", "f/8")
+  .set("frame rate", "30fps")
+  .set("f-number", "f/2.8")
+  .set("resolution", "300dpi")
+  .set("self-time mode usage", "10s")
+  .set("camera model", "Canon EOS R5")
+  .set("orientation", "landscape")
+  .set("metering mode", "evaluative")
+  .set("ISO speed information", "100")
+  .set("pixel dimensions", "6720x4480")
+  .set("copyright information", "John Doe");
 
 /** Test ObjectUpload */
 const TEST_OBJECTUPLOAD: ObjectUpload = {
@@ -46,9 +61,6 @@ describe("View Exif page", () => {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });
 
-    expect(wrapper.find("td.key-cell").contains("Date Original Created")).toBe(
-      true
-    );
-    expect(wrapper.find("td.value-cell").contains("2000, Jan 8")).toBe(true);
+    expect(wrapper.find(ExifView).debug()).toMatchSnapshot();
   });
 });

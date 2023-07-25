@@ -303,7 +303,8 @@ export function transformFieldExtensionToDSL({
     value: fieldExtensionSearchValue.searchValue,
     fieldInfo: {
       ...fieldInfo,
-      distinctTerm: true
+      distinctTerm:
+        fieldExtensionSearchValue.selectedOperator !== "partialMatch"
     } as ESIndexMapping
   });
 }

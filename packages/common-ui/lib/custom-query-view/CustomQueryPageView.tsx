@@ -140,15 +140,17 @@ export function CustomQueryPageView<TData extends KitsuResource>({
             <>
               <div className="col-sm-8">{innerLegend}</div>
               <div className="col-sm-4">
-                <Select<CustomQueryOption>
-                  className="mt-2"
-                  name="customQueryOptions"
-                  options={translatedOptions}
-                  value={customQuerySelected}
-                  onChange={(selectedOption) =>
-                    setCustomQuerySelectedValue(selectedOption?.value ?? null)
-                  }
-                />
+                <label style={{ width: "100%" }}>
+                  <Select<CustomQueryOption>
+                    className="mt-2"
+                    name="customQueryOptions"
+                    options={translatedOptions}
+                    value={customQuerySelected}
+                    onChange={(selectedOption) =>
+                      setCustomQuerySelectedValue(selectedOption?.value ?? null)
+                    }
+                  />
+                </label>
               </div>
             </>
           ) : (
