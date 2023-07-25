@@ -31,7 +31,7 @@ export type ColumnDefinition8<TData extends KitsuResource> =
   | (ColumnDef<TData> & ElasticSearchColumnProps & InternationalizationProps)
   | string;
 
-interface InternationalizationProps {
+export interface InternationalizationProps {
   /**
    * Key used to retrieve the label value from internationalization.
    */

@@ -1,12 +1,11 @@
 import {
   ButtonBar,
-  ColumnDefinition,
   ColumnDefinition8,
   CreateButton,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { groupCell8, Head, Nav } from "../../../components";
+import { Head, Nav, groupCell8 } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqSubmission } from "../../../types/seqdb-api/resources/SeqSubmission";
 

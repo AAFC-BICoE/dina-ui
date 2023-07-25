@@ -1,7 +1,5 @@
 import {
-  ColumnDefinition,
   ColumnDefinition8,
-  dateCell,
   dateCell8,
   DinaForm,
   FormikButton,
@@ -12,7 +10,7 @@ import {
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
-import { ThumbnailCell, ThumbnailCell8 } from "../..";
+import { ThumbnailCell8 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { METADATA_FILTER_ATTRIBUTES } from "../../../pages/object-store/object/list";
 import { Metadata } from "../../../types/objectstore-api";

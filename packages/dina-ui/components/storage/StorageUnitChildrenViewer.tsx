@@ -1,19 +1,14 @@
 import {
-  ColumnDefinition,
   ColumnDefinition8,
   FieldSet,
-  MetaWithTotal,
-  QueryTable,
   QueryTable8,
   useApiClient,
-  useDinaFormContext,
-  useQuery,
-  withResponse
+  useDinaFormContext
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";

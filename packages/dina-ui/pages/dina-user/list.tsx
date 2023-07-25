@@ -1,9 +1,4 @@
-import {
-  ColumnDefinition8,
-  dateCell,
-  ListPageLayout,
-  stringArrayCell
-} from "common-ui";
+import { ColumnDefinition8, ListPageLayout } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";

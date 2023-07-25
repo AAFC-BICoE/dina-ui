@@ -1,8 +1,4 @@
-import {
-  allLangsDescriptionCell,
-  allLangsDescriptionCell8,
-  allLangsTitleCell
-} from "common-ui";
+import { allLangsDescriptionCell8, allLangsTitleCell } from "common-ui";
 import Link from "next/link";
 import { Assemblage } from "../../../types/collection-api";
 import { Metadata } from "../../../types/objectstore-api";
