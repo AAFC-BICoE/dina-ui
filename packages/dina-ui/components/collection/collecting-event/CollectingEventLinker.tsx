@@ -1,8 +1,8 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   FilterForm,
   FormikButton,
-  QueryTable8,
+  QueryTable,
   rsql,
   stringArrayCell8
 } from "common-ui";
@@ -33,7 +33,7 @@ export interface CollectingEventLinkerProps {
 export function CollectingEventLinker({
   onCollectingEventSelect
 }: CollectingEventLinkerProps) {
-  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition8<CollectingEvent>[] = [
+  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
     "dwcFieldNumber",
     stringArrayCell8("otherRecordNumbers"),
     "createdBy",
@@ -114,7 +114,7 @@ export function CollectingEventLinker({
         </FilterForm>
       </div>
       <div className="mb-3" style={{ maxHeight: "50rem", overflowY: "scroll" }}>
-        <QueryTable8
+        <QueryTable
           path="collection-api/collecting-event"
           columns={COLLECTING_EVENT_TABLE_COLUMNS}
           filter={filterParam}

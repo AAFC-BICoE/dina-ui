@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout
 } from "common-ui";
@@ -9,7 +9,7 @@ import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
-const REGION_TABLE_COLUMNS: ColumnDefinition8<Region>[] = [
+const REGION_TABLE_COLUMNS: ColumnDefinition<Region>[] = [
   {
     cell: ({
       row: {

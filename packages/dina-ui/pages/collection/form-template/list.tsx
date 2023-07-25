@@ -3,7 +3,7 @@ import {
   ListPageLayout,
   useAccount,
   Tooltip,
-  ColumnDefinition8,
+  ColumnDefinition,
   booleanCell,
   dateCell,
   FieldHeader
@@ -19,7 +19,7 @@ const FILTER_ATTRIBUTES = ["name", "createdBy"];
 export default function MaterialSampleFormTemplateListPage() {
   const { groupNames, username } = useAccount();
 
-  const TABLE_COLUMNS: ColumnDefinition8<FormTemplate>[] = [
+  const TABLE_COLUMNS: ColumnDefinition<FormTemplate>[] = [
     {
       cell: ({
         row: {

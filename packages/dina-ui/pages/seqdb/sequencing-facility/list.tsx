@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout
 } from "common-ui";
@@ -9,7 +9,7 @@ import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SequencingFacility } from "../../../types/seqdb-api/resources/SequencingFacility";
 
-const SUBMISSION_FACILITY_TABLE_COLUMNS: ColumnDefinition8<SequencingFacility>[] =
+const SUBMISSION_FACILITY_TABLE_COLUMNS: ColumnDefinition<SequencingFacility>[] =
   [
     {
       cell: ({

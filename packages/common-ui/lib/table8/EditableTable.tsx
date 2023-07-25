@@ -1,25 +1,24 @@
 import { FieldArray, FieldArrayRenderProps } from "formik";
 import { useRef } from "react";
 import { Button, Table } from "react-bootstrap";
-import { Accessor, Column } from "react-table";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { TextField } from "../formik-connected/TextField";
-import { InternationalizationProps } from "./QueryTable8";
+import { InternationalizationProps } from "./QueryTable";
+import { AccessorKeyColumnDef, RowData } from "@tanstack/react-table";
 
-export interface EditableTableColumn<D = any>
-  extends Column.Basics,
-    Column.CellProps,
-    Column.HeaderProps {
+export type EditableTableColumn<
+  TData extends RowData,
+  TValue = unknown
+> = AccessorKeyColumnDef<TData, TValue> & {
   /**
-   * Property name as string or Accessor
+   * Property name as string or AccessorKey
    * @example: 'myProperty'
    * @example ["a.b", "c"]
    * @example ["a", "b", "c"]
    * @example {"a": {"b": {"c": $}}}
    * @example (row) => row.propertyName
    */
-  accessor?: Accessor<D> | undefined;
-}
+};
 
 export type EditableTableColumnDefinition<TData> = Partial<
   EditableTableColumn<TData> & InternationalizationProps
@@ -49,7 +48,7 @@ export function EditableTable<TData>({
       {!!column.label ? (
         <FieldHeader name={column.label} />
       ) : (
-        <FieldHeader name={String(column.accessor)} />
+        <FieldHeader name={String(column.accessorKey)} />
       )}
     </th>
   ));
@@ -63,7 +62,7 @@ export function EditableTable<TData>({
       data.map((rec, rowIndex) => (
         <tr key={rowIndex}>
           {columns.map((column, colIndex) => (
-            <td key={colIndex}>{rec[String(column.accessor)]}</td>
+            <td key={colIndex}>{rec[String(column.accessorKey)]}</td>
           ))}
         </tr>
       ))
@@ -80,7 +79,7 @@ export function EditableTable<TData>({
                   <td key={columnIndex}>
                     <TextField
                       name={`${fieldName}[${rowIndex}][${String(
-                        column.accessor
+                        column.accessorKey
                       )}]`}
                       hideLabel={true}
                     />

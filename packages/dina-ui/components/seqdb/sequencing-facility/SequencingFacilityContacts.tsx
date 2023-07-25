@@ -17,16 +17,16 @@ export interface SequencingFacilityProps {
 const CONTACT_COLUMNS: EditableTableColumnDefinition<SequencingFacilityContactVO>[] =
   [
     {
-      accessor: "name",
-      Header: () => <SeqdbMessage id="field_name" />
+      accessorKey: "name",
+      header: () => <SeqdbMessage id="field_name" />
     },
     {
-      accessor: "roles",
-      Header: () => <SeqdbMessage id="field_role" />
+      accessorKey: "roles",
+      header: () => <SeqdbMessage id="field_role" />
     },
     {
-      accessor: "info",
-      Header: () => <SeqdbMessage id="field_contactInfo" />
+      accessorKey: "info",
+      header: () => <SeqdbMessage id="field_contactInfo" />
     }
   ];
 

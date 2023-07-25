@@ -27,7 +27,7 @@ import { SortingRule } from "react-table";
  *
  * If a type of string is provided, it should just create a ColumnDefinition with accessor only.
  */
-export type ColumnDefinition8<TData extends KitsuResource> =
+export type ColumnDefinition<TData extends KitsuResource> =
   | (ColumnDef<TData> & ElasticSearchColumnProps & InternationalizationProps)
   | string;
 
@@ -51,7 +51,7 @@ interface ElasticSearchColumnProps {
 }
 
 /** QueryTable component's props. */
-export interface QueryTable8Props<TData extends KitsuResource> {
+export interface QueryTableProps<TData extends KitsuResource> {
   /** Dependencies: When the values in this array are changed, re-fetch the data. */
   deps?: any[];
 
@@ -76,7 +76,7 @@ export interface QueryTable8Props<TData extends KitsuResource> {
   pageSizeOptions?: number[];
 
   /** The columns to show in the table. */
-  columns: ColumnDefinition8<TData>[];
+  columns: ColumnDefinition<TData>[];
 
   /** Client-side joins across multiple back-end APIs. */
   joinSpecs?: ClientSideJoinSpec[];
@@ -119,7 +119,7 @@ const DEFAULT_PAGE_SIZE = 25;
 /**
  * Table component that fetches data from the backend API.
  */
-export function QueryTable8<TData extends KitsuResource>({
+export function QueryTable<TData extends KitsuResource>({
   columns,
   defaultPageSize = DEFAULT_PAGE_SIZE,
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
@@ -142,7 +142,7 @@ export function QueryTable8<TData extends KitsuResource>({
   enableFilters = false,
   defaultColumnFilters = [],
   onColumnFiltersChange
-}: QueryTable8Props<TData>) {
+}: QueryTableProps<TData>) {
   const { formatMessage, formatNumber } = useIntl();
 
   // JSONAPI sort attribute.

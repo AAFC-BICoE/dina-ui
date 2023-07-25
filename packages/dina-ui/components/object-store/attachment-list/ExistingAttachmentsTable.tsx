@@ -1,10 +1,10 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   dateCell,
   DinaForm,
   FieldHeader,
   FormikButton,
-  QueryTable8,
+  QueryTable,
   Tooltip,
   useGroupedCheckBoxes
 } from "common-ui";
@@ -46,7 +46,7 @@ export function ExistingAttachmentsTable({
 
   const { openMetadataEditorModal } = useBulkMetadataEditModal();
 
-  const ATTACHMENT_TABLE_COLUMNS: ColumnDefinition8<any>[] = [
+  const ATTACHMENT_TABLE_COLUMNS: ColumnDefinition<any>[] = [
     {
       id: "select",
       cell: ({ row: { original: metadata } }) => (
@@ -166,7 +166,7 @@ export function ExistingAttachmentsTable({
           )}
         </div>
       </div>
-      <QueryTable8
+      <QueryTable
         columns={ATTACHMENT_TABLE_COLUMNS}
         joinSpecs={[
           {

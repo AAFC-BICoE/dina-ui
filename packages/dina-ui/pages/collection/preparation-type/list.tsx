@@ -1,5 +1,5 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout,
   dateCell
@@ -10,7 +10,7 @@ import PageLayout from "../../../components/page/PageLayout";
 import { PreparationType } from "../../../types/collection-api";
 
 const PREPARATION_TYPE_FILTER_ATTRIBUTES = ["name"];
-const PREPARATION_TYPE_TABLE_COLUMNS: ColumnDefinition8<PreparationType>[] = [
+const PREPARATION_TYPE_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
   {
     cell: ({
       row: {

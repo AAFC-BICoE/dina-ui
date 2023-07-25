@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   dateCell,
   DateView,
   FieldHeader,
@@ -40,7 +40,7 @@ export function RevisionsPageLayout({
   instanceId
 }: RevisionsPageLayoutProps) {
   const { getFieldLabel } = useFieldLabels();
-  const REVISION_TABLE_COLUMNS: ColumnDefinition8<KitsuResource>[] = [
+  const REVISION_TABLE_COLUMNS: ColumnDefinition<KitsuResource>[] = [
     {
       cell: ({ row }) => {
         return (

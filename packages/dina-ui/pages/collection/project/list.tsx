@@ -1,7 +1,7 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
-  descriptionCell8,
+  descriptionCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
@@ -10,7 +10,7 @@ import PageLayout from "../../../components/page/PageLayout";
 import { PreparationType } from "../../../types/collection-api";
 
 const PROJECT_FILTER_ATTRIBUTES = ["name", "status", "multilingualDescription"];
-const PROJECT_TABLE_COLUMNS: ColumnDefinition8<PreparationType>[] = [
+const PROJECT_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
   {
     cell: ({
       row: {
@@ -20,7 +20,7 @@ const PROJECT_TABLE_COLUMNS: ColumnDefinition8<PreparationType>[] = [
     accessorKey: "name"
   },
   "status",
-  descriptionCell8("multilingualDescription")
+  descriptionCell("multilingualDescription")
 ];
 
 export default function collectionMethodListPage() {

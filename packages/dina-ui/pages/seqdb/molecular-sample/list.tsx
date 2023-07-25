@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   ListPageLayout
@@ -11,7 +11,7 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { MolecularSample } from "../../../types/seqdb-api";
 
 const FILTER_ATTRIBUTES = ["name", "createdBy"];
-const TABLE_COLUMNS: ColumnDefinition8<MolecularSample>[] = [
+const TABLE_COLUMNS: ColumnDefinition<MolecularSample>[] = [
   {
     cell: ({
       row: {

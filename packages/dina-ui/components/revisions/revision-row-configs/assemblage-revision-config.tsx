@@ -1,4 +1,4 @@
-import { allLangsDescriptionCell8, allLangsTitleCell } from "common-ui";
+import { allLangsDescriptionCell, allLangsTitleCell } from "common-ui";
 import Link from "next/link";
 import { Assemblage } from "../../../types/collection-api";
 import { Metadata } from "../../../types/objectstore-api";
@@ -36,7 +36,7 @@ export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
       </div>
     ),
     multilingualTitle: allLangsTitleCell("multilingualTitle").cell,
-    multilingualDescription: allLangsDescriptionCell8("multilingualDescription")
+    multilingualDescription: allLangsDescriptionCell("multilingualDescription")
       .cell,
 
     // Show the entire value of the metadata map in a key-value table:

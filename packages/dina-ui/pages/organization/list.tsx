@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout,
   dateCell,
@@ -12,7 +12,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Organization } from "../../types/agent-api";
 
 const ORGANIZATION_FILTER_ATTRIBUTES = ["createdBy"];
-const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition8<Organization>[] = [
+const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition<Organization>[] = [
   {
     cell: ({
       row: {

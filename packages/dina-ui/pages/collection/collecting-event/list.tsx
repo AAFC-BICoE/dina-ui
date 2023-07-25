@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   ListPageLayout,
@@ -20,7 +20,7 @@ export default function CollectingEventListPage() {
     "dwcFieldNumber",
     "dwcRecordNumber"
   ];
-  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition8<CollectingEvent>[] = [
+  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
     {
       cell: ({
         row: {

@@ -1,5 +1,5 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   FieldHeader,
@@ -11,7 +11,7 @@ import { GroupSelectField } from "../../../components";
 import { Collection } from "../../../types/collection-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
-const COLLECTION_TABLE_COLUMNS: ColumnDefinition8<Collection>[] = [
+const COLLECTION_TABLE_COLUMNS: ColumnDefinition<Collection>[] = [
   {
     cell: ({
       row: {

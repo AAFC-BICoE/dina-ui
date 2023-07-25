@@ -1,7 +1,7 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   FieldSet,
-  QueryTable8,
+  QueryTable,
   useApiClient,
   useDinaFormContext
 } from "common-ui";
@@ -183,7 +183,7 @@ export function StorageUnitContents({
   storageUnit,
   onEmptyMaterialSamples
 }: StorageUnitContentsProps) {
-  const materialSampleColumns: ColumnDefinition8<MaterialSample>[] = [
+  const materialSampleColumns: ColumnDefinition<MaterialSample>[] = [
     {
       cell: ({
         row: {
@@ -231,7 +231,7 @@ export function StorageUnitContents({
           <DinaMessage id="materialSamples" />
         </strong>
 
-        <QueryTable8
+        <QueryTable
           columns={materialSampleColumns}
           path="collection-api/material-sample"
           filter={{

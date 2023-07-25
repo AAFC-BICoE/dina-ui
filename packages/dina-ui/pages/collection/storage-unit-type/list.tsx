@@ -1,5 +1,5 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   ListPageLayout
@@ -14,7 +14,7 @@ import PageLayout from "../../../components/page/PageLayout";
 import { StorageUnitType } from "../../../types/collection-api";
 
 const STORAGE_UNIT_TYPE_FILTER_ATTRIBUTES = ["name", "createdBy"];
-const STORAGE_UNIT_TYPE_TABLE_COLUMNS: ColumnDefinition8<StorageUnitType>[] = [
+const STORAGE_UNIT_TYPE_TABLE_COLUMNS: ColumnDefinition<StorageUnitType>[] = [
   {
     cell: ({
       row: {

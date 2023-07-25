@@ -109,4 +109,4 @@ export * from "./table8/stringArrayCell8";
 export * from "./table8/DateCell";
 export * from "./table8/BooleanCell";
 export * from "./list-page/QueryPage";
-export * from "./table8/QueryTable8";
+export * from "./table8/QueryTable";

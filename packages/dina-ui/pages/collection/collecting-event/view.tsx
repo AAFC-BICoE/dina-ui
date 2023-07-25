@@ -1,4 +1,4 @@
-import { DinaForm, FieldSet, QueryTable8 } from "common-ui";
+import { DinaForm, FieldSet, QueryTable } from "common-ui";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { ViewPageLayout, useCollectingEventQuery } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
@@ -13,7 +13,7 @@ export default function CollectingEventDetailsPage() {
         <DinaForm<CollectingEvent> {...props}>
           <CollectingEventFormLayout />
           <FieldSet legend={<DinaMessage id="materialSamples" />}>
-            <QueryTable8<MaterialSample>
+            <QueryTable<MaterialSample>
               path="collection-api/material-sample"
               include="collection"
               columns={getColumnDefinition()}

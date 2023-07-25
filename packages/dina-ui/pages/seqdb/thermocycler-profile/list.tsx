@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout
 } from "common-ui";
@@ -9,7 +9,7 @@ import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { ThermocyclerProfile } from "../../../types/seqdb-api/resources/ThermocyclerProfile";
 
-const THEROMOCYCLERPROFILE_TABLE_COLUMNS: ColumnDefinition8<ThermocyclerProfile>[] =
+const THEROMOCYCLERPROFILE_TABLE_COLUMNS: ColumnDefinition<ThermocyclerProfile>[] =
   [
     {
       cell: ({

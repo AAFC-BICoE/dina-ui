@@ -1,5 +1,5 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   dateCell,
   DinaForm,
   FormikButton,
@@ -44,7 +44,7 @@ export function ExistingObjectsAttacher({
       await onMetadataIdsSubmitted(metadataIds);
     };
 
-  const METADATA_TABLE_COLUMNS: ColumnDefinition8<Metadata>[] = [
+  const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
     {
       cell: ({ row: { original: metadata } }) => (
         <CheckBoxField key={metadata.id} resource={metadata} />

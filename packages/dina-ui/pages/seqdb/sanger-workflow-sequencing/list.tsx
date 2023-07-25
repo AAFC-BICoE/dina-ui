@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   dateCell,
   FilterAttribute,
   ListPageLayout
@@ -10,7 +10,7 @@ import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqBatch } from "../../../types/seqdb-api";
 
-const TABLE_COLUMNS: ColumnDefinition8<SeqBatch>[] = [
+const TABLE_COLUMNS: ColumnDefinition<SeqBatch>[] = [
   {
     cell: ({
       row: {

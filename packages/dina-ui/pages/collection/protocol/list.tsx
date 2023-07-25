@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   ListPageLayout
@@ -17,7 +17,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Protocol } from "../../../types/collection-api";
 
 const PROTOCOL_FILTER_ATTRIBUTES = ["name"];
-const PROTOCOL_TABLE_COLUMNS: ColumnDefinition8<Protocol>[] = [
+const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
   {
     cell: ({
       row: {

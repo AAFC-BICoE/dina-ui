@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   FilterAttribute,
@@ -11,7 +11,7 @@ import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Institution } from "../../../types/collection-api";
 
-const TABLE_COLUMNS: ColumnDefinition8<Institution>[] = [
+const TABLE_COLUMNS: ColumnDefinition<Institution>[] = [
   {
     cell: ({
       row: {

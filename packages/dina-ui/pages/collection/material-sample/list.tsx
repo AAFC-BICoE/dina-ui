@@ -1,7 +1,7 @@
 import { Row } from "@tanstack/react-table";
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   DeleteButton,
@@ -33,7 +33,7 @@ export interface SampleListLayoutProps {
  *
  * The old version of the listing is still when searching for associated samples.
  */
-export const getColumnDefinition: () => ColumnDefinition8<MaterialSample>[] =
+export const getColumnDefinition: () => ColumnDefinition<MaterialSample>[] =
   () => {
     return [
       {
@@ -97,7 +97,7 @@ export function SampleListLayout({
   const [queryKey, setQueryKey] = useState("");
 
   // The old style columns, but add the action buttons at the end.
-  const columns: ColumnDefinition8<MaterialSample>[] = [
+  const columns: ColumnDefinition<MaterialSample>[] = [
     ...getColumnDefinition(),
     ...(onSelect
       ? [

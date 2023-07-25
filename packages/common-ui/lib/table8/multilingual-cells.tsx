@@ -20,7 +20,7 @@ export const LANGUAGE_BADGE_KEYS = {
  * Used for multilingual descriptions which contain an English and French version of the
  * description.
  */
-export function descriptionCell8(accessorKey: string) {
+export function descriptionCell(accessorKey: string) {
   return {
     cell: ({ row: { original } }) => {
       const { locale } = useContext(intlContext);
@@ -82,7 +82,7 @@ export function descriptionCell8(accessorKey: string) {
 /**
  * Shows the multilingual description in all languages.
  */
-export function allLangsDescriptionCell8(accessorKey: string) {
+export function allLangsDescriptionCell(accessorKey: string) {
   return {
     cell: ({
       row: {
@@ -105,7 +105,7 @@ export function allLangsDescriptionCell8(accessorKey: string) {
  * Used for multilingual titles which contain an English and French version of the
  * title.
  */
-export function titleCell8(accessorKey: string) {
+export function titleCell(accessorKey: string) {
   return {
     cell: ({ row: { original } }) => {
       const { locale } = useContext(intlContext);

@@ -1,5 +1,5 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout,
   dateCell
@@ -10,7 +10,7 @@ import PageLayout from "../../../components/page/PageLayout";
 import { StorageUnit } from "../../../types/collection-api";
 
 const STORAGE_UNIT_FILTER_ATTRIBUTES = ["name", "createdBy", "barcode"];
-const STORAGE_UNIT_TABLE_COLUMNS: ColumnDefinition8<StorageUnit>[] = [
+const STORAGE_UNIT_TABLE_COLUMNS: ColumnDefinition<StorageUnit>[] = [
   {
     cell: ({ row: { original: storage } }) => (
       <Link href={`/collection/storage-unit/view?id=${storage.id}`}>
