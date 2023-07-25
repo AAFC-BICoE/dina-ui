@@ -412,8 +412,7 @@ export function makeAxiosErrorMoreReadable(error: AxiosError) {
       errorMessage +=
         "\n" + getErrorMessages([jsonApiErrorResponse]).errorMessage;
     }
-    const err = new Error(errorMessage);
-    err.cause = error.response;
+    const err = new Error(errorMessage, { cause: error.response });
     throw err;
   }
   throw error;

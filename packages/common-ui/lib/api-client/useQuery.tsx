@@ -151,7 +151,7 @@ export function withResponse<
       <div className="alert alert-danger">
         {`${message}. `}
         {errorDetails?.links?.about && (
-          <Link href={errorDetails?.links?.about}>Audit Snapshot Link</Link>
+          <Link href={errorDetails?.links?.about}>Audit Snapshot</Link>
         )}
       </div>
     );
