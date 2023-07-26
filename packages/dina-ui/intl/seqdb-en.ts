@@ -148,5 +148,10 @@ export const SEQDB_MESSAGES_ENGLISH = {
   seqWorksheetUlRxn: "ul/rxn",
   seqWorksheetEnterSampleDataHere: "Enter Sample data here:",
   seqWorksheetExportersMessage:
-    "Exporters will include all records from all pages"
+    "Exporters will include all records from all pages",
+  materialSampleNameAndVersion: "Sample Name and Version",
+  pcrWellCoordinates: "PCR Well Coordinates",
+  seqWellCoordinates: "SEQ Well Coordinates",
+  seqTubeNumber: "SEQ Tube Number",
+  primerName: "Primer Name"
 };

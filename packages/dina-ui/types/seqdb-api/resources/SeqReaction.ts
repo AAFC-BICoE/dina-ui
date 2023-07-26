@@ -8,6 +8,7 @@ export interface SeqReactionAttributes {
   group?: string;
   wellColumn?: number;
   wellRow?: string;
+  cellNumber?: number;
   createdBy?: string;
   createdOn?: string;
 }

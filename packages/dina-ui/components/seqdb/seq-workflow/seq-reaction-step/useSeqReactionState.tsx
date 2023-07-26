@@ -66,7 +66,7 @@ export function useSeqReactionState(seqBatchId?: string) {
       await bulkGet<PcrBatchItem, true>(
         seqReactions?.map(
           (item) =>
-            `/pcr-batch-item/${item.pcrBatchItem?.id}?include=materialSample`
+            `/pcr-batch-item/${item.pcrBatchItem?.id}?include=materialSample,pcrBatch`
         ),
         {
           apiBaseUrl: "/seqdb-api",
@@ -99,9 +99,7 @@ export function useSeqReactionState(seqBatchId?: string) {
           const foundSample = materialSamples.find(
             (sample) => sample.id === item.pcrBatchItem?.materialSample?.id
           );
-          (
-            item.pcrBatchItem.materialSample as MaterialSample
-          ).materialSampleName = foundSample?.materialSampleName;
+          item.pcrBatchItem.materialSample = foundSample;
         }
       }
       return item;

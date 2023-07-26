@@ -9,8 +9,8 @@ import {
   useApiClient
 } from "common-ui";
 import { useRouter } from "next/router";
-import { SeqReactionDndTable } from "packages/dina-ui/components/seqdb/seq-workflow/seq-reaction-step/SeqReactionDndTable";
-import { useSeqReactionState } from "packages/dina-ui/components/seqdb/seq-workflow/seq-reaction-step/useSeqReactionState";
+import { useSeqReactionState } from "../../../components/seqdb/seq-workflow/seq-reaction-step/useSeqReactionState";
+import { SeqReactionTable } from "../../../components/seqdb/seq-worksheet/SeqReactionTable";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { PersonSelectField } from "../../../components";
@@ -168,20 +168,22 @@ export function SeqWorksheetForm({ seqBatch }: SeqWorksheetFormProps) {
           />
         </div>
       </div>
-
       <div className="row">
         <div className="col-sm-12">
           <p>
             <DinaMessage id="seqWorksheetEnterSampleDataHere" />
           </p>
         </div>
+      </div>
+      <div className="row">
         <div className="col-sm-12">
-          <SeqReactionDndTable
-            editMode={false}
-            selectedSeqReactions={seqReactions}
+          <SeqReactionTable
+            seqReactions={seqReactions}
             className="react-table-overflow col-md-12 mb-2"
           />
         </div>
+      </div>
+      <div className="row">
         <div className="col-sm-12">
           <p>
             <DinaMessage id="seqWorksheetExportersMessage" />
