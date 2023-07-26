@@ -124,6 +124,19 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   };
 }
 
+interface AuditSnapshotRouterProps {
+  error: any;
+}
+function AuditSnapshotRouter({ error }: AuditSnapshotRouterProps) {
+  const errorDetails = (error as any)?.cause?.data?.errors?.[0];
+  const auditSnapshotLink: string = errorDetails?.links?.about;
+  const id: string | undefined = auditSnapshotLink
+    ?.split("=")
+    ?.at(-1)
+    ?.split("/")
+    ?.at(1);
+  return id ? <Link href={`revisions?id=${id}`}>Audit Snapshot</Link> : null;
+}
 /**
  * Only render if there is a response, otherwise show generic 'loading' or 'error' indicators.
  *
@@ -150,9 +163,7 @@ export function withResponse<
     return (
       <div className="alert alert-danger">
         {`${message}. `}
-        {errorDetails?.links?.about && (
-          <Link href={errorDetails?.links?.about}>Audit Snapshot</Link>
-        )}
+        {errorDetails?.links?.about && <AuditSnapshotRouter error={error} />}
       </div>
     );
   }
@@ -187,8 +198,13 @@ export function withResponseOrDisabled<
       error instanceof Error
         ? `${error.name}: ${error.message}`
         : error?.errors?.map((e) => e.detail).join("\n") ?? String(error);
-
-    return <div className="alert alert-danger">{message}</div>;
+    const errorDetails = (error as any)?.cause?.data?.errors?.[0];
+    return (
+      <div className="alert alert-danger">
+        {`${message}. `}
+        {errorDetails?.links?.about && <AuditSnapshotRouter error={error} />}
+      </div>
+    );
   }
   if (response || isDisabled) {
     return responseRenderer(response);
