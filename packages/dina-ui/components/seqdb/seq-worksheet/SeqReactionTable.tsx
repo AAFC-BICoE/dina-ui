@@ -26,15 +26,12 @@ export function SeqReactionTable({
       id: "materialSampleName",
       cell: ({ row: { original } }) => (
         <div>
-          {(original.pcrBatchItem?.materialSample?.materialSampleName ?? "") +
-            (original.pcrBatchItem?.materialSample?.version !== undefined
-              ? ` (${original.pcrBatchItem?.materialSample?.version})`
-              : "")}
+          {original.pcrBatchItem?.materialSample?.materialSampleName ?? ""}
         </div>
       ),
       header: () => (
         <b>
-          <DinaMessage id={"materialSampleNameAndVersion"} />
+          <DinaMessage id={"materialSampleName"} />
         </b>
       ),
       enableSorting: false
