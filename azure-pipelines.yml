@@ -15,7 +15,7 @@ resources:
     type: github
     endpoint: AAFC-BICoE
     name: AAFC-BICoE/dina-local-deployment
-- repository: dina-ui-repo
+  - repository: dina-ui-repo
     type: github
     endpoint: AAFC-BICoE
     name: AAFC-BICoE/dina-ui
@@ -64,7 +64,7 @@ steps:
 
 - checkout: local-deployement-repo
   path: dina-local-deployment
-  
+
 - bash: |
     python3 dina-ui/pa11y.py
   displayName: 'Running pa11y'
