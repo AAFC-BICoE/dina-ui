@@ -14,7 +14,7 @@ resources:
   - repository: local-deployement-repo
     type: github
     endpoint: AAFC-BICoE
-    name: AAFC-BICoE/dina-local-deployment
+    name: $(Pipeline.Workspace)/s
 
 steps:
 - task: NodeTool@0
