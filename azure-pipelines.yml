@@ -53,15 +53,15 @@ steps:
     docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
   displayName: 'Start DockerCompose'
 
-
-- checkout: dina-ui-repo
-  path: dina-ui
-
-
 - bash: |
     echo Try to connect to Keycloak endpoint ...
     curl --head -X GET --retry 25 --retry-delay 1 https://dina.local/auth
   displayName: 'Waiting for Keycloak ...'
+
+
+- checkout: dina-ui-repo
+  path: dina-ui
+
 
 - bash: |
     cd ../
