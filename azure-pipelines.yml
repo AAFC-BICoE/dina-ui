@@ -59,10 +59,6 @@ steps:
   displayName: 'Waiting for Keycloak ...'
 
 
-- checkout: dina-ui-repo
-  path: dina-ui
-
-
 - bash: |
     cd $(Pipeline.Workspace)/s
     python3 dina-ui/pa11y.py
