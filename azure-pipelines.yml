@@ -26,6 +26,11 @@ steps:
     npm install -g pa11y-ci pa11y-ci-reporter-html
   displayName: 'Install pa11y-ci'
 
+  - script: |
+    pip3 install -U selenium
+    pip3 install webdriver-manager
+  displayName: 'Install selenium'
+
 - checkout: local-deployement-repo
   path: dina-local-deployment
 
@@ -54,8 +59,8 @@ steps:
   displayName: 'Waiting for Keycloak ...'
 
 - bash: |
-    pa11y-ci
-  displayName: 'Running pa11yci'
+    python3 pa11y.py
+  displayName: 'Running pa11y'
 
 - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
   displayName: 'Stop DockerCompose'
