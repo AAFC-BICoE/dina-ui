@@ -26,7 +26,7 @@ steps:
     npm install -g pa11y-ci pa11y-ci-reporter-html
   displayName: 'Install pa11y-ci'
 
-  - script: |
+- script: |
     pip3 install -U selenium
     pip3 install webdriver-manager
   displayName: 'Install selenium'
