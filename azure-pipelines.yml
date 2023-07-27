@@ -54,7 +54,7 @@ steps:
   displayName: 'Waiting for Keycloak ...'
 
 - bash: |
-    pa11y-ci --config wcag/.pa11yci
+    pa11y-ci
   displayName: 'Running pa11yci'
 
 - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
