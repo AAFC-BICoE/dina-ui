@@ -59,7 +59,8 @@ steps:
   displayName: 'Waiting for Keycloak ...'
 
 - bash: |
-    python3 ../dina-ui/pa11y.py
+    cd ../
+    python3 dina-ui/pa11y.py
   displayName: 'Running pa11y'
 
 - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
