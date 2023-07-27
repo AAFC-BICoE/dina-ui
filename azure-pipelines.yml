@@ -14,7 +14,7 @@ resources:
   - repository: local-deployement-repo
     type: github
     endpoint: AAFC-BICoE
-    name: $(Pipeline.Workspace)/s
+    name: AAFC-BICoE/dina-local-deployment
 
 steps:
 - task: NodeTool@0
@@ -64,7 +64,7 @@ steps:
 
 
 - bash: |
-    cd ../
+    cd $(Pipeline.Workspace)/s
     python3 dina-ui/pa11y.py
   displayName: 'Running pa11y'
 
