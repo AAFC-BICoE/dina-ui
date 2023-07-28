@@ -15,7 +15,7 @@ import { PersonSelectField } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
 import { PcrBatchItemTable } from "../../../components/seqdb/pcr-worksheet/PcrBatchItemTable";
 import { ReactionInputs } from "../../../components/seqdb/pcr-worksheet/ReactionInputs";
-import { ReactionRxns } from "../../../components/seqdb/pcr-worksheet/ReactionRxns";
+import { PcrProtocolReactionTable } from "../../../components/seqdb/pcr-worksheet/PcrProtocolReactionTable";
 import { ThermocyclerProfileWorksheetElement } from "../../../components/seqdb/pcr-worksheet/ThermocyclerProfileWorksheetElement";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Protocol } from "../../../types/collection-api";
@@ -167,7 +167,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
           </DinaFormSection>
           <div className="row">
             <div className="col-sm-12">
-              <ReactionRxns protocol={initialValues?.protocol} />
+              <PcrProtocolReactionTable protocol={initialValues?.protocol} />
             </div>
           </div>
         </div>
