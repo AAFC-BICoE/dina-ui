@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { PersonSelectField } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
-import { ReactionRxns } from "../../../components/seqdb/seq-worksheet/ReactionRxns";
+import { SeqProtocolReactionTable } from "../../../components/seqdb/seq-worksheet/SeqProtocolReactionTable";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Protocol } from "../../../types/collection-api";
 import {
@@ -162,7 +162,7 @@ export function SeqWorksheetForm({ seqBatch }: SeqWorksheetFormProps) {
 
       <div className="row">
         <div className="col-sm-12">
-          <ReactionRxns
+          <SeqProtocolReactionTable
             protocol={initialValues?.protocol}
             seqReactions={seqReactions}
           />

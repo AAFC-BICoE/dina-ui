@@ -1,14 +1,15 @@
 import { useState, useMemo, useEffect } from "react";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   Protocol,
   ProtocolData,
   ProtocolDataUnitEnum
-} from "../../../../dina-ui/types/collection-api";
+} from "../../../types/collection-api";
 import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
-import styles from "./ReactionRxns.module.css";
+import styles from "./SeqProtocolReactionTable.module.css";
 import { SeqReaction } from "packages/dina-ui/types/seqdb-api";
 import classNames from "classnames";
+import useVocabularyOptions from "../../collection/useVocabularyOptions";
 
 /**
  * JavaScript has an issue that 0.1 + 0.2 = 0.30000000000000004
@@ -20,13 +21,21 @@ function accurateNumber(value: number): number {
   return +value.toPrecision(12);
 }
 
-export function ReactionRxns({
+export function SeqProtocolReactionTable({
   protocol,
   seqReactions
 }: {
   protocol?: Protocol;
   seqReactions?: SeqReaction[];
 }) {
+  const { vocabOptions: unitsOfMeasurement } = useVocabularyOptions({
+    path: "collection-api/vocabulary/unitsOfMeasurement"
+  });
+
+  const { vocabOptions: protocolData } = useVocabularyOptions({
+    path: "collection-api/vocabulary/protocolData"
+  });
+
   const primerRxnsNumber = useMemo<{
     [key: string]: number;
   }>(
@@ -64,6 +73,27 @@ export function ReactionRxns({
     ulRxn: number | null;
   }[] = populateReactionRxnsData(protocol?.protocolData);
 
+  function findUnitLabel(value: string | null | undefined) {
+    if (!value) {
+      return "";
+    } else {
+      return (
+        unitsOfMeasurement.find((option) => option.value === value)?.label ??
+        value
+      );
+    }
+  }
+
+  function findProtocolLabel(value: string | null | undefined) {
+    if (!value) {
+      return "";
+    } else {
+      return (
+        protocolData.find((option) => option.value === value)?.label ?? value
+      );
+    }
+  }
+
   function populateReactionRxnsData(pdArray?: ProtocolData[]) {
     const result: {
       component?: string;
@@ -76,15 +106,17 @@ export function ReactionRxns({
           (pde) =>
             pde.elementType === "quantity" &&
             pde.unit === ProtocolDataUnitEnum.UL_RXN
-        )?.value
+        )?.value ?? ""
       );
       const concentrationElement = pd.protocolDataElement?.find(
         (pde) => pde.elementType === "concentration"
       );
       const concentration =
-        concentrationElement?.value ?? "" + concentrationElement?.unit ?? "";
+        (concentrationElement?.value ?? "") +
+        " " +
+        (findUnitLabel(concentrationElement?.unit) ?? "");
       result.push({
-        component: pd.key,
+        component: findProtocolLabel(pd.key),
         concentration,
         ulRxn
       });
