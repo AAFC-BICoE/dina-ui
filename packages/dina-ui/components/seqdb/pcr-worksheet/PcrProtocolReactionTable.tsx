@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   Protocol,
   ProtocolData,
   ProtocolDataUnitEnum
-} from "../../../../dina-ui/types/collection-api";
+} from "../../../types/collection-api";
 import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
-import styles from "./ReactionRxns.module.css";
+import styles from "./PcrProtocolReactionTable.module.css";
 
 /**
  * JavaScript has an issue that 0.1 + 0.2 = 0.30000000000000004
@@ -18,7 +18,11 @@ function accurateNumber(value: number): number {
   return +value.toPrecision(12);
 }
 
-export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
+export function PcrProtocolReactionTable({
+  protocol
+}: {
+  protocol?: Protocol;
+}) {
   const [numOfRxns, setNumOfRxns] = useState<number>();
   const ulRnxQuantities = [] as {
     key?: string;
@@ -143,7 +147,9 @@ export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
             </tbody>
             <tfoot>
               <tr>
-                <th>Total</th>
+                <th>
+                  <DinaMessage id="total" />
+                </th>
                 <th />
                 <th>{totalUlRxn}</th>
                 <th>{totalUl}</th>

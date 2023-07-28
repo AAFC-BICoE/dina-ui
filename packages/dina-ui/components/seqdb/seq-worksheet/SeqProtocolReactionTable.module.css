@@ -1,0 +1,16 @@
+table.primer {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+table.primer td {
+  padding: 0.5rem;
+  border: 1px solid #ddd !important;
+  word-break: break-all;
+}
+table.primer th {
+  padding: 0.5rem;
+}
+table.primer tfoot tr {
+  border-top: double !important;
+}
