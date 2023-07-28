@@ -1,15 +1,17 @@
 import { useLocalStorage } from "@rehooks/local-storage";
+import { ColumnFiltersState } from "@tanstack/react-table";
+import { debounce } from "lodash";
 import {
-  ColumnDefinition,
+  ColumnDefinition8,
   DinaForm,
+  FieldHeader,
   FormikButton,
-  QueryTable,
+  QueryTable8,
   useGroupedCheckBoxes
 } from "common-ui";
 import { FilterParam } from "kitsu";
-import { debounce, Dictionary } from "lodash";
+import { Dictionary } from "lodash";
 import { useState } from "react";
-import { FilteredChangeFunction } from "react-table";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   LibraryPool,
@@ -65,10 +67,19 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
 
   const [nameFilter, setNameFilter] = useState<string>("");
 
-  const onNameFilterInputChange: FilteredChangeFunction = debounce(
-    (_, __, value) => setNameFilter(value),
-    200
-  );
+  // function onNameFilterInputChange(filters: ColumnFiltersState) {
+  //   setNameFilter(
+  //     "" + (filters.find((filter) => filter.id === "name")?.value ?? "")
+  //   );
+  // }
+  const onNameFilterInputChange: (filters: ColumnFiltersState) => void =
+    debounce(
+      (filters) =>
+        setNameFilter(
+          "" + (filters.find((filter) => filter.id === "name")?.value ?? "")
+        ),
+      1000
+    );
 
   const batchFilter: FilterParam = {
     rsql: `name=='*${nameFilter}*' ${hideUsedItems ? "and dateUsed==null" : ""}`
@@ -79,16 +90,20 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }`
   };
 
-  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] =
+  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition8<LibraryPrepBatch>[] =
     [
       {
-        Header: "Name",
-        accessor: "name",
-        filterable: true
+        header: "Name",
+        accessorKey: "name"
       },
-      "dateUsed",
       {
-        Cell: ({ original }) => {
+        header: () => <FieldHeader name="dateUsed" />,
+        accessorKey: "dateUsed",
+        enableColumnFilter: false
+      },
+      {
+        id: "select",
+        cell: ({ row: { original } }) => {
           const batch: LibraryPrepBatch = original;
 
           return (
@@ -111,20 +126,26 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
             </div>
           );
         },
-        Header: LibraryPrepBatchCheckBoxHeader,
-        sortable: false
+        header: () => <LibraryPrepBatchCheckBoxHeader />,
+        enableColumnFilter: false,
+        enableSorting: false
       }
     ];
 
-  const LIBRARY_POOL_TABLE_COLUMNS: ColumnDefinition<LibraryPool>[] = [
+  const LIBRARY_POOL_TABLE_COLUMNS: ColumnDefinition8<LibraryPool>[] = [
     {
-      Header: "Name",
-      accessor: "name",
-      filterable: true
+      header: "Name",
+      accessorKey: "name",
+      enableColumnFilter: true
     },
-    "dateUsed",
     {
-      Cell: ({ original }) => {
+      header: () => <FieldHeader name="dateUsed" />,
+      accessorKey: "dateUsed",
+      enableColumnFilter: false
+    },
+    {
+      id: "select",
+      cell: ({ row: { original } }) => {
         const pool: LibraryPool = original;
 
         return (
@@ -147,15 +168,15 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
           </div>
         );
       },
-      Header: LibraryPoolCheckBoxHeader,
-      sortable: false
+      header: () => <LibraryPoolCheckBoxHeader />,
+      enableSorting: false
     }
   ];
 
-  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: ColumnDefinition<LibraryPoolContent>[] =
+  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: ColumnDefinition8<LibraryPoolContent>[] =
     [
       {
-        Cell: ({ original }) => {
+        cell: ({ row: { original } }) => {
           const lpc: LibraryPoolContent = original;
 
           return (
@@ -168,21 +189,22 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
             </>
           );
         },
-        Header: "Type",
-        sortable: false
+        header: "Type",
+        enableSorting: false
       },
       {
-        Cell: ({ original: content }) =>
+        cell: ({ row: { original: content } }) =>
           content.pooledLibraryPrepBatch
             ? content.pooledLibraryPrepBatch.name
             : content.pooledLibraryPool
             ? content.pooledLibraryPool.name
             : "",
-        Header: "Name",
-        sortable: false
+        header: "Name",
+        enableSorting: false
       },
       {
-        Cell: ({ original }) => {
+        id: "select",
+        cell: ({ row: { original } }) => {
           const lpc: LibraryPoolContent = original;
 
           return (
@@ -205,8 +227,8 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
             </div>
           );
         },
-        Header: DeselectCheckBoxHeader,
-        sortable: false
+        header: () => <DeselectCheckBoxHeader />,
+        enableSorting: false
       }
     ];
 
@@ -228,7 +250,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                 style={{ width: "20px", height: "20px" }}
                 type="checkbox"
                 checked={hideUsedItems}
-                onChange={e => setHideUsedItems(String(e.target.checked))}
+                onChange={(e) => setHideUsedItems(String(e.target.checked))}
               />
             </div>
             <Tabs>
@@ -237,34 +259,32 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                 <Tab>Library Pools</Tab>
               </TabList>
               <TabPanel>
-                <QueryTable<LibraryPrepBatch>
+                <QueryTable8<LibraryPrepBatch>
                   columns={LIBRARY_PREP_BATCH_TABLE_COLUMNS}
                   deps={[lastSave]}
                   filter={batchFilter}
-                  onSuccess={res => setAvailableBatchs(res.data)}
+                  onSuccess={(res) => setAvailableBatchs(res.data)}
                   path="seqdb-api/library-prep-batch"
+                  enableFilters={true}
                   reactTableProps={{
-                    defaultFiltered: [{ id: "name", value: nameFilter }],
-                    getTrProps: () => ({
-                      style: { background: "rgb(222, 252, 222)" }
-                    }),
-                    onFilteredChange: onNameFilterInputChange
+                    defaultColumnFilters: [{ id: "name", value: nameFilter }],
+                    rowStyling: () => ({ background: "rgb(222, 252, 222" }),
+                    onColumnFiltersChange: onNameFilterInputChange
                   }}
                 />
               </TabPanel>
               <TabPanel>
-                <QueryTable<LibraryPool>
+                <QueryTable8<LibraryPool>
                   columns={LIBRARY_POOL_TABLE_COLUMNS}
                   deps={[lastSave]}
                   filter={poolFilter}
-                  onSuccess={res => setAvailablePools(res.data)}
+                  enableFilters={true}
+                  onSuccess={(res) => setAvailablePools(res.data)}
                   path="seqdb-api/library-pool"
                   reactTableProps={{
-                    defaultFiltered: [{ id: "name", value: nameFilter }],
-                    getTrProps: () => ({
-                      style: { background: "rgb(168, 209, 255)" }
-                    }),
-                    onFilteredChange: onNameFilterInputChange
+                    defaultColumnFilters: [{ id: "name", value: nameFilter }],
+                    rowStyling: () => ({ background: "rgb(168, 209, 255" }),
+                    onColumnFiltersChange: onNameFilterInputChange
                   }}
                 />
               </TabPanel>
@@ -292,22 +312,20 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
           </div>
           <div className="col-5 library-pool-content-table">
             <strong>Selected Pool Contents</strong>
-            <QueryTable<LibraryPoolContent>
+            <QueryTable8<LibraryPoolContent>
               columns={LIBRARY_POOL_CONTENTS_TABLE_COLUMNS}
               deps={[lastSave]}
               include="pooledLibraryPrepBatch,pooledLibraryPool"
-              onSuccess={res => setLibraryPoolContents(res.data)}
+              onSuccess={(res) => setLibraryPoolContents(res.data)}
               path={`seqdb-api/library-pool/${libraryPool.id}/contents`}
               reactTableProps={{
-                getTrProps: (_, rowInfo) => {
-                  if (rowInfo) {
-                    const lpc: LibraryPoolContent = rowInfo.original;
+                rowStyling: (row) => {
+                  if (row) {
+                    const lpc: LibraryPoolContent = row.original;
                     return {
-                      style: {
-                        background: lpc.pooledLibraryPrepBatch
-                          ? "rgb(222, 252, 222)"
-                          : "rgb(168, 209, 255)"
-                      }
+                      background: lpc.pooledLibraryPrepBatch
+                        ? "rgb(222, 252, 222)"
+                        : "rgb(168, 209, 255)"
                     };
                   }
                   return {};
