@@ -1,8 +1,4 @@
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState
-} from "@tanstack/react-table";
+import { ColumnDef, SortingState } from "@tanstack/react-table";
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
@@ -94,10 +90,6 @@ export interface QueryTable8Props<TData extends KitsuResource> {
 
   onSortedChange?: (newSort: SortingState) => void;
 
-  enableFilters?: boolean;
-  defaultColumnFilters?: ColumnFiltersState;
-  onColumnFiltersChange?: (newColumnFiltersState: ColumnFiltersState) => void;
-
   /**
    * Override internal react-table props.
    * Pass in either the props or a function that provides the props.
@@ -138,18 +130,12 @@ export function QueryTable8<TData extends KitsuResource>({
   hideTopPagination,
   reactTableProps,
   topRightCorner,
-  ariaLabel,
-  enableFilters = false,
-  defaultColumnFilters = [],
-  onColumnFiltersChange
+  ariaLabel
 }: QueryTable8Props<TData>) {
   const { formatMessage, formatNumber } = useIntl();
 
   // JSONAPI sort attribute.
-  const [sortingRules, setSortingRules] = useState<SortingState>(defaultSort);
-
-  const [columnFilters, setColumnFilters] =
-    useState<ColumnFiltersState>(defaultColumnFilters);
+  const [sortingRules, setSortingRules] = useState(defaultSort);
 
   if (pageSizeOptions.indexOf(defaultPageSize) < 0) {
     defaultPageSize = pageSizeOptions[0];
@@ -210,18 +196,6 @@ export function QueryTable8<TData extends KitsuResource>({
         ? reactTableProps(queryState)
         : reactTableProps;
     tableProps?.onSortingChange?.(newSorting);
-  }
-
-  function onColumnFiltersChangeInternal(
-    newColumnFiltersState: ColumnFiltersState
-  ) {
-    onColumnFiltersChange?.(newColumnFiltersState);
-    setColumnFilters(newColumnFiltersState);
-    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
-      typeof reactTableProps === "function"
-        ? reactTableProps(queryState)
-        : reactTableProps;
-    tableProps?.onColumnFiltersChange?.(newColumnFiltersState);
   }
 
   // Get the new sort order in JSONAPI format. e.g. "name,-description".
@@ -337,10 +311,6 @@ export function QueryTable8<TData extends KitsuResource>({
         data={(displayData as TData[]) ?? []}
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}
-        enableFilters={enableFilters}
-        defaultColumnFilters={defaultColumnFilters}
-        manualFiltering={true}
-        onColumnFiltersChange={onColumnFiltersChangeInternal}
         manualPagination={true}
         enableSorting={true}
         enableMultiSort={true}
