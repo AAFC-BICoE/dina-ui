@@ -136,5 +136,22 @@ export const SEQDB_MESSAGES_ENGLISH = {
   addSeqSubmissionTitle: "Add SEQ Submission",
   editSeqSubmissionTitle: "Edit SEQ Submission",
   seqSubmissionListTitle: "SEQ Submission",
-  pcrReactionTitle: "PCR Reaction"
+  total: "Total",
+  pcrReactionTitle: "PCR Reaction",
+  seqWorksheetTitle: "Sequencing Reaction Form",
+  seqWorksheetPrimer: "Primer",
+  seqWorksheetRxns: "# Rxns ",
+  seqWorkSheetPleaseAdd: "(please add ",
+  seqWorkSheetErrors: " errors)",
+  seqWorksheetComponents: "Components",
+  seqWorksheetConcentration: "Concentration",
+  seqWorksheetUlRxn: "ul/rxn",
+  seqWorksheetEnterSampleDataHere: "Enter Sample data here:",
+  seqWorksheetExportersMessage:
+    "Exporters will include all records from all pages",
+  materialSampleNameAndVersion: "Sample Name and Version",
+  pcrWellCoordinates: "PCR Well Coordinates",
+  seqWellCoordinates: "SEQ Well Coordinates",
+  seqTubeNumber: "SEQ Tube Number",
+  primerName: "Primer Name"
 };
