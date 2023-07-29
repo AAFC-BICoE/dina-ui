@@ -1,5 +1,6 @@
 import {
   ColumnDef,
+  ColumnFiltersState,
   ExpandedState,
   PaginationState,
   Row,
@@ -8,6 +9,7 @@ import {
   flexRender,
   getCoreRowModel,
   getExpandedRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable
@@ -18,6 +20,7 @@ import { Fragment, useState } from "react";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
+import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
 
@@ -31,9 +34,18 @@ export interface ReactTable8Props<TData> {
   onRowMove?: (from: number, to: number) => void;
   // Enable row drag and drop
   enableDnd?: boolean;
+  // Sorting
   enableSorting?: boolean;
   enableMultiSort?: boolean;
   manualSorting?: boolean;
+  defaultSorted?: SortingState;
+  onSortingChange?: (sorting: SortingState) => void;
+  // Filtering
+  enableFilters?: boolean;
+  manualFiltering?: boolean;
+  onColumnFiltersChange?: (columnFilters: ColumnFiltersState) => void;
+  defaultColumnFilters?: ColumnFiltersState;
+  // Class name of this component.
   className?: string;
   // handle pagination manually
   manualPagination?: boolean;
@@ -47,8 +59,6 @@ export interface ReactTable8Props<TData> {
   // Show pagination on the top
   showPaginationTop?: boolean;
   pageSizeOptions?: number[];
-  defaultSorted?: SortingState;
-  onSortingChange?: (sorting: SortingState) => void;
   defaultExpanded?: ExpandedState;
   // A function to render the SubComponent in the expanded area.
   renderSubComponent?: (props: {
@@ -92,10 +102,16 @@ export function ReactTable8<TData>({
   loading = false,
   columnVisibility,
   highlightRow = true,
-  TbodyComponent
+  TbodyComponent,
+  enableFilters = false,
+  manualFiltering = false,
+  onColumnFiltersChange,
+  defaultColumnFilters = []
 }: ReactTable8Props<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] =
+    useState<ColumnFiltersState>(defaultColumnFilters);
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: page ?? 0,
     pageSize: initPageSize ?? pageSizeOptions[0]
@@ -119,15 +135,17 @@ export function ReactTable8<TData>({
     setSorting(newState);
   }
 
-  const tableStateOption = manualPagination
+  function onColumnFiltersChangeInternal(updator) {
+    const newState = updator(table.getState().columnFilters);
+    onColumnFiltersChange?.(newState);
+    setColumnFilters(newState);
+  }
+
+  const paginationStateOption = manualPagination
     ? {
-        state: {
-          pagination: { pageIndex, pageSize },
-          sorting,
-          columnVisibility
-        }
+        pagination: { pageIndex, pageSize }
       }
-    : { state: { sorting, columnVisibility } };
+    : {};
 
   const getExpandedRowModelOption =
     !!renderSubComponent && !!getRowCanExpand
@@ -147,12 +165,17 @@ export function ReactTable8<TData>({
     ? { onSortingChange: onSortingChangeInternal }
     : { onSortingChange: setSorting };
 
+  const onColumnFilterChangeOption = manualFiltering
+    ? { onColumnFiltersChange: onColumnFiltersChangeInternal }
+    : { onColumnFiltersChange: setColumnFilters };
+
   const tableOption = {
     data,
     columns,
     defaultColumn: { minSize: 0, size: 0 },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getRowCanExpand,
 
     getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4()),
@@ -165,9 +188,17 @@ export function ReactTable8<TData>({
     manualPagination,
     manualSorting,
     ...getExpandedRowModelOption,
-    ...tableStateOption,
+    state: {
+      sorting,
+      columnVisibility,
+      columnFilters,
+      ...paginationStateOption
+    },
+    enableFilters,
+    manualFiltering,
     ...onPaginationChangeOption,
-    ...onSortingChangeOption
+    ...onSortingChangeOption,
+    ...onColumnFilterChangeOption
   };
 
   const table = useReactTable<TData>(tableOption);
@@ -220,6 +251,11 @@ export function ReactTable8<TData>({
                       )}
                     </div>
                   )}
+                  {header.column.getCanFilter() ? (
+                    <div>
+                      <FilterInput column={header.column} />
+                    </div>
+                  ) : null}
                 </th>
               ))}
             </tr>

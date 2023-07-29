@@ -24,6 +24,7 @@ export interface SeqReactionSample {
   primerDirection?: string;
   wellRow?: string;
   wellColumn?: number;
+  cellNumber?: number;
   sampleId?: string;
   sampleName?: string;
 }
@@ -211,7 +212,8 @@ export function useSeqSelectCoordinatesControls({
                 seqReactionId: item.id,
                 pcrBatchItemId: item.pcrBatchItem?.id,
                 wellColumn: item.wellColumn,
-                wellRow: item.wellRow
+                wellRow: item.wellRow,
+                cellNumber: item.cellNumber
               } as SeqReactionSample)
           )
         );

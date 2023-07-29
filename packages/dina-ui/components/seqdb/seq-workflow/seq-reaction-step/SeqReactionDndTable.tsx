@@ -11,7 +11,7 @@ import {
 
 export interface SeqReactionDnDTableProps {
   selectedSeqReactions: SeqReaction[];
-  setSelectedSeqReactions: (seqReactions: SeqReaction[]) => void;
+  setSelectedSeqReactions?: (seqReactions: SeqReaction[]) => void;
   editMode: boolean;
   className?: string;
 }
