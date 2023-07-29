@@ -18,7 +18,6 @@ import classnames from "classnames";
 import { Fragment, useState } from "react";
 
 import { useIntl } from "react-intl";
-import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
@@ -178,7 +177,6 @@ export function ReactTable8<TData>({
     getFilteredRowModel: getFilteredRowModel(),
     getRowCanExpand,
 
-    getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4()),
     initialState: {
       expanded: defaultExpanded,
       sorting: defaultSorted

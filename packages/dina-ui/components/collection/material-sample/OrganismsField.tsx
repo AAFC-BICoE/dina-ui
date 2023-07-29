@@ -311,13 +311,13 @@ function OrganismsTable({
   );
 
   const expandAll = visibleTableData.reduce<Record<number, boolean>>(
-    (prev, curr) => ({ ...prev, [curr.id + ""]: true }),
+    (prev, _, currIndex) => ({ ...prev, [currIndex]: true }),
     {}
   );
 
   /** Number-to-boolean map for when only the first organism is expanded. */
   const expandFirstOnly = {
-    [visibleTableData[0]?.id + ""]: organismsQuantity === 1
+    [0]: organismsQuantity === 1
   };
 
   const initialExpanded: Record<number, boolean> = readOnly
