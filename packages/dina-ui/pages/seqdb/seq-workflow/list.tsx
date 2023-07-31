@@ -17,7 +17,7 @@ const TABLE_COLUMNS: ColumnDefinition<SeqBatch>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/seqdb/sanger-workflow-sequencing/run?seqBatchId=${id}`}>
+      <Link href={`/seqdb/seq-workflow/run?seqBatchId=${id}`}>
         {name || id}
       </Link>
     ),
@@ -50,7 +50,7 @@ export default function SangerWorkflowSequencingListPage() {
           {formatMessage("sangerWorkflowSequencingListTitle")}
         </h1>
         <ButtonBar>
-          <Link href={`/seqdb/sanger-workflow-sequencing/run`}>
+          <Link href={`/seqdb/seq-workflow/run`}>
             <a className="btn btn-primary">
               <SeqdbMessage id="startNewWorkflow" />
             </a>
@@ -63,7 +63,7 @@ export default function SangerWorkflowSequencingListPage() {
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
-          id="sanger-workflow-sequencing-list"
+          id="seq-workflow-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
             path: "seqdb-api/seq-batch"

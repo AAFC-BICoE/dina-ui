@@ -261,7 +261,7 @@ export function Home() {
                     <SeqdbMessage id="sequencingFacilityListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/sanger-workflow-sequencing/list">
+                <Link href="/seqdb/seq-workflow/list">
                   <a>
                     <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
                   </a>

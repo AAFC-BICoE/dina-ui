@@ -1,5 +1,6 @@
 import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
+import Link from "next/link";
 import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
 import { useEffect } from "react";
 import { ContainerGrid } from "./seq-batch-select-coordinats-step/ContainerGrid";
@@ -74,6 +75,17 @@ export function SeqBatchSelectCoordinatesStep(
 
   return (
     <div className="mt-3">
+      {!editMode && (
+        <div className="row">
+          <div className="col-12 text-end">
+            <Link href={`/seqdb/seq-workflow/worksheet?id=${seqBatchId}`}>
+              <a target="_blank" className="btn btn-primary">
+                Worksheet
+              </a>
+            </Link>
+          </div>
+        </div>
+      )}
       {editMode && (
         <div className="row">
           <div className="col-3" />

@@ -11,7 +11,7 @@ import {
 
 export interface SeqReactionDnDTableProps {
   selectedSeqReactions: SeqReaction[];
-  setSelectedSeqReactions: (seqReactions: SeqReaction[]) => void;
+  setSelectedSeqReactions?: (seqReactions: SeqReaction[]) => void;
   editMode: boolean;
   className?: string;
 }
@@ -105,12 +105,25 @@ export function SeqReactionDndTable({
     }
   ];
 
+  function onRowMove(draggedRowIndex: number, targetRowIndex: number) {
+    if (!!selectedSeqReactions) {
+      selectedSeqReactions.splice(
+        targetRowIndex,
+        0,
+        selectedSeqReactions.splice(draggedRowIndex, 1)[0] as SeqReaction
+      );
+      if (!!setSelectedSeqReactions) {
+        setSelectedSeqReactions([...selectedSeqReactions]);
+      }
+    }
+  }
+
   return (
     <ReactTable8<SeqReaction>
       className={className}
       columns={seqReactionColumns}
       data={selectedSeqReactions}
-      setData={setSelectedSeqReactions}
+      onRowMove={onRowMove}
       enableDnd={editMode}
     />
   );

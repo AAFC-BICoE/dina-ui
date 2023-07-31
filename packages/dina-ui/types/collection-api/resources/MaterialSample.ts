@@ -74,6 +74,7 @@ export interface MaterialSampleAttributes {
   restrictionRemarks?: string | null;
   extensionValues?: any;
   extensionValuesForm?: any;
+  version?: string;
 }
 
 export interface HostOrganism {
