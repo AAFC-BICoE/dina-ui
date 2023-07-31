@@ -4,7 +4,7 @@ import {
   FormikButton,
   QueryTable,
   rsql,
-  stringArrayCell8
+  stringArrayCell
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { FilterParam } from "kitsu";
@@ -35,7 +35,7 @@ export function CollectingEventLinker({
 }: CollectingEventLinkerProps) {
   const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
     "dwcFieldNumber",
-    stringArrayCell8("otherRecordNumbers"),
+    stringArrayCell("otherRecordNumbers"),
     "createdBy",
     {
       id: "locationLabel",

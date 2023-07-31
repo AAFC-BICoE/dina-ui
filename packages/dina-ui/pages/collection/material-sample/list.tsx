@@ -9,7 +9,7 @@ import {
   FilterAttribute,
   ListPageLayout,
   QueryPage,
-  stringArrayCell8
+  stringArrayCell
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -66,7 +66,7 @@ export const getColumnDefinition: () => ColumnDefinition<MaterialSample>[] =
           ) : null,
         accessorKey: "collection.name"
       },
-      stringArrayCell8("dwcOtherCatalogNumbers"),
+      stringArrayCell("dwcOtherCatalogNumbers"),
       { accessorKey: "materialSampleType" },
       "createdBy",
       dateCell("createdOn")
@@ -241,7 +241,7 @@ export default function MaterialSampleListPage() {
     },
 
     // List of catalogue numbers
-    stringArrayCell8(
+    stringArrayCell(
       "dwcOtherCatalogNumbers",
       "data.attributes.dwcOtherCatalogNumbers"
     ),
