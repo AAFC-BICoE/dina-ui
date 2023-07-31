@@ -18,7 +18,6 @@ import classnames from "classnames";
 import { Fragment, useState } from "react";
 
 import { useIntl } from "react-intl";
-import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
@@ -30,8 +29,8 @@ export interface ReactTable8Props<TData> {
   // Columns definations, ref: https://tanstack.com/table/v8/docs/api/core/column
   columns: ColumnDef<TData>[];
   data: TData[];
-  // When DnD is enabled, need to call setData() after DnD
-  setData?: (data?: TData[]) => void;
+  // When DnD is enabled, need to call onRowMove() after DnD
+  onRowMove?: (from: number, to: number) => void;
   // Enable row drag and drop
   enableDnd?: boolean;
   // Sorting
@@ -61,7 +60,10 @@ export interface ReactTable8Props<TData> {
   pageSizeOptions?: number[];
   defaultExpanded?: ExpandedState;
   // A function to render the SubComponent in the expanded area.
-  renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement;
+  renderSubComponent?: (props: {
+    row: Row<TData>;
+    index?: number;
+  }) => React.ReactElement;
   // A function that returns true, the the row is expandable
   getRowCanExpand?: (row: Row<TData>) => boolean;
   // Styling to be applied to each row of the React Table
@@ -74,7 +76,7 @@ export interface ReactTable8Props<TData> {
 
 export function ReactTable8<TData>({
   data,
-  setData,
+  onRowMove,
   columns,
   enableDnd = false,
   enableSorting = true,
@@ -114,13 +116,6 @@ export function ReactTable8<TData>({
     pageSize: initPageSize ?? pageSizeOptions[0]
   });
 
-  function reorderRow(draggedRowIndex: number, targetRowIndex: number) {
-    data.splice(targetRowIndex, 0, data.splice(draggedRowIndex, 1)[0] as TData);
-    if (!!setData) {
-      setData([...data]);
-    }
-  }
-
   function onPaginationChangeInternal(updater) {
     const { pageIndex: oldPageIndex, pageSize: oldPageSize } =
       table.getState().pagination;
@@ -152,7 +147,7 @@ export function ReactTable8<TData>({
     : {};
 
   const getExpandedRowModelOption =
-    renderSubComponent && getRowCanExpand
+    !!renderSubComponent && !!getRowCanExpand
       ? { getExpandedRowModel: getExpandedRowModel() }
       : {};
 
@@ -182,7 +177,6 @@ export function ReactTable8<TData>({
     getFilteredRowModel: getFilteredRowModel(),
     getRowCanExpand,
 
-    getRowId: (row) => ((row as any).id ? (row as any).id : uuidv4()),
     initialState: {
       expanded: defaultExpanded,
       sorting: defaultSorted
@@ -292,11 +286,11 @@ export function ReactTable8<TData>({
             </tr>
           ) : (
             table.getRowModel().rows.map((row, index) => (
-              <Fragment key={index}>
+              <Fragment key={row.id ?? index}>
                 {enableDnd ? (
                   <DraggableRow
                     row={row}
-                    reorderRow={reorderRow}
+                    reorderRow={onRowMove}
                     className={classnames(
                       `index-${index}`,
                       index % 2 === 0 ? "-odd" : "-even"
@@ -317,7 +311,7 @@ export function ReactTable8<TData>({
                   <tr>
                     {/* 2nd row is a custom 1 cell row that contains the extended area */}
                     <td colSpan={row.getVisibleCells().length}>
-                      {renderSubComponent?.({ row })}
+                      {renderSubComponent?.({ row, index })}
                     </td>
                   </tr>
                 )}

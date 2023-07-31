@@ -729,6 +729,19 @@ export function QueryPage<TData extends KitsuResource>({
     [pageSize]
   );
 
+  function onRowMove(draggedRowIndex: number, targetRowIndex: number) {
+    if (!!selectedResources) {
+      selectedResources.splice(
+        targetRowIndex,
+        0,
+        selectedResources.splice(draggedRowIndex, 1)[0] as TData
+      );
+      if (!!setSelectedResources) {
+        setSelectedResources([...selectedResources]);
+      }
+    }
+  }
+
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
@@ -897,9 +910,7 @@ export function QueryPage<TData extends KitsuResource>({
                     loading={loading}
                     columns={columnsSelected}
                     data={selectedResources ?? []}
-                    setData={(data) =>
-                      setSelectedResources && setSelectedResources(data ?? [])
-                    }
+                    onRowMove={onRowMove}
                     enableDnd={enableDnd}
                     enableSorting={!enableDnd}
                     showPagination={!enableDnd}

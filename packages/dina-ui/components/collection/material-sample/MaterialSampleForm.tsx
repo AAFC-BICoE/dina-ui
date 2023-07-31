@@ -24,7 +24,8 @@ import {
   StorageLinkerField,
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
-  AssemblageSelectSection
+  AssemblageSelectSection,
+  OrganismsField
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
@@ -52,7 +53,6 @@ import { TabbedResourceLinker } from "../TabbedResourceLinker";
 import { MaterialSampleBreadCrumb } from "./MaterialSampleBreadCrumb";
 import { MaterialSampleIdentifiersSection } from "./MaterialSampleIdentifiersSection";
 import { MaterialSampleInfoSection } from "./MaterialSampleInfoSection";
-import { OrganismsField } from "./OrganismsField";
 import { PreparationField } from "./PreparationField";
 import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
