@@ -4,7 +4,7 @@ import {
   DeleteButton,
   EditButton,
   FieldHeader,
-  stringArrayCell8,
+  stringArrayCell,
   useStringComparator
 } from "common-ui";
 import { Determination, MaterialSample } from "../../../types/collection-api";
@@ -139,7 +139,7 @@ export function useMaterialSampleRelationshipColumns() {
       isKeyword: true
     },
     dateCell("createdOn", "data.attributes.createdOn"),
-    stringArrayCell8("tags", "data.attributes.tags"),
+    stringArrayCell("tags", "data.attributes.tags"),
     {
       id: "action",
       cell: ({ row: { original } }) => (

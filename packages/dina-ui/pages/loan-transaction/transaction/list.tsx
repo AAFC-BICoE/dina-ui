@@ -5,7 +5,7 @@ import {
   QueryPage,
   booleanCell,
   dateCell,
-  stringArrayCell8
+  stringArrayCell
 } from "common-ui";
 import { TableColumn8 } from "common-ui/lib/list-page/types";
 import Link from "next/link";
@@ -36,7 +36,7 @@ export const TRANSACTION_TABLE_COLUMNS: TableColumn8<Transaction>[] = [
     accessorKey: "data.attributes.materialDirection",
     isKeyword: true
   },
-  stringArrayCell8("otherIdentifiers", "data.attributes.otherIdentifiers"),
+  stringArrayCell("otherIdentifiers", "data.attributes.otherIdentifiers"),
   booleanCell("materialToBeReturned", "data.attributes.materialToBeReturned"),
   {
     header: () => <FieldHeader name="purpose" />,

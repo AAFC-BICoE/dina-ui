@@ -4,7 +4,7 @@ import {
   CreateButton,
   ListPageLayout,
   dateCell,
-  stringArrayCell8
+  stringArrayCell
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
@@ -34,7 +34,7 @@ const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition<Organization>[] = [
     accessorKey: "name",
     enableSorting: false
   },
-  stringArrayCell8("aliases"),
+  stringArrayCell("aliases"),
   "createdBy",
   dateCell("createdOn")
 ];

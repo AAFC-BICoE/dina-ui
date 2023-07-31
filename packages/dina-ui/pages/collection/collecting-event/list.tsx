@@ -4,7 +4,7 @@ import {
   CreateButton,
   dateCell,
   ListPageLayout,
-  stringArrayCell8
+  stringArrayCell
 } from "common-ui";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
@@ -39,7 +39,7 @@ export default function CollectingEventListPage() {
     },
     "dwcFieldNumber",
     "dwcRecordNumber",
-    stringArrayCell8("otherRecordNumbers"),
+    stringArrayCell("otherRecordNumbers"),
     "createdBy",
     "startEventDateTime",
     "endEventDateTime",
