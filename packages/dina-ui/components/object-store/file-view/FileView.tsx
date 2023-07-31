@@ -1,8 +1,11 @@
 import { LoadingSpinner, useApiClient, useQuery } from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { ComponentType, ReactNode, useEffect, useState } from "react";
+import { ComponentType, ReactNode, useState } from "react";
 import Link from "next/link";
+import { SmallThumbnail } from "../../table/thumbnail-cell";
+import { useFormikContext } from "formik";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
 
 export type DownLoadLinks = {
   original?: string;
@@ -52,12 +55,12 @@ export function FileView({
 }: FileViewProps) {
   const { apiClient } = useApiClient();
   const [objectURL, setObjectURL] = useState<string>();
-  // const [loading, setLoading] = useState<boolean>(true);
   async function fetchObjectBlob(path) {
     return await apiClient.axios.get(path, {
       responseType: "blob"
     });
   }
+  const form = useFormikContext<Metadata>();
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
 
@@ -100,6 +103,30 @@ export function FileView({
     }
   }
 
+  function fallBackRender() {
+    const thumbnailImageDerivative = form?.initialValues?.derivatives?.find(
+      (it) => it.derivativeType === "THUMBNAIL_IMAGE"
+    );
+    const fileId = thumbnailImageDerivative?.fileIdentifier;
+    const fallBackFilePath = `/objectstore-api/file/${
+      thumbnailImageDerivative?.bucket
+    }/${
+      // Add derivative/ before the fileIdentifier if the file to display is a derivative.
+      thumbnailImageDerivative?.type === "derivative" ? "derivative/" : ""
+    }${fileId}`;
+    return (
+      <div>
+        {thumbnailImageDerivative ? (
+          <SmallThumbnail filePath={fallBackFilePath} />
+        ) : (
+          <Link href={objectURL as any} passHref={true}>
+            <a>{filePath}</a>
+          </Link>
+        )}
+      </div>
+    );
+  }
+
   if (resp?.loading) {
     return <LoadingSpinner loading={true} />;
   }
@@ -134,13 +161,8 @@ export function FileView({
               <FileViewer
                 filePath={objectURL}
                 fileType={fileType}
-                unsupportedComponent={() => (
-                  <div>
-                    <Link href={objectURL as any} passHref={true}>
-                      <a>{filePath}</a>
-                    </Link>
-                  </div>
-                )}
+                unsupportedComponent={fallBackRender}
+                errorComponent={fallBackRender}
               />
             )
           ) : null}

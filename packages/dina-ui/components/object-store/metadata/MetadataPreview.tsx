@@ -32,7 +32,6 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
 
   if (response) {
     const metadata = response.data;
-    const fileToDisplay = getFileToDisplay(metadata);
 
     return (
       <div className="metadata-preview">
