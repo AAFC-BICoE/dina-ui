@@ -23,6 +23,8 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
+    pwd
+    ls -la
     npm install -g pa11y-ci pa11y-ci-reporter-html
   displayName: 'Install pa11y-ci'
 
@@ -49,22 +51,20 @@ steps:
     mkcert -cert-file  $(Pipeline.Workspace)/dina-local-deployment/certs/dina-local-cert.pem -key-file $(Pipeline.Workspace)/dina-local-deployment/certs/dina-local-key.pem "dina.local" "api.dina.local" "keycloak.dina.local"
   displayName: Setting up certificates
 
-- script: |
-    docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
-  displayName: 'Start DockerCompose'
+# - script: |
+#     docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
+#   displayName: 'Start DockerCompose'
+
+# - bash: |
+#     echo Try to connect to Keycloak endpoint ...
+#     curl --head -X GET --retry 25 --retry-delay 2 --retry-connrefused https://dina.local/auth
+#   displayName: 'Waiting for Keycloak ...'
+
 
 - bash: |
-    echo Try to connect to Keycloak endpoint ...
-    curl --head -X GET --retry 25 --retry-delay 2 --retry-connrefused https://dina.local/auth
-  displayName: 'Waiting for Keycloak ...'
-
-
-- bash: |
-    cd $(Pipeline.Workspace)/a
-    ls -la
     python3 a/pa11y.py
   displayName: 'Running pa11y'
 
-- bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
-  displayName: 'Stop DockerCompose'
+# - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
+#   displayName: 'Stop DockerCompose'
   
