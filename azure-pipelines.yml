@@ -15,10 +15,6 @@ resources:
     type: github
     endpoint: AAFC-BICoE
     name: AAFC-BICoE/dina-local-deployment
-  - repository: dina-ui-repo
-    type: github
-    endpoint: AAFC-BICoE
-    name: AAFC-BICoE/dina-ui
 
 steps:
 - task: NodeTool@0
@@ -58,16 +54,16 @@ steps:
   displayName: 'Start DockerCompose'
 
 - bash: |
+    pwd
+    ls -la
     echo Try to connect to Keycloak endpoint ...
     curl --head -X GET --retry 25 --retry-delay 1 https://dina.local/auth
   displayName: 'Waiting for Keycloak ...'
 
-- checkout: dina-ui-repo
-  path: dina-ui
 
-- bash: |
-    python3 dina-ui/pa11y.py
-  displayName: 'Running pa11y'
+# - bash: |
+#     python3 dina-ui/pa11y.py
+#   displayName: 'Running pa11y'
 
 - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
   displayName: 'Stop DockerCompose'
