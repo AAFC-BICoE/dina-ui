@@ -10,7 +10,7 @@ import {
   FormikButton,
   JsonApiQuerySpec,
   OnFormikSubmit,
-  ReactTable8,
+  ReactTable,
   TextField,
   useDinaFormContext
 } from "common-ui";
@@ -190,7 +190,7 @@ export function ScheduledActionsField({
             return (
               <>
                 {hasActions && (
-                  <ReactTable8<ScheduledAction>
+                  <ReactTable<ScheduledAction>
                     columns={actionColumns}
                     defaultSorted={[{ id: "date", desc: true }]}
                     data={scheduledActions}

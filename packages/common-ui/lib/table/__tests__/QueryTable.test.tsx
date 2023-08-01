@@ -13,7 +13,7 @@ import {
   MetaWithTotal,
   QueryTable,
   QueryTableProps,
-  ReactTable8
+  ReactTable
 } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 
@@ -455,7 +455,7 @@ describe("QueryTable component", () => {
       { apiContext }
     );
 
-    expect(wrapper.find(ReactTable8).hasClass("-striped")).toEqual(true);
+    expect(wrapper.find(ReactTable).hasClass("-striped")).toEqual(true);
   });
 
   it("Accepts a combination of strings and column config objects as props.", async () => {
@@ -627,7 +627,7 @@ describe("QueryTable component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(ReactTable8).prop("loading")).toEqual(true);
+    expect(wrapper.find(ReactTable).prop("loading")).toEqual(true);
   });
 
   // it("Provides a header input for filtering.", async () => {

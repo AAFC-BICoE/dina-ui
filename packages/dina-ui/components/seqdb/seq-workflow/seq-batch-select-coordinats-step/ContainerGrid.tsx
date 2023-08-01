@@ -8,7 +8,7 @@ import {
 import { useState, useEffect, useMemo } from "react";
 import { SeqReactionSample } from "./useSeqSelectCoordinatesControls";
 import RcTooltip from "rc-tooltip";
-import { ReactTable8 } from "packages/common-ui/lib";
+import { ReactTable } from "packages/common-ui/lib";
 
 interface ContainerGridProps {
   seqBatch: SeqBatch;
@@ -114,7 +114,7 @@ export function ContainerGrid({
           padding: 0 !important;
         }
       `}</style>
-      <ReactTable8<any>
+      <ReactTable<any>
         columns={tableColumns}
         data={tableData}
         showPagination={false}

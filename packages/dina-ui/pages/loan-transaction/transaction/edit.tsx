@@ -11,7 +11,7 @@ import {
   NumberField,
   QueryPage,
   RadioButtonsField,
-  ReactTable8,
+  ReactTable,
   StringArrayField,
   SubmitButton,
   TextField,
@@ -454,7 +454,7 @@ export function TransactionFormLayout({
                   fieldName="agentRoles"
                 >
                   <div className="mb-3">
-                    <ReactTable8<AgentRole>
+                    <ReactTable<AgentRole>
                       columns={tableColumns}
                       data={agentRoles}
                       className="-striped"

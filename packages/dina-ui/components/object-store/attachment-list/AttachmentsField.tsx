@@ -4,7 +4,7 @@ import {
   FieldSet,
   FieldSpy,
   LoadingSpinner,
-  ReactTable8,
+  ReactTable,
   Tooltip,
   useBulkGet,
   useDinaFormContext,
@@ -160,7 +160,7 @@ export function AttachmentsEditor({
             <>
               {value.length ? (
                 <div className="mb-3">
-                  <ReactTable8
+                  <ReactTable
                     columns={[
                       ThumbnailCell({
                         bucketField: "bucket",

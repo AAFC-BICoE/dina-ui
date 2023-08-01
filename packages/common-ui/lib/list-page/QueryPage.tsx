@@ -13,7 +13,7 @@ import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
-import { FormikButton, ReactTable8, ReactTable8Props, useAccount } from "..";
+import { FormikButton, ReactTable, ReactTableProps, useAccount } from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
@@ -123,11 +123,11 @@ export interface QueryPageProps<TData extends KitsuResource> {
   bulkSplitPath?: string;
 
   reactTableProps?:
-    | Partial<ReactTable8Props<TData>>
+    | Partial<ReactTableProps<TData>>
     | ((
         responseData: PersistedResource<TData>[] | undefined,
         CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>
-      ) => Partial<ReactTable8Props<TData>>);
+      ) => Partial<ReactTableProps<TData>>);
 
   /**
    * When enabled, the user will see the results table with a selection table.
@@ -608,7 +608,7 @@ export function QueryPage<TData extends KitsuResource>({
     {}
   );
 
-  const resolvedReactTableProps: Partial<ReactTable8Props<TData>> = {
+  const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     defaultSorted: sortingRules,
     columnVisibility,
     ...computedReactTableProps
@@ -846,7 +846,7 @@ export function QueryPage<TData extends KitsuResource>({
                   </button>
                 </div>
               )}
-              <ReactTable8<TData>
+              <ReactTable<TData>
                 // Column and data props
                 columns={columnsResults}
                 data={
@@ -910,7 +910,7 @@ export function QueryPage<TData extends KitsuResource>({
                       values={{ totalCount: selectedResources?.length ?? 0 }}
                     />
                   </span>
-                  <ReactTable8<TData>
+                  <ReactTable<TData>
                     loading={loading}
                     columns={columnsSelected}
                     data={selectedResources ?? []}

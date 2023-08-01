@@ -5,7 +5,7 @@ import {
   FieldHeader,
   FieldSet,
   LimitOffsetPageSpec,
-  ReactTable8,
+  ReactTable,
   dateCell
 } from "common-ui";
 import Link from "next/link";
@@ -110,7 +110,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
   const shouldShowPagination = !!totalCount && totalCount > 25;
   return (
     <FieldSet legend={fieldSetId}>
-      <ReactTable8<MaterialSample>
+      <ReactTable<MaterialSample>
         columns={CHILD_SAMPLES_COLUMNS}
         className="-striped react-table-overflow"
         data={samples ?? []}

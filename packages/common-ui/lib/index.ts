@@ -102,7 +102,7 @@ export * from "./util/useIsMounted";
 export * from "./table/EditableTable";
 export * from "./util/useStringArrayConverter";
 export * from "./util/useMaterialSampleNameComparator";
-export * from "./table/ReactTable8";
+export * from "./table/ReactTable";
 export * from "./table/Pagination";
 export * from "./table/RowComponents";
 export * from "./table/StringArrayCell";

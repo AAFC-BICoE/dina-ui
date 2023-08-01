@@ -13,8 +13,8 @@ exports[`View Exif page renders exif props when received file upload response 1`
         </Collapser>
       </h4>
       <KeyValueTable data={{...}}>
-        <ReactTable8 className=\\"-striped\\" highlightRow={false} columns={{...}} data={{...}} showPagination={false} manualPagination={true}>
-          <div className=\\"ReactTable8 -striped\\">
+        <ReactTable className=\\"-striped\\" highlightRow={false} columns={{...}} data={{...}} showPagination={false} manualPagination={true}>
+          <div className=\\"ReactTable -striped\\">
             <table className=\\"w-100\\">
               <thead>
                 <tr>
@@ -417,7 +417,7 @@ exports[`View Exif page renders exif props when received file upload response 1`
               </tbody>
             </table>
           </div>
-        </ReactTable8>
+        </ReactTable>
       </KeyValueTable>
     </div>
   </CollapsableSection>

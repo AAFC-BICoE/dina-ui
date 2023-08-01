@@ -2,7 +2,7 @@ import {
   ApiClientContext,
   DateView,
   FieldHeader,
-  ReactTable8,
+  ReactTable,
   useCollapser
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -143,7 +143,7 @@ function MetadataAttributeGroup({
 
   return (
     <CollapsableSection collapserId={title} title={title}>
-      <ReactTable8
+      <ReactTable
         className="-striped"
         columns={[
           {
