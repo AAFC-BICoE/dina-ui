@@ -41,6 +41,7 @@ steps:
   displayName: 'Setting up hosts name'
 
 - script: |
+    echo $(Pipeline.Workspace)
     sudo apt-get install wget libnss3-tools -y
     wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64
     sudo chmod +x mkcert-v1.4.3-linux-amd64
@@ -50,7 +51,7 @@ steps:
   displayName: Setting up certificates
 
 - script: |
-    docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
+    docker compose -f docker-compose.base.yml -f docker-compose.local.yml up
   displayName: 'Start DockerCompose'
 
 - bash: |
