@@ -37,6 +37,7 @@ steps:
   path: dina-local-deployment
 
 - checkout: self
+  path: dina-ui
 
 - script: |
     sudo sh -c "echo '192.19.33.9 dina.local' >> /etc/hosts"
@@ -64,7 +65,7 @@ steps:
 
 
 - bash: |
-    python3 /home/vsts/work/1/s/pa11y.py
+    python3 $(Pipeline.Workspace)/dina-ui/pa11y.py
   displayName: 'Running pa11y'
 
 # - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
