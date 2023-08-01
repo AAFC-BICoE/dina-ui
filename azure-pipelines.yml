@@ -41,6 +41,7 @@ steps:
   displayName: 'Setting up hosts name'
 
 - script: |
+    pwd
     echo $(Pipeline.Workspace)
     sudo apt-get install wget libnss3-tools -y
     wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64
@@ -51,14 +52,15 @@ steps:
   displayName: Setting up certificates
 
 - script: |
-    docker compose -f docker-compose.base.yml -f docker-compose.local.yml up
+    pwd
+    docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
   displayName: 'Start DockerCompose'
 
 - bash: |
     pwd
     ls -la
     echo Try to connect to Keycloak endpoint ...
-    curl --head -X GET --retry 25 --retry-delay 1 https://dina.local/auth
+    curl --head -X GET --retry 25 --retry-delay 2 https://dina.local/auth
   displayName: 'Waiting for Keycloak ...'
 
 
