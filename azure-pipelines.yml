@@ -62,7 +62,7 @@ steps:
 
 
 - bash: |
-    python3 a/pa11y.py
+    python3 /home/vsts/work/1/s/pa11y.py
   displayName: 'Running pa11y'
 
 # - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
