@@ -61,7 +61,8 @@ steps:
 
 - bash: |
     cd $(Pipeline.Workspace)
-    python3 pa11y.py
+    ls -la
+    python3 s/pa11y.py
   displayName: 'Running pa11y'
 
 - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
