@@ -62,8 +62,8 @@ steps:
     curl --head -X GET --retry 25 --retry-delay 1 https://dina.local/auth
   displayName: 'Waiting for Keycloak ...'
 
-- checkout: local-deployement-repo
-  path: dina-local-deployment
+- checkout: dina-ui-repo
+  path: dina-ui
 
 - bash: |
     python3 dina-ui/pa11y.py
