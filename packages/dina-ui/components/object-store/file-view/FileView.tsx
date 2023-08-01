@@ -5,7 +5,7 @@ import { ComponentType, ReactNode, useState } from "react";
 import Link from "next/link";
 import { SmallThumbnail } from "../../table/thumbnail-cell";
 import { useFormikContext } from "formik";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { Metadata } from "../../../types/objectstore-api";
 
 export type DownLoadLinks = {
   original?: string;

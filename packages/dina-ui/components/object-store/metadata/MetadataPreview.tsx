@@ -56,11 +56,11 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
             </a>
           </Link>
           {metadata.resourceExternalURL && metadata.derivatives && (
-            <MetadataFileView metadata={metadata} />
+            <MetadataFileView metadata={metadata} preview={true} />
           )}
           {metadata.fileIdentifier && (
             <>
-              <MetadataFileView metadata={metadata} />
+              <MetadataFileView metadata={metadata} preview={true} />
               <NotPubliclyReleasableWarning />
               <div className="px-3">
                 <TagsAndRestrictionsSection tagsFieldName="acTags" />
