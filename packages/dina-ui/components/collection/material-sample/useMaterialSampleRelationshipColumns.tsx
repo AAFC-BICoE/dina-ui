@@ -15,7 +15,7 @@ import Link from "next/link";
 export function useMaterialSampleRelationshipColumns() {
   const { compareByStringAndNumber } = useStringComparator();
 
-  const PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8: TableColumn<any>[] = [
+  const PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN: TableColumn<any>[] = [
     {
       id: "materialSampleName",
       cell: ({ row: { original } }) => {
@@ -172,7 +172,7 @@ export function useMaterialSampleRelationshipColumns() {
 
   return {
     ELASTIC_SEARCH_COLUMN,
-    PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8,
+    PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN,
     ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW
   };
 }
