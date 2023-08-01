@@ -38,7 +38,7 @@ const ELASTIC_SEARCH_QUERY: any = {
 const columnDefinitions: (TableColumn<KitsuResource> | string)[] = [
   {
     label: "testColumn1",
-    accessor: "data.attributes.testColumn1",
+    accessorKey: "data.attributes.testColumn1",
     isKeyword: true,
     additionalAccessors: [
       "data.attributes.includeThis1",
@@ -47,20 +47,20 @@ const columnDefinitions: (TableColumn<KitsuResource> | string)[] = [
   },
   {
     label: "testColumn2",
-    accessor: "data.attributes.testColumn2",
+    accessorKey: "data.attributes.testColumn2",
     isKeyword: false,
     additionalAccessors: ["data.attributes.includeThis3"]
   },
   "testColumn3",
   {
     label: "testColumn4",
-    accessor: "data.attributes.testColumn4",
+    accessorKey: "data.attributes.testColumn4",
     isKeyword: false,
     relationshipType: "relationshipType1"
   },
   {
     label: "testColumn5",
-    accessor: "data.attributes.testColumn5",
+    accessorKey: "data.attributes.testColumn5",
     isKeyword: true,
     relationshipType: "relationshipType2"
   }

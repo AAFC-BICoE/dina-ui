@@ -16,7 +16,7 @@ import { uniqBy } from "lodash";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { AllowAttachmentsConfig, AttachmentSection } from "..";
-import { ThumbnailCell, ThumbnailCell8 } from "../..";
+import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
@@ -162,7 +162,7 @@ export function AttachmentsEditor({
                 <div className="mb-3">
                   <ReactTable8
                     columns={[
-                      ThumbnailCell8({
+                      ThumbnailCell({
                         bucketField: "bucket",
                         isJsonApiQuery: true
                       }),

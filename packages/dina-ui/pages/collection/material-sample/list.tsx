@@ -13,7 +13,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { TableColumn8 } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "../../../../common-ui/lib/list-page/types";
 import { useState } from "react";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -194,7 +194,7 @@ export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
 
   // Columns for the elastic search list page.
-  const columns: TableColumn8<any>[] = [
+  const columns: TableColumn<any>[] = [
     // Material Sample Name
     {
       id: "materialSampleName",

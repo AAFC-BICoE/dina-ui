@@ -1,5 +1,10 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import { Row, SortingState, VisibilityState } from "@tanstack/react-table";
+import {
+  ColumnSort,
+  Row,
+  SortingState,
+  VisibilityState
+} from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { compact, toPairs, uniqBy } from "lodash";
@@ -7,7 +12,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
-import { SortingRule } from "react-table";
 import { v4 as uuidv4 } from "uuid";
 import { FormikButton, ReactTable8, ReactTable8Props, useAccount } from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
@@ -43,7 +47,7 @@ import {
   CustomViewField,
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
-import { DynamicFieldsMappingConfig, TableColumn8 } from "./types";
+import { DynamicFieldsMappingConfig, TableColumn } from "./types";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -64,7 +68,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Columns to render on the table. This will also be used to map the data to a specific column.
    */
-  columns: TableColumn8<TData>[];
+  columns: TableColumn<TData>[];
 
   /**
    * Used for the listing page to understand which columns can be provided. Filters are generated
@@ -611,7 +615,7 @@ export function QueryPage<TData extends KitsuResource>({
   };
 
   // Columns generated for the search results.
-  const columnsResults: TableColumn8<TData>[] = [
+  const columnsResults: TableColumn<TData>[] = [
     ...(showRowCheckboxes || selectionMode
       ? [
           {
@@ -629,7 +633,7 @@ export function QueryPage<TData extends KitsuResource>({
   ];
 
   // Columns generated for the selected resources, only in selection mode.
-  const columnsSelected: TableColumn8<TData>[] = [
+  const columnsSelected: TableColumn<TData>[] = [
     ...(selectionMode
       ? [
           {
@@ -699,7 +703,7 @@ export function QueryPage<TData extends KitsuResource>({
    *
    * This method will cause the useEffect with the search to trigger if the sorting has changed.
    */
-  const onSortChange = useCallback((newSort: SortingRule[]) => {
+  const onSortChange = useCallback((newSort: ColumnSort[]) => {
     setSortingRules(newSort);
     setLoading(true);
 

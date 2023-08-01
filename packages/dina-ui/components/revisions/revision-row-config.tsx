@@ -1,5 +1,4 @@
 import { ComponentType } from "react";
-import { CellInfo } from "react-table";
 import { CellContext, ColumnDefTemplate } from "@tanstack/react-table";
 
 // Custom Revision table row rendering per type

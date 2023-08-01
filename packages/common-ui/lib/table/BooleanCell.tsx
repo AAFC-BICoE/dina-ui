@@ -2,7 +2,7 @@ import { get } from "lodash";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { KitsuResource } from "kitsu";
-import { TableColumn8 } from "../list-page/types";
+import { TableColumn } from "../list-page/types";
 
 /**
  * Helper cell function to display boolean values in tables. It will display a checkbox icon that
@@ -17,7 +17,7 @@ import { TableColumn8 } from "../list-page/types";
 export function booleanCell<TData extends KitsuResource>(
   label: string,
   accessorKey?: string
-): TableColumn8<TData> {
+): TableColumn<TData> {
   return {
     cell: ({ row: { original } }) => {
       const booleanValue = get(original, accessorKey ?? label)?.toString();

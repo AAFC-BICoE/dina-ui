@@ -2,7 +2,6 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { FormikProps } from "formik";
 import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { ComponentType, ReactNode } from "react";
-import { SortingRule } from "react-table";
 import {
   CheckBoxFieldProps,
   ColumnDefinition,
@@ -20,11 +19,11 @@ import {
   BulkEditButton
 } from "./bulk-buttons";
 import { FilterForm } from "./FilterForm";
-import { SortingState } from "@tanstack/react-table";
+import { ColumnSort, SortingState } from "@tanstack/react-table";
 
 export interface ListPageLayoutProps<TData extends KitsuResource> {
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
-  defaultSort?: SortingRule[];
+  defaultSort?: ColumnSort[];
   filterAttributes?: FilterAttribute[];
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;

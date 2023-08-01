@@ -20,7 +20,6 @@ import { QueryState } from "../api-client/useQuery";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
-import { SortingRule } from "react-table";
 
 /**
  * Column props with extra props designed specifically for our application on top of it.

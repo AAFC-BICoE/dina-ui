@@ -7,13 +7,13 @@ import {
   dateCell,
   stringArrayCell
 } from "common-ui";
-import { TableColumn8 } from "common-ui/lib/list-page/types";
+import { TableColumn } from "common-ui/lib/list-page/types";
 import Link from "next/link";
 import { Transaction } from "packages/dina-ui/types/loan-transaction-api";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-export const TRANSACTION_TABLE_COLUMNS: TableColumn8<Transaction>[] = [
+export const TRANSACTION_TABLE_COLUMNS: TableColumn<Transaction>[] = [
   {
     cell: ({ row: { original } }) => (
       <Link href={`/loan-transaction/transaction/view?id=${original.id}`}>
