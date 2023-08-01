@@ -36,6 +36,8 @@ steps:
 - checkout: local-deployement-repo
   path: dina-local-deployment
 
+- checkout: self
+
 - script: |
     sudo sh -c "echo '192.19.33.9 dina.local' >> /etc/hosts"
     sudo sh -c "echo '192.19.33.9 api.dina.local' >> /etc/hosts"
