@@ -69,7 +69,7 @@ steps:
     pa11y-ci
   displayName: 'Running pa11y'
 
-  - bash: | 
+- bash: | 
     python3 $(Pipeline.Workspace)/dina-ui/pa11y.py
   displayName: 'Running pa11y.py'
 
