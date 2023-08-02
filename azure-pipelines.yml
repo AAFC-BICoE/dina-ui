@@ -64,7 +64,7 @@ steps:
 - bash: |
     echo Try to connect to Keycloak endpoint ...
     curl --head -X GET --retry 25 --retry-delay 2 --retry-connrefused https://dina.local/auth
-   displayName: 'Waiting for Keycloak ...'
+  displayName: 'Waiting for Keycloak ...'
 
 - bash: | 
     ping dina.local
