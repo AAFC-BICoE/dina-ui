@@ -64,7 +64,7 @@ steps:
 #   displayName: 'Waiting for Keycloak ...'
 
 - bash: | 
-    cd $(Pipeline.Workspace)/dina-ui/pa11y.py
+    cd $(Pipeline.Workspace)/dina-ui
     pa11y-ci
   displayName: 'Running pa11y'
 
