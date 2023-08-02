@@ -65,6 +65,15 @@ steps:
 #   displayName: 'Waiting for Keycloak ...'
 
 - bash: | 
+    echo test
+  displayName: 'Running pa11y'
+
+
+- bash: | 
+    ping www.google.com
+  displayName: 'Running pa11y'
+
+- bash: | 
     cd $(Pipeline.Workspace)/dina-ui
     pa11y-ci
   displayName: 'Running pa11y'
