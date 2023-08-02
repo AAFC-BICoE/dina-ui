@@ -39,7 +39,7 @@ steps:
 
 - bash:
     ./start_stop_dina.sh up
-  displayName: 'Host site.'
+  displayName: 'Host site'
 
 - checkout: self
   path: dina-ui
