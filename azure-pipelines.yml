@@ -69,6 +69,10 @@ steps:
     pa11y-ci
   displayName: 'Running pa11y'
 
+  - bash: | 
+    python3 $(Pipeline.Workspace)/dina-ui/pa11y.py
+  displayName: 'Running pa11y.py'
+
 # - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
 #   displayName: 'Stop DockerCompose'
   
