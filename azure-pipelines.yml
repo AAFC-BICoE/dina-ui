@@ -31,7 +31,6 @@ steps:
 - script: |
     pip3 install -U selenium
     pip3 install webdriver-manager
-    npm install chromedriver --chromedriver-force-download
   displayName: 'Install selenium'
 
 - checkout: local-deployement-repo
@@ -64,14 +63,13 @@ steps:
 #     curl --head -X GET --retry 25 --retry-delay 2 --retry-connrefused https://dina.local/auth
 #   displayName: 'Waiting for Keycloak ...'
 
+- bash: |
+    google-chrome
+  displayName: 'Testing Chrome'
+
 
 - bash: |
     python3 $(Pipeline.Workspace)/dina-ui/pa11y.py
-  displayName: 'Running pa11y'
-
-
-- bash: |
-    pa11y-ci $(Pipeline.Workspace)/dina-ui
   displayName: 'Running pa11y'
 
 # - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
