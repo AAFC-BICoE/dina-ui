@@ -3,7 +3,7 @@ import { useFormikContext } from "formik";
 import { Dispatch, SetStateAction } from "react";
 import { SourceAdministrativeLevel } from "../../../dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { FieldHeader } from "../field-header/FieldHeader";
-import { ReactTable8 } from "../table8/ReactTable8";
+import { ReactTable8 } from "../table/ReactTable8";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { useGroupedCheckBoxes } from "./GroupedCheckBoxFields";
 

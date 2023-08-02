@@ -1,18 +1,18 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
-  dateCell8,
+  dateCell,
   FieldHeader,
-  QueryTable8,
-  QueryTable8Props
+  QueryTable,
+  QueryTableProps
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
-const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition8<ObjectSubtype>[] = [
+const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
   {
     cell: ({
       row: {
@@ -28,10 +28,10 @@ const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition8<ObjectSubtype>[] = [
   },
   "dcType",
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
-const queryTableProps: QueryTable8Props<ObjectSubtype> = {
+const queryTableProps: QueryTableProps<ObjectSubtype> = {
   columns: OBJECTSUBTYPE_TABLE_COLUMNS,
   path: "objectstore-api/object-subtype"
 };
@@ -51,7 +51,7 @@ export default function ObjectSubtypeListPage() {
           <CreateButton entityLink="/object-store/object-subtype" />
         </ButtonBar>
         <div className="w-100">
-          <QueryTable8 {...queryTableProps} />
+          <QueryTable {...queryTableProps} />
         </div>
       </main>
       <Footer />

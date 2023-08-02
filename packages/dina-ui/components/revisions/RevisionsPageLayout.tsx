@@ -1,7 +1,7 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
-  dateCell8,
+  ColumnDefinition,
+  dateCell,
   DateView,
   FieldHeader,
   KeyValueTable,
@@ -40,7 +40,7 @@ export function RevisionsPageLayout({
   instanceId
 }: RevisionsPageLayoutProps) {
   const { getFieldLabel } = useFieldLabels();
-  const REVISION_TABLE_COLUMNS: ColumnDefinition8<KitsuResource>[] = [
+  const REVISION_TABLE_COLUMNS: ColumnDefinition<KitsuResource>[] = [
     {
       cell: ({ row }) => {
         return (
@@ -99,7 +99,7 @@ export function RevisionsPageLayout({
           }
         ]),
     "version",
-    dateCell8("commitDateTime"),
+    dateCell("commitDateTime"),
     "snapshotType",
     {
       cell: ({ row: { original } }) => (

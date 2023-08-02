@@ -1,8 +1,8 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
-  dateCell8,
+  dateCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { MolecularSample } from "../../../types/seqdb-api";
 
 const FILTER_ATTRIBUTES = ["name", "createdBy"];
-const TABLE_COLUMNS: ColumnDefinition8<MolecularSample>[] = [
+const TABLE_COLUMNS: ColumnDefinition<MolecularSample>[] = [
   {
     cell: ({
       row: {
@@ -23,7 +23,7 @@ const TABLE_COLUMNS: ColumnDefinition8<MolecularSample>[] = [
   "sampleType",
   "group",
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function MolecularSampleListPage() {

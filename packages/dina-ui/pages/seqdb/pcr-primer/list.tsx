@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout
 } from "common-ui";
@@ -9,7 +9,7 @@ import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 
-const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition8<PcrPrimer>[] = [
+const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition<PcrPrimer>[] = [
   {
     cell: ({
       row: {

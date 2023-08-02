@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout
 } from "common-ui";
@@ -9,7 +9,7 @@ import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
-const PRODUCT_TABLE_COLUMNS: ColumnDefinition8<Product>[] = [
+const PRODUCT_TABLE_COLUMNS: ColumnDefinition<Product>[] = [
   {
     cell: ({
       row: {

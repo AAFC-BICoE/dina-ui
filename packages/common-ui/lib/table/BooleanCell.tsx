@@ -1,5 +1,8 @@
 import { get } from "lodash";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
+import { FieldHeader } from "../field-header/FieldHeader";
+import { KitsuResource } from "kitsu";
+import { TableColumn8 } from "../list-page/types";
 
 /**
  * Helper cell function to display boolean values in tables. It will display a checkbox icon that
@@ -8,13 +11,16 @@ import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
  * Null/undefined values will be displayed as an empty string.
  *
  * @param label Column header to be used.
- * @param accessor Accessor for elastic search.
+ * @param accessorKey Accessor for elastic search.
  * @returns The cell to be displayed.
  */
-export function booleanCell(label: string, accessor?: string) {
+export function booleanCell<TData extends KitsuResource>(
+  label: string,
+  accessorKey?: string
+): TableColumn8<TData> {
   return {
-    Cell: ({ original }) => {
-      const booleanValue = get(original, accessor ?? label)?.toString();
+    cell: ({ row: { original } }) => {
+      const booleanValue = get(original, accessorKey ?? label)?.toString();
       if (booleanValue === "true") {
         return <FaCheckSquare />;
       } else if (booleanValue === "false") {
@@ -23,8 +29,8 @@ export function booleanCell(label: string, accessor?: string) {
         return <></>;
       }
     },
-    label,
+    header: () => <FieldHeader name={label} />,
     isKeyword: false,
-    accessor: accessor ?? label
+    accessorKey: accessorKey ?? label
   };
 }

@@ -1,12 +1,12 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
-  dateCell8,
+  dateCell,
   FieldHeader,
   FilterAttribute,
   filterBy,
   QueryPage,
   SplitPagePanel,
-  stringArrayCell8
+  stringArrayCell
 } from "common-ui";
 import Link from "next/link";
 import { TableColumn8 } from "packages/common-ui/lib/list-page/types";
@@ -91,8 +91,8 @@ export default function MetadataListPage() {
       accessorKey: "data.attributes.acCaption",
       isKeyword: true
     },
-    dateCell8("acDigitizationDate", "data.attributes.acDigitizationDate"),
-    dateCell8("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
+    dateCell("acDigitizationDate", "data.attributes.acDigitizationDate"),
+    dateCell("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
     {
       cell: ({ row: { original } }) => (
         <>
@@ -108,7 +108,7 @@ export default function MetadataListPage() {
       isKeyword: true,
       enableSorting: false
     },
-    stringArrayCell8("acTags", "data.attributes.acTags"),
+    stringArrayCell("acTags", "data.attributes.acTags"),
     {
       id: "action",
       cell: ({ row: { original } }) => (

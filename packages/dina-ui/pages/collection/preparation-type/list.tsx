@@ -1,8 +1,8 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout,
-  dateCell8
+  dateCell
 } from "common-ui";
 import Link from "next/link";
 import { GroupSelectField } from "../../../components";
@@ -10,7 +10,7 @@ import PageLayout from "../../../components/page/PageLayout";
 import { PreparationType } from "../../../types/collection-api";
 
 const PREPARATION_TYPE_FILTER_ATTRIBUTES = ["name"];
-const PREPARATION_TYPE_TABLE_COLUMNS: ColumnDefinition8<PreparationType>[] = [
+const PREPARATION_TYPE_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
   {
     cell: ({
       row: {
@@ -23,7 +23,7 @@ const PREPARATION_TYPE_TABLE_COLUMNS: ColumnDefinition8<PreparationType>[] = [
   },
   "group",
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function preparationTypeListPage() {

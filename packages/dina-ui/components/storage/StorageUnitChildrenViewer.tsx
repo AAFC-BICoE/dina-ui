@@ -1,19 +1,14 @@
 import {
   ColumnDefinition,
-  ColumnDefinition8,
   FieldSet,
-  MetaWithTotal,
   QueryTable,
-  QueryTable8,
   useApiClient,
-  useDinaFormContext,
-  useQuery,
-  withResponse
+  useDinaFormContext
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
@@ -188,7 +183,7 @@ export function StorageUnitContents({
   storageUnit,
   onEmptyMaterialSamples
 }: StorageUnitContentsProps) {
-  const materialSampleColumns: ColumnDefinition8<MaterialSample>[] = [
+  const materialSampleColumns: ColumnDefinition<MaterialSample>[] = [
     {
       cell: ({
         row: {
@@ -236,7 +231,7 @@ export function StorageUnitContents({
           <DinaMessage id="materialSamples" />
         </strong>
 
-        <QueryTable8
+        <QueryTable
           columns={materialSampleColumns}
           path="collection-api/material-sample"
           filter={{

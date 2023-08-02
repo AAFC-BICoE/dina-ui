@@ -1,27 +1,34 @@
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState
+} from "@tanstack/react-table";
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
-import { isPlainObject } from "lodash";
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { Column, SortingRule, TableProps } from "react-table";
 import {
   ClientSideJoinSpec,
+  DEFAULT_PAGE_SIZE_OPTIONS,
   JsonApiQuerySpec,
   LimitOffsetPageSpec,
   MetaWithTotal,
+  ReactTable8,
+  ReactTable8Props,
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
+import { SortingRule } from "react-table";
 
 /**
  * Column props with extra props designed specifically for our application on top of it.
  *
  * If a type of string is provided, it should just create a ColumnDefinition with accessor only.
  */
-export type ColumnDefinition<TData> =
-  | (Column<TData> & ElasticSearchColumnProps & InternationalizationProps)
+export type ColumnDefinition<TData extends KitsuResource> =
+  | (ColumnDef<TData> & ElasticSearchColumnProps & InternationalizationProps)
   | string;
 
 export interface InternationalizationProps {
@@ -31,7 +38,7 @@ export interface InternationalizationProps {
   label?: string;
 }
 
-export interface ElasticSearchColumnProps {
+interface ElasticSearchColumnProps {
   /**
    * For elastic search operations, should .keyword appended to the accessor.
    */
@@ -61,10 +68,12 @@ export interface QueryTableProps<TData extends KitsuResource> {
   include?: string;
 
   /** Default sort attribute. */
-  defaultSort?: SortingRule[];
+  defaultSort?: SortingState;
 
   /** Default page size. */
   defaultPageSize?: number;
+
+  pageSizeOptions?: number[];
 
   /** The columns to show in the table. */
   columns: ColumnDefinition<TData>[];
@@ -83,15 +92,21 @@ export interface QueryTableProps<TData extends KitsuResource> {
 
   onPageSizeChange?: (newSize: number) => void;
 
-  onSortedChange?: (newSort: SortingRule[]) => void;
+  onSortedChange?: (newSort: SortingState) => void;
+
+  enableFilters?: boolean;
+  defaultColumnFilters?: ColumnFiltersState;
+  onColumnFiltersChange?: (newColumnFiltersState: ColumnFiltersState) => void;
 
   /**
    * Override internal react-table props.
    * Pass in either the props or a function that provides the props.
    */
   reactTableProps?:
-    | Partial<TableProps>
-    | ((queryState: QueryState<TData[], MetaWithTotal>) => Partial<TableProps>);
+    | Partial<ReactTable8Props<TData>>
+    | ((
+        queryState: QueryState<TData[], MetaWithTotal>
+      ) => Partial<ReactTable8Props<TData>>);
 
   hideTopPagination?: boolean;
 
@@ -101,13 +116,13 @@ export interface QueryTableProps<TData extends KitsuResource> {
 }
 
 const DEFAULT_PAGE_SIZE = 25;
-
 /**
  * Table component that fetches data from the backend API.
  */
 export function QueryTable<TData extends KitsuResource>({
   columns,
   defaultPageSize = DEFAULT_PAGE_SIZE,
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   defaultSort = [],
   deps,
   fields,
@@ -123,12 +138,22 @@ export function QueryTable<TData extends KitsuResource>({
   hideTopPagination,
   reactTableProps,
   topRightCorner,
-  ariaLabel
+  ariaLabel,
+  enableFilters = false,
+  defaultColumnFilters = [],
+  onColumnFiltersChange
 }: QueryTableProps<TData>) {
   const { formatMessage, formatNumber } = useIntl();
 
   // JSONAPI sort attribute.
-  const [sortingRules, setSortingRules] = useState(defaultSort);
+  const [sortingRules, setSortingRules] = useState<SortingState>(defaultSort);
+
+  const [columnFilters, setColumnFilters] =
+    useState<ColumnFiltersState>(defaultColumnFilters);
+
+  if (pageSizeOptions.indexOf(defaultPageSize) < 0) {
+    defaultPageSize = pageSizeOptions[0];
+  }
 
   // JSONAPI page spec.
   const [page, setPage] = useState<LimitOffsetPageSpec>({
@@ -138,11 +163,8 @@ export function QueryTable<TData extends KitsuResource>({
 
   const divWrapperRef = useRef<HTMLDivElement>(null);
 
-  function onFetchData(reactTableState) {
-    const { page: newPageNumber, sorted, pageSize } = reactTableState;
-
-    const newOffset = newPageNumber * pageSize;
-
+  function onPageChangeInternal(pageNumber: number) {
+    const newOffset = pageNumber * page.limit;
     // When a new page is requested and the top of the window is below the top of the table,
     // scroll to the top of the table.
     if (
@@ -152,14 +174,54 @@ export function QueryTable<TData extends KitsuResource>({
     ) {
       window.scrollTo(0, divWrapperRef.current.offsetTop);
     }
+    setPage({ offset: newOffset, limit: page.limit });
+    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+      typeof reactTableProps === "function"
+        ? reactTableProps(queryState)
+        : reactTableProps;
+    tableProps?.onPageChange?.(pageNumber);
+  }
 
-    if (sorted.length) {
-      setSortingRules(sorted);
+  function onPageSizeChangeInternal(newSize: number) {
+    const newOffset = 0;
+    // When a new page is requested and the top of the window is below the top of the table,
+    // scroll to the top of the table.
+    if (
+      divWrapperRef.current &&
+      newOffset !== page.offset &&
+      window.scrollY > divWrapperRef.current.offsetTop
+    ) {
+      window.scrollTo(0, divWrapperRef.current.offsetTop);
     }
-    setPage({
-      limit: pageSize,
-      offset: newOffset
-    });
+    setPage({ offset: newOffset, limit: newSize });
+    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+      typeof reactTableProps === "function"
+        ? reactTableProps(queryState)
+        : reactTableProps;
+    tableProps?.onPageSizeChange?.(newSize);
+    onPageSizeChange?.(newSize);
+  }
+
+  function onSortingChangeInternal(newSorting: SortingState) {
+    onSortedChange?.(newSorting);
+    setSortingRules(newSorting);
+    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+      typeof reactTableProps === "function"
+        ? reactTableProps(queryState)
+        : reactTableProps;
+    tableProps?.onSortingChange?.(newSorting);
+  }
+
+  function onColumnFiltersChangeInternal(
+    newColumnFiltersState: ColumnFiltersState
+  ) {
+    onColumnFiltersChange?.(newColumnFiltersState);
+    setColumnFilters(newColumnFiltersState);
+    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+      typeof reactTableProps === "function"
+        ? reactTableProps(queryState)
+        : reactTableProps;
+    tableProps?.onColumnFiltersChange?.(newColumnFiltersState);
   }
 
   // Get the new sort order in JSONAPI format. e.g. "name,-description".
@@ -176,25 +238,25 @@ export function QueryTable<TData extends KitsuResource>({
     sort
   };
 
-  const mappedColumns = columns.map<Column>((column) => {
+  const mappedColumns: ColumnDef<TData>[] = columns.map((column) => {
     // The "columns" prop can be a string or a react-table Column type.
-    const { fieldName, customHeader } =
-      typeof column === "string"
-        ? {
-            customHeader: undefined,
-            fieldName: column
-          }
-        : {
-            customHeader: column.Header,
-            fieldName: String(column.accessor)
-          };
-
-    const Header = customHeader ?? <FieldHeader name={fieldName} />;
-
-    return {
-      Header,
-      ...(typeof column === "string" ? { accessor: column } : { ...column })
+    const header = () => {
+      if (typeof column === "string") {
+        return <FieldHeader name={column} />;
+      } else if (column.header) {
+        return column.header;
+      } else if ((column as any).accessorKey) {
+        return <FieldHeader name={(column as any).accessorKey} />;
+      } else {
+        return <FieldHeader name={""} />;
+      }
     };
+
+    const mappedColumnDef: ColumnDef<TData> = {
+      header,
+      ...(typeof column === "string" ? { accessorKey: column } : { ...column })
+    };
+    return mappedColumnDef;
   });
 
   const queryState = useQuery<TData[], MetaWithTotal>(query, {
@@ -207,6 +269,7 @@ export function QueryTable<TData extends KitsuResource>({
 
   const lastSuccessfulResponse =
     useRef<KitsuResponse<TData[], MetaWithTotal>>();
+
   if (response) {
     lastSuccessfulResponse.current = response;
   }
@@ -254,55 +317,42 @@ export function QueryTable<TData extends KitsuResource>({
     >
       <div className="d-flex align-items-end mb-1">
         {!omitPaging && (
-          <>
-            <span>
-              <CommonMessage
-                id="tableTotalCount"
-                values={{ totalCount: formatNumber(totalCount) }}
-              />
-            </span>
-          </>
+          <span>
+            <CommonMessage
+              id="tableTotalCount"
+              values={{ totalCount: formatNumber(totalCount) }}
+            />
+          </span>
         )}
         <div className="ms-auto">
           {topRightCorner}
-          {resolvedReactTableProps?.sortable !== false && (
+          {resolvedReactTableProps?.enableSorting !== false && (
             <Tooltip id="queryTableMultiSortExplanation" placement="left" />
           )}
         </div>
       </div>
-      <ReactTable
-        FilterComponent={({ filter: headerFilter, onChange }) => (
-          <input
-            className="w-100"
-            placeholder="Search..."
-            value={headerFilter ? headerFilter.value : ""}
-            onChange={(event) => onChange(event.target.value)}
-          />
-        )}
-        TdComponent={DefaultTd}
+      <ReactTable8<TData>
         className="-striped"
         columns={mappedColumns}
-        data={displayData}
-        defaultPageSize={page.limit}
+        data={(displayData as TData[]) ?? []}
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}
-        manual={true}
-        minRows={1}
-        onFetchData={onFetchData}
-        pageSizeOptions={[25, 50, 100, 200, 500]}
-        pages={numberOfPages}
+        enableFilters={enableFilters}
+        defaultColumnFilters={defaultColumnFilters}
+        manualFiltering={true}
+        onColumnFiltersChange={onColumnFiltersChangeInternal}
+        manualPagination={true}
+        enableSorting={true}
+        enableMultiSort={true}
+        manualSorting={true}
+        pageCount={numberOfPages}
         showPaginationTop={shouldShowPagination && !hideTopPagination}
-        showPaginationBottom={shouldShowPagination}
-        noDataText={<CommonMessage id="noRowsFound" />}
-        ofText={<CommonMessage id="of" />}
-        onPageSizeChange={onPageSizeChange}
-        onSortedChange={onSortedChange}
-        rowsText={formatMessage({ id: "rows" })}
-        previousText={<CommonMessage id="previous" />}
-        nextText={<CommonMessage id="next" />}
-        showPagination={!omitPaging && shouldShowPagination}
+        showPagination={shouldShowPagination}
+        onPageSizeChange={onPageSizeChangeInternal}
+        onPageChange={onPageChangeInternal}
+        onSortingChange={onSortingChangeInternal}
+        pageSizeOptions={pageSizeOptions}
         {...resolvedReactTableProps}
-        pageText={<CommonMessage id="page" />}
         TbodyComponent={
           error
             ? () => (
@@ -321,43 +371,16 @@ export function QueryTable<TData extends KitsuResource>({
                     className="btn btn-primary"
                     onClick={() => {
                       const newSort = [{ id: "createdOn", desc: true }];
-                      onSortedChange?.(newSort);
-                      setSortingRules(newSort);
+                      onSortingChangeInternal(newSort);
                     }}
                   >
                     <CommonMessage id="resetSort" />
                   </button>
                 </div>
               )
-            : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
+            : resolvedReactTableProps?.TbodyComponent
         }
       />
-    </div>
-  );
-}
-
-export function DefaultTBody(props) {
-  return <div {...props} className="rt-tbody" />;
-}
-
-export function DefaultTd({ className, style, children, onClick }) {
-  // If children is not a renderable child, stringify it to make it renderable:
-  const content =
-    isPlainObject(children) && !children.props
-      ? JSON.stringify(children)
-      : children;
-
-  return (
-    <div
-      className={`${className} rt-td`}
-      onClick={onClick}
-      // Wraps long text instead of shortening it.
-      style={{ ...style, whiteSpace: "unset" }}
-      // Hovering over the cell should show the value next to the cursor:
-      title={typeof children === "string" ? children : undefined}
-      role="cell"
-    >
-      {content}
     </div>
   );
 }

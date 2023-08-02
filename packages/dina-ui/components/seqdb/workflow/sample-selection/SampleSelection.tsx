@@ -1,10 +1,10 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   DinaForm,
   FieldHeader,
   FilterForm,
   FormikButton,
-  QueryTable8,
+  QueryTable,
   rsql,
   useGroupedCheckBoxes
 } from "common-ui";
@@ -47,7 +47,7 @@ export function SampleSelection(props: StepRendererProps) {
 
   const SAMPLE_FILTER_ATTRIBUTES = ["name"];
 
-  const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition8<any>[] = [
+  const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
     {
       cell: ({
         row: {
@@ -83,7 +83,7 @@ export function SampleSelection(props: StepRendererProps) {
     }
   ];
 
-  const SELECTED_SAMPLE_COLUMNS: ColumnDefinition8<StepResource>[] = [
+  const SELECTED_SAMPLE_COLUMNS: ColumnDefinition<StepResource>[] = [
     {
       cell: ({ row: { original: row } }) => (
         <Link
@@ -162,7 +162,7 @@ export function SampleSelection(props: StepRendererProps) {
               <strong>
                 <SeqdbMessage id="availableSamplesTitle" />
               </strong>
-              <QueryTable8
+              <QueryTable
                 columns={SELECTABLE_SAMPLE_COLUMNS}
                 defaultPageSize={100}
                 filter={filter}
@@ -194,7 +194,7 @@ export function SampleSelection(props: StepRendererProps) {
               <strong>
                 <SeqdbMessage id="selectedSamplesTitle" />
               </strong>
-              <QueryTable8<StepResource>
+              <QueryTable<StepResource>
                 columns={SELECTED_SAMPLE_COLUMNS}
                 defaultPageSize={100}
                 deps={[lastSave]}

@@ -1,10 +1,10 @@
 import { TableColumn8 } from "common-ui/lib/list-page/types";
 import {
-  dateCell8,
+  dateCell,
   DeleteButton,
   EditButton,
   FieldHeader,
-  stringArrayCell8,
+  stringArrayCell,
   useStringComparator
 } from "common-ui";
 import { Determination, MaterialSample } from "../../../types/collection-api";
@@ -138,8 +138,8 @@ export function useMaterialSampleRelationshipColumns() {
       header: () => <FieldHeader name="materialSampleType" />,
       isKeyword: true
     },
-    dateCell8("createdOn", "data.attributes.createdOn"),
-    stringArrayCell8("tags", "data.attributes.tags"),
+    dateCell("createdOn", "data.attributes.createdOn"),
+    stringArrayCell("tags", "data.attributes.tags"),
     {
       id: "action",
       cell: ({ row: { original } }) => (

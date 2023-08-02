@@ -1,10 +1,10 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout,
-  dateCell8,
-  stringArrayCell8
+  dateCell,
+  stringArrayCell
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
@@ -12,7 +12,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Organization } from "../../types/agent-api";
 
 const ORGANIZATION_FILTER_ATTRIBUTES = ["createdBy"];
-const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition8<Organization>[] = [
+const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition<Organization>[] = [
   {
     cell: ({
       row: {
@@ -34,9 +34,9 @@ const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition8<Organization>[] = [
     accessorKey: "name",
     enableSorting: false
   },
-  stringArrayCell8("aliases"),
+  stringArrayCell("aliases"),
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function OrganizationListPage() {

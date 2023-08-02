@@ -1,4 +1,7 @@
-import { MaterialSample } from "../../../../types/collection-api";
+import {
+  MaterialSample,
+  MaterialSampleSummary
+} from "../../../../types/collection-api";
 import { PcrBatchItem } from "../../../../types/seqdb-api";
 
 /**
@@ -468,605 +471,360 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
   }
 ];
 
-export const MATERIAL_SAMPLES: MaterialSample[] = [
+export const MATERIAL_SAMPLES: MaterialSampleSummary[] = [
   {
     id: "53c8dd5c-a287-41d7-8a30-e1ea26580e7e",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    materialSampleName: "1",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
-    ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
-    materialSampleName: "1"
+    ]
   },
   {
     id: "b7e464a8-7715-4742-b0bb-6b826bd054fb",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "2"
   },
   {
     id: "c40ba07d-57f3-4461-92de-2735b3533e8a",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "3"
   },
   {
     id: "99e732dd-e755-43ef-8158-5a8dcf9c4239",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "4"
   },
   {
     id: "863431e7-7465-4347-9854-8c1729b46d4c",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "5"
   },
   {
     id: "102e35ee-f5bc-4403-bf09-3d8fd8d33ddc",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "6"
   },
   {
     id: "286375f6-32cc-4d8b-8303-75c9830f761d",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "7"
   },
   {
     id: "c54932e4-1d6a-42b2-8d6d-4b608be7e3dd",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "8"
   },
   {
     id: "31380b5c-69a7-40eb-8d16-8006961d1bed",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "9"
   },
   {
     id: "8a5ae1d0-da78-4f36-b252-c126b79dc465",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "10"
   },
   {
     id: "32f64502-2856-4bc2-b32a-8977d7a0cc93",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "11"
   },
   {
     id: "ac6c2712-bfb2-4e93-a4ce-0270bad5d439",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "12"
   },
   {
     id: "2c9904aa-dfdd-4eec-8de3-0291cfe216fc",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "13"
   },
   {
     id: "11861055-795f-46a1-b9d7-e1fe78075ba7",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "14"
   },
   {
     id: "faeaa8cf-cb9b-431b-b6a3-6fc56acd5879",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
     materialSampleName: "15"
   },
   {
     id: "76502039-8e9a-478d-a3cb-ec4c4fc12ada",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "16"
   },
   {
     id: "86165f8f-a770-4869-86f1-dc25a42541be",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "17"
   },
   {
     id: "7aebbe3c-9a3e-4cef-b5a2-f32b229c9787",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "18"
   },
   {
     id: "e1a30ee1-80be-4cbc-a699-80196a6dd4eb",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "19"
   },
   {
     id: "97f6c8d2-87b4-49cb-ad79-e67b55f11d73",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "20"
   },
   {
     id: "761e3f18-5572-40ca-942a-ca85ab650f7c",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "21"
   },
   {
     id: "99d8aa0c-418e-4fe9-9aca-4149d1ea2541",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "22"
   },
   {
     id: "73ac47d6-3c5b-43da-a7b1-099e8e4a8ea5",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "23"
   },
   {
     id: "461aac66-2a6a-481c-a70b-d0d3cd313c9e",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "24"
   },
   {
     id: "e54f4cdf-0e41-41ab-974f-61117bf169f7",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "25"
   },
   {
     id: "5024fbfb-d0c1-4799-aa45-01697b4bec36",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "26"
   },
   {
     id: "35bd1f71-e5d2-4790-ab33-a3a79ba1e76a",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "27"
   },
   {
     id: "576a20cc-fc1a-4436-b730-8349ef450b6a",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "28"
   },
   {
     id: "da52dcc1-201d-421a-82d6-77558b5d144c",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "29"
   },
   {
     id: "91487630-a945-41bd-a678-b921ba1d2013",
-    type: "material-sample",
-    organism: [
+    type: "material-sample-summary",
+
+    effectiveDeterminations: [
       {
-        isTarget: true,
-        type: "organism",
-        determination: [
-          {
-            isPrimary: true,
-            verbatimScientificName: "scientificName"
-          }
-        ]
+        isPrimary: true,
+        verbatimScientificName: "scientificName"
       }
     ],
-    group: "aafc",
-    createdOn: "2023-04-20T12:50:38.37319Z",
-    createdBy: "dina-admin",
+
     materialSampleName: "30"
   }
 ];

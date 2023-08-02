@@ -83,7 +83,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
     resourceSelectCell<Protocol>(
       {
         filter: filterBy(["name"]),
-        label: protocol => protocol.name,
+        label: (protocol) => protocol.name,
         model: `collection-api/protocol`,
         type: "protocol"
       },
@@ -96,7 +96,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
     resourceSelectCell<Product>(
       {
         filter: filterBy(["name"]),
-        label: product => product.name,
+        label: (product) => product.name,
         model: `seqdb-api/product`,
         type: "product"
       },
@@ -126,8 +126,8 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
     });
 
     const sampleIds = selectedSampleStepResources
-      .map(sr => sr.molecularSample?.id)
-      .filter(id => id) as string[];
+      .map((sr) => sr.molecularSample?.id)
+      .filter((id) => id) as string[];
 
     const { data: plpStepResources } = await apiClient.get<StepResource[]>(
       "seqdb-api/step-resource",
@@ -141,16 +141,15 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
           "chainStepTemplate.uuid": step.id,
           rsql: sampleIds.length ? `molecularSample.uuid=in=(${sampleIds})` : ""
         },
-        include:
-          "molecularSample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
+        include: "molecularSample,preLibraryPrep,preLibraryPrep.protocol",
         page: { limit: 1000 } // Maximum page limit. There should only be 1 or 2 prelibrarypreps per molecularSample.
       }
     );
 
     const rows = selectedSampleStepResources.map<PreLibraryPrepBulkEditRow>(
-      sampleSr => {
+      (sampleSr) => {
         const plpStepResource = plpStepResources.find(
-          plpSr =>
+          (plpSr) =>
             plpSr.molecularSample &&
             plpSr.molecularSample.id ===
               (sampleSr.molecularSample as MolecularSample).id &&
@@ -176,7 +175,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
     return rows;
   }
   async function onSubmit(rows: RowChange<PreLibraryPrepBulkEditRow>[]) {
-    const plpSaves = rows.map<SaveArgs>(row => {
+    const plpSaves = rows.map<SaveArgs>((row) => {
       const {
         changes: { product, protocol },
         original

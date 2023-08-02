@@ -1,16 +1,15 @@
 import {
   ButtonBar,
   ColumnDefinition,
-  ColumnDefinition8,
   CreateButton,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { groupCell8, Head, Nav } from "../../../components";
+import { Head, Nav, groupCell8 } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqSubmission } from "../../../types/seqdb-api/resources/SeqSubmission";
 
-const SEQ_SUBMISSION_TABLE_COLUMNS: ColumnDefinition8<SeqSubmission>[] = [
+const SEQ_SUBMISSION_TABLE_COLUMNS: ColumnDefinition<SeqSubmission>[] = [
   {
     cell: ({
       row: {

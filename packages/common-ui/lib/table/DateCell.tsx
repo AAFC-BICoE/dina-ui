@@ -1,25 +1,22 @@
+import { DateView } from "../date/DateView";
 import { get } from "lodash";
 import { TableColumn8 } from "../list-page/types";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { KitsuResource } from "kitsu";
 
-/** Renders a string array cell into a table in comma separated format. */
-export function stringArrayCell8<TData extends KitsuResource>(
+/** Renders a date cell into a table in a user-friendly / readable format. */
+export function dateCell<TData extends KitsuResource>(
   label: string,
   accessorKey?: string
 ): TableColumn8<TData> {
   return {
-    id: "stringArrayCol_" + label,
     cell: ({ row: { original } }) => {
       const value = get(original, accessorKey ?? label);
-      if (value) {
-        const joinedString = value.join(", ");
-        return <div className="stringArray-cell">{joinedString}</div>;
-      }
-      return null;
+      return <DateView date={value} />;
     },
     header: () => <FieldHeader name={label} />,
-    isKeyword: true,
-    accessorKey: accessorKey ?? label
+    isKeyword: false,
+    accessorKey: accessorKey ?? label,
+    id: label
   };
 }

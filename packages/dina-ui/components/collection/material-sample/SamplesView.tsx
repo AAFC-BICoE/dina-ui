@@ -6,7 +6,7 @@ import {
   FieldSet,
   LimitOffsetPageSpec,
   ReactTable8,
-  dateCell8
+  dateCell
 } from "common-ui";
 import Link from "next/link";
 import { useState } from "react";
@@ -48,7 +48,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
     },
     {
       id: "createOn",
-      ...dateCell8("createdOn", "createdOn")
+      ...dateCell("createdOn", "createdOn")
     },
     {
       id: "tags",

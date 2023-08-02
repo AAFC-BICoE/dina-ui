@@ -1,9 +1,9 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout,
-  dateCell8
+  dateCell
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
@@ -11,7 +11,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 
 const AGENT_FILTER_ATTRIBUTES = ["displayName", "email", "createdBy"];
-const AGENT_TABLE_COLUMNS: ColumnDefinition8<Person>[] = [
+const AGENT_TABLE_COLUMNS: ColumnDefinition<Person>[] = [
   {
     cell: ({
       row: {
@@ -36,7 +36,7 @@ const AGENT_TABLE_COLUMNS: ColumnDefinition8<Person>[] = [
     accessorKey: "aliases"
   },
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function AgentListPage() {

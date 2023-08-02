@@ -3,9 +3,9 @@ import {
   ListPageLayout,
   useAccount,
   Tooltip,
-  ColumnDefinition8,
-  booleanCell8,
-  dateCell8,
+  ColumnDefinition,
+  booleanCell,
+  dateCell,
   FieldHeader
 } from "common-ui";
 import Link from "next/link";
@@ -19,7 +19,7 @@ const FILTER_ATTRIBUTES = ["name", "createdBy"];
 export default function MaterialSampleFormTemplateListPage() {
   const { groupNames, username } = useAccount();
 
-  const TABLE_COLUMNS: ColumnDefinition8<FormTemplate>[] = [
+  const TABLE_COLUMNS: ColumnDefinition<FormTemplate>[] = [
     {
       cell: ({
         row: {
@@ -32,9 +32,9 @@ export default function MaterialSampleFormTemplateListPage() {
       header: () => <FieldHeader name="name" />
     },
     "group",
-    booleanCell8("restrictToCreatedBy"),
+    booleanCell("restrictToCreatedBy"),
     "createdBy",
-    dateCell8("createdOn"),
+    dateCell("createdOn"),
     {
       cell: ({
         row: {
