@@ -17,7 +17,7 @@
         "click element #kc-login",
         "wait for path to be /"
       ],
-      "url": "https://dina.local"
+      "url": "https://youtube.com"
     }
 ,"https://dina.local"  
 	]
