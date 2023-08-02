@@ -2,10 +2,7 @@
   "defaults": {
     "useIncognitoBrowserContext": false,
     "reporters": [
-      "cli",[
-        "pa11y-ci-reporter-html",
-        { "destination": "./reports", "includeZeroIssues": true }
-      ]
+      "cli"
     ]
   },
   "urls" : [
