@@ -64,8 +64,12 @@ steps:
 #   displayName: 'Waiting for Keycloak ...'
 
 
+#- bash: |
+#    python3 $(Pipeline.Workspace)/dina-ui/pa11y.py
+#  displayName: 'Running pa11y'
+
 - bash: |
-    python3 $(Pipeline.Workspace)/dina-ui/pa11y.py
+    pa11y-ci $(Pipeline.Workspace)/dina-ui
   displayName: 'Running pa11y'
 
 # - bash: docker compose -f docker-compose.base.yml -f docker-compose.local.yml down
