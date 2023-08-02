@@ -64,13 +64,9 @@ steps:
 #   displayName: 'Waiting for Keycloak ...'
 
 
-#- bash: |
-#    python3 $(Pipeline.Workspace)/dina-ui/pa11y.py
-#  displayName: 'Running pa11y'
-
 - bash: |
-    ping www.canada.ca
-  displayName: 'Pinging Canada.ca'
+    python3 $(Pipeline.Workspace)/dina-ui/pa11y.py
+  displayName: 'Running pa11y'
 
 
 - bash: |
