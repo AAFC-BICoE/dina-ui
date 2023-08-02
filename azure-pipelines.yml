@@ -37,6 +37,10 @@ steps:
 - checkout: local-deployement-repo
   path: dina-local-deployment
 
+- bash:
+    ./start_stop_dina.sh up
+  displayName: 'Host site.'
+
 - checkout: self
   path: dina-ui
 
@@ -65,12 +69,7 @@ steps:
 #   displayName: 'Waiting for Keycloak ...'
 
 - bash: | 
-    echo test
-  displayName: 'Running pa11y'
-
-
-- bash: | 
-    ping www.google.com
+    ping dina.local
   displayName: 'Running pa11y'
 
 - bash: | 
