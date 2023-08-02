@@ -9,16 +9,6 @@
     ]
   },
   "urls" : [
-    {
-      "actions" : [
-        "wait for element #kc-login to be visible",
-        "set field #username to dina-admin",
-        "set field #password to dina-admin",
-        "click element #kc-login",
-        "wait for path to be /"
-      ],
-      "url": "https://youtube.com"
-    }
-,"https://dina.local"  
+"https://youtube.com"  
 	]
 }
