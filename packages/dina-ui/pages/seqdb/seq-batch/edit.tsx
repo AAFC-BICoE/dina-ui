@@ -6,6 +6,7 @@ import {
   DinaForm,
   DinaFormProps,
   DinaFormSubmitParams,
+  FieldSet,
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
@@ -21,6 +22,7 @@ import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
 import { cloneDeep, pick } from "lodash";
 import { useRouter } from "next/router";
+import { SeqReactionDndTable } from "packages/dina-ui/components/seqdb/seq-workflow/seq-reaction-step/SeqReactionDndTable";
 import {
   Protocol,
   StorageUnit,
@@ -39,8 +41,11 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import {
   Region,
   SeqBatch,
+  SeqReaction,
   ThermocyclerProfile
 } from "../../../types/seqdb-api";
+import { useSeqReactionState } from "packages/dina-ui/components/seqdb/seq-workflow/seq-reaction-step/useSeqReactionState";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export function useSeqBatchQuery(id?: string, deps?: any[]) {
   return useQuery<SeqBatch>(
@@ -191,6 +196,9 @@ export function LoadExternalDataForSeqBatchForm({
 }: LoadExternalDataForSeqBatchFormProps) {
   // Create a copy of the initial value so we don't change the prop version.
   const initialValues = cloneDeep(dinaFormProps.initialValues);
+  const { selectedResources: seqReactions } = useSeqReactionState(
+    initialValues.id
+  );
 
   // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
   const storageUnitQuery = useQuery<StorageUnit>(
@@ -221,13 +229,26 @@ export function LoadExternalDataForSeqBatchForm({
 
   // Wait for response or if disabled, just continue with rendering.
   return withResponseOrDisabled(storageUnitQuery, () => (
-    <DinaForm<Partial<SeqBatch>>
-      {...dinaFormProps}
-      initialValues={initialValues}
-    >
-      {buttonBar}
-      <SeqBatchFormFields />
-    </DinaForm>
+    <>
+      <DinaForm<Partial<SeqBatch>>
+        {...dinaFormProps}
+        initialValues={initialValues}
+      >
+        {buttonBar}
+        <SeqBatchFormFields />
+      </DinaForm>
+      {!!initialValues.id && (
+        <FieldSet legend={<DinaMessage id="pcrReactionTitle" />}>
+          <div className="row">
+            <SeqReactionDndTable
+              className="react-table-overflow col-md-12 -striped"
+              editMode={false}
+              selectedSeqReactions={seqReactions ?? []}
+            />
+          </div>
+        </FieldSet>
+      )}
+    </>
   ));
 }
 
