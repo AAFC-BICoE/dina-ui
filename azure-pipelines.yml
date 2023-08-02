@@ -69,6 +69,11 @@ steps:
 #  displayName: 'Running pa11y'
 
 - bash: |
+    ping www.canada.ca $(Pipeline.Workspace)/dina-ui
+  displayName: 'Pinging Canada.ca'
+
+
+- bash: |
     pa11y-ci $(Pipeline.Workspace)/dina-ui
   displayName: 'Running pa11y'
 
