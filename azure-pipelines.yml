@@ -31,6 +31,7 @@ steps:
 - script: |
     pip3 install -U selenium
     pip3 install webdriver-manager
+    npm install chromedriver --chromedriver-force-download
   displayName: 'Install selenium'
 
 - checkout: local-deployement-repo
