@@ -58,8 +58,8 @@ steps:
   displayName: Setting up certificates
 
 - script: |
-     docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
-   displayName: 'Start DockerCompose'
+    docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
+  displayName: 'Start DockerCompose'
 
 - bash: |
     echo Try to connect to Keycloak endpoint ...
