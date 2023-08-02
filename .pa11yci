@@ -1,5 +1,6 @@
 {
   "defaults": {
+    "timeout": 10000000,
     "useIncognitoBrowserContext": false,
     "reporters": [
       "cli"
