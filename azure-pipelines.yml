@@ -38,7 +38,7 @@ steps:
   path: dina-local-deployment
 
 - bash:
-    ./start_stop_dina.sh up
+    $(Pipeline.Workspace)/dina-local-deployment/start_stop_dina.sh up
   displayName: 'Host site'
 
 - checkout: self
