@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   AutoSuggestTextField,
   FieldHeader,
-  ReactTable8,
+  ReactTable,
   filterBy,
   useApiClient,
   useDinaFormContext,
@@ -203,7 +203,7 @@ export function PcrReactionTable({
   ];
 
   return (
-    <ReactTable8<PcrBatchItem>
+    <ReactTable<PcrBatchItem>
       className="-striped react-table-overflow"
       columns={PCR_REACTION_COLUMN}
       data={sortBy(pcrBatchItems, "cellNumber")}

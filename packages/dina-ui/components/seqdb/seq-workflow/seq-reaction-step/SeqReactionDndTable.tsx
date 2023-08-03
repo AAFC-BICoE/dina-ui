@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import {
   FieldHeader,
-  ReactTable8,
+  ReactTable,
   useGroupedCheckBoxes
 } from "../../../../../common-ui/lib";
 import {
@@ -119,7 +119,7 @@ export function SeqReactionDndTable({
   }
 
   return (
-    <ReactTable8<SeqReaction>
+    <ReactTable<SeqReaction>
       className={className}
       columns={seqReactionColumns}
       data={selectedSeqReactions}

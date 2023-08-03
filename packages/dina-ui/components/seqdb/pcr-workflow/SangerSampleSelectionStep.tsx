@@ -41,7 +41,7 @@ export function SangerSampleSelectionStep({
 }: SangerSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
   const { username } = useAccount();
-  const { PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8 } =
+  const { PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN } =
     useMaterialSampleRelationshipColumns();
 
   // Check if a save was requested from the top level button bar.
@@ -277,7 +277,7 @@ export function SangerSampleSelectionStep({
       )}
       <QueryPage<any>
         indexName={"dina_material_sample_index"}
-        columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8}
+        columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
         selectionMode={editMode}
         selectionResources={selectedResources}
         setSelectionResources={setSelectedResourcesAndSaveOrder}

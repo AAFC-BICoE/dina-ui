@@ -5,7 +5,7 @@ import {
   FieldSet,
   FormikButton,
   NumberField,
-  ReactTable8,
+  ReactTable,
   ToggleField,
   useDinaFormContext,
   useFieldLabels
@@ -331,7 +331,7 @@ function OrganismsTable({
           min-width: 4rem !important;
         }
       `}</style>
-      <ReactTable8<Organism>
+      <ReactTable<Organism>
         columns={tableColumns}
         enableDnd={!readOnly && !isTemplate}
         onRowMove={onRowMove}

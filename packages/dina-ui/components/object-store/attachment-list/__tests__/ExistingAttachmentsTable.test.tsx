@@ -1,4 +1,4 @@
-import { FormikButton, ReactTable8 } from "common-ui";
+import { FormikButton, ReactTable } from "common-ui";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ExistingMetadataBulkEditor } from "../../../bulk-metadata/ExistingMetadataBulkEditor";
 import { ExistingAttachmentsTable } from "../ExistingAttachmentsTable";
@@ -89,7 +89,7 @@ describe("ExistingAttachmentsTable component", () => {
     wrapper.update();
 
     // Renders the data into ReactTable:
-    expect(wrapper.find(ReactTable8).prop("data")).toEqual([
+    expect(wrapper.find(ReactTable).prop("data")).toEqual([
       {
         id: "00000000-0000-0000-0000-000000000000",
         metadata: {

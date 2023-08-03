@@ -1,4 +1,4 @@
-import { FieldHeader, ReactTable8, useQuery } from "common-ui";
+import { FieldHeader, ReactTable, useQuery } from "common-ui";
 import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
@@ -89,7 +89,7 @@ export default function FieldListPage() {
           {formatMessage("totalExtenstionFieldsCount")}:{" "}
           {fields?.length ?? response?.data?.[0].extension.fields.length}{" "}
         </span>
-        <ReactTable8<ExtensionField>
+        <ReactTable<ExtensionField>
           key={fields?.length}
           className="-striped"
           columns={getTableColumn(locale)}

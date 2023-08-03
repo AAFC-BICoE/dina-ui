@@ -12,15 +12,14 @@ import {
   JsonApiQuerySpec,
   LimitOffsetPageSpec,
   MetaWithTotal,
-  ReactTable8,
-  ReactTable8Props,
+  ReactTable,
+  ReactTableProps,
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
-import { SortingRule } from "react-table";
 
 /**
  * Column props with extra props designed specifically for our application on top of it.
@@ -103,10 +102,10 @@ export interface QueryTableProps<TData extends KitsuResource> {
    * Pass in either the props or a function that provides the props.
    */
   reactTableProps?:
-    | Partial<ReactTable8Props<TData>>
+    | Partial<ReactTableProps<TData>>
     | ((
         queryState: QueryState<TData[], MetaWithTotal>
-      ) => Partial<ReactTable8Props<TData>>);
+      ) => Partial<ReactTableProps<TData>>);
 
   hideTopPagination?: boolean;
 
@@ -175,7 +174,7 @@ export function QueryTable<TData extends KitsuResource>({
       window.scrollTo(0, divWrapperRef.current.offsetTop);
     }
     setPage({ offset: newOffset, limit: page.limit });
-    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+    const tableProps: Partial<ReactTableProps<TData>> | undefined =
       typeof reactTableProps === "function"
         ? reactTableProps(queryState)
         : reactTableProps;
@@ -194,7 +193,7 @@ export function QueryTable<TData extends KitsuResource>({
       window.scrollTo(0, divWrapperRef.current.offsetTop);
     }
     setPage({ offset: newOffset, limit: newSize });
-    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+    const tableProps: Partial<ReactTableProps<TData>> | undefined =
       typeof reactTableProps === "function"
         ? reactTableProps(queryState)
         : reactTableProps;
@@ -205,7 +204,7 @@ export function QueryTable<TData extends KitsuResource>({
   function onSortingChangeInternal(newSorting: SortingState) {
     onSortedChange?.(newSorting);
     setSortingRules(newSorting);
-    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+    const tableProps: Partial<ReactTableProps<TData>> | undefined =
       typeof reactTableProps === "function"
         ? reactTableProps(queryState)
         : reactTableProps;
@@ -217,7 +216,7 @@ export function QueryTable<TData extends KitsuResource>({
   ) {
     onColumnFiltersChange?.(newColumnFiltersState);
     setColumnFilters(newColumnFiltersState);
-    const tableProps: Partial<ReactTable8Props<TData>> | undefined =
+    const tableProps: Partial<ReactTableProps<TData>> | undefined =
       typeof reactTableProps === "function"
         ? reactTableProps(queryState)
         : reactTableProps;
@@ -331,7 +330,7 @@ export function QueryTable<TData extends KitsuResource>({
           )}
         </div>
       </div>
-      <ReactTable8<TData>
+      <ReactTable<TData>
         className="-striped"
         columns={mappedColumns}
         data={(displayData as TData[]) ?? []}

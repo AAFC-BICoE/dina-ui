@@ -1,5 +1,5 @@
 import { get } from "lodash";
-import { TableColumn8 } from "../list-page/types";
+import { TableColumn } from "../list-page/types";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { KitsuResource } from "kitsu";
 
@@ -7,7 +7,7 @@ import { KitsuResource } from "kitsu";
 export function stringArrayCell<TData extends KitsuResource>(
   label: string,
   accessorKey?: string
-): TableColumn8<TData> {
+): TableColumn<TData> {
   return {
     id: "stringArrayCol_" + label,
     cell: ({ row: { original } }) => {

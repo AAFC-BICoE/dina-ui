@@ -34,9 +34,11 @@ describe("Thumbnail cell component", () => {
 
   it("Using data from the API, display the thumbnail", async () => {
     const wrapper = mountWithAppContext(
-      ThumbnailCell({
-        bucketField: "data.attributes.bucket"
-      }).Cell({ original: METADATA_RESPONSE }),
+      (
+        ThumbnailCell({
+          bucketField: "data.attributes.bucket"
+        }).cell as any
+      )({ row: { original: METADATA_RESPONSE } }),
       { apiContext }
     );
 

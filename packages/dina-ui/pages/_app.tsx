@@ -18,7 +18,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { DndProvider } from "react-dnd-cjs";
 import HTML5Backend from "react-dnd-html5-backend-cjs";
 import "react-dropzone-uploader/dist/styles.css";
-import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
 import "setimmediate";
 import { ErrorBoundaryPage } from "../components";
