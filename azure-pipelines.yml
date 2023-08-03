@@ -67,6 +67,11 @@ steps:
 #  displayName: 'Waiting for Keycloak ...'
 
 - bash: | 
+    $(Pipeline.Workspace)/dina-local-deployment/start_stop_dina.sh up
+  displayName: 'Launch'
+
+
+- bash: | 
     ping dina.local
   displayName: 'Ping dina local'
 
