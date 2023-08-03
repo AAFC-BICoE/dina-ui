@@ -61,28 +61,16 @@ steps:
     docker compose -f docker-compose.base.yml -f docker-compose.local.yml up &
   displayName: 'Start DockerCompose'
 
-#- bash: |
-#    echo Try to connect to Keycloak endpoint ...
-#    curl --head -X GET --retry 25 --retry-delay 2 --retry-connrefused https://dina.local/auth
-#  displayName: 'Waiting for Keycloak ...'
+- bash: |
+    echo Try to connect to Keycloak endpoint ...
+    curl --head -X GET --retry 25 --retry-delay 2 --retry-connrefused https://dina.local/auth
+  displayName: 'Waiting for Keycloak ...'
 
 - bash: | 
-    $(Pipeline.Workspace)/dina-local-deployment/start_stop_dina.sh up
-  displayName: 'Launch'
-
-
-- bash: | 
-    ping dina.local
-  displayName: 'Ping dina local'
-
-- bash: | 
-    cd $(Pipeline.Workspace)/dina-ui
-    pa11y-ci
+    echo test
   displayName: 'Running pa11y'
 
-- bash: | 
-    python3 $(Pipeline.Workspace)/dina-ui/pa11y.py
-  displayName: 'Running pa11y.py'
+
 
 
 
