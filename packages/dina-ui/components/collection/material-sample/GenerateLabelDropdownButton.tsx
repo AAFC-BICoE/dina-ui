@@ -19,7 +19,7 @@ type CustomMenuProps = {
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
-  labeledBy?: string;
+  labelledBy?: string;
 };
 
 interface GenerateLabelDropdownButtonProps {
@@ -146,7 +146,7 @@ export function GenerateLabelDropdownButton({
             padding: "20px"
           }}
           className={props.className}
-          aria-labelledby={props.labeledBy}
+          aria-labelledby={props.labelledBy}
         >
           <strong>
             <DinaMessage id="selectTemplate" />
