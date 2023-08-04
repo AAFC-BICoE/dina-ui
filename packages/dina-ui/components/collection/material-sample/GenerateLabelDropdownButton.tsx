@@ -15,7 +15,7 @@ interface ReportTemplateOption {
   includesBarcode: boolean;
 }
 
-type CustomMenuProps = {
+export type CustomMenuProps = {
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
