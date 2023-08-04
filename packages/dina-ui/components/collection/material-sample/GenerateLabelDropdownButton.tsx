@@ -12,6 +12,7 @@ import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientCont
 interface ReportTemplateOption {
   label: string;
   value: string;
+  includesBarcode: boolean;
 }
 
 type CustomMenuProps = {
@@ -46,10 +47,13 @@ export function GenerateLabelDropdownButton({
     },
     {
       onSuccess: async ({ data }) => {
-        const generatedOptions = data.map((template) => ({
-          label: template?.name ?? "",
-          value: template?.id ?? ""
-        }));
+        const generatedOptions: ReportTemplateOption[] = data.map(
+          (template) => ({
+            label: template?.name ?? "",
+            value: template?.id ?? "",
+            includesBarcode: template.includesBarcode
+          })
+        );
         setReportTemplateOptions(generatedOptions);
 
         // If options are available, just set the first one automatically.
@@ -80,7 +84,9 @@ export function GenerateLabelDropdownButton({
               {
                 barcode: {
                   id: materialSample.barcode ?? "",
-                  content: materialSample.materialSampleName ?? ""
+                  content: reportTemplate.includesBarcode
+                    ? materialSample.id
+                    : ""
                 },
                 data: {
                   attributes: materialSample
