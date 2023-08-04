@@ -177,11 +177,14 @@ export function GenerateLabelDropdownButton({
   );
 
   return (
-    <Dropdown>
-      <Dropdown.Toggle>
+    <Dropdown aria-label="Generate Label Dropdown">
+      <Dropdown.Toggle aria-label="Generate Label Toggle">
         <DinaMessage id="generateLabel" />
       </Dropdown.Toggle>
-      <Dropdown.Menu as={CustomMenu} />
+      <Dropdown.Menu
+        as={CustomMenu}
+        aria-label="Generate Label Dropdown Menu"
+      />
     </Dropdown>
   );
 }
