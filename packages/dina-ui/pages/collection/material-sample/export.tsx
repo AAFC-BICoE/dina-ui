@@ -1,4 +1,5 @@
 import {
+  DinaForm,
   FieldHeader,
   ReactTable,
   TextField,
@@ -16,7 +17,9 @@ import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import Link from "next/link";
 import { KitsuResource } from "kitsu";
 
-export function MaterialSampleExportPage<TData extends KitsuResource>() {
+export default function MaterialSampleExportPage<
+  TData extends KitsuResource
+>() {
   const {
     CheckBoxField,
     CheckBoxHeader,
@@ -141,17 +144,19 @@ export function MaterialSampleExportPage<TData extends KitsuResource>() {
 
   return (
     <div>
-      <Dropdown>
-        <Dropdown.Toggle>
-          <DinaMessage id="selectColumn" />
-        </Dropdown.Toggle>
-        <Dropdown.Menu as={CustomMenu} />
-      </Dropdown>
-      <ReactTable<TData>
-        // loading={loading}
-        columns={selectedColumns}
-        data={[]}
-      />
+      <DinaForm initialValues={{}}>
+        <Dropdown>
+          <Dropdown.Toggle>
+            <DinaMessage id="selectColumn" />
+          </Dropdown.Toggle>
+          <Dropdown.Menu as={CustomMenu} />
+        </Dropdown>
+        <ReactTable<TData>
+          // loading={loading}
+          columns={selectedColumns}
+          data={[]}
+        />
+      </DinaForm>
     </div>
   );
 }
