@@ -20,47 +20,6 @@ import { KitsuResource } from "kitsu";
 export default function MaterialSampleExportPage<
   TData extends KitsuResource
 >() {
-  const {
-    CheckBoxField,
-    CheckBoxHeader,
-    setAvailableItems: setAvailableSamples
-  } = useGroupedCheckBoxes({
-    fieldName: "selectedColumns"
-  });
-
-  const [selectedColumns, setSelectedColumns] = useState<TableColumn<TData>[]>(
-    []
-  );
-
-  const CustomMenu = React.forwardRef(
-    (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
-      return (
-        <div
-          ref={ref}
-          style={{
-            ...props.style,
-            width: "400px",
-            padding: "20px"
-          }}
-          className={props.className}
-          aria-labelledby={props.labeledBy}
-        >
-          <TextField name="filterColumns" />
-          <Dropdown.Divider />
-          <CheckBoxHeader />
-          {columns.map((column) => {
-            return (
-              <Dropdown.Item key={column.id}>
-                <CheckBoxField key={column.id} resource={column as any} />
-                {column.header}
-              </Dropdown.Item>
-            );
-          })}
-        </div>
-      );
-    }
-  );
-
   const columns: TableColumn<any>[] = [
     // Material Sample Name
     {
@@ -142,6 +101,54 @@ export default function MaterialSampleExportPage<
     }
   ];
 
+  const { CheckBoxField, CheckBoxHeader, setAvailableItems, availableItems } =
+    useGroupedCheckBoxes({
+      fieldName: "selectedColumns"
+    });
+
+  const [selectedColumns, setSelectedColumns] = useState<TableColumn<TData>[]>(
+    []
+  );
+
+  const CustomMenu = React.forwardRef(
+    (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
+      return (
+        <div
+          ref={ref}
+          style={{
+            ...props.style,
+            width: "400px",
+            padding: "20px"
+          }}
+          className={props.className}
+          aria-labelledby={props.labeledBy}
+        >
+          <TextField name="filterColumns" placeholder="Search" />
+          <Dropdown.Divider />
+          <CheckBoxHeader />
+          {columns.map((column) => {
+            return (
+              <div key={column.id}>
+                <CheckBoxField
+                  key={column.id}
+                  resource={column as any}
+                  className="inline-flex"
+                />
+                {typeof column === "string" ? (
+                  <FieldHeader name={column} />
+                ) : (
+                  column?.header &&
+                  typeof column.header !== "string" &&
+                  (column as any).header()
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+  );
+
   return (
     <div>
       <DinaForm initialValues={{}}>
@@ -153,7 +160,7 @@ export default function MaterialSampleExportPage<
         </Dropdown>
         <ReactTable<TData>
           // loading={loading}
-          columns={selectedColumns}
+          columns={columns as any}
           data={[]}
         />
       </DinaForm>
