@@ -1,18 +1,12 @@
 import {
+  ColumnChooser,
   DinaForm,
   FieldHeader,
   ReactTable,
-  TextField,
   dateCell,
-  stringArrayCell,
-  useGroupedCheckBoxes
+  stringArrayCell
 } from "packages/common-ui/lib";
-import { CustomMenuProps } from "packages/dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import React, { useState } from "react";
-import Dropdown from "react-bootstrap/Dropdown";
-import Select from "react-select";
-import Button from "react-bootstrap/Button";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import Link from "next/link";
 import { KitsuResource } from "kitsu";
@@ -101,64 +95,10 @@ export default function MaterialSampleExportPage<
     }
   ];
 
-  const { CheckBoxField, CheckBoxHeader, setAvailableItems, availableItems } =
-    useGroupedCheckBoxes({
-      fieldName: "selectedColumns"
-    });
-
-  const [selectedColumns, setSelectedColumns] = useState<TableColumn<TData>[]>(
-    []
-  );
-
-  const CustomMenu = React.forwardRef(
-    (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
-      return (
-        <div
-          ref={ref}
-          style={{
-            ...props.style,
-            width: "400px",
-            padding: "20px",
-            zIndex: 1
-          }}
-          className={props.className}
-          aria-labelledby={props.labeledBy}
-        >
-          <TextField name="filterColumns" placeholder="Search" />
-          <Dropdown.Divider />
-          <CheckBoxHeader />
-          {columns.map((column) => {
-            return (
-              <div key={column.id}>
-                <CheckBoxField
-                  key={column.id}
-                  resource={column as any}
-                  className="inline-flex"
-                />
-                {typeof column === "string" ? (
-                  <FieldHeader name={column} />
-                ) : (
-                  column?.header &&
-                  typeof column.header !== "string" &&
-                  (column as any).header()
-                )}
-              </div>
-            );
-          })}
-        </div>
-      );
-    }
-  );
-
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <Dropdown>
-          <Dropdown.Toggle>
-            <DinaMessage id="selectColumn" />
-          </Dropdown.Toggle>
-          <Dropdown.Menu as={CustomMenu} />
-        </Dropdown>
+        <ColumnChooser columns={columns} />
         <ReactTable<TData>
           // loading={loading}
           columns={columns as any}
