@@ -118,7 +118,8 @@ export default function MaterialSampleExportPage<
           style={{
             ...props.style,
             width: "400px",
-            padding: "20px"
+            padding: "20px",
+            zIndex: 1
           }}
           className={props.className}
           aria-labelledby={props.labeledBy}
