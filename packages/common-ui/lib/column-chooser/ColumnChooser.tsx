@@ -1,6 +1,7 @@
 import {
   DinaForm,
   FieldHeader,
+  GroupedCheckboxWithLabel,
   ReactTable,
   TextField,
   dateCell,
@@ -36,19 +37,7 @@ export function ColumnChooser({ columns }: ColumnChooserProps) {
         >
           <TextField name="filterColumns" placeholder="Search" />
           <Dropdown.Divider />
-          {columns.map((column) => {
-            return (
-              <div key={column.id}>
-                {typeof column === "string" ? (
-                  <FieldHeader name={column} />
-                ) : (
-                  column?.header &&
-                  typeof column.header !== "string" &&
-                  (column as any).header()
-                )}
-              </div>
-            );
-          })}
+          <GroupedCheckboxWithLabel resources={columns} isField={true} />
         </div>
       );
     }

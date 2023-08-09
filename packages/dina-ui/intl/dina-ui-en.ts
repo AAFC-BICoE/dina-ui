@@ -880,5 +880,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   controlledVocabularyTitle: "Controlled Vocabulary",
   generatingReport: "Generating Report...",
   auditSnapshot: "Audit Snapshot",
-  selectColumn: "Select Column"
+  selectColumn: "Select Column",
+  selectAll: "Select All"
 };
