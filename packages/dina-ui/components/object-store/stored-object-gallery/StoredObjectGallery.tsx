@@ -4,6 +4,7 @@ import Link from "next/link";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { FileView } from "../file-view/FileView";
+import { useMetadataThumbnailPath } from "../metadata/useMetadataThumbnailPath";
 
 interface StoredObjectGalleryProps {
   /** The GroupedCheckBox component for selecting Metadatas to edit. */
@@ -73,14 +74,13 @@ function GalleryItem({
   metadata,
   onSelectPreviewMetadata
 }: GalleryItemProps) {
-  const { acCaption, originalFilename, bucket } = metadata?.data?.attributes;
+  const { acCaption, originalFilename } = metadata?.data?.attributes;
   const { id } = metadata;
-  const derivativeType =
-    metadata?.included?.derivative?.attributes?.derivativeType;
-  const filePath =
-    derivativeType === "THUMBNAIL_IMAGE"
-      ? `/objectstore-api/file/${bucket}/derivative/${metadata?.included?.derivative?.attributes?.fileIdentifier}`
-      : "";
+  const { filePath } = useMetadataThumbnailPath(
+    metadata,
+    "data.attributes.bucket",
+    false
+  );
 
   const { formatMessage } = useDinaIntl();
 

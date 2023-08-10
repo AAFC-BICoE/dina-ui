@@ -1,11 +1,11 @@
 import { KitsuResource } from "kitsu";
-import { get } from "lodash";
 import Link from "next/link";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";
 import { Derivative } from "../../types/objectstore-api";
+import { useMetadataThumbnailPath } from "../object-store/metadata/useMetadataThumbnailPath";
 
 export interface ThumbnailCellProps {
   bucketField: string;
@@ -19,35 +19,8 @@ export function ThumbnailCell<TData extends KitsuResource>({
   return {
     id: "thumbnailColumn",
     cell: ({ row: { original } }) => {
-      const bucket = get(original as any, bucketField);
-      let derivatives: any[] | undefined = (original as any)?.included
-        ?.derivative;
-      let thumbnailDerivative = derivatives?.find(
-        (derivative) =>
-          derivative.attributes.derivativeType === "THUMBNAIL_IMAGE"
-      );
-      let filePath = thumbnailDerivative
-        ? `/objectstore-api/file/${bucket}/derivative/${thumbnailDerivative.attributes.fileIdentifier}`
-        : "";
-      let resourceExternalURL = (original as any)?.data?.attributes
-        ?.resourceExternalURL;
-      let hasExternalResourceDerivative =
-        resourceExternalURL && (original as any)?.included?.derivative;
-      if (isJsonApiQuery) {
-        derivatives = (original as any)?.metadata
-          ? (original as any)?.metadata.derivatives
-          : (original as any)?.derivatives;
-        thumbnailDerivative = derivatives?.find(
-          (derivative) => derivative.derivativeType === "THUMBNAIL_IMAGE"
-        );
-        filePath = thumbnailDerivative
-          ? `/objectstore-api/file/${bucket}/derivative/${thumbnailDerivative.fileIdentifier}`
-          : "";
-        resourceExternalURL = (original as any)?.data?.attributes
-          ?.resourceExternalURL;
-        hasExternalResourceDerivative =
-          resourceExternalURL && (original as any)?.included?.derivative;
-      }
+      const { resourceExternalURL, hasExternalResourceDerivative, filePath } =
+        useMetadataThumbnailPath<TData>(original, bucketField, isJsonApiQuery);
       return resourceExternalURL ? (
         <div className="d-flex h-100">
           {hasExternalResourceDerivative ? (
