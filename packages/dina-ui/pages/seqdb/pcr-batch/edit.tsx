@@ -483,14 +483,14 @@ function PcrBatchFormFields({
           restrictedFieldValue={values?.storageUnitType?.id}
         />
       </div>
-      {initialValues.id ? (
+      {initialValues.id && (
         <FieldSet legend={<DinaMessage id="pcrReactionTitle" />}>
           <PcrReactionTable
             pcrBatchItems={pcrBatchItems}
             materialSamples={materialSamples}
           />
         </FieldSet>
-      ) : undefined}
+      )}
       <AttachmentsField
         name="attachment"
         attachmentPath={`seqdb-api/pcr-batch/${initialValues.id}/attachment`}
