@@ -271,6 +271,11 @@ export function Home() {
                     <SeqdbMessage id="thermocyclerProfileListTitle" />
                   </a>
                 </Link>
+                <Link href="/seqdb/library-prep-batch/list">
+                  <a>
+                    <SeqdbMessage id="libraryPrepBatchListTitle" />
+                  </a>
+                </Link>
               </Stack>
             </Col>
 
