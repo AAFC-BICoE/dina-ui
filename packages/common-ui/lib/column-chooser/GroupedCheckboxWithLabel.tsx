@@ -1,8 +1,6 @@
 import { startCase } from "lodash";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { Value } from "sass";
 
 export interface CheckboxProps {
   id: string;

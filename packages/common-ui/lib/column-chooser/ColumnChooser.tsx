@@ -1,21 +1,10 @@
-import {
-  DinaForm,
-  FieldHeader,
-  GroupedCheckboxWithLabel,
-  ReactTable,
-  TextField,
-  dateCell,
-  stringArrayCell,
-  useGroupedCheckBoxes
-} from "..";
+import { GroupedCheckboxWithLabel, TextField } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
-import Select from "react-select";
-import Button from "react-bootstrap/Button";
-import { TableColumn } from "../list-page/types";
-import Link from "next/link";
+import { useIntl } from "react-intl";
+import { startCase } from "lodash";
 
 export interface ColumnChooserProps {
   columns: any[];
@@ -31,6 +20,15 @@ export function ColumnChooser({
   isCheckAll,
   setIsCheckAll
 }: ColumnChooserProps) {
+  const { formatMessage, messages } = useIntl();
+  const columnSearchMapping: any[] = columns.map((column) => {
+    const messageKey = `field_${column.id}`;
+    const label = messages[messageKey]
+      ? formatMessage({ id: messageKey as any })
+      : startCase(column.id);
+    return { label: label.toLowerCase(), id: column.id };
+  });
+  const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
   const CustomMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
       return (
@@ -45,10 +43,28 @@ export function ColumnChooser({
           className={props.className}
           aria-labelledby={props.labeledBy}
         >
-          <TextField name="filterColumns" placeholder="Search" />
+          <TextField
+            name="filterColumns"
+            placeholder="Search"
+            onChangeExternal={(_form, _name, value) => {
+              if (value === "" || !value) {
+                setSearchedColumns(columns);
+              } else {
+                const searchedColumnsIds = columnSearchMapping
+                  .filter((columnMapping) =>
+                    columnMapping.label.includes(value?.toLowerCase())
+                  )
+                  .map((filteredMapping) => filteredMapping.id);
+                const filteredColumns = columns.filter((column) =>
+                  searchedColumnsIds.includes(column.id)
+                );
+                setSearchedColumns(filteredColumns);
+              }
+            }}
+          />
           <Dropdown.Divider />
           <GroupedCheckboxWithLabel
-            resources={columns}
+            resources={searchedColumns}
             isField={true}
             checkedIds={checkedIds}
             setCheckedIds={setCheckedIds}
