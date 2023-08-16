@@ -471,6 +471,11 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="libraryPrepBatchListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/ngs-workflow/list" passHref={true}>
+        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+          <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
+        </NavDropdown.Item>
+      </Link>
     </NavDropdown>
   );
 }

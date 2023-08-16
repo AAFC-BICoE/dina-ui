@@ -206,42 +206,42 @@ export function Home() {
               </h2>
 
               <Stack style={{ display: "inline-flex" }}>
-                <Link href="/seqdb/index-set/list">
+                <Link href="/seqdb/index-set/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="indexSetListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/molecular-sample/list">
+                <Link href="/seqdb/molecular-sample/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="molecularSampleListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/workflow/list">
+                <Link href="/seqdb/workflow/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="workflowListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/pcr-batch/list">
+                <Link href="/seqdb/pcr-batch/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="pcrBatchListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/pcr-primer/list">
+                <Link href="/seqdb/pcr-primer/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="pcrPrimerListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/pcr-workflow/list">
+                <Link href="/seqdb/pcr-workflow/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="pcrWorkflowListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/product/list">
+                <Link href="/seqdb/product/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="productListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/region/list">
+                <Link href="/seqdb/region/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="regionListTitle" />
                   </a>
@@ -256,24 +256,29 @@ export function Home() {
                     <SeqdbMessage id="seqSubmissionListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/sequencing-facility/list">
+                <Link href="/seqdb/sequencing-facility/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="sequencingFacilityListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/seq-workflow/list">
+                <Link href="/seqdb/seq-workflow/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/thermocycler-profile/list">
+                <Link href="/seqdb/thermocycler-profile/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="thermocyclerProfileListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/library-prep-batch/list">
+                <Link href="/seqdb/library-prep-batch/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="libraryPrepBatchListTitle" />
+                  </a>
+                </Link>
+                <Link href="/seqdb/ngs-workflow/list" passHref={true}>
+                  <a>
+                    <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
                   </a>
                 </Link>
               </Stack>
