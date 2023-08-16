@@ -1,25 +1,29 @@
-import { GroupedCheckboxWithLabel, TextField } from "..";
+import { useGroupedCheckboxWithLabel, TextField } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { startCase } from "lodash";
 
-export interface ColumnChooserProps {
-  columns: any[];
-  setCheckedIds: React.Dispatch<React.SetStateAction<string[]>>;
-  checkedIds: string[];
-  isCheckAll: boolean;
-  setIsCheckAll: React.Dispatch<React.SetStateAction<boolean>>;
+export function ColumnChooser(
+  CustomMenu: React.ForwardRefExoticComponent<
+    CustomMenuProps & React.RefAttributes<HTMLDivElement>
+  >
+) {
+  return (
+    <Dropdown autoClose={"outside"}>
+      <Dropdown.Toggle>
+        <DinaMessage id="selectColumn" />
+      </Dropdown.Toggle>
+      <Dropdown.Menu as={CustomMenu} />
+    </Dropdown>
+  );
 }
-export function ColumnChooser({
-  columns,
-  checkedIds,
-  setCheckedIds,
-  isCheckAll,
-  setIsCheckAll
-}: ColumnChooserProps) {
+export interface UseColumnChooserProps {
+  columns: any[];
+}
+export function useColumnChooser({ columns }: UseColumnChooserProps) {
   const { formatMessage, messages } = useIntl();
   const columnSearchMapping: any[] = columns.map((column) => {
     const messageKey = `field_${column.id}`;
@@ -28,7 +32,24 @@ export function ColumnChooser({
       : startCase(column.id);
     return { label: label.toLowerCase(), id: column.id };
   });
+  const { CustomMenu, checkedIds } = useCustomMenu(
+    columns,
+    columnSearchMapping
+  );
+  const columnChooser = ColumnChooser(CustomMenu);
+  return { columnChooser, checkedIds };
+}
+
+function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
+  const { groupedCheckBoxes, checkedIds } = useGroupedCheckboxWithLabel({
+    resources: searchedColumns,
+    isField: true
+  });
+  const testRef = useRef<any>();
+  useEffect(() => {
+    testRef?.current?.focus();
+  }, []);
   const CustomMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
       return (
@@ -44,6 +65,7 @@ export function ColumnChooser({
           aria-labelledby={props.labeledBy}
         >
           <TextField
+            inputProps={{ autoFocus: true }}
             name="filterColumns"
             placeholder="Search"
             onChangeExternal={(_form, _name, value) => {
@@ -63,24 +85,10 @@ export function ColumnChooser({
             }}
           />
           <Dropdown.Divider />
-          <GroupedCheckboxWithLabel
-            resources={searchedColumns}
-            isField={true}
-            checkedIds={checkedIds}
-            setCheckedIds={setCheckedIds}
-            isCheckAll={isCheckAll}
-            setIsCheckAll={setIsCheckAll}
-          />
+          {groupedCheckBoxes}
         </div>
       );
     }
   );
-  return (
-    <Dropdown>
-      <Dropdown.Toggle>
-        <DinaMessage id="selectColumn" />
-      </Dropdown.Toggle>
-      <Dropdown.Menu as={CustomMenu} />
-    </Dropdown>
-  );
+  return { CustomMenu, checkedIds };
 }

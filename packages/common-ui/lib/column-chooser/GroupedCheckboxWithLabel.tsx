@@ -27,20 +27,18 @@ export function Checkbox({
       : startCase(id));
   return (
     <div>
-      <label>
-        <input
-          id={id}
-          type={"checkbox"}
-          onChange={handleClick}
-          checked={isChecked}
-          style={{
-            marginRight: "0.3rem",
-            height: "1.3rem",
-            width: "1.3rem"
-          }}
-        />
-        <span>{label}</span>
-      </label>
+      <input
+        id={id}
+        type={"checkbox"}
+        onChange={handleClick}
+        checked={isChecked}
+        style={{
+          marginRight: "0.3rem",
+          height: "1.3rem",
+          width: "1.3rem"
+        }}
+      />
+      <span>{label}</span>
     </div>
   );
 }
@@ -49,28 +47,23 @@ interface CheckboxResource {
   id: string;
   [key: string]: any;
 }
-export interface GroupedCheckboxWithLabelProps {
+export interface UseGroupedCheckboxWithLabelProps {
   resources: CheckboxResource[];
   isField?: boolean;
-  setCheckedIds: React.Dispatch<React.SetStateAction<string[]>>;
-  checkedIds: string[];
-  isCheckAll: boolean;
-  setIsCheckAll: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function GroupedCheckboxWithLabel({
+export function useGroupedCheckboxWithLabel({
   resources,
-  isField,
-  checkedIds,
-  setCheckedIds,
-  isCheckAll,
-  setIsCheckAll
-}: GroupedCheckboxWithLabelProps) {
+  isField
+}: UseGroupedCheckboxWithLabelProps) {
   const [list, setList] = useState<CheckboxResource[]>([]);
-
+  const [checkedIds, setCheckedIds] = useState<string[]>(
+    resources.map((resource) => resource.id ?? "")
+  );
+  const [isCheckAll, setIsCheckAll] = useState<boolean>(true);
   useEffect(() => {
     setList(resources);
-  }, [list]);
+  }, [resources]);
 
   const handleSelectAll = (_e) => {
     setIsCheckAll(!isCheckAll);
@@ -95,20 +88,35 @@ export function GroupedCheckboxWithLabel({
     }
   };
 
-  const groupedCheckboxes = list.map(({ id }) => {
-    return (
-      <>
-        <Checkbox
-          key={id}
-          id={id}
-          handleClick={handleClick}
-          isChecked={checkedIds.includes(id)}
-          isField={isField}
-        />
-      </>
-    );
+  const groupedCheckBoxes = GroupedCheckboxes({
+    handleSelectAll,
+    isCheckAll,
+    list,
+    handleClick,
+    checkedIds,
+    isField
   });
 
+  return { groupedCheckBoxes, checkedIds };
+}
+
+export interface GroupedCheckboxesProps {
+  handleSelectAll: (_e: any) => void;
+  isCheckAll: boolean;
+  list: CheckboxResource[];
+  handleClick: (e: any) => void;
+  checkedIds: any;
+  isField: boolean | undefined;
+}
+
+function GroupedCheckboxes({
+  handleSelectAll,
+  isCheckAll,
+  list,
+  handleClick,
+  checkedIds,
+  isField
+}: GroupedCheckboxesProps) {
   return (
     <div>
       <Checkbox
@@ -116,7 +124,19 @@ export function GroupedCheckboxWithLabel({
         handleClick={handleSelectAll}
         isChecked={isCheckAll}
       />
-      {groupedCheckboxes}
+      {list.map(({ id }) => {
+        return (
+          <>
+            <Checkbox
+              key={id}
+              id={id}
+              handleClick={handleClick}
+              isChecked={checkedIds.includes(id)}
+              isField={isField}
+            />
+          </>
+        );
+      })}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import {
-  ColumnChooser,
+  useColumnChooser,
   DinaForm,
   FieldHeader,
   ReactTable,
@@ -90,21 +90,11 @@ const columns: TableColumn<any>[] = [
 export default function MaterialSampleExportPage<
   TData extends KitsuResource
 >() {
-  const [checkedIds, setCheckedIds] = useState<string[]>(
-    columns.map((column) => column.id ?? "")
-  );
-  const [isCheckAll, setIsCheckAll] = useState<boolean>(true);
-
+  const { columnChooser, checkedIds } = useColumnChooser({ columns });
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <ColumnChooser
-          columns={columns}
-          checkedIds={checkedIds}
-          setCheckedIds={setCheckedIds}
-          isCheckAll={isCheckAll}
-          setIsCheckAll={setIsCheckAll}
-        />
+        {columnChooser}
         <ReactTable<TData>
           // loading={loading}
           columns={
