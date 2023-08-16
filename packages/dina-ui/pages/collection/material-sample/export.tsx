@@ -94,14 +94,28 @@ export default function MaterialSampleExportPage<
       isColumnVisible: false
     }
   ];
+  const [checkedIds, setCheckedIds] = useState<string[]>(
+    columns.map((column) => column.id ?? "")
+  );
+  const [isCheckAll, setIsCheckAll] = useState<boolean>(true);
 
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <ColumnChooser columns={columns} />
+        <ColumnChooser
+          columns={columns}
+          checkedIds={checkedIds}
+          setCheckedIds={setCheckedIds}
+          isCheckAll={isCheckAll}
+          setIsCheckAll={setIsCheckAll}
+        />
         <ReactTable<TData>
           // loading={loading}
-          columns={columns as any}
+          columns={
+            columns.filter((column) =>
+              column.id ? checkedIds.includes(column.id) : false
+            ) as any
+          }
           data={[]}
         />
       </DinaForm>

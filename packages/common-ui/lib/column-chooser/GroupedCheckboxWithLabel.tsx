@@ -54,14 +54,20 @@ interface CheckboxResource {
 export interface GroupedCheckboxWithLabelProps {
   resources: CheckboxResource[];
   isField?: boolean;
+  setCheckedIds: React.Dispatch<React.SetStateAction<string[]>>;
+  checkedIds: string[];
+  isCheckAll: boolean;
+  setIsCheckAll: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function GroupedCheckboxWithLabel({
   resources,
-  isField
+  isField,
+  checkedIds,
+  setCheckedIds,
+  isCheckAll,
+  setIsCheckAll
 }: GroupedCheckboxWithLabelProps) {
-  const [isCheckAll, setIsCheckAll] = useState(false);
-  const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const [list, setList] = useState<CheckboxResource[]>([]);
 
   useEffect(() => {
@@ -78,9 +84,16 @@ export function GroupedCheckboxWithLabel({
 
   const handleClick = (e) => {
     const { id, checked } = e.target;
-    setCheckedIds([...checkedIds, id]);
     if (!checked) {
       setCheckedIds(checkedIds.filter((item) => item !== id));
+      setIsCheckAll(false);
+    } else {
+      setCheckedIds(() => {
+        if ([...checkedIds, id].length === list.length) {
+          setIsCheckAll(true);
+        }
+        return [...checkedIds, id];
+      });
     }
   };
 
