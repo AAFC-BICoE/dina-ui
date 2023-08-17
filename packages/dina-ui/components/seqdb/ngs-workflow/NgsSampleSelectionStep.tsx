@@ -8,15 +8,14 @@ import {
   useApiClient
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { compact, pick, uniq, difference, concat } from "lodash";
-import { useRouter } from "next/router";
+import { compact, concat, difference, pick, uniq } from "lodash";
 import { useEffect, useState } from "react";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
   MaterialSample,
   MaterialSampleSummary
 } from "../../../types/collection-api";
-import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { LibraryPrepBatch, LibraryPrep2 } from "../../../types/seqdb-api";
+import { LibraryPrep2, LibraryPrepBatch } from "../../../types/seqdb-api";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export interface NgsSampleSelectionStepProps {
