@@ -6,6 +6,7 @@ import {
   FormikButton,
   NumberField,
   ReactTable8,
+  TextField,
   ToggleField,
   useDinaFormContext,
   useFieldLabels
@@ -146,11 +147,12 @@ export function OrganismsField({
                   <div className="row">
                     <div className="col-md-6 d-flex gap-3">
                       <NumberField
-                        name="organismsQuantity"
+                        name="organismsQuantity" 
+                        customName="organismsQuantity"
                         className="flex-grow-1"
                         inputProps={{ type: "number" }}
                         min={0}
-                      />
+                      />            
                       {!readOnly && (
                         <div className="d-flex">
                           <ToggleField
@@ -254,9 +256,9 @@ function OrganismsTable({
     },
     ...["lifeStage", "sex"].map<ColumnDef<Organism>>((accessorKey) => ({
       accessorKey,
-      meta: { className: `${accessorKey}-cell` },
+      meta: { "className": `${accessorKey}-cell` },
       header: () => (
-        <FieldHeader name={getFieldLabel({ name: accessorKey }).fieldLabel} />
+        <FieldHeader name={getFieldLabel({ name: "accessorKey" }).fieldLabel} />
       )
     })),
     ...(readOnly

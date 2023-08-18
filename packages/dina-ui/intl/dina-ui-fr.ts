@@ -97,6 +97,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cataloguedObjectListTitle: "Objets catalogués",
   cfiaPPCLevel: "Niveau ACIA PPC",
   changedProperties: "Modifications",
+  childMaterialSamples: "Échantillon de Matériel Direct Enfants",
   childrenStorageUnits: "Tables enfants des unités de stockage",
   closePreviewButtonText: "Fermer la prévisualisation",
   colSearchBoxTooltip: "Rechercher dans le Catalogue de la vie",
@@ -361,6 +362,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_isolatedOn: "Isolé le ",
   field_isolationRemarks: "Isolation - remarques",
   field_license: "Licence",
+  field_lifeStage: "Étape de la Vie",
   field_managedAttributeComponent: "Type de composant des données cibles",
   field_managedAttributeCreatedBy: "Créé par",
   field_managedAttributeCreatedOn: "Créé le",
@@ -373,8 +375,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_vocabularyElementType_picklist_label: "Liste de sélection",
   field_vocabularyElementType_text_label: "Texte",
   field_materialSampleName: "Identifiant Échantillons de matériaux",
-  field_materialSampleRemarks: "Commentaire sur léchantillon de matériau",
-  field_materialSampleState: "État de léchantillon de matériau",
+  field_materialSampleRemarks: "Commentaire sur l'échantillon de matériau",
+  field_materialSampleState: "État de l'échantillon de matériau",
   field_materialSampleState_tooltip:
     "Représente l'état d'un échantillon de matériau qui a été détérioré. ",
   field_materialSampleType: "Type d’échantillon de matière",
@@ -386,9 +388,11 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_name: "Nom",
   field_notPubliclyReleasableReason:
     "Raison pour laquelle il n’est pas possible de le divulguer publiquement",
+  field_organismRemarks: "Organisme Remarques",
   field_organismsIndividualEntry: "Entrée d'un organisme individuel",
   field_organismsIndividualEntry_tooltip:
     "Laisser FERMÉ pour copier les mêmes données pour chaque organisme. Basculement ACTIVÉ pour entrer différentes données pour chaque organisme.",
+  field_organismsQuantity: "Quantité d'Organismes",
   field_organizationMandatoryFieldsError:
     "Le nom d’au moins une organisation est requis",
   field_orientation: "Orientation",
@@ -428,6 +432,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Indique si l’objet peut être diffusé publiquement sur une page Web ou sur des portails de données ouvertes.",
   field_remarks: "Remarques",
   field_scientificNameInput: "Nom scientifique",
+  field_sex: "Sexe",
   field_startDate: "Date de début",
   field_startEventDateTime: "Date et heure de l'événement initial",
   field_tags: "Étiquettes",
@@ -598,8 +603,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   objectSubtypeTitle: "Sous-type d’objet",
   openGeographySearchButtonLabel: "Recherche sur Open Street Maps",
   organism: "Organisme",
+  organismRemarks: "Organisme Remarques",
   organismState: "État de l'organisme",
   organisms: "Organismes",
+  organismsQuantity: "Quantité d'organismes",
   organizationEnglishNameLabel: "Nom anglais ",
   organizationFrenchNameLabel: "Nom français ",
   organizationListTitle: "Organisations",
@@ -782,6 +789,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   transactionAttachments: "Pièces jointes à la transaction",
   transactionDetails: "Détails de la transaction",
   transactions: "Transactions",
+  type: "Catégorie",
   typeAnythingOrPickAScientificName:
     "Taper quelque chose ou choisir un nom scientifique",
   typeNewTagOrSearchPreviousTags:

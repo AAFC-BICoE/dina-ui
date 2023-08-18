@@ -355,6 +355,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_isolatedOn: "Isolated On",
   field_isolationRemarks: "Isolation Remarks",
   field_license: "License",
+  field_lifeStage: "Life Stage",
   field_managedAttributeComponent: "Target Data Component Type",
   field_managedAttributeCreatedBy: "Created By",
   field_managedAttributeCreatedOn: "Created On",
@@ -380,10 +381,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_materialToBeReturned: "To Be Returned",
   field_name: "Name",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
+  field_organismRemarks: "Organism Remarks",
   field_organismsIndividualEntry: "Individual Organism Entry",
   field_organismsIndividualEntry_tooltip:
     "Leave this OFF to copy the same data for every Organism. Toggle ON to enter different data for each Organism.",
-  field_organizationMandatoryFieldsError:
+  field_organismsQuantity: "Organisms quantity",
+    field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
   field_orientation: "Orientation",
   field_orientation_tooltip:
@@ -423,6 +426,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_remarks: "Remarks",
   field_restrictToCreatedBy: "Private",
   field_scientificNameInput: "Scientific Name",
+  field_sex: "Sex",
   field_startDate: "Start Date",
   field_startEventDateTime: "Start Event Date Time",
   field_startEventDateTime_tooltip:
@@ -605,8 +609,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectSubtypeTitle: "Object Subtype",
   openGeographySearchButtonLabel: "Search On Open Street Maps",
   organism: "Organism",
+  organismRemarks: "Organism Remarks",
   organismState: "Organism State",
   organisms: "Organisms",
+  organismsQuantity: "Organisms Quantity",
   organizationEnglishNameLabel: "English Name",
   organizationFrenchNameLabel: "French Name",
   organizationListTitle: "Organizations",
@@ -814,6 +820,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   transactionAttachments: "Transaction Attachments",
   transactionDetails: "Transaction Details",
   transactions: "Transactions",
+  type: "Type",
   typeAnythingOrPickAScientificName: "Type anything or pick a Scientific Name",
   typeNewTagOrSearchPreviousTags: "Type New Tag or Search Previous Tags",
   typeSpecimen: "Type Specimen",
