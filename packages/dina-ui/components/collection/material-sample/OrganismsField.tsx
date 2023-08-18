@@ -256,9 +256,9 @@ function OrganismsTable({
     },
     ...["lifeStage", "sex"].map<ColumnDef<Organism>>((accessorKey) => ({
       accessorKey,
-      meta: { "className": `${accessorKey}-cell` },
+      meta: { className: `${accessorKey}-cell` },
       header: () => (
-        <FieldHeader name={getFieldLabel({ name: "accessorKey" }).fieldLabel} />
+        <FieldHeader name={getFieldLabel({ name: accessorKey }).fieldLabel} />
       )
     })),
     ...(readOnly
