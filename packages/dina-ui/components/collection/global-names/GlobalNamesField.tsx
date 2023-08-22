@@ -59,7 +59,7 @@ export function GlobalNamesField({
         ) : (
           <GlobalNamesSearchBox
             fetchJson={fetchJson}
-            onSelect={newValue => {
+            onSelect={(newValue) => {
               const val = isArray(newValue) ? newValue?.[1] : newValue;
               onChange?.(newValue as any, formik);
               setValue(val);
@@ -177,6 +177,12 @@ export function GlobalNamesReadOnly({
             role="button"
             className="btn-link"
             onClick={() => setShowMore(!showMore)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                setShowMore(!showMore);
+              }
+            }}
+            tabIndex={0}
           >
             {showMore ? formatMessage("showLess") : formatMessage("showMore")}{" "}
           </a>
