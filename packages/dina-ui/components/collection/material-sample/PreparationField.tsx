@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { InputResource } from "kitsu";
 import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
-import { PersonSelectField } from "../..";
+import { ManagedAttributesEditor, PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
@@ -24,6 +24,7 @@ export interface PreparationFieldProps {
   className?: string;
   namePrefix?: string;
   id?: string;
+  visibleManagedAttributeKeys?: string[];
 }
 
 /**
@@ -41,7 +42,8 @@ export const PREPARATION_FIELDS = [
   "preparedBy",
   "preparationRemarks",
   "dwcDegreeOfEstablishment",
-  "preparationProtocol"
+  "preparationProtocol",
+  "preparationManagedAttributes"
 ] as const;
 
 /** Blank values for all Preparation fields. */
@@ -58,13 +60,15 @@ export const BLANK_PREPARATION: Required<
   preparationFixative: null,
   preparationMaterials: null,
   preparationSubstrate: null,
-  preparationProtocol: Object.seal({ id: null, type: "protocol" })
+  preparationProtocol: Object.seal({ id: null, type: "protocol" }),
+  preparationManagedAttributes: {}
 });
 
 export function PreparationField({
   className,
   namePrefix = "",
-  id = PREPARATIONS_COMPONENT_NAME
+  id = PREPARATIONS_COMPONENT_NAME,
+  visibleManagedAttributeKeys
 }: PreparationFieldProps) {
   const { locale } = useDinaIntl();
 
@@ -195,6 +199,21 @@ export function PreparationField({
               />
             )}
           </FieldSpy>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-md-6">
+          <ManagedAttributesEditor
+            valuesPath="preparationManagedAttributes"
+            managedAttributeApiPath="collection-api/managed-attribute"
+            managedAttributeComponent="PREPARATION"
+            fieldSetProps={{
+              id,
+              legend: <DinaMessage id="preparationManagedAttributes" />
+            }}
+            managedAttributeOrderFieldName="preparationManagedAttributesOrder"
+            visibleAttributeKeys={visibleManagedAttributeKeys}
+          />
         </div>
       </div>
     </FieldSet>

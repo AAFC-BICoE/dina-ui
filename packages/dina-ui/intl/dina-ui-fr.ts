@@ -617,6 +617,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Vous avez des données non enregistrées, êtes-vous certain de vouloir quitter cette page?",
   preparation: "Préparation",
   preparationData: "Données de préparation",
+  preparationManagedAttributes: "Préparation des attributs gérés",
   preparationMethodNameLabel: "Nom de la méthode de préparation",
   preparationProtocols: "Protocoles de préparation",
   preparationTypeListTitle: "Type de préparation",
