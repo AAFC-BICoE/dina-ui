@@ -110,6 +110,7 @@ export function MetadataFileView({
             )
           }
           preview={preview}
+          metadata={metadata}
         />
       </div>
       {!preview && (

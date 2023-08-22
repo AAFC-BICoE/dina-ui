@@ -4,7 +4,6 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ComponentType, ReactNode, useState } from "react";
 import Link from "next/link";
 import { SmallThumbnail } from "../../table/thumbnail-cell";
-import { useFormikContext } from "formik";
 import { Metadata } from "../../../types/objectstore-api";
 
 export type DownLoadLinks = {
@@ -22,6 +21,7 @@ export interface FileViewProps {
   downloadLinks?: DownLoadLinks;
   shownTypeIndicator?: ReactNode;
   preview?: boolean;
+  metadata?: Metadata;
 }
 
 // The FileViewer component can't be server-side rendered:
@@ -51,7 +51,8 @@ export function FileView({
   imgHeight,
   downloadLinks,
   shownTypeIndicator,
-  preview
+  preview,
+  metadata
 }: FileViewProps) {
   const { apiClient } = useApiClient();
   const [objectURL, setObjectURL] = useState<string>();
@@ -60,7 +61,6 @@ export function FileView({
       responseType: "blob"
     });
   }
-  const form = useFormikContext<Metadata>();
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
 
@@ -104,7 +104,7 @@ export function FileView({
   }
 
   function fallBackRender() {
-    const thumbnailImageDerivative = form?.initialValues?.derivatives?.find(
+    const thumbnailImageDerivative = metadata?.derivatives?.find(
       (it) => it.derivativeType === "THUMBNAIL_IMAGE"
     );
     const fileId = thumbnailImageDerivative?.fileIdentifier;
