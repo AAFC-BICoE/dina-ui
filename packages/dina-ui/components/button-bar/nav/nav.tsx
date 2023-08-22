@@ -462,7 +462,7 @@ function NavSequenceDropdown({ formatMessage }) {
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/thermocycler-profile/list" passHref={true}>
-        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+        <NavDropdown.Item>
           <SeqdbMessage id="thermocyclerProfileListTitle" />
         </NavDropdown.Item>
       </Link>
