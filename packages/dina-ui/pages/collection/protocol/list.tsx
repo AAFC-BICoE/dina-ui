@@ -1,8 +1,8 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
-  dateCell8,
+  dateCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
@@ -17,7 +17,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Protocol } from "../../../types/collection-api";
 
 const PROTOCOL_FILTER_ATTRIBUTES = ["name"];
-const PROTOCOL_TABLE_COLUMNS: ColumnDefinition8<Protocol>[] = [
+const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
   {
     cell: ({
       row: {
@@ -41,7 +41,7 @@ const PROTOCOL_TABLE_COLUMNS: ColumnDefinition8<Protocol>[] = [
   },
   "group",
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function protocolListPage() {

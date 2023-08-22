@@ -1,10 +1,10 @@
-import { TableColumn8 } from "common-ui/lib/list-page/types";
+import { TableColumn } from "common-ui/lib/list-page/types";
 import {
-  dateCell8,
+  dateCell,
   DeleteButton,
   EditButton,
   FieldHeader,
-  stringArrayCell8,
+  stringArrayCell,
   useStringComparator
 } from "common-ui";
 import { Determination, MaterialSample } from "../../../types/collection-api";
@@ -15,7 +15,7 @@ import Link from "next/link";
 export function useMaterialSampleRelationshipColumns() {
   const { compareByStringAndNumber } = useStringComparator();
 
-  const PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8: TableColumn8<any>[] = [
+  const PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN: TableColumn<any>[] = [
     {
       id: "materialSampleName",
       cell: ({ row: { original } }) => {
@@ -76,7 +76,7 @@ export function useMaterialSampleRelationshipColumns() {
     }
   ];
 
-  const ELASTIC_SEARCH_COLUMN: TableColumn8<MaterialSample>[] = [
+  const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
     {
       id: "materialSampleName",
       cell: ({ row: { original } }) => (
@@ -113,7 +113,7 @@ export function useMaterialSampleRelationshipColumns() {
     }
   ];
 
-  const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn8<MaterialSample>[] = [
+  const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn<MaterialSample>[] = [
     {
       cell: ({ row: { original } }) => (
         <Link href={`/collection/material-sample/view?id=${original.id}`}>
@@ -138,8 +138,8 @@ export function useMaterialSampleRelationshipColumns() {
       header: () => <FieldHeader name="materialSampleType" />,
       isKeyword: true
     },
-    dateCell8("createdOn", "data.attributes.createdOn"),
-    stringArrayCell8("tags", "data.attributes.tags"),
+    dateCell("createdOn", "data.attributes.createdOn"),
+    stringArrayCell("tags", "data.attributes.tags"),
     {
       id: "action",
       cell: ({ row: { original } }) => (
@@ -172,7 +172,7 @@ export function useMaterialSampleRelationshipColumns() {
 
   return {
     ELASTIC_SEARCH_COLUMN,
-    PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN8,
+    PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN,
     ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW
   };
 }

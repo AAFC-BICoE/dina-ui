@@ -7,8 +7,7 @@ import {
 } from "common-ui";
 import "common-ui/common-ui-style.scss";
 import "common-ui/lib/button-bar/buttonbar.css";
-import "common-ui/lib/table/react-table-style.css";
-import "common-ui/lib/table8/react-table.css";
+import "common-ui/lib/table/react-table.css";
 import "../components/object-store/file-upload/file-upload-style.css";
 import "handsontable/dist/handsontable.full.min.css";
 import { AppProps } from "next/app";
@@ -19,7 +18,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { DndProvider } from "react-dnd-cjs";
 import HTML5Backend from "react-dnd-html5-backend-cjs";
 import "react-dropzone-uploader/dist/styles.css";
-import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
 import "setimmediate";
 import { ErrorBoundaryPage } from "../components";

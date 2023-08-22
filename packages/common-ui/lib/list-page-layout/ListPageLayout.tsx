@@ -2,15 +2,14 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { FormikProps } from "formik";
 import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { ComponentType, ReactNode } from "react";
-import { SortingRule } from "react-table";
 import {
   CheckBoxFieldProps,
-  ColumnDefinition8,
+  ColumnDefinition,
   DinaForm,
   FilterAttribute,
   MetaWithTotal,
-  QueryTable8,
-  QueryTable8Props,
+  QueryTable,
+  QueryTableProps,
   useGroupedCheckBoxes
 } from "..";
 import { rsql } from "../filter-builder/rsql";
@@ -20,17 +19,17 @@ import {
   BulkEditButton
 } from "./bulk-buttons";
 import { FilterForm } from "./FilterForm";
-import { SortingState } from "@tanstack/react-table";
+import { ColumnSort, SortingState } from "@tanstack/react-table";
 
 export interface ListPageLayoutProps<TData extends KitsuResource> {
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
-  defaultSort?: SortingRule[];
+  defaultSort?: ColumnSort[];
   filterAttributes?: FilterAttribute[];
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
   queryTableProps:
-    | QueryTable8Props<TData>
-    | ((context: ListPageLayoutContext<TData>) => QueryTable8Props<TData>);
+    | QueryTableProps<TData>
+    | ((context: ListPageLayoutContext<TData>) => QueryTableProps<TData>);
   wrapTable?: (children: ReactNode) => ReactNode;
 
   /** Adds the bulk edit button and the row checkboxes. */
@@ -121,7 +120,7 @@ export function ListPageLayout<TData extends KitsuResource>({
       ? queryTableProps({ CheckBoxField })
       : queryTableProps;
 
-  const columns: ColumnDefinition8<TData>[] = [
+  const columns: ColumnDefinition<TData>[] = [
     ...(showRowCheckboxes
       ? [
           {
@@ -144,7 +143,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   }
 
   const tableElement = (
-    <QueryTable8<TData>
+    <QueryTable<TData>
       defaultPageSize={defaultPageSize ?? undefined}
       defaultSort={defaultSort ?? undefined}
       filter={filterParam}

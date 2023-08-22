@@ -1,11 +1,12 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
-  dateCell8,
+  ColumnDefinition,
+  dateCell,
   DateView,
   FieldHeader,
   KeyValueTable,
   ListPageLayout,
+  LoadingSpinner,
   useFieldLabels,
   useQuery,
   withResponse
@@ -40,7 +41,7 @@ export function RevisionsPageLayout({
   instanceId
 }: RevisionsPageLayoutProps) {
   const { getFieldLabel } = useFieldLabels();
-  const REVISION_TABLE_COLUMNS: ColumnDefinition8<KitsuResource>[] = [
+  const REVISION_TABLE_COLUMNS: ColumnDefinition<KitsuResource>[] = [
     {
       cell: ({ row }) => {
         return (
@@ -99,7 +100,7 @@ export function RevisionsPageLayout({
           }
         ]),
     "version",
-    dateCell8("commitDateTime"),
+    dateCell("commitDateTime"),
     "snapshotType",
     {
       cell: ({ row: { original } }) => (
@@ -202,39 +203,38 @@ export function RevisionsPage({
   const { id, isExternalResourceMetadata } = router.query;
 
   const query = useQuery<KitsuResource>({ path: `${queryPath}/${id}` });
+  const resource = query?.response?.data;
 
-  return withResponse(query, (response) => {
-    const resource = response.data;
-
-    const pageTitle = formatMessage("revisionsListTitle", {
-      name: get(resource, nameField) ?? resource.id
-    });
-
-    return (
-      <>
-        <Head title={pageTitle} />
-        <Nav />
-        <main className="container-fluid px-5">
-          <h1 id="wb-cont">{pageTitle}</h1>
-          <ButtonBar>
-            <Link
-              href={`${detailsPageLink}/${
-                isExternalResourceMetadata ? "external-resource-view" : "view"
-              }?id=${resource.id}`}
-            >
-              <a className="back-button my-auto me-auto">
-                <DinaMessage id="detailsPageLink" />
-              </a>
-            </Link>
-          </ButtonBar>
-          <RevisionsPageLayout
-            auditSnapshotPath={auditSnapshotPath}
-            instanceId={`${resourceType}/${id}`}
-            revisionRowConfigsByType={revisionRowConfigsByType}
-          />
-        </main>
-        <Footer />
-      </>
-    );
+  const pageTitle = formatMessage("revisionsListTitle", {
+    name: get(resource, nameField) ?? resource?.id
   });
+  if (query?.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+  return (
+    <>
+      <Head title={pageTitle} />
+      <Nav />
+      <main className="container-fluid px-5">
+        <h1 id="wb-cont">{pageTitle}</h1>
+        <ButtonBar>
+          <Link
+            href={`${detailsPageLink}/${
+              isExternalResourceMetadata ? "external-resource-view" : "view"
+            }?id=${resource?.id}`}
+          >
+            <a className="back-button my-auto me-auto">
+              <DinaMessage id="detailsPageLink" />
+            </a>
+          </Link>
+        </ButtonBar>
+        <RevisionsPageLayout
+          auditSnapshotPath={auditSnapshotPath}
+          instanceId={`${resourceType}/${id}`}
+          revisionRowConfigsByType={revisionRowConfigsByType}
+        />
+      </main>
+      <Footer />
+    </>
+  );
 }

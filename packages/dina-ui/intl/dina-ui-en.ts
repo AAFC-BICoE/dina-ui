@@ -625,6 +625,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "You have unsaved data, are you sure you want to leave the page?",
   preparation: "Preparation",
   preparationData: "Preparation Data",
+  preparationManagedAttributes: "Preparations Managed Attributes",
   preparationMethodNameLabel: "Preparation Method Name",
   preparationProtocols: "Preparation Protocols",
   preparationTypeListTitle: "Preparation Type",
@@ -878,5 +879,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   formTemplateGroupVisibility_tooltip:
     "Please select a group for this form template, this will determine the visibility.",
   controlledVocabularyTitle: "Controlled Vocabulary",
-  generatingReport: "Generating Report..."
+  generatingReport: "Generating Report...",
+  auditSnapshot: "Audit Snapshot"
 };

@@ -1,49 +1,12 @@
-import { AccessorColumnDef, ColumnDef } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { KitsuResource } from "kitsu";
-import { Column } from "react-table";
 
 /**
  * This type extends the react-table column type, this just adds a few specific fields for elastic
  * search mapping and internationalization.
  */
-export interface TableColumn<TData extends KitsuResource>
-  extends Column<TData> {
-  /**
-   * User-friendly column to be displayed. You can use a DinaMessage key for internationalization.
-   */
-  label?: string;
 
-  /**
-   * Elastic search path to the attribute.
-   *
-   * Example: `data.attributes.name`
-   */
-  attributePath?: string;
-
-  /**
-   * This field is used to find the relationship in the included section.
-   */
-  relationshipType?: string;
-
-  /**
-   * Is this attribute considered a keyword in elastic search. Required for filtering and sorting.
-   */
-  isKeyword?: boolean;
-
-  /**
-   * The QueryPage will only display the accessors that are displayed on the result table. However,
-   * if you have custom cells that receive other fields you will need to add them to this list so
-   * elastic search includes the fields in the result.
-   *
-   * Example: `data.attributes.name`
-   *
-   * Please note that duplicate fields are automatically removed so you don't need to worry about
-   * having unique accessors.
-   */
-  additionalAccessors?: string[];
-}
-
-export type TableColumn8<TData extends KitsuResource> = ColumnDef<TData> & {
+export type TableColumn<TData extends KitsuResource> = ColumnDef<TData> & {
   /**
    * User-friendly column to be displayed. You can use a DinaMessage key for internationalization.
    */

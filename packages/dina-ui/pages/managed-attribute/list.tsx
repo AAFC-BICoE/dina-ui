@@ -1,4 +1,4 @@
-import { ColumnDefinition8, descriptionCell8, ListPageLayout } from "common-ui";
+import { ColumnDefinition, descriptionCell, ListPageLayout } from "common-ui";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -73,7 +73,7 @@ function CollectionAttributeListView() {
 
   const COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
-  const COLLECTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition8<
+  const COLLECTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<
     ManagedAttribute<CollectionModuleType>
   >[] = [
     {
@@ -132,7 +132,7 @@ function CollectionAttributeListView() {
       }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
       accessorKey: "acceptedValues"
     },
-    descriptionCell8("multilingualDescription"),
+    descriptionCell("multilingualDescription"),
     "createdBy"
   ];
 
@@ -160,7 +160,7 @@ function CollectionAttributeListView() {
 function ObjectStoreAttributeListView() {
   const OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
-  const OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition8<ManagedAttribute>[] =
+  const OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] =
     [
       {
         cell: ({
@@ -175,7 +175,7 @@ function ObjectStoreAttributeListView() {
         header: "Name",
         accessorKey: "name"
       },
-      descriptionCell8("multilingualDescription"),
+      descriptionCell("multilingualDescription"),
       {
         cell: ({
           row: {
@@ -231,7 +231,7 @@ function ObjectStoreAttributeListView() {
 function TransactionAttributeListView() {
   const TRANSACTION_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
-  const TRANSACTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition8<ManagedAttribute>[] =
+  const TRANSACTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] =
     [
       {
         cell: ({
@@ -274,7 +274,7 @@ function TransactionAttributeListView() {
         }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
         accessorKey: "acceptedValues"
       },
-      descriptionCell8("multilingualDescription"),
+      descriptionCell("multilingualDescription"),
       "createdBy"
     ];
 

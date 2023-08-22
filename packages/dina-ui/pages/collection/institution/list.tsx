@@ -1,8 +1,8 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
-  dateCell8,
+  dateCell,
   FilterAttribute,
   ListPageLayout
 } from "common-ui";
@@ -11,7 +11,7 @@ import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Institution } from "../../../types/collection-api";
 
-const TABLE_COLUMNS: ColumnDefinition8<Institution>[] = [
+const TABLE_COLUMNS: ColumnDefinition<Institution>[] = [
   {
     cell: ({
       row: {
@@ -23,7 +23,7 @@ const TABLE_COLUMNS: ColumnDefinition8<Institution>[] = [
     accessorKey: "name"
   },
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [

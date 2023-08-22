@@ -1,10 +1,10 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
-  dateCell8,
+  dateCell,
   ListPageLayout,
-  stringArrayCell8
+  stringArrayCell
 } from "common-ui";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
@@ -20,7 +20,7 @@ export default function CollectingEventListPage() {
     "dwcFieldNumber",
     "dwcRecordNumber"
   ];
-  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition8<CollectingEvent>[] = [
+  const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
     {
       cell: ({
         row: {
@@ -39,12 +39,12 @@ export default function CollectingEventListPage() {
     },
     "dwcFieldNumber",
     "dwcRecordNumber",
-    stringArrayCell8("otherRecordNumbers"),
+    stringArrayCell("otherRecordNumbers"),
     "createdBy",
     "startEventDateTime",
     "endEventDateTime",
     "verbatimEventDateTime",
-    dateCell8("createdOn")
+    dateCell("createdOn")
   ];
 
   return (

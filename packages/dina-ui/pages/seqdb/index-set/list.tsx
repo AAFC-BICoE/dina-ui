@@ -1,6 +1,6 @@
-import { ColumnDefinition, ColumnDefinition8, ListPageLayout } from "common-ui";
+import { ColumnDefinition, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import { groupCell, groupCell8, Head, Nav } from "../../../components";
+import { Head, Nav, groupCell8 } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { IndexSet } from "../../../types/seqdb-api";
 
@@ -10,7 +10,7 @@ const INDEX_SET_FILTER_ATTRIBUTES = [
   "reverseadapter"
 ];
 
-const INDEX_SET_TABLE_COLUMNS: ColumnDefinition8<IndexSet>[] = [
+const INDEX_SET_TABLE_COLUMNS: ColumnDefinition<IndexSet>[] = [
   {
     cell: ({
       row: {

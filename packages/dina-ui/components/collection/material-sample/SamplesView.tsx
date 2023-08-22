@@ -1,19 +1,17 @@
+import { ColumnDef } from "@tanstack/react-table";
 import {
-  CommonMessage,
   DeleteButton,
   EditButton,
   FieldHeader,
   FieldSet,
-  LimitOffsetPageSpec,
-  ReactTable8,
-  dateCell8
+  ReactTable,
+  dateCell
 } from "common-ui";
 import Link from "next/link";
 import { useState } from "react";
 import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
-import { ColumnDef } from "@tanstack/react-table";
 
 export interface SamplesViewProps {
   samples?: MaterialSample[];
@@ -48,7 +46,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
     },
     {
       id: "createOn",
-      ...dateCell8("createdOn", "createdOn")
+      ...dateCell("createdOn", "createdOn")
     },
     {
       id: "tags",
@@ -95,22 +93,13 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
 
   // JSONAPI sort attribute.
   const [sortingRules, _] = useState(defaultSort);
-  // JSONAPI page spec.
-  const [page, _setPage] = useState<LimitOffsetPageSpec>({
-    limit: DEFAULT_PAGE_SIZE,
-    offset: 0
-  });
 
   const totalCount = samples?.length;
-
-  const numberOfPages = totalCount
-    ? Math.ceil(totalCount / page.limit)
-    : undefined;
 
   const shouldShowPagination = !!totalCount && totalCount > 25;
   return (
     <FieldSet legend={fieldSetId}>
-      <ReactTable8<MaterialSample>
+      <ReactTable<MaterialSample>
         columns={CHILD_SAMPLES_COLUMNS}
         className="-striped react-table-overflow"
         data={samples ?? []}

@@ -3,7 +3,7 @@ import { useFormikContext } from "formik";
 import { Dispatch, SetStateAction } from "react";
 import { SourceAdministrativeLevel } from "../../../dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { FieldHeader } from "../field-header/FieldHeader";
-import { ReactTable8 } from "../table8/ReactTable8";
+import { ReactTable } from "../table/ReactTable";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { useGroupedCheckBoxes } from "./GroupedCheckBoxFields";
 
@@ -101,7 +101,7 @@ export function PlaceSectionsSelectionField(
     >
       {() => {
         return (
-          <ReactTable8<SourceAdministrativeLevel>
+          <ReactTable<SourceAdministrativeLevel>
             className="-striped"
             columns={PLACE_SECTIONS_TABLE_COLUMNS}
             data={displayData}

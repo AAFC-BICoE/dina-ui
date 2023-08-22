@@ -1,17 +1,17 @@
 import {
-  ColumnDefinition8,
-  dateCell8,
+  ColumnDefinition,
+  dateCell,
   DinaForm,
   FieldHeader,
   FormikButton,
-  QueryTable8,
+  QueryTable,
   Tooltip,
   useGroupedCheckBoxes
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
-import { ThumbnailCell8 } from "../..";
+import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 
@@ -46,7 +46,7 @@ export function ExistingAttachmentsTable({
 
   const { openMetadataEditorModal } = useBulkMetadataEditModal();
 
-  const ATTACHMENT_TABLE_COLUMNS: ColumnDefinition8<any>[] = [
+  const ATTACHMENT_TABLE_COLUMNS: ColumnDefinition<any>[] = [
     {
       id: "select",
       cell: ({ row: { original: metadata } }) => (
@@ -55,7 +55,7 @@ export function ExistingAttachmentsTable({
       header: () => <CheckBoxHeader />,
       enableSorting: false
     },
-    ThumbnailCell8({
+    ThumbnailCell({
       bucketField: "metadata.bucket",
       isJsonApiQuery: true
     }),
@@ -90,7 +90,7 @@ export function ExistingAttachmentsTable({
     },
     {
       id: "metataDate",
-      ...dateCell8("metadata.xmpMetadataDate"),
+      ...dateCell("metadata.xmpMetadataDate"),
       header: () => <FieldHeader name="xmpMetadataDate" />
     },
     {
@@ -166,7 +166,7 @@ export function ExistingAttachmentsTable({
           )}
         </div>
       </div>
-      <QueryTable8
+      <QueryTable
         columns={ATTACHMENT_TABLE_COLUMNS}
         joinSpecs={[
           {

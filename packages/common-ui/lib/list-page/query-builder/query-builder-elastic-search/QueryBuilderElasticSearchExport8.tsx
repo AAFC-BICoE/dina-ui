@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 import { uniq, reject, isEmpty } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { SortingState } from "@tanstack/react-table";
-import { TableColumn8 } from "../../types";
+import { TableColumn } from "../../types";
 
 export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
   /**
@@ -14,7 +14,7 @@ export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
    * Please note some columns require additional fields which can be supplied in the
    * `TableColumn.additionalColumns`
    */
-  columns: TableColumn8<TData>[];
+  columns: TableColumn<TData>[];
 
   /**
    * Provided by the QueryPage table on the sorting order that should be applied.
@@ -184,7 +184,7 @@ export function applyPagination(
 export function applySortingRules<TData extends KitsuResource>(
   elasticSearchQuery: any,
   sortingRules: SortingState,
-  columns: TableColumn8<TData>[]
+  columns: TableColumn<TData>[]
 ) {
   if (sortingRules && sortingRules.length > 0) {
     const sortingQueries = Object.assign(
@@ -271,7 +271,7 @@ export function applySortingRules<TData extends KitsuResource>(
  */
 export function applySourceFiltering<TData extends KitsuResource>(
   elasticSearchQuery: any,
-  columns: TableColumn8<TData>[]
+  columns: TableColumn<TData>[]
 ) {
   // Display only the fields provided in the columns array.
   const sourceFilteringColumns: string[] = [

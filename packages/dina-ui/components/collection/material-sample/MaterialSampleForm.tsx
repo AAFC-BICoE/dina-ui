@@ -64,6 +64,7 @@ export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
   collectingEvent?: string[];
   determination?: string[];
+  preparations?: string[];
 }
 
 export interface MaterialSampleFormProps {
@@ -258,7 +259,14 @@ export function MaterialSampleForm({
       ),
     [PREPARATIONS_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
-      dataComponentState.enablePreparations && <PreparationField id={id} />,
+      dataComponentState.enablePreparations && (
+        <PreparationField
+          id={id}
+          visibleManagedAttributeKeys={
+            visibleManagedAttributeKeys?.preparations
+          }
+        />
+      ),
     [ORGANISMS_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
       dataComponentState.enableOrganisms && (

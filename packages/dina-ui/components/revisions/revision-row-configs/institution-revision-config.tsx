@@ -1,4 +1,4 @@
-import { allLangsDescriptionCell8, KeyValueTable } from "common-ui";
+import { allLangsDescriptionCell, KeyValueTable } from "common-ui";
 import Link from "next/link";
 import { Institution } from "../../../types/collection-api";
 import { RevisionRowConfig } from "../revision-row-config";
@@ -21,7 +21,7 @@ export const INSTITUTION_REVISION_ROW_CONFIG: RevisionRowConfig<Institution> = {
           <KeyValueTable data={identifier} />
         </div>
       )),
-    multilingualDescription: allLangsDescriptionCell8("multilingualDescription")
+    multilingualDescription: allLangsDescriptionCell("multilingualDescription")
       .cell
   }
 };

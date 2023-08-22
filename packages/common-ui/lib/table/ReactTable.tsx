@@ -25,7 +25,7 @@ import { DefaultRow, DraggableRow } from "./RowComponents";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
-export interface ReactTable8Props<TData> {
+export interface ReactTableProps<TData> {
   // Columns definations, ref: https://tanstack.com/table/v8/docs/api/core/column
   columns: ColumnDef<TData>[];
   data: TData[];
@@ -74,7 +74,7 @@ export interface ReactTable8Props<TData> {
   TbodyComponent?: React.ElementType;
 }
 
-export function ReactTable8<TData>({
+export function ReactTable<TData>({
   data,
   onRowMove,
   columns,
@@ -106,7 +106,7 @@ export function ReactTable8<TData>({
   manualFiltering = false,
   onColumnFiltersChange,
   defaultColumnFilters = []
-}: ReactTable8Props<TData>) {
+}: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] =
@@ -204,7 +204,7 @@ export function ReactTable8<TData>({
   return (
     <div
       className={classnames(
-        "ReactTable8",
+        "ReactTable",
         className,
         highlightRow && !TbodyComponent ? "-highlight" : ""
       )}

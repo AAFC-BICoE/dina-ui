@@ -5,7 +5,7 @@ import {
   filterBy,
   FormikButton,
   LoadingSpinner,
-  ReactTable8,
+  ReactTable,
   ResourceSelectField,
   TextField,
   useAccount,
@@ -280,7 +280,7 @@ export function SangerSeqReactionStep({
       {pcrBatchItemQuery?.loading ? (
         <LoadingSpinner loading={true} />
       ) : (
-        <ReactTable8<PcrBatchItem>
+        <ReactTable<PcrBatchItem>
           className="w-100 -striped"
           columns={PCR_BATCH_ITEM_COLUMN}
           data={pcrBatchItemQuery?.response?.data ?? []}

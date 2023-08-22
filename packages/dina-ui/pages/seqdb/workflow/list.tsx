@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
   ListPageLayout
 } from "common-ui";
@@ -8,7 +8,7 @@ import Link from "next/link";
 import { groupCell8, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 
-const WORKFLOW_TABLE_COLUMNS: ColumnDefinition8<any>[] = [
+const WORKFLOW_TABLE_COLUMNS: ColumnDefinition<any>[] = [
   {
     cell: ({
       row: {

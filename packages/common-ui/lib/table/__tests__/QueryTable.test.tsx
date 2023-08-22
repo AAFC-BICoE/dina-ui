@@ -8,12 +8,12 @@ import { range } from "lodash";
 import { IntlProvider } from "react-intl";
 
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   LoadingSpinner,
   MetaWithTotal,
-  QueryTable8,
-  QueryTable8Props,
-  ReactTable8
+  QueryTable,
+  QueryTableProps,
+  ReactTable
 } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 
@@ -62,7 +62,7 @@ describe("QueryTable component", () => {
 
   it("Renders loading state initially.", () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
@@ -71,7 +71,7 @@ describe("QueryTable component", () => {
 
   it("Renders the data from the mocked backend.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
@@ -107,7 +107,7 @@ describe("QueryTable component", () => {
   it("Renders the headers defined in the columns prop.", () => {
     // Create the table with headers
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
@@ -119,7 +119,7 @@ describe("QueryTable component", () => {
 
   it("Renders the total number of pages when no custom pageSize is specified.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
@@ -134,7 +134,7 @@ describe("QueryTable component", () => {
 
   it("Renders the total number of pages when a custom pageSize is specified.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         path="todo"
         defaultPageSize={40}
         pageSizeOptions={[40, 80]}
@@ -154,7 +154,7 @@ describe("QueryTable component", () => {
 
   it("Fetches the next page when the Next button is pressed.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         path="todo"
         defaultPageSize={25}
         columns={["id", "name", "description"]}
@@ -207,7 +207,7 @@ describe("QueryTable component", () => {
 
   it("Fetches the previous page when the previous button is pressed.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         path="todo"
         defaultPageSize={25}
         columns={["id", "name", "description"]}
@@ -257,7 +257,7 @@ describe("QueryTable component", () => {
 
   it("Fetches sorted data when the defaultSort prop is passed.", async () => {
     mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
         defaultSort={[{ id: "description", desc: false }]}
@@ -277,7 +277,7 @@ describe("QueryTable component", () => {
 
   it("Fetches sorted data when the header is clicked.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
@@ -313,7 +313,7 @@ describe("QueryTable component", () => {
 
   it("Fetches multi-sorted data when a second header is shift-clicked.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
@@ -346,7 +346,7 @@ describe("QueryTable component", () => {
   it("Provides a dropdown to change the page size.", async () => {
     // Initial pageSize is 5.
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         path="todo"
         defaultPageSize={5}
         pageSizeOptions={[5, 10, 20]}
@@ -396,13 +396,13 @@ describe("QueryTable component", () => {
   it("Sends a request for filtered data when the filter prop is passed.", async () => {
     const firstFilterProp: FilterParam = { name: "todo 1" };
 
-    const firstProps: QueryTable8Props<Todo> = {
+    const firstProps: QueryTableProps<Todo> = {
       columns: ["id", "name", "description"],
       filter: firstFilterProp,
       path: "todo"
     };
 
-    const wrapper = mountWithAppContext(<QueryTable8<Todo> {...firstProps} />, {
+    const wrapper = mountWithAppContext(<QueryTable<Todo> {...firstProps} />, {
       apiContext
     });
 
@@ -418,7 +418,7 @@ describe("QueryTable component", () => {
     // Update the filter prop.
     const secondFilterProp: FilterParam = { description: "todo 2" };
     wrapper.setProps({
-      children: <QueryTable8<Todo> {...firstProps} filter={secondFilterProp} />
+      children: <QueryTable<Todo> {...firstProps} filter={secondFilterProp} />
     });
 
     // When a new filter is passed, a new request is sent with the new filter.
@@ -431,7 +431,7 @@ describe("QueryTable component", () => {
 
   it("Sends a request for included resources when the include prop is passed.", async () => {
     mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
         include="relatedResource"
@@ -451,15 +451,15 @@ describe("QueryTable component", () => {
 
   it("Is a striped table.", () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
-    expect(wrapper.find(ReactTable8).hasClass("-striped")).toEqual(true);
+    expect(wrapper.find(ReactTable).hasClass("-striped")).toEqual(true);
   });
 
   it("Accepts a combination of strings and column config objects as props.", async () => {
-    const columns: ColumnDefinition8<Todo>[] = [
+    const columns: ColumnDefinition<Todo>[] = [
       "id",
       "name",
       {
@@ -472,7 +472,7 @@ describe("QueryTable component", () => {
 
     // Create the table with headers
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={columns} />,
+      <QueryTable<Todo> path="todo" columns={columns} />,
       { apiContext }
     );
 
@@ -497,7 +497,7 @@ describe("QueryTable component", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         defaultPageSize={10}
         path="todo"
         columns={["id", "name", "description"]}
@@ -525,7 +525,7 @@ describe("QueryTable component", () => {
 
   it("Has the paginator at the top and bottom of the table.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
@@ -540,7 +540,7 @@ describe("QueryTable component", () => {
     const mockOnPageSizeChange = jest.fn();
 
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
         reactTableProps={{
@@ -563,7 +563,7 @@ describe("QueryTable component", () => {
     const mockOnSortedChange = jest.fn();
 
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
         reactTableProps={{
@@ -579,7 +579,7 @@ describe("QueryTable component", () => {
 
   it("Shows the total records count.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
@@ -598,7 +598,7 @@ describe("QueryTable component", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
@@ -615,7 +615,7 @@ describe("QueryTable component", () => {
 
   it("Lets you pass in a 'loading' prop that overrides the internal loading state if true.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         loading={true}
         path="todo"
         columns={["id", "name", "description"]}
@@ -627,14 +627,14 @@ describe("QueryTable component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(ReactTable8).prop("loading")).toEqual(true);
+    expect(wrapper.find(ReactTable).prop("loading")).toEqual(true);
   });
 
   // it("Provides a header input for filtering.", async () => {
   //   const mockOnFilteredChange = jest.fn();
 
   //   const wrapper = mountWithAppContext(
-  //     <QueryTable8<Todo>
+  //     <QueryTable<Todo>
   //       path="todo"
   //       columns={[{ accessorKey: "name", filterable: true }]}
   //       reactTableProps={{
@@ -671,7 +671,7 @@ describe("QueryTable component", () => {
         locale="en"
         messages={{ field_testField: "My Field Label" }}
       >
-        <QueryTable8<Todo> loading={true} path="todo" columns={["testField"]} />
+        <QueryTable<Todo> loading={true} path="todo" columns={["testField"]} />
       </IntlProvider>,
       { apiContext }
     );
@@ -683,7 +683,7 @@ describe("QueryTable component", () => {
 
   it("Provides a 'reactTableProps' prop that passes in the query state.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable8<Todo>
+      <QueryTable<Todo>
         path="todo"
         columns={[
           { id: "name", header: () => <div>name</div>, accessorKey: "name" }

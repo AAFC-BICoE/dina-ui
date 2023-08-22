@@ -1,4 +1,4 @@
-import { DinaForm, FieldView, QueryTable8 } from "common-ui";
+import { DinaForm, FieldView, QueryTable } from "common-ui";
 import { GroupFieldView, ViewPageLayout } from "../../../components";
 import { IndexSet } from "../../../types/seqdb-api";
 
@@ -16,7 +16,7 @@ export default function IndexSetViewPage() {
             <FieldView className="col-md-6" name="reverseAdapter" />
           </div>
           <strong>NGS indexes:</strong>
-          <QueryTable8
+          <QueryTable
             columns={["name", "lotNumber", "direction"]}
             path={`seqdb-api/index-set/${props.initialValues.id}/ngsIndexes`}
           />

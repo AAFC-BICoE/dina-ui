@@ -3,17 +3,17 @@ import {
   CreateButton,
   FieldHeader,
   QueryPage,
-  booleanCell8,
-  dateCell8,
-  stringArrayCell8
+  booleanCell,
+  dateCell,
+  stringArrayCell
 } from "common-ui";
-import { TableColumn8 } from "common-ui/lib/list-page/types";
+import { TableColumn } from "common-ui/lib/list-page/types";
 import Link from "next/link";
 import { Transaction } from "packages/dina-ui/types/loan-transaction-api";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-export const TRANSACTION_TABLE_COLUMNS: TableColumn8<Transaction>[] = [
+export const TRANSACTION_TABLE_COLUMNS: TableColumn<Transaction>[] = [
   {
     cell: ({ row: { original } }) => (
       <Link href={`/loan-transaction/transaction/view?id=${original.id}`}>
@@ -36,8 +36,8 @@ export const TRANSACTION_TABLE_COLUMNS: TableColumn8<Transaction>[] = [
     accessorKey: "data.attributes.materialDirection",
     isKeyword: true
   },
-  stringArrayCell8("otherIdentifiers", "data.attributes.otherIdentifiers"),
-  booleanCell8("materialToBeReturned", "data.attributes.materialToBeReturned"),
+  stringArrayCell("otherIdentifiers", "data.attributes.otherIdentifiers"),
+  booleanCell("materialToBeReturned", "data.attributes.materialToBeReturned"),
   {
     header: () => <FieldHeader name="purpose" />,
     accessorKey: "data.attributes.purpose",
@@ -48,9 +48,9 @@ export const TRANSACTION_TABLE_COLUMNS: TableColumn8<Transaction>[] = [
     accessorKey: "data.attributes.status",
     isKeyword: true
   },
-  dateCell8("openedDate", "data.attributes.openedDate"),
-  dateCell8("closedDate", "data.attributes.closedDate"),
-  dateCell8("dueDate", "data.attributes.dueDate")
+  dateCell("openedDate", "data.attributes.openedDate"),
+  dateCell("closedDate", "data.attributes.closedDate"),
+  dateCell("dueDate", "data.attributes.dueDate")
 ];
 
 export default function TransactionListPage() {

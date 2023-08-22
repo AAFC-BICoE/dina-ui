@@ -1,7 +1,7 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
-  dateCell8,
+  dateCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
@@ -14,7 +14,7 @@ import PageLayout from "../../../components/page/PageLayout";
 import { StorageUnitType } from "../../../types/collection-api";
 
 const STORAGE_UNIT_TYPE_FILTER_ATTRIBUTES = ["name", "createdBy"];
-const STORAGE_UNIT_TYPE_TABLE_COLUMNS: ColumnDefinition8<StorageUnitType>[] = [
+const STORAGE_UNIT_TYPE_TABLE_COLUMNS: ColumnDefinition<StorageUnitType>[] = [
   {
     cell: ({
       row: {
@@ -33,7 +33,7 @@ const STORAGE_UNIT_TYPE_TABLE_COLUMNS: ColumnDefinition8<StorageUnitType>[] = [
     accessorKey: "isInseperable"
   },
   "createdBy",
-  dateCell8("createdOn")
+  dateCell("createdOn")
 ];
 
 export default function StorageUnitTypeListPage() {

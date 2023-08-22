@@ -2,11 +2,11 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { ColumnFiltersState } from "@tanstack/react-table";
 import { debounce } from "lodash";
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   DinaForm,
   FieldHeader,
   FormikButton,
-  QueryTable8,
+  QueryTable,
   useGroupedCheckBoxes
 } from "common-ui";
 import { FilterParam } from "kitsu";
@@ -90,7 +90,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }`
   };
 
-  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition8<LibraryPrepBatch>[] =
+  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] =
     [
       {
         header: "Name",
@@ -132,7 +132,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
       }
     ];
 
-  const LIBRARY_POOL_TABLE_COLUMNS: ColumnDefinition8<LibraryPool>[] = [
+  const LIBRARY_POOL_TABLE_COLUMNS: ColumnDefinition<LibraryPool>[] = [
     {
       header: "Name",
       accessorKey: "name",
@@ -173,7 +173,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }
   ];
 
-  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: ColumnDefinition8<LibraryPoolContent>[] =
+  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: ColumnDefinition<LibraryPoolContent>[] =
     [
       {
         cell: ({ row: { original } }) => {
@@ -259,7 +259,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                 <Tab>Library Pools</Tab>
               </TabList>
               <TabPanel>
-                <QueryTable8<LibraryPrepBatch>
+                <QueryTable<LibraryPrepBatch>
                   columns={LIBRARY_PREP_BATCH_TABLE_COLUMNS}
                   deps={[lastSave]}
                   filter={batchFilter}
@@ -274,7 +274,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                 />
               </TabPanel>
               <TabPanel>
-                <QueryTable8<LibraryPool>
+                <QueryTable<LibraryPool>
                   columns={LIBRARY_POOL_TABLE_COLUMNS}
                   deps={[lastSave]}
                   filter={poolFilter}
@@ -312,7 +312,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
           </div>
           <div className="col-5 library-pool-content-table">
             <strong>Selected Pool Contents</strong>
-            <QueryTable8<LibraryPoolContent>
+            <QueryTable<LibraryPoolContent>
               columns={LIBRARY_POOL_CONTENTS_TABLE_COLUMNS}
               deps={[lastSave]}
               include="pooledLibraryPrepBatch,pooledLibraryPool"

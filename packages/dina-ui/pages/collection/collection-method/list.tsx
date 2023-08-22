@@ -1,8 +1,8 @@
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
-  descriptionCell8,
+  descriptionCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectionMethod } from "../../../types/collection-api";
 
 const COLLECTION_METHOD_FILTER_ATTRIBUTES = ["name"];
-const COLLECTION_METHOD_TABLE_COLUMNS: ColumnDefinition8<CollectionMethod>[] = [
+const COLLECTION_METHOD_TABLE_COLUMNS: ColumnDefinition<CollectionMethod>[] = [
   {
     cell: ({
       row: {
@@ -23,7 +23,7 @@ const COLLECTION_METHOD_TABLE_COLUMNS: ColumnDefinition8<CollectionMethod>[] = [
     accessorKey: "name"
   },
   "group",
-  descriptionCell8("multilingualDescription")
+  descriptionCell("multilingualDescription")
 ];
 
 export default function collectionMethodListPage() {

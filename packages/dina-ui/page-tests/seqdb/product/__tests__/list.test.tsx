@@ -1,4 +1,4 @@
-import { QueryTable8 } from "common-ui";
+import { QueryTable } from "common-ui";
 import ProductListPage from "../../../../pages/seqdb/product/list";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
@@ -67,7 +67,7 @@ describe("Product list page", () => {
       "seqdb-api/product",
       expect.objectContaining({ filter: { rsql: "name==*omni*" } })
     );
-    expect(wrapper.find(QueryTable8).prop("filter")).toEqual({
+    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
       rsql: "name==*omni*"
     });
   });

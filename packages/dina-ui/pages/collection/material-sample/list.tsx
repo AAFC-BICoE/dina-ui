@@ -1,19 +1,19 @@
 import { Row } from "@tanstack/react-table";
 import {
   ButtonBar,
-  ColumnDefinition8,
+  ColumnDefinition,
   CreateButton,
-  dateCell8,
+  dateCell,
   DeleteButton,
   FieldHeader,
   FilterAttribute,
   ListPageLayout,
   QueryPage,
-  stringArrayCell8
+  stringArrayCell
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { TableColumn8 } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "../../../../common-ui/lib/list-page/types";
 import { useState } from "react";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -33,7 +33,7 @@ export interface SampleListLayoutProps {
  *
  * The old version of the listing is still when searching for associated samples.
  */
-export const getColumnDefinition: () => ColumnDefinition8<MaterialSample>[] =
+export const getColumnDefinition: () => ColumnDefinition<MaterialSample>[] =
   () => {
     return [
       {
@@ -66,10 +66,10 @@ export const getColumnDefinition: () => ColumnDefinition8<MaterialSample>[] =
           ) : null,
         accessorKey: "collection.name"
       },
-      stringArrayCell8("dwcOtherCatalogNumbers"),
+      stringArrayCell("dwcOtherCatalogNumbers"),
       { accessorKey: "materialSampleType" },
       "createdBy",
-      dateCell8("createdOn")
+      dateCell("createdOn")
     ];
   };
 
@@ -97,7 +97,7 @@ export function SampleListLayout({
   const [queryKey, setQueryKey] = useState("");
 
   // The old style columns, but add the action buttons at the end.
-  const columns: ColumnDefinition8<MaterialSample>[] = [
+  const columns: ColumnDefinition<MaterialSample>[] = [
     ...getColumnDefinition(),
     ...(onSelect
       ? [
@@ -194,7 +194,7 @@ export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
 
   // Columns for the elastic search list page.
-  const columns: TableColumn8<any>[] = [
+  const columns: TableColumn<any>[] = [
     // Material Sample Name
     {
       id: "materialSampleName",
@@ -241,7 +241,7 @@ export default function MaterialSampleListPage() {
     },
 
     // List of catalogue numbers
-    stringArrayCell8(
+    stringArrayCell(
       "dwcOtherCatalogNumbers",
       "data.attributes.dwcOtherCatalogNumbers"
     ),
@@ -263,7 +263,7 @@ export default function MaterialSampleListPage() {
     },
 
     // Created On
-    dateCell8("createdOn", "data.attributes.createdOn"),
+    dateCell("createdOn", "data.attributes.createdOn"),
 
     // Material Sample State
     {

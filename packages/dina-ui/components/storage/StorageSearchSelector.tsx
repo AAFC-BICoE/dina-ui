@@ -1,8 +1,8 @@
 import {
-  ColumnDefinition8,
+  ColumnDefinition,
   FilterGroupModel,
   FormikButton,
-  QueryTable8,
+  QueryTable,
   rsql,
   useDinaFormContext
 } from "common-ui";
@@ -29,7 +29,7 @@ export function StorageSearchSelector({
   const [filter, setFilter] = useState<FilterGroupModel | null>();
   const { readOnly } = useDinaFormContext();
 
-  const tableColumns: ColumnDefinition8<StorageUnit>[] = [
+  const tableColumns: ColumnDefinition<StorageUnit>[] = [
     {
       cell: ({ row: { original } }) => (
         <Link href={`/collection/storage-unit/view?id=${original.id}`}>
@@ -75,7 +75,7 @@ export function StorageSearchSelector({
         }
       `}</style>
       <StorageFilter onChange={setFilter} />
-      <QueryTable8
+      <QueryTable
         columns={tableColumns}
         path="collection-api/storage-unit"
         include="hierarchy,storageUnitType"

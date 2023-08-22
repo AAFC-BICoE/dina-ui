@@ -1,4 +1,4 @@
-import { allLangsDescriptionCell8 } from "common-ui";
+import { allLangsDescriptionCell } from "common-ui";
 import Link from "next/link";
 import { Project } from "../../../types/collection-api";
 import { Metadata } from "../../../types/objectstore-api";
@@ -34,7 +34,7 @@ export const PROJECT_REVISION_ROW_CONFIG: RevisionRowConfig<Project> = {
         )}
       </div>
     ),
-    multilingualDescription: allLangsDescriptionCell8("multilingualDescription")
+    multilingualDescription: allLangsDescriptionCell("multilingualDescription")
       .cell
   }
 };

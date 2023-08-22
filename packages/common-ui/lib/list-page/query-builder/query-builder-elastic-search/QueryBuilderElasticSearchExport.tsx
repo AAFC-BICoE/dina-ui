@@ -1,8 +1,8 @@
 import { KitsuResource } from "kitsu";
 import { uniq, reject, isEmpty } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
-import { SortingRule } from "react-table";
 import { TableColumn } from "../../types";
+import { ColumnSort } from "@tanstack/react-table";
 
 export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
   /**
@@ -19,7 +19,7 @@ export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
   /**
    * Provided by the QueryPage table on the sorting order that should be applied.
    */
-  sortingRules: SortingRule[];
+  sortingRules: ColumnSort[];
 }
 
 /**
@@ -183,19 +183,19 @@ export function applyPagination(
  */
 export function applySortingRules<TData extends KitsuResource>(
   elasticSearchQuery: any,
-  sortingRules: SortingRule[],
+  sortingRules: ColumnSort[],
   columns: TableColumn<TData>[]
 ) {
   if (sortingRules && sortingRules.length > 0) {
     const sortingQueries = Object.assign(
       {},
-      ...sortingRules.map((sortingRule) => {
+      ...sortingRules.map((columnSort) => {
         const columnDefinition = columns.find((column) => {
           // Depending on if it's a string or not.
           if (typeof column === "string") {
-            return column === sortingRule.id;
+            return column === columnSort.id;
           } else {
-            return column.accessor === sortingRule.id;
+            return (column as any).accessorKey === columnSort.id;
           }
         });
 
@@ -203,16 +203,16 @@ export function applySortingRules<TData extends KitsuResource>(
         if (typeof columnDefinition === "string") {
           return {
             [columnDefinition]: {
-              order: sortingRule.desc ? "desc" : "asc"
+              order: columnSort.desc ? "desc" : "asc"
             }
           };
         } else {
-          if (!columnDefinition || !columnDefinition?.accessor) {
+          if (!columnDefinition || !(columnDefinition as any)?.accessorKey) {
             return;
           }
 
           const indexPath =
-            columnDefinition.accessor +
+            (columnDefinition as any).accessorKey +
             (columnDefinition.isKeyword && columnDefinition.isKeyword === true
               ? ".keyword"
               : "");
@@ -220,7 +220,7 @@ export function applySortingRules<TData extends KitsuResource>(
           if (columnDefinition.relationshipType) {
             return {
               [indexPath]: {
-                order: sortingRule.desc ? "desc" : "asc",
+                order: columnSort.desc ? "desc" : "asc",
                 nested_path: "included",
                 nested_filter: {
                   term: {
@@ -232,7 +232,7 @@ export function applySortingRules<TData extends KitsuResource>(
           } else {
             return {
               [indexPath]: {
-                order: sortingRule.desc ? "desc" : "asc"
+                order: columnSort.desc ? "desc" : "asc"
               }
             };
           }
@@ -275,9 +275,9 @@ export function applySourceFiltering<TData extends KitsuResource>(
     ...columns
       .map((column) => {
         const accessors: string[] = [];
-
-        if (column?.accessor) {
-          accessors.push(column.accessor as string);
+        const accessorKey = (column as any)?.accessorKey;
+        if (accessorKey) {
+          accessors.push(accessorKey as string);
         }
 
         if (column?.additionalAccessors) {
