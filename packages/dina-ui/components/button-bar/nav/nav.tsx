@@ -406,6 +406,11 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="indexSetListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/library-prep-batch/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="libraryPrepBatchListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/molecular-sample/list" passHref={true}>
         <NavDropdown.Item>
           <SeqdbMessage id="molecularSampleListTitle" />
