@@ -177,6 +177,11 @@ export function GlobalNamesReadOnly({
             role="button"
             className="btn-link"
             onClick={() => setShowMore(!showMore)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                setShowMore(!showMore);
+              }
+            }}
             tabIndex={0}
           >
             {showMore ? formatMessage("showLess") : formatMessage("showMore")}{" "}
