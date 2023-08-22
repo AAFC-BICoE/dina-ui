@@ -406,6 +406,11 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="indexSetListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/library-prep-batch/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="libraryPrepBatchListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/molecular-sample/list" passHref={true}>
         <NavDropdown.Item>
           <SeqdbMessage id="molecularSampleListTitle" />
@@ -462,13 +467,8 @@ function NavSequenceDropdown({ formatMessage }) {
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/thermocycler-profile/list" passHref={true}>
-        <NavDropdown.Item>
-          <SeqdbMessage id="thermocyclerProfileListTitle" />
-        </NavDropdown.Item>
-      </Link>
-      <Link href="/seqdb/library-prep-batch/list" passHref={true}>
         <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
-          <SeqdbMessage id="libraryPrepBatchListTitle" />
+          <SeqdbMessage id="thermocyclerProfileListTitle" />
         </NavDropdown.Item>
       </Link>
     </NavDropdown>
