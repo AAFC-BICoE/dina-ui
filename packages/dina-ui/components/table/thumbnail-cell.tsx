@@ -60,7 +60,7 @@ export function ThumbnailCell<TData extends KitsuResource>({
   };
 }
 
-function SmallThumbnail({ filePath }) {
+export function SmallThumbnail({ filePath }) {
   const { formatMessage } = useDinaIntl();
 
   const height = "5rem";
