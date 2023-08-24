@@ -276,11 +276,6 @@ export function Home() {
                     <SeqdbMessage id="thermocyclerProfileListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/library-prep-batch/list" passHref={true}>
-                  <a>
-                    <SeqdbMessage id="libraryPrepBatchListTitle" />
-                  </a>
-                </Link>
                 <Link href="/seqdb/ngs-workflow/list" passHref={true}>
                   <a>
                     <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />

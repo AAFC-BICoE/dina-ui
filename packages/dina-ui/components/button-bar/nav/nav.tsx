@@ -471,11 +471,6 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="thermocyclerProfileListTitle" />
         </NavDropdown.Item>
       </Link>
-      <Link href="/seqdb/library-prep-batch/list" passHref={true}>
-        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
-          <SeqdbMessage id="libraryPrepBatchListTitle" />
-        </NavDropdown.Item>
-      </Link>
       <Link href="/seqdb/ngs-workflow/list" passHref={true}>
         <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
           <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
