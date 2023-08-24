@@ -50,7 +50,9 @@ export function ManagedAttributeFieldWithLabel(
       <div className="mb-2 d-flex align-items-center">
         <strong className="me-auto">
           {attribute.name ?? attributeKey}
-          <Tooltip directText={tooltipText ?? fallbackTooltipText ?? ""} />
+          <Tooltip
+            directText={tooltipText ?? fallbackTooltipText ?? attribute.name}
+          />
         </strong>
         {!readOnly && (
           <FormikButton

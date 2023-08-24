@@ -211,7 +211,12 @@ export function Home() {
                     <SeqdbMessage id="indexSetListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/molecular-sample/list" passHref={true}>
+                <Link href="/seqdb/library-prep-batch/list">
+                  <a>
+                    <SeqdbMessage id="libraryPrepBatchListTitle" />
+                  </a>
+                </Link>
+                <Link href="/seqdb/molecular-sample/list">
                   <a>
                     <SeqdbMessage id="molecularSampleListTitle" />
                   </a>

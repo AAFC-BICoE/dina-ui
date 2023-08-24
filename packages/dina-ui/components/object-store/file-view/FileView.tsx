@@ -1,8 +1,10 @@
 import { LoadingSpinner, useApiClient, useQuery } from "../../../../common-ui";
 import dynamic from "next/dynamic";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { ComponentType, ReactNode, useEffect, useState } from "react";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ComponentType, ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
+import { SmallThumbnail } from "../../table/thumbnail-cell";
+import { Metadata } from "../../../types/objectstore-api";
 
 export type DownLoadLinks = {
   original?: string;
@@ -19,6 +21,7 @@ export interface FileViewProps {
   downloadLinks?: DownLoadLinks;
   shownTypeIndicator?: ReactNode;
   preview?: boolean;
+  metadata?: Metadata;
 }
 
 // The FileViewer component can't be server-side rendered:
@@ -48,11 +51,12 @@ export function FileView({
   imgHeight,
   downloadLinks,
   shownTypeIndicator,
-  preview
+  preview,
+  metadata
 }: FileViewProps) {
   const { apiClient } = useApiClient();
+  const { formatMessage } = useDinaIntl();
   const [objectURL, setObjectURL] = useState<string>();
-  // const [loading, setLoading] = useState<boolean>(true);
   async function fetchObjectBlob(path) {
     return await apiClient.axios.get(path, {
       responseType: "blob"
@@ -60,7 +64,15 @@ export function FileView({
   }
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
-
+  const [isFallbackRender, setIsFallBackRender] = useState<boolean>(false);
+  const shownTypeIndicatorFallback = (
+    <div className="shown-file-type">
+      <strong>
+        <DinaMessage id="showing" />:
+      </strong>
+      {` ${formatMessage("thumbnail")}`}
+    </div>
+  );
   const showFile = !isSpreadsheet;
   function onSuccess(response) {
     setObjectURL(window?.URL?.createObjectURL(response));
@@ -100,6 +112,33 @@ export function FileView({
     }
   }
 
+  function fallBackRender() {
+    const thumbnailImageDerivative = metadata?.derivatives?.find(
+      (it) => it.derivativeType === "THUMBNAIL_IMAGE"
+    );
+    const fileId = thumbnailImageDerivative?.fileIdentifier;
+    const fallBackFilePath = `/objectstore-api/file/${
+      thumbnailImageDerivative?.bucket
+    }/${
+      // Add derivative/ before the fileIdentifier if the file to display is a derivative.
+      thumbnailImageDerivative?.type === "derivative" ? "derivative/" : ""
+    }${fileId}`;
+    if (thumbnailImageDerivative) {
+      setIsFallBackRender(true);
+    }
+    return (
+      <div>
+        {thumbnailImageDerivative ? (
+          <SmallThumbnail filePath={fallBackFilePath} />
+        ) : (
+          <Link href={objectURL as any} passHref={true}>
+            <a>{filePath}</a>
+          </Link>
+        )}
+      </div>
+    );
+  }
+
   if (resp?.loading) {
     return <LoadingSpinner loading={true} />;
   }
@@ -134,13 +173,8 @@ export function FileView({
               <FileViewer
                 filePath={objectURL}
                 fileType={fileType}
-                unsupportedComponent={() => (
-                  <div>
-                    <Link href={objectURL as any} passHref={true}>
-                      <a>{filePath}</a>
-                    </Link>
-                  </div>
-                )}
+                unsupportedComponent={fallBackRender}
+                errorComponent={fallBackRender}
               />
             )
           ) : null}
@@ -179,7 +213,14 @@ export function FileView({
           )}
         </div>
       )}
-      {!preview && <div>{showFile && shownTypeIndicator}</div>}
+      {!preview && (
+        <div>
+          {showFile &&
+            (isFallbackRender
+              ? shownTypeIndicatorFallback
+              : shownTypeIndicator)}
+        </div>
+      )}
     </div>
   );
 }
