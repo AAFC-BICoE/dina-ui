@@ -11,6 +11,7 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { LibraryPrepBatch } from "../../../types/seqdb-api";
 import { useLibraryPrepBatchQuery } from "../library-prep-batch/edit";
 import { NgsSampleSelectionStep } from "packages/dina-ui/components/seqdb";
+import { PreLibraryPrepStep } from "packages/dina-ui/components/seqdb/ngs-workflow/PreLibraryPrepStep";
 
 export default function NgsWorkFlowRunPage() {
   const router = useRouter();
@@ -236,7 +237,19 @@ export default function NgsWorkFlowRunPage() {
             />
           )}
         </TabPanel>
-        <TabPanel>{batchId && <>Pre Library Prep Step</>}</TabPanel>
+        <TabPanel>
+          {batchId && !!libraryPrepBatch.response?.data && (
+            <PreLibraryPrepStep
+              batchId={batchId}
+              batch={libraryPrepBatch.response?.data}
+              onSaved={onSaved}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
+        </TabPanel>
         <TabPanel>
           {libraryPrepBatch.response?.data && batchId && <>Library Prep Step</>}
         </TabPanel>

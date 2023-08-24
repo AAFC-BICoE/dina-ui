@@ -123,8 +123,8 @@ export function LibraryPrepBatchForm({
           type: "container-type"
         }
       };
+      delete submittedValues.containerType;
     }
-    delete submittedValues.containerType;
 
     if (submittedValues.product) {
       (submittedValues as any).relationships.product = {
@@ -133,8 +133,8 @@ export function LibraryPrepBatchForm({
           type: "product"
         }
       };
+      delete submittedValues.product;
     }
-    delete submittedValues.product;
 
     if (submittedValues.protocol) {
       (submittedValues as any).relationships.protocol = {
@@ -143,8 +143,8 @@ export function LibraryPrepBatchForm({
           type: "protocol"
         }
       };
+      delete submittedValues.protocol;
     }
-    delete submittedValues.protocol;
 
     if (submittedValues.thermocyclerProfile) {
       (submittedValues as any).relationships.thermocyclerProfile = {
@@ -153,8 +153,8 @@ export function LibraryPrepBatchForm({
           type: "thermocycler-profile"
         }
       };
+      delete submittedValues.thermocyclerProfile;
     }
-    delete submittedValues.thermocyclerProfile;
 
     const [savedResource] = await save<LibraryPrepBatch2>(
       [
@@ -190,22 +190,6 @@ export function LoadExternalDataForLibraryPrepBatchForm({
 }: LoadExternalDataForLibraryPrepBatchFormProps) {
   // Create a copy of the initial value so we don't change the prop version.
   const initialValues = cloneDeep(dinaFormProps.initialValues);
-
-  // // Display loading indicator if not ready.
-  // if (storageUnitQuery.loading) {
-  //   return <LoadingSpinner loading={true} />;
-  // }
-
-  // // Wait for response or if disabled, just continue with rendering.
-  // return withResponseOrDisabled(storageUnitQuery, () => (
-  //   <DinaForm<Partial<SeqBatch>>
-  //     {...dinaFormProps}
-  //     initialValues={initialValues}
-  //   >
-  //     {buttonBar}
-  //     <LibraryPrepBatchFormFields />
-  //   </DinaForm>
-  // ));
 
   return (
     <DinaForm<Partial<LibraryPrepBatch2>>

@@ -15,7 +15,7 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import classnames from "classnames";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useCallback, useEffect, useRef } from "react";
 
 import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
@@ -29,6 +29,8 @@ export interface ReactTableProps<TData> {
   // Columns definations, ref: https://tanstack.com/table/v8/docs/api/core/column
   columns: ColumnDef<TData>[];
   data: TData[];
+  onDataChanged?: (newData: TData[]) => void;
+  enableEditing?: boolean;
   // When DnD is enabled, need to call onRowMove() after DnD
   onRowMove?: (from: number, to: number) => void;
   // Enable row drag and drop
@@ -90,6 +92,8 @@ export function ReactTable<TData>({
   page,
   onPageChange,
   onPageSizeChange,
+  onDataChanged,
+  enableEditing,
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   defaultSorted,
   onSortingChange,
@@ -115,6 +119,8 @@ export function ReactTable<TData>({
     pageIndex: page ?? 0,
     pageSize: initPageSize ?? pageSizeOptions[0]
   });
+
+  const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
 
   function onPaginationChangeInternal(updater) {
     const { pageIndex: oldPageIndex, pageSize: oldPageSize } =
@@ -176,7 +182,6 @@ export function ReactTable<TData>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getRowCanExpand,
-
     initialState: {
       expanded: defaultExpanded,
       sorting: defaultSorted
@@ -196,7 +201,27 @@ export function ReactTable<TData>({
     manualFiltering,
     ...onPaginationChangeOption,
     ...onSortingChangeOption,
-    ...onColumnFilterChangeOption
+    ...onColumnFilterChangeOption,
+    autoResetPageIndex,
+    meta: {
+      updateData: (rowIndex, columnId, value) => {
+        if (enableEditing) {
+          // Skip page index reset until after next rerender
+          skipAutoResetPageIndex();
+          onDataChanged?.(
+            data.map((row, index) => {
+              if (index === rowIndex) {
+                return {
+                  ...data[rowIndex]!,
+                  [columnId]: value
+                };
+              }
+              return row;
+            })
+          );
+        }
+      }
+    }
   };
 
   const table = useReactTable<TData>(tableOption);
@@ -327,4 +352,20 @@ export function ReactTable<TData>({
       )}
     </div>
   );
+}
+
+function useSkipper() {
+  const shouldSkipRef = useRef(true);
+  const shouldSkip = shouldSkipRef.current;
+
+  // Wrap a function with this to skip a pagination reset temporarily
+  const skip = useCallback(() => {
+    shouldSkipRef.current = false;
+  }, []);
+
+  useEffect(() => {
+    shouldSkipRef.current = true;
+  });
+
+  return [shouldSkip, skip] as const;
 }

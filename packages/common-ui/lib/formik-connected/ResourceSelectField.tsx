@@ -74,7 +74,10 @@ export function ResourceSelectField<TData extends KitsuResource>(
 
 export interface ReadOnlyResourceLinkProps<TData extends KitsuResource> {
   value?: SingleOrArray<PersistedResource<TData> | null>;
-  resourceSelectFieldProps: ResourceSelectFieldProps<TData>;
+  resourceSelectFieldProps: Omit<
+    ResourceSelectFieldProps<TData>,
+    "name" | "filter"
+  >;
 }
 
 /** Shows a link to the resource. Tries to fetch the resource if theres only a shallow reference. */

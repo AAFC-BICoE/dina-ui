@@ -1,30 +1,22 @@
-import { useLocalStorage } from "@rehooks/local-storage";
 import {
   DoOperationsError,
   LoadingSpinner,
-  QueryPage,
-  SaveArgs,
   filterBy,
   useAccount,
   useApiClient
 } from "common-ui";
-import { KitsuResource, PersistedResource } from "kitsu";
-import { compact, concat, difference, pick, uniq } from "lodash";
-import { useEffect, useState } from "react";
+import { PersistedResource } from "kitsu";
+import { compact } from "lodash";
+import { useEffect, useState, Dispatch, SetStateAction } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import {
-  MaterialSample,
-  MaterialSampleSummary
-} from "../../../types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 import {
   LibraryPrep2,
   LibraryPrepBatch2,
-  PreLibraryPrep2,
-  PreLibraryPrepType
+  PreLibraryPrep2
 } from "../../../types/seqdb-api";
-import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { PreLibraryPrepTable } from "./PreLibraryPrepTable";
 
 export interface PreLibraryPrepStepProps {
@@ -35,6 +27,7 @@ export interface PreLibraryPrepStepProps {
     batchSaved?: PersistedResource<LibraryPrepBatch2>
   ) => Promise<void>;
   editMode: boolean;
+  setEditMode: Dispatch<SetStateAction<boolean>>;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
 }
@@ -43,6 +36,7 @@ export function PreLibraryPrepStep({
   batchId,
   batch,
   editMode,
+  setEditMode,
   onSaved,
   performSave,
   setPerformSave
@@ -53,9 +47,9 @@ export function PreLibraryPrepStep({
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
     async function performSaveInternal() {
-      await saveLibraryPrep();
+      await savePreLibraryPreps();
       setPerformSave(false);
-      await onSaved(2);
+      await onSaved(3);
     }
 
     if (performSave) {
@@ -113,21 +107,24 @@ export function PreLibraryPrepStep({
 
     // Fetch all previously saved PreLibraryPreps
     const libraryPrepIds = libraryPreps.map((item) => item.id);
-    const preLibraryPreps = compact(
-      await bulkGet<PreLibraryPrep2>(
-        libraryPrepIds.map(
-          (id) =>
-            `/pre-library-prep?filter[rsql]=libraryPrep.uuid==${id}&include=libraryPrep`
-        ),
-        { apiBaseUrl: "/seqdb-api" }
-      )
+    const savedPreLibraryPreps = await apiClient.get<PreLibraryPrep2[]>(
+      "seqdb-api/pre-library-prep",
+      {
+        filter: {
+          rsql: libraryPrepIds.length
+            ? `libraryPrep.uuid=in=(${libraryPrepIds})`
+            : ""
+        },
+        include: "libraryPrep,product,protocol",
+        page: { limit: 1000 }
+      }
     );
 
     // Find newly added libraryPrep IDs and prepare new PreLibraryPreps to add
     const newPreLibraryIds = libraryPrepIds.filter(
       (id) =>
-        preLibraryPreps.filter((item) => item.libraryPrep.id === id).length ===
-        0
+        savedPreLibraryPreps.data.filter((item) => item.libraryPrep.id === id)
+          .length === 0
     );
 
     const newShearingPrepLibraryPreps: PreLibraryPrep2[] = newPreLibraryIds.map(
@@ -152,7 +149,13 @@ export function PreLibraryPrepStep({
         ) as LibraryPrep2
       }));
 
-    for (const item of preLibraryPreps) {
+    for (const item of savedPreLibraryPreps.data) {
+      const libraryPrep = libraryPreps.find(
+        (lp) => lp.id === item.libraryPrep.id
+      );
+      if (libraryPrep) {
+        item.libraryPrep = libraryPrep;
+      }
       if (item.preLibraryPrepType === "SHEARING") {
         newShearingPrepLibraryPreps.push(item);
       } else {
@@ -164,18 +167,53 @@ export function PreLibraryPrepStep({
     setSizeSelectionPrepLibraryPreps(newSizeSelectionPrepLibraryPreps);
   }
 
-  async function saveLibraryPrep() {
+  async function savePreLibraryPreps() {
     try {
-      const { data: libraryPrepBatch } = await apiClient.get<LibraryPrepBatch2>(
-        `seqdb-api/library-prep-batch/${batchId}`,
-        {}
-      );
+      const resources = [
+        ...(shearingPrepLibraryPreps ?? []),
+        ...(sizeSelectionPrepLibraryPreps ?? [])
+      ].map((item) => {
+        (item as any).relationships = {};
+        if (item.libraryPrep) {
+          (item as any).relationships.libraryPrep = {
+            data: {
+              id: item.libraryPrep.id,
+              type: "library-prep"
+            }
+          };
+          delete (item as any).libraryPrep;
+        }
+
+        if (item.product) {
+          (item as any).relationships.product = {
+            data: {
+              id: item.product.id,
+              type: "product"
+            }
+          };
+          delete item.product;
+        }
+        if (item.protocol) {
+          (item as any).relationships.protocol = {
+            data: {
+              id: item.protocol.id,
+              type: "protocol"
+            }
+          };
+          delete item.protocol;
+        }
+        if (!item.id) {
+          item.createdBy = username;
+        }
+        return { resource: item, type: item.type };
+      });
+
+      await save(resources, { apiBaseUrl: "seqdb-api/pre-library-prep" });
+      setEditMode(false);
     } catch (e) {
       if (e.toString() === "Error: Access is denied") {
         throw new DoOperationsError("Access is denied");
       }
-    } finally {
-      // setEditMode(false);
     }
   }
 
