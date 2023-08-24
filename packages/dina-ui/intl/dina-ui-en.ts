@@ -218,6 +218,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   externalResourceListTitle: "External Resources",
   feedbackButtonText: "Feedback",
   fieldExtensions: "Field Extensions",
+  materialSampleFieldExtensions: "Material Sample Field Extensions",
+  collectingEventFieldExtensions: "Collecting Event Field Extensions",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
   field_acDigitizationDate: "Date Original Version Created",
