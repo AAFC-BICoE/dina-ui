@@ -152,11 +152,13 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   dataset: "Ensemble de données",
   datasetSearchTooltip:
     "Pour utiliser un ensemble de données différent du Catalogue de la vie.",
+  dataType: "Taper: ",
+  dataValue: "Valeur: ",
   decimalLatLong: "Lat/Long décimales",
   default: "Par défaut",
   defaultValues: "Valeurs par défaut",
   defaultValuesConfig: "Configuration des valeurs par défaut ",
-  defaultValuesConfigs: "Configurations des valeurs par défaut ",
+  defaultValuesConfigs: "Configuratsions des valeurs par défaut ",
   deleteButtonText: "Supprimer",
   deleteConfig: "Supprimer la configuration",
   deleteEmptyStorageWarning:
@@ -795,6 +797,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   typeNewTagOrSearchPreviousTags:
     "Entrer la nouvelle étiquette ou consulter les précédentes étiquettes",
   typeSpecimen: "Taper spécimen",
+  unit: "Unité: ",
   unsavedChanges: "Modifications non sauvegardées apportées",
   unsetAsDefault: "Ne plus définir par défaut",
   updateExistingView: "Mettre à jour la vue existante",
