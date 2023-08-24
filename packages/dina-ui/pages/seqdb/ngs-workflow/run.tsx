@@ -202,16 +202,13 @@ export default function NgsWorkFlowRunPage() {
       <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>
         <TabList>
           <Tab disabled={isDisabled(0, false)}>
-            {formatMessage("libraryPrepBatchListTitle")}
+            {formatMessage("libraryPrepBatch")}
           </Tab>
           <Tab disabled={isDisabled(1, true)}>
             {formatMessage("selectMaterialSamples")}
           </Tab>
           <Tab disabled={isDisabled(2, true)}>
             {formatMessage("preLibraryPrep")}
-          </Tab>
-          <Tab disabled={isDisabled(3, true)}>
-            {formatMessage("libraryPrep")}
           </Tab>
         </TabList>
         <TabPanel>
@@ -249,9 +246,6 @@ export default function NgsWorkFlowRunPage() {
               setPerformSave={setPerformSave}
             />
           )}
-        </TabPanel>
-        <TabPanel>
-          {libraryPrepBatch.response?.data && batchId && <>Library Prep Step</>}
         </TabPanel>
       </Tabs>
     </PageLayout>

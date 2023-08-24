@@ -160,7 +160,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   libraryPrepBatchListTitle: "Library Prep Batches",
   ngsWorkflowWholeGenomeSeqTitle: "NGS Workflows - Whole Genome Sequencing",
   preLibraryPrep: "Pre Library Prep",
-  libraryPrep: "Library Prep",
+  libraryPrepBatch: "Library Prep Batch",
   shearingDetails: "Shearing Details",
   sizeSelectionDetails: "Size Selection Details"
 };

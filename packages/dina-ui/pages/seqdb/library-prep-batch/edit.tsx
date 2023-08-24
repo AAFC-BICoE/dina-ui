@@ -26,6 +26,7 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Protocol } from "../../../types/collection-api";
 import {
   ContainerType,
+  IndexSet,
   LibraryPrepBatch2,
   Product,
   ThermocyclerProfile
@@ -214,7 +215,7 @@ function LibraryPrepBatchFormFields() {
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
-            className="col-md-6"
+            className="col-md-12"
           />
         )}
         <TextField className="col-md-6" name="name" />
@@ -228,10 +229,6 @@ function LibraryPrepBatchFormFields() {
             }
           }}
         /> */}
-        <NumberField className="col-md-6" name="totalLibraryYieldNm" />
-        <TextField className="col-md-6" name="notes" />
-        <TextField className="col-md-6" name="cleanUpNotes" />
-        <TextField className="col-md-6" name="yieldNotes" />
         <DateField className="col-md-6" name="dateUsed" />
         <ResourceSelectField<Product>
           className="col-md-6"
@@ -262,6 +259,17 @@ function LibraryPrepBatchFormFields() {
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
         />
+        <ResourceSelectField<IndexSet>
+          className="col-md-6"
+          name="indexSet"
+          filter={filterBy(["name"])}
+          model="seqdb-api/index-set"
+          optionLabel={(set) => set.name}
+        />
+        <NumberField className="col-md-6" name="totalLibraryYieldNm" />
+        <TextField className="col-md-6" name="yieldNotes" multiLines={true} />
+        <TextField className="col-md-6" name="cleanUpNotes" multiLines={true} />
+        <TextField className="col-md-6" name="notes" multiLines={true} />
       </div>
       {readOnly && (
         <div className="row">
