@@ -221,9 +221,9 @@ export function Home() {
                     <SeqdbMessage id="molecularSampleListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/workflow/list">
+                <Link href="/seqdb/ngs-workflow/list" passHref={true}>
                   <a>
-                    <SeqdbMessage id="workflowListTitle" />
+                    <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
                   </a>
                 </Link>
                 <Link href="/seqdb/pcr-batch/list">
@@ -274,16 +274,6 @@ export function Home() {
                 <Link href="/seqdb/thermocycler-profile/list">
                   <a>
                     <SeqdbMessage id="thermocyclerProfileListTitle" />
-                  </a>
-                </Link>
-                <Link href="/seqdb/library-prep-batch/list" passHref={true}>
-                  <a>
-                    <SeqdbMessage id="libraryPrepBatchListTitle" />
-                  </a>
-                </Link>
-                <Link href="/seqdb/ngs-workflow/list" passHref={true}>
-                  <a>
-                    <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
                   </a>
                 </Link>
               </Stack>
