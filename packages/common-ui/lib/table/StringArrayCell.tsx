@@ -9,7 +9,7 @@ export function stringArrayCell<TData extends KitsuResource>(
   accessorKey?: string
 ): TableColumn<TData> {
   return {
-    id: "stringArrayCol_" + label,
+    id: label,
     cell: ({ row: { original } }) => {
       const value = get(original, accessorKey ?? label);
       if (value) {
