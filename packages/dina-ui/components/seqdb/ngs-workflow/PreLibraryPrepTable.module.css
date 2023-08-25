@@ -1,0 +1,6 @@
+.noArrowNumberInput {
+  /* Chrome, Safari, Edge, Opera */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
