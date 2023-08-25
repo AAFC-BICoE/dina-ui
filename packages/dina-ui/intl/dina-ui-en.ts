@@ -880,5 +880,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Please select a group for this form template, this will determine the visibility.",
   controlledVocabularyTitle: "Controlled Vocabulary",
   generatingReport: "Generating Report...",
-  auditSnapshot: "Audit Snapshot"
+  auditSnapshot: "Audit Snapshot",
+  selectColumn: "Select Column",
+  selectAll: "Select All"
 };
