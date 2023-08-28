@@ -62,7 +62,7 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
             zIndex: 1
           }}
           className={props.className}
-          aria-labelledby={props.labeledBy}
+          aria-labelledby={props.labelledBy}
         >
           <TextField
             inputProps={{ autoFocus: true }}
