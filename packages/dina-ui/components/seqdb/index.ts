@@ -11,3 +11,5 @@ export * from "./workflow/pre-library-prep/PreLibraryPrepBulkEdit";
 export * from "./workflow/sample-selection/SampleSelection";
 export * from "./workflow/sample-selection/useSelectionControls";
 export * from "./sequencing-facility/SequencingFacilityContacts";
+export * from "./ngs-workflow/LibraryPrepBatchStep";
+export * from "./ngs-workflow/NgsSampleSelectionStep";

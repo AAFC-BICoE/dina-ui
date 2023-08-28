@@ -5,4 +5,9 @@ declare module "@tanstack/table-core" {
     className?: string;
     style?: CSSProperties;
   }
+
+  interface TableMeta<TData extends RowData> {
+    updateData?: (rowIndex: number, columnId: string, value: unknown) => void;
+    enableEditing?: boolean;
+  }
 }

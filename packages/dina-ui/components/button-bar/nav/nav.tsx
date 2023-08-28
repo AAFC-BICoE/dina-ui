@@ -411,6 +411,11 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="libraryPrepBatchListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/ngs-workflow/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/molecular-sample/list" passHref={true}>
         <NavDropdown.Item>
           <SeqdbMessage id="molecularSampleListTitle" />

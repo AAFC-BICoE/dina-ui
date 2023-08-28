@@ -1,23 +1,25 @@
 import { KitsuResource } from "kitsu";
-import { Product } from "../..";
-import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { Protocol } from "packages/dina-ui/types/collection-api";
+import { LibraryPrep2, Product } from "../..";
+
+export type PreLibraryPrepType = "SHEARING" | "SIZE_SELECTION";
 
 export interface PreLibraryPrep2Attributes {
   type: "pre-library-prep";
   createdBy?: string;
   createdOn?: string;
-  preLibraryPrepType: string;
-  inputAmount: number;
-  targetBpSize: number;
-  averageFragmentSize: number;
-  concentration: number;
-  quality: string;
-  notes: string;
+  preLibraryPrepType: PreLibraryPrepType;
+  inputAmount?: number;
+  targetBpSize?: number;
+  averageFragmentSize?: number;
+  concentration?: number;
+  quality?: string;
+  notes?: string;
   group?: string;
 }
 
 export interface PreLibraryPrep2Relationships {
+  libraryPrep: LibraryPrep2;
   protocol?: Protocol;
   product?: Product;
 }

@@ -26,6 +26,7 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Protocol } from "../../../types/collection-api";
 import {
   ContainerType,
+  IndexSet,
   LibraryPrepBatch2,
   Product,
   ThermocyclerProfile
@@ -123,8 +124,8 @@ export function LibraryPrepBatchForm({
           type: "container-type"
         }
       };
+      delete submittedValues.containerType;
     }
-    delete submittedValues.containerType;
 
     if (submittedValues.product) {
       (submittedValues as any).relationships.product = {
@@ -133,8 +134,8 @@ export function LibraryPrepBatchForm({
           type: "product"
         }
       };
+      delete submittedValues.product;
     }
-    delete submittedValues.product;
 
     if (submittedValues.protocol) {
       (submittedValues as any).relationships.protocol = {
@@ -143,8 +144,8 @@ export function LibraryPrepBatchForm({
           type: "protocol"
         }
       };
+      delete submittedValues.protocol;
     }
-    delete submittedValues.protocol;
 
     if (submittedValues.thermocyclerProfile) {
       (submittedValues as any).relationships.thermocyclerProfile = {
@@ -153,8 +154,8 @@ export function LibraryPrepBatchForm({
           type: "thermocycler-profile"
         }
       };
+      delete submittedValues.thermocyclerProfile;
     }
-    delete submittedValues.thermocyclerProfile;
 
     const [savedResource] = await save<LibraryPrepBatch2>(
       [
@@ -191,22 +192,6 @@ export function LoadExternalDataForLibraryPrepBatchForm({
   // Create a copy of the initial value so we don't change the prop version.
   const initialValues = cloneDeep(dinaFormProps.initialValues);
 
-  // // Display loading indicator if not ready.
-  // if (storageUnitQuery.loading) {
-  //   return <LoadingSpinner loading={true} />;
-  // }
-
-  // // Wait for response or if disabled, just continue with rendering.
-  // return withResponseOrDisabled(storageUnitQuery, () => (
-  //   <DinaForm<Partial<SeqBatch>>
-  //     {...dinaFormProps}
-  //     initialValues={initialValues}
-  //   >
-  //     {buttonBar}
-  //     <LibraryPrepBatchFormFields />
-  //   </DinaForm>
-  // ));
-
   return (
     <DinaForm<Partial<LibraryPrepBatch2>>
       {...dinaFormProps}
@@ -230,7 +215,7 @@ function LibraryPrepBatchFormFields() {
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
-            className="col-md-6"
+            className="col-md-12"
           />
         )}
         <TextField className="col-md-6" name="name" />
@@ -244,10 +229,6 @@ function LibraryPrepBatchFormFields() {
             }
           }}
         /> */}
-        <NumberField className="col-md-6" name="totalLibraryYieldNm" />
-        <TextField className="col-md-6" name="notes" />
-        <TextField className="col-md-6" name="cleanUpNotes" />
-        <TextField className="col-md-6" name="yieldNotes" />
         <DateField className="col-md-6" name="dateUsed" />
         <ResourceSelectField<Product>
           className="col-md-6"
@@ -278,6 +259,17 @@ function LibraryPrepBatchFormFields() {
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
         />
+        <ResourceSelectField<IndexSet>
+          className="col-md-6"
+          name="indexSet"
+          filter={filterBy(["name"])}
+          model="seqdb-api/index-set"
+          optionLabel={(set) => set.name}
+        />
+        <NumberField className="col-md-6" name="totalLibraryYieldNm" />
+        <TextField className="col-md-6" name="yieldNotes" multiLines={true} />
+        <TextField className="col-md-6" name="cleanUpNotes" multiLines={true} />
+        <TextField className="col-md-6" name="notes" multiLines={true} />
       </div>
       {readOnly && (
         <div className="row">

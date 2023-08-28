@@ -1,8 +1,7 @@
 import { KitsuResource } from "kitsu";
-import { MolecularSample } from "../MolecularSample";
-import { LibraryPrepBatch2 } from "./LibraryPrepBatch2";
-import { NgsIndex } from "../workflow/NgsIndex";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { NgsIndex } from "../workflow/NgsIndex";
+import { LibraryPrepBatch2 } from "./LibraryPrepBatch2";
 
 interface LibraryPrepAttributes {
   type: "library-prep";
