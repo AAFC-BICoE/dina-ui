@@ -98,7 +98,7 @@ export function Nav({ marginBottom = true }: NavProps) {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               {/* Navigation menu left */}
-              <ReactNav>
+              <ReactNav role="menubar">
                 <NavCollectionDropdown formatMessage={formatMessage} />
                 <NavTransactionsDropdown formatMessage={formatMessage} />
                 <NavObjectStoreDropdown formatMessage={formatMessage} />
@@ -107,7 +107,7 @@ export function Nav({ marginBottom = true }: NavProps) {
               </ReactNav>
 
               {/* Navigation menu right */}
-              <ReactNav style={{ marginLeft: "auto" }}>
+              <ReactNav style={{ marginLeft: "auto" }} role="menubar">
                 {showManagementNavigation && (
                   <NavDinaManagementDropdown formatMessage={formatMessage} />
                 )}
