@@ -81,7 +81,7 @@ export function Nav({ marginBottom = true }: NavProps) {
             </Col>
           </Row>
         </Container>
-        <Navbar className="app-bar" expand="lg">
+        <Navbar className="app-bar" expand="lg" role="menubar">
           <Container fluid={true} className="px-5">
             <Link href="/" passHref={true}>
               <Navbar.Brand href="/" className="app-name">
@@ -224,6 +224,7 @@ function NavCollectionDropdown({ formatMessage }) {
       onKeyDown={onKeyDown}
       onMouseLeave={hideDropdown}
       show={show}
+      role="menuitem"
     >
       <Link href="/collection/assemblage/list" passHref={true}>
         <NavDropdown.Item>
@@ -307,6 +308,7 @@ function NavTransactionsDropdown({ formatMessage }) {
       onMouseOver={showDropdown}
       onMouseLeave={hideDropdown}
       onKeyDown={onKeyDown}
+      role="menuitem"
     >
       <Link href="/loan-transaction/revisions-by-user" passHref={true}>
         <NavDropdown.Item>
@@ -332,6 +334,7 @@ function NavObjectStoreDropdown({ formatMessage }) {
       onKeyDown={onKeyDown}
       onMouseLeave={hideDropdown}
       show={show}
+      role="menuitem"
     >
       <Link
         href="/object-store/metadata/external-resource-edit"
@@ -375,6 +378,7 @@ function NavAgentDropdown({ formatMessage }) {
       onKeyDown={onKeyDown}
       onMouseLeave={hideDropdown}
       show={show}
+      role="menuitem"
     >
       <Link href="/organization/list" passHref={true}>
         <NavDropdown.Item>
@@ -400,6 +404,7 @@ function NavSequenceDropdown({ formatMessage }) {
       onKeyDown={onKeyDown}
       onMouseLeave={hideDropdown}
       show={show}
+      role="menuitem"
     >
       <Link href="/seqdb/index-set/list" passHref={true}>
         <NavDropdown.Item>
@@ -492,6 +497,7 @@ function NavDinaManagementDropdown({ formatMessage }) {
       onMouseLeave={hideDropdown}
       show={show}
       className="float-right"
+      role="menuitem"
     >
       <Link href="/collection/extension/list" passHref={true}>
         <NavDropdown.Item>
