@@ -98,6 +98,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cfiaPPCLevel: "Niveau ACIA PPC",
   changedProperties: "Modifications",
   childMaterialSamples: "Échantillon de Matériel Direct Enfants",
+  childCultureStrains: "Souches de culture",
   childrenStorageUnits: "Tables enfants des unités de stockage",
   closePreviewButtonText: "Fermer la prévisualisation",
   colSearchBoxTooltip: "Rechercher dans le Catalogue de la vie",
