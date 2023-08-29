@@ -15,11 +15,11 @@ interface ReportTemplateOption {
   includesBarcode: boolean;
 }
 
-type CustomMenuProps = {
+export type CustomMenuProps = {
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
-  labeledBy?: string;
+  labelledBy?: string;
 };
 
 interface GenerateLabelDropdownButtonProps {
@@ -146,7 +146,7 @@ export function GenerateLabelDropdownButton({
             padding: "20px"
           }}
           className={props.className}
-          aria-labelledby={props.labeledBy}
+          aria-labelledby={props.labelledBy}
         >
           <strong>
             <DinaMessage id="selectTemplate" />
@@ -177,11 +177,14 @@ export function GenerateLabelDropdownButton({
   );
 
   return (
-    <Dropdown>
-      <Dropdown.Toggle>
+    <Dropdown aria-label="Generate Label Dropdown">
+      <Dropdown.Toggle aria-label="Generate Label Toggle">
         <DinaMessage id="generateLabel" />
       </Dropdown.Toggle>
-      <Dropdown.Menu as={CustomMenu} />
+      <Dropdown.Menu
+        as={CustomMenu}
+        aria-label="Generate Label Dropdown Menu"
+      />
     </Dropdown>
   );
 }

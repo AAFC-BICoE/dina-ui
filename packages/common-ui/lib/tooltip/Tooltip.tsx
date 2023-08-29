@@ -125,7 +125,7 @@ export function Tooltip({
           ) : (
             <img
               src="/static/images/iconInformation.gif"
-              alt={id ? formatMessage({ id }) : ""}
+              alt={id ? formatMessage({ id }) : directText}
               aria-describedby={id}
               tabIndex={0}
             />

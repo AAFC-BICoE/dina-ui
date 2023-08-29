@@ -386,7 +386,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_organismsIndividualEntry_tooltip:
     "Leave this OFF to copy the same data for every Organism. Toggle ON to enter different data for each Organism.",
   field_organismsQuantity: "Organisms quantity",
-    field_organizationMandatoryFieldsError:
+  field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
   field_orientation: "Orientation",
   field_orientation_tooltip:
@@ -631,6 +631,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "You have unsaved data, are you sure you want to leave the page?",
   preparation: "Preparation",
   preparationData: "Preparation Data",
+  preparationManagedAttributes: "Preparations Managed Attributes",
   preparationMethodNameLabel: "Preparation Method Name",
   preparationProtocols: "Preparation Protocols",
   preparationTypeListTitle: "Preparation Type",
@@ -885,5 +886,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   formTemplateGroupVisibility_tooltip:
     "Please select a group for this form template, this will determine the visibility.",
   controlledVocabularyTitle: "Controlled Vocabulary",
-  generatingReport: "Generating Report..."
+  generatingReport: "Generating Report...",
+  auditSnapshot: "Audit Snapshot",
+  selectColumn: "Select Column",
+  selectAll: "Select All"
 };

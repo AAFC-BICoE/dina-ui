@@ -1,6 +1,6 @@
 import { CellContext, ColumnDefTemplate } from "@tanstack/react-table";
 import classNames from "classnames";
-import { FieldHeader, ReactTable8 } from "common-ui";
+import { FieldHeader, ReactTable } from "common-ui";
 import { toPairs } from "lodash";
 import { ErrorBoundary } from "react-error-boundary";
 import { ReadOnlyValue } from "../formik-connected/FieldView";
@@ -44,7 +44,7 @@ export function KeyValueTable({
   }));
 
   return (
-    <ReactTable8
+    <ReactTable
       className={classNames("-striped", tableClassName)}
       highlightRow={false}
       columns={[

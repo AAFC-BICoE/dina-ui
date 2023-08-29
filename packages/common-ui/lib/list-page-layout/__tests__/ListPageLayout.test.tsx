@@ -1,4 +1,4 @@
-import { QueryTable, ReactTable8 } from "../..";
+import { QueryTable, ReactTable } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ListPageLayout } from "../ListPageLayout";
 
@@ -72,12 +72,8 @@ describe("ListPageLayout component", () => {
 
     const testSort = [{ id: "type", desc: false }];
 
-    wrapper.find(ReactTable8).prop<any>("onSortingChange")(
-      testSort,
-      null,
-      null
-    );
-    wrapper.find(ReactTable8).prop<any>("onPageSizeChange")(5, null);
+    wrapper.find(ReactTable).prop<any>("onSortingChange")(testSort, null, null);
+    wrapper.find(ReactTable).prop<any>("onPageSizeChange")(5, null);
 
     await new Promise(setImmediate);
     wrapper.update();

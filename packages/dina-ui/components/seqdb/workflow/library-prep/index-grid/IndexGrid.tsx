@@ -2,7 +2,7 @@ import {
   DinaForm,
   filterBy,
   LoadingSpinner,
-  ReactTable8,
+  ReactTable,
   ResourceSelectField,
   SubmitButton
 } from "common-ui";
@@ -144,7 +144,7 @@ export function IndexGrid(props: IndexGridProps) {
         <div>
           <SubmitButton className="mb-3" />
         </div>
-        <ReactTable8<any>
+        <ReactTable<any>
           columns={columns}
           data={tableData}
           showPagination={false}

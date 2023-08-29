@@ -10,7 +10,7 @@ type CustomMenuProps = {
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
-  labeledBy?: string;
+  labelledBy?: string;
 };
 
 interface SavedSearchListDropdownProps {
@@ -41,7 +41,7 @@ export function SavedSearchListDropdown({
             padding: "0px"
           }}
           className={props.className}
-          aria-labelledby={props.labeledBy}
+          aria-labelledby={props.labelledBy}
         >
           <Modal.Header className="float-left">
             <Modal.Title>Saved Searches</Modal.Title>

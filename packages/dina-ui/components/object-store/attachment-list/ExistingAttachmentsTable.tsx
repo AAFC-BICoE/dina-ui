@@ -11,7 +11,7 @@ import {
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
-import { ThumbnailCell8 } from "../..";
+import { ThumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 
@@ -55,7 +55,7 @@ export function ExistingAttachmentsTable({
       header: () => <CheckBoxHeader />,
       enableSorting: false
     },
-    ThumbnailCell8({
+    ThumbnailCell({
       bucketField: "metadata.bucket",
       isJsonApiQuery: true
     }),

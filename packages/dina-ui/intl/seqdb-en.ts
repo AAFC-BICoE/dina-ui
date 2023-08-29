@@ -153,5 +153,14 @@ export const SEQDB_MESSAGES_ENGLISH = {
   pcrWellCoordinates: "PCR Well Coordinates",
   seqWellCoordinates: "SEQ Well Coordinates",
   seqTubeNumber: "SEQ Tube Number",
-  primerName: "Primer Name"
+  primerName: "Primer Name",
+  ngsWorkflowListTitle: "NGS Workflow",
+  editLibraryPrepBatchTitle: "Edit Library Prep Batch",
+  addLibraryPrepBatchTitle: "Add Library Prep Batch",
+  libraryPrepBatchListTitle: "Library Prep Batches",
+  ngsWorkflowWholeGenomeSeqTitle: "NGS Workflows - Whole Genome Sequencing",
+  preLibraryPrep: "Pre Library Prep",
+  libraryPrepBatch: "Library Prep Batch",
+  shearingDetails: "Shearing Details",
+  sizeSelectionDetails: "Size Selection Details"
 };

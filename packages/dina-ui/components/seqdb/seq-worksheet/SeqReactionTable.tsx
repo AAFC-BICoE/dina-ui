@@ -1,15 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  FieldHeader,
-  ReactTable8,
-  useGroupedCheckBoxes
-} from "../../../../common-ui/lib";
-import {
-  SeqReaction,
-  PcrBatchItem,
-  pcrBatchItemResultColor
-} from "../../../../dina-ui/types/seqdb-api";
-import { DataRow } from "../..";
+import { ReactTable } from "../../../../common-ui/lib";
+import { SeqReaction } from "../../../../dina-ui/types/seqdb-api";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export interface SeqReactionTableProps {
@@ -111,7 +102,7 @@ export function SeqReactionTable({
   ];
 
   return (
-    <ReactTable8<SeqReaction>
+    <ReactTable<SeqReaction>
       className={className}
       columns={seqReactionColumns}
       data={seqReactions}

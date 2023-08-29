@@ -21,3 +21,6 @@ export * from "./resources/workflow/StepResource";
 export * from "./resources/workflow/StepTemplate";
 export * from "./resources/SeqReaction";
 export * from "./resources/SequencingFacility";
+export * from "./resources/ngs-workflow/LibraryPrep2";
+export * from "./resources/ngs-workflow/LibraryPrepBatch2";
+export * from "./resources/ngs-workflow/PreLibraryPrep2";

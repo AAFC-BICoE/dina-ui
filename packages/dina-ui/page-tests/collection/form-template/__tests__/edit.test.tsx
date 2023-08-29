@@ -1410,7 +1410,18 @@ describe("Form template edit page", () => {
             {
               name: "collecting-event-managed-attributes-section",
               visible: true,
-              items: []
+              items: [
+                {
+                  name: "managedAttributes",
+                  visible: true,
+                  defaultValue: undefined
+                },
+                {
+                  name: "managedAttributesOrder",
+                  visible: true,
+                  defaultValue: undefined
+                }
+              ]
             },
             {
               name: "collecting-event-attachments-section",

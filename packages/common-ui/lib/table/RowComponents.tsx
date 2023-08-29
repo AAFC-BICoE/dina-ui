@@ -2,7 +2,7 @@ import { Row, Table, flexRender } from "@tanstack/react-table";
 import { CSSProperties } from "react";
 import { useDrag, useDrop } from "react-dnd-cjs";
 
-const ITEM_DRAG_KEY = "ReactTable8RowDndKey";
+const ITEM_DRAG_KEY = "ReactTableRowDndKey";
 
 export function DefaultRow<TData>({
   row,

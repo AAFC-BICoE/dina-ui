@@ -19,7 +19,7 @@
       // Use our own Kitsu type definitions instead of the incomplete provided types.
       "kitsu": [
         "./packages/common-ui/types/kitsu",
-        "./packages/common-ui/types/react-table8"
+        "./packages/common-ui/types/react-table"
       ]
     },
     "allowJs": true,

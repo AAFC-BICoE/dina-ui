@@ -25,10 +25,12 @@ import { DefaultRow, DraggableRow } from "./RowComponents";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
-export interface ReactTable8Props<TData> {
+export interface ReactTableProps<TData> {
   // Columns definations, ref: https://tanstack.com/table/v8/docs/api/core/column
   columns: ColumnDef<TData>[];
   data: TData[];
+  onDataChanged?: (newData: TData[]) => void;
+  enableEditing?: boolean;
   // When DnD is enabled, need to call onRowMove() after DnD
   onRowMove?: (from: number, to: number) => void;
   // Enable row drag and drop
@@ -74,7 +76,7 @@ export interface ReactTable8Props<TData> {
   TbodyComponent?: React.ElementType;
 }
 
-export function ReactTable8<TData>({
+export function ReactTable<TData>({
   data,
   onRowMove,
   columns,
@@ -90,6 +92,8 @@ export function ReactTable8<TData>({
   page,
   onPageChange,
   onPageSizeChange,
+  onDataChanged,
+  enableEditing,
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   defaultSorted,
   onSortingChange,
@@ -106,7 +110,7 @@ export function ReactTable8<TData>({
   manualFiltering = false,
   onColumnFiltersChange,
   defaultColumnFilters = []
-}: ReactTable8Props<TData>) {
+}: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] =
@@ -176,7 +180,6 @@ export function ReactTable8<TData>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getRowCanExpand,
-
     initialState: {
       expanded: defaultExpanded,
       sorting: defaultSorted
@@ -196,7 +199,24 @@ export function ReactTable8<TData>({
     manualFiltering,
     ...onPaginationChangeOption,
     ...onSortingChangeOption,
-    ...onColumnFilterChangeOption
+    ...onColumnFilterChangeOption,
+    meta: {
+      updateData: (rowIndex, columnId, value) => {
+        if (enableEditing) {
+          onDataChanged?.(
+            data.map((row, index) => {
+              if (index === rowIndex) {
+                return {
+                  ...data[rowIndex]!,
+                  [columnId]: value
+                };
+              }
+              return row;
+            })
+          );
+        }
+      }
+    }
   };
 
   const table = useReactTable<TData>(tableOption);
@@ -204,7 +224,7 @@ export function ReactTable8<TData>({
   return (
     <div
       className={classnames(
-        "ReactTable8",
+        "ReactTable",
         className,
         highlightRow && !TbodyComponent ? "-highlight" : ""
       )}
