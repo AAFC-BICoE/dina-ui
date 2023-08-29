@@ -27,6 +27,7 @@ Object {
       "format": "yyyy",
       "gte": "1998||/y",
       "lte": "1998||/y",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -39,6 +40,7 @@ Object {
       "format": "yyyy-MM",
       "gte": "1998-05||/M",
       "lte": "1998-05||/M",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -51,6 +53,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -69,6 +72,7 @@ Object {
                 "format": "yyyy",
                 "gte": "1998||/y",
                 "lte": "1998||/y",
+                "time_zone": "+00:00",
               },
             },
           },
@@ -143,16 +147,26 @@ Object {
 
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Equals operation Normal field 1`] = `
 Object {
-  "term": Object {
-    "data.attributes.dateField": "1998-05-19",
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19",
+      "lte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
   },
 }
 `;
 
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Equals operation Normal field 2`] = `
 Object {
-  "term": Object {
-    "data.attributes.dateField": "true",
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "2023-08-29",
+      "lte": "2023-08-29",
+      "time_zone": "+00:00",
+    },
   },
 }
 `;
@@ -165,8 +179,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "includes.name": "1998-05-19",
+            "range": Object {
+              "includes.name": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
             },
           },
           Object {
@@ -189,8 +208,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "includes.name": "false",
+            "range": Object {
+              "includes.name": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2023-08-29",
+                "lte": "2023-08-29",
+                "time_zone": "+00:00",
+              },
             },
           },
           Object {
@@ -207,8 +231,13 @@ Object {
 
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Exact Match operation Normal field 1`] = `
 Object {
-  "term": Object {
-    "data.attributes.dateField": "1998-05-19",
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19",
+      "lte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
   },
 }
 `;
@@ -221,8 +250,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "includes.name": "1998-05-19",
+            "range": Object {
+              "includes.name": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
             },
           },
           Object {
@@ -242,6 +276,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gte": "1998-05-19",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -258,6 +293,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gte": "1998-05-19",
+                "time_zone": "+00:00",
               },
             },
           },
@@ -278,6 +314,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gt": "1998-05-19",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -294,6 +331,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gt": "1998-05-19",
+                "time_zone": "+00:00",
               },
             },
           },
@@ -314,6 +352,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lt": "1998-05-19",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -330,6 +369,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lt": "1998-05-19",
+                "time_zone": "+00:00",
               },
             },
           },
@@ -352,8 +392,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "data.attributes.dateField": "1998-05-19",
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
             },
           },
         },
@@ -387,8 +432,13 @@ Object {
                 },
               },
               "must_not": Object {
-                "term": Object {
-                  "includes.name": "1998-05-19",
+                "range": Object {
+                  "includes.name": Object {
+                    "format": "yyyy-MM-dd",
+                    "gte": "1998-05-19",
+                    "lte": "1998-05-19",
+                    "time_zone": "+00:00",
+                  },
                 },
               },
             },
@@ -462,8 +512,13 @@ Object {
 
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function Partial Match operation Normal field 1`] = `
 Object {
-  "term": Object {
-    "data.attributes.dateField": "1998-05-19",
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19",
+      "lte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
   },
 }
 `;
@@ -476,8 +531,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "includes.name": "1998-05-19",
+            "range": Object {
+              "includes.name": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
             },
           },
           Object {
@@ -497,6 +557,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lte": "1998-05-19",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -513,6 +574,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lte": "1998-05-19",
+                "time_zone": "+00:00",
               },
             },
           },

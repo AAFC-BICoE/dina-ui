@@ -389,7 +389,7 @@ describe("QueryBuilderDateSearch", () => {
         expect(
           transformDateSearchToDSL({
             operation: "equals",
-            value: "false",
+            value: "2023-08-29",
             fieldInfo: {
               parentType: "collection",
               parentName: "collection"
@@ -404,7 +404,7 @@ describe("QueryBuilderDateSearch", () => {
         expect(
           transformDateSearchToDSL({
             operation: "equals",
-            value: "true",
+            value: "2023-08-29",
             fieldInfo: {} as any,
             fieldPath: "data.attributes.dateField",
             queryType: "equals"
@@ -418,7 +418,7 @@ describe("QueryBuilderDateSearch", () => {
         expect(
           transformDateSearchToDSL({
             operation: "exactMatch",
-            value: "false",
+            value: "",
             fieldInfo: undefined,
             fieldPath: "includes.name",
             queryType: "exactMatch"
