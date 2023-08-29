@@ -265,7 +265,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
   field_determination: "Determinations",
-  "field_determination.scientificName": "Scientific Name",
+  field_scientificName: "Scientific Name",
   "field_determination.typeStatus": "Type Status",
   "field_determination.verbatimScientificName": "Verbatim Scientific Name",
   field_determinationRemarks: "Determination Remarks",
