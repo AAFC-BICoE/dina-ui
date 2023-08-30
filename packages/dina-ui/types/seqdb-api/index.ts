@@ -24,3 +24,5 @@ export * from "./resources/SequencingFacility";
 export * from "./resources/ngs-workflow/LibraryPrep2";
 export * from "./resources/ngs-workflow/LibraryPrepBatch2";
 export * from "./resources/ngs-workflow/PreLibraryPrep2";
+export * from "./resources/ngs-workflow/LibraryPool2";
+export * from "./resources/ngs-workflow/LibraryPoolContent2";
