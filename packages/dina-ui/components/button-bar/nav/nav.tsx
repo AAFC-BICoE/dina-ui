@@ -227,17 +227,17 @@ function NavCollectionDropdown({ formatMessage }) {
       role="menuitem"
     >
       <Link href="/collection/assemblage/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="title_assemblage" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/collecting-event/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="collectingEventListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/collection/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="collectionListTitle" />
         </NavDropdown.Item>
       </Link>
@@ -251,45 +251,49 @@ function NavCollectionDropdown({ formatMessage }) {
         show={submenuShow}
         className="submenu"
         variant="light"
+        role="menuitem"
       >
         <Link href="/collection/collection-method/list" passHref={true}>
-          <NavDropdown.Item>
+          <NavDropdown.Item role="menuitem">
             <DinaMessage id="collectionMethodListTitle" />
           </NavDropdown.Item>
         </Link>
         <Link href="/collection/preparation-method/list" passHref={true}>
-          <NavDropdown.Item>
+          <NavDropdown.Item role="menuitem">
             <DinaMessage id="title_preparationMethod" />
           </NavDropdown.Item>
         </Link>
         <Link href="/collection/preparation-type/list" passHref={true}>
-          <NavDropdown.Item onKeyDown={submenuOnKeyDownLastItem}>
+          <NavDropdown.Item
+            onKeyDown={submenuOnKeyDownLastItem}
+            role="menuitem"
+          >
             <DinaMessage id="preparationTypeListTitle" />
           </NavDropdown.Item>
         </Link>
       </DropdownButton>
       <Link href="/collection/material-sample/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="materialSampleListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/revisions-by-user" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="revisionsByUserPageTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/storage-unit/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="storageUnitListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/project/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="projectListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/workbook/upload" passHref={true}>
-        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+        <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
           <DinaMessage id="workbookGroupUploadTitle" />
         </NavDropdown.Item>
       </Link>
@@ -311,12 +315,12 @@ function NavTransactionsDropdown({ formatMessage }) {
       role="menuitem"
     >
       <Link href="/loan-transaction/revisions-by-user" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="revisionsByUserPageTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/loan-transaction/transaction/list" passHref={true}>
-        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+        <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
           <DinaMessage id="transactions" />
         </NavDropdown.Item>
       </Link>
@@ -340,27 +344,27 @@ function NavObjectStoreDropdown({ formatMessage }) {
         href="/object-store/metadata/external-resource-edit"
         passHref={true}
       >
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="externalResourceListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/object-store/object-subtype/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="objectSubtypeListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/object-store/revisions-by-user" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="revisionsByUserPageTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/object-store/object/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="objectListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/object-store/upload" passHref={true}>
-        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+        <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
           <DinaMessage id="uploadPageTitle" />
         </NavDropdown.Item>
       </Link>
@@ -381,12 +385,12 @@ function NavAgentDropdown({ formatMessage }) {
       role="menuitem"
     >
       <Link href="/organization/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="organizationListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/person/list" passHref={true}>
-        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+        <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
           <DinaMessage id="personListTitle" />
         </NavDropdown.Item>
       </Link>
@@ -407,82 +411,82 @@ function NavSequenceDropdown({ formatMessage }) {
       role="menuitem"
     >
       <Link href="/seqdb/index-set/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="indexSetListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/library-prep-batch/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="libraryPrepBatchListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/ngs-workflow/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/ngs-workflow-pooling/list" passHref={true}>
-        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+        <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
           <SeqdbMessage id="ngsWorkflowWholeGenomeSeqPoolingTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/molecular-sample/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="molecularSampleListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/workflow/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="workflowListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/pcr-batch/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="pcrBatchListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/pcr-primer/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="pcrPrimerListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/pcr-workflow/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="pcrWorkflowListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/product/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="productListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/region/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="regionListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/seq-batch/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="seqBatchListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/seq-submission/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="seqSubmissionListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/sequencing-facility/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="sequencingFacilityListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/seq-workflow/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/thermocycler-profile/list" passHref={true}>
-        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+        <NavDropdown.Item onKeyDown={onKeyDownLastItem} role="menuitem">
           <SeqdbMessage id="thermocyclerProfileListTitle" />
         </NavDropdown.Item>
       </Link>
@@ -505,33 +509,36 @@ function NavDinaManagementDropdown({ formatMessage }) {
       role="menuitem"
     >
       <Link href="/collection/extension/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="fieldExtensions" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/form-template/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="formTemplates" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/institution/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="institutionListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/managed-attribute/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="managedAttributes" />
         </NavDropdown.Item>
       </Link>
       {/* Permission page here. */}
       <Link href="/collection/protocol/list" passHref={true}>
-        <NavDropdown.Item>
+        <NavDropdown.Item role="menuitem">
           <DinaMessage id="protocolListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/storage-unit-type/list" passHref={true}>
-        <NavDropdown.Item onKeyDown={!isAdmin ? onKeyDownLastItem : undefined}>
+        <NavDropdown.Item
+          onKeyDown={!isAdmin ? onKeyDownLastItem : undefined}
+          role="menuitem"
+        >
           <DinaMessage id="storageUnitTypeListTitle" />
         </NavDropdown.Item>
       </Link>
@@ -543,7 +550,7 @@ function NavDinaManagementDropdown({ formatMessage }) {
           onKeyDown={onKeyDownLastItem}
           passHref={true}
         >
-          <NavDropdown.Item>
+          <NavDropdown.Item role="menuitem">
             <DinaMessage id="userListTitle" />
           </NavDropdown.Item>
         </Link>
