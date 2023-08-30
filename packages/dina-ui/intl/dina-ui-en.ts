@@ -882,5 +882,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   generatingReport: "Generating Report...",
   auditSnapshot: "Audit Snapshot",
   selectColumn: "Select Column",
-  selectAll: "Select All"
+  selectAll: "Select All",
+  field_fileIdentifier: "File Identifier",
+  field_fileSize: "File Size"
 };
