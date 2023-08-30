@@ -18,7 +18,7 @@ type CustomMenuProps = {
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
-  labeledBy?: string;
+  labelledBy?: string;
 };
 
 interface SplitMaterialSampleDropdownButtonProps {
@@ -106,7 +106,7 @@ export function SplitMaterialSampleDropdownButton({
             padding: "20px"
           }}
           className={props.className}
-          aria-labelledby={props.labeledBy}
+          aria-labelledby={props.labelledBy}
         >
           <strong>
             <DinaMessage id="selectSplitConfiguration" />
