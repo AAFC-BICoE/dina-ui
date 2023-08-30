@@ -1,19 +1,29 @@
-import { BackToListButton, LoadingSpinner } from "common-ui";
+import { BackToListButton, LoadingSpinner, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { LibraryPrepBatchStep } from "packages/dina-ui/components/seqdb/ngs-workflow/LibraryPrepBatchStep";
+import {
+  LibraryPoolStep,
+  LibraryPoolContentStep
+} from "packages/dina-ui/components/seqdb";
 import { useEffect, useState } from "react";
 import { Button, ButtonGroup, Dropdown, Spinner } from "react-bootstrap";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { LibraryPrepBatch } from "../../../types/seqdb-api";
-import { useLibraryPrepBatchQuery } from "../library-prep-batch/edit";
-import { NgsSampleSelectionStep } from "packages/dina-ui/components/seqdb";
-import { PreLibraryPrepStep } from "packages/dina-ui/components/seqdb/ngs-workflow/PreLibraryPrepStep";
+import { LibraryPool2 } from "../../../types/seqdb-api";
 
-export default function NgsWorkFlowRunPage() {
+export function useLibraryPoolQuery(id?: string, deps?: any[]) {
+  return useQuery<LibraryPool2>(
+    {
+      path: `seqdb-api/library-pool/${id}`,
+      include: "containerType,product,protocol,thermocyclerProfile"
+    },
+    { disabled: !id, deps }
+  );
+}
+
+export default function NgsWorkFlowPoolingRunPage() {
   const router = useRouter();
   const { formatMessage } = useSeqdbIntl();
 
@@ -31,13 +41,13 @@ export default function NgsWorkFlowRunPage() {
   // Request completion to be performed.
   const [performComplete, setPerformComplete] = useState<boolean>(false);
 
-  // Loaded Batch ID.
-  const [batchId, setBatchId] = useState<string | undefined>(
-    router.query.batchId?.toString()
+  // Loaded Library Pool ID.
+  const [libraryPoolId, setLibraryPoolId] = useState<string | undefined>(
+    router.query.id?.toString()
   );
-  // Loaded PCR Batch.
-  const libraryPrepBatch = useLibraryPrepBatchQuery(batchId, [
-    batchId,
+  // Loaded Library Pools.
+  const libraryPoolQueryState = useLibraryPoolQuery(libraryPoolId, [
+    libraryPoolId,
     currentStep
   ]);
 
@@ -51,29 +61,29 @@ export default function NgsWorkFlowRunPage() {
 
   async function onSaved(
     nextStep: number,
-    batchSaved?: PersistedResource<LibraryPrepBatch>
+    libraryPoolSaved?: PersistedResource<LibraryPool2>
   ) {
     setCurrentStep(nextStep);
-    if (batchSaved) {
-      setBatchId(batchSaved.id);
+    if (libraryPoolSaved) {
+      setLibraryPoolId(libraryPoolSaved.id);
     }
     await router.push({
       pathname: router.pathname,
       query: {
         ...router.query,
-        batchId: batchSaved ? batchSaved.id : batchId,
+        libraryPoolId: libraryPoolSaved ? libraryPoolSaved.id : libraryPoolId,
         step: "" + nextStep
       }
     });
   }
 
-  if (libraryPrepBatch.loading) {
+  if (libraryPoolQueryState.loading) {
     return <LoadingSpinner loading={true} />;
   }
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/ngs-workflow" />
+      <BackToListButton entityLink="/seqdb/ngs-workflow-pooling" />
       {editMode ? (
         <>
           <Button
@@ -179,14 +189,14 @@ export default function NgsWorkFlowRunPage() {
   );
 
   // Helper function to determine if a step should be disabled.
-  const isDisabled = (stepNumber: number, batchRequired: boolean) => {
+  const isDisabled = (stepNumber: number, libraryPoolRequired: boolean) => {
     // While in edit mode, other steps should be disabled.
     if (editMode && stepNumber !== currentStep) {
       return true;
     }
 
     // If a PCR Batch is required, and not provided then this step should be disabled.
-    if (batchRequired && !batchId) {
+    if (libraryPoolRequired && !libraryPoolId) {
       return true;
     }
 
@@ -196,25 +206,22 @@ export default function NgsWorkFlowRunPage() {
 
   return (
     <PageLayout
-      titleId={"ngsWorkflowWholeGenomeSeqTitle"}
+      titleId={"ngsWorkflowWholeGenomeSeqPoolingTitle"}
       buttonBarContent={buttonBarContent}
     >
       <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>
         <TabList>
           <Tab disabled={isDisabled(0, false)}>
-            {formatMessage("libraryPrepBatch")}
+            {formatMessage("libraryPool")}
           </Tab>
           <Tab disabled={isDisabled(1, true)}>
-            {formatMessage("selectMaterialSamples")}
-          </Tab>
-          <Tab disabled={isDisabled(2, true)}>
-            {formatMessage("preLibraryPrep")}
+            {formatMessage("libraryPoolContent")}
           </Tab>
         </TabList>
         <TabPanel>
-          <LibraryPrepBatchStep
-            batchId={batchId}
-            batch={libraryPrepBatch.response?.data}
+          <LibraryPoolStep
+            libraryPoolId={libraryPoolId}
+            libraryPool={libraryPoolQueryState.response?.data}
             onSaved={onSaved}
             editMode={editMode}
             setEditMode={setEditMode}
@@ -223,26 +230,14 @@ export default function NgsWorkFlowRunPage() {
           />
         </TabPanel>
         <TabPanel>
-          {batchId && (
-            <NgsSampleSelectionStep
-              batchId={batchId}
+          {libraryPoolId && libraryPoolQueryState.response?.data && (
+            <LibraryPoolContentStep
+              libraryPoolId={libraryPoolId}
+              libraryPool={libraryPoolQueryState.response?.data}
               onSaved={onSaved}
               editMode={editMode}
-              setEditMode={setEditMode}
               performSave={performSave}
-              setPerformSave={setPerformSave}
-            />
-          )}
-        </TabPanel>
-        <TabPanel>
-          {batchId && !!libraryPrepBatch.response?.data && (
-            <PreLibraryPrepStep
-              batchId={batchId}
-              batch={libraryPrepBatch.response?.data}
-              onSaved={onSaved}
-              editMode={editMode}
               setEditMode={setEditMode}
-              performSave={performSave}
               setPerformSave={setPerformSave}
             />
           )}

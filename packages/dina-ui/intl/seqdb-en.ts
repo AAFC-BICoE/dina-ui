@@ -162,5 +162,14 @@ export const SEQDB_MESSAGES_ENGLISH = {
   preLibraryPrep: "Pre Library Prep",
   libraryPrepBatch: "Library Prep Batch",
   shearingDetails: "Shearing Details",
-  sizeSelectionDetails: "Size Selection Details"
+  sizeSelectionDetails: "Size Selection Details",
+  ngsWorkflowWholeGenomeSeqPoolingTitle:
+    "NGS Workflows - Whole Genome Sequencing Pooling",
+  libraryPoolingName: "Library Pooling Name",
+  libraryPool: "Library Pool",
+  libraryPoolContent: "Library Pool Content",
+  selectLibraryPrepBatch: "Select Library Prep Batch",
+  selectLibraryPool: "Select Library Pool",
+  editLibraryPoolTitle: "Edit Library Pool",
+  addLibraryPoolTitle: "Add Library Pool"
 };
