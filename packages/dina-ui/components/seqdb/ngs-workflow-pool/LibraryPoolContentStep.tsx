@@ -31,6 +31,7 @@ import {
   LibraryPoolContent2,
   LibraryPrepBatch2
 } from "../../../types/seqdb-api";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 const HIDE_USED_ITEMS_KEY = "pooling-search-hide-used";
 
@@ -228,11 +229,11 @@ export function LibraryPoolContentStep({
         enableSorting: false
       },
       {
-        header: "Name",
+        header: () => <DinaMessage id="name" />,
         accessorKey: "name"
       },
       {
-        header: "dateUsed",
+        header: () => <DinaMessage id="field_dateUsed" />,
         accessorKey: "dateUsed",
         enableColumnFilter: false
       }
@@ -248,12 +249,12 @@ export function LibraryPoolContentStep({
       enableSorting: false
     },
     {
-      header: "Name",
+      header: () => <DinaMessage id="name" />,
       accessorKey: "name",
       enableColumnFilter: true
     },
     {
-      header: "dateUsed",
+      header: () => <DinaMessage id="field_dateUsed" />,
       accessorKey: "dateUsed",
       enableColumnFilter: false
     }
@@ -276,6 +277,7 @@ export function LibraryPoolContentStep({
     [
       ...LIBRARY_POOL_CONTENTS_SELECT_COLUMN,
       {
+        id: "type",
         cell: ({ row: { original } }) => (
           <>
             {original.pooledLibraryPrepBatch
@@ -285,11 +287,11 @@ export function LibraryPoolContentStep({
               : ""}
           </>
         ),
-
-        header: "Type",
+        header: () => <DinaMessage id="field_type" />,
         enableSorting: false
       },
       {
+        id: "name",
         cell: ({ row: { original } }) => (
           <>
             {original.pooledLibraryPrepBatch
@@ -299,7 +301,7 @@ export function LibraryPoolContentStep({
               : ""}
           </>
         ),
-        header: "Name",
+        header: () => <DinaMessage id="name" />,
         enableSorting: false
       }
     ];
@@ -434,7 +436,9 @@ export function LibraryPoolContentStep({
           <>
             <div className="col-5 library-pool-content-selection-table">
               <div className="float-end">
-                <strong>Hide used</strong>
+                <strong>
+                  <DinaMessage id="hideUsed" />
+                </strong>
                 <input
                   className="hide-used-checkbox"
                   style={{ width: "20px", height: "20px" }}
@@ -445,8 +449,12 @@ export function LibraryPoolContentStep({
               </div>
               <Tabs>
                 <TabList>
-                  <Tab>Library Prep Batches</Tab>
-                  <Tab>Library Pools</Tab>
+                  <Tab>
+                    <DinaMessage id="libraryPrepBatchListTitle" />
+                  </Tab>
+                  <Tab>
+                    <DinaMessage id="libraryPoolsListTitle" />
+                  </Tab>
                 </TabList>
                 <TabPanel>
                   <QueryTable<LibraryPrepBatch2>
@@ -505,7 +513,9 @@ export function LibraryPoolContentStep({
             editMode ? "col-5" : "col-12"
           }`}
         >
-          <strong>Selected Pool Contents</strong>
+          <strong>
+            <DinaMessage id="selectedPoolContents" />
+          </strong>
           <ReactTable<LibraryPoolContent2>
             columns={LIBRARY_POOL_CONTENTS_TABLE_COLUMNS}
             data={selectedResources}
