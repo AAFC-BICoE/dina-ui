@@ -104,7 +104,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   wellCoordinates: "Well Coordinates",
   workflowDetails: "Workflow Details",
   workflowDetailsTab: "Details",
-  workflowListTitle: "NGS Workflows",
   workflowStepTab: "Step {number}: {name}",
   workflowViewTitle: "NGS Workflow",
   selectPcrBatch: "Select PCR Batch",

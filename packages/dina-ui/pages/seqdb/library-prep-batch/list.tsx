@@ -22,6 +22,7 @@ const TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] = [
     ),
     accessorKey: "name"
   },
+  dateCell("dateUsed"),
   "group",
   "createdBy",
   dateCell("createdOn")

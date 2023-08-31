@@ -22,6 +22,7 @@ const TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] = [
     accessorKey: "name",
     header: () => <SeqdbMessage id="name" />
   },
+  dateCell("dateUsed"),
   "group",
   "createdBy",
   dateCell("createdOn")

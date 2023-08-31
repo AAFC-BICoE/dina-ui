@@ -107,7 +107,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   wellCoordinates: "Coordonnées du puits",
   workflowDetails: "Détails du flux de travail",
   workflowDetailsTab: "Détails",
-  workflowListTitle: "Flux de SNG",
   workflowStepTab: "Étape {number} : {name}",
   workflowViewTitle: "Flux de SNG"
 };

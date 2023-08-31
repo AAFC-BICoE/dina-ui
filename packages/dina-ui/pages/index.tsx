@@ -231,11 +231,6 @@ export function Home() {
                     <SeqdbMessage id="molecularSampleListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/ngs-workflow/list" passHref={true}>
-                  <a>
-                    <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
-                  </a>
-                </Link>
                 <Link href="/seqdb/pcr-batch/list">
                   <a>
                     <SeqdbMessage id="pcrBatchListTitle" />

@@ -27,9 +27,9 @@ import { useEffect, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
-  LibraryPool2,
-  LibraryPoolContent2,
-  LibraryPrepBatch2
+  LibraryPool,
+  LibraryPoolContent,
+  LibraryPrepBatch
 } from "../../../types/seqdb-api";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
@@ -37,10 +37,10 @@ const HIDE_USED_ITEMS_KEY = "pooling-search-hide-used";
 
 export interface LibraryPoolContentStepProps {
   libraryPoolId: string;
-  libraryPool: LibraryPool2;
+  libraryPool: LibraryPool;
   onSaved: (
     nextStep: number,
-    libraryPoolSaved?: PersistedResource<LibraryPool2>
+    libraryPoolSaved?: PersistedResource<LibraryPool>
   ) => Promise<void>;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
@@ -137,9 +137,9 @@ export function LibraryPoolContentStep({
   };
 
   const [selectedResources, setSelectedResources] = useState<
-    LibraryPoolContent2[]
+    LibraryPoolContent[]
   >([]);
-  const [toDelete, setToDelete] = useState<LibraryPoolContent2[]>([]);
+  const [toDelete, setToDelete] = useState<LibraryPoolContent[]>([]);
 
   /**
    * When the page is first loaded, check if saved Library Pool Contents has already been chosen and reload them.
@@ -152,7 +152,7 @@ export function LibraryPoolContentStep({
    * Retrieve all of the PCR Batch Items that are associated with the PCR Batch from step 1.
    */
   async function fetchLibraryPoolContents() {
-    const response = await apiClient.get<LibraryPoolContent2[]>(
+    const response = await apiClient.get<LibraryPoolContent[]>(
       "/seqdb-api/library-pool-content",
       {
         filter: filterBy([], {
@@ -217,7 +217,7 @@ export function LibraryPoolContentStep({
     }`
   };
 
-  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch2>[] =
+  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] =
     [
       {
         id: "select",
@@ -239,7 +239,7 @@ export function LibraryPoolContentStep({
       }
     ];
 
-  const LIBRARY_POOL_TABLE_COLUMNS: ColumnDefinition<LibraryPool2>[] = [
+  const LIBRARY_POOL_TABLE_COLUMNS: ColumnDefinition<LibraryPool>[] = [
     {
       id: "select",
       cell: ({ row: { original } }) => (
@@ -260,7 +260,7 @@ export function LibraryPoolContentStep({
     }
   ];
 
-  const LIBRARY_POOL_CONTENTS_SELECT_COLUMN: ColumnDef<LibraryPoolContent2>[] =
+  const LIBRARY_POOL_CONTENTS_SELECT_COLUMN: ColumnDef<LibraryPoolContent>[] =
     editMode
       ? [
           {
@@ -273,38 +273,37 @@ export function LibraryPoolContentStep({
           }
         ]
       : [];
-  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: ColumnDef<LibraryPoolContent2>[] =
-    [
-      ...LIBRARY_POOL_CONTENTS_SELECT_COLUMN,
-      {
-        id: "type",
-        cell: ({ row: { original } }) => (
-          <>
-            {original.pooledLibraryPrepBatch
-              ? "Library"
-              : original.pooledLibraryPool
-              ? "Library Pool"
-              : ""}
-          </>
-        ),
-        header: () => <DinaMessage id="field_type" />,
-        enableSorting: false
-      },
-      {
-        id: "name",
-        cell: ({ row: { original } }) => (
-          <>
-            {original.pooledLibraryPrepBatch
-              ? original.pooledLibraryPrepBatch.name
-              : original.pooledLibraryPool
-              ? original.pooledLibraryPool.name
-              : ""}
-          </>
-        ),
-        header: () => <DinaMessage id="name" />,
-        enableSorting: false
-      }
-    ];
+  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: ColumnDef<LibraryPoolContent>[] = [
+    ...LIBRARY_POOL_CONTENTS_SELECT_COLUMN,
+    {
+      id: "type",
+      cell: ({ row: { original } }) => (
+        <>
+          {original.pooledLibraryPrepBatch
+            ? "Library"
+            : original.pooledLibraryPool
+            ? "Library Pool"
+            : ""}
+        </>
+      ),
+      header: () => <DinaMessage id="field_type" />,
+      enableSorting: false
+    },
+    {
+      id: "name",
+      cell: ({ row: { original } }) => (
+        <>
+          {original.pooledLibraryPrepBatch
+            ? original.pooledLibraryPrepBatch.name
+            : original.pooledLibraryPool
+            ? original.pooledLibraryPool.name
+            : ""}
+        </>
+      ),
+      header: () => <DinaMessage id="name" />,
+      enableSorting: false
+    }
+  ];
 
   const onSelectResources = (
     formValues: LibraryPoolingSelectionFormValues,
@@ -336,7 +335,7 @@ export function LibraryPoolContentStep({
       );
 
     const newPoolContents = [
-      ...libraryPoolIds.map<LibraryPoolContent2>((id) => {
+      ...libraryPoolIds.map<LibraryPoolContent>((id) => {
         let libraryPoolContent: any = remove(
           toDelete,
           (p) => p.pooledLibraryPool?.id === id
@@ -353,11 +352,11 @@ export function LibraryPoolContentStep({
             createdBy: username,
             libraryPool,
             pooledLibraryPool
-          } as LibraryPoolContent2;
+          } as LibraryPoolContent;
         }
         return libraryPoolContent;
       }),
-      ...libraryPrepBatchIds.map<LibraryPoolContent2>((id) => {
+      ...libraryPrepBatchIds.map<LibraryPoolContent>((id) => {
         let libraryPoolContent: any = remove(
           toDelete,
           (p) => p.pooledLibraryPrepBatch?.id === id
@@ -375,7 +374,7 @@ export function LibraryPoolContentStep({
             createdBy: username,
             libraryPool,
             pooledLibraryPrepBatch
-          } as LibraryPoolContent2;
+          } as LibraryPoolContent;
         }
         return libraryPoolContent;
       })
@@ -457,7 +456,7 @@ export function LibraryPoolContentStep({
                   </Tab>
                 </TabList>
                 <TabPanel>
-                  <QueryTable<LibraryPrepBatch2>
+                  <QueryTable<LibraryPrepBatch>
                     columns={LIBRARY_PREP_BATCH_TABLE_COLUMNS}
                     deps={[]}
                     filter={batchFilter}
@@ -472,7 +471,7 @@ export function LibraryPoolContentStep({
                   />
                 </TabPanel>
                 <TabPanel>
-                  <QueryTable<LibraryPool2>
+                  <QueryTable<LibraryPool>
                     columns={LIBRARY_POOL_TABLE_COLUMNS}
                     deps={[]}
                     filter={poolFilter}
@@ -516,12 +515,12 @@ export function LibraryPoolContentStep({
           <strong>
             <DinaMessage id="selectedPoolContents" />
           </strong>
-          <ReactTable<LibraryPoolContent2>
+          <ReactTable<LibraryPoolContent>
             columns={LIBRARY_POOL_CONTENTS_TABLE_COLUMNS}
             data={selectedResources}
             rowStyling={(row) => {
               if (row) {
-                const lpc: LibraryPoolContent2 = row.original;
+                const lpc: LibraryPoolContent = row.original;
                 return {
                   background: lpc.pooledLibraryPrepBatch
                     ? "rgb(222, 252, 222)"
