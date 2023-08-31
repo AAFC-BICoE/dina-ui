@@ -216,6 +216,16 @@ export function Home() {
                     <SeqdbMessage id="libraryPrepBatchListTitle" />
                   </a>
                 </Link>
+                <Link href="/seqdb/ngs-workflow/list" passHref={true}>
+                  <a>
+                    <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
+                  </a>
+                </Link>
+                <Link href="/seqdb/ngs-workflow-pooling/list" passHref={true}>
+                  <a>
+                    <SeqdbMessage id="ngsWorkflowWholeGenomeSeqPoolingTitle" />
+                  </a>
+                </Link>
                 <Link href="/seqdb/molecular-sample/list">
                   <a>
                     <SeqdbMessage id="molecularSampleListTitle" />

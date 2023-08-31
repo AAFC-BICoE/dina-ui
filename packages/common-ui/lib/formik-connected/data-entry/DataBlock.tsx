@@ -8,7 +8,7 @@ import {
   FieldWrapperProps,
   SelectField
 } from "../../../../common-ui/lib";
-import { DataRow } from "../../../../dina-ui/components";
+import { DataRow } from "../../../../common-ui/lib";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 export interface DataBlockProps extends FieldWrapperProps {

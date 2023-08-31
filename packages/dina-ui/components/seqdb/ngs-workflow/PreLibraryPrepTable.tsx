@@ -10,7 +10,8 @@ import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { Protocol } from "packages/dina-ui/types/collection-api";
 import { PreLibraryPrep, Product } from "packages/dina-ui/types/seqdb-api";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { DataRow } from "../..";
+import styles from "./PreLibraryPrepTable.module.css";
+import classNames from "classnames";
 
 export interface PreLibraryPrepTableProps {
   readOnly: boolean;
@@ -41,7 +42,7 @@ export function PreLibraryPrepTable({
       accessorKey: "inputAmount",
       cell: readOnly
         ? ({ row: { original } }) => <div>{original.inputAmount}</div>
-        : TextInputCell,
+        : NumberInputCell,
       header: () => (
         <b>
           <DinaMessage id={"field_inputAmount"} />
@@ -53,7 +54,7 @@ export function PreLibraryPrepTable({
       accessorKey: "concentration",
       cell: readOnly
         ? ({ row: { original } }) => <div>{original.concentration}</div>
-        : TextInputCell,
+        : NumberInputCell,
       header: () => (
         <b>
           <DinaMessage id={"field_concentration"} />
@@ -65,7 +66,7 @@ export function PreLibraryPrepTable({
       accessorKey: "targetBpSize",
       cell: readOnly
         ? ({ row: { original } }) => <div>{original.targetBpSize}</div>
-        : TextInputCell,
+        : NumberInputCell,
       header: () => (
         <b>
           <DinaMessage id={"field_targetBpSize"} />
@@ -77,7 +78,7 @@ export function PreLibraryPrepTable({
       accessorKey: "averageFragmentSize",
       cell: readOnly
         ? ({ row: { original } }) => <div>{original.averageFragmentSize}</div>
-        : TextInputCell,
+        : NumberInputCell,
       header: () => (
         <b>
           <DinaMessage id={"field_averageFragmentSize"} />
@@ -89,7 +90,7 @@ export function PreLibraryPrepTable({
       accessorKey: "quality",
       cell: readOnly
         ? ({ row: { original } }) => <div>{original.quality}</div>
-        : TextInputCell,
+        : NumberInputCell,
       header: () => (
         <b>
           <DinaMessage id={"field_quality"} />
@@ -242,7 +243,7 @@ export function TextInputCell<TData>({
 }: CellContext<TData, unknown>) {
   const initialValue = original[columnId] ?? "";
   // We need to keep and update the state of the cell normally
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState<string>(initialValue);
   const [valueChanged, setValueChanged] = useState(false);
 
   // When the input is blurred, we'll call our table meta's updateData function
@@ -271,18 +272,22 @@ export function TextInputCell<TData>({
   );
 }
 
-export function SelectInputCell<TData>({
+export function NumberInputCell<TData>({
   row: { index, original },
   column: { id: columnId },
   table
 }: CellContext<TData, unknown>) {
   const initialValue = original[columnId] ?? "";
   // We need to keep and update the state of the cell normally
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState<number>(initialValue);
+  const [valueChanged, setValueChanged] = useState(false);
 
   // When the input is blurred, we'll call our table meta's updateData function
   const onBlur = () => {
-    (table.options.meta as any).updateData(index, columnId, value);
+    if (valueChanged) {
+      (table.options.meta as any).updateData(index, columnId, value);
+      setValueChanged(false);
+    }
   };
 
   // If the initialValue is changed external, sync it up with our state
@@ -292,9 +297,13 @@ export function SelectInputCell<TData>({
 
   return (
     <input
-      style={{ width: "100%" }}
-      value={value as string}
-      onChange={(e) => setValue(e.target.value)}
+      className={classNames("form-control w-100", styles.noArrowNumberInput)}
+      type="number"
+      value={value}
+      onChange={(e) => {
+        setValue(Number(e.target.value));
+        setValueChanged(true);
+      }}
       onBlur={onBlur}
     />
   );
