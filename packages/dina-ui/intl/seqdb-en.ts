@@ -2,7 +2,6 @@
  * English SeqDB messages. A message must be set here in English before other languages.
  */
 export const SEQDB_MESSAGES_ENGLISH = {
-  addMolecularSampleTitle: "Add Molecular Sample",
   addPcrBatchTitle: "Add PCR Batch",
   addPcrPrimerTitle: "Add PCR Primer",
   addProductTitle: "Add Product",
@@ -19,7 +18,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   deselectAllCheckedSamplesButtonText:
     "<-- Deselect all checked molecular samples",
   deselectButtonText: "Deselect",
-  editMolecularSampleTitle: "Edit Molecular Sample",
   editPcrBatchTitle: "Edit PCR Batch",
   editPcrPrimerTitle: "Edit PCR Primer",
   editProductTitle: "Edit Product",
@@ -49,9 +47,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   indexSetListTitle: "Index Sets",
   indexSetMustBeSet: "Index Set must be set.",
   indexSetViewTitle: "Index Set",
-  molecularSample: "Molecular Sample",
-  molecularSampleListTitle: "Molecular Samples",
-  molecularSampleViewTitle: "Molecular Sample",
   notShearedStatus: "Not Sheared",
   notSizeSelectedStatus: "No Size Selection",
   pcrBatch: "PCR Batch",

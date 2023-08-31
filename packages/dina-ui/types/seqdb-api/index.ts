@@ -6,7 +6,6 @@ export * from "./resources/SeqBatch";
 export * from "./resources/ThermocyclerProfile";
 export * from "./resources/Product";
 export * from "./resources/Region";
-export * from "./resources/MolecularSample";
 export * from "./resources/ngs-workflow/IndexSet";
 export * from "./resources/ngs-workflow/NgsIndex";
 export * from "./resources/SeqReaction";
