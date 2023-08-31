@@ -16,5 +16,3 @@ export * from "./resources/ngs-workflow/LibraryPrepBatch";
 export * from "./resources/ngs-workflow/PreLibraryPrep";
 export * from "./resources/ngs-workflow/LibraryPool";
 export * from "./resources/ngs-workflow/LibraryPoolContent";
-export * from "./resources/ngs-workflow/LibraryPool2";
-export * from "./resources/ngs-workflow/LibraryPoolContent2";

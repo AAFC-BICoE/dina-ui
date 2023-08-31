@@ -11,10 +11,10 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { LibraryPool2 } from "../../../types/seqdb-api";
+import { LibraryPool } from "../../../types/seqdb-api";
 
 export function useLibraryPoolQuery(id?: string, deps?: any[]) {
-  return useQuery<LibraryPool2>(
+  return useQuery<LibraryPool>(
     {
       path: `seqdb-api/library-pool/${id}`,
       include: "containerType,product,protocol,thermocyclerProfile"
@@ -61,7 +61,7 @@ export default function NgsWorkFlowPoolingRunPage() {
 
   async function onSaved(
     nextStep: number,
-    libraryPoolSaved?: PersistedResource<LibraryPool2>
+    libraryPoolSaved?: PersistedResource<LibraryPool>
   ) {
     setCurrentStep(nextStep);
     if (libraryPoolSaved) {
