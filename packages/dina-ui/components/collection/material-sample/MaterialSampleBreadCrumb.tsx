@@ -74,7 +74,7 @@ export function MaterialSampleBreadCrumb({
               </DinaFormSection>
             </h6>
           ) : (
-            <span>{materialSample?.group?.toUpperCase()}</span> //This line must be made a dinamessage, but does not work with undefined strings.
+            <span>{materialSample?.group?.toUpperCase()}</span>
           ))}
       </h1>
 
