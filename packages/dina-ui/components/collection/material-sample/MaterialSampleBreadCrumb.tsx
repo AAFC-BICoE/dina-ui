@@ -4,6 +4,7 @@ import { NotPubliclyReleasableWarning } from "../../tag-editor/NotPubliclyReleas
 import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { useDinaFormContext } from "../../../../common-ui/lib/formik-connected/DinaForm";
 import { DinaFormSection } from "common-ui";
+import { GroupLabel } from "../../group-select/GroupFieldView";
 
 export interface MaterialSampleBreadCrumbProps {
   disableLastLink?: boolean;
@@ -74,7 +75,7 @@ export function MaterialSampleBreadCrumb({
               </DinaFormSection>
             </h6>
           ) : (
-            <span>{materialSample?.group?.toUpperCase()}</span>
+            <GroupLabel groupName={materialSample?.group} />
           ))}
       </h1>
 
