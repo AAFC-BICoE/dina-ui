@@ -10,6 +10,7 @@ import React from "react";
 import { Button } from "react-bootstrap";
 import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { CommonMessage } from "common-ui";
 
 interface QueryBuilderProps {
   /**
@@ -98,10 +99,10 @@ function QueryBuilder({
       />
       <div className="mt-2">
         <Button onClick={onSubmit} className="me-2">
-          Search
+          <DinaMessage id="search" />
         </Button>
         <Button onClick={onReset} variant="secondary">
-          Reset
+          <CommonMessage id="resetButtonText" />
         </Button>
       </div>
     </>
