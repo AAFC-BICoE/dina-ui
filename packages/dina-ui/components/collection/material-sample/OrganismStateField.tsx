@@ -72,6 +72,7 @@ export function OrganismStateField({
           <AutoSuggestTextField<Organism>
             className="col-sm-6"
             {...fieldProps("lifeStage")}
+            customName="lifeStage"
             jsonApiBackend={{
               query: (search, ctx) => ({
                 path: "collection-api/organism",
@@ -87,6 +88,7 @@ export function OrganismStateField({
           <AutoSuggestTextField<Organism>
             className={individualEntry ? "col-sm-5" : "col-sm-6"}
             {...fieldProps("sex")}
+            customName="sex"
             jsonApiBackend={{
               query: (search, ctx) => ({
                 path: "collection-api/organism",
@@ -101,6 +103,7 @@ export function OrganismStateField({
           />
           <TextField
             {...fieldProps("remarks")}
+            name="organismRemarks"
             customName="organismRemarks"
             className="col-sm-12"
             multiLines={true}
