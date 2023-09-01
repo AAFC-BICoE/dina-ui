@@ -447,7 +447,7 @@ export function prefixQuery(
               must: [
                 {
                   prefix: {
-                    [fieldName + ".prefix"]: matchValue
+                    [fieldName]: matchValue
                   }
                 },
                 includedTypeQuery(parentType)
@@ -458,7 +458,7 @@ export function prefixQuery(
       }
     : {
         prefix: {
-          [fieldName + ".prefix"]: matchValue
+          [fieldName]: matchValue
         }
       };
 }

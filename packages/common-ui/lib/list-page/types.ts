@@ -86,13 +86,6 @@ export interface ESIndexMapping {
   distinctTerm: boolean;
 
   /**
-   * If enabled it will allow the user to search based on the starting of a word.
-   *
-   * Example: Hexapoda can be matched with "hex".
-   */
-  startsWithSupport: boolean;
-
-  /**
    * If enabled it will allow the user to search based in the middle of a word.
    *
    * Example: Hexapoda can be matched with "pod".

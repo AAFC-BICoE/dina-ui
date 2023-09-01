@@ -509,7 +509,7 @@ Object {
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith operation Normal field 1`] = `
 Object {
   "prefix": Object {
-    "data.attributes.textField.prefix": "text search",
+    "data.attributes.textField": "text search",
   },
 }
 `;
@@ -523,7 +523,7 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.name.prefix": "text search",
+              "included.attributes.name": "text search",
             },
           },
           Object {
@@ -547,7 +547,7 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.determination.scientificName.prefix": "text",
+              "included.attributes.determination.scientificName": "text",
             },
           },
           Object {

@@ -39,7 +39,7 @@ Object {
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute 1`] = `
 Object {
   "prefix": Object {
-    "data.attribute.materialSampleName.prefix": "searchvalue",
+    "data.attribute.materialSampleName": "searchvalue",
   },
 }
 `;
@@ -53,7 +53,7 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.dwcRecordNumber.prefix": "searchvalue",
+              "included.attributes.dwcRecordNumber": "searchvalue",
             },
           },
           Object {
