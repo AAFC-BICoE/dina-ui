@@ -3,8 +3,8 @@ import { Protocol } from "packages/dina-ui/types/collection-api";
 import { ContainerType } from "../ContainerType";
 import { Product } from "../Product";
 import { ThermocyclerProfile } from "../ThermocyclerProfile";
-import { IndexSet } from "../workflow/IndexSet";
-import { LibraryPrep2 } from "./LibraryPrep2";
+import { IndexSet } from "./IndexSet";
+import { LibraryPrep } from "./LibraryPrep";
 
 interface LibraryPrepBatchAttributes {
   type: "library-prep-batch";
@@ -25,9 +25,9 @@ interface LibraryPrepBatchRelationships {
   protocol?: Protocol;
   indexSet?: IndexSet;
   thermocyclerProfile?: ThermocyclerProfile;
-  libraryPreps?: LibraryPrep2[];
+  libraryPreps?: LibraryPrep[];
 }
 
-export type LibraryPrepBatch2 = KitsuResource &
+export type LibraryPrepBatch = KitsuResource &
   LibraryPrepBatchAttributes &
   LibraryPrepBatchRelationships;

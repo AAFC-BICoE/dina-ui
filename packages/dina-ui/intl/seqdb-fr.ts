@@ -4,7 +4,6 @@ import { SEQDB_MESSAGES_ENGLISH } from "./seqdb-en";
  * French translation of SeqDB English messages
  */
 export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
-  addMolecularSampleTitle: "Ajouter l’échantillon moléculaire",
   addPcrBatchTitle: "Ajouter le lot PCR",
   addPcrPrimerTitle: "Ajouter une amorce PCR",
   addProductTitle: "Ajouter un produit",
@@ -21,7 +20,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   deselectAllCheckedSamplesButtonText:
     "<-- Désélectionner tous les échantillons cochés ",
   deselectButtonText: "Désélectionner",
-  editMolecularSampleTitle: "Modifier l’échantillon moléculaire",
   editPcrBatchTitle: "Modifier le lot PCR",
   editPcrPrimerTitle: "Modifier l’amorce PCR",
   editProductTitle: "Modifier le produit",
@@ -51,9 +49,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   indexSetListTitle: "Ensembles d’indices",
   indexSetMustBeSet: "L’ensemble d’indices doit être défini.",
   indexSetViewTitle: "L'ensemble d’indices",
-  molecularSample: "Échantillon moléculaire",
-  molecularSampleListTitle: "Échantillons moléculaires",
-  molecularSampleViewTitle: "Échantillon moléculaire",
   notShearedStatus: "Sans cisaillement",
   notSizeSelectedStatus: "Sans sélection de taille",
   pcrBatch: "Lot PCR",
@@ -107,7 +102,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   wellCoordinates: "Coordonnées du puits",
   workflowDetails: "Détails du flux de travail",
   workflowDetailsTab: "Détails",
-  workflowListTitle: "Flux de SNG",
   workflowStepTab: "Étape {number} : {name}",
   workflowViewTitle: "Flux de SNG"
 };

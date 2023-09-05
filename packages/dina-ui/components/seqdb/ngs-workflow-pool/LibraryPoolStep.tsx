@@ -1,15 +1,15 @@
 import { SubmitButton } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useEffect } from "react";
-import { LibraryPool2 } from "../../../types/seqdb-api";
+import { LibraryPool } from "../../../types/seqdb-api";
 import { LibraryPoolForm } from "../../../pages/seqdb/ngs-workflow-pooling/edit";
 
 export interface LibraryPoolStepProps {
   libraryPoolId?: string;
-  libraryPool?: LibraryPool2;
+  libraryPool?: LibraryPool;
   onSaved: (
     nextStep: number,
-    libraryPoolSaved?: PersistedResource<LibraryPool2>
+    libraryPoolSaved?: PersistedResource<LibraryPool>
   ) => Promise<void>;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
@@ -32,7 +32,7 @@ export function LibraryPoolStep({
     }
   }, [libraryPoolId]);
 
-  async function onSavedInternal(resource: PersistedResource<LibraryPool2>) {
+  async function onSavedInternal(resource: PersistedResource<LibraryPool>) {
     setPerformSave(false);
     await onSaved(1, resource);
   }

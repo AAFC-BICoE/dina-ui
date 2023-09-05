@@ -226,16 +226,6 @@ export function Home() {
                     <SeqdbMessage id="ngsWorkflowWholeGenomeSeqPoolingTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/molecular-sample/list">
-                  <a>
-                    <SeqdbMessage id="molecularSampleListTitle" />
-                  </a>
-                </Link>
-                <Link href="/seqdb/workflow/list">
-                  <a>
-                    <SeqdbMessage id="workflowListTitle" />
-                  </a>
-                </Link>
                 <Link href="/seqdb/pcr-batch/list">
                   <a>
                     <SeqdbMessage id="pcrBatchListTitle" />

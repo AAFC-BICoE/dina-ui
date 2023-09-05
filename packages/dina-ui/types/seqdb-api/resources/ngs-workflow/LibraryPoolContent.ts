@@ -4,6 +4,8 @@ import { LibraryPrepBatch } from "./LibraryPrepBatch";
 
 interface LibraryPoolContentAttributes {
   type: "library-pool-content";
+  createdBy?: string;
+  createdOn?: string;
 }
 
 interface LibraryPoolContentRelationships {

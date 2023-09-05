@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { Protocol } from "packages/dina-ui/types/collection-api";
-import { LibraryPrep2, Product } from "../..";
+import { LibraryPrep, Product } from "../..";
 
 export type PreLibraryPrepType = "SHEARING" | "SIZE_SELECTION";
 
@@ -19,11 +19,11 @@ export interface PreLibraryPrep2Attributes {
 }
 
 export interface PreLibraryPrep2Relationships {
-  libraryPrep: LibraryPrep2;
+  libraryPrep: LibraryPrep;
   protocol?: Protocol;
   product?: Product;
 }
 
-export type PreLibraryPrep2 = KitsuResource &
+export type PreLibraryPrep = KitsuResource &
   PreLibraryPrep2Attributes &
   PreLibraryPrep2Relationships;

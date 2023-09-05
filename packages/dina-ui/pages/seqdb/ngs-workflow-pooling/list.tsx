@@ -8,9 +8,9 @@ import {
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { LibraryPool2 } from "../../../types/seqdb-api";
+import { LibraryPool } from "../../../types/seqdb-api";
 
-const TABLE_COLUMNS: ColumnDefinition<LibraryPool2>[] = [
+const TABLE_COLUMNS: ColumnDefinition<LibraryPool>[] = [
   {
     cell: ({
       row: {
