@@ -40,6 +40,11 @@ function getTableColumn(locale: string) {
       header: () => <FieldHeader name={"unit"} />
     },
     {
+      id: "vocabularyElementType",
+      accessorKey: "vocabularyElementType",
+      header: () => <FieldHeader name={"type"} />
+    },
+    {
       id: "dinaComponent",
       accessorKey: "dinaComponent",
       header: () => <FieldHeader name={"dinaComponent"} />
