@@ -79,7 +79,7 @@ export function FileView({
   }
   const resp = useQuery(
     { path: filePath, responseType: "blob" },
-    { onSuccess }
+    { onSuccess, disabled: showFile }
   );
 
   if (preview || (!isImage && fileType !== "pdf")) {
