@@ -93,6 +93,7 @@ export function useIndexMapping({
 
               // Additional options for the field:
               distinctTerm: key.distinct_term_agg,
+              optimizedPrefix: key?.fields?.includes("prefix") ?? false,
               containsSupport: key?.fields?.includes("infix") ?? false,
               endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
             });
@@ -122,6 +123,8 @@ export function useIndexMapping({
 
             // Additional options for the field:
             distinctTerm: relationshipAttribute.distinct_term_agg,
+            optimizedPrefix:
+              relationshipAttribute?.fields?.includes("prefix") ?? false,
             containsSupport:
               relationshipAttribute?.fields?.includes("infix") ?? false,
             endsWithSupport:
@@ -140,6 +143,7 @@ export function useIndexMapping({
             label: fieldMapping.label,
             path: fieldMapping.path,
             type: fieldMapping.type,
+            optimizedPrefix: false,
             containsSupport: false,
             endsWithSupport: false
           });
@@ -159,6 +163,7 @@ export function useIndexMapping({
               label: relationshipFieldMapping.label,
               path: relationshipFieldMapping.path,
               type: relationshipFieldMapping.type,
+              optimizedPrefix: false,
               containsSupport: false,
               endsWithSupport: false
             });

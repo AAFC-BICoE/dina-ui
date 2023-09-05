@@ -111,6 +111,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                   label: "managedAttributes",
                   path: "data.attributes.managedAttributes",
                   type: "managedAttribute",
+                  optimizedPrefix: false,
                   containsSupport: false,
                   endsWithSupport: false
                 }
@@ -151,6 +152,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                   label: "managedAttributes",
                   path: "included.attributes.managedAttributes",
                   type: "managedAttribute",
+                  optimizedPrefix: false,
                   containsSupport: false,
                   endsWithSupport: false
                 }

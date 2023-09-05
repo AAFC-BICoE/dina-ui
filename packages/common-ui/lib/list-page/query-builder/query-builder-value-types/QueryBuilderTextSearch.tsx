@@ -66,7 +66,7 @@ export function transformTextSearchToDSL({
     return {};
   }
 
-  const { distinctTerm, parentType, parentName } = fieldInfo;
+  const { distinctTerm, parentType, parentName, optimizedPrefix } = fieldInfo;
 
   // Is the "Exact" option selected? (Or if auto suggestions are being used.)
   const isExactMatch: boolean = distinctTerm || operation === "exactMatch";
@@ -99,7 +99,7 @@ export function transformTextSearchToDSL({
 
     // Prefix partial match
     case "startsWith":
-      return prefixQuery(fieldPath, value, parentType);
+      return prefixQuery(fieldPath, value, parentType, optimizedPrefix);
 
     // Infix partial match
     case "containsText":

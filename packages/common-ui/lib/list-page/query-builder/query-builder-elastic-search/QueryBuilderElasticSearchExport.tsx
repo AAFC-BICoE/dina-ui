@@ -416,7 +416,8 @@ export function rangeQuery(fieldName: string, rangeOptions: any): any {
 export function prefixQuery(
   fieldName: string,
   matchValue: any,
-  parentType: string | undefined
+  parentType: string | undefined,
+  optimizedPrefix: boolean
 ): any {
   if (matchValue === "") {
     return {};
@@ -436,7 +437,8 @@ export function prefixQuery(
               must: [
                 {
                   prefix: {
-                    [fieldName]: matchValue
+                    [optimizedPrefix ? fieldName + ".prefix" : fieldName]:
+                      matchValue
                   }
                 },
                 includedTypeQuery(parentType)
@@ -447,7 +449,7 @@ export function prefixQuery(
       }
     : {
         prefix: {
-          [fieldName]: matchValue
+          [optimizedPrefix ? fieldName + ".prefix" : fieldName]: matchValue
         }
       };
 }

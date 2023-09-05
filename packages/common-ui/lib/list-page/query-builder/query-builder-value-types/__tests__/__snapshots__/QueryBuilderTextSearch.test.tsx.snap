@@ -506,6 +506,62 @@ Object {
 }
 `;
 
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (prefix) operation (Optimized) Normal field 1`] = `
+Object {
+  "prefix": Object {
+    "data.attributes.textField.prefix": "text search",
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (prefix) operation (Optimized) With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.name.prefix": "text search",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (prefix) operation (Optimized) With relationship containing complex path as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.determination.scientificName.prefix": "text",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith operation Normal field 1`] = `
 Object {
   "prefix": Object {

@@ -36,10 +36,74 @@ Object {
 }
 `;
 
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (not optimized) 1`] = `
+Object {
+  "prefix": Object {
+    "data.attribute.materialSampleName": "searchvalue",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (optimized) 1`] = `
+Object {
+  "prefix": Object {
+    "data.attribute.materialSampleName.prefix": "searchvalue",
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute 1`] = `
 Object {
   "prefix": Object {
     "data.attribute.materialSampleName": "searchvalue",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery relationship (not optimized) 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.dwcRecordNumber": "searchvalue",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery relationship (optimized) 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.dwcRecordNumber.prefix": "searchvalue",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
   },
 }
 `;
