@@ -27,13 +27,13 @@ import { Protocol } from "../../../types/collection-api";
 import {
   ContainerType,
   IndexSet,
-  LibraryPrepBatch2,
+  LibraryPrepBatch,
   Product,
   ThermocyclerProfile
 } from "../../../types/seqdb-api";
 
 export function useLibraryPrepBatchQuery(id?: string, deps?: any[]) {
-  return useQuery<LibraryPrepBatch2>(
+  return useQuery<LibraryPrepBatch>(
     {
       path: `seqdb-api/library-prep-batch/${id}`,
       include: "containerType,product,protocol,thermocyclerProfile"
@@ -52,7 +52,7 @@ export default function LibraryPrepBatchEditPage() {
   const title = id ? "editLibraryPrepBatchTitle" : "addLibraryPrepBatchTitle";
 
   async function moveToViewPage(
-    savedResource: PersistedResource<LibraryPrepBatch2>
+    savedResource: PersistedResource<LibraryPrepBatch>
   ) {
     await router.push(`/seqdb/library-prep-batch/view?id=${savedResource.id}`);
   }
@@ -81,9 +81,9 @@ export default function LibraryPrepBatchEditPage() {
 }
 
 export interface LibraryPrepBatchFormProps {
-  libraryPrepBatch?: PersistedResource<LibraryPrepBatch2>;
+  libraryPrepBatch?: PersistedResource<LibraryPrepBatch>;
   results?: { [key: string]: string };
-  onSaved: (resource: PersistedResource<LibraryPrepBatch2>) => Promise<void>;
+  onSaved: (resource: PersistedResource<LibraryPrepBatch>) => Promise<void>;
   buttonBar?: ReactNode;
   readOnlyOverride?: boolean;
 }
@@ -113,7 +113,7 @@ export function LibraryPrepBatchForm({
   async function onSubmit({
     submittedValues,
     api: { save }
-  }: DinaFormSubmitParams<LibraryPrepBatch2 & { [key: string]: string }>) {
+  }: DinaFormSubmitParams<LibraryPrepBatch & { [key: string]: string }>) {
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
@@ -157,7 +157,7 @@ export function LibraryPrepBatchForm({
       delete submittedValues.thermocyclerProfile;
     }
 
-    const [savedResource] = await save<LibraryPrepBatch2>(
+    const [savedResource] = await save<LibraryPrepBatch>(
       [
         {
           resource: submittedValues,
@@ -181,7 +181,7 @@ export function LibraryPrepBatchForm({
 }
 
 interface LoadExternalDataForLibraryPrepBatchFormProps {
-  dinaFormProps: DinaFormProps<LibraryPrepBatch2>;
+  dinaFormProps: DinaFormProps<LibraryPrepBatch>;
   buttonBar?: ReactNode;
 }
 
@@ -193,7 +193,7 @@ export function LoadExternalDataForLibraryPrepBatchForm({
   const initialValues = cloneDeep(dinaFormProps.initialValues);
 
   return (
-    <DinaForm<Partial<LibraryPrepBatch2>>
+    <DinaForm<Partial<LibraryPrepBatch>>
       {...dinaFormProps}
       initialValues={initialValues}
     >

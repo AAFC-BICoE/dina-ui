@@ -1,7 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { NgsIndex } from "../workflow/NgsIndex";
-import { LibraryPrepBatch2 } from "./LibraryPrepBatch2";
+import { NgsIndex } from "./NgsIndex";
+import { LibraryPrepBatch } from "./LibraryPrepBatch";
 
 interface LibraryPrepAttributes {
   type: "library-prep";
@@ -16,12 +16,12 @@ interface LibraryPrepAttributes {
 }
 
 interface LibraryPrepRelationships {
-  libraryPrepBatch: LibraryPrepBatch2;
+  libraryPrepBatch: LibraryPrepBatch;
   materialSample?: MaterialSample;
   indexI5?: NgsIndex | null;
   indexI7?: NgsIndex | null;
 }
 
-export type LibraryPrep2 = KitsuResource &
+export type LibraryPrep = KitsuResource &
   LibraryPrepAttributes &
   LibraryPrepRelationships;

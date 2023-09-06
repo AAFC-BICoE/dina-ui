@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { LibraryPoolContent2 } from "./LibraryPoolContent2";
+import { LibraryPoolContent as LibraryPoolContent } from "./LibraryPoolContent";
 
 interface LibraryPoolAttributes {
   name: string;
@@ -12,9 +12,9 @@ interface LibraryPoolAttributes {
 }
 
 interface LibraryPoolRelationships {
-  contents?: LibraryPoolContent2[];
+  contents?: LibraryPoolContent[];
 }
 
-export type LibraryPool2 = KitsuResource &
+export type LibraryPool = KitsuResource &
   LibraryPoolAttributes &
   LibraryPoolRelationships;

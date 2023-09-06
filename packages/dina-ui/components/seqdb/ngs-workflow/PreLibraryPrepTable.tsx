@@ -8,15 +8,15 @@ import {
 } from "packages/common-ui/lib";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { Protocol } from "packages/dina-ui/types/collection-api";
-import { PreLibraryPrep2, Product } from "packages/dina-ui/types/seqdb-api";
+import { PreLibraryPrep, Product } from "packages/dina-ui/types/seqdb-api";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styles from "./PreLibraryPrepTable.module.css";
 import classNames from "classnames";
 
 export interface PreLibraryPrepTableProps {
   readOnly: boolean;
-  data: PreLibraryPrep2[];
-  setData: Dispatch<SetStateAction<PreLibraryPrep2[] | undefined>>;
+  data: PreLibraryPrep[];
+  setData: Dispatch<SetStateAction<PreLibraryPrep[] | undefined>>;
 }
 
 export function PreLibraryPrepTable({
@@ -24,7 +24,7 @@ export function PreLibraryPrepTable({
   data,
   setData
 }: PreLibraryPrepTableProps) {
-  const tableColumns: ColumnDef<PreLibraryPrep2>[] = [
+  const tableColumns: ColumnDef<PreLibraryPrep>[] = [
     {
       id: "materialSampleName",
       cell: ({ row: { original } }) => (

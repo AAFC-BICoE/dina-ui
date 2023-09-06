@@ -16,10 +16,10 @@ import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { LibraryPool2 } from "../../../types/seqdb-api";
+import { LibraryPool } from "../../../types/seqdb-api";
 
 export function useLibraryPoolQuery(id?: string, deps?: any[]) {
-  return useQuery<LibraryPool2>(
+  return useQuery<LibraryPool>(
     {
       path: `seqdb-api/library-pool/${id}`,
       include: "contents"
@@ -37,9 +37,7 @@ export default function LibraryPoolEditPage() {
 
   const title = id ? "editLibraryPoolTitle" : "addLibraryPoolTitle";
 
-  async function moveToViewPage(
-    savedResource: PersistedResource<LibraryPool2>
-  ) {
+  async function moveToViewPage(savedResource: PersistedResource<LibraryPool>) {
     await router.push(`/seqdb/library-pool/view?id=${savedResource.id}`);
   }
 
@@ -64,8 +62,9 @@ export default function LibraryPoolEditPage() {
 }
 
 export interface LibraryPoolFormProps {
-  libraryPool?: PersistedResource<LibraryPool2>;
-  onSaved: (resource: PersistedResource<LibraryPool2>) => Promise<void>;
+  libraryPool?: PersistedResource<LibraryPool>;
+  results?: { [key: string]: string };
+  onSaved: (resource: PersistedResource<LibraryPool>) => Promise<void>;
   buttonBar?: ReactNode;
   readOnlyOverride?: boolean;
 }
@@ -91,8 +90,8 @@ export function LibraryPoolForm({
   async function onSubmit({
     submittedValues,
     api: { save }
-  }: DinaFormSubmitParams<LibraryPool2 & { [key: string]: string }>) {
-    const [savedResource] = await save<LibraryPool2>(
+  }: DinaFormSubmitParams<LibraryPool & { [key: string]: string }>) {
+    const [savedResource] = await save<LibraryPool>(
       [
         {
           resource: submittedValues,
@@ -105,7 +104,7 @@ export function LibraryPoolForm({
   }
 
   return (
-    <DinaForm<Partial<LibraryPool2>>
+    <DinaForm<Partial<LibraryPool>>
       onSubmit={onSubmit}
       initialValues={initialValues}
       readOnly={readOnlyOverride}

@@ -15,7 +15,7 @@ import {
   MaterialSample,
   MaterialSampleSummary
 } from "../../../types/collection-api";
-import { LibraryPrep2, LibraryPrepBatch } from "../../../types/seqdb-api";
+import { LibraryPrep, LibraryPrepBatch } from "../../../types/seqdb-api";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 
 export interface NgsSampleSelectionStepProps {
@@ -58,7 +58,7 @@ export function NgsSampleSelectionStep({
 
   // Keep track of the previously selected resources to compare.
   const [previouslySelectedResources, setPreviouslySelectedResources] =
-    useState<LibraryPrep2[]>([]);
+    useState<LibraryPrep[]>([]);
 
   // The selected resources to be used for the QueryPage.
   const [selectedResources, setSelectedResources] = useState<
@@ -127,7 +127,7 @@ export function NgsSampleSelectionStep({
    */
   async function fetchSampledIds() {
     await apiClient
-      .get<LibraryPrep2[]>("/seqdb-api/library-prep", {
+      .get<LibraryPrep[]>("/seqdb-api/library-prep", {
         filter: filterBy([], {
           extraFilters: [
             {
@@ -143,7 +143,7 @@ export function NgsSampleSelectionStep({
         }
       })
       .then((response) => {
-        const libraryPreps: PersistedResource<LibraryPrep2>[] =
+        const libraryPreps: PersistedResource<LibraryPrep>[] =
           response?.data?.filter(
             (item) => item?.materialSample?.id !== undefined
           );
