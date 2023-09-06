@@ -90,9 +90,14 @@ function buildEsRule(
     formattedValue = formattedValue.trim();
   }
 
-  // Edge case if nothing is provided for a date.
+  // Edge case if nothing is provided for a date (unless operator is empty/not empty)
   let operatorValue = operator;
-  if (widgetName === "date" && formattedValue === "") {
+  if (
+    widgetName === "date" &&
+    formattedValue === "" &&
+    operator !== "empty" &&
+    operator !== "notEmpty"
+  ) {
     operatorValue = "empty";
   }
 
