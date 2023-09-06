@@ -165,7 +165,7 @@ export function useQueryBuilderConfig({
     indexName,
     dynamicFieldMapping
   });
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
 
   const [queryBuilderConfig, setQueryBuilderConfig] = useState<Config>();
 
@@ -181,7 +181,7 @@ export function useQueryBuilderConfig({
         customViewFields
       )
     );
-  }, [indexMap, customViewFields]);
+  }, [indexMap, customViewFields, locale]);
 
   return { queryBuilderConfig };
 }
