@@ -81,8 +81,9 @@ export function FileView({
     { path: filePath, responseType: "blob" },
     {
       onSuccess,
-      disabled:
-        metadata?.dcType !== "IMAGE" && metadata?.dcType !== "MOVING_IMAGE"
+      disabled: metadata
+        ? metadata?.dcType !== "IMAGE" && metadata?.dcType !== "MOVING_IMAGE"
+        : false
     }
   );
 
