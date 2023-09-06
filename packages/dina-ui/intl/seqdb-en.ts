@@ -175,5 +175,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   addLibraryPoolTitle: "Add Library Pool",
   field_dateUsed: "Date Used",
   hideUsed: "Hide used",
-  selectedPoolContents: "Selected Pool Contents"
+  selectedPoolContents: "Selected Pool Contents",
+  editIndexSetTitle: "Edit Index Set",
+  addIndexSetTitle: "Add Index Set"
 };

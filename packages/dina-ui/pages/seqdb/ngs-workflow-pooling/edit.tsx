@@ -65,7 +65,6 @@ export default function LibraryPoolEditPage() {
 
 export interface LibraryPoolFormProps {
   libraryPool?: PersistedResource<LibraryPool2>;
-  results?: { [key: string]: string };
   onSaved: (resource: PersistedResource<LibraryPool2>) => Promise<void>;
   buttonBar?: ReactNode;
   readOnlyOverride?: boolean;
