@@ -506,6 +506,62 @@ Object {
 }
 `;
 
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (prefix) operation (Non-optimized) Normal field 1`] = `
+Object {
+  "prefix": Object {
+    "data.attributes.textField": "text search",
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (prefix) operation (Non-optimized) With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.name": "text search",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (prefix) operation (Non-optimized) With relationship containing complex path as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.determination.scientificName": "text",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (prefix) operation (Optimized) Normal field 1`] = `
 Object {
   "prefix": Object {
@@ -548,62 +604,6 @@ Object {
           Object {
             "prefix": Object {
               "included.attributes.determination.scientificName.prefix": "text",
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "organism",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith operation Normal field 1`] = `
-Object {
-  "prefix": Object {
-    "data.attributes.textField": "text search",
-  },
-}
-`;
-
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "prefix": Object {
-              "included.attributes.name": "text search",
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collection",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith operation With relationship containing complex path as field 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "prefix": Object {
-              "included.attributes.determination.scientificName": "text",
             },
           },
           Object {
