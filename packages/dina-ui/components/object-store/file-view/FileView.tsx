@@ -136,7 +136,10 @@ export function FileView({
         {thumbnailImageDerivative ? (
           <SmallThumbnail filePath={fallBackFilePath} />
         ) : (
-          <Link href={objectURL as any} passHref={true}>
+          <Link
+            href={objectURL ? (objectURL as any) : filePath}
+            passHref={true}
+          >
             <a>{filePath}</a>
           </Link>
         )}
