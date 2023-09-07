@@ -283,22 +283,46 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
   });
 
   describe("Partial matching query helper functions", () => {
-    test("prefixQuery attribute", async () => {
+    test("prefixQuery attribute (not optimized)", async () => {
       expect(
         prefixQuery(
           "data.attribute.materialSampleName",
           "searchValue",
-          undefined
+          undefined,
+          false
         )
       ).toMatchSnapshot();
     });
 
-    test("prefixQuery relationship", async () => {
+    test("prefixQuery relationship (not optimized)", async () => {
       expect(
         prefixQuery(
           "included.attributes.dwcRecordNumber",
           "searchValue",
-          "collecting-event"
+          "collecting-event",
+          false
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("prefixQuery attribute (optimized)", async () => {
+      expect(
+        prefixQuery(
+          "data.attribute.materialSampleName",
+          "searchValue",
+          undefined,
+          true
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("prefixQuery relationship (optimized)", async () => {
+      expect(
+        prefixQuery(
+          "included.attributes.dwcRecordNumber",
+          "searchValue",
+          "collecting-event",
+          true
         )
       ).toMatchSnapshot();
     });
@@ -345,7 +369,7 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
 
     test("Empty values are left as empty queries", async () => {
       expect(
-        prefixQuery("data.attribute.materialSampleName", "", undefined)
+        prefixQuery("data.attribute.materialSampleName", "", undefined, true)
       ).toStrictEqual({});
       expect(
         infixQuery("data.attribute.materialSampleName", "", undefined)
