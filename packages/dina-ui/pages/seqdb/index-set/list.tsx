@@ -1,4 +1,10 @@
-import { ColumnDefinition, ListPageLayout } from "common-ui";
+import {
+  ButtonBar,
+  ColumnDefinition,
+  CreateButton,
+  ListPageLayout,
+  dateCell
+} from "common-ui";
 import Link from "next/link";
 import { Head, Nav, groupCell8 } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
@@ -26,7 +32,9 @@ const INDEX_SET_TABLE_COLUMNS: ColumnDefinition<IndexSet>[] = [
   },
   groupCell8("group"),
   "forwardAdapter",
-  "reverseAdapter"
+  "reverseAdapter",
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 export default function IndexSetListPage() {
@@ -40,6 +48,9 @@ export default function IndexSetListPage() {
         <h1 id="wb-cont">
           <SeqdbMessage id="indexSetListTitle" />
         </h1>
+        <ButtonBar>
+          <CreateButton entityLink="/seqdb/index-set" />
+        </ButtonBar>
         <ListPageLayout
           filterAttributes={INDEX_SET_FILTER_ATTRIBUTES}
           id="index-set-list"
