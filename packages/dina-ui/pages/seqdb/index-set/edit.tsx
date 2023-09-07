@@ -54,7 +54,7 @@ export default function IndexSetEditPage() {
       [
         {
           resource: submittedValues,
-          type: "library-pool"
+          type: "index-set"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -124,13 +124,13 @@ function IndexSetFields() {
       <div className="row">
         <TextField className="col-md-6" name="forwardAdapter" />
         <TextField className="col-md-6" name="reverseAdapter" />
-        {readOnly && (
-          <div className="row">
-            <DateField className="col-md-6" name="createdOn" />
-            <TextField className="col-md-6" name="createdBy" />
-          </div>
-        )}
       </div>
+      {readOnly && (
+        <div className="row">
+          <DateField className="col-md-6" name="createdOn" />
+          <TextField className="col-md-6" name="createdBy" />
+        </div>
+      )}
     </>
   );
 }
