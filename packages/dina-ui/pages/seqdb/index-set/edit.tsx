@@ -1,4 +1,3 @@
-import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import {
   BackButton,
@@ -63,36 +62,35 @@ export default function IndexSetEditPage() {
   }
 
   return (
-    <div>
+    <main className="container-fluid">
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container">
-        <h1 id="wb-cont">
-          <SeqdbMessage id={title} />
-        </h1>
-        {id ? (
-          withResponse(resourceQuery, ({ data }) => {
-            return (
-              <IndexSetForm
-                dinaFormProps={{ initialValues: data, onSubmit }}
-                buttonBar={buttonBar}
-              />
-            );
-          })
-        ) : (
-          <IndexSetForm
-            dinaFormProps={{
-              initialValues: {
-                createdBy: username,
-                type: "index-set"
-              } as IndexSet,
-              onSubmit
-            }}
-            buttonBar={buttonBar}
-          />
-        )}
-      </div>
-    </div>
+
+      <h1 id="wb-cont">
+        <SeqdbMessage id={title} />
+      </h1>
+      {id ? (
+        withResponse(resourceQuery, ({ data }) => {
+          return (
+            <IndexSetForm
+              dinaFormProps={{ initialValues: data, onSubmit }}
+              buttonBar={buttonBar}
+            />
+          );
+        })
+      ) : (
+        <IndexSetForm
+          dinaFormProps={{
+            initialValues: {
+              createdBy: username,
+              type: "index-set"
+            } as IndexSet,
+            onSubmit
+          }}
+          buttonBar={buttonBar}
+        />
+      )}
+    </main>
   );
 }
 

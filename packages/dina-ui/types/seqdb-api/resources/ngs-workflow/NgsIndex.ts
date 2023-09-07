@@ -4,6 +4,8 @@ import { IndexSet } from "./IndexSet";
 export interface NgsIndexAttributes {
   type: "ngs-index";
   name: string;
+  createdBy?: string;
+  createdOn?: string;
   lotNumber?: number;
   direction?: string;
   purification?: string;

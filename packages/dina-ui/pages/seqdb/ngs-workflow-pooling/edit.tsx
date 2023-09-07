@@ -42,22 +42,20 @@ export default function LibraryPoolEditPage() {
   }
 
   return (
-    <div>
+    <main className="container-fluid">
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container">
-        <h1 id="wb-cont">
-          <SeqdbMessage id={title} />
-        </h1>
-        {id ? (
-          withResponse(resourceQuery, ({ data }) => (
-            <LibraryPoolForm libraryPool={data} onSaved={moveToViewPage} />
-          ))
-        ) : (
-          <LibraryPoolForm onSaved={moveToViewPage} />
-        )}
-      </div>
-    </div>
+      <h1 id="wb-cont">
+        <SeqdbMessage id={title} />
+      </h1>
+      {id ? (
+        withResponse(resourceQuery, ({ data }) => (
+          <LibraryPoolForm libraryPool={data} onSaved={moveToViewPage} />
+        ))
+      ) : (
+        <LibraryPoolForm onSaved={moveToViewPage} />
+      )}
+    </main>
   );
 }
 
