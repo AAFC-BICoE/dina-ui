@@ -59,9 +59,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   allowNew: "Autoriser le nouveau",
   appTitle: "DINA",
   assemblage: "Assemblage",
-  assemblageAttachments: "Pièces jointes de lassemblage",
+  assemblageAttachments: "Pièces jointes de l'assemblage",
   assemblageListTitle: "Assemblages",
-  assemblageManagedAttributes: "Attributs gérés de lassemblage",
+  assemblageManagedAttributes: "Attributs gérés de l'assemblage",
   assemblage_tooltip:
     "Mécanisme utilisé pour regrouper des échantillons de matériau selon un certain thème organisationnel.",
   assemblages: "Assemblages",
@@ -143,7 +143,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createNewMaterialSamples: "Créer de nouveaux échantillons de matériaux",
   createNewView: "Créer une nouvelle vue",
   createSampleWithFormTemplate:
-    "Créer un échantillon à laide dun modèle de formulaire",
+    "Créer un échantillon à l'aide d'un modèle de formulaire",
   createSavedSearch: "Créer une recherche sauvegardée",
   createSplitWorkflow: "Créer un fractionnement",
   createStorage: "Créer un espace d'entreposage",
@@ -243,19 +243,19 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_acTags: "Balises",
   field_acceptedValues: "Valeurs acceptées",
   field_aliases: "Pseudonymes",
-  field_assemblageName: "Nom de lassemblage",
+  field_assemblageName: "Nom de l'assemblage",
   field_attachment: "Pièces jointes",
   field_attributesTemplate: "Modèle des attributs définis",
   field_barcode: "Code à barres",
   field_collectingEventCollectionMethod: "Méthode de collecte",
   field_collectingEventCollectionMethod_tooltip:
-    "Méthode utilisée durant une activité de collecte. Exemples : piège lumineux à UV, chalut de fond",
+    "Méthode utilisée durant une activité de collecte. Exemples : piège lumineux à UV, chalut de fond",
   field_collectingEventHost: "Hôte",
   field_collectingEventHost_tooltip:
-    "Hôte observé de léchantillon de matériau au moment de lactivité de collecte",
+    "Hôte observé de l'échantillon de matériau au moment de l'activité de collecte",
   field_collectingEventSubstrate: "Substrat",
   field_collectingEventSubstrate_tooltip:
-    "Surface observée sur laquelle un organisme a été prélevé et sur laquelle on pense quil a vécu",
+    "Surface observée sur laquelle un organisme a été prélevé et sur laquelle on pense qu'il a vécu",
   field_collectingEvent_endDateTimeError:
     "Le format de date/heure de l’événement final doit être un sous-ensemble de : AAAA-MM-JJTHH:MM:SS.MMM, si la date est présente, 'T’ est obligatoire",
   field_collectingEvent_startDateTimeError:
@@ -284,7 +284,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dwcCoordinateUncertaintyInMeters:
     "Coordonner les incertitudes dans les mesures en mètres",
   field_dwcCoordinateUncertaintyInMeters_tooltip:
-    "Distance horizontale en mètres à partir de la latitude décimale (decimalLatitude) et de la longitude décimale (decimalLongitude), décrivant le plus petit cercle renfermant lensemble de lemplacement",
+    "Distance horizontale en mètres à partir de la latitude décimale (decimalLatitude) et de la longitude décimale (decimalLongitude), décrivant le plus petit cercle renfermant l'ensemble de l'emplacement",
   field_dwcCountry: "Pays",
   field_dwcCountryCode: "Code du pays",
   field_dwcDecimalLatitude: "Latitude décimale",
@@ -294,7 +294,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "La mesure dans laquelle un organisme survit, se reproduit et étend son aire de répartition à un endroit et à un moment donnés.",
   field_dwcFieldNumber: "Numéro de collection",
   field_dwcFieldNumber_tooltip:
-    "Identifiant donné à lactivité sur le terrain au moment de la collecte dun ou de plusieurs échantillons, servant souvent de lien entre les notes prises sur le terrain et lactivité.",
+    "Identifiant donné à l'activité sur le terrain au moment de la collecte d'un ou de plusieurs échantillons, servant souvent de lien entre les notes prises sur le terrain et l'activité.",
   field_dwcGeodeticDatum: "Référence géodésique",
   field_dwcGeodeticDatum_tooltip:
     "La référence géodésique sur laquelle les coordonnées géographiques decimalLatitude et decimalLongitude sont fondées. La pratique exemplaire recommandée est ",
@@ -313,7 +313,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dwcOtherRecordNumbers: "Autres numéros de mentions",
   field_dwcRecordNumber: "Numéro du collecteur",
   field_dwcRecordNumber_tooltip:
-    "Identifiant donné à loccurrence, par le collectionneur, au moment où elle a été consignée, p. ex. le numéro du collectionneur de spécimens, servant souvent de lien entre les notes prises sur le terrain et une mention doccurrence.",
+    "Identifiant donné à l'occurrence, par le collectionneur, au moment où elle a été consignée, p. ex. le numéro du collectionneur de spécimens, servant souvent de lien entre les notes prises sur le terrain et une mention d'occurrence.",
   field_dwcRecordedBy: "Collecteurs Verbatim",
   field_dwcStateProvince: "État/province",
   field_dwcVerbatimCoordinateSystem: "Système de coordonnées Verbatim",
@@ -360,7 +360,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_isInseperable_tooltip: "Les contenus sont inséparables",
   field_isPrimary_tooltip:
     "Faire de cette détermination le point de données principal lors de l'exportation. Une seule détermination peut être principale. ",
-  field_isRestricted: "Fait lobjet de restrictions",
+  field_isRestricted: "Fait l'objet de restrictions",
   field_isolatedBy: "Isolé par",
   field_isolatedOn: "Isolé le ",
   field_isolationRemarks: "Isolation - remarques",
@@ -371,7 +371,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_managedAttributeCreatedOn: "Créé le",
   field_managedAttributeMandatoryFieldsError:
     "Le nom et le type sont des champs obligatoires",
+  field_managedAttributes: "Attributs gérés",
+  field_fieldExtensions: "Extensions de champs",
   field_managedAttributeName: "Nom de l'attribut",
+  field_restrictions: "Restrictions",
   field_vocabularyElementType_boolean_label: "Booléen",
   field_vocabularyElementType_date_label: "Date",
   field_vocabularyElementType_integer_label: "Par ordre numérique",
@@ -411,23 +414,23 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_preparationDate: "Date de la préparation",
   field_preparationFixative: "Solution de fixation de la préparation",
   field_preparationFixative_tooltip:
-    "Solution qui a été appliquée à léchantillon de matériau ou dans laquelle il est conservé. Exemples : ETOH 95 %, ETOH 75 %, ETOH 70 %, solution saline, colle.",
+    "Solution qui a été appliquée à l'échantillon de matériau ou dans laquelle il est conservé. Exemples : ETOH 95 %, ETOH 75 %, ETOH 70 %, solution saline, colle.",
   field_preparationMaterials: "Matériel de préparation",
   field_preparationMaterials_tooltip:
-    "Autres milieux ou objets physiques, généralement inertes, dans ou sur lesquels lorganisme dun échantillon de matériau est conservé. Ne correspond pas à létat de lorganisme ni aux solutions de fixation utilisées, mais plutôt au matériel qui permet de présenter lorganisme. Exemples : épingle, flacon en verre, bocal en plastique, bocal en verre, lame de microscope, papier sans acide, piège collant/plaquette adhésive, tube Eppendorf.",
+    "Autres milieux ou objets physiques, généralement inertes, dans ou sur lesquels l'organisme d'un échantillon de matériau est conservé. Ne correspond pas à l'état de l'organisme ni aux solutions de fixation utilisées, mais plutôt au matériel qui permet de présenter l'organisme. Exemples : épingle, flacon en verre, bocal en plastique, bocal en verre, lame de microscope, papier sans acide, piège collant/plaquette adhésive, tube Eppendorf.",
   field_preparationMethod: "Méthode de préparation",
   field_preparationMethod_tooltip:
-    "Substantif désignant le processus utilisé (la méthode) pour préparer léchantillon de matériau. Exemples : culture, inoculation mécanique, dissection.",
+    "Substantif désignant le processus utilisé (la méthode) pour préparer l'échantillon de matériau. Exemples : culture, inoculation mécanique, dissection.",
   field_preparationRemarks: "Commentaires sur la préparation",
   field_preparationSubstrate: "Substrat de la préparation",
   field_preparationSubstrate_tooltip:
-    "Matériel sur lequel lorganisme de léchantillon de matériau est présenté ou croît. Exemples : roche, bois, gélose.",
+    "Matériel sur lequel l'organisme de l'échantillon de matériau est présenté ou croît. Exemples : roche, bois, gélose.",
   field_preparationType: "Type de préparation",
   field_preparationType_tooltip:
-    "Substantif désignant ce que lon prépare. Exemples : membre, tissus, ADN",
+    "Substantif désignant ce que l'on prépare. Exemples : membre, tissus, ADN",
   field_preservationType: "Type de préservation",
   field_preservationType_tooltip:
-    "Description du type de préservation de léchantillon de matériau. Exemple : lyophilisation.",
+    "Description du type de préservation de l'échantillon de matériau. Exemple : lyophilisation.",
   field_projectName: "Nom du projet",
   field_projectStatus: "État du projet",
   field_publiclyReleasable: "Accessible au public",
@@ -447,9 +450,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_typeStatus: "Type de statut",
   field_typeStatusEvidence: "Type de statut - Preuve",
   field_useNextSequence: "Utiliser le prochain identifiant disponible",
-  field_useTargetOrganism: "Utiliser lorganisme ciblé",
+  field_useTargetOrganism: "Utiliser l'organisme ciblé",
   field_useTargetOrganismError:
-    "Sélectionner lorganisme ciblé lorsque loption Utiliser lorganisme ciblé est activée.",
+    "Sélectionner l'organisme ciblé lorsque l'option Utiliser l'organisme ciblé est activée.",
   field_verbatimDate: "Verbatim - Date",
   field_verbatimDeterminer: "Déterminant verbatim",
   field_verbatimEventDateTime: "Date et heure de l'événement textuel",
@@ -661,11 +664,11 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   queryBuilder_operator_greaterThanOrEqualTo: "Supérieur ou égal à",
   queryBuilder_operator_lessThan: "Inférieur à",
   queryBuilder_operator_lessThanOrEqualTo: "Inférieur ou égal à",
-  queryBuilder_operator_notEmpty: "Nest pas vide",
-  queryBuilder_operator_notEquals: "Nest pas égal à",
+  queryBuilder_operator_notEmpty: "N'est pas vide",
+  queryBuilder_operator_notEquals: "N'est pas égal à",
   queryBuilder_operator_partialMatch: "Correspondance partielle",
-  queryBuilder_value_number_placeholder: "Saisir le nombre à rechercher",
-  queryBuilder_value_text_placeholder: "Saisir le texte à rechercher",
+  queryBuilder_value_number_placeholder: "Saisir le nombre à rechercher",
+  queryBuilder_value_text_placeholder: "Saisir le texte à rechercher",
   queryBuilder_value_true: "true",
   reception: "Réception",
   reloadSavedSearch: "Recharger la recherche enregistrée",
@@ -709,9 +712,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   savedSearchError:
     "Impossible de récupérer les recherches enregistrées, veuillez réessayer plus tard.",
   savedSearchName: "Nom de la recherche enregistrée",
-  savedSearchNotFound: "Aucune recherche enregistrée na encore été créée.",
+  savedSearchNotFound: "Aucune recherche enregistrée n'a encore été créée.",
   savedSearchOverwriteExisting:
-    "Il existe déjà une recherche enregistrée portant le nom « {savedSearchName} ». La création de cette recherche enregistrée écrasera la recherche enregistrée existante.",
+    "Il existe déjà une recherche enregistrée portant le nom « {savedSearchName} ». La création de cette recherche enregistrée écrasera la recherche enregistrée existante.",
   scheduledActions: "Actions prévues",
   scientificNameSearch: "Recherche de nom scientifique",
   searchButton: "Recherche",
@@ -784,7 +787,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   title_preparationMethod: "Méthode de préparation",
   title_preparationType: "Type de préparation",
   title_storageUnit: "Unité de stockage",
-  title_storageUnitType: "Type dunité de stockage",
+  title_storageUnitType: "Type d'unité de stockage",
   to: "À",
   toBeReturned: "À retourner",
   tooltipDefaultLinkMessage: "Cliquez ici pour en savoir plus.",
