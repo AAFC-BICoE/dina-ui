@@ -20,17 +20,16 @@ import { IndexSet } from "packages/dina-ui/types/seqdb-api";
 import { ReactNode } from "react";
 
 export interface IndexSetFormProps {
-  indexSet?: PersistedResource<IndexSet>;
-  onSaved?: (resource: PersistedResource<IndexSet>) => Promise<void>;
+  dinaFormProps: DinaFormProps<IndexSet>;
   buttonBar?: ReactNode;
-  readOnlyOverride?: boolean;
-  dinaFormProps?: DinaFormProps<IndexSet>;
 }
 
 export default function IndexSetEditPage() {
   const router = useRouter();
   const id = router.query.id?.toString();
   const { formatMessage } = useSeqdbIntl();
+  const { username } = useAccount();
+
   const title = id ? "editIndexSetTitle" : "addIndexSetTitle";
   const resourceQuery = useQuery<IndexSet>(
     {
@@ -40,53 +39,12 @@ export default function IndexSetEditPage() {
     { disabled: !id, deps: [] }
   );
 
-  async function moveToViewPage(savedResource: PersistedResource<IndexSet>) {
-    await router.push(`/seqdb/index-set/view?id=${savedResource.id}`);
-  }
-
   const buttonBar = (
     <ButtonBar>
       <BackButton entityId={id} entityLink="/seqdb/index-set" />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
   );
-
-  return (
-    <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
-      <div className="container">
-        <h1 id="wb-cont">
-          <SeqdbMessage id={title} />
-        </h1>
-        {id ? (
-          withResponse(resourceQuery, ({ data }) => (
-            <IndexSetForm
-              indexSet={data}
-              onSaved={moveToViewPage}
-              buttonBar={buttonBar}
-            />
-          ))
-        ) : (
-          <IndexSetForm onSaved={moveToViewPage} />
-        )}
-      </div>
-    </div>
-  );
-}
-
-export function IndexSetForm({
-  indexSet,
-  onSaved,
-  buttonBar,
-  readOnlyOverride
-}: IndexSetFormProps) {
-  const { username } = useAccount();
-
-  const initialValues = indexSet || {
-    createdBy: username,
-    type: "index-set"
-  };
 
   async function onSubmit({
     submittedValues,
@@ -101,14 +59,46 @@ export function IndexSetForm({
       ],
       { apiBaseUrl: "/seqdb-api" }
     );
-    await onSaved?.(savedResource);
+    await router.push(`/seqdb/index-set/view?id=${savedResource.id}`);
   }
+
   return (
-    <DinaForm<Partial<IndexSet>>
-      onSubmit={onSubmit}
-      initialValues={initialValues}
-      readOnly={readOnlyOverride}
-    >
+    <div>
+      <Head title={formatMessage(title)} />
+      <Nav />
+      <div className="container">
+        <h1 id="wb-cont">
+          <SeqdbMessage id={title} />
+        </h1>
+        {id ? (
+          withResponse(resourceQuery, ({ data }) => {
+            return (
+              <IndexSetForm
+                dinaFormProps={{ initialValues: data, onSubmit }}
+                buttonBar={buttonBar}
+              />
+            );
+          })
+        ) : (
+          <IndexSetForm
+            dinaFormProps={{
+              initialValues: {
+                createdBy: username,
+                type: "index-set"
+              } as IndexSet,
+              onSubmit
+            }}
+            buttonBar={buttonBar}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function IndexSetForm({ dinaFormProps, buttonBar }: IndexSetFormProps) {
+  return (
+    <DinaForm<Partial<IndexSet>> {...dinaFormProps}>
       {buttonBar}
       <IndexSetFields />
     </DinaForm>
