@@ -191,6 +191,10 @@
   margin: 3px 10px;
 }
 
+.ReactTable .-pagination select:focus {
+  border-color: currentcolor !important;
+}
+
 .ReactTable .rt-expander {
   display: inline-block;
   position: relative;
