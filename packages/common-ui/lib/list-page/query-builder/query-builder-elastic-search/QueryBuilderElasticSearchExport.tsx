@@ -90,9 +90,14 @@ function buildEsRule(
     formattedValue = formattedValue.trim();
   }
 
-  // Edge case if nothing is provided for a date.
+  // Edge case if nothing is provided for a date (unless operator is empty/not empty)
   let operatorValue = operator;
-  if (widgetName === "date" && formattedValue === "") {
+  if (
+    widgetName === "date" &&
+    formattedValue === "" &&
+    operator !== "empty" &&
+    operator !== "notEmpty"
+  ) {
     operatorValue = "empty";
   }
 
@@ -416,7 +421,8 @@ export function rangeQuery(fieldName: string, rangeOptions: any): any {
 export function prefixQuery(
   fieldName: string,
   matchValue: any,
-  parentType: string | undefined
+  parentType: string | undefined,
+  optimizedPrefix: boolean
 ): any {
   if (matchValue === "") {
     return {};
@@ -436,7 +442,8 @@ export function prefixQuery(
               must: [
                 {
                   prefix: {
-                    [fieldName + ".prefix"]: matchValue
+                    [optimizedPrefix ? fieldName + ".prefix" : fieldName]:
+                      matchValue
                   }
                 },
                 includedTypeQuery(parentType)
@@ -447,7 +454,7 @@ export function prefixQuery(
       }
     : {
         prefix: {
-          [fieldName + ".prefix"]: matchValue
+          [optimizedPrefix ? fieldName + ".prefix" : fieldName]: matchValue
         }
       };
 }

@@ -55,12 +55,6 @@ export function QueryOperatorSelector({
   const operationOptions = options
     ?.filter((option) => {
       if (
-        option.key === "startsWith" &&
-        !selectedFieldMapping?.startsWithSupport
-      ) {
-        return false;
-      }
-      if (
         option.key === "containsText" &&
         !selectedFieldMapping?.containsSupport
       ) {

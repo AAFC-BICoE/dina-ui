@@ -96,7 +96,7 @@ describe("QueryBuilderTextSearch", () => {
       });
     });
 
-    describe("startsWith operation", () => {
+    describe("startsWith (prefix) operation (Non-optimized)", () => {
       test("With relationship as field", async () => {
         expect(
           transformTextSearchToDSL({
@@ -144,6 +144,65 @@ describe("QueryBuilderTextSearch", () => {
             operation: "startsWith",
             value: "text search",
             fieldInfo: {} as any,
+            fieldPath: "data.attributes.textField",
+            queryType: "startsWith"
+          })
+        ).toMatchSnapshot();
+      });
+    });
+
+    describe("startsWith (prefix) operation (Optimized)", () => {
+      test("With relationship as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "startsWith",
+            value: "text search",
+            fieldInfo: {
+              label: "name",
+              value: "collection.name",
+              type: "text",
+              path: "attributes",
+              parentName: "collection",
+              parentType: "collection",
+              parentPath: "included",
+              distinctTerm: true,
+              optimizedPrefix: true // Optimized prefix
+            } as any,
+            fieldPath: "included.attributes.name",
+            queryType: "startsWith"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("With relationship containing complex path as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "startsWith",
+            value: "text",
+            fieldInfo: {
+              label: "determination.scientificName",
+              parentName: "organism",
+              parentPath: "included",
+              parentType: "organism",
+              path: "attributes.determination",
+              type: "text",
+              value: "organism.determination.scientificName",
+              optimizedPrefix: true // Optimized prefix
+            } as any,
+            fieldPath: "included.attributes.determination.scientificName",
+            queryType: "startsWith"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("Normal field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "startsWith",
+            value: "text search",
+            fieldInfo: {
+              optimizedPrefix: true // Optimized prefix
+            } as any,
             fieldPath: "data.attributes.textField",
             queryType: "startsWith"
           })

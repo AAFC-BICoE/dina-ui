@@ -86,11 +86,12 @@ export interface ESIndexMapping {
   distinctTerm: boolean;
 
   /**
-   * If enabled it will allow the user to search based on the starting of a word.
+   * All text fields will support prefixes, but some fields are optimized with a "prefix" field.
    *
-   * Example: Hexapoda can be matched with "hex".
+   * When enabled, the elastic search query will append a ".prefix" to the end of the field to use
+   * the optimized prefix.
    */
-  startsWithSupport: boolean;
+  optimizedPrefix: boolean;
 
   /**
    * If enabled it will allow the user to search based in the middle of a word.
