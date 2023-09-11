@@ -12,10 +12,10 @@ import {
   useDinaFormContext,
   useQuery,
   withResponse
-} from "packages/common-ui";
-import { GroupSelectField, Head, Nav } from "packages/dina-ui/components";
-import { SeqdbMessage, useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
-import { IndexSet } from "packages/dina-ui/types/seqdb-api";
+} from "../../../../common-ui";
+import { GroupSelectField, Head, Nav } from "../../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
+import { IndexSet } from "../../../types/seqdb-api";
 import { ReactNode } from "react";
 
 export interface IndexSetFormProps {
