@@ -381,6 +381,7 @@ export default function MaterialSampleListPage() {
             apiBaseUrl: "/collection-api"
           }}
           bulkEditPath="/collection/material-sample/bulk-edit"
+          dataExportPath="/collection/material-sample/export"
           // bulkSplitPath="/collection/material-sample/bulk-split"
         />
       </main>

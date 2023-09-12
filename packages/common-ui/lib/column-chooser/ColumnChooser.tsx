@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { startCase } from "lodash";
+import { Button } from "react-bootstrap";
 
 export function ColumnChooser(
   CustomMenu: React.ForwardRefExoticComponent<
@@ -12,7 +13,7 @@ export function ColumnChooser(
   >
 ) {
   return (
-    <Dropdown autoClose={"outside"}>
+    <Dropdown>
       <Dropdown.Toggle>
         <DinaMessage id="selectColumn" />
       </Dropdown.Toggle>
@@ -42,16 +43,18 @@ export function useColumnChooser({ columns }: UseColumnChooserProps) {
 
 function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
+  const { formatMessage } = useIntl();
   const { groupedCheckBoxes, checkedIds } = useGroupedCheckboxWithLabel({
     resources: searchedColumns,
     isField: true
   });
-  const testRef = useRef<any>();
-  useEffect(() => {
-    testRef?.current?.focus();
-  }, []);
+
   const CustomMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
+      if (props.style) {
+        props.style.transform = "translate(0px, 40px)";
+      }
+
       return (
         <div
           ref={ref}
@@ -86,6 +89,14 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
           />
           <Dropdown.Divider />
           {groupedCheckBoxes}
+          <Button
+            className="btn btn-primary mt-2 bulk-edit-button"
+            onClick={(e) => {
+              e.preventDefault();
+            }}
+          >
+            {formatMessage({ id: "exportButtonText" })}
+          </Button>
         </div>
       );
     }

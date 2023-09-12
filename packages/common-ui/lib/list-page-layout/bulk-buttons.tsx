@@ -112,6 +112,43 @@ export function BulkEditButton({
   );
 }
 
+export interface DataExportButtonProps {
+  /** Where to perform the request for the data export. */
+  pathname: string;
+  totalRecords: number;
+  query: any;
+}
+
+/**
+ * Key value where the data export search results will be stored.
+ *
+ * This constant is available to use for setting and retrieving the value.
+ */
+export const DATA_EXPORT_SEARCH_RESULTS_KEY = "dataExportSearchResults";
+
+export function DataExportButton({
+  pathname,
+  totalRecords,
+  query
+}: DataExportButtonProps) {
+  const router = useRouter();
+
+  return (
+    <FormikButton
+      className="btn btn-primary ms-2 bulk-edit-button"
+      onClick={async (_values: BulkSelectableFormValues) => {
+        writeStorage<any>(DATA_EXPORT_SEARCH_RESULTS_KEY, query);
+        await router.push({
+          pathname,
+          query: { totalRecords, hideTable: true }
+        });
+      }}
+    >
+      <CommonMessage id="exportButtonText" />
+    </FormikButton>
+  );
+}
+
 export interface BulkSplitButtonProps {
   /**
    * Page where the bulk split is being performed.
