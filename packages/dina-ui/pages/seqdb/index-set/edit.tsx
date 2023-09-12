@@ -6,6 +6,7 @@ import {
   DinaForm,
   DinaFormProps,
   DinaFormSubmitParams,
+  QueryTable,
   SubmitButton,
   TextField,
   useAccount,
@@ -17,6 +18,7 @@ import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { IndexSet } from "../../../types/seqdb-api";
 import { ReactNode } from "react";
+import { NgsIndexField } from "./NgsIndexField";
 
 export interface IndexSetFormProps {
   dinaFormProps: DinaFormProps<IndexSet>;
@@ -33,7 +35,7 @@ export default function IndexSetEditPage() {
   const resourceQuery = useQuery<IndexSet>(
     {
       path: `seqdb-api/index-set/${id}`,
-      include: "contents"
+      include: "ngsIndexes"
     },
     { disabled: !id, deps: [] }
   );
@@ -105,7 +107,7 @@ export function IndexSetForm({ dinaFormProps, buttonBar }: IndexSetFormProps) {
 
 /** Re-usable field layout between edit and view pages. */
 function IndexSetFields() {
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
 
   return (
     <>
@@ -129,6 +131,8 @@ function IndexSetFields() {
           <TextField className="col-md-6" name="createdBy" />
         </div>
       )}
+      <strong>NGS indexes:</strong>
+      <NgsIndexField wrapContent={(content) => content} />
     </>
   );
 }

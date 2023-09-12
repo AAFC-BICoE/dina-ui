@@ -171,5 +171,9 @@ export const SEQDB_MESSAGES_ENGLISH = {
   hideUsed: "Hide used",
   selectedPoolContents: "Selected Pool Contents",
   editIndexSetTitle: "Edit Index Set",
-  addIndexSetTitle: "Add Index Set"
+  addIndexSetTitle: "Add Index Set",
+  ngsIndexes: "NGS Indexes",
+  field_lotNumber: "Lot Number",
+  field_direction: "Direction",
+  field_purification: "Purification"
 };
