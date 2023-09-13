@@ -223,7 +223,6 @@ export function ScheduledActionsField({
                   <ScheduledActionSubForm
                     defaultDate={defaultDate}
                     onSaveAction={(newAction) => {
-                      // row.getToggleExpandedHandler()();
                       return saveAction(newAction);
                     }}
                     onCancelClick={
