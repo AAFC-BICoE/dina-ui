@@ -9,7 +9,8 @@ const TEST_METADATA = {
   bucket: "dao",
   fileIdentifier: "7baa76e3-8c35-4e4a-95b2-0209268a6cc7",
   fileExtension: ".jpg",
-  acCaption: "test caption 1"
+  acCaption: "test caption 1",
+  dcType: "IMAGE"
 };
 
 const TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE = {
@@ -36,7 +37,8 @@ const TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE = {
   ],
   bucket: "dao",
   fileIdentifier: "7baa76e3-8c35-4e4a-95b2-0209268a6cc7",
-  fileExtension: ".cr2"
+  fileExtension: ".cr2",
+  dcType: "IMAGE"
 };
 const mockGet = jest.fn((path) => {
   return path;
