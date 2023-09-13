@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import { ReactNode, useRef } from "react";
 import {
   BackButton,
   ButtonBar,
@@ -6,7 +7,6 @@ import {
   DinaForm,
   DinaFormProps,
   DinaFormSubmitParams,
-  QueryTable,
   SubmitButton,
   TextField,
   useAccount,
@@ -14,14 +14,18 @@ import {
   useQuery,
   withResponse
 } from "../../../../common-ui";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  NgsIndexField
+} from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { IndexSet } from "../../../types/seqdb-api";
-import { ReactNode } from "react";
-import { NgsIndexField } from "./NgsIndexField";
+import { IndexSet, NgsIndex } from "../../../types/seqdb-api";
 
 export interface IndexSetFormProps {
   dinaFormProps: DinaFormProps<IndexSet>;
+  onRemoveNgsIndex: (ngsIndex: NgsIndex) => void;
   buttonBar?: ReactNode;
 }
 
@@ -30,6 +34,7 @@ export default function IndexSetEditPage() {
   const id = router.query.id?.toString();
   const { formatMessage } = useSeqdbIntl();
   const { username } = useAccount();
+  const ngsIndexesToDelete = useRef<NgsIndex[]>([]);
 
   const title = id ? "editIndexSetTitle" : "addIndexSetTitle";
   const resourceQuery = useQuery<IndexSet>(
@@ -51,7 +56,9 @@ export default function IndexSetEditPage() {
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<IndexSet & { [key: string]: string }>) {
-    const [savedResource] = await save<IndexSet>(
+    const ngsIndexes = submittedValues.ngsIndexes;
+    delete submittedValues.ngsIndexes;
+    const [savedIndexSet] = await save<IndexSet>(
       [
         {
           resource: submittedValues,
@@ -60,7 +67,32 @@ export default function IndexSetEditPage() {
       ],
       { apiBaseUrl: "/seqdb-api" }
     );
-    await router.push(`/seqdb/index-set/view?id=${savedResource.id}`);
+    if (ngsIndexes && ngsIndexes.length > 0) {
+      const ngsIndexResources = ngsIndexes?.map((ngsIndex) => {
+        ngsIndex.indexSet = savedIndexSet;
+        return {
+          resource: ngsIndex,
+          type: "ngs-index"
+        };
+      });
+      await save<NgsIndex>(ngsIndexResources, { apiBaseUrl: "/seqdb-api" });
+    }
+    if (ngsIndexesToDelete.current.length > 0) {
+      const resourceToDelete = ngsIndexesToDelete.current.map((ngsIndex) => ({
+        delete: {
+          id: ngsIndex.id as string,
+          type: "ngs-index"
+        }
+      }));
+      await save<NgsIndex>(resourceToDelete, { apiBaseUrl: "/seqdb-api" });
+    }
+    await router.push(`/seqdb/index-set/view?id=${savedIndexSet.id}`);
+  }
+
+  function onRemoveNgsIndex(ngsIndex: NgsIndex) {
+    if (ngsIndex?.id) {
+      ngsIndexesToDelete.current.push(ngsIndex);
+    }
   }
 
   return (
@@ -76,6 +108,7 @@ export default function IndexSetEditPage() {
           return (
             <IndexSetForm
               dinaFormProps={{ initialValues: data, onSubmit }}
+              onRemoveNgsIndex={onRemoveNgsIndex}
               buttonBar={buttonBar}
             />
           );
@@ -89,6 +122,7 @@ export default function IndexSetEditPage() {
             } as IndexSet,
             onSubmit
           }}
+          onRemoveNgsIndex={onRemoveNgsIndex}
           buttonBar={buttonBar}
         />
       )}
@@ -96,18 +130,26 @@ export default function IndexSetEditPage() {
   );
 }
 
-export function IndexSetForm({ dinaFormProps, buttonBar }: IndexSetFormProps) {
+export function IndexSetForm({
+  dinaFormProps,
+  onRemoveNgsIndex,
+  buttonBar
+}: IndexSetFormProps) {
   return (
     <DinaForm<Partial<IndexSet>> {...dinaFormProps}>
       {buttonBar}
-      <IndexSetFields />
+      <IndexSetFields onRemoveNgsIndex={onRemoveNgsIndex} />
     </DinaForm>
   );
 }
 
 /** Re-usable field layout between edit and view pages. */
-function IndexSetFields() {
-  const { readOnly, initialValues } = useDinaFormContext();
+function IndexSetFields({
+  onRemoveNgsIndex
+}: {
+  onRemoveNgsIndex: (ngsIndex: NgsIndex) => void;
+}) {
+  const { readOnly } = useDinaFormContext();
 
   return (
     <>
@@ -132,7 +174,10 @@ function IndexSetFields() {
         </div>
       )}
       <strong>NGS indexes:</strong>
-      <NgsIndexField wrapContent={(content) => content} />
+      <NgsIndexField
+        wrapContent={(content) => content}
+        onRemoveNgsIndex={onRemoveNgsIndex}
+      />
     </>
   );
 }

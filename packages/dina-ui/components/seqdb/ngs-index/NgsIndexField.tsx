@@ -1,5 +1,6 @@
 import { ColumnDef, Row } from "@tanstack/react-table";
 import {
+  DateField,
   DinaForm,
   FieldHeader,
   FieldSet,
@@ -8,6 +9,7 @@ import {
   NumberField,
   OnFormikSubmit,
   ReactTable,
+  SelectField,
   TextField,
   useDinaFormContext
 } from "common-ui";
@@ -20,15 +22,34 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export interface NgsIndexFieldProps {
   wrapContent?: (content: ReactNode) => ReactNode;
-  id?: string;
+  onRemoveNgsIndex: (ngsIndex: NgsIndex) => void;
 }
 
 const fieldName = "ngsIndexes";
 const NGS_INDEX_COMPONENT_NAME = "ngs-index-component";
 
+const DIRECTION_OPTIONS = [
+  {
+    label: "I5",
+    value: "I5"
+  },
+  {
+    label: "I7",
+    value: "I7"
+  },
+  {
+    label: "FORWARD",
+    value: "FORWARD"
+  },
+  {
+    label: "REVERSE",
+    value: "REVERSE"
+  }
+];
+
 export function NgsIndexField({
   wrapContent = (content) => content,
-  id = NGS_INDEX_COMPONENT_NAME
+  onRemoveNgsIndex
 }: NgsIndexFieldProps) {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
@@ -44,9 +65,10 @@ export function NgsIndexField({
     setNgsIndexToEdit({ index: row.index });
   }
 
-  function removeNgxIndex(formik: FormikContextType<NgsIndex>, index: number) {
+  function removeNgsIndex(formik: FormikContextType<NgsIndex>, index: number) {
     setNgsIndexToEdit(null);
     const ngsIndexes = formik.getFieldMeta<NgsIndex[]>(fieldName).value ?? [];
+    onRemoveNgsIndex(ngsIndexes[index]);
     // Remove the item at the index:
     formik.setFieldValue(fieldName, [
       ...ngsIndexes.slice(0, index),
@@ -56,7 +78,7 @@ export function NgsIndexField({
 
   const buttonProps = () => ({ disabled: isEditing, style: { width: "7rem" } });
 
-  const ngxIndexColumns: ColumnDef<NgsIndex>[] = [
+  const ngsIndexColumns: ColumnDef<NgsIndex>[] = [
     {
       accessorKey: "name",
       header: () => <FieldHeader name={formatMessage("field_name")} />
@@ -91,7 +113,7 @@ export function NgsIndexField({
                 <FormikButton
                   className="btn btn-danger remove-button"
                   buttonProps={buttonProps}
-                  onClick={(_, form) => removeNgxIndex(form, row.index)}
+                  onClick={(_, form) => removeNgsIndex(form, row.index)}
                 >
                   <DinaMessage id="remove" />
                 </FormikButton>
@@ -104,26 +126,26 @@ export function NgsIndexField({
   return (
     <FieldSet
       legend={<DinaMessage id="ngsIndexes" />}
-      id={id}
+      id={NGS_INDEX_COMPONENT_NAME}
       fieldName={fieldName}
       componentName={NGS_INDEX_COMPONENT_NAME}
-      sectionName="ngx-index-add-section"
+      sectionName="ngs-index-add-section"
     >
       {wrapContent(
         <FieldSpy fieldName={fieldName}>
           {(value, { form }) => {
             const ngsIndexes = (value ?? []) as NgsIndex[];
 
-            const hasNgxIndexs = !!ngsIndexes.length;
+            const hasNgsIndexs = !!ngsIndexes.length;
 
-            async function saveNgxIndex(savedNgxIndex: NgsIndex) {
+            async function saveNgsIndex(savedNgsIndex: NgsIndex) {
               if (ngsIndexToEdit === "NEW" || !ngsIndexToEdit) {
-                form.setFieldValue(fieldName, [...ngsIndexes, savedNgxIndex]);
+                form.setFieldValue(fieldName, [...ngsIndexes, savedNgsIndex]);
               } else {
                 form.setFieldValue(
                   fieldName,
-                  ngsIndexes.map((ngxIndex, index) =>
-                    index === ngsIndexToEdit?.index ? savedNgxIndex : ngxIndex
+                  ngsIndexes.map((ngsIndex, index) =>
+                    index === ngsIndexToEdit?.index ? savedNgsIndex : ngsIndex
                   )
                 );
               }
@@ -132,9 +154,9 @@ export function NgsIndexField({
 
             return (
               <>
-                {hasNgxIndexs && (
+                {hasNgsIndexs && (
                   <ReactTable<NgsIndex>
-                    columns={ngxIndexColumns}
+                    columns={ngsIndexColumns}
                     defaultSorted={[{ id: "date", desc: true }]}
                     data={ngsIndexes}
                     showPagination={false}
@@ -143,10 +165,13 @@ export function NgsIndexField({
                     renderSubComponent={({ row }) => (
                       <div className="m-2">
                         <NgsIndexSubForm
-                          ngxIndexToEdit={row.original}
-                          onSaveNgxIndex={saveNgxIndex}
+                          ngsIndexToEdit={row.original}
+                          onSaveNgsIndex={(newNgsIndex) => {
+                            row.getToggleExpandedHandler()();
+                            return saveNgsIndex(newNgsIndex);
+                          }}
                           onCancelClick={
-                            hasNgxIndexs
+                            hasNgsIndexs
                               ? () => {
                                   setNgsIndexToEdit(null);
                                   row.getToggleExpandedHandler()();
@@ -158,11 +183,13 @@ export function NgsIndexField({
                     )}
                   />
                 )}
-                {readOnly ? null : !hasNgxIndexs || ngsIndexToEdit === "NEW" ? (
+                {readOnly ? null : !hasNgsIndexs || ngsIndexToEdit === "NEW" ? (
                   <NgsIndexSubForm
-                    onSaveNgxIndex={saveNgxIndex}
+                    onSaveNgsIndex={(newNgsIndex) => {
+                      return saveNgsIndex(newNgsIndex);
+                    }}
                     onCancelClick={
-                      hasNgxIndexs ? () => setNgsIndexToEdit(null) : undefined
+                      hasNgsIndexs ? () => setNgsIndexToEdit(null) : undefined
                     }
                   />
                 ) : (
@@ -184,9 +211,9 @@ export function NgsIndexField({
 }
 
 export interface NgsIndexSubFormProps {
-  onSaveNgxIndex: (ngxIndex: NgsIndex) => Promise<void>;
+  onSaveNgsIndex: (ngsIndex: NgsIndex) => Promise<void>;
   onCancelClick?: () => void;
-  ngxIndexToEdit?: NgsIndex;
+  ngsIndexToEdit?: NgsIndex;
 }
 
 export const ngsIndexSchema = yup.object({
@@ -194,9 +221,9 @@ export const ngsIndexSchema = yup.object({
 });
 
 export function NgsIndexSubForm({
-  onSaveNgxIndex,
+  onSaveNgsIndex,
   onCancelClick,
-  ngxIndexToEdit
+  ngsIndexToEdit
 }: NgsIndexSubFormProps) {
   function disableEnterToSubmitOuterForm(e) {
     // Pressing enter should not submit the outer form:
@@ -214,45 +241,82 @@ export function NgsIndexSubForm({
     };
   }
 
-  const submitNgxIndex: OnFormikSubmit<any> = async (newNgxIndex, formik) => {
+  const submitNgsIndex: OnFormikSubmit<any> = async (newNgsIndex, formik) => {
     // Return if the sub-form has errors:
     const formErrors = await formik.validateForm();
     if (!isEmpty(formErrors)) {
       formik.setErrors({ ...formik.errors, ...formErrors });
       return;
     }
-    await onSaveNgxIndex(newNgxIndex);
+    await onSaveNgsIndex(newNgsIndex);
   };
 
-  const defaultInitialValues = {};
+  const title = ngsIndexToEdit ? "editNgsIndexTitle" : "addNgsIndexTitle";
+
+  const defaultInitialValues = ngsIndexToEdit ?? {};
 
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
-      <FieldSet legend={<DinaMessage id="addNew" />}>
+      <FieldSet legend={<DinaMessage id={title} />}>
         <DinaForm
           validationSchema={ngsIndexSchema}
-          initialValues={ngxIndexToEdit ?? defaultInitialValues}
+          initialValues={defaultInitialValues}
           componentName={NGS_INDEX_COMPONENT_NAME}
-          sectionName="ngx-index-add-section"
+          sectionName="ngs-index-add-section"
         >
           <div className="row">
-            <TextField {...fieldProps("name")} className="col-sm-6" />
-            <NumberField {...fieldProps("lotNumber")} className="col-sm-6" />
+            <TextField className="col-md-4" {...fieldProps("name")} />
+            <NumberField className="col-md-4" {...fieldProps("lotNumber")} />
+            <SelectField
+              className="col-md-4"
+              {...fieldProps("direction")}
+              options={DIRECTION_OPTIONS}
+            />
+          </div>
+          <div className="row">
+            <TextField className="col-md-4" {...fieldProps("purification")} />
+            <TextField className="col-md-4" {...fieldProps("tmCalculated")} />
+            <DateField className="col-md-4" {...fieldProps("dateOrdered")} />
+          </div>
+          <div className="row">
+            <DateField className="col-md-4" {...fieldProps("dateDestroyed")} />
+            <TextField className="col-md-4" {...fieldProps("application")} />
+            <TextField className="col-md-4" {...fieldProps("reference")} />
+          </div>
+          <div className="row">
+            <TextField className="col-md-4" {...fieldProps("supplier")} />
+            <TextField className="col-md-4" {...fieldProps("designedBy")} />
+            <TextField
+              className="col-md-4"
+              {...fieldProps("stockConcentration")}
+            />
+          </div>
+          <div className="row">
+            <TextField className="col-md-4" {...fieldProps("litReference")} />
+            <TextField className="col-md-4" {...fieldProps("primerSequence")} />
+            <TextField
+              className="col-md-4"
+              {...fieldProps("miSeqHiSeqIndexSequence")}
+            />
           </div>
           <div className="row">
             <TextField
-              {...fieldProps("notes")}
+              className="col-md-4"
+              {...fieldProps("miniSeqNextSeqIndexSequence")}
+            />
+            <TextField
               multiLines={true}
-              className="col-sm-12"
+              className="col-md-8"
+              {...fieldProps("notes")}
             />
           </div>
           <div className="d-flex justify-content-center gap-2">
             <FormikButton
               className="btn btn-primary mb-3 add-button"
               buttonProps={() => ({ style: { width: "10rem" } })}
-              onClick={submitNgxIndex}
+              onClick={submitNgsIndex}
             >
-              <DinaMessage id={ngxIndexToEdit ? "submitBtnText" : "add"} />
+              <DinaMessage id={ngsIndexToEdit ? "submitBtnText" : "add"} />
             </FormikButton>
             {onCancelClick && (
               <FormikButton

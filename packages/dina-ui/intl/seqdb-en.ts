@@ -175,5 +175,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   ngsIndexes: "NGS Indexes",
   field_lotNumber: "Lot Number",
   field_direction: "Direction",
-  field_purification: "Purification"
+  field_purification: "Purification",
+  addNgsIndexTitle: "Add NGS Index",
+  editNgsIndexTitle: "Edit NGS Index"
 };
