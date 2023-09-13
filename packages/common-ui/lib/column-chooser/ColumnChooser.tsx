@@ -59,7 +59,9 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
   });
   const { apiClient } = useApiClient();
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_SEARCH_RESULTS_KEY);
-  delete queryObject._source;
+  if (queryObject) {
+    delete (queryObject as any)._source;
+  }
   const queryString = JSON.stringify(queryObject).replace(/"/g, '"');
 
   async function exportData() {
