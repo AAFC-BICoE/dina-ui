@@ -6,9 +6,14 @@ import {
   dateCell,
   stringArrayCell,
   CommonMessage,
-  DATA_EXPORT_SEARCH_RESULTS_KEY
+  DATA_EXPORT_SEARCH_RESULTS_KEY,
+  useApiClient,
+  ErrorViewer,
+  BackToListButton,
+  ButtonBar,
+  BackButton
 } from "packages/common-ui/lib";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import Link from "next/link";
 import { KitsuResource } from "kitsu";
@@ -16,6 +21,7 @@ import { Footer, Head, Nav } from "packages/dina-ui/components";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export default function MaterialSampleExportPage<
   TData extends KitsuResource
@@ -23,7 +29,8 @@ export default function MaterialSampleExportPage<
   const router = useRouter();
   const totalRecords = parseInt(router.query.totalRecords as string, 10);
   const hideTable: boolean | undefined = !!router.query.hideTable;
-  const [query] = useLocalStorage<string[]>(DATA_EXPORT_SEARCH_RESULTS_KEY, []);
+
+  const { formatMessage, formatNumber } = useIntl();
 
   const columns: TableColumn<any>[] = [
     // Material Sample Name
@@ -105,13 +112,22 @@ export default function MaterialSampleExportPage<
       isColumnVisible: false
     }
   ];
+
   const { columnChooser, checkedIds } = useColumnChooser({ columns });
-  const { formatMessage, formatNumber } = useIntl();
+
   return (
     <div>
       <Head title={formatMessage({ id: "exportButtonText" })} />
       <Nav />
       <DinaForm initialValues={{}}>
+        <ButtonBar>
+          <BackButton
+            className="me-auto"
+            entityLink="/collection/material-sample"
+            reloadLastSearch={true}
+            byPassView={true}
+          />
+        </ButtonBar>
         <div className="ms-2">
           <CommonMessage
             id="tableTotalCount"

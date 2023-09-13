@@ -135,6 +135,7 @@ export function DataExportButton({
 
   return (
     <FormikButton
+      buttonProps={(_ctx) => ({ disabled: totalRecords === 0 })}
       className="btn btn-primary ms-2 bulk-edit-button"
       onClick={async (_values: BulkSelectableFormValues) => {
         writeStorage<any>(DATA_EXPORT_SEARCH_RESULTS_KEY, query);

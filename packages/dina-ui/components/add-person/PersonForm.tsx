@@ -91,13 +91,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   }
 
   async function deleteIdentifiers() {
-    const initialValuesIdentifiers = initialValues.identifiers?.map(
-      (identifier) => {
-        return {
-          delete: identifier
-        };
-      }
-    );
     const identifierDeleteArgs: any[] =
       initialValues.identifiers
         ?.map((identifier) => {
