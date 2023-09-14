@@ -91,6 +91,10 @@ function getQueryBuilderTypeFromIndexType(
     case "fieldExtension":
       return type;
 
+    // If it's stored directly as a keyword, it's considered a text field.
+    case "keyword":
+      return "text";
+
     // Elastic search contains many different number fields.
     case "long":
     case "short":
