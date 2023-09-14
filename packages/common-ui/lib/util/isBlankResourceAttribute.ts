@@ -14,7 +14,7 @@ export function isBlankResourceAttribute(value: any) {
     case "undefined":
       // empty object or empty array:
       if (value?.id === null) {
-        return false;
+        return true;
       }
 
       return isEmpty(value);
@@ -24,8 +24,18 @@ export function isBlankResourceAttribute(value: any) {
 }
 
 export function withoutBlankFields<T>(original: T): { [P in keyof T]: T[P] } {
-  const overridenObject = omitBy(original as any, isBlankResourceAttribute) as {
+  const overriddenObject = omitBy(
+    original as any,
+    isBlankResourceAttribute
+  ) as {
     [P in keyof T]: T[P];
   };
-  return overridenObject;
+
+  if (
+    (original as any)?.dcCreator &&
+    (original as any)?.dcCreator?.id === null
+  ) {
+    overriddenObject.dcCreator = (original as any)?.dcCreator;
+  }
+  return overriddenObject;
 }
