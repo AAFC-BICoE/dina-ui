@@ -66,7 +66,13 @@ export function transformTextSearchToDSL({
     return {};
   }
 
-  const { distinctTerm, parentType, parentName, optimizedPrefix } = fieldInfo;
+  const {
+    distinctTerm,
+    parentType,
+    parentName,
+    optimizedPrefix,
+    keywordMultiFieldSupport
+  } = fieldInfo;
 
   // Is the "Exact" option selected? (Or if auto suggestions are being used.)
   const isExactMatch: boolean = distinctTerm || operation === "exactMatch";
@@ -85,7 +91,7 @@ export function transformTextSearchToDSL({
                 bool: {
                   must: [
                     isExactMatch
-                      ? termQuery(fieldPath, value, true)
+                      ? termQuery(fieldPath, value, keywordMultiFieldSupport)
                       : matchQuery(fieldPath, value),
                     includedTypeQuery(parentType)
                   ]
@@ -94,7 +100,7 @@ export function transformTextSearchToDSL({
             }
           }
         : isExactMatch
-        ? termQuery(fieldPath, value, true)
+        ? termQuery(fieldPath, value, keywordMultiFieldSupport)
         : matchQuery(fieldPath, value);
 
     // Prefix partial match
@@ -122,7 +128,11 @@ export function transformTextSearchToDSL({
                     query: {
                       bool: {
                         must_not: isExactMatch
-                          ? termQuery(fieldPath, value, true)
+                          ? termQuery(
+                              fieldPath,
+                              value,
+                              keywordMultiFieldSupport
+                            )
                           : matchQuery(fieldPath, value),
                         must: includedTypeQuery(parentType)
                       }
@@ -160,7 +170,7 @@ export function transformTextSearchToDSL({
                 {
                   bool: {
                     must_not: isExactMatch
-                      ? termQuery(fieldPath, value, true)
+                      ? termQuery(fieldPath, value, keywordMultiFieldSupport)
                       : matchQuery(fieldPath, value)
                   }
                 },

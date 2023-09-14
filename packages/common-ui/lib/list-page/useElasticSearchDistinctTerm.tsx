@@ -20,13 +20,17 @@ interface QuerySuggestionFieldProps {
 
   /** The index you want elastic search to perform the search on */
   indexName: string;
+
+  /** Used to determine if ".keyword" should be appended to the field name.  */
+  keywordMultiFieldSupport: boolean;
 }
 
 export function useElasticSearchDistinctTerm({
   fieldName,
   relationshipType,
   groups,
-  indexName
+  indexName,
+  keywordMultiFieldSupport
 }: QuerySuggestionFieldProps) {
   const { apiClient } = useApiClient();
 
@@ -67,7 +71,7 @@ export function useElasticSearchDistinctTerm({
             (agg) =>
               agg.aggregation(
                 "terms",
-                fieldName + ".keyword",
+                fieldName + (keywordMultiFieldSupport ? ".keyword" : ""),
                 {
                   size: TOTAL_SUGGESTIONS
                 },
@@ -79,7 +83,7 @@ export function useElasticSearchDistinctTerm({
       // If it's an attribute, no need to use nested filters.
       builder.aggregation(
         "terms",
-        fieldName + ".keyword",
+        fieldName + (keywordMultiFieldSupport ? ".keyword" : ""),
         {
           size: TOTAL_SUGGESTIONS
         },

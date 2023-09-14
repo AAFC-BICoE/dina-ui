@@ -4,6 +4,7 @@ interface TestValueStructure {
   type: string;
   testValue: string;
   operators: string[];
+  useKeywordMultiField: boolean;
 }
 
 /**
@@ -25,7 +26,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "notEquals",
           "empty",
           "notEmpty"
-        ]
+        ],
+        useKeywordMultiField: true
       },
       {
         type: "DATE",
@@ -40,7 +42,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "lessThanOrEqualTo",
           "empty",
           "notEmpty"
-        ]
+        ],
+        useKeywordMultiField: false
       },
       {
         type: "INTEGER",
@@ -54,7 +57,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "lessThanOrEqualTo",
           "empty",
           "notEmpty"
-        ]
+        ],
+        useKeywordMultiField: false
       },
       {
         type: "DECIMAL",
@@ -68,17 +72,20 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "lessThanOrEqualTo",
           "empty",
           "notEmpty"
-        ]
+        ],
+        useKeywordMultiField: false
       },
       {
         type: "PICK_LIST",
         testValue: "3.5",
-        operators: ["equals", "notEquals", "empty", "notEmpty"]
+        operators: ["equals", "notEquals", "empty", "notEmpty"],
+        useKeywordMultiField: true
       },
       {
         type: "BOOL",
         testValue: "true",
-        operators: ["equals", "empty", "notEmpty"]
+        operators: ["equals", "empty", "notEmpty"],
+        useKeywordMultiField: true
       }
     ];
 
@@ -111,6 +118,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                   label: "managedAttributes",
                   path: "data.attributes.managedAttributes",
                   type: "managedAttribute",
+                  keywordMultiFieldSupport: (testValue as TestValueStructure)
+                    .useKeywordMultiField,
                   optimizedPrefix: false,
                   containsSupport: false,
                   endsWithSupport: false
@@ -152,6 +161,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                   label: "managedAttributes",
                   path: "included.attributes.managedAttributes",
                   type: "managedAttribute",
+                  keywordMultiFieldSupport: (testValue as TestValueStructure)
+                    .useKeywordMultiField,
                   optimizedPrefix: false,
                   containsSupport: false,
                   endsWithSupport: false

@@ -31,6 +31,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
               label: "fieldExtensions",
               path: "data.attributes.extensionValues",
               type: "extensionValue",
+              keywordMultiFieldSupport: true,
               optimizedPrefix: false,
               containsSupport: false,
               endsWithSupport: false
@@ -66,6 +67,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
               label: "fieldExtensions",
               path: "included.attributes.extensionValues",
               type: "fieldExtension",
+              keywordMultiFieldSupport: true,
               optimizedPrefix: false,
               containsSupport: false,
               endsWithSupport: false
