@@ -53,6 +53,12 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
             path: "data.attributes",
             fields: ["prefix", "infix", "prefix_reverse"]
           },
+          {
+            name: "materialSampleRemarks",
+            type: "text",
+            path: "data.attributes",
+            fields: ["keyword"]
+          },
           { name: "preparationDate", type: "date", path: "data.attributes" },
           { name: "tags", type: "text", path: "data.attributes" },
           { name: "createdBy", type: "text", path: "data.attributes" }
