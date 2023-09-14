@@ -35,7 +35,7 @@ export function withoutBlankFields<T>(original: T): { [P in keyof T]: T[P] } {
     (original as any)?.dcCreator &&
     (original as any)?.dcCreator?.id === null
   ) {
-    overriddenObject.dcCreator = (original as any)?.dcCreator;
+    (overriddenObject as any).dcCreator = (original as any)?.dcCreator;
   }
   return overriddenObject;
 }
