@@ -18,10 +18,11 @@ import {
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { compact, pick, toPairs, uniqBy } from "lodash";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useEffect, useMemo, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { BiChevronsRight } from "react-icons/bi";
 import { v4 as uuidv4 } from "uuid";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
@@ -166,7 +167,8 @@ export function SangerSeqReactionStep({
   const {
     CheckBoxField: SelectCheckBox,
     CheckBoxHeader: SelectCheckBoxHeader,
-    setAvailableItems: setAvailableItems
+    availableItems,
+    setAvailableItems
   } = useGroupedCheckBoxes<PcrBatchItem>({
     fieldName: "itemIdsToSelect"
   });
@@ -276,7 +278,7 @@ export function SangerSeqReactionStep({
   }
 
   const pcrBatchTable = (
-    <div className="d-flex align-items-start col-md-5">
+    <div className="d-flex align-items-start col-md-4">
       {pcrBatchItemQuery?.loading ? (
         <LoadingSpinner loading={true} />
       ) : (
@@ -369,6 +371,42 @@ export function SangerSeqReactionStep({
     formik.setFieldValue("itemIdsToDelete", {});
   }
 
+  function addGoodAndWeaks(formValues, formik: FormikContextType<any>) {
+    const ids = availableItems
+      .filter(
+        (item) => item.result === "Good Band" || item.result === "Weak Band"
+      )
+      .map((item) => item.id);
+    if (!selectedPcrPrimer || ids.length === 0) {
+      return;
+    }
+    const selectedObjects: SeqReaction[] = searchResult
+      ?.filter((itemA) => {
+        return ids.find((itemB) => {
+          return itemA.id === itemB;
+        });
+      })
+      .map((item) => ({
+        type: "seq-reaction",
+        id: `${item.id}_${selectedPcrPrimer?.id}`,
+        group: item.group,
+        seqBatch,
+        pcrBatchItem: item,
+        seqPrimer: selectedPcrPrimer
+      }));
+
+    // Append the newly selected resources with the current resources.
+    const selectedResourcesAppended = uniqBy(
+      [...selectedResources, ...selectedObjects],
+      "id"
+    );
+    // Save ordering when add Seq Reactions.
+    // The selectedReasource.id = pcrBatchItem.id + " " + pcrPrimer.id
+    setSelectedResourcesAndSaveOrder(selectedResourcesAppended);
+    // Deselect the search results.
+    formik.setFieldValue("itemIdsToSelect", {});
+  }
+
   return editMode ? (
     <DinaForm key={formKey} initialValues={defaultValues}>
       <div className="row">
@@ -415,7 +453,7 @@ export function SangerSeqReactionStep({
       </div>
       <div className="row">
         {pcrBatchTable}
-        <div className="col-md-1">
+        <div className="col-md-2">
           <ResourceSelectField<Region>
             name="region"
             filter={filterBy(["name"])}
@@ -450,13 +488,22 @@ export function SangerSeqReactionStep({
           />
           <div className="mt-3">
             <FormikButton
-              className="btn btn-primary w-100 mb-3"
+              className="btn btn-primary w-100"
+              onClick={addGoodAndWeaks}
+            >
+              <DinaMessage id="addGoodAndWeakButton" />
+              <BiChevronsRight />
+            </FormikButton>
+          </div>
+          <div className="mt-3">
+            <FormikButton
+              className="btn btn-primary w-100"
               onClick={addSelectedResources}
             >
               <FiChevronRight />
             </FormikButton>
           </div>
-          <div className="deselect-all-checked-button">
+          <div className="mt-3">
             <FormikButton
               className="btn btn-dark w-100 mb-3"
               onClick={removeSelectedResources}
@@ -467,7 +514,7 @@ export function SangerSeqReactionStep({
         </div>
         <div className="d-flex align-items-start col-md-6">
           <SeqReactionDndTable
-            className="-striped"
+            className="-striped w-100"
             editMode={true}
             selectedSeqReactions={selectedResources}
             setSelectedSeqReactions={setSelectedResourcesAndSaveOrder}

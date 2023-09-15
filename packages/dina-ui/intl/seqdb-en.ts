@@ -177,5 +177,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   field_direction: "Direction",
   field_purification: "Purification",
   addNgsIndexTitle: "Add NGS Index",
-  editNgsIndexTitle: "Edit NGS Index"
+  editNgsIndexTitle: "Edit NGS Index",
+  addGoodAndWeakButton: "Good/Weak"
 };
