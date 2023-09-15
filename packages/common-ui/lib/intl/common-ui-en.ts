@@ -149,5 +149,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   yes: "Yes",
   thumbnailImage: "Thumbnail Image",
   largeImage: "Large Image",
-  uploadDerivative: "Upload Derivative"
+  uploadDerivative: "Upload Derivative",
+  exportButtonText: "Export"
 };

@@ -26,7 +26,8 @@ import {
   BulkDeleteButton,
   BulkDeleteButtonProps,
   BulkEditButton,
-  BulkSplitButton
+  BulkSplitButton,
+  DataExportButton
 } from "../list-page-layout/bulk-buttons";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { MultiSortTooltip } from "./MultiSortTooltip";
@@ -110,6 +111,12 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * The query path to perform for bulk editing.
    */
   bulkEditPath?: string;
+
+  /**
+   * Adds the data export button and the row checkboxes.
+   * The query path to perform for data exporting.
+   */
+  dataExportPath?: string;
 
   /** Query path if user selected only 1 item */
   singleEditPath?: string;
@@ -227,6 +234,7 @@ export function QueryPage<TData extends KitsuResource>({
   bulkEditPath,
   bulkSplitPath,
   singleEditPath,
+  dataExportPath,
   reactTableProps,
   defaultSort,
   defaultPageSize,
@@ -249,6 +257,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
+  const [elasticSearchQuery, setElasticSearchQuery] = useState();
 
   // Total number of records from the query. This is not the total displayed on the screen.
   const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -288,7 +297,9 @@ export function QueryPage<TData extends KitsuResource>({
   );
 
   // Row Checkbox Toggle
-  const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
+  const showRowCheckboxes = Boolean(
+    bulkDeleteButtonProps || bulkEditPath || dataExportPath
+  );
 
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
@@ -354,6 +365,9 @@ export function QueryPage<TData extends KitsuResource>({
       setLoading(false);
       return;
     }
+
+    // Save elastic search query for export page
+    setElasticSearchQuery({ ...queryDSL });
 
     // Fetch data using elastic search.
     // The included section will be transformed from an array to an object with the type name for each relationship.
@@ -783,6 +797,13 @@ export function QueryPage<TData extends KitsuResource>({
                     <BulkEditButton
                       pathname={bulkEditPath}
                       singleEditPathName={singleEditPath}
+                    />
+                  )}
+                  {dataExportPath && (
+                    <DataExportButton
+                      pathname={dataExportPath}
+                      totalRecords={totalRecords}
+                      query={elasticSearchQuery}
                     />
                   )}
                   {bulkSplitPath && (
