@@ -371,7 +371,7 @@ export function SangerSeqReactionStep({
     formik.setFieldValue("itemIdsToDelete", {});
   }
 
-  function addGoodAndWeaks(formValues, formik: FormikContextType<any>) {
+  function addGoodAndWeaks(_formValues, formik: FormikContextType<any>) {
     const ids = availableItems
       .filter(
         (item) => item.result === "Good Band" || item.result === "Weak Band"
