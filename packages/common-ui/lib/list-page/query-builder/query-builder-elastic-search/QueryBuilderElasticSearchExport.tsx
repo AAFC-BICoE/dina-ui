@@ -381,11 +381,11 @@ export function includedTypeQuery(parentType: string): any {
 export function termQuery(
   fieldName: string,
   matchValue: any,
-  keyword: boolean
+  keywordMultiFieldSupport: boolean
 ): any {
   return {
     term: {
-      [fieldName + (keyword ? ".keyword" : "")]: matchValue
+      [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValue
     }
   };
 }

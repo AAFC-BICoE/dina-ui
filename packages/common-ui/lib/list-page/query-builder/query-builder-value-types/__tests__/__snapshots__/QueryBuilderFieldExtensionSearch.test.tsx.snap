@@ -30,7 +30,7 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the exactMatch operator. 1`] = `
 Object {
   "term": Object {
-    "data.attributes.extensionValues.extension.field.keyword": "test123",
+    "data.attributes.extensionValues.extension.field": "test123",
   },
 }
 `;
@@ -60,7 +60,7 @@ Object {
         "bool": Object {
           "must_not": Object {
             "term": Object {
-              "data.attributes.extensionValues.extension.field.keyword": "test123",
+              "data.attributes.extensionValues.extension.field": "test123",
             },
           },
         },
@@ -166,7 +166,7 @@ Object {
         "must": Array [
           Object {
             "term": Object {
-              "included.attributes.extensionValues.extension.field.keyword": "test123",
+              "included.attributes.extensionValues.extension.field": "test123",
             },
           },
           Object {
@@ -226,7 +226,7 @@ Object {
               },
               "must_not": Object {
                 "term": Object {
-                  "included.attributes.extensionValues.extension.field.keyword": "test123",
+                  "included.attributes.extensionValues.extension.field": "test123",
                 },
               },
             },

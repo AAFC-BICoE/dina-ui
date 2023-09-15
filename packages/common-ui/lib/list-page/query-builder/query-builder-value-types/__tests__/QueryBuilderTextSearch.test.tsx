@@ -55,7 +55,8 @@ describe("QueryBuilderTextSearch", () => {
               parentName: "collection",
               parentType: "collection",
               parentPath: "included",
-              distinctTerm: true
+              distinctTerm: true,
+              keywordMultiFieldSupport: true
             } as any,
             fieldPath: "included.attributes.name",
             queryType: "equals"
@@ -75,7 +76,8 @@ describe("QueryBuilderTextSearch", () => {
               parentType: "organism",
               path: "attributes.determination",
               type: "text",
-              value: "organism.determination.scientificName"
+              value: "organism.determination.scientificName",
+              keywordMultiFieldSupport: true
             } as any,
             fieldPath: "included.attributes.determination.scientificName",
             queryType: "exactMatch"
@@ -110,7 +112,8 @@ describe("QueryBuilderTextSearch", () => {
               parentName: "collection",
               parentType: "collection",
               parentPath: "included",
-              distinctTerm: true
+              distinctTerm: true,
+              keywordMultiFieldSupport: true
             } as any,
             fieldPath: "included.attributes.name",
             queryType: "startsWith"
@@ -166,6 +169,7 @@ describe("QueryBuilderTextSearch", () => {
               parentType: "collection",
               parentPath: "included",
               distinctTerm: true,
+              keywordMultiFieldSupport: true,
               optimizedPrefix: true // Optimized prefix
             } as any,
             fieldPath: "included.attributes.name",
@@ -224,7 +228,8 @@ describe("QueryBuilderTextSearch", () => {
               parentName: "collection",
               parentType: "collection",
               parentPath: "included",
-              distinctTerm: true
+              distinctTerm: true,
+              keywordMultiFieldSupport: true
             } as any,
             fieldPath: "included.attributes.name",
             queryType: "containsText"
@@ -279,7 +284,8 @@ describe("QueryBuilderTextSearch", () => {
               parentName: "collection",
               parentType: "collection",
               parentPath: "included",
-              distinctTerm: true
+              distinctTerm: true,
+              keywordMultiFieldSupport: true
             } as any,
             fieldPath: "included.attributes.name",
             queryType: "endsWith"
@@ -357,7 +363,8 @@ describe("QueryBuilderTextSearch", () => {
             value: "text search",
             fieldInfo: {
               parentType: "collection",
-              parentName: "collection"
+              parentName: "collection",
+              keywordMultiFieldSupport: true
             } as any,
             fieldPath: "includes.name",
             queryType: "exactMatch"
@@ -370,7 +377,9 @@ describe("QueryBuilderTextSearch", () => {
           transformTextSearchToDSL({
             operation: "exactMatch",
             value: "text search",
-            fieldInfo: {} as any,
+            fieldInfo: {
+              keywordMultiFieldSupport: true
+            } as any,
             fieldPath: "data.attributes.textField",
             queryType: "exactMatch"
           })
@@ -415,7 +424,8 @@ describe("QueryBuilderTextSearch", () => {
             value: "text search",
             fieldInfo: {
               parentType: "collection",
-              parentName: "collection"
+              parentName: "collection",
+              keywordMultiFieldSupport: true
             } as any,
             fieldPath: "includes.name",
             queryType: "empty"
@@ -428,7 +438,9 @@ describe("QueryBuilderTextSearch", () => {
           transformTextSearchToDSL({
             operation: "empty",
             value: "text search",
-            fieldInfo: {} as any,
+            fieldInfo: {
+              keywordMultiFieldSupport: true
+            } as any,
             fieldPath: "data.attributes.textField",
             queryType: "empty"
           })
@@ -444,7 +456,8 @@ describe("QueryBuilderTextSearch", () => {
             value: "text search",
             fieldInfo: {
               parentType: "collection",
-              parentName: "collection"
+              parentName: "collection",
+              keywordMultiFieldSupport: true
             } as any,
             fieldPath: "includes.name",
             queryType: "notEmpty"
@@ -457,7 +470,9 @@ describe("QueryBuilderTextSearch", () => {
           transformTextSearchToDSL({
             operation: "notEmpty",
             value: "text search",
-            fieldInfo: {} as any,
+            fieldInfo: {
+              keywordMultiFieldSupport: true
+            } as any,
             fieldPath: "data.attributes.textField",
             queryType: "notEmpty"
           })
@@ -473,7 +488,8 @@ describe("QueryBuilderTextSearch", () => {
             value: "false",
             fieldInfo: {
               parentType: "collection",
-              parentName: "collection"
+              parentName: "collection",
+              keywordMultiFieldSupport: true
             } as any,
             fieldPath: "includes.name",
             queryType: "equals"

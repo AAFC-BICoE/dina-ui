@@ -304,7 +304,9 @@ export function transformFieldExtensionToDSL({
     fieldInfo: {
       ...fieldInfo,
       distinctTerm:
-        fieldExtensionSearchValue.selectedOperator !== "partialMatch"
+        fieldExtensionSearchValue.selectedOperator !== "partialMatch",
+      keywordMultiFieldSupport:
+        fieldExtensionSearchValue.selectedOperator === "partialMatch"
     } as ESIndexMapping
   });
 }
