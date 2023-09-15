@@ -131,7 +131,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
                 <th>
                   <FormattedMessage id=\\"parentMaterialSample\\">
                     <FormattedMessage defaultMessage=\\" \\" id=\\"parentMaterialSample\\">
-                       Parent Material Sample
+                      Parent Material Sample
                     </FormattedMessage>
                   </FormattedMessage>
                 </th>
