@@ -76,7 +76,7 @@ export function usePcrReactionData(pcrBatchId?: string) {
       ),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      sortPcrBatchItems(batchItems, response);
+      sortPcrBatchItems(batchItems, response ?? []);
       setPcrBatchItems(batchItems);
       setMaterialSampleSummaries(response);
       setLoading(false);
@@ -90,10 +90,10 @@ export function usePcrReactionData(pcrBatchId?: string) {
     if (items) {
       items.sort((a, b) => {
         const sampleName1 =
-          samples.find((sample) => sample.id === a.materialSample?.id)
+          samples.find((sample) => sample?.id === a.materialSample?.id)
             ?.materialSampleName ?? "";
         const sampleName2 =
-          samples.find((sample) => sample.id === b.materialSample?.id)
+          samples.find((sample) => sample?.id === b.materialSample?.id)
             ?.materialSampleName ?? "";
         return compareByStringAndNumber(sampleName1, sampleName2);
       });
@@ -143,7 +143,8 @@ export function PcrReactionTable({
       id: "materialSampleName",
       cell: ({ row: { original } }) => {
         const fetchedMaterialSample = materialSamples.find(
-          (materialSample) => materialSample.id === original?.materialSample?.id
+          (materialSample) =>
+            materialSample?.id === original?.materialSample?.id
         );
         if (!fetchedMaterialSample) return <></>;
         return <p>{fetchedMaterialSample.materialSampleName}</p>;
@@ -154,7 +155,8 @@ export function PcrReactionTable({
       id: "scientificName",
       cell: ({ row: { original } }) => {
         const fetchedMaterialSample = materialSamples.find(
-          (materialSample) => materialSample.id === original?.materialSample?.id
+          (materialSample) =>
+            materialSample?.id === original?.materialSample?.id
         );
         if (!fetchedMaterialSample) return <></>;
         const scientificName = getDeterminations(
