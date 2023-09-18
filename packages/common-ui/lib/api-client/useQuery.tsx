@@ -68,10 +68,19 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?fields=undefined
-    const { path, fields, filter, sort, include, page, header, responseType } =
-      querySpec;
+    const {
+      path,
+      fields,
+      filter,
+      sort,
+      include,
+      page,
+      header,
+      responseType,
+      timeout
+    } = querySpec;
     const getParams = omitBy<GetParams>(
-      { fields, filter, sort, include, page, header, responseType },
+      { fields, filter, sort, include, page, header, responseType, timeout },
       isUndefined
     );
 

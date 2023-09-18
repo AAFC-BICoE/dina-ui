@@ -426,13 +426,14 @@ export class CustomDinaKitsu extends Kitsu {
    * Override the 'get' method so it works with our long URLs:
    */
   async get(path: string, params: GetParams = {}) {
-    const { responseType, ...paramsNet } = omit(params, "header");
+    const { responseType, timeout, ...paramsNet } = omit(params, "header");
     try {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },
         params: paramsNet,
         paramsSerializer: (p) => query(p),
-        responseType
+        responseType,
+        timeout
       });
 
       const deserialized = await deserialise(data);
