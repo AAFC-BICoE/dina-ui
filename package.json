@@ -18,7 +18,7 @@
     "@phenomnomnominal/tsquery": "^4.1.1",
     "@types/enzyme": "^3.10.8",
     "@types/jest": "^27.0.3",
-    "@types/node": "^16.11.9",
+    "@types/node": "^18.17.1",
     "@types/react-test-renderer": "^17.0.1",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.1",
     "asciidoctor": "^2.2.5",
