@@ -23,27 +23,27 @@ export function ErrorViewer() {
   /** A string of form-level and field-level error messages. */
   const errorMessages = useMemo(
     () => {
-      const fieldErrors = toPairs(flatten(errors, { transformKey }) as any).map(
-        ([field, error], index) => {
-          // Return null if the error is not renderable:
-          if (
-            !error ||
-            (typeof error !== "string" && typeof error !== "function")
-          ) {
-            return null;
-          }
-
-          // The error can be a renderable component:
-          const JSXError = typeof error === "function" && error;
-
-          const { fieldLabel } = getFieldLabel({ name: field });
-          return (
-            <div className="error-message" key={index}>
-              {index + 1} : {fieldLabel} - {JSXError ? <JSXError /> : error}
-            </div>
-          );
+      const fieldErrors = toPairs(
+        flatten<object, any>(errors, { transformKey })
+      ).map(([field, error], index) => {
+        // Return null if the error is not renderable:
+        if (
+          !error ||
+          (typeof error !== "string" && typeof error !== "function")
+        ) {
+          return null;
         }
-      );
+
+        // The error can be a renderable component:
+        const JSXError = typeof error === "function" && error;
+
+        const { fieldLabel } = getFieldLabel({ name: field });
+        return (
+          <div className="error-message" key={index}>
+            {index + 1} : {fieldLabel} - {JSXError ? <JSXError /> : error}
+          </div>
+        );
+      });
 
       const formError = status ? (
         <div className="error-message" key="form-error">
