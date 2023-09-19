@@ -214,10 +214,12 @@ export function RolesPerGroupEditor({
                             <FormikButton
                               className="btn btn-dark remove-button"
                               onClick={() =>
-                                form.setFieldValue(
-                                  "rolesPerGroup",
-                                  omit(form.values.rolesPerGroup, groupName)
-                                )
+                                form
+                                  .setFieldValue(
+                                    "rolesPerGroup",
+                                    omit(form.values.rolesPerGroup, groupName)
+                                  )
+                                  .then()
                               }
                             >
                               <DinaMessage id="removeGroup" />

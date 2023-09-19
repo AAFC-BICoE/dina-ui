@@ -23,7 +23,7 @@ export function ErrorViewer() {
   /** A string of form-level and field-level error messages. */
   const errorMessages = useMemo(
     () => {
-      const fieldErrors = toPairs(flatten(errors, { transformKey })).map(
+      const fieldErrors = toPairs(flatten(errors, { transformKey }) as any).map(
         ([field, error], index) => {
           // Return null if the error is not renderable:
           if (

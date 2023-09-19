@@ -144,7 +144,7 @@ export function ViewPageLayout<T extends KitsuResource>({
                 : get(data, currentField)),
             ""
           );
-          const group = get(data, "group")?.toUpperCase();
+          const group = (get(data, "group") as string)?.toUpperCase();
           // if title is array, only take first element
           if (Array.isArray(title)) {
             title = title[0];
@@ -153,7 +153,7 @@ export function ViewPageLayout<T extends KitsuResource>({
           return (
             <>
               <Head title={title} />
-              
+
               <h1 id="wb-cont" className="d-flex justify-content-between">
                 <span>
                   {title}
