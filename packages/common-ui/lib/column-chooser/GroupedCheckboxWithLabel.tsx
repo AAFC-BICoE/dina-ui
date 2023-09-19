@@ -1,6 +1,7 @@
 import { startCase } from "lodash";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 export interface CheckboxProps {
   id: string;
@@ -24,6 +25,8 @@ export function Checkbox({
     name ??
     (messages[messageKey]
       ? formatMessage({ id: messageKey as any })
+      : messages[id]
+      ? formatMessage({ id: id as any })
       : startCase(id));
   return (
     <div>
@@ -44,47 +47,48 @@ export function Checkbox({
 }
 
 interface CheckboxResource {
+  accessorKey: string;
   id: string;
   [key: string]: any;
 }
 export interface UseGroupedCheckboxWithLabelProps {
   resources: CheckboxResource[];
   isField?: boolean;
+  indexName?: string;
 }
 
 export function useGroupedCheckboxWithLabel({
   resources,
-  isField
+  isField,
+  indexName
 }: UseGroupedCheckboxWithLabelProps) {
-  const [list, setList] = useState<CheckboxResource[]>([]);
-  const [checkedIds, setCheckedIds] = useState<string[]>(
-    resources.map((resource) => resource.id ?? "")
+  const [list, setList] = useState<CheckboxResource[]>(getResourcesWithId());
+  const [checkedColumnIds, setCheckedColumnIds] = useLocalStorage<string[]>(
+    `${indexName}_columnChooser`,
+    list.map((resource) => resource.id ?? "")
   );
-  const [isCheckAll, setIsCheckAll] = useState<boolean>(true);
-  useEffect(() => {
-    setList(resources);
-  }, [resources]);
+  const [isCheckAll, setIsCheckAll] = useState<boolean>(
+    checkedColumnIds.length === list.length
+  );
 
   const handleSelectAll = (_e) => {
     setIsCheckAll(!isCheckAll);
-    setCheckedIds(list.map((li) => li.id));
+    setCheckedColumnIds(list.map((li) => li.id));
     if (isCheckAll) {
-      setCheckedIds([]);
+      setCheckedColumnIds([]);
     }
   };
 
   const handleClick = (e) => {
     const { id, checked } = e.target;
     if (!checked) {
-      setCheckedIds(checkedIds.filter((item) => item !== id));
+      setCheckedColumnIds(checkedColumnIds.filter((item) => item !== id));
       setIsCheckAll(false);
     } else {
-      setCheckedIds(() => {
-        if ([...checkedIds, id].length === list.length) {
-          setIsCheckAll(true);
-        }
-        return [...checkedIds, id];
-      });
+      if ([...checkedColumnIds, id].length === list.length) {
+        setIsCheckAll(true);
+      }
+      setCheckedColumnIds([...checkedColumnIds, id]);
     }
   };
 
@@ -93,11 +97,20 @@ export function useGroupedCheckboxWithLabel({
     isCheckAll,
     list,
     handleClick,
-    checkedIds,
+    checkedColumnIds,
     isField
   });
 
-  return { groupedCheckBoxes, checkedIds };
+  return { groupedCheckBoxes, checkedColumnIds };
+
+  function getResourcesWithId() {
+    return resources.map((resource) => {
+      if (!resource.id) {
+        resource.id = resource.accessorKey.split(".").at(-1) as string;
+      }
+      return resource;
+    });
+  }
 }
 
 export interface GroupedCheckboxesProps {
@@ -105,7 +118,7 @@ export interface GroupedCheckboxesProps {
   isCheckAll: boolean;
   list: CheckboxResource[];
   handleClick: (e: any) => void;
-  checkedIds: any;
+  checkedColumnIds: any;
   isField: boolean | undefined;
 }
 
@@ -114,7 +127,7 @@ function GroupedCheckboxes({
   isCheckAll,
   list,
   handleClick,
-  checkedIds,
+  checkedColumnIds,
   isField
 }: GroupedCheckboxesProps) {
   return (
@@ -131,7 +144,7 @@ function GroupedCheckboxes({
               key={id}
               id={id}
               handleClick={handleClick}
-              isChecked={checkedIds.includes(id)}
+              isChecked={checkedColumnIds.includes(id)}
               isField={isField}
             />
           </>

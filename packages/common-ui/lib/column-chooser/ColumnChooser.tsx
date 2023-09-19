@@ -30,8 +30,12 @@ export function ColumnChooser(
 }
 export interface UseColumnChooserProps {
   columns: any[];
+  indexName?: string;
 }
-export function useColumnChooser({ columns }: UseColumnChooserProps) {
+export function useColumnChooser({
+  columns,
+  indexName
+}: UseColumnChooserProps) {
   const { formatMessage, messages } = useIntl();
   const columnSearchMapping: any[] = columns.map((column) => {
     const messageKey = `field_${column.id}`;
@@ -40,22 +44,32 @@ export function useColumnChooser({ columns }: UseColumnChooserProps) {
       : startCase(column.id);
     return { label: label.toLowerCase(), id: column.id };
   });
-  const { CustomMenu, checkedIds } = useCustomMenu(
+  const { CustomMenu, checkedColumnIds } = useCustomMenu({
     columns,
-    columnSearchMapping
-  );
+    columnSearchMapping,
+    indexName
+  });
   const columnChooser = ColumnChooser(CustomMenu);
-  return { columnChooser, checkedIds };
+  return { columnChooser, checkedColumnIds };
 }
 
-function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
+interface UseCustomMenuProps extends UseColumnChooserProps {
+  columnSearchMapping: any[];
+}
+
+function useCustomMenu({
+  columns,
+  columnSearchMapping,
+  indexName
+}: UseCustomMenuProps) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
   const [loading, setLoading] = useState(false);
 
   const { formatMessage } = useIntl();
-  const { groupedCheckBoxes, checkedIds } = useGroupedCheckboxWithLabel({
+  const { groupedCheckBoxes, checkedColumnIds } = useGroupedCheckboxWithLabel({
     resources: searchedColumns,
-    isField: true
+    isField: true,
+    indexName
   });
   const { apiClient } = useApiClient();
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_SEARCH_RESULTS_KEY);
@@ -74,7 +88,7 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
           attributes: {
             source: "dina_material_sample_index",
             query: queryString,
-            columns: checkedIds
+            columns: checkedColumnIds
           }
         }
       },
@@ -155,5 +169,5 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
       );
     }
   );
-  return { CustomMenu, checkedIds };
+  return { CustomMenu, checkedColumnIds };
 }
