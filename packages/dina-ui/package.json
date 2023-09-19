@@ -30,7 +30,7 @@
     "zod": "^3.11.6"
   },
   "devDependencies": {
-    "@types/bytes": "^3.1.0",
-    "@faker-js/faker": "^7.6.0"
+    "@faker-js/faker": "^7.6.0",
+    "@types/bytes": "^3.1.0"
   }
 }
