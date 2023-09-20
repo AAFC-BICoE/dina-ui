@@ -144,7 +144,7 @@ export function ViewPageLayout<T extends KitsuResource>({
                 : get(data, currentField)),
             ""
           );
-          const group = get<object, string>(data, "group")?.toUpperCase();
+          const group = get(data, "group")?.toUpperCase();
           // if title is array, only take first element
           if (Array.isArray(title)) {
             title = title[0];
