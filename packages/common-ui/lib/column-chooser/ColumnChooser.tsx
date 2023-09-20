@@ -76,7 +76,7 @@ function useCustomMenu({
   if (queryObject) {
     delete (queryObject as any)._source;
   }
-  const queryString = JSON.stringify(queryObject).replace(/"/g, '"');
+  const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
 
   async function exportData() {
     setLoading(true);
