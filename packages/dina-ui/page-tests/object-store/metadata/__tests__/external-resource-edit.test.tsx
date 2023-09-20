@@ -231,7 +231,7 @@ describe("Metadata external resource edit page.", () => {
     });
 
     expect(wrapper.find(".dcType-field Select").prop("value")).toEqual({
-      label: "IMAGE",
+      label: "Image",
       value: "IMAGE"
     });
 
