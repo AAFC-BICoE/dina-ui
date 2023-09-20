@@ -142,7 +142,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createNewLabel: "Create New",
   createNewMaterialSamples: "Create New Material Samples",
   createNewView: "Create New View",
-  createSampleWithFormTemplate: "Create Sample with Form Template",
+  createSampleWithFormTemplate: "Create Sample",
   createSavedSearch: "Create Saved Search",
   createSplitWorkflow: "Create Split",
   createStorage: "Create Storage",
@@ -894,5 +894,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
-  yearMonthDayTime: "Year-Month-Day-Time"
+  yearMonthDayTime: "Year-Month-Day-Time",
+  field_splitConfiguration: "Split Configuration"
 };
