@@ -307,7 +307,9 @@ export function applySourceFiltering<TData extends KitsuResource>(
 
   return {
     ...elasticSearchQuery,
-    _source: uniq(sourceFilteringColumns)
+    _source: {
+      includes: uniq(sourceFilteringColumns)
+    }
   };
 }
 
