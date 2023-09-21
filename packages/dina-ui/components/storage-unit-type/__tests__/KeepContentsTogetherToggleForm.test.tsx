@@ -2,7 +2,9 @@ import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { KeepContentsTogetherToggleForm } from "../KeepContentsTogetherToggleForm";
 import Switch from "react-switch";
 
-const mockSave = jest.fn<any, any>(ops => ops.map(op => ({ ...op.resource })));
+const mockSave = jest.fn<any, any>((ops) =>
+  ops.map((op) => ({ ...op.resource }))
+);
 
 const testCtx = {
   apiContext: {

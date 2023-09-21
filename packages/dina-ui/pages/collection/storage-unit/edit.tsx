@@ -58,28 +58,28 @@ export default function StorageUnitEditPage() {
   }
 
   return (
-    <PageLayout titleId ={title}>
-        {id ? (
-          withResponse(storageUnitQuery, ({ data }) => (
-            <>
-              <Head title={storageUnitDisplayName(data)} />
-              <StorageUnitForm storageUnit={data} onSaved={goToViewPage} />
-            </>
-          ))
-        ) : parentId ? (
-          withResponse(
-            initialParentStorageUnitQuery,
-            ({ data: initialParent }) => (
-              <StorageUnitForm
-                initialParent={initialParent}
-                onSaved={goToViewPage}
-                parentIdInURL={parentId}
-              />
-            )
+    <PageLayout titleId={title}>
+      {id ? (
+        withResponse(storageUnitQuery, ({ data }) => (
+          <>
+            <Head title={storageUnitDisplayName(data)} />
+            <StorageUnitForm storageUnit={data} onSaved={goToViewPage} />
+          </>
+        ))
+      ) : parentId ? (
+        withResponse(
+          initialParentStorageUnitQuery,
+          ({ data: initialParent }) => (
+            <StorageUnitForm
+              initialParent={initialParent}
+              onSaved={goToViewPage}
+              parentIdInURL={parentId}
+            />
           )
-        ) : (
-          <StorageUnitForm onSaved={goToViewPage} />
-        )}
+        )
+      ) : (
+        <StorageUnitForm onSaved={goToViewPage} />
+      )}
     </PageLayout>
   );
 }

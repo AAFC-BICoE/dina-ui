@@ -92,11 +92,13 @@ export function StorageLinker({
                 <DinaMessage id="browseStorageTree" />
               </Tab>
             )}
-            {!value?.id && actionMode !== "ADD_EXISTING_AS_CHILD" && createStorageMode === true &&(
-              <Tab>
-                <DinaMessage id="createStorage" />
-              </Tab>
-            )}
+            {!value?.id &&
+              actionMode !== "ADD_EXISTING_AS_CHILD" &&
+              createStorageMode === true && (
+                <Tab>
+                  <DinaMessage id="createStorage" />
+                </Tab>
+              )}
           </TabList>
           <div
             className="card-body border-top-0"
@@ -122,7 +124,7 @@ export function StorageLinker({
             {!value?.id && (
               <TabPanel>
                 <StorageUnitForm
-                  onSaved={savedUnits =>
+                  onSaved={(savedUnits) =>
                     changeStorageAndResetTab(savedUnits[0])
                   }
                   buttonBar={
@@ -167,7 +169,7 @@ export function StorageLinkerField({
   return (
     <FieldWrapper
       name={name}
-      readOnlyRender={value => (
+      readOnlyRender={(value) => (
         <AssignedStorage readOnly={true} value={value} />
       )}
       disableLabelClick={true}
