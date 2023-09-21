@@ -19,13 +19,10 @@ const TEST_SAMPLES: TestResource[] = [
 const mockOnSubmit = jest.fn();
 
 function TestComponent() {
-  const {
-    CheckBoxHeader,
-    CheckBoxField,
-    setAvailableItems
-  } = useGroupedCheckBoxes<any>({
-    fieldName: "checkedIds"
-  });
+  const { CheckBoxHeader, CheckBoxField, setAvailableItems } =
+    useGroupedCheckBoxes<any>({
+      fieldName: "checkedIds"
+    });
 
   useEffect(() => {
     setAvailableItems(TEST_SAMPLES);
@@ -36,7 +33,7 @@ function TestComponent() {
       initialValues={{ checkedIds: {} }}
       onSubmit={async ({ submittedValues }) => mockOnSubmit(submittedValues)}
     >
-      {TEST_SAMPLES.map(s => (
+      {TEST_SAMPLES.map((s) => (
         <CheckBoxField key={String(s.id)} resource={s} />
       ))}
       <CheckBoxHeader />
@@ -92,7 +89,7 @@ describe("Grouped check boxes hook", () => {
       wrapper
         .find("CheckBoxField")
         .find("input[type='checkbox']")
-        .map(i => i.prop("value"))
+        .map((i) => i.prop("value"))
     ).toEqual([false, true, true, true, false]);
 
     wrapper.find("form").simulate("submit");
@@ -124,7 +121,7 @@ describe("Grouped check boxes hook", () => {
       wrapper
         .find("CheckBoxField")
         .find("input[type='checkbox']")
-        .map(i => i.prop("value"))
+        .map((i) => i.prop("value"))
     ).toEqual([false, true, true, true, false]);
 
     wrapper.find("form").simulate("submit");

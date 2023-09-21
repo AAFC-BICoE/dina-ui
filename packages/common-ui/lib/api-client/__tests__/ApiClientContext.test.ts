@@ -558,7 +558,7 @@ Constraint violation: description size must be between 1 and 10`;
 
   it("bulkGet batches together the same ID to avoid sending duplicate find-one requests.", async () => {
     mockPatch.mockImplementationOnce((_, operations) => ({
-      data: operations.map(op => {
+      data: operations.map((op) => {
         const id = op.path.replace("primer/", "");
 
         return {
@@ -579,7 +579,7 @@ Constraint violation: description size must be between 1 and 10`;
     );
 
     expect(response.length).toEqual(4);
-    expect(response.map(primer => primer?.id)).toEqual([
+    expect(response.map((primer) => primer?.id)).toEqual([
       "100",
       "100",
       "200",

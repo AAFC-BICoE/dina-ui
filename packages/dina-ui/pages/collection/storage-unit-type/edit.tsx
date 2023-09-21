@@ -42,17 +42,14 @@ export default function StorageUnitTypeEditPage() {
   }
 
   return (
-    <PageLayout titleId= {formatMessage(title)}>
-        {id ? (
-          withResponse(storageUnitTypeQuery, ({ data }) => (
-            <StorageUnitTypeForm
-              storageUnitType={data}
-              onSaved={goToViewPage}
-            />
-          ))
-        ) : (
-          <StorageUnitTypeForm onSaved={goToViewPage} />
-        )}
+    <PageLayout titleId={formatMessage(title)}>
+      {id ? (
+        withResponse(storageUnitTypeQuery, ({ data }) => (
+          <StorageUnitTypeForm storageUnitType={data} onSaved={goToViewPage} />
+        ))
+      ) : (
+        <StorageUnitTypeForm onSaved={goToViewPage} />
+      )}
     </PageLayout>
   );
 }

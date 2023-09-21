@@ -19,8 +19,8 @@ export function LanguageSelector() {
   return (
     <div>
       {Object.keys(LANGUAGE_LABELS)
-        .filter(key => key !== locale)
-        .map(key => {
+        .filter((key) => key !== locale)
+        .map((key) => {
           function onClick() {
             setLocale(key);
           }
