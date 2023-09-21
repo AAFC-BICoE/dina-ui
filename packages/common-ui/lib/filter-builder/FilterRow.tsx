@@ -55,6 +55,8 @@ export type FilterDropdownOption<TValue> = {
 export class FilterRow extends React.Component<FilterRowProps> {
   public static contextType = FilterBuilderContext;
 
+  declare context: React.ContextType<typeof FilterBuilderContext>;
+
   public render() {
     const { model, onAndClick, onRemoveClick, onOrClick, showRemoveButton } =
       this.props;
@@ -69,17 +71,17 @@ export class FilterRow extends React.Component<FilterRowProps> {
       const optionAttrString =
         typeof option.value === "string" ? option.value : option.value.name;
 
-      return attribute.name === optionAttrString;
+      return attribute?.name === optionAttrString;
     });
 
     /** The predicate types to put into the dropdown. */
     const predicateTypes =
-      attribute.type === "DATE"
+      attribute?.type === "DATE"
         ? DATE_PREDICATE_OPTIONS
         : BOOLEAN_PREDICATE_OPTIONS;
 
     const searchTypes =
-      attribute.type === "DROPDOWN"
+      attribute?.type === "DROPDOWN"
         ? SEARCH_TYPES_EXACT_ONLY
         : STRING_SEARCH_TYPES;
 
@@ -103,7 +105,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             aria-label="Filter Attribute"
             className="filter-attribute"
             instanceId={`attribute_${model.id}`}
-            options={this.context.attributeOptions}
+            options={this.context?.attributeOptions}
             onChange={this.onPropertyChanged}
             value={selectedAttributeOption}
             styles={customStyle}
@@ -123,7 +125,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
           />
         </div>
         <div className="list-inline-item">
-          {attribute.type === "DATE" && (
+          {attribute?.type === "DATE" && (
             <FilterRowDatePicker
               aria-label="Search Date"
               isRange={model.predicate === "BETWEEN"}
@@ -131,7 +133,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
               onDateValueChanged={this.onDateValueChanged}
             />
           )}
-          {attribute.type === "DROPDOWN" && (
+          {attribute?.type === "DROPDOWN" && (
             <div style={{ width: "16rem" }}>
               <ResourceSelect
                 aria-label="Select Option"
@@ -148,7 +150,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             </div>
           )}
 
-          {attribute.type === "STRING" && (
+          {attribute?.type === "STRING" && (
             <input
               type="text"
               aria-label="Filter Value"
@@ -163,7 +165,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             />
           )}
         </div>
-        {attribute.type !== "DATE" && (
+        {attribute?.type !== "DATE" && (
           <div className="list-inline-item" style={{ width: "12rem" }}>
             <Select
               aria-label="Search Type"
@@ -212,14 +214,14 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     const attribute = this.attributeConfig();
 
-    if (attribute.type === "DATE") {
+    if (attribute?.type === "DATE") {
       this.props.model.value = moment().format();
       this.props.model.predicate = "FROM";
-    } else if (attribute.type === "STRING") {
+    } else if (attribute?.type === "STRING") {
       this.props.model.value = "";
       this.props.model.searchType = "PARTIAL_MATCH";
       this.props.model.predicate = "IS";
-    } else if (attribute.type === "DROPDOWN") {
+    } else if (attribute?.type === "DROPDOWN") {
       this.props.model.searchType = "EXACT_MATCH";
       this.props.model.predicate = "IS";
     }
@@ -265,11 +267,11 @@ export class FilterRow extends React.Component<FilterRowProps> {
   };
 
   /** Gets the passed attribute prop (string or object) as a full FilterAttributeConfig object. */
-  private attributeConfig(): FilterAttributeConfig {
+  private attributeConfig(): FilterAttributeConfig | undefined {
     const { model } = this.props;
 
     const selectedAttribute =
-      this.context.attributeOptions.find((option) => {
+      this.context?.attributeOptions.find((option) => {
         const propAttributeName =
           typeof model.attribute === "string"
             ? model.attribute
@@ -278,13 +280,13 @@ export class FilterRow extends React.Component<FilterRowProps> {
           typeof option.value === "string" ? option.value : option.value.name;
 
         return propAttributeName === optionAttrString;
-      }) ?? this.context.attributeOptions[0];
+      }) ?? this.context?.attributeOptions?.[0];
 
-    return typeof selectedAttribute.value === "string"
+    return typeof selectedAttribute?.value === "string"
       ? {
           name: selectedAttribute.value,
           type: "STRING"
         }
-      : selectedAttribute.value;
+      : selectedAttribute?.value;
   }
 }
