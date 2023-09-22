@@ -161,7 +161,7 @@ export class FilterBuilder extends React.Component<
 
       // When the root Group's AND/OR button was clicked, surround the filter with a new root group.
       if (rootGroupButtonWasClicked) {
-        this.setState(state => ({
+        this.setState((state) => ({
           model: {
             children: [state.model, newFilterRow],
             id: this.getNewFilterId(),
@@ -233,7 +233,7 @@ export class FilterBuilder extends React.Component<
     }
 
     children
-      .filter(child => child.type === "FILTER_GROUP")
+      .filter((child) => child.type === "FILTER_GROUP")
       .forEach((group: FilterGroupModel) => this.flattenModel(group));
   }
 
@@ -272,7 +272,7 @@ export class FilterBuilder extends React.Component<
 
     switch (model.type) {
       case "FILTER_GROUP": {
-        const children = model.children.map(child =>
+        const children = model.children.map((child) =>
           this.renderFilter({ model: child, parent: model })
         );
 

@@ -8,7 +8,7 @@ import {
   rsql,
   useApiClient,
   useQuery,
-  withResponse,
+  withResponse
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -21,7 +21,7 @@ import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";
 import {
   StorageUnitBreadCrumb,
-  storageUnitDisplayName,
+  storageUnitDisplayName
 } from "./StorageUnitBreadCrumb";
 
 export interface BrowseStorageTreeProps {
@@ -72,7 +72,7 @@ export function StorageTreeList({
   parentId,
   disabled,
   filter,
-  showPathInName,
+  showPathInName
 }: StorageTreeListProps) {
   const limit = 100;
   const [pageNumber, setPageNumber] = useState(1);
@@ -121,18 +121,18 @@ export function StorageTreeList({
                     attribute: "parentStorageUnit.uuid",
                     predicate: "IS" as const,
                     searchType: "EXACT_MATCH" as const,
-                    value: parentId,
-                  },
+                    value: parentId
+                  }
                 ]
               : []),
-            ...(filter ? [filter] : []),
-          ],
+            ...(filter ? [filter] : [])
+          ]
         }),
         // For top-level storage units:
         ...(!filter?.children?.length && !parentId
           ? { parentStorageUnit: null }
-          : {}),
-      },
+          : {})
+      }
     },
     { disabled: storageUnitChildren !== undefined }
   );
@@ -224,7 +224,7 @@ function StorageUnitCollapser({
   onSelect,
   disabled,
   showPathInName,
-  checkForChildren,
+  checkForChildren
 }: StorageUnitCollapserProps) {
   const [isOpen, setOpen] = useState(false);
   const { formatMessage } = useDinaIntl();
@@ -254,7 +254,7 @@ function StorageUnitCollapser({
         size="2em"
         className={classNames("storage-collapser-icon aligh-top", {
           // Hide the expander button when there are no children:
-          invisible: !hasChildren,
+          invisible: !hasChildren
         })}
         style={{ cursor: "pointer" }}
         title={isOpen ? formatMessage("collapse") : formatMessage("expand")}

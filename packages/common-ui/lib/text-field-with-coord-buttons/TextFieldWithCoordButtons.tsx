@@ -24,7 +24,7 @@ export function TextFieldWithCoordButtons(
   return (
     <TextField
       {...props}
-      customInput={inputProps => (
+      customInput={(inputProps) => (
         <InputWithCoordButtons
           shouldShowDegree={props.shouldShowDegree}
           shouldShowMinute={props.shouldShowMinute}
@@ -67,7 +67,7 @@ export function InputWithCoordButtons({
   return (
     <div className="input-group">
       <input type="text" {...inputProps} ref={inputRef} />
-      {["°", "′", "″"].map(symbol => (
+      {["°", "′", "″"].map((symbol) => (
         <button
           key={symbol}
           tabIndex={0}

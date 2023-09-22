@@ -29,7 +29,7 @@ const mockGet = jest.fn(async (_, { filter }) => {
   return MOCK_GROUPS;
 });
 
-const mockBulkGet = jest.fn(async paths => {
+const mockBulkGet = jest.fn(async (paths) => {
   if (paths.length === 0) {
     return [];
   }
@@ -51,7 +51,7 @@ const apiContext: any = {
 
 // Mock out the debounce function to avoid waiting during tests.
 jest.mock("use-debounce", () => ({
-  useDebounce: fn => [fn, { isPending: () => false }]
+  useDebounce: (fn) => [fn, { isPending: () => false }]
 }));
 
 describe("ResourceSelectField component", () => {
@@ -63,8 +63,8 @@ describe("ResourceSelectField component", () => {
         <ResourceSelectField<TestGroup>
           name="group"
           model="test-api/group"
-          filter={groupName => ({ groupName })}
-          optionLabel={group => group.groupName}
+          filter={(groupName) => ({ groupName })}
+          optionLabel={(group) => group.groupName}
         />
       </DinaForm>,
       { apiContext }
@@ -91,7 +91,7 @@ describe("ResourceSelectField component", () => {
             <ResourceSelectField<TestGroup>
               name="group"
               model="test-api/group"
-              filter={groupName => ({ groupName })}
+              filter={(groupName) => ({ groupName })}
               /* tslint:disable-next-line */
               optionLabel={group => group.groupName}
             />
@@ -142,8 +142,8 @@ describe("ResourceSelectField component", () => {
         <ResourceSelectField<TestGroup>
           name="group"
           model="test-api/group"
-          filter={groupName => ({ groupName })}
-          optionLabel={group => group.groupName}
+          filter={(groupName) => ({ groupName })}
+          optionLabel={(group) => group.groupName}
           onChange={mockOnChange}
         />
       </DinaForm>,
@@ -177,15 +177,15 @@ describe("ResourceSelectField component", () => {
         <ResourceSelectField<TestGroup>
           name="singleGroup"
           model="test-api/group"
-          filter={groupName => ({ groupName })}
-          optionLabel={group => group.groupName}
+          filter={(groupName) => ({ groupName })}
+          optionLabel={(group) => group.groupName}
           readOnlyLink="/group/view?id="
         />
         <ResourceSelectField<TestGroup>
           name="multipleGroups"
           model="test-api/group"
-          filter={groupName => ({ groupName })}
-          optionLabel={group => group.groupName}
+          filter={(groupName) => ({ groupName })}
+          optionLabel={(group) => group.groupName}
           isMulti={true}
           readOnlyLink="/group/view?id="
         />
@@ -209,7 +209,7 @@ describe("ResourceSelectField component", () => {
     expect(
       wrapper
         .find(".multipleGroups-field .read-only-view a")
-        .map(node => node.prop("href"))
+        .map((node) => node.prop("href"))
     ).toEqual(["/group/view?id=2", "/group/view?id=3"]);
   });
 
@@ -229,23 +229,23 @@ describe("ResourceSelectField component", () => {
         <ResourceSelectField<TestGroup>
           name="singleGroup"
           model="test-api/group"
-          filter={groupName => ({ groupName })}
-          optionLabel={group => group.groupName}
+          filter={(groupName) => ({ groupName })}
+          optionLabel={(group) => group.groupName}
           readOnlyLink="/group/view?id="
         />
         <ResourceSelectField<TestGroup>
           name="multipleGroups"
           model="test-api/group"
-          filter={groupName => ({ groupName })}
-          optionLabel={group => group.groupName}
+          filter={(groupName) => ({ groupName })}
+          optionLabel={(group) => group.groupName}
           isMulti={true}
           readOnlyLink="/group/view?id="
         />
         <ResourceSelectField<TestGroup>
           name="nullGroup"
           model="test-api/group"
-          filter={groupName => ({ groupName })}
-          optionLabel={group => group.groupName}
+          filter={(groupName) => ({ groupName })}
+          optionLabel={(group) => group.groupName}
           readOnlyLink="/group/view?id="
         />
       </DinaForm>,

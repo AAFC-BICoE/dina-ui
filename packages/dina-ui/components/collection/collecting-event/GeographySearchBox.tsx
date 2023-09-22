@@ -65,7 +65,7 @@ export async function nominatimAddressDetailSearch(
     format: "json"
   }).toString();
 
-  const fetchJson = urlArg => window.fetch(urlArg).then(res => res.json());
+  const fetchJson = (urlArg) => window.fetch(urlArg).then((res) => res.json());
 
   try {
     const response = await fetchJson(url.toString());
@@ -112,7 +112,7 @@ async function nominatimSearch(
     format: "jsonv2"
   }).toString();
 
-  const fetchJson = urlArg => window.fetch(urlArg).then(res => res.json());
+  const fetchJson = (urlArg) => window.fetch(urlArg).then((res) => res.json());
 
   try {
     const response = await fetchJson(url.toString());
@@ -190,9 +190,9 @@ export function GeographySearchBox({
           <input
             aria-label={formatMessage("locationLabel")}
             className="form-control"
-            onChange={e => onInputChange(e.target.value)}
-            onFocus={e => e.target.select()}
-            onKeyDown={e => {
+            onChange={(e) => onInputChange(e.target.value)}
+            onFocus={(e) => e.target.select()}
+            onKeyDown={(e) => {
               if (e.keyCode === 13) {
                 e.preventDefault();
                 doSearch();
@@ -220,7 +220,7 @@ export function GeographySearchBox({
         ) : searchResults?.length === 0 ? (
           <DinaMessage id="noResultsFound" />
         ) : (
-          searchResults?.map(place => (
+          searchResults?.map((place) => (
             <div className="list-group-item" key={place.osm_id}>
               <style>{`
                 .searchResult {

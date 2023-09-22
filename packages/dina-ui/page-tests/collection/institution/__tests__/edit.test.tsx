@@ -1,15 +1,15 @@
 import { InstitutionForm } from "../../../../pages/collection/institution/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "user-api/group":
       return { data: [] };
   }
 });
 
-const mockSave = jest.fn(async saves => {
-  return saves.map(save => ({
+const mockSave = jest.fn(async (saves) => {
+  return saves.map((save) => ({
     ...save.resource,
     id: save.resource.id ?? "123"
   }));

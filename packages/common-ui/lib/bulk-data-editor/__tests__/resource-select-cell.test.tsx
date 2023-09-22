@@ -36,8 +36,8 @@ describe("resource-select-cell", () => {
       const resourceSelectCell = useResourceSelectCells();
 
       const cell = resourceSelectCell<Todo>({
-        filter: input => ({ rsql: `name==*${input}*` }),
-        label: todo => todo.name,
+        filter: (input) => ({ rsql: `name==*${input}*` }),
+        label: (todo) => todo.name,
         model: "todo"
       });
 
@@ -65,7 +65,7 @@ describe("resource-select-cell", () => {
     expect(mockProcess).lastCalledWith(["todo 1 (todo/1)", "todo 2 (todo/2)"]);
   });
 
-  it("Does not submit a filter when the cell already has an encoded resource in it.", done => {
+  it("Does not submit a filter when the cell already has an encoded resource in it.", (done) => {
     mockGet.mockImplementationOnce(async () => ({
       data: [
         { id: "1", type: "todo", name: "todo 1" },
@@ -77,8 +77,8 @@ describe("resource-select-cell", () => {
       const resourceSelectCell = useResourceSelectCells();
 
       const cell = resourceSelectCell<Todo>({
-        filter: input => ({ rsql: `name==*${input}*` }),
-        label: todo => todo.name,
+        filter: (input) => ({ rsql: `name==*${input}*` }),
+        label: (todo) => todo.name,
         model: "todo"
       });
 

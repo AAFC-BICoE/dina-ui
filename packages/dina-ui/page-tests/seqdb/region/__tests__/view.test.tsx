@@ -24,7 +24,7 @@ const apiContext: any = { apiClient: { get: mockGet } };
 
 jest.mock("next/router", () => ({
   useRouter: () => ({ query: { id: "100" } }),
-  withRouter: fn => fn
+  withRouter: (fn) => fn
 }));
 
 describe("Region details page", () => {

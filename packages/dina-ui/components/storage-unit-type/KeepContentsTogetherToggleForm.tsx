@@ -31,7 +31,7 @@ export function KeepContentsTogetherToggleForm({
       enableReinitialize={true}
       onSubmit={onSubmit}
     >
-      {form =>
+      {(form) =>
         form.isSubmitting ? (
           <LoadingSpinner loading={true} />
         ) : (

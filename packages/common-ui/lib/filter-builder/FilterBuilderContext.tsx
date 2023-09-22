@@ -28,7 +28,7 @@ export function FilterBuilderContextProvider({
 
   const attributeOptions = useMemo(
     () =>
-      filterAttributes.map<FilterAttributeOption>(attr => {
+      filterAttributes.map<FilterAttributeOption>((attr) => {
         const { fieldName, customLabel } =
           typeof attr === "string"
             ? {

@@ -28,7 +28,7 @@ export function FieldSpy<T = unknown>({
 }: FieldSpyProps<T>) {
   function shouldRender(next, prev) {
     const formStateChanged = ["values", "errors", "touched"].some(
-      formikStateField =>
+      (formikStateField) =>
         !isEqual(
           get(prev.formik[formikStateField], fieldName),
           get(next.formik[formikStateField], fieldName)

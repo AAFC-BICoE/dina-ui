@@ -47,14 +47,14 @@ const apiContext = {
 
 // Mock out the debounce function to avoid waiting during tests.
 jest.mock("use-debounce", () => ({
-  useDebounce: fn => [fn, { isPending: () => false }]
+  useDebounce: (fn) => [fn, { isPending: () => false }]
 }));
 
 describe("ResourceSelect component", () => {
   const DEFAULT_SELECT_PROPS: ResourceSelectProps<Todo> = {
-    filter: input => ({ name: input }),
+    filter: (input) => ({ name: input }),
     model: "todo-api/todo",
-    optionLabel: todo => todo.name
+    optionLabel: (todo) => todo.name
   };
 
   function mountWithContext(element: JSX.Element) {
@@ -86,7 +86,7 @@ describe("ResourceSelect component", () => {
 
     // There should be 4 options including the <None> option.
     expect(options[0].options.length).toEqual(4);
-    expect(options[0].options.map(option => option.label)).toEqual([
+    expect(options[0].options.map((option) => option.label)).toEqual([
       "<None>",
       "todo 1",
       "todo 2",
@@ -176,7 +176,7 @@ describe("ResourceSelect component", () => {
 
   it("Provides a 'filter' prop to filter results.", async () => {
     // Filter by the "description" attribute.
-    const filter = input => ({ description: input });
+    const filter = (input) => ({ description: input });
 
     const wrapper = mountWithContext(
       <ResourceSelect {...DEFAULT_SELECT_PROPS} filter={filter} />
@@ -389,7 +389,7 @@ describe("ResourceSelect component", () => {
     const options = wrapper.find(Select).prop<any>("options")[0].options;
 
     // Only the todos should be options.
-    expect(options.map(o => o.resource)).toEqual(MOCK_TODOS.data);
+    expect(options.map((o) => o.resource)).toEqual(MOCK_TODOS.data);
   });
 
   it("Allows a callback options prop to show special options that call a function (single dropdown mode).", async () => {

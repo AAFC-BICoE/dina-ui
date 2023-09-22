@@ -388,10 +388,8 @@ describe("rsql conversion", () => {
           searchType: "PARTIAL_MATCH",
           type: "FILTER_ROW",
           value: {
-            low:
-              "Tue Oct 06 2020 20:14:30 GMT+0000 (Coordinated Universal Time)",
-            high:
-              "Tue Oct 12 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"
+            low: "Tue Oct 06 2020 20:14:30 GMT+0000 (Coordinated Universal Time)",
+            high: "Tue Oct 12 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"
           }
         }
       ],
@@ -422,10 +420,8 @@ describe("rsql conversion", () => {
           type: "FILTER_ROW",
           value: {
             // The high and low values are backwards:
-            low:
-              "Tue Oct 12 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
-            high:
-              "Tue Oct 06 2020 20:14:30 GMT+0000 (Coordinated Universal Time)"
+            low: "Tue Oct 12 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
+            high: "Tue Oct 06 2020 20:14:30 GMT+0000 (Coordinated Universal Time)"
           }
         }
       ],

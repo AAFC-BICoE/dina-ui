@@ -203,7 +203,7 @@ describe("useQuery hook", () => {
             apiBaseUrl: "/people-api",
             idField: "creatorId",
             joinField: "creator",
-            path: todo => `person/${todo.creatorId}`
+            path: (todo) => `person/${todo.creatorId}`
           }
         ]}
       />,
@@ -244,7 +244,7 @@ describe("useQuery hook", () => {
     expect(mockGet).toHaveBeenCalledTimes(0);
   });
 
-  it("Renders with loading as true before sending a request", done => {
+  it("Renders with loading as true before sending a request", (done) => {
     let renderCount = 0;
     mountWithAppContext(
       <Query<Todo[]> query={{ path: "todo" }}>
@@ -262,7 +262,7 @@ describe("useQuery hook", () => {
     );
   });
 
-  it("Passes single-resource data from the mocked API to child components", done => {
+  it("Passes single-resource data from the mocked API to child components", (done) => {
     mountWithAppContext(
       <Query<Todo> query={{ path: "todo/25" }}>
         {({ loading, response }) => {
@@ -280,7 +280,7 @@ describe("useQuery hook", () => {
     );
   });
 
-  it("Passes list data from the mocked API to child components", done => {
+  it("Passes list data from the mocked API to child components", (done) => {
     mountWithAppContext(
       <Query<Todo[], MetaWithTotal> query={{ path: "todo" }}>
         {({ loading, response }) => {
@@ -346,7 +346,7 @@ describe("useQuery hook", () => {
     });
   });
 
-  it("Renders an error to child components", done => {
+  it("Renders an error to child components", (done) => {
     // Get an error by requesting an attribute that the resource doesn't have.
     mountWithAppContext(
       <Query<Todo[]>

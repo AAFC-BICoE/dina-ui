@@ -9,7 +9,7 @@ import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/u
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   if (path === "seqdb-api/region/100") {
     // The request for the primer returns the test region.
     return { data: TEST_REGION };

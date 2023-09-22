@@ -69,7 +69,7 @@ export function SelectFieldWithNav<T = string>(
       className={className}
       hideLabel={hideLabel}
       onChange={(value, _form) => {
-        const newIdx = options.findIndex(option => value === option.value);
+        const newIdx = options.findIndex((option) => value === option.value);
         if (newIdx === options.length - 1) {
           setRightDisabled(true);
           setLeftDisabled(false);

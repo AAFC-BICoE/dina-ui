@@ -19,7 +19,12 @@ export function NotPubliclyReleasableWarning() {
         visible={visible}
         visibleElement={
           <MdVpnLock
-            style={{ width: "24px", height: "24px", marginLeft: "5px", marginTop: "-5px" }}
+            style={{
+              width: "24px",
+              height: "24px",
+              marginLeft: "5px",
+              marginTop: "-5px"
+            }}
             onMouseOver={() => setVisible(true)}
             onMouseOut={() => setVisible(false)}
           />

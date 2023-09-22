@@ -6,7 +6,7 @@ import { OrganizationFields } from "./edit";
 export default function OrganizationDetailsPage() {
   return (
     <ViewPageLayout<Organization>
-      form={props => {
+      form={(props) => {
         const organization = props.initialValues;
 
         if (organization && organization.createdOn) {
@@ -28,7 +28,7 @@ export default function OrganizationDetailsPage() {
           </DinaForm>
         );
       }}
-      query={id => ({ path: `agent-api/organization/${id}` })}
+      query={(id) => ({ path: `agent-api/organization/${id}` })}
       entityLink="/organization"
       type="organization"
       apiBaseUrl="/agent-api"

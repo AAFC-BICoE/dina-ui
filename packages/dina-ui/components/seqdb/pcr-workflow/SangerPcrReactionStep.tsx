@@ -77,18 +77,21 @@ export function SangerPcrReactionStep({
     }
 
     if (performComplete) {
-      await save<PcrBatch>([
-        {
-          resource: {
-            id: pcrBatchId,
-            isCompleted: true,
+      await save<PcrBatch>(
+        [
+          {
+            resource: {
+              id: pcrBatchId,
+              isCompleted: true,
+              type: "pcr-batch"
+            } as any,
             type: "pcr-batch"
-          } as any,
-          type: "pcr-batch"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
         }
-      ], {
-        apiBaseUrl: "/seqdb-api"
-      });
+      );
     }
 
     // Leave edit mode...
@@ -96,12 +99,10 @@ export function SangerPcrReactionStep({
       setPerformSave(false);
     }
 
-    if (!!setPerformComplete){
+    if (!!setPerformComplete) {
       setPerformComplete(false);
     }
   }
-
-
 
   // Load the result based on the API request with the pcr-batch-item.
   const initialValues = {

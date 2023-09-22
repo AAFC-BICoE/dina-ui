@@ -3,7 +3,7 @@ import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { MaterialSampleIdentifiersSection } from "../MaterialSampleIdentifiersSection";
 import { SetDefaultSampleName } from "../SetDefaultSampleName";
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/collection":
       return { data: [] };

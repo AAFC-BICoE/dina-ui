@@ -6,12 +6,12 @@ import { RegionFormFields } from "./edit";
 export default function RegionDetailsPage() {
   return (
     <ViewPageLayout<Region>
-      form={props => (
+      form={(props) => (
         <DinaForm {...props}>
           <RegionFormFields />
         </DinaForm>
       )}
-      query={id => ({ path: `seqdb-api/region/${id}` })}
+      query={(id) => ({ path: `seqdb-api/region/${id}` })}
       entityLink="/seqdb/region"
       type="region"
       apiBaseUrl="/seqdb-api"

@@ -25,7 +25,7 @@ export function ParseVerbatimToRangeButton({
     const verbatimText: string = get(values, verbatimField)?.toString() ?? "";
     const [newMin, newMax] = verbatimText
       .split(/to|\-/)
-      .map(text => toMeters(text));
+      .map((text) => toMeters(text));
 
     formik.setFieldValue(minField, newMin);
     formik.setFieldValue(maxField, newMax);

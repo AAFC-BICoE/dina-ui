@@ -30,7 +30,7 @@ export function FormattedTextField(props: FormattedTextFieldProps) {
         const inputPropsInternal = {
           ...inputPropsExternal,
           className: classnames("form-control", { "is-invalid": invalid }),
-          onChange: event => setValue(event.target.value),
+          onChange: (event) => setValue(event.target.value),
           value: value ?? "",
           readOnly
         };
