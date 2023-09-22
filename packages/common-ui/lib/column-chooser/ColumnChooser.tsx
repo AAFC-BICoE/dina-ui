@@ -32,7 +32,7 @@ export function ColumnChooser(
 export interface UseColumnChooserProps {
   columns: any[];
   indexName?: string;
-  hideExportButton: boolean;
+  hideExportButton?: boolean;
 }
 
 export function useColumnChooser({
