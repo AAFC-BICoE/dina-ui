@@ -69,9 +69,7 @@ function useCustomMenu({
   indexName,
   hideExportButton
 }: UseCustomMenuProps) {
-  const [searchedColumns, setSearchedColumns] = useState<any[]>(
-    columns.filter((item) => item.id !== "selectColumn")
-  );
+  const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
   const [loading, setLoading] = useState(false);
 
   const { formatMessage } = useIntl();

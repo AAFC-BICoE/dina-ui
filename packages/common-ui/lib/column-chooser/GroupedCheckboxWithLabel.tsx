@@ -1,4 +1,4 @@
-import { startCase } from "lodash";
+import { startCase, uniq } from "lodash";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
@@ -65,7 +65,7 @@ export function useGroupedCheckboxWithLabel({
   const [list, setList] = useState<CheckboxResource[]>(getResourcesWithId());
   const [checkedColumnIds, setCheckedColumnIds] = useLocalStorage<string[]>(
     `${indexName}_columnChooser`,
-    list.map((resource) => resource.id ?? "")
+    uniq([...list.map((resource) => resource.id ?? ""), "selectColumn"])
   );
   const [isCheckAll, setIsCheckAll] = useState<boolean>(
     checkedColumnIds.length === list.length
@@ -73,29 +73,34 @@ export function useGroupedCheckboxWithLabel({
 
   const handleSelectAll = (_e) => {
     setIsCheckAll(!isCheckAll);
-    setCheckedColumnIds(list.map((li) => li.id));
+    setCheckedColumnIds(uniq([...list.map((li) => li.id), "selectColumn"]));
     if (isCheckAll) {
-      setCheckedColumnIds([]);
+      setCheckedColumnIds(["selectColumn"]);
     }
   };
 
   const handleClick = (e) => {
     const { id, checked } = e.target;
     if (!checked) {
-      setCheckedColumnIds(checkedColumnIds.filter((item) => item !== id));
+      setCheckedColumnIds(
+        uniq([
+          ...checkedColumnIds.filter((item) => item !== id),
+          "selectColumn"
+        ])
+      );
       setIsCheckAll(false);
     } else {
       if ([...checkedColumnIds, id].length === list.length) {
         setIsCheckAll(true);
       }
-      setCheckedColumnIds([...checkedColumnIds, id]);
+      setCheckedColumnIds(uniq([...checkedColumnIds, id, "selectColumn"]));
     }
   };
 
   const groupedCheckBoxes = GroupedCheckboxes({
     handleSelectAll,
     isCheckAll,
-    list,
+    list: list.filter((item) => item.id !== "selectColumn"),
     handleClick,
     checkedColumnIds,
     isField
