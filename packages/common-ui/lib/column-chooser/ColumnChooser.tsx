@@ -32,11 +32,13 @@ export function ColumnChooser(
 export interface UseColumnChooserProps {
   columns: any[];
   indexName?: string;
+  hideExportButton: boolean;
 }
 
 export function useColumnChooser({
   columns,
-  indexName
+  indexName,
+  hideExportButton = false
 }: UseColumnChooserProps) {
   const { formatMessage, messages } = useIntl();
   const columnSearchMapping: any[] = columns.map((column) => {
@@ -49,7 +51,8 @@ export function useColumnChooser({
   const { CustomMenu, checkedColumnIds } = useCustomMenu({
     columns,
     columnSearchMapping,
-    indexName
+    indexName,
+    hideExportButton
   });
   const columnChooser = ColumnChooser(CustomMenu);
   return { columnChooser, checkedColumnIds };
@@ -57,12 +60,14 @@ export function useColumnChooser({
 
 interface UseCustomMenuProps extends UseColumnChooserProps {
   columnSearchMapping: any[];
+  hideExportButton: boolean;
 }
 
 function useCustomMenu({
   columns,
   columnSearchMapping,
-  indexName
+  indexName,
+  hideExportButton
 }: UseCustomMenuProps) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(
     columns.filter((item) => item.id !== "selectColumn")
@@ -115,11 +120,11 @@ function useCustomMenu({
 
     const url = window?.URL.createObjectURL(getFileResponse?.data);
     const link = document?.createElement("a");
-    link.href = url;
+    link.href = url ?? "";
     link?.setAttribute("download", `${exportRequestResponse.data.data.id}`);
     document?.body?.appendChild(link);
     link?.click();
-    window?.URL?.revokeObjectURL(url);
+    window?.URL?.revokeObjectURL(url ?? "");
     setLoading(false);
   }
 
@@ -163,17 +168,19 @@ function useCustomMenu({
           />
           <Dropdown.Divider />
           {groupedCheckBoxes}
-          <Button
-            disabled={loading}
-            className="btn btn-primary mt-2 bulk-edit-button"
-            onClick={exportData}
-          >
-            {loading ? (
-              <LoadingSpinner loading={loading} />
-            ) : (
-              formatMessage({ id: "exportButtonText" })
-            )}
-          </Button>
+          {!hideExportButton && (
+            <Button
+              disabled={loading}
+              className="btn btn-primary mt-2 bulk-edit-button"
+              onClick={exportData}
+            >
+              {loading ? (
+                <LoadingSpinner loading={loading} />
+              ) : (
+                formatMessage({ id: "exportButtonText" })
+              )}
+            </Button>
+          )}
         </div>
       );
     }

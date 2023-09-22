@@ -774,7 +774,8 @@ export function QueryPage<TData extends KitsuResource>({
 
   const { columnChooser, checkedColumnIds } = useColumnChooser({
     columns: columnsResults,
-    indexName
+    indexName,
+    hideExportButton: true
   });
 
   return (
