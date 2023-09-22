@@ -71,7 +71,7 @@ describe("GeoSuggestTextField component", () => {
 
     // Suggestions are shown in a list of buttons:
     expect(
-      wrapper.find(".suggestion-list button").map(node => node.text())
+      wrapper.find(".suggestion-list button").map((node) => node.text())
     ).toEqual(["result 1", "result 2"]);
 
     // The correct API url shouls have been used:

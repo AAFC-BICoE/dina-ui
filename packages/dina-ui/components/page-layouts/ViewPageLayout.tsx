@@ -153,7 +153,7 @@ export function ViewPageLayout<T extends KitsuResource>({
           return (
             <>
               <Head title={title} />
-              
+
               <h1 id="wb-cont" className="d-flex justify-content-between">
                 <span>
                   {title}

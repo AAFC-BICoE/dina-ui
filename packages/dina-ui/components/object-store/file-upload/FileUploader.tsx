@@ -91,7 +91,7 @@ export function FileUploader<TValues = any>({
         )}
         <Dropzone
           maxSizeBytes={maxSizeBytes}
-          onSubmit={acceptedFiles =>
+          onSubmit={(acceptedFiles) =>
             safeSubmit(onSubmit)({ ...formik.values, acceptedFiles }, formik)
           }
           PreviewComponent={CustomPreviewComponent}
@@ -99,7 +99,8 @@ export function FileUploader<TValues = any>({
             const filesWithMeta = props.files;
             const hasAnInvalidFileSize =
               maxSizeBytes &&
-              filesWithMeta.filter(file => file.file.size > maxSizeBytes).length
+              filesWithMeta.filter((file) => file.file.size > maxSizeBytes)
+                .length
                 ? true
                 : false;
 
