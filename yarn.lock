@@ -1068,7 +1068,7 @@
     date-fns "^2.0.1"
     react-popper "^2.2.5"
 
-"@types/react-dom@17.0.2", "@types/react-dom@^17.0.11":
+"@types/react-dom@17.0.2", "@types/react-dom@^18.2.7":
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-17.0.2.tgz#35654cf6c49ae162d5bc90843d5437dc38008d43"
   integrity sha512-Icd9KEgdnFfJs39KyRyr0jQ7EKhq8U6CcHRMGAS45fp5qgUvxL3ujUCfWFttUK2UErqZNj97t9gsVPNAqcwoCg==
@@ -1113,7 +1113,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@16 || 17", "@types/react@17.0.2", "@types/react@>=16.14.8", "@types/react@>=16.9.11", "@types/react@^17.0.36":
+"@types/react@*", "@types/react@16 || 17", "@types/react@17.0.2", "@types/react@>=16.14.8", "@types/react@>=16.9.11", "@types/react@^18.2.22":
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.2.tgz#3de24c4efef902dd9795a49c75f760cbe4f7a5a8"
   integrity sha512-Xt40xQsrkdvjn1EyWe1Bc0dJLcil/9x2vAuW7ya+PuQip4UYUaXyhzWmAbwRsdMgwOFHpfp7/FFZebDU6Y8VHA==
@@ -1944,12 +1944,12 @@ commander@~3.0.2:
     node-localstorage "^2.1.6"
     rc-pagination "^3.1.13"
     rc-tooltip "^5.1.1"
-    react "^17.0.2"
+    react "^18.2.0"
     react-autosuggest "^10.1.0"
     react-awesome-query-builder "^5.3.1"
     react-bootstrap "2.0.2"
     react-datepicker "^4.2.1"
-    react-dom "^17.0.2"
+    react-dom "^18.2.0"
     react-error-boundary "^3.1.4"
     react-icons "^4.3.1"
     react-intl "^5.21.2"
@@ -4846,14 +4846,13 @@ react-dnd-html5-backend-cjs@^9.4.0:
   dependencies:
     dnd-core-cjs "^9.5.1"
 
-react-dom@^17.0.2:
-  version "17.0.2"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-17.0.2.tgz#ecffb6845e3ad8dbfcdc498f0d0a939736502c23"
-  integrity sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==
+react-dom@^18.2.0:
+  version "18.2.0"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.2.0.tgz#22aaf38708db2674ed9ada224ca4aa708d821e3d"
+  integrity sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==
   dependencies:
     loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    scheduler "^0.20.2"
+    scheduler "^0.23.0"
 
 react-dropzone-uploader@^2.11.0:
   version "2.11.0"
@@ -5057,13 +5056,12 @@ react-visibility-sensor@^5.0.2:
   dependencies:
     prop-types "^15.7.2"
 
-react@^17.0.2:
-  version "17.0.2"
-  resolved "https://registry.yarnpkg.com/react/-/react-17.0.2.tgz#d0b5cc516d29eb3eee383f75b62864cfb6800037"
-  integrity sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==
+react@^18.2.0:
+  version "18.2.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
+  integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
   dependencies:
     loose-envify "^1.1.0"
-    object-assign "^4.1.1"
 
 read-pkg@^3.0.0:
   version "3.0.0"
@@ -5238,6 +5236,13 @@ scheduler@^0.20.2:
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
+
+scheduler@^0.23.0:
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.23.0.tgz#ba8041afc3d30eb206a487b6b384002e4e61fdfe"
+  integrity sha512-CtuThmgHNg7zIZWAXi3AsyIzA3n4xx7aNyjwC2VJldO2LMVDhFK+63xGqq6CsJH4rTAt6/M+N4GhZiDYPx9eUw==
+  dependencies:
+    loose-envify "^1.1.0"
 
 schema-utils@^0.3.0:
   version "0.3.0"
