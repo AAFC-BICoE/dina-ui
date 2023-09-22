@@ -7,7 +7,7 @@ import {
 } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { startCase } from "lodash";
@@ -28,10 +28,18 @@ export function ColumnChooser(
     </Dropdown>
   );
 }
+
 export interface UseColumnChooserProps {
   columns: any[];
+  indexName?: string;
+  hideExportButton?: boolean;
 }
-export function useColumnChooser({ columns }: UseColumnChooserProps) {
+
+export function useColumnChooser({
+  columns,
+  indexName,
+  hideExportButton = false
+}: UseColumnChooserProps) {
   const { formatMessage, messages } = useIntl();
   const columnSearchMapping: any[] = columns.map((column) => {
     const messageKey = `field_${column.id}`;
@@ -40,29 +48,47 @@ export function useColumnChooser({ columns }: UseColumnChooserProps) {
       : startCase(column.id);
     return { label: label.toLowerCase(), id: column.id };
   });
-  const { CustomMenu, checkedIds } = useCustomMenu(
+  const { CustomMenu, checkedColumnIds } = useCustomMenu({
     columns,
-    columnSearchMapping
-  );
+    columnSearchMapping,
+    indexName,
+    hideExportButton
+  });
   const columnChooser = ColumnChooser(CustomMenu);
-  return { columnChooser, checkedIds };
+  return { columnChooser, checkedColumnIds };
 }
 
-function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
+interface UseCustomMenuProps extends UseColumnChooserProps {
+  columnSearchMapping: any[];
+  hideExportButton: boolean;
+}
+
+function useCustomMenu({
+  columns,
+  columnSearchMapping,
+  indexName,
+  hideExportButton
+}: UseCustomMenuProps) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
   const [loading, setLoading] = useState(false);
 
   const { formatMessage } = useIntl();
-  const { groupedCheckBoxes, checkedIds } = useGroupedCheckboxWithLabel({
+
+  const { groupedCheckBoxes, checkedColumnIds } = useGroupedCheckboxWithLabel({
     resources: searchedColumns,
-    isField: true
+    isField: true,
+    indexName
   });
+
   const { apiClient } = useApiClient();
+
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_SEARCH_RESULTS_KEY);
+
   if (queryObject) {
     delete (queryObject as any)._source;
   }
-  const queryString = JSON.stringify(queryObject).replace(/"/g, '"');
+
+  const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
 
   async function exportData() {
     setLoading(true);
@@ -74,7 +100,7 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
           attributes: {
             source: "dina_material_sample_index",
             query: queryString,
-            columns: checkedIds
+            columns: checkedColumnIds
           }
         }
       },
@@ -92,11 +118,11 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
 
     const url = window?.URL.createObjectURL(getFileResponse?.data);
     const link = document?.createElement("a");
-    link.href = url;
+    link.href = url ?? "";
     link?.setAttribute("download", `${exportRequestResponse.data.data.id}`);
     document?.body?.appendChild(link);
     link?.click();
-    window?.URL?.revokeObjectURL(url);
+    window?.URL?.revokeObjectURL(url ?? "");
     setLoading(false);
   }
 
@@ -140,20 +166,22 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
           />
           <Dropdown.Divider />
           {groupedCheckBoxes}
-          <Button
-            disabled={loading}
-            className="btn btn-primary mt-2 bulk-edit-button"
-            onClick={exportData}
-          >
-            {loading ? (
-              <LoadingSpinner loading={loading} />
-            ) : (
-              formatMessage({ id: "exportButtonText" })
-            )}
-          </Button>
+          {!hideExportButton && (
+            <Button
+              disabled={loading}
+              className="btn btn-primary mt-2 bulk-edit-button"
+              onClick={exportData}
+            >
+              {loading ? (
+                <LoadingSpinner loading={loading} />
+              ) : (
+                formatMessage({ id: "exportButtonText" })
+              )}
+            </Button>
+          )}
         </div>
       );
     }
   );
-  return { CustomMenu, checkedIds };
+  return { CustomMenu, checkedColumnIds };
 }
