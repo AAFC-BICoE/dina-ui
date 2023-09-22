@@ -7,7 +7,7 @@ import {
 } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { startCase } from "lodash";
@@ -28,10 +28,12 @@ export function ColumnChooser(
     </Dropdown>
   );
 }
+
 export interface UseColumnChooserProps {
   columns: any[];
   indexName?: string;
 }
+
 export function useColumnChooser({
   columns,
   indexName
@@ -62,20 +64,27 @@ function useCustomMenu({
   columnSearchMapping,
   indexName
 }: UseCustomMenuProps) {
-  const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
+  const [searchedColumns, setSearchedColumns] = useState<any[]>(
+    columns.filter((item) => item.id !== "selectColumn")
+  );
   const [loading, setLoading] = useState(false);
 
   const { formatMessage } = useIntl();
+
   const { groupedCheckBoxes, checkedColumnIds } = useGroupedCheckboxWithLabel({
     resources: searchedColumns,
     isField: true,
     indexName
   });
+
   const { apiClient } = useApiClient();
+
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_SEARCH_RESULTS_KEY);
+
   if (queryObject) {
     delete (queryObject as any)._source;
   }
+
   const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
 
   async function exportData() {
