@@ -24,7 +24,7 @@ export default function RevisionsByUserPage({
 
   return (
     <>
-    <PageLayout titleId={pageTitle}>
+      <PageLayout titleId={pageTitle}>
         <AuthorFilterForm />
         {
           // Only show the revisions table if the author is set:

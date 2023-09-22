@@ -24,7 +24,7 @@ export function ColDataSetDropdown({
 
   const { inputValue, isLoading, searchResult, setInputValue } =
     useDebouncedFetch({
-      fetcher: searchValue =>
+      fetcher: (searchValue) =>
         catalogueOfLifeQuery<CatalogueOfLifeDataSetSearchResult>({
           url: "https://api.catalogueoflife.org/dataset",
           params: {
@@ -50,10 +50,10 @@ export function ColDataSetDropdown({
     <Select<{ label: string; value?: DataSetResult }>
       // Input value (for searching)
       inputValue={inputValue}
-      onInputChange={newVal => setInputValue(newVal)}
+      onInputChange={(newVal) => setInputValue(newVal)}
       // Selected value state:
       value={value && toOption(value)}
-      onChange={selection => onChange(selection?.value)}
+      onChange={(selection) => onChange(selection?.value)}
       // Other Select component config:
       isLoading={isLoading}
       placeholder={formatMessage("typeHereToSearch")}

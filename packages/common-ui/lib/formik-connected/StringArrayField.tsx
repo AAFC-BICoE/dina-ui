@@ -34,7 +34,7 @@ export function StringArrayField(
           </div>
         </div>
       }
-      customInput={inputProps => <StringArrayFieldInternal {...inputProps} />}
+      customInput={(inputProps) => <StringArrayFieldInternal {...inputProps} />}
     />
   );
 }
@@ -66,7 +66,7 @@ function StringArrayFieldInternal(
     <TextareaAutosize
       minRows={4}
       {...inputProps}
-      onChange={event => onChange(event.target.value)}
+      onChange={(event) => onChange(event.target.value)}
       value={textValue}
     />
   );
@@ -78,7 +78,7 @@ function asArray(text?: string) {
       // Split by line breaks:
       ?.match(/[^\r\n]+/g)
       // Remove empty lines:
-      ?.filter(line => line.trim()) ?? []
+      ?.filter((line) => line.trim()) ?? []
   );
 }
 

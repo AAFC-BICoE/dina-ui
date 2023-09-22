@@ -44,7 +44,7 @@ export interface NominatumApiSearchResult {
 }
 
 export function GeoSuggestSearchBox({
-  fetchJson = url => window.fetch(url).then(res => res.json()),
+  fetchJson = (url) => window.fetch(url).then((res) => res.json()),
   onSelectSearchResult,
   inputProps
 }: GeoSuggestProps) {
@@ -91,7 +91,7 @@ export function GeoSuggestSearchBox({
 
     // Filter results down to administrative boundaries:
     const administrativeBoundaries = geoSearchResults.filter(
-      result =>
+      (result) =>
         result.category === "boundary" && result.type === "administrative"
     );
 
@@ -110,7 +110,7 @@ export function GeoSuggestSearchBox({
         </div>
         <div className="modal-body">
           <div className="list-group suggestion-list">
-            {administrativeBoundaries.map(boundary => (
+            {administrativeBoundaries.map((boundary) => (
               <button
                 type="button"
                 key={boundary.osm_id}
@@ -143,9 +143,9 @@ export function GeoSuggestSearchBox({
         <div className="input-group">
           <input
             className="form-control"
-            onChange={e => setInputValue(e.target.value)}
+            onChange={(e) => setInputValue(e.target.value)}
             // Pressing enter should open the modal, not submit the form:
-            onKeyDown={e => {
+            onKeyDown={(e) => {
               if (e.keyCode === 13) {
                 e.preventDefault();
                 openGeoSuggestModal();

@@ -29,7 +29,7 @@ describe("Product edit page", () => {
     jest.resetAllMocks();
 
     // The get request will return the existing product.
-    mockGet.mockImplementation(async path => {
+    mockGet.mockImplementation(async (path) => {
       if (path === "seqdb-api/product/10") {
         // The request for the product returns the test product.
         return { data: TEST_PRODUCT };

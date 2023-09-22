@@ -6,12 +6,15 @@ import { PcrPrimerFormFields } from "./edit";
 export default function PcrPrimerDetailsPage() {
   return (
     <ViewPageLayout<PcrPrimer>
-      form={props => (
+      form={(props) => (
         <DinaForm<PcrPrimer> {...props}>
           <PcrPrimerFormFields />
         </DinaForm>
       )}
-      query={id => ({ include: "region", path: `seqdb-api/pcr-primer/${id}` })}
+      query={(id) => ({
+        include: "region",
+        path: `seqdb-api/pcr-primer/${id}`
+      })}
       entityLink="/seqdb/pcr-primer"
       type="pcr-primer"
       apiBaseUrl="/seqdb-api"

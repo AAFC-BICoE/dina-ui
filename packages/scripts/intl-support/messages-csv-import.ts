@@ -29,7 +29,7 @@ export function importCsvMessages({
       // Get the filename + messages for this app and language:
       const { file, messages } = appConfig[lang];
 
-      const appRows = csvRows.filter(row => row.app === app);
+      const appRows = csvRows.filter((row) => row.app === app);
 
       let newMessages = { ...messages };
 

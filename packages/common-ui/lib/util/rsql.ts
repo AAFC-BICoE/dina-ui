@@ -37,14 +37,14 @@ export function filterBy(
   options?: RsqlFilterOptions
 ): (value: string) => Record<string, string> | {} {
   const otherFilters = options?.nullValueFilters;
-  return value => {
+  return (value) => {
     const rsqlFilter = (transformToRSQL as any)({
       operator: "AND",
       operands: [
         ...(value
           ? [
               {
-                operands: fields.map(field => ({
+                operands: fields.map((field) => ({
                   arguments: `*${value}*`,
                   comparison: "==",
                   selector: field

@@ -40,7 +40,7 @@ function toGroup(
     operands: children
       // Exclude filter rows using PARTIAL_MATCH or EXACT_MATCH with no value.
       .filter(
-        child =>
+        (child) =>
           !(
             child.type === "FILTER_ROW" &&
             (child.searchType === "PARTIAL_MATCH" ||
@@ -50,9 +50,9 @@ function toGroup(
       )
       // Exclude filter groups with no children:
       .filter(
-        child => !(child.type === "FILTER_GROUP" && !child.children.length)
+        (child) => !(child.type === "FILTER_GROUP" && !child.children.length)
       )
-      .map(child => {
+      .map((child) => {
         switch (child.type) {
           case "FILTER_GROUP":
             return toGroup(child);
@@ -103,8 +103,8 @@ function toPredicate(
   if (typeof value === "string" && attributeConfig.allowRange) {
     const commaSplit = value.split(",");
 
-    const singleNumbers = commaSplit.filter(e => !e.includes("-"));
-    const ranges = commaSplit.filter(e => e.includes("-"));
+    const singleNumbers = commaSplit.filter((e) => !e.includes("-"));
+    const ranges = commaSplit.filter((e) => e.includes("-"));
 
     const listOperands = singleNumbers.length
       ? [
@@ -116,7 +116,7 @@ function toPredicate(
         ]
       : [];
 
-    const rangeOperands = ranges.map(range => {
+    const rangeOperands = ranges.map((range) => {
       const [low, high] = range
         .split("-")
         .sort((a, b) => Number(a) - Number(b));

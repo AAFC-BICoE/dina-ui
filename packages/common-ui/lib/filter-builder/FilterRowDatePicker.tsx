@@ -44,7 +44,7 @@ export function FilterRowDatePicker({
             className="d-inline-block form-control"
             wrapperClassName="w-100"
             selected={new Date(low)}
-            onChange={date =>
+            onChange={(date) =>
               date && onDateValueChanged({ ...value, low: date.toString() })
             }
           />
@@ -54,7 +54,7 @@ export function FilterRowDatePicker({
             className="d-inline-block form-control"
             wrapperClassName="w-100"
             selected={new Date(high)}
-            onChange={date =>
+            onChange={(date) =>
               date && onDateValueChanged({ ...value, high: date.toString() })
             }
           />
@@ -76,7 +76,7 @@ export function FilterRowDatePicker({
             className="d-inline-block form-control"
             wrapperClassName="w-100"
             selected={selected}
-            onChange={date => onDateValueChanged(date && date.toString())}
+            onChange={(date) => onDateValueChanged(date && date.toString())}
           />
         </div>
         <div className="list-inline-item" style={{ width: "12rem" }} />

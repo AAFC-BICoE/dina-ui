@@ -34,7 +34,7 @@ export default function StorageUnitBulkResult() {
             },
             ({ data: units }) => (
               <div>
-                {(units as PersistedResource<StorageUnit>[]).map(unit => (
+                {(units as PersistedResource<StorageUnit>[]).map((unit) => (
                   <div className="d-flex flex-row mx-3" key={unit.id}>
                     <Link href={`/collection/storage-unit/view?id=${unit.id}`}>
                       <a>

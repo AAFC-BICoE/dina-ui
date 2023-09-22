@@ -10,7 +10,7 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 const mockPush = jest.fn();
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
+const mockGet = jest.fn(async (model) => {
   // The get request will return the existing object subtype.
   if (model === "objectstore-api/object-subtype/1") {
     // The request returns the test subtype.

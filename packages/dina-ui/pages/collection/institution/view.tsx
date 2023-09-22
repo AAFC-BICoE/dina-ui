@@ -7,7 +7,7 @@ import { InstitutionFormLayout } from "./edit";
 export default function InstitutionDetailsPage() {
   return (
     <ViewPageLayout<Institution>
-      form={props => (
+      form={(props) => (
         <DinaForm<Institution>
           {...props}
           initialValues={{
@@ -23,7 +23,7 @@ export default function InstitutionDetailsPage() {
           <InstitutionFormLayout />
         </DinaForm>
       )}
-      query={id => ({ path: `collection-api/institution/${id}` })}
+      query={(id) => ({ path: `collection-api/institution/${id}` })}
       entityLink="/collection/institution"
       type="institution"
       apiBaseUrl="/collection-api"

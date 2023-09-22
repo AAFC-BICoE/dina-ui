@@ -24,7 +24,7 @@ const mockOnSaved = jest.fn();
 let mockQuery: any = {};
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
+const mockGet = jest.fn(async (model) => {
   // The get request will return the existing collection-method.
   if (model === "collection-api/collection-method/1") {
     return { data: TEST_COLLECTION_METHOD };

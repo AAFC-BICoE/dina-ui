@@ -15,7 +15,7 @@ const mockPush = jest.fn();
 
 const mockRouter = { push: mockPush, query: {} };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/collection":
     case "collection-api/material-sample":

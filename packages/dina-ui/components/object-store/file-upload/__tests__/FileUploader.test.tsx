@@ -7,7 +7,7 @@ const MOCK_API_MAX_FILE_SIZE = "3GB";
 const EXPECTED_MAX_FILE_SIZE_IN_BYTES = 3221225472;
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   if (path === "objectstore-api/config/file-upload") {
     return { data: { "max-file-size": MOCK_API_MAX_FILE_SIZE } };
   }
@@ -32,7 +32,9 @@ describe("FileUploader component", () => {
     wrapper.update();
 
     expect(
-      wrapper.findWhere(node => node.prop("maxSizeBytes")).prop("maxSizeBytes")
+      wrapper
+        .findWhere((node) => node.prop("maxSizeBytes"))
+        .prop("maxSizeBytes")
     ).toEqual(EXPECTED_MAX_FILE_SIZE_IN_BYTES);
   });
 });

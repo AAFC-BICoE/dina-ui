@@ -10,7 +10,7 @@ const TEST_COLLECTION_METHOD: CollectionMethod = {
 };
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn<any, any>(async model => {
+const mockGet = jest.fn<any, any>(async (model) => {
   // The get request will return the existing collection-method.
   if (model === "collection-api/collection-method/100") {
     return { data: TEST_COLLECTION_METHOD };

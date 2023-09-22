@@ -2,7 +2,7 @@ import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { DinaForm } from "common-ui";
 import { StorageLinkerField } from "../StorageLinker";
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/storage-unit/A":
       return {
