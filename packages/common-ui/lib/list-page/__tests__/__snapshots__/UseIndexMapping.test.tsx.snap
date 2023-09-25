@@ -105,7 +105,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "collecting-event",
           "path": "attributes",
           "type": "text",
-          "value": "collecting-event.createdBy",
+          "value": "collectingEvent.createdBy",
         },
         Object {
           "containsSupport": false,
@@ -119,7 +119,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "collecting-event",
           "path": "attributes",
           "type": "date",
-          "value": "collecting-event.createdOn",
+          "value": "collectingEvent.createdOn",
         },
         Object {
           "containsSupport": false,
@@ -133,7 +133,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "collecting-event",
           "path": "attributes",
           "type": "text",
-          "value": "collecting-event.tags",
+          "value": "collectingEvent.tags",
         },
         Object {
           "containsSupport": false,
@@ -147,7 +147,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "collecting-event",
           "path": "attributes",
           "type": "text",
-          "value": "collecting-event.habitat",
+          "value": "collectingEvent.habitat",
         },
         Object {
           "containsSupport": false,
@@ -161,7 +161,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "collecting-event",
           "path": "attributes",
           "type": "text",
-          "value": "collecting-event.substrate",
+          "value": "collectingEvent.substrate",
         },
         Object {
           "containsSupport": false,
@@ -175,7 +175,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "collecting-event",
           "path": "attributes",
           "type": "text",
-          "value": "collecting-event.dwcOtherRecordNumbers",
+          "value": "collectingEvent.dwcOtherRecordNumbers",
         },
         Object {
           "containsSupport": false,
@@ -189,7 +189,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "collecting-event",
           "path": "attributes",
           "type": "text",
-          "value": "collecting-event.dwcRecordNumber",
+          "value": "collectingEvent.dwcRecordNumber",
         },
         Object {
           "containsSupport": false,
@@ -203,7 +203,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "collecting-event",
           "path": "attributes",
           "type": "date",
-          "value": "collecting-event.startEventDateTime",
+          "value": "collectingEvent.startEventDateTime",
         },
         Object {
           "containsSupport": false,
@@ -217,7 +217,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "collecting-event",
           "path": "attributes",
           "type": "date",
-          "value": "collecting-event.endEventDateTime",
+          "value": "collectingEvent.endEventDateTime",
         },
         Object {
           "containsSupport": false,
@@ -231,7 +231,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "preparation-method",
           "path": "attributes",
           "type": "text",
-          "value": "preparation-method.name",
+          "value": "preparationMethod.name",
         },
         Object {
           "containsSupport": false,
@@ -245,7 +245,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "storage-unit",
           "path": "attributes",
           "type": "text",
-          "value": "storage-unit.name",
+          "value": "storageUnit.name",
         },
         Object {
           "containsSupport": false,
@@ -329,7 +329,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "assemblage",
           "path": "attributes",
           "type": "text",
-          "value": "assemblage.name",
+          "value": "assemblages.name",
         },
         Object {
           "containsSupport": false,
@@ -343,7 +343,7 @@ exports[`Use Index Mapping Hook Retrieve index and transform the structure. 1`] 
           "parentType": "preparation-type",
           "path": "attributes",
           "type": "text",
-          "value": "preparation-type.name",
+          "value": "preparationType.name",
         },
       ],
     ],
