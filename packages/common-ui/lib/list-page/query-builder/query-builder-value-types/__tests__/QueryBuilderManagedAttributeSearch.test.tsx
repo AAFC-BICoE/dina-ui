@@ -23,6 +23,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
         operators: [
           "exactMatch",
           "partialMatch",
+          "startsWith",
           "notEquals",
           "empty",
           "notEmpty"
