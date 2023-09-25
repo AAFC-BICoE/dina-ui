@@ -113,7 +113,10 @@ export default function MaterialSampleExportPage<
     }
   ];
 
-  const { columnChooser, checkedIds } = useColumnChooser({ columns });
+  const { columnChooser, checkedColumnIds } = useColumnChooser({
+    columns,
+    indexName: "material_sample_export"
+  });
 
   return (
     <div>
@@ -140,7 +143,7 @@ export default function MaterialSampleExportPage<
           <ReactTable<TData>
             columns={
               columns.filter((column) =>
-                column.id ? checkedIds.includes(column.id) : false
+                column.id ? checkedColumnIds.includes(column.id) : false
               ) as any
             }
             data={[]}

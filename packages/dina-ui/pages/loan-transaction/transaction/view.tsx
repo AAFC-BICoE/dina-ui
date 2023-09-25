@@ -6,12 +6,12 @@ import { TransactionFormLayout, useTransactionQuery } from "./edit";
 export default function TransactionDetailsPage() {
   return (
     <ViewPageLayout<Transaction>
-      form={props => (
+      form={(props) => (
         <DinaForm {...props}>
           <TransactionFormLayout />
         </DinaForm>
       )}
-      customQueryHook={id => useTransactionQuery(id, true)}
+      customQueryHook={(id) => useTransactionQuery(id, true)}
       entityLink="/loan-transaction/transaction"
       type="transaction"
       apiBaseUrl="/loan-transaction-api"

@@ -13,7 +13,13 @@ import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
-import { FormikButton, ReactTable, ReactTableProps, useAccount } from "..";
+import {
+  FormikButton,
+  ReactTable,
+  ReactTableProps,
+  useAccount,
+  useColumnChooser
+} from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
@@ -212,6 +218,8 @@ export interface QueryPageProps<TData extends KitsuResource> {
   rowStyling?: (row: Row<TData>) => any;
 
   enableDnd?: boolean;
+
+  enableColumnChooser?: boolean;
 }
 
 const GROUP_STORAGE_KEY = "groupStorage";
@@ -249,7 +257,8 @@ export function QueryPage<TData extends KitsuResource>({
   rowStyling,
   enableDnd = false,
   onSelect,
-  onDeselect
+  onDeselect,
+  enableColumnChooser = true
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
@@ -763,6 +772,12 @@ export function QueryPage<TData extends KitsuResource>({
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
+  const { columnChooser, checkedColumnIds } = useColumnChooser({
+    columns: columnsResults,
+    indexName,
+    hideExportButton: true
+  });
+
   return (
     <>
       {!viewMode && (
@@ -793,11 +808,15 @@ export function QueryPage<TData extends KitsuResource>({
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (
                 <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
+                  {enableColumnChooser && columnChooser}
                   {bulkEditPath && (
                     <BulkEditButton
                       pathname={bulkEditPath}
                       singleEditPathName={singleEditPath}
                     />
+                  )}
+                  {bulkDeleteButtonProps && (
+                    <BulkDeleteButton {...bulkDeleteButtonProps} />
                   )}
                   {dataExportPath && (
                     <DataExportButton
@@ -808,9 +827,6 @@ export function QueryPage<TData extends KitsuResource>({
                   )}
                   {bulkSplitPath && (
                     <BulkSplitButton pathname={bulkSplitPath} />
-                  )}
-                  {bulkDeleteButtonProps && (
-                    <BulkDeleteButton {...bulkDeleteButtonProps} />
                   )}
                 </div>
               )}
@@ -869,7 +885,9 @@ export function QueryPage<TData extends KitsuResource>({
               )}
               <ReactTable<TData>
                 // Column and data props
-                columns={columnsResults}
+                columns={columnsResults.filter((column) =>
+                  column.id ? checkedColumnIds.includes(column.id) : false
+                )}
                 data={
                   (viewMode
                     ? customViewFields

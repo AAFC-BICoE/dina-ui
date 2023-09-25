@@ -11,7 +11,7 @@ const TEST_COLLECTION: Collection = {
   institution: { id: "1", type: "institution", name: "test institution" }
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/collection/123":
       return { data: TEST_COLLECTION };

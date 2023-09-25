@@ -58,7 +58,7 @@ describe("safeSubmit function", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".error-message").map(node => node.text())).toEqual([
+    expect(wrapper.find(".error-message").map((node) => node.text())).toEqual([
       "Test error message",
       "1 : Field A - must be a number",
       "2 : Field B - must be set"
@@ -74,6 +74,8 @@ describe("safeSubmit function", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".error-message").map(node => node.text())).toEqual([]);
+    expect(wrapper.find(".error-message").map((node) => node.text())).toEqual(
+      []
+    );
   });
 });
