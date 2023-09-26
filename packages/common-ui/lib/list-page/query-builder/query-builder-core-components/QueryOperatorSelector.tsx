@@ -63,7 +63,12 @@ export function QueryOperatorSelector({
       }
 
       // Wildcard "contains" should not be displayed if optimized infix exists.
-      if (option.key === "wildcard" && selectedFieldMapping?.containsSupport) {
+      // Or if the main type is keyword, it's not supported.
+      if (
+        option.key === "wildcard" &&
+        (selectedFieldMapping?.containsSupport ||
+          selectedFieldMapping?.type === "keyword")
+      ) {
         return false;
       }
 

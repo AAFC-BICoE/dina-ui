@@ -686,6 +686,7 @@ function generateBuilderConfig(
       };
       return field;
     }),
+
     // Support all first level fields from the custom view.
     ...(customViewFields
       ? customViewFields.map((customViewField: CustomViewField) => {
