@@ -54,12 +54,20 @@ export function QueryOperatorSelector({
   // Some options are displayed only if it is supported.
   const operationOptions = options
     ?.filter((option) => {
+      // Only display the infix option if it is supported in the mapping.
       if (
         option.key === "containsText" &&
         !selectedFieldMapping?.containsSupport
       ) {
         return false;
       }
+
+      // Wildcard "contains" should not be displayed if optimized infix exists.
+      if (option.key === "wildcard" && selectedFieldMapping?.containsSupport) {
+        return false;
+      }
+
+      // Only display the "ends with" option if it's supported in the mapping.
       if (option.key === "endsWith" && !selectedFieldMapping?.endsWithSupport) {
         return false;
       }

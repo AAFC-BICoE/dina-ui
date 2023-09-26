@@ -22,6 +22,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
         testValue: "stringValue",
         operators: [
           "exactMatch",
+          "wildcard",
           "partialMatch",
           "notEquals",
           "empty",

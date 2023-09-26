@@ -217,7 +217,13 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_exactMatch" }),
       cardinality: 1
     },
+    wildcard: {
+      // Displayed as "Contains"
+      label: formatMessage({ id: "queryBuilder_operator_wildcard" }),
+      cardinality: 1
+    },
     partialMatch: {
+      // Displayed as "Contains word"
       label: formatMessage({ id: "queryBuilder_operator_partialMatch" }),
       cardinality: 1
     },
@@ -226,6 +232,7 @@ function generateBuilderConfig(
       cardinality: 1
     },
     containsText: {
+      // Displayed as "Contains", this is an optimized version of the wildcard.
       label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
       cardinality: 1
     },
@@ -268,6 +275,7 @@ function generateBuilderConfig(
       cardinality: 1
     },
     containsDate: {
+      // Displayed as "Contains" - Used for searching "2017-08" or "2023" in dates.
       label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
       cardinality: 1
     },
@@ -469,6 +477,7 @@ function generateBuilderConfig(
         text: {
           operators: [
             "exactMatch",
+            "wildcard",
             "partialMatch",
             "startsWith", // Only displayed if supported on the mapping.
             "containsText", // Only displayed if supported on the mapping.

@@ -131,7 +131,14 @@ export default function QueryRowManagedAttributeSearch({
       case "BOOL":
         return ["equals", "empty", "notEmpty"];
       case "STRING":
-        return ["exactMatch", "partialMatch", "notEquals", "empty", "notEmpty"];
+        return [
+          "exactMatch",
+          "wildcard",
+          "partialMatch",
+          "notEquals",
+          "empty",
+          "notEmpty"
+        ];
       default:
         return [];
     }
