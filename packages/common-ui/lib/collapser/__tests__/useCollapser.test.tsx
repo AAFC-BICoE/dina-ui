@@ -1,4 +1,5 @@
-import { mount } from "enzyme";
+import "@testing-library/jest-dom";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useCollapser } from "../useCollapser";
 
 function TestComponent() {
@@ -18,21 +19,22 @@ function TestComponent() {
 
 describe("Collapser", () => {
   it("Renders initially as open.", () => {
-    const wrapper = mount(<TestComponent />);
-    expect(wrapper.find(".collapsible-content").exists()).toEqual(true);
+    render(<TestComponent />);
+    expect(screen.queryByText("Collapsed content")).not.toBeNull();
   });
 
   it("Provides a button to change collapsed state.", () => {
-    const wrapper = mount(<TestComponent />);
-
+    const wrapper = render(<TestComponent />);
+    expect(wrapper.queryByText("Collapsed content")).toBeInTheDocument();
     // Collapse the content:
-    wrapper.find("button.collapser-button").simulate("click");
-    wrapper.update();
-    expect(wrapper.find(".collapsible-content").exists()).toEqual(false);
+    const button = wrapper.getByTitle("Collapser Button");
+    fireEvent.click(button);
+    expect(wrapper.queryByText("Collapsed content")).not.toBeInTheDocument();
 
     // Un-collapse the content:
-    wrapper.find("button.collapser-button").simulate("click");
-    wrapper.update();
-    expect(wrapper.find(".collapsible-content").exists()).toEqual(true);
+    fireEvent.click(button);
+    waitFor(() => {
+      expect(wrapper.queryByText("Collapsed content")).toBeInTheDocument();
+    });
   });
 });
