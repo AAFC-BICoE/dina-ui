@@ -9,6 +9,6 @@ const csvSheet = readFile(csvFilePath).Sheets.Sheet1;
 importCsvMessages({
   csvSheet,
   messageGroups: MESSAGE_GROUPS,
-  readFile: file => readFileSync(file).toString(),
+  readFile: (file) => readFileSync(file).toString(),
   writeFile: writeFileSync
 });

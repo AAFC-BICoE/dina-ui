@@ -106,11 +106,12 @@ export default function MetadataListPage() {
       relationshipType: "person",
       accessorKey: "included.attributes.displayName",
       isKeyword: true,
-      enableSorting: false
+      enableSorting: false,
+      id: "acMetadataCreator.displayName"
     },
     stringArrayCell("acTags", "data.attributes.acTags"),
     {
-      id: "action",
+      id: "viewPreviewButtonText",
       cell: ({ row: { original } }) => (
         <div className="d-flex h-100">
           <button

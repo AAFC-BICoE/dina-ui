@@ -638,19 +638,21 @@ Object {
 
 exports[`QueryBuilderElasticSearchExport functionality applySourceFiltering Ensure all source filtering are being applied to the query 1`] = `
 Object {
-  "_source": Array [
-    "data.id",
-    "data.type",
-    "data.attributes.testColumn1",
-    "data.attributes.includeThis1",
-    "data.attributes.includeThis2",
-    "data.attributes.testColumn2",
-    "data.attributes.includeThis3",
-    "data.attributes.testColumn4",
-    "data.attributes.testColumn5",
-    "included.id",
-    "included.type",
-  ],
+  "_source": Object {
+    "includes": Array [
+      "data.id",
+      "data.type",
+      "data.attributes.testColumn1",
+      "data.attributes.includeThis1",
+      "data.attributes.includeThis2",
+      "data.attributes.testColumn2",
+      "data.attributes.includeThis3",
+      "data.attributes.testColumn4",
+      "data.attributes.testColumn5",
+      "included.id",
+      "included.type",
+    ],
+  },
   "query": Object {
     "bool": Object {
       "must": Array [

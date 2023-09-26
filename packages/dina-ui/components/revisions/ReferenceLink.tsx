@@ -36,7 +36,7 @@ export function ReferenceLink<TResource extends KitsuResource>({
     { disabled: !id || !type }
   );
 
-  return withResponse(q, res => {
+  return withResponse(q, (res) => {
     const content =
       name(res.data as PersistedResource<TResource>) || res.data.id;
 

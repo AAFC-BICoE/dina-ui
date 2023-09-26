@@ -254,6 +254,14 @@ export default function MaterialSampleListPage() {
       isKeyword: true
     },
 
+    // Material Sample State
+    {
+      id: "materialSampleState",
+      header: () => <FieldHeader name="materialSampleState" />,
+      accessorKey: "data.attributes.materialSampleState",
+      isKeyword: true
+    },
+
     // Created By
     {
       id: "createdBy",
@@ -263,16 +271,7 @@ export default function MaterialSampleListPage() {
     },
 
     // Created On
-    dateCell("createdOn", "data.attributes.createdOn"),
-
-    // Material Sample State
-    {
-      id: "materialSampleState",
-      header: () => <FieldHeader name="materialSampleState" />,
-      accessorKey: "data.attributes.materialSampleState",
-      isKeyword: true,
-      isColumnVisible: false
-    }
+    dateCell("createdOn", "data.attributes.createdOn")
   ];
 
   function rowStyling(row: Row<MaterialSample>) {

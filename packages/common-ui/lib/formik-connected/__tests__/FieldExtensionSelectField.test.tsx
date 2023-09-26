@@ -25,7 +25,7 @@ const TEST_FIELD_EXTENTION_DATA = {
   }
 };
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   if (path === "test-path/extension/cfia_ppc") {
     return { data: TEST_FIELD_EXTENTION_DATA.data };
   }

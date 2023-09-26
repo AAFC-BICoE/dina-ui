@@ -74,7 +74,7 @@ const TEST_LICENSES: PersistedResource<License>[] = [
 const TEST_METADATA: PersistedResource<Metadata> = {
   acSubtype: "TEST_SUBTYPE",
   bucket: "testbucket",
-  dcType: "Image",
+  dcType: "IMAGE",
   xmpRightsWebStatement:
     "https://open.canada.ca/en/open-government-licence-canada",
   id: "25f81de5-bbee-430c-b5fa-71986b70e612",
@@ -232,7 +232,7 @@ describe("Metadata external resource edit page.", () => {
 
     expect(wrapper.find(".dcType-field Select").prop("value")).toEqual({
       label: "Image",
-      value: "Image"
+      value: "IMAGE"
     });
 
     // Set new values:

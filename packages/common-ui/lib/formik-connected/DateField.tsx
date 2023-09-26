@@ -90,7 +90,7 @@ export function DateField(props: DateFieldProps) {
           }
         }
 
-        function onBlur(event: FocusEvent<HTMLInputElement, Element>) {
+        function onBlur(event: FocusEvent<HTMLInputElement>) {
           const newText = event.target.value;
 
           const error = validate?.(newText);

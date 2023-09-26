@@ -10,7 +10,7 @@ const TEST_PREPARATION_TYPE: PreparationType = {
 };
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn<any, any>(async model => {
+const mockGet = jest.fn<any, any>(async (model) => {
   // The get request will return the existing preparation-type.
   if (model === "collection-api/preparation-type/100") {
     return { data: TEST_PREPARATION_TYPE };
