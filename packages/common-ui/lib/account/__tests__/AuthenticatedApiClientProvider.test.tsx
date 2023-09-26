@@ -1,4 +1,5 @@
-import { mount } from "enzyme";
+import "@testing-library/jest-dom";
+import { render } from "@testing-library/react";
 import { noop } from "lodash";
 import { ApiClientProvider } from "../../api-client/ApiClientContext";
 import { useQuery } from "../../api-client/useQuery";
@@ -31,7 +32,7 @@ describe("AuthenticatedApiClientProvider", () => {
       return <></>;
     };
 
-    mount(
+    render(
       <AccountProvider
         value={{
           ...MOCK_ACCOUNT_CONTEXT,
