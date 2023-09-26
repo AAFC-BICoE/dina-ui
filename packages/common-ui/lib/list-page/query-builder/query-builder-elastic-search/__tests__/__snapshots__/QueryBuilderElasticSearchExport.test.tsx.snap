@@ -36,7 +36,15 @@ Object {
 }
 `;
 
-exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute 1`] = `
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (not optimized) 1`] = `
+Object {
+  "prefix": Object {
+    "data.attribute.materialSampleName": "searchvalue",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (optimized) 1`] = `
 Object {
   "prefix": Object {
     "data.attribute.materialSampleName.prefix": "searchvalue",
@@ -44,7 +52,31 @@ Object {
 }
 `;
 
-exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery relationship 1`] = `
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery relationship (not optimized) 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.dwcRecordNumber": "searchvalue",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery relationship (optimized) 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -606,19 +638,21 @@ Object {
 
 exports[`QueryBuilderElasticSearchExport functionality applySourceFiltering Ensure all source filtering are being applied to the query 1`] = `
 Object {
-  "_source": Array [
-    "data.id",
-    "data.type",
-    "data.attributes.testColumn1",
-    "data.attributes.includeThis1",
-    "data.attributes.includeThis2",
-    "data.attributes.testColumn2",
-    "data.attributes.includeThis3",
-    "data.attributes.testColumn4",
-    "data.attributes.testColumn5",
-    "included.id",
-    "included.type",
-  ],
+  "_source": Object {
+    "includes": Array [
+      "data.id",
+      "data.type",
+      "data.attributes.testColumn1",
+      "data.attributes.includeThis1",
+      "data.attributes.includeThis2",
+      "data.attributes.testColumn2",
+      "data.attributes.includeThis3",
+      "data.attributes.testColumn4",
+      "data.attributes.testColumn5",
+      "included.id",
+      "included.type",
+    ],
+  },
   "query": Object {
     "bool": Object {
       "must": Array [

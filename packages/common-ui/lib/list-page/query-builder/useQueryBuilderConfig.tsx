@@ -91,6 +91,10 @@ function getQueryBuilderTypeFromIndexType(
     case "fieldExtension":
       return type;
 
+    // If it's stored directly as a keyword, it's considered a text field.
+    case "keyword":
+      return "text";
+
     // Elastic search contains many different number fields.
     case "long":
     case "short":
@@ -165,7 +169,7 @@ export function useQueryBuilderConfig({
     indexName,
     dynamicFieldMapping
   });
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
 
   const [queryBuilderConfig, setQueryBuilderConfig] = useState<Config>();
 
@@ -181,7 +185,7 @@ export function useQueryBuilderConfig({
         customViewFields
       )
     );
-  }, [indexMap, customViewFields]);
+  }, [indexMap, customViewFields, locale]);
 
   return { queryBuilderConfig };
 }

@@ -15,8 +15,8 @@ const STORAGE_UNIT_CHILDREN = ["B", "C", "D"].map<
     id: "BOX",
     name: "Box",
     group: "test-group",
-    type: "storage-unit-type",
-  },
+    type: "storage-unit-type"
+  }
 }));
 
 // Initial container:
@@ -26,7 +26,7 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
   group: "group",
   name: "A",
   type: "storage-unit",
-  storageUnitChildren: STORAGE_UNIT_CHILDREN,
+  storageUnitChildren: STORAGE_UNIT_CHILDREN
 };
 
 /** Target container. */
@@ -34,7 +34,7 @@ const STORAGE_B: PersistedResource<StorageUnit> = {
   id: "B",
   group: "group",
   name: "B",
-  type: "storage-unit",
+  type: "storage-unit"
 };
 
 // Just return what is passed to it:
@@ -45,8 +45,8 @@ const mockReload = jest.fn();
 jest.mock("next/router", () => ({
   useRouter: () => ({
     push: mockPush,
-    reload: mockReload,
-  }),
+    reload: mockReload
+  })
 }));
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
@@ -59,13 +59,13 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
               // The initial Storage Unit's children:
               return {
                 data: STORAGE_UNIT_CHILDREN,
-                meta: { totalResourceCount: 3 },
+                meta: { totalResourceCount: 3 }
               };
             case "parentStorageUnit.uuid==X":
               // The initial Storage Unit's children:
               return {
                 data: [],
-                meta: { totalResourceCount: 0 },
+                meta: { totalResourceCount: 0 }
               };
           }
         case "hierarchy,storageUnitType":
@@ -75,7 +75,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
               // The searchable table results:
               return {
                 data: [STORAGE_B],
-                meta: { totalResourceCount: 1 },
+                meta: { totalResourceCount: 1 }
               };
           }
       }
@@ -85,7 +85,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       // The fetcher for all current children before executing the Save operation:
       return {
         data: STORAGE_A,
-        meta: { totalResourceCount: 1 },
+        meta: { totalResourceCount: 1 }
       };
     case "collection-api/material-sample":
       // Stored material samples:
@@ -109,7 +109,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths) => {
   const storageUnitChildrenPaths = [
     "/storage-unit/B?include=storageUnitType",
     "/storage-unit/C?include=storageUnitType",
-    "/storage-unit/D?include=storageUnitType",
+    "/storage-unit/D?include=storageUnitType"
   ];
   if (arrayEquals(paths, storageUnitChildrenPaths)) {
     return STORAGE_UNIT_CHILDREN;
@@ -118,10 +118,10 @@ const mockBulkGet = jest.fn<any, any>(async (paths) => {
 
 const apiContext = {
   apiClient: {
-    get: mockGet,
+    get: mockGet
   },
   save: mockSave,
-  bulkGet: mockBulkGet,
+  bulkGet: mockBulkGet
 };
 
 const storageUnitA: StorageUnit = {
@@ -129,14 +129,14 @@ const storageUnitA: StorageUnit = {
   id: "A",
   name: "testNameA",
   group: "aafc",
-  storageUnitChildren: STORAGE_UNIT_CHILDREN,
+  storageUnitChildren: STORAGE_UNIT_CHILDREN
 };
 
 const storageUnitX: StorageUnit = {
   type: "storage-unit",
   id: "X",
   name: "testNameX",
-  group: "aafc",
+  group: "aafc"
 };
 
 describe("StorageUnitChildrenViewer component", () => {
@@ -186,21 +186,21 @@ describe("StorageUnitChildrenViewer component", () => {
           resource: {
             id: unit.id,
             type: "storage-unit",
-            parentStorageUnit: { type: "storage-unit", id: "B" },
+            parentStorageUnit: { type: "storage-unit", id: "B" }
           },
-          type: "storage-unit",
+          type: "storage-unit"
         })),
         {
           resource: {
             id: "ms-1",
             storageUnit: {
               id: "B",
-              type: "storage-unit",
+              type: "storage-unit"
             },
-            type: "material-sample",
+            type: "material-sample"
           },
-          type: "material-sample",
-        },
+          type: "material-sample"
+        }
       ],
       { apiBaseUrl: "/collection-api" }
     );
@@ -234,10 +234,10 @@ describe("StorageUnitChildrenViewer component", () => {
           resource: {
             id: "B",
             type: "storage-unit",
-            parentStorageUnit: { type: "storage-unit", id: "X" },
+            parentStorageUnit: { type: "storage-unit", id: "X" }
           },
-          type: "storage-unit",
-        },
+          type: "storage-unit"
+        }
       ],
       { apiBaseUrl: "/collection-api" }
     );

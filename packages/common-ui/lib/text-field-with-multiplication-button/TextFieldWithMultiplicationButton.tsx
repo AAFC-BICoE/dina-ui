@@ -9,7 +9,7 @@ export function TextFieldWithMultiplicationButton(props: TextFieldProps) {
   return (
     <TextField
       {...props}
-      customInput={inputProps => (
+      customInput={(inputProps) => (
         <InputWithMultiplicationButton {...inputProps} />
       )}
     />

@@ -79,7 +79,12 @@ export function FileView({
   }
   const resp = useQuery(
     { path: filePath, responseType: "blob" },
-    { onSuccess }
+    {
+      onSuccess,
+      disabled: metadata
+        ? metadata?.dcType !== "IMAGE" && metadata?.dcType !== "MOVING_IMAGE"
+        : false
+    }
   );
 
   if (preview || (!isImage && fileType !== "pdf")) {
@@ -131,7 +136,10 @@ export function FileView({
         {thumbnailImageDerivative ? (
           <SmallThumbnail filePath={fallBackFilePath} />
         ) : (
-          <Link href={objectURL as any} passHref={true}>
+          <Link
+            href={objectURL ? (objectURL as any) : filePath}
+            passHref={true}
+          >
             <a>{filePath}</a>
           </Link>
         )}

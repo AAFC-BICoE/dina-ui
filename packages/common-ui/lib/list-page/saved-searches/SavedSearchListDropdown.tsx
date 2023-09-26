@@ -5,12 +5,13 @@ import { FaRegSadTear, FaRegFrown } from "react-icons/fa";
 import { DefaultBadge } from "./SavedSearchBadges";
 import { SavedSearchItem } from "./SavedSearchItem";
 import { SingleSavedSearch } from "./types";
+import { useIntl } from "react-intl";
 
 type CustomMenuProps = {
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
-  labeledBy?: string;
+  labelledBy?: string;
 };
 
 interface SavedSearchListDropdownProps {
@@ -30,6 +31,8 @@ export function SavedSearchListDropdown({
   onSavedSearchSelected,
   onSavedSearchDelete
 }: SavedSearchListDropdownProps) {
+  const { formatMessage } = useIntl();
+
   const CustomMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
       return (
@@ -41,10 +44,12 @@ export function SavedSearchListDropdown({
             padding: "0px"
           }}
           className={props.className}
-          aria-labelledby={props.labeledBy}
+          aria-labelledby={props.labelledBy}
         >
           <Modal.Header className="float-left">
-            <Modal.Title>Saved Searches</Modal.Title>
+            <Modal.Title>
+              <DinaMessage id="queryBuilder_savedSearches" />
+            </Modal.Title>
           </Modal.Header>
 
           <Modal.Body
@@ -100,7 +105,8 @@ export function SavedSearchListDropdown({
   return (
     <Dropdown className="float-end" autoClose="outside">
       <Dropdown.Toggle variant="light" className="btn-empty">
-        {selectedSavedSearch ?? "Saved Searches"}
+        {selectedSavedSearch ??
+          formatMessage({ id: "queryBuilder_savedSearches" })}
         <DefaultBadge displayBadge={currentIsDefault} />
       </Dropdown.Toggle>
       <Dropdown.Menu as={CustomMenu} />

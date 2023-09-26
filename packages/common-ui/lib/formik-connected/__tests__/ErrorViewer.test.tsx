@@ -58,7 +58,7 @@ describe("ErrorViewer component", () => {
     expect(
       wrapper
         .find(".alert.alert-danger .error-message")
-        .map(node => node.text())
+        .map((node) => node.text())
     ).toEqual([
       "1 : Top Level Field - Error",
       "2 : Nested Object Nested Field - Nested Error",

@@ -11,6 +11,7 @@ export interface CheckBoxFieldProps<TData extends KitsuResource> {
   fileHyperlinkId?: string;
   disabled?: boolean;
   setCustomGeographicPlaceCheckboxState?: Dispatch<SetStateAction<boolean>>;
+  className?: string;
 }
 
 export interface GroupedCheckBoxesParams<TData extends KitsuResource> {
@@ -35,7 +36,8 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   function CheckBoxField({
     resource,
     fileHyperlinkId,
-    disabled
+    disabled,
+    className
   }: CheckBoxFieldProps<TData>) {
     const thisBoxFieldName = `${fieldName}[${resource.shortId ?? resource.id}]`;
     const computedAvailableItems =
@@ -77,7 +79,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
           }
 
           return (
-            <div className="d-flex w-100 h-100">
+            <div className={className ?? "d-flex w-100 h-100"}>
               <div className="mx-auto my-auto">
                 <input
                   disabled={disabled}
@@ -172,6 +174,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
     CheckBoxField,
     CheckBoxHeader,
     setAvailableItems,
+    availableItems,
     DetachedTotalSelected
   };
 }

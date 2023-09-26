@@ -7,7 +7,7 @@ import { PreparationTypeFormLayout } from "./edit";
 export default function PreparationTypeDetailsPage() {
   return (
     <ViewPageLayout<PreparationType>
-      form={props => (
+      form={(props) => (
         <DinaForm<PreparationType>
           {...props}
           initialValues={{
@@ -23,7 +23,7 @@ export default function PreparationTypeDetailsPage() {
           <PreparationTypeFormLayout />
         </DinaForm>
       )}
-      query={id => ({ path: `collection-api/preparation-type/${id}` })}
+      query={(id) => ({ path: `collection-api/preparation-type/${id}` })}
       entityLink="/collection/preparation-type"
       type="preparation-type"
       apiBaseUrl="/collection-api"

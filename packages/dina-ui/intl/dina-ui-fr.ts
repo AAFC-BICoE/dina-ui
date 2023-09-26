@@ -58,10 +58,11 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   allowExisting: "Autoriser l’existant",
   allowNew: "Autoriser le nouveau",
   appTitle: "DINA",
+  appTitleInstanceMode: "DINA ({instanceMode})",
   assemblage: "Assemblage",
-  assemblageAttachments: "Pièces jointes de lassemblage",
+  assemblageAttachments: "Pièces jointes de l'assemblage",
   assemblageListTitle: "Assemblages",
-  assemblageManagedAttributes: "Attributs gérés de lassemblage",
+  assemblageManagedAttributes: "Attributs gérés de l'assemblage",
   assemblage_tooltip:
     "Mécanisme utilisé pour regrouper des échantillons de matériau selon un certain thème organisationnel.",
   assemblages: "Assemblages",
@@ -79,6 +80,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   attachedMaterialSamples: "Pièces jointes des échantillons de matériau",
   attachments: "Pièces jointes",
   attributeLabel: "Attribut",
+  auditSnapshot: "Aperçu de l'audit",
   backToParentUnit: "Retour à l'unité parent",
   baseNameLabel: "Nom de base",
   batchModeInfo:
@@ -97,6 +99,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cataloguedObjectListTitle: "Objets catalogués",
   cfiaPPCLevel: "Niveau ACIA PPC",
   changedProperties: "Modifications",
+  childCultureStrains: "Souches de culture",
+  childMaterialSamples: "Échantillon de Matériel Direct Enfants",
   childrenStorageUnits: "Tables enfants des unités de stockage",
   closePreviewButtonText: "Fermer la prévisualisation",
   colSearchBoxTooltip: "Rechercher dans le Catalogue de la vie",
@@ -125,6 +129,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   configureDefaultValues: "Configurer les valeurs par défaut",
   configureFormTemplate: "Configurer un modèle de formulaire",
   contents: "Table des matières",
+  controlledVocabularyTitle: "Vocabulaire vérifié",
   convertToDepthMinMax: "Conversion de la profondeur min/max",
   convertToElevationMinMax: "Conversion de l’élévation min/max",
   coordinateUncertaintyInMeters: "Coordonner l’incertitude en mètres",
@@ -141,13 +146,15 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createNewMaterialSamples: "Créer de nouveaux échantillons de matériaux",
   createNewView: "Créer une nouvelle vue",
   createSampleWithFormTemplate:
-    "Créer un échantillon à laide dun modèle de formulaire",
+    "Créer un échantillon à l'aide d'un modèle de formulaire",
   createSavedSearch: "Créer une recherche sauvegardée",
   createSplitWorkflow: "Créer un fractionnement",
   createStorage: "Créer un espace d'entreposage",
   customPlaceName: "Nom de lieu personnalisé",
   dataComponents: "Éléments de données",
   dataEntryLabel: "Saisie de données",
+  dataType: "Taper: ",
+  dataValue: "Valeur: ",
   dataset: "Ensemble de données",
   datasetSearchTooltip:
     "Pour utiliser un ensemble de données différent du Catalogue de la vie.",
@@ -155,7 +162,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   default: "Par défaut",
   defaultValues: "Valeurs par défaut",
   defaultValuesConfig: "Configuration des valeurs par défaut ",
-  defaultValuesConfigs: "Configurations des valeurs par défaut ",
+  defaultValuesConfigs: "Configuratsions des valeurs par défaut ",
   deleteButtonText: "Supprimer",
   deleteConfig: "Supprimer la configuration",
   deleteEmptyStorageWarning:
@@ -239,19 +246,19 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_acTags: "Balises",
   field_acceptedValues: "Valeurs acceptées",
   field_aliases: "Pseudonymes",
-  field_assemblageName: "Nom de lassemblage",
+  field_assemblageName: "Nom de l'assemblage",
   field_attachment: "Pièces jointes",
   field_attributesTemplate: "Modèle des attributs définis",
   field_barcode: "Code à barres",
   field_collectingEventCollectionMethod: "Méthode de collecte",
   field_collectingEventCollectionMethod_tooltip:
-    "Méthode utilisée durant une activité de collecte. Exemples : piège lumineux à UV, chalut de fond",
+    "Méthode utilisée durant une activité de collecte. Exemples : piège lumineux à UV, chalut de fond",
   field_collectingEventHost: "Hôte",
   field_collectingEventHost_tooltip:
-    "Hôte observé de léchantillon de matériau au moment de lactivité de collecte",
+    "Hôte observé de l'échantillon de matériau au moment de l'activité de collecte",
   field_collectingEventSubstrate: "Substrat",
   field_collectingEventSubstrate_tooltip:
-    "Surface observée sur laquelle un organisme a été prélevé et sur laquelle on pense quil a vécu",
+    "Surface observée sur laquelle un organisme a été prélevé et sur laquelle on pense qu'il a vécu",
   field_collectingEvent_endDateTimeError:
     "Le format de date/heure de l’événement final doit être un sous-ensemble de : AAAA-MM-JJTHH:MM:SS.MMM, si la date est présente, 'T’ est obligatoire",
   field_collectingEvent_startDateTimeError:
@@ -271,8 +278,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   "field_description.en": "Description anglaise",
   "field_description.fr": "Description française",
   field_determination: "Déterminations",
-  "field_determination.scientificName": "Nom scientifique",
-  "field_determination.typeStatus": "Type détat",
+  "field_determination.typeStatus": "Type d'état",
   "field_determination.verbatimScientificName": "Nom scientifique verbatim",
   field_determinationRemarks: "Détermination - remarques",
   field_displayName: "Visualiser le nom",
@@ -280,7 +286,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dwcCoordinateUncertaintyInMeters:
     "Coordonner les incertitudes dans les mesures en mètres",
   field_dwcCoordinateUncertaintyInMeters_tooltip:
-    "Distance horizontale en mètres à partir de la latitude décimale (decimalLatitude) et de la longitude décimale (decimalLongitude), décrivant le plus petit cercle renfermant lensemble de lemplacement",
+    "Distance horizontale en mètres à partir de la latitude décimale (decimalLatitude) et de la longitude décimale (decimalLongitude), décrivant le plus petit cercle renfermant l'ensemble de l'emplacement",
   field_dwcCountry: "Pays",
   field_dwcCountryCode: "Code du pays",
   field_dwcDecimalLatitude: "Latitude décimale",
@@ -290,7 +296,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "La mesure dans laquelle un organisme survit, se reproduit et étend son aire de répartition à un endroit et à un moment donnés.",
   field_dwcFieldNumber: "Numéro de collection",
   field_dwcFieldNumber_tooltip:
-    "Identifiant donné à lactivité sur le terrain au moment de la collecte dun ou de plusieurs échantillons, servant souvent de lien entre les notes prises sur le terrain et lactivité.",
+    "Identifiant donné à l'activité sur le terrain au moment de la collecte d'un ou de plusieurs échantillons, servant souvent de lien entre les notes prises sur le terrain et l'activité.",
   field_dwcGeodeticDatum: "Référence géodésique",
   field_dwcGeodeticDatum_tooltip:
     "La référence géodésique sur laquelle les coordonnées géographiques decimalLatitude et decimalLongitude sont fondées. La pratique exemplaire recommandée est ",
@@ -309,7 +315,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dwcOtherRecordNumbers: "Autres numéros de mentions",
   field_dwcRecordNumber: "Numéro du collecteur",
   field_dwcRecordNumber_tooltip:
-    "Identifiant donné à loccurrence, par le collectionneur, au moment où elle a été consignée, p. ex. le numéro du collectionneur de spécimens, servant souvent de lien entre les notes prises sur le terrain et une mention doccurrence.",
+    "Identifiant donné à l'occurrence, par le collectionneur, au moment où elle a été consignée, p. ex. le numéro du collectionneur de spécimens, servant souvent de lien entre les notes prises sur le terrain et une mention d'occurrence.",
   field_dwcRecordedBy: "Collecteurs Verbatim",
   field_dwcStateProvince: "État/province",
   field_dwcVerbatimCoordinateSystem: "Système de coordonnées Verbatim",
@@ -341,9 +347,14 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Créer une grille permettant de stocker le contenu. Aucune table enfant ne peut être créée pour les unités de stockage.",
   field_endDate: "Date de fin",
   field_endEventDateTime: "Date et heure de l'événement final",
+  field_endEventDateTime_tooltip:
+    "Le format de date/heure de la fin de l’événement doit être un sous-ensemble de : AAAA-MM-JJTHH:MM:SS.MMM, si la date est présente, 'T’ est obligatoire",
   field_familyNames: "Noms de famille",
   field_familyNames_tooltip:
     "Nom(s) de famille, y compris les noms de famille composés",
+  field_fieldExtensions: "Extensions de champs",
+  field_fileIdentifier: "Identifiant du fichier",
+  field_fileSize: "Taille du fichier",
   field_givenNames: "Prénoms",
   field_givenNames_tooltip: "Prénom et tous les seconds prénoms",
   field_gridLayoutDefinition_column_label: "Par colonne",
@@ -356,25 +367,22 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_isInseperable_tooltip: "Les contenus sont inséparables",
   field_isPrimary_tooltip:
     "Faire de cette détermination le point de données principal lors de l'exportation. Une seule détermination peut être principale. ",
-  field_isRestricted: "Fait lobjet de restrictions",
+  field_isRestricted: "Fait l'objet de restrictions",
   field_isolatedBy: "Isolé par",
   field_isolatedOn: "Isolé le ",
   field_isolationRemarks: "Isolation - remarques",
   field_license: "Licence",
+  field_lifeStage: "Étape de la Vie",
   field_managedAttributeComponent: "Type de composant des données cibles",
   field_managedAttributeCreatedBy: "Créé par",
   field_managedAttributeCreatedOn: "Créé le",
   field_managedAttributeMandatoryFieldsError:
     "Le nom et le type sont des champs obligatoires",
   field_managedAttributeName: "Nom de l'attribut",
-  field_vocabularyElementType_boolean_label: "Booléen",
-  field_vocabularyElementType_date_label: "Date",
-  field_vocabularyElementType_integer_label: "Par ordre numérique",
-  field_vocabularyElementType_picklist_label: "Liste de sélection",
-  field_vocabularyElementType_text_label: "Texte",
+  field_managedAttributes: "Attributs gérés",
   field_materialSampleName: "Identifiant Échantillons de matériaux",
-  field_materialSampleRemarks: "Commentaire sur léchantillon de matériau",
-  field_materialSampleState: "État de léchantillon de matériau",
+  field_materialSampleRemarks: "Commentaire sur l'échantillon de matériau",
+  field_materialSampleState: "État de l'échantillon de matériau",
   field_materialSampleState_tooltip:
     "Représente l'état d'un échantillon de matériau qui a été détérioré. ",
   field_materialSampleType: "Type d’échantillon de matière",
@@ -386,9 +394,11 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_name: "Nom",
   field_notPubliclyReleasableReason:
     "Raison pour laquelle il n’est pas possible de le divulguer publiquement",
+  field_organismRemarks: "Organisme Remarques",
   field_organismsIndividualEntry: "Entrée d'un organisme individuel",
   field_organismsIndividualEntry_tooltip:
     "Laisser FERMÉ pour copier les mêmes données pour chaque organisme. Basculement ACTIVÉ pour entrer différentes données pour chaque organisme.",
+  field_organismsQuantity: "Quantité d'Organismes",
   field_organizationMandatoryFieldsError:
     "Le nom d’au moins une organisation est requis",
   field_orientation: "Orientation",
@@ -404,32 +414,39 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_preparationDate: "Date de la préparation",
   field_preparationFixative: "Solution de fixation de la préparation",
   field_preparationFixative_tooltip:
-    "Solution qui a été appliquée à léchantillon de matériau ou dans laquelle il est conservé. Exemples : ETOH 95 %, ETOH 75 %, ETOH 70 %, solution saline, colle.",
+    "Solution qui a été appliquée à l'échantillon de matériau ou dans laquelle il est conservé. Exemples : ETOH 95 %, ETOH 75 %, ETOH 70 %, solution saline, colle.",
   field_preparationMaterials: "Matériel de préparation",
   field_preparationMaterials_tooltip:
-    "Autres milieux ou objets physiques, généralement inertes, dans ou sur lesquels lorganisme dun échantillon de matériau est conservé. Ne correspond pas à létat de lorganisme ni aux solutions de fixation utilisées, mais plutôt au matériel qui permet de présenter lorganisme. Exemples : épingle, flacon en verre, bocal en plastique, bocal en verre, lame de microscope, papier sans acide, piège collant/plaquette adhésive, tube Eppendorf.",
+    "Autres milieux ou objets physiques, généralement inertes, dans ou sur lesquels l'organisme d'un échantillon de matériau est conservé. Ne correspond pas à l'état de l'organisme ni aux solutions de fixation utilisées, mais plutôt au matériel qui permet de présenter l'organisme. Exemples : épingle, flacon en verre, bocal en plastique, bocal en verre, lame de microscope, papier sans acide, piège collant/plaquette adhésive, tube Eppendorf.",
   field_preparationMethod: "Méthode de préparation",
   field_preparationMethod_tooltip:
-    "Substantif désignant le processus utilisé (la méthode) pour préparer léchantillon de matériau. Exemples : culture, inoculation mécanique, dissection.",
+    "Substantif désignant le processus utilisé (la méthode) pour préparer l'échantillon de matériau. Exemples : culture, inoculation mécanique, dissection.",
   field_preparationRemarks: "Commentaires sur la préparation",
   field_preparationSubstrate: "Substrat de la préparation",
   field_preparationSubstrate_tooltip:
-    "Matériel sur lequel lorganisme de léchantillon de matériau est présenté ou croît. Exemples : roche, bois, gélose.",
+    "Matériel sur lequel l'organisme de l'échantillon de matériau est présenté ou croît. Exemples : roche, bois, gélose.",
   field_preparationType: "Type de préparation",
   field_preparationType_tooltip:
-    "Substantif désignant ce que lon prépare. Exemples : membre, tissus, ADN",
+    "Substantif désignant ce que l'on prépare. Exemples : membre, tissus, ADN",
   field_preservationType: "Type de préservation",
   field_preservationType_tooltip:
-    "Description du type de préservation de léchantillon de matériau. Exemple : lyophilisation.",
+    "Description du type de préservation de l'échantillon de matériau. Exemple : lyophilisation.",
   field_projectName: "Nom du projet",
   field_projectStatus: "État du projet",
   field_publiclyReleasable: "Accessible au public",
   field_publiclyReleasable_tooltip:
     "Indique si l’objet peut être diffusé publiquement sur une page Web ou sur des portails de données ouvertes.",
   field_remarks: "Remarques",
+  field_restrictToCreatedBy: "Privé",
+  field_restrictions: "Restrictions",
+  field_sampleName: "Nom de l’échantillon",
+  field_scientificName: "Nom scientifique",
   field_scientificNameInput: "Nom scientifique",
+  field_sex: "Sexe",
   field_startDate: "Date de début",
   field_startEventDateTime: "Date et heure de l'événement initial",
+  field_startEventDateTime_tooltip:
+    "Le format de date/heure du début de l’événement doit être un sous-ensemble de : AAAA-MM-JJTHH:MM:SS.MMM, si la date est présente, 'T’ est obligatoire",
   field_tags: "Étiquettes",
   field_title: "Titre",
   "field_title.en": "Titre en anglais",
@@ -439,9 +456,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_typeStatus: "Type de statut",
   field_typeStatusEvidence: "Type de statut - Preuve",
   field_useNextSequence: "Utiliser le prochain identifiant disponible",
-  field_useTargetOrganism: "Utiliser lorganisme ciblé",
+  field_useTargetOrganism: "Utiliser l'organisme ciblé",
   field_useTargetOrganismError:
-    "Sélectionner lorganisme ciblé lorsque loption Utiliser lorganisme ciblé est activée.",
+    "Sélectionner l'organisme ciblé lorsque l'option Utiliser l'organisme ciblé est activée.",
   field_verbatimDate: "Verbatim - Date",
   field_verbatimDeterminer: "Déterminant verbatim",
   field_verbatimEventDateTime: "Date et heure de l'événement textuel",
@@ -450,6 +467,12 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_visibleManagedAttributes: "Attributs gérés visibles",
   field_visibleManagedAttributes_tooltip:
     "Ajouter ou retirer un attribut à l'aide du présent menu déroulant ne modifie pas la valeur. Cela ne fait que modifier la visibilité de l'attribut dans l'éditeur.",
+  field_vocabularyElementType_boolean_label: "Booléen",
+  field_vocabularyElementType_date_label: "Date",
+  field_vocabularyElementType_decimal_label: "Décimal",
+  field_vocabularyElementType_integer_label: "Par ordre numérique",
+  field_vocabularyElementType_picklist_label: "Liste de sélection",
+  field_vocabularyElementType_text_label: "Texte",
   field_webpage: "Page Web",
   field_xmpMetadataDate: "Date d’application des métadonnées",
   field_xmpMetadataDate_tooltip:
@@ -467,13 +490,22 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Aux fins d’analyse seulement. Seules des données non classifiées peuvent être téléversées. Toute donnée téléversée peut être supprimée, en tout temps. ",
   formNavigation: "Navigation dans les formulaires",
   formTemplate: "Modèle de formulaire",
+  formTemplateEditPermission_tooltip:
+    "Seul le créateur de ce modèle de formulaire peut modifier ce modèle de formulaire.",
+  formTemplateGroupVisibility_tooltip:
+    "Veuillez choisir un groupe pour ce modèle de formulaire pour déterminer la visibilité",
+  formTemplatePrivate_tooltip:
+    "Vous êtes la seule personne à pouvoir visualiser ce modèle de formulaire.",
+  formTemplatePublic_tooltip:
+    "Tous les membres du groupe {group} peuvent visualiser ce modèle de formulaire.",
   formTemplateSelection: "Vue du formulaire personnalisé",
   formTemplates: "Modèles de formulaires",
-  fromDinaUserGuide: "Extrait du Guide de lutilisateur de DINA.",
+  fromDinaUserGuide: "Extrait du Guide de l'utilisateur de DINA.",
   fromParent: "(de {parentLink})",
   generateBatch: "Produire un lot",
-  generateLabel: "Générer létiquette",
+  generateLabel: "Générer l'étiquette",
   generateSeries: "Produire une série",
+  generatingReport: "Production de rapport...",
   geoReferenceAssertion: "Assertion de géoréférencement",
   geoReferencing: "Géoréférencement",
   geoReferencingLegend: "Géoréférencement",
@@ -489,6 +521,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   group: "Groupe",
   groupMustBeSelected: "Un groupe doit être sélectionné ",
   hostOrganismLegend: "Organisme hôte",
+  http403ForbiddenError: "Accès refusé",
   identifierLegend: "Identifiants",
   identifierType: "Type d’identifiant",
   identifierURI: "Identifiant URI",
@@ -510,6 +543,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Latitude invalide : {latitude}, \nLa plage de latitude valide est comprise entre -90 et 90 pour les degrés, et entre 0 et 60 pour les minutes et les secondes",
   literalGeoreferencedByLabel: "Géoréférencé par",
   load: "Charger",
+  loading: "Chargement",
   loanTransaction: "Transaction",
   loanTransactionManagedAttributeListTitle:
     "Attributs de prêt et de transaction gérés",
@@ -525,11 +559,15 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   managedAttributeValueLabel: "Valeur",
   managedAttributes: "Attributs gérés",
   managedAttributesViews: "Modèles de formulaires",
+  "material-sample": "Échantillon de matériau",
+  materialDirection_tooltip:
+    "Direction du matériau visé par la transaction : {materialDirection}",
   materialIn: "Entrée de matériel",
   materialOut: "Sortie de matériel",
   materialSample: "Échantillon de matériaux",
   materialSampleAssociationLegend: "Association d'échantillons de matériaux",
   materialSampleAttachments: "Pièces jointes de l’échantillon de matériaux",
+  materialSampleFieldsMapping: "Champ Échantillon de matériau",
   materialSampleFormTemplate:
     "Modèle de formulaire des échantillons de matériau",
   materialSampleFormTemplates:
@@ -539,6 +577,17 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   materialSampleManagedAttributes:
     "Attributs gérés de l’échantillon de matière",
   materialSampleName: "Nom de l’échantillon de matière",
+  materialSampleSplitConfiguration: "Configuration du fractionnement",
+  materialSampleSplitConfigurationCondition: "Condition",
+  materialSampleSplitConfigurationConditionType: "Type de condition",
+  materialSampleSplitConfigurationDirectParent: "Parent direct",
+  materialSampleSplitConfigurationMaterialSampleNameGeneration:
+    "Génération du nom de l'échantillon de matériau",
+  materialSampleSplitConfigurationRequiredMaterialSampleType:
+    "Le type d'échantillon de matériau est requis lorsque la configuration du fractionnement utilise la stratégie Type d'échantillon de matériau",
+  materialSampleSplitConfigurationStrategy: "Stratégie",
+  materialSampleSplitConfigurationVisibleMaterialSampleType:
+    "Le type d'échantillon de matériau doit être visible lorsque la configuration du fractionnement utilise la stratégie Type d'échantillon de matériau",
   materialSampleTypeListTitle: "Types d’échantillon de matière",
   materialSampleViewTitle: "{primaryID} - Échantillon de matériaux",
   materialSamples: "Échantillons de matériaux",
@@ -598,8 +647,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   objectSubtypeTitle: "Sous-type d’objet",
   openGeographySearchButtonLabel: "Recherche sur Open Street Maps",
   organism: "Organisme",
+  organismRemarks: "Organisme Remarques",
   organismState: "État de l'organisme",
   organisms: "Organismes",
+  organismsQuantity: "Quantité d'organismes",
   organizationEnglishNameLabel: "Nom anglais ",
   organizationFrenchNameLabel: "Nom français ",
   organizationListTitle: "Organisations",
@@ -607,6 +658,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   originalMaterialSampleLabel: "Échantillon de matière original",
   overwriteValues: "Écraser les valeurs",
   parentCollectionLabel: "Collection mère",
+  parentMaterialSample: "Échantillon de matériau parent",
   parentSampleNotFoundLabel: "Échantillon parent non trouvé",
   partial: "Partiel",
   personListTitle: "Personnes",
@@ -625,6 +677,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   preparations: "Préparations",
   preparedBy: "Préparé par",
   previewAndCustomizeLabel: "Prévisualiser et personnaliser",
+  previewLabel: "Aperçu",
   previewNotAvailable: "Aperçu non disponible",
   primary: "Principal",
   primaryButton_tooltip:
@@ -635,6 +688,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   projectListTitle: "Projets",
   projects: "Projets",
   protocolAttachments: "Protocole sur les pièces jointes",
+  protocolData: "Données sur le protocole",
   protocolListTitle: "Protocoles",
   protocolNameLabel: "Nom du protocole",
   protocolViewTitle: "Protocole",
@@ -642,20 +696,30 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   queryBuilder_addSearchRule: "Ajouter une requête",
   queryBuilder_conjunction_and: "ET",
   queryBuilder_conjunction_or: "OU",
+  queryBuilder_extension_field_placeholder:
+    "Sélectionner le champ Extension pour faire une recherche...",
+  queryBuilder_extension_placeholder:
+    "Sélectionner Extension pour faire une recherche...",
   queryBuilder_field_placeholder: "Sélectionner le champ à rechercher",
+  queryBuilder_managedAttribute_placeholder:
+    "Sélectionner Attribut géré pour faire une recherche...",
   queryBuilder_operator_containsDate: "Contient",
   queryBuilder_operator_empty: "Vide",
+  queryBuilder_operator_endsWith: "Se termine par",
   queryBuilder_operator_equals: "Est égal à",
   queryBuilder_operator_exactMatch: "Correspondance exacte",
   queryBuilder_operator_greaterThan: "Supérieur à",
   queryBuilder_operator_greaterThanOrEqualTo: "Supérieur ou égal à",
   queryBuilder_operator_lessThan: "Inférieur à",
   queryBuilder_operator_lessThanOrEqualTo: "Inférieur ou égal à",
-  queryBuilder_operator_notEmpty: "Nest pas vide",
-  queryBuilder_operator_notEquals: "Nest pas égal à",
+  queryBuilder_operator_notEmpty: "N'est pas vide",
+  queryBuilder_operator_notEquals: "N'est pas égal à",
   queryBuilder_operator_partialMatch: "Correspondance partielle",
-  queryBuilder_value_number_placeholder: "Saisir le nombre à rechercher",
-  queryBuilder_value_text_placeholder: "Saisir le texte à rechercher",
+  queryBuilder_operator_startsWith: "Commence par ",
+  queryBuilder_pickList_placeholder: "Sélectionner une valeur acceptée...",
+  queryBuilder_value_false: "Faux ",
+  queryBuilder_value_number_placeholder: "Saisir le nombre à rechercher",
+  queryBuilder_value_text_placeholder: "Saisir le texte à rechercher",
   queryBuilder_value_true: "true",
   reception: "Réception",
   reloadSavedSearch: "Recharger la recherche enregistrée",
@@ -670,6 +734,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   removeSavedSearch: "Supprimer la recherche enregistrée",
   removeThisElement: "Supprimer cette {typeName}",
   removeThisPlaceLabel: " Supprimer ce lieu",
+  requiredField: "Champ requis",
   resetMetadataEditorAttributesButtonText:
     "Réinitialiser à la disposition initiale des attributs",
   resetNamesToDefaultValues: "Réinitialiser les noms aux valeurs par défaut",
@@ -689,6 +754,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   saveAndCreateNewMaterialSampleButton:
     "Enregistrer et créer un nouvel échantillon de matière",
   saveAndGoToViewPageButton: "Enregistrer et passer à la page Visualiser",
+  saveAndMarkAsComplete: "Sauvegarder et indiquer comme Terminé",
   saveAsDefault: "Enregistrer comme valeur par défaut",
   saveChanges: "Enregistrer les modifications",
   saveGeoReferenceAssertion: "Sauvegarder l’assertion de géoréférence",
@@ -699,9 +765,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   savedSearchError:
     "Impossible de récupérer les recherches enregistrées, veuillez réessayer plus tard.",
   savedSearchName: "Nom de la recherche enregistrée",
-  savedSearchNotFound: "Aucune recherche enregistrée na encore été créée.",
+  savedSearchNotFound: "Aucune recherche enregistrée n'a encore été créée.",
   savedSearchOverwriteExisting:
-    "Il existe déjà une recherche enregistrée portant le nom « {savedSearchName} ». La création de cette recherche enregistrée écrasera la recherche enregistrée existante.",
+    "Il existe déjà une recherche enregistrée portant le nom « {savedSearchName} ». La création de cette recherche enregistrée écrasera la recherche enregistrée existante.",
   scheduledActions: "Actions prévues",
   scientificNameSearch: "Recherche de nom scientifique",
   searchButton: "Recherche",
@@ -709,18 +775,22 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   searchPreviousTags: "Consulter les précédentes étiquettes",
   searchResults: "Résultats de la recherche ({resultSize})",
   searchStorage: "Recherche dans le stockage",
+  selectAll: "Sélectionner Tout",
   selectAnExtenstion: "Sélectionner une extension",
   selectCollectorGroupLabel:
     "Sélectionnez un groupe de collecteurs pour prépeupler le champ «Collecteurs»",
+  selectColumn: "Sélectionner Colonne",
   selectGroup: "Sélectionnez Groupe",
   selectOrType: "Sélectionner ou taper",
   selectRuleSet: "Sélectionner un ensemble de règles",
+  selectSplitConfiguration: "Sélectionner Configuration du fractionnement",
   selectTemplate: "Sélectionner un modèle",
   seriesModeInfo:
     "Mode de traitement en série : les échantillons de matériaux ont des no d'identification croissants.",
   set: "Ensemble",
   setAll: "Tous les ensembles",
   setAsDefault: "Définir par défaut",
+  settingLabel: "Paramètres",
   shipmentAddress: "Adresse d'expédition",
   shipmentDetails: "Détails de l'expédition",
   showLess: "Montrer moins",
@@ -736,6 +806,14 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   specifyParentContainer: "Veuillez sélectionner le contenant parent",
   splitButton: "Diviser",
   splitFrom: "Partie de",
+  splitGenerationOptionLabel: "Options de production ",
+  splitGenerationOptionLowercase: "a (en lettres minuscules)",
+  splitGenerationOptionNumerical: "1 (en chiffre)",
+  splitGenerationOptionUppercase: "A (en lettres majuscules)",
+  splitMaterialSampleNameRequiredTooltip:
+    "Un identifiant principal est requis pour exécuter un fractionnement.",
+  splitPreviewGeneratedIdentifierColumn: "Identifiant généré",
+  splitPreviewNumberColumn: "Numéro",
   splitSampleActionMetadataLegend: "Métadonnées sur les mesures",
   splitSampleChildSamplesToCreateLabel:
     "Échantillons de matière enfant à créer",
@@ -747,8 +825,17 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   splitSampleRemarksPlaceholder:
     "Décrivez ce que vous avez fait, ce qui a été modifié, ou ce qui s’est passé en a résulté (par exemple, la suppression d’une partie)",
   splitSampleTagOriginalAsDestroyed: "Identifier l’original comme « Détruit »",
+  splitSeriesOptionContinue: "Série continue",
+  splitSeriesOptionContinueFromParent: "Série continue à partir d'un parent",
+  splitSeriesOptionContinueFromParentTooltip:
+    "La série continue à partir d'un parent est seulement disponible si l'échantillon de matériau qui est fractionné a un parent pour continuer la série.",
+  splitSeriesOptionContinueTooltip:
+    "La série continue est seulement disponible si l'échantillon de matériau qui est fractionné a déjà des enfants pour continuer la série.",
+  splitSeriesOptionLabel: "Options de séries",
+  splitSeriesOptionNew: "Nouvelle série",
   splitSubsampleTitle: "Division (sous-échantillon)",
   splitWorkflowRunTitle: "Exécuter la division du flux de travail ",
+  spreadsheetHeader: "En-tête de la feuille de calcul",
   startNewRunConfigLabel: "Lancer une nouvelle éxécution",
   stateChangeMetaLegend: "Métadonnées sur le changement d'état (optionnel)",
   stateProvinceLabel: "État/province",
@@ -774,7 +861,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   title_preparationMethod: "Méthode de préparation",
   title_preparationType: "Type de préparation",
   title_storageUnit: "Unité de stockage",
-  title_storageUnitType: "Type dunité de stockage",
+  title_storageUnitType: "Type d'unité de stockage",
   to: "À",
   toBeReturned: "À retourner",
   tooltipDefaultLinkMessage: "Cliquez ici pour en savoir plus.",
@@ -783,13 +870,17 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   transactionAttachments: "Pièces jointes à la transaction",
   transactionDetails: "Détails de la transaction",
   transactions: "Transactions",
+  type: "Catégorie",
   typeAnythingOrPickAScientificName:
     "Taper quelque chose ou choisir un nom scientifique",
   typeNewTagOrSearchPreviousTags:
     "Entrer la nouvelle étiquette ou consulter les précédentes étiquettes",
   typeSpecimen: "Taper spécimen",
+  unit: "Unité: ",
   unsavedChanges: "Modifications non sauvegardées apportées",
   unsetAsDefault: "Ne plus définir par défaut",
+  unsupportedFileTypeError:
+    'Le fichier "{fileName}" ne peut pas être téléversé puisque ce type de fichier n\'est pas pris en charge.  ',
   updateExistingView: "Mettre à jour la vue existante",
   uploadButtonText: "Téléverser",
   uploadFilesMaxSize: "La taille maximale des fichiers est de {maxSize}",
@@ -815,6 +906,14 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   whoAmITitle: "Qui suis-je?",
   withAKeyboard: "Avec un clavier",
   withAMouse: "Avec une souris",
+  workBookDuplicateFieldMap:
+    "Cette colonne ne doit pas être mise en correspondance avec le même champ",
+  workBookInvalidDataFormat:
+    "Format de données invalide, feuille : {sheet}, rangée : {index}, champ : {field}, le type de données doit être {dataType}",
+  workBookInvalidManagedAttributeDataType:
+    "Type de données invalide pour l'attribut géré : la clé d'attribut géré {key} correspond au type de données {type}.",
+  workBookInvalidManagedAttributeKey:
+    "Clé d'attribut géré invalide : clé d'attribut géré {key} introuvable.",
   workbookGroupUploadTitle: "Téléverser le tableur",
   workbookTitle: "Tableurs",
   workbookUploadFailure:

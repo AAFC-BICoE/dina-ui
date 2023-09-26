@@ -16,8 +16,8 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
     id: STORAGE_UNIT_TYPE_NAME,
     type: "storage-unit-type",
     name: STORAGE_UNIT_TYPE_NAME,
-    group: "group",
-  },
+    group: "group"
+  }
 };
 
 /** Units B and C are inside Unit A. */
@@ -30,12 +30,12 @@ const STORAGE_B: PersistedResource<StorageUnit> = {
     id: STORAGE_UNIT_TYPE_NAME,
     type: "storage-unit-type",
     name: STORAGE_UNIT_TYPE_NAME,
-    group: "group",
+    group: "group"
   },
   parentStorageUnit: {
     id: "A",
-    type: "storage-unit",
-  } as PersistedResource<StorageUnit>,
+    type: "storage-unit"
+  } as PersistedResource<StorageUnit>
 };
 const STORAGE_C: PersistedResource<StorageUnit> = {
   id: "C",
@@ -46,12 +46,12 @@ const STORAGE_C: PersistedResource<StorageUnit> = {
     id: STORAGE_UNIT_TYPE_NAME,
     type: "storage-unit-type",
     name: STORAGE_UNIT_TYPE_NAME,
-    group: "group",
+    group: "group"
   },
   parentStorageUnit: {
     id: "A",
-    type: "storage-unit",
-  } as PersistedResource<StorageUnit>,
+    type: "storage-unit"
+  } as PersistedResource<StorageUnit>
 };
 
 /** D is inside C. */
@@ -64,12 +64,12 @@ const STORAGE_D: PersistedResource<StorageUnit> = {
     id: STORAGE_UNIT_TYPE_NAME,
     type: "storage-unit-type",
     name: STORAGE_UNIT_TYPE_NAME,
-    group: "group",
+    group: "group"
   },
   parentStorageUnit: {
     id: "C",
-    type: "storage-unit",
-  } as PersistedResource<StorageUnit>,
+    type: "storage-unit"
+  } as PersistedResource<StorageUnit>
 };
 
 const mockGet = jest.fn<any, any>(async (path, params = {}) => {
@@ -84,7 +84,7 @@ const mockGet = jest.fn<any, any>(async (path, params = {}) => {
       } else if (params.filter?.rsql === "parentStorageUnit.uuid==A") {
         return {
           data: [STORAGE_B, STORAGE_C],
-          meta: { totalResourceCount: 2 },
+          meta: { totalResourceCount: 2 }
         };
       } else if (params.filter?.rsql === "parentStorageUnit.uuid==C") {
         return { data: [STORAGE_D], meta: { totalResourceCount: 1 } };
@@ -98,8 +98,8 @@ const mockGet = jest.fn<any, any>(async (path, params = {}) => {
 
 const apiContext = {
   apiClient: {
-    get: mockGet,
-  },
+    get: mockGet
+  }
 };
 
 const mockOnSelect = jest.fn();
@@ -158,14 +158,14 @@ describe("BrowseStorageTree component", () => {
     // With no filter, gets the top-level units:
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {
       filter: {
-        rsql: "group==aafc;group==cnc",
+        rsql: "group==aafc;group==cnc"
       },
       include: "storageUnitChildren,storageUnitType",
       page: {
         limit: 100,
-        offset: 0,
+        offset: 0
       },
-      sort: "storageUnitType.name,name",
+      sort: "storageUnitType.name,name"
     });
 
     wrapper
@@ -179,14 +179,14 @@ describe("BrowseStorageTree component", () => {
     // With a filter, gets units from any level matching the search text:
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {
       filter: {
-        rsql: "name==*test-search-text*;group==aafc;group==cnc",
+        rsql: "name==*test-search-text*;group==aafc;group==cnc"
       },
       include: "storageUnitChildren,storageUnitType",
       page: {
         limit: 100,
-        offset: 0,
+        offset: 0
       },
-      sort: "storageUnitType.name,name",
+      sort: "storageUnitType.name,name"
     });
 
     // Reset the search:
@@ -199,14 +199,14 @@ describe("BrowseStorageTree component", () => {
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {
       filter: {
         parentStorageUnit: null,
-        rsql: "",
+        rsql: ""
       },
       include: "storageUnitChildren,storageUnitType",
       page: {
         limit: 100,
-        offset: 0,
+        offset: 0
       },
-      sort: "storageUnitType.name,name",
+      sort: "storageUnitType.name,name"
     });
   });
 });

@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../../components";
-import { LibraryPrepBatch2 } from "../../../types/seqdb-api";
+import { LibraryPrepBatch } from "../../../types/seqdb-api";
 import {
   useLibraryPrepBatchQuery,
   LoadExternalDataForLibraryPrepBatchForm
@@ -8,7 +8,7 @@ import {
 
 export default function PcrBatchDetailsPage() {
   return (
-    <ViewPageLayout<LibraryPrepBatch2>
+    <ViewPageLayout<LibraryPrepBatch>
       form={(props) => (
         <LoadExternalDataForLibraryPrepBatchForm dinaFormProps={props} />
       )}

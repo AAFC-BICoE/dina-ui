@@ -44,7 +44,7 @@ describe("ClientSideJoiner", () => {
       apiBaseUrl: "/agent-api",
       idField: "acMetadataCreator",
       joinField: "acMetadataCreator",
-      path: metadata => `person/${metadata.acMetadataCreator}`
+      path: (metadata) => `person/${metadata.acMetadataCreator}`
     });
 
     mockBulkGet.mockReturnValueOnce([
@@ -120,7 +120,7 @@ describe("ClientSideJoiner", () => {
       apiBaseUrl: "/agent-api",
       idField: "acMetadataCreator",
       joinField: "acMetadataCreator",
-      path: metadata => `person/${metadata.acMetadataCreator}`
+      path: (metadata) => `person/${metadata.acMetadataCreator}`
     });
 
     mockBulkGet.mockImplementationOnce(async () => {

@@ -16,7 +16,7 @@ export function TextFieldWithRemoveButton(
   const { formatMessage } = useIntl();
 
   /* Clear the input value and remove the whole wrapping div */
-  const removeEntry = onChange => {
+  const removeEntry = (onChange) => {
     onChange?.({
       target: { value: "" }
     } as ChangeEvent<HTMLInputElement>);
@@ -27,7 +27,7 @@ export function TextFieldWithRemoveButton(
   return shouldRemove === false ? (
     <TextField
       {...props}
-      customInput={inputProps => (
+      customInput={(inputProps) => (
         <div className="input-group div-has-button">
           <input {...inputProps} type="text" />
           <button

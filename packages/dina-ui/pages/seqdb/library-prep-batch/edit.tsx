@@ -26,13 +26,14 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Protocol } from "../../../types/collection-api";
 import {
   ContainerType,
-  LibraryPrepBatch2,
+  IndexSet,
+  LibraryPrepBatch,
   Product,
   ThermocyclerProfile
 } from "../../../types/seqdb-api";
 
 export function useLibraryPrepBatchQuery(id?: string, deps?: any[]) {
-  return useQuery<LibraryPrepBatch2>(
+  return useQuery<LibraryPrepBatch>(
     {
       path: `seqdb-api/library-prep-batch/${id}`,
       include: "containerType,product,protocol,thermocyclerProfile"
@@ -51,38 +52,36 @@ export default function LibraryPrepBatchEditPage() {
   const title = id ? "editLibraryPrepBatchTitle" : "addLibraryPrepBatchTitle";
 
   async function moveToViewPage(
-    savedResource: PersistedResource<LibraryPrepBatch2>
+    savedResource: PersistedResource<LibraryPrepBatch>
   ) {
     await router.push(`/seqdb/library-prep-batch/view?id=${savedResource.id}`);
   }
 
   return (
-    <div>
+    <main className="container-fluid">
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container">
-        <h1 id="wb-cont">
-          <SeqdbMessage id={title} />
-        </h1>
-        {id ? (
-          withResponse(resourceQuery, ({ data: libraryPrepBatchData }) => (
-            <LibraryPrepBatchForm
-              libraryPrepBatch={libraryPrepBatchData}
-              onSaved={moveToViewPage}
-            />
-          ))
-        ) : (
-          <LibraryPrepBatchForm onSaved={moveToViewPage} />
-        )}
-      </div>
-    </div>
+      <h1 id="wb-cont">
+        <SeqdbMessage id={title} />
+      </h1>
+      {id ? (
+        withResponse(resourceQuery, ({ data: libraryPrepBatchData }) => (
+          <LibraryPrepBatchForm
+            libraryPrepBatch={libraryPrepBatchData}
+            onSaved={moveToViewPage}
+          />
+        ))
+      ) : (
+        <LibraryPrepBatchForm onSaved={moveToViewPage} />
+      )}
+    </main>
   );
 }
 
 export interface LibraryPrepBatchFormProps {
-  libraryPrepBatch?: PersistedResource<LibraryPrepBatch2>;
+  libraryPrepBatch?: PersistedResource<LibraryPrepBatch>;
   results?: { [key: string]: string };
-  onSaved: (resource: PersistedResource<LibraryPrepBatch2>) => Promise<void>;
+  onSaved: (resource: PersistedResource<LibraryPrepBatch>) => Promise<void>;
   buttonBar?: ReactNode;
   readOnlyOverride?: boolean;
 }
@@ -112,7 +111,7 @@ export function LibraryPrepBatchForm({
   async function onSubmit({
     submittedValues,
     api: { save }
-  }: DinaFormSubmitParams<LibraryPrepBatch2 & { [key: string]: string }>) {
+  }: DinaFormSubmitParams<LibraryPrepBatch & { [key: string]: string }>) {
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
@@ -123,8 +122,8 @@ export function LibraryPrepBatchForm({
           type: "container-type"
         }
       };
+      delete submittedValues.containerType;
     }
-    delete submittedValues.containerType;
 
     if (submittedValues.product) {
       (submittedValues as any).relationships.product = {
@@ -133,8 +132,8 @@ export function LibraryPrepBatchForm({
           type: "product"
         }
       };
+      delete submittedValues.product;
     }
-    delete submittedValues.product;
 
     if (submittedValues.protocol) {
       (submittedValues as any).relationships.protocol = {
@@ -143,8 +142,8 @@ export function LibraryPrepBatchForm({
           type: "protocol"
         }
       };
+      delete submittedValues.protocol;
     }
-    delete submittedValues.protocol;
 
     if (submittedValues.thermocyclerProfile) {
       (submittedValues as any).relationships.thermocyclerProfile = {
@@ -153,10 +152,10 @@ export function LibraryPrepBatchForm({
           type: "thermocycler-profile"
         }
       };
+      delete submittedValues.thermocyclerProfile;
     }
-    delete submittedValues.thermocyclerProfile;
 
-    const [savedResource] = await save<LibraryPrepBatch2>(
+    const [savedResource] = await save<LibraryPrepBatch>(
       [
         {
           resource: submittedValues,
@@ -180,7 +179,7 @@ export function LibraryPrepBatchForm({
 }
 
 interface LoadExternalDataForLibraryPrepBatchFormProps {
-  dinaFormProps: DinaFormProps<LibraryPrepBatch2>;
+  dinaFormProps: DinaFormProps<LibraryPrepBatch>;
   buttonBar?: ReactNode;
 }
 
@@ -191,24 +190,8 @@ export function LoadExternalDataForLibraryPrepBatchForm({
   // Create a copy of the initial value so we don't change the prop version.
   const initialValues = cloneDeep(dinaFormProps.initialValues);
 
-  // // Display loading indicator if not ready.
-  // if (storageUnitQuery.loading) {
-  //   return <LoadingSpinner loading={true} />;
-  // }
-
-  // // Wait for response or if disabled, just continue with rendering.
-  // return withResponseOrDisabled(storageUnitQuery, () => (
-  //   <DinaForm<Partial<SeqBatch>>
-  //     {...dinaFormProps}
-  //     initialValues={initialValues}
-  //   >
-  //     {buttonBar}
-  //     <LibraryPrepBatchFormFields />
-  //   </DinaForm>
-  // ));
-
   return (
-    <DinaForm<Partial<LibraryPrepBatch2>>
+    <DinaForm<Partial<LibraryPrepBatch>>
       {...dinaFormProps}
       initialValues={initialValues}
     >
@@ -230,7 +213,7 @@ function LibraryPrepBatchFormFields() {
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
-            className="col-md-6"
+            className="col-md-12"
           />
         )}
         <TextField className="col-md-6" name="name" />
@@ -244,10 +227,6 @@ function LibraryPrepBatchFormFields() {
             }
           }}
         /> */}
-        <NumberField className="col-md-6" name="totalLibraryYieldNm" />
-        <TextField className="col-md-6" name="notes" />
-        <TextField className="col-md-6" name="cleanUpNotes" />
-        <TextField className="col-md-6" name="yieldNotes" />
         <DateField className="col-md-6" name="dateUsed" />
         <ResourceSelectField<Product>
           className="col-md-6"
@@ -278,6 +257,17 @@ function LibraryPrepBatchFormFields() {
           optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
         />
+        <ResourceSelectField<IndexSet>
+          className="col-md-6"
+          name="indexSet"
+          filter={filterBy(["name"])}
+          model="seqdb-api/index-set"
+          optionLabel={(set) => set.name}
+        />
+        <NumberField className="col-md-6" name="totalLibraryYieldNm" />
+        <TextField className="col-md-6" name="yieldNotes" multiLines={true} />
+        <TextField className="col-md-6" name="cleanUpNotes" multiLines={true} />
+        <TextField className="col-md-6" name="notes" multiLines={true} />
       </div>
       {readOnly && (
         <div className="row">

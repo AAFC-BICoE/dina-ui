@@ -108,7 +108,7 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
   {
     acTags: ["tag1"],
     bucket: "testbucket",
-    dcType: "Image",
+    dcType: "IMAGE",
     fileExtension: ".png",
     fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
     id: METADATA_UUID1,
@@ -118,7 +118,7 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
   {
     acTags: ["tag1", "tag2"],
     bucket: "testbucket",
-    dcType: "Image",
+    dcType: "IMAGE",
     fileExtension: ".png",
     fileIdentifier: "72b4b907-c486-49a8-ab58-d01541d83eff",
     id: METADATA_UUID2,
@@ -127,7 +127,7 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
   },
   {
     bucket: "testbucket",
-    dcType: "Image",
+    dcType: "IMAGE",
     fileExtension: ".png",
     fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
     id: METADATA_UUID3,

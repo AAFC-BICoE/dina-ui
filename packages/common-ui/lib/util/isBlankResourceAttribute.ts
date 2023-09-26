@@ -24,5 +24,18 @@ export function isBlankResourceAttribute(value: any) {
 }
 
 export function withoutBlankFields<T>(original: T): { [P in keyof T]: T[P] } {
-  return omitBy(original, isBlankResourceAttribute) as { [P in keyof T]: T[P] };
+  const overriddenObject = omitBy(
+    original as any,
+    isBlankResourceAttribute
+  ) as {
+    [P in keyof T]: T[P];
+  };
+
+  if (
+    (original as any)?.dcCreator &&
+    (original as any)?.dcCreator?.id === null
+  ) {
+    (overriddenObject as any).dcCreator = (original as any)?.dcCreator;
+  }
+  return overriddenObject;
 }

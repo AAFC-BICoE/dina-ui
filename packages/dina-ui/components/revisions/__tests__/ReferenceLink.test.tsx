@@ -20,7 +20,7 @@ describe("ReferenceLink component", () => {
           cdoId: "64047517-b7d4-4af9-af86-4bef3ff36950",
           typeName: "person"
         }}
-        name={person => (
+        name={(person) => (
           <span className="display-name">{person.displayName}</span>
         )}
         href="/person/view?id="
