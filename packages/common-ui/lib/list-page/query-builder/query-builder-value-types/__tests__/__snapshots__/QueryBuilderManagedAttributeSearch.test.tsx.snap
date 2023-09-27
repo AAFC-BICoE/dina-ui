@@ -1606,6 +1606,16 @@ Object {
 }
 `;
 
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator wildcard 1`] = `
+Object {
+  "wildcard": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "value": "*stringValue*",
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator empty 1`] = `
 Object {
   "bool": Object {
@@ -1832,3 +1842,30 @@ Object {
   },
 }
 `;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator wildcard 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "wildcard": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "value": "*stringValue*",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+

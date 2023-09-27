@@ -182,6 +182,16 @@ Object {
 }
 `;
 
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions wildcard 1`] = `
+Object {
+  "wildcard": Object {
+    "fieldTest": Object {
+      "value": "*valueToMatch*",
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters Multiple groups 1`] = `
 Object {
   "query": Object {

@@ -130,6 +130,7 @@ export default function QueryRowManagedAttributeSearch({
       case "STRING":
         return [
           "exactMatch",
+          "wildcard",
           "partialMatch",
           "startsWith",
           "notEquals",
