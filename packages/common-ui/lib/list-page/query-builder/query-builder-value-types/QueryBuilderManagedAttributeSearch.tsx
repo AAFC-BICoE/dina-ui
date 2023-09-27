@@ -63,9 +63,6 @@ export default function QueryRowManagedAttributeSearch({
 }: QueryRowTextSearchProps) {
   const { formatMessage } = useIntl();
 
-  const [managedAttributeSearchValue, setManagedAttributeSearchValue] =
-    useState<string>("");
-
   const [managedAttributeState, setManagedAttributeState] =
     useState<ManagedAttributeSearchStates>(() =>
       value
@@ -135,6 +132,7 @@ export default function QueryRowManagedAttributeSearch({
           "exactMatch",
           "wildcard",
           "partialMatch",
+          "startsWith",
           "notEquals",
           "empty",
           "notEmpty"
@@ -159,6 +157,14 @@ export default function QueryRowManagedAttributeSearch({
 
   // Determine the value input to display based on the type.
   const supportedValueForType = (type: string) => {
+    // If the operator is "empty" or "not empty", do not display anything.
+    if (
+      managedAttributeState.selectedOperator === "empty" ||
+      managedAttributeState.selectedOperator === "notEmpty"
+    ) {
+      return <></>;
+    }
+
     const commonProps = {
       matchType: managedAttributeState.selectedOperator,
       value: managedAttributeState.searchValue,
@@ -337,8 +343,10 @@ export function transformManagedAttributeToDSL({
     value: managedAttributeSearchValue.searchValue,
     fieldInfo: {
       ...fieldInfo,
-      distinctTerm:
-        managedAttributeSearchValue.selectedOperator !== "partialMatch"
+      distinctTerm: false,
+
+      // All managed attributes have keyword support.
+      keywordMultiFieldSupport: true
     } as ESIndexMapping
   };
 

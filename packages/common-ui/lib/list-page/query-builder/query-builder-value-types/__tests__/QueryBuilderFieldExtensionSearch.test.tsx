@@ -6,6 +6,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
       "exactMatch",
       "wildcard",
       "partialMatch",
+      "startsWith",
       "notEquals",
       "empty",
       "notEmpty"
