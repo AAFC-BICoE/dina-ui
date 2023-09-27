@@ -5,6 +5,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
     const operators = [
       "exactMatch",
       "partialMatch",
+      "startsWith",
       "notEquals",
       "empty",
       "notEmpty"
