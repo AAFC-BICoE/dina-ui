@@ -1,5 +1,5 @@
 import { noop } from "lodash";
-import { useDrag } from "react-dnd-cjs";
+import { useDrag } from "react-dnd";
 import RcTooltip from "rc-tooltip";
 import { SeqReactionSample } from "./useSeqSelectCoordinatesControls";
 
@@ -23,6 +23,7 @@ export function DraggableSeqReactionBox({
   editMode
 }: DraggableSeqReactionBoxProps) {
   const [, drag] = useDrag({
+    type: ITEM_BOX_DRAG_KEY,
     item: { seqReactionSample, type: ITEM_BOX_DRAG_KEY },
     canDrag: () => {
       return editMode;

@@ -1,4 +1,4 @@
-import { useDrop } from "react-dnd-cjs";
+import { useDrop } from "react-dnd";
 import {
   DraggablePCRBatchItemBox,
   ITEM_BOX_DRAG_KEY

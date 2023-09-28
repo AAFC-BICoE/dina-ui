@@ -9,8 +9,8 @@ import {
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
 import { useMemo, useRef } from "react";
-import { DndProvider } from "react-dnd-cjs";
-import HTML5Backend from "react-dnd-html5-backend-cjs";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { SWRConfig } from "swr";
 import { PartialDeep } from "type-fest";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
