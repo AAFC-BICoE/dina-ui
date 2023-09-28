@@ -318,7 +318,9 @@ export function applySourceFiltering<TData extends KitsuResource>(
 
   return {
     ...elasticSearchQuery,
-    _source: uniq(sourceFilteringColumns)
+    _source: {
+      includes: uniq(sourceFilteringColumns)
+    }
   };
 }
 
@@ -401,7 +403,18 @@ export function termQuery(
   };
 }
 
-// Query used for partial matches.
+// Query used for wildcard searches (contains).
+export function wildcardQuery(fieldName: string, matchValue: any): any {
+  return {
+    wildcard: {
+      [fieldName]: {
+        value: `*${matchValue}*`
+      }
+    }
+  };
+}
+
+// Query used for partial matches (contains word).
 export function matchQuery(fieldName: string, matchValue: any): any {
   return {
     match: {

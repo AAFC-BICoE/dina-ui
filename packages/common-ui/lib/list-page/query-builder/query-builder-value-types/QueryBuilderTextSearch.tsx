@@ -6,7 +6,8 @@ import {
   existsQuery,
   prefixQuery,
   suffixQuery,
-  infixQuery
+  infixQuery,
+  wildcardQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
@@ -102,6 +103,24 @@ export function transformTextSearchToDSL({
         : isExactMatch
         ? termQuery(fieldPath, value, keywordMultiFieldSupport)
         : matchQuery(fieldPath, value);
+
+    // Wild card search
+    case "wildcard":
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    wildcardQuery(fieldPath, value),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
+          }
+        : wildcardQuery(fieldPath, value);
 
     // Prefix partial match
     case "startsWith":

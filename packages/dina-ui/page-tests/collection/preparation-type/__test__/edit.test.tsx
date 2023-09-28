@@ -22,7 +22,7 @@ const mockPush = jest.fn();
 let mockQuery: any = {};
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   switch (path) {
     // The get request will return the existing preparation-type.
     case "collection-api/preparation-type/1":

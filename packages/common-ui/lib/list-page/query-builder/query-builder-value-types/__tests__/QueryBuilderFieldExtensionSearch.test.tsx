@@ -4,7 +4,9 @@ describe("QueryBuilderManagedAttributeSearch", () => {
   describe("transformFieldExtensionToDSL function", () => {
     const operators = [
       "exactMatch",
+      "wildcard",
       "partialMatch",
+      "startsWith",
       "notEquals",
       "empty",
       "notEmpty"

@@ -52,7 +52,7 @@ export function FilterForm({
 
   return (
     <DinaForm initialValues={filterForm} onSubmit={onFilterFormSubmitInternal}>
-      {formikProps => (
+      {(formikProps) => (
         <div className="d-flex gap-3 flex-wrap mb-3" translate={undefined}>
           <div>
             <strong>

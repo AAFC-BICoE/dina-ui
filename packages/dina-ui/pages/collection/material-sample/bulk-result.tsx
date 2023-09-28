@@ -84,7 +84,7 @@ export default function MaterialSampleBulkResult() {
                   :
                 </div>
                 {(samples as PersistedResource<MaterialSample>[]).map(
-                  sample => (
+                  (sample) => (
                     <div className="d-flex flex-row mx-3" key={sample.id}>
                       <Link
                         href={`/collection/material-sample/view?id=${sample.id}`}

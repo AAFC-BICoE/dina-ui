@@ -142,7 +142,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createNewLabel: "Create New",
   createNewMaterialSamples: "Create New Material Samples",
   createNewView: "Create New View",
-  createSampleWithFormTemplate: "Create Sample with Form Template",
+  createSampleWithFormTemplate: "Create Sample",
   createSavedSearch: "Create Saved Search",
   createSplitWorkflow: "Create Split",
   createStorage: "Create Storage",
@@ -222,6 +222,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   externalResourceListTitle: "External Resources",
   feedbackButtonText: "Feedback",
   fieldExtensions: "Field Extensions",
+  materialSampleFieldExtensions: "Material Sample Field Extensions",
+  collectingEventFieldExtensions: "Collecting Event Field Extensions",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
   field_acDigitizationDate: "Date Original Version Created",
@@ -695,7 +697,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_operator_lessThanOrEqualTo: "Less than or equal to",
   queryBuilder_operator_notEmpty: "Not empty",
   queryBuilder_operator_notEquals: "Not equals",
-  queryBuilder_operator_partialMatch: "Partial match",
+  queryBuilder_operator_partialMatch: "Contains word",
+  queryBuilder_operator_wildcard: "Contains",
   queryBuilder_operator_startsWith: "Starts with",
   queryBuilder_pickList_placeholder: "Select an accepted value...",
   queryBuilder_savedSearches: "Saved searches",
@@ -894,5 +897,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
-  yearMonthDayTime: "Year-Month-Day-Time"
+  yearMonthDayTime: "Year-Month-Day-Time",
+  field_splitConfiguration: "Split Configuration"
 };

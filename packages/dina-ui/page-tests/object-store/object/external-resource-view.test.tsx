@@ -6,7 +6,7 @@ import { Metadata } from "../../../../dina-ui/types/objectstore-api/resources/Me
 const TEST_METADATA: PersistedResource<Metadata> = {
   acSubtype: "TEST_SUBTYPE",
   bucket: "testbucket",
-  dcType: "Image",
+  dcType: "IMAGE",
   dcFormat: "jpeg",
   xmpRightsWebStatement:
     "https://open.canada.ca/en/open-government-licence-canada",

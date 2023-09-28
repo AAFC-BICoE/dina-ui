@@ -10,7 +10,7 @@ const TEST_PREPARATION_METHOD: PreparationMethod = {
 };
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn<any, any>(async model => {
+const mockGet = jest.fn<any, any>(async (model) => {
   // The get request will return the existing preparation-method.
   if (model === "collection-api/preparation-method/100") {
     return { data: TEST_PREPARATION_METHOD };

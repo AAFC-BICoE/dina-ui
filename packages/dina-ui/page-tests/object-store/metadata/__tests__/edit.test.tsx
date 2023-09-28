@@ -63,7 +63,7 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   } as Person,
   acTags: ["tag1", "tag2", "tag3"],
   bucket: "testbucket",
-  dcType: "Image",
+  dcType: "IMAGE",
   orientation: 5,
   fileExtension: ".png",
   fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",

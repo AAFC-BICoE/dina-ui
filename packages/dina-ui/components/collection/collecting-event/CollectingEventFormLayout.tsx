@@ -1003,7 +1003,7 @@ export function CollectingEventFormLayout({
           sectionName="collecting-event-field-extension-section"
         >
           <DataEntryField
-            legend={<DinaMessage id="fieldExtensions" />}
+            legend={<DinaMessage id="collectingEventFieldExtensions" />}
             name="extensionValuesForm"
             readOnly={readOnly}
             isTemplate={isTemplate}

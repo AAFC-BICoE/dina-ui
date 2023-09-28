@@ -8,13 +8,18 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { useState, useEffect } from "react";
-import { Button, Spinner, Dropdown, DropdownButton, ButtonGroup } from "react-bootstrap";
-import { PCRBatchItemGrid } from "packages/dina-ui/components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
+import {
+  Button,
+  Spinner,
+  Dropdown,
+  DropdownButton,
+  ButtonGroup
+} from "react-bootstrap";
+import { SangerPcrBatchItemGridStep } from "packages/dina-ui/components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { usePcrBatchQuery } from "../pcr-batch/edit";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
 import React, { ChangeEvent } from "react";
-
 
 export default function PCRWorkFlowRunPage() {
   const router = useRouter();
@@ -40,7 +45,6 @@ export default function PCRWorkFlowRunPage() {
   );
   // Loaded PCR Batch.
   const pcrBatch = usePcrBatchQuery(pcrBatchId, [pcrBatchId, currentStep]);
-  
 
   // Update the URL to contain the current step.
   useEffect(() => {
@@ -86,80 +90,85 @@ export default function PCRWorkFlowRunPage() {
             Cancel
           </Button>
 
-          {currentStep != 3 ?
-          (
+          {currentStep !== 3 ? (
             <Button
-            variant={"primary"}
-            className="ms-2"
-            onClick={() => setPerformSave(true)}
-            style={{ width: "10rem" }}
-          >
-            {performSave ? (
-              <>
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-                <span className="visually-hidden"><DinaMessage id="loading" /></span>
-              </>
-            ) : (
-              <DinaMessage id="save" />
-            )}
-          </Button>
-          ):(
+              variant={"primary"}
+              className="ms-2"
+              onClick={() => setPerformSave(true)}
+              style={{ width: "10rem" }}
+            >
+              {performSave ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                  <span className="visually-hidden">
+                    <DinaMessage id="loading" />
+                  </span>
+                </>
+              ) : (
+                <DinaMessage id="save" />
+              )}
+            </Button>
+          ) : (
             <>
-             <Dropdown as={ButtonGroup}>
-             <Button
-            variant={"primary"}
-            className="ms-2"
-            onClick={() => setPerformSave(true)}
-            style={{ width: "10rem" }}>
-            {performSave ? (
-              <>
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-                <span className="visually-hidden"><DinaMessage id="loading" /></span>
-              </>
-            ) : (
-              <DinaMessage id="save" />
-            )}
-          </Button>
-              <Dropdown.Toggle split id="dropdown-split-basic" />
-              <Dropdown.Menu>
-                <Dropdown.Item as="button" href="#/action-1"
-                className="ms-2"
-                onClick={() => {
-                  setPerformComplete(true);
-                  setPerformSave(true);
-                }}>
-                {performComplete ? (
-                  <>
-                    <Spinner
-                      as="span"
-                      animation="border"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                    />
-                    <span className="visually-hidden">Loading...</span>
-                  </>
-                ) : (
-                  null
-                )}<DinaMessage id="saveAndMarkAsComplete" /></Dropdown.Item>
-               </Dropdown.Menu>
-            </Dropdown>
-
-          </>
+              <Dropdown as={ButtonGroup}>
+                <Button
+                  variant={"primary"}
+                  className="ms-2"
+                  onClick={() => setPerformSave(true)}
+                  style={{ width: "10rem" }}
+                >
+                  {performSave ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                      />
+                      <span className="visually-hidden">
+                        <DinaMessage id="loading" />
+                      </span>
+                    </>
+                  ) : (
+                    <DinaMessage id="save" />
+                  )}
+                </Button>
+                <Dropdown.Toggle split={true} id="dropdown-split-basic" />
+                <Dropdown.Menu>
+                  <Dropdown.Item
+                    as="button"
+                    href="#/action-1"
+                    className="ms-2"
+                    onClick={() => {
+                      setPerformComplete(true);
+                      setPerformSave(true);
+                    }}
+                  >
+                    {performComplete ? (
+                      <>
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                        <span className="visually-hidden">Loading...</span>
+                      </>
+                    ) : null}
+                    <DinaMessage id="saveAndMarkAsComplete" />
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </>
           )}
-
         </>
       ) : (
         <Button
@@ -230,7 +239,7 @@ export default function PCRWorkFlowRunPage() {
         </TabPanel>
         <TabPanel>
           {pcrBatch.response?.data && pcrBatchId && (
-            <PCRBatchItemGrid
+            <SangerPcrBatchItemGridStep
               pcrBatchId={pcrBatchId}
               pcrBatch={pcrBatch.response.data}
               onSaved={onSaved}

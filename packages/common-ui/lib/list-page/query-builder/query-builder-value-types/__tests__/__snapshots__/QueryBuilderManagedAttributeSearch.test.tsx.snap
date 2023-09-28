@@ -29,8 +29,8 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level with operator equals 1`] = `
 Object {
-  "term": Object {
-    "data.attributes.managedAttributes.attributeName.keyword": "true",
+  "match": Object {
+    "data.attributes.managedAttributes.attributeName": "true",
   },
 }
 `;
@@ -130,8 +130,8 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.attributes.managedAttributes.attributeName.keyword": "true",
+            "match": Object {
+              "included.attributes.managedAttributes.attributeName": "true",
             },
           },
           Object {
@@ -1282,8 +1282,8 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level with operator equals 1`] = `
 Object {
-  "term": Object {
-    "data.attributes.managedAttributes.attributeName.keyword": "3.5",
+  "match": Object {
+    "data.attributes.managedAttributes.attributeName": "3.5",
   },
 }
 `;
@@ -1312,8 +1312,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "data.attributes.managedAttributes.attributeName.keyword": "3.5",
+            "match": Object {
+              "data.attributes.managedAttributes.attributeName": "3.5",
             },
           },
         },
@@ -1410,8 +1410,8 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.attributes.managedAttributes.attributeName.keyword": "3.5",
+            "match": Object {
+              "included.attributes.managedAttributes.attributeName": "3.5",
             },
           },
           Object {
@@ -1470,8 +1470,8 @@ Object {
                 },
               },
               "must_not": Object {
-                "term": Object {
-                  "included.attributes.managedAttributes.attributeName.keyword": "3.5",
+                "match": Object {
+                  "included.attributes.managedAttributes.attributeName": "3.5",
                 },
               },
             },
@@ -1570,8 +1570,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "data.attributes.managedAttributes.attributeName.keyword": "stringValue",
+            "match": Object {
+              "data.attributes.managedAttributes.attributeName": "stringValue",
             },
           },
         },
@@ -1594,6 +1594,24 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 Object {
   "match": Object {
     "data.attributes.managedAttributes.attributeName": "stringValue",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator startsWith 1`] = `
+Object {
+  "prefix": Object {
+    "data.attributes.managedAttributes.attributeName": "stringvalue",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator wildcard 1`] = `
+Object {
+  "wildcard": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "value": "*stringValue*",
+    },
   },
 }
 `;
@@ -1736,8 +1754,8 @@ Object {
                 },
               },
               "must_not": Object {
-                "term": Object {
-                  "included.attributes.managedAttributes.attributeName.keyword": "stringValue",
+                "match": Object {
+                  "included.attributes.managedAttributes.attributeName": "stringValue",
                 },
               },
             },
@@ -1800,3 +1818,54 @@ Object {
   },
 }
 `;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator startsWith 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.managedAttributes.attributeName": "stringvalue",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator wildcard 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "wildcard": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "value": "*stringValue*",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+

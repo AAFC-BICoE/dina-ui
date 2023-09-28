@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { AxiosError, AxiosAdapter } from "axios";
 import { cacheAdapterEnhancer } from "axios-extensions";
 import { FormikErrors } from "formik";
 import Kitsu, {
@@ -146,7 +146,7 @@ export class ApiClientImpl implements ApiClientI {
           // e.g. a page with a lot of the same dropdown select component, or a set of group label components fetching the label for the same group.
           defaultCache: new LRUCache({ max: 100, maxAge: ONE_SECOND })
         }
-      );
+      ) as AxiosAdapter;
     }
 
     // Bind the methods so context consumers can use object destructuring.

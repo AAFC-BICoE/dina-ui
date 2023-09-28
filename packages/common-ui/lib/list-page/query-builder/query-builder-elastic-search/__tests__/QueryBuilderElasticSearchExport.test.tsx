@@ -13,7 +13,8 @@ import {
   rangeQuery,
   prefixQuery,
   infixQuery,
-  suffixQuery
+  suffixQuery,
+  wildcardQuery
 } from "../QueryBuilderElasticSearchExport";
 
 const ELASTIC_SEARCH_QUERY: any = {
@@ -267,6 +268,10 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
     test("termQuery", async () => {
       expect(termQuery("fieldTest", "valueToMatch", true)).toMatchSnapshot();
       expect(termQuery("fieldTest", "valueToMatch", false)).toMatchSnapshot();
+    });
+
+    test("wildcard", async () => {
+      expect(wildcardQuery("fieldTest", "valueToMatch")).toMatchSnapshot();
     });
 
     test("matchQuery", async () => {
