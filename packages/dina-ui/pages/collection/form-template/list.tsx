@@ -33,6 +33,7 @@ export default function MaterialSampleFormTemplateListPage() {
     },
     "group",
     booleanCell("restrictToCreatedBy"),
+    booleanCell("splitConfiguration", "components[0].visible"),
     "createdBy",
     dateCell("createdOn"),
     {

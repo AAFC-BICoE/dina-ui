@@ -93,6 +93,8 @@ export function useIndexMapping({
 
               // Additional options for the field:
               distinctTerm: key.distinct_term_agg,
+              keywordMultiFieldSupport:
+                key?.fields?.includes("keyword") ?? false,
               optimizedPrefix: key?.fields?.includes("prefix") ?? false,
               containsSupport: key?.fields?.includes("infix") ?? false,
               endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
@@ -104,7 +106,7 @@ export function useIndexMapping({
       resp.data?.relationships?.map((relationship) => {
         relationship?.attributes?.map((relationshipAttribute) => {
           // This is the user-friendly label to display on the search dropdown.
-          const attributeLabel = relationshipAttribute.path?.includes(".")
+          let attributeLabel = relationshipAttribute.path?.includes(".")
             ? relationshipAttribute.path.substring(
                 relationshipAttribute.path.indexOf(".") + 1
               ) +
@@ -112,9 +114,16 @@ export function useIndexMapping({
               relationshipAttribute.name
             : relationshipAttribute.name;
 
+          if (
+            relationship.referencedBy === "acMetadataCreator" ||
+            relationship.referencedBy === "dcCreator"
+          ) {
+            attributeLabel = `${relationship.referencedBy}.${relationshipAttribute.name}`;
+          }
+
           result.push({
             label: attributeLabel,
-            value: relationship.value + "." + attributeLabel,
+            value: relationship.referencedBy + "." + attributeLabel,
             type: relationshipAttribute.type,
             path: relationshipAttribute.path,
             parentName: relationship.referencedBy,
@@ -123,6 +132,7 @@ export function useIndexMapping({
 
             // Additional options for the field:
             distinctTerm: relationshipAttribute.distinct_term_agg,
+            keywordMultiFieldSupport: true, // Forced for relationships.
             optimizedPrefix:
               relationshipAttribute?.fields?.includes("prefix") ?? false,
             containsSupport:
@@ -143,6 +153,7 @@ export function useIndexMapping({
             label: fieldMapping.label,
             path: fieldMapping.path,
             type: fieldMapping.type,
+            keywordMultiFieldSupport: false,
             optimizedPrefix: false,
             containsSupport: false,
             endsWithSupport: false
@@ -163,6 +174,7 @@ export function useIndexMapping({
               label: relationshipFieldMapping.label,
               path: relationshipFieldMapping.path,
               type: relationshipFieldMapping.type,
+              keywordMultiFieldSupport: false,
               optimizedPrefix: false,
               containsSupport: false,
               endsWithSupport: false

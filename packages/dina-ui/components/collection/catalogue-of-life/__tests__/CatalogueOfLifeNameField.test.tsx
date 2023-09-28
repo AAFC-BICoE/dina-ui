@@ -46,7 +46,7 @@ describe("CatalogueOfLifeNameField component", () => {
     wrapper.update();
 
     expect(
-      wrapper.find(".col-search-result-label").map(node => node.text())
+      wrapper.find(".col-search-result-label").map((node) => node.text())
     ).toEqual(["Poa muralis Honck.", "Poa muralis Wibel, nom. illeg."]);
 
     wrapper.find("button.col-name-select-button").at(1).simulate("click");

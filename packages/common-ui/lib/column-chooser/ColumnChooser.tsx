@@ -1,10 +1,18 @@
-import { useGroupedCheckboxWithLabel, TextField } from "..";
+import {
+  useGroupedCheckboxWithLabel,
+  TextField,
+  DATA_EXPORT_SEARCH_RESULTS_KEY,
+  useApiClient,
+  LoadingSpinner
+} from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { startCase } from "lodash";
+import { Button } from "react-bootstrap";
+import useLocalStorage from "@rehooks/local-storage";
 
 export function ColumnChooser(
   CustomMenu: React.ForwardRefExoticComponent<
@@ -12,7 +20,7 @@ export function ColumnChooser(
   >
 ) {
   return (
-    <Dropdown autoClose={"outside"}>
+    <Dropdown>
       <Dropdown.Toggle>
         <DinaMessage id="selectColumn" />
       </Dropdown.Toggle>
@@ -20,10 +28,18 @@ export function ColumnChooser(
     </Dropdown>
   );
 }
+
 export interface UseColumnChooserProps {
   columns: any[];
+  indexName?: string;
+  hideExportButton?: boolean;
 }
-export function useColumnChooser({ columns }: UseColumnChooserProps) {
+
+export function useColumnChooser({
+  columns,
+  indexName,
+  hideExportButton = false
+}: UseColumnChooserProps) {
   const { formatMessage, messages } = useIntl();
   const columnSearchMapping: any[] = columns.map((column) => {
     const messageKey = `field_${column.id}`;
@@ -32,26 +48,90 @@ export function useColumnChooser({ columns }: UseColumnChooserProps) {
       : startCase(column.id);
     return { label: label.toLowerCase(), id: column.id };
   });
-  const { CustomMenu, checkedIds } = useCustomMenu(
+  const { CustomMenu, checkedColumnIds } = useCustomMenu({
     columns,
-    columnSearchMapping
-  );
+    columnSearchMapping,
+    indexName,
+    hideExportButton
+  });
   const columnChooser = ColumnChooser(CustomMenu);
-  return { columnChooser, checkedIds };
+  return { columnChooser, checkedColumnIds };
 }
 
-function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
+interface UseCustomMenuProps extends UseColumnChooserProps {
+  columnSearchMapping: any[];
+  hideExportButton: boolean;
+}
+
+function useCustomMenu({
+  columns,
+  columnSearchMapping,
+  indexName,
+  hideExportButton
+}: UseCustomMenuProps) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
-  const { groupedCheckBoxes, checkedIds } = useGroupedCheckboxWithLabel({
+  const [loading, setLoading] = useState(false);
+
+  const { formatMessage } = useIntl();
+
+  const { groupedCheckBoxes, checkedColumnIds } = useGroupedCheckboxWithLabel({
     resources: searchedColumns,
-    isField: true
+    isField: true,
+    indexName
   });
-  const testRef = useRef<any>();
-  useEffect(() => {
-    testRef?.current?.focus();
-  }, []);
+
+  const { apiClient } = useApiClient();
+
+  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_SEARCH_RESULTS_KEY);
+
+  if (queryObject) {
+    delete (queryObject as any)._source;
+  }
+
+  const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
+
+  async function exportData() {
+    setLoading(true);
+    const exportRequestResponse = await apiClient.axios.post(
+      "dina-export-api/export-request",
+      {
+        data: {
+          type: "export-request",
+          attributes: {
+            source: "dina_material_sample_index",
+            query: queryString,
+            columns: checkedColumnIds
+          }
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json"
+        }
+      }
+    );
+
+    const getFileResponse = await apiClient.axios.get(
+      `dina-export-api/file/${exportRequestResponse.data.data.id}?type=DATA_EXPORT`,
+      { responseType: "blob" }
+    );
+
+    const url = window?.URL.createObjectURL(getFileResponse?.data);
+    const link = document?.createElement("a");
+    link.href = url ?? "";
+    link?.setAttribute("download", `${exportRequestResponse.data.data.id}`);
+    document?.body?.appendChild(link);
+    link?.click();
+    window?.URL?.revokeObjectURL(url ?? "");
+    setLoading(false);
+  }
+
   const CustomMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
+      if (props.style) {
+        props.style.transform = "translate(0px, 40px)";
+      }
+
       return (
         <div
           ref={ref}
@@ -86,9 +166,22 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
           />
           <Dropdown.Divider />
           {groupedCheckBoxes}
+          {!hideExportButton && (
+            <Button
+              disabled={loading}
+              className="btn btn-primary mt-2 bulk-edit-button"
+              onClick={exportData}
+            >
+              {loading ? (
+                <LoadingSpinner loading={loading} />
+              ) : (
+                formatMessage({ id: "exportButtonText" })
+              )}
+            </Button>
+          )}
         </div>
       );
     }
   );
-  return { CustomMenu, checkedIds };
+  return { CustomMenu, checkedColumnIds };
 }

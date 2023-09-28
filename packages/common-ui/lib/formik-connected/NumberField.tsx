@@ -49,7 +49,7 @@ export function NumberField(props: NumberFieldProps) {
       {...props}
       validate={validate}
       customInput={(inputProps, formik) => {
-        function onBlur(event: FocusEvent<HTMLInputElement, Element>) {
+        function onBlur(event: FocusEvent<HTMLInputElement>) {
           const error = validate?.(event.target.value);
           if (error) {
             formik.setFieldError(props.name, error);

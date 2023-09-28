@@ -1,5 +1,5 @@
 import { noop } from "lodash";
-import { useDrag } from "react-dnd-cjs";
+import { useDrag } from "react-dnd";
 import RcTooltip from "rc-tooltip";
 import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
 
@@ -23,6 +23,7 @@ export function DraggablePCRBatchItemBox({
   editMode
 }: DraggablePCRBatchItemBoxProps) {
   const [, drag] = useDrag({
+    type: ITEM_BOX_DRAG_KEY,
     item: { pcrBatchItemSample, type: ITEM_BOX_DRAG_KEY },
     canDrag: () => {
       return editMode;

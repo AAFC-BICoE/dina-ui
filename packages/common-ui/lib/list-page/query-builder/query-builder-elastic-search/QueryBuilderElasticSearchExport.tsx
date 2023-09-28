@@ -307,7 +307,9 @@ export function applySourceFiltering<TData extends KitsuResource>(
 
   return {
     ...elasticSearchQuery,
-    _source: uniq(sourceFilteringColumns)
+    _source: {
+      includes: uniq(sourceFilteringColumns)
+    }
   };
 }
 
@@ -381,16 +383,27 @@ export function includedTypeQuery(parentType: string): any {
 export function termQuery(
   fieldName: string,
   matchValue: any,
-  keyword: boolean
+  keywordMultiFieldSupport: boolean
 ): any {
   return {
     term: {
-      [fieldName + (keyword ? ".keyword" : "")]: matchValue
+      [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValue
     }
   };
 }
 
-// Query used for partial matches.
+// Query used for wildcard searches (contains).
+export function wildcardQuery(fieldName: string, matchValue: any): any {
+  return {
+    wildcard: {
+      [fieldName]: {
+        value: `*${matchValue}*`
+      }
+    }
+  };
+}
+
+// Query used for partial matches (contains word).
 export function matchQuery(fieldName: string, matchValue: any): any {
   return {
     match: {

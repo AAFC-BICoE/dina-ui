@@ -12,7 +12,7 @@ const TEST_COLLECTION: PersistedResource<Collection> = {
   institution: { id: "1", type: "institution", name: "test institution" }
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/collection/123":
       return { data: TEST_COLLECTION };
@@ -25,7 +25,7 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
-const mockSave = jest.fn(async resources => {
+const mockSave = jest.fn(async (resources) => {
   return resources.map(() => TEST_COLLECTION);
 });
 

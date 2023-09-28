@@ -17,7 +17,7 @@ export function ThumbnailCell<TData extends KitsuResource>({
   isJsonApiQuery
 }: ThumbnailCellProps): TableColumn<TData> {
   return {
-    id: "thumbnailColumn",
+    id: "thumbnail",
     cell: ({ row: { original } }) => {
       const { resourceExternalURL, hasExternalResourceDerivative, filePath } =
         useMetadataThumbnailPath<TData>(original, bucketField, isJsonApiQuery);

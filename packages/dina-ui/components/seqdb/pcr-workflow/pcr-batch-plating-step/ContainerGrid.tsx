@@ -1,4 +1,4 @@
-import { useDrop } from "react-dnd-cjs";
+import { useDrop } from "react-dnd";
 import { ColumnDef } from "@tanstack/react-table";
 import { PcrBatch } from "../../../../types/seqdb-api";
 import {

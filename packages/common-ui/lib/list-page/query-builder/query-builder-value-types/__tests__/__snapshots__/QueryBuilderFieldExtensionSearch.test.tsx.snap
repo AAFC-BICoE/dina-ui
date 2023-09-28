@@ -59,8 +59,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "data.attributes.extensionValues.extension.field.keyword": "test123",
+            "match": Object {
+              "data.attributes.extensionValues.extension.field": "test123",
             },
           },
         },
@@ -83,6 +83,24 @@ exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL functio
 Object {
   "match": Object {
     "data.attributes.extensionValues.extension.field": "test123",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the startsWith operator. 1`] = `
+Object {
+  "prefix": Object {
+    "data.attributes.extensionValues.extension.field": "test123",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the wildcard operator. 1`] = `
+Object {
+  "wildcard": Object {
+    "data.attributes.extensionValues.extension.field": Object {
+      "value": "*test123*",
+    },
   },
 }
 `;
@@ -225,8 +243,8 @@ Object {
                 },
               },
               "must_not": Object {
-                "term": Object {
-                  "included.attributes.extensionValues.extension.field.keyword": "test123",
+                "match": Object {
+                  "included.attributes.extensionValues.extension.field": "test123",
                 },
               },
             },
@@ -276,6 +294,56 @@ Object {
           Object {
             "match": Object {
               "included.attributes.extensionValues.extension.field": "test123",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the startsWith operator. 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.extensionValues.extension.field": "test123",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the wildcard operator. 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "wildcard": Object {
+              "included.attributes.extensionValues.extension.field": Object {
+                "value": "*test123*",
+              },
             },
           },
           Object {

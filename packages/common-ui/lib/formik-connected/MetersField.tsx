@@ -124,7 +124,7 @@ const FEET_INCH_REGEX =
 /** Unabbreviates units e.g. "ft." to "ft" */
 function unAbbreviate(text: string) {
   const UNIT_ABBREVIATION_REGEX = /[a-z]\./gi;
-  return text.replace(UNIT_ABBREVIATION_REGEX, matched => matched.charAt(0));
+  return text.replace(UNIT_ABBREVIATION_REGEX, (matched) => matched.charAt(0));
 }
 
 /** Converts apostrophes and quotes to feet and inches */
@@ -133,10 +133,10 @@ function quotesToUnits(text: string) {
   const NUMBER_WITH_QUOTE_REGEX = /\d\s*\"/gi;
 
   return text
-    .replace(NUMBER_WITH_APOSTROOPHE_REGEX, match =>
+    .replace(NUMBER_WITH_APOSTROOPHE_REGEX, (match) =>
       match.replace("'", " feet")
     )
-    .replace(NUMBER_WITH_QUOTE_REGEX, match => match.replace('"', " inches"));
+    .replace(NUMBER_WITH_QUOTE_REGEX, (match) => match.replace('"', " inches"));
 }
 
 const NUMBERS_ONLY_REGEX = /^\s*([\d|\.]+)\s*$/;

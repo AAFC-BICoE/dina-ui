@@ -22,7 +22,7 @@ async function nominatimSearch(
     format: "jsonv2"
   }).toString();
 
-  const fetchJson = urlArg => window.fetch(urlArg).then(res => res.json());
+  const fetchJson = (urlArg) => window.fetch(urlArg).then((res) => res.json());
 
   try {
     const results = await fetchJson(url.toString());
@@ -93,8 +93,8 @@ export function GeographySearchDialog({
           <div className="col-md-9">
             <input
               className="form-control"
-              onChange={e => setInputValue(e.target.value)}
-              onKeyDown={e => {
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
                 if (e.keyCode === 13) {
                   e.preventDefault();
                   searchByValueOnAdminBoundaries(inputValue);
@@ -112,7 +112,7 @@ export function GeographySearchDialog({
             </button>
           </div>
         </div>
-        {administrativeBoundaries?.map(boundary => (
+        {administrativeBoundaries?.map((boundary) => (
           <div key={boundary.osm_id}>
             <div className="row">
               <div className="col-md-12">{boundary.display_name}</div>
