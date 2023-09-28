@@ -9,7 +9,6 @@ import "common-ui/common-ui-style.scss";
 import "common-ui/lib/button-bar/buttonbar.css";
 import "common-ui/lib/table/react-table.css";
 import "../components/object-store/file-upload/file-upload-style.css";
-import "handsontable/dist/handsontable.full.min.css";
 import { AppProps } from "next/app";
 import "rc-pagination/assets/index.css";
 import "rc-tooltip/assets/bootstrap.css";
