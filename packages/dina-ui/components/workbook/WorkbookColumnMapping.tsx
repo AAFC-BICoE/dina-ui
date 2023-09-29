@@ -16,6 +16,7 @@ import { ValidationError } from "yup";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { WorkbookJSON } from "./types/Workbook";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
+import { Card } from "react-bootstrap";
 import {
   DataTypeEnum,
   FieldMappingConfigType,
@@ -34,6 +35,7 @@ import {
   isNumberArray,
   isValidManagedAttribute
 } from "./utils/workbookMappingUtils";
+import { WorkbookDisplay } from "./WorkbookDisplay";
 
 export type FieldMapType = (string | undefined)[];
 
@@ -502,36 +504,39 @@ export function WorkbookColumnMapping({
                 </div>
               </div>
 
-              {/* Column Header Mapping Table */}
-              <Table>
-                <thead>
-                  <tr>
-                    <th>
-                      <DinaMessage id="spreadsheetHeader" />
-                    </th>
-                    <th>
-                      <DinaMessage id="materialSampleFieldsMapping" />
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {headers
-                    ? headers.map((columnHeader, index) => (
-                        <tr key={columnHeader}>
-                          <td>{columnHeader}</td>
-                          <td>
-                            <SelectField
-                              name={`fieldMap[${index}]`}
-                              options={fieldOptions}
-                              hideLabel={true}
-                              styles={customStyles}
-                            />
-                          </td>
-                        </tr>
-                      ))
-                    : undefined}
-                </tbody>
-              </Table>
+              <WorkbookDisplay sheetIndex={sheet} jsonData={spreadsheetData} />
+              <div className="mb-3 border card px-4 py-2">
+                {/* Column Header Mapping Table */}
+                <Table>
+                  <thead>
+                    <tr>
+                      <th>
+                        <DinaMessage id="spreadsheetHeader" />
+                      </th>
+                      <th>
+                        <DinaMessage id="materialSampleFieldsMapping" />
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {headers
+                      ? headers.map((columnHeader, index) => (
+                          <tr key={columnHeader}>
+                            <td>{columnHeader}</td>
+                            <td>
+                              <SelectField
+                                name={`fieldMap[${index}]`}
+                                options={fieldOptions}
+                                hideLabel={true}
+                                styles={customStyles}
+                              />
+                            </td>
+                          </tr>
+                        ))
+                      : undefined}
+                  </tbody>
+                </Table>
+              </div>
             </>
           );
         }}

@@ -890,6 +890,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
   workbookGroupUploadTitle: "Upload Workbook",
   workbookTitle: "Workbooks",
+  workbookPreviewTitle: "Workbook preview",
   workbookUploadFailure:
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
