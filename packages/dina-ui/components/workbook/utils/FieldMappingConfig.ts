@@ -1,49 +1,60 @@
-import { DataTypeEnum, FieldMappingConfigType } from "./useWorkbookConverter";
+import { FieldMappingConfigType } from "../";
+import { WorkBookDataTypeEnum } from "../";
 
 const FieldMappingConfig: FieldMappingConfigType = {
   "material-sample": {
-    materialSampleName: { dataType: DataTypeEnum.STRING },
-    preservationType: { dataType: DataTypeEnum.STRING },
-    preparationFixative: { dataType: DataTypeEnum.STRING },
-    preparationMaterials: { dataType: DataTypeEnum.STRING },
-    preparationSubstrate: { dataType: DataTypeEnum.STRING },
-    preparationDate: { dataType: DataTypeEnum.DATE },
-    preparationRemarks: { dataType: DataTypeEnum.STRING },
-    description: { dataType: DataTypeEnum.STRING },
-    dwcDegreeOfEstablishment: { dataType: DataTypeEnum.STRING },
-    barcode: { dataType: DataTypeEnum.STRING },
-    materialSampleState: { dataType: DataTypeEnum.STRING },
-    materialSampleRemarks: { dataType: DataTypeEnum.STRING },
-    notPubliclyReleasableReason: { dataType: DataTypeEnum.STRING },
-    dwcOtherCatalogNumbers: { dataType: DataTypeEnum.STRING_ARRAY },
-    tags: { dataType: DataTypeEnum.STRING_ARRAY },
+    materialSampleName: { dataType: WorkBookDataTypeEnum.STRING },
+    preservationType: { dataType: WorkBookDataTypeEnum.STRING },
+    preparationFixative: { dataType: WorkBookDataTypeEnum.STRING },
+    preparationMaterials: { dataType: WorkBookDataTypeEnum.STRING },
+    preparationSubstrate: { dataType: WorkBookDataTypeEnum.STRING },
+    preparationDate: { dataType: WorkBookDataTypeEnum.DATE },
+    preparationRemarks: { dataType: WorkBookDataTypeEnum.STRING },
+    description: { dataType: WorkBookDataTypeEnum.STRING },
+    dwcDegreeOfEstablishment: { dataType: WorkBookDataTypeEnum.STRING },
+    barcode: { dataType: WorkBookDataTypeEnum.STRING },
+    materialSampleState: { dataType: WorkBookDataTypeEnum.STRING },
+    materialSampleRemarks: { dataType: WorkBookDataTypeEnum.STRING },
+    notPubliclyReleasableReason: { dataType: WorkBookDataTypeEnum.STRING },
+    dwcOtherCatalogNumbers: { dataType: WorkBookDataTypeEnum.STRING_ARRAY },
+    tags: { dataType: WorkBookDataTypeEnum.STRING_ARRAY },
     materialSampleType: {
-      dataType: DataTypeEnum.VOCABULARY,
+      dataType: WorkBookDataTypeEnum.VOCABULARY,
       vocabularyEndpoint: "/collection-api/vocabulary/materialSampleType"
     },
-    managedAttributes: { dataType: DataTypeEnum.MANAGED_ATTRIBUTES },
-    organismsIndividualEntry: { dataType: DataTypeEnum.BOOLEAN },
-    useTargetOrganism: { dataType: DataTypeEnum.BOOLEAN },
-    publiclyReleasable: { dataType: DataTypeEnum.BOOLEAN },
-    useNextSequence: { dataType: DataTypeEnum.BOOLEAN },
-    isRestricted: { dataType: DataTypeEnum.BOOLEAN },
+    managedAttributes: { dataType: WorkBookDataTypeEnum.MANAGED_ATTRIBUTES },
+    organismsIndividualEntry: { dataType: WorkBookDataTypeEnum.BOOLEAN },
+    useTargetOrganism: { dataType: WorkBookDataTypeEnum.BOOLEAN },
+    publiclyReleasable: { dataType: WorkBookDataTypeEnum.BOOLEAN },
+    useNextSequence: { dataType: WorkBookDataTypeEnum.BOOLEAN },
+    isRestricted: { dataType: WorkBookDataTypeEnum.BOOLEAN },
     organism: {
-      dataType: DataTypeEnum.OBJECT_ARRAY,
+      dataType: WorkBookDataTypeEnum.OBJECT_ARRAY,
       attributes: {
-        lifeStage: { dataType: DataTypeEnum.STRING },
-        sex: { dataType: DataTypeEnum.STRING },
-        remarks: { dataType: DataTypeEnum.STRING },
-        isTarget: { dataType: DataTypeEnum.BOOLEAN },
+        lifeStage: { dataType: WorkBookDataTypeEnum.STRING },
+        sex: { dataType: WorkBookDataTypeEnum.STRING },
+        remarks: { dataType: WorkBookDataTypeEnum.STRING },
+        isTarget: { dataType: WorkBookDataTypeEnum.BOOLEAN },
         determination: {
-          dataType: DataTypeEnum.OBJECT_ARRAY,
+          dataType: WorkBookDataTypeEnum.OBJECT_ARRAY,
           attributes: {
-            verbatimScientificName: { dataType: DataTypeEnum.STRING },
-            verbatimDeterminer: { dataType: DataTypeEnum.STRING },
-            verbatimDate: { dataType: DataTypeEnum.DATE },
-            typeStatus: { dataType: DataTypeEnum.STRING }
+            verbatimScientificName: { dataType: WorkBookDataTypeEnum.STRING },
+            verbatimDeterminer: { dataType: WorkBookDataTypeEnum.STRING },
+            verbatimDate: { dataType: WorkBookDataTypeEnum.DATE },
+            typeStatus: { dataType: WorkBookDataTypeEnum.STRING }
           }
         }
       }
+    },
+    preparedBy: {
+      dataType: WorkBookDataTypeEnum.RELATIONSHIP_ARRAY,
+      type: "person",
+      baseApiPath: "agent-api"
+    },
+    collection: {
+      dataType: WorkBookDataTypeEnum.RELATIONSHIP,
+      type: "collection",
+      baseApiPath: "collection-api"
     }
   }
 };

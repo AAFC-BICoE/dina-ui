@@ -17,11 +17,8 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { WorkbookJSON } from "./types/Workbook";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { Card } from "react-bootstrap";
-import {
-  DataTypeEnum,
-  FieldMappingConfigType,
-  useWorkbookConverter
-} from "./utils/useWorkbookConverter";
+import { useWorkbookConverter } from "./utils/useWorkbookConverter";
+import { WorkBookDataTypeEnum } from "./";
 import lodash, { startCase } from "lodash";
 import {
   convertMap,
@@ -120,7 +117,7 @@ export function WorkbookColumnMapping({
     Object.keys(recordFieldsMap).forEach((recordField) => {
       const { dataType, endpoint } = recordFieldsMap[recordField];
       switch (dataType) {
-        case DataTypeEnum.VOCABULARY:
+        case WorkBookDataTypeEnum.VOCABULARY:
           if (endpoint) {
             const query: any = useQuery({
               path: endpoint
@@ -132,7 +129,7 @@ export function WorkbookColumnMapping({
             FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
           }
           break;
-        case DataTypeEnum.MANAGED_ATTRIBUTES:
+        case WorkBookDataTypeEnum.MANAGED_ATTRIBUTES:
           if (endpoint) {
             // load available Managed Attributes
             const query: any = useQuery({
@@ -160,8 +157,8 @@ export function WorkbookColumnMapping({
       Object.keys(flattenedConfig).forEach((fieldPath) => {
         const config = flattenedConfig[fieldPath];
         if (
-          config.dataType !== DataTypeEnum.OBJECT &&
-          config.dataType !== DataTypeEnum.OBJECT_ARRAY
+          config.dataType !== WorkBookDataTypeEnum.OBJECT &&
+          config.dataType !== WorkBookDataTypeEnum.OBJECT_ARRAY
         ) {
           // Handle creating options for all flattened fields to be used for mapping, not actually used for dropdown component
           const newLabelPath = fieldPath.substring(
@@ -308,7 +305,7 @@ export function WorkbookColumnMapping({
             sheet: number;
             index: number;
             field: string;
-            dataType?: DataTypeEnum;
+            dataType?: WorkBookDataTypeEnum;
           } = {
             sheet: sheet + 1,
             index: row.rowNumber + 1,
@@ -318,9 +315,9 @@ export function WorkbookColumnMapping({
             const fieldPath = getPathOfField(field);
             if (fieldPath) {
               switch (flattenedConfig[fieldPath]?.dataType) {
-                case DataTypeEnum.BOOLEAN:
+                case WorkBookDataTypeEnum.BOOLEAN:
                   if (!isBoolean(row[field])) {
-                    param.dataType = DataTypeEnum.BOOLEAN;
+                    param.dataType = WorkBookDataTypeEnum.BOOLEAN;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
@@ -330,9 +327,9 @@ export function WorkbookColumnMapping({
                     );
                   }
                   break;
-                case DataTypeEnum.NUMBER:
+                case WorkBookDataTypeEnum.NUMBER:
                   if (!isNumber(row[field])) {
-                    param.dataType = DataTypeEnum.NUMBER;
+                    param.dataType = WorkBookDataTypeEnum.NUMBER;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
@@ -342,9 +339,9 @@ export function WorkbookColumnMapping({
                     );
                   }
                   break;
-                case DataTypeEnum.NUMBER_ARRAY:
+                case WorkBookDataTypeEnum.NUMBER_ARRAY:
                   if (!isNumberArray(row[field])) {
-                    param.dataType = DataTypeEnum.NUMBER_ARRAY;
+                    param.dataType = WorkBookDataTypeEnum.NUMBER_ARRAY;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
@@ -354,9 +351,9 @@ export function WorkbookColumnMapping({
                     );
                   }
                   break;
-                case DataTypeEnum.BOOLEAN_ARRAY:
+                case WorkBookDataTypeEnum.BOOLEAN_ARRAY:
                   if (!isBooleanArray(row[field])) {
-                    param.dataType = DataTypeEnum.BOOLEAN_ARRAY;
+                    param.dataType = WorkBookDataTypeEnum.BOOLEAN_ARRAY;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
@@ -366,9 +363,9 @@ export function WorkbookColumnMapping({
                     );
                   }
                   break;
-                case DataTypeEnum.MANAGED_ATTRIBUTES:
+                case WorkBookDataTypeEnum.MANAGED_ATTRIBUTES:
                   if (!isMap(row[field])) {
-                    param.dataType = DataTypeEnum.MANAGED_ATTRIBUTES;
+                    param.dataType = WorkBookDataTypeEnum.MANAGED_ATTRIBUTES;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
@@ -388,9 +385,9 @@ export function WorkbookColumnMapping({
                     errors.push(error);
                   }
                   break;
-                case DataTypeEnum.NUMBER:
+                case WorkBookDataTypeEnum.NUMBER:
                   if (!isNumber(row[field])) {
-                    param.dataType = DataTypeEnum.NUMBER;
+                    param.dataType = WorkBookDataTypeEnum.NUMBER;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
@@ -400,10 +397,10 @@ export function WorkbookColumnMapping({
                     );
                   }
                   break;
-                case DataTypeEnum.VOCABULARY:
+                case WorkBookDataTypeEnum.VOCABULARY:
                   const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
                   if (vocabElements && !vocabElements.includes(row[field])) {
-                    param.dataType = DataTypeEnum.VOCABULARY;
+                    param.dataType = WorkBookDataTypeEnum.VOCABULARY;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),

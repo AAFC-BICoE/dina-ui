@@ -1,0 +1,15 @@
+export enum WorkBookDataTypeEnum {
+  NUMBER = "number",
+  BOOLEAN = "boolean",
+  STRING = "string",
+  DATE = "date",
+  STRING_ARRAY = "string[]",
+  NUMBER_ARRAY = "number[]",
+  BOOLEAN_ARRAY = "boolean[]",
+  MANAGED_ATTRIBUTES = "managedAttributes",
+  VOCABULARY = "vocabulary",
+  OBJECT = "object",
+  OBJECT_ARRAY = "object[]",
+  RELATIONSHIP = "relationship",
+  RELATIONSHIP_ARRAY = "relationship[]"
+}

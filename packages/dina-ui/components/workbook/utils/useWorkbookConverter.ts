@@ -10,43 +10,19 @@ import {
   convertStringArray,
   flattenObject
 } from "./workbookMappingUtils";
-
-export enum DataTypeEnum {
-  NUMBER = "number",
-  BOOLEAN = "boolean",
-  STRING = "string",
-  DATE = "date",
-  STRING_ARRAY = "string[]",
-  NUMBER_ARRAY = "number[]",
-  BOOLEAN_ARRAY = "boolean[]",
-  MANAGED_ATTRIBUTES = "managedAttributes",
-  VOCABULARY = "vocabulary",
-  OBJECT = "object",
-  OBJECT_ARRAY = "object[]"
-}
-
-export type Leaves<T> = { [K in string]: T | Leaves<T> } & {
-  [K in keyof T]?: never;
-};
-
-export type FieldMappingConfigType = Leaves<FieldConfigType>;
-
-export type FieldConfigType = {
-  dataType: DataTypeEnum;
-  vocabularyEndpoint?: string;
-  attributes?: FieldMappingConfigType;
-};
+import { FieldMappingConfigType, WorkBookDataTypeEnum } from "../";
 
 export const DATATYPE_CONVERTER_MAPPING = {
-  [DataTypeEnum.NUMBER]: convertNumber,
-  [DataTypeEnum.BOOLEAN]: convertBoolean,
-  [DataTypeEnum.STRING_ARRAY]: convertStringArray,
-  [DataTypeEnum.NUMBER_ARRAY]: convertNumberArray,
-  [DataTypeEnum.MANAGED_ATTRIBUTES]: convertMap,
-  [DataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
-  [DataTypeEnum.DATE]: convertDate,
-  [DataTypeEnum.STRING]: (value) => value,
-  [DataTypeEnum.VOCABULARY]: (value) => value
+  [WorkBookDataTypeEnum.NUMBER]: convertNumber,
+  [WorkBookDataTypeEnum.BOOLEAN]: convertBoolean,
+  [WorkBookDataTypeEnum.STRING_ARRAY]: convertStringArray,
+  [WorkBookDataTypeEnum.NUMBER_ARRAY]: convertNumberArray,
+  [WorkBookDataTypeEnum.MANAGED_ATTRIBUTES]: convertMap,
+  [WorkBookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
+  [WorkBookDataTypeEnum.DATE]: convertDate,
+  [WorkBookDataTypeEnum.STRING]: (value) => value,
+  [WorkBookDataTypeEnum.VOCABULARY]: (value) => value,
+  [WorkBookDataTypeEnum.RELATIONSHIP]: (value) => value
 };
 
 export function useWorkbookConverter(
@@ -137,7 +113,7 @@ export function useWorkbookConverter(
             childPath = childPath + "." + childName;
             const childDataType = flattenedConfig[childPath]?.dataType;
             let child: InputResource<KitsuResource & { group?: string }>;
-            if (childDataType === DataTypeEnum.OBJECT) {
+            if (childDataType === WorkBookDataTypeEnum.OBJECT) {
               child = parent[childName];
             } else {
               child = parent[childName] ? parent[childName][0] : undefined;
@@ -147,7 +123,7 @@ export function useWorkbookConverter(
                 type: childName,
                 group
               } as InputResource<KitsuResource & { group?: string }>;
-              if (childDataType === DataTypeEnum.OBJECT) {
+              if (childDataType === WorkBookDataTypeEnum.OBJECT) {
                 parent[childName] = child;
               } else {
                 parent[childName] = [child];

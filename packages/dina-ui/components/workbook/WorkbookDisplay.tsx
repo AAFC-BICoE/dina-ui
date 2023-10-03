@@ -13,7 +13,7 @@ export function WorkbookDisplay({
   jsonData: WorkbookJSON;
   sheetIndex: number;
 }) {
-  const dataToDisplay = take(jsonData[sheetIndex], 10);
+  const dataToDisplay = take(jsonData[sheetIndex], 11);
   const numOfColumns = dataToDisplay[0].content.length;
   const numOfRows = dataToDisplay.length - 1;
   const headerRow = dataToDisplay[0].content.map((col) => (
@@ -95,7 +95,7 @@ export function WorkbookDisplay({
       >
         <Card.Header>
           <DinaMessage id="workbookPreviewTitle" /> ({numOfRows} /{" "}
-          {jsonData[sheetIndex].length})
+          {jsonData[sheetIndex].length - 1})
         </Card.Header>
         <Card.Body>
           <div className="cells">
