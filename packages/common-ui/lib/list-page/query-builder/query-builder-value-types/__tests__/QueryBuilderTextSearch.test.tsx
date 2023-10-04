@@ -113,7 +113,7 @@ describe("QueryBuilderTextSearch", () => {
               parentType: "collection",
               parentPath: "included",
               distinctTerm: true,
-              keywordMultiFieldSupport: true
+              keywordMultiFieldSupport: false
             } as any,
             fieldPath: "included.attributes.name",
             queryType: "startsWith"

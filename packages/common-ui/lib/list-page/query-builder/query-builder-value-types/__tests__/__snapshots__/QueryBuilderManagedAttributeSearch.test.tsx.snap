@@ -1601,7 +1601,7 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator startsWith 1`] = `
 Object {
   "prefix": Object {
-    "data.attributes.managedAttributes.attributeName": "stringvalue",
+    "data.attributes.managedAttributes.attributeName.keyword": "stringvalue",
   },
 }
 `;
@@ -1609,7 +1609,7 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator wildcard 1`] = `
 Object {
   "wildcard": Object {
-    "data.attributes.managedAttributes.attributeName": Object {
+    "data.attributes.managedAttributes.attributeName.keyword": Object {
       "value": "*stringValue*",
     },
   },
@@ -1828,7 +1828,7 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.managedAttributes.attributeName": "stringvalue",
+              "included.attributes.managedAttributes.attributeName.keyword": "stringvalue",
             },
           },
           Object {
@@ -1852,7 +1852,7 @@ Object {
         "must": Array [
           Object {
             "wildcard": Object {
-              "included.attributes.managedAttributes.attributeName": Object {
+              "included.attributes.managedAttributes.attributeName.keyword": Object {
                 "value": "*stringValue*",
               },
             },
@@ -1868,4 +1868,3 @@ Object {
   },
 }
 `;
-

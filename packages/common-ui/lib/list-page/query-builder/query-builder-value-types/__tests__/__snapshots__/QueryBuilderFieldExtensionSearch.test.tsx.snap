@@ -90,7 +90,7 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the startsWith operator. 1`] = `
 Object {
   "prefix": Object {
-    "data.attributes.extensionValues.extension.field": "test123",
+    "data.attributes.extensionValues.extension.field.keyword": "test123",
   },
 }
 `;
@@ -98,7 +98,7 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the wildcard operator. 1`] = `
 Object {
   "wildcard": Object {
-    "data.attributes.extensionValues.extension.field": Object {
+    "data.attributes.extensionValues.extension.field.keyword": Object {
       "value": "*test123*",
     },
   },
@@ -317,7 +317,7 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.extensionValues.extension.field": "test123",
+              "included.attributes.extensionValues.extension.field.keyword": "test123",
             },
           },
           Object {
@@ -341,7 +341,7 @@ Object {
         "must": Array [
           Object {
             "wildcard": Object {
-              "included.attributes.extensionValues.extension.field": Object {
+              "included.attributes.extensionValues.extension.field.keyword": Object {
                 "value": "*test123*",
               },
             },
