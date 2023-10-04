@@ -403,11 +403,12 @@ export function termQuery(
   };
 }
 
+
 // Query used for wildcard searches (contains).
-export function wildcardQuery(fieldName: string, matchValue: any): any {
+export function wildcardQuery(fieldName: string, matchValue: any, keywordSupport: boolean): any {
   return {
     wildcard: {
-      [fieldName]: {
+      [keywordSupport ? fieldName + ".keyword" : fieldName]: {
         value: `*${matchValue}*`
       }
     }
@@ -446,7 +447,8 @@ export function prefixQuery(
   fieldName: string,
   matchValue: any,
   parentType: string | undefined,
-  optimizedPrefix: boolean
+  optimizedPrefix: boolean,
+  keywordSupport: boolean
 ): any {
   if (matchValue === "") {
     return {};
@@ -466,7 +468,7 @@ export function prefixQuery(
               must: [
                 {
                   prefix: {
-                    [optimizedPrefix ? fieldName + ".prefix" : fieldName]:
+                    [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]:
                       matchValue
                   }
                 },
@@ -478,7 +480,7 @@ export function prefixQuery(
       }
     : {
         prefix: {
-          [optimizedPrefix ? fieldName + ".prefix" : fieldName]: matchValue
+          [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]: matchValue
         }
       };
 }

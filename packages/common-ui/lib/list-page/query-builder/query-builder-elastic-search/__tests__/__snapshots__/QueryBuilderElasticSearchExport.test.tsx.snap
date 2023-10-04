@@ -44,6 +44,14 @@ Object {
 }
 `;
 
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (not optimized, keyword support) 1`] = `
+Object {
+  "prefix": Object {
+    "data.attribute.materialSampleName.keyword": "searchvalue",
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (optimized) 1`] = `
 Object {
   "prefix": Object {
@@ -62,6 +70,30 @@ Object {
           Object {
             "prefix": Object {
               "included.attributes.dwcRecordNumber": "searchvalue",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery relationship (not optimized, keyword support) 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.dwcRecordNumber.keyword": "searchvalue",
             },
           },
           Object {
@@ -186,6 +218,16 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions wi
 Object {
   "wildcard": Object {
     "fieldTest": Object {
+      "value": "*valueToMatch*",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions wildcard 2`] = `
+Object {
+  "wildcard": Object {
+    "fieldTest.keyword": Object {
       "value": "*valueToMatch*",
     },
   },

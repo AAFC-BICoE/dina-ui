@@ -113,18 +113,18 @@ export function transformTextSearchToDSL({
               query: {
                 bool: {
                   must: [
-                    wildcardQuery(fieldPath, value),
+                    wildcardQuery(fieldPath, value, keywordMultiFieldSupport),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
-        : wildcardQuery(fieldPath, value);
+        : wildcardQuery(fieldPath, value, keywordMultiFieldSupport);
 
     // Prefix partial match
     case "startsWith":
-      return prefixQuery(fieldPath, value, parentType, optimizedPrefix);
+      return prefixQuery(fieldPath, value, parentType, optimizedPrefix, keywordMultiFieldSupport);
 
     // Infix partial match
     case "containsText":
