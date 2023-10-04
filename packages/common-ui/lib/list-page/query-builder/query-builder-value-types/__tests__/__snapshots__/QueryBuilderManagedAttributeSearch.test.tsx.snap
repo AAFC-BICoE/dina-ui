@@ -1605,6 +1605,7 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 Object {
   "wildcard": Object {
     "data.attributes.managedAttributes.attributeName.keyword": Object {
+      "case_insensitive": true,
       "value": "*stringValue*",
     },
   },
@@ -1827,6 +1828,7 @@ Object {
           Object {
             "wildcard": Object {
               "included.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
                 "value": "*stringValue*",
               },
             },

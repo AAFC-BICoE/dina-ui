@@ -397,7 +397,8 @@ export function wildcardQuery(fieldName: string, matchValue: any, keywordSupport
   return {
     wildcard: {
       [keywordSupport ? fieldName + ".keyword" : fieldName]: {
-        value: `*${matchValue}*`
+        value: `*${matchValue}*`,
+        case_insensitive: true
       }
     }
   };

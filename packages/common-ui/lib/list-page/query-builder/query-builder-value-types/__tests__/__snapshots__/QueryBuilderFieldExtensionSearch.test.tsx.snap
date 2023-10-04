@@ -94,6 +94,7 @@ exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL functio
 Object {
   "wildcard": Object {
     "data.attributes.extensionValues.extension.field.keyword": Object {
+      "case_insensitive": true,
       "value": "*test123*",
     },
   },
@@ -316,6 +317,7 @@ Object {
           Object {
             "wildcard": Object {
               "included.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
                 "value": "*test123*",
               },
             },

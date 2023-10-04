@@ -228,6 +228,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions wi
 Object {
   "wildcard": Object {
     "fieldTest": Object {
+      "case_insensitive": true,
       "value": "*valueToMatch*",
     },
   },
@@ -238,6 +239,7 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions wi
 Object {
   "wildcard": Object {
     "fieldTest.keyword": Object {
+      "case_insensitive": true,
       "value": "*valueToMatch*",
     },
   },
