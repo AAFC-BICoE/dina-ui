@@ -39,7 +39,10 @@ Object {
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (not optimized) 1`] = `
 Object {
   "prefix": Object {
-    "data.attribute.materialSampleName": "searchvalue",
+    "data.attribute.materialSampleName": Object {
+      "case_insensitive": true,
+      "value": "searchValue",
+    },
   },
 }
 `;
@@ -47,7 +50,10 @@ Object {
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (not optimized, keyword support) 1`] = `
 Object {
   "prefix": Object {
-    "data.attribute.materialSampleName.keyword": "searchvalue",
+    "data.attribute.materialSampleName.keyword": Object {
+      "case_insensitive": true,
+      "value": "searchValue",
+    },
   },
 }
 `;
@@ -55,7 +61,10 @@ Object {
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute (optimized) 1`] = `
 Object {
   "prefix": Object {
-    "data.attribute.materialSampleName.prefix": "searchvalue",
+    "data.attribute.materialSampleName.prefix": Object {
+      "case_insensitive": true,
+      "value": "searchValue",
+    },
   },
 }
 `;
@@ -69,7 +78,10 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.dwcRecordNumber": "searchvalue",
+              "included.attributes.dwcRecordNumber": Object {
+                "case_insensitive": true,
+                "value": "searchValue",
+              },
             },
           },
           Object {
@@ -93,7 +105,10 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.dwcRecordNumber.keyword": "searchvalue",
+              "included.attributes.dwcRecordNumber.keyword": Object {
+                "case_insensitive": true,
+                "value": "searchValue",
+              },
             },
           },
           Object {
@@ -117,7 +132,10 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.dwcRecordNumber.prefix": "searchvalue",
+              "included.attributes.dwcRecordNumber.prefix": Object {
+                "case_insensitive": true,
+                "value": "searchValue",
+              },
             },
           },
           Object {
@@ -176,14 +194,6 @@ exports[`QueryBuilderElasticSearchExport functionality Query helper functions in
 Object {
   "term": Object {
     "included.type": "parentTest",
-  },
-}
-`;
-
-exports[`QueryBuilderElasticSearchExport functionality Query helper functions matchQuery 1`] = `
-Object {
-  "match": Object {
-    "fieldTest": "valueToMatch",
   },
 }
 `;

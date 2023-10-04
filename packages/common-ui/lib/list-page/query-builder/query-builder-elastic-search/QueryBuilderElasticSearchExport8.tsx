@@ -415,15 +415,6 @@ export function wildcardQuery(fieldName: string, matchValue: any, keywordSupport
   };
 }
 
-// Query used for partial matches (contains word).
-export function matchQuery(fieldName: string, matchValue: any): any {
-  return {
-    match: {
-      [fieldName]: matchValue
-    }
-  };
-}
-
 // Query used to see if the field exists.
 export function existsQuery(fieldName: string): any {
   return {
@@ -454,11 +445,6 @@ export function prefixQuery(
     return {};
   }
 
-  // Lowercase the matchValue here, if it's a string.
-  if (typeof matchValue === "string") {
-    matchValue = matchValue.toLowerCase();
-  }
-
   return parentType
     ? {
         nested: {
@@ -468,8 +454,10 @@ export function prefixQuery(
               must: [
                 {
                   prefix: {
-                    [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]:
-                      matchValue
+                    [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]: {
+                      value: matchValue,
+                      case_insensitive: true
+                    }
                   }
                 },
                 includedTypeQuery(parentType)
@@ -480,7 +468,10 @@ export function prefixQuery(
       }
     : {
         prefix: {
-          [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]: matchValue
+          [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]: {
+            value: matchValue,
+            case_insensitive: true
+          }
         }
       };
 }

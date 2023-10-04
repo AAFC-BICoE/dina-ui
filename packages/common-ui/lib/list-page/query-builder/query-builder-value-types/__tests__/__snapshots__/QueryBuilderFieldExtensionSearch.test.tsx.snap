@@ -59,8 +59,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "match": Object {
-              "data.attributes.extensionValues.extension.field": "test123",
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": "test123",
             },
           },
         },
@@ -79,18 +79,13 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the partialMatch operator. 1`] = `
-Object {
-  "match": Object {
-    "data.attributes.extensionValues.extension.field": "test123",
-  },
-}
-`;
-
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the startsWith operator. 1`] = `
 Object {
   "prefix": Object {
-    "data.attributes.extensionValues.extension.field.keyword": "test123",
+    "data.attributes.extensionValues.extension.field.keyword": Object {
+      "case_insensitive": true,
+      "value": "test123",
+    },
   },
 }
 `;
@@ -243,8 +238,8 @@ Object {
                 },
               },
               "must_not": Object {
-                "match": Object {
-                  "included.attributes.extensionValues.extension.field": "test123",
+                "term": Object {
+                  "included.attributes.extensionValues.extension.field.keyword": "test123",
                 },
               },
             },
@@ -284,30 +279,6 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the partialMatch operator. 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "match": Object {
-              "included.attributes.extensionValues.extension.field": "test123",
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the startsWith operator. 1`] = `
 Object {
   "nested": Object {
@@ -317,7 +288,10 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.extensionValues.extension.field.keyword": "test123",
+              "included.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test123",
+              },
             },
           },
           Object {

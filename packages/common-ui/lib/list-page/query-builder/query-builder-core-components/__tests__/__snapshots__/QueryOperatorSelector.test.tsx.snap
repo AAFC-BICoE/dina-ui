@@ -87,30 +87,23 @@ exports[`QueryOperatorSelector component Snapshot Test 1`] = `
                                   </div>
                                 </EmotionCssPropInternal>
                               </Option>
-                              <Option clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerProps={{...}} data={{...}} isDisabled={false} isSelected={false} label=\\"Partial Match\\" type=\\"option\\" value=\\"partialMatch\\" isFocused={false} innerRef={[undefined]}>
+                              <Option clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerProps={{...}} data={{...}} isDisabled={false} isSelected={false} label=\\"Not Equals\\" type=\\"option\\" value=\\"notEquals\\" isFocused={false} innerRef={[undefined]}>
                                 <EmotionCssPropInternal css={{...}} className=\\"\\" aria-disabled={false} id=\\"react-select-2-option-1\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Option\\">
                                   <div className=\\" css-yt9ioa-option\\" aria-disabled={false} id=\\"react-select-2-option-1\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1}>
-                                    Partial Match
-                                  </div>
-                                </EmotionCssPropInternal>
-                              </Option>
-                              <Option clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerProps={{...}} data={{...}} isDisabled={false} isSelected={false} label=\\"Not Equals\\" type=\\"option\\" value=\\"notEquals\\" isFocused={false} innerRef={[undefined]}>
-                                <EmotionCssPropInternal css={{...}} className=\\"\\" aria-disabled={false} id=\\"react-select-2-option-2\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Option\\">
-                                  <div className=\\" css-yt9ioa-option\\" aria-disabled={false} id=\\"react-select-2-option-2\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1}>
                                     Not Equals
                                   </div>
                                 </EmotionCssPropInternal>
                               </Option>
                               <Option clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerProps={{...}} data={{...}} isDisabled={false} isSelected={false} label=\\"Empty\\" type=\\"option\\" value=\\"empty\\" isFocused={false} innerRef={[undefined]}>
-                                <EmotionCssPropInternal css={{...}} className=\\"\\" aria-disabled={false} id=\\"react-select-2-option-3\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Option\\">
-                                  <div className=\\" css-yt9ioa-option\\" aria-disabled={false} id=\\"react-select-2-option-3\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1}>
+                                <EmotionCssPropInternal css={{...}} className=\\"\\" aria-disabled={false} id=\\"react-select-2-option-2\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Option\\">
+                                  <div className=\\" css-yt9ioa-option\\" aria-disabled={false} id=\\"react-select-2-option-2\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1}>
                                     Empty
                                   </div>
                                 </EmotionCssPropInternal>
                               </Option>
                               <Option clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerProps={{...}} data={{...}} isDisabled={false} isSelected={false} label=\\"Not Empty\\" type=\\"option\\" value=\\"notEmpty\\" isFocused={false} innerRef={[undefined]}>
-                                <EmotionCssPropInternal css={{...}} className=\\"\\" aria-disabled={false} id=\\"react-select-2-option-4\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Option\\">
-                                  <div className=\\" css-yt9ioa-option\\" aria-disabled={false} id=\\"react-select-2-option-4\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1}>
+                                <EmotionCssPropInternal css={{...}} className=\\"\\" aria-disabled={false} id=\\"react-select-2-option-3\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Option\\">
+                                  <div className=\\" css-yt9ioa-option\\" aria-disabled={false} id=\\"react-select-2-option-3\\" onClick={[Function (anonymous)]} onMouseMove={[Function (anonymous)]} onMouseOver={[Function (anonymous)]} tabIndex={-1}>
                                     Not Empty
                                   </div>
                                 </EmotionCssPropInternal>

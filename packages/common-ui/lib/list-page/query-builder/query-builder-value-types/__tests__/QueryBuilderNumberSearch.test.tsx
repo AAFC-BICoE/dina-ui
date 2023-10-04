@@ -215,35 +215,6 @@ describe("QueryBuilderNumberSearch", () => {
       });
     });
 
-    describe("Partial Match operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformNumberSearchToDSL({
-            operation: "partialMatch",
-            value: "123",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "partialMatch"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformNumberSearchToDSL({
-            operation: "partialMatch",
-            value: "123",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.numberField",
-            queryType: "partialMatch"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
     describe("Exact Match operation", () => {
       test("With relationship as field", async () => {
         expect(

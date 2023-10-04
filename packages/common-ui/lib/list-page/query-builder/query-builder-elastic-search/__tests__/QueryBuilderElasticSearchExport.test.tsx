@@ -8,7 +8,6 @@ import {
   applySourceFiltering,
   includedTypeQuery,
   termQuery,
-  matchQuery,
   existsQuery,
   rangeQuery,
   prefixQuery,
@@ -273,10 +272,6 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
     test("wildcard", async () => {
       expect(wildcardQuery("fieldTest", "valueToMatch", false)).toMatchSnapshot();
       expect(wildcardQuery("fieldTest", "valueToMatch", true)).toMatchSnapshot();
-    });
-
-    test("matchQuery", async () => {
-      expect(matchQuery("fieldTest", "valueToMatch")).toMatchSnapshot();
     });
 
     test("existsQuery", async () => {

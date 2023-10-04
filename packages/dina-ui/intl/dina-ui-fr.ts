@@ -714,7 +714,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   queryBuilder_operator_lessThanOrEqualTo: "Inférieur ou égal à",
   queryBuilder_operator_notEmpty: "N'est pas vide",
   queryBuilder_operator_notEquals: "N'est pas égal à",
-  queryBuilder_operator_partialMatch: "Correspondance partielle",
   queryBuilder_operator_startsWith: "Commence par ",
   queryBuilder_pickList_placeholder: "Sélectionner une valeur acceptée...",
   queryBuilder_value_false: "Faux ",

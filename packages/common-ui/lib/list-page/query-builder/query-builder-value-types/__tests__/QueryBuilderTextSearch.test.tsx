@@ -326,35 +326,6 @@ describe("QueryBuilderTextSearch", () => {
       });
     });
 
-    describe("Partial Match operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformTextSearchToDSL({
-            operation: "partialMatch",
-            value: "text search",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "partialMatch"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformTextSearchToDSL({
-            operation: "partialMatch",
-            value: "text search",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.textField",
-            queryType: "partialMatch"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
     describe("Exact Match operation", () => {
       test("With relationship as field", async () => {
         expect(
