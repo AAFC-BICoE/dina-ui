@@ -11,7 +11,7 @@ describe("CheckBoxField component", () => {
       </DinaForm>
     );
     expect(wrapper.find("label").text()).toEqual("Test Object Test Field");
-    expect((wrapper.find("input").instance() as any).checked).toEqual(false);
+    expect((wrapper.find("input").instance() as any).checked).toEqual(true);
   });
 
   it("Changes the field's value.", () => {
