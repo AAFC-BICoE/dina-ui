@@ -239,35 +239,6 @@ describe("QueryBuilderDateSearch", () => {
       });
     });
 
-    describe("Partial Match operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "partialMatch",
-            value: "1998-05-19",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "partialMatch"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "partialMatch",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "partialMatch"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
     describe("Exact Match operation", () => {
       test("With relationship as field", async () => {
         expect(

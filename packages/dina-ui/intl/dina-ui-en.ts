@@ -697,7 +697,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_operator_lessThanOrEqualTo: "Less than or equal to",
   queryBuilder_operator_notEmpty: "Not empty",
   queryBuilder_operator_notEquals: "Not equals",
-  queryBuilder_operator_partialMatch: "Contains word",
   queryBuilder_operator_wildcard: "Contains",
   queryBuilder_operator_startsWith: "Starts with",
   queryBuilder_pickList_placeholder: "Select an accepted value...",

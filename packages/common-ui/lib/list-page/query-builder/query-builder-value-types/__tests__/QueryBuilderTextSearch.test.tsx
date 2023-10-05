@@ -113,7 +113,7 @@ describe("QueryBuilderTextSearch", () => {
               parentType: "collection",
               parentPath: "included",
               distinctTerm: true,
-              keywordMultiFieldSupport: true
+              keywordMultiFieldSupport: false
             } as any,
             fieldPath: "included.attributes.name",
             queryType: "startsWith"
@@ -209,6 +209,62 @@ describe("QueryBuilderTextSearch", () => {
             } as any,
             fieldPath: "data.attributes.textField",
             queryType: "startsWith"
+          })
+        ).toMatchSnapshot();
+      });
+    });
+
+    describe("contains (wildcard) operation", () => {
+      test("With relationship as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "wildcard",
+            value: "text search",
+            fieldInfo: {
+              label: "name",
+              value: "collection.name",
+              type: "text",
+              path: "attributes",
+              parentName: "collection",
+              parentType: "collection",
+              parentPath: "included",
+              distinctTerm: true,
+              keywordMultiFieldSupport: true
+            } as any,
+            fieldPath: "included.attributes.name",
+            queryType: "wildcard"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("With relationship containing complex path as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "wildcard",
+            value: "text",
+            fieldInfo: {
+              label: "determination.scientificName",
+              parentName: "organism",
+              parentPath: "included",
+              parentType: "organism",
+              path: "attributes.determination",
+              type: "text",
+              value: "organism.determination.scientificName"
+            } as any,
+            fieldPath: "included.attributes.determination.scientificName",
+            queryType: "wildcard"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("Normal field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "wildcard",
+            value: "text search",
+            fieldInfo: {} as any,
+            fieldPath: "data.attributes.textField",
+            queryType: "wildcard"
           })
         ).toMatchSnapshot();
       });
@@ -321,35 +377,6 @@ describe("QueryBuilderTextSearch", () => {
             fieldInfo: {} as any,
             fieldPath: "data.attributes.textField",
             queryType: "endsWith"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("Partial Match operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformTextSearchToDSL({
-            operation: "partialMatch",
-            value: "text search",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "partialMatch"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformTextSearchToDSL({
-            operation: "partialMatch",
-            value: "text search",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.textField",
-            queryType: "partialMatch"
           })
         ).toMatchSnapshot();
       });
