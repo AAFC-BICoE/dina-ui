@@ -9,7 +9,5 @@ export enum WorkBookDataTypeEnum {
   MANAGED_ATTRIBUTES = "managedAttributes",
   VOCABULARY = "vocabulary",
   OBJECT = "object",
-  OBJECT_ARRAY = "object[]",
-  RELATIONSHIP = "relationship",
-  RELATIONSHIP_ARRAY = "relationship[]"
+  OBJECT_ARRAY = "object[]"
 }

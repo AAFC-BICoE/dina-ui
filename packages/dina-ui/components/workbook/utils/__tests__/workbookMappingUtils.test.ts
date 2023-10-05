@@ -1,4 +1,4 @@
-import { DataTypeEnum } from "../useWorkbookConverter";
+import { WorkBookDataTypeEnum } from "../../";
 import {
   convertDate,
   convertMap,
@@ -17,24 +17,27 @@ import {
 const mockConfig = {
   mockEntity: {
     stringField: {
-      dataType: DataTypeEnum.VOCABULARY,
+      dataType: WorkBookDataTypeEnum.VOCABULARY,
       vocabularyEndpoint: "/collection-api/vocabulary/materialSampleType"
     },
-    numberField: { dataType: DataTypeEnum.NUMBER },
-    booleanField: { dataType: DataTypeEnum.BOOLEAN },
-    stringArrayField: { dataType: DataTypeEnum.STRING_ARRAY },
-    numberArrayField: { dataType: DataTypeEnum.NUMBER_ARRAY },
-    mapField: { dataType: DataTypeEnum.MANAGED_ATTRIBUTES },
+    numberField: { dataType: WorkBookDataTypeEnum.NUMBER },
+    booleanField: { dataType: WorkBookDataTypeEnum.BOOLEAN },
+    stringArrayField: { dataType: WorkBookDataTypeEnum.STRING_ARRAY },
+    numberArrayField: { dataType: WorkBookDataTypeEnum.NUMBER_ARRAY },
+    mapField: { dataType: WorkBookDataTypeEnum.MANAGED_ATTRIBUTES },
     objectField: {
-      name: { dataType: DataTypeEnum.STRING },
-      age: { dataType: DataTypeEnum.NUMBER },
-      address: {
-        dataType: DataTypeEnum.OBJECT,
-        attributes: {
-          addressLine1: { dataType: DataTypeEnum.STRING },
-          city: { dataType: DataTypeEnum.STRING },
-          province: { dataType: DataTypeEnum.STRING },
-          postalCode: { dataType: DataTypeEnum.STRING }
+      dataType: WorkBookDataTypeEnum.OBJECT,
+      attributes: {
+        name: { dataType: WorkBookDataTypeEnum.STRING },
+        age: { dataType: WorkBookDataTypeEnum.NUMBER },
+        address: {
+          dataType: WorkBookDataTypeEnum.OBJECT,
+          attributes: {
+            addressLine1: { dataType: WorkBookDataTypeEnum.STRING },
+            city: { dataType: WorkBookDataTypeEnum.STRING },
+            province: { dataType: WorkBookDataTypeEnum.STRING },
+            postalCode: { dataType: WorkBookDataTypeEnum.STRING }
+          }
         }
       }
     }
@@ -241,18 +244,22 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.mapField.dataType": "managedAttributes",
       "mockEntity.numberArrayField.dataType": "number[]",
       "mockEntity.numberField.dataType": "number",
-      "mockEntity.objectField.age.dataType": "number",
-      "mockEntity.objectField.name.dataType": "string",
       "mockEntity.stringArrayField.dataType": "string[]",
       "mockEntity.stringField.dataType": "vocabulary",
       "mockEntity.stringField.vocabularyEndpoint":
         "/collection-api/vocabulary/materialSampleType",
-      "mockEntity.objectField.address.attributes.addressLine1.dataType":
+      "mockEntity.objectField.attributes.address.attributes.addressLine1.dataType":
         "string",
-      "mockEntity.objectField.address.attributes.city.dataType": "string",
-      "mockEntity.objectField.address.attributes.postalCode.dataType": "string",
-      "mockEntity.objectField.address.attributes.province.dataType": "string",
-      "mockEntity.objectField.address.dataType": "object"
+      "mockEntity.objectField.attributes.address.attributes.city.dataType":
+        "string",
+      "mockEntity.objectField.attributes.address.attributes.postalCode.dataType":
+        "string",
+      "mockEntity.objectField.attributes.address.attributes.province.dataType":
+        "string",
+      "mockEntity.objectField.attributes.address.dataType": "object",
+      "mockEntity.objectField.attributes.age.dataType": "number",
+      "mockEntity.objectField.attributes.name.dataType": "string",
+      "mockEntity.objectField.dataType": "object"
     });
   });
 });

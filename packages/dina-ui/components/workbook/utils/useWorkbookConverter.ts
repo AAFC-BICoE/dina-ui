@@ -21,8 +21,7 @@ export const DATATYPE_CONVERTER_MAPPING = {
   [WorkBookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
   [WorkBookDataTypeEnum.DATE]: convertDate,
   [WorkBookDataTypeEnum.STRING]: (value) => value,
-  [WorkBookDataTypeEnum.VOCABULARY]: (value) => value,
-  [WorkBookDataTypeEnum.RELATIONSHIP]: (value) => value
+  [WorkBookDataTypeEnum.VOCABULARY]: (value) => value
 };
 
 export function useWorkbookConverter(
@@ -77,10 +76,12 @@ export function useWorkbookConverter(
     }
   }
 
+  function getFieldDataType(fieldPath?: string) {
+    return fieldPath ? flattenedConfig[fieldPath]?.dataType : undefined;
+  }
+
   function getFieldConverter(fieldPath?: string) {
-    const fieldDataType = fieldPath
-      ? flattenedConfig[fieldPath]?.dataType
-      : undefined;
+    const fieldDataType = getFieldDataType(fieldPath);
     return !!fieldDataType
       ? DATATYPE_CONVERTER_MAPPING[fieldDataType]
       : undefined;
@@ -110,8 +111,9 @@ export function useWorkbookConverter(
           let childPath = "";
           for (let i = 0; i < fieldNameArray.length - 1; i++) {
             const childName = fieldNameArray[i];
-            childPath = childPath + "." + childName;
-            const childDataType = flattenedConfig[childPath]?.dataType;
+            childPath =
+              childPath === "" ? childName : childPath + "." + childName;
+            const childDataType = getFieldDataType(childPath);
             let child: InputResource<KitsuResource & { group?: string }>;
             if (childDataType === WorkBookDataTypeEnum.OBJECT) {
               child = parent[childName];

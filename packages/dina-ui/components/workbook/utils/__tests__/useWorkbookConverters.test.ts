@@ -1,42 +1,47 @@
-import {
-  DataTypeEnum,
-  FieldMappingConfigType,
-  useWorkbookConverter
-} from "../useWorkbookConverter";
+import { useWorkbookConverter } from "../useWorkbookConverter";
+
+import { WorkBookDataTypeEnum, FieldMappingConfigType } from "../..";
 
 const mockConfig: FieldMappingConfigType = {
   mockEntity: {
-    stringField: { dataType: DataTypeEnum.STRING },
-    numberField: { dataType: DataTypeEnum.NUMBER },
-    booleanField: { dataType: DataTypeEnum.BOOLEAN },
-    stringArrayField: { dataType: DataTypeEnum.STRING_ARRAY },
-    numberArrayField: { dataType: DataTypeEnum.NUMBER_ARRAY },
-    mapField: { dataType: DataTypeEnum.MANAGED_ATTRIBUTES },
+    stringField: { dataType: WorkBookDataTypeEnum.STRING },
+    numberField: { dataType: WorkBookDataTypeEnum.NUMBER },
+    booleanField: { dataType: WorkBookDataTypeEnum.BOOLEAN },
+    stringArrayField: { dataType: WorkBookDataTypeEnum.STRING_ARRAY },
+    numberArrayField: { dataType: WorkBookDataTypeEnum.NUMBER_ARRAY },
+    mapField: { dataType: WorkBookDataTypeEnum.MANAGED_ATTRIBUTES },
     vocabularyField: {
-      dataType: DataTypeEnum.VOCABULARY,
+      dataType: WorkBookDataTypeEnum.VOCABULARY,
       vocabularyEndpoint: "vocabulary endpoint"
     },
     objectField: {
-      dataType: DataTypeEnum.OBJECT,
+      dataType: WorkBookDataTypeEnum.OBJECT,
       attributes: {
-        name: { dataType: DataTypeEnum.STRING },
-        age: { dataType: DataTypeEnum.NUMBER },
+        name: { dataType: WorkBookDataTypeEnum.STRING },
+        age: { dataType: WorkBookDataTypeEnum.NUMBER },
         address: {
-          dataType: DataTypeEnum.OBJECT,
+          dataType: WorkBookDataTypeEnum.OBJECT,
           attributes: {
-            addressLine1: { dataType: DataTypeEnum.STRING },
-            city: { dataType: DataTypeEnum.STRING },
-            province: { dataType: DataTypeEnum.STRING },
-            postalCode: { dataType: DataTypeEnum.STRING }
+            addressLine1: { dataType: WorkBookDataTypeEnum.STRING },
+            city: { dataType: WorkBookDataTypeEnum.STRING },
+            province: { dataType: WorkBookDataTypeEnum.STRING },
+            postalCode: { dataType: WorkBookDataTypeEnum.STRING }
           }
         }
       }
     },
     objectArrayField: {
-      dataType: DataTypeEnum.OBJECT_ARRAY,
+      dataType: WorkBookDataTypeEnum.OBJECT_ARRAY,
       attributes: {
-        name: { dataType: DataTypeEnum.STRING },
-        age: { dataType: DataTypeEnum.NUMBER }
+        name: { dataType: WorkBookDataTypeEnum.STRING },
+        age: { dataType: WorkBookDataTypeEnum.NUMBER },
+        collector: {
+          dataType: WorkBookDataTypeEnum.OBJECT,
+          attributes: {
+            name: { dataType: WorkBookDataTypeEnum.STRING },
+            age: { dataType: WorkBookDataTypeEnum.NUMBER }
+          }
+        }
       }
     }
   }
@@ -51,8 +56,10 @@ const mockWorkbookData = [
     "objectField.age": "12",
     "objectField.address.addressLine1": "object 1 address line 1",
     "objectField.address.city": "object 1 address city",
-    "objectArrayField.name": "object array name",
-    "objectArrayField.age": "222"
+    "objectArrayField.name": "name1",
+    "objectArrayField.age": "11",
+    "objectArrayField.collector.name": "Tom",
+    "objectArrayField.collector.age": "61"
   }
 ];
 
@@ -79,18 +86,18 @@ describe("useWorkbookConverters", () => {
         {
           mockEntity: {
             dog: {
-              dataType: DataTypeEnum.OBJECT,
+              dataType: WorkBookDataTypeEnum.OBJECT,
               attributes: {
                 name: {
-                  dataType: DataTypeEnum.STRING
+                  dataType: WorkBookDataTypeEnum.STRING
                 }
               }
             },
             cat: {
-              dataType: DataTypeEnum.OBJECT,
+              dataType: WorkBookDataTypeEnum.OBJECT,
               attributes: {
                 name: {
-                  dataType: DataTypeEnum.STRING
+                  dataType: WorkBookDataTypeEnum.STRING
                 }
               }
             }
@@ -102,7 +109,7 @@ describe("useWorkbookConverters", () => {
     });
   });
 
-  describe("convertWorkbook", () => {
+  it("convertWorkbook", () => {
     const { convertWorkbook } = useWorkbookConverter(mockConfig, "mockEntity");
     expect(convertWorkbook(mockWorkbookData, "cnc")).toEqual([
       {
@@ -111,28 +118,30 @@ describe("useWorkbookConverters", () => {
         stringField: "string value1",
         booleanField: true,
         numberField: 123,
-        objectField: [
-          {
-            type: "objectField",
+        objectField: {
+          type: "objectField",
+          group: "cnc",
+          name: "object name 1",
+          age: 12,
+          address: {
+            type: "address",
             group: "cnc",
-            name: "object name 1",
-            age: 12,
-            address: [
-              {
-                type: "address",
-                group: "cnc",
-                addressLine1: "object 1 address line 1",
-                city: "object 1 address city"
-              }
-            ]
+            addressLine1: "object 1 address line 1",
+            city: "object 1 address city"
           }
-        ],
+        },
         objectArrayField: [
           {
             type: "objectArrayField",
             group: "cnc",
-            name: "object array name",
-            age: 222
+            name: "name1",
+            age: 11,
+            collector: {
+              type: "collector",
+              group: "cnc",
+              name: "Tom",
+              age: 61
+            }
           }
         ]
       }

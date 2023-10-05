@@ -45,16 +45,6 @@ const FieldMappingConfig: FieldMappingConfigType = {
           }
         }
       }
-    },
-    preparedBy: {
-      dataType: WorkBookDataTypeEnum.RELATIONSHIP_ARRAY,
-      type: "person",
-      baseApiPath: "agent-api"
-    },
-    collection: {
-      dataType: WorkBookDataTypeEnum.RELATIONSHIP,
-      type: "collection",
-      baseApiPath: "collection-api"
     }
   }
 };
