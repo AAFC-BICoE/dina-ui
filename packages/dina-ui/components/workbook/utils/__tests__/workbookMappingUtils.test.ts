@@ -1,4 +1,4 @@
-import { WorkBookDataTypeEnum } from "../../";
+import { WorkbookDataTypeEnum } from "../../";
 import {
   convertDate,
   convertMap,
@@ -17,26 +17,26 @@ import {
 const mockConfig = {
   mockEntity: {
     stringField: {
-      dataType: WorkBookDataTypeEnum.VOCABULARY,
+      dataType: WorkbookDataTypeEnum.VOCABULARY,
       vocabularyEndpoint: "/collection-api/vocabulary/materialSampleType"
     },
-    numberField: { dataType: WorkBookDataTypeEnum.NUMBER },
-    booleanField: { dataType: WorkBookDataTypeEnum.BOOLEAN },
-    stringArrayField: { dataType: WorkBookDataTypeEnum.STRING_ARRAY },
-    numberArrayField: { dataType: WorkBookDataTypeEnum.NUMBER_ARRAY },
-    mapField: { dataType: WorkBookDataTypeEnum.MANAGED_ATTRIBUTES },
+    numberField: { dataType: WorkbookDataTypeEnum.NUMBER },
+    booleanField: { dataType: WorkbookDataTypeEnum.BOOLEAN },
+    stringArrayField: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
+    numberArrayField: { dataType: WorkbookDataTypeEnum.NUMBER_ARRAY },
+    mapField: { dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES },
     objectField: {
-      dataType: WorkBookDataTypeEnum.OBJECT,
+      dataType: WorkbookDataTypeEnum.OBJECT,
       attributes: {
-        name: { dataType: WorkBookDataTypeEnum.STRING },
-        age: { dataType: WorkBookDataTypeEnum.NUMBER },
+        name: { dataType: WorkbookDataTypeEnum.STRING },
+        age: { dataType: WorkbookDataTypeEnum.NUMBER },
         address: {
-          dataType: WorkBookDataTypeEnum.OBJECT,
+          dataType: WorkbookDataTypeEnum.OBJECT,
           attributes: {
-            addressLine1: { dataType: WorkBookDataTypeEnum.STRING },
-            city: { dataType: WorkBookDataTypeEnum.STRING },
-            province: { dataType: WorkBookDataTypeEnum.STRING },
-            postalCode: { dataType: WorkBookDataTypeEnum.STRING }
+            addressLine1: { dataType: WorkbookDataTypeEnum.STRING },
+            city: { dataType: WorkbookDataTypeEnum.STRING },
+            province: { dataType: WorkbookDataTypeEnum.STRING },
+            postalCode: { dataType: WorkbookDataTypeEnum.STRING }
           }
         }
       }

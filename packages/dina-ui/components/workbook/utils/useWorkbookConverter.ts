@@ -10,18 +10,18 @@ import {
   convertStringArray,
   flattenObject
 } from "./workbookMappingUtils";
-import { FieldMappingConfigType, WorkBookDataTypeEnum } from "../";
+import { FieldMappingConfigType, WorkbookDataTypeEnum } from "../";
 
 export const DATATYPE_CONVERTER_MAPPING = {
-  [WorkBookDataTypeEnum.NUMBER]: convertNumber,
-  [WorkBookDataTypeEnum.BOOLEAN]: convertBoolean,
-  [WorkBookDataTypeEnum.STRING_ARRAY]: convertStringArray,
-  [WorkBookDataTypeEnum.NUMBER_ARRAY]: convertNumberArray,
-  [WorkBookDataTypeEnum.MANAGED_ATTRIBUTES]: convertMap,
-  [WorkBookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
-  [WorkBookDataTypeEnum.DATE]: convertDate,
-  [WorkBookDataTypeEnum.STRING]: (value) => value,
-  [WorkBookDataTypeEnum.VOCABULARY]: (value) => value
+  [WorkbookDataTypeEnum.NUMBER]: convertNumber,
+  [WorkbookDataTypeEnum.BOOLEAN]: convertBoolean,
+  [WorkbookDataTypeEnum.STRING_ARRAY]: convertStringArray,
+  [WorkbookDataTypeEnum.NUMBER_ARRAY]: convertNumberArray,
+  [WorkbookDataTypeEnum.MANAGED_ATTRIBUTES]: convertMap,
+  [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
+  [WorkbookDataTypeEnum.DATE]: convertDate,
+  [WorkbookDataTypeEnum.STRING]: (value) => value,
+  [WorkbookDataTypeEnum.VOCABULARY]: (value) => value
 };
 
 export function useWorkbookConverter(
@@ -115,7 +115,7 @@ export function useWorkbookConverter(
               childPath === "" ? childName : childPath + "." + childName;
             const childDataType = getFieldDataType(childPath);
             let child: InputResource<KitsuResource & { group?: string }>;
-            if (childDataType === WorkBookDataTypeEnum.OBJECT) {
+            if (childDataType === WorkbookDataTypeEnum.OBJECT) {
               child = parent[childName];
             } else {
               child = parent[childName] ? parent[childName][0] : undefined;
@@ -125,7 +125,7 @@ export function useWorkbookConverter(
                 type: childName,
                 group
               } as InputResource<KitsuResource & { group?: string }>;
-              if (childDataType === WorkBookDataTypeEnum.OBJECT) {
+              if (childDataType === WorkbookDataTypeEnum.OBJECT) {
                 parent[childName] = child;
               } else {
                 parent[childName] = [child];

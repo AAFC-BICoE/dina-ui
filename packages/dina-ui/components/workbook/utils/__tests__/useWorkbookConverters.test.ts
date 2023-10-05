@@ -1,45 +1,51 @@
 import { useWorkbookConverter } from "../useWorkbookConverter";
 
-import { WorkBookDataTypeEnum, FieldMappingConfigType } from "../..";
+import { WorkbookDataTypeEnum, FieldMappingConfigType } from "../..";
 
 const mockConfig: FieldMappingConfigType = {
   mockEntity: {
-    stringField: { dataType: WorkBookDataTypeEnum.STRING },
-    numberField: { dataType: WorkBookDataTypeEnum.NUMBER },
-    booleanField: { dataType: WorkBookDataTypeEnum.BOOLEAN },
-    stringArrayField: { dataType: WorkBookDataTypeEnum.STRING_ARRAY },
-    numberArrayField: { dataType: WorkBookDataTypeEnum.NUMBER_ARRAY },
-    mapField: { dataType: WorkBookDataTypeEnum.MANAGED_ATTRIBUTES },
+    type: "mock-entity",
+    stringField: { dataType: WorkbookDataTypeEnum.STRING },
+    numberField: { dataType: WorkbookDataTypeEnum.NUMBER },
+    booleanField: { dataType: WorkbookDataTypeEnum.BOOLEAN },
+    stringArrayField: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
+    numberArrayField: { dataType: WorkbookDataTypeEnum.NUMBER_ARRAY },
+    mapField: { dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES },
     vocabularyField: {
-      dataType: WorkBookDataTypeEnum.VOCABULARY,
+      dataType: WorkbookDataTypeEnum.VOCABULARY,
       vocabularyEndpoint: "vocabulary endpoint"
     },
     objectField: {
-      dataType: WorkBookDataTypeEnum.OBJECT,
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      relationships: {
+        tryToLinkExisting: true,
+        type: "object-field",
+        baseApiPath: "fake-api"
+      },
       attributes: {
-        name: { dataType: WorkBookDataTypeEnum.STRING },
-        age: { dataType: WorkBookDataTypeEnum.NUMBER },
+        name: { dataType: WorkbookDataTypeEnum.STRING },
+        age: { dataType: WorkbookDataTypeEnum.NUMBER },
         address: {
-          dataType: WorkBookDataTypeEnum.OBJECT,
+          dataType: WorkbookDataTypeEnum.OBJECT,
           attributes: {
-            addressLine1: { dataType: WorkBookDataTypeEnum.STRING },
-            city: { dataType: WorkBookDataTypeEnum.STRING },
-            province: { dataType: WorkBookDataTypeEnum.STRING },
-            postalCode: { dataType: WorkBookDataTypeEnum.STRING }
+            addressLine1: { dataType: WorkbookDataTypeEnum.STRING },
+            city: { dataType: WorkbookDataTypeEnum.STRING },
+            province: { dataType: WorkbookDataTypeEnum.STRING },
+            postalCode: { dataType: WorkbookDataTypeEnum.STRING }
           }
         }
       }
     },
     objectArrayField: {
-      dataType: WorkBookDataTypeEnum.OBJECT_ARRAY,
+      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
       attributes: {
-        name: { dataType: WorkBookDataTypeEnum.STRING },
-        age: { dataType: WorkBookDataTypeEnum.NUMBER },
+        name: { dataType: WorkbookDataTypeEnum.STRING },
+        age: { dataType: WorkbookDataTypeEnum.NUMBER },
         collector: {
-          dataType: WorkBookDataTypeEnum.OBJECT,
+          dataType: WorkbookDataTypeEnum.OBJECT,
           attributes: {
-            name: { dataType: WorkBookDataTypeEnum.STRING },
-            age: { dataType: WorkBookDataTypeEnum.NUMBER }
+            name: { dataType: WorkbookDataTypeEnum.STRING },
+            age: { dataType: WorkbookDataTypeEnum.NUMBER }
           }
         }
       }
@@ -85,19 +91,20 @@ describe("useWorkbookConverters", () => {
       const { getPathOfField } = useWorkbookConverter(
         {
           mockEntity: {
+            type: "mock-entity",
             dog: {
-              dataType: WorkBookDataTypeEnum.OBJECT,
+              dataType: WorkbookDataTypeEnum.OBJECT,
               attributes: {
                 name: {
-                  dataType: WorkBookDataTypeEnum.STRING
+                  dataType: WorkbookDataTypeEnum.STRING
                 }
               }
             },
             cat: {
-              dataType: WorkBookDataTypeEnum.OBJECT,
+              dataType: WorkbookDataTypeEnum.OBJECT,
               attributes: {
                 name: {
-                  dataType: WorkBookDataTypeEnum.STRING
+                  dataType: WorkbookDataTypeEnum.STRING
                 }
               }
             }

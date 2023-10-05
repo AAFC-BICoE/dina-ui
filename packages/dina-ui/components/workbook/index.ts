@@ -1,2 +1,2 @@
-export * from "./types/WorkBookDataTypeEnum";
+export * from "./types/WorkbookDataTypeEnum";
 export * from "./types/Workbook";
