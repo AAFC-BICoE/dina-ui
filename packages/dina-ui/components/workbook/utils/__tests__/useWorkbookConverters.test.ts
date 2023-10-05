@@ -20,7 +20,8 @@ const mockConfig: FieldMappingConfigType = {
       relationships: {
         tryToLinkExisting: true,
         type: "object-field",
-        baseApiPath: "fake-api"
+        baseApiPath: "fake-api",
+        hasGroup: true
       },
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING },

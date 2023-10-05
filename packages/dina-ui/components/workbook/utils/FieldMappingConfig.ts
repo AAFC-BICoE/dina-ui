@@ -32,6 +32,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
     organism: {
       dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
       relationships: {
+        hasGroup: true,
         tryToLinkExisting: false,
         type: "organism",
         baseApiPath: "collection-api"

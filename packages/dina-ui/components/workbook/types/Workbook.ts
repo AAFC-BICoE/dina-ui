@@ -50,6 +50,7 @@ export interface ObjectField {
   attributes: Leaves<FieldConfigType>;
   relationships?: {
     type: string;
+    hasGroup: boolean;
     tryToLinkExisting: boolean;
     baseApiPath?: string;
   };
