@@ -29,12 +29,12 @@ export function Checkbox({
       ? formatMessage({ id: id as any })
       : startCase(id));
   return (
-    <div>
+    <div hidden={id === "selectColumn"}>
       <input
         id={id}
         type={"checkbox"}
         onChange={handleClick}
-        checked={isChecked}
+        checked={id === "selectColumn" ? true : isChecked}
         style={{
           marginRight: "0.3rem",
           height: "1.3rem",
