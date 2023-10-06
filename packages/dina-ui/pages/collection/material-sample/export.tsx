@@ -29,6 +29,7 @@ export default function MaterialSampleExportPage<
   const router = useRouter();
   const totalRecords = parseInt(router.query.totalRecords as string, 10);
   const hideTable: boolean | undefined = !!router.query.hideTable;
+  const indexName = String(router.query.indexName);
 
   const { formatMessage, formatNumber } = useIntl();
 
@@ -113,9 +114,9 @@ export default function MaterialSampleExportPage<
     }
   ];
 
-  const { columnChooser, checkedColumnIds } = useColumnChooser({
+  const { checkedColumnIds, CustomMenu } = useColumnChooser({
     columns,
-    indexName: "material_sample_export"
+    indexName
   });
 
   return (
@@ -136,7 +137,7 @@ export default function MaterialSampleExportPage<
             id="tableTotalCount"
             values={{ totalCount: formatNumber(totalRecords) }}
           />
-          {columnChooser}
+          <CustomMenu />
         </div>
 
         {!hideTable && (

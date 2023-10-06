@@ -117,6 +117,7 @@ export interface DataExportButtonProps {
   pathname: string;
   totalRecords: number;
   query: any;
+  indexName: string;
 }
 
 /**
@@ -129,7 +130,8 @@ export const DATA_EXPORT_SEARCH_RESULTS_KEY = "dataExportSearchResults";
 export function DataExportButton({
   pathname,
   totalRecords,
-  query
+  query,
+  indexName
 }: DataExportButtonProps) {
   const router = useRouter();
 
@@ -141,7 +143,7 @@ export function DataExportButton({
         writeStorage<any>(DATA_EXPORT_SEARCH_RESULTS_KEY, query);
         await router.push({
           pathname,
-          query: { totalRecords, hideTable: true }
+          query: { totalRecords, hideTable: true, indexName }
         });
       }}
     >
