@@ -100,7 +100,7 @@ function useCustomMenu({
           attributes: {
             source: "dina_material_sample_index",
             query: queryString,
-            columns: checkedColumnIds
+            columns: checkedColumnIds.filter((id) => id !== "selectColumn")
           }
         }
       },

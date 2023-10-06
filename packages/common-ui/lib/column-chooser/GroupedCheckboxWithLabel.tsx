@@ -68,7 +68,8 @@ export function useGroupedCheckboxWithLabel({
     list.map((resource) => resource.id ?? "")
   );
   const [isCheckAll, setIsCheckAll] = useState<boolean>(
-    checkedColumnIds.length === list.length
+    checkedColumnIds.filter((id) => id !== "selectColumn").length ===
+      list.filter((resource) => resource.id !== "selectColumn").length
   );
 
   const handleSelectAll = (_e) => {
@@ -85,7 +86,12 @@ export function useGroupedCheckboxWithLabel({
       setCheckedColumnIds(checkedColumnIds.filter((item) => item !== id));
       setIsCheckAll(false);
     } else {
-      if ([...checkedColumnIds, id].length === list.length) {
+      if (
+        [...checkedColumnIds, id].filter(
+          (selectedId) => selectedId !== "selectColumn"
+        ).length ===
+        list.filter((resource) => resource.id !== "selectColumn").length
+      ) {
         setIsCheckAll(true);
       }
       setCheckedColumnIds([...checkedColumnIds, id]);
