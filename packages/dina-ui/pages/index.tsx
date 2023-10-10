@@ -72,8 +72,8 @@ export function Home() {
             </Card.Body>
           </Card>
 
-          {/* Split page into three sections */}
-          <Row lg={3} md={2} xs={1} className="mb-5">
+          {/* Split page into lg sections */}
+          <Row lg={4} md={2} xs={1} className="mb-5">
             {/* Collection Links */}
             <Col className="mb-4">
               <h2>
@@ -186,7 +186,7 @@ export function Home() {
               </h2>
 
               <Stack style={{ display: "inline-flex" }}>
-                <Link href="/organization/list">
+                <Link href="/organization/list" passHref={true}>
                   <a>
                     <DinaMessage id="organizationListTitle" />
                   </a>
@@ -279,6 +279,61 @@ export function Home() {
               </Stack>
             </Col>
 
+            {/* Controlled Vocabulary Links */}
+            <Col className="mb-4">
+              <h2>
+                <DinaMessage id="controlledVocabularyTitle" />
+              </h2>
+
+              <Stack style={{ display: "inline-flex" }}>
+                <Link href="/collection/collection-method/list">
+                  <a>
+                    <DinaMessage id="collectionMethodListTitle" />
+                  </a>
+                </Link>
+                <Link href="/collection/extension/list">
+                  <a>
+                    <DinaMessage id="fieldExtensions" />
+                  </a>
+                </Link>
+                <Link href="/collection/form-template/list">
+                  <a>
+                    <DinaMessage id="formTemplates" />
+                  </a>
+                </Link>
+                <Link href="/collection/institution/list">
+                  <a>
+                    <DinaMessage id="institutionListTitle" />
+                  </a>
+                </Link>
+                <Link href="/managed-attribute/list">
+                  <a>
+                    <DinaMessage id="managedAttributes" />
+                  </a>
+                </Link>
+                <Link href="/collection/preparation-method/list">
+                  <a>
+                    <DinaMessage id="title_preparationMethod" />
+                  </a>
+                </Link>
+                <Link href="/collection/preparation-type/list">
+                  <a>
+                    <DinaMessage id="preparationTypeListTitle" />
+                  </a>
+                </Link>
+                <Link href="/collection/protocol/list">
+                  <a>
+                    <DinaMessage id="protocolListTitle" />
+                  </a>
+                </Link>
+                <Link href="/collection/storage-unit-type/list">
+                  <a>
+                    <DinaMessage id="storageUnitTypeListTitle" />
+                  </a>
+                </Link>
+              </Stack>
+            </Col>
+
             {/* Management Links (Only visible to collection managers) */}
             {showManagementNavigation && (
               <Col className="mb-4">
@@ -287,37 +342,6 @@ export function Home() {
                 </h2>
 
                 <Stack style={{ display: "inline-flex" }}>
-                  <Link href="/collection/extension/list">
-                    <a>
-                      <DinaMessage id="fieldExtensions" />
-                    </a>
-                  </Link>
-                  <Link href="/collection/form-template/list">
-                    <a>
-                      <DinaMessage id="formTemplates" />
-                    </a>
-                  </Link>
-                  <Link href="/collection/institution/list">
-                    <a>
-                      <DinaMessage id="institutionListTitle" />
-                    </a>
-                  </Link>
-                  <Link href="/managed-attribute/list">
-                    <a>
-                      <DinaMessage id="managedAttributes" />
-                    </a>
-                  </Link>
-                  {/* Permissions link here */}
-                  <Link href="/collection/protocol/list">
-                    <a>
-                      <DinaMessage id="protocolListTitle" />
-                    </a>
-                  </Link>
-                  <Link href="/collection/storage-unit-type/list">
-                    <a>
-                      <DinaMessage id="storageUnitTypeListTitle" />
-                    </a>
-                  </Link>
                   {isAdmin && (
                     <Link href="/dina-user/list">
                       <a>

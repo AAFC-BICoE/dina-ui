@@ -307,7 +307,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 )}
                 <DataEntryViewer
                   name={"extensionValuesForm"}
-                  legend={<DinaMessage id="fieldExtensions" />}
+                  legend={<DinaMessage id="materialSampleFieldExtensions" />}
                   extensionValues={materialSample.extensionValues}
                   disableDinaForm={true}
                   blockOptionsEndpoint={`collection-api/extension`}

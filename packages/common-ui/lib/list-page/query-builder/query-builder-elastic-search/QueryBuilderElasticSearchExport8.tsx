@@ -403,11 +403,14 @@ export function termQuery(
   };
 }
 
-// Query used for partial matches.
-export function matchQuery(fieldName: string, matchValue: any): any {
+
+// Query used for wildcard searches (contains).
+export function wildcardQuery(fieldName: string, matchValue: any, keywordSupport: boolean): any {
   return {
-    match: {
-      [fieldName]: matchValue
+    wildcard: {
+      [keywordSupport ? fieldName + ".keyword" : fieldName]: {
+        value: `*${matchValue}*`
+      }
     }
   };
 }
@@ -435,15 +438,11 @@ export function prefixQuery(
   fieldName: string,
   matchValue: any,
   parentType: string | undefined,
-  optimizedPrefix: boolean
+  optimizedPrefix: boolean,
+  keywordSupport: boolean
 ): any {
   if (matchValue === "") {
     return {};
-  }
-
-  // Lowercase the matchValue here, if it's a string.
-  if (typeof matchValue === "string") {
-    matchValue = matchValue.toLowerCase();
   }
 
   return parentType
@@ -455,8 +454,10 @@ export function prefixQuery(
               must: [
                 {
                   prefix: {
-                    [optimizedPrefix ? fieldName + ".prefix" : fieldName]:
-                      matchValue
+                    [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]: {
+                      value: matchValue,
+                      case_insensitive: true
+                    }
                   }
                 },
                 includedTypeQuery(parentType)
@@ -467,7 +468,10 @@ export function prefixQuery(
       }
     : {
         prefix: {
-          [optimizedPrefix ? fieldName + ".prefix" : fieldName]: matchValue
+          [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]: {
+            value: matchValue,
+            case_insensitive: true
+          }
         }
       };
 }

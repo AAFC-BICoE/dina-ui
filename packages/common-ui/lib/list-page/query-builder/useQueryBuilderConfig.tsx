@@ -217,8 +217,9 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_exactMatch" }),
       cardinality: 1
     },
-    partialMatch: {
-      label: formatMessage({ id: "queryBuilder_operator_partialMatch" }),
+    wildcard: {
+      // Displayed as "Contains"
+      label: formatMessage({ id: "queryBuilder_operator_wildcard" }),
       cardinality: 1
     },
     startsWith: {
@@ -226,6 +227,7 @@ function generateBuilderConfig(
       cardinality: 1
     },
     containsText: {
+      // Displayed as "Contains", this is an optimized version of the wildcard.
       label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
       cardinality: 1
     },
@@ -268,6 +270,7 @@ function generateBuilderConfig(
       cardinality: 1
     },
     containsDate: {
+      // Displayed as "Contains" - Used for searching "2017-08" or "2023" in dates.
       label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
       cardinality: 1
     },
@@ -469,7 +472,7 @@ function generateBuilderConfig(
         text: {
           operators: [
             "exactMatch",
-            "partialMatch",
+            "wildcard",
             "startsWith", // Only displayed if supported on the mapping.
             "containsText", // Only displayed if supported on the mapping.
             "endsWith", // Only displayed if supported on the mapping.
@@ -677,6 +680,7 @@ function generateBuilderConfig(
       };
       return field;
     }),
+
     // Support all first level fields from the custom view.
     ...(customViewFields
       ? customViewFields.map((customViewField: CustomViewField) => {

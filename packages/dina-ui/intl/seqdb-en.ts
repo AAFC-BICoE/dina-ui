@@ -167,6 +167,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   shearingLabel: "Shearing",
   sizeSelectedStatus: "Size Selection Added",
   sizeSelectionDetails: "Size Selection Details",
+  addGoodAndWeakButton: "Good/Weak",
   sizeSelectionLabel: "Size Selection",
   specimenIdentifier: "Specimen Identifier",
   startNewWorkflow: "Start New Workflow",

@@ -59,12 +59,14 @@ export function FileView({
   const [objectURL, setObjectURL] = useState<string>();
   async function fetchObjectBlob(path) {
     return await apiClient.axios.get(path, {
-      responseType: "blob"
+      responseType: "blob",
+      timeout: 0
     });
   }
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
   const [isFallbackRender, setIsFallBackRender] = useState<boolean>(false);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const shownTypeIndicatorFallback = (
     <div className="shown-file-type">
       <strong>
@@ -78,7 +80,7 @@ export function FileView({
     setObjectURL(window?.URL?.createObjectURL(response));
   }
   const resp = useQuery(
-    { path: filePath, responseType: "blob" },
+    { path: filePath, responseType: "blob", timeout: 0 },
     {
       onSuccess,
       disabled: metadata
@@ -99,6 +101,7 @@ export function FileView({
   async function handleDownloadLink(path?: string) {
     if (path) {
       try {
+        setIsDownloading(true);
         const response = await fetchObjectBlob(path);
         const url = window?.URL?.createObjectURL(response.data);
         const link = document?.createElement("a");
@@ -111,7 +114,9 @@ export function FileView({
         document?.body?.appendChild(link);
         link?.click();
         window?.URL?.revokeObjectURL(url);
+        setIsDownloading(false);
       } catch (error) {
+        setIsDownloading(false);
         return error;
       }
     }
@@ -193,31 +198,28 @@ export function FileView({
       {!preview && (
         <div className="d-flex justify-content-center">
           {downloadLinks?.original && (
-            <a
-              className="p-2 original"
-              style={{ cursor: "pointer" }}
-              onClick={() => handleDownloadLink(downloadLinks?.original)}
-            >
-              <DinaMessage id="originalFile" />
-            </a>
+            <DownloadLink
+              id="originalFile"
+              path={downloadLinks?.original}
+              isDownloading={isDownloading}
+              handleDownloadLink={handleDownloadLink}
+            />
           )}
           {downloadLinks?.thumbNail && (
-            <a
-              className="p-2 thumbnail"
-              style={{ cursor: "pointer" }}
-              onClick={() => handleDownloadLink(downloadLinks?.thumbNail)}
-            >
-              <DinaMessage id="thumbnail" />
-            </a>
+            <DownloadLink
+              id="thumbnail"
+              path={downloadLinks?.thumbNail}
+              isDownloading={isDownloading}
+              handleDownloadLink={handleDownloadLink}
+            />
           )}
           {downloadLinks?.largeData && (
-            <a
-              className="p-2 large"
-              style={{ cursor: "pointer" }}
-              onClick={() => handleDownloadLink(downloadLinks?.largeData)}
-            >
-              <DinaMessage id="largeImg" />
-            </a>
+            <DownloadLink
+              id="largeImg"
+              path={downloadLinks?.largeData}
+              isDownloading={isDownloading}
+              handleDownloadLink={handleDownloadLink}
+            />
           )}
         </div>
       )}
@@ -230,5 +232,30 @@ export function FileView({
         </div>
       )}
     </div>
+  );
+}
+
+interface DownloadLinkProps {
+  id: string;
+  path: string;
+  isDownloading: boolean;
+  handleDownloadLink: (path?: string) => Promise<any>;
+}
+function DownloadLink({
+  id,
+  path,
+  isDownloading,
+  handleDownloadLink
+}: DownloadLinkProps) {
+  return isDownloading ? (
+    <LoadingSpinner loading={true} />
+  ) : (
+    <a
+      className="p-2 original"
+      style={{ cursor: "pointer" }}
+      onClick={() => handleDownloadLink(path)}
+    >
+      <DinaMessage id={id as any} />
+    </a>
   );
 }

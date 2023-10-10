@@ -227,7 +227,7 @@ Object {
 
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation Normal field 1`] = `
 Object {
-  "match": Object {
+  "term": Object {
     "data.attributes.textField": "text search",
   },
 }
@@ -235,7 +235,7 @@ Object {
 
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation Normal field 2`] = `
 Object {
-  "match": Object {
+  "term": Object {
     "data.attributes.textField": "true",
   },
 }
@@ -273,8 +273,8 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "match": Object {
-              "includes.name": "false",
+            "term": Object {
+              "includes.name.keyword": "false",
             },
           },
           Object {
@@ -352,7 +352,7 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "match": Object {
+            "term": Object {
               "data.attributes.textField": "text search",
             },
           },
@@ -387,7 +387,7 @@ Object {
                 },
               },
               "must_not": Object {
-                "match": Object {
+                "term": Object {
                   "includes.name": "text search",
                 },
               },
@@ -474,15 +474,18 @@ Object {
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Partial Match operation Normal field 1`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function contains (wildcard) operation Normal field 1`] = `
 Object {
-  "match": Object {
-    "data.attributes.textField": "text search",
+  "wildcard": Object {
+    "data.attributes.textField": Object {
+      "case_insensitive": true,
+      "value": "*text search*",
+    },
   },
 }
 `;
 
-exports[`QueryBuilderTextSearch transformTextSearchToDSL function Partial Match operation With relationship as field 1`] = `
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function contains (wildcard) operation With relationship as field 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -490,8 +493,11 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "match": Object {
-              "includes.name": "text search",
+            "wildcard": Object {
+              "included.attributes.name.keyword": Object {
+                "case_insensitive": true,
+                "value": "*text search*",
+              },
             },
           },
           Object {
@@ -506,10 +512,40 @@ Object {
 }
 `;
 
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function contains (wildcard) operation With relationship containing complex path as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "wildcard": Object {
+              "included.attributes.determination.scientificName": Object {
+                "case_insensitive": true,
+                "value": "*text*",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (prefix) operation (Non-optimized) Normal field 1`] = `
 Object {
   "prefix": Object {
-    "data.attributes.textField": "text search",
+    "data.attributes.textField": Object {
+      "case_insensitive": true,
+      "value": "text search",
+    },
   },
 }
 `;
@@ -523,7 +559,10 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.name": "text search",
+              "included.attributes.name": Object {
+                "case_insensitive": true,
+                "value": "text search",
+              },
             },
           },
           Object {
@@ -547,7 +586,10 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.determination.scientificName": "text",
+              "included.attributes.determination.scientificName": Object {
+                "case_insensitive": true,
+                "value": "text",
+              },
             },
           },
           Object {
@@ -565,7 +607,10 @@ Object {
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function startsWith (prefix) operation (Optimized) Normal field 1`] = `
 Object {
   "prefix": Object {
-    "data.attributes.textField.prefix": "text search",
+    "data.attributes.textField.prefix": Object {
+      "case_insensitive": true,
+      "value": "text search",
+    },
   },
 }
 `;
@@ -579,7 +624,10 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.name.prefix": "text search",
+              "included.attributes.name.prefix": Object {
+                "case_insensitive": true,
+                "value": "text search",
+              },
             },
           },
           Object {
@@ -603,7 +651,10 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.determination.scientificName.prefix": "text",
+              "included.attributes.determination.scientificName.prefix": Object {
+                "case_insensitive": true,
+                "value": "text",
+              },
             },
           },
           Object {

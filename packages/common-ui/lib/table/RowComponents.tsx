@@ -1,6 +1,6 @@
 import { Row, Table, flexRender } from "@tanstack/react-table";
 import { CSSProperties } from "react";
-import { useDrag, useDrop } from "react-dnd-cjs";
+import { useDrag, useDrop } from "react-dnd";
 
 const ITEM_DRAG_KEY = "ReactTableRowDndKey";
 
@@ -48,8 +48,9 @@ export function DraggableRow<TData>({
   });
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
+    type: ITEM_DRAG_KEY,
     collect: (monitor) => {
-      if (monitor.isDragging()) {
+      if (monitor.isDragging() && row.getIsExpanded()) {
         row.toggleExpanded(false);
       }
       return {

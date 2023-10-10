@@ -8,12 +8,12 @@ import {
   applySourceFiltering,
   includedTypeQuery,
   termQuery,
-  matchQuery,
   existsQuery,
   rangeQuery,
   prefixQuery,
   infixQuery,
-  suffixQuery
+  suffixQuery,
+  wildcardQuery
 } from "../QueryBuilderElasticSearchExport";
 
 const ELASTIC_SEARCH_QUERY: any = {
@@ -269,8 +269,9 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(termQuery("fieldTest", "valueToMatch", false)).toMatchSnapshot();
     });
 
-    test("matchQuery", async () => {
-      expect(matchQuery("fieldTest", "valueToMatch")).toMatchSnapshot();
+    test("wildcard", async () => {
+      expect(wildcardQuery("fieldTest", "valueToMatch", false)).toMatchSnapshot();
+      expect(wildcardQuery("fieldTest", "valueToMatch", true)).toMatchSnapshot();
     });
 
     test("existsQuery", async () => {
@@ -289,6 +290,7 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
           "data.attribute.materialSampleName",
           "searchValue",
           undefined,
+          false,
           false
         )
       ).toMatchSnapshot();
@@ -300,7 +302,32 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
           "included.attributes.dwcRecordNumber",
           "searchValue",
           "collecting-event",
+          false,
           false
+        )
+      ).toMatchSnapshot();
+    });
+  
+    test("prefixQuery attribute (not optimized, keyword support)", async () => {
+      expect(
+        prefixQuery(
+          "data.attribute.materialSampleName",
+          "searchValue",
+          undefined,
+          false,
+          true
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("prefixQuery relationship (not optimized, keyword support)", async () => {
+      expect(
+        prefixQuery(
+          "included.attributes.dwcRecordNumber",
+          "searchValue",
+          "collecting-event",
+          false,
+          true
         )
       ).toMatchSnapshot();
     });
@@ -311,7 +338,8 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
           "data.attribute.materialSampleName",
           "searchValue",
           undefined,
-          true
+          true,
+          false
         )
       ).toMatchSnapshot();
     });
@@ -322,7 +350,8 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
           "included.attributes.dwcRecordNumber",
           "searchValue",
           "collecting-event",
-          true
+          true,
+          false
         )
       ).toMatchSnapshot();
     });
@@ -369,7 +398,7 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
 
     test("Empty values are left as empty queries", async () => {
       expect(
-        prefixQuery("data.attribute.materialSampleName", "", undefined, true)
+        prefixQuery("data.attribute.materialSampleName", "", undefined, true, false)
       ).toStrictEqual({});
       expect(
         infixQuery("data.attribute.materialSampleName", "", undefined)
