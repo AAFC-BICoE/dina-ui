@@ -9,7 +9,7 @@ import {
   useStringComparator
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { sortBy } from "lodash";
+import { sortBy, compact } from "lodash";
 import { useEffect, useState } from "react";
 import { MaterialSampleSummary } from "../../../types/collection-api";
 import {
@@ -74,11 +74,22 @@ export function usePcrReactionData(pcrBatchId?: string) {
       batchItems.map(
         (item) => "/material-sample-summary/" + item?.materialSample?.id
       ),
-      { apiBaseUrl: "/collection-api" }
+      {
+        apiBaseUrl: "/collection-api",
+        returnNullForMissingResource: true
+      }
     ).then((response) => {
-      sortPcrBatchItems(batchItems, response ?? []);
+      const sampleSummaries = compact(response ?? []);
+      batchItems = batchItems.filter(
+        (item) =>
+          !!sampleSummaries.find(
+            (sample) =>
+              item.materialSample?.id && sample.id === item.materialSample?.id
+          )
+      );
+      sortPcrBatchItems(batchItems, sampleSummaries);
       setPcrBatchItems(batchItems);
-      setMaterialSampleSummaries(response);
+      setMaterialSampleSummaries(sampleSummaries);
       setLoading(false);
     });
   }
