@@ -13,7 +13,7 @@ export function WorkbookUpload({ submitData }: WorkbookUploadProps) {
         onSubmit={submitData}
         multiple={false}
         maxFiles={1}
-        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .csv"
         classNames={{
           submitButton: "btn btn-success",
           inputLabelWithFiles: "btn btn-default dzu-inputLabelAddFiles",
