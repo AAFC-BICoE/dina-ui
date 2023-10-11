@@ -1,4 +1,4 @@
-import { startCase, uniq } from "lodash";
+import { startCase } from "lodash";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
@@ -29,12 +29,12 @@ export function Checkbox({
       ? formatMessage({ id: id as any })
       : startCase(id));
   return (
-    <div>
+    <div hidden={id === "selectColumn"}>
       <input
         id={id}
         type={"checkbox"}
         onChange={handleClick}
-        checked={isChecked}
+        checked={id === "selectColumn" ? true : isChecked}
         style={{
           marginRight: "0.3rem",
           height: "1.3rem",
@@ -65,42 +65,43 @@ export function useGroupedCheckboxWithLabel({
   const [list, setList] = useState<CheckboxResource[]>(getResourcesWithId());
   const [checkedColumnIds, setCheckedColumnIds] = useLocalStorage<string[]>(
     `${indexName}_columnChooser`,
-    uniq([...list.map((resource) => resource.id ?? ""), "selectColumn"])
+    list.map((resource) => resource.id ?? "")
   );
   const [isCheckAll, setIsCheckAll] = useState<boolean>(
-    checkedColumnIds.length === list.length
+    checkedColumnIds.filter((id) => id !== "selectColumn").length ===
+      list.filter((resource) => resource.id !== "selectColumn").length
   );
 
   const handleSelectAll = (_e) => {
     setIsCheckAll(!isCheckAll);
-    setCheckedColumnIds(uniq([...list.map((li) => li.id), "selectColumn"]));
+    setCheckedColumnIds(list.map((li) => li.id));
     if (isCheckAll) {
-      setCheckedColumnIds(["selectColumn"]);
+      setCheckedColumnIds([]);
     }
   };
 
   const handleClick = (e) => {
     const { id, checked } = e.target;
     if (!checked) {
-      setCheckedColumnIds(
-        uniq([
-          ...checkedColumnIds.filter((item) => item !== id),
-          "selectColumn"
-        ])
-      );
+      setCheckedColumnIds(checkedColumnIds.filter((item) => item !== id));
       setIsCheckAll(false);
     } else {
-      if ([...checkedColumnIds, id].length === list.length) {
+      if (
+        [...checkedColumnIds, id].filter(
+          (selectedId) => selectedId !== "selectColumn"
+        ).length ===
+        list.filter((resource) => resource.id !== "selectColumn").length
+      ) {
         setIsCheckAll(true);
       }
-      setCheckedColumnIds(uniq([...checkedColumnIds, id, "selectColumn"]));
+      setCheckedColumnIds([...checkedColumnIds, id]);
     }
   };
 
   const groupedCheckBoxes = GroupedCheckboxes({
     handleSelectAll,
     isCheckAll,
-    list: list.filter((item) => item.id !== "selectColumn"),
+    list,
     handleClick,
     checkedColumnIds,
     isField
