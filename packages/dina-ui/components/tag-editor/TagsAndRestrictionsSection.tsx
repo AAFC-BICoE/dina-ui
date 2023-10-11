@@ -92,13 +92,14 @@ export function TagsAndRestrictionsSection({
             />
           )}
           <DinaFormSection horizontal={false}>
-            {!formik.values.publiclyReleasable && (
-              <TextField
-                name="notPubliclyReleasableReason"
-                className="flex-grow-1 notPubliclyReleasableReason"
-                multiLines={true}
-              />
-            )}
+            {formik.values.publiclyReleasable !== undefined &&
+              !formik.values.publiclyReleasable && (
+                <TextField
+                  name="notPubliclyReleasableReason"
+                  className="flex-grow-1 notPubliclyReleasableReason"
+                  multiLines={true}
+                />
+              )}
           </DinaFormSection>
         </div>
       </DinaFormSection>
