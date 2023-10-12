@@ -7,7 +7,7 @@ React based user interface for AAFC-DINA.
 ## Required
 
 - NodeJS (18)
-- Yarn (1.22)
+- Yarn (3.6.0)
 
 ## Dependencies
 
