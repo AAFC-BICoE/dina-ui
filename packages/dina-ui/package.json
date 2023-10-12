@@ -3,7 +3,7 @@
   "version": "0.135.0",
   "scripts": {
     "build": "yarn next:build && yarn next:export",
-    "next:dev": "node --require ./next.config.js ../../node_modules/.bin/next dev",
+    "dev": "next",
     "next:build": "node --require ./next.config.js ../../node_modules/.bin/next build",
     "next:export": "node --require ./next.config.js ../../node_modules/.bin/next export",
     "a11y-check": "pa11y-ci -j > pa11y-result.json",
