@@ -3,9 +3,7 @@ import {
   TextField,
   DATA_EXPORT_SEARCH_RESULTS_KEY,
   useApiClient,
-  LoadingSpinner,
-  useQuery,
-  useAccount
+  LoadingSpinner
 } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
@@ -74,7 +72,6 @@ function useCustomMenu({
 }: UseCustomMenuProps) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
   const [loading, setLoading] = useState(false);
-  const { groupNames } = useAccount();
 
   const { formatMessage } = useIntl();
 
