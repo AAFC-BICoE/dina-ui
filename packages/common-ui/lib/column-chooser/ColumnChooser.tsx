@@ -126,7 +126,7 @@ function useCustomMenu({
     );
 
     // Download the data
-    const url = window?.URL.createObjectURL(getFileResponse?.data as any);
+    const url = window?.URL.createObjectURL(getFileResponse as any);
     const link = document?.createElement("a");
     link.href = url ?? "";
     link?.setAttribute("download", `${dataExportPostResponse[0].id}`);
