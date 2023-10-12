@@ -3,13 +3,8 @@
 Before starting, you will need to setup your dev environment:
 
 == Node.js and Yarn
-Install Node.js with NPM at https://nodejs.org/
 
-Install the Yarn package manager with:
-
-----
-npm i -g yarn
-----
+See dina-local-deployment https://aafc-bicoe.github.io/dina-local-deployment/#_prerequisites[prerequisites]
 
 You can check which versions you currently have installed with:
 
