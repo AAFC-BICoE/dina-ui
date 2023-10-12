@@ -1747,6 +1747,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmldom/xmldom@npm:^0.8.6":
+  version: 0.8.10
+  resolution: "@xmldom/xmldom@npm:0.8.10"
+  checksum: 4c136aec31fb3b49aaa53b6fcbfe524d02a1dc0d8e17ee35bd3bf35e9ce1344560481cd1efd086ad1a4821541482528672306d5e37cdbd187f33d7fadd3e2cf0
+  languageName: node
+  linkType: hard
+
 "abab@npm:^2.0.3, abab@npm:^2.0.5":
   version: 2.0.5
   resolution: "abab@npm:2.0.5"
@@ -4554,6 +4561,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immediate@npm:~3.0.5":
+  version: 3.0.6
+  resolution: "immediate@npm:3.0.6"
+  checksum: f9b3486477555997657f70318cc8d3416159f208bec4cca3ff3442fd266bc23f50f0c9bd8547e1371a6b5e82b821ec9a7044a4f7b944798b25aa3cc6d5e63e62
+  languageName: node
+  linkType: hard
+
 "immutable@npm:^3.8.2":
   version: 3.8.2
   resolution: "immutable@npm:3.8.2"
@@ -5670,12 +5684,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jszip@npm:~2.5.0":
-  version: 2.5.0
-  resolution: "jszip@npm:2.5.0"
+"jszip@npm:^3.7.1":
+  version: 3.10.1
+  resolution: "jszip@npm:3.10.1"
   dependencies:
-    pako: ~0.2.5
-  checksum: 8b70c9207fd87d4b8f453132da39873559a1f5ad70deb106d4b1aa9f849f86c0ec6fcd87b1778705bdca6cf59cd0fc2aa7ce7e2fe48ef402c1db4a77bfa6b0f6
+    lie: ~3.3.0
+    pako: ~1.0.2
+    readable-stream: ~2.3.6
+    setimmediate: ^1.0.5
+  checksum: abc77bfbe33e691d4d1ac9c74c8851b5761fba6a6986630864f98d876f3fcc2d36817dfc183779f32c00157b5d53a016796677298272a714ae096dfe6b1c8b60
   languageName: node
   linkType: hard
 
@@ -5736,6 +5753,15 @@ __metadata:
     prelude-ls: ~1.1.2
     type-check: ~0.3.2
   checksum: 0d084a524231a8246bb10fec48cdbb35282099f6954838604f3c7fc66f2e16fa66fd9cc2f3f20a541a113c4dafdf181e822c887c8a319c9195444e6c64ac395e
+  languageName: node
+  linkType: hard
+
+"lie@npm:~3.3.0":
+  version: 3.3.0
+  resolution: "lie@npm:3.3.0"
+  dependencies:
+    immediate: ~3.0.5
+  checksum: 33102302cf19766f97919a6a98d481e01393288b17a6aa1f030a3542031df42736edde8dab29ffdbf90bebeffc48c761eb1d064dc77592ca3ba3556f9fe6d2a8
   languageName: node
   linkType: hard
 
@@ -5988,22 +6014,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mammoth@npm:1.4.17":
-  version: 1.4.17
-  resolution: "mammoth@npm:1.4.17"
+"mammoth@npm:1.6.0":
+  version: 1.6.0
+  resolution: "mammoth@npm:1.6.0"
   dependencies:
+    "@xmldom/xmldom": ^0.8.6
     argparse: ~1.0.3
+    base64-js: ^1.5.1
     bluebird: ~3.4.0
     dingbat-to-unicode: ^1.0.1
-    jszip: ~2.5.0
+    jszip: ^3.7.1
     lop: ^0.4.1
     path-is-absolute: ^1.0.0
-    sax: ~1.1.1
     underscore: ^1.13.1
     xmlbuilder: ^10.0.0
   bin:
     mammoth: bin/mammoth
-  checksum: 647fdc60f6fe4e6db36af4ca8b725dbba2c05a1ab80fca5b62980c79c5b843ed7d5c9fe61678ed0d8b7479afa76b51c56ebeec0ba2518c8d188e02cd343c042e
+  checksum: f79c8c55a6a1b0c5fa0c63203c2818eae629d3496f1abfa5441184f92607d0541c9ca9cd5afa7137412b8abb46696930cd93f292287dbd120e403e9c31b705de
   languageName: node
   linkType: hard
 
@@ -6829,10 +6856,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pako@npm:~0.2.5":
-  version: 0.2.9
-  resolution: "pako@npm:0.2.9"
-  checksum: 055f9487cd57fbb78df84315873bbdd089ba286f3499daed47d2effdc6253e981f5db6898c23486de76d4a781559f890d643bd3a49f70f1b4a18019c98aa5125
+"pako@npm:~1.0.2":
+  version: 1.0.11
+  resolution: "pako@npm:1.0.11"
+  checksum: 1be2bfa1f807608c7538afa15d6f25baa523c30ec870a3228a89579e474a4d992f4293859524e46d5d87fd30fa17c5edf34dbef0671251d9749820b488660b16
   languageName: node
   linkType: hard
 
@@ -7842,6 +7869,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"readable-stream@npm:~2.3.6":
+  version: 2.3.8
+  resolution: "readable-stream@npm:2.3.8"
+  dependencies:
+    core-util-is: ~1.0.0
+    inherits: ~2.0.3
+    isarray: ~1.0.0
+    process-nextick-args: ~2.0.0
+    safe-buffer: ~5.1.1
+    string_decoder: ~1.1.1
+    util-deprecate: ~1.0.1
+  checksum: 65645467038704f0c8aaf026a72fbb588a9e2ef7a75cd57a01702ee9db1c4a1e4b03aaad36861a6a0926546a74d174149c8c207527963e0c2d3eee2f37678a42
+  languageName: node
+  linkType: hard
+
 "readdirp@npm:~3.6.0":
   version: 3.6.0
   resolution: "readdirp@npm:3.6.0"
@@ -8064,13 +8106,6 @@ __metadata:
   bin:
     sass: sass.js
   checksum: e725a37eb7360ad5f96e6e6209d81beeb22ecec70c6f01a1acdf237dbbb6e05e50cc0a0851b16ee1dbc63fbdd7a90405cbbd9911f56b2dba3d5f934f7e291f10
-  languageName: node
-  linkType: hard
-
-"sax@npm:~1.1.1":
-  version: 1.1.6
-  resolution: "sax@npm:1.1.6"
-  checksum: 879f18483d00f4630580fb4dc95da7d06046b1d71af1f27e33425f81d82751ab66a84eb584a462aa610f7a94de8d87416e03c708530ba76b1aa381b6828bfc9e
   languageName: node
   linkType: hard
 
