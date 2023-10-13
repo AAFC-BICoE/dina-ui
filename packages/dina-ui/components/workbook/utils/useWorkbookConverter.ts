@@ -95,7 +95,7 @@ export function useWorkbookConverter(
   function getFieldRelationshipConfig(fieldPath?: string) {
     return fieldPath
       ? flattenedConfig[fieldPath]?.relationshipConfig
-      : flattenedConfig.relationshipConfig;
+      : flattenedConfig["relationshipConfig"];
   }
 
   function getFieldConverter(fieldPath?: string) {
@@ -147,7 +147,7 @@ export function useWorkbookConverter(
           };
         }
       > = {
-        type: flattenedConfig.type,
+        type: flattenedConfig["type"],
         group,
         relationships: {}
       } as InputResource<KitsuResource & { group?: string }>;
@@ -232,7 +232,7 @@ export function useWorkbookConverter(
       if (value.hasGroup) {
         resource[group] = group;
       }
-      delete resource.relationshipConfig;
+      delete resource["relationshipConfig"];
     } else if (isObject(value)) {
       const relationshipConfig = value.relationshipConfig;
       // if the value is an object, traverse into properies of the object
