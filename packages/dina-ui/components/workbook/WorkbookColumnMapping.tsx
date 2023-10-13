@@ -8,19 +8,18 @@ import {
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
-import { InputResource, KitsuResource } from "kitsu";
+import { startCase, chain } from "lodash";
 import { Ref, useMemo, useRef, useState } from "react";
 import Table from "react-bootstrap/Table";
 import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { WorkbookDataTypeEnum } from "./";
+import { WorkbookDisplay } from "./WorkbookDisplay";
 import { WorkbookJSON } from "./types/Workbook";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
-import { Card } from "react-bootstrap";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
-import { WorkbookDataTypeEnum } from "./";
-import lodash, { startCase } from "lodash";
 import {
   convertMap,
   findMatchField,
@@ -33,7 +32,6 @@ import {
   isNumberArray,
   isValidManagedAttribute
 } from "./utils/workbookMappingUtils";
-import { WorkbookDisplay } from "./WorkbookDisplay";
 
 export type FieldMapType = (string | undefined)[];
 
@@ -48,10 +46,6 @@ export interface WorkbookColumnMappingProps {
   spreadsheetData: WorkbookJSON;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
-  onGenerate: (submission: {
-    data: InputResource<KitsuResource & { group?: string }>[];
-    type?: string;
-  }) => void;
 }
 
 const ENTITY_TYPES = ["material-sample"] as const;
@@ -59,8 +53,7 @@ const ENTITY_TYPES = ["material-sample"] as const;
 export function WorkbookColumnMapping({
   spreadsheetData,
   performSave,
-  setPerformSave,
-  onGenerate
+  setPerformSave
 }: WorkbookColumnMappingProps) {
   const { save } = useApiClient();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
@@ -213,8 +206,7 @@ export function WorkbookColumnMapping({
       nonNestedRowOptions.sort((a, b) => a.label.localeCompare(b.label));
 
       // Using the parent name, group the relationships into sections.
-      const groupedNestRowOptions = lodash
-        .chain(nestedRowOptions)
+      const groupedNestRowOptions = chain(nestedRowOptions)
         .groupBy((prop) => prop.parentPath)
         .map((group, key) => {
           return {
@@ -272,9 +264,6 @@ export function WorkbookColumnMapping({
         ),
         { apiBaseUrl: baseApiPath }
       );
-    }
-    if (onGenerate) {
-      onGenerate({ data: resources, type: selectedType?.value });
     }
   }
 
