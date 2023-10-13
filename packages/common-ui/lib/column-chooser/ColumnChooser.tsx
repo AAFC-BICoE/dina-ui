@@ -13,6 +13,7 @@ import { useIntl } from "react-intl";
 import { startCase } from "lodash";
 import { Button } from "react-bootstrap";
 import useLocalStorage from "@rehooks/local-storage";
+import { DataExport } from "packages/dina-ui/types/dina-export-api";
 
 export function ColumnChooser(
   CustomMenu: React.ForwardRefExoticComponent<
@@ -80,7 +81,7 @@ function useCustomMenu({
     indexName
   });
 
-  const { apiClient } = useApiClient();
+  const { apiClient, save } = useApiClient();
 
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_SEARCH_RESULTS_KEY);
 
@@ -92,34 +93,43 @@ function useCustomMenu({
 
   async function exportData() {
     setLoading(true);
-    const exportRequestResponse = await apiClient.axios.post(
-      "dina-export-api/export-request",
-      {
-        data: {
-          type: "export-request",
-          attributes: {
-            source: "dina_material_sample_index",
-            query: queryString,
-            columns: checkedColumnIds.filter((id) => id !== "selectColumn")
-          }
-        }
+    // Make query to data-export
+    const dataExportSaveArg = {
+      resource: {
+        type: "data-export",
+        source: "dina_material_sample_index",
+        query: queryString,
+        columns: checkedColumnIds.filter((id) => id !== "selectColumn")
       },
+      type: "data-export"
+    };
+    const dataExportPostResponse = await save<DataExport>([dataExportSaveArg], {
+      apiBaseUrl: "/dina-export-api"
+    });
+
+    // data-export POST will return immediately but export won't necessarily be available
+    // continue to get status of export until it's COMPLETED
+    let dataExportGetResponse;
+    while (dataExportGetResponse?.data?.status !== "COMPLETED") {
+      dataExportGetResponse = await apiClient.get<DataExport>(
+        `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
+        {}
+      );
+    }
+
+    // Get the exported data
+    const getFileResponse = await apiClient.get(
+      `dina-export-api/file/${dataExportPostResponse[0].id}?type=DATA_EXPORT`,
       {
-        headers: {
-          "Content-Type": "application/vnd.api+json"
-        }
+        responseType: "blob"
       }
     );
 
-    const getFileResponse = await apiClient.axios.get(
-      `dina-export-api/file/${exportRequestResponse.data.data.id}?type=DATA_EXPORT`,
-      { responseType: "blob" }
-    );
-
-    const url = window?.URL.createObjectURL(getFileResponse?.data);
+    // Download the data
+    const url = window?.URL.createObjectURL(getFileResponse as any);
     const link = document?.createElement("a");
     link.href = url ?? "";
-    link?.setAttribute("download", `${exportRequestResponse.data.data.id}`);
+    link?.setAttribute("download", `${dataExportPostResponse[0].id}`);
     document?.body?.appendChild(link);
     link?.click();
     window?.URL?.revokeObjectURL(url ?? "");

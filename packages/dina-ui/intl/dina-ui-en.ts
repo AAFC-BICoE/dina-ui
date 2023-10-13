@@ -897,5 +897,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
   yearMonthDayTime: "Year-Month-Day-Time",
-  field_splitConfiguration: "Split Configuration"
+  field_splitConfiguration: "Split Configuration",
+  dataExports: "Data Exports"
 };
