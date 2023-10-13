@@ -1,4 +1,4 @@
-import { WorkbookDataTypeEnum } from "../../";
+import { FieldMappingConfigType, WorkbookDataTypeEnum } from "../../";
 import {
   convertDate,
   convertMap,
@@ -14,8 +14,13 @@ import {
   isNumber
 } from "../workbookMappingUtils";
 
-const mockConfig = {
+const mockConfig: FieldMappingConfigType = {
   mockEntity: {
+    relationshipConfig: {
+      type: "mock-entity",
+      hasGroup: true,
+      baseApiPath: "/fake-api"
+    },
     stringField: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
       vocabularyEndpoint: "/collection-api/vocabulary/materialSampleType"
@@ -25,7 +30,29 @@ const mockConfig = {
     stringArrayField: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
     numberArrayField: { dataType: WorkbookDataTypeEnum.NUMBER_ARRAY },
     mapField: { dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES },
-    objectField: {
+    objectField1: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      relationshipConfig: {
+        tryToLinkExisting: true,
+        hasGroup: true,
+        type: "object-field",
+        baseApiPath: "apiPath"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING },
+        age: { dataType: WorkbookDataTypeEnum.NUMBER },
+        address: {
+          dataType: WorkbookDataTypeEnum.OBJECT,
+          attributes: {
+            addressLine1: { dataType: WorkbookDataTypeEnum.STRING },
+            city: { dataType: WorkbookDataTypeEnum.STRING },
+            province: { dataType: WorkbookDataTypeEnum.STRING },
+            postalCode: { dataType: WorkbookDataTypeEnum.STRING }
+          }
+        }
+      }
+    },
+    objectField2: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING },
@@ -248,18 +275,37 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.stringField.dataType": "vocabulary",
       "mockEntity.stringField.vocabularyEndpoint":
         "/collection-api/vocabulary/materialSampleType",
-      "mockEntity.objectField.attributes.address.attributes.addressLine1.dataType":
+      "mockEntity.objectField1.attributes.address.attributes.addressLine1.dataType":
         "string",
-      "mockEntity.objectField.attributes.address.attributes.city.dataType":
+      "mockEntity.objectField1.attributes.address.attributes.city.dataType":
         "string",
-      "mockEntity.objectField.attributes.address.attributes.postalCode.dataType":
+      "mockEntity.objectField1.attributes.address.attributes.postalCode.dataType":
         "string",
-      "mockEntity.objectField.attributes.address.attributes.province.dataType":
+      "mockEntity.objectField1.attributes.address.attributes.province.dataType":
         "string",
-      "mockEntity.objectField.attributes.address.dataType": "object",
-      "mockEntity.objectField.attributes.age.dataType": "number",
-      "mockEntity.objectField.attributes.name.dataType": "string",
-      "mockEntity.objectField.dataType": "object"
+      "mockEntity.objectField1.attributes.address.dataType": "object",
+      "mockEntity.objectField1.attributes.age.dataType": "number",
+      "mockEntity.objectField1.attributes.name.dataType": "string",
+      "mockEntity.objectField1.dataType": "object",
+      "mockEntity.objectField1.relationshipConfig.baseApiPath": "apiPath",
+      "mockEntity.objectField1.relationshipConfig.hasGroup": true,
+      "mockEntity.objectField1.relationshipConfig.tryToLinkExisting": true,
+      "mockEntity.objectField1.relationshipConfig.type": "object-field",
+      "mockEntity.objectField2.attributes.address.attributes.addressLine1.dataType":
+        "string",
+      "mockEntity.objectField2.attributes.address.attributes.city.dataType":
+        "string",
+      "mockEntity.objectField2.attributes.address.attributes.postalCode.dataType":
+        "string",
+      "mockEntity.objectField2.attributes.address.attributes.province.dataType":
+        "string",
+      "mockEntity.objectField2.attributes.address.dataType": "object",
+      "mockEntity.objectField2.attributes.age.dataType": "number",
+      "mockEntity.objectField2.attributes.name.dataType": "string",
+      "mockEntity.objectField2.dataType": "object",
+      "mockEntity.relationshipConfig.baseApiPath": "/fake-api",
+      "mockEntity.relationshipConfig.hasGroup": true,
+      "mockEntity.relationshipConfig.type": "mock-entity"
     });
   });
 });

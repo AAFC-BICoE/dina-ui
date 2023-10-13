@@ -3,15 +3,17 @@ import { ApiClientContext, LoadingSpinner } from "common-ui";
 import { InputResource, KitsuResource, PersistedResource } from "kitsu";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { MaterialSampleBulkEditor } from "packages/dina-ui/components";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { WorkbookColumnMapping } from "packages/dina-ui/components/workbook/WorkbookColumnMapping";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useContext, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
+import {
+  MaterialSampleBulkEditor,
+  WorkbookColumnMapping,
+  WorkbookJSON,
+  WorkbookUpload
+} from "../../components";
 import { IFileWithMeta } from "../../components/object-store";
-import { WorkbookJSON } from "../../components/workbook/types/Workbook";
-import { WorkbookUpload } from "../../components/workbook/WorkbookUpload";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { BULK_EDIT_RESULT_IDS_KEY } from "../collection/material-sample/bulk-edit";
 

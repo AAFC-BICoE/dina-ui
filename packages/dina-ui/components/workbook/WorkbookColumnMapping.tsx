@@ -3,6 +3,7 @@ import {
   SelectField,
   SubmitButton,
   useAccount,
+  useApiClient,
   useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
@@ -61,6 +62,7 @@ export function WorkbookColumnMapping({
   setPerformSave,
   onGenerate
 }: WorkbookColumnMappingProps) {
+  const { save } = useApiClient();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
   const { formatMessage } = useDinaIntl();
@@ -79,11 +81,16 @@ export function WorkbookColumnMapping({
   const [fieldHeaderPair, setFieldHeaderPair] = useState(
     {} as { [field: string]: string }
   );
-  const { convertWorkbook, flattenedConfig, getPathOfField } =
-    useWorkbookConverter(
-      FieldMappingConfig,
-      selectedType?.value || "material-sample"
-    );
+  const {
+    convertWorkbook,
+    flattenedConfig,
+    getPathOfField,
+    linkRelationshipAttribute,
+    getFieldRelationshipConfig
+  } = useWorkbookConverter(
+    FieldMappingConfig,
+    selectedType?.value || "material-sample"
+  );
 
   const buttonBar = (
     <>
@@ -239,15 +246,35 @@ export function WorkbookColumnMapping({
   // Generate the currently selected value
   const sheetValue = sheetOptions[sheet];
 
-  function onSubmit({ submittedValues }) {
+  async function onSubmit({ submittedValues }) {
     const workbookData = getDataFromWorkbook(
       spreadsheetData,
       sheet,
       submittedValues.fieldMap
     );
-    const samples = convertWorkbook(workbookData, submittedValues.group);
+    const group = submittedValues.group;
+    const resources = convertWorkbook(workbookData, submittedValues.group);
+    const { type, baseApiPath } = getFieldRelationshipConfig();
+
+    if (resources.length > 0) {
+      for (const resource of resources) {
+        for (const key of Object.keys(resource)) {
+          await linkRelationshipAttribute(resource, key, group);
+        }
+      }
+      await save(
+        resources.map(
+          (item) =>
+            ({
+              resource: item,
+              type
+            } as any)
+        ),
+        { apiBaseUrl: baseApiPath }
+      );
+    }
     if (onGenerate) {
-      onGenerate({ data: samples, type: selectedType?.value });
+      onGenerate({ data: resources, type: selectedType?.value });
     }
   }
 

@@ -3,7 +3,12 @@ import { WorkbookDataTypeEnum } from "../";
 
 const FieldMappingConfig: FieldMappingConfigType = {
   "material-sample": {
-    type: "material-sample",
+    relationshipConfig: {
+      type: "material-sample",
+      hasGroup: true,
+      tryToLinkExisting: true,
+      baseApiPath: "/collection-api"
+    },
     materialSampleName: { dataType: WorkbookDataTypeEnum.STRING },
     preservationType: { dataType: WorkbookDataTypeEnum.STRING },
     preparationFixative: { dataType: WorkbookDataTypeEnum.STRING },
@@ -31,7 +36,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
     isRestricted: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     organism: {
       dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
-      relationships: {
+      relationshipConfig: {
         hasGroup: true,
         tryToLinkExisting: false,
         type: "organism",

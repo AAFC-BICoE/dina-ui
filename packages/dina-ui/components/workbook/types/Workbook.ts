@@ -20,9 +20,14 @@ export type Leaves<T> = { [K: string]: T | Leaves<T> } | { type: string };
 // export type FieldMappingConfigType = Leaves<FieldConfigType>;
 
 export type FieldMappingConfigType = {
-  [key: string]: {
-    type: string;
-  } & Leaves<FieldConfigType>;
+  [key: string]: Leaves<FieldConfigType> & {
+    relationshipConfig: {
+      type: string;
+      hasGroup: boolean;
+      tryToLinkExisting?: boolean;
+      baseApiPath: string;
+    };
+  };
 };
 
 export interface PrimitiveField {
@@ -48,7 +53,7 @@ export interface VocabularyField {
 export interface ObjectField {
   dataType: WorkbookDataTypeEnum.OBJECT | WorkbookDataTypeEnum.OBJECT_ARRAY;
   attributes: Leaves<FieldConfigType>;
-  relationships?: {
+  relationshipConfig?: {
     type: string;
     hasGroup: boolean;
     tryToLinkExisting: boolean;

@@ -323,8 +323,8 @@ export function convertDate(value: string) {
   }
 }
 
-function isObject(input: any) {
-  return typeof input === "object" && input !== null;
+export function isObject(value: any) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**

@@ -1,7 +1,7 @@
 import { take } from "lodash";
 import { WorkbookJSON, WorkbookRow } from "./types/Workbook";
 import { Card } from "react-bootstrap";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 
 /**
  * This component is currently not used anywhere yet. It will be implemented in a future ticket.
