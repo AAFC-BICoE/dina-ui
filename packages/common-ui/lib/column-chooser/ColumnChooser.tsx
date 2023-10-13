@@ -15,6 +15,8 @@ import { Button } from "react-bootstrap";
 import useLocalStorage from "@rehooks/local-storage";
 import { DataExport } from "packages/dina-ui/types/dina-export-api";
 
+const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
+
 export function ColumnChooser(
   CustomMenu: React.ForwardRefExoticComponent<
     CustomMenuProps & React.RefAttributes<HTMLDivElement>
@@ -49,14 +51,14 @@ export function useColumnChooser({
       : startCase(column.id);
     return { label: label.toLowerCase(), id: column.id };
   });
-  const { CustomMenu, checkedColumnIds } = useCustomMenu({
+  const { CustomMenu, checkedColumnIds, dataExportError } = useCustomMenu({
     columns,
     columnSearchMapping,
     indexName,
     hideExportButton
   });
   const columnChooser = ColumnChooser(CustomMenu);
-  return { columnChooser, checkedColumnIds, CustomMenu };
+  return { columnChooser, checkedColumnIds, CustomMenu, dataExportError };
 }
 
 interface UseCustomMenuProps extends UseColumnChooserProps {
@@ -72,6 +74,7 @@ function useCustomMenu({
 }: UseCustomMenuProps) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
   const [loading, setLoading] = useState(false);
+  const [dataExportError, setDataExportError] = useState<JSX.Element>();
 
   const { formatMessage } = useIntl();
 
@@ -109,30 +112,48 @@ function useCustomMenu({
 
     // data-export POST will return immediately but export won't necessarily be available
     // continue to get status of export until it's COMPLETED
+    let isFetchingDataExport = true;
+    const fetchDataExportRetries = 0;
     let dataExportGetResponse;
-    while (dataExportGetResponse?.data?.status !== "COMPLETED") {
-      dataExportGetResponse = await apiClient.get<DataExport>(
-        `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
-        {}
-      );
-    }
+    while (
+      isFetchingDataExport &&
+      fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES
+    ) {
+      if (dataExportGetResponse?.data?.status === "COMPLETED") {
+        // Get the exported data
+        const getFileResponse = await apiClient.get(
+          `dina-export-api/file/${dataExportPostResponse[0].id}?type=DATA_EXPORT`,
+          {
+            responseType: "blob"
+          }
+        );
 
-    // Get the exported data
-    const getFileResponse = await apiClient.get(
-      `dina-export-api/file/${dataExportPostResponse[0].id}?type=DATA_EXPORT`,
-      {
-        responseType: "blob"
+        // Download the data
+        const url = window?.URL.createObjectURL(getFileResponse as any);
+        const link = document?.createElement("a");
+        link.href = url ?? "";
+        link?.setAttribute("download", `${dataExportPostResponse[0].id}`);
+        document?.body?.appendChild(link);
+        link?.click();
+        window?.URL?.revokeObjectURL(url ?? "");
+        isFetchingDataExport = false;
+      } else if (dataExportGetResponse?.data?.status === "ERROR") {
+        isFetchingDataExport = false;
+        setDataExportError(
+          <div className="alert alert-danger">
+            <DinaMessage id="dataExportError" />
+          </div>
+        );
+      } else {
+        dataExportGetResponse = await apiClient.get<DataExport>(
+          `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
+          {}
+        );
+        // Wait 1 second before retrying
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-    );
-
-    // Download the data
-    const url = window?.URL.createObjectURL(getFileResponse as any);
-    const link = document?.createElement("a");
-    link.href = url ?? "";
-    link?.setAttribute("download", `${dataExportPostResponse[0].id}`);
-    document?.body?.appendChild(link);
-    link?.click();
-    window?.URL?.revokeObjectURL(url ?? "");
+    }
+    isFetchingDataExport = false;
     setLoading(false);
   }
 
@@ -193,5 +214,5 @@ function useCustomMenu({
       );
     }
   );
-  return { CustomMenu, checkedColumnIds };
+  return { CustomMenu, checkedColumnIds, dataExportError };
 }
