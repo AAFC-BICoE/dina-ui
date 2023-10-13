@@ -374,26 +374,12 @@ export function useWorkbookConverter(
     }
   }
 
-  // async function saveData(
-  //   resource: InputResource<
-  //     KitsuResource & { group?: string } & {
-  //       relationshipConfig: {
-  //         type: string;
-  //         hasGroup: boolean;
-  //         tryToLinkExisting: boolean;
-  //         baseApiPath?: string;
-  //       };
-  //     }
-  //   >
-  // ) {}
-
   return {
     linkRelationshipAttribute,
     convertWorkbook,
     flattenedConfig,
     getFieldConverter,
     getPathOfField,
-    getFieldRelationshipConfig,
-    saveData
+    getFieldRelationshipConfig
   };
 }
