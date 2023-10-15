@@ -40,7 +40,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         hasGroup: true,
         tryToLinkExisting: false,
         type: "organism",
-        baseApiPath: "collection-api"
+        baseApiPath: "/collection-api"
       },
       attributes: {
         lifeStage: { dataType: WorkbookDataTypeEnum.STRING },

@@ -318,6 +318,8 @@ export function convertDate(value: string) {
     const msDay = 86400000;
     const date = new Date(excelEpoc + (dateNum ?? 0) * msDay);
     return date.toISOString().split("T")[0];
+  } else if (typeof value === "string") {
+    return value;
   } else {
     return null;
   }

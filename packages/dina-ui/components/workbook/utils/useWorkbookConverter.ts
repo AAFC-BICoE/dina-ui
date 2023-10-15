@@ -230,10 +230,10 @@ export function useWorkbookConverter(
       resource.type = value.type;
       resource.relationships = {};
       if (value.hasGroup) {
-        resource[group] = group;
+        resource.group = group;
       }
       delete resource["relationshipConfig"];
-    } else if (isObject(value)) {
+    } else if (isObject(value) && attributeName !== "relationships") {
       const relationshipConfig = value.relationshipConfig;
       // if the value is an object, traverse into properies of the object
       if (relationshipConfig) {
@@ -356,20 +356,22 @@ export function useWorkbookConverter(
             await linkRelationshipAttribute(item, childName, group);
           }
         }
-        const valueForRelationship = await save(
-          value.map((item) => ({
-            resource: item,
-            type: relationshipConfig.type
-          })),
-          { apiBaseUrl: relationshipConfig.baseApiPath }
-        ).then((response) => response.map((rs) => pick(rs, ["id", "type"])));
-        if (!resource.relationships) {
-          resource.relationships = {};
+        if (relationshipConfig) {
+          const valueForRelationship = await save(
+            value.map((item) => ({
+              resource: item,
+              type: relationshipConfig.type
+            })),
+            { apiBaseUrl: relationshipConfig.baseApiPath }
+          ).then((response) => response.map((rs) => pick(rs, ["id", "type"])));
+          if (!resource.relationships) {
+            resource.relationships = {};
+          }
+          resource.relationships[attributeName] = {
+            data: valueForRelationship
+          };
+          delete resource[attributeName];
         }
-        resource.relationships[attributeName] = {
-          data: valueForRelationship
-        };
-        delete resource[attributeName];
       }
     }
   }

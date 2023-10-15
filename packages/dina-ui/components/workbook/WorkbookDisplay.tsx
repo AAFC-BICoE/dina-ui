@@ -17,12 +17,12 @@ export function WorkbookDisplay({
   const numOfColumns = dataToDisplay[0].content.length;
   const numOfRows = dataToDisplay.length - 1;
   const headerRow = dataToDisplay[0].content.map((col) => (
-    <div className="cells__alphabet" key={col}>
+    <div className="cells_alphabet" key={col}>
       {col}
     </div>
   ));
   const excelIndexColumn = [...Array(numOfRows)].map((_, i) => (
-    <div key={i} className="cells__number">
+    <div key={i} className="cells_number">
       {i + 1}
     </div>
   ));
@@ -30,7 +30,7 @@ export function WorkbookDisplay({
     // Skip the first row since it's already been displayed.
     if (index !== 0) {
       return row.content.map((col, i) => (
-        <div key={i} className="cells__content">
+        <div key={i} className="cells_content">
           {col}
         </div>
       ));
@@ -51,11 +51,11 @@ export function WorkbookDisplay({
             overflow: hidden;
             height: calc(51px + ${numOfRows}*31px);
           }
-          .cells__spacer {
+          .cells_spacer {
             background: #e6e6e6;
             position: relative;
           }
-          .cells__spacer:after {
+          .cells_spacer:after {
             content: "";
             position: absolute;
             right: 4px;
@@ -64,26 +64,26 @@ export function WorkbookDisplay({
             width: 100%;
             background: linear-gradient(135deg, transparent 30px, #bbb 30px, #bbb 55px, transparent 55px);
           }
-          .cells__alphabet {
+          .cells_alphabet {
             background: #e6e6e6;
             display: flex;
             justify-content: center;
             align-items: center;
             word-wrap: anywhere;
           }
-          .cells__number {
+          .cells_number {
             background: #e6e6e6;
             grid-column: 1/span 1;
             display: flex;
             justify-content: center;
             align-items: center;
           }
-          .cells__content {
+          .cells_content {
             text-align: left;
             padding: 6px;
             background: #fff;
           }
-          .cells__content_header {
+          .cells_content_header {
             text-align: left;
             padding: 6px;
             background: #f3f2f1;
@@ -99,7 +99,7 @@ export function WorkbookDisplay({
         </Card.Header>
         <Card.Body>
           <div className="cells">
-            <div className="cells__spacer" />
+            <div className="cells_spacer" />
             {headerRow}
             {excelIndexColumn}
             {dataRows}
