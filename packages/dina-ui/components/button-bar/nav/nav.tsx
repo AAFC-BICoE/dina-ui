@@ -104,6 +104,9 @@ export function Nav({ marginBottom = true }: NavProps) {
                 <NavObjectStoreDropdown formatMessage={formatMessage} />
                 <NavAgentDropdown formatMessage={formatMessage} />
                 <NavSequenceDropdown formatMessage={formatMessage} />
+                <NavControlledVocabularyDropdown
+                  formatMessage={formatMessage}
+                />
               </ReactNav>
 
               {/* Navigation menu right */}
@@ -210,13 +213,6 @@ function menuDisplayControl() {
 function NavCollectionDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
-  const {
-    show: submenuShow,
-    showDropdown: submenuShowDropdown,
-    hideDropdown: submenuHideDropdown,
-    onKeyDown: submenuOnKeyDown,
-    onKeyDownLastItem: submenuOnKeyDownLastItem
-  } = menuDisplayControl();
   return (
     <NavDropdown
       title={formatMessage("collectionSectionTitle")}
@@ -241,37 +237,6 @@ function NavCollectionDropdown({ formatMessage }) {
           <DinaMessage id="collectionListTitle" />
         </NavDropdown.Item>
       </Link>
-      {/* Controlled Vocabulary submenu */}
-      <DropdownButton
-        title={formatMessage("controlledVocabularyTitle")}
-        drop={"end"}
-        onMouseOverCapture={submenuShowDropdown}
-        onKeyDown={submenuOnKeyDown}
-        onMouseLeave={submenuHideDropdown}
-        show={submenuShow}
-        className="submenu"
-        variant="light"
-        role="menuitem"
-      >
-        <Link href="/collection/collection-method/list" passHref={true}>
-          <NavDropdown.Item role="menuitem">
-            <DinaMessage id="collectionMethodListTitle" />
-          </NavDropdown.Item>
-        </Link>
-        <Link href="/collection/preparation-method/list" passHref={true}>
-          <NavDropdown.Item role="menuitem">
-            <DinaMessage id="title_preparationMethod" />
-          </NavDropdown.Item>
-        </Link>
-        <Link href="/collection/preparation-type/list" passHref={true}>
-          <NavDropdown.Item
-            onKeyDown={submenuOnKeyDownLastItem}
-            role="menuitem"
-          >
-            <DinaMessage id="preparationTypeListTitle" />
-          </NavDropdown.Item>
-        </Link>
-      </DropdownButton>
       <Link href="/collection/material-sample/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="materialSampleListTitle" />
@@ -484,20 +449,24 @@ function NavSequenceDropdown({ formatMessage }) {
   );
 }
 
-function NavDinaManagementDropdown({ formatMessage }) {
+function NavControlledVocabularyDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
   const { isAdmin } = useAccount();
   return (
     <NavDropdown
-      title={formatMessage("dinaManagementSectionTitle")}
+      title={formatMessage("controlledVocabularyTitle")}
       onMouseOver={showDropdown}
       onKeyDown={onKeyDown}
       onMouseLeave={hideDropdown}
       show={show}
-      className="float-right"
       role="menuitem"
     >
+      <Link href="/collection/collection-method/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="collectionMethodListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/collection/extension/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="fieldExtensions" />
@@ -519,6 +488,16 @@ function NavDinaManagementDropdown({ formatMessage }) {
         </NavDropdown.Item>
       </Link>
       {/* Permission page here. */}
+      <Link href="/collection/preparation-method/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="title_preparationMethod" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/collection/preparation-type/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="preparationTypeListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/collection/protocol/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="protocolListTitle" />
@@ -532,7 +511,24 @@ function NavDinaManagementDropdown({ formatMessage }) {
           <DinaMessage id="storageUnitTypeListTitle" />
         </NavDropdown.Item>
       </Link>
+    </NavDropdown>
+  );
+}
 
+function NavDinaManagementDropdown({ formatMessage }) {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
+  const { isAdmin } = useAccount();
+  return (
+    <NavDropdown
+      title={formatMessage("dinaManagementSectionTitle")}
+      onMouseOver={showDropdown}
+      onKeyDown={onKeyDown}
+      onMouseLeave={hideDropdown}
+      show={show}
+      className="float-right"
+      role="menuitem"
+    >
       {/* Admins only can view users. */}
       {isAdmin && (
         <Link

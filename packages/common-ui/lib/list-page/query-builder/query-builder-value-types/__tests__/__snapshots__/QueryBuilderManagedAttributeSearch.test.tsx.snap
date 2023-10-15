@@ -29,8 +29,8 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level with operator equals 1`] = `
 Object {
-  "match": Object {
-    "data.attributes.managedAttributes.attributeName": "true",
+  "term": Object {
+    "data.attributes.managedAttributes.attributeName.keyword": "true",
   },
 }
 `;
@@ -130,8 +130,8 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "match": Object {
-              "included.attributes.managedAttributes.attributeName": "true",
+            "term": Object {
+              "included.attributes.managedAttributes.attributeName.keyword": "true",
             },
           },
           Object {
@@ -1282,8 +1282,8 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level with operator equals 1`] = `
 Object {
-  "match": Object {
-    "data.attributes.managedAttributes.attributeName": "3.5",
+  "term": Object {
+    "data.attributes.managedAttributes.attributeName.keyword": "3.5",
   },
 }
 `;
@@ -1312,8 +1312,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "match": Object {
-              "data.attributes.managedAttributes.attributeName": "3.5",
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": "3.5",
             },
           },
         },
@@ -1410,8 +1410,8 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "match": Object {
-              "included.attributes.managedAttributes.attributeName": "3.5",
+            "term": Object {
+              "included.attributes.managedAttributes.attributeName.keyword": "3.5",
             },
           },
           Object {
@@ -1470,8 +1470,8 @@ Object {
                 },
               },
               "must_not": Object {
-                "match": Object {
-                  "included.attributes.managedAttributes.attributeName": "3.5",
+                "term": Object {
+                  "included.attributes.managedAttributes.attributeName.keyword": "3.5",
                 },
               },
             },
@@ -1570,8 +1570,8 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "match": Object {
-              "data.attributes.managedAttributes.attributeName": "stringValue",
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": "stringValue",
             },
           },
         },
@@ -1590,18 +1590,13 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator partialMatch 1`] = `
-Object {
-  "match": Object {
-    "data.attributes.managedAttributes.attributeName": "stringValue",
-  },
-}
-`;
-
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator startsWith 1`] = `
 Object {
   "prefix": Object {
-    "data.attributes.managedAttributes.attributeName": "stringvalue",
+    "data.attributes.managedAttributes.attributeName.keyword": Object {
+      "case_insensitive": true,
+      "value": "stringValue",
+    },
   },
 }
 `;
@@ -1609,7 +1604,8 @@ Object {
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator wildcard 1`] = `
 Object {
   "wildcard": Object {
-    "data.attributes.managedAttributes.attributeName": Object {
+    "data.attributes.managedAttributes.attributeName.keyword": Object {
+      "case_insensitive": true,
       "value": "*stringValue*",
     },
   },
@@ -1754,8 +1750,8 @@ Object {
                 },
               },
               "must_not": Object {
-                "match": Object {
-                  "included.attributes.managedAttributes.attributeName": "stringValue",
+                "term": Object {
+                  "included.attributes.managedAttributes.attributeName.keyword": "stringValue",
                 },
               },
             },
@@ -1795,30 +1791,6 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator partialMatch 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "match": Object {
-              "included.attributes.managedAttributes.attributeName": "stringValue",
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator startsWith 1`] = `
 Object {
   "nested": Object {
@@ -1828,7 +1800,10 @@ Object {
         "must": Array [
           Object {
             "prefix": Object {
-              "included.attributes.managedAttributes.attributeName": "stringvalue",
+              "included.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "stringValue",
+              },
             },
           },
           Object {
@@ -1852,7 +1827,8 @@ Object {
         "must": Array [
           Object {
             "wildcard": Object {
-              "included.attributes.managedAttributes.attributeName": Object {
+              "included.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
                 "value": "*stringValue*",
               },
             },
@@ -1868,4 +1844,3 @@ Object {
   },
 }
 `;
-

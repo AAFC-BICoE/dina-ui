@@ -222,11 +222,6 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_wildcard" }),
       cardinality: 1
     },
-    partialMatch: {
-      // Displayed as "Contains word"
-      label: formatMessage({ id: "queryBuilder_operator_partialMatch" }),
-      cardinality: 1
-    },
     startsWith: {
       label: formatMessage({ id: "queryBuilder_operator_startsWith" }),
       cardinality: 1
@@ -478,7 +473,6 @@ function generateBuilderConfig(
           operators: [
             "exactMatch",
             "wildcard",
-            "partialMatch",
             "startsWith", // Only displayed if supported on the mapping.
             "containsText", // Only displayed if supported on the mapping.
             "endsWith", // Only displayed if supported on the mapping.

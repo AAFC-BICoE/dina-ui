@@ -62,7 +62,7 @@ export function InverseToggleField({
     <FieldWrapper {...props}>
       {({ value, setValue, formik }) => (
         <Switch
-          checked={!value ?? true}
+          checked={value !== undefined ? !value : false}
           onChange={(checked) => {
             setValue(!checked);
             onChangeExternal?.(!checked, formik);

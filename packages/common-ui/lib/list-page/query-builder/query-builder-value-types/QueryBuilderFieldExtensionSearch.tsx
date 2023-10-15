@@ -121,7 +121,6 @@ export default function QueryRowFieldExtensionSearch({
   const operatorOptions = [
     "exactMatch",
     "wildcard",
-    "partialMatch",
     "startsWith",
     "notEquals",
     "empty",
