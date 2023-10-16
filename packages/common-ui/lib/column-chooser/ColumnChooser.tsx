@@ -14,6 +14,7 @@ import { startCase } from "lodash";
 import { Button } from "react-bootstrap";
 import useLocalStorage from "@rehooks/local-storage";
 import { DataExport } from "packages/dina-ui/types/dina-export-api";
+import Kitsu from "kitsu";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
@@ -121,21 +122,7 @@ function useCustomMenu({
     ) {
       if (dataExportGetResponse?.data?.status === "COMPLETED") {
         // Get the exported data
-        const getFileResponse = await apiClient.get(
-          `dina-export-api/file/${dataExportPostResponse[0].id}?type=DATA_EXPORT`,
-          {
-            responseType: "blob"
-          }
-        );
-
-        // Download the data
-        const url = window?.URL.createObjectURL(getFileResponse as any);
-        const link = document?.createElement("a");
-        link.href = url ?? "";
-        link?.setAttribute("download", `${dataExportPostResponse[0].id}`);
-        document?.body?.appendChild(link);
-        link?.click();
-        window?.URL?.revokeObjectURL(url ?? "");
+        await downloadDataExport(apiClient, dataExportPostResponse[0].id);
         isFetchingDataExport = false;
       } else if (dataExportGetResponse?.data?.status === "ERROR") {
         isFetchingDataExport = false;
@@ -215,4 +202,26 @@ function useCustomMenu({
     }
   );
   return { CustomMenu, checkedColumnIds, dataExportError };
+}
+export async function downloadDataExport(
+  apiClient: Kitsu,
+  id: string | undefined
+) {
+  if (id) {
+    const getFileResponse = await apiClient.get(
+      `dina-export-api/file/${id}?type=DATA_EXPORT`,
+      {
+        responseType: "blob"
+      }
+    );
+
+    // Download the data
+    const url = window?.URL.createObjectURL(getFileResponse as any);
+    const link = document?.createElement("a");
+    link.href = url ?? "";
+    link?.setAttribute("download", `${id}`);
+    document?.body?.appendChild(link);
+    link?.click();
+    window?.URL?.revokeObjectURL(url ?? "");
+  }
 }
