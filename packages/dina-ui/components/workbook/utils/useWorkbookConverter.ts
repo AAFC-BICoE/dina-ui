@@ -1,7 +1,11 @@
 import { useApiClient } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
 import { filter, get, has, pick } from "lodash";
-import { FieldMappingConfigType, WorkbookDataTypeEnum } from "..";
+import {
+  FieldMappingConfigType,
+  LinkOrCreateSetting,
+  WorkbookDataTypeEnum
+} from "..";
 import {
   convertBoolean,
   convertBooleanArray,
@@ -113,7 +117,6 @@ export function useWorkbookConverter(
       relationshipConfig: {
         type: string;
         hasGroup: boolean;
-        tryToLinkExisting: boolean;
         baseApiPath?: string;
       };
       relationships: {
@@ -174,7 +177,7 @@ export function useWorkbookConverter(
                 relationshipConfig: {
                   type: string;
                   hasGroup: boolean;
-                  tryToLinkExisting: boolean;
+                  linkOrCreateSetting: LinkOrCreateSetting;
                   baseApiPath?: string;
                 };
               }
@@ -237,8 +240,15 @@ export function useWorkbookConverter(
       const relationshipConfig = value.relationshipConfig;
       // if the value is an object, traverse into properies of the object
       if (relationshipConfig) {
-        if (relationshipConfig.tryToLinkExisting) {
-          // find the fields that are simple data type
+        // If the value is an Object type, and there is a relationshipConfig defined
+        // Then we need to loop through all properties of the value
+        if (
+          relationshipConfig.linkOrCreateSetting === LinkOrCreateSetting.LINK ||
+          relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_OR_CREATE
+        ) {
+          // The filter below is to find out all simple data type properties
+          // We will use these properties to query from the database
           const fields = Object.keys(value).filter((key) => {
             if (key === "relationshipConfig") {
               return false;
@@ -248,6 +258,7 @@ export function useWorkbookConverter(
             }
             return true;
           });
+          // Query from dababase
           const valueToLink = await apiClient
             .get(
               `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`,
@@ -257,14 +268,21 @@ export function useWorkbookConverter(
                 }
               }
             )
-            .then((response) =>
-              response?.data
-                ? {
-                    id: response.data.id,
-                    type: response.data.type
+            .then((response) => {
+              if (response?.data) {
+                if (Array.isArray(response.data)) {
+                  if (response.data.length > 0) {
+                    return pick(response.data[0], ["id", "type"]);
+                  } else {
+                    return null;
                   }
-                : null
-            );
+                } else {
+                  return pick(response.data, ["id", "type"]);
+                }
+              } else {
+                return null;
+              }
+            });
           if (valueToLink) {
             if (!resource.relationships) {
               resource.relationships = {};
@@ -276,25 +294,37 @@ export function useWorkbookConverter(
             return;
           }
         }
-        // if there is no existing record in the db, then create it
-        for (const childName of Object.keys(value)) {
-          await linkRelationshipAttribute(value, childName, group);
+        if (
+          relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.CREATE ||
+          relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_OR_CREATE
+        ) {
+          // if there is no existing record in the db, then create it
+          for (const childName of Object.keys(value)) {
+            await linkRelationshipAttribute(value, childName, group);
+          }
+          const valueForRelationship = await save(
+            [
+              {
+                resource: value,
+                type: relationshipConfig.type
+              }
+            ],
+            { apiBaseUrl: relationshipConfig.baseApiPath }
+          ).then((response) => ({
+            id: response[0].id,
+            type: response[0].type
+          }));
+          if (!resource.relationships) {
+            resource.relationships = {};
+          }
+          resource.relationships[attributeName] = {
+            data: valueForRelationship
+          };
+          delete resource[attributeName];
+          return;
         }
-        const valueForRelationship = await save(
-          [
-            {
-              resource: value,
-              type: relationshipConfig.type
-            }
-          ],
-          { apiBaseUrl: relationshipConfig.baseApiPath }
-        ).then((response) => ({ id: response[0].id, type: response[0].type }));
-        if (!resource.relationships) {
-          resource.relationships = {};
-        }
-        resource.relationships[attributeName] = { data: valueForRelationship };
-        delete resource[attributeName];
-        return;
       } else {
         for (const childName of Object.keys(value)) {
           await linkRelationshipAttribute(value, childName, group);
@@ -304,10 +334,18 @@ export function useWorkbookConverter(
       const relationshipConfig = value[0].relationshipConfig;
       if (isObject(value[0])) {
         if (relationshipConfig) {
-          if (relationshipConfig.tryToLinkExisting) {
-            // find the fields that are simple data type
+          // If the value is an Object Array type, and there is a relationshipConfig defined
+          // Then we need to loop through all properties of each item in the array
+          if (
+            relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK ||
+            relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK_OR_CREATE
+          ) {
             const valuesForRelationship: { id: string; type: string }[] = [];
             for (const item of value) {
+              // The filter below is to find out all simple data type properties
+              // We will use these properties to query from the database
               const fields = Object.keys(item).filter((key) => {
                 if (key === "relationshipConfig") {
                   return false;
@@ -317,6 +355,7 @@ export function useWorkbookConverter(
                 }
                 return true;
               });
+              // query data from database
               const valueToLink = await apiClient
                 .get(
                   `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`,
@@ -326,14 +365,21 @@ export function useWorkbookConverter(
                     }
                   }
                 )
-                .then((response) =>
-                  response?.data
-                    ? {
-                        id: response.data.id,
-                        type: response.data.type
+                .then((response) => {
+                  if (response?.data) {
+                    if (Array.isArray(response.data)) {
+                      if (response.data.length > 0) {
+                        return pick(response.data[0], ["id", "type"]);
+                      } else {
+                        return null;
                       }
-                    : null
-                );
+                    } else {
+                      return pick(response.data, ["id", "type"]);
+                    }
+                  } else {
+                    return null;
+                  }
+                });
               if (valueToLink) {
                 valuesForRelationship.push(valueToLink);
               }
@@ -349,28 +395,38 @@ export function useWorkbookConverter(
               return;
             }
           }
-        }
-        // if there is no existing record in the db, then create it
-        for (const item of value) {
-          for (const childName of Object.keys(item)) {
-            await linkRelationshipAttribute(item, childName, group);
+
+          if (
+            relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.CREATE ||
+            relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK_OR_CREATE
+          ) {
+            // if there is no existing record in the db, then create it
+            for (const item of value) {
+              for (const childName of Object.keys(item)) {
+                await linkRelationshipAttribute(item, childName, group);
+              }
+            }
+            if (relationshipConfig) {
+              const valueForRelationship = await save(
+                value.map((item) => ({
+                  resource: item,
+                  type: relationshipConfig.type
+                })),
+                { apiBaseUrl: relationshipConfig.baseApiPath }
+              ).then((response) =>
+                response.map((rs) => pick(rs, ["id", "type"]))
+              );
+              if (!resource.relationships) {
+                resource.relationships = {};
+              }
+              resource.relationships[attributeName] = {
+                data: valueForRelationship
+              };
+              delete resource[attributeName];
+            }
           }
-        }
-        if (relationshipConfig) {
-          const valueForRelationship = await save(
-            value.map((item) => ({
-              resource: item,
-              type: relationshipConfig.type
-            })),
-            { apiBaseUrl: relationshipConfig.baseApiPath }
-          ).then((response) => response.map((rs) => pick(rs, ["id", "type"])));
-          if (!resource.relationships) {
-            resource.relationships = {};
-          }
-          resource.relationships[attributeName] = {
-            data: valueForRelationship
-          };
-          delete resource[attributeName];
         }
       }
     }

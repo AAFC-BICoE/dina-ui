@@ -1,4 +1,8 @@
-import { FieldMappingConfigType, WorkbookDataTypeEnum } from "../../";
+import {
+  FieldMappingConfigType,
+  LinkOrCreateSetting,
+  WorkbookDataTypeEnum
+} from "../../";
 import {
   convertDate,
   convertMap,
@@ -33,7 +37,7 @@ const mockConfig: FieldMappingConfigType = {
     objectField1: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
-        tryToLinkExisting: true,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         hasGroup: true,
         type: "object-field",
         baseApiPath: "apiPath"
@@ -289,7 +293,8 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.objectField1.dataType": "object",
       "mockEntity.objectField1.relationshipConfig.baseApiPath": "apiPath",
       "mockEntity.objectField1.relationshipConfig.hasGroup": true,
-      "mockEntity.objectField1.relationshipConfig.tryToLinkExisting": true,
+      "mockEntity.objectField1.relationshipConfig.linkOrCreateSetting":
+        "LINK_OR_CREATE",
       "mockEntity.objectField1.relationshipConfig.type": "object-field",
       "mockEntity.objectField2.attributes.address.attributes.addressLine1.dataType":
         "string",

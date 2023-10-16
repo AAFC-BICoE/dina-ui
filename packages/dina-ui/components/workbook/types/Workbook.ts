@@ -1,5 +1,11 @@
 import { WorkbookDataTypeEnum } from "./WorkbookDataTypeEnum";
 
+export enum LinkOrCreateSetting {
+  LINK = "LINK", // Find the existing object then set to relationships
+  CREATE = "CREATE", // Create a new object then set to relationships
+  LINK_OR_CREATE = "LINK_OR_CREATE" // Try to find an existing object, if not found, then create one, then set to relationships
+}
+
 /**
  * A specific row on a spreadsheet.
  */
@@ -24,7 +30,6 @@ export type FieldMappingConfigType = {
     relationshipConfig: {
       type: string;
       hasGroup: boolean;
-      tryToLinkExisting?: boolean;
       baseApiPath: string;
     };
   };
@@ -53,10 +58,11 @@ export interface VocabularyField {
 export interface ObjectField {
   dataType: WorkbookDataTypeEnum.OBJECT | WorkbookDataTypeEnum.OBJECT_ARRAY;
   attributes: Leaves<FieldConfigType>;
+  // If relationshipConfig is defined, the this field need to move to relationships.
   relationshipConfig?: {
     type: string;
     hasGroup: boolean;
-    tryToLinkExisting: boolean;
+    linkOrCreateSetting: LinkOrCreateSetting;
     baseApiPath?: string;
   };
 }

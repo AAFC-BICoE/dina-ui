@@ -1,6 +1,10 @@
 import { useWorkbookConverter } from "../useWorkbookConverter";
 
-import { WorkbookDataTypeEnum, FieldMappingConfigType } from "../..";
+import {
+  WorkbookDataTypeEnum,
+  FieldMappingConfigType,
+  LinkOrCreateSetting
+} from "../..";
 
 import * as ApiClientContext from "../../../../../common-ui/lib/api-client/ApiClientContext";
 
@@ -9,7 +13,6 @@ const mockConfig: FieldMappingConfigType = {
     relationshipConfig: {
       type: "mock-entity",
       hasGroup: true,
-      tryToLinkExisting: true,
       baseApiPath: "fake-api"
     },
     stringField: { dataType: WorkbookDataTypeEnum.STRING },
@@ -25,7 +28,7 @@ const mockConfig: FieldMappingConfigType = {
     objectField: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
-        tryToLinkExisting: true,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         type: "object-field",
         baseApiPath: "fake-api",
         hasGroup: true
@@ -36,7 +39,7 @@ const mockConfig: FieldMappingConfigType = {
         address: {
           dataType: WorkbookDataTypeEnum.OBJECT,
           relationshipConfig: {
-            tryToLinkExisting: true,
+            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
             type: "address",
             baseApiPath: "fake-api",
             hasGroup: true
@@ -61,7 +64,7 @@ const mockConfig: FieldMappingConfigType = {
     objectArrayField: {
       dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
       relationshipConfig: {
-        tryToLinkExisting: true,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         type: "object-array",
         baseApiPath: "fake-api",
         hasGroup: true
@@ -147,7 +150,6 @@ describe("useWorkbookConverters", () => {
           relationshipConfig: {
             type: "mock-entity",
             hasGroup: true,
-            tryToLinkExisting: true,
             baseApiPath: "fake-api"
           },
           dog: {
@@ -185,7 +187,6 @@ describe("useWorkbookConverters", () => {
       relationshipConfig: {
         baseApiPath: "fake-api",
         hasGroup: true,
-        tryToLinkExisting: true,
         type: "mock-entity"
       },
       booleanField: {
@@ -203,7 +204,7 @@ describe("useWorkbookConverters", () => {
       objectArrayField: {
         dataType: "object[]",
         relationshipConfig: {
-          tryToLinkExisting: true,
+          linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
           type: "object-array",
           baseApiPath: "fake-api",
           hasGroup: true
@@ -256,7 +257,7 @@ describe("useWorkbookConverters", () => {
           address: {
             dataType: "object",
             relationshipConfig: {
-              tryToLinkExisting: true,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
               type: "address",
               baseApiPath: "fake-api",
               hasGroup: true
@@ -301,7 +302,7 @@ describe("useWorkbookConverters", () => {
         relationshipConfig: {
           baseApiPath: "fake-api",
           hasGroup: true,
-          tryToLinkExisting: true,
+          linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
           type: "object-field"
         }
       },
@@ -322,7 +323,7 @@ describe("useWorkbookConverters", () => {
         },
         dataType: "object",
         relationshipConfig: {
-          tryToLinkExisting: true,
+          linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
           type: "address",
           baseApiPath: "fake-api",
           hasGroup: true
@@ -396,13 +397,12 @@ describe("useWorkbookConverters", () => {
     expect(getFieldRelationshipConfig()).toEqual({
       type: "mock-entity",
       hasGroup: true,
-      tryToLinkExisting: true,
       baseApiPath: "fake-api"
     });
     expect(getFieldRelationshipConfig("objectField")).toEqual({
       type: "object-field",
       hasGroup: true,
-      tryToLinkExisting: true,
+      linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
       baseApiPath: "fake-api"
     });
     expect(getFieldRelationshipConfig("unknownField")).toEqual(undefined);
@@ -431,7 +431,7 @@ describe("useWorkbookConverters", () => {
       relationshipConfig: {
         baseApiPath: "fake-api",
         hasGroup: true,
-        tryToLinkExisting: true,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         type: "mock-resource"
       },
       objectAttr1: {
@@ -439,7 +439,7 @@ describe("useWorkbookConverters", () => {
         relationshipConfig: {
           baseApiPath: "fake-api",
           hasGroup: true,
-          tryToLinkExisting: true,
+          linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
           type: "object-field"
         }
       },
@@ -449,7 +449,7 @@ describe("useWorkbookConverters", () => {
           relationshipConfig: {
             baseApiPath: "fake-api",
             hasGroup: true,
-            tryToLinkExisting: true,
+            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
             type: "object-field"
           }
         }
@@ -468,7 +468,7 @@ describe("useWorkbookConverters", () => {
         age: 12,
         name: "ddd"
       },
-      group1: "group1",
+      group: "group1",
       relationships: {
         objectArray1: {
           data: [
@@ -512,7 +512,7 @@ describe("useWorkbookConverters", () => {
       relationshipConfig: {
         baseApiPath: "fake-api",
         hasGroup: true,
-        tryToLinkExisting: true,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         type: "mock-resource"
       },
       objectAttr1: {
@@ -520,7 +520,7 @@ describe("useWorkbookConverters", () => {
         relationshipConfig: {
           baseApiPath: "fake-api",
           hasGroup: true,
-          tryToLinkExisting: true,
+          linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
           type: "object-field"
         }
       },
@@ -530,7 +530,7 @@ describe("useWorkbookConverters", () => {
           relationshipConfig: {
             baseApiPath: "fake-api",
             hasGroup: true,
-            tryToLinkExisting: true,
+            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
             type: "object-field"
           }
         }
@@ -550,7 +550,7 @@ describe("useWorkbookConverters", () => {
         age: 12,
         name: "ddd"
       },
-      group1: "group1",
+      group: "group1",
       relationships: {
         objectAttr1: {
           data: {
@@ -593,7 +593,7 @@ describe("useWorkbookConverters", () => {
             addressLine1: "object 1 address line 1",
             city: "object 1 address city",
             relationshipConfig: {
-              tryToLinkExisting: true,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
               type: "address",
               baseApiPath: "fake-api",
               hasGroup: true
@@ -607,14 +607,14 @@ describe("useWorkbookConverters", () => {
           relationshipConfig: {
             baseApiPath: "fake-api",
             hasGroup: true,
-            tryToLinkExisting: true,
+            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
             type: "object-field"
           }
         },
         objectArrayField: [
           {
             relationshipConfig: {
-              tryToLinkExisting: true,
+              linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
               type: "object-array",
               baseApiPath: "fake-api",
               hasGroup: true
@@ -645,7 +645,7 @@ describe("useWorkbookConverters", () => {
           addressLine1: "object 1 address line 1",
           city: "object 1 address city",
           relationshipConfig: {
-            tryToLinkExisting: true,
+            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
             type: "address",
             baseApiPath: "fake-api",
             hasGroup: true
@@ -654,7 +654,7 @@ describe("useWorkbookConverters", () => {
         relationshipConfig: {
           baseApiPath: "fake-api",
           hasGroup: true,
-          tryToLinkExisting: true,
+          linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
           type: "object-field"
         }
       },
