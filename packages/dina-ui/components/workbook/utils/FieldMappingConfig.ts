@@ -101,6 +101,49 @@ const FieldMappingConfig: FieldMappingConfigType = {
             dwcGeoreferenceSources: { dataType: WorkbookDataTypeEnum.STRING },
             dwcGeoreferenceRemarks: { dataType: WorkbookDataTypeEnum.STRING }
           }
+        },
+        collectionMethod: {
+          dataType: WorkbookDataTypeEnum.OBJECT,
+          relationshipConfig: {
+            linkOrCreateSetting: LinkOrCreateSetting.LINK,
+            type: "collection-method",
+            hasGroup: true,
+            baseApiPath: "/collection-api"
+          },
+          attributes: {
+            name: { dataType: WorkbookDataTypeEnum.STRING }
+          }
+        },
+        protocol: {
+          dataType: WorkbookDataTypeEnum.OBJECT,
+          relationshipConfig: {
+            linkOrCreateSetting: LinkOrCreateSetting.LINK,
+            type: "protocol",
+            hasGroup: true,
+            baseApiPath: "/collection-api"
+          },
+          attributes: {
+            name: { dataType: WorkbookDataTypeEnum.STRING },
+            protocolType: { dataType: WorkbookDataTypeEnum.STRING }
+          }
+        },
+        collectors: {
+          dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+          relationshipConfig: {
+            hasGroup: false,
+            type: "person",
+            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+            baseApiPath: "agent-api"
+          },
+          attributes: {
+            displayName: { dataType: WorkbookDataTypeEnum.STRING },
+            email: { dataType: WorkbookDataTypeEnum.STRING },
+            givenNames: { dataType: WorkbookDataTypeEnum.STRING },
+            familyNames: { dataType: WorkbookDataTypeEnum.STRING },
+            aliases: { dataType: WorkbookDataTypeEnum.STRING },
+            webpage: { dataType: WorkbookDataTypeEnum.STRING },
+            remarks: { dataType: WorkbookDataTypeEnum.STRING }
+          }
         }
       }
     },
