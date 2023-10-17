@@ -47,7 +47,7 @@ export default function DataExportListPage() {
             {loading ? (
               <LoadingSpinner loading={loading} />
             ) : (
-              formatMessage({ id: "exportButtonText" })
+              formatMessage({ id: "field_downloadExport" })
             )}
           </Button>
         );
