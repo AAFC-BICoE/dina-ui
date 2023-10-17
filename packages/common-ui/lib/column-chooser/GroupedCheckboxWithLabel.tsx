@@ -115,7 +115,7 @@ export function useGroupedCheckboxWithLabel({
         if (typeof resource === "string") {
           resource = { id: resource, accessorKey: resource };
         } else {
-          resource.id = resource.accessorKey.split(".").at(-1) as string;
+          resource.id = resource?.accessorKey?.split(".").at(-1) as string;
         }
       }
       return resource;
