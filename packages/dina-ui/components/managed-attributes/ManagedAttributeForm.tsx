@@ -166,6 +166,9 @@ export function ManagedAttributeFormLayout({
             setType && setType(selectValue)
           }
         />
+        {(type === "DECIMAL" || type === "INTEGER") && (
+          <TextField className="col-md-6" name="unit" />
+        )}
       </div>
       {type === "PICKLIST" && (
         <div className="row">

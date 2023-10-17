@@ -151,6 +151,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataEntryLabel: "Data Entry",
   dataType: "Type: ",
   dataValue: "Value: ",
+  dataUnit: "Unit: ",
   dataset: "Dataset",
   datasetSearchTooltip: "For using a different Catalog of Life dataset.",
   decimalLatLong: "Decimal Lat/Long",
@@ -851,7 +852,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   typeAnythingOrPickAScientificName: "Type anything or pick a Scientific Name",
   typeNewTagOrSearchPreviousTags: "Type New Tag or Search Previous Tags",
   typeSpecimen: "Type Specimen",
-  unit: "Unit: ",
+  unit: "Unit",
   unsavedChanges: "Unsaved changes made",
   unsetAsDefault: "Unset as default",
   unsupportedFileTypeError:

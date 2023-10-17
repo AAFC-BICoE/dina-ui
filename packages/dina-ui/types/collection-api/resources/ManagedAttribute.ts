@@ -6,6 +6,7 @@ export interface ManagedAttributeAttributes<TComponent = string> {
   type: "managed-attribute";
   name: string;
   vocabularyElementType: string;
+  unit?: string;
   managedAttributeComponent?: TComponent;
   acceptedValues?: string[] | null;
   key: string;

@@ -1,4 +1,9 @@
-import { ColumnDefinition, descriptionCell, ListPageLayout } from "common-ui";
+import {
+  ColumnDefinition,
+  descriptionCell,
+  FieldHeader,
+  ListPageLayout
+} from "common-ui";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -125,6 +130,10 @@ function CollectionAttributeListView() {
       enableSorting: false
     },
     {
+      accessorKey: "unit",
+      header: () => <FieldHeader name={"unit"} />
+    },
+    {
       cell: ({
         row: {
           original: { acceptedValues }
@@ -133,6 +142,10 @@ function CollectionAttributeListView() {
       accessorKey: "acceptedValues"
     },
     descriptionCell("multilingualDescription"),
+    {
+      accessorKey: "group",
+      header: () => <FieldHeader name={"group"} />
+    },
     "createdBy"
   ];
 
@@ -150,7 +163,8 @@ function CollectionAttributeListView() {
         id="collections-module-managed-attribute-list"
         queryTableProps={{
           columns: COLLECTION_ATTRIBUTES_LIST_COLUMNS,
-          path: "collection-api/managed-attribute"
+          path: "collection-api/managed-attribute",
+          enableColumnChooser: true
         }}
       />
     </>
@@ -197,6 +211,10 @@ function ObjectStoreAttributeListView() {
         enableSorting: false
       },
       {
+        accessorKey: "unit",
+        header: () => <FieldHeader name={"unit"} />
+      },
+      {
         cell: ({
           row: {
             original: { acceptedValues }
@@ -204,7 +222,11 @@ function ObjectStoreAttributeListView() {
         }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
         accessorKey: "acceptedValues"
       },
-      "createdBy"
+      "createdBy",
+      {
+        accessorKey: "group",
+        header: () => <FieldHeader name={"group"} />
+      }
     ];
 
   return (
@@ -267,6 +289,10 @@ function TransactionAttributeListView() {
         enableSorting: false
       },
       {
+        accessorKey: "unit",
+        header: () => <FieldHeader name={"unit"} />
+      },
+      {
         cell: ({
           row: {
             original: { acceptedValues }
@@ -275,7 +301,11 @@ function TransactionAttributeListView() {
         accessorKey: "acceptedValues"
       },
       descriptionCell("multilingualDescription"),
-      "createdBy"
+      "createdBy",
+      {
+        accessorKey: "group",
+        header: () => <FieldHeader name={"group"} />
+      }
     ];
 
   return (

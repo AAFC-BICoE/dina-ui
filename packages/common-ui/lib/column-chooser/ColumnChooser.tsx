@@ -32,13 +32,14 @@ export function ColumnChooser(
 
 export interface UseColumnChooserProps {
   columns: any[];
-  indexName?: string;
+  /** A unique identifier to be used for local storage key */
+  localStorageKey?: string;
   hideExportButton?: boolean;
 }
 
 export function useColumnChooser({
   columns,
-  indexName,
+  localStorageKey,
   hideExportButton = false
 }: UseColumnChooserProps) {
   const { formatMessage, messages } = useIntl();
@@ -52,7 +53,7 @@ export function useColumnChooser({
   const { CustomMenu, checkedColumnIds } = useCustomMenu({
     columns,
     columnSearchMapping,
-    indexName,
+    localStorageKey,
     hideExportButton
   });
   const columnChooser = ColumnChooser(CustomMenu);
@@ -67,7 +68,7 @@ interface UseCustomMenuProps extends UseColumnChooserProps {
 function useCustomMenu({
   columns,
   columnSearchMapping,
-  indexName,
+  localStorageKey,
   hideExportButton
 }: UseCustomMenuProps) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
@@ -78,7 +79,7 @@ function useCustomMenu({
   const { groupedCheckBoxes, checkedColumnIds } = useGroupedCheckboxWithLabel({
     resources: searchedColumns,
     isField: true,
-    indexName
+    localStorageKey
   });
 
   const { apiClient, save } = useApiClient();
@@ -154,11 +155,12 @@ function useCustomMenu({
           className={props.className}
           aria-labelledby={props.labelledBy}
         >
-          <TextField
-            inputProps={{ autoFocus: true }}
+          <input
+            autoFocus={true}
             name="filterColumns"
             placeholder="Search"
-            onChangeExternal={(_form, _name, value) => {
+            onChange={(event) => {
+              const value = event.target.value;
               if (value === "" || !value) {
                 setSearchedColumns(columns);
               } else {

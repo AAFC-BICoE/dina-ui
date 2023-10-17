@@ -54,17 +54,17 @@ interface CheckboxResource {
 export interface UseGroupedCheckboxWithLabelProps {
   resources: CheckboxResource[];
   isField?: boolean;
-  indexName?: string;
+  localStorageKey?: string;
 }
 
 export function useGroupedCheckboxWithLabel({
   resources,
   isField,
-  indexName
+  localStorageKey
 }: UseGroupedCheckboxWithLabelProps) {
   const [list, setList] = useState<CheckboxResource[]>(getResourcesWithId());
   const [checkedColumnIds, setCheckedColumnIds] = useLocalStorage<string[]>(
-    `${indexName}_columnChooser`,
+    `${localStorageKey}_columnChooser`,
     list.map((resource) => resource.id ?? "")
   );
   const [isCheckAll, setIsCheckAll] = useState<boolean>(
@@ -112,7 +112,11 @@ export function useGroupedCheckboxWithLabel({
   function getResourcesWithId() {
     return resources.map((resource) => {
       if (!resource.id) {
-        resource.id = resource.accessorKey.split(".").at(-1) as string;
+        if (typeof resource === "string") {
+          resource = { id: resource, accessorKey: resource };
+        } else {
+          resource.id = resource.accessorKey.split(".").at(-1) as string;
+        }
       }
       return resource;
     });

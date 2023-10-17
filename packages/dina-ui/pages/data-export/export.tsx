@@ -111,7 +111,7 @@ export default function MaterialSampleExportPage<
 
   const { checkedColumnIds, CustomMenu } = useColumnChooser({
     columns,
-    indexName
+    localStorageKey: indexName
   });
 
   return (
