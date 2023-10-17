@@ -243,7 +243,8 @@ function ObjectStoreAttributeListView() {
         id="object-store-module-managed-attribute-list"
         queryTableProps={{
           columns: OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS,
-          path: "objectstore-api/managed-attribute"
+          path: "objectstore-api/managed-attribute",
+          enableColumnChooser: true
         }}
       />
     </>
@@ -322,7 +323,8 @@ function TransactionAttributeListView() {
         id="loan-transaction-module-managed-attribute-list"
         queryTableProps={{
           columns: TRANSACTION_ATTRIBUTES_LIST_COLUMNS,
-          path: "loan-transaction-api/managed-attribute"
+          path: "loan-transaction-api/managed-attribute",
+          enableColumnChooser: true
         }}
       />
     </>
