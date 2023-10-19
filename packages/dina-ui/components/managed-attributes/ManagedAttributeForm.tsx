@@ -116,7 +116,6 @@ export function ManagedAttributeForm({
       <ManagedAttributeFormLayout
         componentField={componentField}
         withGroup={withGroup}
-        apiBaseUrl={apiBaseUrl}
       />
     </DinaForm>
   );
@@ -125,13 +124,11 @@ export function ManagedAttributeForm({
 export interface ManagedAttributeFormLayoutLayoutProps {
   componentField?: JSX.Element;
   withGroup?: boolean;
-  apiBaseUrl: string;
 }
 
 export function ManagedAttributeFormLayout({
   componentField,
-  withGroup = true,
-  apiBaseUrl
+  withGroup = true
 }: ManagedAttributeFormLayoutLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
@@ -177,7 +174,7 @@ export function ManagedAttributeFormLayout({
             setType && setType(selectValue)
           }
         />
-        {apiBaseUrl === "/collection-api" &&
+        {router.route.includes("collection") &&
           (type === "DECIMAL" || type === "INTEGER") && (
             <TextField className="col-md-6" name="unit" />
           )}
