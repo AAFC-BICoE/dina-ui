@@ -333,9 +333,12 @@ export function QueryTable<TData extends KitsuResource>({
             />
           </span>
         )}
-        <div className="d-flex ms-auto">
-          {topRightCorner}
-          {enableColumnChooser && columnChooser}
+        <div className="ms-auto">
+          <div>
+            {enableColumnChooser && columnChooser}
+            {topRightCorner}
+          </div>
+
           {resolvedReactTableProps?.enableSorting !== false && (
             <Tooltip id="queryTableMultiSortExplanation" placement="left" />
           )}

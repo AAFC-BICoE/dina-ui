@@ -211,10 +211,6 @@ function ObjectStoreAttributeListView() {
         enableSorting: false
       },
       {
-        accessorKey: "unit",
-        header: () => <FieldHeader name={"unit"} />
-      },
-      {
         cell: ({
           row: {
             original: { acceptedValues }
@@ -288,10 +284,6 @@ function TransactionAttributeListView() {
         // The API sorts alphabetically by key, not displayed intl-ized value,
         // so the displayed order wouldn't make sense.
         enableSorting: false
-      },
-      {
-        accessorKey: "unit",
-        header: () => <FieldHeader name={"unit"} />
       },
       {
         cell: ({

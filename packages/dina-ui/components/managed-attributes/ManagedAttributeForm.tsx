@@ -79,6 +79,14 @@ export function ManagedAttributeForm({
       submittedValues.acceptedValues = null;
     }
 
+    // Don't save unit if type is not INTEGER/DECIMAL
+    if (
+      submittedValues.vocabularyElementType !== "INTEGER" &&
+      submittedValues.vocabularyElementType !== "DECIMAL"
+    ) {
+      delete submittedValues.unit;
+    }
+
     // Convert the editable format to the stored format:
     submittedValues.multilingualDescription = {
       descriptions: toPairs(submittedValues.multilingualDescription).map(
@@ -108,6 +116,7 @@ export function ManagedAttributeForm({
       <ManagedAttributeFormLayout
         componentField={componentField}
         withGroup={withGroup}
+        apiBaseUrl={apiBaseUrl}
       />
     </DinaForm>
   );
@@ -116,11 +125,13 @@ export function ManagedAttributeForm({
 export interface ManagedAttributeFormLayoutLayoutProps {
   componentField?: JSX.Element;
   withGroup?: boolean;
+  apiBaseUrl: string;
 }
 
 export function ManagedAttributeFormLayout({
   componentField,
-  withGroup = true
+  withGroup = true,
+  apiBaseUrl
 }: ManagedAttributeFormLayoutLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
@@ -166,9 +177,10 @@ export function ManagedAttributeFormLayout({
             setType && setType(selectValue)
           }
         />
-        {(type === "DECIMAL" || type === "INTEGER") && (
-          <TextField className="col-md-6" name="unit" />
-        )}
+        {apiBaseUrl === "/collection-api" &&
+          (type === "DECIMAL" || type === "INTEGER") && (
+            <TextField className="col-md-6" name="unit" />
+          )}
       </div>
       {type === "PICKLIST" && (
         <div className="row">
