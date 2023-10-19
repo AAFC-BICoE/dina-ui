@@ -82,3 +82,13 @@ route /api/dina-export-api/* {
     uri replace /api/dina-export-api /api/v1
     reverse_proxy {$REPORT_LABEL_API_ADDRESS}
 }
+
+route /api/dina-export-api/export-request {
+	uri replace /api/dina-export-api /datatables/export
+	reverse_proxy {$EXPORT_API_ADDRESS}
+}
+
+route /api/dina-export-api/file/*?type=DATA_EXPORT {
+	uri replace /api/dina-export-api /datatables/export
+	reverse_proxy {$EXPORT_API_ADDRESS}
+}

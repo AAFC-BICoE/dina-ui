@@ -990,11 +990,32 @@ export function CollectingEventFormLayout({
           ) : null}
         </div>
         <div className="col-md-6">
-          {!readOnly
-            ? geographicPlaceNameSourceComponent
-            : initialValues?.geographicPlaceNameSource // if read-only, check for managed attributes
-            ? geographicPlaceNameSourceComponent
-            : null}
+          <div className="row">
+            <div className="col">
+              {!readOnly
+                ? geographicPlaceNameSourceComponent
+                : initialValues?.geographicPlaceNameSource // if read-only, check for managed attributes
+                ? geographicPlaceNameSourceComponent
+                : null}
+            </div>
+          </div>
+          <div className="row">
+            <div className="col">
+              <FieldSet
+                legend={<DinaMessage id="geoReferencingLegend" />}
+                className="non-strip"
+                componentName={COLLECTING_EVENT_COMPONENT_NAME}
+              >
+                <div
+                  style={{
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    maxHeight: 520
+                  }}
+                />
+              </FieldSet>
+            </div>
+          </div>
         </div>
       </div>
       <div>
