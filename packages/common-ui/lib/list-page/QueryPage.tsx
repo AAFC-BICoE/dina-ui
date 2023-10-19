@@ -771,7 +771,6 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
-
   const { columnChooser, checkedColumnIds } = useColumnChooser({
     columns: columnsResults,
     indexName,
@@ -823,6 +822,7 @@ export function QueryPage<TData extends KitsuResource>({
                       pathname={dataExportPath}
                       totalRecords={totalRecords}
                       query={elasticSearchQuery}
+                      indexName={indexName}
                     />
                   )}
                   {bulkSplitPath && (

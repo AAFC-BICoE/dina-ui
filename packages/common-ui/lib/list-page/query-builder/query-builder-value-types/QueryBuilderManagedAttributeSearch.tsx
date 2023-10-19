@@ -131,7 +131,6 @@ export default function QueryRowManagedAttributeSearch({
         return [
           "exactMatch",
           "wildcard",
-          "partialMatch",
           "startsWith",
           "notEquals",
           "empty",

@@ -6,21 +6,16 @@ import {
   dateCell,
   stringArrayCell,
   CommonMessage,
-  DATA_EXPORT_SEARCH_RESULTS_KEY,
-  useApiClient,
-  ErrorViewer,
-  BackToListButton,
   ButtonBar,
   BackButton
 } from "packages/common-ui/lib";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import Link from "next/link";
 import { KitsuResource } from "kitsu";
 import { Footer, Head, Nav } from "packages/dina-ui/components";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
-import { useLocalStorage } from "@rehooks/local-storage";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export default function MaterialSampleExportPage<
@@ -29,6 +24,7 @@ export default function MaterialSampleExportPage<
   const router = useRouter();
   const totalRecords = parseInt(router.query.totalRecords as string, 10);
   const hideTable: boolean | undefined = !!router.query.hideTable;
+  const indexName = String(router.query.indexName);
 
   const { formatMessage, formatNumber } = useIntl();
 
@@ -113,9 +109,9 @@ export default function MaterialSampleExportPage<
     }
   ];
 
-  const { columnChooser, checkedColumnIds } = useColumnChooser({
+  const { checkedColumnIds, CustomMenu } = useColumnChooser({
     columns,
-    indexName: "material_sample_export"
+    indexName
   });
 
   return (
@@ -130,13 +126,18 @@ export default function MaterialSampleExportPage<
             reloadLastSearch={true}
             byPassView={true}
           />
+          <Link href={`/data-export/list`}>
+            <a className="btn btn-primary">
+              <DinaMessage id="dataExports" />
+            </a>
+          </Link>
         </ButtonBar>
         <div className="ms-2">
           <CommonMessage
             id="tableTotalCount"
             values={{ totalCount: formatNumber(totalRecords) }}
           />
-          {columnChooser}
+          <CustomMenu />
         </div>
 
         {!hideTable && (

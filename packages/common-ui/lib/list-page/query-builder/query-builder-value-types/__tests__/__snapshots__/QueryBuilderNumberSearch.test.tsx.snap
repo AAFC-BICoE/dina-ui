@@ -416,38 +416,6 @@ Object {
 }
 `;
 
-exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Partial Match operation Normal field 1`] = `
-Object {
-  "term": Object {
-    "data.attributes.numberField": "123",
-  },
-}
-`;
-
-exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Partial Match operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "term": Object {
-              "includes.name": "123",
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collection",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function lessThanOrEqualTo operation Normal field 1`] = `
 Object {
   "range": Object {

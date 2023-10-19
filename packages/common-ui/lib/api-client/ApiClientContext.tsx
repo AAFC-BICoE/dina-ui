@@ -24,12 +24,12 @@ import {
 import DataLoader from "dataloader";
 import { ResponseType } from "axios";
 
-export interface BulkGetOptions<TReturnNull extends boolean = false> {
+export interface BulkGetOptions {
   apiBaseUrl?: string;
   joinSpecs?: ClientSideJoinSpec[];
 
   /** Return null for missing resource instead of throwing an Error. */
-  returnNullForMissingResource?: TReturnNull;
+  returnNullForMissingResource?: boolean;
 }
 
 export type BulkGetOperation =
@@ -67,7 +67,7 @@ export interface ApiClientI {
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
   bulkGet: <T extends KitsuResource, TReturnNull extends boolean = false>(
     paths: readonly string[],
-    options?: BulkGetOptions<TReturnNull>
+    options?: BulkGetOptions
   ) => Promise<
     (TReturnNull extends true
       ? PersistedResource<T> | null
@@ -276,7 +276,7 @@ export class ApiClientImpl implements ApiClientI {
       apiBaseUrl = "",
       joinSpecs = [],
       returnNullForMissingResource
-    }: BulkGetOptions<TReturnNull> = {}
+    }: BulkGetOptions = {}
   ) {
     // Don't do an empty operations request:
     if (!paths.length) {
