@@ -10,6 +10,7 @@ import {
   useApiClient,
   useModal
 } from "..";
+import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -140,9 +141,21 @@ export function DataExportButton({
     <FormikButton
       buttonProps={(_ctx) => ({ disabled: totalRecords === 0 })}
       className="btn btn-primary ms-2 bulk-edit-button"
-      onClick={async (_values: BulkSelectableFormValues) => {
-        writeStorage<any>(DATA_EXPORT_SEARCH_RESULTS_KEY, query);
-        writeStorage<number>(DATA_EXPORT_TOTAL_RECORDS_KEY, totalRecords);
+      onClick={async (values: BulkSelectableFormValues) => {
+        const selectedResourceIds: string[] = values.itemIdsToSelect
+          ? Object.keys(values.itemIdsToSelect)
+          : [];
+        const selectedIdsQuery = uuidQuery(selectedResourceIds);
+        writeStorage<any>(
+          DATA_EXPORT_SEARCH_RESULTS_KEY,
+          selectedResourceIds.length > 0 ? selectedIdsQuery : query
+        );
+        writeStorage<number>(
+          DATA_EXPORT_TOTAL_RECORDS_KEY,
+          selectedResourceIds.length > 0
+            ? selectedResourceIds.length
+            : totalRecords
+        );
         await router.push({
           pathname,
           query: { hideTable: true, indexName }
