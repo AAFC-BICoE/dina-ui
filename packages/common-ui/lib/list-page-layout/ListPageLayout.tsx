@@ -149,7 +149,6 @@ export function ListPageLayout<TData extends KitsuResource>({
       filter={filterParam}
       onPageSizeChange={(newSize) => setDefaultPageSize(newSize)}
       onSortedChange={(newSort) => setStoredDefaultSort(newSort)}
-      {...resolvedQueryTableProps}
       topRightCorner={
         <div className="d-flex gap-3">
           {bulkEditPath && <BulkEditButton pathname={bulkEditPath} />}
@@ -158,6 +157,7 @@ export function ListPageLayout<TData extends KitsuResource>({
           )}
         </div>
       }
+      {...resolvedQueryTableProps}
       columns={columns}
       onSuccess={onSuccess}
     />
