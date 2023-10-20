@@ -1,3 +1,4 @@
+import { InputResource, KitsuResource } from "kitsu";
 import { WorkbookDataTypeEnum } from "./WorkbookDataTypeEnum";
 
 export enum LinkOrCreateSetting {
@@ -72,3 +73,14 @@ export type FieldConfigType =
   | VocabularyField
   | ManagedAttributeField
   | ObjectField;
+
+export type WorkbookResourceType = InputResource<
+  KitsuResource & {
+    group: string;
+    relationships: {
+      [key: string]: {
+        data: { id: string; type: string } | { id: string; type: string }[];
+      };
+    };
+  }
+>;

@@ -899,5 +899,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   yearMonthDay: "Year-Month-Day",
   yearMonthDayTime: "Year-Month-Day-Time",
   field_splitConfiguration: "Split Configuration",
-  dataExports: "Data Exports"
+  dataExports: "Data Exports",
+  pause: "Pause",
+  resume: "Resume",
+  leaveSaveWorkbookWarning: "Are you sure you want to leave this page?",
+  confirmToResumeSavingWorkbook:
+    "There is an un-finished workbook upload, do you want to continue?",
+  uploadWorkbookIsDone: 'The workbook is uploaded, click "OK" to finish it'
 };

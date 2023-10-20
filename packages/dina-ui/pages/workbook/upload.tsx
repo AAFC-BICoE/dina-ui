@@ -1,23 +1,22 @@
-import { writeStorage } from "@rehooks/local-storage";
 import { ApiClientContext, LoadingSpinner } from "common-ui";
-import { PersistedResource } from "kitsu";
-import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useContext, useState } from "react";
+import { SaveWorkbookProgress } from "packages/dina-ui/components/workbook/SaveWorkbookProgress";
+import { useContext, useState, useEffect } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import {
   WorkbookColumnMapping,
   WorkbookJSON,
-  WorkbookUpload
+  WorkbookUpload,
+  useWorkbookContext
 } from "../../components";
 import { IFileWithMeta } from "../../components/object-store";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { BULK_EDIT_RESULT_IDS_KEY } from "../collection/material-sample/bulk-edit";
 
-export function UploadWorkbookPage({ router }: WithRouterProps) {
+export function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
+  const { isThereAnActiveUpload, cleanUp, progress, workbookResources } =
+    useWorkbookContext();
 
   const [spreadsheetData, setSpreadsheetData] = useState<WorkbookJSON | null>(
     null
@@ -26,6 +25,12 @@ export function UploadWorkbookPage({ router }: WithRouterProps) {
   const [failed, setFailed] = useState<boolean>(false);
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (progress === workbookResources.length) {
+      cleanUp();
+    }
+  }, []);
 
   /**
    * Using the object store backend that takes in a spreadsheet and returns a JSON format
@@ -45,6 +50,7 @@ export function UploadWorkbookPage({ router }: WithRouterProps) {
       .post("/objectstore-api/conversion/workbook", formData)
       .then((response) => {
         setSpreadsheetData(response.data);
+        cleanUp();
         setLoading(false);
         setFailed(false);
       })
@@ -55,24 +61,16 @@ export function UploadWorkbookPage({ router }: WithRouterProps) {
       });
   }
 
+  function onWorkbookSaved() {
+    cleanUp();
+    backToUpload();
+  }
+
   function backToUpload() {
     setSpreadsheetData(null);
     setFailed(false);
     setLoading(false);
-  }
-
-  async function moveToResultPage(
-    samples: PersistedResource<MaterialSample>[]
-  ) {
-    writeStorage(
-      BULK_EDIT_RESULT_IDS_KEY,
-      samples.map((it) => it.id)
-    );
-
-    await router.push({
-      pathname: "/collection/material-sample/bulk-result",
-      query: { actionType: "created" }
-    });
+    setPerformSave(false);
   }
 
   const failedMessage = failed ? (
@@ -81,47 +79,35 @@ export function UploadWorkbookPage({ router }: WithRouterProps) {
     </div>
   ) : undefined;
 
-  const buttonBar = !!spreadsheetData ? (
-    <>
-      <button onClick={backToUpload} className="btn btn-secondary">
-        {performSave ? (
-          <>
-            <Spinner
-              as="span"
-              animation="border"
-              size="sm"
-              role="status"
-              aria-hidden="true"
-            />
-            <span className="visually-hidden">Loading...</span>
-          </>
-        ) : (
+  const buttonBar =
+    !isThereAnActiveUpload() && !!spreadsheetData ? (
+      <>
+        <button onClick={() => backToUpload()} className="btn btn-secondary">
           <DinaMessage id="cancelButtonText" />
-        )}
-      </button>
-      <Button
-        variant={"primary"}
-        className="ms-auto"
-        onClick={() => setPerformSave(true)}
-        style={{ width: "10rem" }}
-      >
-        {performSave ? (
-          <>
-            <Spinner
-              as="span"
-              animation="border"
-              size="sm"
-              role="status"
-              aria-hidden="true"
-            />
-            <span className="visually-hidden">Loading...</span>
-          </>
-        ) : (
-          <DinaMessage id="save" />
-        )}
-      </Button>
-    </>
-  ) : undefined;
+        </button>
+        <Button
+          variant={"primary"}
+          className="ms-auto"
+          onClick={() => setPerformSave(true)}
+          style={{ width: "10rem" }}
+        >
+          {performSave ? (
+            <>
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />
+              <span className="visually-hidden">Loading...</span>
+            </>
+          ) : (
+            <DinaMessage id="save" />
+          )}
+        </Button>
+      </>
+    ) : undefined;
 
   return (
     <PageLayout titleId="workbookGroupUploadTitle" buttonBarContent={buttonBar}>
@@ -129,7 +115,10 @@ export function UploadWorkbookPage({ router }: WithRouterProps) {
         <LoadingSpinner loading={true} />
       ) : (
         <>
-          {spreadsheetData ? (
+          {isThereAnActiveUpload() ? (
+            // If there is an unfinished upload
+            <SaveWorkbookProgress onWorkbookSaved={onWorkbookSaved} />
+          ) : spreadsheetData ? (
             <WorkbookColumnMapping
               spreadsheetData={spreadsheetData}
               performSave={performSave}

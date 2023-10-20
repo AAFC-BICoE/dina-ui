@@ -8,14 +8,14 @@ import {
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
-import { startCase, chain } from "lodash";
+import { chain, startCase } from "lodash";
 import { Ref, useMemo, useRef, useState } from "react";
 import Table from "react-bootstrap/Table";
 import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { WorkbookDataTypeEnum } from "./";
+import { WorkbookDataTypeEnum, useWorkbookContext } from "./";
 import { WorkbookDisplay } from "./WorkbookDisplay";
 import { WorkbookJSON } from "./types/Workbook";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
@@ -55,7 +55,7 @@ export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const { save } = useApiClient();
+  const { startSavingWorkbook } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
   const { formatMessage } = useDinaIntl();
@@ -74,6 +74,7 @@ export function WorkbookColumnMapping({
   const [fieldHeaderPair, setFieldHeaderPair] = useState(
     {} as { [field: string]: string }
   );
+
   const {
     convertWorkbook,
     flattenedConfig,
@@ -244,26 +245,10 @@ export function WorkbookColumnMapping({
       sheet,
       submittedValues.fieldMap
     );
-    const group = submittedValues.group;
-    const resources = convertWorkbook(workbookData, submittedValues.group);
     const { type, baseApiPath } = getFieldRelationshipConfig();
-
-    if (resources.length > 0) {
-      for (const resource of resources) {
-        for (const key of Object.keys(resource)) {
-          await linkRelationshipAttribute(resource, key, group);
-        }
-      }
-      await save(
-        resources.map(
-          (item) =>
-            ({
-              resource: item,
-              type
-            } as any)
-        ),
-        { apiBaseUrl: baseApiPath }
-      );
+    const resources = convertWorkbook(workbookData, submittedValues.group);
+    if (resources?.length > 0) {
+      startSavingWorkbook(resources, submittedValues.group, type, baseApiPath);
     }
   }
 

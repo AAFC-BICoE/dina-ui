@@ -79,29 +79,42 @@ const FieldMappingConfig: FieldMappingConfigType = {
             },
             dwcGeoreferencedDate: { dataType: WorkbookDataTypeEnum.DATE },
             georeferencedBy: {
-              dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
-              relationshipConfig: {
-                hasGroup: false,
-                type: "person",
-                linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-                baseApiPath: "agent-api"
-              },
-              attributes: {
-                displayName: { dataType: WorkbookDataTypeEnum.STRING },
-                email: { dataType: WorkbookDataTypeEnum.STRING },
-                givenNames: { dataType: WorkbookDataTypeEnum.STRING },
-                familyNames: { dataType: WorkbookDataTypeEnum.STRING },
-                aliases: { dataType: WorkbookDataTypeEnum.STRING },
-                webpage: { dataType: WorkbookDataTypeEnum.STRING },
-                remarks: { dataType: WorkbookDataTypeEnum.STRING }
-              }
+              dataType: WorkbookDataTypeEnum.STRING_ARRAY
             },
             literalGeoreferencedBy: { dataType: WorkbookDataTypeEnum.STRING },
             dwcGeoreferenceProtocol: { dataType: WorkbookDataTypeEnum.STRING },
             dwcGeoreferenceSources: { dataType: WorkbookDataTypeEnum.STRING },
-            dwcGeoreferenceRemarks: { dataType: WorkbookDataTypeEnum.STRING }
+            dwcGeoreferenceRemarks: { dataType: WorkbookDataTypeEnum.STRING },
+            dwcGeodeticDatum: { dataType: WorkbookDataTypeEnum.STRING }
           }
         },
+        dwcVerbatimCoordinates: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcRecordedBy: { dataType: WorkbookDataTypeEnum.STRING },
+        startEventDateTime: { dataType: WorkbookDataTypeEnum.STRING },
+        endEventDateTime: { dataType: WorkbookDataTypeEnum.STRING },
+        verbatimEventDateTime: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcVerbatimLocality: { dataType: WorkbookDataTypeEnum.STRING },
+        host: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcVerbatimLatitude: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcVerbatimLongitude: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcVerbatimCoordinateSystem: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcVerbatimSRS: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcVerbatimElevation: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcVerbatimDepth: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcCountry: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcCountryCode: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcStateProvince: { dataType: WorkbookDataTypeEnum.STRING },
+        habitat: { dataType: WorkbookDataTypeEnum.STRING },
+        dwcMinimumElevationInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
+        dwcMinimumDepthInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
+        dwcMaximumElevationInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
+        dwcMaximumDepthInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
+        substrate: { dataType: WorkbookDataTypeEnum.STRING },
+        remarks: { dataType: WorkbookDataTypeEnum.STRING },
+        publiclyReleasable: { dataType: WorkbookDataTypeEnum.BOOLEAN },
+        notPubliclyReleasableReason: { dataType: WorkbookDataTypeEnum.STRING },
+        tags: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
+        geographicPlaceNameSource: { dataType: WorkbookDataTypeEnum.STRING },
         collectionMethod: {
           dataType: WorkbookDataTypeEnum.OBJECT,
           relationshipConfig: {
