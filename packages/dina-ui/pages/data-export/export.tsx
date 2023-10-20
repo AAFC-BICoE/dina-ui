@@ -7,7 +7,8 @@ import {
   stringArrayCell,
   CommonMessage,
   ButtonBar,
-  BackButton
+  BackButton,
+  DATA_EXPORT_TOTAL_RECORDS_KEY
 } from "packages/common-ui/lib";
 import React from "react";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
@@ -17,12 +18,13 @@ import { Footer, Head, Nav } from "packages/dina-ui/components";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 export default function MaterialSampleExportPage<
   TData extends KitsuResource
 >() {
   const router = useRouter();
-  const totalRecords = parseInt(router.query.totalRecords as string, 10);
+  const [totalRecords] = useLocalStorage<number>(DATA_EXPORT_TOTAL_RECORDS_KEY);
   const hideTable: boolean | undefined = !!router.query.hideTable;
   const indexName = String(router.query.indexName);
 
@@ -109,7 +111,7 @@ export default function MaterialSampleExportPage<
     }
   ];
 
-  const { checkedColumnIds, CustomMenu } = useColumnChooser({
+  const { checkedColumnIds, CustomMenu, dataExportError } = useColumnChooser({
     columns,
     indexName
   });
@@ -133,9 +135,10 @@ export default function MaterialSampleExportPage<
           </Link>
         </ButtonBar>
         <div className="ms-2">
+          {typeof dataExportError !== "undefined" && dataExportError}
           <CommonMessage
             id="tableTotalCount"
-            values={{ totalCount: formatNumber(totalRecords) }}
+            values={{ totalCount: formatNumber(totalRecords ?? 0) }}
           />
           <CustomMenu />
         </div>

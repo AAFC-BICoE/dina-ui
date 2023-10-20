@@ -126,6 +126,7 @@ export interface DataExportButtonProps {
  * This constant is available to use for setting and retrieving the value.
  */
 export const DATA_EXPORT_SEARCH_RESULTS_KEY = "dataExportSearchResults";
+export const DATA_EXPORT_TOTAL_RECORDS_KEY = "dataExportTotalRecords";
 
 export function DataExportButton({
   pathname,
@@ -141,9 +142,10 @@ export function DataExportButton({
       className="btn btn-primary ms-2 bulk-edit-button"
       onClick={async (_values: BulkSelectableFormValues) => {
         writeStorage<any>(DATA_EXPORT_SEARCH_RESULTS_KEY, query);
+        writeStorage<number>(DATA_EXPORT_TOTAL_RECORDS_KEY, totalRecords);
         await router.push({
           pathname,
-          query: { totalRecords, hideTable: true, indexName }
+          query: { hideTable: true, indexName }
         });
       }}
     >

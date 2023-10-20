@@ -71,6 +71,9 @@ export function useGroupedCheckboxWithLabel({
     checkedColumnIds.filter((id) => id !== "selectColumn").length ===
       list.filter((resource) => resource.id !== "selectColumn").length
   );
+  useEffect(() => {
+    setList(getResourcesWithId());
+  }, [resources]);
 
   const handleSelectAll = (_e) => {
     setIsCheckAll(!isCheckAll);
