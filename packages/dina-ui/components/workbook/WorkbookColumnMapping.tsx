@@ -79,7 +79,6 @@ export function WorkbookColumnMapping({
     convertWorkbook,
     flattenedConfig,
     getPathOfField,
-    linkRelationshipAttribute,
     getFieldRelationshipConfig
   } = useWorkbookConverter(
     FieldMappingConfig,

@@ -84,10 +84,10 @@ export function WorkbookUploadContextProvider({
     setWorkbookResourcesInLocalStorage(newWorkbookResources);
     setIsSaving(true);
     setProgress(0);
-    setWorkbookResources(newWorkbookResources);
     setGroup(newGroup);
     setType(newType);
     setApiBaseUrl(newApiBaseUrl);
+    setWorkbookResources(newWorkbookResources);
   };
 
   return (

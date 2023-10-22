@@ -89,11 +89,11 @@ export function SaveWorkbookProgress({
   }, [workbookResources]);
 
   useEffect(() => {
-    saveWorkbook();
+    (() => saveWorkbook())();
   }, []);
 
-  function saveWorkbook() {
-    async function asyncSave(chunkedResources) {
+  async function saveWorkbook() {
+    async function saveChunkOfWorkbook(chunkedResources) {
       for (const resource of chunkedResources) {
         for (const key of Object.keys(resource)) {
           if (resource[key] !== undefined && resource[key] !== null) {
@@ -101,7 +101,6 @@ export function SaveWorkbookProgress({
           }
         }
       }
-      await save(chunkedResources, { apiBaseUrl });
       await save(
         chunkedResources.map(
           (item) =>
@@ -123,10 +122,10 @@ export function SaveWorkbookProgress({
       i += chunkSize
     ) {
       const chunk = workbookResources.slice(i, i + chunkSize);
-      asyncSave(chunk);
+      await saveChunkOfWorkbook(chunk);
       setNow(i + 1);
       increasProgress(i + 1);
-      delay(200); // Yield to render the progress bar
+      await delay(20); // Yield to render the progress bar
     }
     setNow(workbookResources.length);
     increasProgress(workbookResources.length);
