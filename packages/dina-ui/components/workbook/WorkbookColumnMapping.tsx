@@ -247,7 +247,12 @@ export function WorkbookColumnMapping({
     const { type, baseApiPath } = getFieldRelationshipConfig();
     const resources = convertWorkbook(workbookData, submittedValues.group);
     if (resources?.length > 0) {
-      startSavingWorkbook(resources, submittedValues.group, type, baseApiPath);
+      await startSavingWorkbook(
+        resources,
+        submittedValues.group,
+        type,
+        baseApiPath
+      );
     }
   }
 
