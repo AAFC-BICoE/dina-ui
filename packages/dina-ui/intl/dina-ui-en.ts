@@ -905,7 +905,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   pause: "Pause",
   resume: "Resume",
   leaveSaveWorkbookWarning: "Are you sure you want to leave this page?",
-  confirmToResumeSavingWorkbook:
-    "There is an un-finished workbook upload, do you want to continue?",
-  uploadWorkbookIsDone: 'The workbook is uploaded, click "OK" to finish it'
+  confirmToResumeSavingWorkbook: "Do you want to continue saving workbook?",
+  uploadWorkbookIsDone: 'The workbook is saved, click "OK" to finish it'
 };

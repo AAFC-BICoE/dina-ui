@@ -15,8 +15,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
-  const { isThereAnActiveUpload, cleanUp, progress, workbookResources } =
-    useWorkbookContext();
+  const { workbookResources, status, reset } = useWorkbookContext();
 
   const [spreadsheetData, setSpreadsheetData] = useState<WorkbookJSON | null>(
     null
@@ -25,12 +24,6 @@ export function UploadWorkbookPage() {
   const [failed, setFailed] = useState<boolean>(false);
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (progress === workbookResources.length) {
-      cleanUp();
-    }
-  }, []);
 
   /**
    * Using the object store backend that takes in a spreadsheet and returns a JSON format
@@ -50,7 +43,7 @@ export function UploadWorkbookPage() {
       .post("/objectstore-api/conversion/workbook", formData)
       .then((response) => {
         setSpreadsheetData(response.data);
-        cleanUp();
+        reset();
         setLoading(false);
         setFailed(false);
       })
@@ -62,8 +55,8 @@ export function UploadWorkbookPage() {
   }
 
   function onWorkbookSaved() {
-    cleanUp();
     backToUpload();
+    reset();
   }
 
   function backToUpload() {
@@ -78,6 +71,15 @@ export function UploadWorkbookPage() {
       <DinaMessage id="workbookUploadFailure" />
     </div>
   ) : undefined;
+
+  function isThereAnActiveUpload(): boolean {
+    return (
+      workbookResources &&
+      workbookResources.length > 0 &&
+      status !== "CENCELED" &&
+      status !== "FINISHED"
+    );
+  }
 
   const buttonBar =
     !isThereAnActiveUpload() && !!spreadsheetData ? (
@@ -117,7 +119,10 @@ export function UploadWorkbookPage() {
         <>
           {isThereAnActiveUpload() ? (
             // If there is an unfinished upload
-            <SaveWorkbookProgress onWorkbookSaved={onWorkbookSaved} />
+            <SaveWorkbookProgress
+              onWorkbookSaved={onWorkbookSaved}
+              onWorkbookCanceled={backToUpload}
+            />
           ) : spreadsheetData ? (
             <WorkbookColumnMapping
               spreadsheetData={spreadsheetData}

@@ -5,32 +5,37 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { useIntl } from "react-intl";
-import { useWorkbookContext } from "./WorkbookProvider";
+import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
 
-const delay = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export interface SaveWorkbookProgressProps {
   onWorkbookSaved: () => void;
+  onWorkbookCanceled: () => void;
 }
 
 export function SaveWorkbookProgress({
-  onWorkbookSaved
+  onWorkbookSaved,
+  onWorkbookCanceled
 }: SaveWorkbookProgressProps) {
   const {
-    isSaving,
-    progress,
     workbookResources,
-    cleanUp,
-    increasProgress,
+    progress,
     group,
     type,
-    apiBaseUrl
+    apiBaseUrl,
+    status,
+    saveProgress,
+    pauseSavingWorkbook,
+    resumeSavingWorkbook,
+    finishSavingWorkbook,
+    cancelSavingWorkbook
   } = useWorkbookContext();
 
   const { save } = useApiClient();
-  const isSavingRef = useRef(isSaving);
+  const statusRef = useRef<WorkBookSavingStatus>(status ?? "CENCELED");
   const router = useRouter();
   const { formatMessage } = useIntl();
   const warningText = formatMessage({ id: "leaveSaveWorkbookWarning" });
@@ -39,14 +44,14 @@ export function SaveWorkbookProgress({
 
   const isSafeToLeave = () => {
     return (
-      !isSavingRef.current ||
+      !statusRef.current ||
       workbookResources.length === 0 ||
       now === workbookResources.length
     );
   };
 
   const finishUpload = () => {
-    cleanUp();
+    finishSavingWorkbook();
     onWorkbookSaved?.();
   };
 
@@ -74,7 +79,8 @@ export function SaveWorkbookProgress({
         return;
       }
       if (window.confirm(warningText)) {
-        isSavingRef.current = false;
+        statusRef.current = "PAUSED";
+        pauseSavingWorkbook();
         return;
       }
       router.events.emit("routeChangeError");
@@ -117,19 +123,26 @@ export function SaveWorkbookProgress({
     // Save very 5 records once.
     const chunkSize = 5;
     for (
-      let i = 0;
-      i < workbookResources.length && isSavingRef.current;
+      let i = now;
+      i < workbookResources.length && statusRef.current === "SAVING";
       i += chunkSize
     ) {
       const chunk = workbookResources.slice(i, i + chunkSize);
       await saveChunkOfWorkbook(chunk);
       setNow(i + 1);
-      increasProgress(i + 1);
-      await delay(20); // Yield to render the progress bar
+      saveProgress(i + 1);
+      await delay(0); // Yield to render the progress bar
     }
-    setNow(workbookResources.length);
-    increasProgress(workbookResources.length);
-    isSavingRef.current = false;
+    if (statusRef.current === "SAVING") {
+      statusRef.current = "FINISHED";
+      setNow(workbookResources.length);
+      saveProgress(workbookResources.length);
+    }
+  }
+
+  function pause() {
+    statusRef.current = "PAUSED";
+    pauseSavingWorkbook();
   }
 
   return (
@@ -140,17 +153,26 @@ export function SaveWorkbookProgress({
         now={now}
         label={`${now}/${workbookResources.length}`}
       />
-      {workbookResources.length > 0 && now === workbookResources.length && (
+      {statusRef.current === "SAVING" && (
         <div className="mt-3 text-center">
-          <p>
-            <DinaMessage id="uploadWorkbookIsDone" />
-          </p>
-          <Button className="mt-1 mb-2" onClick={() => finishUpload()}>
-            OK
+          <Button className="mt-1 mb-2" onClick={() => pause()}>
+            <DinaMessage id="pause" />
           </Button>
         </div>
       )}
-      {isSavingRef.current === false && now < workbookResources.length && (
+      {statusRef.current === "FINISHED" &&
+        workbookResources.length > 0 &&
+        now >= workbookResources.length && (
+          <div className="mt-3 text-center">
+            <p>
+              <DinaMessage id="uploadWorkbookIsDone" />
+            </p>
+            <Button className="mt-1 mb-2" onClick={() => finishUpload()}>
+              OK
+            </Button>
+          </div>
+        )}
+      {statusRef.current === "PAUSED" && now < workbookResources.length && (
         <div className="mt-3 text-center">
           <p>
             <DinaMessage id="confirmToResumeSavingWorkbook" />
@@ -158,7 +180,8 @@ export function SaveWorkbookProgress({
           <Button
             className="mt-1 mb-2 btn"
             onClick={() => {
-              isSavingRef.current = true;
+              statusRef.current = "SAVING";
+              resumeSavingWorkbook();
               saveWorkbook();
             }}
           >
@@ -167,7 +190,11 @@ export function SaveWorkbookProgress({
           <Button
             variant="secondary"
             className="mt-1 mb-2 ms-4"
-            onClick={() => cleanUp()}
+            onClick={() => {
+              statusRef.current = "CENCELED";
+              cancelSavingWorkbook();
+              onWorkbookCanceled?.();
+            }}
           >
             <DinaMessage id="no" />
           </Button>
