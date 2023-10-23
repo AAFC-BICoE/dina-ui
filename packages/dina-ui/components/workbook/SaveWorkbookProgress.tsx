@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import { useApiClient } from "packages/common-ui/lib";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { useApiClient } from "../../../common-ui/lib";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
