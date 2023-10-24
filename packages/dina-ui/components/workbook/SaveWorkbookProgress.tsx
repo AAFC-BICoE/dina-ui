@@ -35,7 +35,7 @@ export function SaveWorkbookProgress({
   } = useWorkbookContext();
 
   const { save } = useApiClient();
-  const statusRef = useRef<WorkBookSavingStatus>(status ?? "CENCELED");
+  const statusRef = useRef<WorkBookSavingStatus>(status ?? "CANCELED");
   const router = useRouter();
   const { formatMessage } = useIntl();
   const warningText = formatMessage({ id: "leaveSaveWorkbookWarning" });
@@ -128,7 +128,7 @@ export function SaveWorkbookProgress({
       i += chunkSize
     ) {
       const chunk = workbookResources.slice(i, i + chunkSize);
-      await saveChunkOfWorkbook(chunk);
+      // await saveChunkOfWorkbook(chunk);
       setNow(i + 1);
       saveProgress(i + 1);
       await delay(0); // Yield to render the progress bar
@@ -191,7 +191,7 @@ export function SaveWorkbookProgress({
             variant="secondary"
             className="mt-1 mb-2 ms-4"
             onClick={() => {
-              statusRef.current = "CENCELED";
+              statusRef.current = "CANCELED";
               cancelSavingWorkbook();
               onWorkbookCanceled?.();
             }}

@@ -22,7 +22,7 @@ export type WorkBookSavingStatus =
   | "SAVING"
   | "PAUSED"
   | "FINISHED"
-  | "CENCELED";
+  | "CANCELED";
 
 type State = {
   workbookResources: WorkbookResourceType[];
@@ -44,34 +44,21 @@ interface WorkbookMetaData {
 const reducer = (state, action: { type: actionType; payload?: any }): State => {
   switch (action.type) {
     case "CANCEL_SAVING":
-      deleteFromStorage("workbookResourceToSave");
-      deleteFromStorage("workbookResourceMetaData");
+      writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
+        status: "CANCELED",
+        progress: 0
+      });
       return {
         workbookResources: [],
         progress: 0,
-        status: "CENCELED"
+        status: "CANCELED"
       };
     case "SAVE_PROGRESS":
-      writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
-        status: state.status,
-        type: state.type,
-        group: state.group,
-        apiBaseUrl: state.apiBaseUrl,
-        progress: action.payload
-      });
       return {
         ...state,
         progress: action.payload
       };
     case "START_SAVING":
-      writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
-        status: "SAVING",
-        group: action.payload.group,
-        type: action.payload.type,
-        apiBaseUrl: action.payload.apiBaseUrl,
-        progress: 0
-      });
-      writeStorage("workbookResourceToSave", action.payload.workbookResources);
       return {
         status: "SAVING",
         progress: 0,
@@ -81,44 +68,21 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         apiBaseUrl: action.payload.apiBaseUrl
       };
     case "PAUSE_SAVING":
-      writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
-        status: "PAUSED",
-        group: state.group,
-        type: state.type,
-        apiBaseUrl: state.apiBaseUrl,
-        progress: state.progress
-      });
       return {
         ...state,
         status: "PAUSED"
       };
     case "RESUME_SAVING":
-      writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
-        status: "SAVING",
-        group: state.group,
-        type: state.type,
-        apiBaseUrl: state.apiBaseUrl,
-        progress: state.progress
-      });
       return {
         ...state,
         status: "SAVING"
       };
     case "FINISH_SAVING":
-      writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
-        status: "FINISHED",
-        group: state.group,
-        type: state.type,
-        apiBaseUrl: state.apiBaseUrl,
-        progress: state.progress
-      });
       return {
         ...state,
         status: "FINISHED"
       };
     case "RESET":
-      deleteFromStorage("workbookResourceToSave");
-      deleteFromStorage("workbookResourceMetaData");
       return {
         workbookResources: [],
         progress: 0
@@ -183,7 +147,15 @@ export function WorkbookUploadContextProvider({
     type: workbookMetaDataInLocalStorage?.type
   };
   const [state, dispatch] = useReducer(reducer, initState);
+
   const saveProgress = (newProgress) => {
+    writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
+      status: state.status,
+      type: state.type,
+      group: state.group,
+      apiBaseUrl: state.apiBaseUrl,
+      progress: newProgress
+    });
     dispatch({ type: "SAVE_PROGRESS", payload: newProgress });
   };
 
@@ -193,6 +165,14 @@ export function WorkbookUploadContextProvider({
     newType: string,
     newApiBaseUrl: string
   ) => {
+    writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
+      status: "SAVING",
+      group: newGroup,
+      type: newType,
+      apiBaseUrl: newApiBaseUrl,
+      progress: 0
+    });
+    writeStorage("workbookResourceToSave", newWorkbookResources);
     dispatch({
       type: "START_SAVING",
       payload: {
@@ -205,30 +185,55 @@ export function WorkbookUploadContextProvider({
   };
 
   const pauseSavingWorkbook = () => {
+    writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
+      status: "PAUSED",
+      group: state.group,
+      type: state.type,
+      apiBaseUrl: state.apiBaseUrl,
+      progress: state.progress
+    });
     dispatch({
       type: "PAUSE_SAVING"
     });
   };
 
   const resumeSavingWorkbook = () => {
+    writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
+      status: "SAVING",
+      group: state.group,
+      type: state.type,
+      apiBaseUrl: state.apiBaseUrl,
+      progress: state.progress
+    });
     dispatch({
       type: "RESUME_SAVING"
     });
   };
 
   const cancelSavingWorkbook = () => {
+    deleteFromStorage("workbookResourceToSave");
+    deleteFromStorage("workbookResourceMetaData");
     dispatch({
       type: "CANCEL_SAVING"
     });
   };
 
   const finishSavingWorkbook = () => {
+    writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
+      status: "FINISHED",
+      group: state.group,
+      type: state.type,
+      apiBaseUrl: state.apiBaseUrl,
+      progress: state.progress
+    });
     dispatch({
       type: "FINISH_SAVING"
     });
   };
 
   const reset = () => {
+    deleteFromStorage("workbookResourceToSave");
+    deleteFromStorage("workbookResourceMetaData");
     dispatch({
       type: "RESET"
     });
