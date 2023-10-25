@@ -33,9 +33,11 @@ export function ManagedAttributeFieldWithLabel(
   const { locale } = useDinaIntl();
   const attributeKey = attribute.key;
   const attributePath = `${valuesPath}.${attributeKey}`;
-  const tooltipText = attribute?.multilingualDescription?.descriptions?.find(
-    (description) => description.lang === locale
-  )?.desc;
+  const tooltipText = attribute?.unit
+    ? attribute?.unit
+    : attribute?.multilingualDescription?.descriptions?.find(
+        (description) => description.lang === locale
+      )?.desc;
   const fallbackTooltipText =
     attribute?.multilingualDescription?.descriptions?.find(
       (description) => description.lang !== locale
