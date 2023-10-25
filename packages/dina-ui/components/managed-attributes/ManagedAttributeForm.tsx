@@ -79,6 +79,14 @@ export function ManagedAttributeForm({
       submittedValues.acceptedValues = null;
     }
 
+    // Don't save unit if type is not INTEGER/DECIMAL
+    if (
+      submittedValues.vocabularyElementType !== "INTEGER" &&
+      submittedValues.vocabularyElementType !== "DECIMAL"
+    ) {
+      delete submittedValues.unit;
+    }
+
     // Convert the editable format to the stored format:
     submittedValues.multilingualDescription = {
       descriptions: toPairs(submittedValues.multilingualDescription).map(
@@ -166,9 +174,10 @@ export function ManagedAttributeFormLayout({
             setType && setType(selectValue)
           }
         />
-        {(type === "DECIMAL" || type === "INTEGER") && (
-          <TextField className="col-md-6" name="unit" />
-        )}
+        {router.route.includes("collection") &&
+          (type === "DECIMAL" || type === "INTEGER") && (
+            <TextField className="col-md-6" name="unit" />
+          )}
       </div>
       {type === "PICKLIST" && (
         <div className="row">

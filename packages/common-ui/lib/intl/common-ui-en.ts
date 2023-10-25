@@ -151,5 +151,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   viewDetails: "View Details",
   warning: "Warning",
   yes: "Yes",
-  refreshButtonText: "Refresh"
+  refreshButtonText: "Refresh",
+  filterColumns: "Filter Columns"
 };

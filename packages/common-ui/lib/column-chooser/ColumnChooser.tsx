@@ -3,7 +3,9 @@ import {
   TextField,
   DATA_EXPORT_SEARCH_RESULTS_KEY,
   useApiClient,
-  LoadingSpinner
+  LoadingSpinner,
+  LabelView,
+  FieldHeader
 } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
@@ -77,6 +79,7 @@ function useCustomMenu({
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
   const [loading, setLoading] = useState(false);
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
+  const [filterColumsValue, setFilterColumnsValue] = useState<string>("");
 
   const { formatMessage } = useIntl();
 
@@ -163,12 +166,17 @@ function useCustomMenu({
           className={props.className}
           aria-labelledby={props.labelledBy}
         >
+          <strong>{<FieldHeader name="filterColumns" />}</strong>
           <input
             autoFocus={true}
             name="filterColumns"
+            className="form-control"
+            type="text"
             placeholder="Search"
+            value={filterColumsValue}
             onChange={(event) => {
               const value = event.target.value;
+              setFilterColumnsValue(value);
               if (value === "" || !value) {
                 setSearchedColumns(columns);
               } else {
