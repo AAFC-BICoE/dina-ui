@@ -393,7 +393,11 @@ export function termQuery(
 }
 
 // Query used for wildcard searches (contains).
-export function wildcardQuery(fieldName: string, matchValue: any, keywordSupport: boolean): any {
+export function wildcardQuery(
+  fieldName: string,
+  matchValue: any,
+  keywordSupport: boolean
+): any {
   return {
     wildcard: {
       [keywordSupport ? fieldName + ".keyword" : fieldName]: {
@@ -443,7 +447,11 @@ export function prefixQuery(
               must: [
                 {
                   prefix: {
-                    [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]: {
+                    [optimizedPrefix
+                      ? fieldName + ".prefix"
+                      : keywordSupport
+                      ? fieldName + ".keyword"
+                      : fieldName]: {
                       value: matchValue,
                       case_insensitive: true
                     }
@@ -457,7 +465,11 @@ export function prefixQuery(
       }
     : {
         prefix: {
-          [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]: {
+          [optimizedPrefix
+            ? fieldName + ".prefix"
+            : keywordSupport
+            ? fieldName + ".keyword"
+            : fieldName]: {
             value: matchValue,
             case_insensitive: true
           }
@@ -542,4 +554,18 @@ export function suffixQuery(
           [fieldName + ".prefix_reverse"]: matchValue
         }
       };
+}
+
+/**
+ * Make a basic elastic search query by uuids
+ * @param uuids string array of uuids to be used for elastic search
+ */
+export function uuidQuery(uuids: string[]) {
+  return {
+    query: {
+      terms: {
+        "data.id": uuids
+      }
+    }
+  };
 }

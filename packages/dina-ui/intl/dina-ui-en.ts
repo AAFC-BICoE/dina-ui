@@ -606,7 +606,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataResourceExternalURLLabel: "Resource External URL",
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
-  metadataUploadDetailsLabel: "Upload Details",
+  metadataUploadDetailsLabel: "Object Details",
   metersField_tooltip:
     "Use the following units for auto-conversion: ft, in, ft in, yd, mm, cm, km, pd, po, pd po.",
   moveAllContent: " Move All Content",

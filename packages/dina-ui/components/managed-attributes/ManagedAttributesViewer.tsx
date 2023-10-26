@@ -55,10 +55,12 @@ export function ManagedAttributesViewer({
           value: mav
         }))
       : []
-  ).map((item) => ({
-    ...item,
-    name: allAttrKeyNameMap[item.key]
-  }));
+  )
+    .map((item) => ({
+      ...item,
+      name: allAttrKeyNameMap[item.key]
+    }))
+    .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 
   return (
     <DinaForm initialValues={managedAttributeValues} readOnly={true}>
