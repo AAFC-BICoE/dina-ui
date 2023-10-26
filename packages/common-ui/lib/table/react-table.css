@@ -27,7 +27,7 @@
 .ReactTable thead td.-sort-asc {
   box-shadow: none !important;
   &:before {
-    content: "▼";
+    content: "▲";
     float: right;
     pointer-events: none;
   }
@@ -37,7 +37,7 @@
 .ReactTable thead td.-sort-desc {
   box-shadow: none !important;
   &:before {
-    content: "▲";
+    content: "▼";
     float: right;
     pointer-events: none;
   }
