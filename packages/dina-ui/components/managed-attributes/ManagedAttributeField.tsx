@@ -30,12 +30,21 @@ export function ManagedAttributeFieldWithLabel(
 ) {
   const { attribute, valuesPath, onRemoveClick } = props;
   const { readOnly } = useDinaFormContext();
-  const { locale } = useDinaIntl();
+  const { locale, formatMessage } = useDinaIntl();
   const attributeKey = attribute.key;
   const attributePath = `${valuesPath}.${attributeKey}`;
-  const tooltipText = attribute?.multilingualDescription?.descriptions?.find(
-    (description) => description.lang === locale
-  )?.desc;
+  const multiDescription =
+    attribute?.multilingualDescription?.descriptions?.find(
+      (description) => description.lang === locale
+    )?.desc;
+  const unit = attribute?.unit;
+
+  const unitMessage = formatMessage("dataUnit");
+
+  const tooltipText = unit
+    ? `${multiDescription}\n${unitMessage}${unit}`
+    : multiDescription;
+
   const fallbackTooltipText =
     attribute?.multilingualDescription?.descriptions?.find(
       (description) => description.lang !== locale
