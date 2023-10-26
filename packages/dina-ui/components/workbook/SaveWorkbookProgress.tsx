@@ -128,9 +128,9 @@ export function SaveWorkbookProgress({
       i += chunkSize
     ) {
       const chunk = workbookResources.slice(i, i + chunkSize);
-      // await saveChunkOfWorkbook(chunk);
-      setNow(i + 1);
-      saveProgress(i + 1);
+      await saveChunkOfWorkbook(chunk);
+      setNow(i);
+      saveProgress(i + chunkSize);
       await delay(0); // Yield to render the progress bar
     }
     if (statusRef.current === "SAVING") {
@@ -150,7 +150,7 @@ export function SaveWorkbookProgress({
       <ProgressBar
         min={0}
         max={workbookResources.length}
-        now={now}
+        now={now + 1}
         label={`${now}/${workbookResources.length}`}
       />
       {statusRef.current === "SAVING" && (
@@ -192,7 +192,7 @@ export function SaveWorkbookProgress({
             className="mt-1 mb-2 ms-4"
             onClick={() => {
               statusRef.current = "CANCELED";
-              cancelSavingWorkbook();
+              cancelSavingWorkbook(type);
               onWorkbookCanceled?.();
             }}
           >

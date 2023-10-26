@@ -1,12 +1,37 @@
 import {
+  deleteFromStorage,
   useLocalStorage,
-  writeStorage,
-  deleteFromStorage
+  writeStorage
 } from "@rehooks/local-storage";
-import { uniq } from "lodash";
-import { ReactNode, createContext, useContext, useReducer } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useReducer,
+  useEffect
+} from "react";
 import { WorkbookResourceType } from "./types/Workbook";
-import StorageUnitTypeDetailsPage from "packages/dina-ui/pages/collection/storage-unit-type/view";
+
+import db, { WorkbookDB } from "./WorkbookDB";
+import { useLiveQuery } from "dexie-react-hooks";
+
+async function saveWorkbookResources(
+  type: string,
+  workbookResources: WorkbookResourceType[]
+) {
+  const workbook = await db.workbooks.get(type);
+  if (workbook) {
+    await db.workbooks.put({ name: type, workbook: workbookResources });
+  } else {
+    await db.workbooks.add({ name: type, workbook: workbookResources });
+  }
+}
+
+async function deleteWorkbookResources(type?: string) {
+  if (type) {
+    await db.workbooks.delete(type);
+  }
+}
 
 type actionType =
   | "START_SAVING"
@@ -15,6 +40,7 @@ type actionType =
   | "CANCEL_SAVING"
   | "FINISH_SAVING"
   | "SAVE_PROGRESS"
+  | "RETRIEVE_WORKBOOK_FROM_STORAGE"
   | "RESET";
 
 export type WorkBookSavingStatus =
@@ -43,6 +69,11 @@ interface WorkbookMetaData {
 
 const reducer = (state, action: { type: actionType; payload?: any }): State => {
   switch (action.type) {
+    case "RETRIEVE_WORKBOOK_FROM_STORAGE":
+      return {
+        ...state,
+        ...action.payload
+      };
     case "CANCEL_SAVING":
       writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
         status: "CANCELED",
@@ -80,7 +111,8 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
     case "FINISH_SAVING":
       return {
         ...state,
-        status: "FINISHED"
+        status: "FINISHED",
+        progress: action.payload
       };
     case "RESET":
       return {
@@ -105,12 +137,12 @@ export interface WorkbookUploadContextI {
     group: string,
     type: string,
     apiBaseUrl: string
-  ) => void;
+  ) => Promise<void>;
   pauseSavingWorkbook: () => void;
   resumeSavingWorkbook: () => void;
-  finishSavingWorkbook: () => void;
-  cancelSavingWorkbook: () => void;
-  reset: () => void;
+  finishSavingWorkbook: () => Promise<void>;
+  cancelSavingWorkbook: (type?: string) => Promise<void>;
+  reset: (type?: string) => void;
 }
 
 const WorkbookUploadContext = createContext<WorkbookUploadContextI | null>(
@@ -134,19 +166,34 @@ export function WorkbookUploadContextProvider({
 }: {
   children: ReactNode;
 }) {
-  const [workbookResourcesInLocalStorage, setWorkbookResourcesInLocalStorage] =
-    useLocalStorage<WorkbookResourceType[]>("workbookResourceToSave");
-  const [workbookMetaDataInLocalStorage, setWorkbookMetaDataInLocalStorage] =
-    useLocalStorage<WorkbookMetaData>("workbookResourceMetaData");
   const initState: State = {
-    workbookResources: workbookResourcesInLocalStorage ?? [],
-    progress: workbookMetaDataInLocalStorage?.progress ?? 0,
-    status: workbookMetaDataInLocalStorage?.status,
-    apiBaseUrl: workbookMetaDataInLocalStorage?.apiBaseUrl,
-    group: workbookMetaDataInLocalStorage?.group,
-    type: workbookMetaDataInLocalStorage?.type
+    workbookResources: [],
+    progress: 0
   };
   const [state, dispatch] = useReducer(reducer, initState);
+  useEffect(() => {
+    const strMetaData = localStorage.getItem("workbookResourceMetaData");
+    const workbookMetaDataInLocalStorage: WorkbookMetaData = strMetaData
+      ? JSON.parse(strMetaData)
+      : ({} as any);
+
+    const type = state.type ?? workbookMetaDataInLocalStorage?.type;
+
+    async function queryWorkbookResources(typeParam: string) {
+      const found = await db.workbooks.get(typeParam);
+      const result = found?.workbook ?? [];
+      dispatch({
+        type: "RETRIEVE_WORKBOOK_FROM_STORAGE",
+        payload: {
+          workbookResources: result,
+          ...workbookMetaDataInLocalStorage
+        }
+      });
+    }
+    if (type) {
+      queryWorkbookResources(type);
+    }
+  }, [state.type]);
 
   const saveProgress = (newProgress) => {
     writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
@@ -159,7 +206,7 @@ export function WorkbookUploadContextProvider({
     dispatch({ type: "SAVE_PROGRESS", payload: newProgress });
   };
 
-  const startSavingWorkbook = (
+  const startSavingWorkbook = async (
     newWorkbookResources: WorkbookResourceType[],
     newGroup: string,
     newType: string,
@@ -172,7 +219,7 @@ export function WorkbookUploadContextProvider({
       apiBaseUrl: newApiBaseUrl,
       progress: 0
     });
-    writeStorage("workbookResourceToSave", newWorkbookResources);
+    await saveWorkbookResources(newType, newWorkbookResources);
     dispatch({
       type: "START_SAVING",
       payload: {
@@ -210,15 +257,14 @@ export function WorkbookUploadContextProvider({
     });
   };
 
-  const cancelSavingWorkbook = () => {
-    deleteFromStorage("workbookResourceToSave");
-    deleteFromStorage("workbookResourceMetaData");
+  const cancelSavingWorkbook = async (type?: string) => {
+    await deleteWorkbookResources(type);
     dispatch({
       type: "CANCEL_SAVING"
     });
   };
 
-  const finishSavingWorkbook = () => {
+  const finishSavingWorkbook = async () => {
     writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
       status: "FINISHED",
       group: state.group,
@@ -226,13 +272,14 @@ export function WorkbookUploadContextProvider({
       apiBaseUrl: state.apiBaseUrl,
       progress: state.progress
     });
+    await deleteWorkbookResources(state.type);
     dispatch({
       type: "FINISH_SAVING"
     });
   };
 
-  const reset = () => {
-    deleteFromStorage("workbookResourceToSave");
+  const reset = async (type?: string) => {
+    await deleteWorkbookResources(type);
     deleteFromStorage("workbookResourceMetaData");
     dispatch({
       type: "RESET"

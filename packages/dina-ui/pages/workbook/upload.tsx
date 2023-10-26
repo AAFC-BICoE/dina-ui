@@ -76,7 +76,7 @@ export function UploadWorkbookPage() {
     return (
       workbookResources &&
       workbookResources.length > 0 &&
-      status !== "CENCELED" &&
+      status !== "CANCELED" &&
       status !== "FINISHED"
     );
   }
