@@ -29,6 +29,7 @@
   &:before {
     content: "▼";
     float: right;
+    pointer-events: none;
   }
 }
 
@@ -38,6 +39,7 @@
   &:before {
     content: "▲";
     float: right;
+    pointer-events: none;
   }
 }
 
