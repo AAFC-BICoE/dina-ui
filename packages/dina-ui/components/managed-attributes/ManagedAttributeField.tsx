@@ -30,7 +30,7 @@ export function ManagedAttributeFieldWithLabel(
 ) {
   const { attribute, valuesPath, onRemoveClick } = props;
   const { readOnly } = useDinaFormContext();
-  const { locale } = useDinaIntl();
+  const { locale, formatMessage } = useDinaIntl();
   const attributeKey = attribute.key;
   const attributePath = `${valuesPath}.${attributeKey}`;
   const multiDescription =
@@ -38,8 +38,11 @@ export function ManagedAttributeFieldWithLabel(
       (description) => description.lang === locale
     )?.desc;
   const unit = attribute?.unit;
+
+  const unitMessage = formatMessage("dataUnit");
+
   const tooltipText = unit
-    ? `${multiDescription}\nUnit: ${unit}`
+    ? `${multiDescription}\n${unitMessage}${unit}`
     : multiDescription;
 
   const fallbackTooltipText =
