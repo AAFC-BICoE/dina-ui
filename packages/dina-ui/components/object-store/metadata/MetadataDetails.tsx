@@ -53,6 +53,10 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         fields={[
           ...(!isExternalResource ? ["originalFilename"] : []),
           {
+            name: "acDigitizationDate",
+            value: <DateView date={metadata.acDigitizationDate} />
+          },
+          {
             name: "group",
             value: <GroupLabel groupName={metadata.group} />
           },
@@ -89,10 +93,6 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           ...(isExternalResource ? ["resourceExternalURL"] : []),
           "dcFormat",
           "acCaption",
-          {
-            name: "acDigitizationDate",
-            value: <DateView date={metadata.acDigitizationDate} />
-          },
           "dcType",
           "acSubtype",
           "fileExtension",
