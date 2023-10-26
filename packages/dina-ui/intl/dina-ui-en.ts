@@ -839,6 +839,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   title_preparationType: "Preparation Type",
   title_storageUnit: "Storage Unit",
   title_storageUnitType: "Storage Unit Type",
+  tgnLegend: "TGN Referencing",
   to: "To",
   toBeReturned: "To Be Returned",
   tooltipDefaultLinkMessage: "Click here to learn more.",

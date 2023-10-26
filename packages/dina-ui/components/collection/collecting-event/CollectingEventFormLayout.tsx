@@ -62,6 +62,7 @@ import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimBu
 import Link from "next/link";
 import { find, compact } from "lodash";
 import { FieldExtension } from "packages/dina-ui/types/collection-api/resources/FieldExtension";
+import { TgnIntegration } from "./TgnIntegration";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -1001,19 +1002,7 @@ export function CollectingEventFormLayout({
           </div>
           <div className="row">
             <div className="col">
-              <FieldSet
-                legend={<DinaMessage id="geoReferencingLegend" />}
-                className="non-strip"
-                componentName={COLLECTING_EVENT_COMPONENT_NAME}
-              >
-                <div
-                  style={{
-                    overflowY: "auto",
-                    overflowX: "hidden",
-                    maxHeight: 520
-                  }}
-                />
-              </FieldSet>
+              <TgnIntegration />
             </div>
           </div>
         </div>
