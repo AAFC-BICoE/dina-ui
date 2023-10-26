@@ -39,7 +39,7 @@ export function ManagedAttributeFieldWithLabel(
     )?.desc;
   const unit = attribute?.unit;
   const tooltipText = unit
-    ? `${multiDescription}.\nUnit: ${unit}`
+    ? `${multiDescription}\nUnit: ${unit}`
     : multiDescription;
 
   const fallbackTooltipText =
