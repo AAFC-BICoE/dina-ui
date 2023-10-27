@@ -1,10 +1,4 @@
-import {
-  DinaForm,
-  DinaFormSection,
-  FieldView,
-  useApiClient,
-  useIsMounted
-} from "common-ui";
+import { DinaForm, FieldView, useApiClient, useIsMounted } from "common-ui";
 import { toPairs } from "lodash";
 import { ManagedAttribute } from "../../types/collection-api";
 import { useEffect, useState } from "react";
@@ -67,20 +61,20 @@ export function ManagedAttributesViewer({
       name: allAttrKeyNameMap[item.key]
     }))
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-  const managedAttributesInitialValues = managedAttributeValues.reduce(
+  const managedAttributesInitialValues = managedAttributeValues?.reduce(
     (prev, curr) => ({ ...prev, [curr.key]: curr.value }),
     {}
   );
   return (
-    <DinaFormSection initialValues={managedAttributesInitialValues}>
-      {managedAttributeValues.length ? (
+    <DinaForm initialValues={managedAttributesInitialValues}>
+      {managedAttributeValues?.length ? (
         <div className="row">
-          {managedAttributeValues.map((mav) => {
+          {managedAttributeValues?.map((mav) => {
             return (
               <FieldView
                 className="col-6"
                 label={mav.name}
-                name={`managedAttributes.${mav.key}`}
+                name={`${mav.key}`}
                 key={mav.key}
               />
             );
@@ -91,6 +85,6 @@ export function ManagedAttributesViewer({
           <DinaMessage id="noManagedAttributeValues" />
         </div>
       )}
-    </DinaFormSection>
+    </DinaForm>
   );
 }
