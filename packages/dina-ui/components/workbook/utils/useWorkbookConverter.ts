@@ -102,7 +102,7 @@ export function useWorkbookConverter(
   }
 
   function putItemInCache(key: string, fieldValue) {
-    return (cache.current[key] = fieldValue);
+    cache.current[key] = fieldValue;
   }
 
   function getFieldDataType(fieldPath?: string): WorkbookDataTypeEnum {
@@ -332,7 +332,13 @@ export function useWorkbookConverter(
             resource.relationships[attributeName] = {
               data: newCreatedValue
             };
-            putItemInCache(keyForCache, newCreatedValue);
+            if (
+              relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK_OR_CREATE
+            ) {
+              // If create only, we don't need to put it in cache
+              putItemInCache(keyForCache, newCreatedValue);
+            }
           }
           delete resource[attributeName];
           return;
@@ -369,14 +375,14 @@ export function useWorkbookConverter(
               path: queryPath,
               queryFilter
             });
-
+            let valueToLink;
             if (
               relationshipConfig.linkOrCreateSetting ===
                 LinkOrCreateSetting.LINK ||
               relationshipConfig.linkOrCreateSetting ===
                 LinkOrCreateSetting.LINK_OR_CREATE
             ) {
-              let valueToLink = getItemFromCache(keyForCache);
+              valueToLink = getItemFromCache(keyForCache);
               if (!valueToLink) {
                 // query data from database
                 valueToLink = await apiClient
@@ -406,10 +412,11 @@ export function useWorkbookConverter(
             }
 
             if (
-              relationshipConfig.linkOrCreateSetting ===
+              !valueToLink &&
+              (relationshipConfig.linkOrCreateSetting ===
                 LinkOrCreateSetting.CREATE ||
-              relationshipConfig.linkOrCreateSetting ===
-                LinkOrCreateSetting.LINK_OR_CREATE
+                relationshipConfig.linkOrCreateSetting ===
+                  LinkOrCreateSetting.LINK_OR_CREATE)
             ) {
               // if there is no existing record in the db, then create it
               for (const childName of Object.keys(valueInArray)) {
@@ -426,7 +433,13 @@ export function useWorkbookConverter(
                 { apiBaseUrl: relationshipConfig.baseApiPath }
               ).then((response) => pick(response[0], ["id", "type"]));
               if (newCreatedValue) {
-                putItemInCache(keyForCache, newCreatedValue);
+                if (
+                  relationshipConfig.linkOrCreateSetting ===
+                  LinkOrCreateSetting.LINK_OR_CREATE
+                ) {
+                  // If create only, we don't need to put it in cache
+                  putItemInCache(keyForCache, newCreatedValue);
+                }
                 valuesForRelationship.push(newCreatedValue);
               }
             }
