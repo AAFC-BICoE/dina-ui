@@ -8,17 +8,18 @@ import { useIntl } from "react-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
-
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+import { delay } from "./utils/workbookMappingUtils";
 
 export interface SaveWorkbookProgressProps {
   onWorkbookSaved: () => void;
   onWorkbookCanceled: () => void;
+  onWorkbookFailed: () => void;
 }
 
 export function SaveWorkbookProgress({
   onWorkbookSaved,
-  onWorkbookCanceled
+  onWorkbookCanceled,
+  onWorkbookFailed
 }: SaveWorkbookProgressProps) {
   const {
     workbookResources,
@@ -28,10 +29,12 @@ export function SaveWorkbookProgress({
     apiBaseUrl,
     status,
     saveProgress,
+    error,
     pauseSavingWorkbook,
     resumeSavingWorkbook,
     finishSavingWorkbook,
-    cancelSavingWorkbook
+    cancelSavingWorkbook,
+    failSavingWorkbook
   } = useWorkbookContext();
 
   const { save } = useApiClient();
@@ -128,10 +131,17 @@ export function SaveWorkbookProgress({
       i += chunkSize
     ) {
       const chunk = workbookResources.slice(i, i + chunkSize);
-      await saveChunkOfWorkbook(chunk);
+      try {
+        await saveChunkOfWorkbook(chunk);
+      } catch (error) {
+        statusRef.current = "FAILED";
+        await failSavingWorkbook(error);
+        await delay(10); // Yield to render the progress bar
+        break;
+      }
       setNow(i);
       saveProgress(i + chunkSize);
-      await delay(0); // Yield to render the progress bar
+      await delay(10); // Yield to render the progress bar
     }
     if (statusRef.current === "SAVING") {
       statusRef.current = "FINISHED";
@@ -150,7 +160,7 @@ export function SaveWorkbookProgress({
       <ProgressBar
         min={0}
         max={workbookResources.length}
-        now={now + 1}
+        now={now}
         label={`${now}/${workbookResources.length}`}
       />
       {statusRef.current === "SAVING" && (
@@ -172,6 +182,15 @@ export function SaveWorkbookProgress({
             </Button>
           </div>
         )}
+
+      {statusRef.current === "FAILED" && (
+        <div className="mt-3 text-center">
+          <p className="text-start">{`Error: ${error?.message}`}</p>
+          <Button className="mt-1 mb-2" onClick={() => onWorkbookFailed?.()}>
+            OK
+          </Button>
+        </div>
+      )}
       {statusRef.current === "PAUSED" && now < workbookResources.length && (
         <div className="mt-3 text-center">
           <p>

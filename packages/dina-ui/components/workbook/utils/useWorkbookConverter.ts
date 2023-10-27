@@ -1,6 +1,7 @@
 import { useApiClient } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
 import { filter, get, has, pick } from "lodash";
+import { useRef } from "react";
 import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
@@ -35,6 +36,8 @@ export function useWorkbookConverter(
   entityName: string
 ) {
   const { apiClient, save } = useApiClient();
+  const cache = useRef<Record<string, { id: string; type: string }>>({});
+
   /**
    * The data structure in the flatternedConfig is like this
    * {
@@ -92,7 +95,17 @@ export function useWorkbookConverter(
     }
   }
 
-  function getFieldDataType(fieldPath?: string) {
+  function getItemFromCache(
+    key: string
+  ): { id: string; type: string } | undefined {
+    return cache.current[key];
+  }
+
+  function putItemInCache(key: string, fieldValue) {
+    return (cache.current[key] = fieldValue);
+  }
+
+  function getFieldDataType(fieldPath?: string): WorkbookDataTypeEnum {
     return fieldPath ? flattenedConfig[fieldPath]?.dataType : undefined;
   }
 
@@ -118,6 +131,7 @@ export function useWorkbookConverter(
         type: string;
         hasGroup: boolean;
         baseApiPath?: string;
+        linkOrCreateSetting: LinkOrCreateSetting;
       };
       relationships: {
         [key: string]: {
@@ -238,6 +252,21 @@ export function useWorkbookConverter(
       delete resource["relationshipConfig"];
     } else if (isObject(value) && attributeName !== "relationships") {
       const relationshipConfig = value.relationshipConfig;
+      // The filter below is to find out all simple data type properties
+      // We will use these properties to query from the database
+      const fields = Object.keys(value).filter((key) => {
+        if (key === "relationshipConfig") {
+          return false;
+        }
+        if (Array.isArray(value[key] || isObject(value[key]))) {
+          return false;
+        }
+        return true;
+      });
+      const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
+      const queryFilter = { ...pick(value, fields) };
+      const keyForCache = JSON.stringify({ path: queryPath, queryFilter });
+
       // if the value is an object, traverse into properies of the object
       if (relationshipConfig) {
         // If the value is an Object type, and there is a relationshipConfig defined
@@ -247,42 +276,25 @@ export function useWorkbookConverter(
           relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.LINK_OR_CREATE
         ) {
-          // The filter below is to find out all simple data type properties
-          // We will use these properties to query from the database
-          const fields = Object.keys(value).filter((key) => {
-            if (key === "relationshipConfig") {
-              return false;
-            }
-            if (Array.isArray(value[key] || isObject(value[key]))) {
-              return false;
-            }
-            return true;
-          });
-          // Query from dababase
-          const valueToLink = await apiClient
-            .get(
-              `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`,
-              {
-                filter: {
-                  ...pick(value, fields)
-                }
-              }
-            )
-            .then((response) => {
-              if (response?.data) {
-                if (Array.isArray(response.data)) {
-                  if (response.data.length > 0) {
-                    return pick(response.data[0], ["id", "type"]);
+          let valueToLink = getItemFromCache(keyForCache);
+          if (!valueToLink) {
+            // Query from dababase
+            valueToLink = await apiClient
+              .get(queryPath, { filter: queryFilter })
+              .then((response) => {
+                if (response?.data) {
+                  if (Array.isArray(response.data)) {
+                    if (response.data.length > 0) {
+                      return pick(response.data[0], ["id", "type"]);
+                    }
                   } else {
-                    return null;
+                    const valueFromDb = pick(response.data, ["id", "type"]);
+                    putItemInCache(keyForCache, valueFromDb);
+                    return valueFromDb;
                   }
-                } else {
-                  return pick(response.data, ["id", "type"]);
                 }
-              } else {
-                return null;
-              }
-            });
+              });
+          }
           if (valueToLink) {
             if (!resource.relationships) {
               resource.relationships = {};
@@ -304,7 +316,7 @@ export function useWorkbookConverter(
           for (const childName of Object.keys(value)) {
             await linkRelationshipAttribute(value, childName, group);
           }
-          const valueForRelationship = await save(
+          const newCreatedValue = await save(
             [
               {
                 resource: value,
@@ -312,16 +324,16 @@ export function useWorkbookConverter(
               }
             ],
             { apiBaseUrl: relationshipConfig.baseApiPath }
-          ).then((response) => ({
-            id: response[0].id,
-            type: response[0].type
-          }));
+          ).then((response) => pick(response[0], ["id", "type"]));
           if (!resource.relationships) {
             resource.relationships = {};
           }
-          resource.relationships[attributeName] = {
-            data: valueForRelationship
-          };
+          if (newCreatedValue) {
+            resource.relationships[attributeName] = {
+              data: newCreatedValue
+            };
+            putItemInCache(keyForCache, newCreatedValue);
+          }
           delete resource[attributeName];
           return;
         }
@@ -331,103 +343,105 @@ export function useWorkbookConverter(
         }
       }
     } else if (Array.isArray(value) && value.length > 0) {
-      const relationshipConfig = value[0].relationshipConfig;
-      if (isObject(value[0])) {
-        if (relationshipConfig) {
-          // If the value is an Object Array type, and there is a relationshipConfig defined
-          // Then we need to loop through all properties of each item in the array
-          if (
-            relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK ||
-            relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK_OR_CREATE
-          ) {
-            const valuesForRelationship: { id: string; type: string }[] = [];
-            for (const item of value) {
-              // The filter below is to find out all simple data type properties
-              // We will use these properties to query from the database
-              const fields = Object.keys(item).filter((key) => {
-                if (key === "relationshipConfig") {
-                  return false;
-                }
-                if (Array.isArray(item[key] || isObject(item[key]))) {
-                  return false;
-                }
-                return true;
-              });
-              // query data from database
-              const valueToLink = await apiClient
-                .get(
-                  `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`,
-                  {
-                    filter: {
-                      ...pick(item, fields)
-                    }
-                  }
-                )
-                .then((response) => {
-                  if (response?.data) {
-                    if (Array.isArray(response.data)) {
-                      if (response.data.length > 0) {
-                        return pick(response.data[0], ["id", "type"]);
+      const valuesForRelationship: { id: string; type: string }[] = [];
+      for (const valueInArray of value) {
+        const relationshipConfig = valueInArray.relationshipConfig;
+        // If the value is an Object Array type, and there is a relationshipConfig defined
+        // Then we need to loop through all properties of each item in the array
+        if (isObject(valueInArray)) {
+          if (relationshipConfig) {
+            // The filter below is to find out all simple data type properties
+            // We will use these properties to query from the database
+            const fields = Object.keys(valueInArray).filter((key) => {
+              if (key === "relationshipConfig") {
+                return false;
+              }
+              if (
+                Array.isArray(valueInArray[key] || isObject(valueInArray[key]))
+              ) {
+                return false;
+              }
+              return true;
+            });
+            const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
+            const queryFilter = { ...pick(valueInArray, fields) };
+            const keyForCache = JSON.stringify({
+              path: queryPath,
+              queryFilter
+            });
+
+            if (
+              relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK ||
+              relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK_OR_CREATE
+            ) {
+              let valueToLink = getItemFromCache(keyForCache);
+              if (!valueToLink) {
+                // query data from database
+                valueToLink = await apiClient
+                  .get(queryPath, { filter: queryFilter })
+                  .then((response) => {
+                    if (response?.data) {
+                      if (Array.isArray(response.data)) {
+                        if (response.data.length > 0) {
+                          const valueFromDb = pick(response.data[0], [
+                            "id",
+                            "type"
+                          ]);
+                          putItemInCache(keyForCache, valueFromDb);
+                          return valueFromDb;
+                        }
                       } else {
-                        return null;
+                        const valueFromDb = pick(response.data, ["id", "type"]);
+                        putItemInCache(keyForCache, valueFromDb);
+                        return valueFromDb;
                       }
-                    } else {
-                      return pick(response.data, ["id", "type"]);
                     }
-                  } else {
-                    return null;
-                  }
-                });
+                  });
+              }
               if (valueToLink) {
                 valuesForRelationship.push(valueToLink);
               }
             }
-            if (valuesForRelationship.length === value.length) {
-              if (!resource.relationships) {
-                resource.relationships = {};
-              }
-              resource.relationships[attributeName] = {
-                data: valuesForRelationship
-              };
-              delete resource[attributeName];
-              return;
-            }
-          }
 
-          if (
-            relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.CREATE ||
-            relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK_OR_CREATE
-          ) {
-            // if there is no existing record in the db, then create it
-            for (const item of value) {
-              for (const childName of Object.keys(item)) {
-                await linkRelationshipAttribute(item, childName, group);
+            if (
+              relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.CREATE ||
+              relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK_OR_CREATE
+            ) {
+              // if there is no existing record in the db, then create it
+              for (const childName of Object.keys(valueInArray)) {
+                await linkRelationshipAttribute(valueInArray, childName, group);
               }
-            }
-            if (relationshipConfig) {
-              const valueForRelationship = await save(
-                value.map((item) => ({
-                  resource: item,
-                  type: relationshipConfig.type
-                })),
+
+              const newCreatedValue = await save(
+                [
+                  {
+                    resource: valueInArray,
+                    type: relationshipConfig.type
+                  }
+                ],
                 { apiBaseUrl: relationshipConfig.baseApiPath }
-              ).then((response) =>
-                response.map((rs) => pick(rs, ["id", "type"]))
-              );
-              if (!resource.relationships) {
-                resource.relationships = {};
+              ).then((response) => pick(response[0], ["id", "type"]));
+              if (newCreatedValue) {
+                putItemInCache(keyForCache, newCreatedValue);
+                valuesForRelationship.push(newCreatedValue);
               }
-              resource.relationships[attributeName] = {
-                data: valueForRelationship
-              };
-              delete resource[attributeName];
             }
           }
         }
+      }
+      if (valuesForRelationship.length === value.length) {
+        if (!resource.relationships) {
+          resource.relationships = {};
+        }
+        resource.relationships[attributeName] = {
+          data: valuesForRelationship
+        };
+        delete resource[attributeName];
+        return;
       }
     }
   }

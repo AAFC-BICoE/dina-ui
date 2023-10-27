@@ -1,19 +1,14 @@
-import {
-  deleteFromStorage,
-  useLocalStorage,
-  writeStorage
-} from "@rehooks/local-storage";
+import { deleteFromStorage, writeStorage } from "@rehooks/local-storage";
 import {
   ReactNode,
   createContext,
   useContext,
-  useReducer,
-  useEffect
+  useEffect,
+  useReducer
 } from "react";
 import { WorkbookResourceType } from "./types/Workbook";
 
-import db, { WorkbookDB } from "./WorkbookDB";
-import { useLiveQuery } from "dexie-react-hooks";
+import db from "./WorkbookDB";
 
 async function saveWorkbookResources(
   type: string,
@@ -39,6 +34,7 @@ type actionType =
   | "RESUME_SAVING"
   | "CANCEL_SAVING"
   | "FINISH_SAVING"
+  | "FAIL_SAVING"
   | "SAVE_PROGRESS"
   | "RETRIEVE_WORKBOOK_FROM_STORAGE"
   | "RESET";
@@ -48,7 +44,8 @@ export type WorkBookSavingStatus =
   | "SAVING"
   | "PAUSED"
   | "FINISHED"
-  | "CANCELED";
+  | "CANCELED"
+  | "FAILED";
 
 type State = {
   workbookResources: WorkbookResourceType[];
@@ -57,6 +54,7 @@ type State = {
   type?: string;
   group?: string;
   apiBaseUrl?: string;
+  error?: Error;
 };
 
 interface WorkbookMetaData {
@@ -65,6 +63,7 @@ interface WorkbookMetaData {
   type?: string;
   group?: string;
   apiBaseUrl?: string;
+  error?: Error;
 }
 
 const reducer = (state, action: { type: actionType; payload?: any }): State => {
@@ -97,6 +96,12 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         group: action.payload.group,
         type: action.payload.type,
         apiBaseUrl: action.payload.apiBaseUrl
+      };
+    case "FAIL_SAVING":
+      return {
+        ...state,
+        status: "FAILED",
+        error: action.payload
       };
     case "PAUSE_SAVING":
       return {
@@ -132,6 +137,7 @@ export interface WorkbookUploadContextI {
   apiBaseUrl?: string;
   group?: string;
   type?: string;
+  error?: Error;
   startSavingWorkbook: (
     newWorkbookResources: WorkbookResourceType[],
     group: string,
@@ -142,6 +148,7 @@ export interface WorkbookUploadContextI {
   resumeSavingWorkbook: () => void;
   finishSavingWorkbook: () => Promise<void>;
   cancelSavingWorkbook: (type?: string) => Promise<void>;
+  failSavingWorkbook: (error: Error) => Promise<void>;
   reset: (type?: string) => void;
 }
 
@@ -278,6 +285,22 @@ export function WorkbookUploadContextProvider({
     });
   };
 
+  const failSavingWorkbook = async (error: Error) => {
+    writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
+      status: "FAILED",
+      group: state.group,
+      type: state.type,
+      apiBaseUrl: state.apiBaseUrl,
+      progress: state.progress,
+      error
+    });
+    await deleteWorkbookResources(state.type);
+    dispatch({
+      type: "FAIL_SAVING",
+      payload: error
+    });
+  };
+
   const reset = async (type?: string) => {
     await deleteWorkbookResources(type);
     deleteFromStorage("workbookResourceMetaData");
@@ -295,12 +318,14 @@ export function WorkbookUploadContextProvider({
         group: state.group,
         apiBaseUrl: state.apiBaseUrl,
         status: state.status,
+        error: state.error,
         saveProgress,
         startSavingWorkbook,
         pauseSavingWorkbook,
         resumeSavingWorkbook,
         finishSavingWorkbook,
         cancelSavingWorkbook,
+        failSavingWorkbook,
         reset
       }}
     >

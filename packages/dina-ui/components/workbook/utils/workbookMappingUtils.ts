@@ -358,3 +358,5 @@ export function flattenObject(source: any) {
       )
     : source;
 }
+
+export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

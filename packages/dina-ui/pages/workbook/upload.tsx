@@ -54,7 +54,7 @@ export function UploadWorkbookPage() {
       });
   }
 
-  function onWorkbookSaved() {
+  function onWorkbookSavedOrFailed() {
     backToUpload();
     reset();
   }
@@ -120,8 +120,9 @@ export function UploadWorkbookPage() {
           {isThereAnActiveUpload() ? (
             // If there is an unfinished upload
             <SaveWorkbookProgress
-              onWorkbookSaved={onWorkbookSaved}
+              onWorkbookSaved={onWorkbookSavedOrFailed}
               onWorkbookCanceled={backToUpload}
+              onWorkbookFailed={onWorkbookSavedOrFailed}
             />
           ) : spreadsheetData ? (
             <WorkbookColumnMapping
