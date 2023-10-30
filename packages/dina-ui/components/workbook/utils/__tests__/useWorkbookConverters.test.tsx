@@ -39,7 +39,7 @@ const mockConfig: FieldMappingConfigType = {
         address: {
           dataType: WorkbookDataTypeEnum.OBJECT,
           relationshipConfig: {
-            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+            linkOrCreateSetting: LinkOrCreateSetting.CREATE,
             type: "address",
             baseApiPath: "fake-api",
             hasGroup: true
@@ -221,7 +221,8 @@ describe("useWorkbookConverters", () => {
           linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
           type: "object-array",
           baseApiPath: "fake-api",
-          hasGroup: true
+          hasGroup: true,
+          queryFields: ["name"]
         },
         attributes: {
           age: {
@@ -239,8 +240,7 @@ describe("useWorkbookConverters", () => {
             dataType: "object"
           },
           name: {
-            dataType: "string",
-            isQueryField: true
+            dataType: "string"
           }
         }
       },
@@ -265,15 +265,14 @@ describe("useWorkbookConverters", () => {
         dataType: "string"
       },
       "objectArrayField.name": {
-        dataType: "string",
-        isQueryField: true
+        dataType: "string"
       },
       objectField: {
         attributes: {
           address: {
             dataType: "object",
             relationshipConfig: {
-              linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+              linkOrCreateSetting: LinkOrCreateSetting.CREATE,
               type: "address",
               baseApiPath: "fake-api",
               hasGroup: true
@@ -297,8 +296,7 @@ describe("useWorkbookConverters", () => {
             dataType: "number"
           },
           name: {
-            dataType: "string",
-            isQueryField: true
+            dataType: "string"
           },
           contact: {
             attributes: {
@@ -320,7 +318,8 @@ describe("useWorkbookConverters", () => {
           baseApiPath: "fake-api",
           hasGroup: true,
           linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-          type: "object-field"
+          type: "object-field",
+          queryFields: ["name"]
         }
       },
       "objectField.address": {
@@ -340,7 +339,7 @@ describe("useWorkbookConverters", () => {
         },
         dataType: "object",
         relationshipConfig: {
-          linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+          linkOrCreateSetting: LinkOrCreateSetting.CREATE,
           type: "address",
           baseApiPath: "fake-api",
           hasGroup: true
@@ -362,8 +361,7 @@ describe("useWorkbookConverters", () => {
         dataType: "number"
       },
       "objectField.name": {
-        dataType: "string",
-        isQueryField: true
+        dataType: "string"
       },
       "objectField.contact": {
         attributes: {
@@ -421,7 +419,8 @@ describe("useWorkbookConverters", () => {
       type: "object-field",
       hasGroup: true,
       linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-      baseApiPath: "fake-api"
+      baseApiPath: "fake-api",
+      queryFields: ["name"]
     });
     expect(getFieldRelationshipConfig("unknownField")).toEqual(undefined);
   });
@@ -430,7 +429,11 @@ describe("useWorkbookConverters", () => {
     const mockGet = jest
       .fn()
       .mockResolvedValue({ data: { id: "id", type: "object-field" } });
-    const mockSave = jest.fn().mockResolvedValue({});
+    const mockSave = jest
+      .fn()
+      .mockResolvedValue([
+        { id: "newId", type: "object-field", name: "name1" }
+      ]);
     jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
       apiClient: {
         get: mockGet
@@ -458,7 +461,8 @@ describe("useWorkbookConverters", () => {
           baseApiPath: "fake-api",
           hasGroup: true,
           linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-          type: "object-field"
+          type: "object-field",
+          queryFields: ["name"]
         }
       },
       objectArray1: [
@@ -468,7 +472,8 @@ describe("useWorkbookConverters", () => {
             baseApiPath: "fake-api",
             hasGroup: true,
             linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-            type: "object-field"
+            type: "object-field",
+            queryFields: ["name"]
           }
         }
       ]
@@ -477,7 +482,7 @@ describe("useWorkbookConverters", () => {
     for (const key of Object.keys(mockResource)) {
       await linkRelationshipAttribute(mockResource, key, "group1");
     }
-    expect(mockGet).toHaveBeenCalledTimes(2);
+    expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockResource).toEqual({
       attr1: 123,
       attr2: "abc",
@@ -511,7 +516,9 @@ describe("useWorkbookConverters", () => {
     const mockGet = jest.fn().mockResolvedValue(null);
     const mockSave = jest
       .fn()
-      .mockResolvedValue([{ id: "newId", type: "object-field" }]);
+      .mockResolvedValue([
+        { id: "newId", type: "object-field", name: "name1" }
+      ]);
     jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
       apiClient: {
         get: mockGet
@@ -539,7 +546,8 @@ describe("useWorkbookConverters", () => {
           baseApiPath: "fake-api",
           hasGroup: true,
           linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-          type: "object-field"
+          type: "object-field",
+          queryFields: ["name"]
         }
       },
       objectArray1: [
@@ -549,7 +557,8 @@ describe("useWorkbookConverters", () => {
             baseApiPath: "fake-api",
             hasGroup: true,
             linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-            type: "object-field"
+            type: "object-field",
+            queryFields: ["name"]
           }
         }
       ]
@@ -611,7 +620,7 @@ describe("useWorkbookConverters", () => {
             addressLine1: "object 1 address line 1",
             city: "object 1 address city",
             relationshipConfig: {
-              linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+              linkOrCreateSetting: LinkOrCreateSetting.CREATE,
               type: "address",
               baseApiPath: "fake-api",
               hasGroup: true
@@ -626,7 +635,8 @@ describe("useWorkbookConverters", () => {
             baseApiPath: "fake-api",
             hasGroup: true,
             linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-            type: "object-field"
+            type: "object-field",
+            queryFields: ["name"]
           }
         },
         objectArrayField: [
@@ -635,6 +645,7 @@ describe("useWorkbookConverters", () => {
               linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
               type: "object-array",
               baseApiPath: "fake-api",
+              queryFields: ["name"],
               hasGroup: true
             },
             name: "name1",
