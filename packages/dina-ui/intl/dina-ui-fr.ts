@@ -231,6 +231,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   externalResourceListTitle: "Ressources externes",
   feedbackButtonText: "Commentaires",
   fieldExtensions: "Extensions de champs",
+  materialSampleFieldExtensions:
+    "Extensions de champs de l’événement de collecte",
+  collectingEventFieldExtensions:
+    "Extensions de champs de l’événement de collecte",
   field_acCaption: "Légende",
   field_acDerivedFrom: "Tiré de",
   field_acDigitizationDate: "Date de création de la version originale",
