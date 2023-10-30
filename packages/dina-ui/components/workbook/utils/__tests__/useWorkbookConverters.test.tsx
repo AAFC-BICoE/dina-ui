@@ -1,12 +1,11 @@
-import { useWorkbookConverter } from "../useWorkbookConverter";
-
+import * as ApiClientContext from "common-ui/lib/api-client/ApiClientContext";
+import { mount } from "enzyme";
 import {
-  WorkbookDataTypeEnum,
   FieldMappingConfigType,
-  LinkOrCreateSetting
+  LinkOrCreateSetting,
+  WorkbookDataTypeEnum
 } from "../..";
-
-import * as ApiClientContext from "../../../../../common-ui/lib/api-client/ApiClientContext";
+import { useWorkbookConverter } from "../useWorkbookConverter";
 
 const mockConfig: FieldMappingConfigType = {
   mockEntity: {
@@ -31,6 +30,7 @@ const mockConfig: FieldMappingConfigType = {
         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         type: "object-field",
         baseApiPath: "fake-api",
+        queryFields: ["name"],
         hasGroup: true
       },
       attributes: {
@@ -67,6 +67,7 @@ const mockConfig: FieldMappingConfigType = {
         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         type: "object-array",
         baseApiPath: "fake-api",
+        queryFields: ["name"],
         hasGroup: true
       },
       attributes: {
@@ -103,6 +104,19 @@ const mockWorkbookData = [
   }
 ];
 
+function getWorkbookConverter(
+  mappingConfig: FieldMappingConfigType,
+  entityName: string
+) {
+  const returnVal: ReturnType<typeof useWorkbookConverter> = {} as any;
+  function TestComponent() {
+    Object.assign(returnVal, useWorkbookConverter(mappingConfig, entityName));
+    return <></>;
+  }
+  mount(<TestComponent />);
+  return returnVal;
+}
+
 describe("useWorkbookConverters", () => {
   beforeEach(() => {
     jest.resetAllMocks();
@@ -116,7 +130,7 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: jest.fn()
     } as any);
-    const { getPathOfField } = useWorkbookConverter(mockConfig, "mockEntity");
+    const { getPathOfField } = getWorkbookConverter(mockConfig, "mockEntity");
     expect(getPathOfField("stringField")).toEqual("stringField");
     expect(getPathOfField("objectField")).toEqual("objectField");
     expect(getPathOfField("objectArrayField")).toEqual("objectArrayField");
@@ -133,7 +147,7 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: jest.fn()
     } as any);
-    const { getPathOfField } = useWorkbookConverter(mockConfig, "mockEntity");
+    const { getPathOfField } = getWorkbookConverter(mockConfig, "mockEntity");
     expect(getPathOfField("stringFields")).toBeUndefined();
   });
 
@@ -144,7 +158,7 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: jest.fn()
     } as any);
-    const { getPathOfField: getPathOfField2 } = useWorkbookConverter(
+    const { getPathOfField: getPathOfField2 } = getWorkbookConverter(
       {
         mockEntity: {
           relationshipConfig: {
@@ -182,7 +196,7 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: jest.fn()
     } as any);
-    const { flattenedConfig } = useWorkbookConverter(mockConfig, "mockEntity");
+    const { flattenedConfig } = getWorkbookConverter(mockConfig, "mockEntity");
     expect(flattenedConfig).toEqual({
       relationshipConfig: {
         baseApiPath: "fake-api",
@@ -225,7 +239,8 @@ describe("useWorkbookConverters", () => {
             dataType: "object"
           },
           name: {
-            dataType: "string"
+            dataType: "string",
+            isQueryField: true
           }
         }
       },
@@ -250,7 +265,8 @@ describe("useWorkbookConverters", () => {
         dataType: "string"
       },
       "objectArrayField.name": {
-        dataType: "string"
+        dataType: "string",
+        isQueryField: true
       },
       objectField: {
         attributes: {
@@ -281,7 +297,8 @@ describe("useWorkbookConverters", () => {
             dataType: "number"
           },
           name: {
-            dataType: "string"
+            dataType: "string",
+            isQueryField: true
           },
           contact: {
             attributes: {
@@ -345,7 +362,8 @@ describe("useWorkbookConverters", () => {
         dataType: "number"
       },
       "objectField.name": {
-        dataType: "string"
+        dataType: "string",
+        isQueryField: true
       },
       "objectField.contact": {
         attributes: {
@@ -390,7 +408,7 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: jest.fn()
     } as any);
-    const { getFieldRelationshipConfig } = useWorkbookConverter(
+    const { getFieldRelationshipConfig } = getWorkbookConverter(
       mockConfig,
       "mockEntity"
     );
@@ -419,7 +437,7 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute } = useWorkbookConverter(
+    const { linkRelationshipAttribute } = getWorkbookConverter(
       mockConfig,
       "mockEntity"
     );
@@ -500,7 +518,7 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute } = useWorkbookConverter(
+    const { linkRelationshipAttribute } = getWorkbookConverter(
       mockConfig,
       "mockEntity"
     );
@@ -540,8 +558,8 @@ describe("useWorkbookConverters", () => {
     for (const key of Object.keys(mockResource)) {
       await linkRelationshipAttribute(mockResource, key, "group1");
     }
-    expect(mockGet).toHaveBeenCalledTimes(2);
-    expect(mockSave).toHaveBeenCalledTimes(2);
+    expect(mockGet).toHaveBeenCalledTimes(1);
+    expect(mockSave).toHaveBeenCalledTimes(1);
     expect(mockResource).toEqual({
       attr1: 123,
       attr2: "abc",
@@ -578,7 +596,7 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: jest.fn()
     } as any);
-    const { convertWorkbook } = useWorkbookConverter(mockConfig, "mockEntity");
+    const { convertWorkbook } = getWorkbookConverter(mockConfig, "mockEntity");
     expect(convertWorkbook(mockWorkbookData, "cnc")).toEqual([
       {
         group: "cnc",

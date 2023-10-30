@@ -39,7 +39,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
         hasGroup: true,
         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         type: "collection",
-        baseApiPath: "/collection-api"
+        baseApiPath: "/collection-api",
+        queryFields: ["name"]
       },
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING },
@@ -63,7 +64,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
         type: "collecting-event",
         hasGroup: true,
         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-        baseApiPath: "/collection-api"
+        baseApiPath: "/collection-api",
+        queryFields: ["dwcFieldNumber"]
       },
       attributes: {
         dwcFieldNumber: { dataType: WorkbookDataTypeEnum.STRING },
@@ -121,7 +123,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
             linkOrCreateSetting: LinkOrCreateSetting.LINK,
             type: "collection-method",
             hasGroup: true,
-            baseApiPath: "/collection-api"
+            baseApiPath: "/collection-api",
+            queryFields: ["name"]
           },
           attributes: {
             name: { dataType: WorkbookDataTypeEnum.STRING }
@@ -133,7 +136,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
             linkOrCreateSetting: LinkOrCreateSetting.LINK,
             type: "protocol",
             hasGroup: true,
-            baseApiPath: "/collection-api"
+            baseApiPath: "/collection-api",
+            queryFields: ["name"]
           },
           attributes: {
             name: { dataType: WorkbookDataTypeEnum.STRING },
@@ -146,7 +150,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
             hasGroup: false,
             type: "person",
             linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-            baseApiPath: "agent-api"
+            baseApiPath: "agent-api",
+            queryFields: ["displayName"]
           },
           attributes: {
             displayName: { dataType: WorkbookDataTypeEnum.STRING },
@@ -166,7 +171,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
         linkOrCreateSetting: LinkOrCreateSetting.LINK,
         type: "preparation-type",
         hasGroup: true,
-        baseApiPath: "/collection-api"
+        baseApiPath: "/collection-api",
+        queryFields: ["name"]
       },
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING }
@@ -178,7 +184,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
         linkOrCreateSetting: LinkOrCreateSetting.LINK,
         type: "preparation-type",
         hasGroup: true,
-        baseApiPath: "/collection-api"
+        baseApiPath: "/collection-api",
+        queryFields: ["name"]
       },
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING }
@@ -190,7 +197,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
         linkOrCreateSetting: LinkOrCreateSetting.LINK,
         type: "protocol",
         hasGroup: true,
-        baseApiPath: "/collection-api"
+        baseApiPath: "/collection-api",
+        queryFields: ["name"]
       },
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING },
@@ -203,7 +211,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
         hasGroup: false,
         type: "person",
         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-        baseApiPath: "agent-api"
+        baseApiPath: "agent-api",
+        queryFields: ["displayName"]
       },
       attributes: {
         displayName: { dataType: WorkbookDataTypeEnum.STRING },
@@ -221,7 +230,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
         hasGroup: true,
         linkOrCreateSetting: LinkOrCreateSetting.LINK,
         type: "storage-unit",
-        baseApiPath: "/collection-api"
+        baseApiPath: "/collection-api",
+        queryFields: ["name"]
       },
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING },
@@ -234,7 +244,8 @@ const FieldMappingConfig: FieldMappingConfigType = {
         hasGroup: true,
         type: "project",
         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-        baseApiPath: "collection-api"
+        baseApiPath: "collection-api",
+        queryFields: ["name"]
       },
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING },

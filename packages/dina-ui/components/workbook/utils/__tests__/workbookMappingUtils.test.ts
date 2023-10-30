@@ -40,7 +40,8 @@ const mockConfig: FieldMappingConfigType = {
         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         hasGroup: true,
         type: "object-field",
-        baseApiPath: "apiPath"
+        baseApiPath: "apiPath",
+        queryFields: ["name"]
       },
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING },
@@ -293,6 +294,7 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.objectField1.dataType": "object",
       "mockEntity.objectField1.relationshipConfig.baseApiPath": "apiPath",
       "mockEntity.objectField1.relationshipConfig.hasGroup": true,
+      "mockEntity.objectField1.relationshipConfig.queryFields": ["name"],
       "mockEntity.objectField1.relationshipConfig.linkOrCreateSetting":
         "LINK_OR_CREATE",
       "mockEntity.objectField1.relationshipConfig.type": "object-field",

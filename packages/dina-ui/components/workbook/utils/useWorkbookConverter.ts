@@ -131,6 +131,7 @@ export function useWorkbookConverter(
         type: string;
         hasGroup: boolean;
         baseApiPath?: string;
+        queryFields?: string[];
         linkOrCreateSetting: LinkOrCreateSetting;
       };
       relationships: {
@@ -193,6 +194,7 @@ export function useWorkbookConverter(
                   hasGroup: boolean;
                   linkOrCreateSetting: LinkOrCreateSetting;
                   baseApiPath?: string;
+                  queryFields?: string[];
                 };
               }
             >;
@@ -254,21 +256,21 @@ export function useWorkbookConverter(
       const relationshipConfig = value.relationshipConfig;
       // The filter below is to find out all simple data type properties
       // We will use these properties to query from the database
-      const fields = Object.keys(value).filter((key) => {
-        if (key === "relationshipConfig") {
-          return false;
-        }
-        if (Array.isArray(value[key] || isObject(value[key]))) {
-          return false;
-        }
-        return true;
+      const fields = Object.keys(value).filter((fieldName) => {
+        if (
+          relationshipConfig.queryFields &&
+          relationshipConfig.queryFields.length > 0 &&
+          relationshipConfig.queryFields?.indexOf(fieldName) > -1
+        )
+          return true;
+        else return false;
       });
-      const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
-      const queryFilter = { ...pick(value, fields) };
-      const keyForCache = JSON.stringify({ path: queryPath, queryFilter });
 
       // if the value is an object, traverse into properies of the object
       if (relationshipConfig) {
+        const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
+        const queryFilter = { ...pick(value, fields) };
+        const keyForCache = JSON.stringify({ path: queryPath, queryFilter });
         // If the value is an Object type, and there is a relationshipConfig defined
         // Then we need to loop through all properties of the value
         if (
@@ -358,16 +360,14 @@ export function useWorkbookConverter(
           if (relationshipConfig) {
             // The filter below is to find out all simple data type properties
             // We will use these properties to query from the database
-            const fields = Object.keys(valueInArray).filter((key) => {
-              if (key === "relationshipConfig") {
-                return false;
-              }
+            const fields = Object.keys(valueInArray).filter((fieldName) => {
               if (
-                Array.isArray(valueInArray[key] || isObject(valueInArray[key]))
-              ) {
-                return false;
-              }
-              return true;
+                relationshipConfig.queryFields &&
+                relationshipConfig.queryFields.length > 0 &&
+                relationshipConfig.queryFields?.indexOf(fieldName) > -1
+              )
+                return true;
+              else return false;
             });
             const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
             const queryFilter = { ...pick(valueInArray, fields) };
