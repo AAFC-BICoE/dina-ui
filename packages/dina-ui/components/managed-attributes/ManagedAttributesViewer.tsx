@@ -61,18 +61,21 @@ export function ManagedAttributesViewer({
       name: allAttrKeyNameMap[item.key]
     }))
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-
+  const managedAttributesInitialValues = managedAttributeValues?.reduce(
+    (prev, curr) => ({ ...prev, [curr.key]: curr.value }),
+    {}
+  );
   return (
-    <DinaForm initialValues={managedAttributeValues} readOnly={true}>
-      {managedAttributeValues.length ? (
+    <DinaForm initialValues={managedAttributesInitialValues}>
+      {managedAttributeValues?.length ? (
         <div className="row">
-          {managedAttributeValues.map((mav, index) => {
+          {managedAttributeValues?.map((mav) => {
             return (
               <FieldView
-                key={mav.key}
                 className="col-6"
                 label={mav.name}
-                name={`${index}.value`}
+                name={`${mav.key}`}
+                key={mav.key}
               />
             );
           })}
