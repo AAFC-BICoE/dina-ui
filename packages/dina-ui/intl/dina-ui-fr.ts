@@ -232,7 +232,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   feedbackButtonText: "Commentaires",
   fieldExtensions: "Extensions de champs",
   materialSampleFieldExtensions:
-    "Extensions de champs de l’événement de collecte",
+    "Extensions de champs de l’échantillon de matériaux",
   collectingEventFieldExtensions:
     "Extensions de champs de l’événement de collecte",
   field_acCaption: "Légende",
