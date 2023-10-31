@@ -926,5 +926,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   year: "Année",
   yearMonth: "Année-Mois",
   yearMonthDay: "Année-Mois-Jour",
-  yearMonthDayTime: "Année-Mois-Jour-Heure"
+  yearMonthDayTime: "Année-Mois-Jour-Heure",
+  field_storageUnit: "Unité de stockage"
 };
