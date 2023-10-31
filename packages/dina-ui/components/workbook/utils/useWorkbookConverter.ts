@@ -268,48 +268,57 @@ export function useWorkbookConverter(
             return true;
           else return false;
         });
-        if (fields && fields.length > 0) {
-          const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
-          const queryFilter = { ...pick(value, fields) };
-          const keyForCache = JSON.stringify({ path: queryPath, queryFilter });
-          // If there are fields which name is in the queryFields list
-          if (
+        if (
+          (!fields || fields.length === 0) &&
+          (relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK ||
             relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK ||
-            relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK_OR_CREATE
-          ) {
-            let valueToLink = getItemFromCache(keyForCache);
-            if (!valueToLink) {
-              // Query from dababase
-              valueToLink = await apiClient
-                .get(queryPath, { filter: queryFilter })
-                .then((response) => {
-                  if (response?.data) {
-                    if (Array.isArray(response.data)) {
-                      if (response.data.length > 0) {
-                        return pick(response.data[0], ["id", "type"]);
-                      }
-                    } else {
-                      const valueFromDb = pick(response.data, ["id", "type"]);
-                      putItemInCache(keyForCache, valueFromDb);
-                      return valueFromDb;
+              LinkOrCreateSetting.LINK_OR_CREATE)
+        ) {
+          throw new Error(
+            `Can not link or create "${attributeName}" with the missing fileds "${relationshipConfig.queryFields}"`
+          );
+        }
+        const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
+        const queryFilter = { ...pick(value, fields) };
+        const keyForCache = JSON.stringify({ path: queryPath, queryFilter });
+        // If there are fields which name is in the queryFields list
+        if (
+          relationshipConfig.linkOrCreateSetting === LinkOrCreateSetting.LINK ||
+          relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_OR_CREATE
+        ) {
+          let valueToLink = getItemFromCache(keyForCache);
+          if (!valueToLink) {
+            // Query from dababase
+            valueToLink = await apiClient
+              .get(queryPath, { filter: queryFilter })
+              .then((response) => {
+                if (response?.data) {
+                  if (Array.isArray(response.data)) {
+                    if (response.data.length > 0) {
+                      return pick(response.data[0], ["id", "type"]);
                     }
+                  } else {
+                    const valueFromDb = pick(response.data, ["id", "type"]);
+                    putItemInCache(keyForCache, valueFromDb);
+                    return valueFromDb;
                   }
-                });
+                }
+              });
+          }
+          if (valueToLink) {
+            if (!resource.relationships) {
+              resource.relationships = {};
             }
-            if (valueToLink) {
-              if (!resource.relationships) {
-                resource.relationships = {};
-              }
-              resource.relationships[attributeName] = {
-                data: valueToLink
-              };
-              delete resource[attributeName];
-              return;
-            }
+            resource.relationships[attributeName] = {
+              data: valueToLink
+            };
+            delete resource[attributeName];
+            return;
           }
         }
+
         if (
           relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.CREATE ||
@@ -335,23 +344,6 @@ export function useWorkbookConverter(
               LinkOrCreateSetting.LINK_OR_CREATE
             ) {
               // If LINK or LINK_OR_CREATE, we need to put it in cache
-              const newFields = Object.keys(response[0]).filter((fieldName) => {
-                if (
-                  relationshipConfig.queryFields &&
-                  relationshipConfig.queryFields.length > 0 &&
-                  relationshipConfig.queryFields?.indexOf(fieldName) > -1
-                )
-                  return true;
-                else return false;
-              });
-              const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
-              const queryFilter = {
-                ...pick(response[0], newFields)
-              };
-              const keyForCache = JSON.stringify({
-                path: queryPath,
-                queryFilter
-              });
               putItemInCache(keyForCache, valueToLink);
             }
             return valueToLink;
@@ -392,51 +384,57 @@ export function useWorkbookConverter(
               else return false;
             });
             let valueToLink;
-            if (fields && fields.length > 0) {
-              // If there are fields which name is in the queryFields list
-              const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
-              const queryFilter = { ...pick(valueInArray, fields) };
-              const keyForCache = JSON.stringify({
-                path: queryPath,
-                queryFilter
-              });
+            if (
+              (!fields || fields.length === 0) &&
+              (relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK ||
+                relationshipConfig.linkOrCreateSetting ===
+                  LinkOrCreateSetting.LINK_OR_CREATE)
+            ) {
+              throw new Error(
+                `Can not link or create "${attributeName}" with the missing fileds "${relationshipConfig.queryFields}"`
+              );
+            }
+            // If there are fields which name is in the queryFields list
+            const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
+            const queryFilter = { ...pick(valueInArray, fields) };
+            const keyForCache = JSON.stringify({
+              path: queryPath,
+              queryFilter
+            });
 
-              if (
-                relationshipConfig.linkOrCreateSetting ===
-                  LinkOrCreateSetting.LINK ||
-                relationshipConfig.linkOrCreateSetting ===
-                  LinkOrCreateSetting.LINK_OR_CREATE
-              ) {
-                valueToLink = getItemFromCache(keyForCache);
-                if (!valueToLink) {
-                  // query data from database
-                  valueToLink = await apiClient
-                    .get(queryPath, { filter: queryFilter })
-                    .then((response) => {
-                      if (response?.data) {
-                        if (Array.isArray(response.data)) {
-                          if (response.data.length > 0) {
-                            const valueFromDb = pick(response.data[0], [
-                              "id",
-                              "type"
-                            ]);
-                            putItemInCache(keyForCache, valueFromDb);
-                            return valueFromDb;
-                          }
-                        } else {
-                          const valueFromDb = pick(response.data, [
+            if (
+              relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK ||
+              relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK_OR_CREATE
+            ) {
+              valueToLink = getItemFromCache(keyForCache);
+              if (!valueToLink) {
+                // query data from database
+                valueToLink = await apiClient
+                  .get(queryPath, { filter: queryFilter })
+                  .then((response) => {
+                    if (response?.data) {
+                      if (Array.isArray(response.data)) {
+                        if (response.data.length > 0) {
+                          const valueFromDb = pick(response.data[0], [
                             "id",
                             "type"
                           ]);
                           putItemInCache(keyForCache, valueFromDb);
                           return valueFromDb;
                         }
+                      } else {
+                        const valueFromDb = pick(response.data, ["id", "type"]);
+                        putItemInCache(keyForCache, valueFromDb);
+                        return valueFromDb;
                       }
-                    });
-                }
-                if (valueToLink) {
-                  valuesForRelationship.push(valueToLink);
-                }
+                    }
+                  });
+              }
+              if (valueToLink) {
+                valuesForRelationship.push(valueToLink);
               }
             }
 
@@ -467,23 +465,6 @@ export function useWorkbookConverter(
                   LinkOrCreateSetting.LINK_OR_CREATE
                 ) {
                   // If LINK or LINK_OR_CREATE, we need to put it in cache
-                  const newFields = Object.keys(response[0]).filter(
-                    (fieldName) => {
-                      if (
-                        relationshipConfig.queryFields &&
-                        relationshipConfig.queryFields.length > 0 &&
-                        relationshipConfig.queryFields?.indexOf(fieldName) > -1
-                      )
-                        return true;
-                      else return false;
-                    }
-                  );
-                  const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
-                  const queryFilter = { ...pick(response[0], newFields) };
-                  const keyForCache = JSON.stringify({
-                    path: queryPath,
-                    queryFilter
-                  });
                   putItemInCache(keyForCache, newValueToLink);
                 }
                 return newValueToLink;
