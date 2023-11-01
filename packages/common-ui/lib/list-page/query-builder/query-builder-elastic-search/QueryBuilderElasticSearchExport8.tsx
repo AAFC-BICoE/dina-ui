@@ -34,7 +34,8 @@ export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
  */
 export function elasticSearchFormatExport(
   queryTree: ImmutableTree,
-  config: Config
+  config: Config,
+  fieldNames
 ) {
   if (!queryTree) return undefined;
   const type = queryTree.get("type");
@@ -45,7 +46,7 @@ export function elasticSearchFormatExport(
     const field = properties.get("field");
     const value = properties.get("value").toJS();
 
-    return buildEsRule(field, value, operator, config);
+    return buildEsRule(field, value, operator, config, fieldNames);
   }
 
   if (type === "group" || type === "rule_group") {
@@ -57,7 +58,8 @@ export function elasticSearchFormatExport(
       children,
       conjunction,
       elasticSearchFormatExport,
-      config
+      config,
+      fieldNames
     );
   }
 }
@@ -76,7 +78,8 @@ function buildEsRule(
   fieldName: string,
   value: string,
   operator: string,
-  config: Config
+  config: Config,
+  fieldNames
 ) {
   const widgetName = config.fields?.[fieldName]?.type;
   const widgetConfig = config.widgets[widgetName];
@@ -108,6 +111,7 @@ function buildEsRule(
     fieldName,
     config
   );
+  fieldNames.push(fieldName);
 
   return { ...parameters };
 }
@@ -125,7 +129,8 @@ function buildEsGroup(
   children,
   conjunction,
   recursiveFunction,
-  config: Config
+  config: Config,
+  fieldNames
 ) {
   // If there is nothing in the group, then don't add it to the query.
   if (!children || !children.size) return undefined;
@@ -137,7 +142,7 @@ function buildEsGroup(
 
   // Go through each of the children and generate the elastic search query for each item.
   const result = childrenArray
-    .map((childTree) => recursiveFunction(childTree, config))
+    .map((childTree) => recursiveFunction(childTree, config, fieldNames))
     .filter((v) => v !== undefined);
 
   // If no results, do not add this group to the query.
@@ -403,9 +408,12 @@ export function termQuery(
   };
 }
 
-
 // Query used for wildcard searches (contains).
-export function wildcardQuery(fieldName: string, matchValue: any, keywordSupport: boolean): any {
+export function wildcardQuery(
+  fieldName: string,
+  matchValue: any,
+  keywordSupport: boolean
+): any {
   return {
     wildcard: {
       [keywordSupport ? fieldName + ".keyword" : fieldName]: {
@@ -454,7 +462,11 @@ export function prefixQuery(
               must: [
                 {
                   prefix: {
-                    [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]: {
+                    [optimizedPrefix
+                      ? fieldName + ".prefix"
+                      : keywordSupport
+                      ? fieldName + ".keyword"
+                      : fieldName]: {
                       value: matchValue,
                       case_insensitive: true
                     }
@@ -468,7 +480,11 @@ export function prefixQuery(
       }
     : {
         prefix: {
-          [optimizedPrefix ? fieldName + ".prefix" : keywordSupport ? fieldName + ".keyword" : fieldName]: {
+          [optimizedPrefix
+            ? fieldName + ".prefix"
+            : keywordSupport
+            ? fieldName + ".keyword"
+            : fieldName]: {
             value: matchValue,
             case_insensitive: true
           }

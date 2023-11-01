@@ -14,9 +14,11 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
 import {
+  FieldHeader,
   FormikButton,
   ReactTable,
   ReactTableProps,
+  getResourcesWithId,
   useAccount,
   useColumnChooser
 } from "..";
@@ -353,17 +355,19 @@ export function QueryPage<TData extends KitsuResource>({
 
     // Elastic search query with pagination settings.
     let queryDSL;
-
+    const fieldNames = [];
     if (customViewElasticSearchQuery) {
       queryDSL = customViewElasticSearchQuery;
     } else {
       queryDSL = elasticSearchFormatExport(
         submittedQueryBuilderTree,
-        queryBuilderConfig
+        queryBuilderConfig,
+        fieldNames
       );
     }
 
     queryDSL = applyRootQuery(queryDSL);
+
     queryDSL = applyGroupFilters(queryDSL, groups);
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
     queryDSL = applySortingRules(queryDSL, sortingRules, columns);

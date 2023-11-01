@@ -57,12 +57,27 @@ export interface UseGroupedCheckboxWithLabelProps {
   localStorageKey?: string;
 }
 
+export function getResourcesWithId(resources) {
+  return resources.map((resource) => {
+    if (!resource.id) {
+      if (typeof resource === "string") {
+        resource = { id: resource, accessorKey: resource };
+      } else {
+        resource.id = resource?.accessorKey?.split(".").at(-1) as string;
+      }
+    }
+    return resource;
+  });
+}
+
 export function useGroupedCheckboxWithLabel({
   resources,
   isField,
   localStorageKey
 }: UseGroupedCheckboxWithLabelProps) {
-  const [list, setList] = useState<CheckboxResource[]>(getResourcesWithId());
+  const [list, setList] = useState<CheckboxResource[]>(
+    getResourcesWithId(resources)
+  );
   const [checkedColumnIds, setCheckedColumnIds] = useLocalStorage<string[]>(
     `${localStorageKey}_columnChooser`,
     list.map((resource) => resource.id ?? "")
@@ -72,7 +87,8 @@ export function useGroupedCheckboxWithLabel({
       list.filter((resource) => resource.id !== "selectColumn").length
   );
   useEffect(() => {
-    setList(getResourcesWithId());
+    setList(getResourcesWithId(resources));
+    setCheckedColumnIds(list.map((resource) => resource.id ?? ""));
   }, [resources]);
 
   const handleSelectAll = (_e) => {
@@ -111,19 +127,6 @@ export function useGroupedCheckboxWithLabel({
   });
 
   return { groupedCheckBoxes, checkedColumnIds };
-
-  function getResourcesWithId() {
-    return resources.map((resource) => {
-      if (!resource.id) {
-        if (typeof resource === "string") {
-          resource = { id: resource, accessorKey: resource };
-        } else {
-          resource.id = resource?.accessorKey?.split(".").at(-1) as string;
-        }
-      }
-      return resource;
-    });
-  }
 }
 
 export interface GroupedCheckboxesProps {
