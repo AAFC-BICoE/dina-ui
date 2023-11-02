@@ -1,11 +1,7 @@
 import {
   DinaForm,
-  LoadingSpinner,
-  processExtensionValuesLoading,
-  useQuery
+  processExtensionValuesLoading
 } from "common-ui";
-import { useState } from "react";
-import { FieldExtension } from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
 import { DataEntry, DataEntryProps } from "./DataEntry";
 
 export interface DataEntryViewerProps extends DataEntryProps {
