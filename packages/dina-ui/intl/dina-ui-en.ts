@@ -906,5 +906,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   resume: "Resume",
   leaveSaveWorkbookWarning: "Are you sure you want to leave this page?",
   confirmToResumeSavingWorkbook: "Do you want to continue saving workbook?",
-  uploadWorkbookIsDone: 'The workbook is saved, click "OK" to finish it'
+  uploadWorkbookIsDone: 'The workbook is saved, click "OK" to finish it',
+  mapRelationship: "Map Relationship"
 };

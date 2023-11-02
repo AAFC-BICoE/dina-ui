@@ -15,7 +15,8 @@ import {
   isBoolean,
   isBooleanArray,
   isMap,
-  isNumber
+  isNumber,
+  calculateColumnUniqueValuesFromSpreadsheetData
 } from "../workbookMappingUtils";
 
 const mockConfig: FieldMappingConfigType = {
@@ -189,6 +190,52 @@ describe("workbookMappingUtils functions", () => {
           field3: "dataC3"
         }
       ]);
+    });
+
+    test("get data with undefined data", () => {
+      expect(
+        getDataFromWorkbook(
+          undefined,
+          0, // Return first sheet.
+          ["field1", "field2", "field3"]
+        )
+      ).toEqual([]);
+    });
+
+    test("resolveNumberOfUniqueValueFromSpreadsheetData", () => {
+      expect(
+        calculateColumnUniqueValuesFromSpreadsheetData({
+          "0": [
+            { rowNumber: 0, content: ["header1", "header2", "header3"] },
+            { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
+            { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
+            { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
+            { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
+            { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
+            { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
+          ],
+          "1": [
+            { rowNumber: 0, content: ["header4", "header5", "header6"] },
+            { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
+            { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
+            { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
+            { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
+            { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
+            { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
+          ]
+        })
+      ).toEqual({
+        "0": {
+          header1: { dataA1: 1, dataB1: 2, dataC1: 3 },
+          header2: { dataA2: 1, dataB2: 2, dataC2: 3 },
+          header3: { dataA3: 1, dataB3: 2, dataC3: 3 }
+        },
+        "1": {
+          header4: { dataA1: 1, dataB1: 2, dataC1: 3 },
+          header5: { dataA2: 1, dataB2: 2, dataC2: 3 },
+          header6: { dataA3: 1, dataB3: 2, dataC3: 3 }
+        }
+      });
     });
   });
 

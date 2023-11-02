@@ -7,13 +7,13 @@ import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
  * This component is currently not used anywhere yet. It will be implemented in a future ticket.
  */
 export function WorkbookDisplay({
-  jsonData,
+  workbookJsonData,
   sheetIndex
 }: {
-  jsonData: WorkbookJSON;
+  workbookJsonData?: WorkbookJSON;
   sheetIndex: number;
 }) {
-  const dataToDisplay = take(jsonData[sheetIndex], 11);
+  const dataToDisplay = take(workbookJsonData?.[sheetIndex], 11);
   const numOfColumns = dataToDisplay[0].content.length;
   const numOfRows = dataToDisplay.length - 1;
   const headerRow = dataToDisplay[0].content.map((col) => (
@@ -95,7 +95,7 @@ export function WorkbookDisplay({
       >
         <Card.Header>
           <DinaMessage id="workbookPreviewTitle" /> ({numOfRows} /{" "}
-          {jsonData[sheetIndex].length - 1})
+          {workbookJsonData ? workbookJsonData[sheetIndex].length - 1 : 0})
         </Card.Header>
         <Card.Body>
           <div className="cells">

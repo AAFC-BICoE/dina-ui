@@ -1,4 +1,8 @@
-import { WorkbookJSON } from "../types/Workbook";
+import {
+  ColumnUniqueValues,
+  WorkbookJSON,
+  WorkbookRow
+} from "../types/Workbook";
 import { find, trim } from "lodash";
 import { ValidationError } from "yup";
 
@@ -14,7 +18,7 @@ const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
  * @return An array of the columns from the spreadsheet. Null if no headers could be found.
  */
 export function getColumnHeaders(
-  spreadsheetData: WorkbookJSON,
+  spreadsheetData: WorkbookJSON | undefined,
   sheetNumber: number
 ) {
   const data = spreadsheetData?.[sheetNumber]?.find(
@@ -42,6 +46,8 @@ export function findMatchField(
   fieldOptions: {
     label: string;
     value: string;
+    parentPath?: string;
+    isParentRelationshipField?: boolean;
   }[]
 ) {
   const option = find(fieldOptions, (item) => {
@@ -74,7 +80,7 @@ export function findMatchField(
  * @returns
  */
 export function getDataFromWorkbook(
-  spreadsheetData: WorkbookJSON,
+  spreadsheetData: WorkbookJSON | undefined,
   sheetNumber: number,
   fieldNames: (string | undefined)[],
   getRowNumber?: boolean
@@ -83,20 +89,18 @@ export function getDataFromWorkbook(
   const workbookData = spreadsheetData?.[sheetNumber].filter(
     (rowData) => rowData.content.length !== 0
   );
-  for (let i = 1; i < workbookData.length; i++) {
-    const row = workbookData[i];
+  for (let i = 1; i < (workbookData?.length ?? 0); i++) {
+    const row = workbookData?.[i];
     const rowData: { [key: string]: any } = {};
     for (let index = 0; index < fieldNames.length; index++) {
       const field = fieldNames[index];
       if (field !== undefined) {
-        rowData[field] = row.content[index];
+        rowData[field] = row?.content[index];
       }
     }
-
     if (!!getRowNumber) {
-      rowData.rowNumber = row.rowNumber;
+      rowData.rowNumber = row?.rowNumber;
     }
-
     data.push(rowData);
   }
   return data;
@@ -360,3 +364,34 @@ export function flattenObject(source: any) {
 }
 
 export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export function calculateColumnUniqueValuesFromSpreadsheetData(
+  spreadsheetData: WorkbookJSON
+): ColumnUniqueValues {
+  const result: ColumnUniqueValues = {};
+  for (const sheet of Object.keys(spreadsheetData)) {
+    const columnUniqueValues: { [columnName: string]: string[] } = {};
+    const workbookRows: WorkbookRow[] = spreadsheetData[sheet];
+    const columnNames: string[] = workbookRows[0].content;
+    for (let colIndex = 0; colIndex < columnNames.length; colIndex++) {
+      const uniqueValueSet: Set<string> = new Set();
+      for (let rowIndex = 1; rowIndex < workbookRows.length; rowIndex++) {
+        const value = workbookRows[rowIndex].content[colIndex];
+        uniqueValueSet.add(value);
+      }
+      columnUniqueValues[columnNames[colIndex]] =
+        Array.from(uniqueValueSet).sort();
+    }
+    result[sheet] = columnUniqueValues;
+  }
+  return result;
+}
+
+export function getParentFieldPath(fieldPath: string) {
+  if (fieldPath.includes(".")) {
+    const lastIndex = fieldPath.lastIndexOf(".");
+    return fieldPath.substring(0, lastIndex);
+  } else {
+    return undefined;
+  }
+}

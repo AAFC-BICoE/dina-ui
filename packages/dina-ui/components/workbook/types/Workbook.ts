@@ -24,8 +24,6 @@ export interface WorkbookJSON {
 
 export type Leaves<T> = { [K: string]: T | Leaves<T> } | { type: string };
 
-// export type FieldMappingConfigType = Leaves<FieldConfigType>;
-
 export type FieldMappingConfigType = {
   [key: string]: Leaves<FieldConfigType> & {
     relationshipConfig: {
@@ -85,3 +83,7 @@ export type WorkbookResourceType = InputResource<
     };
   }
 >;
+
+export interface ColumnUniqueValues {
+  [sheetNumber: number]: { [columnName: string]: string[] };
+}

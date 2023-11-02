@@ -15,19 +15,17 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
-  const { workbookResources, status, reset } = useWorkbookContext();
+  const { workbookResources, status, reset, spreadsheetData, uploadWorkbook } =
+    useWorkbookContext();
 
-  const [spreadsheetData, setSpreadsheetData] = useState<WorkbookJSON | null>(
-    null
-  );
   const [loading, setLoading] = useState<boolean>(false);
   const [failed, setFailed] = useState<boolean>(false);
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
 
   /**
-   * Using the object store backend that takes in a spreadsheet and returns a JSON format
-   * representation of the spreadsheet.
+   * Call the object store backend API that takes in a spreadsheet and returns
+   * a JSON format representation of the spreadsheet.
    *
    * @param acceptedFiles Files from the file uploader.
    */
@@ -42,28 +40,21 @@ export function UploadWorkbookPage() {
     await apiClient.axios
       .post("/objectstore-api/conversion/workbook", formData)
       .then((response) => {
-        setSpreadsheetData(response.data);
-        reset();
+        uploadWorkbook(response.data);
         setLoading(false);
         setFailed(false);
       })
       .catch(() => {
-        setSpreadsheetData(null);
         setLoading(false);
         setFailed(true);
       });
   }
 
-  function onWorkbookSavedOrFailed() {
-    backToUpload();
-    reset();
-  }
-
   function backToUpload() {
-    setSpreadsheetData(null);
     setFailed(false);
     setLoading(false);
     setPerformSave(false);
+    reset();
   }
 
   const failedMessage = failed ? (
@@ -120,9 +111,9 @@ export function UploadWorkbookPage() {
           {isThereAnActiveUpload() ? (
             // If there is an unfinished upload
             <SaveWorkbookProgress
-              onWorkbookSaved={onWorkbookSavedOrFailed}
+              onWorkbookSaved={backToUpload}
               onWorkbookCanceled={backToUpload}
-              onWorkbookFailed={onWorkbookSavedOrFailed}
+              onWorkbookFailed={backToUpload}
             />
           ) : spreadsheetData ? (
             <WorkbookColumnMapping

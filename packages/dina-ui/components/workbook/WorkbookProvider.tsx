@@ -6,9 +6,15 @@ import {
   useEffect,
   useReducer
 } from "react";
-import { WorkbookResourceType } from "./types/Workbook";
+import {
+  ColumnUniqueValues,
+  WorkbookJSON,
+  WorkbookResourceType,
+  WorkbookRow
+} from "./types/Workbook";
 
 import db from "./WorkbookDB";
+import { calculateColumnUniqueValuesFromSpreadsheetData } from "./utils/workbookMappingUtils";
 
 async function saveWorkbookResources(
   type: string,
@@ -22,13 +28,12 @@ async function saveWorkbookResources(
   }
 }
 
-async function deleteWorkbookResources(type?: string) {
-  if (type) {
-    await db.workbooks.delete(type);
-  }
+async function clearWorkbookResources() {
+  await db.workbooks.clear();
 }
 
 type actionType =
+  | "UPLOAD_SPREADSHEET_DATA"
   | "START_SAVING"
   | "PAUSE_SAVING"
   | "RESUME_SAVING"
@@ -36,8 +41,8 @@ type actionType =
   | "FINISH_SAVING"
   | "FAIL_SAVING"
   | "SAVE_PROGRESS"
-  | "RETRIEVE_WORKBOOK_FROM_STORAGE"
-  | "RESET";
+  | "RESET"
+  | "RETRIEVE_WORKBOOK_FROM_STORAGE";
 
 export type WorkBookSavingStatus =
   | "READY"
@@ -48,6 +53,8 @@ export type WorkBookSavingStatus =
   | "FAILED";
 
 type State = {
+  spreadsheetData?: WorkbookJSON;
+  columnUniqueValues?: ColumnUniqueValues;
   workbookResources: WorkbookResourceType[];
   progress: number;
   status?: WorkBookSavingStatus;
@@ -124,12 +131,24 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         workbookResources: [],
         progress: 0
       };
+    case "UPLOAD_SPREADSHEET_DATA":
+      const spreadsheetData: WorkbookJSON = action.payload;
+      const columnUniqueValues: ColumnUniqueValues =
+        calculateColumnUniqueValuesFromSpreadsheetData(spreadsheetData);
+      return {
+        spreadsheetData,
+        columnUniqueValues,
+        workbookResources: [],
+        progress: 0
+      };
     default:
       return state;
   }
 };
 
 export interface WorkbookUploadContextI {
+  spreadsheetData?: WorkbookJSON;
+  columnUniqueValues?: ColumnUniqueValues;
   workbookResources: WorkbookResourceType[];
   progress: number;
   status?: WorkBookSavingStatus;
@@ -138,6 +157,8 @@ export interface WorkbookUploadContextI {
   group?: string;
   type?: string;
   error?: Error;
+
+  uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
   startSavingWorkbook: (
     newWorkbookResources: WorkbookResourceType[],
     group: string,
@@ -149,7 +170,7 @@ export interface WorkbookUploadContextI {
   finishSavingWorkbook: () => Promise<void>;
   cancelSavingWorkbook: (type?: string) => Promise<void>;
   failSavingWorkbook: (error: Error) => Promise<void>;
-  reset: (type?: string) => void;
+  reset: () => void;
 }
 
 const WorkbookUploadContext = createContext<WorkbookUploadContextI | null>(
@@ -264,8 +285,8 @@ export function WorkbookUploadContextProvider({
     });
   };
 
-  const cancelSavingWorkbook = async (type?: string) => {
-    await deleteWorkbookResources(type);
+  const cancelSavingWorkbook = async () => {
+    await clearWorkbookResources();
     dispatch({
       type: "CANCEL_SAVING"
     });
@@ -279,7 +300,7 @@ export function WorkbookUploadContextProvider({
       apiBaseUrl: state.apiBaseUrl,
       progress: state.progress
     });
-    await deleteWorkbookResources(state.type);
+    await clearWorkbookResources();
     dispatch({
       type: "FINISH_SAVING"
     });
@@ -294,24 +315,35 @@ export function WorkbookUploadContextProvider({
       progress: state.progress,
       error
     });
-    await deleteWorkbookResources(state.type);
+    await clearWorkbookResources();
     dispatch({
       type: "FAIL_SAVING",
       payload: error
     });
   };
 
-  const reset = async (type?: string) => {
-    await deleteWorkbookResources(type);
+  const reset = async () => {
+    await clearWorkbookResources();
     deleteFromStorage("workbookResourceMetaData");
     dispatch({
       type: "RESET"
     });
   };
 
+  const uploadWorkbook = async (newSpreadsheetData: WorkbookJSON) => {
+    await clearWorkbookResources();
+    deleteFromStorage("workbookResourceMetaData");
+    dispatch({
+      type: "UPLOAD_SPREADSHEET_DATA",
+      payload: newSpreadsheetData
+    });
+  };
+
   return (
     <WorkbookUploadProvider
       value={{
+        spreadsheetData: state.spreadsheetData,
+        columnUniqueValues: state.columnUniqueValues,
         workbookResources: state.workbookResources,
         progress: state.progress,
         type: state.type,
@@ -319,6 +351,8 @@ export function WorkbookUploadContextProvider({
         apiBaseUrl: state.apiBaseUrl,
         status: state.status,
         error: state.error,
+
+        uploadWorkbook,
         saveProgress,
         startSavingWorkbook,
         pauseSavingWorkbook,

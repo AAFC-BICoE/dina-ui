@@ -95,6 +95,16 @@ export function useWorkbookConverter(
     }
   }
 
+  function isFieldInRelationshipField(fieldPath: string) {
+    if (fieldPath.includes(".")) {
+      const lastIndex = fieldPath.lastIndexOf(".");
+      const parentPath = fieldPath.substring(0, lastIndex);
+      const parentConfig = flattenedConfig[parentPath];
+      return !!parentConfig.relationshipConfig;
+    }
+    return false;
+  }
+
   function getItemFromCache(
     key: string
   ): { id: string; type: string } | undefined {
@@ -495,6 +505,7 @@ export function useWorkbookConverter(
     flattenedConfig,
     getFieldConverter,
     getPathOfField,
-    getFieldRelationshipConfig
+    getFieldRelationshipConfig,
+    isFieldInRelationshipField
   };
 }
