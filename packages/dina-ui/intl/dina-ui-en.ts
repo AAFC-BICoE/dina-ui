@@ -151,6 +151,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataEntryLabel: "Data Entry",
   dataType: "Type: ",
   dataValue: "Value: ",
+  dataUnit: "Unit: ",
   dataset: "Dataset",
   datasetSearchTooltip: "For using a different Catalog of Life dataset.",
   decimalLatLong: "Decimal Lat/Long",
@@ -605,7 +606,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataResourceExternalURLLabel: "Resource External URL",
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
-  metadataUploadDetailsLabel: "Upload Details",
+  metadataUploadDetailsLabel: "Object Details",
   metersField_tooltip:
     "Use the following units for auto-conversion: ft, in, ft in, yd, mm, cm, km, pd, po, pd po.",
   moveAllContent: " Move All Content",
@@ -852,7 +853,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   typeAnythingOrPickAScientificName: "Type anything or pick a Scientific Name",
   typeNewTagOrSearchPreviousTags: "Type New Tag or Search Previous Tags",
   typeSpecimen: "Type Specimen",
-  unit: "Unit: ",
+  unit: "Unit",
   unsavedChanges: "Unsaved changes made",
   unsetAsDefault: "Unset as default",
   unsupportedFileTypeError:
@@ -899,5 +900,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   yearMonthDay: "Year-Month-Day",
   yearMonthDayTime: "Year-Month-Day-Time",
   field_splitConfiguration: "Split Configuration",
-  dataExports: "Data Exports"
+  dataExports: "Data Exports",
+  dataExportError: "A problem occured while trying to export data.",
+  field_downloadExport: "Download Export"
 };

@@ -169,7 +169,7 @@ export function DataRow({
               options={unitsOptions}
               name={unitSelectFieldName}
               removeBottomMargin={true}
-              label={<DinaMessage id="unit" />}
+              label={<DinaMessage id="dataUnit" />}
               disableTemplateCheckbox={true}
               hideLabel={rowIndex !== 0}
             />
@@ -178,7 +178,7 @@ export function DataRow({
               options={unitsOptions}
               name={unitSelectFieldName}
               removeBottomMargin={true}
-              label={<DinaMessage id="unit" />}
+              label={<DinaMessage id="dataUnit" />}
               disableTemplateCheckbox={true}
               hideLabel={rowIndex !== 0}
             />
@@ -189,7 +189,7 @@ export function DataRow({
           <TextField
             name={unitSelectFieldName}
             removeBottomMargin={true}
-            label={<DinaMessage id="unit" />}
+            label={<DinaMessage id="dataUnit" />}
             disableTemplateCheckbox={true}
             hideLabel={rowIndex !== 0}
             readOnly={true}

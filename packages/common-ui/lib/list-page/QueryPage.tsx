@@ -773,7 +773,7 @@ export function QueryPage<TData extends KitsuResource>({
   const formKey = useMemo(() => uuidv4(), []);
   const { columnChooser, checkedColumnIds } = useColumnChooser({
     columns: columnsResults,
-    indexName,
+    localStorageKey: indexName,
     hideExportButton: true
   });
 
@@ -885,9 +885,17 @@ export function QueryPage<TData extends KitsuResource>({
               )}
               <ReactTable<TData>
                 // Column and data props
-                columns={columnsResults.filter((column) =>
-                  column.id ? checkedColumnIds.includes(column.id) : false
-                )}
+                columns={
+                  enableColumnChooser
+                    ? columnsResults.filter((column) =>
+                        typeof column === "string"
+                          ? checkedColumnIds.includes(column)
+                          : column.id
+                          ? checkedColumnIds.includes(column.id)
+                          : false
+                      )
+                    : columnsResults
+                }
                 data={
                   (viewMode
                     ? customViewFields
