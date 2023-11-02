@@ -136,7 +136,7 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
         <DataEntryViewer
           extensionValues={value}
           legend={<></>}
-          name={"extensionValuesForm"}
+          name={"extensionValues"}
           blockOptionsEndpoint={`collection-api/extension`}
           blockOptionsFilter={{
             "extension.fields.dinaComponent": "COLLECTING_EVENT"

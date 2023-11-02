@@ -62,7 +62,6 @@ export interface CollectingEventAttributes {
 
   selectedSections?: string[];
   extensionValues?: any;
-  extensionValuesForm?: any;
   protocol?: Protocol;
 }
 

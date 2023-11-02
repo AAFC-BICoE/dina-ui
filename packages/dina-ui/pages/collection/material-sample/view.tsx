@@ -306,7 +306,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <ScheduledActionsField />
                 )}
                 <DataEntryViewer
-                  name={"extensionValuesForm"}
+                  name={"extensionValues"}
                   legend={<DinaMessage id="materialSampleFieldExtensions" />}
                   extensionValues={materialSample.extensionValues}
                   disableDinaForm={true}
