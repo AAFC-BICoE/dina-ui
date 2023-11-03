@@ -1,21 +1,19 @@
 import {
-  CheckBoxField,
   FieldWrapper,
-  SelectField,
   SubmitButton,
   useAccount,
   useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
-import { chain, startCase } from "lodash";
 import { Ref, useMemo, useRef, useState } from "react";
-import Table from "react-bootstrap/Table";
 import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
+import { chain, startCase } from "lodash";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { WorkbookDataTypeEnum, useWorkbookContext } from "./";
+import { ColumnMappingRow } from "./ColumnMappingRow";
 import { WorkbookDisplay } from "./WorkbookDisplay";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
@@ -24,7 +22,6 @@ import {
   findMatchField,
   getColumnHeaders,
   getDataFromWorkbook,
-  getParentFieldPath,
   isBoolean,
   isBooleanArray,
   isMap,
@@ -32,8 +29,6 @@ import {
   isNumberArray,
   isValidManagedAttribute
 } from "./utils/workbookMappingUtils";
-
-const THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP = 10;
 
 export type FieldMapType = (string | undefined)[];
 
@@ -56,11 +51,7 @@ export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const {
-    startSavingWorkbook,
-    spreadsheetData,
-    columnUniqueValues: numberOfUniqueValueByColumn
-  } = useWorkbookContext();
+  const { startSavingWorkbook, spreadsheetData } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
   const { formatMessage } = useDinaIntl();
@@ -75,8 +66,6 @@ export function WorkbookColumnMapping({
     value: string;
   } | null>(entityTypes[0]);
   const [fieldMap, setFieldMap] = useState<FieldMapType>([]);
-  const [showMapRelationshipCheckboxes, setShowMapRelationshipCheckboxes] =
-    useState<boolean[]>([]);
   // fieldHeaderPair stores the pairs of field name in the configuration and the column header in the excel file.
   const [fieldHeaderPair, setFieldHeaderPair] = useState(
     {} as { [field: string]: string }
@@ -124,6 +113,7 @@ export function WorkbookColumnMapping({
 
   // Have to load end-points up front, save all responses in a map
   const FIELD_TO_VOCAB_ELEMS_MAP = new Map();
+
   Object.keys(FieldMappingConfig).forEach((recordType) => {
     const recordFieldsMap = FieldMappingConfig[recordType];
     Object.keys(recordFieldsMap).forEach((recordField) => {
@@ -158,7 +148,7 @@ export function WorkbookColumnMapping({
 
   // Generate field options
   const fieldOptions = useMemo(() => {
-    if (!!selectedType?.value) {
+    if (!!selectedType) {
       const nonNestedRowOptions: { label: string; value: string }[] = [];
       const nestedRowOptions: {
         label: string;
@@ -439,66 +429,6 @@ export function WorkbookColumnMapping({
     return errors;
   }
 
-  // Custom styling to indent the group option menus.
-  const customStyles = useMemo(
-    () => ({
-      placeholder: (provided, _) => ({
-        ...provided,
-        color: "rgb(87,120,94)"
-      }),
-      menu: (base) => ({ ...base, zIndex: 1050 }),
-      control: (base) => ({
-        ...base
-      }),
-      // Grouped options (relationships) should be indented.
-      option: (baseStyle, { data }) => {
-        if (data?.parentPath) {
-          return {
-            ...baseStyle,
-            paddingLeft: "25px"
-          };
-        }
-
-        // Default style for everything else.
-        return {
-          ...baseStyle
-        };
-      },
-
-      // When viewing a group item, the parent path should be prefixed on to the value.
-      singleValue: (baseStyle, { data }) => {
-        if (data?.parentPath) {
-          return {
-            ...baseStyle,
-            ":before": {
-              content: `'${startCase(data.parentPath)} '`
-            }
-          };
-        }
-
-        return {
-          ...baseStyle
-        };
-      }
-    }),
-    [selectedType]
-  );
-
-  function showMapRelationshipCheckbox(columnIndex): boolean {
-    if (numberOfUniqueValueByColumn && headers) {
-      return (
-        numberOfUniqueValueByColumn[sheet][headers[columnIndex]].length <=
-        THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP
-      );
-    } else {
-      return false;
-    }
-  }
-
-  function mapRelationship(columnIndex) {
-    // TODO implement it later
-  }
-
   return (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
       initialValues={{
@@ -542,47 +472,30 @@ export function WorkbookColumnMapping({
               />
               <div className="mb-3 border card px-4 py-2">
                 {/* Column Header Mapping Table */}
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>
-                        <DinaMessage id="spreadsheetHeader" />
-                      </th>
-                      <th>
-                        <DinaMessage id="materialSampleFieldsMapping" />
-                      </th>
-                      <th>
-                        <DinaMessage id="mapRelationship" />
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {headers
-                      ? headers.map((columnHeader, index) => (
-                          <tr key={columnHeader}>
-                            <td>{columnHeader}</td>
-                            <td>
-                              <SelectField
-                                name={`fieldMap[${index}]`}
-                                options={fieldOptions}
-                                hideLabel={true}
-                                styles={customStyles}
-                              />
-                            </td>
-                            <td>
-                              {showMapRelationshipCheckbox(index) && (
-                                <CheckBoxField
-                                  onCheckBoxClick={() => mapRelationship(index)}
-                                  name={`mapRelationships[${index}]`}
-                                  hideLabel={true}
-                                />
-                              )}
-                            </td>
-                          </tr>
-                        ))
-                      : undefined}
-                  </tbody>
-                </Table>
+                <div className="row">
+                  <div className="col-4">
+                    <DinaMessage id="spreadsheetHeader" />
+                  </div>
+                  <div className="col-4">
+                    <DinaMessage id="materialSampleFieldsMapping" />
+                  </div>
+                  <div className="col-4">
+                    <DinaMessage id="mapRelationship" />
+                  </div>
+                </div>
+                {headers
+                  ? headers.map((columnHeader, index) => (
+                      <ColumnMappingRow
+                        columnHeader={columnHeader}
+                        sheet={sheet}
+                        selectedType={selectedType?.value ?? "material-sample"}
+                        columnIndex={index}
+                        fieldOptions={fieldOptions}
+                        fieldMap={fieldMap}
+                        key={index}
+                      />
+                    ))
+                  : undefined}
               </div>
             </>
           );

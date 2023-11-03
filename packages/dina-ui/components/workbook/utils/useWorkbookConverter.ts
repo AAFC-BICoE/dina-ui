@@ -95,12 +95,18 @@ export function useWorkbookConverter(
     }
   }
 
-  function isFieldInRelationshipField(fieldPath: string) {
+  function isFieldInALinkableRelationshipField(fieldPath: string) {
     if (fieldPath.includes(".")) {
       const lastIndex = fieldPath.lastIndexOf(".");
       const parentPath = fieldPath.substring(0, lastIndex);
       const parentConfig = flattenedConfig[parentPath];
-      return !!parentConfig.relationshipConfig;
+      return (
+        parentConfig.relationshipConfig &&
+        (parentConfig.relationshipConfig.linkOrCreateSetting ===
+          LinkOrCreateSetting.LINK ||
+          parentConfig.relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_OR_CREATE)
+      );
     }
     return false;
   }
@@ -506,6 +512,6 @@ export function useWorkbookConverter(
     getFieldConverter,
     getPathOfField,
     getFieldRelationshipConfig,
-    isFieldInRelationshipField
+    isFieldInRelationshipField: isFieldInALinkableRelationshipField
   };
 }
