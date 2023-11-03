@@ -325,7 +325,7 @@ export function MaterialSampleForm({
         >
           <DataEntryField
             legend={<DinaMessage id="materialSampleFieldExtensions" />}
-            name="extensionValuesForm"
+            name="extensionValues"
             readOnly={readOnly}
             isTemplate={isTemplate}
             id={id}

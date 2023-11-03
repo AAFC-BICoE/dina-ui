@@ -13,7 +13,7 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
   ),
   customValueCells: {
     // Date Fields:
-    createdDate: ({
+    createdOn: ({
       row: {
         original: { value }
       }

@@ -51,20 +51,24 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
+          ...(!isExternalResource ? ["originalFilename"] : []),
+          {
+            name: "acDigitizationDate",
+            value: <DateView date={metadata.acDigitizationDate} />
+          },
           {
             name: "group",
             value: <GroupLabel groupName={metadata.group} />
           },
           {
-            name: "createdDate",
-            value: <DateView date={metadata.createdDate} />
+            name: "createdOn",
+            value: <DateView date={metadata.createdOn} />
           },
           {
             name: "xmpMetadataDate",
             value: <DateView date={metadata.xmpMetadataDate} />
           },
-          "acMetadataCreator.displayName",
-          "acSubtype"
+          "acMetadataCreator.displayName"
         ]}
         title={
           isExternalResource
@@ -89,12 +93,8 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           ...(isExternalResource ? ["resourceExternalURL"] : []),
           "dcFormat",
           "acCaption",
-          {
-            name: "acDigitizationDate",
-            value: <DateView date={metadata.acDigitizationDate} />
-          },
           "dcType",
-          ...(!isExternalResource ? ["originalFilename"] : []),
+          "acSubtype",
           "fileExtension",
           "dcCreator.displayName",
           {

@@ -3,7 +3,9 @@ import {
   TextField,
   DATA_EXPORT_SEARCH_RESULTS_KEY,
   useApiClient,
-  LoadingSpinner
+  LoadingSpinner,
+  LabelView,
+  FieldHeader
 } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
@@ -35,13 +37,14 @@ export function ColumnChooser(
 
 export interface UseColumnChooserProps {
   columns: any[];
-  indexName?: string;
+  /** A unique identifier to be used for local storage key */
+  localStorageKey?: string;
   hideExportButton?: boolean;
 }
 
 export function useColumnChooser({
   columns,
-  indexName,
+  localStorageKey,
   hideExportButton = false
 }: UseColumnChooserProps) {
   const { formatMessage, messages } = useIntl();
@@ -55,7 +58,7 @@ export function useColumnChooser({
   const { CustomMenu, checkedColumnIds, dataExportError } = useCustomMenu({
     columns,
     columnSearchMapping,
-    indexName,
+    localStorageKey,
     hideExportButton
   });
   const columnChooser = ColumnChooser(CustomMenu);
@@ -70,19 +73,20 @@ interface UseCustomMenuProps extends UseColumnChooserProps {
 function useCustomMenu({
   columns,
   columnSearchMapping,
-  indexName,
+  localStorageKey,
   hideExportButton
 }: UseCustomMenuProps) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
   const [loading, setLoading] = useState(false);
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
+  const [filterColumsValue, setFilterColumnsValue] = useState<string>("");
 
   const { formatMessage } = useIntl();
 
   const { groupedCheckBoxes, checkedColumnIds } = useGroupedCheckboxWithLabel({
     resources: searchedColumns,
     isField: true,
-    indexName
+    localStorageKey
   });
 
   const { apiClient, save } = useApiClient();
@@ -162,11 +166,17 @@ function useCustomMenu({
           className={props.className}
           aria-labelledby={props.labelledBy}
         >
-          <TextField
-            inputProps={{ autoFocus: true }}
+          <strong>{<FieldHeader name="filterColumns" />}</strong>
+          <input
+            autoFocus={true}
             name="filterColumns"
+            className="form-control"
+            type="text"
             placeholder="Search"
-            onChangeExternal={(_form, _name, value) => {
+            value={filterColumsValue}
+            onChange={(event) => {
+              const value = event.target.value;
+              setFilterColumnsValue(value);
               if (value === "" || !value) {
                 setSearchedColumns(columns);
               } else {
