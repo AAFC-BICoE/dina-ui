@@ -85,5 +85,18 @@ export type WorkbookResourceType = InputResource<
 >;
 
 export interface ColumnUniqueValues {
-  [sheetNumber: number]: { [columnName: string]: string[] };
+  [sheetIndex: number]: {
+    [columnName: string]: {
+      [value: string]: number;
+    };
+  };
+}
+
+export interface WorkbookColumnMap {
+  [columnName: string]: // columnName in the spreadsheet
+  | {
+        fieldPath: string; // Mapped fieldPath in the configuration
+        mapRelationship: boolean; // If relationship mapping needed.
+      }
+    | undefined;
 }
