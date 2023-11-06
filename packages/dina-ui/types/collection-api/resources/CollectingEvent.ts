@@ -14,6 +14,7 @@ import { Protocol } from "./Protocol";
 export interface CollectingEventAttributes {
   type: "collecting-event";
 
+  dwcFieldNumber?: string;
   startEventDateTime?: string | null | undefined;
   endEventDateTime?: string | null;
   dwcRecordedBy?: string;

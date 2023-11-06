@@ -9,6 +9,7 @@ import { SetOptional } from "type-fest";
 import { useAddPersonModal } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import {
+  CollectingEvent,
   Collection,
   Institution,
   StorageUnit
@@ -176,6 +177,46 @@ export function StorageUnitSelectField({
         return storageUnit.name;
       }}
       {...resourceProps}
+    />
+  );
+}
+
+/** CollectingEvent Select Field. **/
+export function CollectingEventSelectField(
+  props: SetOptional<ResourceSelectFieldProps<CollectingEvent>, ProvidedProps>
+) {
+  const { isAdmin, groupNames } = useAccount();
+
+  const filter = filterBy(
+    ["dwcFieldNumber"],
+    !isAdmin
+      ? {
+          extraFilters: [
+            // Restrict the list to just the user's groups:
+            {
+              selector: "group",
+              comparison: "=in=",
+              arguments: groupNames || []
+            }
+          ]
+        }
+      : undefined
+  );
+
+  return (
+    <ResourceSelectField<CollectingEvent>
+      key={String(isAdmin)}
+      readOnlyLink="/collection/collecting-event/view?id="
+      filter={filter}
+      model="collection-api/collecting-event"
+      optionLabel={(coll) =>
+        `${
+          coll.dwcFieldNumber || coll.otherRecordNumbers?.join(", ") || coll.id
+        }}`
+      }
+      cannotBeChanged={true}
+      omitNullOption={true}
+      {...props}
     />
   );
 }
