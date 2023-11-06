@@ -6,13 +6,17 @@ import {
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
+import { chain, startCase } from "lodash";
 import { Ref, useMemo, useRef, useState } from "react";
 import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
-import { chain, startCase } from "lodash";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { WorkbookDataTypeEnum, useWorkbookContext } from "..";
+import {
+  WorkbookColumnMap,
+  WorkbookDataTypeEnum,
+  useWorkbookContext
+} from "..";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { WorkbookDisplay } from "../WorkbookDisplay";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
@@ -51,7 +55,12 @@ export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const { startSavingWorkbook, spreadsheetData } = useWorkbookContext();
+  const {
+    startSavingWorkbook,
+    spreadsheetData,
+    workbookColumnMap,
+    setColumnMap
+  } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
   const { formatMessage } = useDinaIntl();
@@ -65,18 +74,17 @@ export function WorkbookColumnMapping({
     label: string;
     value: string;
   } | null>(entityTypes[0]);
-  const [fieldMap, setFieldMap] = useState<FieldMapType>([]);
-  // fieldHeaderPair stores the pairs of field name in the configuration and the column header in the excel file.
-  const [fieldHeaderPair, setFieldHeaderPair] = useState(
-    {} as { [field: string]: string }
-  );
+  // const [fieldMap, setFieldMap] = useState<FieldMapType>([]);
+  // // fieldHeaderPair stores the pairs of field name in the configuration and the column header in the excel file.
+  // const [fieldHeaderPair, setFieldHeaderPair] = useState(
+  //   {} as { [field: string]: string }
+  // );
 
   const {
     convertWorkbook,
     flattenedConfig,
     getPathOfField,
-    getFieldRelationshipConfig,
-    isFieldInRelationshipField
+    getFieldRelationshipConfig
   } = useWorkbookConverter(
     FieldMappingConfig,
     selectedType?.value || "material-sample"
@@ -149,7 +157,7 @@ export function WorkbookColumnMapping({
   // Generate field options
   const fieldOptions = useMemo(() => {
     if (!!selectedType) {
-      const nonNestedRowOptions: { label: string; value: string }[] = [];
+      const nonNestedRowOptions: { label: string; value: string | null }[] = [];
       const nestedRowOptions: {
         label: string;
         value: string;
@@ -221,17 +229,25 @@ export function WorkbookColumnMapping({
         })
         .sort((a, b) => a.label.localeCompare(b.label))
         .value();
-      const map = [] as FieldMapType;
+
+      // Calculate the workbook column mapping based on the name of the spreadsheet column header name
+      const newWorkbookColumnMap: WorkbookColumnMap = {};
       const _fieldHeaderPair = {};
       for (const columnHeader of headers || []) {
-        const field = findMatchField(columnHeader, newFieldOptions)?.value;
-        if (field !== undefined) {
-          _fieldHeaderPair[field] = columnHeader;
+        const fieldPath = findMatchField(columnHeader, newFieldOptions)?.value;
+        if (fieldPath !== undefined) {
+          _fieldHeaderPair[fieldPath] = columnHeader;
+          newWorkbookColumnMap[columnHeader] = {
+            fieldPath,
+            mapRelationship: false
+          };
+        } else {
+          newWorkbookColumnMap[columnHeader] = undefined;
         }
-        map.push(field);
       }
-      setFieldMap(map);
-      setFieldHeaderPair(_fieldHeaderPair);
+      setColumnMap(newWorkbookColumnMap);
+      // End of workbook column mapping calculation
+
       return nonNestedRowOptions
         ? [...nonNestedRowOptions, ...groupedNestRowOptions]
         : [];
@@ -307,88 +323,88 @@ export function WorkbookColumnMapping({
     if (!!selectedType?.value) {
       for (let i = 0; i < workbookData.length; i++) {
         const row = workbookData[i];
-        for (const field of Object.keys(row)) {
-          if (field === "rowNumber") {
+        for (const columnName of Object.keys(row)) {
+          if (columnName === "rowNumber") {
             continue;
           }
-          const param: {
-            sheet: number;
-            index: number;
-            field: string;
-            dataType?: WorkbookDataTypeEnum;
-          } = {
-            sheet: sheet + 1,
-            index: row.rowNumber + 1,
-            field: fieldHeaderPair[field]
-          };
-          if (!!row[field]) {
-            const fieldPath = getPathOfField(field);
+          if (!!row[columnName]) {
+            const param: {
+              sheet: number;
+              index: number;
+              field: string;
+              dataType?: WorkbookDataTypeEnum;
+            } = {
+              sheet: sheet + 1,
+              index: row.rowNumber + 1,
+              field: columnName // TODO not sure if this is column name in the spreasheet or fieldPath in the config
+            };
+            const fieldPath = getPathOfField(columnName);
             if (fieldPath) {
               switch (flattenedConfig[fieldPath]?.dataType) {
                 case WorkbookDataTypeEnum.BOOLEAN:
-                  if (!isBoolean(row[field])) {
+                  if (!isBoolean(row[columnName])) {
                     param.dataType = WorkbookDataTypeEnum.BOOLEAN;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
-                        field,
+                        columnName,
                         "sheet"
                       )
                     );
                   }
                   break;
                 case WorkbookDataTypeEnum.NUMBER:
-                  if (!isNumber(row[field])) {
+                  if (!isNumber(row[columnName])) {
                     param.dataType = WorkbookDataTypeEnum.NUMBER;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
-                        field,
+                        columnName,
                         "sheet"
                       )
                     );
                   }
                   break;
                 case WorkbookDataTypeEnum.NUMBER_ARRAY:
-                  if (!isNumberArray(row[field])) {
+                  if (!isNumberArray(row[columnName])) {
                     param.dataType = WorkbookDataTypeEnum.NUMBER_ARRAY;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
-                        field,
+                        columnName,
                         "sheet"
                       )
                     );
                   }
                   break;
                 case WorkbookDataTypeEnum.BOOLEAN_ARRAY:
-                  if (!isBooleanArray(row[field])) {
+                  if (!isBooleanArray(row[columnName])) {
                     param.dataType = WorkbookDataTypeEnum.BOOLEAN_ARRAY;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
-                        field,
+                        columnName,
                         "sheet"
                       )
                     );
                   }
                   break;
                 case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
-                  if (!isMap(row[field])) {
+                  if (!isMap(row[columnName])) {
                     param.dataType = WorkbookDataTypeEnum.MANAGED_ATTRIBUTES;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
-                        field,
+                        columnName,
                         "sheet"
                       )
                     );
                   }
-                  const workbookManagedAttributes = convertMap(row[field]);
+                  const workbookManagedAttributes = convertMap(row[columnName]);
                   try {
                     isValidManagedAttribute(
                       workbookManagedAttributes,
-                      FIELD_TO_VOCAB_ELEMS_MAP.get(field),
+                      FIELD_TO_VOCAB_ELEMS_MAP.get(columnName),
                       formatMessage
                     );
                   } catch (error) {
@@ -396,25 +412,29 @@ export function WorkbookColumnMapping({
                   }
                   break;
                 case WorkbookDataTypeEnum.NUMBER:
-                  if (!isNumber(row[field])) {
+                  if (!isNumber(row[columnName])) {
                     param.dataType = WorkbookDataTypeEnum.NUMBER;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
-                        field,
+                        columnName,
                         "sheet"
                       )
                     );
                   }
                   break;
                 case WorkbookDataTypeEnum.VOCABULARY:
-                  const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
-                  if (vocabElements && !vocabElements.includes(row[field])) {
+                  const vocabElements =
+                    FIELD_TO_VOCAB_ELEMS_MAP.get(columnName);
+                  if (
+                    vocabElements &&
+                    !vocabElements.includes(row[columnName])
+                  ) {
                     param.dataType = WorkbookDataTypeEnum.VOCABULARY;
                     errors.push(
                       new ValidationError(
                         formatMessage("workBookInvalidDataFormat", param),
-                        field,
+                        columnName,
                         "sheet"
                       )
                     );
@@ -429,6 +449,17 @@ export function WorkbookColumnMapping({
     return errors;
   }
 
+  function onToggleColumnMapping(colIndex: number, checked: boolean) {
+    console.log(`colIndex: ${colIndex}, checked: ${checked}`);
+  }
+
+  function onFieldMappingChange(newFieldPath: string) {
+    console.log(`newFieldPath: ${newFieldPath}`);
+  }
+
+  const fieldMap = Object.values(workbookColumnMap).map((item) =>
+    item === undefined ? undefined : item.fieldPath
+  );
   return (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
       initialValues={{
@@ -484,16 +515,29 @@ export function WorkbookColumnMapping({
                   </div>
                 </div>
                 {headers
-                  ? headers.map((columnHeader, index) => (
+                  ? headers.map((columnName, index) => (
                       <ColumnMappingRow
-                        columnHeader={columnHeader}
+                        columnHeader={columnName}
                         sheet={sheet}
                         selectedType={selectedType?.value ?? "material-sample"}
                         columnIndex={index}
                         fieldOptions={fieldOptions}
                         fieldMap={fieldMap}
                         key={index}
+                        onToggleColumnMapping={onToggleColumnMapping}
+                        onFieldMappingChange={onFieldMappingChange}
                       />
+                    ))
+                  : undefined}
+              </div>
+              <div className="mb-3 border card px-4 py-2">
+                {headers
+                  ? headers.map((columnName) => (
+                    <>relationship mapping here</>
+                      // <RelationshipFieldMapping
+                      //   columnName={columnName}
+                      //   sheetIndex={sheet}
+                      // />
                     ))
                   : undefined}
               </div>

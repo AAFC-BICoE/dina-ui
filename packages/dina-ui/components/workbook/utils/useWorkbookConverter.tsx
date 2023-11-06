@@ -8,6 +8,10 @@ import {
   WorkbookDataTypeEnum
 } from "..";
 import {
+  CollectingEventSelectField,
+  CollectionSelectField
+} from "../../resource-select-fields/resource-select-fields";
+import {
   convertBoolean,
   convertBooleanArray,
   convertDate,
@@ -46,6 +50,12 @@ export function useWorkbookConverter(
    *    objectField: {
    *      dataType: 'object',
    *      attributes: { name: [Object], age: [Object] }
+   *      relationshipConfig: {
+   *        baseApiPath: "fake-api",
+   *        hasGroup: true,
+   *        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+   *        type: "object-field"
+   *      }
    *    },
    *    'objectField.name': { dataType: 'string' },
    *    'objectField.age': { dataType: 'number' }
@@ -505,6 +515,20 @@ export function useWorkbookConverter(
     }
   }
 
+  function getResourceSelectForRelationshipField(
+    relationshipConfig,
+    fieldName: string,
+    value: string
+  ) {
+    const eleName = `relationshipMapping.${fieldName}.${value}`;
+    switch (relationshipConfig.type) {
+      case "collection":
+        return <CollectionSelectField name={eleName} />;
+      case "collecting-event":
+        return <CollectingEventSelectField name={eleName} />;
+    }
+  }
+
   return {
     linkRelationshipAttribute,
     convertWorkbook,
@@ -512,6 +536,7 @@ export function useWorkbookConverter(
     getFieldConverter,
     getPathOfField,
     getFieldRelationshipConfig,
-    isFieldInRelationshipField: isFieldInALinkableRelationshipField
+    isFieldInALinkableRelationshipField,
+    getResourceSelectForRelationshipField
   };
 }
