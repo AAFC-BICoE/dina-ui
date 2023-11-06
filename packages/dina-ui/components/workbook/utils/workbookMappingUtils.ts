@@ -43,14 +43,30 @@ export function _toPlainString(value: string) {
  */
 export function findMatchField(
   columnHeader: string,
-  fieldOptions: {
-    label: string;
-    value: string;
-    parentPath?: string;
-    isParentRelationshipField?: boolean;
-  }[]
+  fieldOptions: 
+    {
+        label: string;
+        value?: string;
+        options?: 
+          {
+            label: string;
+            value: string;
+            parentPath: string;
+          }[]
+      }[]
+    
 ) {
-  const option = find(fieldOptions, (item) => {
+  const plainOptions: {label: string; value: string}[] = [];
+  for (const opt of fieldOptions) {
+    if (opt.options) {
+      for (const nestOpt of opt.options) {
+        plainOptions.push({label: nestOpt.label, value: nestOpt.value})
+      }
+    } else {
+      plainOptions.push({label: opt.label, value: opt.value!})
+    }
+  }
+  const option = find(plainOptions, (item) => {
     const pos = columnHeader.lastIndexOf(".");
     if (pos !== -1) {
       const prefix = columnHeader.substring(0, pos + 1);
@@ -67,7 +83,7 @@ export function findMatchField(
       return _toPlainString(item.label) === _toPlainString(columnHeader);
     }
   });
-  return option;
+  return option ? option.value : undefined;
 }
 
 /**
@@ -370,17 +386,20 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
 ): ColumnUniqueValues {
   const result: ColumnUniqueValues = {};
   for (const sheet of Object.keys(spreadsheetData)) {
-    const columnUniqueValues: { [columnName: string]: string[] } = {};
+    const columnUniqueValues: {
+      [columnName: string]: { [value: string]: number };
+    } = {};
     const workbookRows: WorkbookRow[] = spreadsheetData[sheet];
     const columnNames: string[] = workbookRows[0].content;
     for (let colIndex = 0; colIndex < columnNames.length; colIndex++) {
-      const uniqueValueSet: Set<string> = new Set();
+      const counts: { [value: string]: number } = {};
       for (let rowIndex = 1; rowIndex < workbookRows.length; rowIndex++) {
         const value = workbookRows[rowIndex].content[colIndex];
-        uniqueValueSet.add(value);
+        if (value !== undefined) {
+          counts[value] = 1 + (counts[value] || 0);
+        }
       }
-      columnUniqueValues[columnNames[colIndex]] =
-        Array.from(uniqueValueSet).sort();
+      columnUniqueValues[columnNames[colIndex]] = counts;
     }
     result[sheet] = columnUniqueValues;
   }

@@ -2,7 +2,6 @@ import { startCase } from "lodash";
 import { CheckBoxField, SelectField } from "packages/common-ui/lib";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { useMemo, useState } from "react";
-import { FieldMapType } from "./WorkbookColumnMapping";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
@@ -15,17 +14,18 @@ export interface ColumnMappingRowProps {
   selectedType: string;
   columnHeader: string;
   columnIndex: number;
-  fieldOptions: (
-    | { label: string; value: string }
-    | {
-        label: string;
-        options: [
-          { label: string; value: string; parentPath: string },
-          ...{ label: string; value: string; parentPath: string }[]
-        ];
-      }
-  )[];
-  fieldMap: FieldMapType;
+  fieldPath?: string;
+  fieldOptions: {
+    label: string;
+    value?: string;
+    options?: {
+      label: string;
+      value: string;
+      parentPath: string;
+    }[];
+  }[];
+  onToggleColumnMapping: (colIndex: number, checked: boolean) => void;
+  onFieldMappingChange: (newFieldPath) => void;
 }
 
 export function ColumnMappingRow({
@@ -33,14 +33,15 @@ export function ColumnMappingRow({
   selectedType,
   columnHeader,
   columnIndex,
+  fieldPath,
   fieldOptions,
-  fieldMap
+  onToggleColumnMapping,
+  onFieldMappingChange
 }: ColumnMappingRowProps) {
   const { formatMessage } = useDinaIntl();
-  const { spreadsheetData, columnUniqueValues: numberOfUniqueValueByColumn } =
-    useWorkbookContext();
+  const { spreadsheetData, columnUniqueValues } = useWorkbookContext();
 
-  const { flattenedConfig, isFieldInRelationshipField } = useWorkbookConverter(
+  const { isFieldInALinkableRelationshipField } = useWorkbookConverter(
     FieldMappingConfig,
     selectedType || "material-sample"
   );
@@ -102,13 +103,13 @@ export function ColumnMappingRow({
 
   function showMapRelationshipCheckbox(colIndex, fieldPath?: string): boolean {
     if (
-      numberOfUniqueValueByColumn &&
+      columnUniqueValues &&
       headers &&
       fieldPath &&
-      isFieldInRelationshipField(fieldPath)
+      isFieldInALinkableRelationshipField(fieldPath)
     ) {
       return (
-        numberOfUniqueValueByColumn[sheet][headers[colIndex]].length <=
+        Object.keys(columnUniqueValues[sheet][headers[colIndex]]).length <=
         THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP
       );
     } else {
@@ -116,31 +117,25 @@ export function ColumnMappingRow({
     }
   }
 
-  function onFieldMapChanged(e: any) {
-    // TODO:
-  }
-
-  function onMapRelationshipClicked(colIndex: number, checked: boolean) {
-    // TODO:
-  }
-
+  console.log("rendering ------", fieldPath);
   return (
     <div className="row">
       <div className="col-md-4">{columnHeader}</div>
       <div className="col-md-4">
         <SelectField
-          name={`fieldMap[${columnIndex}]`}
+          name={`fieldMap.${columnIndex}`}
           options={fieldOptions}
+          selectProps={{ isClearable: true }}
           hideLabel={true}
           styles={customStyles}
-          onChange={(e) => onFieldMapChanged(e)}
+          onChange={(newValue) => onFieldMappingChange(newValue)}
         />
       </div>
       <div className="col-md-4">
-        {showMapRelationshipCheckbox(columnIndex, fieldMap[columnIndex]) && (
+        {showMapRelationshipCheckbox(columnIndex, fieldPath) && (
           <CheckBoxField
             onCheckBoxClick={(e) =>
-              onMapRelationshipClicked(columnIndex, e.target.checked)
+              onToggleColumnMapping?.(columnIndex, e.target.checked)
             }
             name={`mapRelationships[${columnIndex}]`}
             hideLabel={true}

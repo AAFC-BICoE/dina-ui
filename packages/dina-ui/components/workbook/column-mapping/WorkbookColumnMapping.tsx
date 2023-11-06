@@ -51,7 +51,7 @@ export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const { startSavingWorkbook, spreadsheetData } = useWorkbookContext();
+  const { startSavingWorkbook, spreadsheetData, workbookColumnMap } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
   const { formatMessage } = useDinaIntl();
@@ -76,7 +76,7 @@ export function WorkbookColumnMapping({
     flattenedConfig,
     getPathOfField,
     getFieldRelationshipConfig,
-    isFieldInRelationshipField
+    isFieldInALinkableRelationshipField
   } = useWorkbookConverter(
     FieldMappingConfig,
     selectedType?.value || "material-sample"
@@ -224,7 +224,7 @@ export function WorkbookColumnMapping({
       const map = [] as FieldMapType;
       const _fieldHeaderPair = {};
       for (const columnHeader of headers || []) {
-        const field = findMatchField(columnHeader, newFieldOptions)?.value;
+        const field = findMatchField(columnHeader, newFieldOptions);
         if (field !== undefined) {
           _fieldHeaderPair[field] = columnHeader;
         }
@@ -428,6 +428,14 @@ export function WorkbookColumnMapping({
     }
     return errors;
   }
+  
+  function onToggleColumnMapping(colIndex: number, checked: boolean) {
+    console.log(`colIndex: ${colIndex}, checked: ${checked}`);
+  }
+
+  function onFieldMappingChange(newFieldPath: string) {
+    console.log(`newFieldPath: ${newFieldPath}`);
+  }
 
   return (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
@@ -484,14 +492,16 @@ export function WorkbookColumnMapping({
                   </div>
                 </div>
                 {headers
-                  ? headers.map((columnHeader, index) => (
+                  ? headers.map((columnName, index) => (
                       <ColumnMappingRow
-                        columnHeader={columnHeader}
+                        columnHeader={columnName}
                         sheet={sheet}
                         selectedType={selectedType?.value ?? "material-sample"}
                         columnIndex={index}
                         fieldOptions={fieldOptions}
-                        fieldMap={fieldMap}
+                        fieldPath={workbookColumnMap[columnName]?.fieldPath}
+                        onToggleColumnMapping={onToggleColumnMapping}
+                        onFieldMappingChange={onFieldMappingChange}
                         key={index}
                       />
                     ))
