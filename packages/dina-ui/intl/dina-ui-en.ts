@@ -905,7 +905,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_storageUnit: "Storage Unit",
   field_transactionNumber: "Transaction Number",
   field_transactionType: "Transaction Type",
-  field_MaterialDirection: "Material Direction",
+  field_materialDirection: "Material Direction",
   field_otherIdentifiers: "Other Identifiers",
   field_purpose: "Purpose",
   field_status: "Status",
