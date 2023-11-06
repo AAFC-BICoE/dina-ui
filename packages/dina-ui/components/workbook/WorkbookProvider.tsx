@@ -8,9 +8,9 @@ import {
 } from "react";
 import {
   ColumnUniqueValues,
-  WorkbookColumnMap,
   WorkbookJSON,
-  WorkbookResourceType
+  WorkbookResourceType,
+  WorkbookRow
 } from "./types/Workbook";
 
 import db from "./WorkbookDB";
@@ -42,9 +42,7 @@ type actionType =
   | "FAIL_SAVING"
   | "SAVE_PROGRESS"
   | "RESET"
-  | "RETRIEVE_WORKBOOK_FROM_STORAGE"
-  | "SET_COLUMN_MAP";
-
+  | "RETRIEVE_WORKBOOK_FROM_STORAGE";
 
 export type WorkBookSavingStatus =
   | "READY"
@@ -58,7 +56,6 @@ type State = {
   spreadsheetData?: WorkbookJSON;
   columnUniqueValues?: ColumnUniqueValues;
   workbookResources: WorkbookResourceType[];
-  workbookColumnMap: WorkbookColumnMap;
   progress: number;
   status?: WorkBookSavingStatus;
   type?: string;
@@ -89,7 +86,6 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         progress: 0
       });
       return {
-        workbookColumnMap: {},
         workbookResources: [],
         progress: 0,
         status: "CANCELED"
@@ -101,7 +97,6 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
       };
     case "START_SAVING":
       return {
-        ...state,
         status: "SAVING",
         progress: 0,
         workbookResources: action.payload.workbookResources,
@@ -133,7 +128,6 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
       };
     case "RESET":
       return {
-        workbookColumnMap: {},
         workbookResources: [],
         progress: 0
       };
@@ -145,14 +139,8 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         spreadsheetData,
         columnUniqueValues,
         workbookResources: [],
-        workbookColumnMap: {},
         progress: 0
       };
-    case "SET_COLUMN_MAP":
-      return {
-        ...state,
-        ...action.payload
-      }
     default:
       return state;
   }
@@ -162,7 +150,6 @@ export interface WorkbookUploadContextI {
   spreadsheetData?: WorkbookJSON;
   columnUniqueValues?: ColumnUniqueValues;
   workbookResources: WorkbookResourceType[];
-  workbookColumnMap: WorkbookColumnMap;
   progress: number;
   status?: WorkBookSavingStatus;
   saveProgress: (newValue: number) => void;
@@ -172,7 +159,6 @@ export interface WorkbookUploadContextI {
   error?: Error;
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
-  setColumnMap: (newColumnMap : WorkbookColumnMap) => void;
   startSavingWorkbook: (
     newWorkbookResources: WorkbookResourceType[],
     group: string,
@@ -209,7 +195,6 @@ export function WorkbookUploadContextProvider({
   children: ReactNode;
 }) {
   const initState: State = {
-    workbookColumnMap: {},
     workbookResources: [],
     progress: 0
   };
@@ -354,20 +339,12 @@ export function WorkbookUploadContextProvider({
     });
   };
 
-  const setColumnMap = (newColumnMap : WorkbookColumnMap) => {
-    dispatch({
-      type: 'SET_COLUMN_MAP',
-      payload: newColumnMap
-    })
-  }
-
   return (
     <WorkbookUploadProvider
       value={{
         spreadsheetData: state.spreadsheetData,
         columnUniqueValues: state.columnUniqueValues,
         workbookResources: state.workbookResources,
-        workbookColumnMap: state.workbookColumnMap,
         progress: state.progress,
         type: state.type,
         group: state.group,
@@ -376,7 +353,6 @@ export function WorkbookUploadContextProvider({
         error: state.error,
 
         uploadWorkbook,
-        setColumnMap,
         saveProgress,
         startSavingWorkbook,
         pauseSavingWorkbook,

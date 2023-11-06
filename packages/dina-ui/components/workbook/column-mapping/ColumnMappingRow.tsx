@@ -16,7 +16,7 @@ export interface ColumnMappingRowProps {
   columnHeader: string;
   columnIndex: number;
   fieldOptions: (
-    | { label: string; value: string | null }
+    | { label: string; value: string }
     | {
         label: string;
         options: [
@@ -26,8 +26,6 @@ export interface ColumnMappingRowProps {
       }
   )[];
   fieldMap: FieldMapType;
-  onToggleColumnMapping: (colIndex: number, checked: boolean) => void;
-  onFieldMappingChange: (newFieldPath) => void;
 }
 
 export function ColumnMappingRow({
@@ -36,15 +34,13 @@ export function ColumnMappingRow({
   columnHeader,
   columnIndex,
   fieldOptions,
-  fieldMap,
-  onToggleColumnMapping,
-  onFieldMappingChange
+  fieldMap
 }: ColumnMappingRowProps) {
   const { formatMessage } = useDinaIntl();
   const { spreadsheetData, columnUniqueValues: numberOfUniqueValueByColumn } =
     useWorkbookContext();
 
-  const { isFieldInALinkableRelationshipField: isFieldInRelationshipField } = useWorkbookConverter(
+  const { flattenedConfig, isFieldInRelationshipField } = useWorkbookConverter(
     FieldMappingConfig,
     selectedType || "material-sample"
   );
@@ -120,6 +116,14 @@ export function ColumnMappingRow({
     }
   }
 
+  function onFieldMapChanged(e: any) {
+    // TODO:
+  }
+
+  function onMapRelationshipClicked(colIndex: number, checked: boolean) {
+    // TODO:
+  }
+
   return (
     <div className="row">
       <div className="col-md-4">{columnHeader}</div>
@@ -127,17 +131,16 @@ export function ColumnMappingRow({
         <SelectField
           name={`fieldMap[${columnIndex}]`}
           options={fieldOptions}
-          selectProps={{isClearable: true}}
           hideLabel={true}
           styles={customStyles}
-          onChange={(newValue) => onFieldMappingChange(newValue)}
+          onChange={(e) => onFieldMapChanged(e)}
         />
       </div>
       <div className="col-md-4">
         {showMapRelationshipCheckbox(columnIndex, fieldMap[columnIndex]) && (
           <CheckBoxField
             onCheckBoxClick={(e) =>
-              onToggleColumnMapping?.(columnIndex, e.target.checked)
+              onMapRelationshipClicked(columnIndex, e.target.checked)
             }
             name={`mapRelationships[${columnIndex}]`}
             hideLabel={true}
