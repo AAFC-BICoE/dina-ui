@@ -151,7 +151,7 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
     case "SET_COLUMN_MAP":
       return {
         ...state,
-        ...action.payload
+        workbookColumnMap: {...action.payload}
       }
     default:
       return state;

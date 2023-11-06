@@ -12,7 +12,7 @@ import * as yup from "yup";
 import { ValidationError } from "yup";
 import { chain, startCase } from "lodash";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { WorkbookDataTypeEnum, useWorkbookContext } from "..";
+import { WorkbookColumnMap, WorkbookDataTypeEnum, useWorkbookContext } from "..";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { WorkbookDisplay } from "../WorkbookDisplay";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
@@ -29,6 +29,7 @@ import {
   isNumberArray,
   isValidManagedAttribute
 } from "../utils/workbookMappingUtils";
+import { RelationshipFieldMapping } from "../relationship-mapping/RelationshipFieldMapping";
 
 export type FieldMapType = (string | undefined)[];
 
@@ -51,7 +52,7 @@ export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const { startSavingWorkbook, spreadsheetData, workbookColumnMap } = useWorkbookContext();
+  const { startSavingWorkbook, spreadsheetData, setColumnMap } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
   const { formatMessage } = useDinaIntl();
@@ -221,15 +222,26 @@ export function WorkbookColumnMapping({
         })
         .sort((a, b) => a.label.localeCompare(b.label))
         .value();
-      const map = [] as FieldMapType;
+
+        // Calculate the workbook column mapping based on the name of the spreadsheet column header name
+      const newWorkbookColumnMap: WorkbookColumnMap = {};
       const _fieldHeaderPair = {};
+      const map = [] as FieldMapType;
       for (const columnHeader of headers || []) {
-        const field = findMatchField(columnHeader, newFieldOptions);
-        if (field !== undefined) {
-          _fieldHeaderPair[field] = columnHeader;
+        const fieldPath = findMatchField(columnHeader, newFieldOptions);
+        if (fieldPath !== undefined) {
+          _fieldHeaderPair[fieldPath] = columnHeader;
+          newWorkbookColumnMap[columnHeader] = {
+            fieldPath,
+            mapRelationship: false
+          };
+        } else {
+          newWorkbookColumnMap[columnHeader] = undefined;
         }
-        map.push(field);
+        map.push(fieldPath);
       }
+      setColumnMap(newWorkbookColumnMap);
+      // End of workbook column mapping calculation
       setFieldMap(map);
       setFieldHeaderPair(_fieldHeaderPair);
       return nonNestedRowOptions
@@ -430,11 +442,11 @@ export function WorkbookColumnMapping({
   }
   
   function onToggleColumnMapping(colIndex: number, checked: boolean) {
-    console.log(`colIndex: ${colIndex}, checked: ${checked}`);
+    // console.log(`colIndex: ${colIndex}, checked: ${checked}`);
   }
 
   function onFieldMappingChange(newFieldPath: string) {
-    console.log(`newFieldPath: ${newFieldPath}`);
+    // console.log(`newFieldPath: ${newFieldPath}`);
   }
 
   return (
@@ -494,15 +506,25 @@ export function WorkbookColumnMapping({
                 {headers
                   ? headers.map((columnName, index) => (
                       <ColumnMappingRow
-                        columnHeader={columnName}
+                        columnName={columnName}
                         sheet={sheet}
                         selectedType={selectedType?.value ?? "material-sample"}
                         columnIndex={index}
                         fieldOptions={fieldOptions}
-                        fieldPath={workbookColumnMap[columnName]?.fieldPath}
                         onToggleColumnMapping={onToggleColumnMapping}
                         onFieldMappingChange={onFieldMappingChange}
                         key={index}
+                      />
+                    ))
+                  : undefined}
+              </div>
+              <div className="mb-3 border card px-4 py-2">
+                {headers
+                  ? headers.map((columnName, index) => (
+                      <RelationshipFieldMapping
+                        key={index}
+                        columnName={columnName}
+                        sheetIndex={sheet}
                       />
                     ))
                   : undefined}

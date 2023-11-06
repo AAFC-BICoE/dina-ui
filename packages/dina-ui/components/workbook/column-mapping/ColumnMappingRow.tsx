@@ -12,9 +12,8 @@ const THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP = 10;
 export interface ColumnMappingRowProps {
   sheet: number;
   selectedType: string;
-  columnHeader: string;
+  columnName: string;
   columnIndex: number;
-  fieldPath?: string;
   fieldOptions: {
     label: string;
     value?: string;
@@ -31,15 +30,14 @@ export interface ColumnMappingRowProps {
 export function ColumnMappingRow({
   sheet,
   selectedType,
-  columnHeader,
+  columnName,
   columnIndex,
-  fieldPath,
   fieldOptions,
   onToggleColumnMapping,
   onFieldMappingChange
 }: ColumnMappingRowProps) {
   const { formatMessage } = useDinaIntl();
-  const { spreadsheetData, columnUniqueValues } = useWorkbookContext();
+  const { spreadsheetData, columnUniqueValues, workbookColumnMap } = useWorkbookContext();
 
   const { isFieldInALinkableRelationshipField } = useWorkbookConverter(
     FieldMappingConfig,
@@ -117,10 +115,10 @@ export function ColumnMappingRow({
     }
   }
 
-  console.log("rendering ------", fieldPath);
+  const fieldPath= workbookColumnMap[columnName]?.fieldPath
   return (
     <div className="row">
-      <div className="col-md-4">{columnHeader}</div>
+      <div className="col-md-4">{columnName}</div>
       <div className="col-md-4">
         <SelectField
           name={`fieldMap.${columnIndex}`}
