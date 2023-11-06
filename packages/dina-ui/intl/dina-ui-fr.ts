@@ -930,7 +930,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_storageUnit: "Unité de stockage",
   field_transactionNumber: "Numéro de transaction",
   field_transactionType: "Type de transaction",
-  field_MaterialDirection: "Direction du matériau",
+  field_materialDirection: "Direction du matériau",
   field_otherIdentifiers: "Autres identifiants",
   field_purpose: "But",
   field_status: "Statut",
