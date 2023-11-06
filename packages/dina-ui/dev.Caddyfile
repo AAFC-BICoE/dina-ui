@@ -31,8 +31,15 @@ respond /keycloak.json "{
 	\"confidential-port\": 0
 }"
 
+# Provide the current instance mode to the front-end:
 respond /instance.json "{ 
 	\"instance-mode\": \"{$INSTANCE_MODE}\"
+}"
+
+# Provide the dev-user configuration to the front-end:
+respond /dev-user.json "{ 
+	\"enabled\": {$DEV_USER_ENABLED:false},
+	\"groupRole\": \"{$DEV_USER_GROUP_ROLE}\",
 }"
 
 # Proxy to the back-end Object Store API:
