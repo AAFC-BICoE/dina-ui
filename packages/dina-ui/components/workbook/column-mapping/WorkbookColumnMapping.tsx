@@ -11,12 +11,12 @@ import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
 import { chain, startCase } from "lodash";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { WorkbookDataTypeEnum, useWorkbookContext } from "./";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { WorkbookDataTypeEnum, useWorkbookContext } from "..";
 import { ColumnMappingRow } from "./ColumnMappingRow";
-import { WorkbookDisplay } from "./WorkbookDisplay";
-import FieldMappingConfig from "./utils/FieldMappingConfig";
-import { useWorkbookConverter } from "./utils/useWorkbookConverter";
+import { WorkbookDisplay } from "../WorkbookDisplay";
+import FieldMappingConfig from "../utils/FieldMappingConfig";
+import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
   convertMap,
   findMatchField,
@@ -28,7 +28,7 @@ import {
   isNumber,
   isNumberArray,
   isValidManagedAttribute
-} from "./utils/workbookMappingUtils";
+} from "../utils/workbookMappingUtils";
 
 export type FieldMapType = (string | undefined)[];
 

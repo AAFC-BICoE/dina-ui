@@ -3,10 +3,10 @@ import { CheckBoxField, SelectField } from "packages/common-ui/lib";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { useMemo, useState } from "react";
 import { FieldMapType } from "./WorkbookColumnMapping";
-import { useWorkbookContext } from "./WorkbookProvider";
-import FieldMappingConfig from "./utils/FieldMappingConfig";
-import { useWorkbookConverter } from "./utils/useWorkbookConverter";
-import { getColumnHeaders } from "./utils/workbookMappingUtils";
+import { useWorkbookContext } from "../WorkbookProvider";
+import FieldMappingConfig from "../utils/FieldMappingConfig";
+import { useWorkbookConverter } from "../utils/useWorkbookConverter";
+import { getColumnHeaders } from "../utils/workbookMappingUtils";
 
 const THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP = 10;
 
