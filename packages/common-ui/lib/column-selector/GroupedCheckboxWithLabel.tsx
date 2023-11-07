@@ -6,8 +6,8 @@ import { useLocalStorage } from "@rehooks/local-storage";
 export interface CheckboxProps {
   id: string;
   name?: string;
-  handleClick: (e: any) => void;
-  isChecked: boolean;
+  handleClick?: (e: any) => void;
+  isChecked?: boolean;
   isField?: boolean;
 }
 

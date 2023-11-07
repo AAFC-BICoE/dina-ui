@@ -901,5 +901,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_splitConfiguration: "Split Configuration",
   dataExports: "Data Exports",
   dataExportError: "A problem occured while trying to export data.",
-  field_downloadExport: "Download Export"
+  field_downloadExport: "Download Export",
+  managedAttribute: "Managed Attribute {name}"
 };

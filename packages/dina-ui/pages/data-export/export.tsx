@@ -1,17 +1,13 @@
 import {
   useColumnChooser,
   DinaForm,
-  FieldHeader,
   ReactTable,
-  dateCell,
-  stringArrayCell,
   CommonMessage,
   ButtonBar,
   BackButton,
   DATA_EXPORT_TOTAL_RECORDS_KEY
 } from "packages/common-ui/lib";
 import React from "react";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import Link from "next/link";
 import { KitsuResource } from "kitsu";
 import { Footer, Head, Nav } from "packages/dina-ui/components";
@@ -19,6 +15,8 @@ import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
+import { Table, Column } from "@tanstack/react-table";
+import { useState } from "react";
 
 export default function MaterialSampleExportPage<
   TData extends KitsuResource
@@ -27,93 +25,17 @@ export default function MaterialSampleExportPage<
   const [totalRecords] = useLocalStorage<number>(DATA_EXPORT_TOTAL_RECORDS_KEY);
   const hideTable: boolean | undefined = !!router.query.hideTable;
   const indexName = String(router.query.indexName);
-
   const { formatMessage, formatNumber } = useIntl();
+  const [selectedColumns] = useLocalStorage<
+    Column<TData, unknown>[] | undefined
+  >(`${indexName}_columnChooser`);
+  const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
+    useState<JSX.Element>();
+  const [reactTable, setReactTable] = useState<Table<TData>>();
 
-  const columns: TableColumn<any>[] = [
-    // Material Sample Name
-    {
-      id: "materialSampleName",
-      cell: ({
-        row: {
-          original: { id, data }
-        }
-      }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-        >
-          <a>
-            {data?.attributes?.materialSampleName ||
-              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-              id}
-          </a>
-        </Link>
-      ),
-      header: () => <FieldHeader name="materialSampleName" />,
-      accessorKey: "data.attributes.materialSampleName",
-      isKeyword: true
-    },
-
-    // Collection Name (External Relationship)
-    {
-      id: "collectionName",
-      cell: ({
-        row: {
-          original: { included }
-        }
-      }) =>
-        included?.collection?.id ? (
-          <Link
-            href={`/collection/collection/view?id=${included?.collection?.id}`}
-          >
-            <a>{included?.collection?.attributes?.name}</a>
-          </Link>
-        ) : null,
-      header: () => <FieldHeader name="collection.name" />,
-      accessorKey: "included.attributes.name",
-      relationshipType: "collection",
-      isKeyword: true
-    },
-
-    // List of catalogue numbers
-    stringArrayCell(
-      "dwcOtherCatalogNumbers",
-      "data.attributes.dwcOtherCatalogNumbers"
-    ),
-
-    // Material Sample Type
-    {
-      id: "materialSampleType",
-      header: () => <FieldHeader name="materialSampleType" />,
-      accessorKey: "data.attributes.materialSampleType",
-      isKeyword: true
-    },
-
-    // Created By
-    {
-      id: "createdBy",
-      header: () => <FieldHeader name="createdBy" />,
-      accessorKey: "data.attributes.createdBy",
-      isKeyword: true
-    },
-
-    // Created On
-    dateCell("createdOn", "data.attributes.createdOn"),
-
-    // Material Sample State
-    {
-      id: "materialSampleState",
-      header: () => <FieldHeader name="materialSampleState" />,
-      accessorKey: "data.attributes.materialSampleState",
-      isKeyword: true,
-      isColumnVisible: false
-    }
-  ];
-
-  const { checkedColumnIds, CustomMenu, dataExportError } = useColumnChooser({
-    columns,
-    localStorageKey: indexName
+  const { CustomMenu, dataExportError } = useColumnChooser({
+    localStorageKey: indexName,
+    reactTable
   });
 
   return (
@@ -145,12 +67,10 @@ export default function MaterialSampleExportPage<
 
         {!hideTable && (
           <ReactTable<TData>
-            columns={
-              columns.filter((column) =>
-                column.id ? checkedColumnIds.includes(column.id) : false
-              ) as any
-            }
+            columns={selectedColumns ? selectedColumns : []}
             data={[]}
+            setColumnSelectionCheckboxes={setColumnSelectionCheckboxes}
+            setReactTable={setReactTable}
           />
         )}
       </DinaForm>

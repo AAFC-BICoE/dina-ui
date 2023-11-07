@@ -108,5 +108,5 @@ export * from "./table/DateCell";
 export * from "./table/BooleanCell";
 export * from "./list-page/QueryPage";
 export * from "./table/QueryTable";
-export * from "./column-chooser/ColumnChooser";
-export * from "./column-chooser/GroupedCheckboxWithLabel";
+export * from "./column-selector/ColumnSelector";
+export * from "./column-selector/GroupedCheckboxWithLabel";

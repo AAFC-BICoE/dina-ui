@@ -3,6 +3,7 @@ import {
   ColumnSort,
   Row,
   SortingState,
+  Table,
   VisibilityState
 } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
@@ -18,7 +19,6 @@ import {
   FormikButton,
   ReactTable,
   ReactTableProps,
-  getResourcesWithId,
   useAccount,
   useColumnChooser
 } from "..";
@@ -634,10 +634,15 @@ export function QueryPage<TData extends KitsuResource>({
     (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
     {}
   );
+  const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
+    useState<JSX.Element>();
+  const [reactTable, setReactTable] = useState<Table<TData>>();
 
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     defaultSorted: sortingRules,
     columnVisibility,
+    setReactTable,
+    setColumnSelectionCheckboxes,
     ...computedReactTableProps
   };
 
@@ -775,10 +780,10 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
-  const { columnChooser, checkedColumnIds } = useColumnChooser({
-    columns: columnsResults,
+  const { columnSelector } = useColumnChooser({
     localStorageKey: indexName,
-    hideExportButton: true
+    hideExportButton: true,
+    reactTable
   });
 
   return (
@@ -811,7 +816,7 @@ export function QueryPage<TData extends KitsuResource>({
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (
                 <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
-                  {enableColumnChooser && columnChooser}
+                  {enableColumnChooser && columnSelector}
                   {bulkEditPath && (
                     <BulkEditButton
                       pathname={bulkEditPath}
@@ -889,17 +894,7 @@ export function QueryPage<TData extends KitsuResource>({
               )}
               <ReactTable<TData>
                 // Column and data props
-                columns={
-                  enableColumnChooser
-                    ? columnsResults.filter((column) =>
-                        typeof column === "string"
-                          ? checkedColumnIds.includes(column)
-                          : column.id
-                          ? checkedColumnIds.includes(column.id)
-                          : false
-                      )
-                    : columnsResults
-                }
+                columns={columnsResults}
                 data={
                   (viewMode
                     ? customViewFields

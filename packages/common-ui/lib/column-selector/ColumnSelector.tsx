@@ -1,5 +1,4 @@
 import {
-  useGroupedCheckboxWithLabel,
   TextField,
   DATA_EXPORT_SEARCH_RESULTS_KEY,
   useApiClient,
@@ -9,7 +8,7 @@ import {
 } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { startCase } from "lodash";
@@ -17,10 +16,13 @@ import { Button } from "react-bootstrap";
 import useLocalStorage from "@rehooks/local-storage";
 import { DataExport } from "packages/dina-ui/types/dina-export-api";
 import Kitsu from "kitsu";
+import { Table, VisibilityState, Column } from "@tanstack/react-table";
+import { table } from "console";
+import { Checkbox } from "./GroupedCheckboxWithLabel";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
-export function ColumnChooser(
+export function ColumnSelector(
   CustomMenu: React.ForwardRefExoticComponent<
     CustomMenuProps & React.RefAttributes<HTMLDivElement>
   >
@@ -35,59 +37,62 @@ export function ColumnChooser(
   );
 }
 
-export interface UseColumnChooserProps {
-  columns: any[];
+export interface UseColumnChooserProps<TData> {
   /** A unique identifier to be used for local storage key */
   localStorageKey?: string;
   hideExportButton?: boolean;
+  reactTable: Table<TData> | undefined;
 }
 
-export function useColumnChooser({
-  columns,
+export function useColumnChooser<TData>({
   localStorageKey,
-  hideExportButton = false
-}: UseColumnChooserProps) {
-  const { formatMessage, messages } = useIntl();
-  const columnSearchMapping: any[] = columns.map((column) => {
-    const messageKey = `field_${column.id}`;
-    const label = messages[messageKey]
-      ? formatMessage({ id: messageKey as any })
-      : startCase(column.id);
-    return { label: label.toLowerCase(), id: column.id };
-  });
-  const { CustomMenu, checkedColumnIds, dataExportError } = useCustomMenu({
-    columns,
-    columnSearchMapping,
+  hideExportButton = false,
+  reactTable
+}: UseColumnChooserProps<TData>) {
+  const { CustomMenu, dataExportError } = useCustomMenu({
     localStorageKey,
-    hideExportButton
+    hideExportButton,
+    reactTable
   });
-  const columnChooser = ColumnChooser(CustomMenu);
-  return { columnChooser, checkedColumnIds, CustomMenu, dataExportError };
+  const columnSelector = ColumnSelector(CustomMenu);
+  return { columnSelector, CustomMenu, dataExportError };
 }
 
-interface UseCustomMenuProps extends UseColumnChooserProps {
-  columnSearchMapping: any[];
-  hideExportButton: boolean;
-}
+interface UseCustomMenuProps<TData> extends UseColumnChooserProps<TData> {}
 
-function useCustomMenu({
-  columns,
-  columnSearchMapping,
+function useCustomMenu<TData>({
   localStorageKey,
-  hideExportButton
-}: UseCustomMenuProps) {
-  const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
+  hideExportButton,
+  reactTable
+}: UseCustomMenuProps<TData>) {
+  const { formatMessage, messages } = useIntl();
+  // For finding columns using text search
+  const columnSearchMapping: { label: string; id: string }[] | undefined =
+    reactTable?.getAllLeafColumns().map((column) => {
+      const messageKey = `field_${column.id}`;
+      const label = messages[messageKey]
+        ? formatMessage({ id: messageKey as any })
+        : startCase(column.id);
+      return { label: label.toLowerCase(), id: column.id };
+    });
+  const [columns, setColumns] = useLocalStorage<
+    Column<TData, unknown>[] | undefined
+  >(`${localStorageKey}_columnSelector`, reactTable?.getAllLeafColumns());
+  // Columns filtered from text search
+  const [searchedColumns, setSearchedColumns] = useState(
+    reactTable?.getAllLeafColumns()
+  );
+
+  useEffect(() => {
+    setColumns(reactTable?.getAllLeafColumns());
+    setSearchedColumns(reactTable?.getAllLeafColumns());
+  }, [reactTable]);
+
   const [loading, setLoading] = useState(false);
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
+
+  // Keep track of column text search value
   const [filterColumsValue, setFilterColumnsValue] = useState<string>("");
-
-  const { formatMessage } = useIntl();
-
-  const { groupedCheckBoxes, checkedColumnIds } = useGroupedCheckboxWithLabel({
-    resources: searchedColumns,
-    isField: true,
-    localStorageKey
-  });
 
   const { apiClient, save } = useApiClient();
 
@@ -98,6 +103,28 @@ function useCustomMenu({
   }
 
   const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
+  const columnSelectionCheckboxesInternal = (
+    <div>
+      <Checkbox
+        id="selectAll"
+        handleClick={reactTable?.getToggleAllColumnsVisibilityHandler()}
+        isChecked={reactTable?.getIsAllColumnsVisible()}
+      />
+      {searchedColumns?.map((column) => {
+        return (
+          <>
+            <Checkbox
+              key={column.id}
+              id={column.id}
+              handleClick={column.getToggleVisibilityHandler()}
+              isChecked={column.getIsVisible()}
+              isField={true}
+            />
+          </>
+        );
+      })}
+    </div>
+  );
 
   async function exportData() {
     setLoading(true);
@@ -107,7 +134,11 @@ function useCustomMenu({
         type: "data-export",
         source: "dina_material_sample_index",
         query: queryString,
-        columns: checkedColumnIds.filter((id) => id !== "selectColumn")
+        columns: reactTable
+          ? Object.keys(reactTable.getState().columnVisibility).filter(
+              (id) => id !== "selectColumn"
+            )
+          : []
       },
       type: "data-export"
     };
@@ -178,22 +209,22 @@ function useCustomMenu({
               const value = event.target.value;
               setFilterColumnsValue(value);
               if (value === "" || !value) {
-                setSearchedColumns(columns);
+                setSearchedColumns(reactTable?.getAllLeafColumns());
               } else {
                 const searchedColumnsIds = columnSearchMapping
-                  .filter((columnMapping) =>
+                  ?.filter((columnMapping) =>
                     columnMapping.label.includes(value?.toLowerCase())
                   )
                   .map((filteredMapping) => filteredMapping.id);
-                const filteredColumns = columns.filter((column) =>
-                  searchedColumnsIds.includes(column.id)
-                );
+                const filteredColumns = reactTable
+                  ?.getAllLeafColumns()
+                  .filter((column) => searchedColumnsIds?.includes(column.id));
                 setSearchedColumns(filteredColumns);
               }
             }}
           />
           <Dropdown.Divider />
-          {groupedCheckBoxes}
+          {columnSelectionCheckboxesInternal}
           {!hideExportButton && (
             <Button
               disabled={loading}
@@ -211,7 +242,7 @@ function useCustomMenu({
       );
     }
   );
-  return { CustomMenu, checkedColumnIds, dataExportError };
+  return { CustomMenu, dataExportError };
 }
 export async function downloadDataExport(
   apiClient: Kitsu,

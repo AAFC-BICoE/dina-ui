@@ -5,6 +5,7 @@ import {
   PaginationState,
   Row,
   SortingState,
+  Table,
   VisibilityState,
   flexRender,
   getCoreRowModel,
@@ -15,13 +16,14 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import classnames from "classnames";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 
 import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
+import { Checkbox } from "../column-selector/GroupedCheckboxWithLabel";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
@@ -74,6 +76,13 @@ export interface ReactTableProps<TData> {
   columnVisibility?: VisibilityState;
   highlightRow?: boolean;
   TbodyComponent?: React.ElementType;
+  // Mostly used for re-rendering QueryPage so that checkboxes update toggle state
+  setColumnSelectionCheckboxes?: React.Dispatch<
+    React.SetStateAction<JSX.Element | undefined>
+  >;
+  setReactTable?: React.Dispatch<
+    React.SetStateAction<Table<TData> | undefined>
+  >;
 }
 
 export function ReactTable<TData>({
@@ -103,13 +112,15 @@ export function ReactTable<TData>({
   getRowCanExpand,
   rowStyling,
   loading = false,
-  columnVisibility,
+  columnVisibility: columnVisibilityExternal,
   highlightRow = true,
   TbodyComponent,
   enableFilters = false,
   manualFiltering = false,
   onColumnFiltersChange,
-  defaultColumnFilters = []
+  defaultColumnFilters = [],
+  setColumnSelectionCheckboxes,
+  setReactTable
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -171,6 +182,9 @@ export function ReactTable<TData>({
   const onColumnFilterChangeOption = manualFiltering
     ? { onColumnFiltersChange: onColumnFiltersChangeInternal }
     : { onColumnFiltersChange: setColumnFilters };
+  const [columnVisibility, setColumnVisibility] = useState(
+    columnVisibilityExternal
+  );
 
   const tableOption = {
     data,
@@ -197,6 +211,7 @@ export function ReactTable<TData>({
     },
     enableFilters,
     manualFiltering,
+    onColumnVisibilityChange: setColumnVisibility,
     ...onPaginationChangeOption,
     ...onSortingChangeOption,
     ...onColumnFilterChangeOption,
@@ -220,6 +235,37 @@ export function ReactTable<TData>({
   };
 
   const table = useReactTable<TData>(tableOption);
+
+  const columnSelectionCheckboxes = (
+    <div>
+      <Checkbox
+        id="selectAll"
+        handleClick={table.getToggleAllColumnsVisibilityHandler()}
+        isChecked={table.getIsAllColumnsVisible()}
+      />
+      {table.getAllLeafColumns().map((column) => {
+        return (
+          <>
+            <Checkbox
+              key={column.id}
+              id={column.id}
+              handleClick={column.getToggleVisibilityHandler()}
+              isChecked={column.getIsVisible()}
+              isField={true}
+            />
+          </>
+        );
+      })}
+    </div>
+  );
+  useEffect(() => {
+    if (setColumnSelectionCheckboxes) {
+      setColumnSelectionCheckboxes(columnSelectionCheckboxes);
+    }
+    if (setReactTable) {
+      setReactTable(table);
+    }
+  }, [...table.getAllLeafColumns().map((column) => column.getIsVisible())]);
 
   return (
     <div

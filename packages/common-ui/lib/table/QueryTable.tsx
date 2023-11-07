@@ -166,7 +166,7 @@ export function QueryTable<TData extends KitsuResource>({
 
   const divWrapperRef = useRef<HTMLDivElement>(null);
 
-  const { columnChooser, checkedColumnIds } = useColumnChooser({
+  const { columnSelector: columnChooser, checkedColumnIds } = useColumnChooser({
     columns,
     localStorageKey: path,
     hideExportButton: true
