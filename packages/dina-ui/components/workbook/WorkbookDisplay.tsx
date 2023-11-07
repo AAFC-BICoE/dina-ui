@@ -93,7 +93,7 @@ export function WorkbookDisplay({
         className="mb-3"
         style={{ width: "100%", overflowX: "auto", height: "70hp" }}
       >
-        <Card.Header>
+        <Card.Header style={{fontSize: "1.4em"}}>
           <DinaMessage id="workbookPreviewTitle" /> ({numOfRows} /{" "}
           {workbookJsonData ? workbookJsonData[sheetIndex].length - 1 : 0})
         </Card.Header>

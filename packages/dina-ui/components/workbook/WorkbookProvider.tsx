@@ -149,10 +149,11 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         progress: 0
       };
     case "SET_COLUMN_MAP":
-      return {
+      const newState = {
         ...state,
-        workbookColumnMap: {...action.payload}
+        workbookColumnMap: {...state.workbookColumnMap, ...action.payload}
       }
+      return newState;
     default:
       return state;
   }
@@ -355,6 +356,7 @@ export function WorkbookUploadContextProvider({
   };
 
   const setColumnMap = (newColumnMap : WorkbookColumnMap) => {
+    console.log('dispatch ============= SET_COLUMN_MAP')
     dispatch({
       type: 'SET_COLUMN_MAP',
       payload: newColumnMap

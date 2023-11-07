@@ -909,5 +909,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   confirmToResumeSavingWorkbook: "Do you want to continue saving workbook?",
   uploadWorkbookIsDone: 'The workbook is saved, click "OK" to finish it',
   mapRelationship: "Map Relationship",
-  field_storageUnit: "Storage Unit"
+  field_storageUnit: "Storage Unit",
+  mapColumns: "Map Columns"
 };

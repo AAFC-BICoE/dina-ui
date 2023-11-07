@@ -230,6 +230,10 @@ input[type="number"]::-webkit-outer-spin-button {
 /*
  * Accordion Styles
  */
+.accordion-header {
+  background-color: #f3f3f3;
+  margin-top: 0;
+}
 .accordion-button {
   font-size: 1.7rem !important;
   font-weight: 600;

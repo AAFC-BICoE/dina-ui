@@ -23,7 +23,7 @@ export interface ColumnMappingRowProps {
       parentPath: string;
     }[];
   }[];
-  onToggleColumnMapping: (colIndex: number, checked: boolean) => void;
+  onToggleColumnMapping: (colIndex: number, columnName: string, fieldPath: string, checked: boolean) => void;
   onFieldMappingChange: (newFieldPath) => void;
 }
 
@@ -118,7 +118,7 @@ export function ColumnMappingRow({
   const fieldPath= workbookColumnMap[columnName]?.fieldPath
   return (
     <div className="row">
-      <div className="col-md-4">{columnName}</div>
+      <div className="col-md-4 mt-3">{columnName}</div>
       <div className="col-md-4">
         <SelectField
           name={`fieldMap.${columnIndex}`}
@@ -129,11 +129,11 @@ export function ColumnMappingRow({
           onChange={(newValue) => onFieldMappingChange(newValue)}
         />
       </div>
-      <div className="col-md-4">
+      <div className="col-md-4 mt-2">
         {showMapRelationshipCheckbox(columnIndex, fieldPath) && (
           <CheckBoxField
             onCheckBoxClick={(e) =>
-              onToggleColumnMapping?.(columnIndex, e.target.checked)
+              onToggleColumnMapping?.(columnIndex, columnName, fieldPath!, e.target.checked)
             }
             name={`mapRelationships[${columnIndex}]`}
             hideLabel={true}
