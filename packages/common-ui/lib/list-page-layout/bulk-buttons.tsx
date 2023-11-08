@@ -11,6 +11,8 @@ import {
   useModal
 } from "..";
 import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { TableColumn } from "../list-page/types";
+import { KitsuResource } from "kitsu";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -113,12 +115,13 @@ export function BulkEditButton({
   );
 }
 
-export interface DataExportButtonProps {
+export interface DataExportButtonProps<TData extends KitsuResource> {
   /** Where to perform the request for the data export. */
   pathname: string;
   totalRecords: number;
   query: any;
   indexName: string;
+  columns: TableColumn<TData>[];
 }
 
 /**
@@ -126,15 +129,17 @@ export interface DataExportButtonProps {
  *
  * This constant is available to use for setting and retrieving the value.
  */
-export const DATA_EXPORT_SEARCH_RESULTS_KEY = "dataExportSearchResults";
+export const DATA_EXPORT_QUERY_KEY = "dataExportQuery";
 export const DATA_EXPORT_TOTAL_RECORDS_KEY = "dataExportTotalRecords";
+export const DATA_EXPORT_COLUMNS_KEY = "dataExportColumns";
 
-export function DataExportButton({
+export function DataExportButton<TData extends KitsuResource>({
   pathname,
   totalRecords,
   query,
-  indexName
-}: DataExportButtonProps) {
+  indexName,
+  columns
+}: DataExportButtonProps<TData>) {
   const router = useRouter();
 
   return (
@@ -147,7 +152,7 @@ export function DataExportButton({
           : [];
         const selectedIdsQuery = uuidQuery(selectedResourceIds);
         writeStorage<any>(
-          DATA_EXPORT_SEARCH_RESULTS_KEY,
+          DATA_EXPORT_QUERY_KEY,
           selectedResourceIds.length > 0 ? selectedIdsQuery : query
         );
         writeStorage<number>(
@@ -155,6 +160,10 @@ export function DataExportButton({
           selectedResourceIds.length > 0
             ? selectedResourceIds.length
             : totalRecords
+        );
+        writeStorage<TableColumn<TData>[]>(
+          `${indexName}_${DATA_EXPORT_COLUMNS_KEY}`,
+          columns
         );
         await router.push({
           pathname,

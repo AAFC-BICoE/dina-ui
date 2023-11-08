@@ -1,6 +1,6 @@
 import {
   TextField,
-  DATA_EXPORT_SEARCH_RESULTS_KEY,
+  DATA_EXPORT_QUERY_KEY,
   useApiClient,
   LoadingSpinner,
   LabelView,
@@ -38,18 +38,18 @@ export function ColumnSelector(
 
 export interface UseColumnChooserProps<TData> {
   /** A unique identifier to be used for local storage key */
-  localStorageKey?: string;
+  indexName?: string;
   hideExportButton?: boolean;
   reactTable: Table<TData> | undefined;
 }
 
 export function useColumnChooser<TData>({
-  localStorageKey,
+  indexName,
   hideExportButton = false,
   reactTable
 }: UseColumnChooserProps<TData>) {
   const { CustomMenu, dataExportError } = useCustomMenu({
-    localStorageKey,
+    indexName,
     hideExportButton,
     reactTable
   });
@@ -60,7 +60,7 @@ export function useColumnChooser<TData>({
 interface UseCustomMenuProps<TData> extends UseColumnChooserProps<TData> {}
 
 function useCustomMenu<TData>({
-  localStorageKey,
+  indexName,
   hideExportButton,
   reactTable
 }: UseCustomMenuProps<TData>) {
@@ -76,7 +76,7 @@ function useCustomMenu<TData>({
     });
   const [localStorageColumnStates, setLocalStorageColumnStates] =
     useLocalStorage<VisibilityState | undefined>(
-      `${localStorageKey}_columnSelector`,
+      `${indexName}_columnSelector`,
       {}
     );
   // Columns filtered from text search
@@ -114,7 +114,7 @@ function useCustomMenu<TData>({
 
   const { apiClient, save } = useApiClient();
 
-  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_SEARCH_RESULTS_KEY);
+  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
 
   if (queryObject) {
     delete (queryObject as any)._source;
@@ -149,11 +149,13 @@ function useCustomMenu<TData>({
     // Make query to data-export
     const exportColumns = reactTable
       ?.getAllLeafColumns()
-      .filter(
-        (column) =>
-          column.id !== "selectColumn" ||
-          localStorageColumnStates?.[column.id] !== false
-      )
+      .filter((column) => {
+        if (column.id === "selectColumn") {
+          return false;
+        } else {
+          return column.getIsVisible();
+        }
+      })
       .map((column) => column.id);
     const dataExportSaveArg = {
       resource: {

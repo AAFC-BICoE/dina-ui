@@ -170,7 +170,7 @@ export function QueryTable<TData extends KitsuResource>({
   const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
     useState<JSX.Element>();
   const { columnSelector } = useColumnChooser({
-    localStorageKey: path,
+    indexName: path,
     hideExportButton: true,
     reactTable
   });

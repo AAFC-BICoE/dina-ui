@@ -83,6 +83,9 @@ export interface ReactTableProps<TData> {
   setReactTable?: React.Dispatch<
     React.SetStateAction<Table<TData> | undefined>
   >;
+
+  // Hides the table rendering. Useful for accessing table states but don't want to render table
+  hideTable?: boolean;
 }
 
 export function ReactTable<TData>({
@@ -120,7 +123,8 @@ export function ReactTable<TData>({
   onColumnFiltersChange,
   defaultColumnFilters = [],
   setColumnSelectionCheckboxes,
-  setReactTable
+  setReactTable,
+  hideTable = false
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -267,7 +271,7 @@ export function ReactTable<TData>({
     }
   }, [...table.getAllLeafColumns().map((column) => column.getIsVisible())]);
 
-  return (
+  return !hideTable ? (
     <div
       className={classnames(
         "ReactTable",
@@ -392,5 +396,5 @@ export function ReactTable<TData>({
         </div>
       )}
     </div>
-  );
+  ) : null;
 }

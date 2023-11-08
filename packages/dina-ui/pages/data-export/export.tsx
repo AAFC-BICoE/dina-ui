@@ -5,7 +5,8 @@ import {
   CommonMessage,
   ButtonBar,
   BackButton,
-  DATA_EXPORT_TOTAL_RECORDS_KEY
+  DATA_EXPORT_TOTAL_RECORDS_KEY,
+  DATA_EXPORT_COLUMNS_KEY
 } from "packages/common-ui/lib";
 import React from "react";
 import Link from "next/link";
@@ -17,6 +18,7 @@ import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { Table, Column } from "@tanstack/react-table";
 import { useState } from "react";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
 
 export default function MaterialSampleExportPage<
   TData extends KitsuResource
@@ -26,15 +28,15 @@ export default function MaterialSampleExportPage<
   const hideTable: boolean | undefined = !!router.query.hideTable;
   const indexName = String(router.query.indexName);
   const { formatMessage, formatNumber } = useIntl();
-  const [selectedColumns] = useLocalStorage<
-    Column<TData, unknown>[] | undefined
-  >(`${indexName}_columnChooser`);
+  const [columns] = useLocalStorage<TableColumn<TData>[] | undefined>(
+    `${indexName}_${DATA_EXPORT_COLUMNS_KEY}`
+  );
   const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
     useState<JSX.Element>();
   const [reactTable, setReactTable] = useState<Table<TData>>();
 
   const { CustomMenu, dataExportError } = useColumnChooser({
-    localStorageKey: indexName,
+    indexName,
     reactTable
   });
 
@@ -65,14 +67,13 @@ export default function MaterialSampleExportPage<
           <CustomMenu />
         </div>
 
-        {!hideTable && (
-          <ReactTable<TData>
-            columns={selectedColumns ? selectedColumns : []}
-            data={[]}
-            setColumnSelectionCheckboxes={setColumnSelectionCheckboxes}
-            setReactTable={setReactTable}
-          />
-        )}
+        <ReactTable<TData>
+          columns={columns ? columns : []}
+          data={[]}
+          setColumnSelectionCheckboxes={setColumnSelectionCheckboxes}
+          setReactTable={setReactTable}
+          hideTable={hideTable}
+        />
       </DinaForm>
       <Footer />
     </div>
