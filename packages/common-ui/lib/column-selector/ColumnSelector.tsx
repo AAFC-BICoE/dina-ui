@@ -17,7 +17,6 @@ import useLocalStorage from "@rehooks/local-storage";
 import { DataExport } from "packages/dina-ui/types/dina-export-api";
 import Kitsu from "kitsu";
 import { Table, VisibilityState, Column } from "@tanstack/react-table";
-import { table } from "console";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
@@ -75,21 +74,37 @@ function useCustomMenu<TData>({
         : startCase(column.id);
       return { label: label.toLowerCase(), id: column.id };
     });
-  const [columns, setColumns] = useLocalStorage<
-    Column<TData, unknown>[] | undefined
-  >(`${localStorageKey}_columnSelector`, reactTable?.getAllLeafColumns());
+  const [localStorageColumnStates, setLocalStorageColumnStates] =
+    useLocalStorage<VisibilityState | undefined>(
+      `${localStorageKey}_columnSelector`,
+      {}
+    );
   // Columns filtered from text search
-  const [searchedColumns, setSearchedColumns] = useState(
-    reactTable?.getAllLeafColumns()
-  );
+  const [searchedColumns, setSearchedColumns] =
+    useState<Column<TData, unknown>[]>();
 
+  // Set initial columns for column selector dropdown and local storage
   useEffect(() => {
-    const initialColumns = reactTable
-      ?.getAllLeafColumns()
-      .filter((column) => column.id !== "selectColumn");
-    setColumns(initialColumns);
-    setSearchedColumns(initialColumns);
+    reactTable?.getAllLeafColumns().forEach((column) => {
+      if (localStorageColumnStates?.[column.id] === false) {
+        column.toggleVisibility(false);
+      }
+    });
+    setSearchedColumns(reactTable?.getAllLeafColumns());
   }, [reactTable]);
+
+  useEffect(
+    () => {
+      if (reactTable && reactTable?.getState()?.columnVisibility) {
+        const isColumnVisibilityEmpty =
+          Object.keys(reactTable?.getState()?.columnVisibility).length === 0;
+        if (!isColumnVisibilityEmpty) {
+          setLocalStorageColumnStates(reactTable?.getState().columnVisibility);
+        }
+      }
+    },
+    reactTable?.getAllLeafColumns().map((column) => column.getIsVisible())
+  );
 
   const [loading, setLoading] = useState(false);
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
@@ -117,10 +132,10 @@ function useCustomMenu<TData>({
         return (
           <>
             <Checkbox
-              key={column.id}
-              id={column.id}
-              handleClick={column.getToggleVisibilityHandler()}
-              isChecked={column.getIsVisible()}
+              key={column?.id}
+              id={column?.id}
+              handleClick={column?.getToggleVisibilityHandler()}
+              isChecked={column?.getIsVisible()}
               isField={true}
             />
           </>
@@ -132,16 +147,20 @@ function useCustomMenu<TData>({
   async function exportData() {
     setLoading(true);
     // Make query to data-export
+    const exportColumns = reactTable
+      ?.getAllLeafColumns()
+      .filter(
+        (column) =>
+          column.id !== "selectColumn" ||
+          localStorageColumnStates?.[column.id] !== false
+      )
+      .map((column) => column.id);
     const dataExportSaveArg = {
       resource: {
         type: "data-export",
         source: "dina_material_sample_index",
         query: queryString,
-        columns: reactTable
-          ? Object.keys(reactTable.getState().columnVisibility).filter(
-              (id) => id !== "selectColumn"
-            )
-          : []
+        columns: reactTable ? exportColumns : []
       },
       type: "data-export"
     };
