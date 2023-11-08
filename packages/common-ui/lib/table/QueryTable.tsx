@@ -167,6 +167,8 @@ export function QueryTable<TData extends KitsuResource>({
 
   const divWrapperRef = useRef<HTMLDivElement>(null);
   const [reactTable, setReactTable] = useState<Table<TData>>();
+  const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
+    useState<JSX.Element>();
   const { columnSelector } = useColumnChooser({
     localStorageKey: path,
     hideExportButton: true,
@@ -366,6 +368,7 @@ export function QueryTable<TData extends KitsuResource>({
         onPageChange={onPageChangeInternal}
         onSortingChange={onSortingChangeInternal}
         pageSizeOptions={pageSizeOptions}
+        setColumnSelectionCheckboxes={setColumnSelectionCheckboxes}
         setReactTable={setReactTable}
         {...resolvedReactTableProps}
         TbodyComponent={
