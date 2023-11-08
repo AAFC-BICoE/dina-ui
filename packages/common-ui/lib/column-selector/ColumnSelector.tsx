@@ -84,8 +84,11 @@ function useCustomMenu<TData>({
   );
 
   useEffect(() => {
-    setColumns(reactTable?.getAllLeafColumns());
-    setSearchedColumns(reactTable?.getAllLeafColumns());
+    // const initialColumns = reactTable
+    //   ?.getAllLeafColumns()
+    //   .filter((column) => column.id !== "selectColumn");
+    // setColumns(initialColumns);
+    // setSearchedColumns(initialColumns);
   }, [reactTable]);
 
   const [loading, setLoading] = useState(false);

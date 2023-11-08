@@ -21,6 +21,7 @@ import { QueryState } from "../api-client/useQuery";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
+import { Table } from "@tanstack/react-table";
 
 /**
  * Column props with extra props designed specifically for our application on top of it.
@@ -165,11 +166,11 @@ export function QueryTable<TData extends KitsuResource>({
   });
 
   const divWrapperRef = useRef<HTMLDivElement>(null);
-
-  const { columnSelector: columnChooser, checkedColumnIds } = useColumnChooser({
-    columns,
+  const [reactTable, setReactTable] = useState<Table<TData>>();
+  const { columnSelector } = useColumnChooser({
     localStorageKey: path,
-    hideExportButton: true
+    hideExportButton: true,
+    reactTable
   });
 
   function onPageChangeInternal(pageNumber: number) {
@@ -335,7 +336,7 @@ export function QueryTable<TData extends KitsuResource>({
         )}
         <div className="ms-auto">
           <div>
-            {enableColumnChooser && columnChooser}
+            {enableColumnChooser && columnSelector}
             {topRightCorner}
           </div>
 
@@ -346,17 +347,7 @@ export function QueryTable<TData extends KitsuResource>({
       </div>
       <ReactTable<TData>
         className="-striped"
-        columns={
-          enableColumnChooser
-            ? mappedColumns.filter((column) =>
-                typeof column === "string"
-                  ? checkedColumnIds.includes(column)
-                  : (column as any).accessorKey
-                  ? checkedColumnIds.includes((column as any).accessorKey)
-                  : false
-              )
-            : mappedColumns
-        }
+        columns={mappedColumns}
         data={(displayData as TData[]) ?? []}
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}
@@ -375,6 +366,7 @@ export function QueryTable<TData extends KitsuResource>({
         onPageChange={onPageChangeInternal}
         onSortingChange={onSortingChangeInternal}
         pageSizeOptions={pageSizeOptions}
+        setReactTable={setReactTable}
         {...resolvedReactTableProps}
         TbodyComponent={
           error
