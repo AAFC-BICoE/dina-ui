@@ -910,5 +910,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadWorkbookIsDone: 'The workbook is saved, click "OK" to finish it',
   mapRelationship: "Map Relationship",
   field_storageUnit: "Storage Unit",
-  mapColumns: "Map Columns"
+  mapColumns: "Map Columns",
+  field_transactionNumber: "Transaction Number",
+  field_transactionType: "Transaction Type",
+  field_materialDirection: "Material Direction",
+  field_otherIdentifiers: "Other Identifiers",
+  field_purpose: "Purpose",
+  field_status: "Status",
+  field_openedDate: "Opened Date",
+  field_closedDate: "Closed Date",
+  field_dueDate: "Due Date"
 };
