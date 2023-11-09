@@ -103,12 +103,11 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         }
 
-        // Process loaded back-end data into data structure that Forkmiks can use
+        // Process loaded back-end data into data structure that Formik can use
         if (data.extensionValues) {
-          data.extensionValuesForm = processExtensionValuesLoading(
+          data.extensionValues = processExtensionValuesLoading(
             data.extensionValues
           );
-          delete data.extensionValues;
         }
 
         // Convert to separated list
@@ -487,12 +486,11 @@ export function useMaterialSampleSave({
       };
     }
 
-    if (submittedValues.extensionValuesForm) {
+    if (submittedValues.extensionValues) {
       submittedValues.extensionValues = processExtensionValuesSaving(
-        submittedValues.extensionValuesForm
+        submittedValues.extensionValues
       );
     }
-    delete submittedValues.extensionValuesForm;
 
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {

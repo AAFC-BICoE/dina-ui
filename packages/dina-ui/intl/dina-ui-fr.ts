@@ -232,7 +232,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   feedbackButtonText: "Commentaires",
   fieldExtensions: "Extensions de champs",
   materialSampleFieldExtensions:
-    "Extensions de champs de l’événement de collecte",
+    "Extensions de champs de l’échantillon de matériaux",
   collectingEventFieldExtensions:
     "Extensions de champs de l’événement de collecte",
   field_acCaption: "Légende",
@@ -926,5 +926,15 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   year: "Année",
   yearMonth: "Année-Mois",
   yearMonthDay: "Année-Mois-Jour",
-  yearMonthDayTime: "Année-Mois-Jour-Heure"
+  yearMonthDayTime: "Année-Mois-Jour-Heure",
+  field_storageUnit: "Unité de stockage",
+  field_transactionNumber: "Numéro de transaction",
+  field_transactionType: "Type de transaction",
+  field_materialDirection: "Direction du matériau",
+  field_otherIdentifiers: "Autres identifiants",
+  field_purpose: "But",
+  field_status: "Statut",
+  field_openedDate: "Date d'ouverture",
+  field_closedDate: "Date de fermeture",
+  field_dueDate: "Date d'échéance"
 };

@@ -18,9 +18,6 @@ import Col from "react-bootstrap/Col";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
 import axios from "axios";
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownButton from "react-bootstrap/DropdownButton";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
@@ -81,7 +78,7 @@ export function Nav({ marginBottom = true }: NavProps) {
             </Col>
           </Row>
         </Container>
-        <Navbar className="app-bar" expand="lg" role="menubar">
+        <Navbar className="app-bar" expand="lg">
           <Container fluid={true} className="px-5">
             <Link href="/" passHref={true}>
               <Navbar.Brand href="/" className="app-name">
@@ -96,25 +93,19 @@ export function Nav({ marginBottom = true }: NavProps) {
               </Navbar.Brand>
             </Link>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
+            <Navbar.Collapse id="basic-navbar-nav" role="menubar">
               {/* Navigation menu left */}
-              <ReactNav role="menubar">
-                <NavCollectionDropdown formatMessage={formatMessage} />
-                <NavTransactionsDropdown formatMessage={formatMessage} />
-                <NavObjectStoreDropdown formatMessage={formatMessage} />
-                <NavAgentDropdown formatMessage={formatMessage} />
-                <NavSequenceDropdown formatMessage={formatMessage} />
-                <NavControlledVocabularyDropdown
-                  formatMessage={formatMessage}
-                />
-              </ReactNav>
+              <NavCollectionDropdown formatMessage={formatMessage} />
+              <NavTransactionsDropdown formatMessage={formatMessage} />
+              <NavObjectStoreDropdown formatMessage={formatMessage} />
+              <NavAgentDropdown formatMessage={formatMessage} />
+              <NavSequenceDropdown formatMessage={formatMessage} />
+              <NavControlledVocabularyDropdown formatMessage={formatMessage} />
 
               {/* Navigation menu right */}
-              <ReactNav style={{ marginLeft: "auto" }} role="menubar">
-                {showManagementNavigation && (
-                  <NavDinaManagementDropdown formatMessage={formatMessage} />
-                )}
-              </ReactNav>
+              {showManagementNavigation && (
+                <NavDinaManagementDropdown formatMessage={formatMessage} />
+              )}
             </Navbar.Collapse>
           </Container>
         </Navbar>
@@ -221,6 +212,7 @@ function NavCollectionDropdown({ formatMessage }) {
       onMouseLeave={hideDropdown}
       show={show}
       role="menuitem"
+      menuRole="menu"
     >
       <Link href="/collection/assemblage/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
@@ -278,6 +270,7 @@ function NavTransactionsDropdown({ formatMessage }) {
       onMouseLeave={hideDropdown}
       onKeyDown={onKeyDown}
       role="menuitem"
+      menuRole="menu"
     >
       <Link href="/loan-transaction/revisions-by-user" passHref={true}>
         <NavDropdown.Item role="menuitem">
@@ -304,6 +297,7 @@ function NavObjectStoreDropdown({ formatMessage }) {
       onMouseLeave={hideDropdown}
       show={show}
       role="menuitem"
+      menuRole="menu"
     >
       <Link
         href="/object-store/metadata/external-resource-edit"
@@ -348,6 +342,7 @@ function NavAgentDropdown({ formatMessage }) {
       onMouseLeave={hideDropdown}
       show={show}
       role="menuitem"
+      menuRole="menu"
     >
       <Link href="/organization/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
@@ -374,6 +369,7 @@ function NavSequenceDropdown({ formatMessage }) {
       onMouseLeave={hideDropdown}
       show={show}
       role="menuitem"
+      menuRole="menu"
     >
       <Link href="/seqdb/index-set/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
@@ -461,6 +457,7 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
       onMouseLeave={hideDropdown}
       show={show}
       role="menuitem"
+      menuRole="menu"
     >
       <Link href="/collection/collection-method/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
@@ -528,6 +525,8 @@ function NavDinaManagementDropdown({ formatMessage }) {
       show={show}
       className="float-right"
       role="menuitem"
+      menuRole="menu"
+      style={{ marginLeft: "auto" }}
     >
       {/* Admins only can view users. */}
       {isAdmin && (
