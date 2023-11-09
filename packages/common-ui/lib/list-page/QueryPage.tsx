@@ -317,6 +317,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Query Page error message state
   const [error, setError] = useState<any>();
+  const [queryBuilderESKeys, setQueryBuilderESKeys] = useState<string[]>([]);
 
   const defaultGroups = {
     group: groups
@@ -365,6 +366,7 @@ export function QueryPage<TData extends KitsuResource>({
         fieldNames
       );
     }
+    setQueryBuilderESKeys(fieldNames);
 
     queryDSL = applyRootQuery(queryDSL);
 

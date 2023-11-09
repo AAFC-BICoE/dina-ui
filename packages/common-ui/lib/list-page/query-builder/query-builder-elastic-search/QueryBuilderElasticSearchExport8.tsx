@@ -111,7 +111,12 @@ function buildEsRule(
     fieldName,
     config
   );
-  fieldNames.push(fieldName);
+
+  for (const param of Object.values(parameters)) {
+    for (const elasticSearchKey of Object.keys(param as any)) {
+      fieldNames.push(elasticSearchKey);
+    }
+  }
 
   return { ...parameters };
 }
