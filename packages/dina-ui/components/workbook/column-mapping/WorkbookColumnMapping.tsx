@@ -437,9 +437,6 @@ export function WorkbookColumnMapping({
     fieldPath: string,
     checked: boolean
   ) {
-    console.log(
-      `colIndex: ${colIndex}, columnName: ${columnName}, fieldPath: ${fieldPath}, checked: ${checked}`
-    );
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
       fieldPath,
@@ -448,8 +445,17 @@ export function WorkbookColumnMapping({
     setColumnMap(newColumnMap);
   }
 
-  function onFieldMappingChange(newFieldPath: string) {
-    console.log(`newFieldPath: ${newFieldPath}`);
+  function onFieldMappingChange(
+    colIndex: number,
+    columnName: string,
+    newFieldPath: string
+  ) {
+    const newColumnMap: WorkbookColumnMap = {};
+    newColumnMap[columnName] = {
+      fieldPath: newFieldPath,
+      mapRelationship: false
+    };
+    setColumnMap(newColumnMap);
   }
 
   return (
@@ -504,12 +510,15 @@ export function WorkbookColumnMapping({
                 className="mb-3"
                 style={{ width: "100%", overflowX: "auto", height: "70hp" }}
               >
-                <Card.Header style={{fontSize: "1.4em"}}>
+                <Card.Header style={{ fontSize: "1.4em" }}>
                   <DinaMessage id="mapColumns" />
                 </Card.Header>
                 <Card.Body className="mb-3 px-4 py-2">
                   {/* Column Header Mapping Table */}
-                  <div className="row mb-2" style={{borderBottom: 'solid 1px', paddingBottom: '8px'}}>
+                  <div
+                    className="row mb-2"
+                    style={{ borderBottom: "solid 1px", paddingBottom: "8px" }}
+                  >
                     <div className="col-4">
                       <DinaMessage id="spreadsheetHeader" />
                     </div>

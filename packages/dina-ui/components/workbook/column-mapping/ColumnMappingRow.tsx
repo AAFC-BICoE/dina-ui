@@ -1,6 +1,6 @@
 import { startCase } from "lodash";
-import { CheckBoxField, SelectField } from "packages/common-ui/lib";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { CheckBoxField, SelectField } from "../../../../common-ui/lib";
+import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useMemo, useState } from "react";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
@@ -24,7 +24,7 @@ export interface ColumnMappingRowProps {
     }[];
   }[];
   onToggleColumnMapping: (colIndex: number, columnName: string, fieldPath: string, checked: boolean) => void;
-  onFieldMappingChange: (newFieldPath) => void;
+  onFieldMappingChange: (colIndex: number, columnName: string, newFieldPath) => void;
 }
 
 export function ColumnMappingRow({
@@ -126,7 +126,7 @@ export function ColumnMappingRow({
           selectProps={{ isClearable: true }}
           hideLabel={true}
           styles={customStyles}
-          onChange={(newValue) => onFieldMappingChange(newValue)}
+          onChange={(newFieldPath) => onFieldMappingChange(columnIndex, columnName, newFieldPath)}
         />
       </div>
       <div className="col-md-4 mt-2">
@@ -135,7 +135,7 @@ export function ColumnMappingRow({
             onCheckBoxClick={(e) =>
               onToggleColumnMapping?.(columnIndex, columnName, fieldPath!, e.target.checked)
             }
-            name={`relationshipMapping.${columnName}.mapRelationships`}
+            name={`relationshipMapping.${columnName.replaceAll('.', '_')}.mapRelationships`}
             hideLabel={true}
           />
         )}

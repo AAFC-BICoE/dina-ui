@@ -356,7 +356,6 @@ export function WorkbookUploadContextProvider({
   };
 
   const setColumnMap = (newColumnMap : WorkbookColumnMap) => {
-    console.log('dispatch ============= SET_COLUMN_MAP')
     dispatch({
       type: 'SET_COLUMN_MAP',
       payload: newColumnMap
