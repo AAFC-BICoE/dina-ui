@@ -182,7 +182,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
         linkOrCreateSetting: LinkOrCreateSetting.LINK,
-        type: "preparation-type",
+        type: "preparation-method",
         hasGroup: true,
         baseApiPath: "/collection-api",
         queryFields: ["name"]

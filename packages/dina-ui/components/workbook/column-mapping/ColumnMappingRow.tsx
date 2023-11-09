@@ -1,7 +1,6 @@
 import { startCase } from "lodash";
-import { CheckBoxField, SelectField } from "../../../../common-ui/lib";
-import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useMemo, useState } from "react";
+import { CheckBoxField, SelectField } from "../../../../common-ui/lib";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
@@ -36,7 +35,6 @@ export function ColumnMappingRow({
   onToggleColumnMapping,
   onFieldMappingChange
 }: ColumnMappingRowProps) {
-  const { formatMessage } = useDinaIntl();
   const { spreadsheetData, columnUniqueValues, workbookColumnMap } = useWorkbookContext();
 
   const { isFieldInALinkableRelationshipField } = useWorkbookConverter(

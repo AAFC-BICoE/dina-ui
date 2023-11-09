@@ -9,8 +9,13 @@ import {
 } from "..";
 import {
   CollectingEventSelectField,
+  CollectionMethodSelectField,
   CollectionSelectField,
-  PersonSelectField
+  PersonSelectField,
+  PreparationMethodSelectField,
+  PreparationTypeSelectField,
+  ProjectSelectField,
+  ProtocolSelectField
 } from "../../resource-select-fields/resource-select-fields";
 import {
   convertBoolean,
@@ -524,20 +529,33 @@ export function useWorkbookConverter(
   ) {
     const parentPath = getParentFieldPath(fieldPath);
     const relationshipConfig = getFieldRelationshipConfig(parentPath);
-    const eleName = `relationshipMapping.${columnName.replaceAll('.', '_')}.${value}`;
+    const eleName = `relationshipMapping.${columnName.replaceAll(
+      ".",
+      "_"
+    )}.${value}`;
     const resourceSelectProps = {
       hideLabel: true,
-      selectProps: { isClearable: true}, 
+      selectProps: { isClearable: true },
       cannotBeChanged: false,
       name: eleName
     };
     switch (relationshipConfig?.type) {
       case "collection":
-        return <CollectionSelectField {...resourceSelectProps}/>;
+        return <CollectionSelectField {...resourceSelectProps} />;
       case "collecting-event":
         return <CollectingEventSelectField {...resourceSelectProps} />;
       case "person":
         return <PersonSelectField {...resourceSelectProps} />;
+      case "collection-method":
+        return <CollectionMethodSelectField {...resourceSelectProps} />;
+      case "protocol":
+        return <ProtocolSelectField {...resourceSelectProps} />;
+      case "preparation-type":
+        return <PreparationTypeSelectField {...resourceSelectProps} />;
+      case "preparation-method":
+        return <PreparationMethodSelectField {...resourceSelectProps} />;
+      case "project":
+        return <ProjectSelectField {...resourceSelectProps} />;
     }
   }
 
