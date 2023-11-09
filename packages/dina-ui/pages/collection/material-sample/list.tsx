@@ -271,15 +271,24 @@ export default function MaterialSampleListPage() {
     },
 
     // Created On
-    dateCell("createdOn", "data.attributes.createdOn")
-    // {
-    //   id: "managedAttributesB",
-    //   header: () => <FieldHeader name={formatMessage("managedAttribute", {
-    //     name: "B"
-    //   })} />,
-    //   accessorKey: "data.attributes.managedAttributes.b"
-    //   // isKeyword: true
-    // }
+    dateCell("createdOn", "data.attributes.createdOn"),
+    {
+      header: () => (
+        <FieldHeader
+          name={formatMessage("managedAttribute", {
+            name: "integer 1"
+          })}
+        />
+      ),
+      accessorKey: "data.attributes.managedAttributes.integer_1"
+      // isKeyword: true
+    },
+    // TODO: remove after finishing ES parsing
+    dateCell(
+      "collectingEventCreatedOn",
+      "included.attributes.createdOn",
+      "collecting-event"
+    )
   ];
 
   function rowStyling(row: Row<MaterialSample>) {
