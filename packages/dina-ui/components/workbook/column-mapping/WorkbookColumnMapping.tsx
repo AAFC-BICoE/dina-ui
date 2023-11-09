@@ -509,8 +509,8 @@ export function WorkbookColumnMapping({
                 </Card.Header>
                 <Card.Body className="mb-3 px-4 py-2">
                   {/* Column Header Mapping Table */}
-                  <div className="row">
-                    <div className="col-4 mt-2">
+                  <div className="row mb-2" style={{borderBottom: 'solid 1px', paddingBottom: '8px'}}>
+                    <div className="col-4">
                       <DinaMessage id="spreadsheetHeader" />
                     </div>
                     <div className="col-4">

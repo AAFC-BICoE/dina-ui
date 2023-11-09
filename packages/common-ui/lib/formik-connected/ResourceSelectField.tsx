@@ -12,7 +12,7 @@ import {
 } from "..";
 
 /** The value could be one element or an array. */
-export type SingleOrArray<T> = T | T[];
+export type SingleOrArray<T> = null | T | T[];
 
 export interface ResourceSelectFieldProps<TData extends KitsuResource>
   extends Omit<ResourceSelectProps<TData>, "value">,

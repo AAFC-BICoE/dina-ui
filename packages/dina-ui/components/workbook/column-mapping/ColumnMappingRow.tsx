@@ -121,7 +121,7 @@ export function ColumnMappingRow({
       <div className="col-md-4 mt-3">{columnName}</div>
       <div className="col-md-4">
         <SelectField
-          name={`fieldMap.${columnIndex}`}
+          name={`fieldMap[${columnIndex}]`}
           options={fieldOptions}
           selectProps={{ isClearable: true }}
           hideLabel={true}
@@ -135,7 +135,7 @@ export function ColumnMappingRow({
             onCheckBoxClick={(e) =>
               onToggleColumnMapping?.(columnIndex, columnName, fieldPath!, e.target.checked)
             }
-            name={`mapRelationships[${columnIndex}]`}
+            name={`relationshipMapping.${columnName}.mapRelationships`}
             hideLabel={true}
           />
         )}

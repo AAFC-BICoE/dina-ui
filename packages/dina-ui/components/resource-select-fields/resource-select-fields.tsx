@@ -65,8 +65,8 @@ export function CollectionSelectField(
       optionLabel={(coll) =>
         `${coll.name || coll.id}${coll.code ? ` (${coll.code})` : ""}`
       }
-      cannotBeChanged={true}
-      omitNullOption={true}
+      cannotBeChanged={props.cannotBeChanged === undefined ? true : props.cannotBeChanged}
+      omitNullOption={props.omitNullOption === undefined ? true : props.omitNullOption}
       {...props}
     />
   );

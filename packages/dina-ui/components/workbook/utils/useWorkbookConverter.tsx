@@ -9,7 +9,8 @@ import {
 } from "..";
 import {
   CollectingEventSelectField,
-  CollectionSelectField
+  CollectionSelectField,
+  PersonSelectField
 } from "../../resource-select-fields/resource-select-fields";
 import {
   convertBoolean,
@@ -20,6 +21,7 @@ import {
   convertNumberArray,
   convertStringArray,
   flattenObject,
+  getParentFieldPath,
   isObject
 } from "./workbookMappingUtils";
 
@@ -516,16 +518,26 @@ export function useWorkbookConverter(
   }
 
   function getResourceSelectForRelationshipField(
-    relationshipConfig,
-    fieldName: string,
+    columnName: string,
+    fieldPath: string,
     value: string
   ) {
-    const eleName = `relationshipMapping.${fieldName}.${value}`;
-    switch (relationshipConfig.type) {
+    const parentPath = getParentFieldPath(fieldPath);
+    const relationshipConfig = getFieldRelationshipConfig(parentPath);
+    const eleName = `relationshipMapping.${columnName}.${value}`;
+    const resourceSelectProps = {
+      hideLabel: true,
+      selectProps: { isClearable: true}, 
+      cannotBeChanged: false,
+      name: eleName
+    };
+    switch (relationshipConfig?.type) {
       case "collection":
-        return <CollectionSelectField name={eleName} />;
+        return <CollectionSelectField {...resourceSelectProps}/>;
       case "collecting-event":
-        return <CollectingEventSelectField name={eleName} />;
+        return <CollectingEventSelectField {...resourceSelectProps} />;
+      case "person":
+        return <PersonSelectField {...resourceSelectProps} />;
     }
   }
 

@@ -117,7 +117,6 @@ export function UploadWorkbookPage() {
             />
           ) : spreadsheetData ? (
             <WorkbookColumnMapping
-              spreadsheetData={spreadsheetData}
               performSave={performSave}
               setPerformSave={setPerformSave}
             />
