@@ -633,6 +633,7 @@ function generateBuilderConfig(
       <QueryConjunctionSwitch
         currentConjunction={conjunctionProps?.selectedConjunction}
         setConjunction={conjunctionProps?.setConjunction}
+        disabled={conjunctionProps?.disabled}
       />
     )
   };

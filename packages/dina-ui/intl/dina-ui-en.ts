@@ -902,5 +902,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_splitConfiguration: "Split Configuration",
   dataExports: "Data Exports",
   dataExportError: "A problem occured while trying to export data.",
-  field_downloadExport: "Download Export"
+  field_downloadExport: "Download Export",
+  field_storageUnit: "Storage Unit",
+  field_transactionNumber: "Transaction Number",
+  field_transactionType: "Transaction Type",
+  field_materialDirection: "Material Direction",
+  field_otherIdentifiers: "Other Identifiers",
+  field_purpose: "Purpose",
+  field_status: "Status",
+  field_openedDate: "Opened Date",
+  field_closedDate: "Closed Date",
+  field_dueDate: "Due Date"
 };
