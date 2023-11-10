@@ -317,7 +317,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Query Page error message state
   const [error, setError] = useState<any>();
-  const [queryBuilderESKeys, setQueryBuilderESKeys] = useState<string[]>([]);
+  const [queryParameters, setQueryParameters] = useState<string[]>([]);
 
   const defaultGroups = {
     group: groups
@@ -356,17 +356,28 @@ export function QueryPage<TData extends KitsuResource>({
 
     // Elastic search query with pagination settings.
     let queryDSL;
-    const fieldNames = [];
+    const parameters = [];
     if (customViewElasticSearchQuery) {
       queryDSL = customViewElasticSearchQuery;
     } else {
       queryDSL = elasticSearchFormatExport(
         submittedQueryBuilderTree,
         queryBuilderConfig,
-        fieldNames
+        parameters
       );
     }
-    setQueryBuilderESKeys(fieldNames);
+    parameters.forEach((queryParameter) => {
+      const flattenedParameter = flattenObject(queryParameter);
+      Object.keys(flattenedParameter).forEach((paramKey) => {
+        if (paramKey.includes("data.attributes")) {
+          const dataAttributesIndex = paramKey.indexOf("data.attributes");
+          const queryKey = paramKey.slice(dataAttributesIndex);
+        } else if (paramKey.includes("included.attributes")) {
+          const dataAttributesIndex = paramKey.indexOf("included.attributes");
+          const queryKey = paramKey.slice(dataAttributesIndex);
+        }
+      });
+    });
 
     queryDSL = applyRootQuery(queryDSL);
 
@@ -665,6 +676,31 @@ export function QueryPage<TData extends KitsuResource>({
       : []),
     ...columns
   ];
+
+  /**
+   * Return a flattened object with nested keys concatenated with "."
+   * @param ob
+   * @returns Flattened object
+   */
+  function flattenObject(ob) {
+    const toReturn = {};
+
+    for (const i in ob) {
+      if (!ob.hasOwnProperty(i)) continue;
+
+      if (typeof ob[i] === "object" && ob[i] !== null) {
+        const flatObject = flattenObject(ob[i]);
+        for (const x in flatObject) {
+          if (!flatObject.hasOwnProperty(x)) continue;
+
+          toReturn[i + "." + x] = flatObject[x];
+        }
+      } else {
+        toReturn[i] = ob[i];
+      }
+    }
+    return toReturn;
+  }
 
   // Columns generated for the selected resources, only in selection mode.
   const columnsSelected: TableColumn<TData>[] = [

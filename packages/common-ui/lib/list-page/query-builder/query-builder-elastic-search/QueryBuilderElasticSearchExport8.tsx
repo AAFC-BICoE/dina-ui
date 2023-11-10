@@ -35,7 +35,7 @@ export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
 export function elasticSearchFormatExport(
   queryTree: ImmutableTree,
   config: Config,
-  fieldNames
+  queryParameters
 ) {
   if (!queryTree) return undefined;
   const type = queryTree.get("type");
@@ -46,7 +46,7 @@ export function elasticSearchFormatExport(
     const field = properties.get("field");
     const value = properties.get("value").toJS();
 
-    return buildEsRule(field, value, operator, config, fieldNames);
+    return buildEsRule(field, value, operator, config, queryParameters);
   }
 
   if (type === "group" || type === "rule_group") {
@@ -59,7 +59,7 @@ export function elasticSearchFormatExport(
       conjunction,
       elasticSearchFormatExport,
       config,
-      fieldNames
+      queryParameters
     );
   }
 }
@@ -79,7 +79,7 @@ function buildEsRule(
   value: string,
   operator: string,
   config: Config,
-  fieldNames
+  queryParameters
 ) {
   const widgetName = config.fields?.[fieldName]?.type;
   const widgetConfig = config.widgets[widgetName];
@@ -111,12 +111,7 @@ function buildEsRule(
     fieldName,
     config
   );
-
-  for (const param of Object.values(parameters)) {
-    for (const elasticSearchKey of Object.keys(param as any)) {
-      fieldNames.push(elasticSearchKey);
-    }
-  }
+  queryParameters.push(parameters);
 
   return { ...parameters };
 }
@@ -135,7 +130,7 @@ function buildEsGroup(
   conjunction,
   recursiveFunction,
   config: Config,
-  fieldNames
+  queryParameters
 ) {
   // If there is nothing in the group, then don't add it to the query.
   if (!children || !children.size) return undefined;
@@ -147,7 +142,7 @@ function buildEsGroup(
 
   // Go through each of the children and generate the elastic search query for each item.
   const result = childrenArray
-    .map((childTree) => recursiveFunction(childTree, config, fieldNames))
+    .map((childTree) => recursiveFunction(childTree, config, queryParameters))
     .filter((v) => v !== undefined);
 
   // If no results, do not add this group to the query.
