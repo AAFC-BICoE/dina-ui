@@ -5,20 +5,24 @@ exports[`QueryConjunctionSwitch component Snapshot Test 1`] = `
   <div className=\\"toggleGroup\\">
     <Button className=\\"toggleButton activeToggle\\" onClick={[Function: onClick]} variant=\\"primary\\" active={false} disabled={false}>
       <button onClick={[Function: onClick]} disabled={false} type=\\"button\\" className=\\"toggleButton activeToggle btn btn-primary\\">
-        <FormattedMessage id=\\"queryBuilder_conjunction_and\\">
-          <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_and\\">
-             
+        <span>
+          <FormattedMessage id=\\"queryBuilder_conjunction_and\\">
+            <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_and\\">
+               
+            </FormattedMessage>
           </FormattedMessage>
-        </FormattedMessage>
+        </span>
       </button>
     </Button>
     <Button className=\\"toggleButton\\" onClick={[Function: onClick]} variant=\\"primary\\" active={false} disabled={false}>
       <button onClick={[Function: onClick]} disabled={false} type=\\"button\\" className=\\"toggleButton btn btn-primary\\">
-        <FormattedMessage id=\\"queryBuilder_conjunction_or\\">
-          <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_or\\">
-             
+        <span>
+          <FormattedMessage id=\\"queryBuilder_conjunction_or\\">
+            <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_or\\">
+               
+            </FormattedMessage>
           </FormattedMessage>
-        </FormattedMessage>
+        </span>
       </button>
     </Button>
   </div>
@@ -30,20 +34,24 @@ exports[`QueryConjunctionSwitch component Snapshot Test 2`] = `
   <div className=\\"toggleGroup\\">
     <Button className=\\"toggleButton\\" onClick={[Function: onClick]} variant=\\"primary\\" active={false} disabled={false}>
       <button onClick={[Function: onClick]} disabled={false} type=\\"button\\" className=\\"toggleButton btn btn-primary\\">
-        <FormattedMessage id=\\"queryBuilder_conjunction_and\\">
-          <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_and\\">
-             
+        <span>
+          <FormattedMessage id=\\"queryBuilder_conjunction_and\\">
+            <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_and\\">
+               
+            </FormattedMessage>
           </FormattedMessage>
-        </FormattedMessage>
+        </span>
       </button>
     </Button>
     <Button className=\\"toggleButton activeToggle\\" onClick={[Function: onClick]} variant=\\"primary\\" active={false} disabled={false}>
       <button onClick={[Function: onClick]} disabled={false} type=\\"button\\" className=\\"toggleButton activeToggle btn btn-primary\\">
-        <FormattedMessage id=\\"queryBuilder_conjunction_or\\">
-          <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_or\\">
-             
+        <span>
+          <FormattedMessage id=\\"queryBuilder_conjunction_or\\">
+            <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_or\\">
+               
+            </FormattedMessage>
           </FormattedMessage>
-        </FormattedMessage>
+        </span>
       </button>
     </Button>
   </div>

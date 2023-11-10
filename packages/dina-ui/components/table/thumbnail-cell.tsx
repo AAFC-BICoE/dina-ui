@@ -19,8 +19,16 @@ export function ThumbnailCell<TData extends KitsuResource>({
   return {
     id: "thumbnail",
     cell: ({ row: { original } }) => {
-      const { resourceExternalURL, hasExternalResourceDerivative, filePath } =
-        useMetadataThumbnailPath<TData>(original, bucketField, isJsonApiQuery);
+      const {
+        resourceExternalURL,
+        hasExternalResourceDerivative,
+        filePath,
+        altImage
+      } = useMetadataThumbnailPath<TData>(
+        original,
+        bucketField,
+        isJsonApiQuery
+      );
       return resourceExternalURL ? (
         <div className="d-flex h-100">
           {hasExternalResourceDerivative ? (
@@ -33,7 +41,7 @@ export function ThumbnailCell<TData extends KitsuResource>({
             </Link>
           )}
           {hasExternalResourceDerivative && (
-            <SmallThumbnail filePath={filePath} />
+            <SmallThumbnail filePath={filePath} altImage={altImage} />
           )}
           <Link
             href={`/object-store/object/external-resource-view?id=${original?.id}`}
@@ -44,7 +52,7 @@ export function ThumbnailCell<TData extends KitsuResource>({
           </Link>
         </div>
       ) : (
-        <SmallThumbnail filePath={filePath} />
+        <SmallThumbnail filePath={filePath} altImage={altImage} />
       );
     },
     enableSorting: false,
@@ -60,7 +68,12 @@ export function ThumbnailCell<TData extends KitsuResource>({
   };
 }
 
-export function SmallThumbnail({ filePath }) {
+export interface SmallThumbnailProps {
+  filePath: string;
+  altImage?: string;
+}
+
+export function SmallThumbnail({ filePath, altImage }: SmallThumbnailProps) {
   const { formatMessage } = useDinaIntl();
 
   const height = "5rem";
@@ -70,7 +83,9 @@ export function SmallThumbnail({ filePath }) {
       <FileView
         filePath={filePath}
         fileType="jpg"
-        imgAlt={formatMessage("thumbnailNotAvailableText")}
+        imgAlt={
+          altImage ? altImage : formatMessage("thumbnailNotAvailableText")
+        }
         imgHeight={height}
       />
     </div>

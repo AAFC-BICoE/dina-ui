@@ -57,3 +57,8 @@ a.nav-link.dropdown-toggle:focus,
 button.navbar-toggler {
   background-color: #fff;
 }
+
+a.nav-link.dropdown-toggle {
+  padding-left: 8px;
+  padding-right: 8px;
+}

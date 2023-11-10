@@ -4,13 +4,15 @@ import Button from "react-bootstrap/Button";
 interface QueryConjunctionSwitchProps {
   currentConjunction?: string;
   setConjunction?: (conjunction: string) => void;
+  disabled?: boolean;
 }
 
 export function QueryConjunctionSwitch({
   currentConjunction,
-  setConjunction
+  setConjunction,
+  disabled
 }: QueryConjunctionSwitchProps) {
-  return (
+  return !disabled ? (
     <>
       <div className="toggleGroup">
         <Button
@@ -21,7 +23,9 @@ export function QueryConjunctionSwitch({
           }
           onClick={(_) => setConjunction?.("AND")}
         >
-          <DinaMessage id="queryBuilder_conjunction_and" />
+          <span>
+            <DinaMessage id="queryBuilder_conjunction_and" />
+          </span>
         </Button>
         <Button
           className={
@@ -31,9 +35,11 @@ export function QueryConjunctionSwitch({
           }
           onClick={(_) => setConjunction?.("OR")}
         >
-          <DinaMessage id="queryBuilder_conjunction_or" />
+          <span>
+            <DinaMessage id="queryBuilder_conjunction_or" />
+          </span>
         </Button>
       </div>
     </>
-  );
+  ) : (<></>);
 }
