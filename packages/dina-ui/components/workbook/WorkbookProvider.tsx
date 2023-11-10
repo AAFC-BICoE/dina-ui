@@ -43,7 +43,8 @@ type actionType =
   | "SAVE_PROGRESS"
   | "RESET"
   | "RETRIEVE_WORKBOOK_FROM_STORAGE"
-  | "SET_COLUMN_MAP";
+  | "SET_COLUMN_MAP"
+  | "SET_COLUMN_MAP_VALUE";
 
 
 export type WorkBookSavingStatus =
@@ -149,11 +150,15 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         progress: 0
       };
     case "SET_COLUMN_MAP":
-      const newState = {
+      return {
         ...state,
         workbookColumnMap: {...state.workbookColumnMap, ...action.payload}
-      }
-      return newState;
+      };
+    case "SET_COLUMN_MAP_VALUE":
+      return {
+        ...state,
+        workbookColumnMap: {...state.workbookColumnMap, ...action.payload}
+      };
     default:
       return state;
   }
@@ -174,6 +179,7 @@ export interface WorkbookUploadContextI {
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
   setColumnMap: (newColumnMap : WorkbookColumnMap) => void;
+  setColumnMapValue: (newColumnMap : WorkbookColumnMap) => void;
   startSavingWorkbook: (
     newWorkbookResources: WorkbookResourceType[],
     group: string,
@@ -362,6 +368,13 @@ export function WorkbookUploadContextProvider({
     })
   }
 
+  const setColumnMapValue = (newColumnMap: WorkbookColumnMap ) => {
+    dispatch({
+      type: 'SET_COLUMN_MAP_VALUE',
+      payload: newColumnMap
+    })
+  }
+
   return (
     <WorkbookUploadProvider
       value={{
@@ -378,6 +391,7 @@ export function WorkbookUploadContextProvider({
 
         uploadWorkbook,
         setColumnMap,
+        setColumnMapValue,
         saveProgress,
         startSavingWorkbook,
         pauseSavingWorkbook,

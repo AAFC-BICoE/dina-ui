@@ -57,7 +57,7 @@ export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const { startSavingWorkbook, spreadsheetData, setColumnMap } =
+  const { startSavingWorkbook, spreadsheetData, workbookColumnMap, setColumnMap } =
     useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
@@ -235,7 +235,8 @@ export function WorkbookColumnMapping({
       if (fieldPath !== undefined) {
         newWorkbookColumnMap[columnHeader] = {
           fieldPath,
-          mapRelationship: false
+          mapRelationship: false,
+          valueMapping: {}
         };
       } else {
         newWorkbookColumnMap[columnHeader] = undefined;
@@ -432,7 +433,6 @@ export function WorkbookColumnMapping({
   }
 
   function onToggleColumnMapping(
-    colIndex: number,
     columnName: string,
     fieldPath: string,
     checked: boolean
@@ -440,20 +440,21 @@ export function WorkbookColumnMapping({
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
       fieldPath,
-      mapRelationship: checked
+      mapRelationship: checked,
+      valueMapping: {}
     };
     setColumnMap(newColumnMap);
   }
 
   function onFieldMappingChange(
-    colIndex: number,
     columnName: string,
     newFieldPath: string
   ) {
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
       fieldPath: newFieldPath,
-      mapRelationship: false
+      mapRelationship: false,
+      valueMapping: {}
     };
     setColumnMap(newColumnMap);
   }

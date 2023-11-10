@@ -9,6 +9,7 @@ export interface CheckboxProps {
   handleClick: (e: any) => void;
   isChecked: boolean;
   isField?: boolean;
+  hideLabel?: boolean;
 }
 
 export function Checkbox({
@@ -16,7 +17,8 @@ export function Checkbox({
   name,
   handleClick,
   isChecked,
-  isField
+  isField,
+  hideLabel
 }: CheckboxProps) {
   const { formatMessage, messages } = useIntl();
   // Try to use dina messages first, if not just use the string directly.
@@ -41,7 +43,7 @@ export function Checkbox({
           width: "1.3rem"
         }}
       />
-      <span>{label}</span>
+      {!hideLabel && <span>{label}</span>}
     </div>
   );
 }

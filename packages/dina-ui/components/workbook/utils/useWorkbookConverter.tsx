@@ -525,7 +525,8 @@ export function useWorkbookConverter(
   function getResourceSelectForRelationshipField(
     columnName: string,
     fieldPath: string,
-    value: string
+    value: string,
+    onChange: (newValue: any) => void
   ) {
     const parentPath = getParentFieldPath(fieldPath);
     const relationshipConfig = getFieldRelationshipConfig(parentPath);
@@ -537,11 +538,12 @@ export function useWorkbookConverter(
       hideLabel: true,
       selectProps: { isClearable: true },
       cannotBeChanged: false,
-      name: eleName
+      name: eleName,
+      onChange
     };
     switch (relationshipConfig?.type) {
       case "collection":
-        return <CollectionSelectField {...resourceSelectProps} />;
+        return <CollectionSelectField {...resourceSelectProps}/>;
       case "collecting-event":
         return <CollectingEventSelectField {...resourceSelectProps} />;
       case "person":

@@ -2,6 +2,8 @@ import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import Accordion from "react-bootstrap/Accordion";
+import { pick } from "lodash";
+import { WorkbookColumnMap } from "../types/Workbook";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
@@ -10,7 +12,8 @@ export interface RelationshipFieldMappingProps {
 export function RelationshipFieldMapping({
   sheetIndex
 }: RelationshipFieldMappingProps) {
-  const { columnUniqueValues, type, workbookColumnMap} = useWorkbookContext();
+  const { columnUniqueValues, type, workbookColumnMap, setColumnMapValue } =
+    useWorkbookContext();
   const selectedType = type ?? "material-sample";
   const { getResourceSelectForRelationshipField } = useWorkbookConverter(
     FieldMappingConfig,
@@ -22,8 +25,9 @@ export function RelationshipFieldMapping({
       {Object.keys(columnUniqueValues[sheetIndex])
         .filter((columnName) => workbookColumnMap[columnName]?.mapRelationship)
         .map((columnName, index) => {
-          const fieldPath = workbookColumnMap[columnName]?.fieldPath;
-          
+          const thisColumnMap = workbookColumnMap[columnName]!;
+          const fieldPath = thisColumnMap.fieldPath;
+
           const counts = columnUniqueValues[sheetIndex][columnName];
           return (
             <Accordion.Item eventKey={"" + index} key={columnName}>
@@ -41,7 +45,34 @@ export function RelationshipFieldMapping({
                   <div className="row" key={fieldValue}>
                     <div className="col-3">{fieldValue}</div>
                     <div className="col-3">{counts[fieldValue]}</div>
-                    <div className="col-6">{getResourceSelectForRelationshipField(columnName, fieldPath!, fieldValue )} </div>
+                    <div className="col-6">
+                      {getResourceSelectForRelationshipField(
+                        columnName,
+                        fieldPath!,
+                        fieldValue,
+                        (newValue: any) => {
+                          const newValueMapping = {
+                            ...thisColumnMap.valueMapping
+                          };
+                          if (newValue) {
+                            newValueMapping[fieldValue] = {
+                              id: newValue.id,
+                              type: newValue.type
+                            };
+                          } else {
+                            delete newValueMapping[fieldValue];
+                          }
+                          const newColumnMap = {
+                            ...workbookColumnMap,
+                            [columnName]: {
+                              ...thisColumnMap,
+                              valueMapping: newValueMapping
+                            }
+                          };
+                          setColumnMapValue(newColumnMap);
+                        }
+                      )}{" "}
+                    </div>
                   </div>
                 ))}
               </Accordion.Body>

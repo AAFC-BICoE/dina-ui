@@ -1,6 +1,10 @@
 import { startCase } from "lodash";
-import { useMemo, useState } from "react";
-import { CheckBoxField, SelectField } from "../../../../common-ui/lib";
+import { useMemo, useEffect, useState } from "react";
+import {
+  CheckBoxField,
+  Checkbox,
+  SelectField
+} from "../../../../common-ui/lib";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
@@ -22,8 +26,15 @@ export interface ColumnMappingRowProps {
       parentPath: string;
     }[];
   }[];
-  onToggleColumnMapping: (colIndex: number, columnName: string, fieldPath: string, checked: boolean) => void;
-  onFieldMappingChange: (colIndex: number, columnName: string, newFieldPath) => void;
+  onToggleColumnMapping: (
+    columnName: string,
+    fieldPath: string,
+    checked: boolean
+  ) => void;
+  onFieldMappingChange: (
+    columnName: string,
+    newFieldPath
+  ) => void;
 }
 
 export function ColumnMappingRow({
@@ -35,17 +46,15 @@ export function ColumnMappingRow({
   onToggleColumnMapping,
   onFieldMappingChange
 }: ColumnMappingRowProps) {
-  const { spreadsheetData, columnUniqueValues, workbookColumnMap } = useWorkbookContext();
+  const { spreadsheetData, columnUniqueValues, workbookColumnMap } =
+    useWorkbookContext();
 
   const { isFieldInALinkableRelationshipField } = useWorkbookConverter(
     FieldMappingConfig,
     selectedType || "material-sample"
   );
 
-  // fieldHeaderPair stores the pairs of field name in the configuration and the column header in the excel file.
-  const [fieldHeaderPair, setFieldHeaderPair] = useState(
-    {} as { [field: string]: string }
-  );
+  const [checked, setChecked] = useState<boolean>(false);
 
   // Retrieve a string array of the headers from the uploaded spreadsheet.
   const headers = useMemo(() => {
@@ -113,7 +122,7 @@ export function ColumnMappingRow({
     }
   }
 
-  const fieldPath= workbookColumnMap[columnName]?.fieldPath
+  const fieldPath = workbookColumnMap[columnName]?.fieldPath;
   return (
     <div className="row">
       <div className="col-md-4 mt-3">{columnName}</div>
@@ -124,17 +133,27 @@ export function ColumnMappingRow({
           selectProps={{ isClearable: true }}
           hideLabel={true}
           styles={customStyles}
-          onChange={(newFieldPath) => onFieldMappingChange(columnIndex, columnName, newFieldPath)}
+          onChange={(newFieldPath) => {
+            setChecked(false);
+            onFieldMappingChange(columnName, newFieldPath);
+          }}
         />
       </div>
       <div className="col-md-4 mt-2">
         {showMapRelationshipCheckbox(columnIndex, fieldPath) && (
-          <CheckBoxField
-            onCheckBoxClick={(e) =>
-              onToggleColumnMapping?.(columnIndex, columnName, fieldPath!, e.target.checked)
-            }
-            name={`relationshipMapping.${columnName.replaceAll('.', '_')}.mapRelationships`}
+          <Checkbox
+            id={`${columnName}-map-relationship`}
             hideLabel={true}
+            isChecked={checked}
+            isField={false}
+            handleClick={(e) => {
+              setChecked(e.target.checked);
+              onToggleColumnMapping?.(
+                columnName,
+                fieldPath!,
+                e.target.checked
+              );
+            }}
           />
         )}
       </div>
