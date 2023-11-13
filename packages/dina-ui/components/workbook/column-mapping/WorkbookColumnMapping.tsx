@@ -57,7 +57,7 @@ export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const { startSavingWorkbook, spreadsheetData, workbookColumnMap, setColumnMap } =
+  const { startSavingWorkbook, spreadsheetData, setColumnMap, workbookColumnMap } =
     useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
@@ -260,6 +260,7 @@ export function WorkbookColumnMapping({
     if (resources?.length > 0) {
       await startSavingWorkbook(
         resources,
+        workbookColumnMap,
         submittedValues.group,
         type,
         baseApiPath

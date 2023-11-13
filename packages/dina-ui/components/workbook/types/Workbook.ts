@@ -63,7 +63,6 @@ export interface ObjectField {
     hasGroup: boolean;
     linkOrCreateSetting: LinkOrCreateSetting;
     baseApiPath?: string;
-    queryFields?: string[];
   };
 }
 

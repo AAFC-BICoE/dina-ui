@@ -16,15 +16,16 @@ import {
 import db from "./WorkbookDB";
 import { calculateColumnUniqueValuesFromSpreadsheetData } from "./utils/workbookMappingUtils";
 
-async function saveWorkbookResources(
+async function saveWorkbookResourcesInIndexDB(
   type: string,
-  workbookResources: WorkbookResourceType[]
+  workbookResources: WorkbookResourceType[],
+  workbookColumnMap: WorkbookColumnMap,
 ) {
   const workbook = await db.workbooks.get(type);
   if (workbook) {
-    await db.workbooks.put({ name: type, workbook: workbookResources });
+    await db.workbooks.put({ name: type, workbook: workbookResources, relationshipMapping: workbookColumnMap });
   } else {
-    await db.workbooks.add({ name: type, workbook: workbookResources });
+    await db.workbooks.add({ name: type, workbook: workbookResources, relationshipMapping: workbookColumnMap });
   }
 }
 
@@ -182,6 +183,7 @@ export interface WorkbookUploadContextI {
   setColumnMapValue: (newColumnMap : WorkbookColumnMap) => void;
   startSavingWorkbook: (
     newWorkbookResources: WorkbookResourceType[],
+    newWorkbookColumnMap: WorkbookColumnMap,
     group: string,
     type: string,
     apiBaseUrl: string
@@ -231,11 +233,13 @@ export function WorkbookUploadContextProvider({
 
     async function queryWorkbookResources(typeParam: string) {
       const found = await db.workbooks.get(typeParam);
-      const result = found?.workbook ?? [];
+      const workbookResourcesFromIndexDB = found?.workbook ?? [];
+      const workbookColumnMapFromIndexDB = found?.relationshipMapping;
       dispatch({
         type: "RETRIEVE_WORKBOOK_FROM_STORAGE",
         payload: {
-          workbookResources: result,
+          workbookResources: workbookResourcesFromIndexDB,
+          workbookColumnMap: workbookColumnMapFromIndexDB,
           ...workbookMetaDataInLocalStorage
         }
       });
@@ -258,6 +262,7 @@ export function WorkbookUploadContextProvider({
 
   const startSavingWorkbook = async (
     newWorkbookResources: WorkbookResourceType[],
+    newWorkbookColumnMap: WorkbookColumnMap,
     newGroup: string,
     newType: string,
     newApiBaseUrl: string
@@ -269,7 +274,7 @@ export function WorkbookUploadContextProvider({
       apiBaseUrl: newApiBaseUrl,
       progress: 0
     });
-    await saveWorkbookResources(newType, newWorkbookResources);
+    await saveWorkbookResourcesInIndexDB(newType, newWorkbookResources, newWorkbookColumnMap);
     dispatch({
       type: "START_SAVING",
       payload: {

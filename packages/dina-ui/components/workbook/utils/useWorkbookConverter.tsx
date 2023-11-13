@@ -5,6 +5,7 @@ import { useRef } from "react";
 import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
+  WorkbookColumnMap,
   WorkbookDataTypeEnum
 } from "..";
 import {
@@ -47,8 +48,6 @@ export function useWorkbookConverter(
   entityName: string
 ) {
   const { apiClient, save } = useApiClient();
-  const cache = useRef<Record<string, { id: string; type: string }>>({});
-
   /**
    * The data structure in the flatternedConfig is like this
    * {
@@ -128,16 +127,6 @@ export function useWorkbookConverter(
     return false;
   }
 
-  function getItemFromCache(
-    key: string
-  ): { id: string; type: string } | undefined {
-    return cache.current[key];
-  }
-
-  function putItemInCache(key: string, fieldValue) {
-    cache.current[key] = fieldValue;
-  }
-
   function getFieldDataType(fieldPath?: string): WorkbookDataTypeEnum {
     return fieldPath ? flattenedConfig[fieldPath]?.dataType : undefined;
   }
@@ -164,7 +153,6 @@ export function useWorkbookConverter(
         type: string;
         hasGroup: boolean;
         baseApiPath?: string;
-        queryFields?: string[];
         linkOrCreateSetting: LinkOrCreateSetting;
       };
       relationships: {
@@ -198,7 +186,7 @@ export function useWorkbookConverter(
           };
         }
       > = {
-        type: flattenedConfig["type"],
+        type: flattenedConfig["relationshipConfig"]["type"],
         group,
         relationships: {}
       } as InputResource<KitsuResource & { group?: string }>;
@@ -227,7 +215,6 @@ export function useWorkbookConverter(
                   hasGroup: boolean;
                   linkOrCreateSetting: LinkOrCreateSetting;
                   baseApiPath?: string;
-                  queryFields?: string[];
                 };
               }
             >;
@@ -274,6 +261,7 @@ export function useWorkbookConverter(
         };
       }
     >,
+    workbookColumnMap: WorkbookColumnMap,
     attributeName: string,
     group: string
   ) {
@@ -286,60 +274,17 @@ export function useWorkbookConverter(
       }
       delete resource["relationshipConfig"];
     } else if (isObject(value) && attributeName !== "relationships") {
-      const relationshipConfig = value.relationshipConfig;
       // if the value is an object, traverse into properies of the object
+      const relationshipConfig = value.relationshipConfig;
       if (relationshipConfig) {
         // If the value is an Object type, and there is a relationshipConfig defined
-        // Then we need to loop through all properties of the value
-        // We will use these properties to query from the database
-        const fields = Object.keys(value).filter((fieldName) => {
-          if (
-            relationshipConfig.queryFields &&
-            relationshipConfig.queryFields.length > 0 &&
-            relationshipConfig.queryFields?.indexOf(fieldName) > -1
-          )
-            return true;
-          else return false;
-        });
-        if (
-          (!fields || fields.length === 0) &&
-          (relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.LINK ||
-            relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK_OR_CREATE)
-        ) {
-          throw new Error(
-            `Can not link or create "${attributeName}" with the missing fileds "${relationshipConfig.queryFields}"`
-          );
-        }
-        const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
-        const queryFilter = { ...pick(value, fields) };
-        const keyForCache = JSON.stringify({ path: queryPath, queryFilter });
-        // If there are fields which name is in the queryFields list
         if (
           relationshipConfig.linkOrCreateSetting === LinkOrCreateSetting.LINK ||
-          relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.LINK_OR_CREATE
+          relationshipConfig.linkOrCreateSetting === LinkOrCreateSetting.LINK_OR_CREATE
         ) {
-          let valueToLink = getItemFromCache(keyForCache);
-          if (!valueToLink) {
-            // Query from dababase
-            valueToLink = await apiClient
-              .get(queryPath, { filter: queryFilter })
-              .then((response) => {
-                if (response?.data) {
-                  if (Array.isArray(response.data)) {
-                    if (response.data.length > 0) {
-                      return pick(response.data[0], ["id", "type"]);
-                    }
-                  } else {
-                    const valueFromDb = pick(response.data, ["id", "type"]);
-                    putItemInCache(keyForCache, valueFromDb);
-                    return valueFromDb;
-                  }
-                }
-              });
-          }
+          let valueToLink
+          // TODO: get valueToLink from workbookColumnMap
+
           if (valueToLink) {
             if (!resource.relationships) {
               resource.relationships = {};
@@ -360,7 +305,7 @@ export function useWorkbookConverter(
         ) {
           // if there is no existing record in the db, then create it
           for (const childName of Object.keys(value)) {
-            await linkRelationshipAttribute(value, childName, group);
+            await linkRelationshipAttribute(value, workbookColumnMap, childName, group);
           }
           const newCreatedValue = await save(
             [
@@ -371,15 +316,7 @@ export function useWorkbookConverter(
             ],
             { apiBaseUrl: relationshipConfig.baseApiPath }
           ).then((response) => {
-            const valueToLink = pick(response[0], ["id", "type"]);
-            if (
-              relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK_OR_CREATE
-            ) {
-              // If LINK or LINK_OR_CREATE, we need to put it in cache
-              putItemInCache(keyForCache, valueToLink);
-            }
-            return valueToLink;
+            return pick(response[0], ["id", "type"]);
           });
           if (!resource.relationships) {
             resource.relationships = {};
@@ -394,7 +331,7 @@ export function useWorkbookConverter(
         }
       } else {
         for (const childName of Object.keys(value)) {
-          await linkRelationshipAttribute(value, childName, group);
+          await linkRelationshipAttribute(value, workbookColumnMap, childName, group);
         }
       }
     } else if (Array.isArray(value) && value.length > 0) {
@@ -406,66 +343,14 @@ export function useWorkbookConverter(
         if (isObject(valueInArray)) {
           if (relationshipConfig) {
             // The filter below is to find out all simple data type properties
-            // We will use these properties to query from the database
-            const fields = Object.keys(valueInArray).filter((fieldName) => {
-              if (
-                relationshipConfig.queryFields &&
-                relationshipConfig.queryFields.length > 0 &&
-                relationshipConfig.queryFields?.indexOf(fieldName) > -1
-              )
-                return true;
-              else return false;
-            });
             let valueToLink;
-            if (
-              (!fields || fields.length === 0) &&
-              (relationshipConfig.linkOrCreateSetting ===
-                LinkOrCreateSetting.LINK ||
-                relationshipConfig.linkOrCreateSetting ===
-                  LinkOrCreateSetting.LINK_OR_CREATE)
-            ) {
-              throw new Error(
-                `Can not link or create "${attributeName}" with the missing fileds "${relationshipConfig.queryFields}"`
-              );
-            }
-            // If there are fields which name is in the queryFields list
-            const queryPath = `${relationshipConfig.baseApiPath}/${relationshipConfig.type}`;
-            const queryFilter = { ...pick(valueInArray, fields) };
-            const keyForCache = JSON.stringify({
-              path: queryPath,
-              queryFilter
-            });
-
             if (
               relationshipConfig.linkOrCreateSetting ===
                 LinkOrCreateSetting.LINK ||
               relationshipConfig.linkOrCreateSetting ===
                 LinkOrCreateSetting.LINK_OR_CREATE
             ) {
-              valueToLink = getItemFromCache(keyForCache);
-              if (!valueToLink) {
-                // query data from database
-                valueToLink = await apiClient
-                  .get(queryPath, { filter: queryFilter })
-                  .then((response) => {
-                    if (response?.data) {
-                      if (Array.isArray(response.data)) {
-                        if (response.data.length > 0) {
-                          const valueFromDb = pick(response.data[0], [
-                            "id",
-                            "type"
-                          ]);
-                          putItemInCache(keyForCache, valueFromDb);
-                          return valueFromDb;
-                        }
-                      } else {
-                        const valueFromDb = pick(response.data, ["id", "type"]);
-                        putItemInCache(keyForCache, valueFromDb);
-                        return valueFromDb;
-                      }
-                    }
-                  });
-              }
+              // TODO: get valueToLink from workbookColumnMap
               if (valueToLink) {
                 valuesForRelationship.push(valueToLink);
               }
@@ -480,7 +365,7 @@ export function useWorkbookConverter(
             ) {
               // if there is no existing record in the db, then create it
               for (const childName of Object.keys(valueInArray)) {
-                await linkRelationshipAttribute(valueInArray, childName, group);
+                await linkRelationshipAttribute(valueInArray, workbookColumnMap, childName, group);
               }
 
               const newCreatedValue = await save(
@@ -492,15 +377,7 @@ export function useWorkbookConverter(
                 ],
                 { apiBaseUrl: relationshipConfig.baseApiPath }
               ).then((response) => {
-                const newValueToLink = pick(response[0], ["id", "type"]);
-                if (
-                  relationshipConfig.linkOrCreateSetting ===
-                  LinkOrCreateSetting.LINK_OR_CREATE
-                ) {
-                  // If LINK or LINK_OR_CREATE, we need to put it in cache
-                  putItemInCache(keyForCache, newValueToLink);
-                }
-                return newValueToLink;
+                return pick(response[0], ["id", "type"]);
               });
               if (newCreatedValue) {
                 valuesForRelationship.push(newCreatedValue);

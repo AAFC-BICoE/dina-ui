@@ -1,9 +1,10 @@
 import Dexie, { Table } from "dexie";
-import { WorkbookResourceType } from "./types/Workbook";
+import { WorkbookColumnMap, WorkbookResourceType } from "./types/Workbook";
 
 export interface Workbook {
   name: string;
   workbook: WorkbookResourceType[];
+  relationshipMapping: WorkbookColumnMap;
 }
 
 export class WorkbookDB extends Dexie {

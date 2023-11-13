@@ -1,10 +1,11 @@
+import { pickBy } from "lodash";
 import { useRouter } from "next/router";
-import { useApiClient } from "../../../common-ui/lib";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { useIntl } from "react-intl";
+import { useApiClient } from "../../../common-ui/lib";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
@@ -34,7 +35,8 @@ export function SaveWorkbookProgress({
     resumeSavingWorkbook,
     finishSavingWorkbook,
     cancelSavingWorkbook,
-    failSavingWorkbook
+    failSavingWorkbook,
+    workbookColumnMap
   } = useWorkbookContext();
 
   const { save } = useApiClient();
@@ -102,11 +104,12 @@ export function SaveWorkbookProgress({
   }, []);
 
   async function saveWorkbook() {
+    const filteredWorkbookColumnMap = pickBy(workbookColumnMap, (value) => value && value.mapRelationship === true);
     async function saveChunkOfWorkbook(chunkedResources) {
       for (const resource of chunkedResources) {
         for (const key of Object.keys(resource)) {
           if (resource[key] !== undefined && resource[key] !== null) {
-            await linkRelationshipAttribute(resource, key, group ?? "");
+            await linkRelationshipAttribute(resource, filteredWorkbookColumnMap, key, group ?? "");
           }
         }
       }

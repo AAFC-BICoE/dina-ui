@@ -3,9 +3,12 @@ import { mount } from "enzyme";
 import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
+  WorkbookColumnMap,
+  WorkbookColumnMapping,
   WorkbookDataTypeEnum
 } from "../..";
 import { useWorkbookConverter } from "../useWorkbookConverter";
+import {pickBy} from 'lodash';
 
 const mockConfig: FieldMappingConfigType = {
   mockEntity: {
@@ -30,7 +33,6 @@ const mockConfig: FieldMappingConfigType = {
         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         type: "object-field",
         baseApiPath: "fake-api",
-        queryFields: ["name"],
         hasGroup: true
       },
       attributes: {
@@ -67,7 +69,6 @@ const mockConfig: FieldMappingConfigType = {
         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
         type: "object-array",
         baseApiPath: "fake-api",
-        queryFields: ["name"],
         hasGroup: true
       },
       attributes: {
@@ -221,8 +222,7 @@ describe("useWorkbookConverters", () => {
           linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
           type: "object-array",
           baseApiPath: "fake-api",
-          hasGroup: true,
-          queryFields: ["name"]
+          hasGroup: true
         },
         attributes: {
           age: {
@@ -318,8 +318,7 @@ describe("useWorkbookConverters", () => {
           baseApiPath: "fake-api",
           hasGroup: true,
           linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-          type: "object-field",
-          queryFields: ["name"]
+          type: "object-field"
         }
       },
       "objectField.address": {
@@ -419,8 +418,7 @@ describe("useWorkbookConverters", () => {
       type: "object-field",
       hasGroup: true,
       linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-      baseApiPath: "fake-api",
-      queryFields: ["name"]
+      baseApiPath: "fake-api"
     });
     expect(getFieldRelationshipConfig("unknownField")).toEqual(undefined);
   });
@@ -461,8 +459,7 @@ describe("useWorkbookConverters", () => {
           baseApiPath: "fake-api",
           hasGroup: true,
           linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-          type: "object-field",
-          queryFields: ["name"]
+          type: "object-field"
         }
       },
       objectArray1: [
@@ -472,15 +469,50 @@ describe("useWorkbookConverters", () => {
             baseApiPath: "fake-api",
             hasGroup: true,
             linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-            type: "object-field",
-            queryFields: ["name"]
+            type: "object-field"
           }
         }
       ]
     };
+    const mockWorkbookColumnMap: WorkbookColumnMap = {
+      "attr1": {
+        "fieldPath": "attr1",
+        "mapRelationship": false,
+        "valueMapping": {}
+      },
+      "attr2": {
+        "fieldPath": "attr2",
+        "mapRelationship": false,
+        "valueMapping": {}
+      },
+      "attr3": {
+        "fieldPath": "attr3",
+        "mapRelationship": false,
+        "valueMapping": {}
+      },
+      "attr4": {
+        "fieldPath": "attr4",
+        "mapRelationship": false,
+        "valueMapping": {}
+      },
+      "objectAttr1.name1": {
+        fieldPath: "objectAttr1.name1",
+        mapRelationship: true,
+        valueMapping: {
+          'name1': {id: 'id-name1', type: "object-field"}
+        }
+      },
+      "objectArray1.name1": {
+        fieldPath: "objectAttr1.name1",
+        mapRelationship: true,
+        valueMapping: {
+          'name1': {id: 'id-name1', type: "object-field"}
+        }
+      }
+    }
 
     for (const key of Object.keys(mockResource)) {
-      await linkRelationshipAttribute(mockResource, key, "group1");
+      await linkRelationshipAttribute(mockResource, mockWorkbookColumnMap, key, "group1");
     }
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockResource).toEqual({
@@ -546,8 +578,7 @@ describe("useWorkbookConverters", () => {
           baseApiPath: "fake-api",
           hasGroup: true,
           linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-          type: "object-field",
-          queryFields: ["name"]
+          type: "object-field"
         }
       },
       objectArray1: [
@@ -557,15 +588,51 @@ describe("useWorkbookConverters", () => {
             baseApiPath: "fake-api",
             hasGroup: true,
             linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-            type: "object-field",
-            queryFields: ["name"]
+            type: "object-field"
           }
         }
       ]
     };
 
+    const mockWorkbookColumnMap: WorkbookColumnMap = {
+      "attr1": {
+        "fieldPath": "attr1",
+        "mapRelationship": false,
+        "valueMapping": {}
+      },
+      "attr2": {
+        "fieldPath": "attr2",
+        "mapRelationship": false,
+        "valueMapping": {}
+      },
+      "attr3": {
+        "fieldPath": "attr3",
+        "mapRelationship": false,
+        "valueMapping": {}
+      },
+      "attr4": {
+        "fieldPath": "attr4",
+        "mapRelationship": false,
+        "valueMapping": {}
+      },
+      "objectAttr1.name1": {
+        fieldPath: "objectAttr1.name1",
+        mapRelationship: true,
+        valueMapping: {
+          'name1': {id: 'id-name1', type: "object-field"}
+        }
+      },
+      "objectArray1.name1": {
+        fieldPath: "objectAttr1.name1",
+        mapRelationship: true,
+        valueMapping: {
+          'name1': {id: 'id-name1', type: "object-field"}
+        }
+      }
+    }
+
     for (const key of Object.keys(mockResource)) {
-      await linkRelationshipAttribute(mockResource, key, "group1");
+      await linkRelationshipAttribute(mockResource, mockWorkbookColumnMap, key, "group1");
     }
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockSave).toHaveBeenCalledTimes(1);
@@ -610,6 +677,7 @@ describe("useWorkbookConverters", () => {
       {
         group: "cnc",
         relationships: {},
+        type: "mock-entity",
         stringField: "string value1",
         booleanField: true,
         numberField: 123,
@@ -635,8 +703,7 @@ describe("useWorkbookConverters", () => {
             baseApiPath: "fake-api",
             hasGroup: true,
             linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-            type: "object-field",
-            queryFields: ["name"]
+            type: "object-field"
           }
         },
         objectArrayField: [
@@ -645,7 +712,6 @@ describe("useWorkbookConverters", () => {
               linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
               type: "object-array",
               baseApiPath: "fake-api",
-              queryFields: ["name"],
               hasGroup: true
             },
             name: "name1",
@@ -698,5 +764,64 @@ describe("useWorkbookConverters", () => {
         }
       ]
     };
+  });
+
+  it("test", () => {
+    const workbookColumnMap: WorkbookColumnMap = {
+      id: {
+        fieldPath: "materialSampleName",
+        mapRelationship: false,
+        valueMapping: {}
+      },
+      "collectingEvent.collectors": {
+        fieldPath: "collectingEvent.collectors.displayName",
+        mapRelationship: true,
+        valueMapping: {
+          "collector 3": {
+            id: "70875e43-c5e1-4381-bd20-f41aa88a0052",
+            type: "person"
+          },
+          "collector 2": {
+            id: "70875e43-c5e1-4381-bd20-f41aa88a0052",
+            type: "person"
+          },
+          "collector 1": {
+            id: "86c65bc9-ff2d-440d-8c63-3b6f928b2b69",
+            type: "person"
+          }
+        }
+      },
+      "collection.name": {
+        fieldPath: "collection.name",
+        mapRelationship: true,
+        valueMapping: {
+          coll1: {
+            id: "06a0cf94-9c77-4ec3-a8c1-f7a8ea3ce304",
+            type: "collection"
+          },
+          coll2: {
+            id: "633dcb70-81c0-4c36-821b-4f5d8740615d",
+            type: "collection"
+          },
+          coll3: {
+            id: "633dcb70-81c0-4c36-821b-4f5d8740615d",
+            type: "collection"
+          }
+        }
+      },
+      "collectingEvent.startEventDateTime": {
+        fieldPath: "collectingEvent.startEventDateTime",
+        mapRelationship: false,
+        valueMapping: {}
+      }
+    };
+
+    const newMap: {[fieldPath: string]: {[value: string]: {id: string, type: string}}} = {};
+
+    const filtered = Object.values(workbookColumnMap).filter((item) => item && item.mapRelationship === true );
+    filtered.forEach(item => {
+      newMap[item!.fieldPath] = item!.valueMapping
+    });
+    console.log(JSON.stringify(newMap, null, ' '));
   });
 });
