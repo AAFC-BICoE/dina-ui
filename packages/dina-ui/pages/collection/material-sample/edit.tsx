@@ -61,11 +61,7 @@ export default function MaterialSampleEditPage() {
     enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar>
-        <BackButton
-          entityId={id}
-          entityLink="/collection/material-sample"
-          reloadLastSearch={true}
-        />
+        <BackButton entityId={id} entityLink="/collection/material-sample" />
         <div className="flex-grow-1 d-flex">
           <div className="mx-auto">
             <MaterialSampleFormTemplateSelect

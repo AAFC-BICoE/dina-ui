@@ -31,13 +31,7 @@ const OBJECT_DETAILS_PAGE_CSS = `
   }
 `;
 
-export interface MetadataViewPageProps {
-  reloadLastSearch?: boolean;
-}
-
-export default function MetadataViewPage({
-  reloadLastSearch
-}: MetadataViewPageProps) {
+export default function MetadataViewPage() {
   const router = useRouter();
   const { ELASTIC_SEARCH_COLUMN } = useMaterialSampleRelationshipColumns();
   const uuid = String(router.query.id);
@@ -68,7 +62,6 @@ export default function MetadataViewPage({
         className="me-auto"
         entityId={uuid}
         entityLink="/object-store/object"
-        reloadLastSearch={reloadLastSearch ?? true}
       />
       {canEdit && (
         <>
@@ -90,7 +83,6 @@ export default function MetadataViewPage({
           className="ms-5"
           id={uuid}
           options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/object-store/object/list?reloadLastSearch"
           type="metadata"
         />
       )}

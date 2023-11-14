@@ -169,7 +169,6 @@ export function MaterialSampleForm({
     <ButtonBar>
       <BackButton
         entityId={materialSample?.id}
-        reloadLastSearch={true}
         entityLink="/collection/material-sample"
       />
       <SubmitButton className="ms-auto" />

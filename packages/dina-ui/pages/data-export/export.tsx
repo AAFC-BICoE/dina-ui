@@ -125,7 +125,6 @@ export default function MaterialSampleExportPage<
           <BackButton
             className="me-auto"
             entityLink="/collection/material-sample"
-            reloadLastSearch={true}
             byPassView={true}
           />
           <Link href={`/data-export/list`}>

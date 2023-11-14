@@ -38,7 +38,6 @@ export function useLastSavedSearch({
   performSubmit
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
   const router = useRouter();
-  const loadLastUsed = router?.query?.reloadLastSearch !== undefined;
   const localStorageKey = indexName + "-last-used-tree";
 
   const [queryLoaded, setQueryLoaded] = useState<boolean>(false);
@@ -46,9 +45,9 @@ export function useLastSavedSearch({
   const [localStorageQueryTree, setLocalStorageQueryTree] =
     useLocalStorage<JsonTree>(localStorageKey);
 
-  // Load in the last used save search if the reloadLastSearch param is present.
+  // Load in the last used save search
   useEffect(() => {
-    if (loadLastUsed && localStorageQueryTree) {
+    if (localStorageQueryTree) {
       setQueryBuilderTree(Utils.loadTree(localStorageQueryTree as JsonTree));
       setQueryLoaded(true);
       performSubmit();
@@ -71,6 +70,6 @@ export function useLastSavedSearch({
   }, [queryBuilderTree]);
 
   return {
-    loadLastUsed
+    loadLastUsed: !!localStorageQueryTree
   };
 }
