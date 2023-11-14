@@ -4,11 +4,9 @@ import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
   WorkbookColumnMap,
-  WorkbookColumnMapping,
   WorkbookDataTypeEnum
 } from "../..";
 import { useWorkbookConverter } from "../useWorkbookConverter";
-import {pickBy} from 'lodash';
 
 const mockConfig: FieldMappingConfigType = {
   mockEntity: {
@@ -438,10 +436,8 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute } = getWorkbookConverter(
-      mockConfig,
-      "mockEntity"
-    );
+    const { filterWorkbookColumnMap, linkRelationshipAttribute } =
+      getWorkbookConverter(mockConfig, "mockEntity");
     const mockResource: any = {
       attr1: 123,
       attr2: "abc",
@@ -475,44 +471,49 @@ describe("useWorkbookConverters", () => {
       ]
     };
     const mockWorkbookColumnMap: WorkbookColumnMap = {
-      "attr1": {
-        "fieldPath": "attr1",
-        "mapRelationship": false,
-        "valueMapping": {}
+      attr1: {
+        fieldPath: "attr1",
+        mapRelationship: false,
+        valueMapping: {}
       },
-      "attr2": {
-        "fieldPath": "attr2",
-        "mapRelationship": false,
-        "valueMapping": {}
+      attr2: {
+        fieldPath: "attr2",
+        mapRelationship: false,
+        valueMapping: {}
       },
-      "attr3": {
-        "fieldPath": "attr3",
-        "mapRelationship": false,
-        "valueMapping": {}
+      attr3: {
+        fieldPath: "attr3",
+        mapRelationship: false,
+        valueMapping: {}
       },
-      "attr4": {
-        "fieldPath": "attr4",
-        "mapRelationship": false,
-        "valueMapping": {}
+      attr4: {
+        fieldPath: "attr4",
+        mapRelationship: false,
+        valueMapping: {}
       },
       "objectAttr1.name1": {
         fieldPath: "objectAttr1.name1",
         mapRelationship: true,
         valueMapping: {
-          'name1': {id: 'id-name1', type: "object-field"}
+          name1: { id: "id-name1", type: "object-field" }
         }
       },
       "objectArray1.name1": {
         fieldPath: "objectAttr1.name1",
         mapRelationship: true,
         valueMapping: {
-          'name1': {id: 'id-name1', type: "object-field"}
+          name1: { id: "id-name1", type: "object-field" }
         }
       }
-    }
+    };
 
     for (const key of Object.keys(mockResource)) {
-      await linkRelationshipAttribute(mockResource, mockWorkbookColumnMap, key, "group1");
+      await linkRelationshipAttribute(
+        mockResource,
+        filterWorkbookColumnMap(mockWorkbookColumnMap),
+        key,
+        "group1"
+      );
     }
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockResource).toEqual({
@@ -557,10 +558,8 @@ describe("useWorkbookConverters", () => {
       } as any,
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute } = getWorkbookConverter(
-      mockConfig,
-      "mockEntity"
-    );
+    const { filterWorkbookColumnMap, linkRelationshipAttribute } =
+      getWorkbookConverter(mockConfig, "mockEntity");
     const mockResource: any = {
       attr1: 123,
       attr2: "abc",
@@ -594,45 +593,50 @@ describe("useWorkbookConverters", () => {
       ]
     };
 
-    const mockWorkbookColumnMap: WorkbookColumnMap = {
-      "attr1": {
-        "fieldPath": "attr1",
-        "mapRelationship": false,
-        "valueMapping": {}
+    const mockWorkbookColumnMap = filterWorkbookColumnMap({
+      attr1: {
+        fieldPath: "attr1",
+        mapRelationship: false,
+        valueMapping: {}
       },
-      "attr2": {
-        "fieldPath": "attr2",
-        "mapRelationship": false,
-        "valueMapping": {}
+      attr2: {
+        fieldPath: "attr2",
+        mapRelationship: false,
+        valueMapping: {}
       },
-      "attr3": {
-        "fieldPath": "attr3",
-        "mapRelationship": false,
-        "valueMapping": {}
+      attr3: {
+        fieldPath: "attr3",
+        mapRelationship: false,
+        valueMapping: {}
       },
-      "attr4": {
-        "fieldPath": "attr4",
-        "mapRelationship": false,
-        "valueMapping": {}
+      attr4: {
+        fieldPath: "attr4",
+        mapRelationship: false,
+        valueMapping: {}
       },
       "objectAttr1.name1": {
         fieldPath: "objectAttr1.name1",
         mapRelationship: true,
         valueMapping: {
-          'name1': {id: 'id-name1', type: "object-field"}
+          name1: { id: "id-name1", type: "object-field" }
         }
       },
       "objectArray1.name1": {
         fieldPath: "objectAttr1.name1",
         mapRelationship: true,
         valueMapping: {
-          'name1': {id: 'id-name1', type: "object-field"}
+          name1: { id: "id-name1", type: "object-field" }
         }
       }
-    }
+    });
 
     for (const key of Object.keys(mockResource)) {
-      await linkRelationshipAttribute(mockResource, mockWorkbookColumnMap, key, "group1");
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
+        key,
+        "group1"
+      );
     }
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockSave).toHaveBeenCalledTimes(1);
@@ -816,12 +820,16 @@ describe("useWorkbookConverters", () => {
       }
     };
 
-    const newMap: {[fieldPath: string]: {[value: string]: {id: string, type: string}}} = {};
+    const newMap: {
+      [fieldPath: string]: { [value: string]: { id: string; type: string } };
+    } = {};
 
-    const filtered = Object.values(workbookColumnMap).filter((item) => item && item.mapRelationship === true );
-    filtered.forEach(item => {
-      newMap[item!.fieldPath] = item!.valueMapping
+    const filtered = Object.values(workbookColumnMap).filter(
+      (item) => item && item.mapRelationship === true
+    );
+    filtered.forEach((item) => {
+      newMap[item!.fieldPath] = item!.valueMapping;
     });
-    console.log(JSON.stringify(newMap, null, ' '));
+    console.log(JSON.stringify(newMap, null, " "));
   });
 });

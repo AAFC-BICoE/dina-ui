@@ -250,6 +250,20 @@ export function useWorkbookConverter(
     return resources;
   }
 
+  function filterWorkbookColumnMap(workbookColumnMap: WorkbookColumnMap) {
+    const filteredWorkbookColumnMap: {
+      [fieldPath: string]: { [value: string]: { id: string; type: string } };
+    } = {};
+
+    const filtered = Object.values(workbookColumnMap).filter(
+      (item) => item && item.mapRelationship === true
+    );
+    filtered.forEach((item) => {
+      filteredWorkbookColumnMap[item!.fieldPath] = item!.valueMapping;
+    });
+    return filterWorkbookColumnMap;
+  }
+
   async function linkRelationshipAttribute(
     resource: InputResource<
       KitsuResource & {
@@ -261,7 +275,7 @@ export function useWorkbookConverter(
         };
       }
     >,
-    workbookColumnMap: WorkbookColumnMap,
+    workbookColumnMap: ReturnType<typeof filterWorkbookColumnMap>,
     attributeName: string,
     group: string
   ) {
@@ -280,9 +294,10 @@ export function useWorkbookConverter(
         // If the value is an Object type, and there is a relationshipConfig defined
         if (
           relationshipConfig.linkOrCreateSetting === LinkOrCreateSetting.LINK ||
-          relationshipConfig.linkOrCreateSetting === LinkOrCreateSetting.LINK_OR_CREATE
+          relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_OR_CREATE
         ) {
-          let valueToLink
+          let valueToLink;
           // TODO: get valueToLink from workbookColumnMap
 
           if (valueToLink) {
@@ -305,7 +320,12 @@ export function useWorkbookConverter(
         ) {
           // if there is no existing record in the db, then create it
           for (const childName of Object.keys(value)) {
-            await linkRelationshipAttribute(value, workbookColumnMap, childName, group);
+            await linkRelationshipAttribute(
+              value,
+              workbookColumnMap,
+              childName,
+              group
+            );
           }
           const newCreatedValue = await save(
             [
@@ -331,7 +351,12 @@ export function useWorkbookConverter(
         }
       } else {
         for (const childName of Object.keys(value)) {
-          await linkRelationshipAttribute(value, workbookColumnMap, childName, group);
+          await linkRelationshipAttribute(
+            value,
+            workbookColumnMap,
+            childName,
+            group
+          );
         }
       }
     } else if (Array.isArray(value) && value.length > 0) {
@@ -365,7 +390,12 @@ export function useWorkbookConverter(
             ) {
               // if there is no existing record in the db, then create it
               for (const childName of Object.keys(valueInArray)) {
-                await linkRelationshipAttribute(valueInArray, workbookColumnMap, childName, group);
+                await linkRelationshipAttribute(
+                  valueInArray,
+                  workbookColumnMap,
+                  childName,
+                  group
+                );
               }
 
               const newCreatedValue = await save(
@@ -420,7 +450,7 @@ export function useWorkbookConverter(
     };
     switch (relationshipConfig?.type) {
       case "collection":
-        return <CollectionSelectField {...resourceSelectProps}/>;
+        return <CollectionSelectField {...resourceSelectProps} />;
       case "collecting-event":
         return <CollectingEventSelectField {...resourceSelectProps} />;
       case "person":
@@ -439,6 +469,7 @@ export function useWorkbookConverter(
   }
 
   return {
+    filterWorkbookColumnMap,
     linkRelationshipAttribute,
     convertWorkbook,
     flattenedConfig,
