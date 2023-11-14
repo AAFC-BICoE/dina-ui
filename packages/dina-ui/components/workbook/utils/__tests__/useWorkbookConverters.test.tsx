@@ -771,7 +771,23 @@ describe("useWorkbookConverters", () => {
   });
 
   it("test", () => {
-    const workbookColumnMap: WorkbookColumnMap = {
+    const mockGet = jest
+      .fn()
+      .mockResolvedValue({ data: { id: "id", type: "object-field" } });
+    const mockSave = jest
+      .fn()
+      .mockResolvedValue([
+        { id: "newId", type: "object-field", name: "name1" }
+      ]);
+    jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
+      apiClient: {
+        get: mockGet
+      } as any,
+      save: mockSave
+    } as any);
+    const { searchColumnMap, filterWorkbookColumnMap, linkRelationshipAttribute } =
+      getWorkbookConverter(mockConfig, "mockEntity");
+    const mockWorkbookColumnMap: WorkbookColumnMap = {
       id: {
         fieldPath: "materialSampleName",
         mapRelationship: false,
@@ -820,16 +836,46 @@ describe("useWorkbookConverters", () => {
       }
     };
 
-    const newMap: {
-      [fieldPath: string]: { [value: string]: { id: string; type: string } };
-    } = {};
+    const mockFilteredWorkbookColumnMap = {
+      "collectingEvent.collectors.displayName": {
+        "collector 3": {
+          id: "70875e43-c5e1-4381-bd20-f41aa88a0052",
+          type: "person"
+        },
+        "collector 2": {
+          id: "70875e43-c5e1-4381-bd20-f41aa88a0052",
+          type: "person"
+        },
+        "collector 1": {
+          id: "86c65bc9-ff2d-440d-8c63-3b6f928b2b69",
+          type: "person"
+        }
+      },
+      "collection.name": {
+        coll1: {
+          id: "06a0cf94-9c77-4ec3-a8c1-f7a8ea3ce304",
+          type: "collection"
+        },
+        coll2: {
+          id: "633dcb70-81c0-4c36-821b-4f5d8740615d",
+          type: "collection"
+        },
+        coll3: {
+          id: "633dcb70-81c0-4c36-821b-4f5d8740615d",
+          type: "collection"
+        }
+      }
+    };
 
-    const filtered = Object.values(workbookColumnMap).filter(
-      (item) => item && item.mapRelationship === true
+    expect(filterWorkbookColumnMap(mockWorkbookColumnMap)).toEqual(
+      mockFilteredWorkbookColumnMap
     );
-    filtered.forEach((item) => {
-      newMap[item!.fieldPath] = item!.valueMapping;
-    });
-    console.log(JSON.stringify(newMap, null, " "));
+
+    const collectionColumnMap = searchColumnMap(
+      "collection",
+      mockFilteredWorkbookColumnMap
+    );
+
+    console.log(collectionColumnMap);
   });
 });

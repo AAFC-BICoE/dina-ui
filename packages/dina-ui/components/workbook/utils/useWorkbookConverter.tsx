@@ -250,6 +250,40 @@ export function useWorkbookConverter(
     return resources;
   }
 
+  /**
+   * filter the workbookColumnMap and generate a pure relationshi map like this
+   *    {
+   *      "collectingEvent.collectors.displayName": {
+   *        "collector 3": {
+   *          "id": "70875e43-c5e1-4381-bd20-f41aa88a0052",
+   *          "type": "person"
+   *        },
+   *        "collector 2": {
+   *          "id": "70875e43-c5e1-4381-bd20-f41aa88a0052",
+   *          "type": "person"
+   *        },
+   *        "collector 1": {
+   *          "id": "86c65bc9-ff2d-440d-8c63-3b6f928b2b69",
+   *          "type": "person"
+   *        }
+   *       },
+   *      "collection.name": {
+   *        "coll1": {
+   *          "id": "06a0cf94-9c77-4ec3-a8c1-f7a8ea3ce304",
+   *          "type": "collection"
+   *        },
+   *        "coll2": {
+   *          "id": "633dcb70-81c0-4c36-821b-4f5d8740615d",
+   *          "type": "collection"
+   *        },
+   *        "coll3": {
+   *          "id": "633dcb70-81c0-4c36-821b-4f5d8740615d",
+   *          "type": "collection"
+   *        }
+   *      }
+   *    }
+   * 
+   */
   function filterWorkbookColumnMap(workbookColumnMap: WorkbookColumnMap) {
     const filteredWorkbookColumnMap: {
       [fieldPath: string]: { [value: string]: { id: string; type: string } };
@@ -261,7 +295,47 @@ export function useWorkbookConverter(
     filtered.forEach((item) => {
       filteredWorkbookColumnMap[item!.fieldPath] = item!.valueMapping;
     });
-    return filterWorkbookColumnMap;
+    return filteredWorkbookColumnMap;
+  }
+
+  /**
+   * search there is a columnMap for a attributeName. We can use this function 
+   * to check if there is a relationship mapping for an attribute. For example,
+   * searchColumnMap('collection', filteredWorkbookColumnMap).  It will 
+   * return the following if there is a mpping for collection.
+   * 
+   *   {
+   *     "coll1": {
+   *       "id": "06a0cf94-9c77-4ec3-a8c1-f7a8ea3ce304",
+   *       "type": "collection"
+   *     },
+   *     "coll2": {
+   *       "id": "633dcb70-81c0-4c36-821b-4f5d8740615d",
+   *       "type": "collection"
+   *     },
+   *     "coll3": {
+   *       "id": "633dcb70-81c0-4c36-821b-4f5d8740615d",
+   *       "type": "collection"
+   *     }
+   *   }
+   * 
+   * @param attributeName 
+   * @param filteredWorkbookColumnMap 
+   * @returns 
+   */
+  function searchColumnMap(
+    attributeName: string,
+    filteredWorkbookColumnMap: ReturnType<typeof filterWorkbookColumnMap>
+  ): {[value: string]: {id: string, type: string}} | undefined {
+    const foundFieldPath = Object.keys(filteredWorkbookColumnMap).find(
+      (fieldPath) => {
+        const lastIndex = fieldPath.lastIndexOf(".");
+        return fieldPath.substring(0, lastIndex) === attributeName;
+      }
+    );
+    if (foundFieldPath) {
+      return filteredWorkbookColumnMap[foundFieldPath];
+    }
   }
 
   async function linkRelationshipAttribute(
@@ -275,7 +349,7 @@ export function useWorkbookConverter(
         };
       }
     >,
-    workbookColumnMap: ReturnType<typeof filterWorkbookColumnMap>,
+    filteredWorkbookColumnMap: ReturnType<typeof filterWorkbookColumnMap>,
     attributeName: string,
     group: string
   ) {
@@ -298,6 +372,10 @@ export function useWorkbookConverter(
             LinkOrCreateSetting.LINK_OR_CREATE
         ) {
           let valueToLink;
+          const columnMap = searchColumnMap(attributeName, filteredWorkbookColumnMap);
+          if (columnMap) {
+            valueToLink = columnMap[value]
+          }
           // TODO: get valueToLink from workbookColumnMap
 
           if (valueToLink) {
@@ -322,7 +400,7 @@ export function useWorkbookConverter(
           for (const childName of Object.keys(value)) {
             await linkRelationshipAttribute(
               value,
-              workbookColumnMap,
+              filteredWorkbookColumnMap,
               childName,
               group
             );
@@ -353,7 +431,7 @@ export function useWorkbookConverter(
         for (const childName of Object.keys(value)) {
           await linkRelationshipAttribute(
             value,
-            workbookColumnMap,
+            filteredWorkbookColumnMap,
             childName,
             group
           );
@@ -392,7 +470,7 @@ export function useWorkbookConverter(
               for (const childName of Object.keys(valueInArray)) {
                 await linkRelationshipAttribute(
                   valueInArray,
-                  workbookColumnMap,
+                  filteredWorkbookColumnMap,
                   childName,
                   group
                 );
@@ -469,8 +547,9 @@ export function useWorkbookConverter(
   }
 
   return {
-    filterWorkbookColumnMap,
     linkRelationshipAttribute,
+    filterWorkbookColumnMap,
+    searchColumnMap,
     convertWorkbook,
     flattenedConfig,
     getFieldConverter,
