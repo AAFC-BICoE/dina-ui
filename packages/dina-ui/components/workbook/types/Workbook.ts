@@ -93,15 +93,15 @@ export interface ColumnUniqueValues {
 
 export interface WorkbookColumnMap {
   [columnName: string]: // columnName in the spreadsheet
-  | {
-       fieldPath: string; // Mapped fieldPath in the configuration
-       mapRelationship: boolean; // If relationship mapping needed.
-       valueMapping: {
-        [value: string]: {
-          id: string;
-          type: string;
-        }
-       }
-    }
-    | undefined;
+  {
+    fieldPath?: string; // Mapped fieldPath in the configuration
+    mapRelationship: boolean; // If relationship mapping needed.
+    numOfUniqueValues: number;
+    valueMapping: {
+      [value: string]: {
+        id: string;
+        type: string;
+      };
+    };
+  };
 }

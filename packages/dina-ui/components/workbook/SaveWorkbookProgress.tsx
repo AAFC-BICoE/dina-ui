@@ -60,7 +60,7 @@ export function SaveWorkbookProgress({
     onWorkbookSaved?.();
   };
 
-  const { filterWorkbookColumnMap, linkRelationshipAttribute } = useWorkbookConverter(
+  const { linkRelationshipAttribute } = useWorkbookConverter(
     FieldMappingConfig,
     workbookResources?.[0].type || "material-sample"
   );
@@ -104,15 +104,13 @@ export function SaveWorkbookProgress({
   }, []);
 
   async function saveWorkbook() {
-    const filteredWorkbookColumnMap = filterWorkbookColumnMap(workbookColumnMap);
-
     async function saveChunkOfWorkbook(chunkedResources) {
       for (const resource of chunkedResources) {
         for (const key of Object.keys(resource)) {
           if (resource[key] !== undefined && resource[key] !== null) {
             await linkRelationshipAttribute(
               resource,
-              filteredWorkbookColumnMap,
+              workbookColumnMap,
               key,
               group ?? ""
             );

@@ -57,7 +57,7 @@ export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const { startSavingWorkbook, spreadsheetData, setColumnMap, workbookColumnMap } =
+  const { startSavingWorkbook, spreadsheetData, setColumnMap, workbookColumnMap, columnUniqueValues } =
     useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
@@ -232,15 +232,12 @@ export function WorkbookColumnMapping({
     const newWorkbookColumnMap: WorkbookColumnMap = {};
     for (const columnHeader of headers || []) {
       const fieldPath = findMatchField(columnHeader, fieldOptions);
-      if (fieldPath !== undefined) {
         newWorkbookColumnMap[columnHeader] = {
           fieldPath,
           mapRelationship: false,
+          numOfUniqueValues: Object.keys(columnUniqueValues?.[sheet]?.[columnHeader] ?? {}).length,
           valueMapping: {}
         };
-      } else {
-        newWorkbookColumnMap[columnHeader] = undefined;
-      }
     }
     setColumnMap(newWorkbookColumnMap);
     // End of workbook column mapping calculation
@@ -441,6 +438,7 @@ export function WorkbookColumnMapping({
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
       fieldPath,
+      numOfUniqueValues: Object.keys(columnUniqueValues?.[sheet]?.[columnName] ?? {}).length,
       mapRelationship: checked,
       valueMapping: {}
     };
@@ -454,6 +452,7 @@ export function WorkbookColumnMapping({
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
       fieldPath: newFieldPath,
+      numOfUniqueValues: Object.keys(columnUniqueValues?.[sheet]?.[columnName] ?? {}).length,
       mapRelationship: false,
       valueMapping: {}
     };

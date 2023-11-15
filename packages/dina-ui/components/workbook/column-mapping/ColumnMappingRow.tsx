@@ -1,16 +1,13 @@
 import { startCase } from "lodash";
-import { useMemo, useEffect, useState } from "react";
-import {
-  CheckBoxField,
-  Checkbox,
-  SelectField
-} from "../../../../common-ui/lib";
+import { useMemo, useState } from "react";
+import { Checkbox, SelectField } from "../../../../common-ui/lib";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
-import { useWorkbookConverter } from "../utils/useWorkbookConverter";
+import {
+  THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP,
+  useWorkbookConverter
+} from "../utils/useWorkbookConverter";
 import { getColumnHeaders } from "../utils/workbookMappingUtils";
-
-const THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP = 10;
 
 export interface ColumnMappingRowProps {
   sheet: number;
@@ -31,10 +28,7 @@ export interface ColumnMappingRowProps {
     fieldPath: string,
     checked: boolean
   ) => void;
-  onFieldMappingChange: (
-    columnName: string,
-    newFieldPath
-  ) => void;
+  onFieldMappingChange: (columnName: string, newFieldPath) => void;
 }
 
 export function ColumnMappingRow({
@@ -148,11 +142,7 @@ export function ColumnMappingRow({
             isField={false}
             handleClick={(e) => {
               setChecked(e.target.checked);
-              onToggleColumnMapping?.(
-                columnName,
-                fieldPath!,
-                e.target.checked
-              );
+              onToggleColumnMapping?.(columnName, fieldPath!, e.target.checked);
             }}
           />
         )}
