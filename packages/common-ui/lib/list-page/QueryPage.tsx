@@ -799,6 +799,7 @@ export function QueryPage<TData extends KitsuResource>({
           queryBuilderConfig={queryBuilderConfig}
           setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
           setPageOffset={setPageOffset}
+          onSubmit={onSubmit}
           onReset={onReset}
         />
       )}
