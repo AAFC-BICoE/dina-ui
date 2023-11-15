@@ -158,7 +158,7 @@ export function SavedSearch({
   // User Preferences has been loaded in and apply default loaded search:
   useEffect(() => {
     // Do not load the saved search if the last search used was loaded in.
-    if (!userPreferences || defaultLoadedIn || loadLastUsed) return;
+    if (!userPreferences || defaultLoadedIn) return;
 
     // User preferences have been loaded in, we can now check for the default saved search if it
     // exists and pre-load it in.
@@ -256,6 +256,8 @@ export function SavedSearch({
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+      setSubmittedQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+      setPageOffset(0);
     }
   }
 
