@@ -160,6 +160,7 @@ export function SavedSearch({
     loadSavedSearch(selectedSavedSearch);
   }, [selectedSavedSearch, lastSelected]);
 
+  // Clear saved-search-changed local storage if user closes window
   window.addEventListener("beforeunload", (_e) => {
     setChangesMade(false);
   });
