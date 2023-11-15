@@ -43,8 +43,6 @@ interface QueryBuilderProps {
    * Callback to indicate the query builder was reset.
    */
   onReset: () => void;
-
-  onSortChange: (newSort: ColumnSort[]) => void;
 }
 
 function QueryBuilder({
@@ -53,8 +51,7 @@ function QueryBuilder({
   queryBuilderTree,
   setQueryBuilderTree,
   onSubmit,
-  onReset,
-  onSortChange
+  onReset
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -94,7 +91,6 @@ function QueryBuilder({
         setQueryBuilderTree={setQueryBuilderTree}
         queryBuilderConfig={queryBuilderConfig}
         performSubmit={onSubmit}
-        onSortChange={onSortChange}
       />
       <Query
         {...queryBuilderConfig}
@@ -114,35 +110,35 @@ function QueryBuilder({
   );
 }
 
+const groupId = "8c6dc2c8-4070-48ce-b700-13a931f9ebaf";
+const ruleId = "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6";
+export const defaultJsonTree = {
+  id: groupId,
+  type: "group",
+  children1: {
+    "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6": {
+      type: "rule",
+      id: ruleId,
+      properties: {
+        field: null,
+        operator: null,
+        value: [],
+        valueSrc: [],
+        valueError: []
+      },
+      path: [groupId, ruleId]
+    }
+  },
+  properties: { conjunction: "AND" },
+  path: [groupId]
+} as JsonTree;
 /**
  * Default query tree contains an empty rule so it's one less the step the user needs to perform.
  *
  * This is the default when first loading the page and resetting the query builder.
  */
 export function defaultQueryTree(): ImmutableTree {
-  const groupId = "8c6dc2c8-4070-48ce-b700-13a931f9ebaf";
-  const ruleId = "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6";
-
-  return Utils.loadTree({
-    id: groupId,
-    type: "group",
-    children1: {
-      "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6": {
-        type: "rule",
-        id: ruleId,
-        properties: {
-          field: null,
-          operator: null,
-          value: [],
-          valueSrc: [],
-          valueError: []
-        },
-        path: [groupId, ruleId]
-      }
-    },
-    properties: { conjunction: "AND" },
-    path: [groupId]
-  } as JsonTree);
+  return Utils.loadTree(defaultJsonTree);
 }
 
 /**

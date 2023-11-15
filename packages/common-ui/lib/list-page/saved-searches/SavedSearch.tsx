@@ -47,8 +47,6 @@ export interface SavedSearchProps {
    * function.
    */
   performSubmit: () => void;
-
-  onSortChange: (newSort: ColumnSort[]) => void;
 }
 
 /**
@@ -69,8 +67,7 @@ export function SavedSearch({
   queryBuilderTree,
   setQueryBuilderTree,
   queryBuilderConfig,
-  performSubmit,
-  onSortChange
+  performSubmit
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -98,10 +95,8 @@ export function SavedSearch({
   // Functionality for the last loaded search.
   const { loadLastUsed } = useLastSavedSearch({
     indexName,
-    queryBuilderTree,
     setQueryBuilderTree,
-    performSubmit,
-    onSortChange
+    performSubmit
   });
 
   // Using the user preferences get the options and user preferences.

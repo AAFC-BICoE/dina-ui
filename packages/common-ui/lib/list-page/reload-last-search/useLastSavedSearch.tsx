@@ -11,11 +11,6 @@ interface UseLastSavedSearchProps {
   indexName: string;
 
   /**
-   * Query Builder local tree, used for changing the last used search into local storage.
-   */
-  queryBuilderTree?: ImmutableTree;
-
-  /**
    * Set the query builder tree, used to to load a saved search.
    */
   setQueryBuilderTree: (newTree: ImmutableTree) => void;
@@ -25,8 +20,6 @@ interface UseLastSavedSearchProps {
    * function.
    */
   performSubmit: () => void;
-
-  onSortChange: (newSort: ColumnSort[]) => void;
 }
 
 interface UseLastSavedSearchReturn {
@@ -36,10 +29,8 @@ interface UseLastSavedSearchReturn {
 
 export function useLastSavedSearch({
   indexName,
-  queryBuilderTree,
   setQueryBuilderTree,
-  performSubmit,
-  onSortChange
+  performSubmit
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
   const localStorageLastUsedTreeKey = indexName + "-last-used-tree";
   const localStorageLastUsedSortKey = indexName + "-last-used-sort";
@@ -57,7 +48,6 @@ export function useLastSavedSearch({
   useEffect(() => {
     if (localStorageQueryTree) {
       setQueryBuilderTree(Utils.loadTree(localStorageQueryTree as JsonTree));
-      onSortChange(localStorageSort);
       setQueryLoaded(true);
       performSubmit();
     } else {

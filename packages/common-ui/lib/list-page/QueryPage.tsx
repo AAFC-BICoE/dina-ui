@@ -39,6 +39,7 @@ import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { MultiSortTooltip } from "./MultiSortTooltip";
 import {
   QueryBuilderMemo,
+  defaultJsonTree,
   defaultQueryTree,
   emptyQueryTree
 } from "./query-builder/QueryBuilder";
@@ -272,7 +273,12 @@ export function QueryPage<TData extends KitsuResource>({
   const [totalRecords, setTotalRecords] = useState<number>(0);
 
   // User applied sorting rules for elastic search to use.
-  const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
+  const localStorageLastUsedSortKey = indexName + "-last-used-sort";
+  const [sortingRules, setSortingRules] = useLocalStorage<ColumnSort[]>(
+    localStorageLastUsedSortKey,
+    defaultSort ?? DEFAULT_SORT
+  );
+  // const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
   // The pagination size.
   const [pageSize, setPageSize] = useState<number>(
@@ -677,12 +683,6 @@ export function QueryPage<TData extends KitsuResource>({
   const [localStorageQueryTree, setLocalStorageQueryTree] =
     useLocalStorage<JsonTree>(localStorageLastUsedKey);
 
-  const localStorageLastUsedSortKey = indexName + "-last-used-sort";
-  const [localStorageSort, setLocalStorageSort] = useLocalStorage<ColumnSort[]>(
-    localStorageLastUsedSortKey,
-    []
-  );
-
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
    * performed.
@@ -690,6 +690,7 @@ export function QueryPage<TData extends KitsuResource>({
   const onReset = useCallback(() => {
     setSubmittedQueryBuilderTree(defaultQueryTree());
     setQueryBuilderTree(defaultQueryTree());
+    setLocalStorageQueryTree(defaultJsonTree);
     setError(undefined);
     setPageOffset(0);
   }, []);
@@ -699,7 +700,6 @@ export function QueryPage<TData extends KitsuResource>({
    * a new search.
    */
   const onSubmit = () => {
-    setLocalStorageSort(sortingRules);
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
     setLocalStorageQueryTree(Utils.getTree(queryBuilderTree));
@@ -796,7 +796,6 @@ export function QueryPage<TData extends KitsuResource>({
           indexName={indexName}
           queryBuilderTree={queryBuilderTree}
           setQueryBuilderTree={onQueryBuildTreeChange}
-          onSortChange={onSortChange}
           queryBuilderConfig={queryBuilderConfig}
           onSubmit={onSubmit}
           onReset={onReset}
