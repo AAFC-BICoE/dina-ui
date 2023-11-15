@@ -11,6 +11,7 @@ import { Button } from "react-bootstrap";
 import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
+import { ColumnSort } from "@tanstack/react-table";
 
 interface QueryBuilderProps {
   /**
@@ -42,6 +43,8 @@ interface QueryBuilderProps {
    * Callback to indicate the query builder was reset.
    */
   onReset: () => void;
+
+  onSortChange: (newSort: ColumnSort[]) => void;
 }
 
 function QueryBuilder({
@@ -50,7 +53,8 @@ function QueryBuilder({
   queryBuilderTree,
   setQueryBuilderTree,
   onSubmit,
-  onReset
+  onReset,
+  onSortChange
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -90,6 +94,7 @@ function QueryBuilder({
         setQueryBuilderTree={setQueryBuilderTree}
         queryBuilderConfig={queryBuilderConfig}
         performSubmit={onSubmit}
+        onSortChange={onSortChange}
       />
       <Query
         {...queryBuilderConfig}

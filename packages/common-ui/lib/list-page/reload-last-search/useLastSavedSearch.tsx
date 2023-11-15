@@ -1,4 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
+import { ColumnSort } from "@tanstack/react-table";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
@@ -24,6 +25,8 @@ interface UseLastSavedSearchProps {
    * function.
    */
   performSubmit: () => void;
+
+  onSortChange: (newSort: ColumnSort[]) => void;
 }
 
 interface UseLastSavedSearchReturn {
@@ -35,20 +38,26 @@ export function useLastSavedSearch({
   indexName,
   queryBuilderTree,
   setQueryBuilderTree,
-  performSubmit
+  performSubmit,
+  onSortChange
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
-  const router = useRouter();
-  const localStorageKey = indexName + "-last-used-tree";
+  const localStorageLastUsedTreeKey = indexName + "-last-used-tree";
+  const localStorageLastUsedSortKey = indexName + "-last-used-sort";
 
   const [queryLoaded, setQueryLoaded] = useState<boolean>(false);
 
   const [localStorageQueryTree, setLocalStorageQueryTree] =
-    useLocalStorage<JsonTree>(localStorageKey);
+    useLocalStorage<JsonTree>(localStorageLastUsedTreeKey);
+  const [localStorageSort, setLocalStorageSort] = useLocalStorage<ColumnSort[]>(
+    localStorageLastUsedSortKey,
+    []
+  );
 
   // Load in the last used save search
   useEffect(() => {
     if (localStorageQueryTree) {
       setQueryBuilderTree(Utils.loadTree(localStorageQueryTree as JsonTree));
+      onSortChange(localStorageSort);
       setQueryLoaded(true);
       performSubmit();
     } else {
@@ -61,13 +70,6 @@ export function useLastSavedSearch({
   useEffect(() => {
     performSubmit();
   }, [queryLoaded]);
-
-  // Every time the tree has been changed, save it to local storage.
-  useEffect(() => {
-    if (!queryBuilderTree || !indexName || !queryLoaded) return;
-
-    setLocalStorageQueryTree(Utils.getTree(queryBuilderTree));
-  }, [queryBuilderTree]);
 
   return {
     loadLastUsed: !!localStorageQueryTree

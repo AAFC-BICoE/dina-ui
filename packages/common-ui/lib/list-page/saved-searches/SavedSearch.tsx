@@ -16,6 +16,7 @@ import { map, cloneDeep } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
+import { ColumnSort } from "@tanstack/react-table";
 
 export interface SavedSearchProps {
   /**
@@ -46,6 +47,8 @@ export interface SavedSearchProps {
    * function.
    */
   performSubmit: () => void;
+
+  onSortChange: (newSort: ColumnSort[]) => void;
 }
 
 /**
@@ -66,7 +69,8 @@ export function SavedSearch({
   queryBuilderTree,
   setQueryBuilderTree,
   queryBuilderConfig,
-  performSubmit
+  performSubmit,
+  onSortChange
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -96,7 +100,8 @@ export function SavedSearch({
     indexName,
     queryBuilderTree,
     setQueryBuilderTree,
-    performSubmit
+    performSubmit,
+    onSortChange
   });
 
   // Using the user preferences get the options and user preferences.

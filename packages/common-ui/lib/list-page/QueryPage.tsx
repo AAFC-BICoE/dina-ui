@@ -673,6 +673,16 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
+  const localStorageLastUsedKey = indexName + "-last-used-tree";
+  const [localStorageQueryTree, setLocalStorageQueryTree] =
+    useLocalStorage<JsonTree>(localStorageLastUsedKey);
+
+  const localStorageLastUsedSortKey = indexName + "-last-used-sort";
+  const [localStorageSort, setLocalStorageSort] = useLocalStorage<ColumnSort[]>(
+    localStorageLastUsedSortKey,
+    []
+  );
+
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
    * performed.
@@ -689,8 +699,10 @@ export function QueryPage<TData extends KitsuResource>({
    * a new search.
    */
   const onSubmit = () => {
+    setLocalStorageSort(sortingRules);
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
+    setLocalStorageQueryTree(Utils.getTree(queryBuilderTree));
   };
 
   /**
@@ -784,6 +796,7 @@ export function QueryPage<TData extends KitsuResource>({
           indexName={indexName}
           queryBuilderTree={queryBuilderTree}
           setQueryBuilderTree={onQueryBuildTreeChange}
+          onSortChange={onSortChange}
           queryBuilderConfig={queryBuilderConfig}
           onSubmit={onSubmit}
           onReset={onReset}
