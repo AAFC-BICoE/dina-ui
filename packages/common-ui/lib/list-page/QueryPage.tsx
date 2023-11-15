@@ -278,7 +278,6 @@ export function QueryPage<TData extends KitsuResource>({
     localStorageLastUsedSortKey,
     defaultSort ?? DEFAULT_SORT
   );
-  // const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
   // The pagination size.
   const [pageSize, setPageSize] = useState<number>(
@@ -691,6 +690,7 @@ export function QueryPage<TData extends KitsuResource>({
     setSubmittedQueryBuilderTree(defaultQueryTree());
     setQueryBuilderTree(defaultQueryTree());
     setLocalStorageQueryTree(defaultJsonTree);
+    setSortingRules(defaultSort ?? DEFAULT_SORT);
     setError(undefined);
     setPageOffset(0);
   }, []);
