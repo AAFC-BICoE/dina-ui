@@ -17,6 +17,7 @@ import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
 import { ColumnSort } from "@tanstack/react-table";
+import useLocalStorage from "@rehooks/local-storage";
 
 export interface SavedSearchProps {
   /**
@@ -97,7 +98,11 @@ export function SavedSearch({
 
   const [defaultLoadedIn, setDefaultLoadedIn] = useState<boolean>(false);
 
-  const [changesMade, setChangesMade] = useState<boolean>(false);
+  const localStorageLastUsedTreeKey = indexName + "-saved-search-changed";
+  const [changesMade, setChangesMade] = useLocalStorage<boolean>(
+    localStorageLastUsedTreeKey,
+    false
+  );
 
   // Functionality for the last loaded search.
   const { loadLastUsed } = useLastSavedSearch({
@@ -155,10 +160,14 @@ export function SavedSearch({
     loadSavedSearch(selectedSavedSearch);
   }, [selectedSavedSearch, lastSelected]);
 
+  window.addEventListener("beforeunload", (_e) => {
+    setChangesMade(false);
+  });
+
   // User Preferences has been loaded in and apply default loaded search:
   useEffect(() => {
-    // Do not load the saved search if the last search used was loaded in.
-    if (!userPreferences || defaultLoadedIn) return;
+    // Do not load the saved search if the last search used was loaded in or there were changes
+    if (!userPreferences || defaultLoadedIn || changesMade) return;
 
     // User preferences have been loaded in, we can now check for the default saved search if it
     // exists and pre-load it in.
