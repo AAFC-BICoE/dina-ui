@@ -43,6 +43,18 @@ interface QueryBuilderProps {
    * Callback to indicate the query builder was reset.
    */
   onReset: () => void;
+
+  /**
+   * Set the submitted query builder tree, used to to load a saved search.
+   */
+  setSubmittedQueryBuilderTree: React.Dispatch<
+    React.SetStateAction<ImmutableTree>
+  >;
+
+  /**
+   * Set the page offset, used to to load a saved search.
+   */
+  setPageOffset: React.Dispatch<React.SetStateAction<number>>;
 }
 
 function QueryBuilder({
@@ -51,7 +63,9 @@ function QueryBuilder({
   queryBuilderTree,
   setQueryBuilderTree,
   onSubmit,
-  onReset
+  onReset,
+  setSubmittedQueryBuilderTree,
+  setPageOffset
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -90,7 +104,8 @@ function QueryBuilder({
         queryBuilderTree={queryBuilderTree}
         setQueryBuilderTree={setQueryBuilderTree}
         queryBuilderConfig={queryBuilderConfig}
-        performSubmit={onSubmit}
+        setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+        setPageOffset={setPageOffset}
       />
       <Query
         {...queryBuilderConfig}

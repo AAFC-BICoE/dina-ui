@@ -16,10 +16,16 @@ interface UseLastSavedSearchProps {
   setQueryBuilderTree: (newTree: ImmutableTree) => void;
 
   /**
-   * For the last loaded search, we will actually perform the search by calling this callback
-   * function.
+   * Set the submitted query builder tree, used to to load a saved search.
    */
-  performSubmit: () => void;
+  setSubmittedQueryBuilderTree: React.Dispatch<
+    React.SetStateAction<ImmutableTree>
+  >;
+
+  /**
+   * Set the page offset, used to to load a saved search.
+   */
+  setPageOffset: React.Dispatch<React.SetStateAction<number>>;
 }
 
 interface UseLastSavedSearchReturn {
@@ -30,26 +36,25 @@ interface UseLastSavedSearchReturn {
 export function useLastSavedSearch({
   indexName,
   setQueryBuilderTree,
-  performSubmit
+  setSubmittedQueryBuilderTree,
+  setPageOffset
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
   const localStorageLastUsedTreeKey = indexName + "-last-used-tree";
-  const localStorageLastUsedSortKey = indexName + "-last-used-sort";
 
   const [queryLoaded, setQueryLoaded] = useState<boolean>(false);
 
   const [localStorageQueryTree, setLocalStorageQueryTree] =
     useLocalStorage<JsonTree>(localStorageLastUsedTreeKey);
-  const [localStorageSort, setLocalStorageSort] = useLocalStorage<ColumnSort[]>(
-    localStorageLastUsedSortKey,
-    []
-  );
 
   // Load in the last used save search
   useEffect(() => {
     if (localStorageQueryTree) {
       setQueryBuilderTree(Utils.loadTree(localStorageQueryTree as JsonTree));
       setQueryLoaded(true);
-      performSubmit();
+      setSubmittedQueryBuilderTree(
+        Utils.loadTree(localStorageQueryTree as JsonTree)
+      );
+      setPageOffset(0);
     } else {
       // Nothing to load in, mark as loaded.
       setQueryLoaded(true);
@@ -58,7 +63,10 @@ export function useLastSavedSearch({
 
   // Once the query builder tree has been loaded in, perform a submit.
   useEffect(() => {
-    performSubmit();
+    setSubmittedQueryBuilderTree(
+      Utils.loadTree(localStorageQueryTree as JsonTree)
+    );
+    setPageOffset(0);
   }, [queryLoaded]);
 
   return {
