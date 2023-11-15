@@ -201,7 +201,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     actionMeta: ActionMeta<{ resource: PersistedResource<TData> }>
   ) {
     if (!newSelectedRaw) {
-      // when clea
+      // when delete all the selected options.
       onChangeProp(isMulti ? [] : null, actionMeta);
     } else {
       const newSelected = castArray(newSelectedRaw);
