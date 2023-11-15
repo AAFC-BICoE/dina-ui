@@ -27,7 +27,8 @@
     "react-file-viewer": "^1.2.1",
     "react-switch": "^6.0.0",
     "react-tabs": "^3.2.3",
-    "zod": "^3.11.6"
+    "zod": "^3.11.6",
+    "mammoth": "1.6.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
