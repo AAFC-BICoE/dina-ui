@@ -1,4 +1,4 @@
-import { useLocalStorage } from "@rehooks/local-storage";
+import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
 import {
   ColumnSort,
   Row,
@@ -679,8 +679,7 @@ export function QueryPage<TData extends KitsuResource>({
   ];
 
   const localStorageLastUsedKey = indexName + "-last-used-tree";
-  const [localStorageQueryTree, setLocalStorageQueryTree] =
-    useLocalStorage<JsonTree>(localStorageLastUsedKey);
+  const localStorageLastUsedTreeKey = indexName + "-saved-search-changed";
 
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
@@ -689,7 +688,8 @@ export function QueryPage<TData extends KitsuResource>({
   const onReset = useCallback(() => {
     setSubmittedQueryBuilderTree(defaultQueryTree());
     setQueryBuilderTree(defaultQueryTree());
-    setLocalStorageQueryTree(defaultJsonTree);
+    writeStorage(localStorageLastUsedKey, defaultJsonTree);
+    writeStorage(localStorageLastUsedTreeKey, false);
     setSortingRules(defaultSort ?? DEFAULT_SORT);
     setError(undefined);
     setPageOffset(0);
@@ -702,7 +702,7 @@ export function QueryPage<TData extends KitsuResource>({
   const onSubmit = () => {
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
-    setLocalStorageQueryTree(Utils.getTree(queryBuilderTree));
+    writeStorage(localStorageLastUsedKey, Utils.getTree(queryBuilderTree));
   };
 
   /**

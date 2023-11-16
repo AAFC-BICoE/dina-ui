@@ -63,10 +63,12 @@ export function useLastSavedSearch({
 
   // Once the query builder tree has been loaded in, perform a submit.
   useEffect(() => {
-    setSubmittedQueryBuilderTree(
-      Utils.loadTree(localStorageQueryTree as JsonTree)
-    );
-    setPageOffset(0);
+    if (localStorageQueryTree) {
+      setSubmittedQueryBuilderTree(
+        Utils.loadTree(localStorageQueryTree as JsonTree)
+      );
+      setPageOffset(0);
+    }
   }, [queryLoaded]);
 
   return {

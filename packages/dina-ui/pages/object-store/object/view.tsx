@@ -83,6 +83,7 @@ export default function MetadataViewPage() {
           className="ms-5"
           id={uuid}
           options={{ apiBaseUrl: "/objectstore-api" }}
+          postDeleteRedirect="/object-store/object/list"
           type="metadata"
         />
       )}
