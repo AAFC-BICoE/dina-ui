@@ -54,6 +54,12 @@ export interface SavedSearchProps {
    * Set the page offset, used to to load a saved search.
    */
   setPageOffset: React.Dispatch<React.SetStateAction<number>>;
+
+  /**
+   * For the last loaded search, we will actually perform the search by calling this callback
+   * function.
+   */
+  performSubmit: () => void;
 }
 
 /**
@@ -75,7 +81,8 @@ export function SavedSearch({
   setQueryBuilderTree,
   queryBuilderConfig,
   setSubmittedQueryBuilderTree,
-  setPageOffset
+  setPageOffset,
+  performSubmit
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -109,7 +116,8 @@ export function SavedSearch({
     indexName,
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
-    setPageOffset
+    setPageOffset,
+    performSubmit
   });
 
   // Using the user preferences get the options and user preferences.

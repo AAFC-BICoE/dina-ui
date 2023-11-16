@@ -106,6 +106,7 @@ function QueryBuilder({
         queryBuilderConfig={queryBuilderConfig}
         setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
         setPageOffset={setPageOffset}
+        performSubmit={onSubmit}
       />
       <Query
         {...queryBuilderConfig}
