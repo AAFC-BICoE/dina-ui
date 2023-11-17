@@ -23,11 +23,6 @@ interface UseLastSavedSearchProps {
   >;
 
   /**
-   * Set the page offset, used to to load a saved search.
-   */
-  setPageOffset: React.Dispatch<React.SetStateAction<number>>;
-
-  /**
    * For the last loaded search, we will actually perform the search by calling this callback
    * function.
    */
@@ -43,7 +38,6 @@ export function useLastSavedSearch({
   indexName,
   setQueryBuilderTree,
   setSubmittedQueryBuilderTree,
-  setPageOffset,
   performSubmit
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
   const localStorageLastUsedTreeKey = indexName + "-last-used-tree";
@@ -61,7 +55,6 @@ export function useLastSavedSearch({
       setSubmittedQueryBuilderTree(
         Utils.loadTree(localStorageQueryTree as JsonTree)
       );
-      setPageOffset(0);
     } else {
       // Nothing to load in, mark as loaded.
       setQueryLoaded(true);
@@ -74,7 +67,6 @@ export function useLastSavedSearch({
       setSubmittedQueryBuilderTree(
         Utils.loadTree(localStorageQueryTree as JsonTree)
       );
-      setPageOffset(0);
     } else {
       performSubmit();
     }

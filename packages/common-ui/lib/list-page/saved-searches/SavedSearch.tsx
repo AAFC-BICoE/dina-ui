@@ -116,7 +116,6 @@ export function SavedSearch({
     indexName,
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
-    setPageOffset,
     performSubmit
   });
 
