@@ -16,6 +16,8 @@ import { map, cloneDeep } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
+import { ColumnSort } from "@tanstack/react-table";
+import useLocalStorage from "@rehooks/local-storage";
 
 export interface SavedSearchProps {
   /**
@@ -42,6 +44,18 @@ export interface SavedSearchProps {
   queryBuilderConfig: Config;
 
   /**
+   * Set the submitted query builder tree, used to to load a saved search.
+   */
+  setSubmittedQueryBuilderTree: React.Dispatch<
+    React.SetStateAction<ImmutableTree>
+  >;
+
+  /**
+   * Set the page offset, used to to load a saved search.
+   */
+  setPageOffset: React.Dispatch<React.SetStateAction<number>>;
+
+  /**
    * For the last loaded search, we will actually perform the search by calling this callback
    * function.
    */
@@ -66,6 +80,8 @@ export function SavedSearch({
   queryBuilderTree,
   setQueryBuilderTree,
   queryBuilderConfig,
+  setSubmittedQueryBuilderTree,
+  setPageOffset,
   performSubmit
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
@@ -89,13 +105,18 @@ export function SavedSearch({
 
   const [defaultLoadedIn, setDefaultLoadedIn] = useState<boolean>(false);
 
-  const [changesMade, setChangesMade] = useState<boolean>(false);
+  const localStorageLastUsedTreeKey = indexName + "-saved-search-changed";
+  const [changesMade, setChangesMade] = useLocalStorage<boolean>(
+    localStorageLastUsedTreeKey,
+    false
+  );
 
   // Functionality for the last loaded search.
   const { loadLastUsed } = useLastSavedSearch({
     indexName,
-    queryBuilderTree,
     setQueryBuilderTree,
+    setSubmittedQueryBuilderTree,
+    setPageOffset,
     performSubmit
   });
 
@@ -147,10 +168,15 @@ export function SavedSearch({
     loadSavedSearch(selectedSavedSearch);
   }, [selectedSavedSearch, lastSelected]);
 
+  // Clear saved-search-changed local storage if user closes window
+  window.addEventListener("beforeunload", (_e) => {
+    setChangesMade(false);
+  });
+
   // User Preferences has been loaded in and apply default loaded search:
   useEffect(() => {
-    // Do not load the saved search if the last search used was loaded in.
-    if (!userPreferences || defaultLoadedIn || loadLastUsed) return;
+    // Do not load the saved search if the last search used was loaded in or there were changes
+    if (!userPreferences || defaultLoadedIn || changesMade) return;
 
     // User preferences have been loaded in, we can now check for the default saved search if it
     // exists and pre-load it in.
@@ -248,6 +274,8 @@ export function SavedSearch({
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+      setSubmittedQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+      setPageOffset(0);
     }
   }
 
