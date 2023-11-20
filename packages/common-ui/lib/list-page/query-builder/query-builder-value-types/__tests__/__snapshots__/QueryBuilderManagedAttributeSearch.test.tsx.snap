@@ -182,6 +182,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -201,8 +202,13 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator equals 1`] = `
 Object {
-  "term": Object {
-    "data.attributes.managedAttributes.attributeName": "1998-05-19",
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19",
+      "lte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
   },
 }
 `;
@@ -212,6 +218,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gt": "1998-05-19",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -222,6 +229,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gte": "1998-05-19",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -232,6 +240,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lt": "1998-05-19",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -242,6 +251,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lte": "1998-05-19",
+      "time_zone": "+00:00",
     },
   },
 }
@@ -262,8 +272,13 @@ Object {
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "data.attributes.managedAttributes.attributeName": "1998-05-19",
+            "range": Object {
+              "data.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
             },
           },
         },
@@ -295,6 +310,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
+                "time_zone": "+00:00",
               },
             },
           },
@@ -361,8 +377,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.attributes.managedAttributes.attributeName": "1998-05-19",
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
             },
           },
           Object {
@@ -388,6 +409,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gt": "1998-05-19",
+                "time_zone": "+00:00",
               },
             },
           },
@@ -414,6 +436,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gte": "1998-05-19",
+                "time_zone": "+00:00",
               },
             },
           },
@@ -440,6 +463,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lt": "1998-05-19",
+                "time_zone": "+00:00",
               },
             },
           },
@@ -466,6 +490,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lte": "1998-05-19",
+                "time_zone": "+00:00",
               },
             },
           },
@@ -520,8 +545,13 @@ Object {
                 },
               },
               "must_not": Object {
-                "term": Object {
-                  "included.attributes.managedAttributes.attributeName": "1998-05-19",
+                "range": Object {
+                  "included.attributes.managedAttributes.attributeName": Object {
+                    "format": "yyyy-MM-dd",
+                    "gte": "1998-05-19",
+                    "lte": "1998-05-19",
+                    "time_zone": "+00:00",
+                  },
                 },
               },
             },
