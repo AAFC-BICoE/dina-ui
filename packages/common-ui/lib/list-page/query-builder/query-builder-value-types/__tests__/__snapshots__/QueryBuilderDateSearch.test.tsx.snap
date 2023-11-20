@@ -510,48 +510,6 @@ Object {
 }
 `;
 
-exports[`QueryBuilderDateSearch transformDateSearchToDSL function Partial Match operation Normal field 1`] = `
-Object {
-  "range": Object {
-    "data.attributes.dateField": Object {
-      "format": "yyyy-MM-dd",
-      "gte": "1998-05-19",
-      "lte": "1998-05-19",
-      "time_zone": "+00:00",
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderDateSearch transformDateSearchToDSL function Partial Match operation With relationship as field 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "range": Object {
-              "includes.name": Object {
-                "format": "yyyy-MM-dd",
-                "gte": "1998-05-19",
-                "lte": "1998-05-19",
-                "time_zone": "+00:00",
-              },
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collection",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
 exports[`QueryBuilderDateSearch transformDateSearchToDSL function lessThanOrEqualTo operation Normal field 1`] = `
 Object {
   "range": Object {
