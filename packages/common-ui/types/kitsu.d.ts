@@ -63,6 +63,11 @@ declare module "kitsu" {
 
     /** Response type that the request should be formatted as. "arraybuffer" | "blob" | "document" | "json" | "text" | "stream" */
     responseType?: ResponseType;
+
+    /** Specifies the number of milliseconds before the request times out.
+     * If the request takes longer than `timeout`, the request will be aborted.
+     */
+    timeout?: number;
   }
 
   /** Parameter for requesting sparse fields. */

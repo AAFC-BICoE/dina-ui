@@ -22,7 +22,7 @@ export function messagesToCsv(messageDictionary: MessageDictionary): string {
 
     const { english, french } = appConfig;
 
-    const rows = keys.map<CsvRow>(key => ({
+    const rows = keys.map<CsvRow>((key) => ({
       app,
       key,
       english: english.messages[key],

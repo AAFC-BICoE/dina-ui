@@ -86,11 +86,12 @@ export interface ESIndexMapping {
   distinctTerm: boolean;
 
   /**
-   * If enabled it will allow the user to search based on the starting of a word.
+   * All text fields will support prefixes, but some fields are optimized with a "prefix" field.
    *
-   * Example: Hexapoda can be matched with "hex".
+   * When enabled, the elastic search query will append a ".prefix" to the end of the field to use
+   * the optimized prefix.
    */
-  startsWithSupport: boolean;
+  optimizedPrefix: boolean;
 
   /**
    * If enabled it will allow the user to search based in the middle of a word.
@@ -105,6 +106,28 @@ export interface ESIndexMapping {
    * Example: Hexapoda can be matched with "poda".
    */
   endsWithSupport: boolean;
+
+  /**
+   * In elastic search you can have multiple fields on an attribute, for example:
+   *
+   *  <pre>
+   *  "acCaption": {
+   *    "type": "text",
+   *    "fields": {
+   *      "keyword": {
+   *        "type": "keyword",
+   *        "ignore_above": 256
+   *      }
+   *    }
+   *  }
+   *  </pre>
+   *
+   * The `acCaption` is indexed in two different ways here but contains an extra version for keyword
+   * type. In this case the keywordMultiFieldSupport would be true since it's not the default but it
+   * is supported. If true, the ".keyword" will be appended to the field name to access the keyword
+   * version if required.
+   */
+  keywordMultiFieldSupport: boolean;
 
   /**
    * The path for the attribute without the attribute name. This path does not include the parent

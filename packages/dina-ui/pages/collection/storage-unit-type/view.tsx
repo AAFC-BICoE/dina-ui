@@ -6,12 +6,12 @@ import { StorageUnitTypeFormFields } from "./edit";
 export default function StorageUnitTypeDetailsPage() {
   return (
     <ViewPageLayout<StorageUnitType>
-      form={props => (
+      form={(props) => (
         <DinaForm<StorageUnitType> {...props}>
           <StorageUnitTypeFormFields />
         </DinaForm>
       )}
-      query={id => ({ path: `collection-api/storage-unit-type/${id}` })}
+      query={(id) => ({ path: `collection-api/storage-unit-type/${id}` })}
       entityLink="/collection/storage-unit-type"
       type="storage-unit-type"
       apiBaseUrl="/collection-api"

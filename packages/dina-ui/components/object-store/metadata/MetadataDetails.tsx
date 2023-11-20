@@ -51,20 +51,24 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
+          ...(!isExternalResource ? ["originalFilename"] : []),
+          {
+            name: "acDigitizationDate",
+            value: <DateView date={metadata.acDigitizationDate} />
+          },
           {
             name: "group",
             value: <GroupLabel groupName={metadata.group} />
           },
           {
-            name: "createdDate",
-            value: <DateView date={metadata.createdDate} />
+            name: "createdOn",
+            value: <DateView date={metadata.createdOn} />
           },
           {
             name: "xmpMetadataDate",
             value: <DateView date={metadata.xmpMetadataDate} />
           },
-          "acMetadataCreator.displayName",
-          "acSubtype"
+          "acMetadataCreator.displayName"
         ]}
         title={
           isExternalResource
@@ -89,12 +93,8 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           ...(isExternalResource ? ["resourceExternalURL"] : []),
           "dcFormat",
           "acCaption",
-          {
-            name: "acDigitizationDate",
-            value: <DateView date={metadata.acDigitizationDate} />
-          },
           "dcType",
-          ...(!isExternalResource ? ["originalFilename"] : []),
+          "acSubtype",
           "fileExtension",
           "dcCreator.displayName",
           {
@@ -115,7 +115,12 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       {!isExternalResource && (
         <MetadataAttributeGroup
           metadata={metadata}
-          fields={["fileIdentifier", "acHashFunction", "acHashValue"]}
+          fields={[
+            "fileIdentifier",
+            "acHashFunction",
+            "acHashValue",
+            "objectUpload.sizeInBytes"
+          ]}
           title={formatMessage("metadataFileStorageDetailsLabel")}
         />
       )}
@@ -129,6 +134,18 @@ interface MetadataAttributeGroupProps {
   title: string;
 }
 
+function formatBytes(bytes, decimals = 2) {
+  if (!+bytes) return "0 Bytes";
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
 function MetadataAttributeGroup({
   metadata,
   fields,
@@ -136,6 +153,10 @@ function MetadataAttributeGroup({
 }: MetadataAttributeGroupProps) {
   const data = fields.map((field) => {
     if (typeof field === "string") {
+      if (field === "objectUpload.sizeInBytes") {
+        const sizeInBytes = get(metadata, field);
+        return { name: "fileSize", value: formatBytes(sizeInBytes) };
+      }
       return { name: field, value: get(metadata, field) };
     }
     return field;

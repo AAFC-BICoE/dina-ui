@@ -45,7 +45,7 @@ export function useBulkGet<TData extends KitsuResource>({
       return undefined;
     }
     const [_, apiBaseUrl, typeName] = listPathMatch;
-    const paths = ids.map(id => `${typeName}/${id}${includes ?? ""}`);
+    const paths = ids.map((id) => `${typeName}/${id}${includes ?? ""}`);
 
     const fetchedWithNulls = await bulkGet<TData, true>(paths, {
       apiBaseUrl: `/${apiBaseUrl}`,

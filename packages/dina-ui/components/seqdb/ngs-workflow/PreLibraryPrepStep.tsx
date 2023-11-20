@@ -13,18 +13,18 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
-  LibraryPrep2,
-  LibraryPrepBatch2,
-  PreLibraryPrep2
+  LibraryPrep,
+  LibraryPrepBatch,
+  PreLibraryPrep
 } from "../../../types/seqdb-api";
 import { PreLibraryPrepTable } from "./PreLibraryPrepTable";
 
 export interface PreLibraryPrepStepProps {
   batchId: string;
-  batch: LibraryPrepBatch2;
+  batch: LibraryPrepBatch;
   onSaved: (
     nextStep: number,
-    batchSaved?: PersistedResource<LibraryPrepBatch2>
+    batchSaved?: PersistedResource<LibraryPrepBatch>
   ) => Promise<void>;
   editMode: boolean;
   setEditMode: Dispatch<SetStateAction<boolean>>;
@@ -58,10 +58,10 @@ export function PreLibraryPrepStep({
   }, [performSave]);
 
   const [shearingPrepLibraryPreps, setShearingPrepLibraryPreps] = useState<
-    PreLibraryPrep2[] | undefined
+    PreLibraryPrep[] | undefined
   >(undefined);
   const [sizeSelectionPrepLibraryPreps, setSizeSelectionPrepLibraryPreps] =
-    useState<PreLibraryPrep2[] | undefined>(undefined);
+    useState<PreLibraryPrep[] | undefined>(undefined);
 
   /**
    * When the page is first loaded, check if saved samples has already been chosen and reload them.
@@ -73,7 +73,7 @@ export function PreLibraryPrepStep({
   async function fetchPreLibraryPreps() {
     // fetch all libraryPrep IDs
     const libraryPreps = (
-      await apiClient.get<LibraryPrep2[]>("/seqdb-api/library-prep", {
+      await apiClient.get<LibraryPrep[]>("/seqdb-api/library-prep", {
         filter: filterBy([], {
           extraFilters: [
             {
@@ -107,7 +107,7 @@ export function PreLibraryPrepStep({
 
     // Fetch all previously saved PreLibraryPreps
     const libraryPrepIds = libraryPreps.map((item) => item.id);
-    const savedPreLibraryPreps = await apiClient.get<PreLibraryPrep2[]>(
+    const savedPreLibraryPreps = await apiClient.get<PreLibraryPrep[]>(
       "seqdb-api/pre-library-prep",
       {
         filter: {
@@ -127,7 +127,7 @@ export function PreLibraryPrepStep({
           .length === 0
     );
 
-    const newShearingPrepLibraryPreps: PreLibraryPrep2[] = newPreLibraryIds.map(
+    const newShearingPrepLibraryPreps: PreLibraryPrep[] = newPreLibraryIds.map(
       (newId) => ({
         type: "pre-library-prep",
         preLibraryPrepType: "SHEARING",
@@ -135,10 +135,10 @@ export function PreLibraryPrepStep({
         group: batch.group,
         libraryPrep: libraryPreps.find(
           (item) => item.id === newId
-        ) as LibraryPrep2
+        ) as LibraryPrep
       })
     );
-    const newSizeSelectionPrepLibraryPreps: PreLibraryPrep2[] =
+    const newSizeSelectionPrepLibraryPreps: PreLibraryPrep[] =
       newPreLibraryIds.map((newId) => ({
         type: "pre-library-prep",
         preLibraryPrepType: "SIZE_SELECTION",
@@ -146,7 +146,7 @@ export function PreLibraryPrepStep({
         group: batch.group,
         libraryPrep: libraryPreps.find(
           (item) => item.id === newId
-        ) as LibraryPrep2
+        ) as LibraryPrep
       }));
 
     for (const item of savedPreLibraryPreps.data) {

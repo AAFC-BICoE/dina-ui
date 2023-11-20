@@ -1,6 +1,6 @@
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrBatch } from "../../../../types/seqdb-api";
-import { PCRBatchItemGrid } from "../pcr-batch-plating-step/SangerPcrBatchItemGridStep";
+import { SangerPcrBatchItemGridStep } from "../pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { noop } from "lodash";
 
 const PCR_BATCH_ID = "pcr-batch-id";
@@ -172,7 +172,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
   it("Display material samples in selection list", async () => {
     const wrapper = mountWithAppContext(
-      <PCRBatchItemGrid
+      <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
         editMode={false}
@@ -212,7 +212,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
   it("Switch between view and edit mode", async () => {
     const wrapper = mountWithAppContext(
-      <PCRBatchItemGrid
+      <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
         editMode={false}
@@ -235,7 +235,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     // Switch to edit mode.
     wrapper.setProps({
       children: (
-        <PCRBatchItemGrid
+        <SangerPcrBatchItemGridStep
           pcrBatch={PCR_BATCH}
           pcrBatchId={PCR_BATCH_ID}
           editMode={true}
@@ -258,7 +258,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
   it("Pre-populate fill by and grid row and columns", async () => {
     const wrapper = mountWithAppContext(
-      <PCRBatchItemGrid
+      <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
         editMode={false}
@@ -276,7 +276,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     // Switch to edit mode.
     wrapper.setProps({
       children: (
-        <PCRBatchItemGrid
+        <SangerPcrBatchItemGridStep
           pcrBatch={PCR_BATCH}
           pcrBatchId={PCR_BATCH_ID}
           editMode={true}
@@ -303,7 +303,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
   it("Move all functionality", async () => {
     const wrapper = mountWithAppContext(
-      <PCRBatchItemGrid
+      <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
         editMode={false}
@@ -321,7 +321,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     // Switch to edit mode.
     wrapper.setProps({
       children: (
-        <PCRBatchItemGrid
+        <SangerPcrBatchItemGridStep
           pcrBatch={PCR_BATCH}
           pcrBatchId={PCR_BATCH_ID}
           editMode={true}
@@ -388,7 +388,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     // Save the container...
     wrapper.setProps({
       children: (
-        <PCRBatchItemGrid
+        <SangerPcrBatchItemGridStep
           pcrBatch={PCR_BATCH}
           pcrBatchId={PCR_BATCH_ID}
           editMode={true}
@@ -457,7 +457,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
   it("Load existing records and clear grid", async () => {
     const wrapper = mountWithAppContext(
-      <PCRBatchItemGrid
+      <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
         editMode={false}
@@ -483,7 +483,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     // Switch to edit mode...
     wrapper.setProps({
       children: (
-        <PCRBatchItemGrid
+        <SangerPcrBatchItemGridStep
           pcrBatch={PCR_BATCH}
           pcrBatchId={PCR_BATCH_ID}
           editMode={true}
@@ -507,7 +507,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
     // Save the container...
     wrapper.setProps({
       children: (
-        <PCRBatchItemGrid
+        <SangerPcrBatchItemGridStep
           pcrBatch={PCR_BATCH}
           pcrBatchId={PCR_BATCH_ID}
           editMode={true}
@@ -550,7 +550,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
 
   it("Display message if no storage unit is provided on PcrBatch", async () => {
     const wrapper = mountWithAppContext(
-      <PCRBatchItemGrid
+      <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH_NO_STORAGE}
         pcrBatchId={PCR_BATCH_ID}
         editMode={false}

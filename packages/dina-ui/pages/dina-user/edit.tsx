@@ -11,10 +11,10 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { GUEST, SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import { FieldArray } from "formik";
 import { keys, last, omit, uniq } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { SUPER_USER, USER, GUEST } from "common-ui/types/DinaRoles";
 import Select from "react-select";
 import {
   GroupLabel,
@@ -213,12 +213,12 @@ export function RolesPerGroupEditor({
                           {canEdit && (
                             <FormikButton
                               className="btn btn-dark remove-button"
-                              onClick={() =>
+                              onClick={() => {
                                 form.setFieldValue(
                                   "rolesPerGroup",
                                   omit(form.values.rolesPerGroup, groupName)
-                                )
-                              }
+                                );
+                              }}
                             >
                               <DinaMessage id="removeGroup" />
                             </FormikButton>

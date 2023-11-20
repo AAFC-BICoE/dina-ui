@@ -88,10 +88,10 @@ export function SangerSampleSelectionStep({
   function sortMaterialSamples(samples: MaterialSampleSummary[]) {
     if (materialSampleSortOrder) {
       const sorted = materialSampleSortOrder.map((sampleId) =>
-        samples.find((item) => item.id === sampleId)
+        samples.find((item) => item?.id === sampleId)
       );
       samples.forEach((item) => {
-        if (materialSampleSortOrder.indexOf(item.id ?? "unknown") === -1) {
+        if (materialSampleSortOrder.indexOf(item?.id ?? "unknown") === -1) {
           sorted.push(item);
         }
       });
@@ -171,7 +171,7 @@ export function SangerSampleSelectionStep({
       if (response.length === 0) {
         setEditMode(true);
       }
-      const sorted = sortMaterialSamples(response);
+      const sorted = sortMaterialSamples(response ?? []);
       setSelectedResources(sorted);
     });
   }

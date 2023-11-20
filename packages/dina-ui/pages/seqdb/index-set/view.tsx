@@ -1,4 +1,4 @@
-import { DinaForm, FieldView, QueryTable } from "common-ui";
+import { DinaForm, FieldView, QueryTable } from "../../../../common-ui/lib";
 import { GroupFieldView, ViewPageLayout } from "../../../components";
 import { IndexSet } from "../../../types/seqdb-api";
 
@@ -27,7 +27,6 @@ export default function IndexSetViewPage() {
       type="index-set"
       apiBaseUrl="/seqdb-api"
       mainClass="container-fluid"
-      editButton={() => null}
     />
   );
 }

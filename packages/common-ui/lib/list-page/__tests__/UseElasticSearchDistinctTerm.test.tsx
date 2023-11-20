@@ -11,6 +11,7 @@ const GROUPS = ["aafc"];
 
 interface UseElasticSearchDistinctTermWrapperProps {
   searchResultsRetrieved: (results: string[]) => void;
+  keywordMultiFieldSupport: boolean;
   emptyResultsRetrieved?: () => void;
   fieldName?: string;
   groups?: string[];
@@ -29,13 +30,15 @@ function UseElasticSearchDistinctTermWrapper({
   emptyResultsRetrieved,
   fieldName,
   groups = GROUPS,
-  relationshipType
+  relationshipType,
+  keywordMultiFieldSupport
 }: UseElasticSearchDistinctTermWrapperProps) {
   const searchResults = useElasticSearchDistinctTerm({
     fieldName,
     relationshipType,
     groups,
-    indexName: INDEX_NAME
+    indexName: INDEX_NAME,
+    keywordMultiFieldSupport
   });
 
   useEffect(() => {
@@ -111,13 +114,14 @@ describe("Use Elastic Search Distinct Term Hook", () => {
     jest.clearAllMocks();
   });
 
-  it("Non-relationship suggestions retrieved", async () => {
+  it("Non-relationship suggestions retrieved (keyword multiField)", async () => {
     const wrapper = mountWithAppContext(
       <UseElasticSearchDistinctTermWrapper
         fieldName={FIELD_NAME}
         searchResultsRetrieved={(results: any) => {
           mockSearchResults(results);
         }}
+        keywordMultiFieldSupport={true}
       />,
       {
         apiContext: {
@@ -148,6 +152,44 @@ describe("Use Elastic Search Distinct Term Hook", () => {
     expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
   });
 
+  it("Non-relationship suggestions retrieved (keyword type)", async () => {
+    const wrapper = mountWithAppContext(
+      <UseElasticSearchDistinctTermWrapper
+        fieldName={FIELD_NAME}
+        searchResultsRetrieved={(results: any) => {
+          mockSearchResults(results);
+        }}
+        keywordMultiFieldSupport={false}
+      />,
+      {
+        apiContext: {
+          apiClient: {
+            axios: { post: mockSuggestionRequest } as any
+          }
+        }
+      }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSuggestionRequest).toBeCalledWith(
+      "search-api/search-ws/search",
+      {
+        aggs: {
+          term_aggregation: {
+            terms: { field: FIELD_NAME, size: 100 }
+          }
+        },
+        query: { terms: { "data.attributes.group": GROUPS } },
+        size: 0
+      },
+      { params: { indexName: INDEX_NAME } }
+    );
+
+    expect(mockSearchResults).toBeCalledWith(["WHOLE_ORGANISM"]);
+  });
+
   it("Relationship suggestions retrieved", async () => {
     const wrapper = mountWithAppContext(
       <UseElasticSearchDistinctTermWrapper
@@ -156,6 +198,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         searchResultsRetrieved={(results: any) => {
           mockSearchResults(results);
         }}
+        keywordMultiFieldSupport={true}
       />,
       {
         apiContext: {
@@ -214,6 +257,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
           emptyResultsRetrieved={() => {
             mockEmptyResults();
           }}
+          keywordMultiFieldSupport={true}
         />,
         {
           apiContext: {
@@ -245,6 +289,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
           emptyResultsRetrieved={() => {
             mockEmptyResults();
           }}
+          keywordMultiFieldSupport={true}
         />,
         {
           apiContext: {
@@ -270,6 +315,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
             mockSearchResults(results);
           }}
           groups={[]}
+          keywordMultiFieldSupport={true}
         />,
         {
           apiContext: {

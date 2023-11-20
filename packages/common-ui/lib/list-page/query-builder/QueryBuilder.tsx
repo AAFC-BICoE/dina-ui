@@ -10,6 +10,8 @@ import React from "react";
 import { Button } from "react-bootstrap";
 import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { CommonMessage } from "common-ui";
+import { ColumnSort } from "@tanstack/react-table";
 
 interface QueryBuilderProps {
   /**
@@ -41,6 +43,18 @@ interface QueryBuilderProps {
    * Callback to indicate the query builder was reset.
    */
   onReset: () => void;
+
+  /**
+   * Set the submitted query builder tree, used to to load a saved search.
+   */
+  setSubmittedQueryBuilderTree: React.Dispatch<
+    React.SetStateAction<ImmutableTree>
+  >;
+
+  /**
+   * Set the page offset, used to to load a saved search.
+   */
+  setPageOffset: React.Dispatch<React.SetStateAction<number>>;
 }
 
 function QueryBuilder({
@@ -49,7 +63,9 @@ function QueryBuilder({
   queryBuilderTree,
   setQueryBuilderTree,
   onSubmit,
-  onReset
+  onReset,
+  setSubmittedQueryBuilderTree,
+  setPageOffset
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -88,6 +104,8 @@ function QueryBuilder({
         queryBuilderTree={queryBuilderTree}
         setQueryBuilderTree={setQueryBuilderTree}
         queryBuilderConfig={queryBuilderConfig}
+        setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+        setPageOffset={setPageOffset}
         performSubmit={onSubmit}
       />
       <Query
@@ -98,45 +116,45 @@ function QueryBuilder({
       />
       <div className="mt-2">
         <Button onClick={onSubmit} className="me-2">
-          Search
+          <DinaMessage id="search" />
         </Button>
         <Button onClick={onReset} variant="secondary">
-          Reset
+          <CommonMessage id="resetButtonText" />
         </Button>
       </div>
     </>
   );
 }
 
+const groupId = "8c6dc2c8-4070-48ce-b700-13a931f9ebaf";
+const ruleId = "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6";
+export const defaultJsonTree = {
+  id: groupId,
+  type: "group",
+  children1: {
+    "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6": {
+      type: "rule",
+      id: ruleId,
+      properties: {
+        field: null,
+        operator: null,
+        value: [],
+        valueSrc: [],
+        valueError: []
+      },
+      path: [groupId, ruleId]
+    }
+  },
+  properties: { conjunction: "AND" },
+  path: [groupId]
+} as JsonTree;
 /**
  * Default query tree contains an empty rule so it's one less the step the user needs to perform.
  *
  * This is the default when first loading the page and resetting the query builder.
  */
 export function defaultQueryTree(): ImmutableTree {
-  const groupId = "8c6dc2c8-4070-48ce-b700-13a931f9ebaf";
-  const ruleId = "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6";
-
-  return Utils.loadTree({
-    id: groupId,
-    type: "group",
-    children1: {
-      "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6": {
-        type: "rule",
-        id: ruleId,
-        properties: {
-          field: null,
-          operator: null,
-          value: [],
-          valueSrc: [],
-          valueError: []
-        },
-        path: [groupId, ruleId]
-      }
-    },
-    properties: { conjunction: "AND" },
-    path: [groupId]
-  } as JsonTree);
+  return Utils.loadTree(defaultJsonTree);
 }
 
 /**

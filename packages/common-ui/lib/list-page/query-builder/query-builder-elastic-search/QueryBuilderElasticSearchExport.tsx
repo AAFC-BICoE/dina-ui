@@ -90,9 +90,14 @@ function buildEsRule(
     formattedValue = formattedValue.trim();
   }
 
-  // Edge case if nothing is provided for a date.
+  // Edge case if nothing is provided for a date (unless operator is empty/not empty)
   let operatorValue = operator;
-  if (widgetName === "date" && formattedValue === "") {
+  if (
+    widgetName === "date" &&
+    formattedValue === "" &&
+    operator !== "empty" &&
+    operator !== "notEmpty"
+  ) {
     operatorValue = "empty";
   }
 
@@ -302,7 +307,9 @@ export function applySourceFiltering<TData extends KitsuResource>(
 
   return {
     ...elasticSearchQuery,
-    _source: uniq(sourceFilteringColumns)
+    _source: {
+      includes: uniq(sourceFilteringColumns)
+    }
   };
 }
 
@@ -376,20 +383,27 @@ export function includedTypeQuery(parentType: string): any {
 export function termQuery(
   fieldName: string,
   matchValue: any,
-  keyword: boolean
+  keywordMultiFieldSupport: boolean
 ): any {
   return {
     term: {
-      [fieldName + (keyword ? ".keyword" : "")]: matchValue
+      [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValue
     }
   };
 }
 
-// Query used for partial matches.
-export function matchQuery(fieldName: string, matchValue: any): any {
+// Query used for wildcard searches (contains).
+export function wildcardQuery(
+  fieldName: string,
+  matchValue: any,
+  keywordSupport: boolean
+): any {
   return {
-    match: {
-      [fieldName]: matchValue
+    wildcard: {
+      [keywordSupport ? fieldName + ".keyword" : fieldName]: {
+        value: `*${matchValue}*`,
+        case_insensitive: true
+      }
     }
   };
 }
@@ -416,15 +430,12 @@ export function rangeQuery(fieldName: string, rangeOptions: any): any {
 export function prefixQuery(
   fieldName: string,
   matchValue: any,
-  parentType: string | undefined
+  parentType: string | undefined,
+  optimizedPrefix: boolean,
+  keywordSupport: boolean
 ): any {
   if (matchValue === "") {
     return {};
-  }
-
-  // Lowercase the matchValue here, if it's a string.
-  if (typeof matchValue === "string") {
-    matchValue = matchValue.toLowerCase();
   }
 
   return parentType
@@ -436,7 +447,14 @@ export function prefixQuery(
               must: [
                 {
                   prefix: {
-                    [fieldName + ".prefix"]: matchValue
+                    [optimizedPrefix
+                      ? fieldName + ".prefix"
+                      : keywordSupport
+                      ? fieldName + ".keyword"
+                      : fieldName]: {
+                      value: matchValue,
+                      case_insensitive: true
+                    }
                   }
                 },
                 includedTypeQuery(parentType)
@@ -447,7 +465,14 @@ export function prefixQuery(
       }
     : {
         prefix: {
-          [fieldName + ".prefix"]: matchValue
+          [optimizedPrefix
+            ? fieldName + ".prefix"
+            : keywordSupport
+            ? fieldName + ".keyword"
+            : fieldName]: {
+            value: matchValue,
+            case_insensitive: true
+          }
         }
       };
 }
@@ -529,4 +554,18 @@ export function suffixQuery(
           [fieldName + ".prefix_reverse"]: matchValue
         }
       };
+}
+
+/**
+ * Make a basic elastic search query by uuids
+ * @param uuids string array of uuids to be used for elastic search
+ */
+export function uuidQuery(uuids: string[]) {
+  return {
+    query: {
+      terms: {
+        "data.id": uuids
+      }
+    }
+  };
 }

@@ -4,7 +4,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
   describe("transformFieldExtensionToDSL function", () => {
     const operators = [
       "exactMatch",
-      "partialMatch",
+      "wildcard",
+      "startsWith",
       "notEquals",
       "empty",
       "notEmpty"
@@ -31,7 +32,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
               label: "fieldExtensions",
               path: "data.attributes.extensionValues",
               type: "extensionValue",
-              startsWithSupport: false,
+              keywordMultiFieldSupport: true,
+              optimizedPrefix: false,
               containsSupport: false,
               endsWithSupport: false
             }
@@ -66,7 +68,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
               label: "fieldExtensions",
               path: "included.attributes.extensionValues",
               type: "fieldExtension",
-              startsWithSupport: false,
+              keywordMultiFieldSupport: false,
+              optimizedPrefix: false,
               containsSupport: false,
               endsWithSupport: false
             }

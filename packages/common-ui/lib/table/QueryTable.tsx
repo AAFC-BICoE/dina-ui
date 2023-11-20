@@ -14,6 +14,7 @@ import {
   MetaWithTotal,
   ReactTable,
   ReactTableProps,
+  useColumnChooser,
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
@@ -112,6 +113,8 @@ export interface QueryTableProps<TData extends KitsuResource> {
   topRightCorner?: ReactNode;
 
   ariaLabel?: string;
+
+  enableColumnChooser?: boolean;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -140,7 +143,8 @@ export function QueryTable<TData extends KitsuResource>({
   ariaLabel,
   enableFilters = false,
   defaultColumnFilters = [],
-  onColumnFiltersChange
+  onColumnFiltersChange,
+  enableColumnChooser
 }: QueryTableProps<TData>) {
   const { formatMessage, formatNumber } = useIntl();
 
@@ -161,6 +165,12 @@ export function QueryTable<TData extends KitsuResource>({
   });
 
   const divWrapperRef = useRef<HTMLDivElement>(null);
+
+  const { columnChooser, checkedColumnIds } = useColumnChooser({
+    columns,
+    localStorageKey: path,
+    hideExportButton: true
+  });
 
   function onPageChangeInternal(pageNumber: number) {
     const newOffset = pageNumber * page.limit;
@@ -324,7 +334,11 @@ export function QueryTable<TData extends KitsuResource>({
           </span>
         )}
         <div className="ms-auto">
-          {topRightCorner}
+          <div>
+            {enableColumnChooser && columnChooser}
+            {topRightCorner}
+          </div>
+
           {resolvedReactTableProps?.enableSorting !== false && (
             <Tooltip id="queryTableMultiSortExplanation" placement="left" />
           )}
@@ -332,7 +346,17 @@ export function QueryTable<TData extends KitsuResource>({
       </div>
       <ReactTable<TData>
         className="-striped"
-        columns={mappedColumns}
+        columns={
+          enableColumnChooser
+            ? mappedColumns.filter((column) =>
+                typeof column === "string"
+                  ? checkedColumnIds.includes(column)
+                  : (column as any).accessorKey
+                  ? checkedColumnIds.includes((column as any).accessorKey)
+                  : false
+              )
+            : mappedColumns
+        }
         data={(displayData as TData[]) ?? []}
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}

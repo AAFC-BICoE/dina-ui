@@ -10,6 +10,7 @@ import {
   useApiClient,
   useModal
 } from "..";
+import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -108,6 +109,60 @@ export function BulkEditButton({
       }}
     >
       <CommonMessage id="editSelectedButtonText" />
+    </FormikButton>
+  );
+}
+
+export interface DataExportButtonProps {
+  /** Where to perform the request for the data export. */
+  pathname: string;
+  totalRecords: number;
+  query: any;
+  indexName: string;
+}
+
+/**
+ * Key value where the data export search results will be stored.
+ *
+ * This constant is available to use for setting and retrieving the value.
+ */
+export const DATA_EXPORT_SEARCH_RESULTS_KEY = "dataExportSearchResults";
+export const DATA_EXPORT_TOTAL_RECORDS_KEY = "dataExportTotalRecords";
+
+export function DataExportButton({
+  pathname,
+  totalRecords,
+  query,
+  indexName
+}: DataExportButtonProps) {
+  const router = useRouter();
+
+  return (
+    <FormikButton
+      buttonProps={(_ctx) => ({ disabled: totalRecords === 0 })}
+      className="btn btn-primary ms-2 bulk-edit-button"
+      onClick={async (values: BulkSelectableFormValues) => {
+        const selectedResourceIds: string[] = values.itemIdsToSelect
+          ? Object.keys(values.itemIdsToSelect)
+          : [];
+        const selectedIdsQuery = uuidQuery(selectedResourceIds);
+        writeStorage<any>(
+          DATA_EXPORT_SEARCH_RESULTS_KEY,
+          selectedResourceIds.length > 0 ? selectedIdsQuery : query
+        );
+        writeStorage<number>(
+          DATA_EXPORT_TOTAL_RECORDS_KEY,
+          selectedResourceIds.length > 0
+            ? selectedResourceIds.length
+            : totalRecords
+        );
+        await router.push({
+          pathname,
+          query: { hideTable: true, indexName }
+        });
+      }}
+    >
+      <CommonMessage id="exportButtonText" />
     </FormikButton>
   );
 }

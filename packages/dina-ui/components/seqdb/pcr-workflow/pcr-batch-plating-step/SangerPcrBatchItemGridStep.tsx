@@ -21,7 +21,7 @@ export interface PCRBatchItemGridProps {
   setPerformSave: (newValue: boolean) => void;
 }
 
-export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
+export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
   const {
     pcrBatchId,
     pcrBatch,

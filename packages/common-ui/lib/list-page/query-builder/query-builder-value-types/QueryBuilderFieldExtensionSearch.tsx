@@ -120,7 +120,8 @@ export default function QueryRowFieldExtensionSearch({
   // Generate the operator options
   const operatorOptions = [
     "exactMatch",
-    "partialMatch",
+    "wildcard",
+    "startsWith",
     "notEquals",
     "empty",
     "notEmpty"
@@ -303,8 +304,10 @@ export function transformFieldExtensionToDSL({
     value: fieldExtensionSearchValue.searchValue,
     fieldInfo: {
       ...fieldInfo,
-      distinctTerm:
-        fieldExtensionSearchValue.selectedOperator !== "partialMatch"
+      distinctTerm: false,
+
+      // All field extensions have keyword support.
+      keywordMultiFieldSupport: true
     } as ESIndexMapping
   });
 }

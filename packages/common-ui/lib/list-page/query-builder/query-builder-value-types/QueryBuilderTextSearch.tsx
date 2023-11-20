@@ -1,12 +1,12 @@
 import React from "react";
 import {
   includedTypeQuery,
-  matchQuery,
   termQuery,
   existsQuery,
   prefixQuery,
   suffixQuery,
-  infixQuery
+  infixQuery,
+  wildcardQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
@@ -66,15 +66,17 @@ export function transformTextSearchToDSL({
     return {};
   }
 
-  const { distinctTerm, parentType, parentName } = fieldInfo;
-
-  // Is the "Exact" option selected? (Or if auto suggestions are being used.)
-  const isExactMatch: boolean = distinctTerm || operation === "exactMatch";
+  const {
+    distinctTerm,
+    parentType,
+    parentName,
+    optimizedPrefix,
+    keywordMultiFieldSupport
+  } = fieldInfo;
 
   switch (operation) {
     // Equals match type.
     case "equals":
-    case "partialMatch":
     case "exactMatch":
       // Autocompletion expects to use the full text search.
       return parentType
@@ -84,22 +86,36 @@ export function transformTextSearchToDSL({
               query: {
                 bool: {
                   must: [
-                    isExactMatch
-                      ? termQuery(fieldPath, value, true)
-                      : matchQuery(fieldPath, value),
+                    termQuery(fieldPath, value, keywordMultiFieldSupport),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
-        : isExactMatch
-        ? termQuery(fieldPath, value, true)
-        : matchQuery(fieldPath, value);
+        : termQuery(fieldPath, value, keywordMultiFieldSupport)
+
+    // Wild card search
+    case "wildcard":
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    wildcardQuery(fieldPath, value, keywordMultiFieldSupport),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
+          }
+        : wildcardQuery(fieldPath, value, keywordMultiFieldSupport);
 
     // Prefix partial match
     case "startsWith":
-      return prefixQuery(fieldPath, value, parentType);
+      return prefixQuery(fieldPath, value, parentType, optimizedPrefix, keywordMultiFieldSupport);
 
     // Infix partial match
     case "containsText":
@@ -121,9 +137,11 @@ export function transformTextSearchToDSL({
                     path: "included",
                     query: {
                       bool: {
-                        must_not: isExactMatch
-                          ? termQuery(fieldPath, value, true)
-                          : matchQuery(fieldPath, value),
+                        must_not: termQuery(
+                              fieldPath,
+                              value,
+                              keywordMultiFieldSupport
+                            ),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -159,9 +177,7 @@ export function transformTextSearchToDSL({
               should: [
                 {
                   bool: {
-                    must_not: isExactMatch
-                      ? termQuery(fieldPath, value, true)
-                      : matchQuery(fieldPath, value)
+                    must_not: termQuery(fieldPath, value, keywordMultiFieldSupport)
                   }
                 },
                 {

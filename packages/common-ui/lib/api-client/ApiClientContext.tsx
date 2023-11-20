@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { AxiosError, AxiosAdapter } from "axios";
 import { cacheAdapterEnhancer } from "axios-extensions";
 import { FormikErrors } from "formik";
 import Kitsu, {
@@ -24,12 +24,12 @@ import {
 import DataLoader from "dataloader";
 import { ResponseType } from "axios";
 
-export interface BulkGetOptions<TReturnNull extends boolean = false> {
+export interface BulkGetOptions {
   apiBaseUrl?: string;
   joinSpecs?: ClientSideJoinSpec[];
 
   /** Return null for missing resource instead of throwing an Error. */
-  returnNullForMissingResource?: TReturnNull;
+  returnNullForMissingResource?: boolean;
 }
 
 export type BulkGetOperation =
@@ -67,7 +67,7 @@ export interface ApiClientI {
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
   bulkGet: <T extends KitsuResource, TReturnNull extends boolean = false>(
     paths: readonly string[],
-    options?: BulkGetOptions<TReturnNull>
+    options?: BulkGetOptions
   ) => Promise<
     (TReturnNull extends true
       ? PersistedResource<T> | null
@@ -146,7 +146,7 @@ export class ApiClientImpl implements ApiClientI {
           // e.g. a page with a lot of the same dropdown select component, or a set of group label components fetching the label for the same group.
           defaultCache: new LRUCache({ max: 100, maxAge: ONE_SECOND })
         }
-      );
+      ) as AxiosAdapter;
     }
 
     // Bind the methods so context consumers can use object destructuring.
@@ -276,7 +276,7 @@ export class ApiClientImpl implements ApiClientI {
       apiBaseUrl = "",
       joinSpecs = [],
       returnNullForMissingResource
-    }: BulkGetOptions<TReturnNull> = {}
+    }: BulkGetOptions = {}
   ) {
     // Don't do an empty operations request:
     if (!paths.length) {
@@ -426,13 +426,14 @@ export class CustomDinaKitsu extends Kitsu {
    * Override the 'get' method so it works with our long URLs:
    */
   async get(path: string, params: GetParams = {}) {
-    const { responseType, ...paramsNet } = omit(params, "header");
+    const { responseType, timeout, ...paramsNet } = omit(params, "header");
     try {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },
         params: paramsNet,
         paramsSerializer: (p) => query(p),
-        responseType
+        responseType,
+        timeout
       });
 
       const deserialized = await deserialise(data);

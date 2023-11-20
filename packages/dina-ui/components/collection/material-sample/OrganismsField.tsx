@@ -6,6 +6,7 @@ import {
   FormikButton,
   NumberField,
   ReactTable,
+  TextField,
   ToggleField,
   useDinaFormContext,
   useFieldLabels
@@ -147,6 +148,7 @@ export function OrganismsField({
                     <div className="col-md-6 d-flex gap-3">
                       <NumberField
                         name="organismsQuantity"
+                        customName="organismsQuantity"
                         className="flex-grow-1"
                         inputProps={{ type: "number" }}
                         min={0}

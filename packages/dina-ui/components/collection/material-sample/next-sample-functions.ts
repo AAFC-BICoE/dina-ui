@@ -42,7 +42,7 @@ export function nextSampleInitialValues(
   } = originalSample;
 
   // Omit the IDs from the original sample's organisms:
-  const newOrganisms = organism?.map(org => org && { ...org, id: undefined });
+  const newOrganisms = organism?.map((org) => org && { ...org, id: undefined });
 
   // Calculate the next suffix:
   const newMaterialSampleName = nextSampleName(materialSampleName);

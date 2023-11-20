@@ -119,7 +119,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
       translatedOptions?.find(
         (option) => option.value === customQuerySelectedValue
       ),
-    [customQuerySelectedValue]
+    [customQuerySelectedValue, locale]
   );
 
   // The legend is based if customQueryOptions are provided as a prop or just a title key.

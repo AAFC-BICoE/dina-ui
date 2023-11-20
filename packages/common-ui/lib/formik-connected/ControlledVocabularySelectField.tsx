@@ -11,6 +11,7 @@ import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { find } from "lodash";
 import classNames from "classnames";
+import { ReadOnlyValue } from "..";
 
 export interface ControlledVocabularySelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
@@ -43,7 +44,23 @@ export function ControlledVocabularySelectField(
     }));
 
     return (
-      <FieldWrapper {...controlledVocabularySelectFieldProps}>
+      <FieldWrapper
+        {...controlledVocabularySelectFieldProps}
+        readOnlyRender={(value, _form) => {
+          const selectedValue = options?.find((opt) => {
+            if (Array.isArray(value)) {
+              return value.includes(opt.value);
+            } else {
+              return opt.value === value;
+            }
+          });
+          return (
+            <div className="read-only-view">
+              <ReadOnlyValue value={selectedValue?.label} />
+            </div>
+          );
+        }}
+      >
         {({ setValue, value, invalid }) => {
           function onChange(newValue) {
             if (Array.isArray(newValue)) {

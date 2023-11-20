@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
           cache: 'yarn'
       - run: yarn install 
 
@@ -20,10 +20,10 @@ jobs:
         # awk NF: Remove additional empty lines.
         # jq -R .: Convert each line to a JSON string.
         # jq -s .: Combine them all into a single JSON array.
-        # jq -cM ...: This part will split it into 6 groups. The last group will probably not have enough to fill the full group.
+        # jq -cM ...: This part will split it into 8 groups. The last group will probably not have enough to fill the full group.
       - id: set-test-chunks
         name: split tests into chunks
-        run: echo "test-chunks=$(npx jest --listTests | shuf | awk NF | jq -R . | jq -s . | jq -cM '[_nwise(length / 5 | floor)]')" >> $GITHUB_OUTPUT
+        run: echo "test-chunks=$(npx jest --listTests | shuf | awk NF | jq -R . | jq -s . | jq -cM '[_nwise(length / 7 | floor)]')" >> $GITHUB_OUTPUT
 
       - id: set-test-chunk-ids
         name: Set Chunk IDs
@@ -33,17 +33,18 @@ jobs:
 
   test-chunk:
     runs-on: ubuntu-latest
-    name: Run tests (Chunk ${{ matrix.chunk }})
+    name: run tests (Chunk ${{ matrix.chunk }})
     needs:
       - setup
     strategy:
+      fail-fast: false
       matrix:
         chunk: ${{ fromJson(needs.setup.outputs['test-chunk-ids']) }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
           cache: 'yarn'
       - run: yarn install
       - name: Run all tests in chunk
@@ -55,12 +56,11 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - setup
-      - test-chunk
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
           cache: 'yarn'
 
       - name: Install
@@ -125,12 +125,12 @@ jobs:
 
   build-docs:
     runs-on: ubuntu-latest
-    # if: ${{ github.ref == 'refs/heads/master' }}
+    if: ${{ github.ref == 'refs/heads/master' }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
       - name: Building ascii docs
         run: |
           yarn install

@@ -1590,10 +1590,24 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator partialMatch 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator startsWith 1`] = `
 Object {
-  "match": Object {
-    "data.attributes.managedAttributes.attributeName": "stringValue",
+  "prefix": Object {
+    "data.attributes.managedAttributes.attributeName.keyword": Object {
+      "case_insensitive": true,
+      "value": "stringValue",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator wildcard 1`] = `
+Object {
+  "wildcard": Object {
+    "data.attributes.managedAttributes.attributeName.keyword": Object {
+      "case_insensitive": true,
+      "value": "*stringValue*",
+    },
   },
 }
 `;
@@ -1777,7 +1791,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator partialMatch 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator startsWith 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1785,8 +1799,38 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "match": Object {
-              "included.attributes.managedAttributes.attributeName": "stringValue",
+            "prefix": Object {
+              "included.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "stringValue",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator wildcard 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "wildcard": Object {
+              "included.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "*stringValue*",
+              },
             },
           },
           Object {

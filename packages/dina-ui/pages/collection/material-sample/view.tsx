@@ -306,8 +306,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <ScheduledActionsField />
                 )}
                 <DataEntryViewer
-                  name={"extensionValuesForm"}
-                  legend={<DinaMessage id="fieldExtensions" />}
+                  name={"extensionValues"}
+                  legend={<DinaMessage id="materialSampleFieldExtensions" />}
                   extensionValues={materialSample.extensionValues}
                   disableDinaForm={true}
                   blockOptionsEndpoint={`collection-api/extension`}
@@ -368,7 +368,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             entityLink="/collection/material-sample"
             byPassView={true}
             className="me-auto"
-            reloadLastSearch={true}
           />
           <EditButton entityId={id} entityLink="collection/material-sample" />
           <SplitMaterialSampleDropdownButton
@@ -386,7 +385,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             className="ms-5"
             id={id}
             options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/material-sample/list?reloadLastSearch"
+            postDeleteRedirect="/collection/material-sample/list"
             type="material-sample"
           />
         </ButtonBar>

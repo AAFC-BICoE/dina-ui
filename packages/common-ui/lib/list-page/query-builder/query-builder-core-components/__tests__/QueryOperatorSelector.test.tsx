@@ -9,10 +9,6 @@ const OPERATOR_OPTIONS: FieldItems = [
     label: "Exact Match"
   },
   {
-    key: "partialMatch",
-    label: "Partial Match"
-  },
-  {
     key: "notEquals",
     label: "Not Equals"
   },

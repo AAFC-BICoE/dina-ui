@@ -7,7 +7,7 @@ import { CollectionMethodFormLayout } from "./edit";
 export default function CollectionMethodDetailsPage() {
   return (
     <ViewPageLayout<CollectionMethod>
-      form={props => (
+      form={(props) => (
         <DinaForm<CollectionMethod>
           {...props}
           initialValues={{
@@ -23,7 +23,7 @@ export default function CollectionMethodDetailsPage() {
           <CollectionMethodFormLayout />
         </DinaForm>
       )}
-      query={id => ({ path: `collection-api/collection-method/${id}` })}
+      query={(id) => ({ path: `collection-api/collection-method/${id}` })}
       entityLink="/collection/collection-method"
       type="collection-method"
       apiBaseUrl="/collection-api"

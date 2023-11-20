@@ -1,10 +1,24 @@
-import { useGroupedCheckboxWithLabel, TextField } from "..";
+import {
+  useGroupedCheckboxWithLabel,
+  TextField,
+  DATA_EXPORT_SEARCH_RESULTS_KEY,
+  useApiClient,
+  LoadingSpinner,
+  LabelView,
+  FieldHeader
+} from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { startCase } from "lodash";
+import { Button } from "react-bootstrap";
+import useLocalStorage from "@rehooks/local-storage";
+import { DataExport } from "packages/dina-ui/types/dina-export-api";
+import Kitsu from "kitsu";
+
+const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
 export function ColumnChooser(
   CustomMenu: React.ForwardRefExoticComponent<
@@ -12,7 +26,7 @@ export function ColumnChooser(
   >
 ) {
   return (
-    <Dropdown autoClose={"outside"}>
+    <Dropdown>
       <Dropdown.Toggle>
         <DinaMessage id="selectColumn" />
       </Dropdown.Toggle>
@@ -20,10 +34,19 @@ export function ColumnChooser(
     </Dropdown>
   );
 }
+
 export interface UseColumnChooserProps {
   columns: any[];
+  /** A unique identifier to be used for local storage key */
+  localStorageKey?: string;
+  hideExportButton?: boolean;
 }
-export function useColumnChooser({ columns }: UseColumnChooserProps) {
+
+export function useColumnChooser({
+  columns,
+  localStorageKey,
+  hideExportButton = false
+}: UseColumnChooserProps) {
   const { formatMessage, messages } = useIntl();
   const columnSearchMapping: any[] = columns.map((column) => {
     const messageKey = `field_${column.id}`;
@@ -32,26 +55,105 @@ export function useColumnChooser({ columns }: UseColumnChooserProps) {
       : startCase(column.id);
     return { label: label.toLowerCase(), id: column.id };
   });
-  const { CustomMenu, checkedIds } = useCustomMenu(
+  const { CustomMenu, checkedColumnIds, dataExportError } = useCustomMenu({
     columns,
-    columnSearchMapping
-  );
+    columnSearchMapping,
+    localStorageKey,
+    hideExportButton
+  });
   const columnChooser = ColumnChooser(CustomMenu);
-  return { columnChooser, checkedIds };
+  return { columnChooser, checkedColumnIds, CustomMenu, dataExportError };
 }
 
-function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
+interface UseCustomMenuProps extends UseColumnChooserProps {
+  columnSearchMapping: any[];
+  hideExportButton: boolean;
+}
+
+function useCustomMenu({
+  columns,
+  columnSearchMapping,
+  localStorageKey,
+  hideExportButton
+}: UseCustomMenuProps) {
   const [searchedColumns, setSearchedColumns] = useState<any[]>(columns);
-  const { groupedCheckBoxes, checkedIds } = useGroupedCheckboxWithLabel({
+  const [loading, setLoading] = useState(false);
+  const [dataExportError, setDataExportError] = useState<JSX.Element>();
+  const [filterColumsValue, setFilterColumnsValue] = useState<string>("");
+
+  const { formatMessage } = useIntl();
+
+  const { groupedCheckBoxes, checkedColumnIds } = useGroupedCheckboxWithLabel({
     resources: searchedColumns,
-    isField: true
+    isField: true,
+    localStorageKey
   });
-  const testRef = useRef<any>();
-  useEffect(() => {
-    testRef?.current?.focus();
-  }, []);
+
+  const { apiClient, save } = useApiClient();
+
+  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_SEARCH_RESULTS_KEY);
+
+  if (queryObject) {
+    delete (queryObject as any)._source;
+  }
+
+  const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
+
+  async function exportData() {
+    setLoading(true);
+    // Make query to data-export
+    const dataExportSaveArg = {
+      resource: {
+        type: "data-export",
+        source: "dina_material_sample_index",
+        query: queryString,
+        columns: checkedColumnIds.filter((id) => id !== "selectColumn")
+      },
+      type: "data-export"
+    };
+    const dataExportPostResponse = await save<DataExport>([dataExportSaveArg], {
+      apiBaseUrl: "/dina-export-api"
+    });
+
+    // data-export POST will return immediately but export won't necessarily be available
+    // continue to get status of export until it's COMPLETED
+    let isFetchingDataExport = true;
+    const fetchDataExportRetries = 0;
+    let dataExportGetResponse;
+    while (
+      isFetchingDataExport &&
+      fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES
+    ) {
+      if (dataExportGetResponse?.data?.status === "COMPLETED") {
+        // Get the exported data
+        await downloadDataExport(apiClient, dataExportPostResponse[0].id);
+        isFetchingDataExport = false;
+      } else if (dataExportGetResponse?.data?.status === "ERROR") {
+        isFetchingDataExport = false;
+        setDataExportError(
+          <div className="alert alert-danger">
+            <DinaMessage id="dataExportError" />
+          </div>
+        );
+      } else {
+        dataExportGetResponse = await apiClient.get<DataExport>(
+          `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
+          {}
+        );
+        // Wait 1 second before retrying
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+    isFetchingDataExport = false;
+    setLoading(false);
+  }
+
   const CustomMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
+      if (props.style) {
+        props.style.transform = "translate(0px, 40px)";
+      }
+
       return (
         <div
           ref={ref}
@@ -64,11 +166,17 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
           className={props.className}
           aria-labelledby={props.labelledBy}
         >
-          <TextField
-            inputProps={{ autoFocus: true }}
+          <strong>{<FieldHeader name="filterColumns" />}</strong>
+          <input
+            autoFocus={true}
             name="filterColumns"
+            className="form-control"
+            type="text"
             placeholder="Search"
-            onChangeExternal={(_form, _name, value) => {
+            value={filterColumsValue}
+            onChange={(event) => {
+              const value = event.target.value;
+              setFilterColumnsValue(value);
               if (value === "" || !value) {
                 setSearchedColumns(columns);
               } else {
@@ -86,9 +194,44 @@ function useCustomMenu(columns: any[], columnSearchMapping: any[]) {
           />
           <Dropdown.Divider />
           {groupedCheckBoxes}
+          {!hideExportButton && (
+            <Button
+              disabled={loading}
+              className="btn btn-primary mt-2 bulk-edit-button"
+              onClick={exportData}
+            >
+              {loading ? (
+                <LoadingSpinner loading={loading} />
+              ) : (
+                formatMessage({ id: "exportButtonText" })
+              )}
+            </Button>
+          )}
         </div>
       );
     }
   );
-  return { CustomMenu, checkedIds };
+  return { CustomMenu, checkedColumnIds, dataExportError };
+}
+export async function downloadDataExport(
+  apiClient: Kitsu,
+  id: string | undefined
+) {
+  if (id) {
+    const getFileResponse = await apiClient.get(
+      `dina-export-api/file/${id}?type=DATA_EXPORT`,
+      {
+        responseType: "blob"
+      }
+    );
+
+    // Download the data
+    const url = window?.URL.createObjectURL(getFileResponse as any);
+    const link = document?.createElement("a");
+    link.href = url ?? "";
+    link?.setAttribute("download", `${id}`);
+    document?.body?.appendChild(link);
+    link?.click();
+    window?.URL?.revokeObjectURL(url ?? "");
+  }
 }

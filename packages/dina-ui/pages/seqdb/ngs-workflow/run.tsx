@@ -196,7 +196,7 @@ export default function NgsWorkFlowRunPage() {
 
   return (
     <PageLayout
-      titleId={"ngsWorkflowListTitle"}
+      titleId={"ngsWorkflowWholeGenomeSeqTitle"}
       buttonBarContent={buttonBarContent}
     >
       <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>

@@ -169,7 +169,6 @@ export function MaterialSampleForm({
     <ButtonBar>
       <BackButton
         entityId={materialSample?.id}
-        reloadLastSearch={true}
         entityLink="/collection/material-sample"
       />
       <SubmitButton className="ms-auto" />
@@ -324,8 +323,8 @@ export function MaterialSampleForm({
           sectionName="field-extension-section"
         >
           <DataEntryField
-            legend={<DinaMessage id="fieldExtensions" />}
-            name="extensionValuesForm"
+            legend={<DinaMessage id="materialSampleFieldExtensions" />}
+            name="extensionValues"
             readOnly={readOnly}
             isTemplate={isTemplate}
             id={id}

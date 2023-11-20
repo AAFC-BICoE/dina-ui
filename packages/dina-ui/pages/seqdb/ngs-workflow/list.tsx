@@ -8,9 +8,9 @@ import {
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { LibraryPrepBatch2 } from "../../../types/seqdb-api";
+import { LibraryPrepBatch } from "../../../types/seqdb-api";
 
-const TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch2>[] = [
+const TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] = [
   {
     cell: ({
       row: {
@@ -22,6 +22,7 @@ const TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch2>[] = [
     accessorKey: "name",
     header: () => <SeqdbMessage id="name" />
   },
+  dateCell("dateUsed"),
   "group",
   "createdBy",
   dateCell("createdOn")

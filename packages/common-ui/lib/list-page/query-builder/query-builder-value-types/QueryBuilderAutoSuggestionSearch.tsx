@@ -67,7 +67,8 @@ function QueryBuilderAutoSuggestionTextSearch({
     fieldName,
     groups: groupNames ?? [],
     relationshipType: fieldSettings?.parentType,
-    indexName
+    indexName,
+    keywordMultiFieldSupport: fieldSettings?.keywordMultiFieldSupport ?? false
   });
 
   // Whenever the current field name changes, retrieve the new field settings for that field.

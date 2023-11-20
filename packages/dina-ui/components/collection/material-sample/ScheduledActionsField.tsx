@@ -202,7 +202,10 @@ export function ScheduledActionsField({
                         <ScheduledActionSubForm
                           actionToEdit={row.original}
                           defaultDate={defaultDate}
-                          onSaveAction={saveAction}
+                          onSaveAction={(newAction) => {
+                            row.getToggleExpandedHandler()();
+                            return saveAction(newAction);
+                          }}
                           onCancelClick={
                             hasActions
                               ? () => {
@@ -219,7 +222,9 @@ export function ScheduledActionsField({
                 {readOnly ? null : !hasActions || actionToEdit === "NEW" ? (
                   <ScheduledActionSubForm
                     defaultDate={defaultDate}
-                    onSaveAction={saveAction}
+                    onSaveAction={(newAction) => {
+                      return saveAction(newAction);
+                    }}
                     onCancelClick={
                       hasActions ? () => setActionToEdit(null) : undefined
                     }
