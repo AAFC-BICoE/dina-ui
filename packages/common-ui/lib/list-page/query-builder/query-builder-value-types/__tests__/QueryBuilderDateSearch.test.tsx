@@ -42,345 +42,100 @@ describe("QueryBuilderDateSearch", () => {
   });
 
   describe("transformDateSearchToDSL function", () => {
-    describe("ContainsDate operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "containsDate",
-            value: "1998",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "containsDate"
-          })
-        ).toMatchSnapshot();
-      });
+    const operators = [
+      {
+        operator: "containsDate",
+        testValues: ["1998", "1998-05", "1998-05-19"],
+      },
+      {
+        operator: "greaterThan",
+        testValues: ["1970-07-31"]
+      },
+      {
+        operator: "greaterThanOrEqualTo",
+        testValues: ["1981-06-15"]
+      },
+      {
+        operator: "lessThan",
+        testValues: ["1982-04-20"]
+      },
+      {
+        operator: "lessThanOrEqualTo",
+        testValues: ["1995-06-19"]
+      },
+      {
+        operator: "equals",
+        testValues: ["2013-12-16"]
+      },
+      {
+        operator: "notEquals",
+        testValues: ["2002-12-30"]
+      },
+      {
+        operator: "empty",
+        testValues: [null]
+      },
+      {
+        operator: "notEmpty",
+        testValues: [null]
+      }
+    ];
 
-      test("Normal field", async () => {
-        // Contains the year only.
-        expect(
-          transformDateSearchToDSL({
-            operation: "containsDate",
-            value: "1998",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "containsDate"
-          })
-        ).toMatchSnapshot();
+    const subTypes = [
+      undefined,
+      "local_date",
+      "local_date_time",
+      "date_time",
+      "date_time_optional_tz"
+    ];
 
-        // Contains the year and month only.
-        expect(
-          transformDateSearchToDSL({
-            operation: "containsDate",
-            value: "1998-05",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "containsDate"
-          })
-        ).toMatchSnapshot();
-
-        // Contains the full date.
-        expect(
-          transformDateSearchToDSL({
-            operation: "containsDate",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "containsDate"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("Greater Than operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "greaterThan",
-            value: "1998-05-19",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "greaterThan"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "greaterThan",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "greaterThan"
-          })
-        ).toMatchSnapshot();
+    describe("Attribute level tests", () => {
+      operators.forEach(({operator, testValues}) => {
+        subTypes.forEach((subType) => {
+          testValues.forEach((value) => {
+            const testName = `Using the ${operator} operator, ${subType} subtype, testing with ${value} value`;
+            
+            test(testName, async () => {
+              expect(
+                transformDateSearchToDSL({
+                  operation: operator,
+                  value: value,
+                  fieldInfo: {
+                    subType: subType
+                  } as any,
+                  fieldPath: "data.attributes.dateField",
+                  queryType: operator
+                })
+              ).toMatchSnapshot();
+            });
+          });
+        });
       });
     });
 
-    describe("Greater Than Or Equal To operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "greaterThanOrEqualTo",
-            value: "1998-05-19",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "greaterThanOrEqualTo"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "greaterThanOrEqualTo",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "greaterThanOrEqualTo"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("Less Than operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "lessThan",
-            value: "1998-05-19",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "lessThan"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "lessThan",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "lessThan"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("lessThanOrEqualTo operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "lessThanOrEqualTo",
-            value: "1998-05-19",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "lessThanOrEqualTo"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "lessThanOrEqualTo",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "lessThanOrEqualTo"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("Equals operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "equals",
-            value: "1998-05-19",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "equals"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "equals",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "equals"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("Exact Match operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "exactMatch",
-            value: "1998-05-19",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "exactMatch"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "exactMatch",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "exactMatch"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("Not Equals operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "notEquals",
-            value: "1998-05-19",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "notEquals"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "notEquals",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "notEquals"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("Empty operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "empty",
-            value: "1998-05-19",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "empty"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "empty",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "empty"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("Not empty operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "notEmpty",
-            value: "1998-05-19",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "notEmpty"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "notEmpty",
-            value: "1998-05-19",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "notEmpty"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("Equals operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "equals",
-            value: "2023-08-29",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "equals"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformDateSearchToDSL({
-            operation: "equals",
-            value: "2023-08-29",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.dateField",
-            queryType: "equals"
-          })
-        ).toMatchSnapshot();
+    describe("Relationship level tests", () => {
+      operators.forEach(({operator, testValues}) => {
+        subTypes.forEach((subType) => {
+          testValues.forEach((value) => {
+            const testName = `Using the ${operator} operator, ${subType} subtype, testing with ${value} value`;
+            
+            test(testName, async () => {
+              expect(
+                transformDateSearchToDSL({
+                  operation: operator,
+                  value: value,
+                  fieldInfo: {
+                    subType: subType,
+                    parentType: "collection",
+                    parentName: "collection"
+                  } as any,
+                  fieldPath: "includes.name",
+                  queryType: operator
+                })
+              ).toMatchSnapshot();
+            });
+          });
+        });
       });
     });
 

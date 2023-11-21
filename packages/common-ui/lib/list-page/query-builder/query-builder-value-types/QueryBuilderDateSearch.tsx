@@ -3,7 +3,6 @@ import DatePicker from "react-datepicker";
 import {
   includedTypeQuery,
   rangeQuery,
-  termQuery,
   existsQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
@@ -86,7 +85,7 @@ export function transformDateSearchToDSL({
     return {};
   }
 
-  const { parentType, parentName } = fieldInfo;
+  const { parentType, parentName, subType } = fieldInfo;
 
   switch (operation) {
     // Contains / less than / greater than / less than or equal to / greater than or equal to.
@@ -104,7 +103,7 @@ export function transformDateSearchToDSL({
                   must: [
                     rangeQuery(
                       fieldPath,
-                      buildDateRangeObject(operation, value)
+                      buildDateRangeObject(operation, value, subType)
                     ),
                     includedTypeQuery(parentType)
                   ]
@@ -112,7 +111,7 @@ export function transformDateSearchToDSL({
               }
             }
           }
-        : rangeQuery(fieldPath, buildDateRangeObject(operation, value));
+        : rangeQuery(fieldPath, buildDateRangeObject(operation, value, subType));
 
     // Not equals match type.
     case "notEquals":
@@ -128,7 +127,7 @@ export function transformDateSearchToDSL({
                       bool: {
                         must_not: rangeQuery(
                           fieldPath,
-                          buildDateRangeObject(operation, value)
+                          buildDateRangeObject(operation, value, subType)
                         ),
                         must: includedTypeQuery(parentType)
                       }
@@ -167,7 +166,7 @@ export function transformDateSearchToDSL({
                   bool: {
                     must_not: rangeQuery(
                       fieldPath,
-                      buildDateRangeObject(operation, value)
+                      buildDateRangeObject(operation, value, subType)
                     )
                   }
                 },
@@ -245,7 +244,7 @@ export function transformDateSearchToDSL({
                   must: [
                     rangeQuery(
                       fieldPath,
-                      buildDateRangeObject(operation, value)
+                      buildDateRangeObject(operation, value, subType)
                     ),
                     includedTypeQuery(parentType)
                   ]
@@ -253,12 +252,14 @@ export function transformDateSearchToDSL({
               }
             }
           }
-        : rangeQuery(fieldPath, buildDateRangeObject(operation, value));
+        : rangeQuery(fieldPath, buildDateRangeObject(operation, value, subType));
   }
 }
 
 /**
  * Generates the time_zone to return with the elastic search response.
+ * 
+ * This will retrieve the users current timezone offset.
  *
  * This will return the offset in ISO 8601 UTC offset format, such as +01:00 or -08:00.
  */
@@ -292,14 +293,19 @@ function getTimezoneOffset() {
  * When using Equals to search for a date, the following would be matched for "2022":
  *    - 2022
  *
- * Timezone is also determined and included in the request here.
+ * Timezone is also determined and included in the request here if the subtype supports it.
  *
  * @param matchType the operator type (example: greaterThan ---> gt)
  * @param value The operator value to search against.
+ * @param subType subtype of the date, used to determine if timezone should be included.
  * @returns numerical operator and value.
  */
-function buildDateRangeObject(matchType, value) {
-  const timezone = getTimezoneOffset();
+function buildDateRangeObject(matchType, value, subType) {
+  // Local date does not store timezone, ignore it.
+  const timezone =
+    subType != "local_date" && subType != "local_date_time"
+      ? getTimezoneOffset()
+      : undefined;
 
   switch (matchType) {
     case "containsDate":
