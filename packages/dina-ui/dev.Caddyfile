@@ -94,21 +94,9 @@ route /api/dina-export-api/file/*?type=DATA_EXPORT {
 }
 
 # Proxy for TGN
-route /tgn {
-	uri replace /tgn /TGNService.asmx/TGNGetTermMatch
+route /tgn/* {
+	uri replace /tgn /TGNService.asmx
 	reverse_proxy http://vocabsservices.getty.edu {
 			header_up Host {upstream_hostport}
 	}
-}
-
-route /test/* {
-	uri replace /test /
-	reverse_proxy https://www.heise.de {
-			header_up Host {upstream_hostport}
-	}
-}
-
-
-log {
-	level DEBUG
 }

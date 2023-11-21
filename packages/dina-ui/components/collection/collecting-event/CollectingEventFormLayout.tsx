@@ -62,7 +62,13 @@ import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimBu
 import Link from "next/link";
 import { find, compact } from "lodash";
 import { FieldExtension } from "packages/dina-ui/types/collection-api/resources/FieldExtension";
-import { TgnIntegration } from "./TgnIntegration";
+import {
+  TgnDetails,
+  TgnSearchBox,
+  TgnSelectSearchResultDetail,
+  TgnViewDetailButton,
+  fetchTgnParents
+} from "./TgnIntegration";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -107,6 +113,10 @@ export function CollectingEventFormLayout({
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
+  const [tgnSearchValue, setTgnSearchValue] = useState<string>("");
+  const [tgnResultSelection, setTgnResultSelection] =
+    useState<TgnSelectSearchResultDetail>();
+
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
   const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
@@ -119,6 +129,16 @@ export function CollectingEventFormLayout({
   const { isValidating: detailResultsIsLoading } = useSWR(
     [selectedSearchResult, "nominatimAddressDetailSearch"],
     nominatimAddressDetailSearch,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
+  );
+
+  const { isValidating: tgnResultsIsLoading } = useSWR(
+    [tgnResultSelection],
+    fetchTgnParents,
     {
       shouldRetryOnError: false,
       revalidateOnFocus: false,
@@ -336,6 +356,13 @@ export function CollectingEventFormLayout({
     formik.values.dwcVerbatimCoordinates === null
       ? formik.setFieldValue("dwcVerbatimCoordinates", "")
       : formik.setFieldValue("dwcVerbatimCoordinates", null);
+  }
+
+  function removeTgn(formik: FormikContextType<{}>) {
+    formik.setFieldValue("tgnSourceDetail", null);
+
+    setTgnResultSelection(undefined);
+    setTgnSearchValue("");
   }
 
   const onChangeExternal = (form, name, value) => {
@@ -582,6 +609,55 @@ export function CollectingEventFormLayout({
                     }}
                   </Field>
                 }
+              />
+            ) : null
+          }
+        </Field>
+      </div>
+    </FieldSet>
+  );
+
+  const tgnSourceSelection = (
+    <FieldSet
+      fieldName="tgnSourceDetail"
+      legend={<DinaMessage id="tgnLegend" />}
+      className="non-strip"
+      componentName={COLLECTING_EVENT_COMPONENT_NAME}
+      sectionName="current-tgn-place"
+    >
+      <div
+        style={{
+          overflowY: "auto",
+          overflowX: "hidden",
+          maxHeight: 600
+        }}
+      >
+        <Field name="tgnSourceDetail">
+          {({ field: { value: detail }, form }) =>
+            detail ? (
+              <div>
+                <TgnDetails formik={form} />
+                <div className="row">
+                  {!readOnly && (
+                    <div className="col-md-4">
+                      <FormikButton
+                        className="btn btn-dark"
+                        onClick={(_, formik) => removeTgn(formik)}
+                      >
+                        <DinaMessage id="removeThisPlaceLabel" />
+                      </FormikButton>
+                    </div>
+                  )}
+                  <div className="col-md-4">
+                    <TgnViewDetailButton subjectId={detail?.subjectId} />
+                  </div>
+                </div>
+              </div>
+            ) : !readOnly ? (
+              <TgnSearchBox
+                onInputChange={setTgnSearchValue}
+                inputValue={tgnSearchValue}
+                onSelectSearchResult={setTgnResultSelection}
               />
             ) : null
           }
@@ -1001,9 +1077,7 @@ export function CollectingEventFormLayout({
             </div>
           </div>
           <div className="row">
-            <div className="col">
-              <TgnIntegration />
-            </div>
+            <div className="col">{tgnSourceSelection}</div>
           </div>
         </div>
       </div>
