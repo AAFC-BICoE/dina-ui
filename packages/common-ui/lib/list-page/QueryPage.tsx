@@ -373,8 +373,18 @@ export function QueryPage<TData extends KitsuResource>({
           const dataAttributesIndex = paramKey.indexOf("data.attributes");
           const queryKey = paramKey.slice(dataAttributesIndex);
         } else if (paramKey.includes("included.attributes")) {
-          const dataAttributesIndex = paramKey.indexOf("included.attributes");
-          const queryKey = paramKey.slice(dataAttributesIndex);
+          const includedAttributesIndex = paramKey.indexOf(
+            "included.attributes"
+          );
+          let includedType: string = "";
+          for (const [key, value] of Object.entries<string>(
+            flattenedParameter
+          )) {
+            if (key.includes("included.type")) {
+              includedType = value;
+            }
+          }
+          const queryKey = paramKey.slice(includedAttributesIndex);
         }
       });
     });
