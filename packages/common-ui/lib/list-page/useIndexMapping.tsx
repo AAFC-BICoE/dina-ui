@@ -89,6 +89,7 @@ export function useIndexMapping({
                 ? "data." + key.name
                 : key.name,
               type: key.type,
+              subType: key?.subtype ? key.subtype : undefined,
               path: key.path,
 
               // Additional options for the field:
@@ -125,6 +126,7 @@ export function useIndexMapping({
             label: attributeLabel,
             value: relationship.referencedBy + "." + attributeLabel,
             type: relationshipAttribute.type,
+            subType: relationshipAttribute?.subtype ? relationshipAttribute.subtype : undefined,
             path: relationshipAttribute.path,
             parentName: relationship.referencedBy,
             parentType: relationship.value,
