@@ -40,9 +40,9 @@ respond /instance.json "{
 }"
 
 # Provide the dev-user configuration to the front-end:
-respond /dev-user.json "{ 
+respond /dev-user.json "{
 	\"enabled\": {$DEV_USER_ENABLED:false},
-	\"groupRole\": \"{$DEV_USER_GROUP_ROLE}\",
+	\"groupRole\": \"{$DEV_USER_GROUP_ROLE}\"
 }"
 
 # Proxy to the main back-end API:
