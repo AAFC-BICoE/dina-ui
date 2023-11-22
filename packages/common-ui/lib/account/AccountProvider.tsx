@@ -115,18 +115,6 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       });
   }, [devUserConfig]);
 
-  // Non-authenticated users should never see the the full website. Display a loading indicator.
-  if (!authenticated || !initialized) {
-    return (
-      <div
-        className="d-flex align-items-center justify-content-center"
-        style={{ marginTop: "calc(50vh - 10px)" }}
-      >
-        <LoadingSpinner loading={true} />
-      </div>
-    );
-  }
-
   if (devUserConfig?.enabled) {
 
     const username = "dev";
@@ -135,9 +123,6 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 
     //const keycloakGroups = process.env['dev-user.enabled.groupRole'] ? processDevUserGroups() : [];
     const { groupNames, rolesPerGroup } = parseGroupRoleDevUser(devUserConfig?.groupRole);
-
-    console.log(groupNames);
-    console.log(rolesPerGroup);
 
     return (
       <AccountProvider
@@ -159,7 +144,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         {children}
       </AccountProvider>
     );
-  } else if (keycloak !== null) {
+  } else if (initialized && authenticated && keycloak !== null) {
     const tokenParsed = keycloak?.tokenParsed;
 
     const subject = keycloak?.subject;
@@ -211,6 +196,16 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       </AccountProvider>
     );
   }
+
+  // Non-authenticated users should never see the the full website. Display a loading indicator.
+  return (
+    <div
+      className="d-flex align-items-center justify-content-center"
+      style={{ marginTop: "calc(50vh - 10px)" }}
+    >
+      <LoadingSpinner loading={true} />
+    </div>
+  );
 
 }
 
