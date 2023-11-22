@@ -333,7 +333,7 @@ export function QueryPage<TData extends KitsuResource>({
   const [error, setError] = useState<any>();
 
   const { formatMessage: dinaFormatMessage } = useDinaIntl();
-  const [queryBuilderColumns, setQueryParameters] = useState<
+  const [queryBuilderColumns, setQueryBuilderColumns] = useState<
     TableColumn<TData>[]
   >([]);
 
@@ -384,7 +384,9 @@ export function QueryPage<TData extends KitsuResource>({
         parameters
       );
     }
-    getQueryBuilderColumns(parameters, dinaFormatMessage);
+    setQueryBuilderColumns(
+      getQueryBuilderColumns(parameters, dinaFormatMessage)
+    );
 
     queryDSL = applyRootQuery(queryDSL);
 
@@ -681,7 +683,8 @@ export function QueryPage<TData extends KitsuResource>({
           }
         ]
       : []),
-    ...columns
+    ...columns,
+    ...queryBuilderColumns
   ];
 
   // Columns generated for the selected resources, only in selection mode.

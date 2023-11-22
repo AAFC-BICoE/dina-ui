@@ -272,17 +272,6 @@ export default function MaterialSampleListPage() {
 
     // Created On
     dateCell("createdOn", "data.attributes.createdOn"),
-    {
-      header: () => (
-        <FieldHeader
-          name={formatMessage("managedAttribute", {
-            name: "integer 1"
-          })}
-        />
-      ),
-      accessorKey: "data.attributes.managedAttributes.integer_1"
-      // isKeyword: true
-    },
     // TODO: remove after finishing ES parsing
     dateCell(
       "collectingEventCreatedOn",

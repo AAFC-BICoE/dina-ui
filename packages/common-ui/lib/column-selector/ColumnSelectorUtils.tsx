@@ -1,7 +1,13 @@
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { query } from "kitsu-core";
 import { FieldHeader } from "..";
+import { TableColumn } from "../list-page/types";
+import { KitsuResource } from "kitsu";
 
-export function getQueryBuilderColumns(parameters: any[], formatMessage) {
+export function getQueryBuilderColumns<TData extends KitsuResource>(
+  parameters: any[],
+  formatMessage
+): TableColumn<TData>[] {
+  const queryBuilderColumns: TableColumn<TData>[] = [];
   parameters.forEach((queryParameter) => {
     const flattenedParameter = flattenObject(queryParameter);
     Object.keys(flattenedParameter).forEach((paramKey) => {
@@ -9,17 +15,11 @@ export function getQueryBuilderColumns(parameters: any[], formatMessage) {
         const dataAttributesIndex = paramKey.indexOf("data.attributes");
         const queryKey = paramKey.slice(dataAttributesIndex);
         if (queryKey.includes("managedAttributes")) {
-          const attributeColumn = {
-            header: () => (
-              <FieldHeader
-                name={formatMessage("managedAttribute", {
-                  name: "integer 1"
-                })}
-              />
-            ),
-            accessorKey: "data.attributes.managedAttributes.integer_1"
-            // isKeyword: true
-          };
+          const managedAttributesColumn = getManagedAttributesColumn(
+            queryKey,
+            formatMessage
+          );
+          queryBuilderColumns.push(managedAttributesColumn);
         }
       } else if (paramKey.includes("included.attributes")) {
         const includedAttributesIndex = paramKey.indexOf("included.attributes");
@@ -33,6 +33,27 @@ export function getQueryBuilderColumns(parameters: any[], formatMessage) {
       }
     });
   });
+
+  return queryBuilderColumns;
+}
+
+function getManagedAttributesColumn(queryKey: string, formatMessage: any) {
+  const managedAttributesKey = queryKey.slice(queryKey.lastIndexOf(".") + 1);
+  const managedAttributesName = managedAttributesKey.replaceAll("_", " ");
+  const managedAttributesColumn = {
+    header: () => (
+      <FieldHeader
+        name={formatMessage("managedAttribute", {
+          name: managedAttributesName
+        })}
+      />
+    ),
+    accessorKey: queryKey,
+    id: formatMessage("managedAttribute", {
+      name: managedAttributesName
+    })
+  };
+  return managedAttributesColumn;
 }
 
 /**

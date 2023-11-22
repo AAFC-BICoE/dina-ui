@@ -91,8 +91,9 @@ function useCustomMenu<TData>({
       }
     });
     setSearchedColumns(reactTable?.getAllLeafColumns());
-  }, [reactTable]);
+  }, [reactTable, reactTable?.getAllLeafColumns().length]);
 
+  // Set local storage visibility state whenever state changes
   useEffect(
     () => {
       if (reactTable && reactTable?.getState()?.columnVisibility) {
