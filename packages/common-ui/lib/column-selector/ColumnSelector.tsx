@@ -11,7 +11,7 @@ import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
-import { startCase } from "lodash";
+import { cloneDeep, startCase } from "lodash";
 import { Button } from "react-bootstrap";
 import useLocalStorage from "@rehooks/local-storage";
 import { DataExport } from "packages/dina-ui/types/dina-export-api";
@@ -65,6 +65,7 @@ function useCustomMenu<TData>({
   reactTable
 }: UseCustomMenuProps<TData>) {
   const { formatMessage, messages } = useIntl();
+  const rerender = React.useReducer(() => ({}), {})[1];
   // For finding columns using text search
   const columnSearchMapping: { label: string; id: string }[] | undefined =
     reactTable?.getAllLeafColumns().map((column) => {
@@ -91,7 +92,7 @@ function useCustomMenu<TData>({
       }
     });
     setSearchedColumns(reactTable?.getAllLeafColumns());
-  }, [reactTable, reactTable?.getAllLeafColumns().length]);
+  }, [reactTable, reactTable?.getAllColumns().length]);
 
   // Set local storage visibility state whenever state changes
   useEffect(

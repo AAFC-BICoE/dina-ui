@@ -271,13 +271,13 @@ export default function MaterialSampleListPage() {
     },
 
     // Created On
-    dateCell("createdOn", "data.attributes.createdOn"),
+    dateCell("createdOn", "data.attributes.createdOn")
     // TODO: remove after finishing ES parsing
-    dateCell(
-      "collectingEventCreatedOn",
-      "included.attributes.createdOn",
-      "collecting-event"
-    )
+    // dateCell(
+    //   "collectingEventCreatedOn",
+    //   "included.attributes.createdOn",
+    //   "collecting-event"
+    // )
   ];
 
   function rowStyling(row: Row<MaterialSample>) {

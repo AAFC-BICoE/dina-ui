@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { compact, toPairs, uniqBy } from "lodash";
+import { cloneDeep, compact, toPairs, uniq, uniqBy } from "lodash";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
@@ -333,13 +333,14 @@ export function QueryPage<TData extends KitsuResource>({
   const [error, setError] = useState<any>();
 
   const { formatMessage: dinaFormatMessage } = useDinaIntl();
-  const [queryBuilderColumns, setQueryBuilderColumns] = useState<
-    TableColumn<TData>[]
-  >([]);
 
   const defaultGroups = {
     group: groups
   };
+
+  const [queryBuilderColumns, setQueryBuilderColumns] = useState<
+    TableColumn<TData>[]
+  >([]);
 
   useEffect(() => {
     if (viewMode && selectedResources?.length) {
@@ -384,16 +385,20 @@ export function QueryPage<TData extends KitsuResource>({
         parameters
       );
     }
-    setQueryBuilderColumns(
-      getQueryBuilderColumns(parameters, dinaFormatMessage)
+    const queryColumns = getQueryBuilderColumns<TData>(
+      parameters,
+      dinaFormatMessage
     );
+    setQueryBuilderColumns(queryColumns);
 
     queryDSL = applyRootQuery(queryDSL);
-
     queryDSL = applyGroupFilters(queryDSL, groups);
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
-    queryDSL = applySortingRules(queryDSL, sortingRules, columns);
-    queryDSL = applySourceFiltering(queryDSL, columns);
+    queryDSL = applySortingRules(queryDSL, sortingRules, [
+      ...columns,
+      ...queryColumns
+    ]);
+    queryDSL = applySourceFiltering(queryDSL, [...columns, ...queryColumns]);
 
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) {
