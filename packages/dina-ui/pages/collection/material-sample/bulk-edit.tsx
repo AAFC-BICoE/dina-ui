@@ -54,7 +54,7 @@ export default function MaterialSampleBulkEditPage() {
             ids={ids ?? []}
             onSaved={moveToResultPage}
             onPreviousClick={() =>
-              router.push("/collection/material-sample/list?reloadLastSearch")
+              router.push("/collection/material-sample/list")
             }
           />
         )}
