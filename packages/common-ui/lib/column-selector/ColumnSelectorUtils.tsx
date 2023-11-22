@@ -1,4 +1,4 @@
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { FieldHeader } from "..";
 
 export function getQueryBuilderColumns(parameters: any[], formatMessage) {
