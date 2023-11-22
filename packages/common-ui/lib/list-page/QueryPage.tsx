@@ -57,6 +57,8 @@ import {
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
 import { DynamicFieldsMappingConfig, TableColumn } from "./types";
+import { getQueryBuilderColumns } from "../column-selector/ColumnSelectorUtils";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -317,7 +319,11 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Query Page error message state
   const [error, setError] = useState<any>();
-  const [queryParameters, setQueryParameters] = useState<string[]>([]);
+
+  const { formatMessage: dinaFormatMessage } = useDinaIntl();
+  const [queryBuilderColumns, setQueryParameters] = useState<
+    TableColumn<TData>[]
+  >([]);
 
   const defaultGroups = {
     group: groups
@@ -366,28 +372,7 @@ export function QueryPage<TData extends KitsuResource>({
         parameters
       );
     }
-    parameters.forEach((queryParameter) => {
-      const flattenedParameter = flattenObject(queryParameter);
-      Object.keys(flattenedParameter).forEach((paramKey) => {
-        if (paramKey.includes("data.attributes")) {
-          const dataAttributesIndex = paramKey.indexOf("data.attributes");
-          const queryKey = paramKey.slice(dataAttributesIndex);
-        } else if (paramKey.includes("included.attributes")) {
-          const includedAttributesIndex = paramKey.indexOf(
-            "included.attributes"
-          );
-          let includedType: string = "";
-          for (const [key, value] of Object.entries<string>(
-            flattenedParameter
-          )) {
-            if (key.includes("included.type")) {
-              includedType = value;
-            }
-          }
-          const queryKey = paramKey.slice(includedAttributesIndex);
-        }
-      });
-    });
+    getQueryBuilderColumns(parameters, dinaFormatMessage);
 
     queryDSL = applyRootQuery(queryDSL);
 
@@ -686,31 +671,6 @@ export function QueryPage<TData extends KitsuResource>({
       : []),
     ...columns
   ];
-
-  /**
-   * Return a flattened object with nested keys concatenated with "."
-   * @param ob
-   * @returns Flattened object
-   */
-  function flattenObject(ob) {
-    const toReturn = {};
-
-    for (const i in ob) {
-      if (!ob.hasOwnProperty(i)) continue;
-
-      if (typeof ob[i] === "object" && ob[i] !== null) {
-        const flatObject = flattenObject(ob[i]);
-        for (const x in flatObject) {
-          if (!flatObject.hasOwnProperty(x)) continue;
-
-          toReturn[i + "." + x] = flatObject[x];
-        }
-      } else {
-        toReturn[i] = ob[i];
-      }
-    }
-    return toReturn;
-  }
 
   // Columns generated for the selected resources, only in selection mode.
   const columnsSelected: TableColumn<TData>[] = [
