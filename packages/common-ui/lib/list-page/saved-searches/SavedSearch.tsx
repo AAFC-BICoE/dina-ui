@@ -12,7 +12,7 @@ import { FaCog } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
 import { Config, ImmutableTree, Utils } from "react-awesome-query-builder";
 import { SavedSearchStructure, SingleSavedSearch, SAVED_SEARCH_VERSION } from "./types";
-import { map, cloneDeep } from "lodash";
+import { map, cloneDeep, sortBy, isEqual } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import useLocalStorage from "@rehooks/local-storage";
@@ -184,6 +184,8 @@ export function SavedSearch({
   // Detect if any changes have been made to the query tree.
   useEffect(() => {
     if (!userPreferences || !selectedSavedSearch || !queryBuilderTree) return;
+    const savedSearch = userPreferences?.savedSearches?.[indexName]?.[selectedSavedSearch];
+    let changesMade = false;
 
     const currentQueryTreeString = Utils.queryString(
       queryBuilderTree,
@@ -191,12 +193,17 @@ export function SavedSearch({
     );
 
     // Compare against currently selected tree.
-    if (compareChangeSelected === currentQueryTreeString) {
-      setChangesMade(false);
-    } else {
-      setChangesMade(true);
+    if (compareChangeSelected !== currentQueryTreeString) {
+      changesMade = true;
     }
-  }, [queryBuilderTree]);
+
+    // Check if the group has changed.
+    if (!isEqual(sortBy(groups), sortBy(savedSearch?.groups))) {
+      changesMade = true;
+    }
+
+    setChangesMade(changesMade);
+  }, [queryBuilderTree, groups]);
 
   /**
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch
