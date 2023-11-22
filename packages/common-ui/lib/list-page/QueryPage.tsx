@@ -808,6 +808,8 @@ export function QueryPage<TData extends KitsuResource>({
           setPageOffset={setPageOffset}
           onSubmit={onSubmit}
           onReset={onReset}
+          setGroups={setGroups}
+          groups={groups}
         />
       )}
       <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
