@@ -116,7 +116,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   }, [devUserConfig]);
 
   // Non-authenticated users should never see the the full website. Display a loading indicator.
-  if (!authenticated || !initialized || (!keycloak || !devUserConfig?.enabled)) {
+  if (!authenticated || !initialized) {
     return (
       <div
         className="d-flex align-items-center justify-content-center"
@@ -134,10 +134,10 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
     const token = "dev-user-token";
 
     //const keycloakGroups = process.env['dev-user.enabled.groupRole'] ? processDevUserGroups() : [];
-    const groupNames = ["aafc"];
-    const rolesPerGroup = {
-      aafc: ["dina-admin"]
-    }
+    const { groupNames, rolesPerGroup } = parseGroupRoleDevUser(devUserConfig?.groupRole);
+
+    console.log(groupNames);
+    console.log(rolesPerGroup);
 
     return (
       <AccountProvider
@@ -159,7 +159,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         {children}
       </AccountProvider>
     );
-  } else {
+  } else if (keycloak !== null) {
     const tokenParsed = keycloak?.tokenParsed;
 
     const subject = keycloak?.subject;
@@ -270,17 +270,50 @@ export function generateKeycloakRolesPerGroup(
   }, {} as Record<string, string[] | undefined>);
 }
 
-// Work in progress...
-//function processDevUserGroups() {
-  // const groupRoles = [];
-  // for (const key in process.env) {
-  //   if (key.startsWith("dev-user.groupRole.")) {
-  //     const groupName = key.split('.').slice(-2).join('/'); // Extract the group name
-  //     const roles = JSON.parse(process.env[key]);
-  //     roles.forEach((role) => {
-  //       groupRoles.push(`/${groupName}/${role}`);
-  //     });
-  //   }
-  // }
-  // return groupRoles;
-//}
+interface ParseGroupRoleDevUserOutput {
+  groupNames: string[];
+  rolesPerGroup: any;
+}
+
+/**
+ * Parses the "groupRole" string to extract group names and roles.
+ * 
+ * Example: "/aafc/user, /bicoe/read-only, /aafc/super-user" will return:
+ * groupNames: ["aafc", "bicoe"]
+ * rolesPerGroup: {
+ *    aafc: ["user", "super-user"],
+ *    bicoe: ["read-only"]
+ * }
+ * 
+ * @param groupRole - The input string containing group and role information.
+ * @returns Object An object containing group names and roles per group.
+ */
+export function parseGroupRoleDevUser(groupRole: string | null): ParseGroupRoleDevUserOutput {
+  if (!groupRole || groupRole === "") {
+    return {
+      groupNames: [],
+      rolesPerGroup: {}
+    };
+  }
+
+  const groups = groupRole.split(',').map(group => group.trim().substring(1));
+  const groupNames = [...new Set(groups.map(group => group.split('/')[0]))];
+  const rolesPerGroup = {};
+
+  groups.forEach(group => {
+    const [groupName, role] = group.split('/');
+
+    if (!rolesPerGroup[groupName]) {
+      rolesPerGroup[groupName] = new Set(); // Use a Set to store roles
+    }
+
+    rolesPerGroup[groupName].add(role); // Add role to the Set
+  });
+
+  // Convert Sets back to arrays
+  for (const groupName in rolesPerGroup) {
+    rolesPerGroup[groupName] = [...rolesPerGroup[groupName]];
+  }
+
+  return { groupNames, rolesPerGroup };
+}
