@@ -77,7 +77,7 @@ const mockGet = jest.fn<any, any>(async (path, params = {}) => {
     case "collection-api/storage-unit":
       if (
         params.filter?.parentStorageUnit === null ||
-        params.filter?.rsql === "group==aafc;group==cnc"
+        params.filter?.rsql === "group=in=(aafc,cnc)"
       ) {
         // Top-level units:
         return { data: [STORAGE_A], meta: { totalResourceCount: 1 } };
@@ -158,7 +158,7 @@ describe("BrowseStorageTree component", () => {
     // With no filter, gets the top-level units:
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {
       filter: {
-        rsql: "group==aafc;group==cnc"
+        rsql: "group=in=(aafc,cnc)"
       },
       include: "storageUnitChildren,storageUnitType",
       page: {
@@ -179,7 +179,7 @@ describe("BrowseStorageTree component", () => {
     // With a filter, gets units from any level matching the search text:
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {
       filter: {
-        rsql: "name==*test-search-text*;group==aafc;group==cnc"
+        rsql: "name==*test-search-text*;group=in=(aafc,cnc)"
       },
       include: "storageUnitChildren,storageUnitType",
       page: {
