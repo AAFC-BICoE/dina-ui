@@ -115,6 +115,7 @@ function QueryBuilder({
         setQueryBuilderTree={setQueryBuilderTree}
         queryBuilderConfig={queryBuilderConfig}
         setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+        performSubmit={onSubmit}
         setPageOffset={setPageOffset}
         groups={groups}
         setGroups={setGroups}

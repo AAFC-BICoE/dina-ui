@@ -15,6 +15,7 @@ import { SavedSearchStructure, SingleSavedSearch, SAVED_SEARCH_VERSION } from ".
 import { map, cloneDeep, sortBy, isEqual } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
+import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
 import useLocalStorage from "@rehooks/local-storage";
 
 export interface SavedSearchProps {
@@ -47,6 +48,12 @@ export interface SavedSearchProps {
   setSubmittedQueryBuilderTree: React.Dispatch<
     React.SetStateAction<ImmutableTree>
   >;
+
+  /**
+   * For the last loaded search, we will actually perform the search by calling this callback
+   * function.
+   */
+  performSubmit: () => void;
 
   /**
    * Set the page offset, used to to load a saved search.
@@ -83,6 +90,7 @@ export function SavedSearch({
   setQueryBuilderTree,
   queryBuilderConfig,
   setSubmittedQueryBuilderTree,
+  performSubmit,
   setPageOffset,
   groups,
   setGroups
@@ -113,6 +121,14 @@ export function SavedSearch({
     localStorageLastUsedTreeKey,
     false
   );
+
+  // Functionality for the last loaded search.
+  useLastSavedSearch({
+    indexName,
+    setQueryBuilderTree,
+    setSubmittedQueryBuilderTree,
+    performSubmit
+  });
 
   // Using the user preferences get the options and user preferences.
   const userPreferenceID = userPreferences?.id;

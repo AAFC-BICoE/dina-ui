@@ -1,6 +1,4 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import { ColumnSort } from "@tanstack/react-table";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 
