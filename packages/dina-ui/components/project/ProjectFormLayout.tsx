@@ -84,6 +84,7 @@ export function ProjectFormLayout() {
       {readOnly && (
         <CustomQueryPageView
           titleKey="attachedMaterialSamples"
+          uniqueName="attached-material-samples-project"
           columns={ELASTIC_SEARCH_COLUMN}
           indexName={"dina_material_sample_index"}
           viewMode={readOnly}

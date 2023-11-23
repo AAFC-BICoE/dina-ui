@@ -96,6 +96,15 @@ export interface QueryPageProps<TData extends KitsuResource> {
   indexName: string;
 
   /**
+   * Used for generating the local storage keys. Every instance of the QueryPage should have it's
+   * own unique name.
+   *
+   * In special cases where you want the sorting, pagination, column selection and other features
+   * to remain the same across tables, it can share the same name.
+   */
+  uniqueName: string;
+
+  /**
    * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
    * be searched against. It will also define the path and data component if required.
    *
@@ -241,6 +250,7 @@ const GROUP_STORAGE_KEY = "groupStorage";
  */
 export function QueryPage<TData extends KitsuResource>({
   indexName,
+  uniqueName,
   dynamicFieldMapping,
   columns,
   bulkDeleteButtonProps,
@@ -277,14 +287,14 @@ export function QueryPage<TData extends KitsuResource>({
   const [totalRecords, setTotalRecords] = useState<number>(0);
 
   // User applied sorting rules for elastic search to use.
-  const localStorageLastUsedSortKey = indexName + "-last-used-sort";
+  const localStorageLastUsedSortKey = uniqueName + "-last-used-sort";
   const [sortingRules, setSortingRules] = useLocalStorage<ColumnSort[]>(
     localStorageLastUsedSortKey,
     defaultSort ?? DEFAULT_SORT
   );
 
   // The pagination size.
-  const localStorageLastUsedPageSizeKey = indexName + "-last-used-page-size";
+  const localStorageLastUsedPageSizeKey = uniqueName + "-last-used-page-size";
   const [pageSize, setPageSize] = useLocalStorage<number>(
     localStorageLastUsedPageSizeKey,
     defaultPageSize ?? DEFAULT_PAGE_SIZE
@@ -292,7 +302,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   // The pagination offset.
   const localStorageLastUsedPageOffsetKey =
-    indexName + "-last-used-page-offset";
+    uniqueName + "-last-used-page-offset";
   const [pageOffset, setPageOffset] = useLocalStorage<number>(
     localStorageLastUsedPageOffsetKey,
     0
@@ -706,8 +716,8 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
-  const localStorageLastUsedKey = indexName + "-last-used-tree";
-  const localStorageLastUsedTreeKey = indexName + "-saved-search-changed";
+  const localStorageLastUsedKey = uniqueName + "-last-used-tree";
+  const localStorageLastUsedTreeKey = uniqueName + "-saved-search-changed";
 
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
@@ -812,7 +822,7 @@ export function QueryPage<TData extends KitsuResource>({
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
   const { columnSelector } = useColumnSelector({
-    indexName,
+    indexName: uniqueName,
     hideExportButton: true,
     reactTable
   });
