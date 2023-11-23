@@ -16,6 +16,7 @@ export function MaterialSampleTransactionList({ transactionQueryDSL }) {
   return (
     <QueryPage
       indexName="dina_loan_transaction_index"
+      uniqueName="loan-transaction-material-samples"
       customViewElasticSearchQuery={transactionQueryDSL}
       customViewFields={[]}
       viewMode={true}
