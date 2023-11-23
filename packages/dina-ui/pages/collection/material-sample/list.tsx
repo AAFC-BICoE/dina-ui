@@ -301,6 +301,7 @@ export default function MaterialSampleListPage() {
         <QueryPage
           rowStyling={rowStyling}
           indexName={"dina_material_sample_index"}
+          uniqueName="material-sample-list"
           dynamicFieldMapping={{
             fields: [
               // Managed Attributes
