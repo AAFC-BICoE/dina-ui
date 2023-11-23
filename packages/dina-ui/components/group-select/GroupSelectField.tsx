@@ -8,7 +8,7 @@ import {
 } from "common-ui";
 import { useField } from "formik";
 import { get, uniq } from "lodash";
-import { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useImperativeHandle } from "react";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 import { GroupLabel } from "./GroupFieldView";
@@ -33,7 +33,14 @@ interface GroupSelectFieldProps extends Omit<SelectFieldProps<any>, "options"> {
   readOnlyHideLabel?: boolean;
 }
 
-export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
+export interface GroupSelectFieldInstance {
+  setValue: (value: string[] | null | undefined) => void;
+}
+
+export const GroupSelectField = React.forwardRef<
+  GroupSelectFieldInstance,
+  GroupSelectFieldProps
+>(function GroupSelectField(groupSelectFieldProps, forwardedRef) {
   const {
     showAnyOption,
     showAllGroups,
@@ -77,6 +84,17 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     ...groupSelectOptions
   ];
 
+  // Expose the setValue function using useImperativeHandle
+  useImperativeHandle(
+    forwardedRef,
+    () => ({
+      setValue: (newValue) => {
+        setValue(newValue);
+      }
+    }),
+    [setValue]
+  );
+
   return (
     <SelectField
       // Re-initialize the component if the labels change:
@@ -94,7 +112,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
       hideLabel={readOnlyHideLabel && readOnly}
     />
   );
-}
+});
 
 export interface UseAvailableGroupOptionsParams {
   initialGroupName?: string;
