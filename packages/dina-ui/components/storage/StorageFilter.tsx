@@ -10,10 +10,16 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnitType } from "../../types/collection-api";
 
 export interface StorageFilterProps {
+  /**
+   * To prevent displaying itself in the search results, this UUID will be filtered from the 
+   * results.
+   */
+  parentStorageUnitUUID?: string;
+
   onChange: (newValue: FilterGroupModel | null) => void;
 }
 
-export function StorageFilter({ onChange }: StorageFilterProps) {
+export function StorageFilter({ onChange, parentStorageUnitUUID }: StorageFilterProps) {
   const [searchText, setSearchText] = useState<string>("");
   const [storageTypeFilter, setStorageTypeFilter] =
     useState<PersistedResource<StorageUnitType>>();
@@ -35,6 +41,19 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
                 predicate: "IS" as const,
                 searchType: "PARTIAL_MATCH" as const,
                 value: searchText
+              }
+            ]
+          : []),
+        // Hide the parent storage unit, to prevent linking of itself.
+        ...(parentStorageUnitUUID
+          ? [
+              {
+                id: -432,
+                type: "FILTER_ROW" as const,
+                attribute: "uuid",
+                predicate: "IS NOT" as const,
+                searchType: "EXACT_MATCH" as const,
+                value: parentStorageUnitUUID
               }
             ]
           : []),
