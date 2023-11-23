@@ -338,9 +338,8 @@ export function QueryPage<TData extends KitsuResource>({
     group: groups
   };
 
-  const [queryBuilderColumns, setQueryBuilderColumns] = useState<
-    TableColumn<TData>[]
-  >([]);
+  // Combined columns from passed in columns + queryBuilderColumns
+  const [totalColumns, setTotalColumns] = useState<TableColumn<TData>[]>([]);
 
   useEffect(() => {
     if (viewMode && selectedResources?.length) {
@@ -389,16 +388,14 @@ export function QueryPage<TData extends KitsuResource>({
       parameters,
       dinaFormatMessage
     );
-    setQueryBuilderColumns(queryColumns);
+    const combinedColumns = [...columns, ...queryColumns];
+    setTotalColumns(combinedColumns);
 
     queryDSL = applyRootQuery(queryDSL);
     queryDSL = applyGroupFilters(queryDSL, groups);
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
-    queryDSL = applySortingRules(queryDSL, sortingRules, [
-      ...columns,
-      ...queryColumns
-    ]);
-    queryDSL = applySourceFiltering(queryDSL, [...columns, ...queryColumns]);
+    queryDSL = applySortingRules(queryDSL, sortingRules, combinedColumns);
+    queryDSL = applySourceFiltering(queryDSL, combinedColumns);
 
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) {
@@ -652,7 +649,7 @@ export function QueryPage<TData extends KitsuResource>({
       : reactTableProps;
 
   const columnVisibility = compact(
-    columns.map((col) =>
+    totalColumns.map((col) =>
       col.isColumnVisible === false
         ? { id: col.id, visibility: false }
         : undefined
@@ -688,8 +685,7 @@ export function QueryPage<TData extends KitsuResource>({
           }
         ]
       : []),
-    ...columns,
-    ...queryBuilderColumns
+    ...totalColumns
   ];
 
   // Columns generated for the selected resources, only in selection mode.
@@ -869,7 +865,7 @@ export function QueryPage<TData extends KitsuResource>({
                       totalRecords={totalRecords}
                       query={elasticSearchQuery}
                       indexName={indexName}
-                      columns={columns}
+                      columns={totalColumns}
                     />
                   )}
                   {bulkSplitPath && (

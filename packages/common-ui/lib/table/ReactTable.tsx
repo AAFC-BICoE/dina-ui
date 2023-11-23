@@ -269,7 +269,10 @@ export function ReactTable<TData>({
     if (setReactTable) {
       setReactTable(table);
     }
-  }, [...table.getAllLeafColumns().map((column) => column.getIsVisible())]);
+  }, [
+    ...table.getAllLeafColumns().map((column) => column.getIsVisible()),
+    table.getAllLeafColumns().length
+  ]);
 
   return !hideTable ? (
     <div
