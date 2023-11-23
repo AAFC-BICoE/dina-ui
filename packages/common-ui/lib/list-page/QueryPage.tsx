@@ -20,7 +20,7 @@ import {
   ReactTable,
   ReactTableProps,
   useAccount,
-  useColumnChooser
+  useColumnSelector
 } from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
@@ -811,7 +811,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
-  const { columnSelector } = useColumnChooser({
+  const { columnSelector } = useColumnSelector({
     indexName,
     hideExportButton: true,
     reactTable

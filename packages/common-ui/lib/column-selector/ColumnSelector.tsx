@@ -43,7 +43,7 @@ export interface UseColumnChooserProps<TData> {
   reactTable: Table<TData> | undefined;
 }
 
-export function useColumnChooser<TData>({
+export function useColumnSelector<TData>({
   indexName,
   hideExportButton = false,
   reactTable
