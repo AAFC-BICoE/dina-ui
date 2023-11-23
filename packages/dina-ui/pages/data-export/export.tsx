@@ -1,5 +1,5 @@
 import {
-  useColumnChooser,
+  useColumnSelector,
   DinaForm,
   ReactTable,
   CommonMessage,
@@ -26,17 +26,17 @@ export default function MaterialSampleExportPage<
   const router = useRouter();
   const [totalRecords] = useLocalStorage<number>(DATA_EXPORT_TOTAL_RECORDS_KEY);
   const hideTable: boolean | undefined = !!router.query.hideTable;
-  const indexName = String(router.query.indexName);
+  const uniqueName = String(router.query.uniqueName);
   const { formatMessage, formatNumber } = useIntl();
   const [columns] = useLocalStorage<TableColumn<TData>[] | undefined>(
-    `${indexName}_${DATA_EXPORT_COLUMNS_KEY}`
+    `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`
   );
   const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
     useState<JSX.Element>();
   const [reactTable, setReactTable] = useState<Table<TData>>();
 
-  const { CustomMenu, dataExportError } = useColumnChooser({
-    indexName,
+  const { CustomMenu, dataExportError } = useColumnSelector({
+    uniqueName,
     reactTable
   });
 

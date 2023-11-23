@@ -59,10 +59,14 @@ function getDataAttributesColumn<TData extends KitsuResource>(
       formatMessage
     );
     queryBuilderColumns.push(managedAttributesColumn);
-  } else if (queryKey.toLowerCase().includes("date")) {
+  } else if (
+    queryKey.toLowerCase().includes("date") ||
+    queryKey.toLowerCase().includes("createdon")
+  ) {
     // Handle getting date column
-    const dateColumName = queryKey.slice(queryKey.lastIndexOf(".") + 1);
-    queryBuilderColumns.push(dateCell(dateColumName, queryKey));
+    const dateColumName = queryKey.split(".")[2];
+    const accessorKey = queryKey.split(".").slice(0, 3).join(".");
+    queryBuilderColumns.push(dateCell(dateColumName, accessorKey));
   } else if (queryKey.includes("extensionValues")) {
     // Handle getting extension values column
     const extensionValuesColumn = getExtensionValuesColumn(queryKey);

@@ -398,7 +398,10 @@ export function QueryPage<TData extends KitsuResource>({
       parameters,
       dinaFormatMessage
     );
-    const combinedColumns = [...columns, ...queryColumns];
+    const filteredQueryColumns = queryColumns.filter(
+      (queryColumn) => !!!columns.find((column) => column.id === queryColumn.id)
+    );
+    const combinedColumns = [...columns, ...filteredQueryColumns];
     setTotalColumns(combinedColumns);
 
     queryDSL = applyRootQuery(queryDSL);
@@ -874,7 +877,7 @@ export function QueryPage<TData extends KitsuResource>({
                       pathname={dataExportPath}
                       totalRecords={totalRecords}
                       query={elasticSearchQuery}
-                      indexName={indexName}
+                      uniqueName={uniqueName}
                       columns={totalColumns}
                     />
                   )}

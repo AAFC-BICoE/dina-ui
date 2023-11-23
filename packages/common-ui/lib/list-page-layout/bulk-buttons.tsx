@@ -120,7 +120,7 @@ export interface DataExportButtonProps<TData extends KitsuResource> {
   pathname: string;
   totalRecords: number;
   query: any;
-  indexName: string;
+  uniqueName: string;
   columns: TableColumn<TData>[];
 }
 
@@ -137,7 +137,7 @@ export function DataExportButton<TData extends KitsuResource>({
   pathname,
   totalRecords,
   query,
-  indexName,
+  uniqueName,
   columns
 }: DataExportButtonProps<TData>) {
   const router = useRouter();
@@ -162,12 +162,12 @@ export function DataExportButton<TData extends KitsuResource>({
             : totalRecords
         );
         writeStorage<TableColumn<TData>[]>(
-          `${indexName}_${DATA_EXPORT_COLUMNS_KEY}`,
+          `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`,
           columns
         );
         await router.push({
           pathname,
-          query: { hideTable: true, indexName }
+          query: { hideTable: true, uniqueName }
         });
       }}
     >
