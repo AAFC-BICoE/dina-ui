@@ -38,18 +38,18 @@ export function ColumnSelector(
 
 export interface UseColumnChooserProps<TData> {
   /** A unique identifier to be used for local storage key */
-  indexName?: string;
+  uniqueName?: string;
   hideExportButton?: boolean;
   reactTable: Table<TData> | undefined;
 }
 
 export function useColumnSelector<TData>({
-  indexName,
+  uniqueName,
   hideExportButton = false,
   reactTable
 }: UseColumnChooserProps<TData>) {
   const { CustomMenu, dataExportError } = useCustomMenu({
-    indexName,
+    uniqueName,
     hideExportButton,
     reactTable
   });
@@ -60,7 +60,7 @@ export function useColumnSelector<TData>({
 interface UseCustomMenuProps<TData> extends UseColumnChooserProps<TData> {}
 
 function useCustomMenu<TData>({
-  indexName,
+  uniqueName,
   hideExportButton,
   reactTable
 }: UseCustomMenuProps<TData>) {
@@ -77,7 +77,7 @@ function useCustomMenu<TData>({
     });
   const [localStorageColumnStates, setLocalStorageColumnStates] =
     useLocalStorage<VisibilityState | undefined>(
-      `${indexName}_columnSelector`,
+      `${uniqueName}_columnSelector`,
       {}
     );
   // Columns filtered from text search
