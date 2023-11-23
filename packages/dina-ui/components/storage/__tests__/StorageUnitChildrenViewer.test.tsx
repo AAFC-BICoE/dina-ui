@@ -50,6 +50,12 @@ jest.mock("next/router", () => ({
 }));
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
+  console.log("Path: ");
+  console.log(path);
+
+  console.log("Params: ");
+  console.log(params?.filter?.rsql)
+  
   switch (path) {
     case "collection-api/storage-unit":
       switch (params?.include) {
@@ -70,6 +76,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           }
         case "hierarchy,storageUnitType":
           switch (params?.filter?.rsql) {
+            case "uuid!=X;group=in=(aafc,cnc)":
             case "group=in=(aafc,cnc)":
             case "":
               // The searchable table results:
