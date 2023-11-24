@@ -37,6 +37,11 @@ export function getQueryBuilderColumns<TData extends KitsuResource>(
             }
           }
           const queryKey = paramKey.slice(includedAttributesIndex);
+          const includedAttributesField = paramKey.includes(
+            "included.attributes"
+          )
+            ? paramKey
+            : paramValue;
         }
       }
     );

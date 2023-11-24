@@ -397,10 +397,12 @@ export function QueryPage<TData extends KitsuResource>({
       parameters,
       dinaFormatMessage
     );
-    const filteredQueryColumns = queryColumns.filter(
-      (queryColumn) => !!!columns.find((column) => column.id === queryColumn.id)
+
+    // Combine input columns and query builder columns, then filter for unique columns
+    const combinedColumns = [...columns, ...queryColumns].filter(
+      (v, i, a) => a.findIndex((v2) => v2.id === v.id) === i
     );
-    const combinedColumns = [...columns, ...filteredQueryColumns];
+
     setTotalColumns(combinedColumns);
 
     queryDSL = applyRootQuery(queryDSL);
