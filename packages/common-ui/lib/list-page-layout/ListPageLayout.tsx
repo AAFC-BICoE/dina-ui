@@ -1,6 +1,11 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FormikProps } from "formik";
-import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
+import {
+  FilterParam,
+  KitsuResource,
+  KitsuResponse,
+  PersistedResource
+} from "kitsu";
 import { ComponentType, ReactNode } from "react";
 import {
   CheckBoxFieldProps,
@@ -20,10 +25,25 @@ import {
 } from "./bulk-buttons";
 import { FilterForm } from "./FilterForm";
 import { ColumnSort, SortingState } from "@tanstack/react-table";
+import { FreeTextFilterForm } from "./FreeTextFilterForm";
+import { number } from "mathjs";
+
+export enum ListLayoutFilterType {
+  FREE_TEXT = "FREE_TEXT",
+  FILTER_BUILDER = "FILTER_BUILDER"
+}
 
 export interface ListPageLayoutProps<TData extends KitsuResource> {
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
   defaultSort?: ColumnSort[];
+  filterType?: ListLayoutFilterType;
+  enableInMemoryFilter?: boolean;
+  filterFn?: (
+    filterForm: any,
+    value: PersistedResource<TData>,
+    index?: number,
+    array?: PersistedResource<TData>[]
+  ) => boolean;
   filterAttributes?: FilterAttribute[];
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
@@ -50,6 +70,9 @@ interface ListPageLayoutContext<TData extends KitsuResource> {
 export function ListPageLayout<TData extends KitsuResource>({
   additionalFilters: additionalFiltersProp,
   defaultSort: defaultSortProp,
+  filterType = ListLayoutFilterType.FILTER_BUILDER,
+  enableInMemoryFilter = false,
+  filterFn = () => true,
   filterAttributes,
   filterFormchildren,
   id,
@@ -76,35 +99,54 @@ export function ListPageLayout<TData extends KitsuResource>({
   const [defaultPageSize, setDefaultPageSize] =
     useLocalStorage<number>(tablePageSizeKey);
 
-  let filterBuilderRsql = "";
-  try {
-    filterBuilderRsql = rsql(filterForm.filterBuilderModel);
-  } catch (error) {
-    // If there is an error, ignore the filter form rsql instead of crashing the page.
-    // tslint:disable-next-line
-    console.error(error);
-    setImmediate(() => setFilterForm({}));
+  let filterParam: FilterParam | undefined = undefined;
+  let inMemoryFilter:
+    | ((
+        value: PersistedResource<TData>,
+        index?: number,
+        array?: PersistedResource<TData>[]
+      ) => boolean)
+    | undefined;
+
+  if (enableInMemoryFilter) {
+    filterForm.filterBuilderModel;
+    inMemoryFilter = (
+      value: PersistedResource<TData>,
+      index?: number,
+      array?: PersistedResource<TData>[]
+    ) => {
+      return filterFn(filterForm, value, index, array);
+    };
+  } else {
+    let filterBuilderRsql = "";
+    try {
+      filterBuilderRsql = rsql(filterForm.filterBuilderModel);
+    } catch (error) {
+      // If there is an error, ignore the filter form rsql instead of crashing the page.
+      // tslint:disable-next-line
+      console.error(error);
+      setImmediate(() => setFilterForm({}));
+    }
+
+    const additionalFilters = (
+      typeof additionalFiltersProp === "function"
+        ? additionalFiltersProp(filterForm)
+        : additionalFiltersProp
+    ) as Record<string, string>;
+
+    // Combine the inner rsql with the passed additionalFilters?.rsql filter if they are set:
+    const combinedRsql = [
+      ...(filterBuilderRsql ? [filterBuilderRsql] : []),
+      ...(additionalFilters?.rsql ? [additionalFilters?.rsql] : [])
+    ].join(" and ");
+
+    // Build the JSONAPI filter param to be sent to the back-end.
+    filterParam = {
+      ...additionalFilters,
+      // Only include rsql if it's not blank:
+      ...(combinedRsql && { rsql: combinedRsql })
+    };
   }
-
-  const additionalFilters = (
-    typeof additionalFiltersProp === "function"
-      ? additionalFiltersProp(filterForm)
-      : additionalFiltersProp
-  ) as Record<string, string>;
-
-  // Combine the inner rsql with the passed additionalFilters?.rsql filter if they are set:
-  const combinedRsql = [
-    ...(filterBuilderRsql ? [filterBuilderRsql] : []),
-    ...(additionalFilters?.rsql ? [additionalFilters?.rsql] : [])
-  ].join(" and ");
-
-  // Build the JSONAPI filter param to be sent to the back-end.
-  const filterParam: FilterParam = {
-    ...additionalFilters,
-    // Only include rsql if it's not blank:
-    ...(combinedRsql && { rsql: combinedRsql })
-  };
-
   const {
     CheckBoxField,
     CheckBoxHeader,
@@ -144,6 +186,8 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   const tableElement = (
     <QueryTable<TData>
+      enableInMemoryFilter={enableInMemoryFilter}
+      filterFn={inMemoryFilter}
       defaultPageSize={defaultPageSize ?? undefined}
       defaultSort={defaultSort ?? undefined}
       filter={filterParam}
@@ -174,10 +218,15 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   return (
     <div>
-      {filterAttributes && (
+      {filterAttributes && filterType === ListLayoutFilterType.FILTER_BUILDER && (
         <FilterForm filterAttributes={filterAttributes} id={id}>
           {filterFormchildren}
         </FilterForm>
+      )}
+      {filterAttributes && filterType === ListLayoutFilterType.FREE_TEXT && (
+        <FreeTextFilterForm filterAttributes={filterAttributes} id={id}>
+          {filterFormchildren}
+        </FreeTextFilterForm>
       )}
       {wrapTable(tableWrappedInForm)}
     </div>
