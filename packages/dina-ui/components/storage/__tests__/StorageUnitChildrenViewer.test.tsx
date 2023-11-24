@@ -168,7 +168,7 @@ describe("StorageUnitChildrenViewer component", () => {
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer storageUnit={storageUnitA} />,
       </DinaForm>,
-      { apiContext }
+      { apiContext, accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] } }
     );
 
     wrapper.find("button.enable-move-content").simulate("click");
