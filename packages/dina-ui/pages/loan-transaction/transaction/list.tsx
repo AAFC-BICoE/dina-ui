@@ -69,6 +69,7 @@ export default function TransactionListPage() {
         </ButtonBar>
         <QueryPage
           indexName={"dina_loan_transaction_index"}
+          uniqueName="transaction-list-material-samples"
           columns={TRANSACTION_TABLE_COLUMNS}
           dynamicFieldMapping={{
             fields: [

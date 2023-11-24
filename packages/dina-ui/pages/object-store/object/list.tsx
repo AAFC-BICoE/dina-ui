@@ -176,6 +176,7 @@ export default function MetadataListPage() {
             <SplitPagePanel>
               <QueryPage
                 indexName={"dina_object_store_index"}
+                uniqueName="object-store-list"
                 dynamicFieldMapping={{
                   fields: [
                     {

@@ -116,6 +116,7 @@ export default function MetadataViewPage() {
                     {customViewQuery && (
                       <CustomQueryPageView
                         titleKey="attachedMaterialSamples"
+                        uniqueName="attached-material-samples-object-store"
                         columns={ELASTIC_SEARCH_COLUMN}
                         indexName={"dina_material_sample_index"}
                         viewMode={customViewQuery ? true : false}
