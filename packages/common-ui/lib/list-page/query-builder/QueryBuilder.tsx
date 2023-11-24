@@ -55,6 +55,15 @@ interface QueryBuilderProps {
    * Set the page offset, used to to load a saved search.
    */
   setPageOffset: React.Dispatch<React.SetStateAction<number>>;
+
+  /**
+   * Used for generating the local storage keys. Every instance of the QueryPage should have it's
+   * own unique name.
+   *
+   * In special cases where you want the sorting, pagination, column selection and other features
+   * to remain the same across tables, it can share the same name.
+   */
+  uniqueName: string;
 }
 
 function QueryBuilder({
@@ -65,7 +74,8 @@ function QueryBuilder({
   onSubmit,
   onReset,
   setSubmittedQueryBuilderTree,
-  setPageOffset
+  setPageOffset,
+  uniqueName
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -107,6 +117,7 @@ function QueryBuilder({
         setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
         setPageOffset={setPageOffset}
         performSubmit={onSubmit}
+        uniqueName={uniqueName}
       />
       <Query
         {...queryBuilderConfig}

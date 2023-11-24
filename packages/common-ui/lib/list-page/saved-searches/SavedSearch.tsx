@@ -60,6 +60,15 @@ export interface SavedSearchProps {
    * function.
    */
   performSubmit: () => void;
+
+  /**
+   * Used for generating the local storage keys. Every instance of the QueryPage should have it's
+   * own unique name.
+   *
+   * In special cases where you want the sorting, pagination, column selection and other features
+   * to remain the same across tables, it can share the same name.
+   */
+  uniqueName: string;
 }
 
 /**
@@ -82,7 +91,8 @@ export function SavedSearch({
   queryBuilderConfig,
   setSubmittedQueryBuilderTree,
   setPageOffset,
-  performSubmit
+  performSubmit,
+  uniqueName
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -113,10 +123,10 @@ export function SavedSearch({
 
   // Functionality for the last loaded search.
   const { loadLastUsed } = useLastSavedSearch({
-    indexName,
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
-    performSubmit
+    performSubmit,
+    uniqueName
   });
 
   // Using the user preferences get the options and user preferences.
