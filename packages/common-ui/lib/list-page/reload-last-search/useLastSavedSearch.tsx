@@ -6,11 +6,6 @@ import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 
 interface UseLastSavedSearchProps {
   /**
-   * The index name is used to find the local storage query tree.
-   */
-  indexName: string;
-
-  /**
    * Set the query builder tree, used to to load a saved search.
    */
   setQueryBuilderTree: (newTree: ImmutableTree) => void;
@@ -27,6 +22,15 @@ interface UseLastSavedSearchProps {
    * function.
    */
   performSubmit: () => void;
+
+  /**
+   * Used for generating the local storage keys. Every instance of the QueryPage should have it's
+   * own unique name.
+   *
+   * In special cases where you want the sorting, pagination, column selection and other features
+   * to remain the same across tables, it can share the same name.
+   */
+  uniqueName: string;
 }
 
 interface UseLastSavedSearchReturn {
@@ -35,12 +39,12 @@ interface UseLastSavedSearchReturn {
 }
 
 export function useLastSavedSearch({
-  indexName,
   setQueryBuilderTree,
   setSubmittedQueryBuilderTree,
-  performSubmit
+  performSubmit,
+  uniqueName
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
-  const localStorageLastUsedTreeKey = indexName + "-last-used-tree";
+  const localStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
 
   const [queryLoaded, setQueryLoaded] = useState<boolean>(false);
 

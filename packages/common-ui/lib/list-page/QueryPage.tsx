@@ -236,8 +236,6 @@ export interface QueryPageProps<TData extends KitsuResource> {
   enableColumnChooser?: boolean;
 }
 
-const GROUP_STORAGE_KEY = "groupStorage";
-
 /**
  * Top level component for displaying an elastic-search listing page.
  *
@@ -326,6 +324,7 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   // Groups selected for the search.
+  const GROUP_STORAGE_KEY = uniqueName + "_groupStorage";
   const [groups, setGroups] = useLocalStorage<string[]>(
     GROUP_STORAGE_KEY,
     groupNames ?? []
@@ -842,6 +841,7 @@ export function QueryPage<TData extends KitsuResource>({
           setPageOffset={setPageOffset}
           onSubmit={onSubmit}
           onReset={onReset}
+          uniqueName={uniqueName}
         />
       )}
       <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>

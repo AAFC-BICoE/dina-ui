@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -27,7 +27,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level with operator equals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level tests Using the equals operator, undefined subtype 1`] = `
 Object {
   "term": Object {
     "data.attributes.managedAttributes.attributeName.keyword": "true",
@@ -35,7 +35,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "must": Object {
@@ -52,7 +52,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -122,7 +122,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level with operator equals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level tests Using the equals operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -146,7 +146,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function BOOL based managed attribute tests Relationship level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -175,7 +175,33 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator containsDate 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the containsDate operator, date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19||/d",
+      "lte": "1998-05-19||/d",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the containsDate operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19||/d",
+      "lte": "1998-05-19||/d",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the containsDate operator, local_date subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -187,7 +213,32 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the containsDate operator, local_date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19||/d",
+      "lte": "1998-05-19||/d",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the containsDate operator, undefined subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19||/d",
+      "lte": "1998-05-19||/d",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the empty operator, date_time subtype 1`] = `
 Object {
   "bool": Object {
     "must_not": Object {
@@ -199,15 +250,140 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator equals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the empty operator, date_time_optional_tz subtype 1`] = `
 Object {
-  "term": Object {
-    "data.attributes.managedAttributes.attributeName": "1998-05-19",
+  "bool": Object {
+    "must_not": Object {
+      "exists": Object {
+        "field": "data.attributes.managedAttributes.attributeName",
+      },
+    },
   },
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator greaterThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the empty operator, local_date subtype 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "exists": Object {
+        "field": "data.attributes.managedAttributes.attributeName",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the empty operator, local_date_time subtype 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "exists": Object {
+        "field": "data.attributes.managedAttributes.attributeName",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "exists": Object {
+        "field": "data.attributes.managedAttributes.attributeName",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the equals operator, date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19",
+      "lte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the equals operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19",
+      "lte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the equals operator, local_date subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19",
+      "lte": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the equals operator, local_date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19",
+      "lte": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the equals operator, undefined subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19",
+      "lte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the greaterThan operator, date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gt": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the greaterThan operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gt": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the greaterThan operator, local_date subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -217,7 +393,50 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator greaterThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the greaterThan operator, local_date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gt": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the greaterThan operator, undefined subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gt": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the greaterThanOrEqualTo operator, date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the greaterThanOrEqualTo operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the greaterThanOrEqualTo operator, local_date subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -227,7 +446,50 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator lessThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the greaterThanOrEqualTo operator, local_date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gte": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the greaterThanOrEqualTo operator, undefined subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "gte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThan operator, date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lt": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThan operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lt": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThan operator, local_date subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -237,7 +499,50 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator lessThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThan operator, local_date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lt": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThan operator, undefined subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lt": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThanOrEqualTo operator, date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThanOrEqualTo operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThanOrEqualTo operator, local_date subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -247,7 +552,28 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThanOrEqualTo operator, local_date_time subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lte": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThanOrEqualTo operator, undefined subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName": Object {
+      "lte": "1998-05-19",
+      "time_zone": "+00:00",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEmpty operator, date_time subtype 1`] = `
 Object {
   "exists": Object {
     "field": "data.attributes.managedAttributes.attributeName",
@@ -255,15 +581,52 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level with operator notEquals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEmpty operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "exists": Object {
+    "field": "data.attributes.managedAttributes.attributeName",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEmpty operator, local_date subtype 1`] = `
+Object {
+  "exists": Object {
+    "field": "data.attributes.managedAttributes.attributeName",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEmpty operator, local_date_time subtype 1`] = `
+Object {
+  "exists": Object {
+    "field": "data.attributes.managedAttributes.attributeName",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
+Object {
+  "exists": Object {
+    "field": "data.attributes.managedAttributes.attributeName",
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEquals operator, date_time subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
       Object {
         "bool": Object {
           "must_not": Object {
-            "term": Object {
-              "data.attributes.managedAttributes.attributeName": "1998-05-19",
+            "range": Object {
+              "data.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
             },
           },
         },
@@ -282,7 +645,191 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator containsDate 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEquals operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "range": Object {
+              "data.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEquals operator, local_date subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "range": Object {
+              "data.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEquals operator, local_date_time subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "range": Object {
+              "data.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "range": Object {
+              "data.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.managedAttributes.attributeName",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the containsDate operator, date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19||/d",
+                "lte": "1998-05-19||/d",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the containsDate operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19||/d",
+                "lte": "1998-05-19||/d",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the containsDate operator, local_date subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -310,7 +857,64 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the containsDate operator, local_date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19||/d",
+                "lte": "1998-05-19||/d",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the containsDate operator, undefined subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19||/d",
+                "lte": "1998-05-19||/d",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, date_time subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -353,7 +957,179 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator equals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "exists": Object {
+                        "field": "included.attributes.managedAttributes.attributeName",
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.type": "collecting-event",
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, local_date subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "exists": Object {
+                        "field": "included.attributes.managedAttributes.attributeName",
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.type": "collecting-event",
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, local_date_time subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "exists": Object {
+                        "field": "included.attributes.managedAttributes.attributeName",
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.type": "collecting-event",
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "exists": Object {
+                        "field": "included.attributes.managedAttributes.attributeName",
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.type": "collecting-event",
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the equals operator, date_time subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -361,8 +1137,13 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "term": Object {
-              "included.attributes.managedAttributes.attributeName": "1998-05-19",
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
             },
           },
           Object {
@@ -377,7 +1158,175 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator greaterThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the equals operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the equals operator, local_date subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the equals operator, local_date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the equals operator, undefined subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the greaterThan operator, date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gt": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the greaterThan operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gt": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the greaterThan operator, local_date subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -403,7 +1352,114 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator greaterThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the greaterThan operator, local_date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gt": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the greaterThan operator, undefined subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gt": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the greaterThanOrEqualTo operator, date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the greaterThanOrEqualTo operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the greaterThanOrEqualTo operator, local_date subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -429,7 +1485,114 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator lessThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the greaterThanOrEqualTo operator, local_date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the greaterThanOrEqualTo operator, undefined subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "gte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThan operator, date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lt": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThan operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lt": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThan operator, local_date subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -455,7 +1618,114 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator lessThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThan operator, local_date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lt": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThan operator, undefined subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lt": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThanOrEqualTo operator, date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThanOrEqualTo operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThanOrEqualTo operator, local_date subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -481,7 +1751,60 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThanOrEqualTo operator, local_date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThanOrEqualTo operator, undefined subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName": Object {
+                "lte": "1998-05-19",
+                "time_zone": "+00:00",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEmpty operator, date_time subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -505,7 +1828,103 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level with operator notEquals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEmpty operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEmpty operator, local_date subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEmpty operator, local_date_time subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEmpty operator, undefined subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "exists": Object {
+              "field": "included.attributes.managedAttributes.attributeName",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEquals operator, date_time subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -520,8 +1939,13 @@ Object {
                 },
               },
               "must_not": Object {
-                "term": Object {
-                  "included.attributes.managedAttributes.attributeName": "1998-05-19",
+                "range": Object {
+                  "included.attributes.managedAttributes.attributeName": Object {
+                    "format": "yyyy-MM-dd",
+                    "gte": "1998-05-19",
+                    "lte": "1998-05-19",
+                    "time_zone": "+00:00",
+                  },
                 },
               },
             },
@@ -561,7 +1985,249 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEquals operator, date_time_optional_tz subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "range": Object {
+                  "included.attributes.managedAttributes.attributeName": Object {
+                    "format": "yyyy-MM-dd",
+                    "gte": "1998-05-19",
+                    "lte": "1998-05-19",
+                    "time_zone": "+00:00",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.managedAttributes.attributeName",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEquals operator, local_date subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "range": Object {
+                  "included.attributes.managedAttributes.attributeName": Object {
+                    "format": "yyyy-MM-dd",
+                    "gte": "1998-05-19",
+                    "lte": "1998-05-19",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.managedAttributes.attributeName",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEquals operator, local_date_time subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "range": Object {
+                  "included.attributes.managedAttributes.attributeName": Object {
+                    "format": "yyyy-MM-dd",
+                    "gte": "1998-05-19",
+                    "lte": "1998-05-19",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.managedAttributes.attributeName",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "range": Object {
+                  "included.attributes.managedAttributes.attributeName": Object {
+                    "format": "yyyy-MM-dd",
+                    "gte": "1998-05-19",
+                    "lte": "1998-05-19",
+                    "time_zone": "+00:00",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collecting-event",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "included.attributes.managedAttributes.attributeName",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collectingEvent.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "must_not": Object {
@@ -573,7 +2239,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator equals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level tests Using the equals operator, undefined subtype 1`] = `
 Object {
   "term": Object {
     "data.attributes.managedAttributes.attributeName": "3.5",
@@ -581,7 +2247,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator greaterThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level tests Using the greaterThan operator, undefined subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -591,7 +2257,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator greaterThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level tests Using the greaterThanOrEqualTo operator, undefined subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -601,7 +2267,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator lessThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level tests Using the lessThan operator, undefined subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -611,7 +2277,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator lessThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level tests Using the lessThanOrEqualTo operator, undefined subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -621,7 +2287,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "exists": Object {
     "field": "data.attributes.managedAttributes.attributeName",
@@ -629,7 +2295,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level with operator notEquals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -656,7 +2322,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -699,7 +2365,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator equals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the equals operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -723,7 +2389,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator greaterThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the greaterThan operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -749,7 +2415,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator greaterThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the greaterThanOrEqualTo operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -775,7 +2441,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator lessThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the lessThan operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -801,7 +2467,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator lessThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the lessThanOrEqualTo operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -827,7 +2493,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -851,7 +2517,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level with operator notEquals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DECIMAL based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -907,7 +2573,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "must_not": Object {
@@ -919,7 +2585,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator equals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level tests Using the equals operator, undefined subtype 1`] = `
 Object {
   "term": Object {
     "data.attributes.managedAttributes.attributeName": "42",
@@ -927,7 +2593,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator greaterThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level tests Using the greaterThan operator, undefined subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -937,7 +2603,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator greaterThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level tests Using the greaterThanOrEqualTo operator, undefined subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -947,7 +2613,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator lessThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level tests Using the lessThan operator, undefined subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -957,7 +2623,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator lessThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level tests Using the lessThanOrEqualTo operator, undefined subtype 1`] = `
 Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
@@ -967,7 +2633,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "exists": Object {
     "field": "data.attributes.managedAttributes.attributeName",
@@ -975,7 +2641,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level with operator notEquals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1002,7 +2668,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1045,7 +2711,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator equals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the equals operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1069,7 +2735,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator greaterThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the greaterThan operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1095,7 +2761,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator greaterThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the greaterThanOrEqualTo operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1121,7 +2787,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator lessThan 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the lessThan operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1147,7 +2813,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator lessThanOrEqualTo 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the lessThanOrEqualTo operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1173,7 +2839,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1197,7 +2863,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level with operator notEquals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function INTEGER based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1253,7 +2919,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1280,7 +2946,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level with operator equals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level tests Using the equals operator, undefined subtype 1`] = `
 Object {
   "term": Object {
     "data.attributes.managedAttributes.attributeName.keyword": "3.5",
@@ -1288,7 +2954,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "must": Object {
@@ -1305,7 +2971,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level with operator notEquals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1332,7 +2998,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1402,7 +3068,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level with operator equals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level tests Using the equals operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1426,7 +3092,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1455,7 +3121,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level with operator notEquals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function PICK_LIST based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1511,7 +3177,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1538,7 +3204,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator exactMatch 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the exactMatch operator, undefined subtype 1`] = `
 Object {
   "term": Object {
     "data.attributes.managedAttributes.attributeName.keyword": "stringValue",
@@ -1546,7 +3212,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "must": Object {
@@ -1563,7 +3229,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator notEquals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1590,7 +3256,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator startsWith 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the startsWith operator, undefined subtype 1`] = `
 Object {
   "prefix": Object {
     "data.attributes.managedAttributes.attributeName.keyword": Object {
@@ -1601,7 +3267,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level with operator wildcard 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the wildcard operator, undefined subtype 1`] = `
 Object {
   "wildcard": Object {
     "data.attributes.managedAttributes.attributeName.keyword": Object {
@@ -1612,7 +3278,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator empty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1682,7 +3348,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator exactMatch 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the exactMatch operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1706,7 +3372,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator notEmpty 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the notEmpty operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1735,7 +3401,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator notEquals 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the notEquals operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -1791,7 +3457,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator startsWith 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the startsWith operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -1818,7 +3484,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level with operator wildcard 1`] = `
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the wildcard operator, undefined subtype 1`] = `
 Object {
   "nested": Object {
     "path": "included",
