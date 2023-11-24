@@ -400,7 +400,11 @@ export function QueryPage<TData extends KitsuResource>({
 
     // Combine input columns and query builder columns, then filter for unique columns
     const combinedColumns = [...columns, ...queryColumns].filter(
-      (v, i, a) => a.findIndex((v2) => v2.id === v.id) === i
+      (column1, index, combinedArray) =>
+        combinedArray.findIndex(
+          (column2) =>
+            (column2 as any).accessorKey === (column1 as any).accessorKey
+        ) === index
     );
 
     setTotalColumns(combinedColumns);
