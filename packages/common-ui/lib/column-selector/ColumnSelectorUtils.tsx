@@ -88,7 +88,7 @@ function getIncludedAttributeColumn<TData extends KitsuResource>(
     column = dateCell(dateColumName, accessorKey, includedType);
   } else if (queryKey.includes("extensionValues")) {
     // Handle getting extension values column
-    column = getExtensionValuesColumn(queryKey, includedType);
+    column = getIncludedExtensionValuesColumn(queryKey, includedType);
   } else {
     // Handle all standard columns
     column = getIncludedStandardColumn(queryKey, includedType);
@@ -182,9 +182,33 @@ function getIncludedStandardColumn(queryKey: string, includedType: string) {
 }
 
 // Get Extension Values column from Elastic Search field
-function getExtensionValuesColumn(queryKey: string, includedType?: string) {
+function getExtensionValuesColumn(queryKey: string) {
   const extensionValueName = queryKey.split(".").slice(3, 5).join(".");
   const extensionValuesColumn = {
+    header: () => <FieldHeader name={extensionValueName} />,
+    accessorKey: queryKey.replace(".keyword", ""),
+    id: extensionValueName,
+    isKeyword: true
+  };
+  return extensionValuesColumn;
+}
+
+// Get included Extension Values column from ES field
+function getIncludedExtensionValuesColumn(
+  queryKey: string,
+  includedType: string
+) {
+  const extensionValueName = queryKey.split(".").slice(3, 5).join(".");
+  const extensionValuesColumn = {
+    cell: ({ row: { original } }) => {
+      const relationshipAccessor = queryKey?.split(".");
+      relationshipAccessor?.splice(1, 0, includedType);
+      const relationshipAccessorKey = relationshipAccessor
+        ?.join(".")
+        .replace(".keyword", "");
+      const value = get(original, relationshipAccessorKey);
+      return <>{value}</>;
+    },
     header: () => <FieldHeader name={extensionValueName} />,
     accessorKey: queryKey.replace(".keyword", ""),
     id: extensionValueName,
@@ -195,11 +219,7 @@ function getExtensionValuesColumn(queryKey: string, includedType?: string) {
 }
 
 // Get Managed Attributes column from Elastic Search field
-function getManagedAttributesColumn(
-  queryKey: string,
-  formatMessage: any,
-  includedType?: string
-) {
+function getManagedAttributesColumn(queryKey: string, formatMessage: any) {
   const managedAttributesKey = queryKey.slice(queryKey.lastIndexOf(".") + 1);
   const managedAttributesColumn = {
     header: () => (
@@ -213,7 +233,6 @@ function getManagedAttributesColumn(
     id: formatMessage("managedAttribute", {
       name: managedAttributesKey
     }),
-    relationshipType: includedType,
     isKeyword: !!queryKey.includes("keyword")
   };
   return managedAttributesColumn;
