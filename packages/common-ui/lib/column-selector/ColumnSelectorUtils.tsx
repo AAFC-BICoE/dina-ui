@@ -36,9 +36,7 @@ export function getQueryBuilderColumns<TData extends KitsuResource>(
           )
             ? paramKey
             : paramValue;
-          const includedAttributesIndex = includedAttributesField.indexOf(
-            "included.attributes"
-          );
+
           let includedType: string = "";
           for (const [key, value] of Object.entries<string>(
             flattenedParameter
@@ -47,65 +45,74 @@ export function getQueryBuilderColumns<TData extends KitsuResource>(
               includedType = value;
             }
           }
-          const queryKey = includedAttributesField.slice(
-            includedAttributesIndex
+          getIncludedAttributeColumn<TData>(
+            includedAttributesField,
+            includedType,
+            formatMessage,
+            queryBuilderColumns
           );
-
-          if (queryKey.includes("managedAttributes")) {
-            // Handle getting managed attributes column case
-            const managedAttributesColumn = getManagedAttributesColumn(
-              queryKey,
-              formatMessage,
-              includedType
-            );
-            queryBuilderColumns.push(managedAttributesColumn);
-          } else if (
-            queryKey.toLowerCase().includes("date") ||
-            queryKey.toLowerCase().includes("createdon")
-          ) {
-            // Handle getting date column
-            const dateColumName = queryKey.split(".")[2];
-            const accessorKey = queryKey.split(".").slice(0, 3).join(".");
-            queryBuilderColumns.push(
-              dateCell(dateColumName, accessorKey, includedType)
-            );
-          } else if (queryKey.includes("extensionValues")) {
-            // Handle getting extension values column
-            const extensionValuesColumn = getExtensionValuesColumn(
-              queryKey,
-              includedType
-            );
-            queryBuilderColumns.push(extensionValuesColumn);
-          } else {
-            // Handle all standard columns
-            const column = getIncludedStandardColumn(queryKey, includedType);
-
-            // Handle edge case where the flattened parameter has multiple "included.attributes" that results in duplicate columns
-            const duplicateIndex = queryBuilderColumns.findIndex((value) => {
-              const valueAccessorKey: string = (value as any).accessorKey;
-              const columnAccessorKey: string = column.accessorKey;
-              if (
-                valueAccessorKey.includes(columnAccessorKey) ||
-                columnAccessorKey.includes(valueAccessorKey)
-              ) {
-                return true;
-              } else {
-                return false;
-              }
-            });
-            if (duplicateIndex !== -1 && !column.isKeyword) {
-              // Prioritize keeping the columns that dont have "keyword"
-              queryBuilderColumns[duplicateIndex] = column;
-            } else {
-              queryBuilderColumns.push(column);
-            }
-          }
         }
       }
     );
   });
 
   return queryBuilderColumns;
+}
+
+function getIncludedAttributeColumn<TData extends KitsuResource>(
+  includedAttributesField: string,
+  includedType: string,
+  formatMessage: any,
+  queryBuilderColumns: TableColumn<TData>[]
+) {
+  const includedAttributesIndex = includedAttributesField.indexOf(
+    "included.attributes"
+  );
+
+  const queryKey = includedAttributesField.slice(includedAttributesIndex);
+  let column;
+  if (queryKey.includes("managedAttributes")) {
+    // Handle getting managed attributes column case
+    column = getIncludedManagedAttributesColumn(
+      queryKey,
+      formatMessage,
+      includedType
+    );
+  } else if (
+    queryKey.toLowerCase().includes("date") ||
+    queryKey.toLowerCase().includes("createdon")
+  ) {
+    // Handle getting date column
+    const dateColumName = queryKey.split(".")[2];
+    const accessorKey = queryKey.split(".").slice(0, 3).join(".");
+    column = dateCell(dateColumName, accessorKey, includedType);
+  } else if (queryKey.includes("extensionValues")) {
+    // Handle getting extension values column
+    column = getExtensionValuesColumn(queryKey, includedType);
+  } else {
+    // Handle all standard columns
+    column = getIncludedStandardColumn(queryKey, includedType);
+  }
+
+  // Handle edge case where the flattened parameter has multiple "included.attributes" that results in duplicate columns
+  const duplicateIndex = queryBuilderColumns.findIndex((value) => {
+    const valueAccessorKey: string = (value as any).accessorKey;
+    const columnAccessorKey: string = column.accessorKey;
+    if (
+      valueAccessorKey.includes(columnAccessorKey) ||
+      columnAccessorKey.includes(valueAccessorKey)
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+  if (duplicateIndex !== -1 && !column.isKeyword) {
+    // Prioritize keeping the columns that dont have "keyword"
+    queryBuilderColumns[duplicateIndex] = column;
+  } else {
+    queryBuilderColumns.push(column);
+  }
 }
 
 // Get data attributes column
@@ -195,6 +202,38 @@ function getManagedAttributesColumn(
 ) {
   const managedAttributesKey = queryKey.slice(queryKey.lastIndexOf(".") + 1);
   const managedAttributesColumn = {
+    header: () => (
+      <FieldHeader
+        name={formatMessage("managedAttribute", {
+          name: managedAttributesKey
+        })}
+      />
+    ),
+    accessorKey: queryKey,
+    id: formatMessage("managedAttribute", {
+      name: managedAttributesKey
+    }),
+    relationshipType: includedType,
+    isKeyword: !!queryKey.includes("keyword")
+  };
+  return managedAttributesColumn;
+}
+
+// Get relationship Managed Attributes column from Elastic Search field
+function getIncludedManagedAttributesColumn(
+  queryKey: string,
+  formatMessage: any,
+  includedType: string
+) {
+  const managedAttributesKey = queryKey.slice(queryKey.lastIndexOf(".") + 1);
+  const managedAttributesColumn = {
+    cell: ({ row: { original } }) => {
+      const relationshipAccessor = queryKey?.split(".");
+      relationshipAccessor?.splice(1, 0, includedType);
+      const relationshipAccessorKey = relationshipAccessor?.join(".");
+      const value = get(original, relationshipAccessorKey);
+      return <>{value}</>;
+    },
     header: () => (
       <FieldHeader
         name={formatMessage("managedAttribute", {
