@@ -100,23 +100,25 @@ function toPredicate(
   }
 
   // Allow list/range filters.
-  if (typeof value === "string" && attributeConfig.allowRange) {
+  if (typeof value === "string" && (attributeConfig?.allowList || attributeConfig?.allowRange)) {
     const commaSplit = value.split(",");
 
-    const singleNumbers = commaSplit.filter((e) => !e.includes("-"));
-    const ranges = commaSplit.filter((e) => e.includes("-"));
+    const singleNumbers = attributeConfig?.allowRange ? commaSplit.filter((e) => !e.includes("-")) : commaSplit;
+    const ranges = attributeConfig?.allowRange ? commaSplit.filter((e) => e.includes("-")) : commaSplit;
 
-    const listOperands = singleNumbers.length
-      ? [
-          {
-            arguments: singleNumbers,
-            comparison: predicate === "IS NOT" ? "=out=" : "=in=",
-            selector
-          }
-        ]
+    const listOperands = attributeConfig.allowList
+      ? singleNumbers.length
+        ? [
+            {
+              arguments: singleNumbers,
+              comparison: predicate === "IS NOT" ? "=out=" : "=in=",
+              selector
+            }
+          ]
+        : []
       : [];
 
-    const rangeOperands = ranges.map((range) => {
+    const rangeOperands = attributeConfig.allowRange ? ranges.map((range) => {
       const [low, high] = range
         .split("-")
         .sort((a, b) => Number(a) - Number(b));
@@ -124,7 +126,7 @@ function toPredicate(
       const positive = predicate === "IS";
 
       return betweenOperand({ low, high, positive, selector });
-    });
+    }) : [];
 
     return {
       operands: [...listOperands, ...rangeOperands],
