@@ -109,7 +109,6 @@ export function ListPageLayout<TData extends KitsuResource>({
     | undefined;
 
   if (enableInMemoryFilter) {
-    filterForm.filterBuilderModel;
     inMemoryFilter = (
       value: PersistedResource<TData>,
       index?: number,
