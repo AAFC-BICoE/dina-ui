@@ -1,9 +1,15 @@
 import { FieldHeader, dateCell, useApiClient } from "..";
-import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
-import { KitsuResource } from "kitsu";
-import { get } from "lodash";
+import {
+  DynamicField,
+  DynamicFieldsMappingConfig,
+  ESIndexMapping,
+  TableColumn
+} from "../list-page/types";
+import Kitsu, { KitsuResource } from "kitsu";
+import lodash, { get, startCase } from "lodash";
 import { useIndexMapping } from "../list-page/useIndexMapping";
-import { useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { useIntl } from "react-intl";
 
 export interface ColumnSelectorIndexMapColumns {
   indexName: string;
@@ -27,43 +33,165 @@ export function useColumnSelectorIndexMapColumns({
     dynamicFieldMapping
   });
   const { apiClient } = useApiClient();
-  const columnSelectorIndexMapColumns = [];
-
-  async function fetchExtensionValues(path, filter) {
-    const resp = await apiClient.get(path, {
-      filter
-    });
-  }
-
-  async function fetchDynamicField(path) {
-    const resp = await apiClient.get(path, {});
-  }
-
+  const { formatMessage, messages, locale } = useIntl();
+  // Generate the options that can be selected for the field dropdown.
+  const groupedIndexMappings = getGroupedIndexMappings(
+    indexName,
+    indexMap,
+    messages,
+    formatMessage,
+    locale
+  );
   useEffect(() => {
     if (indexMap) {
-      for (const columnMapping of indexMap) {
-        if (columnMapping.dynamicField) {
-          if (columnMapping.path.includes("extensionValues")) {
-            const filter = {
-              "extension.fields.dinaComponent":
-                columnMapping.dynamicField.component
-            };
-            fetchExtensionValues(
-              columnMapping.dynamicField.apiEndpoint,
-              filter
-            );
-          } else {
-            fetchDynamicField(columnMapping.dynamicField.apiEndpoint);
+      for (const groupedIndexMapping of groupedIndexMappings) {
+        const groupedIndexMappingOptions = groupedIndexMapping.options;
+        for (const queryOption of groupedIndexMappingOptions) {
+          if (queryOption.dynamicField) {
+            if (queryOption.type === "fieldExtension") {
+              getExtensionValuesColumns(queryOption, apiClient);
+            }
           }
-        } else {
-          // TODO: implement parsing
-          continue;
         }
       }
     }
-  }, []);
+  }, [indexMap]);
+}
 
-  return [];
+function getAttributesExtensionValuesColumns(extensionValues, queryOption) {
+  const attributesExtensionValuesColumns: any[] = [];
+  for (const extensionValue of extensionValues) {
+    const extensionFields = extensionValue.extension.fields;
+    for (const extensionField of extensionFields) {
+      const extensionValuesColumn = {
+        accessorKey: `${queryOption.path}.${extensionValue.id}.${extensionField.key}`,
+        id: `${extensionValue.id}.${extensionField.key}`,
+        header: () => (
+          <FieldHeader name={`${extensionValue.id}.${extensionField.key}`} />
+        ),
+        isKeyword: true,
+        isColumnVisible: false
+      };
+      attributesExtensionValuesColumns.push(extensionValuesColumn);
+    }
+  }
+  return attributesExtensionValuesColumns;
+}
+
+async function fetchExtensionValues(apiClient: Kitsu, path, filter: any) {
+  const { data } = await apiClient.get(path, {
+    filter
+  });
+}
+
+async function fetchDynamicField(apiClient, path) {
+  const resp = await apiClient.get(path, {});
+}
+
+async function getExtensionValuesColumns(
+  queryOption: {
+    parentName: any;
+    value: string;
+    label: string;
+    type: string;
+    subType?: string | undefined;
+    distinctTerm: boolean;
+    optimizedPrefix: boolean;
+    containsSupport: boolean;
+    endsWithSupport: boolean;
+    keywordMultiFieldSupport: boolean;
+    path: string;
+    parentPath?: string | undefined;
+    parentType?: string | undefined;
+    dynamicField?: DynamicField | undefined;
+  },
+  apiClient: Kitsu
+) {
+  const filter = {
+    "extension.fields.dinaComponent": queryOption.dynamicField?.component
+  };
+  try {
+    const extensionValues = await fetchExtensionValues(
+      apiClient,
+      queryOption.dynamicField?.apiEndpoint,
+      filter
+    );
+    getAttributesExtensionValuesColumns(extensionValues, queryOption);
+  } catch (error) {
+    // Handle the error here, e.g., log it or display an error message.
+    console.error(error);
+  }
+}
+
+function getGroupedIndexMappings(
+  indexName: string,
+  indexMap: ESIndexMapping[] | undefined,
+  messages,
+  formatMessage,
+  locale: string
+) {
+  return useMemo(() => {
+    // Get all of the attributes from the index for the filter dropdown.
+    const columnSelectorParentNameMap = {
+      dina_material_sample_index: "Material Sample",
+      dina_loan_transaction_index: "Loan Transaction",
+      dina_object_store_index: "Object Store"
+    };
+    const attributeMappings = indexMap
+      ?.filter((indexMapping) => !indexMapping.parentPath)
+      ?.map((indexMapping) => ({
+        ...indexMapping,
+        parentName: columnSelectorParentNameMap[indexName]
+      }))
+      ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
+
+    // Get all the relationships for the search dropdown.
+    const relationshipMappings = indexMap
+      ?.filter((indexMapping) => !!indexMapping.parentPath)
+      ?.map((indexMapping) => {
+        return {
+          parentName: indexMapping.parentName,
+          ...indexMapping
+        };
+      })
+      ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
+
+    // Using the parent name, group the attributes into section
+    const groupedAttributeMappings = lodash
+      .chain(attributeMappings)
+      .groupBy((prop) => prop.parentName)
+      .map((group, key) => {
+        return {
+          label: messages["title_" + key]
+            ? formatMessage({ id: "title_" + key })
+            : startCase(key),
+          options: group
+        };
+      })
+      .sort((aProp, bProp) => aProp.label.localeCompare(bProp.label))
+      .value();
+
+    // Using the parent name, group the relationships into sections.
+    const groupedRelationshipMappings = lodash
+      .chain(relationshipMappings)
+      .groupBy((prop) => prop.parentName)
+      .map((group, key) => {
+        return {
+          label: messages["title_" + key]
+            ? formatMessage({ id: "title_" + key })
+            : startCase(key),
+          options: group
+        };
+      })
+      .sort((aProp, bProp) => aProp.label.localeCompare(bProp.label))
+      .value();
+    const groupedMappings = [
+      ...groupedAttributeMappings,
+      ...groupedRelationshipMappings
+    ];
+
+    return groupedAttributeMappings ? groupedMappings : [];
+  }, [indexMap, locale]);
 }
 
 export function getQueryBuilderColumns<TData extends KitsuResource>(

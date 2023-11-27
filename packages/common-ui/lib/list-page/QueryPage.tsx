@@ -60,7 +60,7 @@ import {
 import { DynamicFieldsMappingConfig, TableColumn } from "./types";
 import {
   getQueryBuilderColumns,
-  useColumnSelectorIndexMapColumns as getColumnSelectorIndexMapColumns
+  useColumnSelectorIndexMapColumns
 } from "../column-selector/ColumnSelectorUtils";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { useIndexMapping } from "./useIndexMapping";
@@ -327,7 +327,7 @@ export function QueryPage<TData extends KitsuResource>({
     customViewFields
   });
 
-  const columnSelectorIndexMapColumns = getColumnSelectorIndexMapColumns({
+  useColumnSelectorIndexMapColumns({
     indexName,
     dynamicFieldMapping
   });
