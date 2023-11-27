@@ -1,8 +1,70 @@
-import { query } from "kitsu-core";
-import { FieldHeader, dateCell } from "..";
-import { TableColumn } from "../list-page/types";
+import { FieldHeader, dateCell, useApiClient } from "..";
+import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 import { KitsuResource } from "kitsu";
 import { get } from "lodash";
+import { useIndexMapping } from "../list-page/useIndexMapping";
+import { useEffect } from "react";
+
+export interface ColumnSelectorIndexMapColumns {
+  indexName: string;
+
+  /**
+   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
+   * be searched against. It will also define the path and data component if required.
+   *
+   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
+   * or grouped terms.
+   */
+  dynamicFieldMapping?: DynamicFieldsMappingConfig;
+}
+
+export function useColumnSelectorIndexMapColumns({
+  indexName,
+  dynamicFieldMapping
+}: ColumnSelectorIndexMapColumns) {
+  const { indexMap } = useIndexMapping({
+    indexName,
+    dynamicFieldMapping
+  });
+  const { apiClient } = useApiClient();
+  const columnSelectorIndexMapColumns = [];
+
+  async function fetchExtensionValues(path, filter) {
+    const resp = await apiClient.get(path, {
+      filter
+    });
+  }
+
+  async function fetchDynamicField(path) {
+    const resp = await apiClient.get(path, {});
+  }
+
+  useEffect(() => {
+    if (indexMap) {
+      for (const columnMapping of indexMap) {
+        if (columnMapping.dynamicField) {
+          if (columnMapping.path.includes("extensionValues")) {
+            const filter = {
+              "extension.fields.dinaComponent":
+                columnMapping.dynamicField.component
+            };
+            fetchExtensionValues(
+              columnMapping.dynamicField.apiEndpoint,
+              filter
+            );
+          } else {
+            fetchDynamicField(columnMapping.dynamicField.apiEndpoint);
+          }
+        } else {
+          // TODO: implement parsing
+          continue;
+        }
+      }
+    }
+  }, []);
+
+  return [];
+}
 
 export function getQueryBuilderColumns<TData extends KitsuResource>(
   parameters: any[],

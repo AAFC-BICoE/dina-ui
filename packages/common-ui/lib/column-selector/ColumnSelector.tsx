@@ -65,7 +65,6 @@ function useCustomMenu<TData>({
   reactTable
 }: UseCustomMenuProps<TData>) {
   const { formatMessage, messages } = useIntl();
-  const rerender = React.useReducer(() => ({}), {})[1];
   // For finding columns using text search
   const columnSearchMapping: { label: string; id: string }[] | undefined =
     reactTable?.getAllLeafColumns().map((column) => {

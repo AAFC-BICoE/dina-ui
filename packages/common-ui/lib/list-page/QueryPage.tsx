@@ -58,8 +58,12 @@ import {
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
 import { DynamicFieldsMappingConfig, TableColumn } from "./types";
-import { getQueryBuilderColumns } from "../column-selector/ColumnSelectorUtils";
+import {
+  getQueryBuilderColumns,
+  useColumnSelectorIndexMapColumns as getColumnSelectorIndexMapColumns
+} from "../column-selector/ColumnSelectorUtils";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { useIndexMapping } from "./useIndexMapping";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -321,6 +325,11 @@ export function QueryPage<TData extends KitsuResource>({
     indexName,
     dynamicFieldMapping,
     customViewFields
+  });
+
+  const columnSelectorIndexMapColumns = getColumnSelectorIndexMapColumns({
+    indexName,
+    dynamicFieldMapping
   });
 
   // Groups selected for the search.
