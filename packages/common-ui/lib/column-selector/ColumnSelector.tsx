@@ -122,11 +122,23 @@ function useCustomMenu<TData>({
   }
 
   const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
+  const reactTableToggleAllHander =
+    reactTable?.getToggleAllColumnsVisibilityHandler();
+  function handleToggleAll(event) {
+    if (reactTableToggleAllHander) {
+      reactTableToggleAllHander(event);
+      const selectColumn = reactTable
+        ?.getAllLeafColumns()
+        .find((column) => column.id === "selectColumn");
+      selectColumn?.toggleVisibility(true);
+    }
+  }
+
   const columnSelectionCheckboxesInternal = (
     <div>
       <Checkbox
         id="selectAll"
-        handleClick={reactTable?.getToggleAllColumnsVisibilityHandler()}
+        handleClick={handleToggleAll}
         isChecked={reactTable?.getIsAllColumnsVisible()}
       />
       {searchedColumns?.map((column) => {
