@@ -1,65 +1,40 @@
-import { FieldHeader, dateCell, useApiClient } from "..";
-import {
-  DynamicField,
-  DynamicFieldsMappingConfig,
-  ESIndexMapping,
-  TableColumn
-} from "../list-page/types";
+import { FieldHeader, dateCell } from "..";
+import { DynamicField, ESIndexMapping, TableColumn } from "../list-page/types";
 import Kitsu, { KitsuResource } from "kitsu";
 import lodash, { get, startCase } from "lodash";
-import { useIndexMapping } from "../list-page/useIndexMapping";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
-import { useIntl } from "react-intl";
-
+import { useMemo } from "react";
 export interface ColumnSelectorIndexMapColumns {
-  indexName: string;
-
-  /**
-   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
-   * be searched against. It will also define the path and data component if required.
-   *
-   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
-   * or grouped terms.
-   */
-  dynamicFieldMapping?: DynamicFieldsMappingConfig;
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>;
+  apiClient: Kitsu;
+  groupedIndexMappings: any[];
 }
 
 export function useColumnSelectorIndexMapColumns({
-  indexName,
-  dynamicFieldMapping
+  apiClient,
+  setColumnSelectorIndexMapColumns,
+  groupedIndexMappings
 }: ColumnSelectorIndexMapColumns) {
-  const { indexMap } = useIndexMapping({
-    indexName,
-    dynamicFieldMapping
-  });
-  const { apiClient } = useApiClient();
-  const { formatMessage, messages, locale } = useIntl();
-  // Generate the options that can be selected for the field dropdown.
-  const groupedIndexMappings = getGroupedIndexMappings(
-    indexName,
-    indexMap,
-    messages,
-    formatMessage,
-    locale
-  );
-  useEffect(() => {
-    if (indexMap) {
-      for (const groupedIndexMapping of groupedIndexMappings) {
-        const groupedIndexMappingOptions = groupedIndexMapping.options;
-        for (const queryOption of groupedIndexMappingOptions) {
-          if (queryOption.dynamicField) {
-            if (queryOption.type === "fieldExtension") {
-              getExtensionValuesColumns(queryOption, apiClient);
-            }
-          }
+  for (const groupedIndexMapping of groupedIndexMappings) {
+    const groupedIndexMappingOptions = groupedIndexMapping.options;
+    for (const queryOption of groupedIndexMappingOptions) {
+      if (queryOption.dynamicField) {
+        if (queryOption.type === "fieldExtension") {
+          getExtensionValuesColumns(
+            queryOption,
+            apiClient,
+            setColumnSelectorIndexMapColumns
+          );
         }
       }
     }
-  }, [indexMap]);
+  }
 }
 
-function getAttributesExtensionValuesColumns(extensionValues, queryOption) {
-  const attributesExtensionValuesColumns: any[] = [];
+function getAttributesExtensionValuesColumns(
+  extensionValues,
+  queryOption,
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>
+) {
   for (const extensionValue of extensionValues) {
     const extensionFields = extensionValue.extension.fields;
     for (const extensionField of extensionFields) {
@@ -72,16 +47,29 @@ function getAttributesExtensionValuesColumns(extensionValues, queryOption) {
         isKeyword: true,
         isColumnVisible: false
       };
-      attributesExtensionValuesColumns.push(extensionValuesColumn);
+      setColumnSelectorIndexMapColumns((currentColumns) => {
+        if (
+          !currentColumns.find(
+            (currentColumn) =>
+              currentColumn.accessorKey === extensionValuesColumn.accessorKey
+          )
+        ) {
+          const newColumns = [...currentColumns, extensionValuesColumn];
+          return newColumns;
+        } else {
+          return currentColumns;
+        }
+      });
     }
   }
-  return attributesExtensionValuesColumns;
 }
 
 async function fetchExtensionValues(apiClient: Kitsu, path, filter: any) {
   const { data } = await apiClient.get(path, {
     filter
   });
+
+  return data;
 }
 
 async function fetchDynamicField(apiClient, path) {
@@ -105,7 +93,8 @@ async function getExtensionValuesColumns(
     parentType?: string | undefined;
     dynamicField?: DynamicField | undefined;
   },
-  apiClient: Kitsu
+  apiClient: Kitsu,
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>
 ) {
   const filter = {
     "extension.fields.dinaComponent": queryOption.dynamicField?.component
@@ -116,14 +105,22 @@ async function getExtensionValuesColumns(
       queryOption.dynamicField?.apiEndpoint,
       filter
     );
-    getAttributesExtensionValuesColumns(extensionValues, queryOption);
+    if (queryOption.parentType) {
+      // Handle included extension values
+    } else {
+      getAttributesExtensionValuesColumns(
+        extensionValues,
+        queryOption,
+        setColumnSelectorIndexMapColumns
+      );
+    }
   } catch (error) {
     // Handle the error here, e.g., log it or display an error message.
     console.error(error);
   }
 }
 
-function getGroupedIndexMappings(
+export function getGroupedIndexMappings(
   indexName: string,
   indexMap: ESIndexMapping[] | undefined,
   messages,

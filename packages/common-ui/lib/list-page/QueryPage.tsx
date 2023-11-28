@@ -20,7 +20,8 @@ import {
   ReactTable,
   ReactTableProps,
   useAccount,
-  useColumnSelector
+  useColumnSelector,
+  useQuery
 } from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
@@ -59,6 +60,7 @@ import {
 } from "./query-builder/useQueryBuilderConfig";
 import { DynamicFieldsMappingConfig, TableColumn } from "./types";
 import {
+  getGroupedIndexMappings,
   getQueryBuilderColumns,
   useColumnSelectorIndexMapColumns
 } from "../column-selector/ColumnSelectorUtils";
@@ -278,8 +280,20 @@ export function QueryPage<TData extends KitsuResource>({
   enableColumnChooser = true
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
-  const { formatMessage, formatNumber } = useIntl();
+  const { formatMessage, formatNumber, locale, messages } = useIntl();
   const { groupNames } = useAccount();
+  const { indexMap } = useIndexMapping({
+    indexName,
+    dynamicFieldMapping
+  });
+  // Generate the options that can be selected for the field dropdown.
+  const groupedIndexMappings = getGroupedIndexMappings(
+    indexName,
+    indexMap,
+    messages,
+    formatMessage,
+    locale
+  );
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -327,11 +341,6 @@ export function QueryPage<TData extends KitsuResource>({
     customViewFields
   });
 
-  useColumnSelectorIndexMapColumns({
-    indexName,
-    dynamicFieldMapping
-  });
-
   // Groups selected for the search.
   const GROUP_STORAGE_KEY = uniqueName + "_groupStorage";
   const [groups, setGroups] = useLocalStorage<string[]>(
@@ -357,7 +366,20 @@ export function QueryPage<TData extends KitsuResource>({
   };
 
   // Combined columns from passed in columns + queryBuilderColumns
-  const [totalColumns, setTotalColumns] = useState<TableColumn<TData>[]>([]);
+  const [totalColumns, setTotalColumns] =
+    useState<TableColumn<TData>[]>(columns);
+  const [loadingColumns, setLoadingColumns] = useState<boolean>(true);
+
+  useEffect(() => {
+    setLoadingColumns(true);
+    useColumnSelectorIndexMapColumns({
+      apiClient,
+      setColumnSelectorIndexMapColumns: setTotalColumns,
+      groupedIndexMappings
+    });
+    setTotalColumns((prev) => uniqBy(prev, "accessorKey"));
+    setLoadingColumns(false);
+  }, [indexMap]);
 
   useEffect(() => {
     if (viewMode && selectedResources?.length) {
@@ -390,6 +412,10 @@ export function QueryPage<TData extends KitsuResource>({
       return;
     }
 
+    if (loadingColumns) {
+      return;
+    }
+
     // Elastic search query with pagination settings.
     let queryDSL;
     const parameters = [];
@@ -402,27 +428,17 @@ export function QueryPage<TData extends KitsuResource>({
         parameters
       );
     }
+
     const queryColumns = getQueryBuilderColumns<TData>(
       parameters,
       dinaFormatMessage
     );
 
-    // Combine input columns and query builder columns, then filter for unique columns
-    const combinedColumns = [...columns, ...queryColumns].filter(
-      (column1, index, combinedArray) =>
-        combinedArray.findIndex(
-          (column2) =>
-            (column2 as any).accessorKey === (column1 as any).accessorKey
-        ) === index
-    );
-
-    setTotalColumns(combinedColumns);
-
     queryDSL = applyRootQuery(queryDSL);
     queryDSL = applyGroupFilters(queryDSL, groups);
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
-    queryDSL = applySortingRules(queryDSL, sortingRules, combinedColumns);
-    queryDSL = applySourceFiltering(queryDSL, combinedColumns);
+    queryDSL = applySortingRules(queryDSL, sortingRules, totalColumns);
+    queryDSL = applySourceFiltering(queryDSL, totalColumns);
 
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) {
@@ -501,7 +517,15 @@ export function QueryPage<TData extends KitsuResource>({
         // No matter the end result, loading should stop.
         setLoading(false);
       });
-  }, [pageSize, pageOffset, sortingRules, submittedQueryBuilderTree, groups]);
+  }, [
+    pageSize,
+    pageOffset,
+    sortingRules,
+    submittedQueryBuilderTree,
+    groups,
+    loadingColumns,
+    totalColumns
+  ]);
 
   // Once the configuration is setup, we can display change the tree.
   useEffect(() => {
