@@ -359,8 +359,6 @@ export function QueryPage<TData extends KitsuResource>({
   // Query Page error message state
   const [error, setError] = useState<any>();
 
-  const { formatMessage: dinaFormatMessage } = useDinaIntl();
-
   const defaultGroups = {
     group: groups
   };
@@ -418,21 +416,14 @@ export function QueryPage<TData extends KitsuResource>({
 
     // Elastic search query with pagination settings.
     let queryDSL;
-    const parameters = [];
     if (customViewElasticSearchQuery) {
       queryDSL = customViewElasticSearchQuery;
     } else {
       queryDSL = elasticSearchFormatExport(
         submittedQueryBuilderTree,
-        queryBuilderConfig,
-        parameters
+        queryBuilderConfig
       );
     }
-
-    const queryColumns = getQueryBuilderColumns<TData>(
-      parameters,
-      dinaFormatMessage
-    );
 
     queryDSL = applyRootQuery(queryDSL);
     queryDSL = applyGroupFilters(queryDSL, groups);
@@ -709,6 +700,13 @@ export function QueryPage<TData extends KitsuResource>({
     (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
     {}
   );
+
+  // Local storage for saving columns visibility
+  const [localStorageColumnStates, setLocalStorageColumnStates] =
+    useLocalStorage<VisibilityState | undefined>(
+      `${uniqueName}_columnSelector`,
+      {}
+    );
   const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
     useState<JSX.Element>();
   const [reactTable, setReactTable] = useState<Table<TData>>();

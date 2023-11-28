@@ -31,7 +31,10 @@ export function ColumnSelector(
       <Dropdown.Toggle>
         <DinaMessage id="selectColumn" />
       </Dropdown.Toggle>
-      <Dropdown.Menu as={CustomMenu} />
+      <Dropdown.Menu
+        as={CustomMenu}
+        style={{ maxHeight: "20rem", overflowY: "scroll" }}
+      />
     </Dropdown>
   );
 }
@@ -93,20 +96,6 @@ function useCustomMenu<TData>({
     setSearchedColumns(reactTable?.getAllLeafColumns());
   }, [reactTable, reactTable?.getAllColumns().length]);
 
-  // Set local storage visibility state whenever state changes
-  useEffect(
-    () => {
-      if (reactTable && reactTable?.getState()?.columnVisibility) {
-        const isColumnVisibilityEmpty =
-          Object.keys(reactTable?.getState()?.columnVisibility).length === 0;
-        if (!isColumnVisibilityEmpty) {
-          setLocalStorageColumnStates(reactTable?.getState().columnVisibility);
-        }
-      }
-    },
-    reactTable?.getAllLeafColumns().map((column) => column.getIsVisible())
-  );
-
   const [loading, setLoading] = useState(false);
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
 
@@ -122,9 +111,10 @@ function useCustomMenu<TData>({
   }
 
   const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
-  const reactTableToggleAllHander =
-    reactTable?.getToggleAllColumnsVisibilityHandler();
+
   function handleToggleAll(event) {
+    const reactTableToggleAllHander =
+      reactTable?.getToggleAllColumnsVisibilityHandler();
     if (reactTableToggleAllHander) {
       reactTableToggleAllHander(event);
       const selectColumn = reactTable
@@ -142,12 +132,21 @@ function useCustomMenu<TData>({
         isChecked={reactTable?.getIsAllColumnsVisible()}
       />
       {searchedColumns?.map((column) => {
+        function handdleToggle(event) {
+          const reactTableToggleHandler = column?.getToggleVisibilityHandler();
+          reactTableToggleHandler(event);
+          const columnId = column.id;
+          setLocalStorageColumnStates({
+            ...localStorageColumnStates,
+            [columnId]: event.target.checked
+          });
+        }
         return (
           <>
             <Checkbox
               key={column?.id}
               id={column?.id}
-              handleClick={column?.getToggleVisibilityHandler()}
+              handleClick={handdleToggle}
               isChecked={column?.getIsVisible()}
               isField={true}
             />

@@ -34,8 +34,7 @@ export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
  */
 export function elasticSearchFormatExport(
   queryTree: ImmutableTree,
-  config: Config,
-  queryParameters
+  config: Config
 ) {
   if (!queryTree) return undefined;
   const type = queryTree.get("type");
@@ -46,7 +45,7 @@ export function elasticSearchFormatExport(
     const field = properties.get("field");
     const value = properties.get("value").toJS();
 
-    return buildEsRule(field, value, operator, config, queryParameters);
+    return buildEsRule(field, value, operator, config);
   }
 
   if (type === "group" || type === "rule_group") {
@@ -58,8 +57,7 @@ export function elasticSearchFormatExport(
       children,
       conjunction,
       elasticSearchFormatExport,
-      config,
-      queryParameters
+      config
     );
   }
 }
@@ -78,8 +76,7 @@ function buildEsRule(
   fieldName: string,
   value: string,
   operator: string,
-  config: Config,
-  queryParameters
+  config: Config
 ) {
   const widgetName = config.fields?.[fieldName]?.type;
   const widgetConfig = config.widgets[widgetName];
@@ -111,7 +108,6 @@ function buildEsRule(
     fieldName,
     config
   );
-  queryParameters.push(parameters);
 
   return { ...parameters };
 }
@@ -129,8 +125,7 @@ function buildEsGroup(
   children,
   conjunction,
   recursiveFunction,
-  config: Config,
-  queryParameters
+  config: Config
 ) {
   // If there is nothing in the group, then don't add it to the query.
   if (!children || !children.size) return undefined;
@@ -142,7 +137,7 @@ function buildEsGroup(
 
   // Go through each of the children and generate the elastic search query for each item.
   const result = childrenArray
-    .map((childTree) => recursiveFunction(childTree, config, queryParameters))
+    .map((childTree) => recursiveFunction(childTree, config))
     .filter((v) => v !== undefined);
 
   // If no results, do not add this group to the query.
