@@ -94,13 +94,13 @@ export default function FieldListPage() {
       return fields.filter((value) => {
         if (filterForm?.filterBuilderModel?.value) {
           return (
-            value.name.indexOf(filterForm.filterBuilderModel.value) > -1 ||
+            value.name.toLowerCase().indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
             (
               value.multilingualDescription?.descriptions?.filter(
                 (item) =>
                   item.lang === locale &&
-                  (item.desc ?? "").indexOf(
-                    filterForm.filterBuilderModel.value
+                  (item.desc ?? "").toLowerCase().indexOf(
+                    filterForm.filterBuilderModel.value.toLowerCase()
                   ) > -1
               ) ?? []
             ).length > 0
