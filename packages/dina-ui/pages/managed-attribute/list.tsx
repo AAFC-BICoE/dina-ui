@@ -34,12 +34,12 @@ export function useFilterManagedAttribute() {
     if (filterForm?.filterBuilderModel?.value) {
       result =
         result &&
-        (value.name.indexOf(filterForm.filterBuilderModel.value) > -1 ||
+        (value.name.toLowerCase().indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
           (
             value.multilingualDescription?.descriptions?.filter(
               (item) =>
                 item.lang === language &&
-                (item.desc ?? "").indexOf(filterForm.filterBuilderModel.value) >
+                (item.desc ?? "").toLowerCase().indexOf(filterForm.filterBuilderModel.value.toLowerCase()) >
                   -1
             ) ?? []
           ).length > 0);
