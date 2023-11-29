@@ -265,7 +265,7 @@ export function applySortingRules<TData extends KitsuResource>(
     );
 
     // Add all of the queries to the existing elastic search query.
-    if (sortingQueries.length !== 0) {
+    if (!isEmpty(sortingQueries)) {
       return {
         ...elasticSearchQuery,
         sort: sortingQueries
