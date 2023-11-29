@@ -8,7 +8,7 @@ import {
 } from "common-ui";
 import { useField } from "formik";
 import { get, uniq } from "lodash";
-import React, { useContext, useEffect, useImperativeHandle } from "react";
+import React, { useContext, useEffect } from "react";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 import { GroupLabel } from "./GroupFieldView";
@@ -31,17 +31,16 @@ interface GroupSelectFieldProps extends Omit<SelectFieldProps<any>, "options"> {
   enableStoredDefaultGroup?: boolean;
 
   readOnlyHideLabel?: boolean;
+
+  /**
+   * State based version, instead of using formiks version.
+   */
+  groups?: string[] | string;
 }
 
-export interface GroupSelectFieldInstance {
-  setValue: (value: string[] | null | undefined) => void;
-}
-
-export const GroupSelectField = React.forwardRef<
-  GroupSelectFieldInstance,
-  GroupSelectFieldProps
->(function GroupSelectField(groupSelectFieldProps, forwardedRef) {
+export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   const {
+    groups,
     showAnyOption,
     showAllGroups,
     enableStoredDefaultGroup = false,
@@ -52,6 +51,17 @@ export const GroupSelectField = React.forwardRef<
   const { isAdmin } = useAccount();
   const { initialValues, readOnly } = useDinaFormContext();
   const [{ value }, {}, { setValue }] = useField(selectFieldProps.name);
+
+  // Check if the groups have been provided via state change.
+  useEffect(() => {
+    if (!groups) {
+      return;
+    }
+
+    console.log(groups);
+
+    setValue(groups);
+  }, [groups]);
 
   const { setStoredDefaultGroupIfEnabled } = useStoredDefaultGroup({
     enable: enableStoredDefaultGroup,
@@ -84,17 +94,6 @@ export const GroupSelectField = React.forwardRef<
     ...groupSelectOptions
   ];
 
-  // Expose the setValue function using useImperativeHandle
-  useImperativeHandle(
-    forwardedRef,
-    () => ({
-      setValue: (newValue) => {
-        setValue(newValue);
-      }
-    }),
-    [setValue]
-  );
-
   return (
     <SelectField
       // Re-initialize the component if the labels change:
@@ -112,7 +111,7 @@ export const GroupSelectField = React.forwardRef<
       hideLabel={readOnlyHideLabel && readOnly}
     />
   );
-});
+};
 
 export interface UseAvailableGroupOptionsParams {
   initialGroupName?: string;

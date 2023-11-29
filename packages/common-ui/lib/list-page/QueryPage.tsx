@@ -8,7 +8,7 @@ import {
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { compact, toPairs, uniqBy } from "lodash";
-import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
@@ -20,7 +20,7 @@ import {
   useAccount,
   useColumnChooser
 } from "..";
-import { GroupSelectField, GroupSelectFieldInstance } from "../../../dina-ui/components";
+import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import {
@@ -312,7 +312,6 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   // Groups selected for the search.
-  const groupSelectRef = useRef<GroupSelectFieldInstance>(null);
   const [groups, setGroups] = useLocalStorage<string[]>(
     GROUP_STORAGE_KEY,
     groupNames ?? []
@@ -479,15 +478,6 @@ export function QueryPage<TData extends KitsuResource>({
     customViewFields,
     customViewElasticSearchQuery
   ]);
-
-  // If the group selection changes, load it in.
-  useEffect(() => {
-    if (!groups || !groupSelectRef?.current) {
-      return;
-    }
-
-    groupSelectRef.current.setValue(groups);
-  }, [groups]);
 
   /**
    * Used for selection mode only.
@@ -828,7 +818,6 @@ export function QueryPage<TData extends KitsuResource>({
           <DinaFormSection horizontal={"flex"}>
             <div className="row">
               <GroupSelectField
-                ref={groupSelectRef}
                 isMulti={true}
                 name="group"
                 className="col-md-4 mt-3"
@@ -837,6 +826,7 @@ export function QueryPage<TData extends KitsuResource>({
                     onGroupChange(newGroups);
                   })
                 }
+                groups={groups}
               />
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (

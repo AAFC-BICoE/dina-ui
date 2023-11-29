@@ -379,7 +379,7 @@ export function SavedSearch({
       setCurrentIsDefault(setAsDefault);
       setChangesMade(false);
     },
-    [userPreferences, queryBuilderTree]
+    [userPreferences, queryBuilderTree, groups]
   );
 
   /**
