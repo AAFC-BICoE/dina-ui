@@ -1,8 +1,8 @@
+import { ColumnSort } from "@tanstack/react-table";
 import { KitsuResource } from "kitsu";
-import { uniq, reject, isEmpty } from "lodash";
+import { isEmpty, reject, uniq } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { TableColumn } from "../../types";
-import { ColumnSort } from "@tanstack/react-table";
 
 export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
   /**
@@ -199,48 +199,67 @@ export function applySortingRules<TData extends KitsuResource>(
           // Depending on if it's a string or not.
           if (typeof column === "string") {
             return column === columnSort.id;
-          } else {
-            return (column as any).accessorKey === columnSort.id;
           }
+
+          // Otherwise, check if sorting is enabled for the column and matches.
+          if (column.enableSorting !== false) {
+            return column.id === columnSort.id;
+          }
+          return false;
         });
 
-        // Edge case if a string is only provided as the column definition.
+        // Edge case for when strings are only provided for the column definition.
         if (typeof columnDefinition === "string") {
           return {
             [columnDefinition]: {
               order: columnSort.desc ? "desc" : "asc"
             }
           };
-        } else {
-          if (!columnDefinition || !(columnDefinition as any)?.accessorKey) {
-            return;
-          }
+        }
 
-          const indexPath =
-            (columnDefinition as any).accessorKey +
-            (columnDefinition.isKeyword && columnDefinition.isKeyword === true
-              ? ".keyword"
-              : "");
+        if (
+          !columnDefinition ||
+          (!(columnDefinition as any)?.accessorKey &&
+            !(columnDefinition as any)?.accessorFn)
+        ) {
+          return;
+        }
 
-          if (columnDefinition.relationshipType) {
-            return {
-              [indexPath]: {
-                order: columnSort.desc ? "desc" : "asc",
-                nested_path: "included",
-                nested_filter: {
-                  term: {
-                    "included.type": columnDefinition.relationshipType
-                  }
+        let accessor: string | null = null;
+        if (!!(columnDefinition as any)?.accessorKey) {
+          accessor = (columnDefinition as any)?.accessorKey;
+        } else if (!!(columnDefinition as any)?.accessorFn) {
+          accessor = (columnDefinition as any)?.accessorFn();
+        }
+
+        if (!accessor) {
+          return;
+        }
+
+        const indexPath =
+          accessor +
+          (columnDefinition.isKeyword && columnDefinition.isKeyword === true
+            ? ".keyword"
+            : "");
+
+        if (columnDefinition.relationshipType) {
+          return {
+            [indexPath]: {
+              order: columnSort.desc ? "desc" : "asc",
+              nested_path: "included",
+              nested_filter: {
+                term: {
+                  "included.type": columnDefinition.relationshipType
                 }
               }
-            };
-          } else {
-            return {
-              [indexPath]: {
-                order: columnSort.desc ? "desc" : "asc"
-              }
-            };
-          }
+            }
+          };
+        } else {
+          return {
+            [indexPath]: {
+              order: columnSort.desc ? "desc" : "asc"
+            }
+          };
         }
       })
     );
@@ -280,13 +299,19 @@ export function applySourceFiltering<TData extends KitsuResource>(
     ...columns
       .map((column) => {
         const accessors: string[] = [];
-        const accessorKey = (column as any)?.accessorKey;
-        if (accessorKey) {
-          accessors.push(accessorKey as string);
+        let accessor: string | null = null;
+        if (!!(column as any)?.accessorKey) {
+          accessor = (column as any)?.accessorKey;
+        } else if (!!(column as any)?.accessorFn) {
+          accessor = (column as any)?.accessorFn();
+        }
+
+        if (accessor) {
+          accessors.push(accessor);
         }
 
         if (column?.additionalAccessors) {
-          accessors.push(...(column.additionalAccessors as string[]));
+          accessors.push(...(column.additionalAccessors ?? []));
         }
 
         return accessors;
@@ -552,7 +577,7 @@ export function suffixQuery(
     : {
         prefix: {
           [fieldName + ".prefix_reverse"]: matchValue
-        }
+}
       };
 }
 
@@ -566,6 +591,6 @@ export function uuidQuery(uuids: string[]) {
       terms: {
         "data.id": uuids
       }
-    }
-  };
+        }
+      };
 }

@@ -69,6 +69,15 @@ export interface SavedSearchProps {
    * Set the groups to be loaded, used for the saved search.
    */
   setGroups: React.Dispatch<React.SetStateAction<string[]>>;
+
+  /**
+   * Used for generating the local storage keys. Every instance of the QueryPage should have it's
+   * own unique name.
+   *
+   * In special cases where you want the sorting, pagination, column selection and other features
+   * to remain the same across tables, it can share the same name.
+   */
+  uniqueName: string;
 }
 
 /**
@@ -90,10 +99,11 @@ export function SavedSearch({
   setQueryBuilderTree,
   queryBuilderConfig,
   setSubmittedQueryBuilderTree,
-  performSubmit,
   setPageOffset,
   groups,
-  setGroups
+  setGroups,
+  performSubmit,
+  uniqueName
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -124,10 +134,10 @@ export function SavedSearch({
 
   // Functionality for the last loaded search.
   useLastSavedSearch({
-    indexName,
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
-    performSubmit
+    performSubmit,
+    uniqueName
   });
 
   // Using the user preferences get the options and user preferences.

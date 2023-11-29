@@ -50,7 +50,7 @@ import {
   applySortingRules,
   applySourceFiltering,
   elasticSearchFormatExport
-} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport8";
+} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import {
   CustomViewField,
   useQueryBuilderConfig
@@ -90,6 +90,15 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * `UserPreference.savedSearches.dina_material_sample_index.default.filters`
    */
   indexName: string;
+
+  /**
+   * Used for generating the local storage keys. Every instance of the QueryPage should have it's
+   * own unique name.
+   *
+   * In special cases where you want the sorting, pagination, column selection and other features
+   * to remain the same across tables, it can share the same name.
+   */
+  uniqueName: string;
 
   /**
    * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
@@ -223,8 +232,6 @@ export interface QueryPageProps<TData extends KitsuResource> {
   enableColumnChooser?: boolean;
 }
 
-const GROUP_STORAGE_KEY = "groupStorage";
-
 /**
  * Top level component for displaying an elastic-search listing page.
  *
@@ -237,6 +244,7 @@ const GROUP_STORAGE_KEY = "groupStorage";
  */
 export function QueryPage<TData extends KitsuResource>({
   indexName,
+  uniqueName,
   dynamicFieldMapping,
   columns,
   bulkDeleteButtonProps,
@@ -273,14 +281,14 @@ export function QueryPage<TData extends KitsuResource>({
   const [totalRecords, setTotalRecords] = useState<number>(0);
 
   // User applied sorting rules for elastic search to use.
-  const localStorageLastUsedSortKey = indexName + "-last-used-sort";
+  const localStorageLastUsedSortKey = uniqueName + "-last-used-sort";
   const [sortingRules, setSortingRules] = useLocalStorage<ColumnSort[]>(
     localStorageLastUsedSortKey,
     defaultSort ?? DEFAULT_SORT
   );
 
   // The pagination size.
-  const localStorageLastUsedPageSizeKey = indexName + "-last-used-page-size";
+  const localStorageLastUsedPageSizeKey = uniqueName + "-last-used-page-size";
   const [pageSize, setPageSize] = useLocalStorage<number>(
     localStorageLastUsedPageSizeKey,
     defaultPageSize ?? DEFAULT_PAGE_SIZE
@@ -288,7 +296,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   // The pagination offset.
   const localStorageLastUsedPageOffsetKey =
-    indexName + "-last-used-page-offset";
+    uniqueName + "-last-used-page-offset";
   const [pageOffset, setPageOffset] = useLocalStorage<number>(
     localStorageLastUsedPageOffsetKey,
     0
@@ -312,6 +320,7 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   // Groups selected for the search.
+  const GROUP_STORAGE_KEY = uniqueName + "_groupStorage";
   const [groups, setGroups] = useLocalStorage<string[]>(
     GROUP_STORAGE_KEY,
     groupNames ?? []
@@ -685,8 +694,8 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
-  const localStorageLastUsedKey = indexName + "-last-used-tree";
-  const localStorageLastUsedTreeKey = indexName + "-saved-search-changed";
+  const localStorageLastUsedKey = uniqueName + "-last-used-tree";
+  const localStorageLastUsedTreeKey = uniqueName + "-saved-search-changed";
 
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
@@ -792,7 +801,7 @@ export function QueryPage<TData extends KitsuResource>({
   const formKey = useMemo(() => uuidv4(), []);
   const { columnChooser, checkedColumnIds } = useColumnChooser({
     columns: columnsResults,
-    localStorageKey: indexName,
+    localStorageKey: uniqueName,
     hideExportButton: true
   });
 
@@ -810,6 +819,7 @@ export function QueryPage<TData extends KitsuResource>({
           onReset={onReset}
           setGroups={setGroups}
           groups={groups}
+          uniqueName={uniqueName}
         />
       )}
       <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>

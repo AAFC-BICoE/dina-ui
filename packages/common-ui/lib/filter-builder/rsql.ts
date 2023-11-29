@@ -5,6 +5,7 @@ import { FilterAttributeConfig } from "./FilterBuilder";
 import { FilterGroupModel } from "./FilterGroup";
 import { FilterRowModel } from "./FilterRow";
 import { DateRange } from "./FilterRowDatePicker";
+import { FreeTextSearchFilterModel } from "../filter-free-text-search/FilterFreeTextSearchField";
 
 interface RsqlOperand {
   arguments: string | string[];
@@ -18,7 +19,7 @@ interface RsqlOperandGroup {
 }
 
 /** Converts a FilterGroupModel to an RSQL expression. */
-export function rsql(filter: FilterGroupModel | FilterRowModel | null): string {
+export function rsql(filter: FilterGroupModel | FilterRowModel | FreeTextSearchFilterModel | null): string {
   if (!filter) {
     return "";
   }
@@ -27,6 +28,9 @@ export function rsql(filter: FilterGroupModel | FilterRowModel | null): string {
       return transformToRSQL(toGroup(filter));
     case "FILTER_ROW":
       return transformToRSQL(toPredicate(filter));
+    case "FREE_TEXT_SEARCH_FILTER": {
+      return transformToRSQL(toFreeTextSearch(filter));
+    }
   }
 }
 
@@ -196,6 +200,27 @@ function toPredicate(
     comparison: compare,
     selector
   };
+}
+
+function toFreeTextSearch(
+  filterRow: FreeTextSearchFilterModel
+): RsqlOperandGroup {
+  const { filterAttributes, value } = filterRow;
+
+  const operands = filterAttributes.map(attribute => {
+    const selector = typeof attribute === "string" ? attribute : attribute.name;
+    const operand: RsqlOperand = {
+      arguments: `*${value}*`,
+      comparison: "==",
+      selector
+    }
+    return operand;
+  });
+  return {
+    operands,
+    operator: 'OR'
+  };
+  
 }
 
 interface BetweenOperandParams {

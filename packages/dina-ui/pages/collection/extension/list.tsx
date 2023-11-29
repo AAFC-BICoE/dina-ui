@@ -1,15 +1,15 @@
-import { FieldHeader, ReactTable, useQuery } from "common-ui";
-import { Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useLocalStorage } from "@rehooks/local-storage";
 import { ColumnDef } from "@tanstack/react-table";
+import { FieldHeader, ReactTable, useQuery } from "common-ui";
+import { find } from "lodash";
+import { FreeTextFilterForm } from "packages/common-ui/lib/list-page-layout/FreeTextFilterForm";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import Select from "react-select";
 import {
   ExtensionField,
   FieldExtension
 } from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
-import Select from "react-select";
-import { useState } from "react";
-import { find } from "lodash";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 function getTableColumn(locale: string) {
   const TABLE_COLUMNS: ColumnDef<ExtensionField>[] = [
@@ -57,7 +57,13 @@ function getTableColumn(locale: string) {
 export default function FieldListPage() {
   const { locale } = useDinaIntl();
   const { formatMessage } = useDinaIntl();
-  const [fields, setFields] = useState<ExtensionField[]>();
+  const id = "collection-module-extension-field";
+  // Use a localStorage hook to get the filter form state,
+  // and re-render when the watched localStorage key is changed.
+  const [filterForm] = useLocalStorage<any>(`${id}_filterForm`, {});
+  const [selectedExtensionId, setSelectedExtensionId] = useLocalStorage<string>(
+    `${id}-selectedExtensionId`
+  );
 
   const { response, loading } = useQuery<FieldExtension[]>({
     path: `collection-api/extension`
@@ -70,12 +76,43 @@ export default function FieldListPage() {
     value: data.id
   }));
 
+  if (!selectedExtensionId && extensionOptions && extensionOptions.length > 0) {
+    setSelectedExtensionId(extensionOptions[0].value);
+  }
+
   const onExtensionSelectionChanged = (option) => {
-    const selectedExtension = response?.data.filter(
-      (data) => data.id === option.value
-    );
-    setFields(selectedExtension?.[0].extension.fields);
+    setSelectedExtensionId(option.value);
   };
+
+  const filterExtensionFields = (extensions?: FieldExtension[]) => {
+    if (!extensions) {
+      return [];
+    } else {
+      const fields =
+        extensions.find((item) => item.id === selectedExtensionId)?.extension
+          .fields ?? [];
+      return fields.filter((value) => {
+        if (filterForm?.filterBuilderModel?.value) {
+          return (
+            value.name.toLowerCase().indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
+            (
+              value.multilingualDescription?.descriptions?.filter(
+                (item) =>
+                  item.lang === locale &&
+                  (item.desc ?? "").toLowerCase().indexOf(
+                    filterForm.filterBuilderModel.value.toLowerCase()
+                  ) > -1
+              ) ?? []
+            ).length > 0
+          );
+        } else {
+          return true;
+        }
+      });
+    }
+  };
+
+  const fields = filterExtensionFields(response?.data);
 
   return (
     <PageLayout titleId="extensionListTitle">
@@ -89,6 +126,10 @@ export default function FieldListPage() {
           onChange={onExtensionSelectionChanged}
           defaultValue={extensionOptions?.[0]}
         />
+        <FreeTextFilterForm
+          filterAttributes={["name", "multilingualDescription"]}
+          id={id}
+        />
 
         <span style={{ fontWeight: "bold" }} className="mt-3">
           {" "}
@@ -99,7 +140,7 @@ export default function FieldListPage() {
           key={fields?.length}
           className="-striped"
           columns={getTableColumn(locale)}
-          data={fields ?? response?.data?.[0]?.extension?.fields ?? []}
+          data={fields ?? []}
           showPagination={true}
           showPaginationTop={true}
         />
