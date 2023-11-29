@@ -197,11 +197,25 @@ export function applySortingRules<TData extends KitsuResource>(
       ...sortingRules.map((columnSort) => {
         const columnDefinition = columns.find((column) => {
           // Depending on if it's a string or not.
+          if (typeof column === "string") {
+            return column === columnSort.id;
+          }
+
+          // Otherwise, check if sorting is enabled for the column and matches.
           if (column.enableSorting !== false) {
             return column.id === columnSort.id;
           }
           return false;
         });
+
+        // Edge case for when strings are only provided for the column definition.
+        if (typeof columnDefinition === "string") {
+          return {
+            [columnDefinition]: {
+              order: columnSort.desc ? "desc" : "asc"
+            }
+          };
+        }
 
         if (
           !columnDefinition ||
