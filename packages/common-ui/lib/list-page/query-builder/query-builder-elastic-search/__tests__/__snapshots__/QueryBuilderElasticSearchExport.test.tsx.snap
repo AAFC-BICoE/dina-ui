@@ -573,12 +573,14 @@ Object {
   },
   "sort": Object {
     "data.attributes.testColumn4": Object {
-      "nested_filter": Object {
-        "term": Object {
-          "included.type": "relationshipType1",
+      "nested": Object {
+        "filter": Object {
+          "term": Object {
+            "included.type": "relationshipType1",
+          },
         },
+        "path": "included",
       },
-      "nested_path": "included",
       "order": "desc",
     },
   },
@@ -605,21 +607,25 @@ Object {
   },
   "sort": Object {
     "data.attributes.testColumn4": Object {
-      "nested_filter": Object {
-        "term": Object {
-          "included.type": "relationshipType1",
+      "nested": Object {
+        "filter": Object {
+          "term": Object {
+            "included.type": "relationshipType1",
+          },
         },
+        "path": "included",
       },
-      "nested_path": "included",
       "order": "desc",
     },
     "data.attributes.testColumn5.keyword": Object {
-      "nested_filter": Object {
-        "term": Object {
-          "included.type": "relationshipType2",
+      "nested": Object {
+        "filter": Object {
+          "term": Object {
+            "included.type": "relationshipType2",
+          },
         },
+        "path": "included",
       },
-      "nested_path": "included",
       "order": "asc",
     },
   },
@@ -652,21 +658,25 @@ Object {
       "order": "desc",
     },
     "data.attributes.testColumn4": Object {
-      "nested_filter": Object {
-        "term": Object {
-          "included.type": "relationshipType1",
+      "nested": Object {
+        "filter": Object {
+          "term": Object {
+            "included.type": "relationshipType1",
+          },
         },
+        "path": "included",
       },
-      "nested_path": "included",
       "order": "desc",
     },
     "data.attributes.testColumn5.keyword": Object {
-      "nested_filter": Object {
-        "term": Object {
-          "included.type": "relationshipType2",
+      "nested": Object {
+        "filter": Object {
+          "term": Object {
+            "included.type": "relationshipType2",
+          },
         },
+        "path": "included",
       },
-      "nested_path": "included",
       "order": "asc",
     },
   },

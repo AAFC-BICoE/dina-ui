@@ -246,10 +246,12 @@ export function applySortingRules<TData extends KitsuResource>(
           return {
             [indexPath]: {
               order: columnSort.desc ? "desc" : "asc",
-              nested_path: "included",
-              nested_filter: {
-                term: {
-                  "included.type": columnDefinition.relationshipType
+              nested: {
+                path: "included",
+                filter: {
+                  term: {
+                    "included.type": columnDefinition.relationshipType
+                  }                  
                 }
               }
             }
