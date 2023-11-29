@@ -113,6 +113,13 @@ function useCustomMenu<TData>({
   const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
 
   function handleToggleAll(event) {
+    const visibilityState = reactTable?.getState()?.columnVisibility;
+    if (visibilityState) {
+      Object.keys(visibilityState).forEach((columnId) => {
+        visibilityState[columnId] = event.target.checked;
+      });
+      setLocalStorageColumnStates(visibilityState);
+    }
     const reactTableToggleAllHander =
       reactTable?.getToggleAllColumnsVisibilityHandler();
     if (reactTableToggleAllHander) {
