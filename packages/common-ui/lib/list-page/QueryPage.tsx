@@ -50,7 +50,7 @@ import {
   applySortingRules,
   applySourceFiltering,
   elasticSearchFormatExport
-} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport8";
+} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import {
   CustomViewField,
   useQueryBuilderConfig

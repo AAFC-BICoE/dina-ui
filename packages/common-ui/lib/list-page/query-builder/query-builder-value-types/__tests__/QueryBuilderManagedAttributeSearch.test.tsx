@@ -115,7 +115,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
 
     describe.each(testValues.map((value) => [value.type, value]))(
       "%s based managed attribute tests",
-      (_, testValue) => {
+      (_, testValue: TestValueStructure) => {
         describe("Attribute level tests", () => {
           testValue.operators.forEach((operator) => {
             testValue.subTypes.forEach((subType) => {

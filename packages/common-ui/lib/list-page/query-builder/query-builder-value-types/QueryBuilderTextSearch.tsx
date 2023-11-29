@@ -1,15 +1,14 @@
 import React from "react";
-import {
+import { TransformToDSLProps } from "../../types";
+import { useIntl } from "react-intl";
+import { 
   includedTypeQuery,
   termQuery,
   existsQuery,
   prefixQuery,
   suffixQuery,
   infixQuery,
-  wildcardQuery
-} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { TransformToDSLProps } from "../../types";
-import { useIntl } from "react-intl";
+  wildcardQuery } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 interface QueryRowTextSearchProps {
   /**
