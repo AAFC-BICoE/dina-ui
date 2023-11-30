@@ -262,7 +262,6 @@ export function ColumnSelectorMenu<TData>({
             }}
           />
           <Dropdown.Divider />
-          {columnSelectionCheckboxesInternal}
           {!hideExportButton && (
             <Button
               disabled={loading}
@@ -276,6 +275,7 @@ export function ColumnSelectorMenu<TData>({
               )}
             </Button>
           )}
+          {columnSelectionCheckboxesInternal}
         </div>
       );
     }
