@@ -16,8 +16,9 @@ import { map, cloneDeep, sortBy, isEqual } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
-import useLocalStorage from "@rehooks/local-storage";
+import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
 import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
+import { useIntl } from "react-intl";
 
 export interface SavedSearchProps {
   /**
@@ -109,6 +110,7 @@ export function SavedSearch({
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
   const { subject } = useAccount();
+  const { formatMessage } = useIntl();
 
   // Users saved preferences.
   const [userPreferences, setUserPreferences] = useState<UserPreference>();
@@ -129,11 +131,7 @@ export function SavedSearch({
 
   const [defaultLoadedIn, setDefaultLoadedIn] = useState<boolean>(false);
 
-  const localStorageLastUsedTreeKey = indexName + "-saved-search-changed";
-  const [changesMade, setChangesMade] = useLocalStorage<boolean>(
-    localStorageLastUsedTreeKey,
-    false
-  );
+  const [changesMade, setChangesMade] = useState<boolean>(false);
 
   // Functionality for the last loaded search.
   useLastSavedSearch({
@@ -179,6 +177,8 @@ export function SavedSearch({
     return undefined;
   }, [selectedSavedSearch, userPreferences]);
 
+  const localStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
+
   // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {
     retrieveUserPreferences();
@@ -212,6 +212,10 @@ export function SavedSearch({
 
   // Detect if any changes have been made to the query tree.
   useEffect(() => {
+    if (queryError) {
+      setChangesMade(true);
+    }
+
     if (!userPreferences || !selectedSavedSearch || !queryBuilderTree) return;
     const savedSearch = userPreferences?.savedSearches?.[indexName]?.[selectedSavedSearch];
     let changesMade = false;
@@ -306,8 +310,9 @@ export function SavedSearch({
         // Valid saved search, submit and load the search.
         setSubmittedQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
         setPageOffset(0);
+        writeStorage(localStorageLastUsedTreeKey, savedSearchToLoad.queryTree);
       } else {
-        setQueryError("Some parts of your query were removed as they are no longer supported. Please review and update your query to use supported options:");
+        setQueryError(formatMessage({ id: "queryBuilder_invalid_query" }));
         setChangesMade(true);
       }
 
@@ -399,6 +404,7 @@ export function SavedSearch({
       setSelectedSavedSearch(savedSearchName);
       setCurrentIsDefault(setAsDefault);
       setChangesMade(false);
+      setQueryError(undefined);
     },
     [userPreferences, queryBuilderTree, groups]
   );
