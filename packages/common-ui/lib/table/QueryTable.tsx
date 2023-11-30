@@ -14,7 +14,7 @@ import {
   MetaWithTotal,
   ReactTable,
   ReactTableProps,
-  useColumnSelector,
+  ColumnSelector,
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
@@ -169,7 +169,7 @@ export function QueryTable<TData extends KitsuResource>({
   const [reactTable, setReactTable] = useState<Table<TData>>();
   const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
     useState<JSX.Element>();
-  const { columnSelector } = useColumnSelector({
+  const { columnSelector } = ColumnSelector({
     uniqueName: path,
     hideExportButton: true,
     reactTable

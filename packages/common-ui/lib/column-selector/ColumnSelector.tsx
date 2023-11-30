@@ -8,7 +8,7 @@ import {
 } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { cloneDeep, startCase } from "lodash";
@@ -21,48 +21,39 @@ import { Checkbox } from "./GroupedCheckboxWithLabel";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
-export function ColumnSelector(
-  CustomMenu: React.ForwardRefExoticComponent<
-    CustomMenuProps & React.RefAttributes<HTMLDivElement>
-  >
-) {
-  return (
-    <Dropdown>
-      <Dropdown.Toggle>
-        <DinaMessage id="selectColumn" />
-      </Dropdown.Toggle>
-      <Dropdown.Menu
-        as={CustomMenu}
-        style={{ maxHeight: "20rem", overflowY: "scroll" }}
-      />
-    </Dropdown>
-  );
-}
-
-export interface UseColumnChooserProps<TData> {
+export interface ColumnSelectorProps<TData> {
   /** A unique identifier to be used for local storage key */
   uniqueName?: string;
   hideExportButton?: boolean;
   reactTable: Table<TData> | undefined;
 }
 
-export function useColumnSelector<TData>({
+export function ColumnSelector<TData>({
   uniqueName,
   hideExportButton = false,
   reactTable
-}: UseColumnChooserProps<TData>) {
-  const { CustomMenu, dataExportError } = useCustomMenu({
+}: ColumnSelectorProps<TData>) {
+  const { ColumnSelectorCustomMenu } = useColumnSelectorMenu({
     uniqueName,
     hideExportButton,
     reactTable
   });
-  const columnSelector = ColumnSelector(CustomMenu);
-  return { columnSelector, CustomMenu, dataExportError };
+  return (
+    <Dropdown>
+      <Dropdown.Toggle>
+        <DinaMessage id="selectColumn" />
+      </Dropdown.Toggle>
+      <Dropdown.Menu
+        as={ColumnSelectorCustomMenu}
+        style={{ maxHeight: "20rem", overflowY: "scroll" }}
+      />
+    </Dropdown>
+  );
 }
 
-interface UseCustomMenuProps<TData> extends UseColumnChooserProps<TData> {}
+interface UseCustomMenuProps<TData> extends ColumnSelectorProps<TData> {}
 
-function useCustomMenu<TData>({
+export function useColumnSelectorMenu<TData>({
   uniqueName,
   hideExportButton,
   reactTable
@@ -222,7 +213,7 @@ function useCustomMenu<TData>({
     setLoading(false);
   }
 
-  const CustomMenu = React.forwardRef(
+  const ColumnSelectorCustomMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
       if (props.style) {
         props.style.transform = "translate(0px, 40px)";
@@ -240,6 +231,7 @@ function useCustomMenu<TData>({
           className={props.className}
           aria-labelledby={props.labelledBy}
         >
+          {dataExportError}
           <strong>{<FieldHeader name="filterColumns" />}</strong>
           <input
             autoFocus={true}
@@ -285,7 +277,7 @@ function useCustomMenu<TData>({
       );
     }
   );
-  return { CustomMenu, dataExportError };
+  return { ColumnSelectorCustomMenu };
 }
 export async function downloadDataExport(
   apiClient: Kitsu,

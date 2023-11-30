@@ -1,12 +1,13 @@
 import {
-  useColumnSelector,
+  ColumnSelector,
   DinaForm,
   ReactTable,
   CommonMessage,
   ButtonBar,
   BackButton,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
-  DATA_EXPORT_COLUMNS_KEY
+  DATA_EXPORT_COLUMNS_KEY,
+  useColumnSelectorMenu
 } from "packages/common-ui/lib";
 import React from "react";
 import Link from "next/link";
@@ -20,9 +21,7 @@ import { Table, Column } from "@tanstack/react-table";
 import { useState } from "react";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 
-export default function MaterialSampleExportPage<
-  TData extends KitsuResource
->() {
+export default function ExportPage<TData extends KitsuResource>() {
   const router = useRouter();
   const [totalRecords] = useLocalStorage<number>(DATA_EXPORT_TOTAL_RECORDS_KEY);
   const hideTable: boolean | undefined = !!router.query.hideTable;
@@ -35,7 +34,7 @@ export default function MaterialSampleExportPage<
     useState<JSX.Element>();
   const [reactTable, setReactTable] = useState<Table<TData>>();
 
-  const { CustomMenu, dataExportError } = useColumnSelector({
+  const { ColumnSelectorCustomMenu } = useColumnSelectorMenu({
     uniqueName,
     reactTable
   });
@@ -58,12 +57,11 @@ export default function MaterialSampleExportPage<
           </Link>
         </ButtonBar>
         <div className="ms-2">
-          {typeof dataExportError !== "undefined" && dataExportError}
           <CommonMessage
             id="tableTotalCount"
             values={{ totalCount: formatNumber(totalRecords ?? 0) }}
           />
-          <CustomMenu />
+          <ColumnSelectorCustomMenu />
         </div>
 
         <ReactTable<TData>

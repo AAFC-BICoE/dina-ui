@@ -20,7 +20,7 @@ import {
   ReactTable,
   ReactTableProps,
   useAccount,
-  useColumnSelector,
+  ColumnSelector,
   useQuery
 } from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
@@ -391,12 +391,6 @@ export function QueryPage<TData extends KitsuResource>({
 
     // Check the tree for any validation issues. Do not submit query if issues exist.
     if (!Utils.isValidTree(submittedQueryBuilderTree)) {
-      setLoading(false);
-      return;
-    }
-
-    // Index map columns not loaded yet
-    if (loadingIndexMapColumns === true) {
       setLoading(false);
       return;
     }
@@ -860,11 +854,6 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
-  const { columnSelector } = useColumnSelector({
-    uniqueName,
-    hideExportButton: true,
-    reactTable
-  });
 
   return (
     <>
@@ -899,7 +888,13 @@ export function QueryPage<TData extends KitsuResource>({
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (
                 <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
-                  {enableColumnChooser && columnSelector}
+                  {enableColumnChooser && (
+                    <ColumnSelector
+                      uniqueName={uniqueName}
+                      hideExportButton={true}
+                      reactTable={reactTable}
+                    />
+                  )}
                   {bulkEditPath && (
                     <BulkEditButton
                       pathname={bulkEditPath}
@@ -937,7 +932,7 @@ export function QueryPage<TData extends KitsuResource>({
               <div className="d-flex align-items-end">
                 <span id="queryPageCount">
                   {/* Loading indicator when total is not calculated yet. */}
-                  {loading ? (
+                  {loading || loadingIndexMapColumns ? (
                     <LoadingSpinner loading={true} />
                   ) : (
                     <CommonMessage
@@ -987,7 +982,7 @@ export function QueryPage<TData extends KitsuResource>({
                     : searchResults) ?? []
                 }
                 // Loading Table props
-                loading={loading}
+                loading={loading || loadingIndexMapColumns}
                 // Pagination props
                 manualPagination={
                   viewMode && selectedResources?.length ? false : true
