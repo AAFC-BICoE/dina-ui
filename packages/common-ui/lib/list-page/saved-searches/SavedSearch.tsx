@@ -17,6 +17,7 @@ import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
 import useLocalStorage from "@rehooks/local-storage";
+import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
 
 export interface SavedSearchProps {
   /**
@@ -298,12 +299,15 @@ export function SavedSearch({
       savedSearchToLoad.savedSearchName &&
       savedSearchToLoad.queryTree
     ) {
-      setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
-      setCurrentIsDefault(savedSearchToLoad.default);
-      setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
-      setSubmittedQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
-      setPageOffset(0);
-      setGroups(savedSearchToLoad.groups ?? []);
+      // Check if the query tree is valid against the current config.
+      if (validateQueryTree(savedSearchToLoad.queryTree, queryBuilderConfig)) {
+        setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
+        setCurrentIsDefault(savedSearchToLoad.default);
+        setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+        setSubmittedQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+        setPageOffset(0);
+        setGroups(savedSearchToLoad.groups ?? []);        
+      }
     }
   }
 

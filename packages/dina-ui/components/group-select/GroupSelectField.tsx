@@ -58,8 +58,6 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
       return;
     }
 
-    console.log(groups);
-
     setValue(groups);
   }, [groups]);
 
