@@ -6,6 +6,9 @@ import { JsonTree, Config } from "react-awesome-query-builder";
  * This method will validate the operators and fields to ensure they exist within the current
  * configuration.
  * 
+ * Current limitation is the operator is not checked against the type, it's check if the operator
+ * is defined in the configuration. If it's invalid for the specific type it will not be caught yet.
+ * 
  * @param queryTree queryTree from the saved search, not validated yet.
  * @returns valid query tree, safe to load into the query builder.
  */

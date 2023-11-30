@@ -7,7 +7,7 @@ import { useModal } from "../../modal/modal";
 import { SaveArgs, useApiClient } from "../../api-client/ApiClientContext";
 import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
-import { Dropdown } from "react-bootstrap";
+import { Alert, Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
 import { Config, ImmutableTree, Utils } from "react-awesome-query-builder";
@@ -120,6 +120,8 @@ export function SavedSearch({
   const [loading, setLoading] = useState<boolean>(true);
 
   const [error, setError] = useState<string>();
+
+  const [queryError, setQueryError] = useState<string>();
 
   const [lastLoaded, setLastLoaded] = useState<number>(Date.now());
 
@@ -301,13 +303,18 @@ export function SavedSearch({
     ) {
       // Check if the query tree is valid against the current config.
       if (validateQueryTree(savedSearchToLoad.queryTree, queryBuilderConfig)) {
-        setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
-        setCurrentIsDefault(savedSearchToLoad.default);
-        setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+        // Valid saved search, submit and load the search.
         setSubmittedQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
         setPageOffset(0);
-        setGroups(savedSearchToLoad.groups ?? []);        
+      } else {
+        setQueryError("Some parts of your query were removed as they are no longer supported. Please review and update your query to use supported options:");
+        setChangesMade(true);
       }
+
+      setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+      setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
+      setCurrentIsDefault(savedSearchToLoad.default);
+      setGroups(savedSearchToLoad.groups ?? []);   
     }
   }
 
@@ -541,6 +548,11 @@ export function SavedSearch({
         }}
         onSavedSearchDelete={deleteSavedSearch}
       />
+      {queryError && (
+        <Alert variant={"danger"}>
+          {queryError}
+        </Alert>        
+      )}
     </>
   );
 }
