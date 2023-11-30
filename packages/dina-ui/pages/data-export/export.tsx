@@ -7,7 +7,7 @@ import {
   BackButton,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   DATA_EXPORT_COLUMNS_KEY,
-  useColumnSelectorMenu
+  ColumnSelectorMenu
 } from "packages/common-ui/lib";
 import React from "react";
 import Link from "next/link";
@@ -20,6 +20,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { Table, Column } from "@tanstack/react-table";
 import { useState } from "react";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { CustomMenuProps } from "packages/dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 
 export default function ExportPage<TData extends KitsuResource>() {
   const router = useRouter();
@@ -30,14 +31,9 @@ export default function ExportPage<TData extends KitsuResource>() {
   const [columns] = useLocalStorage<TableColumn<TData>[] | undefined>(
     `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`
   );
-  const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
-    useState<JSX.Element>();
-  const [reactTable, setReactTable] = useState<Table<TData>>();
 
-  const { ColumnSelectorCustomMenu } = useColumnSelectorMenu({
-    uniqueName,
-    reactTable
-  });
+  const [columnSelectorCustomMenu, setColumnSelectorCustomMenu] =
+    useState<JSX.Element>(<></>);
 
   return (
     <div>
@@ -61,15 +57,15 @@ export default function ExportPage<TData extends KitsuResource>() {
             id="tableTotalCount"
             values={{ totalCount: formatNumber(totalRecords ?? 0) }}
           />
-          <ColumnSelectorCustomMenu />
+          {columnSelectorCustomMenu}
         </div>
 
         <ReactTable<TData>
           columns={columns ? columns : []}
           data={[]}
-          setColumnSelectionCheckboxes={setColumnSelectionCheckboxes}
-          setReactTable={setReactTable}
+          setColumnSelectorCustomMenu={setColumnSelectorCustomMenu}
           hideTable={hideTable}
+          uniqueName={uniqueName}
         />
       </DinaForm>
       <Footer />

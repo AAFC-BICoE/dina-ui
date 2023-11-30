@@ -26,25 +26,28 @@ export interface ColumnSelectorProps<TData> {
   uniqueName?: string;
   hideExportButton?: boolean;
   reactTable: Table<TData> | undefined;
+  menuOnly?: boolean;
 }
 
 export function ColumnSelector<TData>({
   uniqueName,
   hideExportButton = false,
-  reactTable
+  reactTable,
+  menuOnly
 }: ColumnSelectorProps<TData>) {
-  const { ColumnSelectorCustomMenu } = useColumnSelectorMenu({
+  const CustomColumnSelectorMenu = ColumnSelectorMenu({
     uniqueName,
-    hideExportButton,
     reactTable
   });
-  return (
+  return menuOnly ? (
+    <CustomColumnSelectorMenu />
+  ) : (
     <Dropdown>
       <Dropdown.Toggle>
         <DinaMessage id="selectColumn" />
       </Dropdown.Toggle>
       <Dropdown.Menu
-        as={ColumnSelectorCustomMenu}
+        as={ColumnSelectorMenu({ uniqueName, hideExportButton, reactTable })}
         style={{ maxHeight: "20rem", overflowY: "scroll" }}
       />
     </Dropdown>
@@ -53,7 +56,7 @@ export function ColumnSelector<TData>({
 
 interface UseCustomMenuProps<TData> extends ColumnSelectorProps<TData> {}
 
-export function useColumnSelectorMenu<TData>({
+export function ColumnSelectorMenu<TData>({
   uniqueName,
   hideExportButton,
   reactTable
@@ -213,7 +216,7 @@ export function useColumnSelectorMenu<TData>({
     setLoading(false);
   }
 
-  const ColumnSelectorCustomMenu = React.forwardRef(
+  return React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
       if (props.style) {
         props.style.transform = "translate(0px, 40px)";
@@ -277,7 +280,6 @@ export function useColumnSelectorMenu<TData>({
       );
     }
   );
-  return { ColumnSelectorCustomMenu };
 }
 export async function downloadDataExport(
   apiClient: Kitsu,

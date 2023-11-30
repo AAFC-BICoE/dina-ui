@@ -24,6 +24,12 @@ import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
 import { Checkbox } from "../column-selector/GroupedCheckboxWithLabel";
+import {
+  ColumnSelector,
+  ColumnSelectorMenu
+} from "../column-selector/ColumnSelector";
+import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
+import { string } from "yup";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
@@ -76,16 +82,20 @@ export interface ReactTableProps<TData> {
   columnVisibility?: VisibilityState;
   highlightRow?: boolean;
   TbodyComponent?: React.ElementType;
-  // Mostly used for re-rendering QueryPage so that checkboxes update toggle state
-  setColumnSelectionCheckboxes?: React.Dispatch<
-    React.SetStateAction<JSX.Element | undefined>
-  >;
-  setReactTable?: React.Dispatch<
-    React.SetStateAction<Table<TData> | undefined>
-  >;
 
   // Hides the table rendering. Useful for accessing table states but don't want to render table
   hideTable?: boolean;
+
+  // Pass the Column Selector to parent caller
+  setColumnSelector?: React.Dispatch<React.SetStateAction<JSX.Element>>;
+
+  // Pass the Column Selector Menu to parent caller
+  setColumnSelectorCustomMenu?: React.Dispatch<
+    React.SetStateAction<JSX.Element>
+  >;
+
+  // uniqueName used for local storage
+  uniqueName?: string;
 }
 
 export function ReactTable<TData>({
@@ -122,9 +132,10 @@ export function ReactTable<TData>({
   manualFiltering = false,
   onColumnFiltersChange,
   defaultColumnFilters = [],
-  setColumnSelectionCheckboxes,
-  setReactTable,
-  hideTable = false
+  hideTable = false,
+  setColumnSelector,
+  setColumnSelectorCustomMenu,
+  uniqueName
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -240,34 +251,27 @@ export function ReactTable<TData>({
 
   const table = useReactTable<TData>(tableOption);
 
-  const columnSelectionCheckboxes = (
-    <div>
-      <Checkbox
-        id="selectAll"
-        handleClick={table.getToggleAllColumnsVisibilityHandler()}
-        isChecked={table.getIsAllColumnsVisible()}
-      />
-      {table.getAllLeafColumns().map((column) => {
-        return (
-          <>
-            <Checkbox
-              key={column.id}
-              id={column.id}
-              handleClick={column.getToggleVisibilityHandler()}
-              isChecked={column.getIsVisible()}
-              isField={true}
-            />
-          </>
-        );
-      })}
-    </div>
-  );
   useEffect(() => {
-    if (setColumnSelectionCheckboxes) {
-      setColumnSelectionCheckboxes(columnSelectionCheckboxes);
+    if (setColumnSelector) {
+      const columnSelector = (
+        <ColumnSelector
+          uniqueName={uniqueName}
+          reactTable={table}
+          hideExportButton={true}
+        />
+      );
+      setColumnSelector?.(columnSelector);
     }
-    if (setReactTable) {
-      setReactTable(table);
+    if (setColumnSelectorCustomMenu) {
+      const columnSelector = (
+        <ColumnSelector
+          uniqueName={uniqueName}
+          reactTable={table}
+          hideExportButton={true}
+          menuOnly={true}
+        />
+      );
+      setColumnSelectorCustomMenu(columnSelector);
     }
   }, [
     ...table.getAllLeafColumns().map((column) => column.getIsVisible()),

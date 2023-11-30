@@ -240,7 +240,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
 
   enableDnd?: boolean;
 
-  enableColumnChooser?: boolean;
+  enableColumnSelector?: boolean;
 }
 
 /**
@@ -278,7 +278,7 @@ export function QueryPage<TData extends KitsuResource>({
   enableDnd = false,
   onSelect,
   onDeselect,
-  enableColumnChooser = true
+  enableColumnSelector = true
 }: QueryPageProps<TData>) {
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
@@ -701,15 +701,10 @@ export function QueryPage<TData extends KitsuResource>({
   ) {
     setLocalStorageColumnStates(columnVisibility);
   }
-  const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
-    useState<JSX.Element>();
-  const [reactTable, setReactTable] = useState<Table<TData>>();
 
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     defaultSorted: sortingRules,
     columnVisibility,
-    setReactTable,
-    setColumnSelectionCheckboxes,
     ...computedReactTableProps
   };
 
@@ -852,6 +847,8 @@ export function QueryPage<TData extends KitsuResource>({
     }
   }
 
+  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
+
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
@@ -888,13 +885,7 @@ export function QueryPage<TData extends KitsuResource>({
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (
                 <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
-                  {enableColumnChooser && (
-                    <ColumnSelector
-                      uniqueName={uniqueName}
-                      hideExportButton={true}
-                      reactTable={reactTable}
-                    />
-                  )}
+                  {enableColumnSelector && columnSelector}
                   {bulkEditPath && (
                     <BulkEditButton
                       pathname={bulkEditPath}
@@ -972,6 +963,8 @@ export function QueryPage<TData extends KitsuResource>({
                 </div>
               )}
               <ReactTable<TData>
+                setColumnSelector={setColumnSelector}
+                uniqueName={uniqueName}
                 // Column and data props
                 columns={columnsResults}
                 data={
