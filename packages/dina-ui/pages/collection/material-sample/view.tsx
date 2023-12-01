@@ -115,11 +115,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const transactionElasticQuery = useElasticSearchQuery({
     indexName: "dina_loan_transaction_index",
     queryDSL: {
-      _source: [
-        "data.id",
-        "data.attributes.materialDirection",
-        "data.attributes.transactionNumber"
-      ],
+      _source: {
+        includes: [
+          "data.id",
+          "data.attributes.materialDirection",
+          "data.attributes.transactionNumber"
+        ]
+      },
       size: 1,
       sort: {
         "data.attributes.openedDate": {
