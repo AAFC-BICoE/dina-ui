@@ -55,13 +55,11 @@ export function useColumnSelectorIndexMapColumns({
         const groupedIndexMappingOptions = groupedIndexMapping.options;
         for (const queryOption of groupedIndexMappingOptions) {
           if (queryOption.dynamicField) {
-            if (queryOption.type === "fieldExtension") {
-              await getExtensionValuesColumns(
-                queryOption,
-                apiClient,
-                setColumnSelectorIndexMapColumns
-              );
-            }
+            await getDynamicFieldColumns(
+              queryOption,
+              apiClient,
+              setColumnSelectorIndexMapColumns
+            );
           }
         }
       }
@@ -73,6 +71,35 @@ export function useColumnSelectorIndexMapColumns({
 
   return { columnSelectorIndexMapColumns, loadingIndexMapColumns };
 }
+
+async function getDynamicFieldColumns(
+  queryOption: QueryOption,
+  apiClient: Kitsu,
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>
+) {
+  if (queryOption.type === "fieldExtension") {
+    await getExtensionValuesColumns(
+      queryOption,
+      apiClient,
+      setColumnSelectorIndexMapColumns
+    );
+  } else if (queryOption.type === "managedAttribute") {
+    // await getIncludedManagedAttributeColumns(
+    //   queryOption,
+    //   apiClient,
+    //   setColumnSelectorIndexMapColumns
+    // );
+  } else {
+    console.error("Uncaught queryOption type.");
+  }
+}
+
+// async function getIncludedManagedAttributeColumns(
+//   queryOption: QueryOption,
+//   apiClient: Kitsu,
+//   setColumnSelectorIndexMapColumns: React.Dispatch<any>
+// ) {
+// }
 
 function getAttributesExtensionValuesColumns(
   extensionValues,
@@ -160,20 +187,16 @@ export async function getExtensionValuesColumns(
         queryOption,
         setColumnSelectorIndexMapColumns
       );
-      return [];
     } else {
-      const attributesExtensionValuesColumns =
-        getAttributesExtensionValuesColumns(
-          extensionValues,
-          queryOption,
-          setColumnSelectorIndexMapColumns
-        );
-      return attributesExtensionValuesColumns;
+      getAttributesExtensionValuesColumns(
+        extensionValues,
+        queryOption,
+        setColumnSelectorIndexMapColumns
+      );
     }
   } catch (error) {
     // Handle the error here, e.g., log it or display an error message.
     console.error(error);
-    return [];
   }
 }
 
