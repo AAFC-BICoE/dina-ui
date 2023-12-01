@@ -71,7 +71,8 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
                 searchType: "EXACT_MATCH" as const,
                 value: groupNames.join(","),
                 attribute: {
-                  allowRange: true,
+                  allowRange: false,
+                  allowList: true,
                   name: "group"
                 }
               }
