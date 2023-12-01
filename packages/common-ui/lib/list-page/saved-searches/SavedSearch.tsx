@@ -7,17 +7,18 @@ import { useModal } from "../../modal/modal";
 import { SaveArgs, useApiClient } from "../../api-client/ApiClientContext";
 import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
-import { Dropdown } from "react-bootstrap";
+import { Alert, Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
 import { Config, ImmutableTree, Utils } from "react-awesome-query-builder";
-import { SavedSearchStructure, SingleSavedSearch } from "./types";
-import { map, cloneDeep } from "lodash";
+import { SavedSearchStructure, SingleSavedSearch, SAVED_SEARCH_VERSION } from "./types";
+import { map, cloneDeep, sortBy, isEqual } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
-import { ColumnSort } from "@tanstack/react-table";
-import useLocalStorage from "@rehooks/local-storage";
+import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
+import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
+import { useIntl } from "react-intl";
 
 export interface SavedSearchProps {
   /**
@@ -51,15 +52,25 @@ export interface SavedSearchProps {
   >;
 
   /**
+   * For the last loaded search, we will actually perform the search by calling this callback
+   * function.
+   */
+  performSubmit: () => void;
+
+  /**
    * Set the page offset, used to to load a saved search.
    */
   setPageOffset: React.Dispatch<React.SetStateAction<number>>;
 
   /**
-   * For the last loaded search, we will actually perform the search by calling this callback
-   * function.
+   * Current groups being applied to the search.
    */
-  performSubmit: () => void;
+  groups: string[];
+
+  /**
+   * Set the groups to be loaded, used for the saved search.
+   */
+  setGroups: React.Dispatch<React.SetStateAction<string[]>>;
 
   /**
    * Used for generating the local storage keys. Every instance of the QueryPage should have it's
@@ -74,7 +85,7 @@ export interface SavedSearchProps {
 /**
  * This component contains the following logic:
  *
- * - Load the last used query when the `?reloadLastQuery` param is present in the URL.
+ * - Load the last used query when if present in local storage.
  * - Ability to create new saved searches
  * - Delete existing saved searches
  * - Toggle the isDefault
@@ -91,12 +102,15 @@ export function SavedSearch({
   queryBuilderConfig,
   setSubmittedQueryBuilderTree,
   setPageOffset,
+  groups,
+  setGroups,
   performSubmit,
   uniqueName
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
   const { subject } = useAccount();
+  const { formatMessage } = useIntl();
 
   // Users saved preferences.
   const [userPreferences, setUserPreferences] = useState<UserPreference>();
@@ -109,20 +123,18 @@ export function SavedSearch({
 
   const [error, setError] = useState<string>();
 
+  const [queryError, setQueryError] = useState<string>();
+
   const [lastLoaded, setLastLoaded] = useState<number>(Date.now());
 
   const [lastSelected, setLastSelected] = useState<number>(Date.now());
 
   const [defaultLoadedIn, setDefaultLoadedIn] = useState<boolean>(false);
 
-  const localStorageLastUsedTreeKey = indexName + "-saved-search-changed";
-  const [changesMade, setChangesMade] = useLocalStorage<boolean>(
-    localStorageLastUsedTreeKey,
-    false
-  );
+  const [changesMade, setChangesMade] = useState<boolean>(false);
 
   // Functionality for the last loaded search.
-  const { loadLastUsed } = useLastSavedSearch({
+  useLastSavedSearch({
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
     performSubmit,
@@ -165,6 +177,8 @@ export function SavedSearch({
     return undefined;
   }, [selectedSavedSearch, userPreferences]);
 
+  const localStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
+
   // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {
     retrieveUserPreferences();
@@ -198,7 +212,13 @@ export function SavedSearch({
 
   // Detect if any changes have been made to the query tree.
   useEffect(() => {
+    if (queryError) {
+      setChangesMade(true);
+    }
+
     if (!userPreferences || !selectedSavedSearch || !queryBuilderTree) return;
+    const savedSearch = userPreferences?.savedSearches?.[indexName]?.[selectedSavedSearch];
+    let changesMade = false;
 
     const currentQueryTreeString = Utils.queryString(
       queryBuilderTree,
@@ -206,12 +226,17 @@ export function SavedSearch({
     );
 
     // Compare against currently selected tree.
-    if (compareChangeSelected === currentQueryTreeString) {
-      setChangesMade(false);
-    } else {
-      setChangesMade(true);
+    if (compareChangeSelected !== currentQueryTreeString) {
+      changesMade = true;
     }
-  }, [queryBuilderTree]);
+
+    // Check if the group has changed.
+    if (!isEqual(sortBy(groups), sortBy(savedSearch?.groups))) {
+      changesMade = true;
+    }
+
+    setChangesMade(changesMade);
+  }, [queryBuilderTree, groups]);
 
   /**
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch
@@ -280,11 +305,21 @@ export function SavedSearch({
       savedSearchToLoad.savedSearchName &&
       savedSearchToLoad.queryTree
     ) {
+      // Check if the query tree is valid against the current config.
+      if (validateQueryTree(savedSearchToLoad.queryTree, queryBuilderConfig)) {
+        // Valid saved search, submit and load the search.
+        setSubmittedQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+        setPageOffset(0);
+        writeStorage(localStorageLastUsedTreeKey, savedSearchToLoad.queryTree);
+      } else {
+        setQueryError(formatMessage({ id: "queryBuilder_invalid_query" }));
+        setChangesMade(true);
+      }
+
+      setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
-      setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
-      setSubmittedQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
-      setPageOffset(0);
+      setGroups(savedSearchToLoad.groups ?? []);   
     }
   }
 
@@ -320,6 +355,7 @@ export function SavedSearch({
         [indexName]: {
           ...userPreferences?.savedSearches?.[indexName],
           [savedSearchName]: {
+            version: SAVED_SEARCH_VERSION,
             default: setAsDefault,
 
             // If updateQueryTree is true, then we will retrieve the current query tree from the
@@ -327,7 +363,9 @@ export function SavedSearch({
             queryTree: updateQueryTree
               ? Utils.getTree(queryBuilderTree)
               : userPreferences?.savedSearches?.[indexName]?.[savedSearchName]
-                  ?.queryTree ?? undefined
+                  ?.queryTree ?? undefined,
+
+            groups: groups
           }
         }
       };
@@ -366,8 +404,9 @@ export function SavedSearch({
       setSelectedSavedSearch(savedSearchName);
       setCurrentIsDefault(setAsDefault);
       setChangesMade(false);
+      setQueryError(undefined);
     },
-    [userPreferences, queryBuilderTree]
+    [userPreferences, queryBuilderTree, groups]
   );
 
   /**
@@ -515,6 +554,11 @@ export function SavedSearch({
         }}
         onSavedSearchDelete={deleteSavedSearch}
       />
+      {queryError && (
+        <Alert variant={"danger"}>
+          {queryError}
+        </Alert>        
+      )}
     </>
   );
 }

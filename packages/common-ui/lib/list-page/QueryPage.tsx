@@ -817,6 +817,8 @@ export function QueryPage<TData extends KitsuResource>({
           setPageOffset={setPageOffset}
           onSubmit={onSubmit}
           onReset={onReset}
+          setGroups={setGroups}
+          groups={groups}
           uniqueName={uniqueName}
         />
       )}
@@ -834,6 +836,7 @@ export function QueryPage<TData extends KitsuResource>({
                     onGroupChange(newGroups);
                   })
                 }
+                groups={groups}
               />
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (
