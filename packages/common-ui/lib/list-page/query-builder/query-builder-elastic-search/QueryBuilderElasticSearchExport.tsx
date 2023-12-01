@@ -246,10 +246,12 @@ export function applySortingRules<TData extends KitsuResource>(
           return {
             [indexPath]: {
               order: columnSort.desc ? "desc" : "asc",
-              nested_path: "included",
-              nested_filter: {
-                term: {
-                  "included.type": columnDefinition.relationshipType
+              nested: {
+                path: "included",
+                filter: {
+                  term: {
+                    "included.type": columnDefinition.relationshipType
+                  }                  
                 }
               }
             }
@@ -265,7 +267,7 @@ export function applySortingRules<TData extends KitsuResource>(
     );
 
     // Add all of the queries to the existing elastic search query.
-    if (sortingQueries.length !== 0) {
+    if (!isEmpty(sortingQueries)) {
       return {
         ...elasticSearchQuery,
         sort: sortingQueries
