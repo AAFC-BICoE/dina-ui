@@ -700,13 +700,12 @@ export function QueryPage<TData extends KitsuResource>({
       {}
     );
 
-  if (
-    (!localStorageColumnStates ||
-      Object.keys(localStorageColumnStates).length === 0) &&
-    Object.keys(columnVisibility).length !== 0
-  ) {
-    setLocalStorageColumnStates(columnVisibility);
-  }
+  useEffect(() => {
+    setLocalStorageColumnStates({
+      ...columnVisibility,
+      ...localStorageColumnStates
+    });
+  }, [loadingIndexMapColumns]);
 
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     defaultSorted: sortingRules,
