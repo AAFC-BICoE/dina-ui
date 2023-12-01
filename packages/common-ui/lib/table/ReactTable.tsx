@@ -16,20 +16,14 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import classnames from "classnames";
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, useReducer } from "react";
 
 import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
-import { Checkbox } from "../column-selector/GroupedCheckboxWithLabel";
-import {
-  ColumnSelector,
-  ColumnSelectorMenu
-} from "../column-selector/ColumnSelector";
-import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
-import { string } from "yup";
+import { ColumnSelector } from "../column-selector/ColumnSelector";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
@@ -96,6 +90,8 @@ export interface ReactTableProps<TData> {
 
   // uniqueName used for local storage
   uniqueName?: string;
+
+  forceUpdate?: React.DispatchWithoutAction;
 }
 
 export function ReactTable<TData>({
@@ -135,7 +131,8 @@ export function ReactTable<TData>({
   hideTable = false,
   setColumnSelector,
   setColumnSelectorCustomMenu,
-  uniqueName
+  uniqueName,
+  forceUpdate
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -258,6 +255,7 @@ export function ReactTable<TData>({
           uniqueName={uniqueName}
           reactTable={table}
           hideExportButton={true}
+          forceUpdate={forceUpdate}
         />
       );
       setColumnSelector?.(columnSelector);
@@ -267,8 +265,8 @@ export function ReactTable<TData>({
         <ColumnSelector
           uniqueName={uniqueName}
           reactTable={table}
-          hideExportButton={true}
           menuOnly={true}
+          hideApplyButton={true}
         />
       );
       setColumnSelectorCustomMenu(columnSelector);

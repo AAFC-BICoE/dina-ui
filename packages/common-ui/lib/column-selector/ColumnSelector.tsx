@@ -8,10 +8,10 @@ import {
 } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
-import { cloneDeep, startCase } from "lodash";
+import { startCase } from "lodash";
 import { Button } from "react-bootstrap";
 import useLocalStorage from "@rehooks/local-storage";
 import { DataExport } from "packages/dina-ui/types/dina-export-api";
@@ -27,17 +27,24 @@ export interface ColumnSelectorProps<TData> {
   hideExportButton?: boolean;
   reactTable: Table<TData> | undefined;
   menuOnly?: boolean;
+  hideApplyButton?: boolean;
+  forceUpdate?: React.DispatchWithoutAction;
 }
 
 export function ColumnSelector<TData>({
   uniqueName,
-  hideExportButton = false,
   reactTable,
-  menuOnly
+  menuOnly,
+  hideExportButton = false,
+  hideApplyButton = false,
+  forceUpdate
 }: ColumnSelectorProps<TData>) {
   const CustomColumnSelectorMenu = ColumnSelectorMenu({
     uniqueName,
-    reactTable
+    reactTable,
+    hideExportButton,
+    hideApplyButton,
+    forceUpdate
   });
   return menuOnly ? (
     <CustomColumnSelectorMenu />
@@ -47,7 +54,7 @@ export function ColumnSelector<TData>({
         <DinaMessage id="selectColumn" />
       </Dropdown.Toggle>
       <Dropdown.Menu
-        as={ColumnSelectorMenu({ uniqueName, hideExportButton, reactTable })}
+        as={CustomColumnSelectorMenu}
         style={{ maxHeight: "20rem", overflowY: "scroll" }}
       />
     </Dropdown>
@@ -58,8 +65,10 @@ interface UseCustomMenuProps<TData> extends ColumnSelectorProps<TData> {}
 
 export function ColumnSelectorMenu<TData>({
   uniqueName,
+  reactTable,
   hideExportButton,
-  reactTable
+  hideApplyButton,
+  forceUpdate
 }: UseCustomMenuProps<TData>) {
   const { formatMessage, messages } = useIntl();
   // For finding columns using text search
@@ -76,17 +85,18 @@ export function ColumnSelectorMenu<TData>({
       `${uniqueName}_columnSelector`,
       {}
     );
+  const filteredColumnsState: VisibilityState = localStorageColumnStates
+    ? localStorageColumnStates
+    : {};
   // Columns filtered from text search
   const [searchedColumns, setSearchedColumns] =
     useState<Column<TData, unknown>[]>();
 
   // Set initial columns for column selector dropdown and local storage
   useEffect(() => {
-    reactTable?.getAllLeafColumns().forEach((column) => {
-      if (localStorageColumnStates?.[column.id] === false) {
-        column.toggleVisibility(false);
-      }
-    });
+    if (localStorageColumnStates) {
+      reactTable?.setColumnVisibility(localStorageColumnStates);
+    }
     setSearchedColumns(reactTable?.getAllLeafColumns());
   }, [reactTable, reactTable?.getAllColumns().length]);
 
@@ -112,6 +122,7 @@ export function ColumnSelectorMenu<TData>({
       Object.keys(visibilityState).forEach((columnId) => {
         visibilityState[columnId] = event.target.checked;
       });
+      visibilityState.selectColumn = true;
       setLocalStorageColumnStates(visibilityState);
     }
     const reactTableToggleAllHander =
@@ -133,29 +144,28 @@ export function ColumnSelectorMenu<TData>({
         isChecked={reactTable?.getIsAllColumnsVisible()}
       />
       {searchedColumns?.map((column) => {
-        function handdleToggle(event) {
-          const reactTableToggleHandler = column?.getToggleVisibilityHandler();
-          reactTableToggleHandler(event);
-          const columnId = column.id;
-          setLocalStorageColumnStates({
-            ...localStorageColumnStates,
-            [columnId]: event.target.checked
-          });
-        }
         return (
           <>
             <Checkbox
               key={column?.id}
               id={column?.id}
-              handleClick={handdleToggle}
               isChecked={column?.getIsVisible()}
               isField={true}
+              filteredColumnsState={filteredColumnsState}
             />
           </>
         );
       })}
     </div>
   );
+
+  function applyFilterColumns() {
+    if (filteredColumnsState) {
+      reactTable?.setColumnVisibility(filteredColumnsState);
+    }
+    setLocalStorageColumnStates(filteredColumnsState);
+    forceUpdate?.();
+  }
 
   async function exportData() {
     setLoading(true);
@@ -221,7 +231,6 @@ export function ColumnSelectorMenu<TData>({
       if (props.style) {
         props.style.transform = "translate(0px, 40px)";
       }
-
       return (
         <div
           ref={ref}
@@ -262,19 +271,36 @@ export function ColumnSelectorMenu<TData>({
             }}
           />
           <Dropdown.Divider />
-          {!hideExportButton && (
-            <Button
-              disabled={loading}
-              className="btn btn-primary mt-2 bulk-edit-button"
-              onClick={exportData}
-            >
-              {loading ? (
-                <LoadingSpinner loading={loading} />
-              ) : (
-                formatMessage({ id: "exportButtonText" })
+          {
+            <div className="d-flex gap-2">
+              {!hideExportButton && (
+                <Button
+                  disabled={loading}
+                  className="btn btn-primary mt-1 mb-2 bulk-edit-button"
+                  onClick={exportData}
+                >
+                  {loading ? (
+                    <LoadingSpinner loading={loading} />
+                  ) : (
+                    formatMessage({ id: "exportButtonText" })
+                  )}
+                </Button>
               )}
-            </Button>
-          )}
+              {!hideApplyButton && (
+                <Button
+                  disabled={loading}
+                  className="btn btn-primary mt-1 mb-2 bulk-edit-button"
+                  onClick={applyFilterColumns}
+                >
+                  {loading ? (
+                    <LoadingSpinner loading={loading} />
+                  ) : (
+                    formatMessage({ id: "applyButtonText" })
+                  )}
+                </Button>
+              )}
+            </div>
+          }
           {columnSelectionCheckboxesInternal}
         </div>
       );

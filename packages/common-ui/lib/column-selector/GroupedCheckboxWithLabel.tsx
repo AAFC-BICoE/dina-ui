@@ -1,24 +1,27 @@
 import { startCase } from "lodash";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useIntl } from "react-intl";
-import { useLocalStorage } from "@rehooks/local-storage";
+import { VisibilityState } from "@tanstack/react-table";
 
 export interface CheckboxProps {
   id: string;
   name?: string;
-  handleClick?: (e: any) => void;
   isChecked?: boolean;
   isField?: boolean;
+  filteredColumnsState?: VisibilityState;
+  handleClick?: (e: any) => void;
 }
 
 export function Checkbox({
   id,
   name,
-  handleClick,
   isChecked,
-  isField
+  isField,
+  filteredColumnsState,
+  handleClick
 }: CheckboxProps) {
   const { formatMessage, messages } = useIntl();
+  const [checked, setChecked] = useState<boolean>(isChecked ?? false);
   // Try to use dina messages first, if not just use the string directly.
   const messageKey = isField ? `field_${id}` : id;
   const label =
@@ -28,13 +31,20 @@ export function Checkbox({
       : messages[id]
       ? formatMessage({ id: id as any })
       : startCase(id));
+  function internalHandleClick(event) {
+    const checkedState = event?.target?.checked;
+    setChecked(checkedState);
+    if (filteredColumnsState) {
+      filteredColumnsState[id] = checkedState;
+    }
+  }
   return (
     <div hidden={id === "selectColumn"}>
       <input
         id={id}
         type={"checkbox"}
-        onChange={handleClick}
-        checked={id === "selectColumn" ? true : isChecked}
+        onChange={handleClick ?? internalHandleClick}
+        checked={checked}
         style={{
           marginRight: "0.3rem",
           height: "1.3rem",
@@ -42,130 +52,6 @@ export function Checkbox({
         }}
       />
       <span>{label}</span>
-    </div>
-  );
-}
-
-interface CheckboxResource {
-  accessorKey: string;
-  id: string;
-  [key: string]: any;
-}
-export interface UseGroupedCheckboxWithLabelProps {
-  resources: CheckboxResource[];
-  isField?: boolean;
-  localStorageKey?: string;
-}
-
-export function getResourcesWithId(resources) {
-  return resources.map((resource) => {
-    if (!resource.id) {
-      if (typeof resource === "string") {
-        resource = { id: resource, accessorKey: resource };
-      } else {
-        resource.id = resource?.accessorKey?.split(".").at(-1) as string;
-      }
-    }
-    return resource;
-  });
-}
-
-export function useGroupedCheckboxWithLabel({
-  resources,
-  isField,
-  localStorageKey
-}: UseGroupedCheckboxWithLabelProps) {
-  const [list, setList] = useState<CheckboxResource[]>(
-    getResourcesWithId(resources)
-  );
-  const [checkedColumnIds, setCheckedColumnIds] = useLocalStorage<string[]>(
-    `${localStorageKey}_columnChooser`,
-    list.map((resource) => resource.id ?? "")
-  );
-  const [isCheckAll, setIsCheckAll] = useState<boolean>(
-    checkedColumnIds.filter((id) => id !== "selectColumn").length ===
-      list.filter((resource) => resource.id !== "selectColumn").length
-  );
-  useEffect(() => {
-    setList(getResourcesWithId(resources));
-    setCheckedColumnIds(list.map((resource) => resource.id ?? ""));
-  }, [resources]);
-
-  const handleSelectAll = (_e) => {
-    setIsCheckAll(!isCheckAll);
-    setCheckedColumnIds(list.map((li) => li.id));
-    if (isCheckAll) {
-      setCheckedColumnIds([]);
-    }
-  };
-
-  const handleClick = (e) => {
-    const { id, checked } = e.target;
-    if (!checked) {
-      setCheckedColumnIds(checkedColumnIds.filter((item) => item !== id));
-      setIsCheckAll(false);
-    } else {
-      if (
-        [...checkedColumnIds, id].filter(
-          (selectedId) => selectedId !== "selectColumn"
-        ).length ===
-        list.filter((resource) => resource.id !== "selectColumn").length
-      ) {
-        setIsCheckAll(true);
-      }
-      setCheckedColumnIds([...checkedColumnIds, id]);
-    }
-  };
-
-  const groupedCheckBoxes = GroupedCheckboxes({
-    handleSelectAll,
-    isCheckAll,
-    list,
-    handleClick,
-    checkedColumnIds,
-    isField
-  });
-
-  return { groupedCheckBoxes, checkedColumnIds };
-}
-
-export interface GroupedCheckboxesProps {
-  handleSelectAll: (_e: any) => void;
-  isCheckAll: boolean;
-  list: CheckboxResource[];
-  handleClick: (e: any) => void;
-  checkedColumnIds: any;
-  isField: boolean | undefined;
-}
-
-function GroupedCheckboxes({
-  handleSelectAll,
-  isCheckAll,
-  list,
-  handleClick,
-  checkedColumnIds,
-  isField
-}: GroupedCheckboxesProps) {
-  return (
-    <div>
-      <Checkbox
-        id="selectAll"
-        handleClick={handleSelectAll}
-        isChecked={isCheckAll}
-      />
-      {list.map(({ id }) => {
-        return (
-          <>
-            <Checkbox
-              key={id}
-              id={id}
-              handleClick={handleClick}
-              isChecked={checkedColumnIds.includes(id)}
-              isField={isField}
-            />
-          </>
-        );
-      })}
     </div>
   );
 }

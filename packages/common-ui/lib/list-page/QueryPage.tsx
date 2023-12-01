@@ -9,7 +9,13 @@ import {
 import { FormikContextType } from "formik";
 import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
 import { cloneDeep, compact, toPairs, uniq, uniqBy } from "lodash";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useReducer
+} from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
@@ -848,6 +854,7 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
@@ -963,6 +970,8 @@ export function QueryPage<TData extends KitsuResource>({
                 </div>
               )}
               <ReactTable<TData>
+                // These 3 props are needed for column selector
+                forceUpdate={forceUpdate}
                 setColumnSelector={setColumnSelector}
                 uniqueName={uniqueName}
                 // Column and data props

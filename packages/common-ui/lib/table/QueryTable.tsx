@@ -4,7 +4,7 @@ import {
   SortingState
 } from "@tanstack/react-table";
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useReducer, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
   ClientSideJoinSpec,
@@ -167,13 +167,6 @@ export function QueryTable<TData extends KitsuResource>({
 
   const divWrapperRef = useRef<HTMLDivElement>(null);
   const [reactTable, setReactTable] = useState<Table<TData>>();
-  const [_columnSelectionCheckboxes, setColumnSelectionCheckboxes] =
-    useState<JSX.Element>();
-  const { columnSelector } = ColumnSelector({
-    uniqueName: path,
-    hideExportButton: true,
-    reactTable
-  });
 
   function onPageChangeInternal(pageNumber: number) {
     const newOffset = pageNumber * page.limit;
@@ -320,6 +313,9 @@ export function QueryTable<TData extends KitsuResource>({
     });
   });
 
+  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+
   return (
     <div
       className="query-table-wrapper"
@@ -348,6 +344,10 @@ export function QueryTable<TData extends KitsuResource>({
         </div>
       </div>
       <ReactTable<TData>
+        // These 3 props are needed for column selector
+        forceUpdate={forceUpdate}
+        setColumnSelector={setColumnSelector}
+        uniqueName={path}
         className="-striped"
         columns={mappedColumns}
         data={(displayData as TData[]) ?? []}
@@ -368,8 +368,6 @@ export function QueryTable<TData extends KitsuResource>({
         onPageChange={onPageChangeInternal}
         onSortingChange={onSortingChangeInternal}
         pageSizeOptions={pageSizeOptions}
-        setColumnSelectionCheckboxes={setColumnSelectionCheckboxes}
-        setReactTable={setReactTable}
         {...resolvedReactTableProps}
         TbodyComponent={
           error
