@@ -58,13 +58,14 @@ function getDescriptionByLanguage(
  * description.
  */
 export function descriptionCell(accessorKey: string) {
-  const { locale } = useContext(intlContext);
-  // Retrieve the current language being used.
-  const language = locale;
-
+  const language = window.localStorage.getItem("locale") ?? "en";
   return {
     cell: ({ row: { original } }) => {
-      const description = getDescriptionByLanguage(original, accessorKey, language);
+      const description = getDescriptionByLanguage(
+        original,
+        accessorKey,
+        language
+      );
       return description ? (
         <div>
           <span className="description list-inline-item">
@@ -79,16 +80,20 @@ export function descriptionCell(accessorKey: string) {
     accessorKey,
     header: () => <FieldHeader name="multilingualDescription" />,
     sortingFn: (rowa, rowb) => {
-      const descA = getDescriptionByLanguage(rowa.original, accessorKey, language)?.desc ?? undefined;
-      const descB = getDescriptionByLanguage(rowb.original, accessorKey, language)?.desc ?? undefined;
-      if(descA === undefined && descB === undefined) {
+      const descA =
+        getDescriptionByLanguage(rowa.original, accessorKey, language)?.desc ??
+        undefined;
+      const descB =
+        getDescriptionByLanguage(rowb.original, accessorKey, language)?.desc ??
+        undefined;
+      if (descA === undefined && descB === undefined) {
         return 0;
       } else if (descA !== undefined && descB === undefined) {
         return 1;
       } else if (descA === undefined && descB !== undefined) {
-        return -1
+        return -1;
       } else {
-        return descA === descB ? 0 : (descA! < descB! ? -1 : 1); 
+        return descA === descB ? 0 : descA! < descB! ? -1 : 1;
       }
     }
   };
@@ -104,26 +109,34 @@ export function allLangsDescriptionCell(accessorKey: string) {
         original: { value }
       }
     }) =>
-      value?.descriptions?.sort((a, b) => a?.lang === b?.lang ? 0 :(a?.lang < b?.lang ? -1 : 1)).map(
-        (desc, index) =>
-          desc?.desc && (
-            <div className="pb-2" key={index}>
-              <strong>{desc?.lang}: </strong> {desc?.desc}
-            </div>
-          )
-      ) ?? null,
+      value?.descriptions
+        ?.sort((a, b) => (a?.lang === b?.lang ? 0 : a?.lang < b?.lang ? -1 : 1))
+        .map(
+          (desc, index) =>
+            desc?.desc && (
+              <div className="pb-2" key={index}>
+                <strong>{desc?.lang}: </strong> {desc?.desc}
+              </div>
+            )
+        ) ?? null,
     accessorKey,
     sortingFn: (rowa, rowb) => {
-      const descA = rowa.descriptions?.sort((a, b) => a?.lang === b?.lang ? 0 :(a?.lang < b?.lang ? -1 : 1)).map(item => item?.desc)?.join(',');
-      const descB = rowb.descriptions?.sort((a, b) => a?.lang === b?.lang ? 0 :(a?.lang < b?.lang ? -1 : 1)).map(item => item?.desc)?.join(',');
-      if(descA === undefined && descB === undefined) {
+      const descA = rowa.descriptions
+        ?.sort((a, b) => (a?.lang === b?.lang ? 0 : a?.lang < b?.lang ? -1 : 1))
+        .map((item) => item?.desc)
+        ?.join(",");
+      const descB = rowb.descriptions
+        ?.sort((a, b) => (a?.lang === b?.lang ? 0 : a?.lang < b?.lang ? -1 : 1))
+        .map((item) => item?.desc)
+        ?.join(",");
+      if (descA === undefined && descB === undefined) {
         return 0;
       } else if (descA !== undefined && descB === undefined) {
         return 1;
       } else if (descA === undefined && descB !== undefined) {
-        return -1
+        return -1;
       } else {
-        return descA === descB ? 0 : (descA! < descB! ? -1 : 1); 
+        return descA === descB ? 0 : descA! < descB! ? -1 : 1;
       }
     }
   };
