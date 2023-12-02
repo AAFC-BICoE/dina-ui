@@ -58,7 +58,7 @@ function getDescriptionByLanguage(
  * description.
  */
 export function descriptionCell(accessorKey: string) {
-  const language = window.localStorage.getItem("locale") ?? "en";
+  const language = localStorage.getItem("locale") ?? "en";
   return {
     cell: ({ row: { original } }) => {
       const description = getDescriptionByLanguage(
