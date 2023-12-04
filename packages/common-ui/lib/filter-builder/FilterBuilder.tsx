@@ -14,7 +14,18 @@ export type FilterAttribute = string | FilterAttributeConfig;
 export interface FilterAttributeConfig {
   name: string;
   label?: string;
+
+  /**
+   * If enabled, ranges will be split into greater than and less than parts.
+   *
+   * Can be combined with allowList option as well.
+   */
   allowRange?: boolean;
+
+  /**
+   * If enabled, any commas will be automatically inserted into a IN query.
+   */
+  allowList?: boolean;
 
   /** Only needed for date or dropdown filters. */
   type?: FilterAttributeType;

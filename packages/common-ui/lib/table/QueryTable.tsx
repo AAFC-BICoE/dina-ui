@@ -3,7 +3,13 @@ import {
   ColumnFiltersState,
   SortingState
 } from "@tanstack/react-table";
-import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
+import {
+  FieldsParam,
+  FilterParam,
+  KitsuResource,
+  KitsuResponse,
+  PersistedResource
+} from "kitsu";
 import { ReactNode, useEffect, useReducer, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
@@ -53,6 +59,16 @@ interface ElasticSearchColumnProps {
 
 /** QueryTable component's props. */
 export interface QueryTableProps<TData extends KitsuResource> {
+  /** if this is true, it will load all data, then filter, sort, paginate in memory */
+  enableInMemoryFilter?: boolean;
+
+  /** a filter function, which is used to filter the data when enableInMemoryFilter */
+  filterFn?: (
+    value: PersistedResource<TData>,
+    index?: number,
+    array?: PersistedResource<TData>[]
+  ) => boolean;
+
   /** Dependencies: When the values in this array are changed, re-fetch the data. */
   deps?: any[];
 
@@ -123,6 +139,8 @@ const DEFAULT_PAGE_SIZE = 25;
  * Table component that fetches data from the backend API.
  */
 export function QueryTable<TData extends KitsuResource>({
+  enableInMemoryFilter = false,
+  filterFn = () => true,
   columns,
   defaultPageSize = DEFAULT_PAGE_SIZE,
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
@@ -234,14 +252,24 @@ export function QueryTable<TData extends KitsuResource>({
     sortingRules.map(({ desc, id }) => `${desc ? "-" : ""}${id}`).join() ||
     undefined;
 
-  const query: JsonApiQuerySpec = {
-    path,
-    fields,
-    filter,
-    include,
-    ...(!omitPaging && { page }),
-    sort
-  };
+  let query: JsonApiQuerySpec;
+  if (enableInMemoryFilter) {
+    query = {
+      path,
+      fields,
+      include,
+      sort
+    };
+  } else {
+    query = {
+      path,
+      fields,
+      filter,
+      include,
+      ...(!omitPaging && { page }),
+      sort
+    };
+  }
 
   const mappedColumns: ColumnDef<TData>[] = columns.map((column) => {
     // The "columns" prop can be a string or a react-table Column type.
@@ -276,7 +304,15 @@ export function QueryTable<TData extends KitsuResource>({
     useRef<KitsuResponse<TData[], MetaWithTotal>>();
 
   if (response) {
-    lastSuccessfulResponse.current = response;
+    if (enableInMemoryFilter) {
+      const data = response.data.filter(filterFn);
+      lastSuccessfulResponse.current = {
+        data,
+        meta: { totalResourceCount: data.length }
+      };
+    } else {
+      lastSuccessfulResponse.current = response;
+    }
   }
 
   const totalCount =
@@ -354,13 +390,13 @@ export function QueryTable<TData extends KitsuResource>({
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}
         enableFilters={enableFilters}
-        defaultColumnFilters={defaultColumnFilters}
-        manualFiltering={true}
+        defaultColumnFilters={columnFilters}
+        manualFiltering={!enableInMemoryFilter}
         onColumnFiltersChange={onColumnFiltersChangeInternal}
-        manualPagination={true}
+        manualPagination={!enableInMemoryFilter}
         enableSorting={true}
         enableMultiSort={true}
-        manualSorting={true}
+        manualSorting={!enableInMemoryFilter}
         pageCount={numberOfPages}
         showPaginationTop={shouldShowPagination && !hideTopPagination}
         showPagination={shouldShowPagination}
