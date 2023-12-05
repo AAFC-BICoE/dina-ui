@@ -39,37 +39,6 @@ export function ColumnSelector<TData>({
   hideApplyButton = false,
   forceUpdate
 }: ColumnSelectorProps<TData>) {
-  const CustomColumnSelectorMenu = ColumnSelectorMenu({
-    uniqueName,
-    reactTable,
-    hideExportButton,
-    hideApplyButton,
-    forceUpdate
-  });
-  return menuOnly ? (
-    <CustomColumnSelectorMenu />
-  ) : (
-    <Dropdown>
-      <Dropdown.Toggle>
-        <DinaMessage id="selectColumn" />
-      </Dropdown.Toggle>
-      <Dropdown.Menu
-        as={CustomColumnSelectorMenu}
-        style={{ maxHeight: "20rem", overflowY: "scroll" }}
-      />
-    </Dropdown>
-  );
-}
-
-interface UseCustomMenuProps<TData> extends ColumnSelectorProps<TData> {}
-
-export function ColumnSelectorMenu<TData>({
-  uniqueName,
-  reactTable,
-  hideExportButton,
-  hideApplyButton,
-  forceUpdate
-}: UseCustomMenuProps<TData>) {
   const { formatMessage, messages } = useIntl();
   // For finding columns using text search
   const columnSearchMapping: { label: string; id: string }[] | undefined =
@@ -85,6 +54,7 @@ export function ColumnSelectorMenu<TData>({
       `${uniqueName}_columnSelector`,
       {}
     );
+  // Keep track of user selected options for when user presses "Apply"
   const filteredColumnsState: VisibilityState = localStorageColumnStates
     ? localStorageColumnStates
     : {};
@@ -135,29 +105,6 @@ export function ColumnSelectorMenu<TData>({
       selectColumn?.toggleVisibility(true);
     }
   }
-
-  const columnSelectionCheckboxesInternal = (
-    <div>
-      <Checkbox
-        id="selectAll"
-        handleClick={handleToggleAll}
-        isChecked={reactTable?.getIsAllColumnsVisible()}
-      />
-      {searchedColumns?.map((column) => {
-        return (
-          <>
-            <Checkbox
-              key={column?.id}
-              id={column?.id}
-              isChecked={column?.getIsVisible()}
-              isField={true}
-              filteredColumnsState={filteredColumnsState}
-            />
-          </>
-        );
-      })}
-    </div>
-  );
 
   function applyFilterColumns() {
     if (filteredColumnsState) {
@@ -226,7 +173,21 @@ export function ColumnSelectorMenu<TData>({
     setLoading(false);
   }
 
-  return React.forwardRef(
+  const CheckboxItem = React.forwardRef((props: any, ref) => {
+    return (
+      <Checkbox
+        key={props.id}
+        id={props.id}
+        isChecked={props.isChecked}
+        isField={props.isField}
+        filteredColumnsState={filteredColumnsState}
+        ref={ref}
+        handleClick={props.handleClick}
+      />
+    );
+  });
+
+  const ColumnSelectorMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
       if (props.style) {
         props.style.transform = "translate(0px, 40px)";
@@ -301,12 +262,55 @@ export function ColumnSelectorMenu<TData>({
               )}
             </div>
           }
-          {columnSelectionCheckboxesInternal}
+          {props.children}
         </div>
       );
     }
   );
+
+  return menuOnly ? (
+    <ColumnSelectorMenu />
+  ) : (
+    <Dropdown>
+      <Dropdown.Toggle>
+        <DinaMessage id="selectColumn" />
+      </Dropdown.Toggle>
+      <Dropdown.Menu
+        as={ColumnSelectorMenu}
+        style={{ maxHeight: "20rem", overflowY: "scroll" }}
+      >
+        <Dropdown.Item
+          id="selectAll"
+          handleClick={handleToggleAll}
+          isChecked={reactTable?.getIsAllColumnsVisible()}
+          as={CheckboxItem}
+        />
+        {searchedColumns?.map((column) => {
+          return (
+            <>
+              <Dropdown.Item
+                key={column?.id}
+                id={column?.id}
+                isChecked={column?.getIsVisible()}
+                isField={true}
+                as={CheckboxItem}
+              />
+            </>
+          );
+        })}
+      </Dropdown.Menu>
+    </Dropdown>
+  );
 }
+
+async function fetchExtensionValues(apiClient: Kitsu, path, filter: any) {
+  const { data } = await apiClient.get(path, {
+    filter
+  });
+
+  return data;
+}
+
 export async function downloadDataExport(
   apiClient: Kitsu,
   id: string | undefined

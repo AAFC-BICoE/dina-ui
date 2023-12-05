@@ -10,6 +10,7 @@ export interface CheckboxProps {
   isField?: boolean;
   filteredColumnsState?: VisibilityState;
   handleClick?: (e: any) => void;
+  ref?: React.ForwardedRef<any>;
 }
 
 export function Checkbox({
@@ -18,7 +19,8 @@ export function Checkbox({
   isChecked,
   isField,
   filteredColumnsState,
-  handleClick
+  handleClick,
+  ref
 }: CheckboxProps) {
   const { formatMessage, messages } = useIntl();
   const [checked, setChecked] = useState<boolean>(isChecked ?? false);
@@ -39,7 +41,7 @@ export function Checkbox({
     }
   }
   return (
-    <div hidden={id === "selectColumn"}>
+    <div hidden={id === "selectColumn"} ref={ref}>
       <input
         key={id}
         id={id}
