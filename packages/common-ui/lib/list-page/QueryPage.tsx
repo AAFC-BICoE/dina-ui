@@ -691,7 +691,7 @@ export function QueryPage<TData extends KitsuResource>({
       ...columnVisibility,
       ...localStorageColumnStates
     });
-  }, [loadingIndexMapColumns]);
+  }, [totalColumns]);
 
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     defaultSorted: sortingRules,
