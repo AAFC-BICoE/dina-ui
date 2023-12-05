@@ -272,7 +272,7 @@ export function ReactTable<TData>({
       setColumnSelectorCustomMenu(columnSelector);
     }
   }, [
-    ...table.getAllLeafColumns().map((column) => column.getIsVisible()),
+    table.getState().columnVisibility,
     table.getAllLeafColumns().length
   ]);
 

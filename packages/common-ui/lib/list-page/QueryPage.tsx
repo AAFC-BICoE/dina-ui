@@ -276,8 +276,6 @@ export function QueryPage<TData extends KitsuResource>({
   const { formatMessage, formatNumber, locale, messages } = useIntl();
   const { groupNames } = useAccount();
 
-  // Generate the options that can be selected for the field dropdown.
-
   const { columnSelectorIndexMapColumns, loadingIndexMapColumns } =
     enableColumnSelector
       ? useColumnSelectorIndexMapColumns({

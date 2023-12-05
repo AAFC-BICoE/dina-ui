@@ -41,6 +41,7 @@ export function Checkbox({
   return (
     <div hidden={id === "selectColumn"}>
       <input
+        key={id}
         id={id}
         type={"checkbox"}
         onChange={handleClick ?? internalHandleClick}
