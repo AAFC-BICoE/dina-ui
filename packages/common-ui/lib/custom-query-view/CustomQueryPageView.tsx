@@ -54,14 +54,6 @@ export interface CustomQueryPageViewProps<TData extends KitsuResource>
   titleKey?: keyof typeof DINAUI_MESSAGES_ENGLISH;
 
   /**
-   * This key is used for generating the local storage key so the option can be saved in the users
-   * local storage.
-   *
-   * If no key is provided, local storage for saving the option will be disabled.
-   */
-  localStorageKey?: string;
-
-  /**
    * If options are provided, a dropdown menu to the right of the legend title will be displayed
    * to allow the user to choose the query thats being displayed.
    *
@@ -72,12 +64,11 @@ export interface CustomQueryPageViewProps<TData extends KitsuResource>
 
 export function CustomQueryPageView<TData extends KitsuResource>({
   titleKey,
-  localStorageKey,
   customQueryOptions,
   ...queryPageProps
 }: CustomQueryPageViewProps<TData>) {
-  const CUSTOM_QUERY_PAGE_LOCAL_STORAGE_KEY = localStorageKey
-    ? localStorageKey + "-custom-query-page-option"
+  const CUSTOM_QUERY_PAGE_LOCAL_STORAGE_KEY = queryPageProps.uniqueName
+    ? queryPageProps.uniqueName + "-custom-query-page-option"
     : null;
 
   const { formatMessage, locale } = useDinaIntl();
@@ -163,6 +154,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
         <>
           <QueryPage<TData>
             {...queryPageProps}
+            enableColumnChooser={false}
             customViewQuery={customQuerySelected.customQuery}
             customViewFields={customQuerySelected.customViewFields ?? []}
             customViewElasticSearchQuery={

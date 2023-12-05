@@ -32,7 +32,7 @@ describe("BackButton", () => {
   it("Back to list button", () => {
     // Simple back to list button snapshot test.
     const backToListButtonWrapper = mountWithAppContext(
-      <BackButton entityLink={ENTITY_LINK} reloadLastSearch={true} />
+      <BackButton entityLink={ENTITY_LINK} />
     );
 
     expect(backToListButtonWrapper.html()).toMatchSnapshot();
@@ -50,7 +50,7 @@ describe("BackButton", () => {
 
     // Test with reload last search option snapshot test.
     const reloadLastSearchWrapper = mountWithAppContext(
-      <BackButton entityLink={ENTITY_LINK} reloadLastSearch={true} />
+      <BackButton entityLink={ENTITY_LINK} />
     );
 
     expect(reloadLastSearchWrapper.html()).toMatchSnapshot();

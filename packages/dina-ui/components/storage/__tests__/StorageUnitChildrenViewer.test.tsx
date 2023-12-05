@@ -70,7 +70,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           }
         case "hierarchy,storageUnitType":
           switch (params?.filter?.rsql) {
-            case "group==aafc;group==cnc":
+            case "group=in=(aafc,cnc)":
             case "":
               // The searchable table results:
               return {

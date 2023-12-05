@@ -63,16 +63,19 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
             ]
           : []),
         ...(groupNames
-          ? groupNames.map((group, index) => {
-              return {
-                id: -index,
+          ? [
+              {
+                id: -1234,
                 type: "FILTER_ROW" as const,
-                attribute: "group",
                 predicate: "IS" as const,
                 searchType: "EXACT_MATCH" as const,
-                value: group
-              };
-            })
+                value: groupNames.join(","),
+                attribute: {
+                  allowRange: true,
+                  name: "group"
+                }
+              }
+            ]
           : [])
       ]
     });
