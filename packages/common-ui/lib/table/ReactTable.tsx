@@ -266,15 +266,11 @@ export function ReactTable<TData>({
           uniqueName={uniqueName}
           reactTable={table}
           menuOnly={true}
-          hideApplyButton={true}
         />
       );
       setColumnSelectorCustomMenu(columnSelector);
     }
-  }, [
-    table.getState().columnVisibility,
-    table.getAllLeafColumns().length
-  ]);
+  }, [table.getState().columnVisibility, table.getAllLeafColumns().length]);
 
   return !hideTable ? (
     <div

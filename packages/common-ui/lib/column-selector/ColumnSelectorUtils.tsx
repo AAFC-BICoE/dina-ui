@@ -10,6 +10,7 @@ import lodash, { get, startCase } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useIndexMapping } from "../list-page/useIndexMapping";
 import { useIntl } from "react-intl";
+import { query } from "kitsu-core";
 export interface ColumnSelectorIndexMapColumns {
   indexName: string;
 
@@ -30,7 +31,7 @@ export function useColumnSelectorIndexMapColumns({
 }: ColumnSelectorIndexMapColumns) {
   const [columnSelectorIndexMapColumns, setColumnSelectorIndexMapColumns] =
     useState<any[]>([]);
-  
+
   const { apiClient } = useApiClient();
   const { indexMap } = useIndexMapping({
     indexName,
@@ -38,10 +39,7 @@ export function useColumnSelectorIndexMapColumns({
   });
   const [loadingIndexMapColumns, setLoadingIndexMapColumns] =
     useState<boolean>(true);
-  const groupedIndexMappings = getGroupedIndexMappings(
-    indexName,
-    indexMap
-  );
+  const groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
   useEffect(() => {
     if (!indexMap) {
       return;
@@ -55,8 +53,10 @@ export function useColumnSelectorIndexMapColumns({
             await getDynamicFieldColumns(
               queryOption,
               apiClient,
-              setColumnSelectorIndexMapColumns,
+              setColumnSelectorIndexMapColumns
             );
+          } else {
+            getStandardColumns(queryOption, setColumnSelectorIndexMapColumns);
           }
         }
       }
@@ -69,10 +69,61 @@ export function useColumnSelectorIndexMapColumns({
   return { columnSelectorIndexMapColumns, loadingIndexMapColumns };
 }
 
+// Get standard columns that don't have dynamicField
+function getStandardColumns(
+  queryOption: QueryOption,
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>
+) {
+  if (queryOption.parentType) {
+    // getIncludedStandardColumns(queryOption, setColumnSelectorIndexMapColumns);
+  } else {
+    getAttributesStandardColumns(queryOption, setColumnSelectorIndexMapColumns);
+  }
+}
+
+// Get standard columns that are the default attributes of the resource
+function getAttributesStandardColumns(
+  queryOption: QueryOption,
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>
+) {
+  let column;
+  if (queryOption.type === "date") {
+    column = dateCell(queryOption.label, queryOption.value, undefined, false);
+  } else {
+    column = {
+      id: queryOption.label,
+      header: () => <FieldHeader name={queryOption.label} />,
+      accessorKey: queryOption.value,
+      isKeyword: queryOption.keywordMultiFieldSupport,
+      isColumnVisible: false
+    };
+  }
+  setColumnSelectorIndexMapColumns((currentColumns) => {
+    if (
+      !currentColumns.find(
+        (currentColumn) =>
+          currentColumn.accessorKey === (column as any).accessorKey
+      )
+    ) {
+      const newColumns = [...currentColumns, column];
+      return newColumns;
+    } else {
+      return currentColumns;
+    }
+  });
+}
+
+// Get standard columns that are the included relationships of the resource
+// function getIncludedStandardColumns(
+//   queryOption: QueryOption,
+//   setColumnSelectorIndexMapColumns: React.Dispatch<any>
+// ) {}
+
+// Handle getting columns from query options that contain dynamicField
 async function getDynamicFieldColumns(
   queryOption: QueryOption,
   apiClient: Kitsu,
-  setColumnSelectorIndexMapColumns: React.Dispatch<any>,
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>
 ) {
   if (queryOption.type === "fieldExtension") {
     await getExtensionValuesColumns(
@@ -84,7 +135,7 @@ async function getDynamicFieldColumns(
     await getManagedAttributesColumns(
       queryOption,
       apiClient,
-      setColumnSelectorIndexMapColumns,
+      setColumnSelectorIndexMapColumns
     );
   } else {
     throw Error("Uncaught queryOption type.");
@@ -94,13 +145,13 @@ async function getDynamicFieldColumns(
 async function getManagedAttributesColumns(
   queryOption: QueryOption,
   apiClient: Kitsu,
-  setColumnSelectorIndexMapColumns: React.Dispatch<any>,
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>
 ) {
   const filter = {
     managedAttributeComponent: queryOption.dynamicField?.component
   };
   try {
-    const managedAttributes = await fetchManagedAttributes(
+    const managedAttributes = await fetchDynamicField(
       apiClient,
       queryOption.dynamicField?.apiEndpoint,
       filter
@@ -116,12 +167,12 @@ async function getManagedAttributesColumns(
       getAttributesManagedAttributeColumns(
         managedAttributes,
         queryOption,
-        setColumnSelectorIndexMapColumns,
+        setColumnSelectorIndexMapColumns
       );
     }
   } catch (error) {
     // Handle the error here, e.g., log it or display an error message.
-    throw(error);
+    throw error;
   }
 }
 
@@ -133,7 +184,7 @@ function getIncludedManagedAttributeColumns(
   for (const managedAttribute of managedAttributes) {
     const managedAttributeKey = managedAttribute.key;
     const accessorKey = `${queryOption.path}.${managedAttributeKey}`;
-    
+
     const managedAttributesColumn = {
       cell: ({ row: { original } }) => {
         const relationshipAccessor = accessorKey?.split(".");
@@ -146,66 +197,58 @@ function getIncludedManagedAttributeColumns(
         const value = get(original, valuePath);
         return <>{value}</>;
       },
-      header: () => (
-        <FieldHeader
-          name={managedAttribute.name}
-        />
-      ),
-      accessorKey: accessorKey,
+      header: () => <FieldHeader name={managedAttribute.name} />,
+      accessorKey,
       id: managedAttribute.name,
       isKeyword: queryOption.keywordMultiFieldSupport,
       isColumnVisible: false,
-      relationshipType: queryOption.parentType,
+      relationshipType: queryOption.parentType
     };
-    
-      setColumnSelectorIndexMapColumns((currentColumns) => {
-        if (
-          !currentColumns.find(
-            (currentColumn) =>
-              currentColumn.accessorKey === managedAttributesColumn.accessorKey
-          )
-        ) {
-          const newColumns = [...currentColumns, managedAttributesColumn];
-          return newColumns;
-        } else {
-          return currentColumns;
-        }
-      });
+
+    setColumnSelectorIndexMapColumns((currentColumns) => {
+      if (
+        !currentColumns.find(
+          (currentColumn) =>
+            currentColumn.accessorKey === managedAttributesColumn.accessorKey
+        )
+      ) {
+        const newColumns = [...currentColumns, managedAttributesColumn];
+        return newColumns;
+      } else {
+        return currentColumns;
+      }
+    });
   }
 }
 
 function getAttributesManagedAttributeColumns(
   managedAttributes,
   queryOption: QueryOption,
-  setColumnSelectorIndexMapColumns: React.Dispatch<any>,
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>
 ) {
   for (const managedAttribute of managedAttributes) {
     const managedAttributeKey = managedAttribute.key;
     const accessorKey = `${queryOption.path}.${managedAttributeKey}`;
     const managedAttributesColumn = {
-      header: () => (
-        <FieldHeader
-          name={managedAttribute.name}
-        />
-      ),
-      accessorKey: accessorKey,
+      header: () => <FieldHeader name={managedAttribute.name} />,
+      accessorKey,
       id: managedAttribute.name,
       isKeyword: queryOption.keywordMultiFieldSupport,
-      isColumnVisible: false,
+      isColumnVisible: false
     };
-      setColumnSelectorIndexMapColumns((currentColumns) => {
-        if (
-          !currentColumns.find(
-            (currentColumn) =>
-              currentColumn.accessorKey === managedAttributesColumn.accessorKey
-          )
-        ) {
-          const newColumns = [...currentColumns, managedAttributesColumn];
-          return newColumns;
-        } else {
-          return currentColumns;
-        }
-      });
+    setColumnSelectorIndexMapColumns((currentColumns) => {
+      if (
+        !currentColumns.find(
+          (currentColumn) =>
+            currentColumn.accessorKey === managedAttributesColumn.accessorKey
+        )
+      ) {
+        const newColumns = [...currentColumns, managedAttributesColumn];
+        return newColumns;
+      } else {
+        return currentColumns;
+      }
+    });
   }
 }
 
@@ -243,17 +286,8 @@ function getAttributesExtensionValuesColumns(
   }
 }
 
-// Fetch filtered extension values from back end
-async function fetchExtensionValues(apiClient: Kitsu, path, filter: any) {
-  const { data } = await apiClient.get(path, {
-    filter
-  });
-
-  return data;
-}
-
-// Fetch filtered managed attrributes from back end
-async function fetchManagedAttributes(apiClient: Kitsu, path, filter?: any) {
+// Fetch filtered dynamic field from back end
+async function fetchDynamicField(apiClient: Kitsu, path, filter?: any) {
   const { data } = await apiClient.get(path, {
     filter
   });
@@ -288,7 +322,7 @@ async function getExtensionValuesColumns(
     "extension.fields.dinaComponent": queryOption.dynamicField?.component
   };
   try {
-    const extensionValues = await fetchExtensionValues(
+    const extensionValues = await fetchDynamicField(
       apiClient,
       queryOption.dynamicField?.apiEndpoint,
       filter
@@ -309,7 +343,7 @@ async function getExtensionValuesColumns(
     }
   } catch (error) {
     // Handle the error here, e.g., log it or display an error message.
-    throw(error);
+    throw error;
   }
 }
 
@@ -363,7 +397,7 @@ function getIncludedExtensionValuesColumn(
 
 export function getGroupedIndexMappings(
   indexName: string,
-  indexMap: ESIndexMapping[] | undefined,
+  indexMap: ESIndexMapping[] | undefined
 ) {
   const { formatMessage, locale, messages } = useIntl();
   return useMemo(() => {

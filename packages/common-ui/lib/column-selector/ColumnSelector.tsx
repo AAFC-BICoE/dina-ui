@@ -268,10 +268,31 @@ export function ColumnSelector<TData>({
     }
   );
 
+  const { show, showDropdown, hideDropdown, onKeyDown } = menuDisplayControl();
+
   return menuOnly ? (
-    <ColumnSelectorMenu />
+    <ColumnSelectorMenu>
+      {searchedColumns?.map((column) => {
+        return (
+          <>
+            <Dropdown.Item
+              key={column?.id}
+              id={column?.id}
+              isChecked={column?.getIsVisible()}
+              isField={true}
+              as={CheckboxItem}
+            />
+          </>
+        );
+      })}
+    </ColumnSelectorMenu>
   ) : (
-    <Dropdown>
+    <Dropdown
+      onMouseOver={showDropdown}
+      onKeyDown={onKeyDown}
+      onMouseLeave={hideDropdown}
+      show={show}
+    >
       <Dropdown.Toggle>
         <DinaMessage id="selectColumn" />
       </Dropdown.Toggle>
@@ -303,12 +324,33 @@ export function ColumnSelector<TData>({
   );
 }
 
-async function fetchExtensionValues(apiClient: Kitsu, path, filter: any) {
-  const { data } = await apiClient.get(path, {
-    filter
-  });
-
-  return data;
+function menuDisplayControl() {
+  const [show, setShow] = useState(false);
+  const showDropdown = () => {
+    setShow(true);
+  };
+  const hideDropdown = () => {
+    setShow(false);
+  };
+  function onKeyDown(e) {
+    if (
+      e.key === "ArrowDown" ||
+      e.key === "ArrowUp" ||
+      e.key === "Space" ||
+      e.key === " " ||
+      e.key === "Enter"
+    ) {
+      showDropdown();
+    } else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab")) {
+      hideDropdown();
+    }
+  }
+  function onKeyDownLastItem(e) {
+    if (!e.shiftKey && e.key === "Tab") {
+      hideDropdown();
+    }
+  }
+  return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
 }
 
 export async function downloadDataExport(
