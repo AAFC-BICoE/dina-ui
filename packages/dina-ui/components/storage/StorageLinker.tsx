@@ -157,6 +157,7 @@ export interface StorageLinkerFieldProps {
   hideLabel?: boolean;
   parentIdInURL?: string;
   createStorageMode?: boolean;
+  parentStorageUnitUUID?: string;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
@@ -166,7 +167,8 @@ export function StorageLinkerField({
   hideLabel,
   targetType,
   parentIdInURL,
-  createStorageMode
+  createStorageMode,
+  parentStorageUnitUUID
 }: StorageLinkerFieldProps) {
   const formId = useField<string | undefined>("id")[0].value;
 
@@ -208,6 +210,7 @@ export function StorageLinkerField({
             placeholder={placeholder}
             parentIdInURL={parentIdInURL}
             createStorageMode={createStorageMode}
+            parentStorageUnitUUID={parentStorageUnitUUID}
           />
         </div>
       )}
