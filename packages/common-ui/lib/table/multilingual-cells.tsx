@@ -13,11 +13,12 @@ import { intlContext } from "../intl/IntlSupport";
  */
 export const LANGUAGE_BADGE_KEYS = {
   en: "languageDescriptionEnglish",
-  fr: "languageDescriptionFrench"
+  fr: "languageDescriptionFrench",
+  de: "languageDescriptionGerman"
 };
 
 /**
- * Used for multilingual descriptions which contain an English and French version of the
+ * Used for multilingual descriptions which contain an English, French and German version of the
  * description.
  */
 export function descriptionCell(accessorKey: string) {

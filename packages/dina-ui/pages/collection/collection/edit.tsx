@@ -184,6 +184,12 @@ export function CollectionFormFields() {
           label={formatMessage("field_description.fr")}
           multiLines={true}
         />
+        <TextField
+          className="german-description col-md-6"
+          name="multilingualDescription.de"
+          label={formatMessage("field_description.de")}
+          multiLines={true}
+        />
       </div>
       <div className="row">
         <TextField className="col-md-6" name="webpage" />

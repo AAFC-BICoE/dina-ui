@@ -206,6 +206,11 @@ export function AssemblageFormLayout() {
           name="multilingualTitle.fr"
           label={formatMessage("field_title.fr")}
         />
+        <TextField
+          className="col-md-6 german-title"
+          name="multilingualTitle.de"
+          label={formatMessage("field_title.de")}
+        />
       </div>
       <div className="row">
         <TextField
@@ -218,6 +223,12 @@ export function AssemblageFormLayout() {
           className="col-md-6 french-description"
           name="multilingualDescription.fr"
           label={formatMessage("field_description.fr")}
+          multiLines={true}
+        />
+        <TextField
+          className="col-md-6 german-description"
+          name="multilingualDescription.de"
+          label={formatMessage("field_description.de")}
           multiLines={true}
         />
       </div>

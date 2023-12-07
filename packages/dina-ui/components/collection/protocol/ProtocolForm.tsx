@@ -131,6 +131,14 @@ export function ProtocolFormLayout() {
           multiLines={true}
         />
       </div>
+      <div className="row">
+        <TextField
+          className="german-description"
+          name="multilingualDescription.de"
+          label={formatMessage("field_description.de")}
+          multiLines={true}
+        />
+      </div>
       <AttachmentsField
         name="attachments"
         title={<DinaMessage id="protocolAttachments" />}

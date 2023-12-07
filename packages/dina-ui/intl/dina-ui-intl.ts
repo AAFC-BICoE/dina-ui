@@ -1,12 +1,15 @@
 import {
   COMMON_UI_MESSAGES_ENGLISH,
   COMMON_UI_MESSAGES_FR,
+  COMMON_UI_MESSAGES_DE,
   getIntlSupport
 } from "common-ui";
 import { DINAUI_MESSAGES_ENGLISH } from "./dina-ui-en";
 import { DINAUI_MESSAGES_FRENCH } from "./dina-ui-fr";
+import { DINAUI_MESSAGES_GERMAN } from "./dina-ui-de";
 import { SEQDB_MESSAGES_ENGLISH } from "./seqdb-en";
 import { SEQDB_MESSAGES_FRENCH } from "./seqdb-fr";
+import { SEQDB_MESSAGES_GERMAN } from "./seqdb-de";
 
 const en = {
   ...COMMON_UI_MESSAGES_ENGLISH,
@@ -18,6 +21,11 @@ const fr = {
   ...SEQDB_MESSAGES_FRENCH,
   ...DINAUI_MESSAGES_FRENCH
 };
+const de = {
+  ...COMMON_UI_MESSAGES_DE,
+  ...SEQDB_MESSAGES_GERMAN,
+  ...DINAUI_MESSAGES_GERMAN
+};
 
 const { FormattedMessage, IntlProvider, useIntl } = getIntlSupport<
   // Even though Seqdb messages are included in the dina-ui messsages obejcts,
@@ -28,7 +36,7 @@ const { FormattedMessage, IntlProvider, useIntl } = getIntlSupport<
     typeof SEQDB_MESSAGES_ENGLISH
 >({
   defaultMessages: en,
-  translations: { en, fr }
+  translations: { en, fr, de }
 });
 
 export const DinaMessage = FormattedMessage;

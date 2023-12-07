@@ -167,6 +167,14 @@ export function CollectionMethodFormLayout() {
           multiLines={true}
         />
       </div>
+      <div className="row">
+        <TextField
+          className="german-description"
+          name="multilingualDescription.de"
+          label={formatMessage("field_description.de")}
+          multiLines={true}
+        />
+      </div>
       {readOnly && (
         <div className="row">
           <DateField name="createdOn" />

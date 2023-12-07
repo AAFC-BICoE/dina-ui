@@ -4,7 +4,8 @@ import Button from "react-bootstrap/Button";
 
 const LANGUAGE_LABELS = {
   en: "English",
-  fr: "Français"
+  fr: "Français",
+  de: "Deutsch"
 };
 
 export function LanguageSelector() {
