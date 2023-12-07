@@ -50,12 +50,6 @@ jest.mock("next/router", () => ({
 }));
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
-  console.log("Path: ");
-  console.log(path);
-
-  console.log("Params: ");
-  console.log(params?.filter?.rsql)
-  
   switch (path) {
     case "collection-api/storage-unit":
       switch (params?.include) {
