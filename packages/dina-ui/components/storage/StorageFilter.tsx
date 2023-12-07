@@ -108,7 +108,7 @@ export function StorageFilter({ onChange, parentStorageUnitUUID }: StorageFilter
     setCreatedByMeFilter(false);
     setStorageTypeFilter(undefined);
     setSearchText("");
-    onChange(null);
+    doSearch();
   }
 
   return (
