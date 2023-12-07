@@ -62,11 +62,17 @@ describe("AssemblageForm.", () => {
       .find(".french-title input")
       .simulate("change", { target: { value: "test french title" } });
     wrapper
+      .find(".german-title input")
+      .simulate("change", { target: { value: "test german title" } });
+    wrapper
       .find(".english-description textarea")
       .simulate("change", { target: { value: "test english description" } });
     wrapper
       .find(".french-description textarea")
       .simulate("change", { target: { value: "test french description" } });
+    wrapper
+      .find(".german-description textarea")
+      .simulate("change", { target: { value: "test german description" } });
 
     wrapper.find("form").simulate("submit");
 
@@ -92,6 +98,10 @@ describe("AssemblageForm.", () => {
                 {
                   desc: "test french description",
                   lang: "fr"
+                },
+                {
+                  desc: "test german description",
+                  lang: "de"
                 }
               ]
             },
@@ -104,6 +114,10 @@ describe("AssemblageForm.", () => {
                 {
                   title: "test french title",
                   lang: "fr"
+                },
+                {
+                  title: "test german title",
+                  lang: "de"
                 }
               ]
             },
@@ -132,6 +146,10 @@ describe("AssemblageForm.", () => {
           {
             desc: "test french description",
             lang: "fr"
+          },
+          {
+            desc: "test german description",
+            lang: "de"
           }
         ]
       },
@@ -144,6 +162,10 @@ describe("AssemblageForm.", () => {
           {
             title: "test french title",
             lang: "fr"
+          },
+          {
+            title: "test german title",
+            lang: "de"
           }
         ]
       },
@@ -163,6 +185,10 @@ describe("AssemblageForm.", () => {
               {
                 lang: "en",
                 desc: "test-eng-desc"
+              },
+              {
+                lang: "de",
+                desc: "test-de-desc"
               }
             ]
           },
@@ -189,6 +215,9 @@ describe("AssemblageForm.", () => {
       .find(".french-description textarea")
       .simulate("change", { target: { value: "test-fr-desc" } });
     wrapper
+      .find(".german-description textarea")
+      .simulate("change", { target: { value: "test-de-desc-updated" } });
+    wrapper
       .find(".english-title input")
       .simulate("change", { target: { value: "test-eng-title-updated" } });
 
@@ -207,6 +236,10 @@ describe("AssemblageForm.", () => {
                 {
                   desc: "test-eng-desc",
                   lang: "en"
+                },
+                {
+                  desc: "test-de-desc-updated",
+                  lang: "de"
                 },
                 {
                   desc: "test-fr-desc",
@@ -243,6 +276,10 @@ describe("AssemblageForm.", () => {
           {
             desc: "test-eng-desc",
             lang: "en"
+          },
+          {
+            desc: "test-de-desc-updated",
+            lang: "de"
           },
           {
             desc: "test-fr-desc",

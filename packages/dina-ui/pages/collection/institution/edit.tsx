@@ -156,6 +156,14 @@ export function InstitutionFormLayout() {
         />
       </div>
       <div className="row">
+        <TextField
+          className="german-description"
+          name="multilingualDescription.de"
+          label={formatMessage("field_description.de")}
+          multiLines={true}
+        />
+      </div>
+      <div className="row">
         <TextField className="col-md-6" name="webpage" />
         <TextField className="col-md-6" name="address" multiLines={true} />
       </div>

@@ -113,6 +113,9 @@ describe("InstitutionForm.", () => {
     wrapper
       .find(".french-description textarea")
       .simulate("change", { target: { value: "test-fr-desc" } });
+    wrapper
+      .find(".german-description textarea")
+      .simulate("change", { target: { value: "test-de-desc" } });
 
     wrapper.find("form").simulate("submit");
 
@@ -133,6 +136,10 @@ describe("InstitutionForm.", () => {
                 {
                   desc: "test-fr-desc",
                   lang: "fr"
+                },
+                {
+                  desc: "test-de-desc",
+                  lang: "de"
                 }
               ]
             },
@@ -157,6 +164,10 @@ describe("InstitutionForm.", () => {
           {
             desc: "test-fr-desc",
             lang: "fr"
+          },
+          {
+            desc: "test-de-desc",
+            lang: "de"
           }
         ]
       },

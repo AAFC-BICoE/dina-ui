@@ -256,6 +256,10 @@ describe("protocol edit page", () => {
       target: { value: "test french description" }
     });
 
+    wrapper.find(".german-description textarea").simulate("change", {
+      target: { value: "test german description" }
+    });
+
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -278,6 +282,10 @@ describe("protocol edit page", () => {
                   {
                     desc: "test french description",
                     lang: "fr"
+                  },
+                  {
+                    desc: "test german description",
+                    lang: "de"
                   }
                 ]
               },

@@ -118,6 +118,10 @@ describe("collection-method edit page", () => {
       target: { value: "test french description" }
     });
 
+    wrapper.find(".german-description textarea").simulate("change", {
+      target: { value: "test german description" }
+    });
+
     wrapper.find(".name input").simulate("change", {
       target: {
         name: "name",
@@ -147,6 +151,10 @@ describe("collection-method edit page", () => {
                   {
                     desc: "test french description",
                     lang: "fr"
+                  },
+                  {
+                    desc: "test german description",
+                    lang: "de"
                   }
                 ]
               },
