@@ -90,7 +90,8 @@ export function StorageFilter({ onChange, parentStorageUnitUUID }: StorageFilter
                 searchType: "EXACT_MATCH" as const,
                 value: groupNames.join(","),
                 attribute: {
-                  allowRange: true,
+                  allowRange: false,
+                  allowList: true,
                   name: "group"
                 }
               }

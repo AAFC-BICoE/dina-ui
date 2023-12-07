@@ -197,7 +197,7 @@ export function useQueryBuilderConfig({
  * @param indexName The index name currently being used.
  * @returns Query Builder configuration.
  */
-function generateBuilderConfig(
+export function generateBuilderConfig(
   indexMap: ESIndexMapping[],
   indexName: string,
   formatMessage: any,

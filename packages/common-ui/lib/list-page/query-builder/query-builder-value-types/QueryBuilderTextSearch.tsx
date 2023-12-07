@@ -1,15 +1,14 @@
 import React from "react";
-import {
+import { TransformToDSLProps } from "../../types";
+import { useIntl } from "react-intl";
+import { 
   includedTypeQuery,
   termQuery,
   existsQuery,
   prefixQuery,
   suffixQuery,
   infixQuery,
-  wildcardQuery
-} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { TransformToDSLProps } from "../../types";
-import { useIntl } from "react-intl";
+  wildcardQuery } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 interface QueryRowTextSearchProps {
   /**
@@ -75,26 +74,6 @@ export function transformTextSearchToDSL({
   } = fieldInfo;
 
   switch (operation) {
-    // Equals match type.
-    case "equals":
-    case "exactMatch":
-      // Autocompletion expects to use the full text search.
-      return parentType
-        ? {
-            nested: {
-              path: "included",
-              query: {
-                bool: {
-                  must: [
-                    termQuery(fieldPath, value, keywordMultiFieldSupport),
-                    includedTypeQuery(parentType)
-                  ]
-                }
-              }
-            }
-          }
-        : termQuery(fieldPath, value, keywordMultiFieldSupport)
-
     // Wild card search
     case "wildcard":
       return parentType
@@ -279,8 +258,25 @@ export function transformTextSearchToDSL({
             }
           };
 
-    // Unsupported case.
+    // Equals match type.
+    case "equals":
+    case "exactMatch":
     default:
-      throw new Error("Unsupported operation for the text widget.");
+      // Autocompletion expects to use the full text search.
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    termQuery(fieldPath, value, keywordMultiFieldSupport),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
+          }
+        : termQuery(fieldPath, value, keywordMultiFieldSupport)
   }
 }

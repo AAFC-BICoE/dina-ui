@@ -78,6 +78,12 @@ export interface ESIndexMapping {
   type: string;
 
   /**
+   * Currently used for dates to describe if it's a local_date (where timezone should not be applied)
+   * but can be expanded to other types in the future.
+   */
+  subType?: string;
+
+  /**
    * If enabled, it will allow the user to see suggestions as they type. The suggestions will come
    * from elastic search based on most common values saved.
    *

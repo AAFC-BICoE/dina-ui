@@ -80,6 +80,8 @@ export function fileUploadErrorHandler(
       );
     } else if (data.includes("HTTP Status 403")) {
       throw new Error(formatMessage("http403ForbiddenError"));
+    } else if (data.includes("HTTP Status 500")) {
+      throw new Error(formatMessage("http500InternalServerError"));
     }
 
     // Otherwise, just display the error message.

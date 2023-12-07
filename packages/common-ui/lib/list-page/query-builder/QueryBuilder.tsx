@@ -11,8 +11,6 @@ import { Button } from "react-bootstrap";
 import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
-import { ColumnSort } from "@tanstack/react-table";
-
 interface QueryBuilderProps {
   /**
    * Index name being used for the QueryPage.
@@ -55,6 +53,25 @@ interface QueryBuilderProps {
    * Set the page offset, used to to load a saved search.
    */
   setPageOffset: React.Dispatch<React.SetStateAction<number>>;
+
+  /**
+   * Current groups being applied to the search.
+   */
+  groups: string[];
+
+  /**
+   * Set the groups to be loaded, used for the saved search.
+   */
+  setGroups: React.Dispatch<React.SetStateAction<string[]>>;
+
+  /**
+   * Used for generating the local storage keys. Every instance of the QueryPage should have it's
+   * own unique name.
+   *
+   * In special cases where you want the sorting, pagination, column selection and other features
+   * to remain the same across tables, it can share the same name.
+   */
+  uniqueName: string;
 }
 
 function QueryBuilder({
@@ -65,7 +82,10 @@ function QueryBuilder({
   onSubmit,
   onReset,
   setSubmittedQueryBuilderTree,
-  setPageOffset
+  setPageOffset,
+  groups,
+  setGroups,
+  uniqueName
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -105,8 +125,11 @@ function QueryBuilder({
         setQueryBuilderTree={setQueryBuilderTree}
         queryBuilderConfig={queryBuilderConfig}
         setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-        setPageOffset={setPageOffset}
         performSubmit={onSubmit}
+        setPageOffset={setPageOffset}
+        groups={groups}
+        setGroups={setGroups}
+        uniqueName={uniqueName}
       />
       <Query
         {...queryBuilderConfig}
