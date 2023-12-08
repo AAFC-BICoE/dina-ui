@@ -24,9 +24,17 @@ export function StorageFilter({ onChange, parentStorageUnitUUID }: StorageFilter
   const [storageTypeFilter, setStorageTypeFilter] =
     useState<PersistedResource<StorageUnitType>>();
   const [createdByMeFilter, setCreatedByMeFilter] = useState(false);
+
+  const [performSearch, setPerformSearch] = useState<boolean>(false);
+
   const { username, groupNames } = useAccount();
 
-  function doSearch() {
+  // Do the search whenever the dropdown or checkbox value changes:
+  useEffect(() => {
+    if (performSearch === false) {
+      return;
+    }
+
     onChange({
       type: "FILTER_GROUP",
       id: -123,
@@ -99,16 +107,21 @@ export function StorageFilter({ onChange, parentStorageUnitUUID }: StorageFilter
           : [])
       ]
     });
-  }
 
-  // Do the search whenever the dropdown or checkbox value changes:
-  useEffect(doSearch, [createdByMeFilter, storageTypeFilter]);
+    setPerformSearch(false);
+  }, [performSearch]);
+
+  // When changing the createdByMeFilter and storageTypeFilter, automatically submit the form.
+  useEffect(() => {
+    setPerformSearch(true);
+  }, [createdByMeFilter, storageTypeFilter]);
 
   function resetSearch() {
     setCreatedByMeFilter(false);
     setStorageTypeFilter(undefined);
     setSearchText("");
-    doSearch();
+
+    setPerformSearch(true);
   }
 
   return (
@@ -149,7 +162,7 @@ export function StorageFilter({ onChange, parentStorageUnitUUID }: StorageFilter
               onKeyDown={(e) => {
                 if (e.keyCode === 13) {
                   e.preventDefault();
-                  doSearch();
+                  setPerformSearch(true);
                 }
               }}
               autoComplete="none"
@@ -173,7 +186,9 @@ export function StorageFilter({ onChange, parentStorageUnitUUID }: StorageFilter
               <button
                 className="storage-tree-search btn btn-primary"
                 type="button"
-                onClick={doSearch}
+                onClick={() => {
+                  setPerformSearch(true);
+                }}
               >
                 <DinaMessage id="search" />
               </button>
