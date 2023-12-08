@@ -75,7 +75,7 @@ function getStandardColumns(
   setColumnSelectorIndexMapColumns: React.Dispatch<any>
 ) {
   if (queryOption.parentType) {
-    // getIncludedStandardColumns(queryOption, setColumnSelectorIndexMapColumns);
+    getIncludedStandardColumns(queryOption, setColumnSelectorIndexMapColumns);
   } else {
     getAttributesStandardColumns(queryOption, setColumnSelectorIndexMapColumns);
   }
@@ -98,11 +98,56 @@ function getAttributesStandardColumns(
       isColumnVisible: false
     };
   }
+  addColumnToIndexMapColumns(column, setColumnSelectorIndexMapColumns);
+}
+
+// Get standard columns that are the included relationships of the resource
+function getIncludedStandardColumns(
+  queryOption: QueryOption,
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>
+) {
+  let column;
+
+  const accessorKey = `${queryOption.parentPath}.${queryOption.path}.${queryOption.label}`;
+  if (queryOption.type === "date") {
+    column = dateCell(
+      queryOption.value,
+      accessorKey,
+      queryOption.parentType,
+      false
+    );
+  } else {
+    column = {
+      id: queryOption.value,
+      header: () => <FieldHeader name={queryOption.value} />,
+      accessorKey,
+      isKeyword: queryOption.keywordMultiFieldSupport,
+      isColumnVisible: false,
+      cell: ({ row: { original } }) => {
+        const relationshipAccessor = accessorKey?.split(".");
+        relationshipAccessor?.splice(
+          1,
+          0,
+          queryOption.parentType ? queryOption.parentType : ""
+        );
+        const valuePath = relationshipAccessor?.join(".");
+        const value = get(original, valuePath);
+        return <>{value}</>;
+      },
+      relationshipType: queryOption.parentType
+    };
+  }
+  addColumnToIndexMapColumns(column, setColumnSelectorIndexMapColumns);
+}
+
+function addColumnToIndexMapColumns(
+  column,
+  setColumnSelectorIndexMapColumns: React.Dispatch<any>
+) {
   setColumnSelectorIndexMapColumns((currentColumns) => {
     if (
       !currentColumns.find(
-        (currentColumn) =>
-          currentColumn.accessorKey === (column as any).accessorKey
+        (currentColumn) => currentColumn.id === (column as any).id
       )
     ) {
       const newColumns = [...currentColumns, column];
@@ -112,12 +157,6 @@ function getAttributesStandardColumns(
     }
   });
 }
-
-// Get standard columns that are the included relationships of the resource
-// function getIncludedStandardColumns(
-//   queryOption: QueryOption,
-//   setColumnSelectorIndexMapColumns: React.Dispatch<any>
-// ) {}
 
 // Handle getting columns from query options that contain dynamicField
 async function getDynamicFieldColumns(
@@ -204,20 +243,10 @@ function getIncludedManagedAttributeColumns(
       isColumnVisible: false,
       relationshipType: queryOption.parentType
     };
-
-    setColumnSelectorIndexMapColumns((currentColumns) => {
-      if (
-        !currentColumns.find(
-          (currentColumn) =>
-            currentColumn.accessorKey === managedAttributesColumn.accessorKey
-        )
-      ) {
-        const newColumns = [...currentColumns, managedAttributesColumn];
-        return newColumns;
-      } else {
-        return currentColumns;
-      }
-    });
+    addColumnToIndexMapColumns(
+      managedAttributesColumn,
+      setColumnSelectorIndexMapColumns
+    );
   }
 }
 
@@ -236,19 +265,10 @@ function getAttributesManagedAttributeColumns(
       isKeyword: queryOption.keywordMultiFieldSupport,
       isColumnVisible: false
     };
-    setColumnSelectorIndexMapColumns((currentColumns) => {
-      if (
-        !currentColumns.find(
-          (currentColumn) =>
-            currentColumn.accessorKey === managedAttributesColumn.accessorKey
-        )
-      ) {
-        const newColumns = [...currentColumns, managedAttributesColumn];
-        return newColumns;
-      } else {
-        return currentColumns;
-      }
-    });
+    addColumnToIndexMapColumns(
+      managedAttributesColumn,
+      setColumnSelectorIndexMapColumns
+    );
   }
 }
 
@@ -269,19 +289,10 @@ function getAttributesExtensionValuesColumns(
         isKeyword: queryOption.keywordMultiFieldSupport,
         isColumnVisible: false
       };
-      setColumnSelectorIndexMapColumns((currentColumns) => {
-        if (
-          !currentColumns.find(
-            (currentColumn) =>
-              currentColumn.accessorKey === extensionValuesColumn.accessorKey
-          )
-        ) {
-          const newColumns = [...currentColumns, extensionValuesColumn];
-          return newColumns;
-        } else {
-          return currentColumns;
-        }
-      });
+      addColumnToIndexMapColumns(
+        extensionValuesColumn,
+        setColumnSelectorIndexMapColumns
+      );
     }
   }
 }
@@ -378,19 +389,10 @@ function getIncludedExtensionValuesColumn(
         isColumnVisible: false,
         relationshipType: queryOption.parentType
       };
-      setColumnSelectorIndexMapColumns((currentColumns) => {
-        if (
-          !currentColumns.find(
-            (currentColumn) =>
-              currentColumn.accessorKey === extensionValuesColumn.accessorKey
-          )
-        ) {
-          const newColumns = [...currentColumns, extensionValuesColumn];
-          return newColumns;
-        } else {
-          return currentColumns;
-        }
-      });
+      addColumnToIndexMapColumns(
+        extensionValuesColumn,
+        setColumnSelectorIndexMapColumns
+      );
     }
   }
 }

@@ -398,7 +398,7 @@ export function QueryPage<TData extends KitsuResource>({
 
     const combinedColumns = uniqBy(
       [...totalColumns, ...columnSelectorIndexMapColumns],
-      "accessorKey"
+      "id"
     );
     setTotalColumns(combinedColumns);
 
