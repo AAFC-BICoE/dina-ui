@@ -11,7 +11,7 @@ import {
   useModal
 } from "..";
 import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { TableColumn } from "../list-page/types";
+import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 import { KitsuResource } from "kitsu";
 
 /** Common button props for the bulk edit/delete buttons */
@@ -122,6 +122,8 @@ export interface DataExportButtonProps<TData extends KitsuResource> {
   query: any;
   uniqueName: string;
   columns: TableColumn<TData>[];
+  dynamicFieldMapping: DynamicFieldsMappingConfig | undefined;
+  indexName: string;
 }
 
 /**
@@ -132,16 +134,18 @@ export interface DataExportButtonProps<TData extends KitsuResource> {
 export const DATA_EXPORT_QUERY_KEY = "dataExportQuery";
 export const DATA_EXPORT_TOTAL_RECORDS_KEY = "dataExportTotalRecords";
 export const DATA_EXPORT_COLUMNS_KEY = "dataExportColumns";
+export const DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY = "dynamicFieldMapping";
 
 export function DataExportButton<TData extends KitsuResource>({
   pathname,
   totalRecords,
   query,
   uniqueName,
-  columns
+  columns,
+  dynamicFieldMapping,
+  indexName
 }: DataExportButtonProps<TData>) {
   const router = useRouter();
-
   return (
     <FormikButton
       buttonProps={(_ctx) => ({ disabled: totalRecords === 0 })}
@@ -165,9 +169,17 @@ export function DataExportButton<TData extends KitsuResource>({
           `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`,
           columns
         );
+        writeStorage<DynamicFieldsMappingConfig | undefined>(
+          `${uniqueName}_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`,
+          dynamicFieldMapping
+        );
         await router.push({
           pathname,
-          query: { hideTable: true, uniqueName }
+          query: {
+            hideTable: true,
+            uniqueName,
+            indexName
+          }
         });
       }}
     >

@@ -24,6 +24,7 @@ import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
 import { ColumnSelector } from "../column-selector/ColumnSelector";
+import { DynamicFieldsMappingConfig } from "../list-page/types";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
@@ -92,6 +93,34 @@ export interface ReactTableProps<TData> {
   uniqueName?: string;
 
   forceUpdate?: React.DispatchWithoutAction;
+
+  /**
+   * Used for the listing page to understand which columns can be provided. Filters are generated
+   * based on the index provided.
+   *
+   * Also used to store saved searches under a specific type:
+   *
+   * `UserPreference.savedSearches.[INDEX_NAME].[SAVED_SEARCH_NAME]`
+   *
+   * For example, to get the default saved searches for the material sample index:
+   * `UserPreference.savedSearches.dina_material_sample_index.default.filters`
+   */
+  indexName?: string;
+
+  /**
+   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
+   * be searched against. It will also define the path and data component if required.
+   *
+   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
+   * or grouped terms.
+   */
+  dynamicFieldMapping?: DynamicFieldsMappingConfig;
+
+  loadedIndexMapColumns?: boolean;
+  setColumnSelectorIndexMapColumns?: React.Dispatch<
+    React.SetStateAction<any[]>
+  >;
+  setLoadedIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function ReactTable<TData>({
@@ -132,7 +161,12 @@ export function ReactTable<TData>({
   setColumnSelector,
   setColumnSelectorCustomMenu,
   uniqueName,
-  forceUpdate
+  forceUpdate,
+  indexName,
+  dynamicFieldMapping,
+  loadedIndexMapColumns,
+  setColumnSelectorIndexMapColumns,
+  setLoadedIndexMapColumns
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -256,6 +290,11 @@ export function ReactTable<TData>({
           reactTable={table}
           hideExportButton={true}
           forceUpdate={forceUpdate}
+          indexName={indexName}
+          dynamicFieldMapping={dynamicFieldMapping}
+          loadedIndexMapColumns={loadedIndexMapColumns}
+          setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
+          setLoadedIndexMapColumns={setLoadedIndexMapColumns}
         />
       );
       setColumnSelector?.(columnSelector);
@@ -266,6 +305,11 @@ export function ReactTable<TData>({
           uniqueName={uniqueName}
           reactTable={table}
           menuOnly={true}
+          indexName={indexName}
+          dynamicFieldMapping={dynamicFieldMapping}
+          loadedIndexMapColumns={loadedIndexMapColumns}
+          setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
+          setLoadedIndexMapColumns={setLoadedIndexMapColumns}
         />
       );
       setColumnSelectorCustomMenu(columnSelector);

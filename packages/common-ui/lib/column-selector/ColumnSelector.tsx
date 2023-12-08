@@ -8,7 +8,7 @@ import {
 } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { startCase } from "lodash";
@@ -18,6 +18,12 @@ import { DataExport } from "packages/dina-ui/types/dina-export-api";
 import Kitsu from "kitsu";
 import { Table, VisibilityState, Column } from "@tanstack/react-table";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
+import {
+  getColumnSelectorIndexMapColumns,
+  getGroupedIndexMappings
+} from "./ColumnSelectorUtils";
+import { DynamicFieldsMappingConfig } from "../list-page/types";
+import { useIndexMapping } from "../list-page/useIndexMapping";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
@@ -29,6 +35,32 @@ export interface ColumnSelectorProps<TData> {
   menuOnly?: boolean;
   hideApplyButton?: boolean;
   forceUpdate?: React.DispatchWithoutAction;
+  /**
+   * Used for the listing page to understand which columns can be provided. Filters are generated
+   * based on the index provided.
+   *
+   * Also used to store saved searches under a specific type:
+   *
+   * `UserPreference.savedSearches.[INDEX_NAME].[SAVED_SEARCH_NAME]`
+   *
+   * For example, to get the default saved searches for the material sample index:
+   * `UserPreference.savedSearches.dina_material_sample_index.default.filters`
+   */
+  indexName?: string;
+
+  /**
+   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
+   * be searched against. It will also define the path and data component if required.
+   *
+   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
+   * or grouped terms.
+   */
+  dynamicFieldMapping?: DynamicFieldsMappingConfig;
+  loadedIndexMapColumns?: boolean;
+  setColumnSelectorIndexMapColumns?: React.Dispatch<
+    React.SetStateAction<any[]>
+  >;
+  setLoadedIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function ColumnSelector<TData>({
@@ -37,8 +69,69 @@ export function ColumnSelector<TData>({
   menuOnly,
   hideExportButton = false,
   hideApplyButton = false,
-  forceUpdate
+  forceUpdate,
+  indexName,
+  dynamicFieldMapping,
+  loadedIndexMapColumns,
+  setColumnSelectorIndexMapColumns,
+  setLoadedIndexMapColumns
 }: ColumnSelectorProps<TData>) {
+  const {
+    show: showMenu,
+    showDropdown: showDropdownMenu,
+    hideDropdown: hideDropdownMenu,
+    onKeyDown: onKeyPressDown
+  } = menuDisplayControl();
+  const { apiClient, save } = useApiClient();
+  let groupedIndexMappings;
+  if (indexName) {
+    const { indexMap } = useIndexMapping({
+      indexName,
+      dynamicFieldMapping
+    });
+    groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
+  }
+
+  function menuDisplayControl() {
+    const [show, setShow] = useState(false);
+
+    const showDropdown = async () => {
+      if (!loadedIndexMapColumns) {
+        setLoading(true);
+        await getColumnSelectorIndexMapColumns({
+          groupedIndexMappings,
+          setLoadedIndexMapColumns,
+          setColumnSelectorIndexMapColumns,
+          apiClient
+        });
+        setLoading(false);
+      }
+      setShow(true);
+    };
+    const hideDropdown = () => {
+      setShow(false);
+    };
+    function onKeyDown(e) {
+      if (
+        e.key === "ArrowDown" ||
+        e.key === "ArrowUp" ||
+        e.key === "Space" ||
+        e.key === " " ||
+        e.key === "Enter"
+      ) {
+        showDropdown();
+      } else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab")) {
+        hideDropdown();
+      }
+    }
+    function onKeyDownLastItem(e) {
+      if (!e.shiftKey && e.key === "Tab") {
+        hideDropdown();
+      }
+    }
+    return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
+  }
+
   const { formatMessage, messages } = useIntl();
   // For finding columns using text search
   const columnSearchMapping: { label: string; id: string }[] | undefined =
@@ -75,8 +168,6 @@ export function ColumnSelector<TData>({
 
   // Keep track of column text search value
   const [filterColumsValue, setFilterColumnsValue] = useState<string>("");
-
-  const { apiClient, save } = useApiClient();
 
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
 
@@ -268,9 +359,9 @@ export function ColumnSelector<TData>({
     }
   );
 
-  const { show, showDropdown, hideDropdown, onKeyDown } = menuDisplayControl();
-
-  return menuOnly ? (
+  return loading ? (
+    <LoadingSpinner loading={loading} />
+  ) : menuOnly ? (
     <ColumnSelectorMenu>
       {searchedColumns?.map((column) => {
         return (
@@ -288,10 +379,10 @@ export function ColumnSelector<TData>({
     </ColumnSelectorMenu>
   ) : (
     <Dropdown
-      onMouseOver={showDropdown}
-      onKeyDown={onKeyDown}
-      onMouseLeave={hideDropdown}
-      show={show}
+      onMouseOver={showDropdownMenu}
+      onKeyDown={onKeyPressDown}
+      onMouseLeave={hideDropdownMenu}
+      show={showMenu}
     >
       <Dropdown.Toggle>
         <DinaMessage id="selectColumn" />
@@ -322,35 +413,6 @@ export function ColumnSelector<TData>({
       </Dropdown.Menu>
     </Dropdown>
   );
-}
-
-function menuDisplayControl() {
-  const [show, setShow] = useState(false);
-  const showDropdown = () => {
-    setShow(true);
-  };
-  const hideDropdown = () => {
-    setShow(false);
-  };
-  function onKeyDown(e) {
-    if (
-      e.key === "ArrowDown" ||
-      e.key === "ArrowUp" ||
-      e.key === "Space" ||
-      e.key === " " ||
-      e.key === "Enter"
-    ) {
-      showDropdown();
-    } else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab")) {
-      hideDropdown();
-    }
-  }
-  function onKeyDownLastItem(e) {
-    if (!e.shiftKey && e.key === "Tab") {
-      hideDropdown();
-    }
-  }
-  return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
 }
 
 export async function downloadDataExport(

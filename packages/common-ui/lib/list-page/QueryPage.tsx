@@ -56,7 +56,6 @@ import {
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
 import { DynamicFieldsMappingConfig, TableColumn } from "./types";
-import { useColumnSelectorIndexMapColumns } from "../column-selector/ColumnSelectorUtils";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -273,22 +272,18 @@ export function QueryPage<TData extends KitsuResource>({
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
   const { apiClient } = useApiClient();
-  const { formatMessage, formatNumber, locale, messages } = useIntl();
+  const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
 
-  const { columnSelectorIndexMapColumns, loadingIndexMapColumns } =
-    enableColumnSelector
-      ? useColumnSelectorIndexMapColumns({
-          indexName,
-          dynamicFieldMapping
-        })
-      : { columnSelectorIndexMapColumns: [], loadingIndexMapColumns: false };
+  const [columnSelectorIndexMapColumns, setColumnSelectorIndexMapColumns] =
+    useState<any[]>([]);
+  const [loadedIndexMapColumns, setLoadedIndexMapColumns] =
+    useState<boolean>(false);
 
-  // Combined columns from passed in columns + columnSelectorIndexMapColumns
-  const [totalColumns, setTotalColumns] = useState<TableColumn<TData>[]>([
-    ...columns,
-    ...columnSelectorIndexMapColumns
-  ]);
+  // Combined columns from passed in columns
+  const [totalColumns, setTotalColumns] =
+    useState<TableColumn<TData>[]>(columns);
+
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
   const [elasticSearchQuery, setElasticSearchQuery] = useState();
@@ -491,7 +486,7 @@ export function QueryPage<TData extends KitsuResource>({
     sortingRules,
     submittedQueryBuilderTree,
     groups,
-    loadingIndexMapColumns
+    loadedIndexMapColumns
   ]);
 
   // Once the configuration is setup, we can display change the tree.
@@ -894,7 +889,9 @@ export function QueryPage<TData extends KitsuResource>({
                       totalRecords={totalRecords}
                       query={elasticSearchQuery}
                       uniqueName={uniqueName}
-                      columns={totalColumns}
+                      columns={columns}
+                      dynamicFieldMapping={dynamicFieldMapping}
+                      indexName={indexName}
                     />
                   )}
                   {bulkSplitPath && (
@@ -916,7 +913,7 @@ export function QueryPage<TData extends KitsuResource>({
               <div className="d-flex align-items-end">
                 <span id="queryPageCount">
                   {/* Loading indicator when total is not calculated yet. */}
-                  {loading || loadingIndexMapColumns ? (
+                  {loading ? (
                     <LoadingSpinner loading={true} />
                   ) : (
                     <CommonMessage
@@ -956,10 +953,17 @@ export function QueryPage<TData extends KitsuResource>({
                 </div>
               )}
               <ReactTable<TData>
-                // These 3 props are needed for column selector
+                // These props are needed for column selector
                 forceUpdate={forceUpdate}
                 setColumnSelector={setColumnSelector}
                 uniqueName={uniqueName}
+                indexName={indexName}
+                dynamicFieldMapping={dynamicFieldMapping}
+                loadedIndexMapColumns={loadedIndexMapColumns}
+                setColumnSelectorIndexMapColumns={
+                  setColumnSelectorIndexMapColumns
+                }
+                setLoadedIndexMapColumns={setLoadedIndexMapColumns}
                 // Column and data props
                 columns={columnsResults}
                 data={
@@ -970,7 +974,7 @@ export function QueryPage<TData extends KitsuResource>({
                     : searchResults) ?? []
                 }
                 // Loading Table props
-                loading={loading || loadingIndexMapColumns}
+                loading={loading}
                 // Pagination props
                 manualPagination={
                   viewMode && selectedResources?.length ? false : true
