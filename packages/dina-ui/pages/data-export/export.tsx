@@ -6,8 +6,7 @@ import {
   ButtonBar,
   BackButton,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
-  DATA_EXPORT_COLUMNS_KEY,
-  ColumnSelectorMenu
+  DATA_EXPORT_COLUMNS_KEY
 } from "packages/common-ui/lib";
 import React from "react";
 import Link from "next/link";
