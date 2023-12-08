@@ -81,13 +81,11 @@ export interface ReactTableProps<TData> {
   // Hides the table rendering. Useful for accessing table states but don't want to render table
   hideTable?: boolean;
 
+  // Column Selector only get menu, no dropdown button
+  menuOnly?: boolean;
+
   // Pass the Column Selector to parent caller
   setColumnSelector?: React.Dispatch<React.SetStateAction<JSX.Element>>;
-
-  // Pass the Column Selector Menu to parent caller
-  setColumnSelectorCustomMenu?: React.Dispatch<
-    React.SetStateAction<JSX.Element>
-  >;
 
   // uniqueName used for local storage
   uniqueName?: string;
@@ -121,6 +119,8 @@ export interface ReactTableProps<TData> {
     React.SetStateAction<any[]>
   >;
   setLoadedIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
+
+  hideExportButton?: boolean;
 }
 
 export function ReactTable<TData>({
@@ -159,14 +159,15 @@ export function ReactTable<TData>({
   defaultColumnFilters = [],
   hideTable = false,
   setColumnSelector,
-  setColumnSelectorCustomMenu,
   uniqueName,
   forceUpdate,
   indexName,
   dynamicFieldMapping,
   loadedIndexMapColumns,
   setColumnSelectorIndexMapColumns,
-  setLoadedIndexMapColumns
+  setLoadedIndexMapColumns,
+  menuOnly,
+  hideExportButton
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -288,7 +289,8 @@ export function ReactTable<TData>({
         <ColumnSelector
           uniqueName={uniqueName}
           reactTable={table}
-          hideExportButton={true}
+          hideExportButton={hideExportButton}
+          menuOnly={menuOnly}
           forceUpdate={forceUpdate}
           indexName={indexName}
           dynamicFieldMapping={dynamicFieldMapping}
@@ -298,21 +300,6 @@ export function ReactTable<TData>({
         />
       );
       setColumnSelector?.(columnSelector);
-    }
-    if (setColumnSelectorCustomMenu) {
-      const columnSelector = (
-        <ColumnSelector
-          uniqueName={uniqueName}
-          reactTable={table}
-          menuOnly={true}
-          indexName={indexName}
-          dynamicFieldMapping={dynamicFieldMapping}
-          loadedIndexMapColumns={loadedIndexMapColumns}
-          setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
-          setLoadedIndexMapColumns={setLoadedIndexMapColumns}
-        />
-      );
-      setColumnSelectorCustomMenu(columnSelector);
     }
   }, [table.getState().columnVisibility, table.getAllLeafColumns().length]);
 

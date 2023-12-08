@@ -44,8 +44,7 @@ export default function ExportPage<TData extends KitsuResource>() {
   const [dynamicFieldMapping] = useLocalStorage<
     DynamicFieldsMappingConfig | undefined
   >(`${uniqueName}_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`, undefined);
-  const [columnSelectorCustomMenu, setColumnSelectorCustomMenu] =
-    useState<JSX.Element>(<></>);
+  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
   const [columnSelectorIndexMapColumns, setColumnSelectorIndexMapColumns] =
     useState<any[]>([]);
   const [loadedIndexMapColumns, setLoadedIndexMapColumns] =
@@ -109,15 +108,16 @@ export default function ExportPage<TData extends KitsuResource>() {
             id="tableTotalCount"
             values={{ totalCount: formatNumber(totalRecords ?? 0) }}
           />
-          {columnSelectorCustomMenu}
+          {columnSelector}
         </div>
 
         <ReactTable<TData>
           columns={totalColumns}
           data={[]}
-          setColumnSelectorCustomMenu={setColumnSelectorCustomMenu}
+          setColumnSelector={setColumnSelector}
           hideTable={hideTable}
           uniqueName={uniqueName}
+          menuOnly={true}
         />
       </DinaForm>
       <Footer />

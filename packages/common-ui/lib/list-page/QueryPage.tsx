@@ -837,6 +837,9 @@ export function QueryPage<TData extends KitsuResource>({
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
+  const [loadingIndexMapColumns, setLoadingIndexMapColumns] =
+    useState<boolean>(false);
+
   return (
     <>
       {!viewMode && (
@@ -913,7 +916,7 @@ export function QueryPage<TData extends KitsuResource>({
               <div className="d-flex align-items-end">
                 <span id="queryPageCount">
                   {/* Loading indicator when total is not calculated yet. */}
-                  {loading ? (
+                  {loading || loadingIndexMapColumns ? (
                     <LoadingSpinner loading={true} />
                   ) : (
                     <CommonMessage
@@ -964,6 +967,7 @@ export function QueryPage<TData extends KitsuResource>({
                   setColumnSelectorIndexMapColumns
                 }
                 setLoadedIndexMapColumns={setLoadedIndexMapColumns}
+                hideExportButton={true}
                 // Column and data props
                 columns={columnsResults}
                 data={
