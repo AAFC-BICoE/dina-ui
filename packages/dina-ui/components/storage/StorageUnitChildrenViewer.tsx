@@ -128,6 +128,7 @@ export function StorageUnitChildrenViewer({
               actionMode="ADD_EXISTING_AS_CHILD"
               onChange={addExistingStorageUnitAsChild}
               createStorageMode={false}
+              parentStorageUnitUUID={storageUnit?.id}
             />
           )}
         </FieldSet>

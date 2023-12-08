@@ -3,8 +3,7 @@ import {
   FilterGroupModel,
   FormikButton,
   QueryTable,
-  rsql,
-  useDinaFormContext
+  rsql
 } from "common-ui";
 import { KitsuResourceLink } from "kitsu";
 import Link from "next/link";
@@ -19,15 +18,21 @@ import {
 } from "./StorageUnitBreadCrumb";
 
 export interface StorageSearchSelectorProps {
+  /**
+   * To prevent displaying itself in the search results, this UUID will be filtered from the 
+   * results.
+   */
+  parentStorageUnitUUID?: string;
+
   onChange: (newValue: KitsuResourceLink) => Promisable<void>;
 }
 
 /** Table UI to search for and select a Storage Unit. */
 export function StorageSearchSelector({
-  onChange
+  onChange,
+  parentStorageUnitUUID
 }: StorageSearchSelectorProps) {
   const [filter, setFilter] = useState<FilterGroupModel | null>();
-  const { readOnly } = useDinaFormContext();
 
   const tableColumns: ColumnDefinition<StorageUnit>[] = [
     {
@@ -74,7 +79,7 @@ export function StorageSearchSelector({
           background-color: rgb(222, 252, 222) !important;
         }
       `}</style>
-      <StorageFilter onChange={setFilter} />
+      <StorageFilter onChange={setFilter} parentStorageUnitUUID={parentStorageUnitUUID} />
       <QueryTable
         columns={tableColumns}
         path="collection-api/storage-unit"
