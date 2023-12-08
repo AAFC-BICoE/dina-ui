@@ -56,11 +56,10 @@ export interface ColumnSelectorProps<TData> {
    * or grouped terms.
    */
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
-  loadedIndexMapColumns?: boolean;
   setColumnSelectorIndexMapColumns?: React.Dispatch<
     React.SetStateAction<any[]>
   >;
-  setLoadedIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function ColumnSelector<TData>({
@@ -72,10 +71,16 @@ export function ColumnSelector<TData>({
   forceUpdate,
   indexName,
   dynamicFieldMapping,
-  loadedIndexMapColumns,
   setColumnSelectorIndexMapColumns,
-  setLoadedIndexMapColumns
+  setLoadingIndexMapColumns
 }: ColumnSelectorProps<TData>) {
+  const [localStorageColumnStates, setLocalStorageColumnStates] =
+    useLocalStorage<VisibilityState | undefined>(
+      `${uniqueName}_columnSelector`,
+      {}
+    );
+  const [loadedIndexMapColumns, setLoadedIndexMapColumns] =
+    useState<boolean>(false);
   const {
     show: showMenu,
     showDropdown: showDropdownMenu,
@@ -84,14 +89,31 @@ export function ColumnSelector<TData>({
   } = menuDisplayControl();
   const { apiClient, save } = useApiClient();
   let groupedIndexMappings;
+  let indexMap;
   if (indexName) {
-    const { indexMap } = useIndexMapping({
+    const indexObject = useIndexMapping({
       indexName,
       dynamicFieldMapping
     });
+    indexMap = indexObject.indexMap;
     groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
   }
-
+  useEffect(() => {
+    if (
+      localStorageColumnStates &&
+      Object.keys(localStorageColumnStates).length > 0
+    ) {
+      if (indexMap) {
+        getColumnSelectorIndexMapColumns({
+          groupedIndexMappings,
+          setLoadedIndexMapColumns,
+          setColumnSelectorIndexMapColumns,
+          apiClient,
+          setLoadingIndexMapColumns
+        });
+      }
+    }
+  }, [indexMap]);
   function menuDisplayControl() {
     const [show, setShow] = useState(false);
 
@@ -142,11 +164,7 @@ export function ColumnSelector<TData>({
         : startCase(column.id);
       return { label: label.toLowerCase(), id: column.id };
     });
-  const [localStorageColumnStates, setLocalStorageColumnStates] =
-    useLocalStorage<VisibilityState | undefined>(
-      `${uniqueName}_columnSelector`,
-      {}
-    );
+
   // Keep track of user selected options for when user presses "Apply"
   const filteredColumnsState: VisibilityState = localStorageColumnStates
     ? localStorageColumnStates

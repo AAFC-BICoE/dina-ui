@@ -10,6 +10,7 @@ export interface ColumnSelectorIndexMapColumns {
   setColumnSelectorIndexMapColumns?: React.Dispatch<
     React.SetStateAction<any[]>
   >;
+  setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
   apiClient: Kitsu;
 }
 
@@ -18,8 +19,10 @@ export async function getColumnSelectorIndexMapColumns({
   groupedIndexMappings,
   setLoadedIndexMapColumns,
   setColumnSelectorIndexMapColumns,
-  apiClient
+  apiClient,
+  setLoadingIndexMapColumns
 }: ColumnSelectorIndexMapColumns) {
+  setLoadingIndexMapColumns?.(true);
   for (const groupedIndexMapping of groupedIndexMappings) {
     const groupedIndexMappingOptions = groupedIndexMapping.options;
     for (const queryOption of groupedIndexMappingOptions) {
@@ -34,6 +37,7 @@ export async function getColumnSelectorIndexMapColumns({
       }
     }
   }
+  setLoadingIndexMapColumns?.(false);
   setLoadedIndexMapColumns?.(true);
 }
 

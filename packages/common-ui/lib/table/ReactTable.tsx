@@ -114,11 +114,10 @@ export interface ReactTableProps<TData> {
    */
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
-  loadedIndexMapColumns?: boolean;
   setColumnSelectorIndexMapColumns?: React.Dispatch<
     React.SetStateAction<any[]>
   >;
-  setLoadedIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
 
   hideExportButton?: boolean;
 }
@@ -163,9 +162,8 @@ export function ReactTable<TData>({
   forceUpdate,
   indexName,
   dynamicFieldMapping,
-  loadedIndexMapColumns,
   setColumnSelectorIndexMapColumns,
-  setLoadedIndexMapColumns,
+  setLoadingIndexMapColumns,
   menuOnly,
   hideExportButton
 }: ReactTableProps<TData>) {
@@ -294,9 +292,8 @@ export function ReactTable<TData>({
           forceUpdate={forceUpdate}
           indexName={indexName}
           dynamicFieldMapping={dynamicFieldMapping}
-          loadedIndexMapColumns={loadedIndexMapColumns}
           setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
-          setLoadedIndexMapColumns={setLoadedIndexMapColumns}
+          setLoadingIndexMapColumns={setLoadingIndexMapColumns}
         />
       );
       setColumnSelector?.(columnSelector);

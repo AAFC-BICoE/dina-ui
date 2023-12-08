@@ -277,7 +277,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   const [columnSelectorIndexMapColumns, setColumnSelectorIndexMapColumns] =
     useState<any[]>([]);
-  const [loadedIndexMapColumns, setLoadedIndexMapColumns] =
+  const [loadingIndexMapColumns, setLoadingIndexMapColumns] =
     useState<boolean>(false);
 
   // Combined columns from passed in columns
@@ -486,7 +486,7 @@ export function QueryPage<TData extends KitsuResource>({
     sortingRules,
     submittedQueryBuilderTree,
     groups,
-    loadedIndexMapColumns
+    loadingIndexMapColumns
   ]);
 
   // Once the configuration is setup, we can display change the tree.
@@ -837,9 +837,6 @@ export function QueryPage<TData extends KitsuResource>({
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
-  const [loadingIndexMapColumns, setLoadingIndexMapColumns] =
-    useState<boolean>(false);
-
   return (
     <>
       {!viewMode && (
@@ -962,11 +959,10 @@ export function QueryPage<TData extends KitsuResource>({
                 uniqueName={uniqueName}
                 indexName={indexName}
                 dynamicFieldMapping={dynamicFieldMapping}
-                loadedIndexMapColumns={loadedIndexMapColumns}
                 setColumnSelectorIndexMapColumns={
                   setColumnSelectorIndexMapColumns
                 }
-                setLoadedIndexMapColumns={setLoadedIndexMapColumns}
+                setLoadingIndexMapColumns={setLoadingIndexMapColumns}
                 hideExportButton={true}
                 // Column and data props
                 columns={columnsResults}
@@ -978,7 +974,7 @@ export function QueryPage<TData extends KitsuResource>({
                     : searchResults) ?? []
                 }
                 // Loading Table props
-                loading={loading}
+                loading={loading || loadingIndexMapColumns}
                 // Pagination props
                 manualPagination={
                   viewMode && selectedResources?.length ? false : true
@@ -1032,7 +1028,7 @@ export function QueryPage<TData extends KitsuResource>({
                     />
                   </span>
                   <ReactTable<TData>
-                    loading={loading}
+                    loading={loading || loadingIndexMapColumns}
                     columns={columnsSelected}
                     data={selectedResources ?? []}
                     onRowMove={onRowMove}
