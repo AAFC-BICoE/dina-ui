@@ -3,7 +3,13 @@ import {
   ColumnFiltersState,
   SortingState
 } from "@tanstack/react-table";
-import { FieldsParam, FilterParam, KitsuResource, KitsuResponse, PersistedResource } from "kitsu";
+import {
+  FieldsParam,
+  FilterParam,
+  KitsuResource,
+  KitsuResponse,
+  PersistedResource
+} from "kitsu";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
@@ -21,6 +27,7 @@ import { QueryState } from "../api-client/useQuery";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
+import { MultiSortTooltip } from "../list-page/MultiSortTooltip";
 
 /**
  * Column props with extra props designed specifically for our application on top of it.
@@ -56,7 +63,11 @@ export interface QueryTableProps<TData extends KitsuResource> {
   enableInMemoryFilter?: boolean;
 
   /** a filter function, which is used to filter the data when enableInMemoryFilter */
-  filterFn?: (value: PersistedResource<TData>, index?: number, array?: PersistedResource<TData>[]) => boolean;
+  filterFn?: (
+    value: PersistedResource<TData>,
+    index?: number,
+    array?: PersistedResource<TData>[]
+  ) => boolean;
 
   /** Dependencies: When the values in this array are changed, re-fetch the data. */
   deps?: any[];
@@ -302,9 +313,8 @@ export function QueryTable<TData extends KitsuResource>({
       const data = response.data.filter(filterFn);
       lastSuccessfulResponse.current = {
         data,
-        meta: {totalResourceCount: data.length}
-      }
-
+        meta: { totalResourceCount: data.length }
+      };
     } else {
       lastSuccessfulResponse.current = response;
     }
@@ -320,8 +330,13 @@ export function QueryTable<TData extends KitsuResource>({
   const resolvedReactTableProps =
     typeof reactTableProps === "function"
       ? reactTableProps(queryState)
-      : reactTableProps;
-
+      : reactTableProps ?? {};
+  if (resolvedReactTableProps.enableSorting === undefined) {
+    resolvedReactTableProps.enableSorting = true; 
+  }
+  if (resolvedReactTableProps.enableMultiSort === undefined) {
+    resolvedReactTableProps.enableMultiSort = true; 
+  }
   // Show the last loaded page while loading the next page:
   const displayData = lastSuccessfulResponse.current?.data;
   const shouldShowPagination = !!displayData?.length;
@@ -366,9 +381,8 @@ export function QueryTable<TData extends KitsuResource>({
             {topRightCorner}
           </div>
 
-          {resolvedReactTableProps?.enableSorting !== false && (
-            <Tooltip id="queryTableMultiSortExplanation" placement="left" />
-          )}
+          {/* Multi sort tooltip - Only shown if it's possible to sort */}
+          {resolvedReactTableProps.enableMultiSort && <MultiSortTooltip />}
         </div>
       </div>
       <ReactTable<TData>
@@ -389,11 +403,9 @@ export function QueryTable<TData extends KitsuResource>({
         loading={loadingProp || queryIsLoading}
         enableFilters={enableFilters}
         defaultColumnFilters={columnFilters}
-        manualFiltering={ !enableInMemoryFilter }
+        manualFiltering={!enableInMemoryFilter}
         onColumnFiltersChange={onColumnFiltersChangeInternal}
         manualPagination={!enableInMemoryFilter}
-        enableSorting={true}
-        enableMultiSort={true}
         manualSorting={!enableInMemoryFilter}
         pageCount={numberOfPages}
         showPaginationTop={shouldShowPagination && !hideTopPagination}
@@ -428,7 +440,7 @@ export function QueryTable<TData extends KitsuResource>({
                   </button>
                 </div>
               )
-            : resolvedReactTableProps?.TbodyComponent
+            : resolvedReactTableProps.TbodyComponent
         }
       />
     </div>
