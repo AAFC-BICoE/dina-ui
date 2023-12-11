@@ -889,7 +889,7 @@ export function QueryPage<TData extends KitsuResource>({
                 </span>
 
                 {/* Multi sort tooltip - Only shown if it's possible to sort */}
-                {!resolvedReactTableProps?.enableMultiSort && (
+                {resolvedReactTableProps.enableMultiSort && (
                   <MultiSortTooltip />
                 )}
               </div>
@@ -954,7 +954,6 @@ export function QueryPage<TData extends KitsuResource>({
                 manualSorting={
                   viewMode && selectedResources?.length ? false : true
                 }
-                enableSorting={true}
                 onSortingChange={onSortChange}
                 defaultSorted={sortingRules}
                 // Table customization props

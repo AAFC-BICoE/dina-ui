@@ -233,7 +233,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     }
                   ]}
                   reactTableProps={{
-                    showPagination: false
+                    showPagination: false,
+                    enableSorting: true,
+                    enableMultiSort: true
                   }}
                   defaultPageSize={500}
                   defaultSort={[

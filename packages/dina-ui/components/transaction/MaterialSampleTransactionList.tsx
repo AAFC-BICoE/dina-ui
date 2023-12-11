@@ -22,7 +22,9 @@ export function MaterialSampleTransactionList({ transactionQueryDSL }) {
       viewMode={true}
       columns={TRANSACTION_TABLE_COLUMNS}
       reactTableProps={{
-        showPagination: false
+        showPagination: false,
+        enableSorting: true,
+        enableMultiSort: true
       }}
       defaultPageSize={500}
       defaultSort={[{ id: "data.attributes.openedDate", desc: false }]}

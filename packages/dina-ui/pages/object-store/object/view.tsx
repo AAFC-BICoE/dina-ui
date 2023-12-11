@@ -132,6 +132,10 @@ export default function MetadataViewPage() {
                               ]
                             : undefined
                         }
+                        reactTableProps={{
+                          enableSorting: true,
+                          enableMultiSort: true
+                        }}
                       />
                     )}
                   </DinaForm>
