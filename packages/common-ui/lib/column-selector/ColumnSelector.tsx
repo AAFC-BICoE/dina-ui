@@ -56,10 +56,17 @@ export interface ColumnSelectorProps<TData> {
    * or grouped terms.
    */
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
+
+  // State setter to pass the processed index map columns to parent components
   setColumnSelectorIndexMapColumns?: React.Dispatch<
     React.SetStateAction<any[]>
   >;
+
+  // If true, index map columns are being loaded and processed from back end
   setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
+
+  // The default visible columns
+  columnSelectorDefaultColumns?: any[];
 }
 
 export function ColumnSelector<TData>({
@@ -72,7 +79,8 @@ export function ColumnSelector<TData>({
   indexName,
   dynamicFieldMapping,
   setColumnSelectorIndexMapColumns,
-  setLoadingIndexMapColumns
+  setLoadingIndexMapColumns,
+  columnSelectorDefaultColumns
 }: ColumnSelectorProps<TData>) {
   const [localStorageColumnStates, setLocalStorageColumnStates] =
     useLocalStorage<VisibilityState | undefined>(
@@ -98,12 +106,24 @@ export function ColumnSelector<TData>({
     indexMap = indexObject.indexMap;
     groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
   }
+
+  // Automatically load index map columns if visibility state indicates a need to
   useEffect(() => {
     if (
       localStorageColumnStates &&
       Object.keys(localStorageColumnStates).length > 0
     ) {
-      if (indexMap) {
+      const savedVisibilityValues = Object.values(
+        localStorageColumnStates
+      ).filter((visibilityValue) => visibilityValue === true);
+      let savedVisilibilityValuesCount = savedVisibilityValues.length;
+      columnSelectorDefaultColumns?.forEach((defaultColumn) => {
+        const columnId = defaultColumn?.id;
+        if (localStorageColumnStates[columnId] === true) {
+          savedVisilibilityValuesCount -= 1;
+        }
+      });
+      if (savedVisilibilityValuesCount > 0 && indexMap) {
         getColumnSelectorIndexMapColumns({
           groupedIndexMappings,
           setLoadedIndexMapColumns,
@@ -114,6 +134,7 @@ export function ColumnSelector<TData>({
       }
     }
   }, [indexMap]);
+
   function menuDisplayControl() {
     const [show, setShow] = useState(false);
 

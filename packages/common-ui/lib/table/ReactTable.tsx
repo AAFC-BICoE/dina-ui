@@ -24,7 +24,7 @@ import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
 import { ColumnSelector } from "../column-selector/ColumnSelector";
-import { DynamicFieldsMappingConfig } from "../list-page/types";
+import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
@@ -90,6 +90,7 @@ export interface ReactTableProps<TData> {
   // uniqueName used for local storage
   uniqueName?: string;
 
+  // Force updates component where this dispatch was created
   forceUpdate?: React.DispatchWithoutAction;
 
   /**
@@ -114,12 +115,19 @@ export interface ReactTableProps<TData> {
    */
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
+  // State setter to pass the processed index map columns to parent components
   setColumnSelectorIndexMapColumns?: React.Dispatch<
     React.SetStateAction<any[]>
   >;
+
+  // If true, index map columns are being loaded and processed from back end
   setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
 
+  // Hide column selector export button if true
   hideExportButton?: boolean;
+
+  // The default visible columns
+  columnSelectorDefaultColumns?: any[];
 }
 
 export function ReactTable<TData>({
@@ -165,7 +173,8 @@ export function ReactTable<TData>({
   setColumnSelectorIndexMapColumns,
   setLoadingIndexMapColumns,
   menuOnly,
-  hideExportButton
+  hideExportButton,
+  columnSelectorDefaultColumns
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -294,6 +303,7 @@ export function ReactTable<TData>({
           dynamicFieldMapping={dynamicFieldMapping}
           setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
           setLoadingIndexMapColumns={setLoadingIndexMapColumns}
+          columnSelectorDefaultColumns={columnSelectorDefaultColumns}
         />
       );
       setColumnSelector?.(columnSelector);

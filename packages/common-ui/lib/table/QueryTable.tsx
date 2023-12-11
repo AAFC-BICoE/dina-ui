@@ -184,7 +184,6 @@ export function QueryTable<TData extends KitsuResource>({
   });
 
   const divWrapperRef = useRef<HTMLDivElement>(null);
-  const [reactTable, setReactTable] = useState<Table<TData>>();
 
   function onPageChangeInternal(pageNumber: number) {
     const newOffset = pageNumber * page.limit;
@@ -380,10 +379,11 @@ export function QueryTable<TData extends KitsuResource>({
         </div>
       </div>
       <ReactTable<TData>
-        // These 3 props are needed for column selector
+        // These props are needed for column selector
         forceUpdate={forceUpdate}
         setColumnSelector={setColumnSelector}
         uniqueName={path}
+        hideExportButton={true}
         className="-striped"
         columns={mappedColumns}
         data={(displayData as TData[]) ?? []}
