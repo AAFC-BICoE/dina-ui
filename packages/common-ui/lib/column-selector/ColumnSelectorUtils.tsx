@@ -210,7 +210,7 @@ function getIncludedManagedAttributeColumns(
       },
       header: () => <FieldHeader name={managedAttribute.name} />,
       accessorKey,
-      id: managedAttribute.name,
+      id: `${queryOption.type}.${managedAttributeKey}`,
       isKeyword: queryOption.keywordMultiFieldSupport,
       isColumnVisible: false,
       relationshipType: queryOption.parentType
@@ -233,7 +233,7 @@ function getAttributesManagedAttributeColumns(
     const managedAttributesColumn = {
       header: () => <FieldHeader name={managedAttribute.name} />,
       accessorKey,
-      id: managedAttribute.name,
+      id: `${queryOption.type}.${managedAttributeKey}`,
       isKeyword: queryOption.keywordMultiFieldSupport,
       isColumnVisible: false
     };
@@ -251,10 +251,11 @@ function getAttributesExtensionValuesColumns(
 ) {
   for (const extensionValue of extensionValues) {
     const extensionFields = extensionValue.extension.fields;
+    const fieldExtensionResourceType = queryOption.path.split(".").at(-1);
     for (const extensionField of extensionFields) {
       const extensionValuesColumn = {
         accessorKey: `${queryOption.path}.${extensionValue.id}.${extensionField.key}`,
-        id: `${extensionValue.id}.${extensionField.key}`,
+        id: `${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
         header: () => (
           <FieldHeader name={`${extensionValue.id}.${extensionField.key}`} />
         ),
@@ -338,6 +339,7 @@ function getIncludedExtensionValuesColumn(
 ) {
   for (const extensionValue of extensionValues) {
     const extensionFields = extensionValue.extension.fields;
+    const fieldExtensionResourceType = queryOption.path.split(".").at(-1);
     for (const extensionField of extensionFields) {
       const accessorKey = `${queryOption.path}.${extensionValue.id}.${extensionField.key}`;
       const extensionValuesColumn = {
@@ -353,7 +355,7 @@ function getIncludedExtensionValuesColumn(
           return <>{value}</>;
         },
         accessorKey,
-        id: `${extensionValue.id}.${extensionField.key}`,
+        id: `${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
         header: () => (
           <FieldHeader name={`${extensionValue.id}.${extensionField.key}`} />
         ),
