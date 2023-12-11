@@ -124,7 +124,8 @@ export function ColumnSelector<TData>({
           groupedIndexMappings,
           setLoadedIndexMapColumns,
           setColumnSelectorIndexMapColumns,
-          apiClient
+          apiClient,
+          setLoadingIndexMapColumns
         });
         setLoading(false);
       }
