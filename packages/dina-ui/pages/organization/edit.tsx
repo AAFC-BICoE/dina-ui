@@ -38,7 +38,7 @@ export default function OrganizationEditPage() {
 
   return (
     <PageLayout titleId={title}>
-    {id ? (
+      {id ? (
         withResponse(query, ({ data }) => (
           <OrganizationForm organization={data} router={router} />
         ))

@@ -12,7 +12,8 @@ import {
   OperationError,
   SaveArgs,
   useApiClient,
-  DeleteArgs
+  DeleteArgs,
+  BackButton
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { Identifier } from "packages/dina-ui/types/agent-api/resources/Identifier";
@@ -21,6 +22,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
 import { mapKeys, pick } from "lodash";
+import ButtonBarLayout from "../page/ButtonBarLayout";
 
 interface PersonFormProps {
   person?: Person;
@@ -178,8 +180,20 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     await onSubmitSuccess?.(savedPerson);
   };
 
+  const buttonBar = (
+    <ButtonBarLayout>
+      <BackButton
+        entityId={id as string}
+        entityLink="/person"
+        byPassView={true}
+      />
+      <SubmitButton className="ms-auto" />
+    </ButtonBarLayout>
+  );
+
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      {buttonBar}
       <div style={{ width: "30rem" }}>
         <TextField name="displayName" />
       </div>
@@ -210,19 +224,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       </div>
       <div style={{ width: "30rem" }}>
         <TextField name="remarks" multiLines={true} />
-      </div>
-      <div className="mb-3 list-inline">
-        <div className="list-inline-item">
-          <SubmitButton />
-        </div>
-        <div className="list-inline-item">
-          <DeleteButton
-            id={id}
-            options={{ apiBaseUrl: "/agent-api" }}
-            postDeleteRedirect="/person/list"
-            type="person"
-          />
-        </div>
       </div>
     </DinaForm>
   );

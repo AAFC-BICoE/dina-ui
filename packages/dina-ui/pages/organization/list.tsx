@@ -49,8 +49,8 @@ export default function OrganizationListPage() {
         filterAttributes={ORGANIZATION_FILTER_ATTRIBUTES}
         id="organization-list"
         queryTableProps={{
-             columns: ORGANIZATION_TABLE_COLUMNS,
-             path: "agent-api/organization"
+          columns: ORGANIZATION_TABLE_COLUMNS,
+          path: "agent-api/organization"
         }}
       />
     </PageLayout>
