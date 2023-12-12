@@ -408,6 +408,7 @@ export function QueryTable<TData extends KitsuResource>({
         manualPagination={!enableInMemoryFilter}
         manualSorting={!enableInMemoryFilter}
         pageCount={numberOfPages}
+        pageSize={defaultPageSize}
         showPaginationTop={shouldShowPagination && !hideTopPagination}
         showPagination={shouldShowPagination}
         onPageSizeChange={onPageSizeChangeInternal}

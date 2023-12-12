@@ -187,7 +187,6 @@ export function ListPageLayout<TData extends KitsuResource>({
     <QueryTable<TData>
       enableInMemoryFilter={enableInMemoryFilter}
       filterFn={inMemoryFilter}
-      defaultPageSize={defaultPageSize ?? undefined}
       defaultSort={defaultSort ?? undefined}
       filter={filterParam}
       onPageSizeChange={(newSize) => setDefaultPageSize(newSize)}

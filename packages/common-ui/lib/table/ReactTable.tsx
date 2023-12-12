@@ -159,11 +159,13 @@ export function ReactTable<TData>({
     getCoreRowModel: getCoreRowModel(),
     ...(enableSorting && { getSortedRowModel: getSortedRowModel() }),
     ...(enableFilters && { getFilteredRowModel: getFilteredRowModel() }),
-    ...(defaultExpanded && {
-      initialState: {
+    initialState: {
+      sorting: defaultSorted,
+      pagination: { pageIndex, pageSize },
+      ...(defaultExpanded && {
         expanded: defaultExpanded
-      }
-    }),
+      })
+    },
     enableSorting,
     enableMultiSort,
     manualPagination,
