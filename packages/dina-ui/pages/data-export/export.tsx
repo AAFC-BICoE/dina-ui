@@ -36,6 +36,7 @@ export default function ExportPage<TData extends KitsuResource>() {
   const hideTable: boolean | undefined = !!router.query.hideTable;
   const uniqueName = String(router.query.uniqueName);
   const indexName = String(router.query.indexName);
+  const entityLink = String(router.query.entityLink);
   const { formatMessage, formatNumber } = useIntl();
   const [columns] = useLocalStorage<TableColumn<TData>[]>(
     `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`,
@@ -94,10 +95,10 @@ export default function ExportPage<TData extends KitsuResource>() {
         <ButtonBar>
           <BackButton
             className="me-auto"
-            entityLink="/collection/material-sample"
+            entityLink={entityLink}
             byPassView={true}
           />
-          <Link href={`/data-export/list`}>
+          <Link href={`/data-export/list?entityLink=${entityLink}`}>
             <a className="btn btn-primary">
               <DinaMessage id="dataExports" />
             </a>
