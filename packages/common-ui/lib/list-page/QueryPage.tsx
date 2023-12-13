@@ -129,10 +129,9 @@ export interface QueryPageProps<TData extends KitsuResource> {
   bulkEditPath?: string;
 
   /**
-   * Adds the data export button and the row checkboxes.
-   * The query path to perform for data exporting.
+   * Adds the data export button.
    */
-  dataExportPath?: string;
+  dataExportProps?: { dataExportPath: string; entityLink: string };
 
   /** Query path if user selected only 1 item */
   singleEditPath?: string;
@@ -251,7 +250,7 @@ export function QueryPage<TData extends KitsuResource>({
   bulkEditPath,
   bulkSplitPath,
   singleEditPath,
-  dataExportPath,
+  dataExportProps,
   reactTableProps,
   defaultSort,
   defaultPageSize,
@@ -339,7 +338,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(
-    bulkDeleteButtonProps || bulkEditPath || dataExportPath
+    bulkDeleteButtonProps || bulkEditPath || dataExportProps
   );
 
   // Query Page error message state
@@ -883,9 +882,10 @@ export function QueryPage<TData extends KitsuResource>({
                   {bulkDeleteButtonProps && (
                     <BulkDeleteButton {...bulkDeleteButtonProps} />
                   )}
-                  {dataExportPath && (
+                  {dataExportProps && (
                     <DataExportButton
-                      pathname={dataExportPath}
+                      pathname={dataExportProps.dataExportPath}
+                      entityLink={dataExportProps.entityLink}
                       totalRecords={totalRecords}
                       query={elasticSearchQuery}
                       uniqueName={uniqueName}

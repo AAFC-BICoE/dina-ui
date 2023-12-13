@@ -381,7 +381,10 @@ export default function MaterialSampleListPage() {
             apiBaseUrl: "/collection-api"
           }}
           bulkEditPath="/collection/material-sample/bulk-edit"
-          dataExportPath="/data-export/export"
+          dataExportProps={{
+            dataExportPath: "/data-export/export",
+            entityLink: "/collection/material-sample"
+          }}
           // bulkSplitPath="/collection/material-sample/bulk-split"
         />
       </main>

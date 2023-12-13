@@ -124,6 +124,7 @@ export interface DataExportButtonProps<TData extends KitsuResource> {
   columns: TableColumn<TData>[];
   dynamicFieldMapping: DynamicFieldsMappingConfig | undefined;
   indexName: string;
+  entityLink: string;
 }
 
 /**
@@ -143,7 +144,8 @@ export function DataExportButton<TData extends KitsuResource>({
   uniqueName,
   columns,
   dynamicFieldMapping,
-  indexName
+  indexName,
+  entityLink
 }: DataExportButtonProps<TData>) {
   const router = useRouter();
   return (
@@ -178,7 +180,8 @@ export function DataExportButton<TData extends KitsuResource>({
           query: {
             hideTable: true,
             uniqueName,
-            indexName
+            indexName,
+            entityLink
           }
         });
       }}

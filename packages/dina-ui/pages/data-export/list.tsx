@@ -3,11 +3,10 @@ import {
   ListPageLayout,
   ColumnDefinition,
   dateCell,
-  BackToListButton,
-  FieldHeader,
   useApiClient,
   LoadingSpinner,
-  downloadDataExport
+  downloadDataExport,
+  BackButton
 } from "../../../common-ui/lib";
 import PageLayout from "../../components/page/PageLayout";
 import { DataExport } from "packages/dina-ui/types/dina-export-api";
@@ -58,9 +57,7 @@ export default function DataExportListPage() {
   return (
     <PageLayout
       titleId="dataExports"
-      buttonBarContent={
-        <BackToListButton entityLink="/collection/material-sample" />
-      }
+      buttonBarContent={<BackButton entityLink="/collection/material-sample" />}
     >
       <ListPageLayout
         additionalFilters={{
