@@ -403,6 +403,12 @@ export function ColumnSelector<TData>({
     <LoadingSpinner loading={loading} />
   ) : menuOnly ? (
     <ColumnSelectorMenu>
+      <Dropdown.Item
+        id="selectAll"
+        handleClick={handleToggleAll}
+        isChecked={reactTable?.getIsAllColumnsVisible()}
+        as={CheckboxItem}
+      />
       {searchedColumns?.map((column) => {
         return (
           <>
