@@ -275,30 +275,38 @@ export function ColumnSelector<TData>({
     // data-export POST will return immediately but export won't necessarily be available
     // continue to get status of export until it's COMPLETED
     let isFetchingDataExport = true;
-    const fetchDataExportRetries = 0;
+    let fetchDataExportRetries = 0;
     let dataExportGetResponse;
-    while (
-      isFetchingDataExport &&
-      fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES
-    ) {
-      if (dataExportGetResponse?.data?.status === "COMPLETED") {
-        // Get the exported data
-        await downloadDataExport(apiClient, dataExportPostResponse[0].id);
+    while (isFetchingDataExport) {
+      if (fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES) {
+        fetchDataExportRetries += 1;
+        if (dataExportGetResponse?.data?.status === "COMPLETED") {
+          // Get the exported data
+          await downloadDataExport(apiClient, dataExportPostResponse[0].id);
+          isFetchingDataExport = false;
+        } else if (dataExportGetResponse?.data?.status === "ERROR") {
+          isFetchingDataExport = false;
+          setDataExportError(
+            <div className="alert alert-danger">
+              <DinaMessage id="dataExportError" />
+            </div>
+          );
+        } else {
+          dataExportGetResponse = await apiClient.get<DataExport>(
+            `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
+            {}
+          );
+          // Wait 1 second before retrying
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+      } else {
         isFetchingDataExport = false;
-      } else if (dataExportGetResponse?.data?.status === "ERROR") {
-        isFetchingDataExport = false;
+        setLoading(false);
         setDataExportError(
           <div className="alert alert-danger">
             <DinaMessage id="dataExportError" />
           </div>
         );
-      } else {
-        dataExportGetResponse = await apiClient.get<DataExport>(
-          `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
-          {}
-        );
-        // Wait 1 second before retrying
-        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
     isFetchingDataExport = false;
