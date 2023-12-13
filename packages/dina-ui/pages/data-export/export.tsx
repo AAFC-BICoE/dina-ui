@@ -107,13 +107,6 @@ export default function ExportPage<TData extends KitsuResource>() {
     setTotalColumns(combinedColumns);
   }, [loadedIndexMapColumns]);
 
-  // useEffect(() => {
-  //   setLocalStorageColumnStates({
-  //     ...columnVisibility,
-  //     ...localStorageColumnStates
-  //   });
-  // }, [totalColumns]);
-
   return loading || !loadedIndexMapColumns ? (
     <LoadingSpinner loading={loading} />
   ) : (
@@ -148,6 +141,7 @@ export default function ExportPage<TData extends KitsuResource>() {
           hideTable={hideTable}
           uniqueName={uniqueName}
           menuOnly={true}
+          indexName={indexName}
         />
       </DinaForm>
       <Footer />

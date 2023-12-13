@@ -262,7 +262,7 @@ export function ColumnSelector<TData>({
     const dataExportSaveArg = {
       resource: {
         type: "data-export",
-        source: "dina_material_sample_index",
+        source: indexName,
         query: queryString,
         columns: reactTable ? exportColumns : []
       },
