@@ -1,6 +1,6 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { ColumnDef } from "@tanstack/react-table";
-import { FieldHeader, ReactTable, useQuery } from "common-ui";
+import { FieldHeader, ReactTable, descriptionCell, useQuery } from "common-ui";
 import { find } from "lodash";
 import { FreeTextFilterForm } from "packages/common-ui/lib/list-page-layout/FreeTextFilterForm";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
@@ -11,29 +11,14 @@ import {
 } from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
-function getTableColumn(locale: string) {
+function getTableColumn() {
   const TABLE_COLUMNS: ColumnDef<ExtensionField>[] = [
     {
       id: "name",
       accessorKey: "name",
       header: () => <FieldHeader name={"name"} />
     },
-    {
-      id: "multilingualDescription",
-      cell: ({
-        row: {
-          original: { multilingualDescription }
-        }
-      }) => {
-        const desc =
-          find(
-            multilingualDescription?.descriptions || [],
-            (item) => item.lang === locale
-          )?.desc || "";
-        return desc;
-      },
-      header: () => <FieldHeader name={"multilingualDescription"} />
-    },
+    descriptionCell("multilingualDescription"),
     {
       id: "vocabularyElementType",
       accessorKey: "vocabularyElementType",
@@ -145,10 +130,12 @@ export default function FieldListPage() {
         <ReactTable<ExtensionField>
           key={extensionFields?.length}
           className="-striped"
-          columns={getTableColumn(locale)}
+          columns={getTableColumn()}
           data={extensionFields ?? []}
           showPagination={true}
           showPaginationTop={true}
+          enableSorting={true}
+          enableMultiSort={true}
         />
       </div>
     </PageLayout>

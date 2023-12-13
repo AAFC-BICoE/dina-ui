@@ -256,6 +256,10 @@ export function AssemblageFormLayout() {
                 ]
               : undefined
           }
+          reactTableProps={{
+            enableSorting: true,
+            enableMultiSort: true
+          }}
         />
       )}
     </div>

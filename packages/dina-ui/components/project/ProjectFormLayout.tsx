@@ -99,6 +99,10 @@ export function ProjectFormLayout() {
                 ]
               : undefined
           }
+          reactTableProps={{
+            enableSorting: true,
+            enableMultiSort: true
+          }}
         />
       )}
     </div>
