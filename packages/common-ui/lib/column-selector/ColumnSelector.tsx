@@ -286,6 +286,7 @@ export function ColumnSelector<TData>({
           isFetchingDataExport = false;
         } else if (dataExportGetResponse?.data?.status === "ERROR") {
           isFetchingDataExport = false;
+          setLoading(false);
           setDataExportError(
             <div className="alert alert-danger">
               <DinaMessage id="dataExportError" />
@@ -300,6 +301,7 @@ export function ColumnSelector<TData>({
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
       } else {
+        // Max retries reached
         isFetchingDataExport = false;
         setLoading(false);
         setDataExportError(
