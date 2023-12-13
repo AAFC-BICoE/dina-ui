@@ -11,7 +11,7 @@ import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect, useCallback } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
-import { startCase } from "lodash";
+import { compact, startCase } from "lodash";
 import { Button } from "react-bootstrap";
 import useLocalStorage from "@rehooks/local-storage";
 import { DataExport } from "packages/dina-ui/types/dina-export-api";
@@ -113,6 +113,7 @@ export function ColumnSelector<TData>({
       localStorageColumnStates &&
       Object.keys(localStorageColumnStates).length > 0
     ) {
+      // Handle scenario where localStorage has information on saved columns
       const savedVisibilityValues = Object.values(
         localStorageColumnStates
       ).filter((visibilityValue) => visibilityValue === true);

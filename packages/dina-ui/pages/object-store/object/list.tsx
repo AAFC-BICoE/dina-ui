@@ -196,7 +196,10 @@ export default function MetadataListPage() {
                   apiBaseUrl: "/objectstore-api"
                 }}
                 bulkEditPath={"/object-store/metadata/bulk-edit"}
-                dataExportPath="/data-export/export"
+                dataExportProps={{
+                  dataExportPath: "/data-export/export",
+                  entityLink: "/object-store/object"
+                }}
                 singleEditPath={"/object-store/metadata/edit"}
                 defaultSort={[
                   {
