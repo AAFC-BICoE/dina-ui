@@ -512,6 +512,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   groupMustBeSelected: "Group must be selected",
   hostOrganismLegend: "Host Organism",
   http403ForbiddenError: "Access is denied",
+  http500InternalServerError: "Unhandled Server Error",
   identifierLegend: "Identifiers",
   identifierType: "Identifier Type",
   identifierURI: "Identifier",

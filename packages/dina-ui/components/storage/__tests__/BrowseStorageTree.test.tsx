@@ -198,8 +198,7 @@ describe("BrowseStorageTree component", () => {
     // No filter again:
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {
       filter: {
-        parentStorageUnit: null,
-        rsql: ""
+        rsql: "group=in=(aafc,cnc)"
       },
       include: "storageUnitChildren,storageUnitType",
       page: {

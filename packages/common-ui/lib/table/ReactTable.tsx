@@ -209,26 +209,6 @@ export function ReactTable<TData>({
     setColumnFilters(newState);
   }
 
-  const paginationStateOption = manualPagination
-    ? {
-        pagination: { pageIndex, pageSize }
-      }
-    : {};
-
-  const getExpandedRowModelOption =
-    !!renderSubComponent && !!getRowCanExpand
-      ? { getExpandedRowModel: getExpandedRowModel() }
-      : {};
-
-  const onPaginationChangeOption = manualPagination
-    ? {
-        onPaginationChange: onPaginationChangeInternal,
-        pageCount
-      }
-    : {
-        getPaginationRowModel: getPaginationRowModel()
-      };
-
   const onSortingChangeOption = manualSorting
     ? { onSortingChange: onSortingChangeInternal }
     : { onSortingChange: setSorting };
@@ -245,28 +225,43 @@ export function ReactTable<TData>({
     columns,
     defaultColumn: { minSize: 0, size: 0 },
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getRowCanExpand,
+    ...(enableSorting && { getSortedRowModel: getSortedRowModel() }),
+    ...(enableFilters && { getFilteredRowModel: getFilteredRowModel() }),
     initialState: {
-      expanded: defaultExpanded,
-      sorting: defaultSorted
+      sorting: defaultSorted,
+      pagination: { pageIndex, pageSize },
+      ...(defaultExpanded && {
+        expanded: defaultExpanded
+      })
     },
     enableSorting,
     enableMultiSort,
     manualPagination,
     manualSorting,
-    ...getExpandedRowModelOption,
+    ...(!!renderSubComponent &&
+      !!getRowCanExpand && {
+        getRowCanExpand,
+        getExpandedRowModel: getExpandedRowModel()
+      }),
     state: {
       sorting,
-      columnVisibility,
-      columnFilters,
-      ...paginationStateOption
+      ...(columnVisibility && { columnVisibility }),
+      ...(enableFilters && columnFilters && { columnFilters }),
+      ...(manualPagination && {
+        pagination: { pageIndex, pageSize }
+      })
     },
     enableFilters,
     manualFiltering,
     onColumnVisibilityChange: setColumnVisibility,
-    ...onPaginationChangeOption,
+    ...(manualPagination
+      ? {
+          onPaginationChange: onPaginationChangeInternal,
+          pageCount
+        }
+      : {
+          getPaginationRowModel: getPaginationRowModel()
+        }),
     ...onSortingChangeOption,
     ...onColumnFilterChangeOption,
     meta: {

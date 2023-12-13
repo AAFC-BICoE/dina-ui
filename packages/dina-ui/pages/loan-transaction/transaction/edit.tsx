@@ -406,6 +406,10 @@ export function TransactionFormLayout({
             }
             setSelectionResources={setSelectedResources}
             viewMode={readOnly}
+            reactTableProps={{
+              enableSorting: true,
+              enableMultiSort: true
+            }}
           />
         </div>
       </FieldSet>

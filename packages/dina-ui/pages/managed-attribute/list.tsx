@@ -207,7 +207,7 @@ function CollectionAttributeListView() {
         id="collections-module-managed-attribute-list"
         queryTableProps={{
           columns: COLLECTION_ATTRIBUTES_LIST_COLUMNS,
-          path: "collection-api/managed-attribute",
+          path: "collection-api/managed-attribute?page[limit]=1000",
           enableColumnChooser: true
         }}
         additionalFilters={(filterForm) => ({

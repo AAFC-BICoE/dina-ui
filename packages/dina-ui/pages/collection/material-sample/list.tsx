@@ -302,6 +302,10 @@ export default function MaterialSampleListPage() {
           rowStyling={rowStyling}
           indexName={"dina_material_sample_index"}
           uniqueName="material-sample-list"
+          reactTableProps={{
+            enableSorting: true,
+            enableMultiSort: true
+          }}
           dynamicFieldMapping={{
             fields: [
               // Managed Attributes

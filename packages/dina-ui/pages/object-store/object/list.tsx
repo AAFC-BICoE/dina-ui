@@ -232,7 +232,9 @@ export default function MetadataListPage() {
                         };
                       }
                       return {};
-                    }
+                    },
+                    enableSorting: true,
+                    enableMultiSort: true
                   };
                 }}
               />

@@ -28,6 +28,7 @@ import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 import { Table } from "@tanstack/react-table";
+import { MultiSortTooltip } from "../list-page/MultiSortTooltip";
 
 /**
  * Column props with extra props designed specifically for our application on top of it.
@@ -324,8 +325,13 @@ export function QueryTable<TData extends KitsuResource>({
   const resolvedReactTableProps =
     typeof reactTableProps === "function"
       ? reactTableProps(queryState)
-      : reactTableProps;
-
+      : reactTableProps ?? {};
+  if (resolvedReactTableProps.enableSorting === undefined) {
+    resolvedReactTableProps.enableSorting = true;
+  }
+  if (resolvedReactTableProps.enableMultiSort === undefined) {
+    resolvedReactTableProps.enableMultiSort = true;
+  }
   // Show the last loaded page while loading the next page:
   const displayData = lastSuccessfulResponse.current?.data;
   const shouldShowPagination = !!displayData?.length;
@@ -373,9 +379,8 @@ export function QueryTable<TData extends KitsuResource>({
             {topRightCorner}
           </div>
 
-          {resolvedReactTableProps?.enableSorting !== false && (
-            <Tooltip id="queryTableMultiSortExplanation" placement="left" />
-          )}
+          {/* Multi sort tooltip - Only shown if it's possible to sort */}
+          {resolvedReactTableProps.enableMultiSort && <MultiSortTooltip />}
         </div>
       </div>
       <ReactTable<TData>
@@ -394,10 +399,9 @@ export function QueryTable<TData extends KitsuResource>({
         manualFiltering={!enableInMemoryFilter}
         onColumnFiltersChange={onColumnFiltersChangeInternal}
         manualPagination={!enableInMemoryFilter}
-        enableSorting={true}
-        enableMultiSort={true}
         manualSorting={!enableInMemoryFilter}
         pageCount={numberOfPages}
+        pageSize={defaultPageSize}
         showPaginationTop={shouldShowPagination && !hideTopPagination}
         showPagination={shouldShowPagination}
         onPageSizeChange={onPageSizeChangeInternal}
@@ -430,7 +434,7 @@ export function QueryTable<TData extends KitsuResource>({
                   </button>
                 </div>
               )
-            : resolvedReactTableProps?.TbodyComponent
+            : resolvedReactTableProps.TbodyComponent
         }
       />
     </div>
