@@ -19,7 +19,13 @@ import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
-import { FormikButton, ReactTable, ReactTableProps, useAccount } from "..";
+import {
+  FormikButton,
+  ReactTable,
+  ReactTableProps,
+  VISIBLE_INDEX_LOCAL_STORAGE_KEY,
+  useAccount
+} from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
@@ -56,6 +62,14 @@ import {
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
 import { DynamicFieldsMappingConfig, TableColumn } from "./types";
+import {
+  getAttributeExtensionFieldColumn,
+  getAttributesManagedAttributeColumn,
+  getAttributesStandardColumns,
+  getIncludedExtensionFieldColumn,
+  getIncludedManagedAttributeColumn,
+  getIncludedStandardColumns
+} from "../column-selector/ColumnSelectorUtils";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -274,10 +288,62 @@ export function QueryPage<TData extends KitsuResource>({
   const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
 
+  const [visibleIndexMapColumns] = useLocalStorage<any[]>(
+    `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
+    []
+  );
+
+  // Index map columns that can be filtered on by query builder
   const [columnSelectorIndexMapColumns, setColumnSelectorIndexMapColumns] =
     useState<any[]>([]);
   const [loadingIndexMapColumns, setLoadingIndexMapColumns] =
     useState<boolean>(false);
+
+  useEffect(() => {
+    visibleIndexMapColumns.forEach((visibleIndexMapColumn) => {
+      if (visibleIndexMapColumn.relationshipType) {
+        if (visibleIndexMapColumn.extensionValue) {
+          getIncludedExtensionFieldColumn(
+            visibleIndexMapColumn.queryOption,
+            visibleIndexMapColumn.extensionValue,
+            visibleIndexMapColumn.extensionField,
+            setColumnSelectorIndexMapColumns
+          );
+        } else if (visibleIndexMapColumn.managedAttribute) {
+          getIncludedManagedAttributeColumn(
+            visibleIndexMapColumn.managedAttribute,
+            visibleIndexMapColumn.queryOption,
+            setColumnSelectorIndexMapColumns
+          );
+        } else {
+          getIncludedStandardColumns(
+            visibleIndexMapColumn.queryOption,
+            setColumnSelectorIndexMapColumns
+          );
+        }
+      } else {
+        if (visibleIndexMapColumn.extensionValue) {
+          getAttributeExtensionFieldColumn(
+            visibleIndexMapColumn.queryOption,
+            visibleIndexMapColumn.extensionValue,
+            visibleIndexMapColumn.extensionField,
+            setColumnSelectorIndexMapColumns
+          );
+        } else if (visibleIndexMapColumn.managedAttribute) {
+          getAttributesManagedAttributeColumn(
+            visibleIndexMapColumn.managedAttribute,
+            visibleIndexMapColumn.queryOption,
+            setColumnSelectorIndexMapColumns
+          );
+        } else {
+          getAttributesStandardColumns(
+            visibleIndexMapColumn.queryOption,
+            setColumnSelectorIndexMapColumns
+          );
+        }
+      }
+    });
+  }, []);
 
   // Combined columns from passed in columns
   const [totalColumns, setTotalColumns] =
@@ -390,11 +456,9 @@ export function QueryPage<TData extends KitsuResource>({
       );
     }
 
-    const combinedColumns = uniqWith(
+    const combinedColumns = uniqBy(
       [...totalColumns, ...columnSelectorIndexMapColumns],
-      (columnA, columnB) =>
-        columnA.accessorKey === columnB.accessorKey &&
-        columnA.relationshipType === columnB.relationshipType
+      "id"
     );
     setTotalColumns(combinedColumns);
 

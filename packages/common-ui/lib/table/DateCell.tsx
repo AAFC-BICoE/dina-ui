@@ -9,7 +9,8 @@ export function dateCell<TData extends KitsuResource>(
   label: string,
   accessorKey?: string,
   relationshipType?: string,
-  isColumnVisible?: boolean
+  isColumnVisible?: boolean,
+  queryOption?: any
 ): TableColumn<TData> {
   return {
     cell: ({ row: { original } }) => {
@@ -27,6 +28,7 @@ export function dateCell<TData extends KitsuResource>(
     accessorKey: accessorKey ?? label,
     id: label,
     relationshipType,
-    isColumnVisible
+    isColumnVisible,
+    queryOption
   };
 }
