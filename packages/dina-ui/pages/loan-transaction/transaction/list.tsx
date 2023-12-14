@@ -71,6 +71,10 @@ export default function TransactionListPage() {
           indexName={"dina_loan_transaction_index"}
           uniqueName="transaction-list-material-samples"
           columns={TRANSACTION_TABLE_COLUMNS}
+          reactTableProps={{
+            enableSorting: true,
+            enableMultiSort: true
+          }}
           dynamicFieldMapping={{
             fields: [
               {

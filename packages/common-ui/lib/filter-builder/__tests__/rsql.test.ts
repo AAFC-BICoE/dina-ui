@@ -141,6 +141,7 @@ describe("rsql conversion", () => {
         {
           attribute: {
             allowRange: true,
+            allowList: true,
             label: "Number",
             name: "number"
           },
@@ -160,12 +161,39 @@ describe("rsql conversion", () => {
     expect(rsqlFilter).toEqual("number=in=(10,90),number=ge=30;number=le=50");
   });
 
+  it("Allows a list but no range filter.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            allowRange: false,
+            allowList: true,
+            label: "Number",
+            name: "number"
+          },
+          id: 1,
+          predicate: "IS",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: "10,30-50,90"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual("number=in=(10,30-50,90)");
+  });
+
   it("Allows a NOT list and range filter.", () => {
     const model: FilterGroupModel = {
       children: [
         {
           attribute: {
             allowRange: true,
+            allowList: true,
             label: "Number",
             name: "number"
           },
@@ -192,7 +220,7 @@ describe("rsql conversion", () => {
       children: [
         {
           attribute: {
-            allowRange: true,
+            allowList: true,
             label: "Number",
             name: "number"
           },

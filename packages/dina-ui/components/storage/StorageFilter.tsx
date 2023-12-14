@@ -10,17 +10,31 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnitType } from "../../types/collection-api";
 
 export interface StorageFilterProps {
+  /**
+   * To prevent displaying itself in the search results, this UUID will be filtered from the 
+   * results.
+   */
+  parentStorageUnitUUID?: string;
+
   onChange: (newValue: FilterGroupModel | null) => void;
 }
 
-export function StorageFilter({ onChange }: StorageFilterProps) {
+export function StorageFilter({ onChange, parentStorageUnitUUID }: StorageFilterProps) {
   const [searchText, setSearchText] = useState<string>("");
   const [storageTypeFilter, setStorageTypeFilter] =
     useState<PersistedResource<StorageUnitType>>();
   const [createdByMeFilter, setCreatedByMeFilter] = useState(false);
+
+  const [performSearch, setPerformSearch] = useState<boolean>(false);
+
   const { username, groupNames } = useAccount();
 
-  function doSearch() {
+  // Do the search whenever the dropdown or checkbox value changes:
+  useEffect(() => {
+    if (performSearch === false) {
+      return;
+    }
+
     onChange({
       type: "FILTER_GROUP",
       id: -123,
@@ -35,6 +49,19 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
                 predicate: "IS" as const,
                 searchType: "PARTIAL_MATCH" as const,
                 value: searchText
+              }
+            ]
+          : []),
+        // Hide the parent storage unit, to prevent linking of itself.
+        ...(parentStorageUnitUUID
+          ? [
+              {
+                id: -432,
+                type: "FILTER_ROW" as const,
+                attribute: "uuid",
+                predicate: "IS NOT" as const,
+                searchType: "EXACT_MATCH" as const,
+                value: parentStorageUnitUUID
               }
             ]
           : []),
@@ -71,7 +98,8 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
                 searchType: "EXACT_MATCH" as const,
                 value: groupNames.join(","),
                 attribute: {
-                  allowRange: true,
+                  allowRange: false,
+                  allowList: true,
                   name: "group"
                 }
               }
@@ -79,16 +107,21 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
           : [])
       ]
     });
-  }
 
-  // Do the search whenever the dropdown or checkbox value changes:
-  useEffect(doSearch, [createdByMeFilter, storageTypeFilter]);
+    setPerformSearch(false);
+  }, [performSearch]);
+
+  // When changing the createdByMeFilter and storageTypeFilter, automatically submit the form.
+  useEffect(() => {
+    setPerformSearch(true);
+  }, [createdByMeFilter, storageTypeFilter]);
 
   function resetSearch() {
     setCreatedByMeFilter(false);
     setStorageTypeFilter(undefined);
     setSearchText("");
-    onChange(null);
+
+    setPerformSearch(true);
   }
 
   return (
@@ -129,7 +162,7 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
               onKeyDown={(e) => {
                 if (e.keyCode === 13) {
                   e.preventDefault();
-                  doSearch();
+                  setPerformSearch(true);
                 }
               }}
               autoComplete="none"
@@ -153,7 +186,9 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
               <button
                 className="storage-tree-search btn btn-primary"
                 type="button"
-                onClick={doSearch}
+                onClick={() => {
+                  setPerformSearch(true);
+                }}
               >
                 <DinaMessage id="search" />
               </button>

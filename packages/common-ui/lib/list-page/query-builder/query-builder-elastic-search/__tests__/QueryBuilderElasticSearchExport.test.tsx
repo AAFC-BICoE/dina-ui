@@ -37,6 +37,7 @@ const ELASTIC_SEARCH_QUERY: any = {
 
 const columnDefinitions: (TableColumn<KitsuResource> | string)[] = [
   {
+    id: "testColumn1",
     label: "testColumn1",
     accessorKey: "data.attributes.testColumn1",
     isKeyword: true,
@@ -46,6 +47,7 @@ const columnDefinitions: (TableColumn<KitsuResource> | string)[] = [
     ]
   },
   {
+    id: "testColumn2",
     label: "testColumn2",
     accessorKey: "data.attributes.testColumn2",
     isKeyword: false,
@@ -53,12 +55,14 @@ const columnDefinitions: (TableColumn<KitsuResource> | string)[] = [
   },
   "testColumn3",
   {
+    id: "testColumn4",
     label: "testColumn4",
     accessorKey: "data.attributes.testColumn4",
     isKeyword: false,
     relationshipType: "relationshipType1"
   },
   {
+    id: "testColumn5",
     label: "testColumn5",
     accessorKey: "data.attributes.testColumn5",
     isKeyword: true,
@@ -81,7 +85,7 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
-          [{ id: "data.attributes.testColumn1", desc: true }],
+          [{ id: "testColumn1", desc: true }],
           columnDefinitions as any
         )
       ).toMatchSnapshot();
@@ -90,7 +94,7 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
-          [{ id: "data.attributes.testColumn1", desc: false }],
+          [{ id: "testColumn1", desc: false }],
           columnDefinitions as any
         )
       ).toMatchSnapshot();
@@ -100,8 +104,8 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
           [
-            { id: "data.attributes.testColumn1", desc: false },
-            { id: "data.attributes.testColumn2", desc: true }
+            { id: "testColumn1", desc: false },
+            { id: "testColumn2", desc: true }
           ],
           columnDefinitions as any
         )
@@ -113,7 +117,7 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
-          [{ id: "data.attributes.testColumn4", desc: true }],
+          [{ id: "testColumn4", desc: true }],
           columnDefinitions as any
         )
       ).toMatchSnapshot();
@@ -123,8 +127,8 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
           [
-            { id: "data.attributes.testColumn4", desc: true },
-            { id: "data.attributes.testColumn5", desc: false }
+            { id: "testColumn4", desc: true },
+            { id: "testColumn5", desc: false }
           ],
           columnDefinitions as any
         )
@@ -135,10 +139,10 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
           [
-            { id: "data.attributes.testColumn1", desc: false },
-            { id: "data.attributes.testColumn2", desc: true },
-            { id: "data.attributes.testColumn4", desc: true },
-            { id: "data.attributes.testColumn5", desc: false }
+            { id: "testColumn1", desc: false },
+            { id: "testColumn2", desc: true },
+            { id: "testColumn4", desc: true },
+            { id: "testColumn5", desc: false }
           ],
           columnDefinitions as any
         )

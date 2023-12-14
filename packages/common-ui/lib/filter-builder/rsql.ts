@@ -5,6 +5,7 @@ import { FilterAttributeConfig } from "./FilterBuilder";
 import { FilterGroupModel } from "./FilterGroup";
 import { FilterRowModel } from "./FilterRow";
 import { DateRange } from "./FilterRowDatePicker";
+import { FreeTextSearchFilterModel } from "../filter-free-text-search/FilterFreeTextSearchField";
 
 interface RsqlOperand {
   arguments: string | string[];
@@ -18,7 +19,7 @@ interface RsqlOperandGroup {
 }
 
 /** Converts a FilterGroupModel to an RSQL expression. */
-export function rsql(filter: FilterGroupModel | FilterRowModel | null): string {
+export function rsql(filter: FilterGroupModel | FilterRowModel | FreeTextSearchFilterModel | null): string {
   if (!filter) {
     return "";
   }
@@ -27,6 +28,9 @@ export function rsql(filter: FilterGroupModel | FilterRowModel | null): string {
       return transformToRSQL(toGroup(filter));
     case "FILTER_ROW":
       return transformToRSQL(toPredicate(filter));
+    case "FREE_TEXT_SEARCH_FILTER": {
+      return transformToRSQL(toFreeTextSearch(filter));
+    }
   }
 }
 
@@ -100,23 +104,25 @@ function toPredicate(
   }
 
   // Allow list/range filters.
-  if (typeof value === "string" && attributeConfig.allowRange) {
+  if (typeof value === "string" && (attributeConfig?.allowList || attributeConfig?.allowRange)) {
     const commaSplit = value.split(",");
 
-    const singleNumbers = commaSplit.filter((e) => !e.includes("-"));
-    const ranges = commaSplit.filter((e) => e.includes("-"));
+    const singleNumbers = attributeConfig?.allowRange ? commaSplit.filter((e) => !e.includes("-")) : commaSplit;
+    const ranges = attributeConfig?.allowRange ? commaSplit.filter((e) => e.includes("-")) : commaSplit;
 
-    const listOperands = singleNumbers.length
-      ? [
-          {
-            arguments: singleNumbers,
-            comparison: predicate === "IS NOT" ? "=out=" : "=in=",
-            selector
-          }
-        ]
+    const listOperands = attributeConfig.allowList
+      ? singleNumbers.length
+        ? [
+            {
+              arguments: singleNumbers,
+              comparison: predicate === "IS NOT" ? "=out=" : "=in=",
+              selector
+            }
+          ]
+        : []
       : [];
 
-    const rangeOperands = ranges.map((range) => {
+    const rangeOperands = attributeConfig.allowRange ? ranges.map((range) => {
       const [low, high] = range
         .split("-")
         .sort((a, b) => Number(a) - Number(b));
@@ -124,7 +130,7 @@ function toPredicate(
       const positive = predicate === "IS";
 
       return betweenOperand({ low, high, positive, selector });
-    });
+    }) : [];
 
     return {
       operands: [...listOperands, ...rangeOperands],
@@ -196,6 +202,27 @@ function toPredicate(
     comparison: compare,
     selector
   };
+}
+
+function toFreeTextSearch(
+  filterRow: FreeTextSearchFilterModel
+): RsqlOperandGroup {
+  const { filterAttributes, value } = filterRow;
+
+  const operands = filterAttributes.map(attribute => {
+    const selector = typeof attribute === "string" ? attribute : attribute.name;
+    const operand: RsqlOperand = {
+      arguments: `*${value}*`,
+      comparison: "==",
+      selector
+    }
+    return operand;
+  });
+  return {
+    operands,
+    operator: 'OR'
+  };
+  
 }
 
 interface BetweenOperandParams {

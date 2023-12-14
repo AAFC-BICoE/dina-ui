@@ -50,7 +50,7 @@ import {
   applySortingRules,
   applySourceFiltering,
   elasticSearchFormatExport
-} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport8";
+} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import {
   CustomViewField,
   useQueryBuilderConfig
@@ -817,6 +817,8 @@ export function QueryPage<TData extends KitsuResource>({
           setPageOffset={setPageOffset}
           onSubmit={onSubmit}
           onReset={onReset}
+          setGroups={setGroups}
+          groups={groups}
           uniqueName={uniqueName}
         />
       )}
@@ -834,6 +836,7 @@ export function QueryPage<TData extends KitsuResource>({
                     onGroupChange(newGroups);
                   })
                 }
+                groups={groups}
               />
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (
@@ -886,7 +889,7 @@ export function QueryPage<TData extends KitsuResource>({
                 </span>
 
                 {/* Multi sort tooltip - Only shown if it's possible to sort */}
-                {!resolvedReactTableProps?.enableMultiSort && (
+                {resolvedReactTableProps.enableMultiSort && (
                   <MultiSortTooltip />
                 )}
               </div>
@@ -951,7 +954,6 @@ export function QueryPage<TData extends KitsuResource>({
                 manualSorting={
                   viewMode && selectedResources?.length ? false : true
                 }
-                enableSorting={true}
                 onSortingChange={onSortChange}
                 defaultSorted={sortingRules}
                 // Table customization props
