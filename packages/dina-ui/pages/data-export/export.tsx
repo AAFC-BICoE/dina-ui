@@ -70,7 +70,8 @@ export default function ExportPage<TData extends KitsuResource>() {
         groupedIndexMappings,
         setLoadedIndexMapColumns,
         setColumnSelectorIndexMapColumns,
-        apiClient
+        apiClient,
+        columnSelectorDefaultColumns: columns
       });
     }
 

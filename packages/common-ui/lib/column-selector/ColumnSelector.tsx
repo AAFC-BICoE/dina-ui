@@ -107,34 +107,6 @@ export function ColumnSelector<TData>({
     groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
   }
 
-  // Automatically load index map columns if visibility state indicates a need to
-  // useEffect(() => {
-  //   if (
-  //     localStorageColumnStates &&
-  //     Object.keys(localStorageColumnStates).length > 0
-  //   ) {
-  //     const savedVisibilityValues = Object.values(
-  //       localStorageColumnStates
-  //     ).filter((visibilityValue) => visibilityValue === true);
-  //     let savedVisilibilityValuesCount = savedVisibilityValues.length;
-  //     columnSelectorDefaultColumns?.forEach((defaultColumn) => {
-  //       const columnId = defaultColumn?.id;
-  //       if (localStorageColumnStates[columnId] === true) {
-  //         savedVisilibilityValuesCount -= 1;
-  //       }
-  //     });
-  //     if (savedVisilibilityValuesCount > 0 && indexMap) {
-  //       getColumnSelectorIndexMapColumns({
-  //         groupedIndexMappings,
-  //         setLoadedIndexMapColumns,
-  //         setColumnSelectorIndexMapColumns,
-  //         apiClient,
-  //         setLoadingIndexMapColumns
-  //       });
-  //     }
-  //   }
-  // }, [indexMap]);
-
   function menuDisplayControl() {
     const [show, setShow] = useState(false);
 
@@ -146,7 +118,8 @@ export function ColumnSelector<TData>({
           setLoadedIndexMapColumns,
           setColumnSelectorIndexMapColumns,
           apiClient,
-          setLoadingIndexMapColumns
+          setLoadingIndexMapColumns,
+          columnSelectorDefaultColumns
         });
         setLoading(false);
       }
