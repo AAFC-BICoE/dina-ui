@@ -71,6 +71,14 @@ export function ProjectFormLayout() {
           multiLines={true}
         />
       </div>
+      <div className="row">
+        <TextField
+          className="col-md-6 german-description"
+          name="multilingualDescription.de"
+          label={formatMessage("field_description.de")}
+          multiLines={true}
+        />
+      </div>
       <AttachmentsField
         name="attachment"
         title={<DinaMessage id="projectAttachments" />}

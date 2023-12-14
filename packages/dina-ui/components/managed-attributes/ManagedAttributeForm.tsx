@@ -199,6 +199,12 @@ export function ManagedAttributeFormLayout({
           label={formatMessage("field_description.fr")}
           multiLines={true}
         />
+        <TextField
+          className="col-md-6 german-description"
+          name="multilingualDescription.de"
+          label={formatMessage("field_description.de")}
+          multiLines={true}
+        />
       </div>
       {readOnly && (
         <div className="row">
