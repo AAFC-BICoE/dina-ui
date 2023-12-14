@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { compact, toPairs, uniqBy } from "lodash";
+import { compact, toPairs, uniqBy, uniqWith } from "lodash";
 import React, {
   useCallback,
   useEffect,
@@ -390,9 +390,11 @@ export function QueryPage<TData extends KitsuResource>({
       );
     }
 
-    const combinedColumns = uniqBy(
+    const combinedColumns = uniqWith(
       [...totalColumns, ...columnSelectorIndexMapColumns],
-      "id"
+      (columnA, columnB) =>
+        columnA.accessorKey === columnB.accessorKey &&
+        columnA.relationshipType === columnB.relationshipType
     );
     setTotalColumns(combinedColumns);
 
