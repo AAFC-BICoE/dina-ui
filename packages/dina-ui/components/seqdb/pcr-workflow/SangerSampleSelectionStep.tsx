@@ -288,7 +288,7 @@ export function SangerSampleSelectionStep({
         onSelect={(selected) => onDeselectMaterial(selected)}
         reactTableProps={{
           enableSorting: true,
-                    enableMultiSort: true
+          enableMultiSort: true
         }}
       />
     </div>

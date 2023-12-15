@@ -21,84 +21,105 @@ const testIndexMap: ESIndexMapping[] = [
     type: "text",
     value: "collectingEvent.dwcRecordNumber"
   }
-]
+];
 
 describe("validateQueryTree", () => {
   test("Given invalid operator in query tree, return false", async () => {
-    expect(validateQueryTree(
-      {
-        id: "8c6dc2c8-4070-48ce-b700-13a931f9ebaf",
-        type: "group",
-        children1: [
-          {
-            type: "rule",
-            properties: {
-              field: "collectingEvent.dwcRecordNumber",
-              value: [],
-              operator: "prefix", // No longer supported prefix.
-              valueSrc: [],
-              valueType: [],
-              valueError: []
+    expect(
+      validateQueryTree(
+        {
+          id: "8c6dc2c8-4070-48ce-b700-13a931f9ebaf",
+          type: "group",
+          children1: [
+            {
+              type: "rule",
+              properties: {
+                field: "collectingEvent.dwcRecordNumber",
+                value: [],
+                operator: "prefix", // No longer supported prefix.
+                valueSrc: [],
+                valueType: [],
+                valueError: []
+              }
             }
+          ],
+          properties: {
+            conjunction: "AND"
           }
-        ],
-        properties: {
-          conjunction: "AND"
-        }
-      } as JsonTree,
-      generateBuilderConfig(testIndexMap, "dina-material-sample-index", mockFormatMessage, [])
-    )).toBe(false);
+        } as JsonTree,
+        generateBuilderConfig(
+          testIndexMap,
+          "dina-material-sample-index",
+          mockFormatMessage,
+          []
+        )
+      )
+    ).toBe(false);
   });
 
   test("Given invalid operator in query tree, return false", async () => {
-    expect(validateQueryTree(
-      {
-        id: "8c6dc2c8-4070-48ce-b700-13a931f9ebaf",
-        type: "group",
-        children1: [
-          {
-            type: "rule",
-            properties: {
-              field: "collectingEvent.invalidField", // Invalid field
-              value: [],
-              operator: "notEmpty",
-              valueSrc: [],
-              valueType: [],
-              valueError: []
+    expect(
+      validateQueryTree(
+        {
+          id: "8c6dc2c8-4070-48ce-b700-13a931f9ebaf",
+          type: "group",
+          children1: [
+            {
+              type: "rule",
+              properties: {
+                field: "collectingEvent.invalidField", // Invalid field
+                value: [],
+                operator: "notEmpty",
+                valueSrc: [],
+                valueType: [],
+                valueError: []
+              }
             }
+          ],
+          properties: {
+            conjunction: "AND"
           }
-        ],
-        properties: {
-          conjunction: "AND"
-        }
-      } as JsonTree,
-      generateBuilderConfig(testIndexMap, "dina-material-sample-index", mockFormatMessage, [])
-    )).toBe(false);
+        } as JsonTree,
+        generateBuilderConfig(
+          testIndexMap,
+          "dina-material-sample-index",
+          mockFormatMessage,
+          []
+        )
+      )
+    ).toBe(false);
   });
 
   test("Given valid query tree, return true", async () => {
-    expect(validateQueryTree(
-      {
-        id: "8c6dc2c8-4070-48ce-b700-13a931f9ebaf",
-        type: "group",
-        children1: [
-          {
-            type: "rule",
-            properties: {
-              field: "collectingEvent.dwcRecordNumber",
-              value: [],
-              operator: "notEmpty",
-              valueSrc: [],
-              valueType: [],
-              valueError: []
+    expect(
+      validateQueryTree(
+        {
+          id: "8c6dc2c8-4070-48ce-b700-13a931f9ebaf",
+          type: "group",
+          children1: [
+            {
+              type: "rule",
+              properties: {
+                field: "collectingEvent.dwcRecordNumber",
+                value: [],
+                operator: "notEmpty",
+                valueSrc: [],
+                valueType: [],
+                valueError: []
+              }
             }
+          ],
+          properties: {
+            conjunction: "AND"
           }
-        ],
-        properties: {
-          conjunction: "AND"
-        }
-      } as JsonTree,
-      generateBuilderConfig(testIndexMap, "dina-material-sample-index", mockFormatMessage, [])
-    )).toBe(true);
+        } as JsonTree,
+        generateBuilderConfig(
+          testIndexMap,
+          "dina-material-sample-index",
+          mockFormatMessage,
+          []
+        )
+      )
+    ).toBe(true);
   });
 });

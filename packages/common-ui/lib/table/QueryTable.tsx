@@ -10,7 +10,7 @@ import {
   KitsuResponse,
   PersistedResource
 } from "kitsu";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useReducer, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
   ClientSideJoinSpec,
@@ -20,13 +20,14 @@ import {
   MetaWithTotal,
   ReactTable,
   ReactTableProps,
-  useColumnChooser,
+  ColumnSelector,
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
+import { Table } from "@tanstack/react-table";
 import { MultiSortTooltip } from "../list-page/MultiSortTooltip";
 
 /**
@@ -185,12 +186,6 @@ export function QueryTable<TData extends KitsuResource>({
 
   const divWrapperRef = useRef<HTMLDivElement>(null);
 
-  const { columnChooser, checkedColumnIds } = useColumnChooser({
-    columns,
-    localStorageKey: path,
-    hideExportButton: true
-  });
-
   function onPageChangeInternal(pageNumber: number) {
     const newOffset = pageNumber * page.limit;
     // When a new page is requested and the top of the window is below the top of the table,
@@ -332,10 +327,10 @@ export function QueryTable<TData extends KitsuResource>({
       ? reactTableProps(queryState)
       : reactTableProps ?? {};
   if (resolvedReactTableProps.enableSorting === undefined) {
-    resolvedReactTableProps.enableSorting = true; 
+    resolvedReactTableProps.enableSorting = true;
   }
   if (resolvedReactTableProps.enableMultiSort === undefined) {
-    resolvedReactTableProps.enableMultiSort = true; 
+    resolvedReactTableProps.enableMultiSort = true;
   }
   // Show the last loaded page while loading the next page:
   const displayData = lastSuccessfulResponse.current?.data;
@@ -359,6 +354,9 @@ export function QueryTable<TData extends KitsuResource>({
     });
   });
 
+  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+
   return (
     <div
       className="query-table-wrapper"
@@ -377,7 +375,7 @@ export function QueryTable<TData extends KitsuResource>({
         )}
         <div className="ms-auto">
           <div>
-            {enableColumnChooser && columnChooser}
+            {enableColumnChooser && columnSelector}
             {topRightCorner}
           </div>
 
@@ -386,18 +384,13 @@ export function QueryTable<TData extends KitsuResource>({
         </div>
       </div>
       <ReactTable<TData>
+        // These props are needed for column selector
+        forceUpdate={forceUpdate}
+        setColumnSelector={setColumnSelector}
+        uniqueName={path}
+        hideExportButton={true}
         className="-striped"
-        columns={
-          enableColumnChooser
-            ? mappedColumns.filter((column) =>
-                typeof column === "string"
-                  ? checkedColumnIds.includes(column)
-                  : (column as any).accessorKey
-                  ? checkedColumnIds.includes((column as any).accessorKey)
-                  : false
-              )
-            : mappedColumns
-        }
+        columns={mappedColumns}
         data={(displayData as TData[]) ?? []}
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}

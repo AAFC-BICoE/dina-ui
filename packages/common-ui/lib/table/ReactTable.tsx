@@ -5,6 +5,7 @@ import {
   PaginationState,
   Row,
   SortingState,
+  Table,
   VisibilityState,
   flexRender,
   getCoreRowModel,
@@ -15,13 +16,15 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import classnames from "classnames";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect, useReducer } from "react";
 
 import { useIntl } from "react-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
+import { ColumnSelector } from "../column-selector/ColumnSelector";
+import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
 
@@ -74,6 +77,57 @@ export interface ReactTableProps<TData> {
   columnVisibility?: VisibilityState;
   highlightRow?: boolean;
   TbodyComponent?: React.ElementType;
+
+  // Hides the table rendering. Useful for accessing table states but don't want to render table
+  hideTable?: boolean;
+
+  // Column Selector only get menu, no dropdown button
+  menuOnly?: boolean;
+
+  // Pass the Column Selector to parent caller
+  setColumnSelector?: React.Dispatch<React.SetStateAction<JSX.Element>>;
+
+  // uniqueName used for local storage
+  uniqueName?: string;
+
+  // Force updates component where this dispatch was created
+  forceUpdate?: React.DispatchWithoutAction;
+
+  /**
+   * Used for the listing page to understand which columns can be provided. Filters are generated
+   * based on the index provided.
+   *
+   * Also used to store saved searches under a specific type:
+   *
+   * `UserPreference.savedSearches.[INDEX_NAME].[SAVED_SEARCH_NAME]`
+   *
+   * For example, to get the default saved searches for the material sample index:
+   * `UserPreference.savedSearches.dina_material_sample_index.default.filters`
+   */
+  indexName?: string;
+
+  /**
+   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
+   * be searched against. It will also define the path and data component if required.
+   *
+   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
+   * or grouped terms.
+   */
+  dynamicFieldMapping?: DynamicFieldsMappingConfig;
+
+  // State setter to pass the processed index map columns to parent components
+  setColumnSelectorIndexMapColumns?: React.Dispatch<
+    React.SetStateAction<any[]>
+  >;
+
+  // If true, index map columns are being loaded and processed from back end
+  setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
+
+  // Hide column selector export button if true
+  hideExportButton?: boolean;
+
+  // The default visible columns
+  columnSelectorDefaultColumns?: any[];
 }
 
 export function ReactTable<TData>({
@@ -103,13 +157,24 @@ export function ReactTable<TData>({
   getRowCanExpand,
   rowStyling,
   loading = false,
-  columnVisibility,
+  columnVisibility: columnVisibilityExternal,
   highlightRow = true,
   TbodyComponent,
   enableFilters = false,
   manualFiltering = false,
   onColumnFiltersChange,
-  defaultColumnFilters = []
+  defaultColumnFilters = [],
+  hideTable = false,
+  setColumnSelector,
+  uniqueName,
+  forceUpdate,
+  indexName,
+  dynamicFieldMapping,
+  setColumnSelectorIndexMapColumns,
+  setLoadingIndexMapColumns,
+  menuOnly,
+  hideExportButton,
+  columnSelectorDefaultColumns
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -151,6 +216,9 @@ export function ReactTable<TData>({
   const onColumnFilterChangeOption = manualFiltering
     ? { onColumnFiltersChange: onColumnFiltersChangeInternal }
     : { onColumnFiltersChange: setColumnFilters };
+  const [columnVisibility, setColumnVisibility] = useState(
+    columnVisibilityExternal
+  );
 
   const tableOption = {
     data,
@@ -185,6 +253,7 @@ export function ReactTable<TData>({
     },
     enableFilters,
     manualFiltering,
+    onColumnVisibilityChange: setColumnVisibility,
     ...(manualPagination
       ? {
           onPaginationChange: onPaginationChangeInternal,
@@ -216,7 +285,27 @@ export function ReactTable<TData>({
 
   const table = useReactTable<TData>(tableOption);
 
-  return (
+  useEffect(() => {
+    if (setColumnSelector) {
+      const columnSelector = (
+        <ColumnSelector
+          uniqueName={uniqueName}
+          reactTable={table}
+          hideExportButton={hideExportButton}
+          menuOnly={menuOnly}
+          forceUpdate={forceUpdate}
+          indexName={indexName}
+          dynamicFieldMapping={dynamicFieldMapping}
+          setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
+          setLoadingIndexMapColumns={setLoadingIndexMapColumns}
+          columnSelectorDefaultColumns={columnSelectorDefaultColumns}
+        />
+      );
+      setColumnSelector?.(columnSelector);
+    }
+  }, [table.getState().columnVisibility, table.getAllLeafColumns().length]);
+
+  return !hideTable ? (
     <div
       className={classnames(
         "ReactTable",
@@ -349,5 +438,5 @@ export function ReactTable<TData>({
         </div>
       )}
     </div>
-  );
+  ) : null;
 }

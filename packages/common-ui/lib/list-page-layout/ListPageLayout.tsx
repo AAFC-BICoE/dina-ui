@@ -99,7 +99,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   const [defaultPageSize, setDefaultPageSize] =
     useLocalStorage<number>(tablePageSizeKey);
 
-  let filterParam: FilterParam | undefined = undefined;
+  let filterParam: FilterParam | undefined;
   let inMemoryFilter:
     | ((
         value: PersistedResource<TData>,

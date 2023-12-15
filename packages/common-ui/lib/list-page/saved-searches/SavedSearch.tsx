@@ -11,7 +11,11 @@ import { Alert, Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
 import { Config, ImmutableTree, Utils } from "react-awesome-query-builder";
-import { SavedSearchStructure, SingleSavedSearch, SAVED_SEARCH_VERSION } from "./types";
+import {
+  SavedSearchStructure,
+  SingleSavedSearch,
+  SAVED_SEARCH_VERSION
+} from "./types";
 import { map, cloneDeep, sortBy, isEqual } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
@@ -217,8 +221,9 @@ export function SavedSearch({
     }
 
     if (!userPreferences || !selectedSavedSearch || !queryBuilderTree) return;
-    const savedSearch = userPreferences?.savedSearches?.[indexName]?.[selectedSavedSearch];
-    let changesMade = false;
+    const savedSearch =
+      userPreferences?.savedSearches?.[indexName]?.[selectedSavedSearch];
+    let isQueryChanged = false;
 
     const currentQueryTreeString = Utils.queryString(
       queryBuilderTree,
@@ -227,15 +232,15 @@ export function SavedSearch({
 
     // Compare against currently selected tree.
     if (compareChangeSelected !== currentQueryTreeString) {
-      changesMade = true;
+      isQueryChanged = true;
     }
 
     // Check if the group has changed.
     if (!isEqual(sortBy(groups), sortBy(savedSearch?.groups))) {
-      changesMade = true;
+      isQueryChanged = true;
     }
 
-    setChangesMade(changesMade);
+    setChangesMade(isQueryChanged);
   }, [queryBuilderTree, groups]);
 
   /**
@@ -308,7 +313,9 @@ export function SavedSearch({
       // Check if the query tree is valid against the current config.
       if (validateQueryTree(savedSearchToLoad.queryTree, queryBuilderConfig)) {
         // Valid saved search, submit and load the search.
-        setSubmittedQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+        setSubmittedQueryBuilderTree(
+          Utils.loadTree(savedSearchToLoad.queryTree)
+        );
         setPageOffset(0);
         writeStorage(localStorageLastUsedTreeKey, savedSearchToLoad.queryTree);
       } else {
@@ -319,7 +326,7 @@ export function SavedSearch({
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
-      setGroups(savedSearchToLoad.groups ?? []);   
+      setGroups(savedSearchToLoad.groups ?? []);
     }
   }
 
@@ -365,7 +372,7 @@ export function SavedSearch({
               : userPreferences?.savedSearches?.[indexName]?.[savedSearchName]
                   ?.queryTree ?? undefined,
 
-            groups: groups
+            groups
           }
         }
       };
@@ -554,11 +561,7 @@ export function SavedSearch({
         }}
         onSavedSearchDelete={deleteSavedSearch}
       />
-      {queryError && (
-        <Alert variant={"danger"}>
-          {queryError}
-        </Alert>        
-      )}
+      {queryError && <Alert variant={"danger"}>{queryError}</Alert>}
     </>
   );
 }

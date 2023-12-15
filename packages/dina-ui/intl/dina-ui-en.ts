@@ -344,7 +344,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "End Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_familyNames: "Family Names",
   field_familyNames_tooltip: "Family name(s) including compound family names",
-  field_fieldExtensions: "Field extensions",
+  field_fieldExtensions: "Field Extensions",
   field_fileIdentifier: "File Identifier",
   field_fileSize: "File Size",
   field_givenNames: "Given Names",
@@ -707,7 +707,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_value_number_placeholder: "Enter number search value...",
   queryBuilder_value_text_placeholder: "Enter text search value...",
   queryBuilder_value_true: "True",
-  queryBuilder_invalid_query: "Some parts of your query were removed as they are no longer supported. Please review and update your query to use supported options:",
+  queryBuilder_invalid_query:
+    "Some parts of your query were removed as they are no longer supported. Please review and update your query to use supported options:",
   reception: "Reception",
   reloadSavedSearch: "Reload saved search",
   removeAssertionLabel: "Remove this GeoReference",

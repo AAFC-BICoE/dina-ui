@@ -29,9 +29,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "empty",
           "notEmpty"
         ],
-        subTypes: [
-          undefined
-        ],
+        subTypes: [undefined],
         useKeywordMultiField: true
       },
       {
@@ -70,9 +68,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "empty",
           "notEmpty"
         ],
-        subTypes: [
-          undefined
-        ],
+        subTypes: [undefined],
         useKeywordMultiField: false
       },
       {
@@ -88,27 +84,21 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "empty",
           "notEmpty"
         ],
-        subTypes: [
-          undefined
-        ],
+        subTypes: [undefined],
         useKeywordMultiField: false
       },
       {
         type: "PICK_LIST",
         testValue: "3.5",
         operators: ["equals", "notEquals", "empty", "notEmpty"],
-        subTypes: [
-          undefined
-        ],
+        subTypes: [undefined],
         useKeywordMultiField: true
       },
       {
         type: "BOOL",
         testValue: "true",
         operators: ["equals", "empty", "notEmpty"],
-        subTypes: [
-          undefined
-        ],
+        subTypes: [undefined],
         useKeywordMultiField: true
       }
     ];
@@ -145,12 +135,13 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                       label: "managedAttributes",
                       path: "data.attributes.managedAttributes",
                       type: "managedAttribute",
-                      keywordMultiFieldSupport: (testValue as TestValueStructure)
-                        .useKeywordMultiField,
+                      keywordMultiFieldSupport: (
+                        testValue as TestValueStructure
+                      ).useKeywordMultiField,
                       optimizedPrefix: false,
                       containsSupport: false,
                       endsWithSupport: false,
-                      subType: subType
+                      subType
                     }
                   })
                 ).toMatchSnapshot();
@@ -194,12 +185,13 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                       label: "managedAttributes",
                       path: "included.attributes.managedAttributes",
                       type: "managedAttribute",
-                      keywordMultiFieldSupport: (testValue as TestValueStructure)
-                        .useKeywordMultiField,
+                      keywordMultiFieldSupport: (
+                        testValue as TestValueStructure
+                      ).useKeywordMultiField,
                       optimizedPrefix: false,
                       containsSupport: false,
                       endsWithSupport: false,
-                      subType: subType
+                      subType
                     }
                   })
                 ).toMatchSnapshot();

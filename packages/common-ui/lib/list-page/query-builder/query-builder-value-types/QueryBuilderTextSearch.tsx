@@ -1,14 +1,15 @@
 import React from "react";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
-import { 
+import {
   includedTypeQuery,
   termQuery,
   existsQuery,
   prefixQuery,
   suffixQuery,
   infixQuery,
-  wildcardQuery } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+  wildcardQuery
+} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 interface QueryRowTextSearchProps {
   /**
@@ -94,7 +95,13 @@ export function transformTextSearchToDSL({
 
     // Prefix partial match
     case "startsWith":
-      return prefixQuery(fieldPath, value, parentType, optimizedPrefix, keywordMultiFieldSupport);
+      return prefixQuery(
+        fieldPath,
+        value,
+        parentType,
+        optimizedPrefix,
+        keywordMultiFieldSupport
+      );
 
     // Infix partial match
     case "containsText":
@@ -117,10 +124,10 @@ export function transformTextSearchToDSL({
                     query: {
                       bool: {
                         must_not: termQuery(
-                              fieldPath,
-                              value,
-                              keywordMultiFieldSupport
-                            ),
+                          fieldPath,
+                          value,
+                          keywordMultiFieldSupport
+                        ),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -156,7 +163,11 @@ export function transformTextSearchToDSL({
               should: [
                 {
                   bool: {
-                    must_not: termQuery(fieldPath, value, keywordMultiFieldSupport)
+                    must_not: termQuery(
+                      fieldPath,
+                      value,
+                      keywordMultiFieldSupport
+                    )
                   }
                 },
                 {
@@ -277,6 +288,6 @@ export function transformTextSearchToDSL({
               }
             }
           }
-        : termQuery(fieldPath, value, keywordMultiFieldSupport)
+        : termQuery(fieldPath, value, keywordMultiFieldSupport);
   }
 }

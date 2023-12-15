@@ -251,7 +251,7 @@ export function applySortingRules<TData extends KitsuResource>(
                 filter: {
                   term: {
                     "included.type": columnDefinition.relationshipType
-                  }                  
+                  }
                 }
               }
             }
@@ -579,7 +579,7 @@ export function suffixQuery(
     : {
         prefix: {
           [fieldName + ".prefix_reverse"]: matchValue
-}
+        }
       };
 }
 
@@ -593,6 +593,6 @@ export function uuidQuery(uuids: string[]) {
       terms: {
         "data.id": uuids
       }
-        }
-      };
+    }
+  };
 }

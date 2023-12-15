@@ -109,7 +109,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
       hideLabel={readOnlyHideLabel && readOnly}
     />
   );
-};
+}
 
 export interface UseAvailableGroupOptionsParams {
   initialGroupName?: string;

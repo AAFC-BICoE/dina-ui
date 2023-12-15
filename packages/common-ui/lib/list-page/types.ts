@@ -42,6 +42,8 @@ export type TableColumn<TData extends KitsuResource> = ColumnDef<TData> & {
   additionalAccessors?: string[];
 
   isColumnVisible?: boolean;
+
+  queryOption?: any;
 };
 
 /**

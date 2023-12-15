@@ -152,5 +152,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   warning: "Warning",
   yes: "Yes",
   refreshButtonText: "Refresh",
-  filterColumns: "Filter Columns"
+  filterColumns: "Filter Columns",
+  applyButtonText: "Apply"
 };

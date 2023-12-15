@@ -83,7 +83,9 @@ export function useCollectingEventQuery(id?: string | null) {
 
         // Process loaded back-end data into data structure that Forkmiks can use
         if (data.extensionValues) {
-          data.extensionValues = processExtensionValuesLoading(data.extensionValues);
+          data.extensionValues = processExtensionValuesLoading(
+            data.extensionValues
+          );
         }
       }
     }

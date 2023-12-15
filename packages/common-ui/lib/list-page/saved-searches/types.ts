@@ -36,5 +36,5 @@ export interface SingleSavedSearch {
   /**
    * Groups to load in.
    */
-  groups: string[]
+  groups: string[];
 }

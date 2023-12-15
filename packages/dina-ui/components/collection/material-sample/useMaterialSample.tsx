@@ -105,7 +105,9 @@ export function useMaterialSampleQuery(id?: string | null) {
 
         // Process loaded back-end data into data structure that Formik can use
         if (data.extensionValues) {
-          data.extensionValues = processExtensionValuesLoading(data.extensionValues);
+          data.extensionValues = processExtensionValuesLoading(
+            data.extensionValues
+          );
         }
 
         // Convert to separated list

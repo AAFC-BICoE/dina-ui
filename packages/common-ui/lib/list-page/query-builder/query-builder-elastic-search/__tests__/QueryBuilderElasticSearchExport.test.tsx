@@ -274,8 +274,12 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
     });
 
     test("wildcard", async () => {
-      expect(wildcardQuery("fieldTest", "valueToMatch", false)).toMatchSnapshot();
-      expect(wildcardQuery("fieldTest", "valueToMatch", true)).toMatchSnapshot();
+      expect(
+        wildcardQuery("fieldTest", "valueToMatch", false)
+      ).toMatchSnapshot();
+      expect(
+        wildcardQuery("fieldTest", "valueToMatch", true)
+      ).toMatchSnapshot();
     });
 
     test("existsQuery", async () => {
@@ -311,7 +315,7 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
         )
       ).toMatchSnapshot();
     });
-  
+
     test("prefixQuery attribute (not optimized, keyword support)", async () => {
       expect(
         prefixQuery(
@@ -402,7 +406,13 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
 
     test("Empty values are left as empty queries", async () => {
       expect(
-        prefixQuery("data.attribute.materialSampleName", "", undefined, true, false)
+        prefixQuery(
+          "data.attribute.materialSampleName",
+          "",
+          undefined,
+          true,
+          false
+        )
       ).toStrictEqual({});
       expect(
         infixQuery("data.attribute.materialSampleName", "", undefined)

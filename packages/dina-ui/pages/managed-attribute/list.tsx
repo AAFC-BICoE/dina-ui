@@ -26,7 +26,10 @@ import {
 
 export function useFilterManagedAttribute() {
   const { locale: language } = useContext(intlContext);
-  const filterManagedAttributes = (filterForm: any, value: ManagedAttribute) => {
+  const filterManagedAttributes = (
+    filterForm: any,
+    value: ManagedAttribute
+  ) => {
     let result = true;
     if (filterForm?.group) {
       result = result && value.group === filterForm.group;
@@ -34,19 +37,23 @@ export function useFilterManagedAttribute() {
     if (filterForm?.filterBuilderModel?.value) {
       result =
         result &&
-        (value.name.toLowerCase().indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
+        (value.name
+          .toLowerCase()
+          .indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
           (
             value.multilingualDescription?.descriptions?.filter(
               (item) =>
                 item.lang === language &&
-                (item.desc ?? "").toLowerCase().indexOf(filterForm.filterBuilderModel.value.toLowerCase()) >
+                (item.desc ?? "")
+                  .toLowerCase()
+                  .indexOf(filterForm.filterBuilderModel.value.toLowerCase()) >
                   -1
             ) ?? []
           ).length > 0);
     }
     return result;
   };
-  return {filterManagedAttributes}
+  return { filterManagedAttributes };
 }
 
 export default function ManagedAttributesListPage() {
@@ -104,8 +111,8 @@ function CreateNewSection({ href }: CreateButtonProps) {
 
 function CollectionAttributeListView() {
   const { formatMessage } = useDinaIntl();
-  
-  const {filterManagedAttributes} = useFilterManagedAttribute();
+
+  const { filterManagedAttributes } = useFilterManagedAttribute();
 
   const COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES = [
     "name",
@@ -225,7 +232,7 @@ function CollectionAttributeListView() {
 }
 
 function ObjectStoreAttributeListView() {
-  const {filterManagedAttributes} = useFilterManagedAttribute();
+  const { filterManagedAttributes } = useFilterManagedAttribute();
 
   const OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
@@ -306,7 +313,7 @@ function ObjectStoreAttributeListView() {
 }
 
 function TransactionAttributeListView() {
-  const {filterManagedAttributes} = useFilterManagedAttribute();
+  const { filterManagedAttributes } = useFilterManagedAttribute();
   const TRANSACTION_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
   const TRANSACTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] =

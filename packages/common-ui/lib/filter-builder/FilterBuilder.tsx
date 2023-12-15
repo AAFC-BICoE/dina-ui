@@ -17,7 +17,7 @@ export interface FilterAttributeConfig {
 
   /**
    * If enabled, ranges will be split into greater than and less than parts.
-   * 
+   *
    * Can be combined with allowList option as well.
    */
   allowRange?: boolean;

@@ -281,8 +281,7 @@ export function NgsSampleSelectionStep({
         enableDnd={true}
         onDeselect={(unselected) => onSelectMaterial(unselected)}
         onSelect={(selected) => onDeselectMaterial(selected)}
-        reactTableProps={{enableSorting: true,
-          enableMultiSort: true}}
+        reactTableProps={{ enableSorting: true, enableMultiSort: true }}
       />
     </div>
   );

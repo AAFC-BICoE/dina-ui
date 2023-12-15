@@ -154,7 +154,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
         <>
           <QueryPage<TData>
             {...queryPageProps}
-            enableColumnChooser={false}
+            enableColumnSelector={false}
             customViewQuery={customQuerySelected.customQuery}
             customViewFields={customQuerySelected.customViewFields ?? []}
             customViewElasticSearchQuery={

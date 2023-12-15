@@ -408,7 +408,7 @@ export function TransactionFormLayout({
             viewMode={readOnly}
             reactTableProps={{
               enableSorting: true,
-                    enableMultiSort: true
+              enableMultiSort: true
             }}
           />
         </div>

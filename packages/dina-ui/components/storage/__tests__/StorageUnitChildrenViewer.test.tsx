@@ -169,7 +169,10 @@ describe("StorageUnitChildrenViewer component", () => {
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer storageUnit={storageUnitA} />,
       </DinaForm>,
-      { apiContext, accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] } }
+      {
+        apiContext,
+        accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
+      }
     );
 
     wrapper.find("button.enable-move-content").simulate("click");
@@ -215,7 +218,10 @@ describe("StorageUnitChildrenViewer component", () => {
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer storageUnit={storageUnitX} />,
       </DinaForm>,
-      { apiContext, accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] } }
+      {
+        apiContext,
+        accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
+      }
     );
 
     wrapper.find("button.add-existing-as-child").simulate("click");

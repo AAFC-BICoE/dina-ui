@@ -79,14 +79,19 @@ export default function FieldListPage() {
       return fields.filter((value) => {
         if (filterForm?.filterBuilderModel?.value) {
           return (
-            value.name.toLowerCase().indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
+            value.name
+              .toLowerCase()
+              .indexOf(filterForm.filterBuilderModel.value.toLowerCase()) >
+              -1 ||
             (
               value.multilingualDescription?.descriptions?.filter(
                 (item) =>
                   item.lang === locale &&
-                  (item.desc ?? "").toLowerCase().indexOf(
-                    filterForm.filterBuilderModel.value.toLowerCase()
-                  ) > -1
+                  (item.desc ?? "")
+                    .toLowerCase()
+                    .indexOf(
+                      filterForm.filterBuilderModel.value.toLowerCase()
+                    ) > -1
               ) ?? []
             ).length > 0
           );
@@ -97,7 +102,7 @@ export default function FieldListPage() {
     }
   };
 
-  const fields = filterExtensionFields(response?.data);
+  const extensionFields = filterExtensionFields(response?.data);
 
   return (
     <PageLayout titleId="extensionListTitle">
@@ -119,13 +124,14 @@ export default function FieldListPage() {
         <span style={{ fontWeight: "bold" }} className="mt-3">
           {" "}
           {formatMessage("totalExtenstionFieldsCount")}:{" "}
-          {fields?.length ?? response?.data?.[0].extension.fields.length}{" "}
+          {extensionFields?.length ??
+            response?.data?.[0].extension.fields.length}{" "}
         </span>
         <ReactTable<ExtensionField>
-          key={fields?.length}
+          key={extensionFields?.length}
           className="-striped"
           columns={getTableColumn()}
-          data={fields ?? []}
+          data={extensionFields ?? []}
           showPagination={true}
           showPaginationTop={true}
           enableSorting={true}
