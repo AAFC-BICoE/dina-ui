@@ -13,7 +13,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { compact, startCase } from "lodash";
 import { Button } from "react-bootstrap";
-import useLocalStorage from "@rehooks/local-storage";
+import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
 import { DataExport } from "packages/dina-ui/types/dina-export-api";
 import Kitsu from "kitsu";
 import { Table, VisibilityState, Column } from "@tanstack/react-table";
@@ -26,7 +26,7 @@ import { DynamicFieldsMappingConfig } from "../list-page/types";
 import { useIndexMapping } from "../list-page/useIndexMapping";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
-
+export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleIndexColumns";
 export interface ColumnSelectorProps<TData> {
   /** A unique identifier to be used for local storage key */
   uniqueName?: string;
@@ -107,35 +107,6 @@ export function ColumnSelector<TData>({
     groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
   }
 
-  // Automatically load index map columns if visibility state indicates a need to
-  useEffect(() => {
-    if (
-      localStorageColumnStates &&
-      Object.keys(localStorageColumnStates).length > 0
-    ) {
-      // Handle scenario where localStorage has information on saved columns
-      const savedVisibilityValues = Object.values(
-        localStorageColumnStates
-      ).filter((visibilityValue) => visibilityValue === true);
-      let savedVisilibilityValuesCount = savedVisibilityValues.length;
-      columnSelectorDefaultColumns?.forEach((defaultColumn) => {
-        const columnId = defaultColumn?.id;
-        if (localStorageColumnStates[columnId] === true) {
-          savedVisilibilityValuesCount -= 1;
-        }
-      });
-      if (savedVisilibilityValuesCount > 0 && indexMap) {
-        getColumnSelectorIndexMapColumns({
-          groupedIndexMappings,
-          setLoadedIndexMapColumns,
-          setColumnSelectorIndexMapColumns,
-          apiClient,
-          setLoadingIndexMapColumns
-        });
-      }
-    }
-  }, [indexMap]);
-
   function menuDisplayControl() {
     const [show, setShow] = useState(false);
 
@@ -147,7 +118,8 @@ export function ColumnSelector<TData>({
           setLoadedIndexMapColumns,
           setColumnSelectorIndexMapColumns,
           apiClient,
-          setLoadingIndexMapColumns
+          setLoadingIndexMapColumns,
+          columnSelectorDefaultColumns
         });
         setLoading(false);
       }
@@ -239,9 +211,25 @@ export function ColumnSelector<TData>({
   }
 
   function applyFilterColumns() {
+    const visibleIndexMapColumns: any[] = [];
     if (filteredColumnsState) {
       reactTable?.setColumnVisibility(filteredColumnsState);
+      reactTable?.getAllLeafColumns().forEach((column) => {
+        if (
+          column.getIsVisible() &&
+          column.id !== "selectColumn" &&
+          !columnSelectorDefaultColumns?.find(
+            (defaultColumn) => defaultColumn.id === column.id
+          )
+        ) {
+          visibleIndexMapColumns.push(column.columnDef);
+        }
+      });
     }
+    writeStorage(
+      `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
+      visibleIndexMapColumns
+    );
     setLocalStorageColumnStates(filteredColumnsState);
     forceUpdate?.();
   }
