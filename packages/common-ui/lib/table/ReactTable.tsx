@@ -26,7 +26,7 @@ import { DefaultRow, DraggableRow } from "./RowComponents";
 import { ColumnSelector } from "../column-selector/ColumnSelector";
 import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 
-export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500];
+export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500, 1000];
 
 export interface ReactTableProps<TData> {
   // Columns definations, ref: https://tanstack.com/table/v8/docs/api/core/column

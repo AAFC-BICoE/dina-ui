@@ -5,7 +5,7 @@ import {
   dateCell
 } from "common-ui";
 import Link from "next/link";
-import { GroupSelectField } from "../../../components";
+import { GroupSelectField, groupCell } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
 import { PreparationMethod } from "../../../types/collection-api";
 
@@ -24,7 +24,7 @@ const PREPARATION_METHOD_TABLE_COLUMNS: ColumnDefinition<PreparationMethod>[] =
       ),
       accessorKey: "name"
     },
-    "group",
+    groupCell("group"),
     "createdBy",
     dateCell("createdOn")
   ];
@@ -54,13 +54,7 @@ export default function preparationMethodListPage() {
         id="preparation-method-list"
         queryTableProps={{
           columns: PREPARATION_METHOD_TABLE_COLUMNS,
-          path: "collection-api/preparation-method",
-          defaultSort: [
-            {
-              id: "name",
-              desc: false
-            }
-          ]
+          path: "collection-api/preparation-method"
         }}
         filterFormchildren={({ submitForm }) => (
           <div className="mb-3">

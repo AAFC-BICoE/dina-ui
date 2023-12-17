@@ -6,7 +6,13 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import {
+  Footer,
+  groupCell,
+  GroupSelectField,
+  Head,
+  Nav
+} from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 
@@ -24,9 +30,9 @@ const TABLE_COLUMNS: ColumnDefinition<PcrBatch>[] = [
     accessorKey: "name",
     header: () => <SeqdbMessage id="pcrBatchName" />
   },
-  "group",
   "primerForward.name",
   "primerReverse.name",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];

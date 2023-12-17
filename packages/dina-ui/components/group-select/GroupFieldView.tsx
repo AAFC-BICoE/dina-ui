@@ -23,18 +23,7 @@ export function GroupLabel({ groupName }) {
 }
 
 /** Renders the Group label in the QueryTable. */
-export function groupCell(accessor: string) {
-  return {
-    Cell: ({ original }) => {
-      const groupName = original[accessor];
-      return <GroupLabel groupName={groupName} />;
-    },
-    accessor
-  };
-}
-
-/** Renders the Group label in the QueryTable. */
-export function groupCell8(accessorKey: string) {
+export function groupCell(accessorKey: string) {
   return {
     cell: ({ row: { original } }) => {
       const groupName = original[accessorKey];

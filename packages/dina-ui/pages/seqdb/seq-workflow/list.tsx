@@ -6,7 +6,13 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import {
+  Footer,
+  groupCell,
+  GroupSelectField,
+  Head,
+  Nav
+} from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqBatch } from "../../../types/seqdb-api";
 
@@ -24,7 +30,7 @@ const TABLE_COLUMNS: ColumnDefinition<SeqBatch>[] = [
     accessorKey: "name",
     header: () => <SeqdbMessage id="seqBatchName" />
   },
-  "group",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];

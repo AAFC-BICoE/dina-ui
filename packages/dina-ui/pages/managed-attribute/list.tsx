@@ -1,5 +1,6 @@
 import {
   ColumnDefinition,
+  dateCell,
   descriptionCell,
   FieldHeader,
   intlContext,
@@ -15,7 +16,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DINAUI_MESSAGES_ENGLISH } from "../../intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
-import { GroupSelectField } from "packages/dina-ui/components";
+import { groupCell, GroupSelectField } from "../../components";
 import PageLayout from "../../components/page/PageLayout";
 import {
   COLLECTION_MODULE_TYPE_LABELS,
@@ -183,11 +184,9 @@ function CollectionAttributeListView() {
       accessorKey: "acceptedValues"
     },
     descriptionCell("multilingualDescription"),
-    {
-      accessorKey: "group",
-      header: () => <FieldHeader name={"group"} />
-    },
-    "createdBy"
+    groupCell("group"),
+    "createdBy",
+    dateCell("createdOn")
   ];
 
   return (

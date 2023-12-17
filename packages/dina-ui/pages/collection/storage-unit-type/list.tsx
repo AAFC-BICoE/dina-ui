@@ -6,11 +6,12 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import {
+  groupCell,
   GroupSelectField,
   KeepContentsTogetherToggleForm
 } from "../../../components";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import PageLayout from "../../../components/page/PageLayout";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnitType } from "../../../types/collection-api";
 
 const STORAGE_UNIT_TYPE_FILTER_ATTRIBUTES = ["name", "createdBy"];
@@ -25,13 +26,13 @@ const STORAGE_UNIT_TYPE_TABLE_COLUMNS: ColumnDefinition<StorageUnitType>[] = [
     ),
     accessorKey: "name"
   },
-  "group",
   {
     cell: ({ row: { original } }) => (
       <KeepContentsTogetherToggleForm initialValues={original as any} />
     ),
     accessorKey: "isInseperable"
   },
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];
