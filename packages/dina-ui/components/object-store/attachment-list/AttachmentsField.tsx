@@ -37,7 +37,6 @@ export interface AttachmentsFieldProps {
 
 export function AttachmentsField(props: AttachmentsFieldProps) {
   const { readOnly } = useDinaFormContext();
-
   return readOnly ? (
     <AttachmentReadOnlySection
       attachmentPath={props.attachmentPath}
@@ -48,8 +47,7 @@ export function AttachmentsField(props: AttachmentsFieldProps) {
     <FieldSpy fieldName={props.name}>
       {(value, { form }) => {
         const metadatas =
-          (value as ResourceIdentifierObject[] | undefined) ?? [];
-
+          uniqBy(value as ResourceIdentifierObject[] | undefined, "id") ?? [];
         return (
           <AttachmentsEditor
             {...props}
@@ -94,7 +92,6 @@ export function AttachmentsEditor({
     ids: value.map((it) => it.id),
     listPath: "objectstore-api/metadata?include=derivatives"
   });
-
   async function addAttachedMetadatas(newIds: string[]) {
     onChange(
       uniqBy(
