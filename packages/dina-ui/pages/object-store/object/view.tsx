@@ -17,6 +17,7 @@ import {
   Head,
   Nav,
   NotPubliclyReleasableWarning,
+  TagSelectReadOnly,
   TagsAndRestrictionsSection
 } from "../../../components";
 import { ExifView, MetadataDetails } from "../../../components/object-store";
@@ -106,6 +107,7 @@ export default function MetadataViewPage() {
               <div className="col-md-8">
                 <div className="container">
                   <DinaForm initialValues={response.data} readOnly={true}>
+                    <TagSelectReadOnly tagsFieldName="acTags" />
                     <NotPubliclyReleasableWarning />
                     <TagsAndRestrictionsSection
                       tagsFieldName="acTags"
