@@ -1,4 +1,6 @@
 import React from "react";
+import { TransformToDSLProps } from "../../types";
+import { useIntl } from "react-intl";
 import {
   includedTypeQuery,
   termQuery,
@@ -8,8 +10,6 @@ import {
   infixQuery,
   wildcardQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { TransformToDSLProps } from "../../types";
-import { useIntl } from "react-intl";
 
 interface QueryRowTextSearchProps {
   /**
@@ -75,26 +75,6 @@ export function transformTextSearchToDSL({
   } = fieldInfo;
 
   switch (operation) {
-    // Equals match type.
-    case "equals":
-    case "exactMatch":
-      // Autocompletion expects to use the full text search.
-      return parentType
-        ? {
-            nested: {
-              path: "included",
-              query: {
-                bool: {
-                  must: [
-                    termQuery(fieldPath, value, keywordMultiFieldSupport),
-                    includedTypeQuery(parentType)
-                  ]
-                }
-              }
-            }
-          }
-        : termQuery(fieldPath, value, keywordMultiFieldSupport)
-
     // Wild card search
     case "wildcard":
       return parentType
@@ -115,7 +95,13 @@ export function transformTextSearchToDSL({
 
     // Prefix partial match
     case "startsWith":
-      return prefixQuery(fieldPath, value, parentType, optimizedPrefix, keywordMultiFieldSupport);
+      return prefixQuery(
+        fieldPath,
+        value,
+        parentType,
+        optimizedPrefix,
+        keywordMultiFieldSupport
+      );
 
     // Infix partial match
     case "containsText":
@@ -138,10 +124,10 @@ export function transformTextSearchToDSL({
                     query: {
                       bool: {
                         must_not: termQuery(
-                              fieldPath,
-                              value,
-                              keywordMultiFieldSupport
-                            ),
+                          fieldPath,
+                          value,
+                          keywordMultiFieldSupport
+                        ),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -177,7 +163,11 @@ export function transformTextSearchToDSL({
               should: [
                 {
                   bool: {
-                    must_not: termQuery(fieldPath, value, keywordMultiFieldSupport)
+                    must_not: termQuery(
+                      fieldPath,
+                      value,
+                      keywordMultiFieldSupport
+                    )
                   }
                 },
                 {
@@ -279,8 +269,25 @@ export function transformTextSearchToDSL({
             }
           };
 
-    // Unsupported case.
+    // Equals match type.
+    case "equals":
+    case "exactMatch":
     default:
-      throw new Error("Unsupported operation for the text widget.");
+      // Autocompletion expects to use the full text search.
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    termQuery(fieldPath, value, keywordMultiFieldSupport),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
+          }
+        : termQuery(fieldPath, value, keywordMultiFieldSupport);
   }
 }

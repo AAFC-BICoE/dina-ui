@@ -27,7 +27,7 @@ export default function MetadataBulkEditPage() {
         }?id=${ids[0]}`
       );
     } else {
-      await router.push("/object-store/object/list?reloadLastSearch");
+      await router.push("/object-store/object/list");
     }
   }
 

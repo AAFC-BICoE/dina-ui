@@ -3,11 +3,11 @@ import DatePicker from "react-datepicker";
 import {
   includedTypeQuery,
   rangeQuery,
-  termQuery,
   existsQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { DATE_REGEX_PARTIAL } from "common-ui/lib";
+import moment from "moment";
 
 interface QueryBuilderDateSearchProps {
   /**
@@ -85,7 +85,7 @@ export function transformDateSearchToDSL({
     return {};
   }
 
-  const { parentType, parentName } = fieldInfo;
+  const { parentType, parentName, subType } = fieldInfo;
 
   switch (operation) {
     // Contains / less than / greater than / less than or equal to / greater than or equal to.
@@ -103,7 +103,7 @@ export function transformDateSearchToDSL({
                   must: [
                     rangeQuery(
                       fieldPath,
-                      buildDateRangeObject(operation, value)
+                      buildDateRangeObject(operation, value, subType)
                     ),
                     includedTypeQuery(parentType)
                   ]
@@ -111,7 +111,10 @@ export function transformDateSearchToDSL({
               }
             }
           }
-        : rangeQuery(fieldPath, buildDateRangeObject(operation, value));
+        : rangeQuery(
+            fieldPath,
+            buildDateRangeObject(operation, value, subType)
+          );
 
     // Not equals match type.
     case "notEquals":
@@ -125,7 +128,10 @@ export function transformDateSearchToDSL({
                     path: "included",
                     query: {
                       bool: {
-                        must_not: termQuery(fieldPath, value, false),
+                        must_not: rangeQuery(
+                          fieldPath,
+                          buildDateRangeObject(operation, value, subType)
+                        ),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -161,7 +167,10 @@ export function transformDateSearchToDSL({
               should: [
                 {
                   bool: {
-                    must_not: termQuery(fieldPath, value, false)
+                    must_not: rangeQuery(
+                      fieldPath,
+                      buildDateRangeObject(operation, value, subType)
+                    )
                   }
                 },
                 {
@@ -227,7 +236,7 @@ export function transformDateSearchToDSL({
           }
         : existsQuery(fieldPath);
 
-    // Equals and default case
+    // default case
     default:
       return parentType
         ? {
@@ -236,15 +245,39 @@ export function transformDateSearchToDSL({
               query: {
                 bool: {
                   must: [
-                    termQuery(fieldPath, value, false),
+                    rangeQuery(
+                      fieldPath,
+                      buildDateRangeObject(operation, value, subType)
+                    ),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
-        : termQuery(fieldPath, value, false);
+        : rangeQuery(
+            fieldPath,
+            buildDateRangeObject(operation, value, subType)
+          );
   }
+}
+
+/**
+ * Generates the time_zone to return with the elastic search response.
+ *
+ * This will retrieve the users current timezone offset.
+ *
+ * This will return the offset in ISO 8601 UTC offset format, such as +01:00 or -08:00.
+ */
+function getTimezoneOffset() {
+  const utcOffsetMinutes = moment().utcOffset();
+  const formattedOffset = moment().utcOffset(utcOffsetMinutes).format("Z");
+
+  const utcTimeOffset = {
+    time_zone: formattedOffset
+  };
+
+  return utcTimeOffset;
 }
 
 /**
@@ -266,11 +299,20 @@ export function transformDateSearchToDSL({
  * When using Equals to search for a date, the following would be matched for "2022":
  *    - 2022
  *
+ * Timezone is also determined and included in the request here if the subtype supports it.
+ *
  * @param matchType the operator type (example: greaterThan ---> gt)
  * @param value The operator value to search against.
+ * @param subType subtype of the date, used to determine if timezone should be included.
  * @returns numerical operator and value.
  */
-function buildDateRangeObject(matchType, value) {
+function buildDateRangeObject(matchType, value, subType) {
+  // Local date does not store timezone, ignore it.
+  const timezone =
+    subType !== "local_date" && subType !== "local_date_time"
+      ? getTimezoneOffset()
+      : undefined;
+
   switch (matchType) {
     case "containsDate":
       const YEAR_REGEX = /^\d{4}$/;
@@ -279,6 +321,7 @@ function buildDateRangeObject(matchType, value) {
       // Check if the value matches the year regex
       if (YEAR_REGEX.test(value)) {
         return {
+          ...timezone,
           gte: `${value}||/y`,
           lte: `${value}||/y`,
           format: "yyyy"
@@ -288,6 +331,7 @@ function buildDateRangeObject(matchType, value) {
       // Check if the value matches the month regex
       if (MONTH_REGEX.test(value)) {
         return {
+          ...timezone,
           gte: `${value}||/M`,
           lte: `${value}||/M`,
           format: "yyyy-MM"
@@ -296,20 +340,28 @@ function buildDateRangeObject(matchType, value) {
 
       // Otherwise just try to match the full date provided.
       return {
+        ...timezone,
         gte: `${value}||/d`,
         lte: `${value}||/d`,
         format: "yyyy-MM-dd"
       };
     case "greaterThan":
-      return { gt: value };
+      return { ...timezone, gt: value };
     case "greaterThanOrEqualTo":
-      return { gte: value };
+      return { ...timezone, gte: value };
     case "lessThan":
-      return { lt: value };
+      return { ...timezone, lt: value };
     case "lessThanOrEqualTo":
-      return { lte: value };
+      return { ...timezone, lte: value };
+
+    // Exact match case:
     default:
-      return value;
+      return {
+        ...timezone,
+        gte: `${value}`,
+        lte: `${value}`,
+        format: "yyyy-MM-dd"
+      };
   }
 }
 

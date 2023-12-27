@@ -1,17 +1,16 @@
 import {
-  useColumnChooser,
   DinaForm,
-  FieldHeader,
   ReactTable,
-  dateCell,
-  stringArrayCell,
   CommonMessage,
   ButtonBar,
   BackButton,
-  DATA_EXPORT_TOTAL_RECORDS_KEY
+  DATA_EXPORT_TOTAL_RECORDS_KEY,
+  DATA_EXPORT_COLUMNS_KEY,
+  DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY,
+  useApiClient,
+  LoadingSpinner
 } from "packages/common-ui/lib";
-import React from "react";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { KitsuResource } from "kitsu";
 import { Footer, Head, Nav } from "packages/dina-ui/components";
@@ -19,104 +18,77 @@ import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
+import { useState } from "react";
+import {
+  DynamicFieldsMappingConfig,
+  TableColumn
+} from "packages/common-ui/lib/list-page/types";
+import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMapping";
+import {
+  getColumnSelectorIndexMapColumns,
+  getGroupedIndexMappings
+} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
+import { uniqBy } from "lodash";
 
-export default function MaterialSampleExportPage<
-  TData extends KitsuResource
->() {
+export default function ExportPage<TData extends KitsuResource>() {
   const router = useRouter();
   const [totalRecords] = useLocalStorage<number>(DATA_EXPORT_TOTAL_RECORDS_KEY);
   const hideTable: boolean | undefined = !!router.query.hideTable;
+  const uniqueName = String(router.query.uniqueName);
   const indexName = String(router.query.indexName);
-
+  const entityLink = String(router.query.entityLink);
   const { formatMessage, formatNumber } = useIntl();
+  const [columns] = useLocalStorage<TableColumn<TData>[]>(
+    `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`,
+    []
+  );
+  const [dynamicFieldMapping] = useLocalStorage<
+    DynamicFieldsMappingConfig | undefined
+  >(`${uniqueName}_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`, undefined);
+  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
+  const [columnSelectorIndexMapColumns, setColumnSelectorIndexMapColumns] =
+    useState<any[]>([]);
+  const [loadedIndexMapColumns, setLoadedIndexMapColumns] =
+    useState<boolean>(false);
+  // Combined columns from passed in columns
+  const [totalColumns, setTotalColumns] =
+    useState<TableColumn<TData>[]>(columns);
 
-  const columns: TableColumn<any>[] = [
-    // Material Sample Name
-    {
-      id: "materialSampleName",
-      cell: ({
-        row: {
-          original: { id, data }
-        }
-      }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-        >
-          <a>
-            {data?.attributes?.materialSampleName ||
-              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-              id}
-          </a>
-        </Link>
-      ),
-      header: () => <FieldHeader name="materialSampleName" />,
-      accessorKey: "data.attributes.materialSampleName",
-      isKeyword: true
-    },
+  const { apiClient } = useApiClient();
+  const [loading, setLoading] = useState(false);
 
-    // Collection Name (External Relationship)
-    {
-      id: "collectionName",
-      cell: ({
-        row: {
-          original: { included }
-        }
-      }) =>
-        included?.collection?.id ? (
-          <Link
-            href={`/collection/collection/view?id=${included?.collection?.id}`}
-          >
-            <a>{included?.collection?.attributes?.name}</a>
-          </Link>
-        ) : null,
-      header: () => <FieldHeader name="collection.name" />,
-      accessorKey: "included.attributes.name",
-      relationshipType: "collection",
-      isKeyword: true
-    },
-
-    // List of catalogue numbers
-    stringArrayCell(
-      "dwcOtherCatalogNumbers",
-      "data.attributes.dwcOtherCatalogNumbers"
-    ),
-
-    // Material Sample Type
-    {
-      id: "materialSampleType",
-      header: () => <FieldHeader name="materialSampleType" />,
-      accessorKey: "data.attributes.materialSampleType",
-      isKeyword: true
-    },
-
-    // Created By
-    {
-      id: "createdBy",
-      header: () => <FieldHeader name="createdBy" />,
-      accessorKey: "data.attributes.createdBy",
-      isKeyword: true
-    },
-
-    // Created On
-    dateCell("createdOn", "data.attributes.createdOn"),
-
-    // Material Sample State
-    {
-      id: "materialSampleState",
-      header: () => <FieldHeader name="materialSampleState" />,
-      accessorKey: "data.attributes.materialSampleState",
-      isKeyword: true,
-      isColumnVisible: false
-    }
-  ];
-
-  const { checkedColumnIds, CustomMenu, dataExportError } = useColumnChooser({
-    columns,
-    localStorageKey: indexName
+  let groupedIndexMappings;
+  const { indexMap } = useIndexMapping({
+    indexName,
+    dynamicFieldMapping
   });
+  groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
+  useEffect(() => {
+    setLoading(true);
+    if (indexMap) {
+      getColumnSelectorIndexMapColumns({
+        groupedIndexMappings,
+        setLoadedIndexMapColumns,
+        setColumnSelectorIndexMapColumns,
+        apiClient,
+        columnSelectorDefaultColumns: columns
+      });
+    }
 
-  return (
+    setLoading(false);
+  }, [indexMap]);
+
+  useEffect(() => {
+    const combinedColumns = uniqBy(
+      [...totalColumns, ...columnSelectorIndexMapColumns],
+      "id"
+    );
+    setTotalColumns(combinedColumns);
+  }, [loadedIndexMapColumns]);
+
+  return loading || !loadedIndexMapColumns ? (
+    <LoadingSpinner loading={loading} />
+  ) : (
     <div>
       <Head title={formatMessage({ id: "exportButtonText" })} />
       <Nav />
@@ -124,35 +96,31 @@ export default function MaterialSampleExportPage<
         <ButtonBar>
           <BackButton
             className="me-auto"
-            entityLink="/collection/material-sample"
-            reloadLastSearch={true}
+            entityLink={entityLink}
             byPassView={true}
           />
-          <Link href={`/data-export/list`}>
+          <Link href={`/data-export/list?entityLink=${entityLink}`}>
             <a className="btn btn-primary">
               <DinaMessage id="dataExports" />
             </a>
           </Link>
         </ButtonBar>
         <div className="ms-2">
-          {typeof dataExportError !== "undefined" && dataExportError}
           <CommonMessage
             id="tableTotalCount"
             values={{ totalCount: formatNumber(totalRecords ?? 0) }}
           />
-          <CustomMenu />
+          {columnSelector}
         </div>
 
-        {!hideTable && (
-          <ReactTable<TData>
-            columns={
-              columns.filter((column) =>
-                column.id ? checkedColumnIds.includes(column.id) : false
-              ) as any
-            }
-            data={[]}
-          />
-        )}
+        <ReactTable<TData>
+          columns={totalColumns}
+          data={[]}
+          setColumnSelector={setColumnSelector}
+          hideTable={hideTable}
+          uniqueName={uniqueName}
+          menuOnly={true}
+        />
       </DinaForm>
       <Footer />
     </div>

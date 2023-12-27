@@ -1,4 +1,4 @@
-import { useLocalStorage } from "@rehooks/local-storage";
+import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
 import {
   ColumnSort,
   Row,
@@ -7,8 +7,14 @@ import {
 } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { compact, toPairs, uniqBy } from "lodash";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { compact, toPairs, uniqBy, uniqWith } from "lodash";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useReducer
+} from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
@@ -17,8 +23,8 @@ import {
   FormikButton,
   ReactTable,
   ReactTableProps,
-  useAccount,
-  useColumnChooser
+  VISIBLE_INDEX_LOCAL_STORAGE_KEY,
+  useAccount
 } from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
@@ -39,6 +45,7 @@ import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { MultiSortTooltip } from "./MultiSortTooltip";
 import {
   QueryBuilderMemo,
+  defaultJsonTree,
   defaultQueryTree,
   emptyQueryTree
 } from "./query-builder/QueryBuilder";
@@ -49,12 +56,20 @@ import {
   applySortingRules,
   applySourceFiltering,
   elasticSearchFormatExport
-} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport8";
+} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import {
   CustomViewField,
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
 import { DynamicFieldsMappingConfig, TableColumn } from "./types";
+import {
+  getAttributeExtensionFieldColumn,
+  getAttributesManagedAttributeColumn,
+  getAttributesStandardColumns,
+  getIncludedExtensionFieldColumn,
+  getIncludedManagedAttributeColumn,
+  getIncludedStandardColumns
+} from "../column-selector/ColumnSelectorUtils";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -91,6 +106,15 @@ export interface QueryPageProps<TData extends KitsuResource> {
   indexName: string;
 
   /**
+   * Used for generating the local storage keys. Every instance of the QueryPage should have it's
+   * own unique name.
+   *
+   * In special cases where you want the sorting, pagination, column selection and other features
+   * to remain the same across tables, it can share the same name.
+   */
+  uniqueName: string;
+
+  /**
    * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
    * be searched against. It will also define the path and data component if required.
    *
@@ -119,10 +143,9 @@ export interface QueryPageProps<TData extends KitsuResource> {
   bulkEditPath?: string;
 
   /**
-   * Adds the data export button and the row checkboxes.
-   * The query path to perform for data exporting.
+   * Adds the data export button.
    */
-  dataExportPath?: string;
+  dataExportProps?: { dataExportPath: string; entityLink: string };
 
   /** Query path if user selected only 1 item */
   singleEditPath?: string;
@@ -219,10 +242,8 @@ export interface QueryPageProps<TData extends KitsuResource> {
 
   enableDnd?: boolean;
 
-  enableColumnChooser?: boolean;
+  enableColumnSelector?: boolean;
 }
-
-const GROUP_STORAGE_KEY = "groupStorage";
 
 /**
  * Top level component for displaying an elastic-search listing page.
@@ -236,13 +257,14 @@ const GROUP_STORAGE_KEY = "groupStorage";
  */
 export function QueryPage<TData extends KitsuResource>({
   indexName,
+  uniqueName,
   dynamicFieldMapping,
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
   bulkSplitPath,
   singleEditPath,
-  dataExportPath,
+  dataExportProps,
   reactTableProps,
   defaultSort,
   defaultPageSize,
@@ -258,11 +280,74 @@ export function QueryPage<TData extends KitsuResource>({
   enableDnd = false,
   onSelect,
   onDeselect,
-  enableColumnChooser = true
+  enableColumnSelector = true
 }: QueryPageProps<TData>) {
+  // Loading state
+  const [loading, setLoading] = useState<boolean>(true);
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
+
+  const [visibleIndexMapColumns] = useLocalStorage<any[]>(
+    `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
+    []
+  );
+
+  // Index map columns that can be filtered on by query builder
+  const [columnSelectorIndexMapColumns, setColumnSelectorIndexMapColumns] =
+    useState<any[]>([]);
+  const [loadingIndexMapColumns, setLoadingIndexMapColumns] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    visibleIndexMapColumns.forEach((visibleIndexMapColumn) => {
+      if (visibleIndexMapColumn.relationshipType) {
+        if (visibleIndexMapColumn.extensionValue) {
+          getIncludedExtensionFieldColumn(
+            visibleIndexMapColumn.queryOption,
+            visibleIndexMapColumn.extensionValue,
+            visibleIndexMapColumn.extensionField,
+            setColumnSelectorIndexMapColumns
+          );
+        } else if (visibleIndexMapColumn.managedAttribute) {
+          getIncludedManagedAttributeColumn(
+            visibleIndexMapColumn.managedAttribute,
+            visibleIndexMapColumn.queryOption,
+            setColumnSelectorIndexMapColumns
+          );
+        } else {
+          getIncludedStandardColumns(
+            visibleIndexMapColumn.queryOption,
+            setColumnSelectorIndexMapColumns
+          );
+        }
+      } else {
+        if (visibleIndexMapColumn.extensionValue) {
+          getAttributeExtensionFieldColumn(
+            visibleIndexMapColumn.queryOption,
+            visibleIndexMapColumn.extensionValue,
+            visibleIndexMapColumn.extensionField,
+            setColumnSelectorIndexMapColumns
+          );
+        } else if (visibleIndexMapColumn.managedAttribute) {
+          getAttributesManagedAttributeColumn(
+            visibleIndexMapColumn.managedAttribute,
+            visibleIndexMapColumn.queryOption,
+            setColumnSelectorIndexMapColumns
+          );
+        } else {
+          getAttributesStandardColumns(
+            visibleIndexMapColumn.queryOption,
+            setColumnSelectorIndexMapColumns
+          );
+        }
+      }
+    });
+  }, []);
+
+  // Combined columns from passed in columns
+  const [totalColumns, setTotalColumns] =
+    useState<TableColumn<TData>[]>(columns);
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -272,15 +357,26 @@ export function QueryPage<TData extends KitsuResource>({
   const [totalRecords, setTotalRecords] = useState<number>(0);
 
   // User applied sorting rules for elastic search to use.
-  const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
+  const localStorageLastUsedSortKey = uniqueName + "-last-used-sort";
+  const [sortingRules, setSortingRules] = useLocalStorage<ColumnSort[]>(
+    localStorageLastUsedSortKey,
+    defaultSort ?? DEFAULT_SORT
+  );
 
   // The pagination size.
-  const [pageSize, setPageSize] = useState<number>(
+  const localStorageLastUsedPageSizeKey = uniqueName + "-last-used-page-size";
+  const [pageSize, setPageSize] = useLocalStorage<number>(
+    localStorageLastUsedPageSizeKey,
     defaultPageSize ?? DEFAULT_PAGE_SIZE
   );
 
   // The pagination offset.
-  const [pageOffset, setPageOffset] = useState<number>(0);
+  const localStorageLastUsedPageOffsetKey =
+    uniqueName + "-last-used-page-offset";
+  const [pageOffset, setPageOffset] = useLocalStorage<number>(
+    localStorageLastUsedPageOffsetKey,
+    0
+  );
 
   // State to store the query tree generated by the Query Builder. This tree is used to store the
   // current values, not the submitted tree.
@@ -300,6 +396,7 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   // Groups selected for the search.
+  const GROUP_STORAGE_KEY = uniqueName + "_groupStorage";
   const [groups, setGroups] = useLocalStorage<string[]>(
     GROUP_STORAGE_KEY,
     groupNames ?? []
@@ -307,11 +404,8 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(
-    bulkDeleteButtonProps || bulkEditPath || dataExportPath
+    bulkDeleteButtonProps || bulkEditPath || dataExportProps
   );
-
-  // Loading state
-  const [loading, setLoading] = useState<boolean>(true);
 
   // Query Page error message state
   const [error, setError] = useState<any>();
@@ -353,7 +447,6 @@ export function QueryPage<TData extends KitsuResource>({
 
     // Elastic search query with pagination settings.
     let queryDSL;
-
     if (customViewElasticSearchQuery) {
       queryDSL = customViewElasticSearchQuery;
     } else {
@@ -363,11 +456,17 @@ export function QueryPage<TData extends KitsuResource>({
       );
     }
 
+    const combinedColumns = uniqBy(
+      [...totalColumns, ...columnSelectorIndexMapColumns],
+      "id"
+    );
+    setTotalColumns(combinedColumns);
+
     queryDSL = applyRootQuery(queryDSL);
     queryDSL = applyGroupFilters(queryDSL, groups);
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
-    queryDSL = applySortingRules(queryDSL, sortingRules, columns);
-    queryDSL = applySourceFiltering(queryDSL, columns);
+    queryDSL = applySortingRules(queryDSL, sortingRules, combinedColumns);
+    queryDSL = applySourceFiltering(queryDSL, combinedColumns);
 
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) {
@@ -446,7 +545,14 @@ export function QueryPage<TData extends KitsuResource>({
         // No matter the end result, loading should stop.
         setLoading(false);
       });
-  }, [pageSize, pageOffset, sortingRules, submittedQueryBuilderTree, groups]);
+  }, [
+    pageSize,
+    pageOffset,
+    sortingRules,
+    submittedQueryBuilderTree,
+    groups,
+    loadingIndexMapColumns
+  ]);
 
   // Once the configuration is setup, we can display change the tree.
   useEffect(() => {
@@ -621,7 +727,7 @@ export function QueryPage<TData extends KitsuResource>({
       : reactTableProps;
 
   const columnVisibility = compact(
-    columns.map((col) =>
+    totalColumns.map((col) =>
       col.isColumnVisible === false
         ? { id: col.id, visibility: false }
         : undefined
@@ -630,6 +736,20 @@ export function QueryPage<TData extends KitsuResource>({
     (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
     {}
   );
+
+  // Local storage for saving columns visibility
+  const [localStorageColumnStates, setLocalStorageColumnStates] =
+    useLocalStorage<VisibilityState | undefined>(
+      `${uniqueName}_columnSelector`,
+      {}
+    );
+
+  useEffect(() => {
+    setLocalStorageColumnStates({
+      ...columnVisibility,
+      ...localStorageColumnStates
+    });
+  }, [totalColumns]);
 
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     defaultSorted: sortingRules,
@@ -652,7 +772,7 @@ export function QueryPage<TData extends KitsuResource>({
           }
         ]
       : []),
-    ...columns
+    ...totalColumns
   ];
 
   // Columns generated for the selected resources, only in selection mode.
@@ -673,6 +793,9 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
+  const localStorageLastUsedKey = uniqueName + "-last-used-tree";
+  const localStorageLastUsedTreeKey = uniqueName + "-saved-search-changed";
+
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
    * performed.
@@ -680,6 +803,9 @@ export function QueryPage<TData extends KitsuResource>({
   const onReset = useCallback(() => {
     setSubmittedQueryBuilderTree(defaultQueryTree());
     setQueryBuilderTree(defaultQueryTree());
+    writeStorage(localStorageLastUsedKey, defaultJsonTree);
+    writeStorage(localStorageLastUsedTreeKey, false);
+    setSortingRules(defaultSort ?? DEFAULT_SORT);
     setError(undefined);
     setPageOffset(0);
   }, []);
@@ -691,6 +817,7 @@ export function QueryPage<TData extends KitsuResource>({
   const onSubmit = () => {
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
+    writeStorage(localStorageLastUsedKey, Utils.getTree(queryBuilderTree));
   };
 
   /**
@@ -769,13 +896,11 @@ export function QueryPage<TData extends KitsuResource>({
     }
   }
 
+  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
-  const { columnChooser, checkedColumnIds } = useColumnChooser({
-    columns: columnsResults,
-    localStorageKey: indexName,
-    hideExportButton: true
-  });
 
   return (
     <>
@@ -785,8 +910,13 @@ export function QueryPage<TData extends KitsuResource>({
           queryBuilderTree={queryBuilderTree}
           setQueryBuilderTree={onQueryBuildTreeChange}
           queryBuilderConfig={queryBuilderConfig}
+          setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+          setPageOffset={setPageOffset}
           onSubmit={onSubmit}
           onReset={onReset}
+          setGroups={setGroups}
+          groups={groups}
+          uniqueName={uniqueName}
         />
       )}
       <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
@@ -803,11 +933,12 @@ export function QueryPage<TData extends KitsuResource>({
                     onGroupChange(newGroups);
                   })
                 }
+                groups={groups}
               />
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (
                 <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
-                  {enableColumnChooser && columnChooser}
+                  {enableColumnSelector && columnSelector}
                   {bulkEditPath && (
                     <BulkEditButton
                       pathname={bulkEditPath}
@@ -817,11 +948,15 @@ export function QueryPage<TData extends KitsuResource>({
                   {bulkDeleteButtonProps && (
                     <BulkDeleteButton {...bulkDeleteButtonProps} />
                   )}
-                  {dataExportPath && (
+                  {dataExportProps && (
                     <DataExportButton
-                      pathname={dataExportPath}
+                      pathname={dataExportProps.dataExportPath}
+                      entityLink={dataExportProps.entityLink}
                       totalRecords={totalRecords}
                       query={elasticSearchQuery}
+                      uniqueName={uniqueName}
+                      columns={columns}
+                      dynamicFieldMapping={dynamicFieldMapping}
                       indexName={indexName}
                     />
                   )}
@@ -844,7 +979,7 @@ export function QueryPage<TData extends KitsuResource>({
               <div className="d-flex align-items-end">
                 <span id="queryPageCount">
                   {/* Loading indicator when total is not calculated yet. */}
-                  {loading ? (
+                  {loading || loadingIndexMapColumns ? (
                     <LoadingSpinner loading={true} />
                   ) : (
                     <CommonMessage
@@ -855,7 +990,7 @@ export function QueryPage<TData extends KitsuResource>({
                 </span>
 
                 {/* Multi sort tooltip - Only shown if it's possible to sort */}
-                {!resolvedReactTableProps?.enableMultiSort && (
+                {resolvedReactTableProps.enableMultiSort && (
                   <MultiSortTooltip />
                 )}
               </div>
@@ -884,18 +1019,20 @@ export function QueryPage<TData extends KitsuResource>({
                 </div>
               )}
               <ReactTable<TData>
-                // Column and data props
-                columns={
-                  enableColumnChooser
-                    ? columnsResults.filter((column) =>
-                        typeof column === "string"
-                          ? checkedColumnIds.includes(column)
-                          : column.id
-                          ? checkedColumnIds.includes(column.id)
-                          : false
-                      )
-                    : columnsResults
+                // These props are needed for column selector
+                forceUpdate={forceUpdate}
+                setColumnSelector={setColumnSelector}
+                uniqueName={uniqueName}
+                indexName={indexName}
+                dynamicFieldMapping={dynamicFieldMapping}
+                setColumnSelectorIndexMapColumns={
+                  setColumnSelectorIndexMapColumns
                 }
+                setLoadingIndexMapColumns={setLoadingIndexMapColumns}
+                hideExportButton={true}
+                columnSelectorDefaultColumns={columns}
+                // Column and data props
+                columns={columnsResults}
                 data={
                   (viewMode
                     ? customViewFields
@@ -904,7 +1041,7 @@ export function QueryPage<TData extends KitsuResource>({
                     : searchResults) ?? []
                 }
                 // Loading Table props
-                loading={loading}
+                loading={loading || loadingIndexMapColumns}
                 // Pagination props
                 manualPagination={
                   viewMode && selectedResources?.length ? false : true
@@ -920,7 +1057,6 @@ export function QueryPage<TData extends KitsuResource>({
                 manualSorting={
                   viewMode && selectedResources?.length ? false : true
                 }
-                enableSorting={true}
                 onSortingChange={onSortChange}
                 defaultSorted={sortingRules}
                 // Table customization props
@@ -958,7 +1094,7 @@ export function QueryPage<TData extends KitsuResource>({
                     />
                   </span>
                   <ReactTable<TData>
-                    loading={loading}
+                    loading={loading || loadingIndexMapColumns}
                     columns={columnsSelected}
                     data={selectedResources ?? []}
                     onRowMove={onRowMove}

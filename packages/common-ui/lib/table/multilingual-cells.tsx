@@ -16,66 +16,86 @@ export const LANGUAGE_BADGE_KEYS = {
   fr: "languageDescriptionFrench"
 };
 
+function getDescriptionByLanguage(
+  original: MultilingualDescription,
+  accessorKey: string,
+  language: string
+) {
+  // Get the descriptions provided.
+  const multilingualDescription: MultilingualDescription | null = get(
+    original,
+    accessorKey
+  );
+
+  // If no descriptions are provided, just leave the cell blank.
+  if (
+    multilingualDescription?.descriptions == null ||
+    multilingualDescription?.descriptions.length === 0
+  ) {
+    return undefined;
+  }
+
+  // Remove any blank descriptions.
+  const descriptionPairs = multilingualDescription?.descriptions.filter(
+    (description) => description.desc !== ""
+  );
+
+  // Loop through all of the descriptions provided, the preferred one is always the currently used language.
+  for (const description of descriptionPairs) {
+    if (description.lang === language) {
+      return description;
+    }
+  }
+  return descriptionPairs.length !== 0 &&
+    descriptionPairs[0] !== null &&
+    descriptionPairs[0]?.desc
+    ? descriptionPairs[0]
+    : undefined;
+}
+
 /**
  * Used for multilingual descriptions which contain an English and French version of the
  * description.
  */
 export function descriptionCell(accessorKey: string) {
+  const language = localStorage.getItem("locale") ?? "en";
   return {
     cell: ({ row: { original } }) => {
-      const { locale } = useContext(intlContext);
-
-      // Retrieve the current language being used.
-      const language = locale;
-
-      // Get the descriptions provided.
-      const multilingualDescription: MultilingualDescription | null = get(
+      const description = getDescriptionByLanguage(
         original,
-        accessorKey
+        accessorKey,
+        language
       );
-
-      // If no descriptions are provided, just leave the cell blank.
-      if (
-        multilingualDescription?.descriptions == null ||
-        multilingualDescription?.descriptions.length === 0
-      ) {
-        return <div />;
-      }
-
-      // Remove any blank descriptions.
-      const descriptionPairs = multilingualDescription?.descriptions.filter(
-        (description) => description.desc !== ""
-      );
-
-      // Loop through all of the descriptions provided, the preferred one is always the currently used language.
-      for (const description of descriptionPairs) {
-        if (description.lang === language) {
-          return (
-            <div>
-              <span className="description list-inline-item">
-                {description.desc}
-              </span>
-              {languageBadge(description.lang)}
-            </div>
-          );
-        }
-      }
-
-      // Preferred language could not be found above. Use another language and make sure it's indicated.
-      // There is also the possibility that this is blank.
-      return descriptionPairs.length !== 0 && descriptionPairs[0] !== null ? (
+      return description ? (
         <div>
           <span className="description list-inline-item">
-            {descriptionPairs[0].desc}
+            {description?.desc}
           </span>
-          {languageBadge(descriptionPairs[0].lang)}
+          {languageBadge(description?.lang)}
         </div>
       ) : (
         <div />
       );
     },
     accessorKey,
-    header: () => <FieldHeader name="multilingualDescription" />
+    header: () => <FieldHeader name="multilingualDescription" />,
+    sortingFn: (rowa, rowb) => {
+      const descA =
+        getDescriptionByLanguage(rowa.original, accessorKey, language)?.desc ??
+        undefined;
+      const descB =
+        getDescriptionByLanguage(rowb.original, accessorKey, language)?.desc ??
+        undefined;
+      if (descA === undefined && descB === undefined) {
+        return 0;
+      } else if (descA !== undefined && descB === undefined) {
+        return 1;
+      } else if (descA === undefined && descB !== undefined) {
+        return -1;
+      } else {
+        return descA === descB ? 0 : descA! < descB! ? -1 : 1;
+      }
+    }
   };
 }
 
@@ -89,15 +109,36 @@ export function allLangsDescriptionCell(accessorKey: string) {
         original: { value }
       }
     }) =>
-      value?.descriptions?.map(
-        (desc, index) =>
-          desc?.desc && (
-            <div className="pb-2" key={index}>
-              <strong>{desc?.lang}: </strong> {desc?.desc}
-            </div>
-          )
-      ) ?? null,
-    accessorKey
+      value?.descriptions
+        ?.sort((a, b) => (a?.lang === b?.lang ? 0 : a?.lang < b?.lang ? -1 : 1))
+        .map(
+          (desc, index) =>
+            desc?.desc && (
+              <div className="pb-2" key={index}>
+                <strong>{desc?.lang}: </strong> {desc?.desc}
+              </div>
+            )
+        ) ?? null,
+    accessorKey,
+    sortingFn: (rowa, rowb) => {
+      const descA = rowa.descriptions
+        ?.sort((a, b) => (a?.lang === b?.lang ? 0 : a?.lang < b?.lang ? -1 : 1))
+        .map((item) => item?.desc)
+        ?.join(",");
+      const descB = rowb.descriptions
+        ?.sort((a, b) => (a?.lang === b?.lang ? 0 : a?.lang < b?.lang ? -1 : 1))
+        .map((item) => item?.desc)
+        ?.join(",");
+      if (descA === undefined && descB === undefined) {
+        return 0;
+      } else if (descA !== undefined && descB === undefined) {
+        return 1;
+      } else if (descA === undefined && descB !== undefined) {
+        return -1;
+      } else {
+        return descA === descB ? 0 : descA! < descB! ? -1 : 1;
+      }
+    }
   };
 }
 

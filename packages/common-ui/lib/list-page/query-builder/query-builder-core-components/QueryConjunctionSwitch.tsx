@@ -41,5 +41,7 @@ export function QueryConjunctionSwitch({
         </Button>
       </div>
     </>
-  ) : (<></>);
+  ) : (
+    <></>
+  );
 }

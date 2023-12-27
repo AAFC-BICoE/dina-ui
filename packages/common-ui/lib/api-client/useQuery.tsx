@@ -83,7 +83,6 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       { fields, filter, sort, include, page, header, responseType, timeout },
       isUndefined
     );
-
     const response = await apiClient.get<TData, TMeta>(path, getParams);
 
     if (!response) {

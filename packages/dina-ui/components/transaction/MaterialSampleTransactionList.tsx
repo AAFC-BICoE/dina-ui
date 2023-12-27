@@ -16,12 +16,15 @@ export function MaterialSampleTransactionList({ transactionQueryDSL }) {
   return (
     <QueryPage
       indexName="dina_loan_transaction_index"
+      uniqueName="loan-transaction-material-samples"
       customViewElasticSearchQuery={transactionQueryDSL}
       customViewFields={[]}
       viewMode={true}
       columns={TRANSACTION_TABLE_COLUMNS}
       reactTableProps={{
-        showPagination: false
+        showPagination: false,
+        enableSorting: true,
+        enableMultiSort: true
       }}
       defaultPageSize={500}
       defaultSort={[{ id: "data.attributes.openedDate", desc: false }]}

@@ -241,6 +241,7 @@ export function AssemblageFormLayout() {
       {readOnly && (
         <CustomQueryPageView
           titleKey="attachedMaterialSamples"
+          uniqueName="attached-material-samples-assemblages"
           columns={ELASTIC_SEARCH_COLUMN}
           indexName={"dina_material_sample_index"}
           viewMode={readOnly}
@@ -255,6 +256,10 @@ export function AssemblageFormLayout() {
                 ]
               : undefined
           }
+          reactTableProps={{
+            enableSorting: true,
+            enableMultiSort: true
+          }}
         />
       )}
     </div>

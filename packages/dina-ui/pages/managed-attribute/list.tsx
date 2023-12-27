@@ -2,23 +2,59 @@ import {
   ColumnDefinition,
   descriptionCell,
   FieldHeader,
+  intlContext,
+  ListLayoutFilterType,
   ListPageLayout
 } from "common-ui";
-import { useState } from "react";
-import { useRouter } from "next/router";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useContext, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DINAUI_MESSAGES_ENGLISH } from "../../intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import {
-  CollectionModuleType,
-  COLLECTION_MODULE_TYPE_LABELS,
-  ManagedAttribute,
-  MANAGED_ATTRIBUTE_TYPE_OPTIONS
-} from "../../types/collection-api";
+
+import { GroupSelectField } from "packages/dina-ui/components";
 import PageLayout from "../../components/page/PageLayout";
+import {
+  COLLECTION_MODULE_TYPE_LABELS,
+  CollectionModuleType,
+  MANAGED_ATTRIBUTE_TYPE_OPTIONS,
+  ManagedAttribute
+} from "../../types/collection-api";
+
+export function useFilterManagedAttribute() {
+  const { locale: language } = useContext(intlContext);
+  const filterManagedAttributes = (
+    filterForm: any,
+    value: ManagedAttribute
+  ) => {
+    let result = true;
+    if (filterForm?.group) {
+      result = result && value.group === filterForm.group;
+    }
+    if (filterForm?.filterBuilderModel?.value) {
+      result =
+        result &&
+        (value.name
+          .toLowerCase()
+          .indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
+          (
+            value.multilingualDescription?.descriptions?.filter(
+              (item) =>
+                item.lang === language &&
+                (item.desc ?? "")
+                  .toLowerCase()
+                  .indexOf(filterForm.filterBuilderModel.value.toLowerCase()) >
+                  -1
+            ) ?? []
+          ).length > 0);
+    }
+    return result;
+  };
+  return { filterManagedAttributes };
+}
 
 export default function ManagedAttributesListPage() {
   const { formatMessage } = useDinaIntl();
@@ -76,7 +112,12 @@ function CreateNewSection({ href }: CreateButtonProps) {
 function CollectionAttributeListView() {
   const { formatMessage } = useDinaIntl();
 
-  const COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
+  const { filterManagedAttributes } = useFilterManagedAttribute();
+
+  const COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES = [
+    "name",
+    "multilingualDescription"
+  ];
 
   const COLLECTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<
     ManagedAttribute<CollectionModuleType>
@@ -158,20 +199,41 @@ function CollectionAttributeListView() {
       {/* Quick create menu */}
       <CreateNewSection href="/collection/managed-attribute/edit" />
 
-      <ListPageLayout
+      <ListPageLayout<ManagedAttribute<CollectionModuleType>>
+        enableInMemoryFilter={true}
+        filterFn={filterManagedAttributes}
+        filterType={ListLayoutFilterType.FREE_TEXT}
         filterAttributes={COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES}
         id="collections-module-managed-attribute-list"
         queryTableProps={{
           columns: COLLECTION_ATTRIBUTES_LIST_COLUMNS,
-          path: "collection-api/managed-attribute",
+          path: "collection-api/managed-attribute?page[limit]=1000",
           enableColumnChooser: true
         }}
+        additionalFilters={(filterForm) => ({
+          isCompleted: false,
+          // Apply group filter:
+          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+        })}
+        filterFormchildren={({ submitForm }) => (
+          <div className="mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+              />
+            </div>
+          </div>
+        )}
       />
     </>
   );
 }
 
 function ObjectStoreAttributeListView() {
+  const { filterManagedAttributes } = useFilterManagedAttribute();
+
   const OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
   const OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] =
@@ -235,6 +297,9 @@ function ObjectStoreAttributeListView() {
       <CreateNewSection href="/object-store/managed-attribute/edit" />
 
       <ListPageLayout
+        enableInMemoryFilter={true}
+        filterFn={filterManagedAttributes}
+        filterType={ListLayoutFilterType.FREE_TEXT}
         filterAttributes={OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES}
         id="object-store-module-managed-attribute-list"
         queryTableProps={{
@@ -248,6 +313,7 @@ function ObjectStoreAttributeListView() {
 }
 
 function TransactionAttributeListView() {
+  const { filterManagedAttributes } = useFilterManagedAttribute();
   const TRANSACTION_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
   const TRANSACTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] =
@@ -311,6 +377,9 @@ function TransactionAttributeListView() {
       <CreateNewSection href="/loan-transaction/managed-attribute/edit" />
 
       <ListPageLayout
+        enableInMemoryFilter={true}
+        filterFn={filterManagedAttributes}
+        filterType={ListLayoutFilterType.FREE_TEXT}
         filterAttributes={TRANSACTION_ATTRIBUTES_FILTER_ATTRIBUTES}
         id="loan-transaction-module-managed-attribute-list"
         queryTableProps={{
@@ -318,6 +387,22 @@ function TransactionAttributeListView() {
           path: "loan-transaction-api/managed-attribute",
           enableColumnChooser: true
         }}
+        additionalFilters={(filterForm) => ({
+          isCompleted: false,
+          // Apply group filter:
+          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+        })}
+        filterFormchildren={({ submitForm }) => (
+          <div className="mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+              />
+            </div>
+          </div>
+        )}
       />
     </>
   );

@@ -42,6 +42,8 @@ export type TableColumn<TData extends KitsuResource> = ColumnDef<TData> & {
   additionalAccessors?: string[];
 
   isColumnVisible?: boolean;
+
+  queryOption?: any;
 };
 
 /**
@@ -76,6 +78,12 @@ export interface ESIndexMapping {
    * Examples: text, keyword, boolean, date, boolean, long, short, integer...
    */
   type: string;
+
+  /**
+   * Currently used for dates to describe if it's a local_date (where timezone should not be applied)
+   * but can be expanded to other types in the future.
+   */
+  subType?: string;
 
   /**
    * If enabled, it will allow the user to see suggestions as they type. The suggestions will come

@@ -30,6 +30,7 @@ export interface StorageLinkerProps {
   actionMode?: StorageActionMode;
   parentIdInURL?: string;
   createStorageMode?: boolean;
+  parentStorageUnitUUID?: string;
 }
 
 /** Multi-Tab Storage Assignment UI. */
@@ -39,7 +40,8 @@ export function StorageLinker({
   placeholder,
   actionMode,
   parentIdInURL,
-  createStorageMode
+  createStorageMode,
+  parentStorageUnitUUID
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
   const { readOnly } = useDinaFormContext();
@@ -110,7 +112,10 @@ export function StorageLinker({
           >
             {!value?.id && (
               <TabPanel>
-                <StorageSearchSelector onChange={changeStorageAndResetTab} />
+                <StorageSearchSelector
+                  onChange={changeStorageAndResetTab}
+                  parentStorageUnitUUID={parentStorageUnitUUID}
+                />
               </TabPanel>
             )}
             {!value?.id && (
@@ -118,6 +123,7 @@ export function StorageLinker({
                 <BrowseStorageTree
                   onSelect={changeStorageAndResetTab}
                   readOnly={readOnly}
+                  parentStorageUnitUUID={parentStorageUnitUUID}
                 />
               </TabPanel>
             )}
@@ -151,6 +157,7 @@ export interface StorageLinkerFieldProps {
   hideLabel?: boolean;
   parentIdInURL?: string;
   createStorageMode?: boolean;
+  parentStorageUnitUUID?: string;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
@@ -160,7 +167,8 @@ export function StorageLinkerField({
   hideLabel,
   targetType,
   parentIdInURL,
-  createStorageMode
+  createStorageMode,
+  parentStorageUnitUUID
 }: StorageLinkerFieldProps) {
   const formId = useField<string | undefined>("id")[0].value;
 
@@ -202,6 +210,7 @@ export function StorageLinkerField({
             placeholder={placeholder}
             parentIdInURL={parentIdInURL}
             createStorageMode={createStorageMode}
+            parentStorageUnitUUID={parentStorageUnitUUID}
           />
         </div>
       )}

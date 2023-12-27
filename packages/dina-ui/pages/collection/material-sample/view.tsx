@@ -115,11 +115,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const transactionElasticQuery = useElasticSearchQuery({
     indexName: "dina_loan_transaction_index",
     queryDSL: {
-      _source: [
-        "data.id",
-        "data.attributes.materialDirection",
-        "data.attributes.transactionNumber"
-      ],
+      _source: {
+        includes: [
+          "data.id",
+          "data.attributes.materialDirection",
+          "data.attributes.transactionNumber"
+        ]
+      },
       size: 1,
       sort: {
         "data.attributes.openedDate": {
@@ -209,7 +211,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <CustomQueryPageView
                   indexName="dina_material_sample_index"
                   columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
-                  localStorageKey="material-sample-children"
+                  uniqueName="material-sample-children"
                   customQueryOptions={[
                     {
                       value: "materialSampleChildren",
@@ -231,7 +233,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     }
                   ]}
                   reactTableProps={{
-                    showPagination: false
+                    showPagination: false,
+                    enableSorting: true,
+                    enableMultiSort: true
                   }}
                   defaultPageSize={500}
                   defaultSort={[
@@ -368,7 +372,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             entityLink="/collection/material-sample"
             byPassView={true}
             className="me-auto"
-            reloadLastSearch={true}
           />
           <EditButton entityId={id} entityLink="collection/material-sample" />
           <SplitMaterialSampleDropdownButton
@@ -386,7 +389,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             className="ms-5"
             id={id}
             options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/material-sample/list?reloadLastSearch"
+            postDeleteRedirect="/collection/material-sample/list"
             type="material-sample"
           />
         </ButtonBar>
