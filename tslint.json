@@ -18,6 +18,7 @@
     "jsx-no-lambda": false,
     "max-classes-per-file": false,
     "no-var-requires": false,
-    "prefer-for-of": false
+    "prefer-for-of": false,
+    "no-string-literal": false
   }
 }

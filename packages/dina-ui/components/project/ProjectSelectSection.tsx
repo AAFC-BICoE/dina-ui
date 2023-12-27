@@ -23,13 +23,13 @@ export function ProjectSelectSection({
 }: ProjectSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
-    <ProjectSelectField resourcePath={resourcePath} />
+    <ProjectsSelectField resourcePath={resourcePath} />
   ) : (
     <div className={`${classNames} row`}>
       <DinaFormSection horizontal="flex">
         <div className="col-md-6">
           <div className="d-flex flex-row gap-1">
-            <ProjectSelectField
+            <ProjectsSelectField
               resourcePath={resourcePath}
               className="flex-grow-1 mb-2"
             />
@@ -45,7 +45,7 @@ export interface ProjectSelectFieldProps {
   className?: string;
 }
 
-export function ProjectSelectField({
+export function ProjectsSelectField({
   resourcePath,
   className
 }: ProjectSelectFieldProps) {

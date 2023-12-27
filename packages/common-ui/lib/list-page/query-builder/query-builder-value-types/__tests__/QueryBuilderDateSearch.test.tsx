@@ -45,7 +45,7 @@ describe("QueryBuilderDateSearch", () => {
     const operators = [
       {
         operator: "containsDate",
-        testValues: ["1998", "1998-05", "1998-05-19"],
+        testValues: ["1998", "1998-05", "1998-05-19"]
       },
       {
         operator: "greaterThan",
@@ -90,18 +90,18 @@ describe("QueryBuilderDateSearch", () => {
     ];
 
     describe("Attribute level tests", () => {
-      operators.forEach(({operator, testValues}) => {
+      operators.forEach(({ operator, testValues }) => {
         subTypes.forEach((subType) => {
           testValues.forEach((value) => {
             const testName = `Using the ${operator} operator, ${subType} subtype, testing with ${value} value`;
-            
+
             test(testName, async () => {
               expect(
                 transformDateSearchToDSL({
                   operation: operator,
-                  value: value,
+                  value,
                   fieldInfo: {
-                    subType: subType
+                    subType
                   } as any,
                   fieldPath: "data.attributes.dateField",
                   queryType: operator
@@ -114,18 +114,18 @@ describe("QueryBuilderDateSearch", () => {
     });
 
     describe("Relationship level tests", () => {
-      operators.forEach(({operator, testValues}) => {
+      operators.forEach(({ operator, testValues }) => {
         subTypes.forEach((subType) => {
           testValues.forEach((value) => {
             const testName = `Using the ${operator} operator, ${subType} subtype, testing with ${value} value`;
-            
+
             test(testName, async () => {
               expect(
                 transformDateSearchToDSL({
                   operation: operator,
-                  value: value,
+                  value,
                   fieldInfo: {
-                    subType: subType,
+                    subType,
                     parentType: "collection",
                     parentName: "collection"
                   } as any,

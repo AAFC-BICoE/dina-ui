@@ -51,12 +51,14 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
 
     // get save arguments. save() already automatically POSTs for new resources and PATCH for existing resources
     const identifierSaveArgs: SaveArgs<Identifier>[] =
-      submitted.identifiers?.filter(item => item && (item.type || item.value))?.map((resource) => {
-        return {
-          resource,
-          type: "identifier"
-        };
-      }) ?? [];
+      submitted.identifiers
+        ?.filter((item) => item && (item.type || item.value))
+        ?.map((resource) => {
+          return {
+            resource,
+            type: "identifier"
+          };
+        }) ?? [];
 
     delete submitted.identifiers;
     try {

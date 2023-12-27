@@ -41,10 +41,7 @@ export default function AgentListPage() {
   const buttonBarContent = <CreateButton entityLink="/person" />;
 
   return (
-    <PageLayout
-      titleId="personListTitle"
-      buttonBarContent={buttonBarContent}
-    >
+    <PageLayout titleId="personListTitle" buttonBarContent={buttonBarContent}>
       <ListPageLayout
         filterAttributes={AGENT_FILTER_ATTRIBUTES}
         id="person-list"
@@ -52,17 +49,17 @@ export default function AgentListPage() {
           columns: AGENT_TABLE_COLUMNS,
           path: "agent-api/person",
           defaultSort: [
-              {
-                id: "familyNames",
-                desc: false
-              },
-              {
-                id: "givenNames",
-                desc: false
-              }
-            ]
-          }}
-        />
+            {
+              id: "familyNames",
+              desc: false
+            },
+            {
+              id: "givenNames",
+              desc: false
+            }
+          ]
+        }}
+      />
     </PageLayout>
   );
 }

@@ -72,6 +72,7 @@ export function ManagedAttributesSorter({
                   model={managedAttributeApiPath}
                   onChange={(ma) => {
                     if (
+                      ma!=null &&
                       !Array.isArray(ma) &&
                       !attributeKeys.includes?.(ma.key)
                     ) {

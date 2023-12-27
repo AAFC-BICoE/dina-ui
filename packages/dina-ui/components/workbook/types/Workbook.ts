@@ -1,3 +1,12 @@
+import { InputResource, KitsuResource } from "kitsu";
+import { WorkbookDataTypeEnum } from "./WorkbookDataTypeEnum";
+
+export enum LinkOrCreateSetting {
+  LINK = "LINK", // Find the existing object then set to relationships
+  CREATE = "CREATE", // Create a new object then set to relationships
+  LINK_OR_CREATE = "LINK_OR_CREATE" // Try to find an existing object, if not found, then create one, then set to relationships
+}
+
 /**
  * A specific row on a spreadsheet.
  */
@@ -11,4 +20,88 @@ export interface WorkbookRow {
  */
 export interface WorkbookJSON {
   [sheetNumber: number]: WorkbookRow[];
+}
+
+export type Leaves<T> = { [K: string]: T | Leaves<T> } | { type: string };
+
+export type FieldMappingConfigType = {
+  [key: string]: Leaves<FieldConfigType> & {
+    relationshipConfig: {
+      type: string;
+      hasGroup: boolean;
+      baseApiPath: string;
+    };
+  };
+};
+
+export interface PrimitiveField {
+  dataType:
+    | WorkbookDataTypeEnum.NUMBER
+    | WorkbookDataTypeEnum.BOOLEAN
+    | WorkbookDataTypeEnum.STRING
+    | WorkbookDataTypeEnum.DATE
+    | WorkbookDataTypeEnum.STRING_ARRAY
+    | WorkbookDataTypeEnum.NUMBER_ARRAY
+    | WorkbookDataTypeEnum.BOOLEAN_ARRAY;
+}
+
+export interface ManagedAttributeField {
+  dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES;
+}
+
+export interface VocabularyField {
+  dataType: WorkbookDataTypeEnum.VOCABULARY;
+  vocabularyEndpoint: string;
+}
+
+export interface ObjectField {
+  dataType: WorkbookDataTypeEnum.OBJECT | WorkbookDataTypeEnum.OBJECT_ARRAY;
+  attributes: Leaves<FieldConfigType>;
+  // If relationshipConfig is defined, the this field need to move to relationships.
+  relationshipConfig?: {
+    type: string;
+    hasGroup: boolean;
+    linkOrCreateSetting: LinkOrCreateSetting;
+    baseApiPath?: string;
+  };
+}
+
+export type FieldConfigType =
+  | PrimitiveField
+  | VocabularyField
+  | ManagedAttributeField
+  | ObjectField;
+
+export type WorkbookResourceType = InputResource<
+  KitsuResource & {
+    group: string;
+    relationships: {
+      [key: string]: {
+        data: { id: string; type: string } | { id: string; type: string }[];
+      };
+    };
+  }
+>;
+
+export interface ColumnUniqueValues {
+  [sheetIndex: number]: {
+    [columnName: string]: {
+      [value: string]: number;
+    };
+  };
+}
+
+export interface WorkbookColumnMap {
+  [columnName: string]: // columnName in the spreadsheet
+  {
+    fieldPath?: string; // Mapped fieldPath in the configuration
+    mapRelationship: boolean; // If relationship mapping needed.
+    numOfUniqueValues: number;
+    valueMapping: {
+      [value: string]: {
+        id: string;
+        type: string;
+      };
+    };
+  };
 }

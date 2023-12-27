@@ -111,7 +111,10 @@ export function transformDateSearchToDSL({
               }
             }
           }
-        : rangeQuery(fieldPath, buildDateRangeObject(operation, value, subType));
+        : rangeQuery(
+            fieldPath,
+            buildDateRangeObject(operation, value, subType)
+          );
 
     // Not equals match type.
     case "notEquals":
@@ -252,13 +255,16 @@ export function transformDateSearchToDSL({
               }
             }
           }
-        : rangeQuery(fieldPath, buildDateRangeObject(operation, value, subType));
+        : rangeQuery(
+            fieldPath,
+            buildDateRangeObject(operation, value, subType)
+          );
   }
 }
 
 /**
  * Generates the time_zone to return with the elastic search response.
- * 
+ *
  * This will retrieve the users current timezone offset.
  *
  * This will return the offset in ISO 8601 UTC offset format, such as +01:00 or -08:00.
@@ -303,7 +309,7 @@ function getTimezoneOffset() {
 function buildDateRangeObject(matchType, value, subType) {
   // Local date does not store timezone, ignore it.
   const timezone =
-    subType != "local_date" && subType != "local_date_time"
+    subType !== "local_date" && subType !== "local_date_time"
       ? getTimezoneOffset()
       : undefined;
 
