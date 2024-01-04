@@ -68,7 +68,7 @@ const mockSuggestionRequest = jest.fn<any, any>(async (path) => {
           hits: []
         },
         aggregations: {
-          term_aggregation: {
+          "sterms#term_aggregation": {
             doc_count_error_upper_bound: 0,
             sum_other_doc_count: 0,
             buckets: [{ key: "WHOLE_ORGANISM", doc_count: 1 }]
@@ -92,11 +92,11 @@ const mockSuggestionRequestRelationship = jest.fn<any, any>(async (path) => {
           hits: []
         },
         aggregations: {
-          included_aggregation: {
+          "nested#included_aggregation": {
             doc_count: 4,
-            included_type_filter: {
+            "filter#included_type_filter": {
               doc_count: 3,
-              term_aggregation: {
+              "sterms#term_aggregation": {
                 doc_count_error_upper_bound: 0,
                 sum_other_doc_count: 0,
                 buckets: [{ key: "CNC", doc_count: 3 }]
