@@ -69,6 +69,12 @@ export interface ColumnSelectorProps<TData> {
   columnSelectorDefaultColumns?: any[];
 }
 
+// Ids of columns not supported for exporting
+export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
+  "selectColumn",
+  "viewPreviewButtonText"
+];
+
 export function ColumnSelector<TData>({
   uniqueName,
   reactTable,
@@ -196,17 +202,18 @@ export function ColumnSelector<TData>({
       Object.keys(visibilityState).forEach((columnId) => {
         visibilityState[columnId] = event.target.checked;
       });
-      visibilityState.selectColumn = true;
+      NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
+        visibilityState[columnId] = true;
+      });
       setLocalStorageColumnStates(visibilityState);
     }
     const reactTableToggleAllHander =
       reactTable?.getToggleAllColumnsVisibilityHandler();
     if (reactTableToggleAllHander) {
       reactTableToggleAllHander(event);
-      const selectColumn = reactTable
-        ?.getAllLeafColumns()
-        .find((column) => column.id === "selectColumn");
-      selectColumn?.toggleVisibility(true);
+      NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
+        reactTable?.getColumn(columnId)?.toggleVisibility(true);
+      });
     }
   }
 
@@ -217,7 +224,7 @@ export function ColumnSelector<TData>({
       reactTable?.getAllLeafColumns().forEach((column) => {
         if (
           column.getIsVisible() &&
-          column.id !== "selectColumn" &&
+          !NOT_EXPORTABLE_COLUMN_IDS.includes(column.id) &&
           !columnSelectorDefaultColumns?.find(
             (defaultColumn) => defaultColumn.id === column.id
           )
@@ -240,7 +247,7 @@ export function ColumnSelector<TData>({
     const exportColumns = reactTable
       ?.getAllLeafColumns()
       .filter((column) => {
-        if (column.id === "selectColumn") {
+        if (NOT_EXPORTABLE_COLUMN_IDS.includes(column.id)) {
           return false;
         } else {
           return column.getIsVisible();

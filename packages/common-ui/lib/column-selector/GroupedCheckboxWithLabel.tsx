@@ -2,6 +2,7 @@ import { startCase } from "lodash";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
 import { VisibilityState } from "@tanstack/react-table";
+import { NOT_EXPORTABLE_COLUMN_IDS } from "./ColumnSelector";
 
 export interface CheckboxProps {
   id: string;
@@ -41,7 +42,7 @@ export function Checkbox({
     }
   }
   return (
-    <div hidden={id === "selectColumn"} ref={ref}>
+    <div hidden={NOT_EXPORTABLE_COLUMN_IDS.includes(id)} ref={ref}>
       <input
         key={id}
         id={id}
