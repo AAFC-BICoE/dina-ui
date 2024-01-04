@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import { useApiClient } from "..";
 
 const TOTAL_SUGGESTIONS: number = 100;
+const FILTER_AGGREGATION_NAME: string = "included_type_filter";
+const FILTER_AGGREGATION_TYPE: string = "filter#";
 const AGGREGATION_NAME: string = "term_aggregation";
-const AGGREGATION_FILTER_NAME: string = "included_type_filter";
+const AGGREGATION_TYPE: string = "sterms#";
 const NEST_AGGREGATION_NAME: string = "included_aggregation";
+const NEST_AGGREGATION_TYPE: string = "nested#";
 
 interface QuerySuggestionFieldProps {
   /** The string you want elastic search to use. */
@@ -67,7 +70,7 @@ export function useElasticSearchDistinctTerm({
                 filter: [{ term: { "included.type": relationshipType } }]
               }
             },
-            AGGREGATION_FILTER_NAME,
+            FILTER_AGGREGATION_NAME,
             (agg) =>
               agg.aggregation(
                 "terms",
@@ -98,19 +101,26 @@ export function useElasticSearchDistinctTerm({
         }
       })
       .then((resp) => {
+        let suggestions: string[] | undefined;
+
         // The path to the results in the response changes if it contains the nested aggregation.
         if (relationshipType) {
-          setSuggestions(
-            resp?.data?.aggregations?.[NEST_AGGREGATION_NAME]?.[
-              AGGREGATION_FILTER_NAME
-            ]?.[AGGREGATION_NAME]?.buckets?.map((bucket) => bucket.key)
-          );
+          suggestions = resp?.data?.aggregations?.[
+            NEST_AGGREGATION_TYPE + NEST_AGGREGATION_NAME
+          ]?.[FILTER_AGGREGATION_TYPE + FILTER_AGGREGATION_NAME]?.[
+            AGGREGATION_TYPE + AGGREGATION_NAME
+          ]?.buckets?.map((bucket) => bucket.key);
         } else {
-          setSuggestions(
-            resp?.data?.aggregations?.[AGGREGATION_NAME]?.buckets?.map(
-              (bucket) => bucket.key
-            )
+          suggestions = resp?.data?.aggregations?.[AGGREGATION_TYPE + AGGREGATION_NAME]?.buckets?.map(
+            (bucket) => bucket.key
           );
+        }
+
+        if (suggestions !== undefined) {
+          setSuggestions(suggestions);
+        } else {
+          // Ignore, don't break.
+          setSuggestions([]);
         }
       })
       .catch(() => {
