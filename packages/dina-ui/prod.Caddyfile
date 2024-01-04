@@ -35,7 +35,9 @@ respond /keycloak.json "{
 }"
 
 respond /instance.json "{ 
-	\"instance-mode\": \"{$INSTANCE_MODE}\"
+	\"instance-mode\": \"{$INSTANCE_MODE}\",
+	\"supported-languages\": \"{$SUPPORTED_LANGUAGES}\",
+	\"supported-languages-iso\": \"{$SUPPORTED_LANGUAGES_ISO}\"
 }"
 
 # Proxy to the main back-end API:
