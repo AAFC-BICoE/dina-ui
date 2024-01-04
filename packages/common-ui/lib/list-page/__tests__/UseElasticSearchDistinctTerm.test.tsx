@@ -94,7 +94,7 @@ const mockSuggestionRequestRelationship = jest.fn<any, any>(async (path) => {
         aggregations: {
           "nested#included_aggregation": {
             doc_count: 4,
-            "filter#included_type_filter": {
+            "included_type_filter": {
               doc_count: 3,
               "sterms#term_aggregation": {
                 doc_count_error_upper_bound: 0,

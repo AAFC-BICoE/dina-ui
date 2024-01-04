@@ -5,11 +5,8 @@ import { useApiClient } from "..";
 
 const TOTAL_SUGGESTIONS: number = 100;
 const FILTER_AGGREGATION_NAME: string = "included_type_filter";
-const FILTER_AGGREGATION_TYPE: string = "filter#";
 const AGGREGATION_NAME: string = "term_aggregation";
-const AGGREGATION_TYPE: string = "sterms#";
 const NEST_AGGREGATION_NAME: string = "included_aggregation";
-const NEST_AGGREGATION_TYPE: string = "nested#";
 
 interface QuerySuggestionFieldProps {
   /** The string you want elastic search to use. */
@@ -101,19 +98,38 @@ export function useElasticSearchDistinctTerm({
         }
       })
       .then((resp) => {
+        // Ignore the type if provided, just look using the end of the key.
+        const findTermAggregationKey = (aggregations: any, keyName: string): any | undefined => {
+          for (const key in aggregations) {
+            if (
+              (key.includes("#") && key.endsWith("#" + keyName)) ||
+              (!key.includes("#") && key === keyName)
+            ) {
+              return aggregations[key];
+            }
+          }
+          return undefined;
+        };
+
         let suggestions: string[] | undefined;
 
         // The path to the results in the response changes if it contains the nested aggregation.
         if (relationshipType) {
-          suggestions = resp?.data?.aggregations?.[
-            NEST_AGGREGATION_TYPE + NEST_AGGREGATION_NAME
-          ]?.[FILTER_AGGREGATION_TYPE + FILTER_AGGREGATION_NAME]?.[
-            AGGREGATION_TYPE + AGGREGATION_NAME
-          ]?.buckets?.map((bucket) => bucket.key);
+          suggestions = findTermAggregationKey(
+            findTermAggregationKey(
+              findTermAggregationKey(
+                resp?.data?.aggregations,
+                NEST_AGGREGATION_NAME
+              ),
+              FILTER_AGGREGATION_NAME
+            ),
+            AGGREGATION_NAME
+          )?.buckets?.map((bucket) => bucket.key);
         } else {
-          suggestions = resp?.data?.aggregations?.[AGGREGATION_TYPE + AGGREGATION_NAME]?.buckets?.map(
-            (bucket) => bucket.key
-          );
+          suggestions = findTermAggregationKey(
+            resp?.data?.aggregations,
+            AGGREGATION_NAME
+          )?.buckets?.map((bucket) => bucket.key);
         }
 
         if (suggestions !== undefined) {
