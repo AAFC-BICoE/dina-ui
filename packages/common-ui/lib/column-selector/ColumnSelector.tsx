@@ -33,7 +33,6 @@ export interface ColumnSelectorProps<TData> {
   hideExportButton?: boolean;
   reactTable: Table<TData> | undefined;
   menuOnly?: boolean;
-  hideApplyButton?: boolean;
   forceUpdate?: React.DispatchWithoutAction;
   /**
    * Used for the listing page to understand which columns can be provided. Filters are generated
@@ -74,7 +73,6 @@ export function ColumnSelector<TData>({
   reactTable,
   menuOnly,
   hideExportButton = false,
-  hideApplyButton = false,
   forceUpdate,
   indexName,
   dynamicFieldMapping,
@@ -367,7 +365,7 @@ export function ColumnSelector<TData>({
                   )}
                 </Button>
               )}
-              {!hideApplyButton && (
+              {!menuOnly && (
                 <Button
                   disabled={loading}
                   className="btn btn-primary mt-1 mb-2 bulk-edit-button"
@@ -399,6 +397,15 @@ export function ColumnSelector<TData>({
         as={CheckboxItem}
       />
       {searchedColumns?.map((column) => {
+        function handdleToggle(event) {
+          const reactTableToggleHandler = column?.getToggleVisibilityHandler();
+          reactTableToggleHandler(event);
+          const columnId = column.id;
+          setLocalStorageColumnStates({
+            ...localStorageColumnStates,
+            [columnId]: event.target.checked
+          });
+        }
         return (
           <>
             <Dropdown.Item
@@ -406,6 +413,7 @@ export function ColumnSelector<TData>({
               id={column?.id}
               isChecked={column?.getIsVisible()}
               isField={true}
+              handleClick={handdleToggle}
               as={CheckboxItem}
             />
           </>
