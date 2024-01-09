@@ -222,6 +222,14 @@ export function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_wildcard" }),
       cardinality: 1
     },
+    in: {
+      label: formatMessage({ id: "queryBuilder_operator_in" }),
+      cardinality: 1
+    },
+    notIn: {
+      label: formatMessage({ id: "queryBuilder_operator_notIn" }),
+      cardinality: 1
+    },
     startsWith: {
       label: formatMessage({ id: "queryBuilder_operator_startsWith" }),
       cardinality: 1
@@ -473,6 +481,8 @@ export function generateBuilderConfig(
           operators: [
             "exactMatch",
             "wildcard",
+            "in",
+            "notIn",
             "startsWith", // Only displayed if supported on the mapping.
             "containsText", // Only displayed if supported on the mapping.
             "endsWith", // Only displayed if supported on the mapping.
@@ -488,7 +498,14 @@ export function generateBuilderConfig(
       defaultOperator: "equals",
       widgets: {
         autoComplete: {
-          operators: ["equals", "notEquals", "empty", "notEmpty"]
+          operators: [
+            "equals", 
+            "notEquals", 
+            "in",
+            "notIn",
+            "empty", 
+            "notEmpty"
+          ]
         }
       }
     },
@@ -517,6 +534,8 @@ export function generateBuilderConfig(
             "equals",
             "notEquals",
             "containsDate",
+            "in",
+            "notIn",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",
@@ -535,6 +554,8 @@ export function generateBuilderConfig(
           operators: [
             "equals",
             "notEquals",
+            "in",
+            "notIn",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",

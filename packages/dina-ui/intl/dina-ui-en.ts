@@ -693,6 +693,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_operator_endsWith: "Ends with",
   queryBuilder_operator_equals: "Equals",
   queryBuilder_operator_exactMatch: "Exact match",
+  queryBuilder_operator_in: "In",
+  queryBuilder_operator_notIn: "Not in",
   queryBuilder_operator_greaterThan: "Greater than",
   queryBuilder_operator_greaterThanOrEqualTo: "Greater than or equal to",
   queryBuilder_operator_lessThan: "Less than",
