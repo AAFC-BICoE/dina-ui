@@ -72,6 +72,7 @@ export interface ColumnSelectorProps<TData> {
 // Ids of columns not supported for exporting
 export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
   "selectColumn",
+  "thumbnail",
   "viewPreviewButtonText"
 ];
 
