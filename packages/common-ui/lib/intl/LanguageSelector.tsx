@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { intlContext } from "./IntlSupport";
 import Button from "react-bootstrap/Button";
-import axios from "axios";
+import { useApiClient } from "../api-client/ApiClientContext";
 
 const LANGUAGE_LABELS = {
   en: "English",
@@ -10,15 +10,16 @@ const LANGUAGE_LABELS = {
 
 export function LanguageSelector() {
   const { locale, setLocale } = useContext(intlContext);
-  const [instanceMode, setInstanceMode] = useState<any>();
+  const [supportedLanguages, setSupportedLanguages] = useState<string>();
+  const { apiClient } = useApiClient();
 
   useEffect(() => {
     const getInstanceMode = async () => {
       try {
-        const response = await axios.get(`/instance.json`);
-        setInstanceMode(response.data["supported-languages-iso"]);
+        const response = await apiClient.axios.get(`/instance.json`);
+        setSupportedLanguages(response.data["supported-languages-iso"]);
       } catch (error) {
-        setInstanceMode(undefined);
+        setSupportedLanguages(undefined);
       }
     };
     getInstanceMode();
@@ -32,7 +33,7 @@ export function LanguageSelector() {
 
   return (
     <div>
-      {instanceMode
+      {supportedLanguages
         ?.split(",")
         .filter((key) => key !== locale)
         .map((key) => {
