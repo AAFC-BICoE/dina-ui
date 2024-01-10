@@ -419,6 +419,26 @@ export function termQuery(
   };
 }
 
+// Multi-search exact matches (in/not in)
+export function inQuery(
+  fieldName: string,
+  matchValues: string,
+  keywordMultiFieldSupport: boolean,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = matchValues?.split(",") ?? [ matchValues ];
+
+  return {
+    bool: {
+      [not ? "must_not" : "must"]: {
+        terms: {
+          [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValuesArray
+        }        
+      }
+    }
+  };
+}
+
 // Query used for wildcard searches (contains).
 export function wildcardQuery(
   fieldName: string,

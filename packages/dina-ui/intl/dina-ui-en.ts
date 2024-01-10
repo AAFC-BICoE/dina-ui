@@ -708,6 +708,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_value_false: "False",
   queryBuilder_value_number_placeholder: "Enter number search value...",
   queryBuilder_value_text_placeholder: "Enter text search value...",
+  queryBuilder_value_in_placeholder: "Enter comma-separated values...",
   queryBuilder_value_true: "True",
   queryBuilder_invalid_query:
     "Some parts of your query were removed as they are no longer supported. Please review and update your query to use supported options:",
