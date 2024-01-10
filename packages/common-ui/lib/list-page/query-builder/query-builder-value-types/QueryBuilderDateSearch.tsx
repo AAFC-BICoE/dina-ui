@@ -3,11 +3,13 @@ import DatePicker from "react-datepicker";
 import {
   includedTypeQuery,
   rangeQuery,
-  existsQuery
+  existsQuery,
+  inRangeQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
-import { DATE_REGEX_PARTIAL } from "common-ui/lib";
+import { DATE_REGEX_PARTIAL, DATE_REGEX_MULTIPLE } from "common-ui/lib";
 import moment from "moment";
+import { useIntl } from "react-intl";
 
 interface QueryBuilderDateSearchProps {
   /**
@@ -31,9 +33,11 @@ export default function QueryBuilderDateSearch({
   value,
   setValue
 }: QueryBuilderDateSearchProps) {
+  const { formatMessage } = useIntl();
+
   return (
     <>
-      {matchType !== "empty" && matchType !== "notEmpty" && (
+      {matchType !== "empty" && matchType !== "notEmpty" && matchType !== "in" && matchType !== "notIn" && (
         <DatePicker
           className="form-control"
           value={value}
@@ -66,6 +70,15 @@ export default function QueryBuilderDateSearch({
           isClearable={true}
           showYearDropdown={true}
           todayButton="Today"
+        />
+      )}
+      {(matchType === "in" || matchType === "notIn") && (
+        <input
+          type="text"
+          value={value ?? ""}
+          onChange={(newValue) => setValue?.(newValue?.target?.value)}
+          className="form-control"
+          placeholder={formatMessage({ id: "queryBuilder_value_in_placeholder" })}
         />
       )}
     </>
@@ -115,6 +128,12 @@ export function transformDateSearchToDSL({
             fieldPath,
             buildDateRangeObject(operation, value, subType)
           );
+
+    case "in":
+      return inRangeQuery(fieldPath, value, false);
+
+    case "notIn":
+      return inRangeQuery(fieldPath, value, true);
 
     // Not equals match type.
     case "notEquals":
@@ -368,14 +387,27 @@ function buildDateRangeObject(matchType, value, subType) {
 /**
  * Validate the date string to ensure it's something elastic search can accept.
  *
- * Partial dates are supported here.
+ * Partial dates and multiple dates are supported here.
  * @param value date value
+ * @param operator operator being used for the search.
  * @param formatMessage error message translation locale
  * @return null if valid, string error if not valid.
  */
-export function validateDate(value, formatMessage): string | null {
-  if (DATE_REGEX_PARTIAL.test(value)) {
-    return null;
+export function validateDate(value, operator, formatMessage): string | null {
+  switch (operator) {
+    // Regex for multiple dates (YYYY-MM-DD, YYYY-MM-DD...)
+    case "in":
+    case "notIn":
+      if (DATE_REGEX_MULTIPLE.test(value)) {
+        return null;
+      }
+      return formatMessage({ id: "dateMustBeFormattedMultiple" });
+    
+    // Regex for partial dates (YYYY or YYYY-MM or YYYY-MM-DD)
+    default:
+      if (DATE_REGEX_PARTIAL.test(value)) {
+        return null;
+      }
+      return formatMessage({ id: "dateMustBeFormattedPartial" });
   }
-  return formatMessage({ id: "dateMustBeFormattedPartial" });
 }

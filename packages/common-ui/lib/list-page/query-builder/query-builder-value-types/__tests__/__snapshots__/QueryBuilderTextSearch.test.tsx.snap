@@ -8,6 +8,18 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
 </QueryRowTextSearch>"
 `;
 
+exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is in or not in: Expect text field to be displayed with a different placeholder. 1`] = `
+"<QueryRowTextSearch matchType=\\"in\\" value=\\"test1, test2, test3\\" setValue={[Function: bound fn]}>
+  <input type=\\"text\\" value=\\"test1, test2, test3\\" onChange={[Function: onChange]} className=\\"form-control\\" placeholder=\\"queryBuilder_value_in_placeholder\\" />
+</QueryRowTextSearch>"
+`;
+
+exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is in or not in: Expect text field to be displayed with a different placeholder. 2`] = `
+"<QueryRowTextSearch matchType=\\"notIn\\" value=\\"test1, test2, test3\\" setValue={[Function: bound fn]}>
+  <input type=\\"text\\" value=\\"test1, test2, test3\\" onChange={[Function: onChange]} className=\\"form-control\\" placeholder=\\"queryBuilder_value_in_placeholder\\" />
+</QueryRowTextSearch>"
+`;
+
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function ContainsText (Infix) operation Normal field 1`] = `
 Object {
   "match": Object {
@@ -532,6 +544,38 @@ Object {
               "included.type": "organism",
             },
           },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function in operator Normal field 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "data.attributes.textField": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function not in operator Normal field 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "terms": Object {
+        "data.attributes.textField": Array [
+          "test1",
+          "test2",
+          "test3",
         ],
       },
     },

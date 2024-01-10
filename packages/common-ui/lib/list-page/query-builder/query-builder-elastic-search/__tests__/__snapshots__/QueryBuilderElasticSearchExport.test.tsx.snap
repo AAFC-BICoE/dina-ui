@@ -297,6 +297,31 @@ Object {
 }
 `;
 
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inRangeQuery 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "range": Object {
+          "fieldTest": Object {
+            "gte": "1998-05-19",
+            "lte": "1998-05-19",
+          },
+        },
+      },
+      Object {
+        "range": Object {
+          "fieldTest": Object {
+            "gte": "2023-03-02",
+            "lte": "2023-03-02",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions includedTypeQuery 1`] = `
 Object {
   "term": Object {

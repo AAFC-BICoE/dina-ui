@@ -474,6 +474,26 @@ export function rangeQuery(fieldName: string, rangeOptions: any): any {
   };
 }
 
+// Query for generating ranges to search multiple different values.
+// Range is used to ignore the time so it can just search for that specific days.
+export function inRangeQuery(fieldName: string, matchValues: string, not: boolean): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+      .map(value => value.trim());
+
+  return {
+    bool: {
+      [not ? "should_not" : "should"]: matchValuesArray.map(date => ({
+        range: {
+          [fieldName]: {
+            gte: date,
+            lte: date
+          }
+        }
+      }))
+    }
+  }
+}
+
 // Query used for prefix partial matches
 export function prefixQuery(
   fieldName: string,

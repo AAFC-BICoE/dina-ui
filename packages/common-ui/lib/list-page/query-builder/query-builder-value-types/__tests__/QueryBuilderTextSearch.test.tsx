@@ -38,6 +38,40 @@ describe("QueryBuilderTextSearch", () => {
         "Expect text field not to be displayed since the match type is not equals"
       );
     });
+
+    it("Display field if match type is in or not in", async () => {
+      // This test will just ensure the layout does not change unexpectedly.
+      // Any changes to the layout, the snapshots will need to be updated.
+      const textSearchIn = mountWithAppContext(
+        <QueryBuilderTextSearch
+          matchType="in"
+          value="test1, test2, test3"
+          setValue={jest.fn}
+        />
+      );
+
+      // Expect a snapshot with the text field being with a different placeholder.
+      expect(
+        textSearchIn.find(QueryBuilderTextSearch).debug()
+      ).toMatchSnapshot(
+        "Expect text field to be displayed with a different placeholder."
+      );
+
+      const textSearchNotIn = mountWithAppContext(
+        <QueryBuilderTextSearch
+          matchType="notIn"
+          value="test1, test2, test3"
+          setValue={jest.fn}
+        />
+      );
+
+      // Expect a snapshot with the text field being with a different placeholder.
+      expect(
+        textSearchNotIn.find(QueryBuilderTextSearch).debug()
+      ).toMatchSnapshot(
+        "Expect text field to be displayed with a different placeholder."
+      );
+    });
   });
 
   describe("transformTextSearchToDSL function", () => {
@@ -93,6 +127,34 @@ describe("QueryBuilderTextSearch", () => {
             fieldInfo: {} as any,
             fieldPath: "data.attributes.textField",
             queryType: "equals"
+          })
+        ).toMatchSnapshot();
+      });
+    });
+
+    describe("in operator", () => {
+      test("Normal field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "in",
+            value: "test1, test2, test3",
+            fieldInfo: {} as any,
+            fieldPath: "data.attributes.textField",
+            queryType: "in"
+          })
+        ).toMatchSnapshot();
+      });
+    });
+
+    describe("not in operator", () => {
+      test("Normal field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "notIn",
+            value: "test1, test2, test3",
+            fieldInfo: {} as any,
+            fieldPath: "data.attributes.textField",
+            queryType: "in"
           })
         ).toMatchSnapshot();
       });

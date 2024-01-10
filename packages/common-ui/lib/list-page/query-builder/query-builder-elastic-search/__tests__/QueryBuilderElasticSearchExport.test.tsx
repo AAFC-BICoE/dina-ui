@@ -14,7 +14,8 @@ import {
   infixQuery,
   suffixQuery,
   wildcardQuery,
-  inQuery
+  inQuery,
+  inRangeQuery
 } from "../QueryBuilderElasticSearchExport";
 
 const ELASTIC_SEARCH_QUERY: any = {
@@ -296,6 +297,10 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(inQuery("fieldTest", "  test1, test2, test3  ", true, false)).toMatchSnapshot();
       expect(inQuery("fieldTest", " test1 ", true, false)).toMatchSnapshot();
       expect(inQuery("fieldTest", "", true, false)).toMatchSnapshot();
+    });
+
+    test("inRangeQuery", async () => {
+      expect(inRangeQuery("fieldTest", "1998-05-19, 2023-03-02", false)).toMatchSnapshot();
     });
 
     test("existsQuery", async () => {
