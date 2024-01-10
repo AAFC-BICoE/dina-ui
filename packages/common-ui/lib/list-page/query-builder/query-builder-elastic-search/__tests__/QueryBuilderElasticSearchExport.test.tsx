@@ -67,6 +67,12 @@ const columnDefinitions: (TableColumn<KitsuResource> | string)[] = [
     accessorKey: "data.attributes.testColumn5",
     isKeyword: true,
     relationshipType: "relationshipType2"
+  },
+  {
+    label: "testColumn6",
+    accessorKey: "data.attributes.testColumn6",
+    isKeyword: true,
+    relationshipType: "relationshipType2"
   }
 ];
 
@@ -80,6 +86,16 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
   });
 
   describe("applySortingRules", () => {
+    test("Sorting on columns without id", async () => {
+      expect(
+        applySortingRules(
+          ELASTIC_SEARCH_QUERY,
+          [{ id: "testColumn6", desc: true }],
+          columnDefinitions as any
+        )
+      ).toMatchSnapshot();
+    });
+
     test("Basic sorting is correctly applied to the query", async () => {
       // Single Sorting rule, descending.
       expect(
