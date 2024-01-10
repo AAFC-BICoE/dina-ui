@@ -190,6 +190,113 @@ Object {
 }
 `;
 
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 2`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 3`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "test1",
+          "test2",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 4`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 5`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 6`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "test1",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 7`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "",
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions includedTypeQuery 1`] = `
 Object {
   "term": Object {

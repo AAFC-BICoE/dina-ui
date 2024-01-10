@@ -13,7 +13,8 @@ import {
   prefixQuery,
   infixQuery,
   suffixQuery,
-  wildcardQuery
+  wildcardQuery,
+  inQuery
 } from "../QueryBuilderElasticSearchExport";
 
 const ELASTIC_SEARCH_QUERY: any = {
@@ -280,6 +281,21 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(
         wildcardQuery("fieldTest", "valueToMatch", true)
       ).toMatchSnapshot();
+    });
+
+    test("inQuery", async () => {
+      // Test keyword support
+      expect(inQuery("fieldTest", "test1, test2, test3", true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "test1, test2, test3", false, false)).toMatchSnapshot();
+
+      // Not version
+      expect(inQuery("fieldTest", "test1, test2", true, true)).toMatchSnapshot();
+
+      // Comma-separator tests. 
+      expect(inQuery("fieldTest", "test1,test2,test3", true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "  test1, test2, test3  ", true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", " test1 ", true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "", true, false)).toMatchSnapshot();
     });
 
     test("existsQuery", async () => {

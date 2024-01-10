@@ -426,7 +426,8 @@ export function inQuery(
   keywordMultiFieldSupport: boolean,
   not: boolean
 ): any {
-  const matchValuesArray: string[] = matchValues?.split(",") ?? [ matchValues ];
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+      .map(value => value.trim());
 
   return {
     bool: {
