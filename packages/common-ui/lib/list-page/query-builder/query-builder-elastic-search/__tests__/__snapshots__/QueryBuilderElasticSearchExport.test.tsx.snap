@@ -756,6 +756,7 @@ Object {
       "data.attributes.includeThis3",
       "data.attributes.testColumn4",
       "data.attributes.testColumn5",
+      "data.attributes.testColumn6",
       "included.id",
       "included.type",
     ],
