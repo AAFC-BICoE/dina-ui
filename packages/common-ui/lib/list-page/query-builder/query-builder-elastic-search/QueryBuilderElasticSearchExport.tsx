@@ -203,7 +203,11 @@ export function applySortingRules<TData extends KitsuResource>(
 
           // Otherwise, check if sorting is enabled for the column and matches.
           if (column.enableSorting !== false) {
-            return column.id === columnSort.id;
+            if (column.id) {
+              return column.id === columnSort.id;
+            } else {
+              return (column as any).accessorKey.endsWith(columnSort.id);
+            }
           }
           return false;
         });

@@ -683,6 +683,40 @@ Object {
 }
 `;
 
+exports[`QueryBuilderElasticSearchExport functionality applySortingRules Sorting on columns without id 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "sort": Object {
+    "data.attributes.testColumn6.keyword": Object {
+      "nested": Object {
+        "filter": Object {
+          "term": Object {
+            "included.type": "relationshipType2",
+          },
+        },
+        "path": "included",
+      },
+      "order": "desc",
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality applySortingRules Strings as column definitions 1`] = `
 Object {
   "query": Object {
