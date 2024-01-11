@@ -2,15 +2,11 @@ import { useContext, useEffect, useState } from "react";
 import { intlContext } from "./IntlSupport";
 import Button from "react-bootstrap/Button";
 import { useApiClient } from "../api-client/ApiClientContext";
-
-const LANGUAGE_LABELS = {
-  en: "English",
-  fr: "Français"
-};
+import { capitalize } from "lodash";
 
 export function LanguageSelector() {
   const { locale, setLocale } = useContext(intlContext);
-  const [supportedLanguages, setSupportedLanguages] = useState<string>();
+  const [supportedLanguages, setSupportedLanguages] = useState<string>("en");
   const { apiClient } = useApiClient();
 
   useEffect(() => {
@@ -19,7 +15,7 @@ export function LanguageSelector() {
         const response = await apiClient.axios.get(`/instance.json`);
         setSupportedLanguages(response.data["supported-languages-iso"]);
       } catch (error) {
-        setSupportedLanguages(undefined);
+        console.error(error);
       }
     };
     getInstanceMode();
@@ -31,10 +27,11 @@ export function LanguageSelector() {
     return null;
   }
 
+  let supportedLanguagesArray: string[] = supportedLanguages?.split(",") ?? [];
+
   return (
     <div>
-      {supportedLanguages
-        ?.split(",")
+      {supportedLanguagesArray
         .filter((key) => key !== locale)
         .map((key) => {
           function onClick() {
@@ -49,7 +46,7 @@ export function LanguageSelector() {
               key={key}
               className="px-0"
             >
-              {LANGUAGE_LABELS[key]}
+              {capitalize(new Intl.DisplayNames(key, { type: "language" }).of(key))}
             </Button>
           );
         })}
