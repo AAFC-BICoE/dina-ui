@@ -1,4 +1,8 @@
-import { WorkbookJSON } from "../types/Workbook";
+import {
+  ColumnUniqueValues,
+  WorkbookJSON,
+  WorkbookRow
+} from "../types/Workbook";
 import { find, trim } from "lodash";
 import { ValidationError } from "yup";
 
@@ -14,7 +18,7 @@ const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
  * @return An array of the columns from the spreadsheet. Null if no headers could be found.
  */
 export function getColumnHeaders(
-  spreadsheetData: WorkbookJSON,
+  spreadsheetData: WorkbookJSON | undefined,
   sheetNumber: number
 ) {
   const data = spreadsheetData?.[sheetNumber]?.find(
@@ -39,12 +43,30 @@ export function _toPlainString(value: string) {
  */
 export function findMatchField(
   columnHeader: string,
-  fieldOptions: {
-    label: string;
-    value: string;
-  }[]
+  fieldOptions: 
+    {
+        label: string;
+        value?: string;
+        options?: 
+          {
+            label: string;
+            value: string;
+            parentPath: string;
+          }[]
+      }[]
+    
 ) {
-  const option = find(fieldOptions, (item) => {
+  const plainOptions: {label: string; value: string}[] = [];
+  for (const opt of fieldOptions) {
+    if (opt.options) {
+      for (const nestOpt of opt.options) {
+        plainOptions.push({label: nestOpt.label, value: nestOpt.value})
+      }
+    } else {
+      plainOptions.push({label: opt.label, value: opt.value!})
+    }
+  }
+  const option = find(plainOptions, (item) => {
     const pos = columnHeader.lastIndexOf(".");
     if (pos !== -1) {
       const prefix = columnHeader.substring(0, pos + 1);
@@ -61,7 +83,7 @@ export function findMatchField(
       return _toPlainString(item.label) === _toPlainString(columnHeader);
     }
   });
-  return option;
+  return option ? option.value : undefined;
 }
 
 /**
@@ -74,7 +96,7 @@ export function findMatchField(
  * @returns
  */
 export function getDataFromWorkbook(
-  spreadsheetData: WorkbookJSON,
+  spreadsheetData: WorkbookJSON | undefined,
   sheetNumber: number,
   fieldNames: (string | undefined)[],
   getRowNumber?: boolean
@@ -83,20 +105,18 @@ export function getDataFromWorkbook(
   const workbookData = spreadsheetData?.[sheetNumber].filter(
     (rowData) => rowData.content.length !== 0
   );
-  for (let i = 1; i < workbookData.length; i++) {
-    const row = workbookData[i];
+  for (let i = 1; i < (workbookData?.length ?? 0); i++) {
+    const row = workbookData?.[i];
     const rowData: { [key: string]: any } = {};
     for (let index = 0; index < fieldNames.length; index++) {
       const field = fieldNames[index];
       if (field !== undefined) {
-        rowData[field] = row.content[index];
+        rowData[field] = row?.content[index];
       }
     }
-
     if (!!getRowNumber) {
-      rowData.rowNumber = row.rowNumber;
+      rowData.rowNumber = row?.rowNumber;
     }
-
     data.push(rowData);
   }
   return data;
@@ -318,13 +338,15 @@ export function convertDate(value: string) {
     const msDay = 86400000;
     const date = new Date(excelEpoc + (dateNum ?? 0) * msDay);
     return date.toISOString().split("T")[0];
+  } else if (typeof value === "string") {
+    return value;
   } else {
     return null;
   }
 }
 
-function isObject(input: any) {
-  return typeof input === "object" && input !== null;
+export function isObject(value: any) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**
@@ -355,4 +377,40 @@ export function flattenObject(source: any) {
         )
       )
     : source;
+}
+
+export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export function calculateColumnUniqueValuesFromSpreadsheetData(
+  spreadsheetData: WorkbookJSON
+): ColumnUniqueValues {
+  const result: ColumnUniqueValues = {};
+  for (const sheet of Object.keys(spreadsheetData)) {
+    const columnUniqueValues: {
+      [columnName: string]: { [value: string]: number };
+    } = {};
+    const workbookRows: WorkbookRow[] = spreadsheetData[sheet];
+    const columnNames: string[] = workbookRows[0].content;
+    for (let colIndex = 0; colIndex < columnNames.length; colIndex++) {
+      const counts: { [value: string]: number } = {};
+      for (let rowIndex = 1; rowIndex < workbookRows.length; rowIndex++) {
+        const value = workbookRows[rowIndex].content[colIndex];
+        if (value !== undefined) {
+          counts[value] = 1 + (counts[value] || 0);
+        }
+      }
+      columnUniqueValues[columnNames[colIndex]] = counts;
+    }
+    result[sheet] = columnUniqueValues;
+  }
+  return result;
+}
+
+export function getParentFieldPath(fieldPath: string) {
+  if (fieldPath.includes(".")) {
+    const lastIndex = fieldPath.lastIndexOf(".");
+    return fieldPath.substring(0, lastIndex);
+  } else {
+    return undefined;
+  }
 }

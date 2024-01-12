@@ -13,6 +13,7 @@ import { DataExport } from "packages/dina-ui/types/dina-export-api";
 import { Button } from "react-bootstrap";
 import { useState } from "react";
 import { useIntl } from "react-intl";
+import { useRouter } from "next/router";
 
 export default function DataExportListPage() {
   const { username } = useAccount();
@@ -20,6 +21,8 @@ export default function DataExportListPage() {
   const { formatMessage } = useIntl();
   const [loading, setLoading] = useState(false);
   const [timestamp, setTimestamp] = useState(Date.now()); // Initial timestamp
+  const router = useRouter();
+  const entityLink = String(router.query.entityLink);
 
   const handleRefresh = () => {
     // When the button is clicked, update the timestamp to trigger the useEffect.
@@ -57,7 +60,7 @@ export default function DataExportListPage() {
   return (
     <PageLayout
       titleId="dataExports"
-      buttonBarContent={<BackButton entityLink="/collection/material-sample" />}
+      buttonBarContent={<BackButton entityLink={entityLink} />}
     >
       <ListPageLayout
         additionalFilters={{

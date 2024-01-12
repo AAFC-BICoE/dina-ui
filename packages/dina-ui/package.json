@@ -1,6 +1,6 @@
 {
   "name": "dina-ui",
-  "version": "0.141.1",
+  "version": "0.143.0",
   "scripts": {
     "build": "run-s next:build next:export",
     "dev": "next",
@@ -27,7 +27,9 @@
     "react-file-viewer": "^1.2.1",
     "react-switch": "^6.0.0",
     "react-tabs": "^3.2.3",
-    "zod": "^3.11.6"
+    "zod": "^3.11.6",
+    "dexie": "^3.2.4",
+    "dexie-react-hooks": "^1.1.6"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",

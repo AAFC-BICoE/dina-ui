@@ -14,7 +14,7 @@ exports[`View Exif page renders exif props when received file upload response 1`
       </h4>
       <KeyValueTable data={{...}}>
         <ReactTable className=\\"-striped\\" highlightRow={false} columns={{...}} data={{...}} showPagination={false} manualPagination={true}>
-          <div className=\\"ReactTable -striped\\">
+          <div data-testid=\\"ReactTable\\" className=\\"ReactTable -striped\\">
             <table className=\\"w-100\\">
               <thead>
                 <tr>

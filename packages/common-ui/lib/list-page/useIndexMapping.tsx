@@ -126,7 +126,9 @@ export function useIndexMapping({
             label: attributeLabel,
             value: relationship.referencedBy + "." + attributeLabel,
             type: relationshipAttribute.type,
-            subType: relationshipAttribute?.subtype ? relationshipAttribute.subtype : undefined,
+            subType: relationshipAttribute?.subtype
+              ? relationshipAttribute.subtype
+              : undefined,
             path: relationshipAttribute.path,
             parentName: relationship.referencedBy,
             parentType: relationship.value,

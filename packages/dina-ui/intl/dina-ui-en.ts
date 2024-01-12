@@ -893,6 +893,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
   workbookGroupUploadTitle: "Upload Workbook",
   workbookTitle: "Workbooks",
+  workbookPreviewTitle: "Workbook preview",
   workbookUploadFailure:
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
@@ -905,7 +906,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataExports: "Data Exports",
   dataExportError: "A problem occured while trying to export data.",
   field_downloadExport: "Download Export",
+  pause: "Pause",
+  resume: "Resume",
+  leaveSaveWorkbookWarning: "Are you sure you want to leave this page?",
+  confirmToResumeSavingWorkbook: "Do you want to continue saving workbook?",
+  uploadWorkbookIsDone: 'The workbook is saved, click "OK" to finish it',
+  mapRelationship: "Map Relationship",
   field_storageUnit: "Storage Unit",
+  mapColumns: "Map Columns",
   field_transactionNumber: "Transaction Number",
   field_transactionType: "Transaction Type",
   field_materialDirection: "Material Direction",

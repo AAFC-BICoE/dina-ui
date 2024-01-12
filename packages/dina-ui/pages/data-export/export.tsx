@@ -29,6 +29,8 @@ import {
   getGroupedIndexMappings
 } from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
 import { uniqBy } from "lodash";
+import { VisibilityState } from "@tanstack/react-table";
+import { compact } from "lodash";
 
 export default function ExportPage<TData extends KitsuResource>() {
   const router = useRouter();
@@ -38,10 +40,18 @@ export default function ExportPage<TData extends KitsuResource>() {
   const indexName = String(router.query.indexName);
   const entityLink = String(router.query.entityLink);
   const { formatMessage, formatNumber } = useIntl();
+
   const [columns] = useLocalStorage<TableColumn<TData>[]>(
     `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`,
     []
   );
+
+  // Local storage for saving columns visibility
+  const [localStorageColumnStates, setLocalStorageColumnStates] =
+    useLocalStorage<VisibilityState | undefined>(
+      `${uniqueName}_columnSelector`,
+      {}
+    );
   const [dynamicFieldMapping] = useLocalStorage<
     DynamicFieldsMappingConfig | undefined
   >(`${uniqueName}_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`, undefined);
@@ -64,18 +74,16 @@ export default function ExportPage<TData extends KitsuResource>() {
   });
   groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
   useEffect(() => {
-    setLoading(true);
     if (indexMap) {
       getColumnSelectorIndexMapColumns({
         groupedIndexMappings,
         setLoadedIndexMapColumns,
         setColumnSelectorIndexMapColumns,
         apiClient,
-        columnSelectorDefaultColumns: columns
+        columnSelectorDefaultColumns: columns,
+        setLoadingIndexMapColumns: setLoading
       });
     }
-
-    setLoading(false);
   }, [indexMap]);
 
   useEffect(() => {
@@ -83,6 +91,20 @@ export default function ExportPage<TData extends KitsuResource>() {
       [...totalColumns, ...columnSelectorIndexMapColumns],
       "id"
     );
+    const columnVisibility = compact(
+      combinedColumns.map((col) =>
+        col.isColumnVisible === false
+          ? { id: col.id, visibility: false }
+          : undefined
+      )
+    ).reduce<VisibilityState>(
+      (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
+      {}
+    );
+    setLocalStorageColumnStates({
+      ...columnVisibility,
+      ...localStorageColumnStates
+    });
     setTotalColumns(combinedColumns);
   }, [loadedIndexMapColumns]);
 
@@ -120,6 +142,7 @@ export default function ExportPage<TData extends KitsuResource>() {
           hideTable={hideTable}
           uniqueName={uniqueName}
           menuOnly={true}
+          indexName={indexName}
         />
       </DinaForm>
       <Footer />

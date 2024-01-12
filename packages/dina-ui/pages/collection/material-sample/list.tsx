@@ -278,13 +278,10 @@ export default function MaterialSampleListPage() {
     dateCell("createdOn", "data.attributes.createdOn")
   ];
 
-  function rowStyling(row: Row<MaterialSample>) {
-    return {
-      style: {
-        opacity: row?.original?.materialSampleState && 0.4
-      }
+  const rowStyling = (row: Row<any>) =>
+    row?.original?.data?.attributes?.materialSampleState && {
+      opacity: 0.4
     };
-  }
 
   return (
     <div>

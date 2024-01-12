@@ -5,7 +5,6 @@ import {
   PaginationState,
   Row,
   SortingState,
-  Table,
   VisibilityState,
   flexRender,
   getCoreRowModel,
@@ -16,15 +15,15 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import classnames from "classnames";
-import { Fragment, useState, useEffect, useReducer } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import { useIntl } from "react-intl";
+import { ColumnSelector } from "../column-selector/ColumnSelector";
+import { DynamicFieldsMappingConfig } from "../list-page/types";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
-import { ColumnSelector } from "../column-selector/ColumnSelector";
-import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500, 1000];
 
@@ -184,6 +183,12 @@ export function ReactTable<TData>({
     pageIndex: page ?? 0,
     pageSize: initPageSize ?? pageSizeOptions[0]
   });
+  useEffect(() => {
+    setPagination({
+      pageIndex: page ?? 0,
+      pageSize: initPageSize ?? pageSizeOptions[0]
+    });
+  }, [page, initPageSize, pageSizeOptions]);
 
   function onPaginationChangeInternal(updater) {
     const { pageIndex: oldPageIndex, pageSize: oldPageSize } =
@@ -307,6 +312,7 @@ export function ReactTable<TData>({
 
   return !hideTable ? (
     <div
+      data-testid="ReactTable"
       className={classnames(
         "ReactTable",
         className,
