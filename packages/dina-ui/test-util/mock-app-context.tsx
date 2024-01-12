@@ -1,3 +1,4 @@
+import { render } from "@testing-library/react";
 import {
   AccountContextI,
   AccountProvider,
@@ -107,13 +108,28 @@ export function MockAppContextProvider({
 }
 
 /**
- * Helper function to get a test wrapper with the required context providers.
+ * Helper function to get a test wrapper with the required context providers using Enzyme.
+ * @deprecated Please mountWithAppContext2, which use React-testing library.  It is compatiple with React 18.
  */
 export function mountWithAppContext(
   element: React.ReactNode,
   mockAppContextProviderProps?: MockAppContextProviderProps
 ) {
   return mount(
+    <MockAppContextProvider {...mockAppContextProviderProps}>
+      {element}
+    </MockAppContextProvider>
+  );
+}
+
+/**
+ * Helper function to get a test wrapper with the required context providers using React-Testing library.
+ */
+export function mountWithAppContext2(
+  element: React.ReactNode,
+  mockAppContextProviderProps?: MockAppContextProviderProps
+) {
+  return render(
     <MockAppContextProvider {...mockAppContextProviderProps}>
       {element}
     </MockAppContextProvider>
