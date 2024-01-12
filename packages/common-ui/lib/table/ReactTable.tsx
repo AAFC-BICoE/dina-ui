@@ -183,6 +183,12 @@ export function ReactTable<TData>({
     pageIndex: page ?? 0,
     pageSize: initPageSize ?? pageSizeOptions[0]
   });
+  useEffect(() => {
+    setPagination({
+      pageIndex: page ?? 0,
+      pageSize: initPageSize ?? pageSizeOptions[0]
+    });
+  }, [page, initPageSize, pageSizeOptions]);
 
   function onPaginationChangeInternal(updater) {
     const { pageIndex: oldPageIndex, pageSize: oldPageSize } =

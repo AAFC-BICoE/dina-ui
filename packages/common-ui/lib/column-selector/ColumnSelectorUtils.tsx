@@ -78,20 +78,20 @@ export function getAttributesStandardColumns(
   columnSelectorDefaultColumns?: any[]
 ) {
   let column;
-  if (queryOption.type === "date") {
+  if (queryOption?.type === "date") {
     column = dateCell(
-      queryOption.label,
-      queryOption.value,
+      queryOption?.label,
+      queryOption?.value,
       undefined,
       false,
       queryOption
     );
   } else {
     column = {
-      id: queryOption.label,
-      header: () => <FieldHeader name={queryOption.label} />,
-      accessorKey: queryOption.value,
-      isKeyword: queryOption.keywordMultiFieldSupport,
+      id: queryOption?.label,
+      header: () => <FieldHeader name={queryOption?.label} />,
+      accessorKey: queryOption?.value,
+      isKeyword: queryOption?.keywordMultiFieldSupport,
       isColumnVisible: false,
       queryOption
     };
