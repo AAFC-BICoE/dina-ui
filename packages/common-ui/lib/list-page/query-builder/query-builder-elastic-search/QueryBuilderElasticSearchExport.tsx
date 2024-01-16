@@ -423,6 +423,108 @@ export function termQuery(
   };
 }
 
+// Multi-search exact matches (Non-text based) (in/not in)
+export function inQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,  
+  keywordMultiFieldSupport: boolean,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+      .map(value => value.trim());
+
+  return parentType
+  ? {
+      nested: {
+        path: "included",
+        query: {
+          bool: {
+            must: [
+              {
+                bool: {
+                  [not ? "must_not" : "must"]: {
+                    terms: {
+                      [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValuesArray
+                    }        
+                  }
+                }
+              },
+              includedTypeQuery(parentType)
+            ]
+          }
+        }
+      }
+    } : {
+    bool: {
+      [not ? "must_not" : "must"]: {
+        terms: {
+          [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValuesArray
+        }        
+      }
+    }
+  };
+}
+
+// Multi-search exact matches (case-insensitive) (in/not in)
+export function inTextQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,  
+  keywordMultiFieldSupport: boolean,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+      .map(value => value.trim());
+
+  return parentType
+  ? {
+      nested: {
+        path: "included",
+        query: {
+          bool: {
+            must: [
+              {
+                bool: {
+                  [not ? "must_not" : "must"]: {
+                    bool: {
+                      should: matchValuesArray.map(value => ({
+                        term: {
+                          [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
+                            value: value,
+                            case_insensitive: true
+                          }
+                        }
+                      })),
+                      minimum_should_match: 1                      
+                    }
+                  }
+                }
+              },
+              includedTypeQuery(parentType)
+            ]
+          }
+        }
+      }
+    } : {
+      bool: {
+        [not ? "must_not" : "must"]: {
+          bool: {
+            should: matchValuesArray.map(value => ({
+              term: {
+                [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
+                  value: value,
+                  case_insensitive: true
+                }
+              }
+            })),
+            minimum_should_match: 1
+          }
+        }
+      }
+    };
+}
+
 // Query used for wildcard searches (contains).
 export function wildcardQuery(
   fieldName: string,
@@ -455,6 +557,57 @@ export function rangeQuery(fieldName: string, rangeOptions: any): any {
       [fieldName]: rangeOptions
     }
   };
+}
+
+// Query for generating ranges to search multiple different values.
+// Range is used to ignore the time so it can just search for that specific days.
+export function inRangeQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (
+    matchValues?.split(",") ?? [matchValues]
+  ).map((value) => value.trim());
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    [not ? "should_not" : "should"]: matchValuesArray.map((date) => ({
+                      range: {
+                        [fieldName]: {
+                          gte: date,
+                          lte: date
+                        }
+                      }
+                    }))
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        bool: {
+          [not ? "should_not" : "should"]: matchValuesArray.map((date) => ({
+            range: {
+              [fieldName]: {
+                gte: date,
+                lte: date
+              }
+            }
+          }))
+        }
+      };
 }
 
 // Query used for prefix partial matches

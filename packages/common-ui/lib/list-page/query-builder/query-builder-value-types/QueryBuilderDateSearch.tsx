@@ -8,6 +8,7 @@ import {
 import { TransformToDSLProps } from "../../types";
 import { DATE_REGEX_PARTIAL } from "common-ui/lib";
 import moment from "moment";
+import { useIntl } from "react-intl";
 
 interface QueryBuilderDateSearchProps {
   /**
@@ -31,9 +32,11 @@ export default function QueryBuilderDateSearch({
   value,
   setValue
 }: QueryBuilderDateSearchProps) {
+  const { formatMessage } = useIntl();
+
   return (
     <>
-      {matchType !== "empty" && matchType !== "notEmpty" && (
+      {matchType !== "empty" && matchType !== "notEmpty" && matchType !== "in" && matchType !== "notIn" && (
         <DatePicker
           className="form-control"
           value={value}
@@ -368,7 +371,7 @@ function buildDateRangeObject(matchType, value, subType) {
 /**
  * Validate the date string to ensure it's something elastic search can accept.
  *
- * Partial dates are supported here.
+ * Partial dates and multiple dates are supported here.
  * @param value date value
  * @param formatMessage error message translation locale
  * @return null if valid, string error if not valid.
@@ -377,5 +380,6 @@ export function validateDate(value, formatMessage): string | null {
   if (DATE_REGEX_PARTIAL.test(value)) {
     return null;
   }
+
   return formatMessage({ id: "dateMustBeFormattedPartial" });
 }

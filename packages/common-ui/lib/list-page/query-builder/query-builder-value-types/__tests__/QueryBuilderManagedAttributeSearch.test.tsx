@@ -2,7 +2,7 @@ import { transformManagedAttributeToDSL } from "../QueryBuilderManagedAttributeS
 
 interface TestValueStructure {
   type: string;
-  testValue: string;
+  testValue: (operator: string) => string;
   operators: string[];
   subTypes: (string | undefined)[];
   useKeywordMultiField: boolean;
@@ -20,10 +20,20 @@ describe("QueryBuilderManagedAttributeSearch", () => {
     const testValues: TestValueStructure[] = [
       {
         type: "STRING",
-        testValue: "stringValue",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "stringValue1, stringValue2,stringValue3"
+            default:
+              return "stringValue"
+          }
+        },
         operators: [
           "exactMatch",
           "wildcard",
+          "in",
+          "notIn",
           "startsWith",
           "notEquals",
           "empty",
@@ -34,7 +44,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
       },
       {
         type: "DATE",
-        testValue: "1998-05-19",
+        testValue: () => "1998-05-19",
         operators: [
           "equals",
           "notEquals",
@@ -57,10 +67,20 @@ describe("QueryBuilderManagedAttributeSearch", () => {
       },
       {
         type: "INTEGER",
-        testValue: "42",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "1, 2,4"
+            default:
+              return "42"
+          }
+        },
         operators: [
           "equals",
           "notEquals",
+          "in",
+          "notIn",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -73,10 +93,20 @@ describe("QueryBuilderManagedAttributeSearch", () => {
       },
       {
         type: "DECIMAL",
-        testValue: "3.5",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "3, 3.1,12.5"
+            default:
+              return "3.5"
+          }
+        },
         operators: [
           "equals",
           "notEquals",
+          "in",
+          "notIn",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -89,14 +119,22 @@ describe("QueryBuilderManagedAttributeSearch", () => {
       },
       {
         type: "PICK_LIST",
-        testValue: "3.5",
-        operators: ["equals", "notEquals", "empty", "notEmpty"],
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "option1, option2,option3"
+            default:
+              return "option1"
+          }
+        },
+        operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"],
         subTypes: [undefined],
         useKeywordMultiField: true
       },
       {
         type: "BOOL",
-        testValue: "true",
+        testValue: () => "true",
         operators: ["equals", "empty", "notEmpty"],
         subTypes: [undefined],
         useKeywordMultiField: true
@@ -118,7 +156,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                     operation: "", // Not used.
                     queryType: "", // Not used.
                     value: `{"searchValue":"${
-                      (testValue as TestValueStructure).testValue
+                      (testValue as TestValueStructure).testValue(operator)
                     }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
                       (testValue as TestValueStructure).type
                     }"}`,
@@ -162,7 +200,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                     operation: "", // Not used.
                     queryType: "", // Not used.
                     value: `{"searchValue":"${
-                      (testValue as TestValueStructure).testValue
+                      (testValue as TestValueStructure).testValue(operator)
                     }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
                       (testValue as TestValueStructure).type
                     }"}`,

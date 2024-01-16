@@ -38,6 +38,40 @@ describe("QueryBuilderNumberSearch", () => {
         "Expect number field not to be displayed since the match type is not equals"
       );
     });
+
+    it("Display different placeholder for in/not in operators", async () => {
+      // This test will just ensure the layout does not change unexpectedly.
+      // Any changes to the layout, the snapshots will need to be updated.
+      const numberSearchIn = mountWithAppContext(
+        <QueryBuilderNumberSearch
+          matchType="in"
+          value="test"
+          setValue={jest.fn}
+        />
+      );
+
+      // Expect a snapshot with specific placeholder.
+      expect(
+        numberSearchIn.find(QueryBuilderNumberSearch).debug()
+      ).toMatchSnapshot(
+        "Placeholder expected to be different for in operator."
+      );
+
+      const numberSearchNotIn = mountWithAppContext(
+        <QueryBuilderNumberSearch
+          matchType="notIn"
+          value="test"
+          setValue={jest.fn}
+        />
+      );
+
+      // Expect a snapshot with specific placeholder.
+      expect(
+        numberSearchNotIn.find(QueryBuilderNumberSearch).debug()
+      ).toMatchSnapshot(
+        "Placeholder expected to be different for not in operator."
+      );
+    });
   });
 
   describe("transformNumberSearchToDSL function", () => {
@@ -186,35 +220,6 @@ describe("QueryBuilderNumberSearch", () => {
       });
     });
 
-    describe("Equals operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformNumberSearchToDSL({
-            operation: "equals",
-            value: "123",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "equals"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformNumberSearchToDSL({
-            operation: "equals",
-            value: "123",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.numberField",
-            queryType: "equals"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
     describe("Exact Match operation", () => {
       test("With relationship as field", async () => {
         expect(
@@ -273,6 +278,34 @@ describe("QueryBuilderNumberSearch", () => {
       });
     });
 
+    describe("In operation", () => {
+      test("Normal field", async () => {
+        expect(
+          transformNumberSearchToDSL({
+            operation: "in",
+            value: "1, 2, 3.5,6",
+            fieldInfo: {} as any,
+            fieldPath: "data.attributes.numberField",
+            queryType: "in"
+          })
+        ).toMatchSnapshot();
+      });
+    });
+
+    describe("Not in operation", () => {
+      test("Normal field", async () => {
+        expect(
+          transformNumberSearchToDSL({
+            operation: "notIn",
+            value: "1, 2, 3.5,6",
+            fieldInfo: {} as any,
+            fieldPath: "data.attributes.numberField",
+            queryType: "notIn"
+          })
+        ).toMatchSnapshot();
+      });
+    });
+
     describe("Empty operation", () => {
       test("With relationship as field", async () => {
         expect(
@@ -326,35 +359,6 @@ describe("QueryBuilderNumberSearch", () => {
             fieldInfo: {} as any,
             fieldPath: "data.attributes.numberField",
             queryType: "notEmpty"
-          })
-        ).toMatchSnapshot();
-      });
-    });
-
-    describe("Equals operation", () => {
-      test("With relationship as field", async () => {
-        expect(
-          transformNumberSearchToDSL({
-            operation: "equals",
-            value: "false",
-            fieldInfo: {
-              parentType: "collection",
-              parentName: "collection"
-            } as any,
-            fieldPath: "includes.name",
-            queryType: "equals"
-          })
-        ).toMatchSnapshot();
-      });
-
-      test("Normal field", async () => {
-        expect(
-          transformNumberSearchToDSL({
-            operation: "equals",
-            value: "true",
-            fieldInfo: {} as any,
-            fieldPath: "data.attributes.numberField",
-            queryType: "equals"
           })
         ).toMatchSnapshot();
       });

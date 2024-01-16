@@ -8,7 +8,8 @@ import {
   prefixQuery,
   suffixQuery,
   infixQuery,
-  wildcardQuery
+  wildcardQuery,
+  inTextQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 interface QueryRowTextSearchProps {
@@ -44,9 +45,9 @@ export default function QueryRowTextSearch({
           value={value ?? ""}
           onChange={(newValue) => setValue?.(newValue?.target?.value)}
           className="form-control"
-          placeholder={formatMessage({
+          placeholder={matchType !== "in" && matchType !== "notIn" ? formatMessage({
             id: "queryBuilder_value_text_placeholder"
-          })}
+          }) : formatMessage({ id: "queryBuilder_value_in_placeholder" })}
         />
       )}
     </>
@@ -67,7 +68,6 @@ export function transformTextSearchToDSL({
   }
 
   const {
-    distinctTerm,
     parentType,
     parentName,
     optimizedPrefix,
@@ -92,6 +92,11 @@ export function transformTextSearchToDSL({
             }
           }
         : wildcardQuery(fieldPath, value, keywordMultiFieldSupport);
+
+    // Comma-separated search (in/not in)
+    case "in":
+    case "notIn":
+      return inTextQuery(fieldPath, value, parentType, keywordMultiFieldSupport, operation === "notIn");
 
     // Prefix partial match
     case "startsWith":

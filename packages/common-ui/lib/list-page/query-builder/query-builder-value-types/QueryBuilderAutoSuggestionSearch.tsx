@@ -166,6 +166,15 @@ function QueryBuilderAutoSuggestionTextSearch({
           </div>
         </>
       )}
+      {(matchType === "in" || matchType === "notIn") && (
+        <input
+          type="text"
+          value={value ?? ""}
+          onChange={(newValue) => setValue?.(newValue?.target?.value)}
+          className="form-control"
+          placeholder={formatMessage({ id: "queryBuilder_value_in_placeholder" })}
+        />
+      )}
     </>
   );
 }
