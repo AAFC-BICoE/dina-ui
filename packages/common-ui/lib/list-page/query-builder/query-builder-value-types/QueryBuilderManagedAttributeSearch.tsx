@@ -204,18 +204,19 @@ export default function QueryRowManagedAttributeSearch({
           <Select
             options={pickListOptions}
             className={`col ps-0`}
-            value={pickListOptions?.find(
-              (pickOption) =>
-                pickOption.value === managedAttributeState.searchValue
-            )}
+            value={
+              (managedAttributeState.searchValue?.split(',') ?? []).map((value) => {
+                return pickListOptions.find((pickOption) => pickOption.value === value);
+              })
+            }
             placeholder={formatMessage({
-              id: "queryBuilder_pickList_placeholder"
+              id: "queryBuilder_pickList_multiple_placeholder"
             })}
             isMulti={true}
             onChange={(pickListOption) =>
               setManagedAttributeState({
                 ...managedAttributeState,
-                searchValue: (pickListOption.flat() ?? []).map(item => item.value).join(',')
+                searchValue: (pickListOption.flat() ?? []).map(item => item?.value ?? "").join(',')
               })
             }
           />

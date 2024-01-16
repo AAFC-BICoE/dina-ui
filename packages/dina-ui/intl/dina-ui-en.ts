@@ -704,6 +704,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_operator_wildcard: "Contains",
   queryBuilder_operator_startsWith: "Starts with",
   queryBuilder_pickList_placeholder: "Select an accepted value...",
+  queryBuilder_pickList_multiple_placeholder: "Select accepted values...",
   queryBuilder_savedSearches: "Saved searches",
   queryBuilder_value_false: "False",
   queryBuilder_value_number_placeholder: "Enter number search value...",
