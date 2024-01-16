@@ -423,7 +423,7 @@ export function termQuery(
   };
 }
 
-// Multi-search exact matches (in/not in)
+// Multi-search exact matches (Non-text based) (in/not in)
 export function inQuery(
   fieldName: string,
   matchValues: string,
@@ -464,6 +464,65 @@ export function inQuery(
       }
     }
   };
+}
+
+// Multi-search exact matches (case-insensitive) (in/not in)
+export function inTextQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,  
+  keywordMultiFieldSupport: boolean,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+      .map(value => value.trim());
+
+  return parentType
+  ? {
+      nested: {
+        path: "included",
+        query: {
+          bool: {
+            must: [
+              {
+                bool: {
+                  [not ? "must_not" : "must"]: {
+                    bool: {
+                      should: matchValuesArray.map(value => ({
+                        term: {
+                          [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
+                            value: value,
+                            case_insensitive: true
+                          }
+                        }
+                      })),
+                      minimum_should_match: 1                      
+                    }
+                  }
+                }
+              },
+              includedTypeQuery(parentType)
+            ]
+          }
+        }
+      }
+    } : {
+      bool: {
+        [not ? "must_not" : "must"]: {
+          bool: {
+            should: matchValuesArray.map(value => ({
+              term: {
+                [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
+                  value: value,
+                  case_insensitive: true
+                }
+              }
+            })),
+            minimum_should_match: 1
+          }
+        }
+      }
+    };
 }
 
 // Query used for wildcard searches (contains).

@@ -198,7 +198,7 @@ Object {
         "fieldTest.keyword": Array [
           "test1",
           "test2",
-          "test3",
+          "TEST3",
         ],
       },
     },
@@ -214,7 +214,7 @@ Object {
         "fieldTest": Array [
           "test1",
           "test2",
-          "test3",
+          "TEST3",
         ],
       },
     },
@@ -275,7 +275,7 @@ Object {
     "must": Object {
       "terms": Object {
         "fieldTest.keyword": Array [
-          "test1",
+          "TEST1",
         ],
       },
     },
@@ -318,6 +318,232 @@ Object {
         },
       },
     ],
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "TEST3",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 2`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest": Object {
+                "case_insensitive": true,
+                "value": "TEST3",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 3`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 4`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test3",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 5`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test3",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 6`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "TEST1",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 7`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "",
+              },
+            },
+          },
+        ],
+      },
+    },
   },
 }
 `;

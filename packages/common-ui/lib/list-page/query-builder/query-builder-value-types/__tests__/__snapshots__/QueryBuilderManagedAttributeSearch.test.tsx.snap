@@ -467,171 +467,6 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the in operator, date_time subtype 1`] = `
-Object {
-  "bool": Object {
-    "should": Array [
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "1998-05-19",
-            "lte": "1998-05-19",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2023-12-25",
-            "lte": "2023-12-25",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2019-07-09",
-            "lte": "2019-07-09",
-          },
-        },
-      },
-    ],
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the in operator, date_time_optional_tz subtype 1`] = `
-Object {
-  "bool": Object {
-    "should": Array [
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "1998-05-19",
-            "lte": "1998-05-19",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2023-12-25",
-            "lte": "2023-12-25",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2019-07-09",
-            "lte": "2019-07-09",
-          },
-        },
-      },
-    ],
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the in operator, local_date subtype 1`] = `
-Object {
-  "bool": Object {
-    "should": Array [
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "1998-05-19",
-            "lte": "1998-05-19",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2023-12-25",
-            "lte": "2023-12-25",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2019-07-09",
-            "lte": "2019-07-09",
-          },
-        },
-      },
-    ],
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the in operator, local_date_time subtype 1`] = `
-Object {
-  "bool": Object {
-    "should": Array [
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "1998-05-19",
-            "lte": "1998-05-19",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2023-12-25",
-            "lte": "2023-12-25",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2019-07-09",
-            "lte": "2019-07-09",
-          },
-        },
-      },
-    ],
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the in operator, undefined subtype 1`] = `
-Object {
-  "bool": Object {
-    "should": Array [
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "1998-05-19",
-            "lte": "1998-05-19",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2023-12-25",
-            "lte": "2023-12-25",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2019-07-09",
-            "lte": "2019-07-09",
-          },
-        },
-      },
-    ],
-  },
-}
-`;
-
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the lessThan operator, date_time subtype 1`] = `
 Object {
   "range": Object {
@@ -928,171 +763,6 @@ Object {
             "exists": Object {
               "field": "data.attributes.managedAttributes.attributeName",
             },
-          },
-        },
-      },
-    ],
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notIn operator, date_time subtype 1`] = `
-Object {
-  "bool": Object {
-    "should_not": Array [
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "1998-05-19",
-            "lte": "1998-05-19",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2023-12-25",
-            "lte": "2023-12-25",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2019-07-09",
-            "lte": "2019-07-09",
-          },
-        },
-      },
-    ],
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notIn operator, date_time_optional_tz subtype 1`] = `
-Object {
-  "bool": Object {
-    "should_not": Array [
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "1998-05-19",
-            "lte": "1998-05-19",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2023-12-25",
-            "lte": "2023-12-25",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2019-07-09",
-            "lte": "2019-07-09",
-          },
-        },
-      },
-    ],
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notIn operator, local_date subtype 1`] = `
-Object {
-  "bool": Object {
-    "should_not": Array [
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "1998-05-19",
-            "lte": "1998-05-19",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2023-12-25",
-            "lte": "2023-12-25",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2019-07-09",
-            "lte": "2019-07-09",
-          },
-        },
-      },
-    ],
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notIn operator, local_date_time subtype 1`] = `
-Object {
-  "bool": Object {
-    "should_not": Array [
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "1998-05-19",
-            "lte": "1998-05-19",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2023-12-25",
-            "lte": "2023-12-25",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2019-07-09",
-            "lte": "2019-07-09",
-          },
-        },
-      },
-    ],
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Attribute level tests Using the notIn operator, undefined subtype 1`] = `
-Object {
-  "bool": Object {
-    "should_not": Array [
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "1998-05-19",
-            "lte": "1998-05-19",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2023-12-25",
-            "lte": "2023-12-25",
-          },
-        },
-      },
-      Object {
-        "range": Object {
-          "data.attributes.managedAttributes.attributeName": Object {
-            "gte": "2019-07-09",
-            "lte": "2019-07-09",
           },
         },
       },
@@ -1868,251 +1538,6 @@ Object {
 }
 `;
 
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the in operator, date_time subtype 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "bool": Object {
-              "should": Array [
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "1998-05-19",
-                      "lte": "1998-05-19",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2023-12-25",
-                      "lte": "2023-12-25",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2019-07-09",
-                      "lte": "2019-07-09",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the in operator, date_time_optional_tz subtype 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "bool": Object {
-              "should": Array [
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "1998-05-19",
-                      "lte": "1998-05-19",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2023-12-25",
-                      "lte": "2023-12-25",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2019-07-09",
-                      "lte": "2019-07-09",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the in operator, local_date subtype 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "bool": Object {
-              "should": Array [
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "1998-05-19",
-                      "lte": "1998-05-19",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2023-12-25",
-                      "lte": "2023-12-25",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2019-07-09",
-                      "lte": "2019-07-09",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the in operator, local_date_time subtype 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "bool": Object {
-              "should": Array [
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "1998-05-19",
-                      "lte": "1998-05-19",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2023-12-25",
-                      "lte": "2023-12-25",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2019-07-09",
-                      "lte": "2019-07-09",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the in operator, undefined subtype 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "bool": Object {
-              "should": Array [
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "1998-05-19",
-                      "lte": "1998-05-19",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2023-12-25",
-                      "lte": "2023-12-25",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2019-07-09",
-                      "lte": "2019-07-09",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the lessThan operator, date_time subtype 1`] = `
 Object {
   "nested": Object {
@@ -2798,251 +2223,6 @@ Object {
         },
       },
     ],
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notIn operator, date_time subtype 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "bool": Object {
-              "should_not": Array [
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "1998-05-19",
-                      "lte": "1998-05-19",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2023-12-25",
-                      "lte": "2023-12-25",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2019-07-09",
-                      "lte": "2019-07-09",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notIn operator, date_time_optional_tz subtype 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "bool": Object {
-              "should_not": Array [
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "1998-05-19",
-                      "lte": "1998-05-19",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2023-12-25",
-                      "lte": "2023-12-25",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2019-07-09",
-                      "lte": "2019-07-09",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notIn operator, local_date subtype 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "bool": Object {
-              "should_not": Array [
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "1998-05-19",
-                      "lte": "1998-05-19",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2023-12-25",
-                      "lte": "2023-12-25",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2019-07-09",
-                      "lte": "2019-07-09",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notIn operator, local_date_time subtype 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "bool": Object {
-              "should_not": Array [
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "1998-05-19",
-                      "lte": "1998-05-19",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2023-12-25",
-                      "lte": "2023-12-25",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2019-07-09",
-                      "lte": "2019-07-09",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function DATE based managed attribute tests Relationship level tests Using the notIn operator, undefined subtype 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "bool": Object {
-              "should_not": Array [
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "1998-05-19",
-                      "lte": "1998-05-19",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2023-12-25",
-                      "lte": "2023-12-25",
-                    },
-                  },
-                },
-                Object {
-                  "range": Object {
-                    "included.attributes.managedAttributes.attributeName": Object {
-                      "gte": "2019-07-09",
-                      "lte": "2019-07-09",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
   },
 }
 `;
@@ -3970,11 +3150,33 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 Object {
   "bool": Object {
     "must": Object {
-      "terms": Object {
-        "data.attributes.managedAttributes.attributeName.keyword": Array [
-          "option1",
-          "option2",
-          "option3",
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "option1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "option2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "option3",
+              },
+            },
+          },
         ],
       },
     },
@@ -4030,11 +3232,33 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 Object {
   "bool": Object {
     "must_not": Object {
-      "terms": Object {
-        "data.attributes.managedAttributes.attributeName.keyword": Array [
-          "option1",
-          "option2",
-          "option3",
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "option1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "option2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "option3",
+              },
+            },
+          },
         ],
       },
     },
@@ -4146,11 +3370,33 @@ Object {
           Object {
             "bool": Object {
               "must": Object {
-                "terms": Object {
-                  "included.attributes.managedAttributes.attributeName.keyword": Array [
-                    "option1",
-                    "option2",
-                    "option3",
+                "bool": Object {
+                  "minimum_should_match": 1,
+                  "should": Array [
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "option1",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "option2",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "option3",
+                        },
+                      },
+                    },
                   ],
                 },
               },
@@ -4263,11 +3509,33 @@ Object {
           Object {
             "bool": Object {
               "must_not": Object {
-                "terms": Object {
-                  "included.attributes.managedAttributes.attributeName.keyword": Array [
-                    "option1",
-                    "option2",
-                    "option3",
+                "bool": Object {
+                  "minimum_should_match": 1,
+                  "should": Array [
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "option1",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "option2",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "option3",
+                        },
+                      },
+                    },
                   ],
                 },
               },
@@ -4324,11 +3592,33 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 Object {
   "bool": Object {
     "must": Object {
-      "terms": Object {
-        "data.attributes.managedAttributes.attributeName.keyword": Array [
-          "stringValue1",
-          "stringValue2",
-          "stringValue3",
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "stringValue1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "stringValue2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "stringValue3",
+              },
+            },
+          },
         ],
       },
     },
@@ -4384,11 +3674,33 @@ exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL funct
 Object {
   "bool": Object {
     "must_not": Object {
-      "terms": Object {
-        "data.attributes.managedAttributes.attributeName.keyword": Array [
-          "stringValue1",
-          "stringValue2",
-          "stringValue3",
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "stringValue1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "stringValue2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.managedAttributes.attributeName.keyword": Object {
+                "case_insensitive": true,
+                "value": "stringValue3",
+              },
+            },
+          },
         ],
       },
     },
@@ -4522,11 +3834,33 @@ Object {
           Object {
             "bool": Object {
               "must": Object {
-                "terms": Object {
-                  "included.attributes.managedAttributes.attributeName.keyword": Array [
-                    "stringValue1",
-                    "stringValue2",
-                    "stringValue3",
+                "bool": Object {
+                  "minimum_should_match": 1,
+                  "should": Array [
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "stringValue1",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "stringValue2",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "stringValue3",
+                        },
+                      },
+                    },
                   ],
                 },
               },
@@ -4639,11 +3973,33 @@ Object {
           Object {
             "bool": Object {
               "must_not": Object {
-                "terms": Object {
-                  "included.attributes.managedAttributes.attributeName.keyword": Array [
-                    "stringValue1",
-                    "stringValue2",
-                    "stringValue3",
+                "bool": Object {
+                  "minimum_should_match": 1,
+                  "should": Array [
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "stringValue1",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "stringValue2",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.managedAttributes.attributeName.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "stringValue3",
+                        },
+                      },
+                    },
                   ],
                 },
               },

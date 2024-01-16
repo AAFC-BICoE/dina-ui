@@ -15,6 +15,7 @@ import {
   suffixQuery,
   wildcardQuery,
   inQuery,
+  inTextQuery,
   inRangeQuery
 } from "../QueryBuilderElasticSearchExport";
 
@@ -302,8 +303,8 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
 
     test("inQuery", async () => {
       // Test keyword support
-      expect(inQuery("fieldTest", "test1, test2, test3", undefined, true, false)).toMatchSnapshot();
-      expect(inQuery("fieldTest", "test1, test2, test3", undefined, false, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "test1, test2, TEST3", undefined, true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "test1, test2, TEST3", undefined, false, false)).toMatchSnapshot();
 
       // Not version
       expect(inQuery("fieldTest", "test1, test2", undefined, true, true)).toMatchSnapshot();
@@ -311,8 +312,23 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       // Comma-separator tests. 
       expect(inQuery("fieldTest", "test1,test2,test3", undefined, true, false)).toMatchSnapshot();
       expect(inQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)).toMatchSnapshot();
-      expect(inQuery("fieldTest", " test1 ", undefined, true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", " TEST1 ", undefined, true, false)).toMatchSnapshot();
       expect(inQuery("fieldTest", "", undefined, true, false)).toMatchSnapshot();
+    });
+
+    test("inTextQuery", async () => {
+      // Test keyword support
+      expect(inTextQuery("fieldTest", "test1, test2, TEST3", undefined, true, false)).toMatchSnapshot();
+      expect(inTextQuery("fieldTest", "test1, test2, TEST3", undefined, false, false)).toMatchSnapshot();
+
+      // Not version
+      expect(inTextQuery("fieldTest", "test1, test2", undefined, true, true)).toMatchSnapshot();
+
+      // Comma-separator tests. 
+      expect(inTextQuery("fieldTest", "test1,test2,test3", undefined, true, false)).toMatchSnapshot();
+      expect(inTextQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)).toMatchSnapshot();
+      expect(inTextQuery("fieldTest", " TEST1 ", undefined, true, false)).toMatchSnapshot();
+      expect(inTextQuery("fieldTest", "", undefined, true, false)).toMatchSnapshot();
     });
 
     test("inRangeQuery", async () => {

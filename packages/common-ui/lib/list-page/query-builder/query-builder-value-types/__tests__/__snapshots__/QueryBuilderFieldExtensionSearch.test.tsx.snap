@@ -39,11 +39,33 @@ exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL functio
 Object {
   "bool": Object {
     "must": Object {
-      "terms": Object {
-        "data.attributes.extensionValues.extension.field.keyword": Array [
-          "test1",
-          "test2",
-          "test3",
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test3",
+              },
+            },
+          },
         ],
       },
     },
@@ -99,11 +121,33 @@ exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL functio
 Object {
   "bool": Object {
     "must_not": Object {
-      "terms": Object {
-        "data.attributes.extensionValues.extension.field.keyword": Array [
-          "test1",
-          "test2",
-          "test3",
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test3",
+              },
+            },
+          },
         ],
       },
     },
@@ -237,11 +281,33 @@ Object {
           Object {
             "bool": Object {
               "must": Object {
-                "terms": Object {
-                  "included.attributes.extensionValues.extension.field.keyword": Array [
-                    "test1",
-                    "test2",
-                    "test3",
+                "bool": Object {
+                  "minimum_should_match": 1,
+                  "should": Array [
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test1",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test2",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test3",
+                        },
+                      },
+                    },
                   ],
                 },
               },
@@ -354,11 +420,33 @@ Object {
           Object {
             "bool": Object {
               "must_not": Object {
-                "terms": Object {
-                  "included.attributes.extensionValues.extension.field.keyword": Array [
-                    "test1",
-                    "test2",
-                    "test3",
+                "bool": Object {
+                  "minimum_should_match": 1,
+                  "should": Array [
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test1",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test2",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test3",
+                        },
+                      },
+                    },
                   ],
                 },
               },

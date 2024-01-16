@@ -3,11 +3,10 @@ import DatePicker from "react-datepicker";
 import {
   includedTypeQuery,
   rangeQuery,
-  existsQuery,
-  inRangeQuery
+  existsQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
-import { DATE_REGEX_PARTIAL, DATE_REGEX_MULTIPLE } from "common-ui/lib";
+import { DATE_REGEX_PARTIAL } from "common-ui/lib";
 import moment from "moment";
 import { useIntl } from "react-intl";
 
@@ -72,15 +71,6 @@ export default function QueryBuilderDateSearch({
           todayButton="Today"
         />
       )}
-      {(matchType === "in" || matchType === "notIn") && (
-        <input
-          type="text"
-          value={value ?? ""}
-          onChange={(newValue) => setValue?.(newValue?.target?.value)}
-          className="form-control"
-          placeholder={formatMessage({ id: "queryBuilder_value_in_placeholder" })}
-        />
-      )}
     </>
   );
 }
@@ -128,11 +118,6 @@ export function transformDateSearchToDSL({
             fieldPath,
             buildDateRangeObject(operation, value, subType)
           );
-
-    // Comma-separated date search.
-    case "in":
-    case "notIn":
-      return inRangeQuery(fieldPath, value, parentType, operation === "notIn");
 
     // Not equals match type.
     case "notEquals":

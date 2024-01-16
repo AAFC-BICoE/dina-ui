@@ -22,7 +22,6 @@ export interface DateFieldProps extends FieldWrapperProps {
 
 export const DATE_REGEX_NO_TIME = /^\d{4}-\d{2}-\d{2}$/;
 export const DATE_REGEX_PARTIAL = /^\d{4}(-\d{2}){0,2}$/;
-export const DATE_REGEX_MULTIPLE = /^\s*\d{4}-\d{2}-\d{2}\s*(,\s*\d{4}-\d{2}-\d{2}\s*)*$/;
 
 /** Formik-connected date input. */
 export function DateField(props: DateFieldProps) {

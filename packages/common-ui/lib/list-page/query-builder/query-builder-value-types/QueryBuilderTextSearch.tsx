@@ -9,7 +9,7 @@ import {
   suffixQuery,
   infixQuery,
   wildcardQuery,
-  inQuery
+  inTextQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 interface QueryRowTextSearchProps {
@@ -96,7 +96,7 @@ export function transformTextSearchToDSL({
     // Comma-separated search (in/not in)
     case "in":
     case "notIn":
-      return inQuery(fieldPath, value, parentType, keywordMultiFieldSupport, operation === "notIn");
+      return inTextQuery(fieldPath, value, parentType, keywordMultiFieldSupport, operation === "notIn");
 
     // Prefix partial match
     case "startsWith":
