@@ -3,7 +3,8 @@ import {
   includedTypeQuery,
   rangeQuery,
   termQuery,
-  existsQuery
+  existsQuery,
+  inQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
@@ -32,17 +33,19 @@ export default function QueryBuilderNumberSearch({
 }: QueryBuilderNumberSearchProps) {
   const { formatMessage } = useIntl();
 
+  const rangeSupport: boolean = matchType === "in" || matchType === "notIn";
+
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {matchType !== "empty" && matchType !== "notEmpty" && (
         <input
-          type="number"
+          type={rangeSupport ? "text" : "number"}
           value={value ?? ""}
           onChange={(newValue) => setValue?.(newValue?.target?.value)}
           className="form-control"
           placeholder={formatMessage({
-            id: "queryBuilder_value_number_placeholder"
+            id: rangeSupport ? "queryBuilder_value_in_placeholder" : "queryBuilder_value_number_placeholder"
           })}
         />
       )}
@@ -89,6 +92,11 @@ export function transformNumberSearchToDSL({
             }
           }
         : rangeQuery(fieldPath, buildNumberRangeObject(operation, value));
+
+    // List of numbers, comma-separated.
+    case "in":
+    case "notIn":
+      return inQuery(fieldPath, value, false, operation === "notIn");
 
     // Not equals match type.
     case "notEquals":

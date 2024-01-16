@@ -389,25 +389,13 @@ function buildDateRangeObject(matchType, value, subType) {
  *
  * Partial dates and multiple dates are supported here.
  * @param value date value
- * @param operator operator being used for the search.
  * @param formatMessage error message translation locale
  * @return null if valid, string error if not valid.
  */
-export function validateDate(value, operator, formatMessage): string | null {
-  switch (operator) {
-    // Regex for multiple dates (YYYY-MM-DD, YYYY-MM-DD...)
-    case "in":
-    case "notIn":
-      if (DATE_REGEX_MULTIPLE.test(value)) {
-        return null;
-      }
-      return formatMessage({ id: "dateMustBeFormattedMultiple" });
-    
-    // Regex for partial dates (YYYY or YYYY-MM or YYYY-MM-DD)
-    default:
-      if (DATE_REGEX_PARTIAL.test(value)) {
-        return null;
-      }
-      return formatMessage({ id: "dateMustBeFormattedPartial" });
+export function validateDate(value, formatMessage): string | null {
+  if (DATE_REGEX_PARTIAL.test(value)) {
+    return null;
   }
+
+  return formatMessage({ id: "dateMustBeFormattedPartial" });
 }

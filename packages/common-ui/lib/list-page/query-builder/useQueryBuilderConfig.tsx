@@ -117,15 +117,13 @@ function getQueryBuilderTypeFromIndexType(
  *
  * @param value string value to validate against.
  * @param type the type of the field, to determine how to validate the value.
- * @param operator the operator being performed on the search, changes the regex to be performed.
  * @param formatMessage internationalization support.
  * @returns null if no validation errors or string with the error message.
  */
-function validateField(value: string, type: string, operator: any, formatMessage: any) {
+function validateField(value: string, type: string, formatMessage: any) {
   switch (type) {
     case "date":
-      // TODO - Operator needs to be passed here somehow.
-      return validateDate(value, "contains", formatMessage);
+      return validateDate(value, formatMessage);
     default:
       return true;
   }
@@ -699,7 +697,7 @@ export function generateBuilderConfig(
         fieldSettings: {
           mapping: indexItem,
           validateValue: (value, fieldSettings) =>
-            validateField(value, type, fieldSettings, formatMessage)
+            validateField(value, type, formatMessage)
         }
       };
       return field;
