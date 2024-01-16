@@ -104,6 +104,8 @@ export default function QueryRowManagedAttributeSearch({
         return [
           "equals",
           "notEquals",
+          "in",
+          "notIn",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -116,6 +118,8 @@ export default function QueryRowManagedAttributeSearch({
           "equals",
           "notEquals",
           "containsDate",
+          "in",
+          "notIn",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -124,13 +128,22 @@ export default function QueryRowManagedAttributeSearch({
           "notEmpty"
         ];
       case "PICK_LIST":
-        return ["equals", "notEquals", "empty", "notEmpty"];
+        return [
+          "equals", 
+          "notEquals", 
+          "in",
+          "notIn",
+          "empty", 
+          "notEmpty"
+        ];
       case "BOOL":
         return ["equals", "empty", "notEmpty"];
       case "STRING":
         return [
           "exactMatch",
           "wildcard",
+          "in",
+          "notIn",
           "startsWith",
           "notEquals",
           "empty",
@@ -156,16 +169,18 @@ export default function QueryRowManagedAttributeSearch({
 
   // Determine the value input to display based on the type.
   const supportedValueForType = (type: string) => {
+    const operator = managedAttributeState.selectedOperator;
+
     // If the operator is "empty" or "not empty", do not display anything.
     if (
-      managedAttributeState.selectedOperator === "empty" ||
-      managedAttributeState.selectedOperator === "notEmpty"
+      operator === "empty" ||
+      operator === "notEmpty"
     ) {
       return <></>;
     }
 
     const commonProps = {
-      matchType: managedAttributeState.selectedOperator,
+      matchType: operator,
       value: managedAttributeState.searchValue,
       setValue: (userInput) =>
         setManagedAttributeState({
@@ -185,7 +200,26 @@ export default function QueryRowManagedAttributeSearch({
             value: pickOption,
             label: pickOption
           })) ?? [];
-        return (
+        return (operator === "in" || operator === "notIn") ? (
+          <Select
+            options={pickListOptions}
+            className={`col ps-0`}
+            value={pickListOptions?.find(
+              (pickOption) =>
+                pickOption.value === managedAttributeState.searchValue
+            )}
+            placeholder={formatMessage({
+              id: "queryBuilder_pickList_placeholder"
+            })}
+            isMulti={true}
+            onChange={(pickListOption) =>
+              setManagedAttributeState({
+                ...managedAttributeState,
+                searchValue: (pickListOption.flat() ?? []).map(item => item.value).join(',')
+              })
+            }
+          />
+        ) : (
           <Select
             options={pickListOptions}
             className={`col ps-0`}
