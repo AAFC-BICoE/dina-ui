@@ -27,25 +27,28 @@ export async function getColumnSelectorIndexMapColumns({
   columnSelectorDefaultColumns
 }: ColumnSelectorIndexMapColumns) {
   setLoadingIndexMapColumns?.(true);
-  for (const groupedIndexMapping of groupedIndexMappings) {
-    const groupedIndexMappingOptions = groupedIndexMapping.options;
-    for (const queryOption of groupedIndexMappingOptions) {
-      if (queryOption.dynamicField) {
-        await getDynamicFieldColumns(
-          queryOption,
-          apiClient,
-          setColumnSelectorIndexMapColumns,
-          columnSelectorDefaultColumns
-        );
-      } else {
-        getStandardColumns(
-          queryOption,
-          setColumnSelectorIndexMapColumns,
-          columnSelectorDefaultColumns
-        );
+  if (groupedIndexMappings) {
+    for (const groupedIndexMapping of groupedIndexMappings) {
+      const groupedIndexMappingOptions = groupedIndexMapping.options;
+      for (const queryOption of groupedIndexMappingOptions) {
+        if (queryOption.dynamicField) {
+          await getDynamicFieldColumns(
+            queryOption,
+            apiClient,
+            setColumnSelectorIndexMapColumns,
+            columnSelectorDefaultColumns
+          );
+        } else {
+          getStandardColumns(
+            queryOption,
+            setColumnSelectorIndexMapColumns,
+            columnSelectorDefaultColumns
+          );
+        }
       }
     }
   }
+
   setLoadingIndexMapColumns?.(false);
   setLoadedIndexMapColumns?.(true);
 }
