@@ -6,6 +6,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
       "exactMatch",
       "wildcard",
       "startsWith",
+      "in",
+      "notIn",
       "notEquals",
       "empty",
       "notEmpty"
@@ -13,12 +15,14 @@ describe("QueryBuilderManagedAttributeSearch", () => {
 
     describe("Attribute level tests", () => {
       test.each(operators)("Using the %s operator.", async (operator) => {
+        const testValue = operator === "in" || operator === "notIn" ? "test1, test2,test3" : "test123";
+
         expect(
           transformFieldExtensionToDSL({
             fieldPath: "", // Not used.
             operation: "", // Not used.
             queryType: "", // Not used.
-            value: `{"searchValue":"test123","selectedOperator":"${operator}","selectedExtension":"extension","selectedField":"field"}`,
+            value: `{"searchValue":"${testValue}","selectedOperator":"${operator}","selectedExtension":"extension","selectedField":"field"}`,
             fieldInfo: {
               dynamicField: {
                 type: "fieldExtension",
@@ -44,12 +48,14 @@ describe("QueryBuilderManagedAttributeSearch", () => {
 
     describe("Relationship level tests", () => {
       test.each(operators)("Using the %s operator.", async (operator) => {
+        const testValue = operator === "in" || operator === "notIn" ? "test1, test2,test3" : "test123";
+
         expect(
           transformFieldExtensionToDSL({
             fieldPath: "", // Not used.
             operation: "", // Not used.
             queryType: "", // Not used.
-            value: `{"searchValue":"test123","selectedOperator":"${operator}","selectedExtension":"extension","selectedField":"field"}`,
+            value: `{"searchValue":"${testValue}","selectedOperator":"${operator}","selectedExtension":"extension","selectedField":"field"}`,
             fieldInfo: {
               dynamicField: {
                 type: "fieldExtension",

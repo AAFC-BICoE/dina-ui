@@ -696,7 +696,7 @@ export function generateBuilderConfig(
         valueSources: ["value"],
         fieldSettings: {
           mapping: indexItem,
-          validateValue: (value, fieldSettings) =>
+          validateValue: (value, _fieldSettings) =>
             validateField(value, type, formatMessage)
         }
       };

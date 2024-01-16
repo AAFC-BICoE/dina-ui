@@ -122,6 +122,8 @@ export default function QueryRowFieldExtensionSearch({
     "exactMatch",
     "wildcard",
     "startsWith",
+    "in",
+    "notIn",
     "notEquals",
     "empty",
     "notEmpty"

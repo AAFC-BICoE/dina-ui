@@ -35,6 +35,22 @@ Object {
 }
 `;
 
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the in operator. 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "data.attributes.extensionValues.extension.field.keyword": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the notEmpty operator. 1`] = `
 Object {
   "bool": Object {
@@ -75,6 +91,22 @@ Object {
         },
       },
     ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the notIn operator. 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "terms": Object {
+        "data.attributes.extensionValues.extension.field.keyword": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
   },
 }
 `;
@@ -195,6 +227,22 @@ Object {
 }
 `;
 
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the in operator. 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "included.attributes.extensionValues.extension.field.keyword": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the notEmpty operator. 1`] = `
 Object {
   "nested": Object {
@@ -276,6 +324,22 @@ Object {
         },
       },
     ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the notIn operator. 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "terms": Object {
+        "included.attributes.extensionValues.extension.field.keyword": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
   },
 }
 `;
