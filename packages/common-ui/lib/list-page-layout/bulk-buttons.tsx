@@ -151,7 +151,7 @@ export function DataExportButton<TData extends KitsuResource>({
   return (
     <FormikButton
       buttonProps={(_ctx) => ({ disabled: totalRecords === 0 })}
-      className="btn btn-primary ms-2 bulk-edit-button"
+      className="btn btn-primary ms-2"
       onClick={async (values: BulkSelectableFormValues) => {
         const selectedResourceIds: string[] = values.itemIdsToSelect
           ? Object.keys(values.itemIdsToSelect)

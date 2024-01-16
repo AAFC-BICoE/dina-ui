@@ -11,7 +11,7 @@ import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect, useCallback } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
-import { startCase } from "lodash";
+import { compact, startCase } from "lodash";
 import { Button } from "react-bootstrap";
 import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
 import { DataExport } from "packages/dina-ui/types/dina-export-api";
@@ -33,7 +33,6 @@ export interface ColumnSelectorProps<TData> {
   hideExportButton?: boolean;
   reactTable: Table<TData> | undefined;
   menuOnly?: boolean;
-  hideApplyButton?: boolean;
   forceUpdate?: React.DispatchWithoutAction;
   /**
    * Used for the listing page to understand which columns can be provided. Filters are generated
@@ -69,12 +68,18 @@ export interface ColumnSelectorProps<TData> {
   columnSelectorDefaultColumns?: any[];
 }
 
+// Ids of columns not supported for exporting
+export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
+  "selectColumn",
+  "thumbnail",
+  "viewPreviewButtonText"
+];
+
 export function ColumnSelector<TData>({
   uniqueName,
   reactTable,
   menuOnly,
   hideExportButton = false,
-  hideApplyButton = false,
   forceUpdate,
   indexName,
   dynamicFieldMapping,
@@ -196,17 +201,18 @@ export function ColumnSelector<TData>({
       Object.keys(visibilityState).forEach((columnId) => {
         visibilityState[columnId] = event.target.checked;
       });
-      visibilityState.selectColumn = true;
+      NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
+        visibilityState[columnId] = true;
+      });
       setLocalStorageColumnStates(visibilityState);
     }
     const reactTableToggleAllHander =
       reactTable?.getToggleAllColumnsVisibilityHandler();
     if (reactTableToggleAllHander) {
       reactTableToggleAllHander(event);
-      const selectColumn = reactTable
-        ?.getAllLeafColumns()
-        .find((column) => column.id === "selectColumn");
-      selectColumn?.toggleVisibility(true);
+      NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
+        reactTable?.getColumn(columnId)?.toggleVisibility(true);
+      });
     }
   }
 
@@ -217,7 +223,7 @@ export function ColumnSelector<TData>({
       reactTable?.getAllLeafColumns().forEach((column) => {
         if (
           column.getIsVisible() &&
-          column.id !== "selectColumn" &&
+          !NOT_EXPORTABLE_COLUMN_IDS.includes(column.id) &&
           !columnSelectorDefaultColumns?.find(
             (defaultColumn) => defaultColumn.id === column.id
           )
@@ -240,7 +246,7 @@ export function ColumnSelector<TData>({
     const exportColumns = reactTable
       ?.getAllLeafColumns()
       .filter((column) => {
-        if (column.id === "selectColumn") {
+        if (NOT_EXPORTABLE_COLUMN_IDS.includes(column.id)) {
           return false;
         } else {
           return column.getIsVisible();
@@ -250,7 +256,7 @@ export function ColumnSelector<TData>({
     const dataExportSaveArg = {
       resource: {
         type: "data-export",
-        source: "dina_material_sample_index",
+        source: indexName,
         query: queryString,
         columns: reactTable ? exportColumns : []
       },
@@ -263,30 +269,40 @@ export function ColumnSelector<TData>({
     // data-export POST will return immediately but export won't necessarily be available
     // continue to get status of export until it's COMPLETED
     let isFetchingDataExport = true;
-    const fetchDataExportRetries = 0;
+    let fetchDataExportRetries = 0;
     let dataExportGetResponse;
-    while (
-      isFetchingDataExport &&
-      fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES
-    ) {
-      if (dataExportGetResponse?.data?.status === "COMPLETED") {
-        // Get the exported data
-        await downloadDataExport(apiClient, dataExportPostResponse[0].id);
+    while (isFetchingDataExport) {
+      if (fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES) {
+        fetchDataExportRetries += 1;
+        if (dataExportGetResponse?.data?.status === "COMPLETED") {
+          // Get the exported data
+          await downloadDataExport(apiClient, dataExportPostResponse[0].id);
+          isFetchingDataExport = false;
+        } else if (dataExportGetResponse?.data?.status === "ERROR") {
+          isFetchingDataExport = false;
+          setLoading(false);
+          setDataExportError(
+            <div className="alert alert-danger">
+              <DinaMessage id="dataExportError" />
+            </div>
+          );
+        } else {
+          dataExportGetResponse = await apiClient.get<DataExport>(
+            `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
+            {}
+          );
+          // Wait 1 second before retrying
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+      } else {
+        // Max retries reached
         isFetchingDataExport = false;
-      } else if (dataExportGetResponse?.data?.status === "ERROR") {
-        isFetchingDataExport = false;
+        setLoading(false);
         setDataExportError(
           <div className="alert alert-danger">
             <DinaMessage id="dataExportError" />
           </div>
         );
-      } else {
-        dataExportGetResponse = await apiClient.get<DataExport>(
-          `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
-          {}
-        );
-        // Wait 1 second before retrying
-        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
     isFetchingDataExport = false;
@@ -367,7 +383,7 @@ export function ColumnSelector<TData>({
                   )}
                 </Button>
               )}
-              {!hideApplyButton && (
+              {!menuOnly && (
                 <Button
                   disabled={loading}
                   className="btn btn-primary mt-1 mb-2 bulk-edit-button"
@@ -399,6 +415,15 @@ export function ColumnSelector<TData>({
         as={CheckboxItem}
       />
       {searchedColumns?.map((column) => {
+        function handdleToggle(event) {
+          const reactTableToggleHandler = column?.getToggleVisibilityHandler();
+          reactTableToggleHandler(event);
+          const columnId = column.id;
+          setLocalStorageColumnStates({
+            ...localStorageColumnStates,
+            [columnId]: event.target.checked
+          });
+        }
         return (
           <>
             <Dropdown.Item
@@ -406,6 +431,7 @@ export function ColumnSelector<TData>({
               id={column?.id}
               isChecked={column?.getIsVisible()}
               isField={true}
+              handleClick={handdleToggle}
               as={CheckboxItem}
             />
           </>
