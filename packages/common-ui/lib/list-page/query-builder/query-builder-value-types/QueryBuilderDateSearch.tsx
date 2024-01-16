@@ -129,11 +129,10 @@ export function transformDateSearchToDSL({
             buildDateRangeObject(operation, value, subType)
           );
 
+    // Comma-separated date search.
     case "in":
-      return inRangeQuery(fieldPath, value, false);
-
     case "notIn":
-      return inRangeQuery(fieldPath, value, true);
+      return inRangeQuery(fieldPath, value, parentType, operation === "notIn");
 
     // Not equals match type.
     case "notEquals":

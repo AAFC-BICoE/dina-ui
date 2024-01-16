@@ -286,21 +286,21 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
 
     test("inQuery", async () => {
       // Test keyword support
-      expect(inQuery("fieldTest", "test1, test2, test3", true, false)).toMatchSnapshot();
-      expect(inQuery("fieldTest", "test1, test2, test3", false, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "test1, test2, test3", undefined, true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "test1, test2, test3", undefined, false, false)).toMatchSnapshot();
 
       // Not version
-      expect(inQuery("fieldTest", "test1, test2", true, true)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "test1, test2", undefined, true, true)).toMatchSnapshot();
 
       // Comma-separator tests. 
-      expect(inQuery("fieldTest", "test1,test2,test3", true, false)).toMatchSnapshot();
-      expect(inQuery("fieldTest", "  test1, test2, test3  ", true, false)).toMatchSnapshot();
-      expect(inQuery("fieldTest", " test1 ", true, false)).toMatchSnapshot();
-      expect(inQuery("fieldTest", "", true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "test1,test2,test3", undefined, true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", " test1 ", undefined, true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "", undefined, true, false)).toMatchSnapshot();
     });
 
     test("inRangeQuery", async () => {
-      expect(inRangeQuery("fieldTest", "1998-05-19, 2023-03-02", false)).toMatchSnapshot();
+      expect(inRangeQuery("fieldTest", "1998-05-19, 2023-03-02", undefined, false)).toMatchSnapshot();
     });
 
     test("existsQuery", async () => {

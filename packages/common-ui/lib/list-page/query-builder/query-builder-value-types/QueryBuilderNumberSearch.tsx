@@ -96,7 +96,7 @@ export function transformNumberSearchToDSL({
     // List of numbers, comma-separated.
     case "in":
     case "notIn":
-      return inQuery(fieldPath, value, false, operation === "notIn");
+      return inQuery(fieldPath, value, parentType, false, operation === "notIn");
 
     // Not equals match type.
     case "notEquals":

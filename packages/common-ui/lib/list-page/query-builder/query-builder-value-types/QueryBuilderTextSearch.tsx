@@ -93,13 +93,10 @@ export function transformTextSearchToDSL({
           }
         : wildcardQuery(fieldPath, value, keywordMultiFieldSupport);
 
-    // Comma-separated search (in)
+    // Comma-separated search (in/not in)
     case "in":
-      return inQuery(fieldPath, value, keywordMultiFieldSupport, false);
-
-    // Inverse comma-separated search (not in)
     case "notIn":
-      return inQuery(fieldPath, value, keywordMultiFieldSupport, true);
+      return inQuery(fieldPath, value, parentType, keywordMultiFieldSupport, operation === "notIn");
 
     // Prefix partial match
     case "startsWith":
