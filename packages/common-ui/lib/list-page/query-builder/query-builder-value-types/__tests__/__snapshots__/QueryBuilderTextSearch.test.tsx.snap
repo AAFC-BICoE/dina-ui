@@ -555,11 +555,33 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function in operator No
 Object {
   "bool": Object {
     "must": Object {
-      "terms": Object {
-        "data.attributes.textField": Array [
-          "test1",
-          "test2",
-          "test3",
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "data.attributes.textField": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.textField": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.textField": Object {
+                "case_insensitive": true,
+                "value": "test3",
+              },
+            },
+          },
         ],
       },
     },
@@ -571,11 +593,33 @@ exports[`QueryBuilderTextSearch transformTextSearchToDSL function not in operato
 Object {
   "bool": Object {
     "must_not": Object {
-      "terms": Object {
-        "data.attributes.textField": Array [
-          "test1",
-          "test2",
-          "test3",
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "data.attributes.textField": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.textField": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.textField": Object {
+                "case_insensitive": true,
+                "value": "test3",
+              },
+            },
+          },
         ],
       },
     },
