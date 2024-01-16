@@ -229,13 +229,29 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the in operator. 1`] = `
 Object {
-  "bool": Object {
-    "must": Object {
-      "terms": Object {
-        "included.attributes.extensionValues.extension.field.keyword": Array [
-          "test1",
-          "test2",
-          "test3",
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must": Object {
+                "terms": Object {
+                  "included.attributes.extensionValues.extension.field.keyword": Array [
+                    "test1",
+                    "test2",
+                    "test3",
+                  ],
+                },
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
         ],
       },
     },
@@ -330,13 +346,29 @@ Object {
 
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the notIn operator. 1`] = `
 Object {
-  "bool": Object {
-    "must_not": Object {
-      "terms": Object {
-        "included.attributes.extensionValues.extension.field.keyword": Array [
-          "test1",
-          "test2",
-          "test3",
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must_not": Object {
+                "terms": Object {
+                  "included.attributes.extensionValues.extension.field.keyword": Array [
+                    "test1",
+                    "test2",
+                    "test3",
+                  ],
+                },
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
         ],
       },
     },
