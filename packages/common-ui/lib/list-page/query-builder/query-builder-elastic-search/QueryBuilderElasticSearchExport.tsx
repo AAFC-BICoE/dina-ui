@@ -1,6 +1,6 @@
 import { ColumnSort } from "@tanstack/react-table";
 import { KitsuResource } from "kitsu";
-import { isEmpty, reject, uniq } from "lodash";
+import { isEmpty, reject, uniq, compact } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { TableColumn } from "../../types";
 
@@ -192,7 +192,7 @@ export function applySortingRules<TData extends KitsuResource>(
   columns: TableColumn<TData>[]
 ) {
   if (sortingRules && sortingRules.length > 0) {
-    const sortingQueries = sortingRules.map((columnSort) => {
+    const sortingQueries = compact(sortingRules.map((columnSort) => {
       const columnDefinition = columns.find((column) => {
         // Depending on if it's a string or not.
         if (typeof column === "string") {
@@ -265,7 +265,7 @@ export function applySortingRules<TData extends KitsuResource>(
           }
         };
       }
-    });
+    }));
 
     // Add all of the queries to the existing elastic search query.
     if (!isEmpty(sortingQueries)) {
