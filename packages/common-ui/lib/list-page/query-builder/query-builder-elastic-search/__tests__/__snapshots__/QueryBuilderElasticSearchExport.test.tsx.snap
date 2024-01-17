@@ -827,11 +827,13 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn1.keyword": Object {
-      "order": "desc",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn1.keyword": Object {
+        "order": "desc",
+      },
     },
-  },
+  ],
 }
 `;
 
@@ -853,11 +855,13 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn1.keyword": Object {
-      "order": "asc",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn1.keyword": Object {
+        "order": "asc",
+      },
     },
-  },
+  ],
 }
 `;
 
@@ -879,14 +883,18 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn1.keyword": Object {
-      "order": "asc",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn1.keyword": Object {
+        "order": "asc",
+      },
     },
-    "data.attributes.testColumn2": Object {
-      "order": "desc",
+    Object {
+      "data.attributes.testColumn2": Object {
+        "order": "desc",
+      },
     },
-  },
+  ],
 }
 `;
 
@@ -929,19 +937,21 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn4": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType1",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn4": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType1",
+            },
           },
+          "path": "included",
         },
-        "path": "included",
+        "order": "desc",
       },
-      "order": "desc",
     },
-  },
+  ],
 }
 `;
 
@@ -963,30 +973,34 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn4": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType1",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn4": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType1",
+            },
           },
+          "path": "included",
         },
-        "path": "included",
+        "order": "desc",
       },
-      "order": "desc",
     },
-    "data.attributes.testColumn5.keyword": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType2",
+    Object {
+      "data.attributes.testColumn5.keyword": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType2",
+            },
           },
+          "path": "included",
         },
-        "path": "included",
+        "order": "asc",
       },
-      "order": "asc",
     },
-  },
+  ],
 }
 `;
 
@@ -1008,36 +1022,44 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn1.keyword": Object {
-      "order": "asc",
-    },
-    "data.attributes.testColumn2": Object {
-      "order": "desc",
-    },
-    "data.attributes.testColumn4": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType1",
-          },
-        },
-        "path": "included",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn1.keyword": Object {
+        "order": "asc",
       },
-      "order": "desc",
     },
-    "data.attributes.testColumn5.keyword": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType2",
-          },
-        },
-        "path": "included",
+    Object {
+      "data.attributes.testColumn2": Object {
+        "order": "desc",
       },
-      "order": "asc",
     },
-  },
+    Object {
+      "data.attributes.testColumn4": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType1",
+            },
+          },
+          "path": "included",
+        },
+        "order": "desc",
+      },
+    },
+    Object {
+      "data.attributes.testColumn5.keyword": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType2",
+            },
+          },
+          "path": "included",
+        },
+        "order": "asc",
+      },
+    },
+  ],
 }
 `;
 
@@ -1059,19 +1081,21 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn6.keyword": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType2",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn6.keyword": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType2",
+            },
           },
+          "path": "included",
         },
-        "path": "included",
+        "order": "desc",
       },
-      "order": "desc",
     },
-  },
+  ],
 }
 `;
 
@@ -1093,11 +1117,13 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "testColumn3": Object {
-      "order": "asc",
+  "sort": Array [
+    Object {
+      "testColumn3": Object {
+        "order": "asc",
+      },
     },
-  },
+  ],
 }
 `;
 

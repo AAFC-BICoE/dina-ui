@@ -1,6 +1,6 @@
 import { ColumnSort } from "@tanstack/react-table";
 import { KitsuResource } from "kitsu";
-import { isEmpty, reject, uniq } from "lodash";
+import { isEmpty, reject, uniq, compact } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { TableColumn } from "../../types";
 
@@ -192,83 +192,80 @@ export function applySortingRules<TData extends KitsuResource>(
   columns: TableColumn<TData>[]
 ) {
   if (sortingRules && sortingRules.length > 0) {
-    const sortingQueries = Object.assign(
-      {},
-      ...sortingRules.map((columnSort) => {
-        const columnDefinition = columns.find((column) => {
-          // Depending on if it's a string or not.
-          if (typeof column === "string") {
-            return column === columnSort.id;
+    const sortingQueries = compact(sortingRules.map((columnSort) => {
+      const columnDefinition = columns.find((column) => {
+        // Depending on if it's a string or not.
+        if (typeof column === "string") {
+          return column === columnSort.id;
+        }
+
+        // Otherwise, check if sorting is enabled for the column and matches.
+        if (column.enableSorting !== false) {
+          if (column.id) {
+            return column.id === columnSort.id;
+          } else {
+            return (column as any).accessorKey.endsWith(columnSort.id);
           }
+        }
+        return false;
+      });
 
-          // Otherwise, check if sorting is enabled for the column and matches.
-          if (column.enableSorting !== false) {
-            if (column.id) {
-              return column.id === columnSort.id;
-            } else {
-              return (column as any).accessorKey.endsWith(columnSort.id);
-            }
+      // Edge case for when strings are only provided for the column definition.
+      if (typeof columnDefinition === "string") {
+        return {
+          [columnDefinition]: {
+            order: columnSort.desc ? "desc" : "asc"
           }
-          return false;
-        });
+        };
+      }
 
-        // Edge case for when strings are only provided for the column definition.
-        if (typeof columnDefinition === "string") {
-          return {
-            [columnDefinition]: {
-              order: columnSort.desc ? "desc" : "asc"
-            }
-          };
-        }
+      if (
+        !columnDefinition ||
+        (!(columnDefinition as any)?.accessorKey &&
+          !(columnDefinition as any)?.accessorFn)
+      ) {
+        return;
+      }
 
-        if (
-          !columnDefinition ||
-          (!(columnDefinition as any)?.accessorKey &&
-            !(columnDefinition as any)?.accessorFn)
-        ) {
-          return;
-        }
+      let accessor: string | null = null;
+      if (!!(columnDefinition as any)?.accessorKey) {
+        accessor = (columnDefinition as any)?.accessorKey;
+      } else if (!!(columnDefinition as any)?.accessorFn) {
+        accessor = (columnDefinition as any)?.accessorFn();
+      }
 
-        let accessor: string | null = null;
-        if (!!(columnDefinition as any)?.accessorKey) {
-          accessor = (columnDefinition as any)?.accessorKey;
-        } else if (!!(columnDefinition as any)?.accessorFn) {
-          accessor = (columnDefinition as any)?.accessorFn();
-        }
+      if (!accessor) {
+        return;
+      }
 
-        if (!accessor) {
-          return;
-        }
+      const indexPath =
+        accessor +
+        (columnDefinition.isKeyword && columnDefinition.isKeyword === true
+          ? ".keyword"
+          : "");
 
-        const indexPath =
-          accessor +
-          (columnDefinition.isKeyword && columnDefinition.isKeyword === true
-            ? ".keyword"
-            : "");
-
-        if (columnDefinition.relationshipType) {
-          return {
-            [indexPath]: {
-              order: columnSort.desc ? "desc" : "asc",
-              nested: {
-                path: "included",
-                filter: {
-                  term: {
-                    "included.type": columnDefinition.relationshipType
-                  }
+      if (columnDefinition.relationshipType) {
+        return {
+          [indexPath]: {
+            order: columnSort.desc ? "desc" : "asc",
+            nested: {
+              path: "included",
+              filter: {
+                term: {
+                  "included.type": columnDefinition.relationshipType
                 }
               }
             }
-          };
-        } else {
-          return {
-            [indexPath]: {
-              order: columnSort.desc ? "desc" : "asc"
-            }
-          };
-        }
-      })
-    );
+          }
+        };
+      } else {
+        return {
+          [indexPath]: {
+            order: columnSort.desc ? "desc" : "asc"
+          }
+        };
+      }
+    }));
 
     // Add all of the queries to the existing elastic search query.
     if (!isEmpty(sortingQueries)) {
