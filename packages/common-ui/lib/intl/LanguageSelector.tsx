@@ -10,7 +10,7 @@ export function LanguageSelector() {
   const { apiClient } = useApiClient();
 
   useEffect(() => {
-    const getInstanceMode = async () => {
+    const getSupportedLanguagesISO = async () => {
       try {
         const response = await apiClient.axios.get(`/instance.json`);
         if (response.data["supported-languages-iso"]) {
@@ -22,7 +22,7 @@ export function LanguageSelector() {
         console.error(error);
       }
     };
-    getInstanceMode();
+    getSupportedLanguagesISO();
   }, []);
 
   // This component fails to server-side render because the user's locale is unknown, so only
