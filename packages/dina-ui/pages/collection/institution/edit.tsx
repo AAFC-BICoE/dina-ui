@@ -4,6 +4,7 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
+  MultilingualDescription,
   SelectOption,
   SubmitButton,
   TextField,
@@ -139,22 +140,7 @@ export function InstitutionFormLayout() {
       <div className="row">
         <TextField className="col-md-6" name="name" />
       </div>
-      <div className="row">
-        <TextField
-          className="english-description"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="french-description"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
       <div className="row">
         <TextField className="col-md-6" name="webpage" />
         <TextField className="col-md-6" name="address" multiLines={true} />
