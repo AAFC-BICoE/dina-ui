@@ -29,11 +29,14 @@ export function MultilingualDescription() {
   const supportedLanguagesArray: string[] = supportedLanguages?.split(",") ?? [
     "en"
   ];
-  Object.keys(initialValues?.multilingualDescription).forEach((isoKey) => {
-    if (!supportedLanguagesArray.includes(isoKey)) {
-      supportedLanguagesArray.push(isoKey);
-    }
-  });
+  if (initialValues?.multilingualDescription) {
+    Object.keys(initialValues?.multilingualDescription).forEach((isoKey) => {
+      if (!supportedLanguagesArray.includes(isoKey)) {
+        supportedLanguagesArray.push(isoKey);
+      }
+    });
+  }
+
   return (
     <div className="row">
       {supportedLanguagesArray.map((isoKey, index) => {
