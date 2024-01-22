@@ -11,7 +11,8 @@ import {
   withResponse,
   Tooltip,
   generateUUIDTree,
-  CustomQueryPageView
+  CustomQueryPageView,
+  MultilingualDescription
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -207,20 +208,7 @@ export function AssemblageFormLayout() {
           label={formatMessage("field_title.fr")}
         />
       </div>
-      <div className="row">
-        <TextField
-          className="col-md-6 english-description"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-        <TextField
-          className="col-md-6 french-description"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
       <ManagedAttributesEditor
         valuesPath="managedAttributes"
         managedAttributeApiPath="collection-api/managed-attribute"
