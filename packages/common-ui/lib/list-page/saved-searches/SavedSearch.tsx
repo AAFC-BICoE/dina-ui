@@ -10,7 +10,12 @@ import { FilterParam } from "kitsu";
 import { Alert, Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
-import { Config, ImmutableTree, Utils } from "react-awesome-query-builder";
+import {
+  Config,
+  ImmutableTree,
+  Utils,
+  JsonTree
+} from "react-awesome-query-builder";
 import {
   SavedSearchStructure,
   SingleSavedSearch,
@@ -137,6 +142,9 @@ export function SavedSearch({
 
   const [changesMade, setChangesMade] = useState<boolean>(false);
 
+  const [selectedSavedSearchName, setSelectedSavedSearchName] =
+    useState<string>();
+
   // Functionality for the last loaded search.
   useLastSavedSearch({
     setQueryBuilderTree,
@@ -182,6 +190,8 @@ export function SavedSearch({
   }, [selectedSavedSearch, userPreferences]);
 
   const localStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
+  const [localStorageQueryTree, setLocalStorageQueryTree] =
+    useLocalStorage<JsonTree>(localStorageLastUsedTreeKey);
 
   // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {
@@ -208,8 +218,43 @@ export function SavedSearch({
     // User preferences have been loaded in, we can now check for the default saved search if it
     // exists and pre-load it in.
     const defaultSavedSearch = getDefaultSavedSearch();
+
     if (defaultSavedSearch && defaultSavedSearch.savedSearchName) {
-      loadSavedSearch(defaultSavedSearch.savedSearchName);
+      if (defaultSavedSearch?.queryTree) {
+        let isQueryChanged = false;
+        const localStorageImmutableTree = Utils.loadTree(
+          localStorageQueryTree as JsonTree
+        );
+        const localStorageQueryTreeString = Utils.queryString(
+          localStorageImmutableTree,
+          queryBuilderConfig
+        );
+        const defaultSavedSearchImmutableTree = Utils.loadTree(
+          defaultSavedSearch?.queryTree
+        );
+        const defaultSavedSearchQueryTreeString = Utils.queryString(
+          defaultSavedSearchImmutableTree,
+          queryBuilderConfig
+        );
+
+        // Compare defaultSavedSearch against localStorage
+        if (defaultSavedSearchQueryTreeString !== localStorageQueryTreeString) {
+          isQueryChanged = true;
+        }
+
+        // Check if the group has changed.
+        if (!isEqual(sortBy(groups), sortBy(defaultSavedSearch?.groups))) {
+          isQueryChanged = true;
+        }
+        if (isQueryChanged) {
+          setSelectedSavedSearchName(defaultSavedSearch.savedSearchName);
+          setQueryBuilderTree(localStorageImmutableTree);
+          setChangesMade(true);
+          setCurrentIsDefault(defaultSavedSearch.default);
+        } else {
+          loadSavedSearch(defaultSavedSearch.savedSearchName);
+        }
+      }
     }
     setDefaultLoadedIn(true);
   }, [userPreferences]);
@@ -552,7 +597,7 @@ export function SavedSearch({
       </Dropdown>
       <SavedSearchListDropdown
         dropdownOptions={dropdownOptions}
-        selectedSavedSearch={selectedSavedSearch}
+        selectedSavedSearch={selectedSavedSearchName ?? selectedSavedSearch}
         currentIsDefault={currentIsDefault}
         error={error}
         onSavedSearchSelected={(savedSearchName) => {
