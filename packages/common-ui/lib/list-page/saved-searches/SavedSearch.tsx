@@ -221,34 +221,9 @@ export function SavedSearch({
 
     if (defaultSavedSearch && defaultSavedSearch.savedSearchName) {
       if (defaultSavedSearch?.queryTree) {
-        let isQueryChanged = false;
-        const localStorageImmutableTree = Utils.loadTree(
-          localStorageQueryTree as JsonTree
-        );
-        const localStorageQueryTreeString = Utils.queryString(
-          localStorageImmutableTree,
-          queryBuilderConfig
-        );
-        const defaultSavedSearchImmutableTree = Utils.loadTree(
-          defaultSavedSearch?.queryTree
-        );
-        const defaultSavedSearchQueryTreeString = Utils.queryString(
-          defaultSavedSearchImmutableTree,
-          queryBuilderConfig
-        );
-
-        // Compare defaultSavedSearch against localStorage
-        if (defaultSavedSearchQueryTreeString !== localStorageQueryTreeString) {
-          isQueryChanged = true;
-        }
-
-        // Check if the group has changed.
-        if (!isEqual(sortBy(groups), sortBy(defaultSavedSearch?.groups))) {
-          isQueryChanged = true;
-        }
+        const isQueryChanged = getDefaultSavedSearchChanged(defaultSavedSearch);
         if (isQueryChanged) {
           setSelectedSavedSearchName(defaultSavedSearch.savedSearchName);
-          setQueryBuilderTree(localStorageImmutableTree);
           setChangesMade(true);
           setCurrentIsDefault(defaultSavedSearch.default);
         } else {
@@ -287,6 +262,35 @@ export function SavedSearch({
 
     setChangesMade(isQueryChanged);
   }, [queryBuilderTree, groups]);
+
+  function getDefaultSavedSearchChanged(defaultSavedSearch: SingleSavedSearch) {
+    let isQueryChanged = false;
+    const localStorageImmutableTree = Utils.loadTree(
+      localStorageQueryTree as JsonTree
+    );
+    const localStorageQueryTreeString = Utils.queryString(
+      localStorageImmutableTree,
+      queryBuilderConfig
+    );
+    const defaultSavedSearchImmutableTree = Utils.loadTree(
+      defaultSavedSearch?.queryTree as JsonTree
+    );
+    const defaultSavedSearchQueryTreeString = Utils.queryString(
+      defaultSavedSearchImmutableTree,
+      queryBuilderConfig
+    );
+
+    // Compare defaultSavedSearch against localStorage
+    if (defaultSavedSearchQueryTreeString !== localStorageQueryTreeString) {
+      isQueryChanged = true;
+    }
+
+    // Check if the group has changed.
+    if (!isEqual(sortBy(groups), sortBy(defaultSavedSearch?.groups))) {
+      isQueryChanged = true;
+    }
+    return isQueryChanged;
+  }
 
   /**
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch
