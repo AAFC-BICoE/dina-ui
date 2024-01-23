@@ -9,8 +9,13 @@ export function DateView({ date: dateString }: DateViewProps) {
   if (dateString) {
     const hasTime = !DATE_REGEX_NO_TIME.test(dateString);
 
+    const date = new Date(dateString);
+
     const displayText = hasTime
-      ? new Date(dateString).toLocaleString("en-CA")
+      ? new Intl.DateTimeFormat("en-CA", {
+          dateStyle: "short",
+          timeStyle: "medium"
+        }).format(date)
       : dateString;
 
     return <div className="date-cell">{displayText}</div>;
