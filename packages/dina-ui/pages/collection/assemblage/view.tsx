@@ -17,6 +17,11 @@ export default function AssemblageDetailsPage() {
               props.initialValues.multilingualDescription?.descriptions?.map(
                 ({ desc, lang }) => [lang ?? "", desc ?? ""]
               )
+            ),
+            multilingualTitle: fromPairs<string | undefined>(
+              props.initialValues.multilingualTitle?.titles?.map(
+                ({ title, lang }) => [lang ?? "", title ?? ""]
+              )
             )
           }}
         >

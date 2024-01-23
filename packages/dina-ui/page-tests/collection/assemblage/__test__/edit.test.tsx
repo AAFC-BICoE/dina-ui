@@ -89,10 +89,10 @@ describe("AssemblageForm.", () => {
       .find(".name-field input")
       .simulate("change", { target: { value: "test-assemblage" } });
     wrapper
-      .find(".english-title input")
+      .find(".en-title input")
       .simulate("change", { target: { value: "test english title" } });
     wrapper
-      .find(".french-title input")
+      .find(".fr-title input")
       .simulate("change", { target: { value: "test french title" } });
     wrapper
       .find(".en-description textarea")
@@ -222,7 +222,7 @@ describe("AssemblageForm.", () => {
       .find(".fr-description textarea")
       .simulate("change", { target: { value: "test-fr-desc" } });
     wrapper
-      .find(".english-title input")
+      .find(".en-title input")
       .simulate("change", { target: { value: "test-eng-title-updated" } });
 
     wrapper.find("form").simulate("submit");
