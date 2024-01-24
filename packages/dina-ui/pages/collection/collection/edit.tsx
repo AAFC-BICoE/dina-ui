@@ -10,7 +10,8 @@ import {
   withResponse,
   ResourceSelectField,
   filterBy,
-  SelectOption
+  SelectOption,
+  MultilingualDescription
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
@@ -171,20 +172,7 @@ export function CollectionFormFields() {
           />
         )}
       </div>
-      <div className="row">
-        <TextField
-          className="english-description col-md-6"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-        <TextField
-          className="french-description col-md-6"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
       <div className="row">
         <TextField className="col-md-6" name="webpage" />
         <TextField className="col-md-6" name="contact" />
