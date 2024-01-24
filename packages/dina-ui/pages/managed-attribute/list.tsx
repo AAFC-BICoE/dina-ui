@@ -182,7 +182,7 @@ function CollectionAttributeListView() {
       }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
       accessorKey: "acceptedValues"
     },
-    descriptionCell("multilingualDescription"),
+    descriptionCell(false, "multilingualDescription"),
     {
       accessorKey: "group",
       header: () => <FieldHeader name={"group"} />
@@ -251,7 +251,7 @@ function ObjectStoreAttributeListView() {
         header: "Name",
         accessorKey: "name"
       },
-      descriptionCell("multilingualDescription"),
+      descriptionCell(false, "multilingualDescription"),
       {
         cell: ({
           row: {
@@ -359,7 +359,7 @@ function TransactionAttributeListView() {
         }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
         accessorKey: "acceptedValues"
       },
-      descriptionCell("multilingualDescription"),
+      descriptionCell(false, "multilingualDescription"),
       "createdBy",
       {
         accessorKey: "group",

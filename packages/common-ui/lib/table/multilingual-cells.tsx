@@ -1,185 +1,73 @@
-import { get } from "lodash";
+import { capitalize, get } from "lodash";
 import { useContext } from "react";
-import { useIntl } from "react-intl";
-import {
-  MultilingualDescription,
-  MultilingualTitle
-} from "../../../dina-ui/types/common";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { intlContext } from "../intl/IntlSupport";
 
 /**
- * Points to the translation key, used for the language badge.
+ * Used for multilingual fields which contain multiple translations of an item.
+ * 
+ * This function should not be exported, see the titleCell and descriptionCell for exportable
+ * versions.
+ * 
+ * @param displayAll If true, display all languages available. Used for revisions to display all the
+ *    changes.
+ * @param accessorKey To find the value in the DinaForm.
+ * @param type Short hand version of what's being accessed (ex. desc)
+ * @param className Long hand version of what's being accessed (ex. description) - Type is used
+ *    if not provided.
  */
-export const LANGUAGE_BADGE_KEYS = {
-  en: "languageDescriptionEnglish",
-  fr: "languageDescriptionFrench"
-};
-
-function getDescriptionByLanguage(
-  original: MultilingualDescription,
-  accessorKey: string,
-  language: string
-) {
-  // Get the descriptions provided.
-  const multilingualDescription: MultilingualDescription | null = get(
-    original,
-    accessorKey
-  );
-
-  // If no descriptions are provided, just leave the cell blank.
-  if (
-    multilingualDescription?.descriptions == null ||
-    multilingualDescription?.descriptions.length === 0
-  ) {
-    return undefined;
+function multilingualFieldCell(displayAll: boolean, accessorKey: string, type: string, className?: string) {
+  if (!className) {
+    className = type;
   }
 
-  // Remove any blank descriptions.
-  const descriptionPairs = multilingualDescription?.descriptions.filter(
-    (description) => description.desc !== ""
-  );
-
-  // Loop through all of the descriptions provided, the preferred one is always the currently used language.
-  for (const description of descriptionPairs) {
-    if (description.lang === language) {
-      return description;
-    }
-  }
-  return descriptionPairs.length !== 0 &&
-    descriptionPairs[0] !== null &&
-    descriptionPairs[0]?.desc
-    ? descriptionPairs[0]
-    : undefined;
-}
-
-/**
- * Used for multilingual descriptions which contain an English and French version of the
- * description.
- */
-export function descriptionCell(accessorKey: string) {
-  const language = localStorage.getItem("locale") ?? "en";
-  return {
+  return displayAll ? {
     cell: ({ row: { original } }) => {
-      const description = getDescriptionByLanguage(
-        original,
-        accessorKey,
-        language
-      );
-      return description ? (
-        <div>
-          <span className="description list-inline-item">
-            {description?.desc}
-          </span>
-          {languageBadge(description?.lang)}
-        </div>
-      ) : (
-        <div />
-      );
+      return original.value?.[`${className}s`]?.map(
+        (field, index) =>
+        field?.[type] && (
+            <div className="pb-2" key={index}>
+              {field?.[type]} {languageBadge(field?.lang)}
+            </div>
+          )
+      ) ?? null
     },
     accessorKey,
-    header: () => <FieldHeader name="multilingualDescription" />,
-    sortingFn: (rowa, rowb) => {
-      const descA =
-        getDescriptionByLanguage(rowa.original, accessorKey, language)?.desc ??
-        undefined;
-      const descB =
-        getDescriptionByLanguage(rowb.original, accessorKey, language)?.desc ??
-        undefined;
-      if (descA === undefined && descB === undefined) {
-        return 0;
-      } else if (descA !== undefined && descB === undefined) {
-        return 1;
-      } else if (descA === undefined && descB !== undefined) {
-        return -1;
-      } else {
-        return descA === descB ? 0 : descA! < descB! ? -1 : 1;
-      }
-    }
-  };
-}
-
-/**
- * Shows the multilingual description in all languages.
- */
-export function allLangsDescriptionCell(accessorKey: string) {
-  return {
-    cell: ({
-      row: {
-        original: { value }
-      }
-    }) =>
-      value?.descriptions
-        ?.sort((a, b) => (a?.lang === b?.lang ? 0 : a?.lang < b?.lang ? -1 : 1))
-        .map(
-          (desc, index) =>
-            desc?.desc && (
-              <div className="pb-2" key={index}>
-                <strong>{desc?.lang}: </strong> {desc?.desc}
-              </div>
-            )
-        ) ?? null,
-    accessorKey,
-    sortingFn: (rowa, rowb) => {
-      const descA = rowa.descriptions
-        ?.sort((a, b) => (a?.lang === b?.lang ? 0 : a?.lang < b?.lang ? -1 : 1))
-        .map((item) => item?.desc)
-        ?.join(",");
-      const descB = rowb.descriptions
-        ?.sort((a, b) => (a?.lang === b?.lang ? 0 : a?.lang < b?.lang ? -1 : 1))
-        .map((item) => item?.desc)
-        ?.join(",");
-      if (descA === undefined && descB === undefined) {
-        return 0;
-      } else if (descA !== undefined && descB === undefined) {
-        return 1;
-      } else if (descA === undefined && descB !== undefined) {
-        return -1;
-      } else {
-        return descA === descB ? 0 : descA! < descB! ? -1 : 1;
-      }
-    }
-  };
-}
-
-/**
- * Used for multilingual titles which contain an English and French version of the
- * title.
- */
-export function titleCell(accessorKey: string) {
-  return {
+    enableSorting: false
+  } : {
     cell: ({ row: { original } }) => {
       const { locale } = useContext(intlContext);
 
       // Retrieve the current language being used.
       const language = locale;
 
-      // Get the titles provided.
-      const multilingualTitle: MultilingualTitle | null = get(
+      // Get the multilingual field data provided.
+      const multilingualField: any | null = get(
         original,
         accessorKey
       );
 
-      // If no titles are provided, just leave the cell blank.
+      // If no data is provided, just leave the cell blank.
       if (
-        multilingualTitle?.titles == null ||
-        multilingualTitle?.titles.length === 0
+        multilingualField == null ||
+        multilingualField[`${className}s`] == null ||
+        multilingualField[`${className}s`].length === 0
       ) {
         return <div />;
       }
 
-      // Remove any blank titles.
-      const titlePairs = multilingualTitle?.titles.filter(
-        (titleItem) => titleItem.title !== ""
+      // Remove any blank entries.
+      const fieldPairs = multilingualField[`${className}s`].filter(
+        (fieldItem) => fieldItem[`${type}`] !== ""
       );
 
-      // Loop through all of the titles provided, the preferred one is always the currently used language.
-      for (const titlePair of titlePairs) {
-        if (titlePair.lang === language) {
+      // Loop through all of the entries provided, the preferred one is always the currently used language.
+      for (const fieldPair of fieldPairs) {
+        if (fieldPair.lang === language) {
           return (
             <div>
-              <span className="title list-inline-item">{titlePair.title}</span>
-              {languageBadge(titlePair.lang)}
+              <span className={`${className} list-inline-item`}>{fieldPair[`${type}`]}</span>
+              {languageBadge(fieldPair.lang)}
             </div>
           );
         }
@@ -187,39 +75,17 @@ export function titleCell(accessorKey: string) {
 
       // Preferred language could not be found above. Use another language and make sure it's indicated.
       // There is also the possibility that this is blank.
-      return titlePairs.length !== 0 && titlePairs[0] !== null ? (
+      return fieldPairs.length !== 0 && fieldPairs[0] !== null ? (
         <div>
-          <span className="title list-inline-item">{titlePairs[0].title}</span>
-          {languageBadge(titlePairs[0].lang)}
+          <span className={`${className} list-inline-item`}>{fieldPairs[0][`${type}`]}</span>
+          {languageBadge(fieldPairs[0].lang)}
         </div>
       ) : (
-        <div />
+        <></>
       );
     },
     accessorKey,
-    header: () => <FieldHeader name="multilingualTitle" />
-  };
-}
-
-/**
- * Shows the multilingual title in all languages.
- */
-export function allLangsTitleCell(accessorKey: string) {
-  return {
-    cell: ({
-      row: {
-        original: { value }
-      }
-    }) =>
-      value?.titles?.map(
-        (title, index) =>
-          title?.title && (
-            <div className="pb-2" key={index}>
-              <strong>{title?.lang}: </strong> {title?.title}
-            </div>
-          )
-      ) ?? null,
-    accessorKey
+    header: () => <FieldHeader name={`multilingual${capitalize(className)}`} />
   };
 }
 
@@ -228,16 +94,22 @@ export function allLangsTitleCell(accessorKey: string) {
  * string.
  *
  * This badge will automatically get translated as well.
- *
+ * 
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames
  * @param language MultilingualDescription or MultilingualTitle lang string.
  * @returns Language description or title badge element.
  */
 function languageBadge(language) {
-  const { formatMessage } = useIntl();
+  const { locale } = useContext(intlContext);
 
   return (
     <span className="badge">
-      {formatMessage({ id: LANGUAGE_BADGE_KEYS[language] })}
+      {capitalize(
+        new Intl.DisplayNames(locale, { type: "language" }).of(language)
+      )}
     </span>
   );
 }
+
+export const descriptionCell = (displayAll: boolean, accessorKey: string) => multilingualFieldCell(displayAll, accessorKey, "desc", "description");
+export const titleCell = (displayAll: boolean, accessorKey: string) => multilingualFieldCell(displayAll, accessorKey, "title");

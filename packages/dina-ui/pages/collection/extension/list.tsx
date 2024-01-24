@@ -18,7 +18,7 @@ function getTableColumn() {
       accessorKey: "name",
       header: () => <FieldHeader name={"name"} />
     },
-    descriptionCell("multilingualDescription"),
+    descriptionCell(false, "multilingualDescription"),
     {
       id: "vocabularyElementType",
       accessorKey: "vocabularyElementType",

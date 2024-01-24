@@ -1,4 +1,4 @@
-import { allLangsDescriptionCell, KeyValueTable } from "common-ui";
+import { descriptionCell, KeyValueTable } from "common-ui";
 import Link from "next/link";
 import { Collection } from "../../../types/collection-api";
 import { ReferenceLink } from "../ReferenceLink";
@@ -35,7 +35,7 @@ export const COLLECTION_REVISION_ROW_CONFIG: RevisionRowConfig<Collection> = {
         href="/collection/collection/view?id="
       />
     ),
-    multilingualDescription: allLangsDescriptionCell("multilingualDescription")
+    multilingualDescription: descriptionCell(true, "multilingualDescription")
       .cell
   }
 };
