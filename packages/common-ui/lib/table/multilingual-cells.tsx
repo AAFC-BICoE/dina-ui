@@ -3,6 +3,52 @@ import { useContext } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { intlContext } from "../intl/IntlSupport";
 
+interface multilingualPair {
+  lang: string;
+  value: string;
+}
+
+function getPreferredPair(original: any, accessorKey: string, type: string, className: string): multilingualPair | undefined {
+  const { locale } = useContext(intlContext);
+
+  // Get the multilingual field data provided.
+  const multilingualField: any | null = get(
+    original,
+    accessorKey
+  );
+
+  // If no data is provided, just leave the cell blank.
+  if (
+    multilingualField == null ||
+    multilingualField[`${className}s`] == null ||
+    multilingualField[`${className}s`].length === 0
+  ) {
+    return undefined;
+  }
+
+  // Remove any blank entries.
+  const fieldPairs = multilingualField[`${className}s`].filter(
+    (fieldItem) => fieldItem[`${type}`] !== ""
+  );
+
+  // Loop through all of the entries provided, the preferred one is always the currently used language.
+  for (const fieldPair of fieldPairs) {
+    if (fieldPair.lang === locale) {
+      return {
+        lang: fieldPair.lang,
+        value: fieldPair[type]
+      }
+    }
+  }
+
+  // Preferred language could not be found above. Use another language and make sure it's indicated.
+  // There is also the possibility that this is blank.
+  return fieldPairs.length !== 0 && fieldPairs[0] !== null ? {
+    lang: fieldPairs[0].lang,
+    value: fieldPairs[0][type]
+  } : undefined;
+}
+
 /**
  * Used for multilingual fields which contain multiple translations of an item.
  * 
@@ -36,55 +82,38 @@ function multilingualFieldCell(displayAll: boolean, accessorKey: string, type: s
     enableSorting: false
   } : {
     cell: ({ row: { original } }) => {
-      const { locale } = useContext(intlContext);
+      const preferredPair = getPreferredPair(original, accessorKey, type, className ?? type);
 
-      // Retrieve the current language being used.
-      const language = locale;
-
-      // Get the multilingual field data provided.
-      const multilingualField: any | null = get(
-        original,
-        accessorKey
-      );
-
-      // If no data is provided, just leave the cell blank.
-      if (
-        multilingualField == null ||
-        multilingualField[`${className}s`] == null ||
-        multilingualField[`${className}s`].length === 0
-      ) {
-        return <div />;
+      if (!preferredPair) {
+        return <></>;
+      } else {
+        return (
+          <>
+            <span className={`${className} list-inline-item`}>{preferredPair.value}</span>
+            {languageBadge(preferredPair.lang)}
+          </>
+        )
       }
-
-      // Remove any blank entries.
-      const fieldPairs = multilingualField[`${className}s`].filter(
-        (fieldItem) => fieldItem[`${type}`] !== ""
-      );
-
-      // Loop through all of the entries provided, the preferred one is always the currently used language.
-      for (const fieldPair of fieldPairs) {
-        if (fieldPair.lang === language) {
-          return (
-            <div>
-              <span className={`${className} list-inline-item`}>{fieldPair[`${type}`]}</span>
-              {languageBadge(fieldPair.lang)}
-            </div>
-          );
-        }
-      }
-
-      // Preferred language could not be found above. Use another language and make sure it's indicated.
-      // There is also the possibility that this is blank.
-      return fieldPairs.length !== 0 && fieldPairs[0] !== null ? (
-        <div>
-          <span className={`${className} list-inline-item`}>{fieldPairs[0][`${type}`]}</span>
-          {languageBadge(fieldPairs[0].lang)}
-        </div>
-      ) : (
-        <></>
-      );
     },
     accessorKey,
+    enableSorting: false,
+    sortingFn: (rowa, rowb) => {
+      const descA =
+      getPreferredPair(rowa.original, accessorKey, type, className ?? type)?.value ??
+        undefined;
+      const descB =
+      getPreferredPair(rowb.original, accessorKey, type, className ?? type)?.value ??
+        undefined;
+      if (descA === undefined && descB === undefined) {
+        return 0;
+      } else if (descA !== undefined && descB === undefined) {
+        return 1;
+      } else if (descA === undefined && descB !== undefined) {
+        return -1;
+      } else {
+        return descA === descB ? 0 : descA! < descB! ? -1 : 1;
+      }
+    },
     header: () => <FieldHeader name={`multilingual${capitalize(className)}`} />
   };
 }

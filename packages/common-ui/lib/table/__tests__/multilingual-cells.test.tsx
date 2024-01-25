@@ -2,7 +2,6 @@ import { titleCell, descriptionCell, ListPageLayout } from "../..";
 import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { ColumnDefinition } from "../QueryTable";
 import '@testing-library/jest-dom';
-import {screen} from '@testing-library/dom'
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch(path) {
@@ -68,8 +67,6 @@ describe("Multilingual-Cell components", () => {
     );
     const reactTable = await englishRender.findByTestId("ReactTable");
     expect(reactTable).toBeInTheDocument();
-
-    screen.logTestingPlaygroundURL();
 
     // Row 1 expectations (both provided):
     expect(englishRender.queryByText("Row 1: English Title")).toBeInTheDocument();
