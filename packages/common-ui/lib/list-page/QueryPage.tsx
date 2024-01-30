@@ -752,7 +752,7 @@ export function QueryPage<TData extends KitsuResource>({
   }, [totalColumns]);
 
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
-    defaultSorted: sortingRules,
+    sort: sortingRules,
     columnVisibility,
     ...computedReactTableProps
   };
@@ -1058,7 +1058,7 @@ export function QueryPage<TData extends KitsuResource>({
                   viewMode && selectedResources?.length ? false : true
                 }
                 onSortingChange={onSortChange}
-                defaultSorted={sortingRules}
+                sort={sortingRules}
                 // Table customization props
                 {...resolvedReactTableProps}
                 className="-striped react-table-overflow"

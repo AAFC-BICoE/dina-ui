@@ -192,7 +192,7 @@ export function ScheduledActionsField({
                 {hasActions && (
                   <ReactTable<ScheduledAction>
                     columns={actionColumns}
-                    defaultSorted={[{ id: "date", desc: true }]}
+                    sort={[{ id: "date", desc: true }]}
                     data={scheduledActions}
                     showPagination={false}
                     className="-striped mb-2"
