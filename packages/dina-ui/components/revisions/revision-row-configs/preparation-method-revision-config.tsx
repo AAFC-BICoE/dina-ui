@@ -13,6 +13,7 @@ export const PREPARATION_METHOD_REVISION_ROW_CONFIG: RevisionRowConfig<Preparati
     customValueCells: {
       multilingualDescription: descriptionCell(
         true,
+        false,
         "multilingualDescription"
       ).cell
     }

@@ -50,8 +50,8 @@ describe("Multilingual-Cell components", () => {
   it("Display only one language in the table at a time", async () => {
     const TABLE_COLUMNS: ColumnDefinition<any>[] = [
       "name",
-      titleCell(false, "multilingualTitle"),
-      descriptionCell(false, "multilingualDescription")
+      titleCell(false, false, "multilingualTitle"),
+      descriptionCell(false, false, "multilingualDescription")
     ];
 
     const englishRender = mountWithAppContext2(

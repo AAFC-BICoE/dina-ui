@@ -20,7 +20,7 @@ const PROJECT_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
     accessorKey: "name"
   },
   "status",
-  descriptionCell(false, "multilingualDescription")
+  descriptionCell(false, false, "multilingualDescription")
 ];
 
 export default function collectionMethodListPage() {

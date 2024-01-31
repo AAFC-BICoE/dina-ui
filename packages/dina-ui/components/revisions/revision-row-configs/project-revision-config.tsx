@@ -34,7 +34,7 @@ export const PROJECT_REVISION_ROW_CONFIG: RevisionRowConfig<Project> = {
         )}
       </div>
     ),
-    multilingualDescription: descriptionCell(true, "multilingualDescription")
+    multilingualDescription: descriptionCell(true, false, "multilingualDescription")
       .cell
   }
 };

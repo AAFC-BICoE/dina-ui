@@ -21,7 +21,7 @@ export const INSTITUTION_REVISION_ROW_CONFIG: RevisionRowConfig<Institution> = {
           <KeyValueTable data={identifier} />
         </div>
       )),
-    multilingualDescription: descriptionCell(true, "multilingualDescription")
+    multilingualDescription: descriptionCell(true, false, "multilingualDescription")
       .cell
   }
 };

@@ -35,7 +35,7 @@ export const COLLECTION_REVISION_ROW_CONFIG: RevisionRowConfig<Collection> = {
         href="/collection/collection/view?id="
       />
     ),
-    multilingualDescription: descriptionCell(true, "multilingualDescription")
+    multilingualDescription: descriptionCell(true, false, "multilingualDescription")
       .cell
   }
 };

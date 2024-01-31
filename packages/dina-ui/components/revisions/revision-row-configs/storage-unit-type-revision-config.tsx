@@ -13,6 +13,7 @@ export const STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<StorageUni
     customValueCells: {
       multilingualDescription: descriptionCell(
         true,
+        false,
         "multilingualDescription"
       ).cell
     }

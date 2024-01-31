@@ -23,7 +23,7 @@ const COLLECTION_METHOD_TABLE_COLUMNS: ColumnDefinition<CollectionMethod>[] = [
     accessorKey: "name"
   },
   "group",
-  descriptionCell(false, "multilingualDescription")
+  descriptionCell(false, false, "multilingualDescription")
 ];
 
 export default function collectionMethodListPage() {

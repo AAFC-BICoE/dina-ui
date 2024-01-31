@@ -57,12 +57,14 @@ function getPreferredPair(original: any, accessorKey: string, type: string, clas
  * 
  * @param displayAll If true, display all languages available. Used for revisions to display all the
  *    changes.
+ * @param allowSorting Enable local sorting support. Cannot be used for tables with pagination, only
+ *    when all the rows are loaded into the table.
  * @param accessorKey To find the value in the DinaForm.
  * @param type Short hand version of what's being accessed (ex. desc)
  * @param className Long hand version of what's being accessed (ex. description) - Type is used
  *    if not provided.
  */
-function multilingualFieldCell(displayAll: boolean, accessorKey: string, type: string, className?: string) {
+function multilingualFieldCell(displayAll: boolean, allowSorting: boolean, accessorKey: string, type: string, className?: string) {
   if (!className) {
     className = type;
   }
@@ -96,23 +98,17 @@ function multilingualFieldCell(displayAll: boolean, accessorKey: string, type: s
       }
     },
     accessorKey,
-    enableSorting: false,
-    sortingFn: (rowa, rowb) => {
+    enableSorting: allowSorting,
+    sortingFn: (rowa: any, rowb: any, _: string): number => {
+      // Retrieve both languages in the users preferred language.
       const descA =
-      getPreferredPair(rowa.original, accessorKey, type, className ?? type)?.value ??
-        undefined;
+        getPreferredPair(rowa.original, accessorKey, type, className ?? type)?.value ??
+        "";
       const descB =
-      getPreferredPair(rowb.original, accessorKey, type, className ?? type)?.value ??
-        undefined;
-      if (descA === undefined && descB === undefined) {
-        return 0;
-      } else if (descA !== undefined && descB === undefined) {
-        return 1;
-      } else if (descA === undefined && descB !== undefined) {
-        return -1;
-      } else {
-        return descA === descB ? 0 : descA! < descB! ? -1 : 1;
-      }
+        getPreferredPair(rowb.original, accessorKey, type, className ?? type)?.value ??
+        "";
+
+      return descA.localeCompare(descB);
     },
     header: () => <FieldHeader name={`multilingual${capitalize(className)}`} />
   };
@@ -140,5 +136,5 @@ function languageBadge(language) {
   );
 }
 
-export const descriptionCell = (displayAll: boolean, accessorKey: string) => multilingualFieldCell(displayAll, accessorKey, "desc", "description");
-export const titleCell = (displayAll: boolean, accessorKey: string) => multilingualFieldCell(displayAll, accessorKey, "title");
+export const descriptionCell = (displayAll: boolean, allowSorting: boolean, accessorKey: string) => multilingualFieldCell(displayAll, allowSorting, accessorKey, "desc", "description");
+export const titleCell = (displayAll: boolean, allowSorting: boolean, accessorKey: string) => multilingualFieldCell(displayAll, allowSorting, accessorKey, "title");

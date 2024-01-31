@@ -13,6 +13,7 @@ export const MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<Manag
     customValueCells: {
       multilingualDescription: descriptionCell(
         true,
+        false,
         "multilingualDescription"
       ).cell
     }

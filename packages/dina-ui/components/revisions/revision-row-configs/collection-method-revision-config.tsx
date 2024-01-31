@@ -13,6 +13,7 @@ export const COLLECTION_METHOD_REVISION_ROW_CONFIG: RevisionRowConfig<Collection
     customValueCells: {
       multilingualDescription: descriptionCell(
         true,
+        false,
         "multilingualDescription"
       ).cell
     }
