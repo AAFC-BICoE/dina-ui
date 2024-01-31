@@ -440,7 +440,7 @@ export function ColumnSelector<TData>({
     </ColumnSelectorMenu>
   ) : (
     <Dropdown
-      onMouseOver={showDropdownMenu}
+      onMouseDown={showDropdownMenu}
       onKeyDown={onKeyPressDown}
       onMouseLeave={hideDropdownMenu}
       show={showMenu}
