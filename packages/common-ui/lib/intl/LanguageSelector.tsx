@@ -10,15 +10,19 @@ export function LanguageSelector() {
   const { apiClient } = useApiClient();
 
   useEffect(() => {
-    const getInstanceMode = async () => {
+    const getSupportedLanguagesISO = async () => {
       try {
         const response = await apiClient.axios.get(`/instance.json`);
-        setSupportedLanguages(response.data["supported-languages-iso"]);
+        if (response.data["supported-languages-iso"]) {
+          setSupportedLanguages(response.data["supported-languages-iso"]);
+        } else {
+          setSupportedLanguages("en");
+        }
       } catch (error) {
         console.error(error);
       }
     };
-    getInstanceMode();
+    getSupportedLanguagesISO();
   }, []);
 
   // This component fails to server-side render because the user's locale is unknown, so only
@@ -27,7 +31,9 @@ export function LanguageSelector() {
     return null;
   }
 
-  let supportedLanguagesArray: string[] = supportedLanguages?.split(",") ?? [];
+  const supportedLanguagesArray: string[] = supportedLanguages?.split(",") ?? [
+    "en"
+  ];
 
   return (
     <div>
@@ -46,7 +52,9 @@ export function LanguageSelector() {
               key={key}
               className="px-0"
             >
-              {capitalize(new Intl.DisplayNames(key, { type: "language" }).of(key))}
+              {capitalize(
+                new Intl.DisplayNames(key, { type: "language" }).of(key)
+              )}
             </Button>
           );
         })}

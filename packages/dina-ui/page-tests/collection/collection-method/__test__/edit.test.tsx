@@ -5,6 +5,34 @@ import CollectionMethodEditPage, {
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
 
+const INSTANCE_DATA = {
+  data: {
+    "instance-mode": "developer",
+    "supported-languages-iso": "en,fr"
+  },
+  status: 200,
+  statusText: "",
+  headers: {
+    "content-length": "99",
+    "content-type": "text/plain; charset=utf-8",
+    date: "Tue, 09 Jan 2024 17:03:48 GMT"
+  },
+  config: {
+    url: "/instance.json",
+    method: "get",
+    headers: {
+      Accept: "application/json, text/plain, */*"
+    },
+    transformRequest: [null],
+    transformResponse: [null],
+    timeout: 0,
+    xsrfCookieName: "XSRF-TOKEN",
+    xsrfHeaderName: "X-XSRF-TOKEN",
+    maxContentLength: -1
+  },
+  request: {}
+};
+
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
@@ -37,8 +65,12 @@ const mockPatch = jest.fn(() => ({
   data: [{ data: TEST_COLLECTION_METHOD, status: 201 }] as OperationsResponse
 }));
 
+const mockGetAxios = jest.fn(async (_path) => {
+  return INSTANCE_DATA;
+});
+
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: { get: mockGet, axios: { patch: mockPatch, get: mockGetAxios } }
 };
 
 describe("collection-method edit page", () => {
@@ -61,7 +93,7 @@ describe("collection-method edit page", () => {
       }
     });
 
-    wrapper.find(".english-description textarea").simulate("change", {
+    wrapper.find(".en-description textarea").simulate("change", {
       target: { value: "test english description" }
     });
 
@@ -109,12 +141,14 @@ describe("collection-method edit page", () => {
       />,
       { apiContext }
     );
+    await new Promise(setImmediate);
+    wrapper.update();
 
-    expect(wrapper.find(".english-description textarea").prop("value")).toEqual(
+    expect(wrapper.find(".en-description textarea").prop("value")).toEqual(
       "test english description"
     );
 
-    wrapper.find(".french-description textarea").simulate("change", {
+    wrapper.find(".fr-description textarea").simulate("change", {
       target: { value: "test french description" }
     });
 

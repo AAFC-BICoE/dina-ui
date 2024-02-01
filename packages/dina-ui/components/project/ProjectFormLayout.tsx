@@ -2,6 +2,7 @@ import {
   CustomQueryPageView,
   DateField,
   generateUUIDTree,
+  MultilingualDescription,
   TextField,
   useDinaFormContext
 } from "common-ui";
@@ -57,20 +58,7 @@ export function ProjectFormLayout() {
           label={formatMessage("field_endDate")}
         />
       </div>
-      <div className="row">
-        <TextField
-          className="col-md-6 english-description"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-        <TextField
-          className="col-md-6 french-description"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
       <AttachmentsField
         name="attachment"
         title={<DinaMessage id="projectAttachments" />}

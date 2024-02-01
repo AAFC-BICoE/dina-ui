@@ -34,7 +34,6 @@ const mockGetAxios = jest.fn(async (_path) => {
 
 const apiContext = {
   apiClient: {
-    get: mockGetAxios,
     axios: {
       get: mockGetAxios
     }

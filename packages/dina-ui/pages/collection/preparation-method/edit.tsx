@@ -8,7 +8,8 @@ import {
   TextField,
   useQuery,
   withResponse,
-  useDinaFormContext
+  useDinaFormContext,
+  MultilingualDescription
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -155,22 +156,7 @@ export function PreparationMethodFormLayout() {
           />
         )}
       </div>
-      <div className="row">
-        <TextField
-          className="english-description"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="french-description"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
     </div>
   );
 }
