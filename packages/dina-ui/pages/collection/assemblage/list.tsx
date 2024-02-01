@@ -21,8 +21,8 @@ const ASSEMBLAGE_TABLE_COLUMNS: ColumnDefinition<Assemblage>[] = [
     accessorKey: "name",
     header: () => <FieldHeader name="name" />
   },
-  titleCell("multilingualTitle"),
-  descriptionCell("multilingualDescription")
+  titleCell(false, false, "multilingualTitle"),
+  descriptionCell(false, false, "multilingualDescription")
 ];
 
 export default function assemblageListPage() {
