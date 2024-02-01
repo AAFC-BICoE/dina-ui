@@ -193,7 +193,7 @@ export function FileView({
             )}
           </a>
         ) : errorStatus === 403 ? (
-          <DinaMessage id="notAuthorized" />
+          <DinaMessage id="unauthorized" />
         ) : (
           <DinaMessage id="failedToRenderFile" />
         )
