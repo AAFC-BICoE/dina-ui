@@ -190,6 +190,364 @@ Object {
 }
 `;
 
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "test1",
+          "test2",
+          "TEST3",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 2`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest": Array [
+          "test1",
+          "test2",
+          "TEST3",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 3`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "test1",
+          "test2",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 4`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 5`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "test1",
+          "test2",
+          "test3",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 6`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "TEST1",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 7`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "fieldTest.keyword": Array [
+          "",
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inRangeQuery 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "range": Object {
+          "fieldTest": Object {
+            "gte": "1998-05-19",
+            "lte": "1998-05-19",
+          },
+        },
+      },
+      Object {
+        "range": Object {
+          "fieldTest": Object {
+            "gte": "2023-03-02",
+            "lte": "2023-03-02",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "TEST3",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 2`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest": Object {
+                "case_insensitive": true,
+                "value": "TEST3",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 3`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 4`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test3",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 5`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test3",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 6`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "TEST1",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 7`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions includedTypeQuery 1`] = `
 Object {
   "term": Object {
@@ -469,11 +827,13 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn1.keyword": Object {
-      "order": "desc",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn1.keyword": Object {
+        "order": "desc",
+      },
     },
-  },
+  ],
 }
 `;
 
@@ -495,11 +855,13 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn1.keyword": Object {
-      "order": "asc",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn1.keyword": Object {
+        "order": "asc",
+      },
     },
-  },
+  ],
 }
 `;
 
@@ -521,14 +883,18 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn1.keyword": Object {
-      "order": "asc",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn1.keyword": Object {
+        "order": "asc",
+      },
     },
-    "data.attributes.testColumn2": Object {
-      "order": "desc",
+    Object {
+      "data.attributes.testColumn2": Object {
+        "order": "desc",
+      },
     },
-  },
+  ],
 }
 `;
 
@@ -571,19 +937,21 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn4": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType1",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn4": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType1",
+            },
           },
+          "path": "included",
         },
-        "path": "included",
+        "order": "desc",
       },
-      "order": "desc",
     },
-  },
+  ],
 }
 `;
 
@@ -605,30 +973,34 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn4": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType1",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn4": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType1",
+            },
           },
+          "path": "included",
         },
-        "path": "included",
+        "order": "desc",
       },
-      "order": "desc",
     },
-    "data.attributes.testColumn5.keyword": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType2",
+    Object {
+      "data.attributes.testColumn5.keyword": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType2",
+            },
           },
+          "path": "included",
         },
-        "path": "included",
+        "order": "asc",
       },
-      "order": "asc",
     },
-  },
+  ],
 }
 `;
 
@@ -650,36 +1022,44 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn1.keyword": Object {
-      "order": "asc",
-    },
-    "data.attributes.testColumn2": Object {
-      "order": "desc",
-    },
-    "data.attributes.testColumn4": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType1",
-          },
-        },
-        "path": "included",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn1.keyword": Object {
+        "order": "asc",
       },
-      "order": "desc",
     },
-    "data.attributes.testColumn5.keyword": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType2",
-          },
-        },
-        "path": "included",
+    Object {
+      "data.attributes.testColumn2": Object {
+        "order": "desc",
       },
-      "order": "asc",
     },
-  },
+    Object {
+      "data.attributes.testColumn4": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType1",
+            },
+          },
+          "path": "included",
+        },
+        "order": "desc",
+      },
+    },
+    Object {
+      "data.attributes.testColumn5.keyword": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType2",
+            },
+          },
+          "path": "included",
+        },
+        "order": "asc",
+      },
+    },
+  ],
 }
 `;
 
@@ -701,19 +1081,21 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "data.attributes.testColumn6.keyword": Object {
-      "nested": Object {
-        "filter": Object {
-          "term": Object {
-            "included.type": "relationshipType2",
+  "sort": Array [
+    Object {
+      "data.attributes.testColumn6.keyword": Object {
+        "nested": Object {
+          "filter": Object {
+            "term": Object {
+              "included.type": "relationshipType2",
+            },
           },
+          "path": "included",
         },
-        "path": "included",
+        "order": "desc",
       },
-      "order": "desc",
     },
-  },
+  ],
 }
 `;
 
@@ -735,11 +1117,13 @@ Object {
       ],
     },
   },
-  "sort": Object {
-    "testColumn3": Object {
-      "order": "asc",
+  "sort": Array [
+    Object {
+      "testColumn3": Object {
+        "order": "asc",
+      },
     },
-  },
+  ],
 }
 `;
 
