@@ -155,25 +155,26 @@ export function FileView({
   if (resp?.loading) {
     return <LoadingSpinner loading={true} />;
   }
+  const errorStatus = (resp.error as any)?.cause?.status;
 
   return (
     <div className="file-viewer-wrapper text-center">
       {showFile ? (
-        <a
-          href={objectURL}
-          target="_blank"
-          style={{
-            color: "inherit",
-            textDecoration: "none",
-            pointerEvents: clickToDownload ? undefined : "none",
-            display: "block",
-            marginLeft: "auto",
-            marginRight: "auto",
-            width: "fit-content"
-          }}
-        >
-          {showFile ? (
-            isImage ? (
+        errorStatus === undefined ? (
+          <a
+            href={objectURL}
+            target="_blank"
+            style={{
+              color: "inherit",
+              textDecoration: "none",
+              pointerEvents: clickToDownload ? undefined : "none",
+              display: "block",
+              marginLeft: "auto",
+              marginRight: "auto",
+              width: "fit-content"
+            }}
+          >
+            {isImage ? (
               <img
                 alt={imgAlt ?? `File path : ${filePath}`}
                 src={objectURL}
@@ -189,9 +190,13 @@ export function FileView({
                 unsupportedComponent={fallBackRender}
                 errorComponent={fallBackRender}
               />
-            )
-          ) : null}
-        </a>
+            )}
+          </a>
+        ) : errorStatus === 403 ? (
+          <DinaMessage id="unauthorized" />
+        ) : (
+          <DinaMessage id="failedToRenderFile" />
+        )
       ) : (
         <DinaMessage id="previewNotAvailable" />
       )}

@@ -926,5 +926,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_status: "Status",
   field_openedDate: "Opened Date",
   field_closedDate: "Closed Date",
-  field_dueDate: "Due Date"
+  field_dueDate: "Due Date",
+  unauthorized: "Unauthorized",
+  failedToRenderFile: "Failed to render file"
 };
