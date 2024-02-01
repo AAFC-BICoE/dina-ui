@@ -1,6 +1,6 @@
 import { Table } from "@tanstack/react-table";
 import { useIntl } from "react-intl";
-import Creatable from "react-select/creatable";
+import CreatableSelect from "react-select/creatable";
 import { SelectOption } from "../formik-connected/SelectField";
 
 export function Pagination<TData>({
@@ -13,7 +13,7 @@ export function Pagination<TData>({
   const { formatMessage } = useIntl();
 
   return (
-    <div className="-pagination">
+    <div className="-pagination" data-testid="pagination">
       <div className="-previous">
         <button
           type="button"
@@ -44,7 +44,7 @@ export function Pagination<TData>({
           <span className="-totalPages">{table.getPageCount()}</span>
         </span>
         <span className="select-wrap -pageSizeOptions">
-          <Creatable<SelectOption<number>, boolean>
+          <CreatableSelect<SelectOption<number>>
             name="pageSize"
             value={{
               value: table.getState().pagination.pageSize,
@@ -65,7 +65,7 @@ export function Pagination<TData>({
               label: `${pageSize}`
             }))}
             formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
-          ></Creatable>
+          ></CreatableSelect>
         </span>
       </div>
       <div className="-next">

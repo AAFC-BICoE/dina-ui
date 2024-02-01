@@ -6,6 +6,7 @@ import {
 } from "kitsu";
 import { range } from "lodash";
 import { IntlProvider } from "react-intl";
+import "@testing-library/jest-dom";
 
 import {
   ColumnDefinition,
@@ -15,7 +16,11 @@ import {
   QueryTableProps,
   ReactTable
 } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import {
+  mountWithAppContext,
+  mountWithAppContext2
+} from "../../test-util/mock-app-context";
+import { fireEvent, waitFor } from "@testing-library/react";
 
 /** Example of an API resource interface definition for a todo-list entry. */
 interface Todo extends KitsuResource {
@@ -343,55 +348,30 @@ describe("QueryTable component", () => {
     expect(mockGet).toHaveBeenCalledTimes(3);
   });
 
-  // it("Provides a dropdown to change the page size.", async () => {
-  //   // Initial pageSize is 5.
-  //   const wrapper = mountWithAppContext(
-  //     <QueryTable<Todo>
-  //       path="todo"
-  //       defaultPageSize={5}
-  //       pageSizeOptions={[5, 10, 20]}
-  //       columns={["id", "name", "description"]}
-  //     />,
-  //     { apiContext }
-  //   );
+  it("Provides a dropdown to change the page size.", async () => {
+    // Initial pageSize is 5.
+    const component = mountWithAppContext2(
+      <QueryTable<Todo>
+        path="todo"
+        defaultPageSize={5}
+        pageSizeOptions={[5, 10, 20]}
+        columns={["id", "name", "description"]}
+      />,
+      { apiContext }
+    );
 
-  //   // Wait for the initial request to finish.
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
+    // The initial request should have a pageSize of 5.
+    expect(mockGet).lastCalledWith(
+      "todo",
+      objectContaining({ page: { limit: 5, offset: 0 } })
+    );
+    const reactTable = await component.findByTestId("ReactTable");
 
-  //   // The initial request should have a pageSize of 5.
-  //   expect(mockGet).lastCalledWith(
-  //     "todo",
-  //     objectContaining({ page: { limit: 5, offset: 0 } })
-  //   );
-
-  //   // Expect 5 rows.
-  //   expect(wrapper.find("tbody tr").length).toEqual(5);
-
-  //   // Select a new page size of 100.
-  //   wrapper
-  //     .find(".-pageSizeOptions select")
-  //     .first()
-  //     .simulate("change", { target: { value: 10 } });
-
-  //   // Wait for the second request to finish.
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-
-  //   // The second request should have a pageSize of 10.
-  //   expect(mockGet).lastCalledWith(
-  //     "todo",
-  //     objectContaining({ page: { limit: 10, offset: 0 } })
-  //   );
-
-  //   // Expect 100 rows.
-  //   expect(wrapper.find("tbody tr").length).toEqual(10);
-
-  //   // There should have been two requests:
-  //   // - The initial request with page size of 5.
-  //   // - The second request with page size of 100.
-  //   expect(mockGet).toHaveBeenCalledTimes(2);
-  // });
+    // Expect 5 rows.
+    expect(reactTable.querySelectorAll("tbody tr").length).toEqual(5);
+    const pageSizeSelect = await component.findAllByTestId("pagination");
+    expect(pageSizeSelect[0]).toBeInTheDocument();
+  });
 
   it("Sends a request for filtered data when the filter prop is passed.", async () => {
     const firstFilterProp: FilterParam = { name: "todo 1" };
