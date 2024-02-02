@@ -268,12 +268,15 @@ export function transformDateSearchToDSL({
 /**
  * Generates the time_zone to return with the elastic search response.
  *
- * This will retrieve the users current timezone offset.
+ * This will retrieve the users current timezone offset based on the date value provided. This will
+ * cover cases if that date is accounting for daylight saving time or not.
  *
  * This will return the offset in ISO 8601 UTC offset format, such as +01:00 or -08:00.
+ * 
+ * @param date string representation of the date. Moment supports full/partial dates formats.
  */
-function getTimezoneOffset() {
-  const utcOffsetMinutes = moment().utcOffset();
+function getTimezoneOffset(date: string) {
+  const utcOffsetMinutes = moment(date, ["YYYY", "YYYY-MM", "YYYY-MM-DD"]).utcOffset();
   const formattedOffset = moment().utcOffset(utcOffsetMinutes).format("Z");
 
   const utcTimeOffset = {
@@ -313,7 +316,7 @@ function buildDateRangeObject(matchType, value, subType) {
   // Local date does not store timezone, ignore it.
   const timezone =
     subType !== "local_date" && subType !== "local_date_time"
-      ? getTimezoneOffset()
+      ? getTimezoneOffset(value)
       : undefined;
 
   switch (matchType) {
