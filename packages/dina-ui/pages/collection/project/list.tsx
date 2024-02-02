@@ -22,7 +22,7 @@ const PROJECT_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
     accessorKey: "name"
   },
   "status",
-  descriptionCell("multilingualDescription"),
+  descriptionCell(false, false, "multilingualDescription"),
   groupCell("group"),
   "createdBy",
   dateCell("createdOn")

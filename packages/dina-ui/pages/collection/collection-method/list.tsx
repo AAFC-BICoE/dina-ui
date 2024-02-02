@@ -29,7 +29,7 @@ const COLLECTION_METHOD_TABLE_COLUMNS: ColumnDefinition<CollectionMethod>[] = [
     ),
     accessorKey: "name"
   },
-  descriptionCell("multilingualDescription"),
+  descriptionCell(false, false, "multilingualDescription"),
   groupCell("group"),
   "createdBy",
   dateCell("createdOn")
