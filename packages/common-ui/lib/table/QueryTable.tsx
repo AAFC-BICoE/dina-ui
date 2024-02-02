@@ -392,7 +392,7 @@ export function QueryTable<TData extends KitsuResource>({
         className="-striped"
         columns={mappedColumns}
         data={(displayData as TData[]) ?? []}
-        defaultSorted={sortingRules}
+        sort={sortingRules}
         loading={loadingProp || queryIsLoading}
         enableFilters={enableFilters}
         defaultColumnFilters={columnFilters}

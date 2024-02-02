@@ -164,7 +164,7 @@ export function RevisionsPageLayout({
                 </div>
               );
             },
-            defaultSorted: [],
+            sort: [],
             // Revisions are not sortable, they are pre-sorted by commit datetime.
             enableSorting: false,
             className: "no-hover-highlight"

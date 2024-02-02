@@ -103,7 +103,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
         columns={CHILD_SAMPLES_COLUMNS}
         className="-striped react-table-overflow"
         data={samples ?? []}
-        defaultSorted={sortingRules}
+        sort={sortingRules}
         showPagination={shouldShowPagination}
       />
     </FieldSet>

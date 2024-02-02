@@ -41,7 +41,7 @@ export interface ReactTableProps<TData> {
   enableSorting?: boolean;
   enableMultiSort?: boolean;
   manualSorting?: boolean;
-  defaultSorted?: SortingState;
+  sort?: SortingState;
   onSortingChange?: (sorting: SortingState) => void;
   // Filtering
   enableFilters?: boolean;
@@ -129,6 +129,13 @@ export interface ReactTableProps<TData> {
   columnSelectorDefaultColumns?: any[];
 }
 
+const DEFAULT_SORT: SortingState = [
+  {
+    id: "createdOn",
+    desc: true
+  }
+];
+
 export function ReactTable<TData>({
   data,
   onRowMove,
@@ -148,7 +155,7 @@ export function ReactTable<TData>({
   onDataChanged,
   enableEditing,
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
-  defaultSorted,
+  sort,
   onSortingChange,
   manualSorting = false,
   defaultExpanded,
@@ -176,7 +183,7 @@ export function ReactTable<TData>({
   columnSelectorDefaultColumns
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>(sort ?? DEFAULT_SORT);
   const [columnFilters, setColumnFilters] =
     useState<ColumnFiltersState>(defaultColumnFilters);
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
@@ -233,7 +240,7 @@ export function ReactTable<TData>({
     ...(enableSorting && { getSortedRowModel: getSortedRowModel() }),
     ...(enableFilters && { getFilteredRowModel: getFilteredRowModel() }),
     initialState: {
-      sorting: defaultSorted,
+      sorting: sort ?? sorting,
       pagination: { pageIndex, pageSize },
       ...(defaultExpanded && {
         expanded: defaultExpanded
@@ -249,7 +256,7 @@ export function ReactTable<TData>({
         getExpandedRowModel: getExpandedRowModel()
       }),
     state: {
-      sorting,
+      sorting: sort ?? sorting,
       ...(columnVisibility && { columnVisibility }),
       ...(enableFilters && columnFilters && { columnFilters }),
       ...(manualPagination && {
@@ -329,10 +336,9 @@ export function ReactTable<TData>({
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
-                const defaultSortRule = defaultSorted?.find(
+                const defaultSortRule = sort?.find(
                   (sortRule) => sortRule.id === header.id
                 );
-
                 return (
                   <th
                     key={header.id}
