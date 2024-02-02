@@ -9,7 +9,7 @@ import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
 import { Alert, Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
-import { LoadingSpinner } from "../..";
+import { LoadingSpinner, defaultJsonTree } from "../..";
 import {
   Config,
   ImmutableTree,
@@ -208,6 +208,7 @@ export function SavedSearch({
   // Clear saved-search-changed local storage if user closes window
   window.addEventListener("beforeunload", (_e) => {
     setChangesMade(false);
+    setLocalStorageQueryTree(defaultJsonTree);
   });
 
   // User Preferences has been loaded in and apply default loaded search:
@@ -279,9 +280,16 @@ export function SavedSearch({
       defaultSavedSearchImmutableTree,
       queryBuilderConfig
     );
+    const defaultJsonTreeString = Utils.queryString(
+      Utils.loadTree(defaultJsonTree),
+      queryBuilderConfig
+    );
 
     // Compare defaultSavedSearch against localStorage
-    if (defaultSavedSearchQueryTreeString !== localStorageQueryTreeString) {
+    if (
+      defaultSavedSearchQueryTreeString !== localStorageQueryTreeString &&
+      defaultJsonTreeString !== localStorageQueryTreeString
+    ) {
       isQueryChanged = true;
     }
 
