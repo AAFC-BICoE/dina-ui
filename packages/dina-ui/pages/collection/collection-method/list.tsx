@@ -2,11 +2,18 @@ import {
   ButtonBar,
   ColumnDefinition,
   CreateButton,
+  dateCell,
   descriptionCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import {
+  Footer,
+  groupCell,
+  GroupSelectField,
+  Head,
+  Nav
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectionMethod } from "../../../types/collection-api";
 
@@ -22,8 +29,10 @@ const COLLECTION_METHOD_TABLE_COLUMNS: ColumnDefinition<CollectionMethod>[] = [
     ),
     accessorKey: "name"
   },
-  "group",
-  descriptionCell(false, false, "multilingualDescription")
+  descriptionCell(false, false, "multilingualDescription"),
+  groupCell("group"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 export default function collectionMethodListPage() {

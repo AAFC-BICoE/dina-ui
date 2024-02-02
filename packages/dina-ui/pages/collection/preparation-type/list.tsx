@@ -5,7 +5,7 @@ import {
   dateCell
 } from "common-ui";
 import Link from "next/link";
-import { GroupSelectField } from "../../../components";
+import { GroupSelectField, groupCell } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
 import { PreparationType } from "../../../types/collection-api";
 
@@ -21,7 +21,7 @@ const PREPARATION_TYPE_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
     ),
     accessorKey: "name"
   },
-  "group",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];
@@ -51,13 +51,7 @@ export default function preparationTypeListPage() {
         id="preparation-type-list"
         queryTableProps={{
           columns: PREPARATION_TYPE_TABLE_COLUMNS,
-          path: "collection-api/preparation-type",
-          defaultSort: [
-            {
-              id: "name",
-              desc: false
-            }
-          ]
+          path: "collection-api/preparation-type"
         }}
         filterFormchildren={({ submitForm }) => (
           <div className="mb-3">

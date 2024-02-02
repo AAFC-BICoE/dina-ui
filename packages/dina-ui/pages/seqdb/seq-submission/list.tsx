@@ -2,10 +2,11 @@ import {
   ButtonBar,
   ColumnDefinition,
   CreateButton,
-  ListPageLayout
+  ListPageLayout,
+  dateCell
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav, groupCell8 } from "../../../components";
+import { Head, Nav, groupCell } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqSubmission } from "../../../types/seqdb-api/resources/SeqSubmission";
 
@@ -22,7 +23,9 @@ const SEQ_SUBMISSION_TABLE_COLUMNS: ColumnDefinition<SeqSubmission>[] = [
     ),
     accessorKey: "name"
   },
-  groupCell8("group")
+  groupCell("group"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 const SEQ_SUBMISSION_FILTER_ATTRIBUTES = ["name", "group"];

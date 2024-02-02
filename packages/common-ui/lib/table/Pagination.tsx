@@ -1,6 +1,7 @@
 import { Table } from "@tanstack/react-table";
-import { insert } from "formik";
 import { useIntl } from "react-intl";
+import CreatableSelect from "react-select/creatable";
+import { SelectOption } from "../formik-connected/SelectField";
 
 export function Pagination<TData>({
   table,
@@ -12,7 +13,7 @@ export function Pagination<TData>({
   const { formatMessage } = useIntl();
 
   return (
-    <div className="-pagination">
+    <div className="-pagination" data-testid="pagination">
       <div className="-previous">
         <button
           type="button"
@@ -43,19 +44,28 @@ export function Pagination<TData>({
           <span className="-totalPages">{table.getPageCount()}</span>
         </span>
         <span className="select-wrap -pageSizeOptions">
-          <select
-            aria-label="rows per page"
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => {
-              table.setPageSize(Number(e.target.value));
+          <CreatableSelect<SelectOption<number>>
+            name="pageSize"
+            value={{
+              value: table.getState().pagination.pageSize,
+              label: `${table.getState().pagination.pageSize} ${formatMessage({
+                id: "rows"
+              })}`
             }}
-          >
-            {pageSizeOptions.map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                {`${pageSize} ${formatMessage({ id: "rows" })}`}
-              </option>
-            ))}
-          </select>
+            aria-label="rows per page"
+            onChange={(selected) => {
+              if (selected) {
+                table.setPageSize(
+                  Number((selected as SelectOption<number>).value)
+                );
+              }
+            }}
+            options={pageSizeOptions.map((pageSize) => ({
+              value: pageSize,
+              label: `${pageSize}`
+            }))}
+            formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
+          ></CreatableSelect>
         </span>
       </div>
       <div className="-next">

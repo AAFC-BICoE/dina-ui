@@ -7,7 +7,7 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { groupCell, GroupSelectField, Head, Nav } from "../../../components";
 import { useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqBatch } from "../../../types/seqdb-api";
 
@@ -20,7 +20,7 @@ const TABLE_COLUMNS: ColumnDefinition<SeqBatch>[] = [
     }) => <Link href={`/seqdb/seq-batch/view?id=${id}`}>{name || id}</Link>,
     accessorKey: "name"
   },
-  "group",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];

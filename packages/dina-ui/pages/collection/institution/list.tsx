@@ -7,7 +7,7 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav } from "../../../components";
+import { groupCell, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Institution } from "../../../types/collection-api";
 
@@ -22,6 +22,7 @@ const TABLE_COLUMNS: ColumnDefinition<Institution>[] = [
     ),
     accessorKey: "name"
   },
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];

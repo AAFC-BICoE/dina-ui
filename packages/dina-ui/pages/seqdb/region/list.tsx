@@ -2,10 +2,11 @@ import {
   ButtonBar,
   ColumnDefinition,
   CreateButton,
-  ListPageLayout
+  ListPageLayout,
+  dateCell
 } from "common-ui";
 import Link from "next/link";
-import { groupCell8, Head, Nav } from "../../../components";
+import { groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
@@ -22,9 +23,11 @@ const REGION_TABLE_COLUMNS: ColumnDefinition<Region>[] = [
     ),
     accessorKey: "name"
   },
-  groupCell8("group"),
   "description",
-  "symbol"
+  "symbol",
+  groupCell("group"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 const REGION_FILTER_ATTRIBUTES = ["name", "description", "symbol"];
