@@ -146,8 +146,9 @@ export function SaveWorkbookProgress({
         await delay(10); // Yield to render the progress bar
         break;
       }
-      setNow(i);
-      saveProgress(i + chunkSize);
+      const next = i+chunkSize;
+      setNow(next);
+      saveProgress(next);
       await delay(10); // Yield to render the progress bar
     }
     if (statusRef.current === "SAVING") {
