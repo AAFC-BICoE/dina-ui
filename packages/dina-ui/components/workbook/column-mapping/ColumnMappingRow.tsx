@@ -135,14 +135,18 @@ export function ColumnMappingRow({
       </div>
       <div className="col-md-4 mt-2">
         {showMapRelationshipCheckbox(columnIndex, fieldPath) && (
-          <Checkbox
+          <input
+            type="checkbox"
+            className="mt-2"
             id={`${columnName}-map-relationship`}
-            hideLabel={true}
-            isChecked={checked}
-            isField={false}
-            handleClick={(e) => {
+            checked={checked}
+            onChange={(e) => {
               setChecked(e.target.checked);
               onToggleColumnMapping?.(columnName, fieldPath!, e.target.checked);
+            }}
+            style={{
+              height: "20px",
+              width: "20px"
             }}
           />
         )}
