@@ -182,7 +182,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -195,7 +195,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -232,7 +232,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -305,7 +305,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19",
       "lte": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -318,7 +318,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19",
       "lte": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -355,7 +355,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19",
       "lte": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -366,7 +366,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gt": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -377,7 +377,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gt": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -408,7 +408,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gt": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -419,7 +419,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gte": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -430,7 +430,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gte": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -461,7 +461,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gte": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -472,7 +472,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lt": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -483,7 +483,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lt": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -514,7 +514,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lt": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -525,7 +525,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lte": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -536,7 +536,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lte": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -567,7 +567,7 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lte": "1998-05-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -625,7 +625,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -657,7 +657,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -751,7 +751,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -784,7 +784,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -813,7 +813,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -898,7 +898,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1142,7 +1142,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1171,7 +1171,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1256,7 +1256,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1283,7 +1283,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gt": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1310,7 +1310,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gt": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1389,7 +1389,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gt": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1416,7 +1416,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1443,7 +1443,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1522,7 +1522,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1549,7 +1549,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lt": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1576,7 +1576,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lt": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1655,7 +1655,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lt": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1682,7 +1682,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1709,7 +1709,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1788,7 +1788,7 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lte": "1998-05-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1944,7 +1944,7 @@ Object {
                     "format": "yyyy-MM-dd",
                     "gte": "1998-05-19",
                     "lte": "1998-05-19",
-                    "time_zone": "+00:00",
+                    "time_zone": "UTC",
                   },
                 },
               },
@@ -2005,7 +2005,7 @@ Object {
                     "format": "yyyy-MM-dd",
                     "gte": "1998-05-19",
                     "lte": "1998-05-19",
-                    "time_zone": "+00:00",
+                    "time_zone": "UTC",
                   },
                 },
               },
@@ -2186,7 +2186,7 @@ Object {
                     "format": "yyyy-MM-dd",
                     "gte": "1998-05-19",
                     "lte": "1998-05-19",
-                    "time_zone": "+00:00",
+                    "time_zone": "UTC",
                   },
                 },
               },

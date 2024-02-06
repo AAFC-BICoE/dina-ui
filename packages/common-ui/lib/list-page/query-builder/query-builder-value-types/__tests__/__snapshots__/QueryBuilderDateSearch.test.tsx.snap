@@ -34,7 +34,7 @@ Object {
       "format": "yyyy",
       "gte": "1998||/y",
       "lte": "1998||/y",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -47,7 +47,7 @@ Object {
       "format": "yyyy-MM",
       "gte": "1998-05||/M",
       "lte": "1998-05||/M",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -60,7 +60,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -73,7 +73,7 @@ Object {
       "format": "yyyy",
       "gte": "1998||/y",
       "lte": "1998||/y",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -86,7 +86,7 @@ Object {
       "format": "yyyy-MM",
       "gte": "1998-05||/M",
       "lte": "1998-05||/M",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -99,7 +99,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -184,7 +184,7 @@ Object {
       "format": "yyyy",
       "gte": "1998||/y",
       "lte": "1998||/y",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -197,7 +197,7 @@ Object {
       "format": "yyyy-MM",
       "gte": "1998-05||/M",
       "lte": "1998-05||/M",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -210,7 +210,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -283,7 +283,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "2013-12-16",
       "lte": "2013-12-16",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -296,7 +296,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "2013-12-16",
       "lte": "2013-12-16",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -333,7 +333,7 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "2013-12-16",
       "lte": "2013-12-16",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -344,7 +344,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gt": "1970-07-31",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -355,7 +355,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gt": "1970-07-31",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -386,7 +386,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gt": "1970-07-31",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -397,7 +397,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gte": "1981-06-15",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -408,7 +408,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gte": "1981-06-15",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -439,7 +439,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gte": "1981-06-15",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -450,7 +450,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lt": "1982-04-20",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -461,7 +461,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lt": "1982-04-20",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -492,7 +492,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lt": "1982-04-20",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -503,7 +503,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lte": "1995-06-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -514,7 +514,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lte": "1995-06-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -545,7 +545,7 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lte": "1995-06-19",
-      "time_zone": "+00:00",
+      "time_zone": "UTC",
     },
   },
 }
@@ -603,7 +603,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2002-12-30",
                 "lte": "2002-12-30",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -635,7 +635,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2002-12-30",
                 "lte": "2002-12-30",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -729,7 +729,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2002-12-30",
                 "lte": "2002-12-30",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -764,7 +764,7 @@ Object {
                 "format": "yyyy",
                 "gte": "1998||/y",
                 "lte": "1998||/y",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -793,7 +793,7 @@ Object {
                 "format": "yyyy-MM",
                 "gte": "1998-05||/M",
                 "lte": "1998-05||/M",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -822,7 +822,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -851,7 +851,7 @@ Object {
                 "format": "yyyy",
                 "gte": "1998||/y",
                 "lte": "1998||/y",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -880,7 +880,7 @@ Object {
                 "format": "yyyy-MM",
                 "gte": "1998-05||/M",
                 "lte": "1998-05||/M",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -909,7 +909,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1106,7 +1106,7 @@ Object {
                 "format": "yyyy",
                 "gte": "1998||/y",
                 "lte": "1998||/y",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1135,7 +1135,7 @@ Object {
                 "format": "yyyy-MM",
                 "gte": "1998-05||/M",
                 "lte": "1998-05||/M",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1164,7 +1164,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1408,7 +1408,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2013-12-16",
                 "lte": "2013-12-16",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1437,7 +1437,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2013-12-16",
                 "lte": "2013-12-16",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1522,7 +1522,7 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2013-12-16",
                 "lte": "2013-12-16",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1549,7 +1549,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gt": "1970-07-31",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1576,7 +1576,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gt": "1970-07-31",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1655,7 +1655,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gt": "1970-07-31",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1682,7 +1682,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gte": "1981-06-15",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1709,7 +1709,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gte": "1981-06-15",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1788,7 +1788,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gte": "1981-06-15",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1815,7 +1815,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lt": "1982-04-20",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1842,7 +1842,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lt": "1982-04-20",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1921,7 +1921,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lt": "1982-04-20",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1948,7 +1948,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lte": "1995-06-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -1975,7 +1975,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lte": "1995-06-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -2054,7 +2054,7 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lte": "1995-06-19",
-                "time_zone": "+00:00",
+                "time_zone": "UTC",
               },
             },
           },
@@ -2210,7 +2210,7 @@ Object {
                     "format": "yyyy-MM-dd",
                     "gte": "2002-12-30",
                     "lte": "2002-12-30",
-                    "time_zone": "+00:00",
+                    "time_zone": "UTC",
                   },
                 },
               },
@@ -2271,7 +2271,7 @@ Object {
                     "format": "yyyy-MM-dd",
                     "gte": "2002-12-30",
                     "lte": "2002-12-30",
-                    "time_zone": "+00:00",
+                    "time_zone": "UTC",
                   },
                 },
               },
@@ -2452,7 +2452,7 @@ Object {
                     "format": "yyyy-MM-dd",
                     "gte": "2002-12-30",
                     "lte": "2002-12-30",
-                    "time_zone": "+00:00",
+                    "time_zone": "UTC",
                   },
                 },
               },
