@@ -206,7 +206,7 @@ export function SavedSearch({
   }, [selectedSavedSearch, lastSelected]);
 
   // Clear saved-search-changed local storage if user closes window
-  window.addEventListener("beforeunload", (_e) => {
+  window.addEventListener("unload", (_e) => {
     setChangesMade(false);
     setLocalStorageQueryTree(defaultJsonTree);
   });
