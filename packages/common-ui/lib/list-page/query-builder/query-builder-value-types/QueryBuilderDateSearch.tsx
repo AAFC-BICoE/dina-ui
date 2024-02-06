@@ -268,19 +268,20 @@ export function transformDateSearchToDSL({
 /**
  * Generates the time_zone to return with the elastic search response.
  *
- * This will retrieve the users current timezone offset.
+ * This will retrieve the users current timezone without the DST offset which can vary.
  *
- * This will return the offset in ISO 8601 UTC offset format, such as +01:00 or -08:00.
+ * This will return the timezone in IANA time zone format for elastic search to use.
+ * 
+ * @returns elasticsearch timezone section, using the users IANA timezone
  */
-function getTimezoneOffset() {
-  const utcOffsetMinutes = moment().utcOffset();
-  const formattedOffset = moment().utcOffset(utcOffsetMinutes).format("Z");
+function getTimezone() {
+  const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const utcTimeOffset = {
-    time_zone: formattedOffset
+  const timezoneConfig = {
+    time_zone: currentTimezone
   };
 
-  return utcTimeOffset;
+  return timezoneConfig;
 }
 
 /**
@@ -313,7 +314,7 @@ function buildDateRangeObject(matchType, value, subType) {
   // Local date does not store timezone, ignore it.
   const timezone =
     subType !== "local_date" && subType !== "local_date_time"
-      ? getTimezoneOffset()
+      ? getTimezone()
       : undefined;
 
   switch (matchType) {
