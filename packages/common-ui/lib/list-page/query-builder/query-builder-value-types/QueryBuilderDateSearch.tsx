@@ -274,6 +274,7 @@ export function transformDateSearchToDSL({
  * This will return the offset in ISO 8601 UTC offset format, such as +01:00 or -08:00.
  * 
  * @param date string representation of the date. Moment supports full/partial dates formats.
+ * @returns elasticsearch timezone section, using utcOffset
  */
 function getTimezoneOffset(date: string) {
   const utcOffsetMinutes = moment(date, ["YYYY", "YYYY-MM", "YYYY-MM-DD"]).utcOffset();
