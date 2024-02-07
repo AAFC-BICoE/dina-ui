@@ -10,11 +10,16 @@ import {
   ApiClientImpl,
   ApiClientProvider
 } from "../api-client/ApiClientContext";
+import {
+  InstanceContextI,
+  InstanceContextProvider
+} from "../instance/InstanceContextProvider";
 import { CommonUIIntlProvider } from "../intl/common-ui-intl";
 import { ModalProvider } from "../modal/modal";
 
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
+  instanceContext?: Partial<InstanceContextI>;
   accountContext?: Partial<AccountContextI>;
   children?: React.ReactNode;
 }
@@ -26,6 +31,7 @@ interface MockAppContextProviderProps {
 export function MockAppContextProvider({
   accountContext,
   apiContext = { apiClient: { get: () => undefined as any } },
+  instanceContext,
   children
 }: MockAppContextProviderProps) {
   const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = useMemo(
@@ -87,11 +93,13 @@ export function MockAppContextProvider({
           value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
           <CommonUIIntlProvider>
-            <div ref={modalWrapperRef}>
-              <ModalProvider appElement={modalWrapperRef.current}>
-                {children}
-              </ModalProvider>
-            </div>
+            <InstanceContextProvider>
+              <div ref={modalWrapperRef}>
+                <ModalProvider appElement={modalWrapperRef.current}>
+                  {children}
+                </ModalProvider>
+              </div>
+            </InstanceContextProvider>
           </CommonUIIntlProvider>
         </ApiClientProvider>
       </AccountProvider>

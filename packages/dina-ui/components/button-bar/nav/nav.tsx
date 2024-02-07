@@ -1,23 +1,21 @@
 import {
   LanguageSelector,
   NavbarUserControl,
+  intlContext,
   useAccount,
-  intlContext
+  useInstanceContext
 } from "common-ui";
-import React from "react";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { useContext, useState, useEffect } from "react";
-import Button from "react-bootstrap/Button";
-import Navbar from "react-bootstrap/Navbar";
-import ReactNav from "react-bootstrap/Nav";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
-import axios from "axios";
+import { useContext, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import NavDropdown from "react-bootstrap/NavDropdown";
+import Navbar from "react-bootstrap/Navbar";
+import Row from "react-bootstrap/Row";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
 
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
@@ -27,25 +25,15 @@ export interface NavProps {
 export function Nav({ marginBottom = true }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
-  const [instanceMode, setInstanceMode] = useState();
-
-  useEffect(() => {
-    const getInstanceMode = async () => {
-      try {
-        const response = await axios.get(`/api/instance.json`);
-        setInstanceMode(response.data["instance-mode"]);
-      } catch (error) {
-        setInstanceMode(undefined);
-      }
-    };
-    getInstanceMode();
-  }, []);
+  const instanceContext = useInstanceContext();
 
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
       ?.flatMap((it) => it)
       ?.includes(SUPER_USER) || isAdmin;
+
+  const instanceMode = instanceContext?.instanceMode ?? "developer";
 
   return (
     <>
