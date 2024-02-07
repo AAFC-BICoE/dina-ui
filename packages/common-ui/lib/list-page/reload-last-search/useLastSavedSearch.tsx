@@ -16,6 +16,11 @@ interface UseLastSavedSearchProps {
   >;
 
   /**
+   * Search has been loaded in.
+   */
+  setDefaultLoadedIn: React.Dispatch<React.SetStateAction<boolean>>;
+
+  /**
    * For the last loaded search, we will actually perform the search by calling this callback
    * function.
    */
@@ -38,6 +43,7 @@ interface UseLastSavedSearchReturn {
 
 export function useLastSavedSearch({
   setQueryBuilderTree,
+  setDefaultLoadedIn,
   setSubmittedQueryBuilderTree,
   performSubmit,
   uniqueName
@@ -57,6 +63,7 @@ export function useLastSavedSearch({
       setSubmittedQueryBuilderTree(
         Utils.loadTree(localStorageQueryTree as JsonTree)
       );
+      setDefaultLoadedIn(true);
     } else {
       // Nothing to load in, mark as loaded.
       setQueryLoaded(true);

@@ -141,6 +141,7 @@ export function SavedSearch({
   useLastSavedSearch({
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
+    setDefaultLoadedIn,
     performSubmit,
     uniqueName
   });
@@ -191,7 +192,7 @@ export function SavedSearch({
   // When a new saved search is selected.
   useEffect(() => {
     if (!selectedSavedSearch || !userPreferences) return;
-
+    setQueryError(undefined);
     loadSavedSearch(selectedSavedSearch);
   }, [selectedSavedSearch, lastSelected]);
 
