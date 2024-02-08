@@ -1,6 +1,8 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useEffect, useState } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
+import { useSessionStorage } from "usehooks-ts";
+import { defaultJsonTree } from "../..";
 
 interface UseLastSavedSearchProps {
   /**
@@ -42,20 +44,20 @@ export function useLastSavedSearch({
   performSubmit,
   uniqueName
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
-  const localStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
+  const sessionStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
 
   const [queryLoaded, setQueryLoaded] = useState<boolean>(false);
 
-  const [localStorageQueryTree, setLocalStorageQueryTree] =
-    useLocalStorage<JsonTree>(localStorageLastUsedTreeKey);
+  const [sessionStorageQueryTree, setSessionStorageQueryTree] =
+    useSessionStorage<JsonTree>(sessionStorageLastUsedTreeKey, defaultJsonTree);
 
   // Load in the last used save search
   useEffect(() => {
-    if (localStorageQueryTree) {
-      setQueryBuilderTree(Utils.loadTree(localStorageQueryTree as JsonTree));
+    if (sessionStorageQueryTree) {
+      setQueryBuilderTree(Utils.loadTree(sessionStorageQueryTree as JsonTree));
       setQueryLoaded(true);
       setSubmittedQueryBuilderTree(
-        Utils.loadTree(localStorageQueryTree as JsonTree)
+        Utils.loadTree(sessionStorageQueryTree as JsonTree)
       );
     } else {
       // Nothing to load in, mark as loaded.
@@ -65,9 +67,9 @@ export function useLastSavedSearch({
 
   // Once the query builder tree has been loaded in, perform a submit.
   useEffect(() => {
-    if (localStorageQueryTree) {
+    if (sessionStorageQueryTree) {
       setSubmittedQueryBuilderTree(
-        Utils.loadTree(localStorageQueryTree as JsonTree)
+        Utils.loadTree(sessionStorageQueryTree as JsonTree)
       );
     } else {
       performSubmit();
@@ -75,6 +77,6 @@ export function useLastSavedSearch({
   }, [queryLoaded]);
 
   return {
-    loadLastUsed: !!localStorageQueryTree
+    loadLastUsed: !!sessionStorageQueryTree
   };
 }

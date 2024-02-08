@@ -70,6 +70,7 @@ import {
   getIncludedManagedAttributeColumn,
   getIncludedStandardColumns
 } from "../column-selector/ColumnSelectorUtils";
+import { useSessionStorage } from "usehooks-ts";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -793,8 +794,14 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
-  const localStorageLastUsedKey = uniqueName + "-last-used-tree";
-  const localStorageLastUsedTreeKey = uniqueName + "-saved-search-changed";
+  const sessionStorageLastUsedKeyTreeKey = uniqueName + "-last-used-tree";
+  const localStorageLastUsedSavedSearchChangedKey =
+    uniqueName + "-saved-search-changed";
+  const [sessionStorageQueryTree, setSessionStorageQueryTree] =
+    useSessionStorage<JsonTree>(
+      sessionStorageLastUsedKeyTreeKey,
+      defaultJsonTree
+    );
 
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
@@ -803,8 +810,8 @@ export function QueryPage<TData extends KitsuResource>({
   const onReset = useCallback(() => {
     setSubmittedQueryBuilderTree(defaultQueryTree());
     setQueryBuilderTree(defaultQueryTree());
-    writeStorage(localStorageLastUsedKey, defaultJsonTree);
-    writeStorage(localStorageLastUsedTreeKey, false);
+    setSessionStorageQueryTree(defaultJsonTree);
+    writeStorage(localStorageLastUsedSavedSearchChangedKey, false);
     setSortingRules(defaultSort ?? DEFAULT_SORT);
     setError(undefined);
     setPageOffset(0);
@@ -817,7 +824,7 @@ export function QueryPage<TData extends KitsuResource>({
   const onSubmit = () => {
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
-    writeStorage(localStorageLastUsedKey, Utils.getTree(queryBuilderTree));
+    setSessionStorageQueryTree(Utils.getTree(queryBuilderTree));
   };
 
   /**

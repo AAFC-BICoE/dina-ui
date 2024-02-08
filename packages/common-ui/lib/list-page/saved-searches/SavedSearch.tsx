@@ -25,9 +25,9 @@ import { map, cloneDeep, sortBy, isEqual } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
-import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
 import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useIntl } from "react-intl";
+import { useSessionStorage } from "usehooks-ts";
 
 export interface SavedSearchProps {
   /**
@@ -189,9 +189,9 @@ export function SavedSearch({
     return undefined;
   }, [selectedSavedSearch, userPreferences]);
 
-  const localStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
-  const [localStorageQueryTree, setLocalStorageQueryTree] =
-    useLocalStorage<JsonTree>(localStorageLastUsedTreeKey);
+  const sessionStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
+  const [sessionStorageQueryTree, setSessionStorageQueryTree] =
+    useSessionStorage<JsonTree>(sessionStorageLastUsedTreeKey, defaultJsonTree);
 
   // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {
@@ -204,12 +204,6 @@ export function SavedSearch({
 
     loadSavedSearch(selectedSavedSearch);
   }, [selectedSavedSearch, lastSelected]);
-
-  // Clear saved-search-changed local storage if user closes window
-  window.addEventListener("unload", (_e) => {
-    setChangesMade(false);
-    setLocalStorageQueryTree(defaultJsonTree);
-  });
 
   // User Preferences has been loaded in and apply default loaded search:
   useEffect(() => {
@@ -266,11 +260,11 @@ export function SavedSearch({
 
   function getDefaultSavedSearchChanged(defaultSavedSearch: SingleSavedSearch) {
     let isQueryChanged = false;
-    const localStorageImmutableTree = Utils.loadTree(
-      localStorageQueryTree as JsonTree
+    const sessionStorageImmutableTree = Utils.loadTree(
+      sessionStorageQueryTree as JsonTree
     );
-    const localStorageQueryTreeString = Utils.queryString(
-      localStorageImmutableTree,
+    const sessionStorageQueryTreeString = Utils.queryString(
+      sessionStorageImmutableTree,
       queryBuilderConfig
     );
     const defaultSavedSearchImmutableTree = Utils.loadTree(
@@ -287,8 +281,8 @@ export function SavedSearch({
 
     // Compare defaultSavedSearch against localStorage
     if (
-      defaultSavedSearchQueryTreeString !== localStorageQueryTreeString &&
-      defaultJsonTreeString !== localStorageQueryTreeString
+      defaultSavedSearchQueryTreeString !== sessionStorageQueryTreeString &&
+      defaultJsonTreeString !== sessionStorageQueryTreeString
     ) {
       isQueryChanged = true;
     }
@@ -374,7 +368,7 @@ export function SavedSearch({
           Utils.loadTree(savedSearchToLoad.queryTree)
         );
         setPageOffset(0);
-        writeStorage(localStorageLastUsedTreeKey, savedSearchToLoad.queryTree);
+        setSessionStorageQueryTree(savedSearchToLoad.queryTree);
       } else {
         setQueryError(formatMessage({ id: "queryBuilder_invalid_query" }));
         setChangesMade(true);
