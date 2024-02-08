@@ -1,23 +1,48 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is equals: Expect text field not to be displayed since the match type is not equals 1`] = `"<QueryRowTextSearch matchType=\\"empty\\" value=\\"test\\" setValue={[Function: bound fn]} />"`;
+exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is equals: Expect text field not to be displayed since the match type is not equals 1`] = `
+<DocumentFragment>
+  <div />
+</DocumentFragment>
+`;
 
 exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is equals: Expect text field to be displayed since match type is equals 1`] = `
-"<QueryRowTextSearch matchType=\\"equals\\" value=\\"test\\" setValue={[Function: bound fn]}>
-  <input type=\\"text\\" value=\\"test\\" onChange={[Function: onChange]} className=\\"form-control\\" placeholder=\\"queryBuilder_value_text_placeholder\\" />
-</QueryRowTextSearch>"
+<DocumentFragment>
+  <div>
+    <input
+      class="form-control"
+      placeholder="queryBuilder_value_text_placeholder"
+      type="text"
+      value="test"
+    />
+  </div>
+</DocumentFragment>
 `;
 
 exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is in or not in: Expect text field to be displayed with a different placeholder. 1`] = `
-"<QueryRowTextSearch matchType=\\"in\\" value=\\"test1, test2, test3\\" setValue={[Function: bound fn]}>
-  <input type=\\"text\\" value=\\"test1, test2, test3\\" onChange={[Function: onChange]} className=\\"form-control\\" placeholder=\\"queryBuilder_value_in_placeholder\\" />
-</QueryRowTextSearch>"
+<DocumentFragment>
+  <div>
+    <input
+      class="form-control"
+      placeholder="queryBuilder_value_in_placeholder"
+      type="text"
+      value="test1, test2, test3"
+    />
+  </div>
+</DocumentFragment>
 `;
 
 exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is in or not in: Expect text field to be displayed with a different placeholder. 2`] = `
-"<QueryRowTextSearch matchType=\\"notIn\\" value=\\"test1, test2, test3\\" setValue={[Function: bound fn]}>
-  <input type=\\"text\\" value=\\"test1, test2, test3\\" onChange={[Function: onChange]} className=\\"form-control\\" placeholder=\\"queryBuilder_value_in_placeholder\\" />
-</QueryRowTextSearch>"
+<DocumentFragment>
+  <div>
+    <input
+      class="form-control"
+      placeholder="queryBuilder_value_in_placeholder"
+      type="text"
+      value="test1, test2, test3"
+    />
+  </div>
+</DocumentFragment>
 `;
 
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function ContainsText (Infix) operation Normal field 1`] = `

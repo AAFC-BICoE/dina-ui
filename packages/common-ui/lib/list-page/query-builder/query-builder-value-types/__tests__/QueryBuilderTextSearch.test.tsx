@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
+import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "../QueryBuilderTextSearch";
@@ -8,7 +8,7 @@ describe("QueryBuilderTextSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const textSearchEquals = mountWithAppContext(
+      const textSearchEquals = mountWithAppContext2(
         <QueryBuilderTextSearch
           matchType="equals"
           value="test"
@@ -17,13 +17,11 @@ describe("QueryBuilderTextSearch", () => {
       );
 
       // Expect a snapshot with the text field being displayed.
-      expect(
-        textSearchEquals.find(QueryBuilderTextSearch).debug()
-      ).toMatchSnapshot(
+      expect(textSearchEquals.asFragment()).toMatchSnapshot(
         "Expect text field to be displayed since match type is equals"
       );
 
-      const textSearchEmpty = mountWithAppContext(
+      const textSearchEmpty = mountWithAppContext2(
         <QueryBuilderTextSearch
           matchType="empty"
           value="test"
@@ -32,9 +30,7 @@ describe("QueryBuilderTextSearch", () => {
       );
 
       // Expect a snapshot without the text field being displayed.
-      expect(
-        textSearchEmpty.find(QueryBuilderTextSearch).debug()
-      ).toMatchSnapshot(
+      expect(textSearchEmpty.asFragment()).toMatchSnapshot(
         "Expect text field not to be displayed since the match type is not equals"
       );
     });
@@ -42,7 +38,7 @@ describe("QueryBuilderTextSearch", () => {
     it("Display field if match type is in or not in", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const textSearchIn = mountWithAppContext(
+      const textSearchIn = mountWithAppContext2(
         <QueryBuilderTextSearch
           matchType="in"
           value="test1, test2, test3"
@@ -51,13 +47,11 @@ describe("QueryBuilderTextSearch", () => {
       );
 
       // Expect a snapshot with the text field being with a different placeholder.
-      expect(
-        textSearchIn.find(QueryBuilderTextSearch).debug()
-      ).toMatchSnapshot(
+      expect(textSearchIn.asFragment()).toMatchSnapshot(
         "Expect text field to be displayed with a different placeholder."
       );
 
-      const textSearchNotIn = mountWithAppContext(
+      const textSearchNotIn = mountWithAppContext2(
         <QueryBuilderTextSearch
           matchType="notIn"
           value="test1, test2, test3"
@@ -66,9 +60,7 @@ describe("QueryBuilderTextSearch", () => {
       );
 
       // Expect a snapshot with the text field being with a different placeholder.
-      expect(
-        textSearchNotIn.find(QueryBuilderTextSearch).debug()
-      ).toMatchSnapshot(
+      expect(textSearchNotIn.asFragment()).toMatchSnapshot(
         "Expect text field to be displayed with a different placeholder."
       );
     });
