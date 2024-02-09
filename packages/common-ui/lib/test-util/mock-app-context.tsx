@@ -20,7 +20,6 @@ import { ModalProvider } from "../modal/modal";
 
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
-  instanceContext?: Partial<InstanceContextI>;
   accountContext?: Partial<AccountContextI>;
   instanceContext?: Partial<InstanceContextI>;
   children?: React.ReactNode;
