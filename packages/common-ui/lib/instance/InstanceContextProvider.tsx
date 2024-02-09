@@ -6,7 +6,9 @@ export interface InstanceContextI {
   instanceMode: string;
 }
 
-export const InstanceContext = createContext<InstanceContextI | undefined>(undefined);
+export const InstanceContext = createContext<InstanceContextI | undefined>(
+  undefined
+);
 
 export function InstanceContextProvider({ children }: { children: ReactNode }) {
   const { apiClient } = useApiClient();
@@ -15,7 +17,7 @@ export function InstanceContextProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const getInstanceJSON = async () => {
       try {
-        const response = await apiClient.axios.get(`/instance.json`);
+        const response = await apiClient.get("/instance.json", {});
         if (response?.data) {
           setInstanceJson({
             supportedLanguages:

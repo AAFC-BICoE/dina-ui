@@ -12,12 +12,12 @@ describe("InstanceContextProvider", () => {
   it("use InstanceContext", async () => {
     const apiContext: any = {
       apiClient: {
-        axios: {
-          get: jest.fn().mockResolvedValue({data: {
+        get: jest.fn().mockResolvedValue({
+          data: {
             "supported-languages-iso": "lang1, lang2",
             "instance-mode": "mode1"
-          }})
-        }
+          }
+        })
       }
     };
     // get instance context
@@ -41,7 +41,7 @@ describe("InstanceContextProvider", () => {
       </ApiClientProvider>
     );
 
-    expect(apiContext.apiClient.axios.get).toHaveBeenCalledTimes(1);
+    expect(apiContext.apiClient.get).toHaveBeenCalledTimes(1);
     const p1 = await component.findByTestId("supportedLanguages");
     expect(p1).toBeInTheDocument();
     expect(p1.textContent).toBe("lang1, lang2");
