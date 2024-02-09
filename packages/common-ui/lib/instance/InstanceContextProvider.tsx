@@ -6,9 +6,17 @@ export interface InstanceContextI {
   instanceMode: string;
 }
 
-export const InstanceContext = createContext<InstanceContextI | undefined>(undefined);
+export const InstanceContext = createContext<InstanceContextI | undefined>(
+  undefined
+);
 
-export function InstanceContextProvider({ children }: { children: ReactNode }) {
+export const InstanceContextProvider = InstanceContext.Provider;
+
+export function DefaultInstanceContextProvider({
+  children
+}: {
+  children: ReactNode;
+}) {
   const { apiClient } = useApiClient();
   const [instanceJson, setInstanceJson] = useState<InstanceContextI>();
 

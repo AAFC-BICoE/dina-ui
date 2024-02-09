@@ -5,13 +5,13 @@ import {
   ApiClientI,
   ApiClientImpl,
   ApiClientProvider,
-  InstanceContext,
   InstanceContextI,
+  InstanceContextProvider,
   ModalProvider
 } from "common-ui";
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
-import { ReactNode, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { SWRConfig } from "swr";
@@ -22,24 +22,8 @@ import { DinaIntlProvider } from "../intl/dina-ui-intl";
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
   accountContext?: Partial<AccountContextI>;
+  instanceContext?: Partial<InstanceContextI>;
   children?: React.ReactNode;
-}
-
-export function MockInstanceContextProvider({
-  children
-}: {
-  children: ReactNode;
-}) {
-  const instanceJson: InstanceContextI = {
-    supportedLanguages: "en,fr",
-    instanceMode: "developer"
-  };
-
-  return (
-    <InstanceContext.Provider value={instanceJson}>
-      {children}
-    </InstanceContext.Provider>
-  );
 }
 
 /**
@@ -49,7 +33,7 @@ export function MockInstanceContextProvider({
 export function MockAppContextProvider({
   accountContext,
   apiContext = { apiClient: { get: () => undefined as any } },
-
+  instanceContext,
   children
 }: MockAppContextProviderProps) {
   const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = useMemo(
@@ -64,6 +48,11 @@ export function MockAppContextProvider({
       username: "test-user",
       isAdmin: false
     }),
+    []
+  );
+
+  const DEFAULT_INSTANCE_CONTEXT_VALUE: InstanceContextI = useMemo(
+    () => ({ supportedLanguages: "en,fr", instanceMode: "developer" }),
     []
   );
 
@@ -110,7 +99,9 @@ export function MockAppContextProvider({
           value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
           <DinaIntlProvider>
-            <MockInstanceContextProvider>
+            <InstanceContextProvider
+              value={{ ...DEFAULT_INSTANCE_CONTEXT_VALUE, ...instanceContext }}
+            >
               <FileUploadProviderImpl>
                 <DndProvider backend={HTML5Backend}>
                   <div ref={modalWrapperRef}>
@@ -120,7 +111,7 @@ export function MockAppContextProvider({
                   </div>
                 </DndProvider>
               </FileUploadProviderImpl>
-            </MockInstanceContextProvider>
+            </InstanceContextProvider>
           </DinaIntlProvider>
         </ApiClientProvider>
       </AccountProvider>
