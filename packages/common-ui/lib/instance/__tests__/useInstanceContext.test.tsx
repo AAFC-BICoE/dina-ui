@@ -1,25 +1,36 @@
+import { InstanceContext, InstanceContextI } from "../InstanceContextProvider";
+
 import { render } from "@testing-library/react";
 import { ApiClientProvider } from "../../api-client/ApiClientContext";
 import { InstanceContextProvider } from "../InstanceContextProvider";
 import { useInstanceContext } from "../useInstanceContext";
 import "@testing-library/jest-dom";
+import { ReactNode } from "react";
+
+function MockInstanceContextProvider({
+  children
+}: {
+  children: ReactNode;
+}) {
+  const instanceJson: InstanceContextI = {
+    supportedLanguages: "en,fr",
+    instanceMode: "developer"
+  };
+
+  return (
+    <InstanceContext.Provider value={instanceJson}>
+      {children}
+    </InstanceContext.Provider>
+  );
+}
 
 describe("InstanceContextProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("render InstanceContextProvider", async () => {
-    const apiContext: any = {
-      apiClient: {
-        axios: {
-          get: jest.fn().mockResolvedValue({data: {
-            "supported-languages-iso": "lang1, lang2",
-            "instance-mode": "mode1"
-          }})
-        }
-      }
-    };
+  it("useInstanceContext", async () => {
+    
     // get instance context
     const DumyComponent = () => {
       const instanceContext = useInstanceContext();
@@ -34,19 +45,16 @@ describe("InstanceContextProvider", () => {
     };
 
     const component = render(
-      <ApiClientProvider value={apiContext}>
-        <InstanceContextProvider>
+        <MockInstanceContextProvider>
           <DumyComponent />
-        </InstanceContextProvider>
-      </ApiClientProvider>
+        </MockInstanceContextProvider>
     );
 
-    expect(apiContext.apiClient.axios.get).toHaveBeenCalledTimes(1);
     const p1 = await component.findByTestId("supportedLanguages");
     expect(p1).toBeInTheDocument();
-    expect(p1.textContent).toBe("lang1, lang2");
+    expect(p1.textContent).toBe("en,fr");
     const p2 = await component.findByTestId("instanceMode");
     expect(p2).toBeInTheDocument();
-    expect(p2.textContent).toBe("mode1");
+    expect(p2.textContent).toBe("developer");
   });
 });

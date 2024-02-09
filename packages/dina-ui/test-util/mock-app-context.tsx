@@ -5,11 +5,13 @@ import {
   ApiClientI,
   ApiClientImpl,
   ApiClientProvider,
+  InstanceContext,
+  InstanceContextI,
   ModalProvider
 } from "common-ui";
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
-import { useMemo, useRef } from "react";
+import { ReactNode, useMemo, useRef } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { SWRConfig } from "swr";
@@ -21,6 +23,23 @@ interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
   accountContext?: Partial<AccountContextI>;
   children?: React.ReactNode;
+}
+
+export function MockInstanceContextProvider({
+  children
+}: {
+  children: ReactNode;
+}) {
+  const instanceJson: InstanceContextI = {
+    supportedLanguages: "en,fr",
+    instanceMode: "developer"
+  };
+
+  return (
+    <InstanceContext.Provider value={instanceJson}>
+      {children}
+    </InstanceContext.Provider>
+  );
 }
 
 /**
@@ -91,15 +110,17 @@ export function MockAppContextProvider({
           value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
           <DinaIntlProvider>
-            <FileUploadProviderImpl>
-              <DndProvider backend={HTML5Backend}>
-                <div ref={modalWrapperRef}>
-                  <ModalProvider appElement={modalWrapperRef.current}>
-                    {children}
-                  </ModalProvider>
-                </div>
-              </DndProvider>
-            </FileUploadProviderImpl>
+            <MockInstanceContextProvider>
+              <FileUploadProviderImpl>
+                <DndProvider backend={HTML5Backend}>
+                  <div ref={modalWrapperRef}>
+                    <ModalProvider appElement={modalWrapperRef.current}>
+                      {children}
+                    </ModalProvider>
+                  </div>
+                </DndProvider>
+              </FileUploadProviderImpl>
+            </MockInstanceContextProvider>
           </DinaIntlProvider>
         </ApiClientProvider>
       </AccountProvider>
