@@ -7,3 +7,4 @@ export * from "./resources/Metadata";
 export * from "./resources/ObjectSubtype";
 export * from "./resources/ObjectUpload";
 export * from "./resources/MediaType";
+export * from "./resources/ObjectExport";

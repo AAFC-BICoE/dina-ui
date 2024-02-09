@@ -153,5 +153,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   yes: "Yes",
   refreshButtonText: "Refresh",
   filterColumns: "Filter Columns",
-  applyButtonText: "Apply"
+  applyButtonText: "Apply",
+  exportObjectsButtonText: "Export Objects"
 };
