@@ -12,7 +12,8 @@ import {
 } from "../api-client/ApiClientContext";
 import {
   InstanceContext,
-  InstanceContextI
+  InstanceContextI,
+  InstanceContextProvider
 } from "../instance/InstanceContextProvider";
 import { CommonUIIntlProvider } from "../intl/common-ui-intl";
 import { ModalProvider } from "../modal/modal";
@@ -21,24 +22,8 @@ interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
   instanceContext?: Partial<InstanceContextI>;
   accountContext?: Partial<AccountContextI>;
+  instanceContext?: Partial<InstanceContextI>;
   children?: React.ReactNode;
-}
-
-export function MockInstanceContextProvider({
-  children
-}: {
-  children: ReactNode;
-}) {
-  const instanceJson: InstanceContextI = {
-    supportedLanguages: "en,fr",
-    instanceMode: "developer"
-  };
-
-  return (
-    <InstanceContext.Provider value={instanceJson}>
-      {children}
-    </InstanceContext.Provider>
-  );
 }
 
 /**
@@ -72,6 +57,11 @@ export function MockAppContextProvider({
       new ApiClientImpl({
         newId: () => "00000000-0000-0000-0000-000000000000"
       }),
+    []
+  );
+
+  const DEFAULT_INSTANCE_CONTEXT_VALUE: InstanceContextI = useMemo(
+    () => ({ supportedLanguages: "en,fr", instanceMode: "developer" }),
     []
   );
 
@@ -109,7 +99,9 @@ export function MockAppContextProvider({
         <ApiClientProvider
           value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
-          <MockInstanceContextProvider>
+          <InstanceContextProvider
+            value={{ ...DEFAULT_INSTANCE_CONTEXT_VALUE, ...instanceContext }}
+          >
             <CommonUIIntlProvider>
               <div ref={modalWrapperRef}>
                 <ModalProvider appElement={modalWrapperRef.current}>
@@ -117,7 +109,7 @@ export function MockAppContextProvider({
                 </ModalProvider>
               </div>
             </CommonUIIntlProvider>
-          </MockInstanceContextProvider>
+          </InstanceContextProvider>
         </ApiClientProvider>
       </AccountProvider>
     </SWRConfig>
