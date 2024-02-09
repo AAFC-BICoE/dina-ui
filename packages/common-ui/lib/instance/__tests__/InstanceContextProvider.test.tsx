@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { ApiClientProvider } from "../../api-client/ApiClientContext";
-import { InstanceContextProvider } from "../InstanceContextProvider";
+import { DefaultInstanceContextProvider } from "../InstanceContextProvider";
 import { useInstanceContext } from "../useInstanceContext";
 import "@testing-library/jest-dom";
 
@@ -35,9 +35,9 @@ describe("InstanceContextProvider", () => {
 
     const component = render(
       <ApiClientProvider value={apiContext}>
-        <InstanceContextProvider>
+        <DefaultInstanceContextProvider>
           <DumyComponent />
-        </InstanceContextProvider>
+        </DefaultInstanceContextProvider>
       </ApiClientProvider>
     );
 
