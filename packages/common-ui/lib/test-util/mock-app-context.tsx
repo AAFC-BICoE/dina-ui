@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
-import { useMemo, useRef } from "react";
+import { ReactNode, useMemo, useRef } from "react";
 import { SWRConfig } from "swr";
 import { PartialDeep } from "type-fest";
 import { AccountContextI, AccountProvider } from "../account/AccountProvider";
@@ -11,8 +11,8 @@ import {
   ApiClientProvider
 } from "../api-client/ApiClientContext";
 import {
-  InstanceContextI,
-  InstanceContextProvider
+  InstanceContext,
+  InstanceContextI
 } from "../instance/InstanceContextProvider";
 import { CommonUIIntlProvider } from "../intl/common-ui-intl";
 import { ModalProvider } from "../modal/modal";
@@ -22,6 +22,23 @@ interface MockAppContextProviderProps {
   instanceContext?: Partial<InstanceContextI>;
   accountContext?: Partial<AccountContextI>;
   children?: React.ReactNode;
+}
+
+export function MockInstanceContextProvider({
+  children
+}: {
+  children: ReactNode;
+}) {
+  const instanceJson: InstanceContextI = {
+    supportedLanguages: "en,fr",
+    instanceMode: "developer"
+  };
+
+  return (
+    <InstanceContext.Provider value={instanceJson}>
+      {children}
+    </InstanceContext.Provider>
+  );
 }
 
 /**
@@ -92,15 +109,15 @@ export function MockAppContextProvider({
         <ApiClientProvider
           value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
-          <CommonUIIntlProvider>
-            <InstanceContextProvider>
+          <MockInstanceContextProvider>
+            <CommonUIIntlProvider>
               <div ref={modalWrapperRef}>
                 <ModalProvider appElement={modalWrapperRef.current}>
                   {children}
                 </ModalProvider>
               </div>
-            </InstanceContextProvider>
-          </CommonUIIntlProvider>
+            </CommonUIIntlProvider>
+          </MockInstanceContextProvider>
         </ApiClientProvider>
       </AccountProvider>
     </SWRConfig>
