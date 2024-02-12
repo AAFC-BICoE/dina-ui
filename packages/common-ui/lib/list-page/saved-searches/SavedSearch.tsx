@@ -149,6 +149,7 @@ export function SavedSearch({
   useLastSavedSearch({
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
+    setDefaultLoadedIn,
     performSubmit,
     uniqueName
   });
@@ -201,7 +202,7 @@ export function SavedSearch({
   // When a new saved search is selected.
   useEffect(() => {
     if (!selectedSavedSearch || !userPreferences) return;
-
+    setQueryError(undefined);
     loadSavedSearch(selectedSavedSearch);
   }, [selectedSavedSearch, lastSelected]);
 
@@ -507,12 +508,8 @@ export function SavedSearch({
       // Ask the user if they sure they want to delete the saved search.
       openModal(
         <AreYouSureModal
-          actionMessage={
-            <>
-              <DinaMessage id="removeSavedSearch" />{" "}
-              {`${savedSearchName ?? ""}`}{" "}
-            </>
-          }
+          actionMessage={<DinaMessage id="removeSavedSearch" />}
+          messageBody={<DinaMessage id="areYouSureRemoveSavedSearch" values={{savedSearchName: savedSearchName}} />}
           onYesButtonClicked={deleteSearch}
         />
       );
