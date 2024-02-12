@@ -457,12 +457,8 @@ export function SavedSearch({
       // Ask the user if they sure they want to delete the saved search.
       openModal(
         <AreYouSureModal
-          actionMessage={
-            <>
-              <DinaMessage id="removeSavedSearch" />{" "}
-              {`${savedSearchName ?? ""}`}{" "}
-            </>
-          }
+          actionMessage={<DinaMessage id="removeSavedSearch" />}
+          messageBody={<DinaMessage id="areYouSureRemoveSavedSearch" values={{savedSearchName: savedSearchName}} />}
           onYesButtonClicked={deleteSearch}
         />
       );
