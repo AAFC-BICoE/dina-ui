@@ -1,7 +1,6 @@
 import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import { QueryBuilderAutoSuggestionTextSearchMemo } from "../QueryBuilderAutoSuggestionSearch";
 import { waitFor } from "@testing-library/react";
-import {fireEvent, screen} from '@testing-library/dom';
 
 const INDEX_NAME = "dina-material-sample-index";
 
@@ -76,6 +75,9 @@ const apiClientMock = {
 }
 
 describe("QueryBuilderAutoSuggestionSearch", () => {
+
+  beforeEach(jest.clearAllMocks);
+
   describe("QueryBuilderAutoSuggestionSearch Component", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
@@ -172,10 +174,21 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       // Wait for the api call to be made.
       await waitFor(() => expect(mockAutoSuggestionRequest).toBeCalledTimes(1));
 
-      // Click on the textbox to make the dropdown options appear.
-      fireEvent.click(autoSuggestionComponent.getByRole("textbox"));
+      // Simulate focus, to display the suggestions dialog.
+      autoSuggestionComponent.getByRole("textbox").focus();
 
-      // Debugging: screen.logTestingPlaygroundURL();
+      // Wait for the component to update after focus change
+      await waitFor(() => expect(autoSuggestionComponent.getByRole("textbox")).toHaveFocus);
+
+      // Get each suggestion item and assert its content
+      const suggestions = autoSuggestionComponent.getAllByRole('option');
+      expect(suggestions.length).toBe(4); // Ensure there are 4 options
+
+      // Assert the text content of each suggestion
+      expect(suggestions[0].textContent).toBe('WHOLE_ORGANISM');
+      expect(suggestions[1].textContent).toBe('MIXED_ORGANISMS');
+      expect(suggestions[2].textContent).toBe('MOLECULAR_SAMPLE');
+      expect(suggestions[3].textContent).toBe('CULTURE_STRAIN');
     });
   });
 });
