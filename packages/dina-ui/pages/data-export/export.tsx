@@ -10,7 +10,8 @@ import {
   useApiClient,
   LoadingSpinner,
   OBJECT_EXPORT_IDS_KEY,
-  downloadDataExport
+  downloadDataExport,
+  Tooltip
 } from "packages/common-ui/lib";
 import React, { useEffect } from "react";
 import Link from "next/link";
@@ -38,7 +39,10 @@ import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 
 export default function ExportPage<TData extends KitsuResource>() {
   const router = useRouter();
-  const [totalRecords] = useLocalStorage<number>(DATA_EXPORT_TOTAL_RECORDS_KEY);
+  const [totalRecords] = useLocalStorage<number>(
+    DATA_EXPORT_TOTAL_RECORDS_KEY,
+    0
+  );
   const hideTable: boolean | undefined = !!router.query.hideTable;
   const uniqueName = String(router.query.uniqueName);
   const indexName = String(router.query.indexName);
@@ -132,20 +136,18 @@ export default function ExportPage<TData extends KitsuResource>() {
       });
 
       // Get the first 100 file identifiers
-      const fileIdentifiers = imageMetadatas
-        .map((imageMetadata) => {
-          // If image has derivative, return large image derivative fileIdentifier if present
-          if (imageMetadata.derivatives) {
-            imageMetadata.derivatives.forEach((derivative) => {
-              if (derivative.derivativeType === "LARGE_IMAGE") {
-                return derivative.fileIdentifier;
-              }
-            });
-          }
-          // Otherwise, return original fileIdentifier
-          return imageMetadata.fileIdentifier;
-        })
-        .slice(0, 100);
+      const fileIdentifiers = imageMetadatas.map((imageMetadata) => {
+        // If image has derivative, return large image derivative fileIdentifier if present
+        if (imageMetadata.derivatives) {
+          imageMetadata.derivatives.forEach((derivative) => {
+            if (derivative.derivativeType === "LARGE_IMAGE") {
+              return derivative.fileIdentifier;
+            }
+          });
+        }
+        // Otherwise, return original fileIdentifier
+        return imageMetadata.fileIdentifier;
+      });
       const objectExportSaveArg = {
         resource: {
           type: "object-export",
@@ -163,6 +165,8 @@ export default function ExportPage<TData extends KitsuResource>() {
       setLoading(false);
     }
   }
+  const disableObjectExportButton =
+    localStorageExportObjectIds.length < 1 || totalRecords > 100;
 
   return loading || !loadedIndexMapColumns ? (
     <LoadingSpinner loading={loading} />
@@ -178,17 +182,23 @@ export default function ExportPage<TData extends KitsuResource>() {
             byPassView={true}
           />
           {uniqueName === "object-store-list" && (
-            <Button
-              disabled={loading || localStorageExportObjectIds.length < 1}
-              className="btn btn-primary"
-              onClick={exportObjects}
-            >
-              {loading ? (
-                <LoadingSpinner loading={loading} />
-              ) : (
-                formatMessage({ id: "exportObjectsButtonText" })
+            <div className="me-2">
+              {" "}
+              <Button
+                disabled={loading || disableObjectExportButton}
+                className="btn btn-primary"
+                onClick={exportObjects}
+              >
+                {loading ? (
+                  <LoadingSpinner loading={loading} />
+                ) : (
+                  formatMessage({ id: "exportObjectsButtonText" })
+                )}
+              </Button>
+              {disableObjectExportButton && (
+                <Tooltip id="exportObjectsMaxLimitTooltip" />
               )}
-            </Button>
+            </div>
           )}
           <Link href={`/data-export/list?entityLink=${entityLink}`}>
             <a className="btn btn-primary">
