@@ -30,7 +30,7 @@ const FileViewer: ComponentType<any> = dynamic(
   { ssr: false }
 );
 
-const IMG_TAG_SUPPORTED_FORMATS = [
+export const IMG_TAG_SUPPORTED_FORMATS = [
   "apng",
   "bmp",
   "gif",

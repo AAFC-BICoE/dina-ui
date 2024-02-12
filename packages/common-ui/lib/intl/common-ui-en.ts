@@ -153,5 +153,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   yes: "Yes",
   refreshButtonText: "Refresh",
   filterColumns: "Filter Columns",
-  applyButtonText: "Apply"
+  applyButtonText: "Apply",
+  exportObjectsButtonText: "Export Objects",
+  exportObjectsMaxLimitTooltip:
+    "Export Objects has a maximum limit of 100 files. Select up to 100 files to export."
 };
