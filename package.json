@@ -56,7 +56,8 @@
     "@types/react": "17.0.2",
     "@types/react-dom": "17.0.2",
     "mammoth": "1.6.0",
-    "underscore": "1.13.1"
+    "underscore": "1.13.1",
+    "@babel/traverse": "7.23.2"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
