@@ -174,6 +174,28 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       // Wait for the api call to be made.
       await waitFor(() => expect(mockAutoSuggestionRequest).toBeCalledTimes(1));
 
+      // Ensure the API request was made correctly.
+      expect(mockAutoSuggestionRequest).toBeCalledWith(
+        "search-api/search-ws/search", // Search endpoint
+        {
+          aggs: {
+            term_aggregation: {
+              terms: {
+                field: "data.attributes.materialSampleType.keyword",
+                size: 100,
+              },
+            },
+          },
+          query: {
+            terms: {
+              "data.attributes.group": ["aafc", "cnc"],
+            },
+          },
+          size: 0,
+        },
+        {"params": {"indexName": "dina-material-sample-index"}}
+      );
+
       // Simulate focus, to display the suggestions dialog.
       autoSuggestionComponent.getByRole("textbox").focus();
 
