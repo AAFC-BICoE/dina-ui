@@ -139,7 +139,7 @@ export class ApiClientImpl implements ApiClientI {
     if (this.apiClient.axios?.defaults?.adapter) {
       const ONE_SECOND = 1000;
       this.apiClient.axios.defaults.adapter = cacheAdapterEnhancer(
-        this.apiClient.axios.defaults.adapter,
+        this.apiClient.axios.defaults.adapter as any,
         {
           // Invalidate the cache after one second.
           // All this does is batch requests if a set of react components all try to make the same request at once.
@@ -394,9 +394,9 @@ export class DoOperationsError extends Error {
 }
 
 /** Show more details in the Axios errors. */
-export function makeAxiosErrorMoreReadable(error: AxiosError) {
+export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   if (error.isAxiosError) {
-    let errorMessage = `${error.config.url}: ${error.response?.statusText}`;
+    let errorMessage = `${error.config?.url}: ${error.response?.statusText}`;
 
     // Special case: Make 502 "bad gateway" messages more user-friendly:
     if (error.response?.status === 502) {
