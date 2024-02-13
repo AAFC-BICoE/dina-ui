@@ -34,15 +34,15 @@ respond /keycloak.json "{
 	\"confidential-port\": 0
 }"
 
-respond /api/instance.json "{ 
-	\"instance-mode\": \"{$INSTANCE_MODE}\",
-	\"supported-languages-iso\": \"{$SUPPORTED_LANGUAGES_ISO}\"
-}"
-
 # Provide the dev-user configuration to the front-end:
 respond /dev-user.json "{
 	\"enabled\": {$DEV_USER_ENABLED:false},
 	\"groupRole\": \"{$DEV_USER_GROUP_ROLE}\"
+}"
+
+respond /api/instance.json "{ 
+	\"instance-mode\": \"{$INSTANCE_MODE}\",
+	\"supported-languages-iso\": \"{$SUPPORTED_LANGUAGES_ISO}\"
 }"
 
 # Proxy to the main back-end API:

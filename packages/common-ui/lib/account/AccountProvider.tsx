@@ -121,7 +121,6 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
     const agentId = "c628fc6f-c9ad-4bb6-a187-81eb7884bdd7";
     const token = "dev-user-token";
 
-    //const keycloakGroups = process.env['dev-user.enabled.groupRole'] ? processDevUserGroups() : [];
     const { groupNames, rolesPerGroup } = parseGroupRoleDevUser(devUserConfig?.groupRole);
 
     return (
