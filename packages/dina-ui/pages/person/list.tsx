@@ -1,14 +1,12 @@
 import {
-  ButtonBar,
   ColumnDefinition,
   CreateButton,
   ListPageLayout,
   dateCell
 } from "common-ui";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../components";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 const AGENT_FILTER_ATTRIBUTES = ["displayName", "email", "createdBy"];
 const AGENT_TABLE_COLUMNS: ColumnDefinition<Person>[] = [
@@ -40,39 +38,28 @@ const AGENT_TABLE_COLUMNS: ColumnDefinition<Person>[] = [
 ];
 
 export default function AgentListPage() {
-  const { formatMessage } = useDinaIntl();
+  const buttonBarContent = <CreateButton entityLink="/person" />;
 
   return (
-    <div>
-      <Head title={formatMessage("personListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="personListTitle" />
-        </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/person" />
-        </ButtonBar>
-        <ListPageLayout
-          filterAttributes={AGENT_FILTER_ATTRIBUTES}
-          id="person-list"
-          queryTableProps={{
-            columns: AGENT_TABLE_COLUMNS,
-            path: "agent-api/person",
-            defaultSort: [
-              {
-                id: "familyNames",
-                desc: false
-              },
-              {
-                id: "givenNames",
-                desc: false
-              }
-            ]
-          }}
-        />
-      </main>
-      <Footer />
-    </div>
+    <PageLayout titleId="personListTitle" buttonBarContent={buttonBarContent}>
+      <ListPageLayout
+        filterAttributes={AGENT_FILTER_ATTRIBUTES}
+        id="person-list"
+        queryTableProps={{
+          columns: AGENT_TABLE_COLUMNS,
+          path: "agent-api/person",
+          defaultSort: [
+            {
+              id: "familyNames",
+              desc: false
+            },
+            {
+              id: "givenNames",
+              desc: false
+            }
+          ]
+        }}
+      />
+    </PageLayout>
   );
 }

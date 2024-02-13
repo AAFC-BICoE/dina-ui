@@ -70,7 +70,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           }
         case "hierarchy,storageUnitType":
           switch (params?.filter?.rsql) {
-            case "group==aafc;group==cnc":
+            case "uuid!=X;group=in=(aafc,cnc,overy-lab)":
+            case "group=in=(aafc,cnc,overy-lab)":
             case "":
               // The searchable table results:
               return {
@@ -168,7 +169,10 @@ describe("StorageUnitChildrenViewer component", () => {
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer storageUnit={storageUnitA} />,
       </DinaForm>,
-      { apiContext }
+      {
+        apiContext,
+        accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
+      }
     );
 
     wrapper.find("button.enable-move-content").simulate("click");
@@ -214,7 +218,10 @@ describe("StorageUnitChildrenViewer component", () => {
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer storageUnit={storageUnitX} />,
       </DinaForm>,
-      { apiContext }
+      {
+        apiContext,
+        accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
+      }
     );
 
     wrapper.find("button.add-existing-as-child").simulate("click");

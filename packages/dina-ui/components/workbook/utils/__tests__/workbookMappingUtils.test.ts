@@ -1,4 +1,8 @@
-import { DataTypeEnum } from "../useWorkbookConverter";
+import {
+  FieldMappingConfigType,
+  LinkOrCreateSetting,
+  WorkbookDataTypeEnum
+} from "../../";
 import {
   convertDate,
   convertMap,
@@ -11,30 +15,61 @@ import {
   isBoolean,
   isBooleanArray,
   isMap,
-  isNumber
+  isNumber,
+  calculateColumnUniqueValuesFromSpreadsheetData
 } from "../workbookMappingUtils";
 
-const mockConfig = {
+const mockConfig: FieldMappingConfigType = {
   mockEntity: {
+    relationshipConfig: {
+      type: "mock-entity",
+      hasGroup: true,
+      baseApiPath: "/fake-api"
+    },
     stringField: {
-      dataType: DataTypeEnum.VOCABULARY,
+      dataType: WorkbookDataTypeEnum.VOCABULARY,
       vocabularyEndpoint: "/collection-api/vocabulary/materialSampleType"
     },
-    numberField: { dataType: DataTypeEnum.NUMBER },
-    booleanField: { dataType: DataTypeEnum.BOOLEAN },
-    stringArrayField: { dataType: DataTypeEnum.STRING_ARRAY },
-    numberArrayField: { dataType: DataTypeEnum.NUMBER_ARRAY },
-    mapField: { dataType: DataTypeEnum.MANAGED_ATTRIBUTES },
-    objectField: {
-      name: { dataType: DataTypeEnum.STRING },
-      age: { dataType: DataTypeEnum.NUMBER },
-      address: {
-        dataType: DataTypeEnum.OBJECT,
-        attributes: {
-          addressLine1: { dataType: DataTypeEnum.STRING },
-          city: { dataType: DataTypeEnum.STRING },
-          province: { dataType: DataTypeEnum.STRING },
-          postalCode: { dataType: DataTypeEnum.STRING }
+    numberField: { dataType: WorkbookDataTypeEnum.NUMBER },
+    booleanField: { dataType: WorkbookDataTypeEnum.BOOLEAN },
+    stringArrayField: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
+    numberArrayField: { dataType: WorkbookDataTypeEnum.NUMBER_ARRAY },
+    mapField: { dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES },
+    objectField1: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      relationshipConfig: {
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+        hasGroup: true,
+        type: "object-field",
+        baseApiPath: "apiPath"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING },
+        age: { dataType: WorkbookDataTypeEnum.NUMBER },
+        address: {
+          dataType: WorkbookDataTypeEnum.OBJECT,
+          attributes: {
+            addressLine1: { dataType: WorkbookDataTypeEnum.STRING },
+            city: { dataType: WorkbookDataTypeEnum.STRING },
+            province: { dataType: WorkbookDataTypeEnum.STRING },
+            postalCode: { dataType: WorkbookDataTypeEnum.STRING }
+          }
+        }
+      }
+    },
+    objectField2: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING },
+        age: { dataType: WorkbookDataTypeEnum.NUMBER },
+        address: {
+          dataType: WorkbookDataTypeEnum.OBJECT,
+          attributes: {
+            addressLine1: { dataType: WorkbookDataTypeEnum.STRING },
+            city: { dataType: WorkbookDataTypeEnum.STRING },
+            province: { dataType: WorkbookDataTypeEnum.STRING },
+            postalCode: { dataType: WorkbookDataTypeEnum.STRING }
+          }
         }
       }
     }
@@ -155,6 +190,52 @@ describe("workbookMappingUtils functions", () => {
         }
       ]);
     });
+
+    test("get data with undefined data", () => {
+      expect(
+        getDataFromWorkbook(
+          undefined,
+          0, // Return first sheet.
+          ["field1", "field2", "field3"]
+        )
+      ).toEqual([]);
+    });
+
+    test("resolveNumberOfUniqueValueFromSpreadsheetData", () => {
+      expect(
+        calculateColumnUniqueValuesFromSpreadsheetData({
+          "0": [
+            { rowNumber: 0, content: ["header1", "header2", "header3"] },
+            { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
+            { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
+            { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
+            { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
+            { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
+            { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
+          ],
+          "1": [
+            { rowNumber: 0, content: ["header4", "header5", "header6"] },
+            { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
+            { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
+            { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
+            { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
+            { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
+            { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
+          ]
+        })
+      ).toEqual({
+        "0": {
+          header1: { dataA1: 1, dataB1: 2, dataC1: 3 },
+          header2: { dataA2: 1, dataB2: 2, dataC2: 3 },
+          header3: { dataA3: 1, dataB3: 2, dataC3: 3 }
+        },
+        "1": {
+          header4: { dataA1: 1, dataB1: 2, dataC1: 3 },
+          header5: { dataA2: 1, dataB2: 2, dataC2: 3 },
+          header6: { dataA3: 1, dataB3: 2, dataC3: 3 }
+        }
+      });
+    });
   });
 
   it("isNumber", () => {
@@ -241,18 +322,42 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.mapField.dataType": "managedAttributes",
       "mockEntity.numberArrayField.dataType": "number[]",
       "mockEntity.numberField.dataType": "number",
-      "mockEntity.objectField.age.dataType": "number",
-      "mockEntity.objectField.name.dataType": "string",
       "mockEntity.stringArrayField.dataType": "string[]",
       "mockEntity.stringField.dataType": "vocabulary",
       "mockEntity.stringField.vocabularyEndpoint":
         "/collection-api/vocabulary/materialSampleType",
-      "mockEntity.objectField.address.attributes.addressLine1.dataType":
+      "mockEntity.objectField1.attributes.address.attributes.addressLine1.dataType":
         "string",
-      "mockEntity.objectField.address.attributes.city.dataType": "string",
-      "mockEntity.objectField.address.attributes.postalCode.dataType": "string",
-      "mockEntity.objectField.address.attributes.province.dataType": "string",
-      "mockEntity.objectField.address.dataType": "object"
+      "mockEntity.objectField1.attributes.address.attributes.city.dataType":
+        "string",
+      "mockEntity.objectField1.attributes.address.attributes.postalCode.dataType":
+        "string",
+      "mockEntity.objectField1.attributes.address.attributes.province.dataType":
+        "string",
+      "mockEntity.objectField1.attributes.address.dataType": "object",
+      "mockEntity.objectField1.attributes.age.dataType": "number",
+      "mockEntity.objectField1.attributes.name.dataType": "string",
+      "mockEntity.objectField1.dataType": "object",
+      "mockEntity.objectField1.relationshipConfig.baseApiPath": "apiPath",
+      "mockEntity.objectField1.relationshipConfig.hasGroup": true,
+      "mockEntity.objectField1.relationshipConfig.linkOrCreateSetting":
+        "LINK_OR_CREATE",
+      "mockEntity.objectField1.relationshipConfig.type": "object-field",
+      "mockEntity.objectField2.attributes.address.attributes.addressLine1.dataType":
+        "string",
+      "mockEntity.objectField2.attributes.address.attributes.city.dataType":
+        "string",
+      "mockEntity.objectField2.attributes.address.attributes.postalCode.dataType":
+        "string",
+      "mockEntity.objectField2.attributes.address.attributes.province.dataType":
+        "string",
+      "mockEntity.objectField2.attributes.address.dataType": "object",
+      "mockEntity.objectField2.attributes.age.dataType": "number",
+      "mockEntity.objectField2.attributes.name.dataType": "string",
+      "mockEntity.objectField2.dataType": "object",
+      "mockEntity.relationshipConfig.baseApiPath": "/fake-api",
+      "mockEntity.relationshipConfig.hasGroup": true,
+      "mockEntity.relationshipConfig.type": "mock-entity"
     });
   });
 });

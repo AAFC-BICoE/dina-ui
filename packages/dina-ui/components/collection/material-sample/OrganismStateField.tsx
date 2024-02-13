@@ -103,7 +103,6 @@ export function OrganismStateField({
           />
           <TextField
             {...fieldProps("remarks")}
-            name="organismRemarks"
             customName="organismRemarks"
             className="col-sm-12"
             multiLines={true}

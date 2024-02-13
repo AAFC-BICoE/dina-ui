@@ -64,7 +64,12 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
             type: "keyword",
             path: "data.attributes"
           },
-          { name: "preparationDate", type: "date", path: "data.attributes" },
+          {
+            name: "preparationDate",
+            type: "date",
+            path: "data.attributes",
+            subtype: "local_date"
+          },
           { name: "tags", type: "text", path: "data.attributes" },
           { name: "createdBy", type: "text", path: "data.attributes" }
         ],
@@ -86,7 +91,12 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
                 path: "attributes"
               },
               { name: "dwcRecordNumber", type: "text", path: "attributes" },
-              { name: "startEventDateTime", type: "date", path: "attributes" },
+              {
+                name: "startEventDateTime",
+                type: "date",
+                path: "attributes",
+                subtype: "local_date"
+              },
               { name: "endEventDateTime", type: "date", path: "attributes" }
             ]
           },

@@ -32,7 +32,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   created: "created",
   date: "Date",
   dateMustBeFormattedPartial:
-    "Data must be formatted as one of the following options: YYYY-MM-DD, YYYY-MM, or YYYY",
+    "Date must be formatted as one of the following options: YYYY-MM-DD, YYYY-MM, or YYYY",
   dateMustBeFormattedYyyyMmDd: "Date must be formatted as YYYY-MM-DD",
   deleteAllButtonText: "Delete All",
   deleteButtonText: "Delete",
@@ -152,5 +152,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   warning: "Warning",
   yes: "Yes",
   refreshButtonText: "Refresh",
-  filterColumns: "Filter Columns"
+  filterColumns: "Filter Columns",
+  applyButtonText: "Apply",
+  exportObjectsButtonText: "Export Objects",
+  exportObjectsMaxLimitTooltip:
+    "Export Objects has a maximum limit of 100 files. Select up to 100 files to export."
 };

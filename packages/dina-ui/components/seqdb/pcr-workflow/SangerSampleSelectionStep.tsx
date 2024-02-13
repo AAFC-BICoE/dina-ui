@@ -277,6 +277,7 @@ export function SangerSampleSelectionStep({
       )}
       <QueryPage<any>
         indexName={"dina_material_sample_index"}
+        uniqueName="pcr-material-sample-selection-step"
         columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
         selectionMode={editMode}
         selectionResources={selectedResources}
@@ -285,6 +286,10 @@ export function SangerSampleSelectionStep({
         enableDnd={true}
         onDeselect={(unselected) => onSelectMaterial(unselected)}
         onSelect={(selected) => onDeselectMaterial(selected)}
+        reactTableProps={{
+          enableSorting: true,
+          enableMultiSort: true
+        }}
       />
     </div>
   );

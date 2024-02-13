@@ -9,8 +9,13 @@ import { SetOptional } from "type-fest";
 import { useAddPersonModal } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import {
+  CollectingEvent,
   Collection,
   Institution,
+  PreparationMethod,
+  PreparationType,
+  Project,
+  Protocol,
   StorageUnit
 } from "../../types/collection-api";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
@@ -64,8 +69,12 @@ export function CollectionSelectField(
       optionLabel={(coll) =>
         `${coll.name || coll.id}${coll.code ? ` (${coll.code})` : ""}`
       }
-      cannotBeChanged={true}
-      omitNullOption={true}
+      cannotBeChanged={
+        props.cannotBeChanged === undefined ? true : props.cannotBeChanged
+      }
+      omitNullOption={
+        props.omitNullOption === undefined ? true : props.omitNullOption
+      }
       {...props}
     />
   );
@@ -176,6 +185,184 @@ export function StorageUnitSelectField({
         return storageUnit.name;
       }}
       {...resourceProps}
+    />
+  );
+}
+
+/** CollectingEvent Select Field. **/
+export function CollectingEventSelectField(
+  props: SetOptional<ResourceSelectFieldProps<CollectingEvent>, ProvidedProps>
+) {
+  const { isAdmin, groupNames } = useAccount();
+
+  const filter = filterBy(
+    ["dwcFieldNumber"],
+    !isAdmin
+      ? {
+          extraFilters: [
+            // Restrict the list to just the user's groups:
+            {
+              selector: "group",
+              comparison: "=in=",
+              arguments: groupNames || []
+            }
+          ]
+        }
+      : undefined
+  );
+
+  return (
+    <ResourceSelectField<CollectingEvent>
+      key={String(isAdmin)}
+      readOnlyLink="/collection/collecting-event/view?id="
+      filter={filter}
+      model="collection-api/collecting-event"
+      optionLabel={(coll) =>
+        `${
+          coll.dwcFieldNumber || coll.otherRecordNumbers?.join(", ") || coll.id
+        }}`
+      }
+      cannotBeChanged={true}
+      omitNullOption={true}
+      {...props}
+    />
+  );
+}
+
+/** Protocol Select Field. **/
+export function ProtocolSelectField(
+  props: SetOptional<ResourceSelectFieldProps<Protocol>, ProvidedProps>
+) {
+  const { isAdmin, groupNames } = useAccount();
+  const filter = filterBy(
+    ["name"],
+    !isAdmin
+      ? {
+          extraFilters: [
+            // Restrict the list to just the user's groups:
+            {
+              selector: "group",
+              comparison: "=in=",
+              arguments: groupNames || []
+            }
+          ]
+        }
+      : undefined
+  );
+  return (
+    <ResourceSelectField<Protocol>
+      filter={filter}
+      model="collection-api/protocol"
+      optionLabel={(protocol) => protocol.name}
+      omitNullOption={false}
+      readOnlyLink="/collection/protocol/view?id="
+      {...props}
+    />
+  );
+}
+
+/** PreparationType Select Field. **/
+export function PreparationTypeSelectField(
+  props: SetOptional<ResourceSelectFieldProps<PreparationType>, ProvidedProps>
+) {
+  const { isAdmin, groupNames } = useAccount();
+  const filter = filterBy(
+    ["name"],
+    !isAdmin
+      ? {
+          extraFilters: [
+            // Restrict the list to just the user's groups:
+            {
+              selector: "group",
+              comparison: "=in=",
+              arguments: groupNames || []
+            }
+          ]
+        }
+      : undefined
+  );
+  return (
+    <ResourceSelectField<PreparationType>
+      {...props}
+      model="collection-api/preparation-type"
+      optionLabel={(it) => it.name}
+      readOnlyLink="/collection/preparation-type/view?id="
+      className="preparation-type"
+      filter={filter}
+      tooltipLink={
+        props.tooltipLink ??
+        "https://aafc-bicoe.github.io/dina-documentation/#preparation-type"
+      }
+      tooltipLinkText={props.tooltipLinkText ?? "fromDinaUserGuide"}
+    />
+  );
+}
+
+/** PreparationMethod Select Field. **/
+export function PreparationMethodSelectField(
+  props: SetOptional<ResourceSelectFieldProps<PreparationMethod>, ProvidedProps>
+) {
+  const { isAdmin, groupNames } = useAccount();
+  const filter = filterBy(
+    ["name"],
+    !isAdmin
+      ? {
+          extraFilters: [
+            // Restrict the list to just the user's groups:
+            {
+              selector: "group",
+              comparison: "=in=",
+              arguments: groupNames || []
+            }
+          ]
+        }
+      : undefined
+  );
+  return (
+    <ResourceSelectField<PreparationMethod>
+      {...props}
+      model="collection-api/preparation-method"
+      optionLabel={(it) => it.name}
+      readOnlyLink="/collection/preparation-method/view?id="
+      className="preparation-method"
+      filter={filter}
+      tooltipLink={
+        props.tooltipLink ??
+        "https://aafc-bicoe.github.io/dina-documentation/#preparation-method"
+      }
+      tooltipLinkText={props.tooltipLinkText ?? "fromDinaUserGuide"}
+    />
+  );
+}
+
+/** Project Select Field. **/
+export function ProjectSelectField(
+  props: SetOptional<ResourceSelectFieldProps<Project>, ProvidedProps>
+) {
+  const { isAdmin, groupNames } = useAccount();
+  const filter = filterBy(
+    ["name"],
+    !isAdmin
+      ? {
+          extraFilters: [
+            // Restrict the list to just the user's groups:
+            {
+              selector: "group",
+              comparison: "=in=",
+              arguments: groupNames || []
+            }
+          ]
+        }
+      : undefined
+  );
+  return (
+    <ResourceSelectField<Project>
+      isMulti={true}
+      readOnlyLink="/collection/project/view?id="
+      filter={filter}
+      model={"collection-api/project"}
+      optionLabel={(prj) => prj.name}
+      {...props}
     />
   );
 }

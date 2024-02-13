@@ -25,7 +25,7 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** Function called when an option is selected. */
   onChange?: (
-    value: PersistedResource<TData> | PersistedResource<TData>[],
+    value: null | PersistedResource<TData> | PersistedResource<TData>[],
     actionMeta?: ActionMeta<{ resource: PersistedResource<TData> }>
   ) => void;
 
@@ -200,25 +200,29 @@ export function ResourceSelect<TData extends KitsuResource>({
     newSelectedRaw,
     actionMeta: ActionMeta<{ resource: PersistedResource<TData> }>
   ) {
-    const newSelected = castArray(newSelectedRaw);
-
-    // If an async option is selected:
-    const asyncOption: AsyncOption<TData> | undefined = newSelected?.find(
-      (option) => option?.getResource
-    );
-
-    if (asyncOption && newSelectedRaw) {
-      // For callback options, don't set any value:
-      const asyncResource = await asyncOption.getResource();
-      if (asyncResource) {
-        const newResources = newSelected.map((option) =>
-          option === asyncOption ? asyncResource : option.resource
-        );
-        onChangeProp(isMulti ? newResources : newResources[0], actionMeta);
-      }
+    if (!newSelectedRaw) {
+      // when delete all the selected options.
+      onChangeProp(isMulti ? [] : null, actionMeta);
     } else {
-      const resources = newSelected?.map((o) => o.resource) || [];
-      onChangeProp(isMulti ? resources : resources[0], actionMeta);
+      const newSelected = castArray(newSelectedRaw);
+      // If an async option is selected:
+      const asyncOption: AsyncOption<TData> | undefined = newSelected?.find(
+        (option) => option?.getResource
+      );
+
+      if (asyncOption && newSelectedRaw) {
+        // For callback options, don't set any value:
+        const asyncResource = await asyncOption.getResource();
+        if (asyncResource) {
+          const newResources = newSelected.map((option) =>
+            option === asyncOption ? asyncResource : option.resource
+          );
+          onChangeProp(isMulti ? newResources : newResources[0], actionMeta);
+        }
+      } else {
+        const resources = newSelected?.map((o) => o.resource) || [];
+        onChangeProp(isMulti ? resources : resources[0], actionMeta);
+      }
     }
   }
 

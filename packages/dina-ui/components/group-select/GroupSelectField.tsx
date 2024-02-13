@@ -8,7 +8,7 @@ import {
 } from "common-ui";
 import { useField } from "formik";
 import { get, uniq } from "lodash";
-import { useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 import { GroupLabel } from "./GroupFieldView";
@@ -31,10 +31,16 @@ interface GroupSelectFieldProps extends Omit<SelectFieldProps<any>, "options"> {
   enableStoredDefaultGroup?: boolean;
 
   readOnlyHideLabel?: boolean;
+
+  /**
+   * State based version, instead of using formiks version.
+   */
+  groups?: string[] | string;
 }
 
 export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   const {
+    groups,
     showAnyOption,
     showAllGroups,
     enableStoredDefaultGroup = false,
@@ -45,6 +51,15 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   const { isAdmin } = useAccount();
   const { initialValues, readOnly } = useDinaFormContext();
   const [{ value }, {}, { setValue }] = useField(selectFieldProps.name);
+
+  // Check if the groups have been provided via state change.
+  useEffect(() => {
+    if (!groups) {
+      return;
+    }
+
+    setValue(groups);
+  }, [groups]);
 
   const { setStoredDefaultGroupIfEnabled } = useStoredDefaultGroup({
     enable: enableStoredDefaultGroup,

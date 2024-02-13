@@ -8,7 +8,7 @@ import {
   QueryTableProps
 } from "common-ui";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../../components";
+import { Footer, groupCell, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
@@ -27,6 +27,7 @@ const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
     header: () => <FieldHeader name="acSubtype" />
   },
   "dcType",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];

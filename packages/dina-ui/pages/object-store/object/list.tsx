@@ -84,12 +84,14 @@ export default function MetadataListPage() {
         ) : null,
       header: () => <FieldHeader name="originalFilename" />,
       accessorKey: "data.attributes.originalFilename",
-      isKeyword: true
+      isKeyword: true,
+      id: "originalFilename"
     },
     {
       header: () => <FieldHeader name="acCaption" />,
       accessorKey: "data.attributes.acCaption",
-      isKeyword: true
+      isKeyword: true,
+      id: "acCaption"
     },
     dateCell("acDigitizationDate", "data.attributes.acDigitizationDate"),
     dateCell("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
@@ -176,6 +178,7 @@ export default function MetadataListPage() {
             <SplitPagePanel>
               <QueryPage
                 indexName={"dina_object_store_index"}
+                uniqueName="object-store-list"
                 dynamicFieldMapping={{
                   fields: [
                     {
@@ -193,6 +196,10 @@ export default function MetadataListPage() {
                   apiBaseUrl: "/objectstore-api"
                 }}
                 bulkEditPath={"/object-store/metadata/bulk-edit"}
+                dataExportProps={{
+                  dataExportPath: "/data-export/export",
+                  entityLink: "/object-store/object"
+                }}
                 singleEditPath={"/object-store/metadata/edit"}
                 defaultSort={[
                   {
@@ -225,7 +232,9 @@ export default function MetadataListPage() {
                         };
                       }
                       return {};
-                    }
+                    },
+                    enableSorting: true,
+                    enableMultiSort: true
                   };
                 }}
               />

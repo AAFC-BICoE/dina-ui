@@ -2,8 +2,9 @@ import { transformManagedAttributeToDSL } from "../QueryBuilderManagedAttributeS
 
 interface TestValueStructure {
   type: string;
-  testValue: string;
+  testValue: (operator: string) => string;
   operators: string[];
+  subTypes: (string | undefined)[];
   useKeywordMultiField: boolean;
 }
 
@@ -19,20 +20,31 @@ describe("QueryBuilderManagedAttributeSearch", () => {
     const testValues: TestValueStructure[] = [
       {
         type: "STRING",
-        testValue: "stringValue",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "stringValue1, stringValue2,stringValue3"
+            default:
+              return "stringValue"
+          }
+        },
         operators: [
           "exactMatch",
           "wildcard",
+          "in",
+          "notIn",
           "startsWith",
           "notEquals",
           "empty",
           "notEmpty"
         ],
+        subTypes: [undefined],
         useKeywordMultiField: true
       },
       {
         type: "DATE",
-        testValue: "1998-05-19",
+        testValue: () => "1998-05-19",
         operators: [
           "equals",
           "notEquals",
@@ -44,14 +56,31 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "empty",
           "notEmpty"
         ],
+        subTypes: [
+          undefined,
+          "local_date",
+          "local_date_time",
+          "date_time",
+          "date_time_optional_tz"
+        ],
         useKeywordMultiField: false
       },
       {
         type: "INTEGER",
-        testValue: "42",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "1, 2,4"
+            default:
+              return "42"
+          }
+        },
         operators: [
           "equals",
           "notEquals",
+          "in",
+          "notIn",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -59,14 +88,25 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "empty",
           "notEmpty"
         ],
+        subTypes: [undefined],
         useKeywordMultiField: false
       },
       {
         type: "DECIMAL",
-        testValue: "3.5",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "3, 3.1,12.5"
+            default:
+              return "3.5"
+          }
+        },
         operators: [
           "equals",
           "notEquals",
+          "in",
+          "notIn",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -74,104 +114,129 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "empty",
           "notEmpty"
         ],
+        subTypes: [undefined],
         useKeywordMultiField: false
       },
       {
         type: "PICK_LIST",
-        testValue: "3.5",
-        operators: ["equals", "notEquals", "empty", "notEmpty"],
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "option1, option2,option3"
+            default:
+              return "option1"
+          }
+        },
+        operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"],
+        subTypes: [undefined],
         useKeywordMultiField: true
       },
       {
         type: "BOOL",
-        testValue: "true",
+        testValue: () => "true",
         operators: ["equals", "empty", "notEmpty"],
+        subTypes: [undefined],
         useKeywordMultiField: true
       }
     ];
 
     describe.each(testValues.map((value) => [value.type, value]))(
       "%s based managed attribute tests",
-      (_, testValue) => {
-        test.each((testValue as TestValueStructure).operators)(
-          "Attribute level with operator %s",
-          (operator) => {
-            expect(
-              transformManagedAttributeToDSL({
-                fieldPath: "", // Not used.
-                operation: "", // Not used.
-                queryType: "", // Not used.
-                value: `{"searchValue":"${
-                  (testValue as TestValueStructure).testValue
-                }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
-                  (testValue as TestValueStructure).type
-                }"}`,
-                fieldInfo: {
-                  dynamicField: {
-                    type: "managedAttribute",
-                    label: "managedAttributes",
-                    component: "MATERIAL_SAMPLE",
-                    path: "data.attributes.managedAttributes",
-                    apiEndpoint: "collection-api/managed-attribute"
-                  },
-                  value: "data.attributes.managedAttributes",
-                  distinctTerm: false,
-                  label: "managedAttributes",
-                  path: "data.attributes.managedAttributes",
-                  type: "managedAttribute",
-                  keywordMultiFieldSupport: (testValue as TestValueStructure)
-                    .useKeywordMultiField,
-                  optimizedPrefix: false,
-                  containsSupport: false,
-                  endsWithSupport: false
-                }
-              })
-            ).toMatchSnapshot();
-          }
-        );
+      (_, testValue: TestValueStructure) => {
+        describe("Attribute level tests", () => {
+          testValue.operators.forEach((operator) => {
+            testValue.subTypes.forEach((subType) => {
+              const testName = `Using the ${operator} operator, ${subType} subtype`;
 
-        test.each((testValue as TestValueStructure).operators)(
-          "Relationship level with operator %s",
-          (operator) => {
-            expect(
-              transformManagedAttributeToDSL({
-                fieldPath: "", // Not used.
-                operation: "", // Not used.
-                queryType: "", // Not used.
-                value: `{"searchValue":"${
-                  (testValue as TestValueStructure).testValue
-                }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
-                  (testValue as TestValueStructure).type
-                }"}`,
-                fieldInfo: {
-                  dynamicField: {
-                    type: "managedAttribute",
-                    label: "managedAttributes",
-                    component: "COLLECTING_EVENT",
-                    path: "included.attributes.managedAttributes",
-                    referencedBy: "collectingEvent",
-                    referencedType: "collecting-event",
-                    apiEndpoint: "collection-api/managed-attribute"
-                  } as any,
-                  parentName: "collectingEvent",
-                  parentPath: "included",
-                  parentType: "collecting-event",
-                  value:
-                    "included.attributes.managedAttributes_collectingEvent",
-                  distinctTerm: false,
-                  label: "managedAttributes",
-                  path: "included.attributes.managedAttributes",
-                  type: "managedAttribute",
-                  keywordMultiFieldSupport: (testValue as TestValueStructure)
-                    .useKeywordMultiField,
-                  optimizedPrefix: false,
-                  containsSupport: false,
-                  endsWithSupport: false
-                }
-              })
-            ).toMatchSnapshot();
-          }
-        );
+              test(testName, async () => {
+                expect(
+                  transformManagedAttributeToDSL({
+                    fieldPath: "", // Not used.
+                    operation: "", // Not used.
+                    queryType: "", // Not used.
+                    value: `{"searchValue":"${
+                      (testValue as TestValueStructure).testValue(operator)
+                    }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
+                      (testValue as TestValueStructure).type
+                    }"}`,
+                    fieldInfo: {
+                      dynamicField: {
+                        type: "managedAttribute",
+                        label: "managedAttributes",
+                        component: "MATERIAL_SAMPLE",
+                        path: "data.attributes.managedAttributes",
+                        apiEndpoint: "collection-api/managed-attribute"
+                      },
+                      value: "data.attributes.managedAttributes",
+                      distinctTerm: false,
+                      label: "managedAttributes",
+                      path: "data.attributes.managedAttributes",
+                      type: "managedAttribute",
+                      keywordMultiFieldSupport: (
+                        testValue as TestValueStructure
+                      ).useKeywordMultiField,
+                      optimizedPrefix: false,
+                      containsSupport: false,
+                      endsWithSupport: false,
+                      subType
+                    }
+                  })
+                ).toMatchSnapshot();
+              });
+            });
+          });
+        });
+
+        describe("Relationship level tests", () => {
+          testValue.operators.forEach((operator) => {
+            testValue.subTypes.forEach((subType) => {
+              const testName = `Using the ${operator} operator, ${subType} subtype`;
+
+              test(testName, async () => {
+                expect(
+                  transformManagedAttributeToDSL({
+                    fieldPath: "", // Not used.
+                    operation: "", // Not used.
+                    queryType: "", // Not used.
+                    value: `{"searchValue":"${
+                      (testValue as TestValueStructure).testValue(operator)
+                    }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
+                      (testValue as TestValueStructure).type
+                    }"}`,
+                    fieldInfo: {
+                      dynamicField: {
+                        type: "managedAttribute",
+                        label: "managedAttributes",
+                        component: "COLLECTING_EVENT",
+                        path: "included.attributes.managedAttributes",
+                        referencedBy: "collectingEvent",
+                        referencedType: "collecting-event",
+                        apiEndpoint: "collection-api/managed-attribute"
+                      } as any,
+                      parentName: "collectingEvent",
+                      parentPath: "included",
+                      parentType: "collecting-event",
+                      value:
+                        "included.attributes.managedAttributes_collectingEvent",
+                      distinctTerm: false,
+                      label: "managedAttributes",
+                      path: "included.attributes.managedAttributes",
+                      type: "managedAttribute",
+                      keywordMultiFieldSupport: (
+                        testValue as TestValueStructure
+                      ).useKeywordMultiField,
+                      optimizedPrefix: false,
+                      containsSupport: false,
+                      endsWithSupport: false,
+                      subType
+                    }
+                  })
+                ).toMatchSnapshot();
+              });
+            });
+          });
+        });
       }
     );
   });

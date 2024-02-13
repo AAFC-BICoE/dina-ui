@@ -113,10 +113,7 @@ describe("Metadata single record edit page.", () => {
   });
 
   it("Lets you edit the Metadata.", async () => {
-    const wrapper = mountWithAppContext(
-      <MetadataEditPage reloadLastSearch={false} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<MetadataEditPage />, { apiContext });
 
     await new Promise(setImmediate);
     wrapper.update();

@@ -1,6 +1,6 @@
 /**
  * Process Extension Values from back-end into nested arrays for front-end (formik) to use
- * 
+ *
  * @param {Object} initExtensionValues - The initial extension values loaded from the back-end.
  * @returns {Object|undefined} The processed extension values for front-end use, or undefined if input is not provided.
  */
@@ -12,8 +12,8 @@ export function processExtensionValuesLoading(initExtensionValues) {
 
   // Recursive function to check for the presence of .select property.
   function hasSelectProperty(obj) {
-    if (typeof obj === 'object') {
-      if (obj.hasOwnProperty('select')) {
+    if (typeof obj === "object") {
+      if (obj.hasOwnProperty("select")) {
         return true;
       }
       for (const key in obj) {
@@ -41,10 +41,8 @@ export function processExtensionValuesLoading(initExtensionValues) {
 
     // Iterate through the keys of the data block (extension fields).
     Object.keys(initExtensionValues[blockKey]).forEach((extensionKey) => {
-
       // Check if the key is not "rows" (a special case).
       if (extensionKey !== "rows") {
-
         // Create an extension field object with 'type' and 'value'.
         const extensionField = {
           type: extensionKey,
@@ -66,9 +64,9 @@ export function processExtensionValuesLoading(initExtensionValues) {
 
 /**
  * Process extension values and store the processed data in the input object.
- * 
+ *
  * This will convert the formik extension values into a format for the API to understand.
- * 
+ *
  * @param {Object} submittedExtensionValues - The input data to process and store.
  * @returns {Object} The processed extension values.
  */

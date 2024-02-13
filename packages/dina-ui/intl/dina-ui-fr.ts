@@ -538,8 +538,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   isTargetHeader: "Est-ce ciblé?",
   isolation: "Isolation",
   keepContentsTogether: "Ne pas séparer le contenu",
-  languageDescriptionEnglish: "Anglais",
-  languageDescriptionFrench: "Français",
   languageOfPage: "fra",
   largeImg: "Grande image",
   latLongAutoSetterButton: "Convertir en décimal Lat/Long",

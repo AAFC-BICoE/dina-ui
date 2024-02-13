@@ -1,12 +1,14 @@
 import {
-  CreateButton,
-  descriptionCell,
-  titleCell,
-  ListPageLayout,
   ColumnDefinition,
-  FieldHeader
+  CreateButton,
+  FieldHeader,
+  ListPageLayout,
+  dateCell,
+  descriptionCell,
+  titleCell
 } from "common-ui";
 import Link from "next/link";
+import { groupCell } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
 import { Assemblage } from "../../../types/collection-api";
 
@@ -21,8 +23,11 @@ const ASSEMBLAGE_TABLE_COLUMNS: ColumnDefinition<Assemblage>[] = [
     accessorKey: "name",
     header: () => <FieldHeader name="name" />
   },
-  titleCell("multilingualTitle"),
-  descriptionCell("multilingualDescription")
+  titleCell(false, false, "multilingualTitle"),
+  descriptionCell(false, false, "multilingualDescription"),
+  groupCell("group"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 export default function assemblageListPage() {
@@ -44,13 +49,7 @@ export default function assemblageListPage() {
         id="assemblage-list"
         queryTableProps={{
           columns: ASSEMBLAGE_TABLE_COLUMNS,
-          path: "collection-api/assemblage",
-          defaultSort: [
-            {
-              id: "name",
-              desc: false
-            }
-          ]
+          path: "collection-api/assemblage"
         }}
       />
     </PageLayout>

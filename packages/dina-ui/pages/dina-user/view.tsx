@@ -1,6 +1,7 @@
 import {
   BackButton,
   ButtonBar,
+  DataExportListPageLayout,
   DinaForm,
   EditButton,
   FieldView,
@@ -18,7 +19,7 @@ import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
 export default function DinaUserDetailsPage() {
   const router = useRouter();
-  const { isAdmin, rolesPerGroup, subject } = useAccount();
+  const { isAdmin, rolesPerGroup, subject, username } = useAccount();
 
   // Get the user ID from the URL, otherwise use the current user:
   const id = router.query.id?.toString() ?? subject;
@@ -81,6 +82,14 @@ export default function DinaUserDetailsPage() {
                     <RolesPerGroupTable
                       rolesPerGroup={dinaUser.rolesPerGroup}
                     />
+                  </div>
+                </div>
+                <div className="row mt-3">
+                  <div>
+                    <h2>
+                      <DinaMessage id="dataExports" />
+                    </h2>
+                    <DataExportListPageLayout username={username} />
                   </div>
                 </div>
               </div>

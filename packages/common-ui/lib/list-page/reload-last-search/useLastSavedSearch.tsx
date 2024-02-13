@@ -1,29 +1,41 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
+import { useSessionStorage } from "usehooks-ts";
+import { defaultJsonTree } from "../..";
 
 interface UseLastSavedSearchProps {
-  /**
-   * The index name is used to find the local storage query tree.
-   */
-  indexName: string;
-
-  /**
-   * Query Builder local tree, used for changing the last used search into local storage.
-   */
-  queryBuilderTree?: ImmutableTree;
-
   /**
    * Set the query builder tree, used to to load a saved search.
    */
   setQueryBuilderTree: (newTree: ImmutableTree) => void;
 
   /**
+   * Set the submitted query builder tree, used to to load a saved search.
+   */
+  setSubmittedQueryBuilderTree: React.Dispatch<
+    React.SetStateAction<ImmutableTree>
+  >;
+
+  /**
+   * Search has been loaded in.
+   */
+  setDefaultLoadedIn: React.Dispatch<React.SetStateAction<boolean>>;
+
+  /**
    * For the last loaded search, we will actually perform the search by calling this callback
    * function.
    */
   performSubmit: () => void;
+
+  /**
+   * Used for generating the local storage keys. Every instance of the QueryPage should have it's
+   * own unique name.
+   *
+   * In special cases where you want the sorting, pagination, column selection and other features
+   * to remain the same across tables, it can share the same name.
+   */
+  uniqueName: string;
 }
 
 interface UseLastSavedSearchReturn {
@@ -32,26 +44,28 @@ interface UseLastSavedSearchReturn {
 }
 
 export function useLastSavedSearch({
-  indexName,
-  queryBuilderTree,
   setQueryBuilderTree,
-  performSubmit
+  setDefaultLoadedIn,
+  setSubmittedQueryBuilderTree,
+  performSubmit,
+  uniqueName
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
-  const router = useRouter();
-  const loadLastUsed = router?.query?.reloadLastSearch !== undefined;
-  const localStorageKey = indexName + "-last-used-tree";
+  const sessionStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
 
   const [queryLoaded, setQueryLoaded] = useState<boolean>(false);
 
-  const [localStorageQueryTree, setLocalStorageQueryTree] =
-    useLocalStorage<JsonTree>(localStorageKey);
+  const [sessionStorageQueryTree, setSessionStorageQueryTree] =
+    useSessionStorage<JsonTree>(sessionStorageLastUsedTreeKey, defaultJsonTree);
 
-  // Load in the last used save search if the reloadLastSearch param is present.
+  // Load in the last used save search
   useEffect(() => {
-    if (loadLastUsed && localStorageQueryTree) {
-      setQueryBuilderTree(Utils.loadTree(localStorageQueryTree as JsonTree));
+    if (sessionStorageQueryTree) {
+      setQueryBuilderTree(Utils.loadTree(sessionStorageQueryTree as JsonTree));
       setQueryLoaded(true);
-      performSubmit();
+      setSubmittedQueryBuilderTree(
+        Utils.loadTree(sessionStorageQueryTree as JsonTree)
+      );
+      setDefaultLoadedIn(true);
     } else {
       // Nothing to load in, mark as loaded.
       setQueryLoaded(true);
@@ -60,17 +74,16 @@ export function useLastSavedSearch({
 
   // Once the query builder tree has been loaded in, perform a submit.
   useEffect(() => {
-    performSubmit();
+    if (sessionStorageQueryTree) {
+      setSubmittedQueryBuilderTree(
+        Utils.loadTree(sessionStorageQueryTree as JsonTree)
+      );
+    } else {
+      performSubmit();
+    }
   }, [queryLoaded]);
 
-  // Every time the tree has been changed, save it to local storage.
-  useEffect(() => {
-    if (!queryBuilderTree || !indexName || !queryLoaded) return;
-
-    setLocalStorageQueryTree(Utils.getTree(queryBuilderTree));
-  }, [queryBuilderTree]);
-
   return {
-    loadLastUsed
+    loadLastUsed: !!sessionStorageQueryTree
   };
 }

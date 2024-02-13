@@ -157,7 +157,7 @@ export function NgsIndexField({
                 {hasNgsIndexs && (
                   <ReactTable<NgsIndex>
                     columns={ngsIndexColumns}
-                    defaultSorted={[{ id: "date", desc: true }]}
+                    sort={[{ id: "date", desc: true }]}
                     data={ngsIndexes}
                     showPagination={false}
                     className="-striped mb-2"

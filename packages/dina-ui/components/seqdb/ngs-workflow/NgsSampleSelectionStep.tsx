@@ -272,6 +272,7 @@ export function NgsSampleSelectionStep({
       )}
       <QueryPage<any>
         indexName={"dina_material_sample_index"}
+        uniqueName="ngs-material-sample-selection-step"
         columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
         selectionMode={editMode}
         selectionResources={selectedResources}
@@ -280,6 +281,7 @@ export function NgsSampleSelectionStep({
         enableDnd={true}
         onDeselect={(unselected) => onSelectMaterial(unselected)}
         onSelect={(selected) => onDeselectMaterial(selected)}
+        reactTableProps={{ enableSorting: true, enableMultiSort: true }}
       />
     </div>
   );

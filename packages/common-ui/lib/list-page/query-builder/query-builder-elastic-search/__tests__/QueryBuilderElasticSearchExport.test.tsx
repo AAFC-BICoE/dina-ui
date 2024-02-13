@@ -13,7 +13,10 @@ import {
   prefixQuery,
   infixQuery,
   suffixQuery,
-  wildcardQuery
+  wildcardQuery,
+  inQuery,
+  inTextQuery,
+  inRangeQuery
 } from "../QueryBuilderElasticSearchExport";
 
 const ELASTIC_SEARCH_QUERY: any = {
@@ -37,6 +40,7 @@ const ELASTIC_SEARCH_QUERY: any = {
 
 const columnDefinitions: (TableColumn<KitsuResource> | string)[] = [
   {
+    id: "testColumn1",
     label: "testColumn1",
     accessorKey: "data.attributes.testColumn1",
     isKeyword: true,
@@ -46,6 +50,7 @@ const columnDefinitions: (TableColumn<KitsuResource> | string)[] = [
     ]
   },
   {
+    id: "testColumn2",
     label: "testColumn2",
     accessorKey: "data.attributes.testColumn2",
     isKeyword: false,
@@ -53,14 +58,22 @@ const columnDefinitions: (TableColumn<KitsuResource> | string)[] = [
   },
   "testColumn3",
   {
+    id: "testColumn4",
     label: "testColumn4",
     accessorKey: "data.attributes.testColumn4",
     isKeyword: false,
     relationshipType: "relationshipType1"
   },
   {
+    id: "testColumn5",
     label: "testColumn5",
     accessorKey: "data.attributes.testColumn5",
+    isKeyword: true,
+    relationshipType: "relationshipType2"
+  },
+  {
+    label: "testColumn6",
+    accessorKey: "data.attributes.testColumn6",
     isKeyword: true,
     relationshipType: "relationshipType2"
   }
@@ -76,12 +89,22 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
   });
 
   describe("applySortingRules", () => {
+    test("Sorting on columns without id", async () => {
+      expect(
+        applySortingRules(
+          ELASTIC_SEARCH_QUERY,
+          [{ id: "testColumn6", desc: true }],
+          columnDefinitions as any
+        )
+      ).toMatchSnapshot();
+    });
+
     test("Basic sorting is correctly applied to the query", async () => {
       // Single Sorting rule, descending.
       expect(
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
-          [{ id: "data.attributes.testColumn1", desc: true }],
+          [{ id: "testColumn1", desc: true }],
           columnDefinitions as any
         )
       ).toMatchSnapshot();
@@ -90,7 +113,7 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
-          [{ id: "data.attributes.testColumn1", desc: false }],
+          [{ id: "testColumn1", desc: false }],
           columnDefinitions as any
         )
       ).toMatchSnapshot();
@@ -100,8 +123,8 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
           [
-            { id: "data.attributes.testColumn1", desc: false },
-            { id: "data.attributes.testColumn2", desc: true }
+            { id: "testColumn1", desc: false },
+            { id: "testColumn2", desc: true }
           ],
           columnDefinitions as any
         )
@@ -113,7 +136,7 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
-          [{ id: "data.attributes.testColumn4", desc: true }],
+          [{ id: "testColumn4", desc: true }],
           columnDefinitions as any
         )
       ).toMatchSnapshot();
@@ -123,8 +146,8 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
           [
-            { id: "data.attributes.testColumn4", desc: true },
-            { id: "data.attributes.testColumn5", desc: false }
+            { id: "testColumn4", desc: true },
+            { id: "testColumn5", desc: false }
           ],
           columnDefinitions as any
         )
@@ -135,10 +158,10 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
         applySortingRules(
           ELASTIC_SEARCH_QUERY,
           [
-            { id: "data.attributes.testColumn1", desc: false },
-            { id: "data.attributes.testColumn2", desc: true },
-            { id: "data.attributes.testColumn4", desc: true },
-            { id: "data.attributes.testColumn5", desc: false }
+            { id: "testColumn1", desc: false },
+            { id: "testColumn2", desc: true },
+            { id: "testColumn4", desc: true },
+            { id: "testColumn5", desc: false }
           ],
           columnDefinitions as any
         )
@@ -270,8 +293,46 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
     });
 
     test("wildcard", async () => {
-      expect(wildcardQuery("fieldTest", "valueToMatch", false)).toMatchSnapshot();
-      expect(wildcardQuery("fieldTest", "valueToMatch", true)).toMatchSnapshot();
+      expect(
+        wildcardQuery("fieldTest", "valueToMatch", false)
+      ).toMatchSnapshot();
+      expect(
+        wildcardQuery("fieldTest", "valueToMatch", true)
+      ).toMatchSnapshot();
+    });
+
+    test("inQuery", async () => {
+      // Test keyword support
+      expect(inQuery("fieldTest", "test1, test2, TEST3", undefined, true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "test1, test2, TEST3", undefined, false, false)).toMatchSnapshot();
+
+      // Not version
+      expect(inQuery("fieldTest", "test1, test2", undefined, true, true)).toMatchSnapshot();
+
+      // Comma-separator tests. 
+      expect(inQuery("fieldTest", "test1,test2,test3", undefined, true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", " TEST1 ", undefined, true, false)).toMatchSnapshot();
+      expect(inQuery("fieldTest", "", undefined, true, false)).toMatchSnapshot();
+    });
+
+    test("inTextQuery", async () => {
+      // Test keyword support
+      expect(inTextQuery("fieldTest", "test1, test2, TEST3", undefined, true, false)).toMatchSnapshot();
+      expect(inTextQuery("fieldTest", "test1, test2, TEST3", undefined, false, false)).toMatchSnapshot();
+
+      // Not version
+      expect(inTextQuery("fieldTest", "test1, test2", undefined, true, true)).toMatchSnapshot();
+
+      // Comma-separator tests. 
+      expect(inTextQuery("fieldTest", "test1,test2,test3", undefined, true, false)).toMatchSnapshot();
+      expect(inTextQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)).toMatchSnapshot();
+      expect(inTextQuery("fieldTest", " TEST1 ", undefined, true, false)).toMatchSnapshot();
+      expect(inTextQuery("fieldTest", "", undefined, true, false)).toMatchSnapshot();
+    });
+
+    test("inRangeQuery", async () => {
+      expect(inRangeQuery("fieldTest", "1998-05-19, 2023-03-02", undefined, false)).toMatchSnapshot();
     });
 
     test("existsQuery", async () => {
@@ -307,7 +368,7 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
         )
       ).toMatchSnapshot();
     });
-  
+
     test("prefixQuery attribute (not optimized, keyword support)", async () => {
       expect(
         prefixQuery(
@@ -398,7 +459,13 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
 
     test("Empty values are left as empty queries", async () => {
       expect(
-        prefixQuery("data.attribute.materialSampleName", "", undefined, true, false)
+        prefixQuery(
+          "data.attribute.materialSampleName",
+          "",
+          undefined,
+          true,
+          false
+        )
       ).toStrictEqual({});
       expect(
         infixQuery("data.attribute.materialSampleName", "", undefined)

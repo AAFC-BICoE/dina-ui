@@ -76,6 +76,12 @@ export function QueryOperatorSelector({
       if (option.key === "endsWith" && !selectedFieldMapping?.endsWithSupport) {
         return false;
       }
+
+      // "In" and "Not in" options not supported for nested values yet.
+      if ((option.key === "in" || option.key === "notIn") && selectedFieldMapping?.parentName) {
+        return false;
+      }
+
       return true;
     })
     ?.map<QueryOperationOption>((option) => ({

@@ -35,6 +35,44 @@ Object {
 }
 `;
 
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the in operator. 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test3",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the notEmpty operator. 1`] = `
 Object {
   "bool": Object {
@@ -75,6 +113,44 @@ Object {
         },
       },
     ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Attribute level tests Using the notIn operator. 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "data.attributes.extensionValues.extension.field.keyword": Object {
+                "case_insensitive": true,
+                "value": "test3",
+              },
+            },
+          },
+        ],
+      },
+    },
   },
 }
 `;
@@ -195,6 +271,60 @@ Object {
 }
 `;
 
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the in operator. 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must": Object {
+                "bool": Object {
+                  "minimum_should_match": 1,
+                  "should": Array [
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test1",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test2",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test3",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the notEmpty operator. 1`] = `
 Object {
   "nested": Object {
@@ -276,6 +406,60 @@ Object {
         },
       },
     ],
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformFieldExtensionToDSL function Relationship level tests Using the notIn operator. 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must_not": Object {
+                "bool": Object {
+                  "minimum_should_match": 1,
+                  "should": Array [
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test1",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test2",
+                        },
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.attributes.extensionValues.extension.field.keyword": Object {
+                          "case_insensitive": true,
+                          "value": "test3",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
   },
 }
 `;

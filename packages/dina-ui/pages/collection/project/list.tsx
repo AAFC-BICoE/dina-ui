@@ -1,12 +1,14 @@
 import {
   ColumnDefinition,
   CreateButton,
+  dateCell,
   descriptionCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { groupCell } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { PreparationType } from "../../../types/collection-api";
 
 const PROJECT_FILTER_ATTRIBUTES = ["name", "status", "multilingualDescription"];
@@ -20,7 +22,10 @@ const PROJECT_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
     accessorKey: "name"
   },
   "status",
-  descriptionCell("multilingualDescription")
+  descriptionCell(false, false, "multilingualDescription"),
+  groupCell("group"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 export default function collectionMethodListPage() {

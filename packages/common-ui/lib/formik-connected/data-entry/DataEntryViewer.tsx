@@ -1,7 +1,4 @@
-import {
-  DinaForm,
-  processExtensionValuesLoading
-} from "common-ui";
+import { DinaForm, processExtensionValuesLoading } from "common-ui";
 import { DataEntry, DataEntryProps } from "./DataEntry";
 
 export interface DataEntryViewerProps extends DataEntryProps {

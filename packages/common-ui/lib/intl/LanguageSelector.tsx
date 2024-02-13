@@ -1,14 +1,29 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { intlContext } from "./IntlSupport";
 import Button from "react-bootstrap/Button";
-
-const LANGUAGE_LABELS = {
-  en: "English",
-  fr: "Français"
-};
+import { useApiClient } from "../api-client/ApiClientContext";
+import { capitalize } from "lodash";
 
 export function LanguageSelector() {
   const { locale, setLocale } = useContext(intlContext);
+  const [supportedLanguages, setSupportedLanguages] = useState<string>("en");
+  const { apiClient } = useApiClient();
+
+  useEffect(() => {
+    const getSupportedLanguagesISO = async () => {
+      try {
+        const response = await apiClient.axios.get(`/instance.json`);
+        if (response.data["supported-languages-iso"]) {
+          setSupportedLanguages(response.data["supported-languages-iso"]);
+        } else {
+          setSupportedLanguages("en");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getSupportedLanguagesISO();
+  }, []);
 
   // This component fails to server-side render because the user's locale is unknown, so only
   // render it on the client where the locale is retrieved correctly.
@@ -16,9 +31,13 @@ export function LanguageSelector() {
     return null;
   }
 
+  const supportedLanguagesArray: string[] = supportedLanguages?.split(",") ?? [
+    "en"
+  ];
+
   return (
     <div>
-      {Object.keys(LANGUAGE_LABELS)
+      {supportedLanguagesArray
         .filter((key) => key !== locale)
         .map((key) => {
           function onClick() {
@@ -33,7 +52,9 @@ export function LanguageSelector() {
               key={key}
               className="px-0"
             >
-              {LANGUAGE_LABELS[key]}
+              {capitalize(
+                new Intl.DisplayNames(key, { type: "language" }).of(key)
+              )}
             </Button>
           );
         })}

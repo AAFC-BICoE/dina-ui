@@ -50,7 +50,8 @@ export const TRANSACTION_TABLE_COLUMNS: TableColumn<Transaction>[] = [
   },
   dateCell("openedDate", "data.attributes.openedDate"),
   dateCell("closedDate", "data.attributes.closedDate"),
-  dateCell("dueDate", "data.attributes.dueDate")
+  dateCell("dueDate", "data.attributes.dueDate"),
+  dateCell("createdOn", "data.attributes.createdOn")
 ];
 
 export default function TransactionListPage() {
@@ -69,7 +70,12 @@ export default function TransactionListPage() {
         </ButtonBar>
         <QueryPage
           indexName={"dina_loan_transaction_index"}
+          uniqueName="transaction-list-material-samples"
           columns={TRANSACTION_TABLE_COLUMNS}
+          reactTableProps={{
+            enableSorting: true,
+            enableMultiSort: true
+          }}
           dynamicFieldMapping={{
             fields: [
               {

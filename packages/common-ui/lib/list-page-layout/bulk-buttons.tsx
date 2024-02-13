@@ -11,6 +11,9 @@ import {
   useModal
 } from "..";
 import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
+import { KitsuResource } from "kitsu";
+import { useEffect } from "react";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -113,12 +116,16 @@ export function BulkEditButton({
   );
 }
 
-export interface DataExportButtonProps {
+export interface DataExportButtonProps<TData extends KitsuResource> {
   /** Where to perform the request for the data export. */
   pathname: string;
   totalRecords: number;
   query: any;
+  uniqueName: string;
+  columns: TableColumn<TData>[];
+  dynamicFieldMapping: DynamicFieldsMappingConfig | undefined;
   indexName: string;
+  entityLink: string;
 }
 
 /**
@@ -126,28 +133,38 @@ export interface DataExportButtonProps {
  *
  * This constant is available to use for setting and retrieving the value.
  */
-export const DATA_EXPORT_SEARCH_RESULTS_KEY = "dataExportSearchResults";
+export const DATA_EXPORT_QUERY_KEY = "dataExportQuery";
 export const DATA_EXPORT_TOTAL_RECORDS_KEY = "dataExportTotalRecords";
+export const DATA_EXPORT_COLUMNS_KEY = "dataExportColumns";
+export const DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY = "dynamicFieldMapping";
+export const OBJECT_EXPORT_IDS_KEY = "objectExportIds";
 
-export function DataExportButton({
+export function DataExportButton<TData extends KitsuResource>({
   pathname,
   totalRecords,
   query,
-  indexName
-}: DataExportButtonProps) {
+  uniqueName,
+  columns,
+  dynamicFieldMapping,
+  indexName,
+  entityLink
+}: DataExportButtonProps<TData>) {
   const router = useRouter();
-
+  useEffect(() => {
+    writeStorage<string[]>(OBJECT_EXPORT_IDS_KEY, []);
+  });
   return (
     <FormikButton
       buttonProps={(_ctx) => ({ disabled: totalRecords === 0 })}
-      className="btn btn-primary ms-2 bulk-edit-button"
+      className="btn btn-primary ms-2"
       onClick={async (values: BulkSelectableFormValues) => {
         const selectedResourceIds: string[] = values.itemIdsToSelect
           ? Object.keys(values.itemIdsToSelect)
           : [];
         const selectedIdsQuery = uuidQuery(selectedResourceIds);
+        writeStorage<string[]>(OBJECT_EXPORT_IDS_KEY, selectedResourceIds);
         writeStorage<any>(
-          DATA_EXPORT_SEARCH_RESULTS_KEY,
+          DATA_EXPORT_QUERY_KEY,
           selectedResourceIds.length > 0 ? selectedIdsQuery : query
         );
         writeStorage<number>(
@@ -156,9 +173,22 @@ export function DataExportButton({
             ? selectedResourceIds.length
             : totalRecords
         );
+        writeStorage<TableColumn<TData>[]>(
+          `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`,
+          columns
+        );
+        writeStorage<DynamicFieldsMappingConfig | undefined>(
+          `${uniqueName}_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`,
+          dynamicFieldMapping
+        );
         await router.push({
           pathname,
-          query: { hideTable: true, indexName }
+          query: {
+            hideTable: true,
+            uniqueName,
+            indexName,
+            entityLink
+          }
         });
       }}
     >

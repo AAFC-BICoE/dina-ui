@@ -6,7 +6,7 @@ import {
   dateCell
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav, groupCell8 } from "../../../components";
+import { Head, Nav, groupCell } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { IndexSet } from "../../../types/seqdb-api";
 
@@ -30,9 +30,9 @@ const INDEX_SET_TABLE_COLUMNS: ColumnDefinition<IndexSet>[] = [
     header: "Name",
     accessorKey: "name"
   },
-  groupCell8("group"),
   "forwardAdapter",
   "reverseAdapter",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];

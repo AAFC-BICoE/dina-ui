@@ -1,8 +1,8 @@
+import { ColumnSort } from "@tanstack/react-table";
 import { KitsuResource } from "kitsu";
-import { uniq, reject, isEmpty } from "lodash";
+import { isEmpty, reject, uniq, compact } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { TableColumn } from "../../types";
-import { ColumnSort } from "@tanstack/react-table";
 
 export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
   /**
@@ -192,61 +192,83 @@ export function applySortingRules<TData extends KitsuResource>(
   columns: TableColumn<TData>[]
 ) {
   if (sortingRules && sortingRules.length > 0) {
-    const sortingQueries = Object.assign(
-      {},
-      ...sortingRules.map((columnSort) => {
-        const columnDefinition = columns.find((column) => {
-          // Depending on if it's a string or not.
-          if (typeof column === "string") {
-            return column === columnSort.id;
+    const sortingQueries = compact(sortingRules.map((columnSort) => {
+      const columnDefinition = columns.find((column) => {
+        // Depending on if it's a string or not.
+        if (typeof column === "string") {
+          return column === columnSort.id;
+        }
+
+        // Otherwise, check if sorting is enabled for the column and matches.
+        if (column.enableSorting !== false) {
+          if (column.id) {
+            return column.id === columnSort.id;
           } else {
-            return (column as any).accessorKey === columnSort.id;
-          }
-        });
-
-        // Edge case if a string is only provided as the column definition.
-        if (typeof columnDefinition === "string") {
-          return {
-            [columnDefinition]: {
-              order: columnSort.desc ? "desc" : "asc"
-            }
-          };
-        } else {
-          if (!columnDefinition || !(columnDefinition as any)?.accessorKey) {
-            return;
-          }
-
-          const indexPath =
-            (columnDefinition as any).accessorKey +
-            (columnDefinition.isKeyword && columnDefinition.isKeyword === true
-              ? ".keyword"
-              : "");
-
-          if (columnDefinition.relationshipType) {
-            return {
-              [indexPath]: {
-                order: columnSort.desc ? "desc" : "asc",
-                nested_path: "included",
-                nested_filter: {
-                  term: {
-                    "included.type": columnDefinition.relationshipType
-                  }
-                }
-              }
-            };
-          } else {
-            return {
-              [indexPath]: {
-                order: columnSort.desc ? "desc" : "asc"
-              }
-            };
+            return (column as any).accessorKey.endsWith(columnSort.id);
           }
         }
-      })
-    );
+        return false;
+      });
+
+      // Edge case for when strings are only provided for the column definition.
+      if (typeof columnDefinition === "string") {
+        return {
+          [columnDefinition]: {
+            order: columnSort.desc ? "desc" : "asc"
+          }
+        };
+      }
+
+      if (
+        !columnDefinition ||
+        (!(columnDefinition as any)?.accessorKey &&
+          !(columnDefinition as any)?.accessorFn)
+      ) {
+        return;
+      }
+
+      let accessor: string | null = null;
+      if (!!(columnDefinition as any)?.accessorKey) {
+        accessor = (columnDefinition as any)?.accessorKey;
+      } else if (!!(columnDefinition as any)?.accessorFn) {
+        accessor = (columnDefinition as any)?.accessorFn();
+      }
+
+      if (!accessor) {
+        return;
+      }
+
+      const indexPath =
+        accessor +
+        (columnDefinition.isKeyword && columnDefinition.isKeyword === true
+          ? ".keyword"
+          : "");
+
+      if (columnDefinition.relationshipType) {
+        return {
+          [indexPath]: {
+            order: columnSort.desc ? "desc" : "asc",
+            nested: {
+              path: "included",
+              filter: {
+                term: {
+                  "included.type": columnDefinition.relationshipType
+                }
+              }
+            }
+          }
+        };
+      } else {
+        return {
+          [indexPath]: {
+            order: columnSort.desc ? "desc" : "asc"
+          }
+        };
+      }
+    }));
 
     // Add all of the queries to the existing elastic search query.
-    if (sortingQueries.length !== 0) {
+    if (!isEmpty(sortingQueries)) {
       return {
         ...elasticSearchQuery,
         sort: sortingQueries
@@ -280,13 +302,19 @@ export function applySourceFiltering<TData extends KitsuResource>(
     ...columns
       .map((column) => {
         const accessors: string[] = [];
-        const accessorKey = (column as any)?.accessorKey;
-        if (accessorKey) {
-          accessors.push(accessorKey as string);
+        let accessor: string | null = null;
+        if (!!(column as any)?.accessorKey) {
+          accessor = (column as any)?.accessorKey;
+        } else if (!!(column as any)?.accessorFn) {
+          accessor = (column as any)?.accessorFn();
+        }
+
+        if (accessor) {
+          accessors.push(accessor);
         }
 
         if (column?.additionalAccessors) {
-          accessors.push(...(column.additionalAccessors as string[]));
+          accessors.push(...(column.additionalAccessors ?? []));
         }
 
         return accessors;
@@ -392,6 +420,108 @@ export function termQuery(
   };
 }
 
+// Multi-search exact matches (Non-text based) (in/not in)
+export function inQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,  
+  keywordMultiFieldSupport: boolean,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+      .map(value => value.trim());
+
+  return parentType
+  ? {
+      nested: {
+        path: "included",
+        query: {
+          bool: {
+            must: [
+              {
+                bool: {
+                  [not ? "must_not" : "must"]: {
+                    terms: {
+                      [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValuesArray
+                    }        
+                  }
+                }
+              },
+              includedTypeQuery(parentType)
+            ]
+          }
+        }
+      }
+    } : {
+    bool: {
+      [not ? "must_not" : "must"]: {
+        terms: {
+          [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValuesArray
+        }        
+      }
+    }
+  };
+}
+
+// Multi-search exact matches (case-insensitive) (in/not in)
+export function inTextQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,  
+  keywordMultiFieldSupport: boolean,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+      .map(value => value.trim());
+
+  return parentType
+  ? {
+      nested: {
+        path: "included",
+        query: {
+          bool: {
+            must: [
+              {
+                bool: {
+                  [not ? "must_not" : "must"]: {
+                    bool: {
+                      should: matchValuesArray.map(value => ({
+                        term: {
+                          [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
+                            value: value,
+                            case_insensitive: true
+                          }
+                        }
+                      })),
+                      minimum_should_match: 1                      
+                    }
+                  }
+                }
+              },
+              includedTypeQuery(parentType)
+            ]
+          }
+        }
+      }
+    } : {
+      bool: {
+        [not ? "must_not" : "must"]: {
+          bool: {
+            should: matchValuesArray.map(value => ({
+              term: {
+                [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
+                  value: value,
+                  case_insensitive: true
+                }
+              }
+            })),
+            minimum_should_match: 1
+          }
+        }
+      }
+    };
+}
+
 // Query used for wildcard searches (contains).
 export function wildcardQuery(
   fieldName: string,
@@ -424,6 +554,57 @@ export function rangeQuery(fieldName: string, rangeOptions: any): any {
       [fieldName]: rangeOptions
     }
   };
+}
+
+// Query for generating ranges to search multiple different values.
+// Range is used to ignore the time so it can just search for that specific days.
+export function inRangeQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (
+    matchValues?.split(",") ?? [matchValues]
+  ).map((value) => value.trim());
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    [not ? "should_not" : "should"]: matchValuesArray.map((date) => ({
+                      range: {
+                        [fieldName]: {
+                          gte: date,
+                          lte: date
+                        }
+                      }
+                    }))
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        bool: {
+          [not ? "should_not" : "should"]: matchValuesArray.map((date) => ({
+            range: {
+              [fieldName]: {
+                gte: date,
+                lte: date
+              }
+            }
+          }))
+        }
+      };
 }
 
 // Query used for prefix partial matches

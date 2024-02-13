@@ -2,10 +2,11 @@ import {
   ButtonBar,
   ColumnDefinition,
   CreateButton,
-  ListPageLayout
+  ListPageLayout,
+  dateCell
 } from "common-ui";
 import Link from "next/link";
-import { groupCell8, Head, Nav } from "../../../components";
+import { groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { ThermocyclerProfile } from "../../../types/seqdb-api/resources/ThermocyclerProfile";
 
@@ -24,7 +25,6 @@ const THEROMOCYCLERPROFILE_TABLE_COLUMNS: ColumnDefinition<ThermocyclerProfile>[
         ) : null,
       accessorKey: "region.name"
     },
-    groupCell8("group"),
     {
       cell: ({
         row: {
@@ -38,7 +38,10 @@ const THEROMOCYCLERPROFILE_TABLE_COLUMNS: ColumnDefinition<ThermocyclerProfile>[
       accessorKey: "name"
     },
     "application",
-    "step3"
+    "step3",
+    groupCell("group"),
+    "createdBy",
+    dateCell("createdOn")
   ];
 
 const THERMOCYCLERPROFILE_FILTER_ATTRIBUTES = ["name", "application"];

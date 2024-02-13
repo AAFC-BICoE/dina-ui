@@ -398,6 +398,7 @@ export function TransactionFormLayout({
         <div className="mb-3">
           <QueryPage<MaterialSample>
             indexName={"dina_material_sample_index"}
+            uniqueName="transaction-edit-material-sample"
             columns={ELASTIC_SEARCH_COLUMN}
             selectionMode={!readOnly}
             selectionResources={
@@ -405,6 +406,10 @@ export function TransactionFormLayout({
             }
             setSelectionResources={setSelectedResources}
             viewMode={readOnly}
+            reactTableProps={{
+              enableSorting: true,
+              enableMultiSort: true
+            }}
           />
         </div>
       </FieldSet>

@@ -3,8 +3,14 @@ import {
   ColumnFiltersState,
   SortingState
 } from "@tanstack/react-table";
-import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import {
+  FieldsParam,
+  FilterParam,
+  KitsuResource,
+  KitsuResponse,
+  PersistedResource
+} from "kitsu";
+import { ReactNode, useEffect, useReducer, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
   ClientSideJoinSpec,
@@ -14,13 +20,15 @@ import {
   MetaWithTotal,
   ReactTable,
   ReactTableProps,
-  useColumnChooser,
+  ColumnSelector,
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
+import { Table } from "@tanstack/react-table";
+import { MultiSortTooltip } from "../list-page/MultiSortTooltip";
 
 /**
  * Column props with extra props designed specifically for our application on top of it.
@@ -52,6 +60,16 @@ interface ElasticSearchColumnProps {
 
 /** QueryTable component's props. */
 export interface QueryTableProps<TData extends KitsuResource> {
+  /** if this is true, it will load all data, then filter, sort, paginate in memory */
+  enableInMemoryFilter?: boolean;
+
+  /** a filter function, which is used to filter the data when enableInMemoryFilter */
+  filterFn?: (
+    value: PersistedResource<TData>,
+    index?: number,
+    array?: PersistedResource<TData>[]
+  ) => boolean;
+
   /** Dependencies: When the values in this array are changed, re-fetch the data. */
   deps?: any[];
 
@@ -122,6 +140,8 @@ const DEFAULT_PAGE_SIZE = 25;
  * Table component that fetches data from the backend API.
  */
 export function QueryTable<TData extends KitsuResource>({
+  enableInMemoryFilter = false,
+  filterFn = () => true,
   columns,
   defaultPageSize = DEFAULT_PAGE_SIZE,
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
@@ -165,12 +185,6 @@ export function QueryTable<TData extends KitsuResource>({
   });
 
   const divWrapperRef = useRef<HTMLDivElement>(null);
-
-  const { columnChooser, checkedColumnIds } = useColumnChooser({
-    columns,
-    localStorageKey: path,
-    hideExportButton: true
-  });
 
   function onPageChangeInternal(pageNumber: number) {
     const newOffset = pageNumber * page.limit;
@@ -238,14 +252,24 @@ export function QueryTable<TData extends KitsuResource>({
     sortingRules.map(({ desc, id }) => `${desc ? "-" : ""}${id}`).join() ||
     undefined;
 
-  const query: JsonApiQuerySpec = {
-    path,
-    fields,
-    filter,
-    include,
-    ...(!omitPaging && { page }),
-    sort
-  };
+  let query: JsonApiQuerySpec;
+  if (enableInMemoryFilter) {
+    query = {
+      path,
+      fields,
+      include,
+      sort
+    };
+  } else {
+    query = {
+      path,
+      fields,
+      filter,
+      include,
+      ...(!omitPaging && { page }),
+      sort
+    };
+  }
 
   const mappedColumns: ColumnDef<TData>[] = columns.map((column) => {
     // The "columns" prop can be a string or a react-table Column type.
@@ -280,7 +304,15 @@ export function QueryTable<TData extends KitsuResource>({
     useRef<KitsuResponse<TData[], MetaWithTotal>>();
 
   if (response) {
-    lastSuccessfulResponse.current = response;
+    if (enableInMemoryFilter) {
+      const data = response.data.filter(filterFn);
+      lastSuccessfulResponse.current = {
+        data,
+        meta: { totalResourceCount: data.length }
+      };
+    } else {
+      lastSuccessfulResponse.current = response;
+    }
   }
 
   const totalCount =
@@ -293,8 +325,13 @@ export function QueryTable<TData extends KitsuResource>({
   const resolvedReactTableProps =
     typeof reactTableProps === "function"
       ? reactTableProps(queryState)
-      : reactTableProps;
-
+      : reactTableProps ?? {};
+  if (resolvedReactTableProps.enableSorting === undefined) {
+    resolvedReactTableProps.enableSorting = true;
+  }
+  if (resolvedReactTableProps.enableMultiSort === undefined) {
+    resolvedReactTableProps.enableMultiSort = true;
+  }
   // Show the last loaded page while loading the next page:
   const displayData = lastSuccessfulResponse.current?.data;
   const shouldShowPagination = !!displayData?.length;
@@ -317,6 +354,9 @@ export function QueryTable<TData extends KitsuResource>({
     });
   });
 
+  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+
   return (
     <div
       className="query-table-wrapper"
@@ -335,40 +375,33 @@ export function QueryTable<TData extends KitsuResource>({
         )}
         <div className="ms-auto">
           <div>
-            {enableColumnChooser && columnChooser}
+            {enableColumnChooser && columnSelector}
             {topRightCorner}
           </div>
 
-          {resolvedReactTableProps?.enableSorting !== false && (
-            <Tooltip id="queryTableMultiSortExplanation" placement="left" />
-          )}
+          {/* Multi sort tooltip - Only shown if it's possible to sort */}
+          {resolvedReactTableProps.enableMultiSort && <MultiSortTooltip />}
         </div>
       </div>
       <ReactTable<TData>
+        // These props are needed for column selector
+        forceUpdate={forceUpdate}
+        setColumnSelector={setColumnSelector}
+        uniqueName={path}
+        hideExportButton={true}
         className="-striped"
-        columns={
-          enableColumnChooser
-            ? mappedColumns.filter((column) =>
-                typeof column === "string"
-                  ? checkedColumnIds.includes(column)
-                  : (column as any).accessorKey
-                  ? checkedColumnIds.includes((column as any).accessorKey)
-                  : false
-              )
-            : mappedColumns
-        }
+        columns={mappedColumns}
         data={(displayData as TData[]) ?? []}
-        defaultSorted={sortingRules}
+        sort={sortingRules}
         loading={loadingProp || queryIsLoading}
         enableFilters={enableFilters}
-        defaultColumnFilters={defaultColumnFilters}
-        manualFiltering={true}
+        defaultColumnFilters={columnFilters}
+        manualFiltering={!enableInMemoryFilter}
         onColumnFiltersChange={onColumnFiltersChangeInternal}
-        manualPagination={true}
-        enableSorting={true}
-        enableMultiSort={true}
-        manualSorting={true}
+        manualPagination={!enableInMemoryFilter}
+        manualSorting={!enableInMemoryFilter}
         pageCount={numberOfPages}
+        pageSize={defaultPageSize}
         showPaginationTop={shouldShowPagination && !hideTopPagination}
         showPagination={shouldShowPagination}
         onPageSizeChange={onPageSizeChangeInternal}
@@ -401,7 +434,7 @@ export function QueryTable<TData extends KitsuResource>({
                   </button>
                 </div>
               )
-            : resolvedReactTableProps?.TbodyComponent
+            : resolvedReactTableProps.TbodyComponent
         }
       />
     </div>

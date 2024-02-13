@@ -261,7 +261,11 @@ export default function MaterialSampleListPage() {
       accessorKey: "data.attributes.materialSampleState",
       isKeyword: true
     },
-
+    {
+      id: "group",
+      header: () => <FieldHeader name="group" />,
+      accessorKey: "data.attributes.group"
+    },
     // Created By
     {
       id: "createdBy",
@@ -274,13 +278,10 @@ export default function MaterialSampleListPage() {
     dateCell("createdOn", "data.attributes.createdOn")
   ];
 
-  function rowStyling(row: Row<MaterialSample>) {
-    return {
-      style: {
-        opacity: row?.original?.materialSampleState && 0.4
-      }
+  const rowStyling = (row: Row<any>) =>
+    row?.original?.data?.attributes?.materialSampleState && {
+      opacity: 0.4
     };
-  }
 
   return (
     <div>
@@ -301,6 +302,11 @@ export default function MaterialSampleListPage() {
         <QueryPage
           rowStyling={rowStyling}
           indexName={"dina_material_sample_index"}
+          uniqueName="material-sample-list"
+          reactTableProps={{
+            enableSorting: true,
+            enableMultiSort: true
+          }}
           dynamicFieldMapping={{
             fields: [
               // Managed Attributes
@@ -380,7 +386,10 @@ export default function MaterialSampleListPage() {
             apiBaseUrl: "/collection-api"
           }}
           bulkEditPath="/collection/material-sample/bulk-edit"
-          dataExportPath="/data-export/export"
+          dataExportProps={{
+            dataExportPath: "/data-export/export",
+            entityLink: "/collection/material-sample"
+          }}
           // bulkSplitPath="/collection/material-sample/bulk-split"
         />
       </main>

@@ -94,6 +94,11 @@ export function MetadataFileView({
     <div>
       <div className="mb-3">
         <FileView
+          imgAlt={
+            metadata?.acCaption
+              ? metadata.acCaption
+              : metadata?.originalFilename
+          }
           clickToDownload={true}
           filePath={filePath}
           fileType={fileType}

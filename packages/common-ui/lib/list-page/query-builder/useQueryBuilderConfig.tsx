@@ -197,7 +197,7 @@ export function useQueryBuilderConfig({
  * @param indexName The index name currently being used.
  * @returns Query Builder configuration.
  */
-function generateBuilderConfig(
+export function generateBuilderConfig(
   indexMap: ESIndexMapping[],
   indexName: string,
   formatMessage: any,
@@ -220,6 +220,14 @@ function generateBuilderConfig(
     wildcard: {
       // Displayed as "Contains"
       label: formatMessage({ id: "queryBuilder_operator_wildcard" }),
+      cardinality: 1
+    },
+    in: {
+      label: formatMessage({ id: "queryBuilder_operator_in" }),
+      cardinality: 1
+    },
+    notIn: {
+      label: formatMessage({ id: "queryBuilder_operator_notIn" }),
       cardinality: 1
     },
     startsWith: {
@@ -473,6 +481,8 @@ function generateBuilderConfig(
           operators: [
             "exactMatch",
             "wildcard",
+            "in",
+            "notIn",
             "startsWith", // Only displayed if supported on the mapping.
             "containsText", // Only displayed if supported on the mapping.
             "endsWith", // Only displayed if supported on the mapping.
@@ -488,7 +498,14 @@ function generateBuilderConfig(
       defaultOperator: "equals",
       widgets: {
         autoComplete: {
-          operators: ["equals", "notEquals", "empty", "notEmpty"]
+          operators: [
+            "equals", 
+            "notEquals", 
+            "in",
+            "notIn",
+            "empty", 
+            "notEmpty"
+          ]
         }
       }
     },
@@ -535,6 +552,8 @@ function generateBuilderConfig(
           operators: [
             "equals",
             "notEquals",
+            "in",
+            "notIn",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",
@@ -633,6 +652,7 @@ function generateBuilderConfig(
       <QueryConjunctionSwitch
         currentConjunction={conjunctionProps?.selectedConjunction}
         setConjunction={conjunctionProps?.setConjunction}
+        disabled={conjunctionProps?.disabled}
       />
     )
   };
