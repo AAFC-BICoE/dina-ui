@@ -549,9 +549,11 @@ export function QueryPage<TData extends KitsuResource>({
   }, [
     pageSize,
     pageOffset,
-    sortingRules,
-    submittedQueryBuilderTree,
-    groups,
+    // useEffect does not compare deeply into array and ImmutableTree, but compares the isntance ref.
+    // Solution: use JSON.stringify() to convert the content of array/ImmutableTree into strings.
+    JSON.stringify(sortingRules),
+    JSON.stringify(submittedQueryBuilderTree),
+    JSON.stringify(groups),
     loadingIndexMapColumns
   ]);
 
@@ -570,7 +572,7 @@ export function QueryPage<TData extends KitsuResource>({
   }, [
     queryBuilderConfig,
     customViewQuery,
-    customViewFields,
+    JSON.stringify(customViewFields),
     customViewElasticSearchQuery
   ]);
 
@@ -750,7 +752,7 @@ export function QueryPage<TData extends KitsuResource>({
       ...columnVisibility,
       ...localStorageColumnStates
     });
-  }, [totalColumns]);
+  }, [JSON.stringify(totalColumns)]);
 
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     sort: sortingRules,
