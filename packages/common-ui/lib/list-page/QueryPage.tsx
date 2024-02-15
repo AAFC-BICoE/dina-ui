@@ -13,7 +13,8 @@ import React, {
   useEffect,
   useMemo,
   useState,
-  useReducer
+  useReducer,
+  useRef
 } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
@@ -24,7 +25,8 @@ import {
   ReactTable,
   ReactTableProps,
   VISIBLE_INDEX_LOCAL_STORAGE_KEY,
-  useAccount
+  useAccount,
+  useIsMounted
 } from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
@@ -288,6 +290,8 @@ export function QueryPage<TData extends KitsuResource>({
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
+  const isInitialQueryFinished = useRef(false);
+  const isActionTriggeredQuery = useRef(false);
 
   const [visibleIndexMapColumns] = useLocalStorage<any[]>(
     `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
@@ -478,74 +482,79 @@ export function QueryPage<TData extends KitsuResource>({
     // Save elastic search query for export page
     setElasticSearchQuery({ ...queryDSL });
 
-    // Fetch data using elastic search.
-    // The included section will be transformed from an array to an object with the type name for each relationship.
-    elasticSearchRequest(queryDSL)
-      .then((result) => {
-        const processedResult = result?.hits.map((rslt) => {
-          return {
-            id: rslt._source?.data?.id,
-            type: rslt._source?.data?.type,
-            data: {
-              attributes: rslt._source?.data?.attributes
-            },
-            included: rslt._source?.included?.reduce(
-              (includedAccumulator, currentIncluded) => {
-                if (
-                  currentIncluded?.type === "organism" ||
-                  currentIncluded?.type === "derivative"
-                ) {
-                  if (!includedAccumulator[currentIncluded?.type]) {
-                    return (
-                      (includedAccumulator[currentIncluded?.type] = [
-                        currentIncluded
-                      ]),
-                      includedAccumulator
-                    );
+    if (isInitialQueryFinished.current == false || isActionTriggeredQuery.current) {
+      if (isInitialQueryFinished.current == false) {
+        isInitialQueryFinished.current = true;
+      }
+      // Fetch data using elastic search.
+      // The included section will be transformed from an array to an object with the type name for each relationship.
+      elasticSearchRequest(queryDSL)
+        .then((result) => {
+          const processedResult = result?.hits.map((rslt) => {
+            return {
+              id: rslt._source?.data?.id,
+              type: rslt._source?.data?.type,
+              data: {
+                attributes: rslt._source?.data?.attributes
+              },
+              included: rslt._source?.included?.reduce(
+                (includedAccumulator, currentIncluded) => {
+                  if (
+                    currentIncluded?.type === "organism" ||
+                    currentIncluded?.type === "derivative"
+                  ) {
+                    if (!includedAccumulator[currentIncluded?.type]) {
+                      return (
+                        (includedAccumulator[currentIncluded?.type] = [
+                          currentIncluded
+                        ]),
+                        includedAccumulator
+                      );
+                    } else {
+                      return (
+                        includedAccumulator[currentIncluded?.type].push(
+                          currentIncluded
+                        ),
+                        includedAccumulator
+                      );
+                    }
                   } else {
                     return (
-                      includedAccumulator[currentIncluded?.type].push(
-                        currentIncluded
-                      ),
+                      (includedAccumulator[currentIncluded?.type] =
+                        currentIncluded),
                       includedAccumulator
                     );
                   }
-                } else {
-                  return (
-                    (includedAccumulator[currentIncluded?.type] =
-                      currentIncluded),
-                    includedAccumulator
-                  );
-                }
-              },
-              {}
-            )
-          };
-        });
-        // If we have reached the count limit, we will need to perform another request for the true
-        // query size.
-        if (result?.total.value === MAX_COUNT_SIZE) {
-          elasticSearchCountRequest(queryDSL)
-            .then((countResult) => {
-              setTotalRecords(countResult);
-            })
-            .catch((elasticSearchError) => {
-              setError(elasticSearchError);
-            });
-        } else {
-          setTotalRecords(result?.total?.value ?? 0);
-        }
+                },
+                {}
+              )
+            };
+          });
+          // If we have reached the count limit, we will need to perform another request for the true
+          // query size.
+          if (result?.total.value === MAX_COUNT_SIZE) {
+            elasticSearchCountRequest(queryDSL)
+              .then((countResult) => {
+                setTotalRecords(countResult);
+              })
+              .catch((elasticSearchError) => {
+                setError(elasticSearchError);
+              });
+          } else {
+            setTotalRecords(result?.total?.value ?? 0);
+          }
 
-        setAvailableResources(processedResult);
-        setSearchResults(processedResult);
-      })
-      .catch((elasticSearchError) => {
-        setError(elasticSearchError);
-      })
-      .finally(() => {
-        // No matter the end result, loading should stop.
-        setLoading(false);
-      });
+          setAvailableResources(processedResult);
+          setSearchResults(processedResult);
+        })
+        .catch((elasticSearchError) => {
+          setError(elasticSearchError);
+        })
+        .finally(() => {
+          // No matter the end result, loading should stop.
+          setLoading(false);
+        });
+    }
   }, [
     pageSize,
     pageOffset,
@@ -587,6 +596,7 @@ export function QueryPage<TData extends KitsuResource>({
     formValues,
     formik: FormikContextType<any>
   ) {
+    isActionTriggeredQuery.current = true;
     // Ensure selectedResources has been setup correctly.
     if (!selectedResources || !setSelectedResources) {
       console.error(
@@ -630,6 +640,7 @@ export function QueryPage<TData extends KitsuResource>({
    * @param formik Formik Context
    */
   function removeSelectedResources(formValues, formik: FormikContextType<any>) {
+    isActionTriggeredQuery.current = true;
     // Ensure selectedResources has been setup correctly.
     if (!selectedResources || !setSelectedResources) {
       console.error(
@@ -808,6 +819,7 @@ export function QueryPage<TData extends KitsuResource>({
    * performed.
    */
   const onReset = useCallback(() => {
+    isActionTriggeredQuery.current = true;
     setSubmittedQueryBuilderTree(defaultQueryTree());
     setQueryBuilderTree(defaultQueryTree());
     setSessionStorageQueryTree(defaultJsonTree);
@@ -822,6 +834,7 @@ export function QueryPage<TData extends KitsuResource>({
    * a new search.
    */
   const onSubmit = () => {
+    isActionTriggeredQuery.current = true;
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
     setSessionStorageQueryTree(Utils.getTree(queryBuilderTree));
@@ -831,6 +844,7 @@ export function QueryPage<TData extends KitsuResource>({
    * When the group filter has changed, store the new value for the search.
    */
   const onGroupChange = useCallback((newGroups: string[]) => {
+    isActionTriggeredQuery.current = true;
     setGroups(newGroups);
   }, []);
 
@@ -850,6 +864,7 @@ export function QueryPage<TData extends KitsuResource>({
    * @param newPageSize
    */
   const onPageSizeChanged = useCallback((newPageSize: number) => {
+    isActionTriggeredQuery.current = true;
     setPageOffset(0);
     setPageSize(newPageSize);
     setLoading(true);
@@ -861,6 +876,7 @@ export function QueryPage<TData extends KitsuResource>({
    * This method will cause the useEffect with the search to trigger if the sorting has changed.
    */
   const onSortChange = useCallback((newSort: ColumnSort[]) => {
+    isActionTriggeredQuery.current = true;
     setSortingRules(newSort);
     setLoading(true);
 
@@ -884,6 +900,7 @@ export function QueryPage<TData extends KitsuResource>({
    */
   const onPageChanged = useCallback(
     (newPage: number) => {
+      isActionTriggeredQuery.current = true;
       setPageOffset(pageSize * newPage);
       setLoading(true);
     },
@@ -891,6 +908,7 @@ export function QueryPage<TData extends KitsuResource>({
   );
 
   function onRowMove(draggedRowIndex: number, targetRowIndex: number) {
+    isActionTriggeredQuery.current = true;
     if (!!selectedResources) {
       selectedResources.splice(
         targetRowIndex,
