@@ -135,15 +135,19 @@ export default function ExportPage<TData extends KitsuResource>() {
         return metadata.dcType === "IMAGE";
       });
 
-      // Get the first 100 file identifiers
       const fileIdentifiers = imageMetadatas.map((imageMetadata) => {
         // If image has derivative, return large image derivative fileIdentifier if present
         if (imageMetadata.derivatives) {
-          imageMetadata.derivatives.forEach((derivative) => {
-            if (derivative.derivativeType === "LARGE_IMAGE") {
-              return derivative.fileIdentifier;
+          const largeImageDerivative = imageMetadata.derivatives.find(
+            (derivative) => {
+              if (derivative.derivativeType === "LARGE_IMAGE") {
+                return true;
+              }
             }
-          });
+          );
+          if (largeImageDerivative) {
+            return largeImageDerivative.fileIdentifier;
+          }
         }
         // Otherwise, return original fileIdentifier
         return imageMetadata.fileIdentifier;
