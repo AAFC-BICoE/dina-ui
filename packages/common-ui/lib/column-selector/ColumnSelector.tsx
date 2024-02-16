@@ -19,10 +19,11 @@ import Kitsu from "kitsu";
 import { Table, VisibilityState, Column } from "@tanstack/react-table";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
 import {
+  addColumnToStateVariable,
   getColumnSelectorIndexMapColumns,
   getGroupedIndexMappings
 } from "./ColumnSelectorUtils";
-import { DynamicFieldsMappingConfig } from "../list-page/types";
+import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 import { useIndexMapping } from "../list-page/useIndexMapping";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
@@ -65,7 +66,7 @@ export interface ColumnSelectorProps<TData> {
   setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
 
   // The default visible columns
-  columnSelectorDefaultColumns?: any[];
+  columnSelectorDefaultColumns?: TableColumn<any>[];
 }
 
 // Ids of columns not supported for exporting
@@ -112,48 +113,6 @@ export function ColumnSelector<TData>({
     groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
   }
 
-  function menuDisplayControl() {
-    const [show, setShow] = useState(false);
-
-    const showDropdown = async () => {
-      if (!loadedIndexMapColumns) {
-        setLoading(true);
-        await getColumnSelectorIndexMapColumns({
-          groupedIndexMappings,
-          setLoadedIndexMapColumns,
-          setColumnSelectorIndexMapColumns,
-          apiClient,
-          setLoadingIndexMapColumns,
-          columnSelectorDefaultColumns
-        });
-        setLoading(false);
-      }
-      setShow(true);
-    };
-    const hideDropdown = () => {
-      setShow(false);
-    };
-    function onKeyDown(e) {
-      if (
-        e.key === "ArrowDown" ||
-        e.key === "ArrowUp" ||
-        e.key === "Space" ||
-        e.key === " " ||
-        e.key === "Enter"
-      ) {
-        showDropdown();
-      } else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab")) {
-        hideDropdown();
-      }
-    }
-    function onKeyDownLastItem(e) {
-      if (!e.shiftKey && e.key === "Tab") {
-        hideDropdown();
-      }
-    }
-    return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
-  }
-
   const { formatMessage, messages } = useIntl();
   // For finding columns using text search
   const columnSearchMapping: { label: string; id: string }[] | undefined =
@@ -170,16 +129,35 @@ export function ColumnSelector<TData>({
     ? localStorageColumnStates
     : {};
   // Columns filtered from text search
-  const [searchedColumns, setSearchedColumns] =
-    useState<Column<TData, unknown>[]>();
+  const [searchedColumns, setSearchedColumns] = useState<
+    TableColumn<any>[] | undefined
+  >(columnSelectorDefaultColumns);
 
   // Set initial columns for column selector dropdown and local storage
   useEffect(() => {
     if (localStorageColumnStates) {
       reactTable?.setColumnVisibility(localStorageColumnStates);
     }
-    setSearchedColumns(reactTable?.getAllLeafColumns());
   }, [reactTable, reactTable?.getAllColumns().length]);
+
+  // Watch for changes in react table columns length and update visible
+  useEffect(() => {
+    const visibleIndexMapColumns: any[] = [];
+    reactTable?.getVisibleLeafColumns().forEach((column) => {
+      if (
+        !NOT_EXPORTABLE_COLUMN_IDS.includes(column.id) &&
+        !columnSelectorDefaultColumns?.find(
+          (defaultColumn) => defaultColumn.id === column.id
+        )
+      ) {
+        visibleIndexMapColumns.push(column.columnDef);
+      }
+    });
+    writeStorage(
+      `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
+      visibleIndexMapColumns
+    );
+  }, [reactTable?.getAllColumns().length]);
 
   const [loading, setLoading] = useState(false);
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
@@ -196,16 +174,16 @@ export function ColumnSelector<TData>({
   const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
 
   function handleToggleAll(event) {
-    const visibilityState = reactTable?.getState()?.columnVisibility;
-    if (visibilityState) {
-      Object.keys(visibilityState).forEach((columnId) => {
-        visibilityState[columnId] = event.target.checked;
-      });
-      NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
-        visibilityState[columnId] = true;
-      });
-      setLocalStorageColumnStates(visibilityState);
-    }
+    const visibilityState = {};
+    searchedColumns?.forEach((column) => {
+      if (column.id) {
+        visibilityState[column.id] = event.target.checked;
+      }
+    });
+    NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
+      visibilityState[columnId] = true;
+    });
+    setLocalStorageColumnStates(visibilityState);
     const reactTableToggleAllHander =
       reactTable?.getToggleAllColumnsVisibilityHandler();
     if (reactTableToggleAllHander) {
@@ -217,25 +195,29 @@ export function ColumnSelector<TData>({
   }
 
   function applyFilterColumns() {
-    const visibleIndexMapColumns: any[] = [];
+    setLoadingIndexMapColumns?.(true);
     if (filteredColumnsState) {
-      reactTable?.setColumnVisibility(filteredColumnsState);
-      reactTable?.getAllLeafColumns().forEach((column) => {
-        if (
-          column.getIsVisible() &&
-          !NOT_EXPORTABLE_COLUMN_IDS.includes(column.id) &&
-          !columnSelectorDefaultColumns?.find(
-            (defaultColumn) => defaultColumn.id === column.id
-          )
-        ) {
-          visibleIndexMapColumns.push(column.columnDef);
+      const checkedColumnIds = Object.keys(filteredColumnsState).filter(
+        (key) => {
+          return filteredColumnsState[key];
+        }
+      );
+      checkedColumnIds.forEach((id) => {
+        const columnToAddToIndexMapColumns = searchedColumns?.find(
+          (column) => column.id === id
+        );
+        if (columnToAddToIndexMapColumns) {
+          addColumnToStateVariable(
+            columnToAddToIndexMapColumns,
+            setColumnSelectorIndexMapColumns,
+            columnSelectorDefaultColumns
+          );
         }
       });
+
+      reactTable?.setColumnVisibility(filteredColumnsState);
     }
-    writeStorage(
-      `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
-      visibleIndexMapColumns
-    );
+
     setLocalStorageColumnStates(filteredColumnsState);
     forceUpdate?.();
   }
@@ -307,6 +289,47 @@ export function ColumnSelector<TData>({
     }
     isFetchingDataExport = false;
     setLoading(false);
+  }
+
+  function menuDisplayControl() {
+    const [show, setShow] = useState(false);
+
+    const showDropdown = async () => {
+      if (!loadedIndexMapColumns) {
+        setLoading(true);
+        await getColumnSelectorIndexMapColumns({
+          groupedIndexMappings,
+          setLoadedIndexMapColumns,
+          setSearchedColumns,
+          apiClient,
+          columnSelectorDefaultColumns
+        });
+        setLoading(false);
+      }
+      setShow(true);
+    };
+    const hideDropdown = () => {
+      setShow(false);
+    };
+    function onKeyDown(e) {
+      if (
+        e.key === "ArrowDown" ||
+        e.key === "ArrowUp" ||
+        e.key === "Space" ||
+        e.key === " " ||
+        e.key === "Enter"
+      ) {
+        showDropdown();
+      } else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab")) {
+        hideDropdown();
+      }
+    }
+    function onKeyDownLastItem(e) {
+      if (!e.shiftKey && e.key === "Tab") {
+        hideDropdown();
+      }
+    }
+    return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
   }
 
   const CheckboxItem = React.forwardRef((props: any, ref) => {
@@ -403,6 +426,27 @@ export function ColumnSelector<TData>({
       );
     }
   );
+  function isChecked(column) {
+    if (localStorageColumnStates?.[column?.id] === true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function isSelectAllChecked() {
+    if (localStorageColumnStates) {
+      const uncheckedColumn = Object.keys(localStorageColumnStates).find(
+        (key) => localStorageColumnStates[key] === false
+      );
+      if (!!uncheckedColumn) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
 
   return loading ? (
     <LoadingSpinner loading={loading} />
@@ -411,27 +455,27 @@ export function ColumnSelector<TData>({
       <Dropdown.Item
         id="selectAll"
         handleClick={handleToggleAll}
-        isChecked={reactTable?.getIsAllColumnsVisible()}
+        isChecked={isSelectAllChecked()}
         as={CheckboxItem}
       />
       {searchedColumns?.map((column) => {
-        function handdleToggle(event) {
-          const reactTableToggleHandler = column?.getToggleVisibilityHandler();
-          reactTableToggleHandler(event);
-          const columnId = column.id;
-          setLocalStorageColumnStates({
-            ...localStorageColumnStates,
-            [columnId]: event.target.checked
-          });
+        function handleToggle(_event) {
+          // const reactTableToggleHandler = column?.getToggleVisibilityHandler();
+          // reactTableToggleHandler(event);
+          // const columnId = column.id;
+          // setLocalStorageColumnStates({
+          //   ...localStorageColumnStates,
+          //   [columnId]: event.target.checked
+          // });
         }
         return (
           <>
             <Dropdown.Item
               key={column?.id}
               id={column?.id}
-              isChecked={column?.getIsVisible()}
+              isChecked={isChecked(column)}
               isField={true}
-              handleClick={handdleToggle}
+              handleClick={handleToggle}
               as={CheckboxItem}
             />
           </>
@@ -455,7 +499,7 @@ export function ColumnSelector<TData>({
         <Dropdown.Item
           id="selectAll"
           handleClick={handleToggleAll}
-          isChecked={reactTable?.getIsAllColumnsVisible()}
+          isChecked={isSelectAllChecked()}
           as={CheckboxItem}
         />
         {searchedColumns?.map((column) => {
@@ -464,7 +508,7 @@ export function ColumnSelector<TData>({
               <Dropdown.Item
                 key={column?.id}
                 id={column?.id}
-                isChecked={column?.getIsVisible()}
+                isChecked={isChecked(column)}
                 isField={true}
                 as={CheckboxItem}
               />

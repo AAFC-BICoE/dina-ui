@@ -545,6 +545,7 @@ export function QueryPage<TData extends KitsuResource>({
       .finally(() => {
         // No matter the end result, loading should stop.
         setLoading(false);
+        setLoadingIndexMapColumns(false);
       });
   }, [
     pageSize,

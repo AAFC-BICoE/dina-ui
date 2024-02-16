@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useIntl } from "react-intl";
 import { VisibilityState } from "@tanstack/react-table";
 import { NOT_EXPORTABLE_COLUMN_IDS } from "./ColumnSelector";
+import { TableColumn } from "../list-page/types";
 
 export interface CheckboxProps {
   id: string;
@@ -13,6 +14,7 @@ export interface CheckboxProps {
   handleClick?: (e: any) => void;
   ref?: React.ForwardedRef<any>;
   hideLabel?: boolean;
+  sendToIndexMapColumnsBatch?: { [key: string]: string };
 }
 
 export function Checkbox({
@@ -23,7 +25,7 @@ export function Checkbox({
   filteredColumnsState,
   handleClick,
   ref,
-  hideLabel
+  hideLabel,
 }: CheckboxProps) {
   const { formatMessage, messages } = useIntl();
   const [checked, setChecked] = useState<boolean>(isChecked ?? false);
@@ -37,6 +39,7 @@ export function Checkbox({
       ? formatMessage({ id: id as any })
       : startCase(id));
   function internalHandleClick(event) {
+    handleClick?.(event);
     const checkedState = event?.target?.checked;
     setChecked(checkedState);
     if (filteredColumnsState) {
@@ -49,7 +52,7 @@ export function Checkbox({
         key={id}
         id={id}
         type={"checkbox"}
-        onChange={handleClick ?? internalHandleClick}
+        onChange={internalHandleClick}
         checked={checked}
         style={{
           marginRight: "0.3rem",
