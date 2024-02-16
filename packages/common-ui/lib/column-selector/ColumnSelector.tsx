@@ -81,7 +81,6 @@ export function ColumnSelector<TData>({
   reactTable,
   menuOnly,
   hideExportButton = false,
-  forceUpdate,
   indexName,
   dynamicFieldMapping,
   setColumnSelectorIndexMapColumns,
@@ -195,7 +194,6 @@ export function ColumnSelector<TData>({
   }
 
   function applyFilterColumns() {
-    setLoadingIndexMapColumns?.(true);
     if (filteredColumnsState) {
       const checkedColumnIds = Object.keys(filteredColumnsState).filter(
         (key) => {
@@ -217,9 +215,8 @@ export function ColumnSelector<TData>({
 
       reactTable?.setColumnVisibility(filteredColumnsState);
     }
-
+    setLoadingIndexMapColumns?.((current) => (!current));
     setLocalStorageColumnStates(filteredColumnsState);
-    forceUpdate?.();
   }
 
   async function exportData() {

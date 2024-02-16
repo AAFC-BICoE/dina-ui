@@ -545,7 +545,6 @@ export function QueryPage<TData extends KitsuResource>({
       .finally(() => {
         // No matter the end result, loading should stop.
         setLoading(false);
-        setLoadingIndexMapColumns(false);
       });
   }, [
     pageSize,
@@ -905,7 +904,6 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
-  const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
@@ -987,7 +985,7 @@ export function QueryPage<TData extends KitsuResource>({
               <div className="d-flex align-items-end">
                 <span id="queryPageCount">
                   {/* Loading indicator when total is not calculated yet. */}
-                  {loading || loadingIndexMapColumns ? (
+                  {loading ? (
                     <LoadingSpinner loading={true} />
                   ) : (
                     <CommonMessage
@@ -1028,7 +1026,6 @@ export function QueryPage<TData extends KitsuResource>({
               )}
               <ReactTable<TData>
                 // These props are needed for column selector
-                forceUpdate={forceUpdate}
                 setColumnSelector={setColumnSelector}
                 uniqueName={uniqueName}
                 indexName={indexName}
@@ -1049,7 +1046,7 @@ export function QueryPage<TData extends KitsuResource>({
                     : searchResults) ?? []
                 }
                 // Loading Table props
-                loading={loading || loadingIndexMapColumns}
+                loading={loading}
                 // Pagination props
                 manualPagination={
                   viewMode && selectedResources?.length ? false : true
@@ -1102,7 +1099,7 @@ export function QueryPage<TData extends KitsuResource>({
                     />
                   </span>
                   <ReactTable<TData>
-                    loading={loading || loadingIndexMapColumns}
+                    loading={loading}
                     columns={columnsSelected}
                     data={selectedResources ?? []}
                     onRowMove={onRowMove}

@@ -89,9 +89,6 @@ export interface ReactTableProps<TData> {
   // uniqueName used for local storage
   uniqueName?: string;
 
-  // Force updates component where this dispatch was created
-  forceUpdate?: React.DispatchWithoutAction;
-
   /**
    * Used for the listing page to understand which columns can be provided. Filters are generated
    * based on the index provided.
@@ -173,7 +170,6 @@ export function ReactTable<TData>({
   hideTable = false,
   setColumnSelector,
   uniqueName,
-  forceUpdate,
   indexName,
   dynamicFieldMapping,
   setColumnSelectorIndexMapColumns,
@@ -305,7 +301,6 @@ export function ReactTable<TData>({
           reactTable={table}
           hideExportButton={hideExportButton}
           menuOnly={menuOnly}
-          forceUpdate={forceUpdate}
           indexName={indexName}
           dynamicFieldMapping={dynamicFieldMapping}
           setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
