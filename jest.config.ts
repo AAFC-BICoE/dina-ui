@@ -27,10 +27,11 @@ const config: Config.InitialOptions = {
   testPathIgnorePatterns: ["/.next/", "/node_modules/"],
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$",
   transform: {
-    "^.+\\.tsx?$": ["babel-jest", { presets: ["next/babel"] }]
+    "^.+\\.tsx?$": ["babel-jest", { presets: ["next/babel"] }],
+    "^.+\\.js?$": ["babel-jest", { presets: ["next/babel"] }]
   },
   // Transform our local common-ui package
-  transformIgnorePatterns: [`/node_modules/(?!common-ui)`],
+  transformIgnorePatterns: [`/node_modules/(?!common-ui|axios)`],
   globalSetup: "./jest-global-setup.js"
 };
 
