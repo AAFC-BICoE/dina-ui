@@ -1,5 +1,5 @@
 import { Table } from "@tanstack/react-table";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useState } from "react";
 import { useIntl } from "react-intl";
 import CreatableSelect from "react-select/creatable";
