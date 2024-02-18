@@ -293,10 +293,13 @@ export function QueryPage<TData extends KitsuResource>({
     `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
     []
   );
-
-  // Index map columns that can be filtered on by query builder
-  const [columnSelectorIndexMapColumns, setColumnSelectorIndexMapColumns] =
-    useState<any[]>([]);
+  // Combined columns from passed in columns
+  const [totalColumns, setTotalColumns] =
+    useState<TableColumn<TData>[]>(columns);
+  const [
+    selectedColumnSelectorIndexMapColumns,
+    setSelectedColumnSelectorIndexMapColumns
+  ] = useState<any[]>([]);
   const [loadingIndexMapColumns, setLoadingIndexMapColumns] =
     useState<boolean>(false);
 
@@ -308,18 +311,18 @@ export function QueryPage<TData extends KitsuResource>({
             visibleIndexMapColumn.queryOption,
             visibleIndexMapColumn.extensionValue,
             visibleIndexMapColumn.extensionField,
-            setColumnSelectorIndexMapColumns
+            setSelectedColumnSelectorIndexMapColumns
           );
         } else if (visibleIndexMapColumn.managedAttribute) {
           getIncludedManagedAttributeColumn(
             visibleIndexMapColumn.managedAttribute,
             visibleIndexMapColumn.queryOption,
-            setColumnSelectorIndexMapColumns
+            setSelectedColumnSelectorIndexMapColumns
           );
         } else {
           getIncludedStandardColumns(
             visibleIndexMapColumn.queryOption,
-            setColumnSelectorIndexMapColumns
+            setSelectedColumnSelectorIndexMapColumns
           );
         }
       } else {
@@ -328,27 +331,23 @@ export function QueryPage<TData extends KitsuResource>({
             visibleIndexMapColumn.queryOption,
             visibleIndexMapColumn.extensionValue,
             visibleIndexMapColumn.extensionField,
-            setColumnSelectorIndexMapColumns
+            setSelectedColumnSelectorIndexMapColumns
           );
         } else if (visibleIndexMapColumn.managedAttribute) {
           getAttributesManagedAttributeColumn(
             visibleIndexMapColumn.managedAttribute,
             visibleIndexMapColumn.queryOption,
-            setColumnSelectorIndexMapColumns
+            setSelectedColumnSelectorIndexMapColumns
           );
         } else {
           getAttributesStandardColumns(
             visibleIndexMapColumn.queryOption,
-            setColumnSelectorIndexMapColumns
+            setSelectedColumnSelectorIndexMapColumns
           );
         }
       }
     });
   }, []);
-
-  // Combined columns from passed in columns
-  const [totalColumns, setTotalColumns] =
-    useState<TableColumn<TData>[]>(columns);
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -458,10 +457,9 @@ export function QueryPage<TData extends KitsuResource>({
     }
 
     const combinedColumns = uniqBy(
-      [...totalColumns, ...columnSelectorIndexMapColumns],
+      [...columns, ...selectedColumnSelectorIndexMapColumns],
       "id"
     );
-    setTotalColumns(combinedColumns);
 
     queryDSL = applyRootQuery(queryDSL);
     queryDSL = applyGroupFilters(queryDSL, groups);
@@ -774,6 +772,7 @@ export function QueryPage<TData extends KitsuResource>({
         ]
       : []),
     ...totalColumns
+    // ...columnSelectorIndexMapColumns
   ];
 
   // Columns generated for the selected resources, only in selection mode.
@@ -904,7 +903,6 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
-  const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
@@ -986,7 +984,7 @@ export function QueryPage<TData extends KitsuResource>({
               <div className="d-flex align-items-end">
                 <span id="queryPageCount">
                   {/* Loading indicator when total is not calculated yet. */}
-                  {loading || loadingIndexMapColumns ? (
+                  {loading ? (
                     <LoadingSpinner loading={true} />
                   ) : (
                     <CommonMessage
@@ -1027,13 +1025,13 @@ export function QueryPage<TData extends KitsuResource>({
               )}
               <ReactTable<TData>
                 // These props are needed for column selector
-                forceUpdate={forceUpdate}
                 setColumnSelector={setColumnSelector}
                 uniqueName={uniqueName}
                 indexName={indexName}
                 dynamicFieldMapping={dynamicFieldMapping}
-                setColumnSelectorIndexMapColumns={
-                  setColumnSelectorIndexMapColumns
+                setColumnSelectorIndexMapColumns={setTotalColumns}
+                setSelectedColumnSelectorIndexMapColumns={
+                  setSelectedColumnSelectorIndexMapColumns
                 }
                 setLoadingIndexMapColumns={setLoadingIndexMapColumns}
                 hideExportButton={true}
@@ -1048,7 +1046,7 @@ export function QueryPage<TData extends KitsuResource>({
                     : searchResults) ?? []
                 }
                 // Loading Table props
-                loading={loading || loadingIndexMapColumns}
+                loading={loading}
                 // Pagination props
                 manualPagination={
                   viewMode && selectedResources?.length ? false : true
@@ -1101,7 +1099,7 @@ export function QueryPage<TData extends KitsuResource>({
                     />
                   </span>
                   <ReactTable<TData>
-                    loading={loading || loadingIndexMapColumns}
+                    loading={loading}
                     columns={columnsSelected}
                     data={selectedResources ?? []}
                     onRowMove={onRowMove}

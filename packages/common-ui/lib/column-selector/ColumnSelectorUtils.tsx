@@ -99,7 +99,7 @@ export function getAttributesStandardColumns(
       queryOption
     };
   }
-  addColumnToIndexMapColumns(
+  addColumnToStateVariable(
     column,
     setColumnSelectorIndexMapColumns,
     columnSelectorDefaultColumns
@@ -145,19 +145,19 @@ export function getIncludedStandardColumns(
       queryOption
     };
   }
-  addColumnToIndexMapColumns(
+  addColumnToStateVariable(
     column,
     setColumnSelectorIndexMapColumns,
     columnSelectorDefaultColumns
   );
 }
 
-function addColumnToIndexMapColumns(
+export function addColumnToStateVariable(
   column,
-  setColumnSelectorIndexMapColumns?: React.Dispatch<any>,
+  setColumns?: React.Dispatch<any>,
   columnSelectorDefaultColumns?: any[]
 ) {
-  setColumnSelectorIndexMapColumns?.((currentColumns) => {
+  setColumns?.((currentColumns) => {
     if (
       !currentColumns.find(
         (currentColumn) => currentColumn.id === (column as any).id
@@ -285,7 +285,7 @@ export function getIncludedManagedAttributeColumn(
     managedAttribute,
     queryOption
   };
-  addColumnToIndexMapColumns(
+  addColumnToStateVariable(
     managedAttributesColumn,
     setColumnSelectorIndexMapColumns,
     columnSelectorDefaultColumns
@@ -325,7 +325,7 @@ export function getAttributesManagedAttributeColumn(
     queryOption,
     managedAttribute
   };
-  addColumnToIndexMapColumns(
+  addColumnToStateVariable(
     managedAttributesColumn,
     setColumnSelectorIndexMapColumns,
     columnSelectorDefaultColumns
@@ -386,7 +386,7 @@ export function getAttributeExtensionFieldColumn(
     extensionValue,
     extensionField
   };
-  addColumnToIndexMapColumns(
+  addColumnToStateVariable(
     extensionValuesColumn,
     setColumnSelectorIndexMapColumns,
     columnSelectorDefaultColumns
@@ -525,7 +525,7 @@ export function getIncludedExtensionFieldColumn(
     extensionValue,
     extensionField
   };
-  addColumnToIndexMapColumns(
+  addColumnToStateVariable(
     extensionValuesColumn,
     setColumnSelectorIndexMapColumns,
     columnSelectorDefaultColumns
