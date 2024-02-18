@@ -757,23 +757,26 @@ export function QueryPage<TData extends KitsuResource>({
   };
 
   // Columns generated for the search results.
-  const columnsResults: TableColumn<TData>[] = [
-    ...(showRowCheckboxes || selectionMode
-      ? [
-          {
-            id: "selectColumn",
-            cell: ({ row: { original: resource } }) => (
-              <SelectCheckBox key={resource.id} resource={resource} />
-            ),
-            header: () => <SelectCheckBoxHeader />,
-            enableSorting: false,
-            size: 200
-          }
-        ]
-      : []),
-    ...totalColumns,
-    ...selectedColumnSelectorIndexMapColumns
-  ];
+  const columnsResults: TableColumn<TData>[] = uniqBy(
+    [
+      ...(showRowCheckboxes || selectionMode
+        ? [
+            {
+              id: "selectColumn",
+              cell: ({ row: { original: resource } }) => (
+                <SelectCheckBox key={resource.id} resource={resource} />
+              ),
+              header: () => <SelectCheckBoxHeader />,
+              enableSorting: false,
+              size: 200
+            }
+          ]
+        : []),
+      ...totalColumns,
+      ...selectedColumnSelectorIndexMapColumns
+    ],
+    "id"
+  );
 
   // Columns generated for the selected resources, only in selection mode.
   const columnsSelected: TableColumn<TData>[] = [

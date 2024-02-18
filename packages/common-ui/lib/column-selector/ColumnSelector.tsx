@@ -221,7 +221,7 @@ export function ColumnSelector<TData>({
   }
 
   function applyFilterColumns() {
-    setSelectedColumnSelectorIndexMapColumns?.([])
+    setSelectedColumnSelectorIndexMapColumns?.([]);
     if (filteredColumnsState) {
       const checkedColumnIds = Object.keys(filteredColumnsState).filter(
         (key) => {
@@ -248,7 +248,7 @@ export function ColumnSelector<TData>({
           selectedIndexMapColumns
         );
         return selectedIndexMapColumns;
-      })
+      });
     }
     setLoadingIndexMapColumns?.((current) => !current);
     setLocalStorageColumnStates(filteredColumnsState);
@@ -417,6 +417,9 @@ export function ColumnSelector<TData>({
       );
     }
   );
+  const [visibleIndexMapColumns, setVisibleIndexMapColumns] = useLocalStorage<
+    any[]
+  >(`${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`, []);
 
   return loading ? (
     <LoadingSpinner loading={loading} />
@@ -429,7 +432,7 @@ export function ColumnSelector<TData>({
         as={CheckboxItem}
       />
       {searchedColumns?.map((column) => {
-        function handdleToggle(event) {
+        function handleToggle(event) {
           const reactTableToggleHandler = column?.getToggleVisibilityHandler();
           reactTableToggleHandler(event);
           const columnId = column.id;
@@ -437,6 +440,32 @@ export function ColumnSelector<TData>({
             ...localStorageColumnStates,
             [columnId]: event.target.checked
           });
+          if (event.target.checked) {
+            const visibleIndexMapColumn = searchedColumns?.find(
+              (searchedColumn) => {
+                if (
+                  !NOT_EXPORTABLE_COLUMN_IDS.includes(column.id) &&
+                  !columnSelectorDefaultColumns?.find(
+                    (defaultColumn) => defaultColumn.id === column.id
+                  ) &&
+                  searchedColumn.id === column.id
+                ) {
+                  return true;
+                }
+                return false;
+              }
+            );
+            setVisibleIndexMapColumns([
+              ...visibleIndexMapColumns,
+              visibleIndexMapColumn?.columnDef
+            ]);
+          } else {
+            setVisibleIndexMapColumns(
+              visibleIndexMapColumns.filter(
+                (visibleColumn) => visibleColumn.id !== column.id
+              )
+            );
+          }
         }
         return (
           <>
@@ -445,7 +474,7 @@ export function ColumnSelector<TData>({
               id={column?.id}
               isChecked={column?.getIsVisible()}
               isField={true}
-              handleClick={handdleToggle}
+              handleClick={handleToggle}
               as={CheckboxItem}
             />
           </>
