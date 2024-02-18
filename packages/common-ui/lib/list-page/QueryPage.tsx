@@ -304,7 +304,6 @@ export function QueryPage<TData extends KitsuResource>({
     useState<boolean>(false);
 
   useEffect(() => {
-    console.log(totalColumns)
     visibleIndexMapColumns.forEach((visibleIndexMapColumn) => {
       if (visibleIndexMapColumn.relationshipType) {
         if (visibleIndexMapColumn.extensionValue) {
