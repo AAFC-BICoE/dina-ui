@@ -385,7 +385,6 @@ export function QueryTable<TData extends KitsuResource>({
       </div>
       <ReactTable<TData>
         // These props are needed for column selector
-        forceUpdate={forceUpdate}
         setColumnSelector={setColumnSelector}
         uniqueName={path}
         hideExportButton={true}
