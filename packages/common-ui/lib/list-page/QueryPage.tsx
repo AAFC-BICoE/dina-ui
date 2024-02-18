@@ -304,7 +304,7 @@ export function QueryPage<TData extends KitsuResource>({
     useState<boolean>(false);
 
   useEffect(() => {
-    setLoading(true);
+    console.log(totalColumns)
     visibleIndexMapColumns.forEach((visibleIndexMapColumn) => {
       if (visibleIndexMapColumn.relationshipType) {
         if (visibleIndexMapColumn.extensionValue) {
@@ -348,7 +348,6 @@ export function QueryPage<TData extends KitsuResource>({
         }
       }
     });
-    setLoading(false);
   }, []);
 
   // Search results returned by Elastic Search
