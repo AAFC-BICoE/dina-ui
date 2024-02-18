@@ -304,6 +304,7 @@ export function QueryPage<TData extends KitsuResource>({
     useState<boolean>(false);
 
   useEffect(() => {
+    setLoading(true);
     visibleIndexMapColumns.forEach((visibleIndexMapColumn) => {
       if (visibleIndexMapColumn.relationshipType) {
         if (visibleIndexMapColumn.extensionValue) {
@@ -347,6 +348,7 @@ export function QueryPage<TData extends KitsuResource>({
         }
       }
     });
+    setLoading(false);
   }, []);
 
   // Search results returned by Elastic Search
@@ -771,8 +773,8 @@ export function QueryPage<TData extends KitsuResource>({
           }
         ]
       : []),
-    ...totalColumns
-    // ...columnSelectorIndexMapColumns
+    ...totalColumns,
+    ...selectedColumnSelectorIndexMapColumns
   ];
 
   // Columns generated for the selected resources, only in selection mode.
