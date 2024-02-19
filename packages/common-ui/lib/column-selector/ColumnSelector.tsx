@@ -117,6 +117,10 @@ export function ColumnSelector<TData>({
     groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
   }
 
+  const [visibleIndexMapColumns, setVisibleIndexMapColumns] = useLocalStorage<
+    any[]
+  >(`${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`, []);
+
   function menuDisplayControl() {
     const [show, setShow] = useState(false);
 
@@ -223,11 +227,11 @@ export function ColumnSelector<TData>({
   function applyFilterColumns() {
     setSelectedColumnSelectorIndexMapColumns?.([]);
     if (filteredColumnsState) {
-      const checkedColumnIds = Object.keys(filteredColumnsState).filter(
-        (key) => {
+      const checkedColumnIds = Object.keys(filteredColumnsState)
+        .filter((key) => {
           return filteredColumnsState[key];
-        }
-      );
+        })
+        .filter((id) => !NOT_EXPORTABLE_COLUMN_IDS.includes(id));
       checkedColumnIds.forEach((id) => {
         const columnToAddToIndexMapColumns = searchedColumns?.find(
           (column) => column.id === id
@@ -417,9 +421,6 @@ export function ColumnSelector<TData>({
       );
     }
   );
-  const [visibleIndexMapColumns, setVisibleIndexMapColumns] = useLocalStorage<
-    any[]
-  >(`${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`, []);
 
   return loading ? (
     <LoadingSpinner loading={loading} />
