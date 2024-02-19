@@ -326,7 +326,7 @@ export function ReactTable<TData>({
         highlightRow && !TbodyComponent ? "-highlight" : ""
       )}
     >
-      {showPaginationTop && (
+      {showPagination && showPaginationTop && (
         <div className="pagination-top">
           <Pagination table={table} pageSizeOptions={pageSizeOptions} />
         </div>
