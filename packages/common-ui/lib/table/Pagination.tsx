@@ -1,4 +1,6 @@
 import { Table } from "@tanstack/react-table";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { useState } from "react";
 import { useIntl } from "react-intl";
 import CreatableSelect from "react-select/creatable";
 import { SelectOption } from "../formik-connected/SelectField";
@@ -11,6 +13,14 @@ export function Pagination<TData>({
   pageSizeOptions: number[];
 }) {
   const { formatMessage } = useIntl();
+  const [selectOptions, setSelectOptions] = useState<
+    { value: number; label: string }[]
+  >(
+    pageSizeOptions.map((pageSize) => ({
+      value: pageSize,
+      label: `${pageSize}`
+    }))
+  );
 
   return (
     <div className="-pagination" data-testid="pagination">
@@ -43,14 +53,15 @@ export function Pagination<TData>({
           {formatMessage({ id: "of" })}{" "}
           <span className="-totalPages">{table.getPageCount()}</span>
         </span>
-        <span className="select-wrap -pageSizeOptions">
+        <span className="-select-wrap -pageSizeOptions">
+          <span style={{ textTransform: "capitalize" }}>
+            <DinaMessage id="rowsPerPage" />
+          </span>
           <CreatableSelect<SelectOption<number>>
             name="pageSize"
             value={{
               value: table.getState().pagination.pageSize,
-              label: `${table.getState().pagination.pageSize} ${formatMessage({
-                id: "rows"
-              })}`
+              label: `${table.getState().pagination.pageSize}`
             }}
             aria-label="rows per page"
             onChange={(selected) => {
@@ -60,10 +71,15 @@ export function Pagination<TData>({
                 );
               }
             }}
-            options={pageSizeOptions.map((pageSize) => ({
-              value: pageSize,
-              label: `${pageSize}`
-            }))}
+            onCreateOption={(inputValue: string) => {
+              const numValue = parseInt(inputValue, 10);
+              if (!isNaN(numValue) && numValue <= 9999 && numValue > 0) {
+                const newOption = { value: numValue, label: `${numValue}` };
+                setSelectOptions([...selectOptions, newOption]);
+                table.setPageSize(numValue);
+              }
+            }}
+            options={selectOptions}
             formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
           ></CreatableSelect>
         </span>
