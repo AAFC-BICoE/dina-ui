@@ -53,7 +53,6 @@ export default function DinaUserDetailsPage() {
       {withResponse(userQuery, ({ data: dinaUser }) => (
         <main className="container">
           <ButtonBar>
-            <BackButton entityLink="/dina-user" />
             {currentUserCanEdit && (
               <EditButton
                 className="ms-auto"

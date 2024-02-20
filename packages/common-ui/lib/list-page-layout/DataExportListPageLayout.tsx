@@ -30,6 +30,7 @@ export function DataExportListPageLayout({
     "status",
     "createdBy",
     dateCell("createdOn"),
+    "exportType",
     {
       id: "download",
       cell: ({ row: { original } }) => {
