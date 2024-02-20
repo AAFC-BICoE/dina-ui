@@ -420,6 +420,11 @@ export function generateBuilderConfig(
         });
       }
     },
+    globalSearch: {
+      ...BasicConfig.widgets.text,
+      type: "globalSearch",
+      valueSrc: "value",
+    },
     managedAttribute: {
       ...BasicConfig.widgets.text,
       type: "managedAttribute",
@@ -570,6 +575,15 @@ export function generateBuilderConfig(
       widgets: {
         boolean: {
           operators: ["equals", "empty", "notEmpty"]
+        }
+      }
+    },
+    globalSearch: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        globalSearch: {
+          operators: ["noOperator"]
         }
       }
     },
