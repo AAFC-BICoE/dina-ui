@@ -226,6 +226,7 @@ export default function ExportPage<TData extends KitsuResource>() {
           uniqueName={uniqueName}
           menuOnly={true}
           indexName={indexName}
+          columnSelectorDefaultColumns={columns}
         />
       </DinaForm>
       <Footer />

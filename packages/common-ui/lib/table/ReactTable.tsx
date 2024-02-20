@@ -89,9 +89,6 @@ export interface ReactTableProps<TData> {
   // uniqueName used for local storage
   uniqueName?: string;
 
-  // Force updates component where this dispatch was created
-  forceUpdate?: React.DispatchWithoutAction;
-
   /**
    * Used for the listing page to understand which columns can be provided. Filters are generated
    * based on the index provided.
@@ -116,6 +113,10 @@ export interface ReactTableProps<TData> {
 
   // State setter to pass the processed index map columns to parent components
   setColumnSelectorIndexMapColumns?: React.Dispatch<
+    React.SetStateAction<any[]>
+  >;
+  // State setter to pass the processed index map columns to parent components
+  setSelectedColumnSelectorIndexMapColumns?: React.Dispatch<
     React.SetStateAction<any[]>
   >;
 
@@ -173,10 +174,10 @@ export function ReactTable<TData>({
   hideTable = false,
   setColumnSelector,
   uniqueName,
-  forceUpdate,
   indexName,
   dynamicFieldMapping,
   setColumnSelectorIndexMapColumns,
+  setSelectedColumnSelectorIndexMapColumns,
   setLoadingIndexMapColumns,
   menuOnly,
   hideExportButton,
@@ -305,12 +306,12 @@ export function ReactTable<TData>({
           reactTable={table}
           hideExportButton={hideExportButton}
           menuOnly={menuOnly}
-          forceUpdate={forceUpdate}
           indexName={indexName}
           dynamicFieldMapping={dynamicFieldMapping}
           setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
           setLoadingIndexMapColumns={setLoadingIndexMapColumns}
           columnSelectorDefaultColumns={columnSelectorDefaultColumns}
+          setSelectedColumnSelectorIndexMapColumns={setSelectedColumnSelectorIndexMapColumns}
         />
       );
       setColumnSelector?.(columnSelector);
