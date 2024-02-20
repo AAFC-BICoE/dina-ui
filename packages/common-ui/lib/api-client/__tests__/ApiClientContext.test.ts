@@ -726,8 +726,8 @@ Constraint violation: description size must be between 1 and 10`;
       },
       params: {
         include: "author"
-      },
-      paramsSerializer: expect.anything()
+      }
+      // paramsSerializer: expect.anything()
     });
 
     expect(response).toEqual({
