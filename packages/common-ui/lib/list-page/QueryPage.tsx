@@ -307,6 +307,11 @@ export function QueryPage<TData extends KitsuResource>({
   const [loadingIndexMapColumns, setLoadingIndexMapColumns] =
     useState<boolean>(false);
 
+  function setSelectedColumnSelectorIndexMapColumnsProxy(params: any[]) {
+    setSelectedColumnSelectorIndexMapColumns(params);
+    isActionTriggeredQuery.current = true;
+  }
+
   useEffect(() => {
     visibleIndexMapColumns.forEach((visibleIndexMapColumn) => {
       if (visibleIndexMapColumn.relationshipType) {
@@ -557,7 +562,8 @@ export function QueryPage<TData extends KitsuResource>({
     sortingRules,
     submittedQueryBuilderTree,
     groups,
-    loadingIndexMapColumns
+    loadingIndexMapColumns,
+    selectedColumnSelectorIndexMapColumns
   ]);
 
   // Once the configuration is setup, we can display change the tree.
@@ -1050,7 +1056,7 @@ export function QueryPage<TData extends KitsuResource>({
                 dynamicFieldMapping={dynamicFieldMapping}
                 setColumnSelectorIndexMapColumns={setTotalColumns}
                 setSelectedColumnSelectorIndexMapColumns={
-                  setSelectedColumnSelectorIndexMapColumns
+                  setSelectedColumnSelectorIndexMapColumnsProxy
                 }
                 setLoadingIndexMapColumns={setLoadingIndexMapColumns}
                 hideExportButton={true}
