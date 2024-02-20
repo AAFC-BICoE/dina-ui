@@ -12,8 +12,8 @@ import { DINA_ADMIN } from "../../types/DinaRoles";
 import axios from "axios";
 
 export interface DevUserConfig {
-  // True to skip keycloak and use dev-user config.
-  enabled: boolean;
+  keycloakEnabled: boolean;
+  devUserEnabled: boolean;
 
   // String separated list of keycloak formatted groups like: "/aafc/user, /bicoe/read-only"
   groupRole: string;
@@ -61,14 +61,16 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       try {
         const response = await axios.get(`/dev-user.json`);
         setDevUserConfig({
-          enabled: response.data["enabled"],
+          keycloakEnabled: response.data["keycloakEnabled"],
+          devUserEnabled: response.data["devUserEnabled"],
           groupRole: response.data["groupRole"]
         });
       } catch (error) {
         // Could not retrieve the dev-user.json, setting the default to off.
         console.error(error);
         setDevUserConfig({
-          enabled: false,
+          devUserEnabled: false,
+          keycloakEnabled: true,
           groupRole: ""
         });
       }
@@ -82,40 +84,54 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // If dev-user is enabled, skip the keycloak init:
-    if (devUserConfig.enabled) {
-      // Skip keycloak login.
-      setAuthenticated(true);
-      setInitialized(true);
-      setKeycloak(null);
+    // If dev-user is enabled AND keycloak is disabled, skip the keycloak init:
+    if (devUserConfig.devUserEnabled) {
+      if (devUserConfig.keycloakEnabled) {
+        // Fail safe since keycloak should be disabled if dev user is enabled.
+        setAuthenticated(false);
+        setInitialized(true);
+        setKeycloak(null);
+      } else {
+        // Skip keycloak login.
+        setAuthenticated(true);
+        setInitialized(true);
+        setKeycloak(null);        
+      }
       return;
     }
 
     // Continue the normal keycloak setup and login screen.
-    const keycloakInstance = new Keycloak("/keycloak.json");
-    keycloakInstance
-      .init({
-        onLoad: "check-sso",
-        silentCheckSsoRedirectUri:
-          typeof window !== undefined
-            ? `${window.location.origin}/static/silent-check-sso.xhtml`
-            : undefined,
-        checkLoginIframe: false
-      })
-      .then((keycloakAuthenticated) => {
-        setKeycloak(keycloakInstance);
-        setAuthenticated(keycloakAuthenticated);
+    if (devUserConfig.keycloakEnabled) {
+      const keycloakInstance = new Keycloak("/keycloak.json");
+      keycloakInstance
+        .init({
+          onLoad: "check-sso",
+          silentCheckSsoRedirectUri:
+            typeof window !== undefined
+              ? `${window.location.origin}/static/silent-check-sso.xhtml`
+              : undefined,
+          checkLoginIframe: false
+        })
+        .then((keycloakAuthenticated) => {
+          setKeycloak(keycloakInstance);
+          setAuthenticated(keycloakAuthenticated);
 
-        // The user is not authenticated... Try again.
-        if (keycloakAuthenticated === false) {
-          keycloakInstance.login();
-        } else {
-          setInitialized(true);
-        }
-      });
+          // The user is not authenticated... Try again.
+          if (keycloakAuthenticated === false) {
+            keycloakInstance.login();
+          } else {
+            setInitialized(true);
+          }
+        });      
+    }
+
   }, [devUserConfig]);
 
-  if (devUserConfig?.enabled) {
+  if (devUserConfig && devUserConfig.devUserEnabled) {
+
+    if (devUserConfig.keycloakEnabled) {
+      return <p>Invalid DINA-UI environment variables provided. In order for the dev-user option to be enabled, keycloak needs to be disabled.</p>;
+    }
 
     const username = "dev";
     const agentId = "c628fc6f-c9ad-4bb6-a187-81eb7884bdd7";
