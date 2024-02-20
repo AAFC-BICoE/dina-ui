@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
-import { useMemo, useRef } from "react";
+import { ReactNode, useMemo, useRef } from "react";
 import { SWRConfig } from "swr";
 import { PartialDeep } from "type-fest";
 import { AccountContextI, AccountProvider } from "../account/AccountProvider";
@@ -10,12 +10,18 @@ import {
   ApiClientImpl,
   ApiClientProvider
 } from "../api-client/ApiClientContext";
+import {
+  InstanceContext,
+  InstanceContextI,
+  InstanceContextProvider
+} from "../instance/InstanceContextProvider";
 import { CommonUIIntlProvider } from "../intl/common-ui-intl";
 import { ModalProvider } from "../modal/modal";
 
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
   accountContext?: Partial<AccountContextI>;
+  instanceContext?: Partial<InstanceContextI>;
   children?: React.ReactNode;
 }
 
@@ -26,6 +32,7 @@ interface MockAppContextProviderProps {
 export function MockAppContextProvider({
   accountContext,
   apiContext = { apiClient: { get: () => undefined as any } },
+  instanceContext,
   children
 }: MockAppContextProviderProps) {
   const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = useMemo(
@@ -49,6 +56,11 @@ export function MockAppContextProvider({
       new ApiClientImpl({
         newId: () => "00000000-0000-0000-0000-000000000000"
       }),
+    []
+  );
+
+  const DEFAULT_INSTANCE_CONTEXT_VALUE: InstanceContextI = useMemo(
+    () => ({ supportedLanguages: "en,fr", instanceMode: "developer" }),
     []
   );
 
@@ -86,13 +98,17 @@ export function MockAppContextProvider({
         <ApiClientProvider
           value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
-          <CommonUIIntlProvider>
-            <div ref={modalWrapperRef}>
-              <ModalProvider appElement={modalWrapperRef.current}>
-                {children}
-              </ModalProvider>
-            </div>
-          </CommonUIIntlProvider>
+          <InstanceContextProvider
+            value={{ ...DEFAULT_INSTANCE_CONTEXT_VALUE, ...instanceContext }}
+          >
+            <CommonUIIntlProvider>
+              <div ref={modalWrapperRef}>
+                <ModalProvider appElement={modalWrapperRef.current}>
+                  {children}
+                </ModalProvider>
+              </div>
+            </CommonUIIntlProvider>
+          </InstanceContextProvider>
         </ApiClientProvider>
       </AccountProvider>
     </SWRConfig>

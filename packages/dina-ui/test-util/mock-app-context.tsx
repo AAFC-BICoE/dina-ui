@@ -5,6 +5,8 @@ import {
   ApiClientI,
   ApiClientImpl,
   ApiClientProvider,
+  InstanceContextI,
+  InstanceContextProvider,
   ModalProvider
 } from "common-ui";
 import { mount } from "enzyme";
@@ -17,9 +19,45 @@ import { PartialDeep } from "type-fest";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
 
+const INSTANCE_DATA = {
+  data: {
+    "instance-mode": "developer",
+    "supported-languages-iso": "en,fr"
+  },
+  status: 200,
+  statusText: "",
+  headers: {
+    "content-length": "99",
+    "content-type": "text/plain; charset=utf-8",
+    date: "Tue, 09 Jan 2024 17:03:48 GMT"
+  },
+  config: {
+    url: "/instance.json",
+    method: "get",
+    headers: {
+      Accept: "application/json, text/plain, */*"
+    },
+    transformRequest: [null],
+    transformResponse: [null],
+    timeout: 0,
+    xsrfCookieName: "XSRF-TOKEN",
+    xsrfHeaderName: "X-XSRF-TOKEN",
+    maxContentLength: -1
+  },
+  request: {}
+};
+const mockGet: any = jest.fn(async (path: string, _param: any) => {
+  if (path === "/instance.json") {
+    return INSTANCE_DATA;
+  } else {
+    return undefined;
+  }
+});
+
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
   accountContext?: Partial<AccountContextI>;
+  instanceContext?: Partial<InstanceContextI>;
   children?: React.ReactNode;
 }
 
@@ -30,7 +68,7 @@ interface MockAppContextProviderProps {
 export function MockAppContextProvider({
   accountContext,
   apiContext = { apiClient: { get: () => undefined as any } },
-
+  instanceContext,
   children
 }: MockAppContextProviderProps) {
   const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = useMemo(
@@ -45,6 +83,11 @@ export function MockAppContextProvider({
       username: "test-user",
       isAdmin: false
     }),
+    []
+  );
+
+  const DEFAULT_INSTANCE_CONTEXT_VALUE: InstanceContextI = useMemo(
+    () => ({ supportedLanguages: "en,fr", instanceMode: "developer" }),
     []
   );
 
@@ -91,15 +134,19 @@ export function MockAppContextProvider({
           value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
           <DinaIntlProvider>
-            <FileUploadProviderImpl>
-              <DndProvider backend={HTML5Backend}>
-                <div ref={modalWrapperRef}>
-                  <ModalProvider appElement={modalWrapperRef.current}>
-                    {children}
-                  </ModalProvider>
-                </div>
-              </DndProvider>
-            </FileUploadProviderImpl>
+            <InstanceContextProvider
+              value={{ ...DEFAULT_INSTANCE_CONTEXT_VALUE, ...instanceContext }}
+            >
+              <FileUploadProviderImpl>
+                <DndProvider backend={HTML5Backend}>
+                  <div ref={modalWrapperRef}>
+                    <ModalProvider appElement={modalWrapperRef.current}>
+                      {children}
+                    </ModalProvider>
+                  </div>
+                </DndProvider>
+              </FileUploadProviderImpl>
+            </InstanceContextProvider>
           </DinaIntlProvider>
         </ApiClientProvider>
       </AccountProvider>

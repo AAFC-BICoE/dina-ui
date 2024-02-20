@@ -1,4 +1,6 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import "@testing-library/jest-dom";
+import { fireEvent, waitFor } from "@testing-library/react";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { LanguageSelector } from "../LanguageSelector";
 
 const INSTANCE_DATA = {
@@ -51,40 +53,37 @@ describe("LanguageSelector component", () => {
   });
 
   it("Renders the language selector.", async () => {
-    const wrapper = mountWithAppContext(<LanguageSelector />, {
+    const component = mountWithAppContext2(<LanguageSelector />, {
       apiContext
     });
-    await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find("button[children='English']").exists()).toEqual(false);
-    expect(wrapper.find("button[children='Français']").exists()).toEqual(true);
+    expect(await component.queryByText("English")).not.toBeInTheDocument();
+    expect(await component.findByText("Français")).toBeInTheDocument();
   });
 
   it("Lets you change the locale.", async () => {
-    const wrapper = mountWithAppContext(<LanguageSelector />, {
+    const component = mountWithAppContext2(<LanguageSelector />, {
       apiContext
     });
-    await new Promise(setImmediate);
-    wrapper.update();
 
     // Initially the locale should be set to "en":
-    expect(wrapper.find("button[children='Français']").exists()).toEqual(true);
+    const langButton = await component.findByText("Français");
+    expect(langButton).toBeInTheDocument();
 
-    wrapper.find("button[children='Français']").simulate("click");
-    await new Promise(setImmediate);
-    wrapper.update();
+    fireEvent.click(langButton);
 
-    // The locale should have been changed to "fr":
-    expect(wrapper.find("button[children='Français']").exists()).toEqual(false);
-    expect(wrapper.find("button[children='English']").exists()).toEqual(true);
+    waitFor(async () => {
+      // The locale should have been changed to "fr":
+      expect(await component.findByText("English")).toBeInTheDocument();
+      expect(await component.findByText("Français")).not.toBeInTheDocument();
+    });
   });
 
-  it("Doesn't render server-side.", () => {
+  it("Doesn't render server-side.", async () => {
     // Pretend this test is not running in the browser:
     (process as any).browser = false;
 
-    const wrapper = mountWithAppContext(<LanguageSelector />);
-    expect(wrapper.find(LanguageSelector).html()).toEqual(null);
+    const component = mountWithAppContext2(<LanguageSelector />);
+    expect(await component.queryByTestId("languageSelector")).toBeNull();
   });
 });
