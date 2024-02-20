@@ -1,8 +1,8 @@
+import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import { ApiClientProvider } from "../../api-client/ApiClientContext";
 import { DefaultInstanceContextProvider } from "../InstanceContextProvider";
 import { useInstanceContext } from "../useInstanceContext";
-import "@testing-library/jest-dom";
 
 describe("InstanceContextProvider", () => {
   beforeEach(() => {
@@ -13,10 +13,8 @@ describe("InstanceContextProvider", () => {
     const apiContext: any = {
       apiClient: {
         get: jest.fn().mockResolvedValue({
-          data: {
-            "supported-languages-iso": "lang1, lang2",
-            "instance-mode": "mode1"
-          }
+          "supported-languages-iso": "lang1, lang2",
+          "instance-mode": "mode1"
         })
       }
     };
