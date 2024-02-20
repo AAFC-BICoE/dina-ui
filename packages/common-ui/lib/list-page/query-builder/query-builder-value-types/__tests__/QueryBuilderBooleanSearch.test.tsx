@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
+import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
 } from "../QueryBuilderBooleanSearch";
@@ -8,7 +8,7 @@ describe("QueryBuilderBooleanSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const boolSearchEquals = mountWithAppContext(
+      const boolSearchEquals = mountWithAppContext2(
         <QueryBuilderBooleanSearch
           matchType="equals"
           value="test"
@@ -17,13 +17,11 @@ describe("QueryBuilderBooleanSearch", () => {
       );
 
       // Expect a snapshot with the text field being displayed.
-      expect(
-        boolSearchEquals.find(QueryBuilderBooleanSearch).debug()
-      ).toMatchSnapshot(
+      expect(boolSearchEquals.asFragment()).toMatchSnapshot(
         "Expect boolean field to be displayed since match type is equals"
       );
 
-      const boolSearchEmpty = mountWithAppContext(
+      const boolSearchEmpty = mountWithAppContext2(
         <QueryBuilderBooleanSearch
           matchType="empty"
           value="test"
@@ -32,9 +30,7 @@ describe("QueryBuilderBooleanSearch", () => {
       );
 
       // Expect a snapshot without the text field being displayed.
-      expect(
-        boolSearchEmpty.find(QueryBuilderBooleanSearch).debug()
-      ).toMatchSnapshot(
+      expect(boolSearchEmpty.asFragment()).toMatchSnapshot(
         "Expect boolean field not to be displayed since the match type is not equals"
       );
     });

@@ -13,6 +13,7 @@ import {
 import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
 import { KitsuResource } from "kitsu";
+import { useEffect } from "react";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -136,6 +137,7 @@ export const DATA_EXPORT_QUERY_KEY = "dataExportQuery";
 export const DATA_EXPORT_TOTAL_RECORDS_KEY = "dataExportTotalRecords";
 export const DATA_EXPORT_COLUMNS_KEY = "dataExportColumns";
 export const DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY = "dynamicFieldMapping";
+export const OBJECT_EXPORT_IDS_KEY = "objectExportIds";
 
 export function DataExportButton<TData extends KitsuResource>({
   pathname,
@@ -148,6 +150,9 @@ export function DataExportButton<TData extends KitsuResource>({
   entityLink
 }: DataExportButtonProps<TData>) {
   const router = useRouter();
+  useEffect(() => {
+    writeStorage<string[]>(OBJECT_EXPORT_IDS_KEY, []);
+  });
   return (
     <FormikButton
       buttonProps={(_ctx) => ({ disabled: totalRecords === 0 })}
@@ -157,6 +162,7 @@ export function DataExportButton<TData extends KitsuResource>({
           ? Object.keys(values.itemIdsToSelect)
           : [];
         const selectedIdsQuery = uuidQuery(selectedResourceIds);
+        writeStorage<string[]>(OBJECT_EXPORT_IDS_KEY, selectedResourceIds);
         writeStorage<any>(
           DATA_EXPORT_QUERY_KEY,
           selectedResourceIds.length > 0 ? selectedIdsQuery : query

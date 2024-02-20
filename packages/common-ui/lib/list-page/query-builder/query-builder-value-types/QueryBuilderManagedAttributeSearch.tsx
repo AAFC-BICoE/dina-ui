@@ -17,7 +17,6 @@ import QueryBuilderTextSearch, {
 } from "./QueryBuilderTextSearch";
 import { get } from "lodash";
 import { PersistedResource } from "kitsu";
-import { format } from "path/posix";
 
 interface QueryRowTextSearchProps {
   /**
@@ -80,14 +79,15 @@ export default function QueryRowManagedAttributeSearch({
     if (setValue) {
       setValue(JSON.stringify(managedAttributeState));
     }
-  }, [managedAttributeState, setValue]);
+  }, [managedAttributeState]);
 
   // Convert a value from Query Builder into the Managed Attribute State in this component.
+  // Dependent on the managedAttributeConfig to indicate when it's changed.
   useEffect(() => {
     if (value) {
       setManagedAttributeState(JSON.parse(value));
     }
-  }, [value]);
+  }, [managedAttributeConfig]);
 
   const managedAttributeSelected =
     managedAttributeState.selectedManagedAttribute;

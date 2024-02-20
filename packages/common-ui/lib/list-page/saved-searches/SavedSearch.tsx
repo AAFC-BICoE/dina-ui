@@ -9,8 +9,13 @@ import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
 import { Alert, Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
-import { LoadingSpinner } from "../..";
-import { Config, ImmutableTree, Utils } from "react-awesome-query-builder";
+import { LoadingSpinner, defaultJsonTree } from "../..";
+import {
+  Config,
+  ImmutableTree,
+  Utils,
+  JsonTree
+} from "react-awesome-query-builder";
 import {
   SavedSearchStructure,
   SingleSavedSearch,
@@ -20,9 +25,9 @@ import { map, cloneDeep, sortBy, isEqual } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
-import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
 import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useIntl } from "react-intl";
+import { useSessionStorage } from "usehooks-ts";
 
 export interface SavedSearchProps {
   /**
@@ -137,10 +142,14 @@ export function SavedSearch({
 
   const [changesMade, setChangesMade] = useState<boolean>(false);
 
+  const [selectedSavedSearchName, setSelectedSavedSearchName] =
+    useState<string>();
+
   // Functionality for the last loaded search.
   useLastSavedSearch({
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
+    setDefaultLoadedIn,
     performSubmit,
     uniqueName
   });
@@ -181,7 +190,9 @@ export function SavedSearch({
     return undefined;
   }, [selectedSavedSearch, userPreferences]);
 
-  const localStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
+  const sessionStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
+  const [sessionStorageQueryTree, setSessionStorageQueryTree] =
+    useSessionStorage<JsonTree>(sessionStorageLastUsedTreeKey, defaultJsonTree);
 
   // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {
@@ -191,14 +202,9 @@ export function SavedSearch({
   // When a new saved search is selected.
   useEffect(() => {
     if (!selectedSavedSearch || !userPreferences) return;
-
+    setQueryError(undefined);
     loadSavedSearch(selectedSavedSearch);
   }, [selectedSavedSearch, lastSelected]);
-
-  // Clear saved-search-changed local storage if user closes window
-  window.addEventListener("beforeunload", (_e) => {
-    setChangesMade(false);
-  });
 
   // User Preferences has been loaded in and apply default loaded search:
   useEffect(() => {
@@ -208,8 +214,18 @@ export function SavedSearch({
     // User preferences have been loaded in, we can now check for the default saved search if it
     // exists and pre-load it in.
     const defaultSavedSearch = getDefaultSavedSearch();
+
     if (defaultSavedSearch && defaultSavedSearch.savedSearchName) {
-      loadSavedSearch(defaultSavedSearch.savedSearchName);
+      if (defaultSavedSearch?.queryTree) {
+        const isQueryChanged = getDefaultSavedSearchChanged(defaultSavedSearch);
+        if (isQueryChanged) {
+          setSelectedSavedSearchName(defaultSavedSearch.savedSearchName);
+          setChangesMade(true);
+          setCurrentIsDefault(defaultSavedSearch.default);
+        } else {
+          loadSavedSearch(defaultSavedSearch.savedSearchName);
+        }
+      }
     }
     setDefaultLoadedIn(true);
   }, [userPreferences]);
@@ -242,6 +258,42 @@ export function SavedSearch({
 
     setChangesMade(isQueryChanged);
   }, [queryBuilderTree, groups]);
+
+  function getDefaultSavedSearchChanged(defaultSavedSearch: SingleSavedSearch) {
+    let isQueryChanged = false;
+    const sessionStorageImmutableTree = Utils.loadTree(
+      sessionStorageQueryTree as JsonTree
+    );
+    const sessionStorageQueryTreeString = Utils.queryString(
+      sessionStorageImmutableTree,
+      queryBuilderConfig
+    );
+    const defaultSavedSearchImmutableTree = Utils.loadTree(
+      defaultSavedSearch?.queryTree as JsonTree
+    );
+    const defaultSavedSearchQueryTreeString = Utils.queryString(
+      defaultSavedSearchImmutableTree,
+      queryBuilderConfig
+    );
+    const defaultJsonTreeString = Utils.queryString(
+      Utils.loadTree(defaultJsonTree),
+      queryBuilderConfig
+    );
+
+    // Compare defaultSavedSearch against localStorage
+    if (
+      defaultSavedSearchQueryTreeString !== sessionStorageQueryTreeString &&
+      defaultJsonTreeString !== sessionStorageQueryTreeString
+    ) {
+      isQueryChanged = true;
+    }
+
+    // Check if the group has changed.
+    if (!isEqual(sortBy(groups), sortBy(defaultSavedSearch?.groups))) {
+      isQueryChanged = true;
+    }
+    return isQueryChanged;
+  }
 
   /**
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch
@@ -317,7 +369,7 @@ export function SavedSearch({
           Utils.loadTree(savedSearchToLoad.queryTree)
         );
         setPageOffset(0);
-        writeStorage(localStorageLastUsedTreeKey, savedSearchToLoad.queryTree);
+        setSessionStorageQueryTree(savedSearchToLoad.queryTree);
       } else {
         setQueryError(formatMessage({ id: "queryBuilder_invalid_query" }));
         setChangesMade(true);
@@ -456,12 +508,8 @@ export function SavedSearch({
       // Ask the user if they sure they want to delete the saved search.
       openModal(
         <AreYouSureModal
-          actionMessage={
-            <>
-              <DinaMessage id="removeSavedSearch" />{" "}
-              {`${savedSearchName ?? ""}`}{" "}
-            </>
-          }
+          actionMessage={<DinaMessage id="removeSavedSearch" />}
+          messageBody={<DinaMessage id="areYouSureRemoveSavedSearch" values={{savedSearchName: savedSearchName}} />}
           onYesButtonClicked={deleteSearch}
         />
       );
@@ -552,7 +600,7 @@ export function SavedSearch({
       </Dropdown>
       <SavedSearchListDropdown
         dropdownOptions={dropdownOptions}
-        selectedSavedSearch={selectedSavedSearch}
+        selectedSavedSearch={selectedSavedSearchName ?? selectedSavedSearch}
         currentIsDefault={currentIsDefault}
         error={error}
         onSavedSearchSelected={(savedSearchName) => {

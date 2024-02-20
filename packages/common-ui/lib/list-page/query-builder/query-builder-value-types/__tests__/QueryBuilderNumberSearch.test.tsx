@@ -1,4 +1,4 @@
-import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
+import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
 } from "../QueryBuilderNumberSearch";
@@ -8,7 +8,7 @@ describe("QueryBuilderNumberSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const numberSearchEquals = mountWithAppContext(
+      const numberSearchEquals = mountWithAppContext2(
         <QueryBuilderNumberSearch
           matchType="equals"
           value="test"
@@ -17,13 +17,11 @@ describe("QueryBuilderNumberSearch", () => {
       );
 
       // Expect a snapshot with the number field being displayed.
-      expect(
-        numberSearchEquals.find(QueryBuilderNumberSearch).debug()
-      ).toMatchSnapshot(
+      expect(numberSearchEquals.asFragment()).toMatchSnapshot(
         "Expect number field to be displayed since match type is equals"
       );
 
-      const numberSearchEmpty = mountWithAppContext(
+      const numberSearchEmpty = mountWithAppContext2(
         <QueryBuilderNumberSearch
           matchType="empty"
           value="test"
@@ -32,9 +30,7 @@ describe("QueryBuilderNumberSearch", () => {
       );
 
       // Expect a snapshot without the number field being displayed.
-      expect(
-        numberSearchEmpty.find(QueryBuilderNumberSearch).debug()
-      ).toMatchSnapshot(
+      expect(numberSearchEmpty.asFragment()).toMatchSnapshot(
         "Expect number field not to be displayed since the match type is not equals"
       );
     });
@@ -42,7 +38,7 @@ describe("QueryBuilderNumberSearch", () => {
     it("Display different placeholder for in/not in operators", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const numberSearchIn = mountWithAppContext(
+      const numberSearchIn = mountWithAppContext2(
         <QueryBuilderNumberSearch
           matchType="in"
           value="test"
@@ -51,13 +47,11 @@ describe("QueryBuilderNumberSearch", () => {
       );
 
       // Expect a snapshot with specific placeholder.
-      expect(
-        numberSearchIn.find(QueryBuilderNumberSearch).debug()
-      ).toMatchSnapshot(
+      expect(numberSearchIn.asFragment()).toMatchSnapshot(
         "Placeholder expected to be different for in operator."
       );
 
-      const numberSearchNotIn = mountWithAppContext(
+      const numberSearchNotIn = mountWithAppContext2(
         <QueryBuilderNumberSearch
           matchType="notIn"
           value="test"
@@ -66,9 +60,7 @@ describe("QueryBuilderNumberSearch", () => {
       );
 
       // Expect a snapshot with specific placeholder.
-      expect(
-        numberSearchNotIn.find(QueryBuilderNumberSearch).debug()
-      ).toMatchSnapshot(
+      expect(numberSearchNotIn.asFragment()).toMatchSnapshot(
         "Placeholder expected to be different for not in operator."
       );
     });
