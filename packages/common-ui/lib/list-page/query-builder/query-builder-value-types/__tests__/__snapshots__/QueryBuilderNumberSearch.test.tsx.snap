@@ -1,23 +1,48 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display different placeholder for in/not in operators: Placeholder expected to be different for in operator. 1`] = `
-"<QueryBuilderNumberSearch matchType=\\"in\\" value=\\"test\\" setValue={[Function: bound fn]}>
-  <input type=\\"text\\" value=\\"test\\" onChange={[Function: onChange]} className=\\"form-control\\" placeholder=\\"queryBuilder_value_in_placeholder\\" />
-</QueryBuilderNumberSearch>"
+<DocumentFragment>
+  <div>
+    <input
+      class="form-control"
+      placeholder="queryBuilder_value_in_placeholder"
+      type="text"
+      value="test"
+    />
+  </div>
+</DocumentFragment>
 `;
 
 exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display different placeholder for in/not in operators: Placeholder expected to be different for not in operator. 1`] = `
-"<QueryBuilderNumberSearch matchType=\\"notIn\\" value=\\"test\\" setValue={[Function: bound fn]}>
-  <input type=\\"text\\" value=\\"test\\" onChange={[Function: onChange]} className=\\"form-control\\" placeholder=\\"queryBuilder_value_in_placeholder\\" />
-</QueryBuilderNumberSearch>"
+<DocumentFragment>
+  <div>
+    <input
+      class="form-control"
+      placeholder="queryBuilder_value_in_placeholder"
+      type="text"
+      value="test"
+    />
+  </div>
+</DocumentFragment>
 `;
 
-exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display field if match type is equals: Expect number field not to be displayed since the match type is not equals 1`] = `"<QueryBuilderNumberSearch matchType=\\"empty\\" value=\\"test\\" setValue={[Function: bound fn]} />"`;
+exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display field if match type is equals: Expect number field not to be displayed since the match type is not equals 1`] = `
+<DocumentFragment>
+  <div />
+</DocumentFragment>
+`;
 
 exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display field if match type is equals: Expect number field to be displayed since match type is equals 1`] = `
-"<QueryBuilderNumberSearch matchType=\\"equals\\" value=\\"test\\" setValue={[Function: bound fn]}>
-  <input type=\\"number\\" value=\\"test\\" onChange={[Function: onChange]} className=\\"form-control\\" placeholder=\\"queryBuilder_value_number_placeholder\\" />
-</QueryBuilderNumberSearch>"
+<DocumentFragment>
+  <div>
+    <input
+      class="form-control"
+      placeholder="queryBuilder_value_number_placeholder"
+      type="number"
+      value="test"
+    />
+  </div>
+</DocumentFragment>
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Edge cases If no field value is provided, nothing should be generated. 1`] = `Object {}`;
