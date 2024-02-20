@@ -429,24 +429,19 @@ export function QueryPage<TData extends KitsuResource>({
   useEffect(() => {
     // If in view mode with selected resources, no requests need to be made.
     if (viewMode && selectedResources?.length) {
-      setLoading(false);
       return;
     }
-
-    setLoading(true);
 
     // Reset any error messages since we are trying again.
     setError(undefined);
 
     // Query builder is not setup yet.
     if (!submittedQueryBuilderTree || !queryBuilderConfig) {
-      setLoading(false);
       return;
     }
 
     // Check the tree for any validation issues. Do not submit query if issues exist.
     if (!Utils.isValidTree(submittedQueryBuilderTree)) {
-      setLoading(false);
       return;
     }
 
@@ -475,14 +470,17 @@ export function QueryPage<TData extends KitsuResource>({
 
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) {
-      setLoading(false);
       return;
     }
 
     // Save elastic search query for export page
     setElasticSearchQuery({ ...queryDSL });
 
-    if (isInitialQueryFinished.current == false || isActionTriggeredQuery.current) {
+    if (
+      isInitialQueryFinished.current == false ||
+      isActionTriggeredQuery.current
+    ) {
+      setLoading(true);
       if (isInitialQueryFinished.current == false) {
         isInitialQueryFinished.current = true;
       }
