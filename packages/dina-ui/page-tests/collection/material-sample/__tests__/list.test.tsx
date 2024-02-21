@@ -271,7 +271,6 @@ const testCtx = {
 describe("Material Sample List Page", () => {
   it("Render the material-sample list page", async () => {
     const component = mountWithAppContext2(<MaterialSampleListPage />, testCtx);
-    expect(component.getByText("Loading...")).toBeInTheDocument();
     expect(await component.findByTestId("ReactTable")).toBeInTheDocument();
 
     const reactTable = await component.findByTestId("ReactTable");

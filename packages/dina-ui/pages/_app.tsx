@@ -2,6 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import {
   ApiClientImplProvider,
   AuthenticatedApiClientProvider,
+  DefaultInstanceContextProvider,
   KeycloakAccountProvider,
   DevUserAccountProvider,
   ModalProvider
@@ -49,17 +50,19 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
         <KeycloakAccountProvider>
           <AuthenticatedApiClientProvider>
             <DinaIntlProvider>
-              <FileUploadProviderImpl>
-                <ErrorBoundaryPage>
-                  <DndProvider backend={HTML5Backend}>
-                    <ModalProvider appElement={appElement}>
-                      <WorkbookUploadContextProvider>
-                        <Component {...pageProps} />
-                      </WorkbookUploadContextProvider>
-                    </ModalProvider>
-                  </DndProvider>
-                </ErrorBoundaryPage>
-              </FileUploadProviderImpl>
+              <DefaultInstanceContextProvider>
+                <FileUploadProviderImpl>
+                  <ErrorBoundaryPage>
+                    <DndProvider backend={HTML5Backend}>
+                      <ModalProvider appElement={appElement}>
+                        <WorkbookUploadContextProvider>
+                          <Component {...pageProps} />
+                        </WorkbookUploadContextProvider>
+                      </ModalProvider>
+                    </DndProvider>
+                  </ErrorBoundaryPage>
+                </FileUploadProviderImpl>
+              </DefaultInstanceContextProvider>
             </DinaIntlProvider>
           </AuthenticatedApiClientProvider>
         </KeycloakAccountProvider>

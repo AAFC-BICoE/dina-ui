@@ -114,3 +114,5 @@ export * from "./column-selector/ColumnSelector";
 export * from "./column-selector/GroupedCheckboxWithLabel";
 export * from "./multilingual-components/MultilingualDescription";
 export * from "./multilingual-components/MultilingualTitle";
+export * from "./instance/InstanceContextProvider";
+export * from "./instance/useInstanceContext";
