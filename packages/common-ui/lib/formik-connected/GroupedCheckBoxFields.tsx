@@ -38,8 +38,10 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   const formik = useFormikContext<any>();
   useEffect(() => {
     const selectedSectionsDefault = defaultAvailableItems?.map((_data) => true);
-    formik?.setFieldValue?.(fieldName, selectedSectionsDefault);
-    formik?.setFieldValue?.(SELECT_ALL_NAME, true);
+    if (selectedSectionsDefault && selectedSectionsDefault?.length > 0) {
+      formik?.setFieldValue?.(fieldName, selectedSectionsDefault);
+      formik?.setFieldValue?.(SELECT_ALL_NAME, true);
+    }
   }, []);
 
   function CheckBoxField({
