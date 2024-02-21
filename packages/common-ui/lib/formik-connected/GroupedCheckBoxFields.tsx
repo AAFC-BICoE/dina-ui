@@ -35,11 +35,11 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const lastCheckedItemRef = useRef<TData>();
   const { formatMessage } = useIntl();
-  const { setFieldValue: setFieldValueFormik } = useFormikContext<any>();
+  const formik = useFormikContext<any>();
   useEffect(() => {
     const selectedSectionsDefault = defaultAvailableItems?.map((_data) => true);
-    setFieldValueFormik(fieldName, selectedSectionsDefault);
-    setFieldValueFormik(SELECT_ALL_NAME, true);
+    formik?.setFieldValue?.(fieldName, selectedSectionsDefault);
+    formik?.setFieldValue?.(SELECT_ALL_NAME, true);
   }, []);
 
   function CheckBoxField({
