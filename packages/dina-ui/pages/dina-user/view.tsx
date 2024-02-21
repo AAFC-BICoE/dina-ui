@@ -23,6 +23,7 @@ export default function DinaUserDetailsPage() {
 
   // Get the user ID from the URL, otherwise use the current user:
   const id = router.query.id?.toString() ?? subject;
+  const hideBackButton = router.query.hideBackButton === "true";
 
   const { formatMessage } = useDinaIntl();
 
@@ -53,6 +54,7 @@ export default function DinaUserDetailsPage() {
       {withResponse(userQuery, ({ data: dinaUser }) => (
         <main className="container">
           <ButtonBar>
+            {!hideBackButton && <BackButton entityLink="/dina-user" />}
             {currentUserCanEdit && (
               <EditButton
                 className="ms-auto"
