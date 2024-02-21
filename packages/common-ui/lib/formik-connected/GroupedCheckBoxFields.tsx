@@ -1,10 +1,11 @@
 import { connect, Field } from "formik";
 import { KitsuResource } from "kitsu";
 import { noop, toPairs } from "lodash";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 import { useIntl } from "react-intl";
+import { useFormikContext } from "formik";
 
 export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
@@ -23,6 +24,8 @@ export interface GroupedCheckBoxesParams<TData extends KitsuResource> {
 
 export type ExtendedKitsuResource = KitsuResource & { shortId?: number };
 
+const SELECT_ALL_NAME = `groupedCheckBox.selectAll`;
+
 export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   fieldName,
   detachTotalSelected,
@@ -32,6 +35,12 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const lastCheckedItemRef = useRef<TData>();
   const { formatMessage } = useIntl();
+  const { setFieldValue: setFieldValueFormik } = useFormikContext<any>();
+  useEffect(() => {
+    const selectedSectionsDefault = defaultAvailableItems?.map((_data) => true);
+    setFieldValueFormik(fieldName, selectedSectionsDefault);
+    setFieldValueFormik(SELECT_ALL_NAME, true);
+  }, []);
 
   function CheckBoxField({
     resource,
@@ -103,37 +112,46 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
     );
   }
 
-  const CheckAllCheckBox = connect(({ formik: { setFieldValue } }) => {
-    function onCheckAllCheckBoxClick(e) {
-      const { checked } = e.target;
-      const computedAvailableItems =
-        (defaultAvailableItems as TData[]) ?? availableItems;
-
-      computedAvailableItems.forEach((item, index) => {
-        if (item.id || index === 0) {
-          setFieldValue(
-            `${fieldName}[${item?.shortId ?? item.id}]`,
-            checked || undefined
-          );
-        }
-
-        // If custom place name is checked, disable custom place name textbox
-        if (!item.id && setCustomGeographicPlaceCheckboxState) {
-          setCustomGeographicPlaceCheckboxState(checked);
-        }
-      });
-    }
-
+  function CheckAllCheckBox() {
     return (
-      <input
-        aria-label={formatMessage({ id: "checkAll" })}
-        className="check-all-checkbox"
-        onClick={onCheckAllCheckBoxClick}
-        style={{ height: "20px", width: "20px", marginLeft: "5px" }}
-        type="checkbox"
-      />
+      <Field name={SELECT_ALL_NAME}>
+        {({ field: { value }, form: { setFieldValue, setFieldTouched } }) => {
+          function onCheckAllCheckBoxClick(e) {
+            const { checked } = e.target;
+            const computedAvailableItems =
+              (defaultAvailableItems as TData[]) ?? availableItems;
+            setFieldValue(SELECT_ALL_NAME, checked);
+            setFieldTouched(SELECT_ALL_NAME);
+
+            computedAvailableItems.forEach((item, index) => {
+              if (item.id || index === 0) {
+                setFieldValue(
+                  `${fieldName}[${item?.shortId ?? item.id}]`,
+                  checked || undefined
+                );
+              }
+
+              // If custom place name is checked, disable custom place name textbox
+              if (!item.id && setCustomGeographicPlaceCheckboxState) {
+                setCustomGeographicPlaceCheckboxState(checked);
+              }
+            });
+          }
+
+          return (
+            <input
+              aria-label={formatMessage({ id: "checkAll" })}
+              className="check-all-checkbox"
+              onClick={onCheckAllCheckBoxClick}
+              style={{ height: "20px", width: "20px", marginLeft: "5px" }}
+              type="checkbox"
+              checked={value || false}
+            />
+          );
+        }}
+      </Field>
     );
-  });
+  }
 
   /** Table column header with a CheckAllCheckBox for the QueryTable. */
   const CheckBoxHeader = connect(({ formik: { values } }) => {
