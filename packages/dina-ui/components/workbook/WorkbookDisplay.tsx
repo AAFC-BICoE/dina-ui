@@ -27,8 +27,11 @@ export function WorkbookDisplay({
     </div>
   ));
   const dataRows = dataToDisplay.map((row: WorkbookRow, index: number) => {
+    // Skip row if all row content empty
+    const skipRow = row.content.every((content) => !!content === false);
+
     // Skip the first row since it's already been displayed.
-    if (index !== 0) {
+    if (index !== 0 && !skipRow) {
       return row.content.map((col, i) => (
         <div key={i} className="cells_content">
           {col}
@@ -91,9 +94,9 @@ export function WorkbookDisplay({
         `}</style>
       <Card
         className="mb-3"
-        style={{ width: "100%", overflowX: "auto", height: "70hp" }}
+        style={{ width: "100%", overflowX: "scroll", height: "70hp" }}
       >
-        <Card.Header style={{fontSize: "1.4em"}}>
+        <Card.Header style={{ fontSize: "1.4em" }}>
           <DinaMessage id="workbookPreviewTitle" /> ({numOfRows} /{" "}
           {workbookJsonData ? workbookJsonData[sheetIndex].length - 1 : 0})
         </Card.Header>
