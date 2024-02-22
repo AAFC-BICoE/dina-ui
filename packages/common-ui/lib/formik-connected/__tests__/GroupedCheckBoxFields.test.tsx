@@ -152,7 +152,7 @@ describe("Grouped check boxes hook", () => {
 
     expect(mockOnSubmit).lastCalledWith({
       checkedIds: { "1": true, "2": true, "3": true, "4": true, "5": true },
-      groupedCheckBox: { selectAll: true }
+      selectAll: { checkedIds: true }
     });
 
     // Uncheck the check-all box.
@@ -169,7 +169,7 @@ describe("Grouped check boxes hook", () => {
 
     expect(mockOnSubmit).lastCalledWith({
       checkedIds: {},
-      groupedCheckBox: { selectAll: false }
+      selectAll: { checkedIds: false }
     });
   });
 });

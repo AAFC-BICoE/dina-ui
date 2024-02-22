@@ -24,7 +24,7 @@ export interface GroupedCheckBoxesParams<TData extends KitsuResource> {
 
 export type ExtendedKitsuResource = KitsuResource & { shortId?: number };
 
-const SELECT_ALL_NAME = `groupedCheckBox.selectAll`;
+const SELECT_ALL_PREFIX = `selectAll`;
 
 export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   fieldName,
@@ -36,11 +36,12 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   const lastCheckedItemRef = useRef<TData>();
   const { formatMessage } = useIntl();
   const formik = useFormikContext<any>();
+  const selectAllName = `${SELECT_ALL_PREFIX}.${fieldName}`;
   useEffect(() => {
     const selectedSectionsDefault = defaultAvailableItems?.map((_data) => true);
     if (selectedSectionsDefault && selectedSectionsDefault?.length > 0) {
       formik?.setFieldValue?.(fieldName, selectedSectionsDefault);
-      formik?.setFieldValue?.(SELECT_ALL_NAME, true);
+      formik?.setFieldValue?.(selectAllName, true);
     }
   }, []);
 
@@ -116,14 +117,14 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
 
   function CheckAllCheckBox() {
     return (
-      <Field name={SELECT_ALL_NAME}>
+      <Field name={selectAllName}>
         {({ field: { value }, form: { setFieldValue, setFieldTouched } }) => {
           function onCheckAllCheckBoxClick(e) {
             const { checked } = e.target;
             const computedAvailableItems =
               (defaultAvailableItems as TData[]) ?? availableItems;
-            setFieldValue(SELECT_ALL_NAME, checked);
-            setFieldTouched(SELECT_ALL_NAME);
+            setFieldValue(selectAllName, checked);
+            setFieldTouched(selectAllName);
 
             computedAvailableItems.forEach((item, index) => {
               if (item.id || index === 0) {
