@@ -32,7 +32,7 @@ export function WorkbookDisplay({
 
     // Skip the first row since it's already been displayed.
     if (index !== 0 && !skipRow) {
-      for (let i = 0; i < numOfColumns - row.content.length; i++) {
+      while (row.content.length < numOfColumns) {
         row.content.push("");
       }
       return row.content.map((col, i) => (
