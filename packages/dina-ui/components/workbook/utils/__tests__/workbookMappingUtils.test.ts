@@ -16,7 +16,8 @@ import {
   isBooleanArray,
   isMap,
   isNumber,
-  calculateColumnUniqueValuesFromSpreadsheetData
+  calculateColumnUniqueValuesFromSpreadsheetData,
+  isEmptyWorkbookValue as isEmptyWorkbookValue
 } from "../workbookMappingUtils";
 
 const mockConfig: FieldMappingConfigType = {
@@ -359,5 +360,45 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.relationshipConfig.hasGroup": true,
       "mockEntity.relationshipConfig.type": "mock-entity"
     });
+  });
+
+  it("isEmptyValue", () => {
+    expect(isEmptyWorkbookValue(null)).toBeTruthy();
+    expect(isEmptyWorkbookValue(undefined)).toBeTruthy();
+    expect(isEmptyWorkbookValue("")).toBeTruthy();
+    expect(isEmptyWorkbookValue([])).toBeTruthy();
+    expect(isEmptyWorkbookValue({})).toBeTruthy();
+    expect(isEmptyWorkbookValue({relationshipConfig: {}})).toBeTruthy();
+    expect(isEmptyWorkbookValue({a: "", relationshipConfig: {}})).toBeTruthy();
+    expect(isEmptyWorkbookValue({a: "", b: [], relationshipConfig: {}})).toBeTruthy();
+    expect(isEmptyWorkbookValue({a: {nested: "", relationshipConfig: {}}, relationshipConfig: {}})).toBeTruthy();
+
+    expect(isEmptyWorkbookValue([null])).toBeTruthy();
+    expect(isEmptyWorkbookValue([undefined])).toBeTruthy();
+    expect(isEmptyWorkbookValue([""])).toBeTruthy();
+    expect(isEmptyWorkbookValue([[]])).toBeTruthy();
+    expect(isEmptyWorkbookValue([{}])).toBeTruthy();
+    expect(isEmptyWorkbookValue([{relationshipConfig: {}}])).toBeTruthy();
+    expect(isEmptyWorkbookValue([{a: "", relationshipConfig: {}}])).toBeTruthy();
+    expect(isEmptyWorkbookValue([{a: "", b: [], relationshipConfig: {}}])).toBeTruthy();
+    expect(isEmptyWorkbookValue([{a: {nested: "", relationshipConfig: {}}, relationshipConfig: {}}])).toBeTruthy();
+
+    expect(isEmptyWorkbookValue(0)).toBeFalsy();
+    expect(isEmptyWorkbookValue(1)).toBeFalsy();
+    expect(isEmptyWorkbookValue(true)).toBeFalsy();
+    expect(isEmptyWorkbookValue(false)).toBeFalsy();
+    expect(isEmptyWorkbookValue([0])).toBeFalsy();
+    expect(isEmptyWorkbookValue({a: 10})).toBeFalsy();
+    expect(isEmptyWorkbookValue({a: 10, relationshipConfig: {}})).toBeFalsy();
+    expect(isEmptyWorkbookValue({a: {nested: "value", relationshipConfig: {}}, relationshipConfig: {}})).toBeFalsy();
+
+    expect(isEmptyWorkbookValue([0])).toBeFalsy();
+    expect(isEmptyWorkbookValue([1])).toBeFalsy();
+    expect(isEmptyWorkbookValue([true])).toBeFalsy();
+    expect(isEmptyWorkbookValue([false])).toBeFalsy();
+    expect(isEmptyWorkbookValue([[0]])).toBeFalsy();
+    expect(isEmptyWorkbookValue([{a: 10}])).toBeFalsy();
+    expect(isEmptyWorkbookValue([{a: 10, relationshipConfig: {}}])).toBeFalsy();
+    expect(isEmptyWorkbookValue([{a: {nested: "value", relationshipConfig: {}}, relationshipConfig: {}}])).toBeFalsy();
   });
 });

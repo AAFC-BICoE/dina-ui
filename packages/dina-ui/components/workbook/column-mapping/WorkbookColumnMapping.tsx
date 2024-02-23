@@ -2,14 +2,16 @@ import {
   FieldWrapper,
   SubmitButton,
   useAccount,
+  useApiClient,
   useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
 import { chain, startCase } from "lodash";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { Ref, useEffect, useMemo, useRef, useState } from "react";
-import Select from "react-select";
 import { Card } from "react-bootstrap";
+import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
 import {
@@ -57,8 +59,14 @@ export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const { startSavingWorkbook, spreadsheetData, setColumnMap, workbookColumnMap, columnUniqueValues } =
-    useWorkbookContext();
+  const { apiClient } = useApiClient();
+  const {
+    startSavingWorkbook,
+    spreadsheetData,
+    setColumnMap,
+    workbookColumnMap,
+    columnUniqueValues
+  } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
   const { formatMessage } = useDinaIntl();
@@ -227,20 +235,87 @@ export function WorkbookColumnMapping({
     }
   }, [selectedType]);
 
-  useEffect(() => {
-    // Calculate the workbook column mapping based on the name of the spreadsheet column header name
-    const newWorkbookColumnMap: WorkbookColumnMap = {};
-    for (const columnHeader of headers || []) {
-      const fieldPath = findMatchField(columnHeader, fieldOptions);
-        newWorkbookColumnMap[columnHeader] = {
-          fieldPath,
-          mapRelationship: false,
-          numOfUniqueValues: Object.keys(columnUniqueValues?.[sheet]?.[columnHeader] ?? {}).length,
-          valueMapping: {}
-        };
+  /**
+   * Resolve parentMaterialSample value mapping.
+   * @param columnHeader the column header of parent material sample in the spreadsheet
+   * @param fieldPath the mapped field path
+   * @returns
+   */
+  async function resolveParentMapping(
+    columnHeader: string,
+    fieldPath: string
+  ): Promise<{
+    [value: string]: {
+      id: string;
+      type: string;
+    };
+  }> {
+    const { type, baseApiPath } = getFieldRelationshipConfig();
+    const lastDotPos = fieldPath.lastIndexOf(".");
+    const fieldName = fieldPath.substring(lastDotPos + 1);
+    const valueMapping: {
+      [value: string]: {
+        id: string;
+        type: string;
+      };
+    } = {};
+    if (spreadsheetData) {
+      const headers = spreadsheetData[sheet][0].content;
+      const colIndex = headers.indexOf(columnHeader) ?? -1;
+      if (colIndex > -1) {
+        for (let i = 1; i < spreadsheetData[sheet].length; i++) {
+          const parentValue = spreadsheetData[sheet][i].content[colIndex];
+          if (parentValue) {
+            const response = await apiClient.get<MaterialSample[]>(
+              `${baseApiPath}/${type}?filter[${fieldName}]=${parentValue}`,
+              {
+                page: { limit: 1 }
+              }
+            );
+            if (response && response.data.length > 0) {
+              valueMapping[parentValue] = { id: response.data[0].id, type };
+            }
+          }
+        }
+      }
     }
-    setColumnMap(newWorkbookColumnMap);
-    // End of workbook column mapping calculation
+    return valueMapping;
+  }
+
+  useEffect(() => {
+    async function initColumnMap() {
+      // Calculate the workbook column mapping based on the name of the spreadsheet column header name
+      const newWorkbookColumnMap: WorkbookColumnMap = {};
+      for (const columnHeader of headers || []) {
+        const fieldPath = findMatchField(columnHeader, fieldOptions);
+        if (fieldPath?.startsWith("parentMaterialSample.")) {
+          const valueMapping = await resolveParentMapping(
+            columnHeader,
+            fieldPath
+          );
+          newWorkbookColumnMap[columnHeader] = {
+            fieldPath,
+            showOnUI: false,
+            mapRelationship: true,
+            numOfUniqueValues: 1,
+            valueMapping
+          };
+        } else {
+          newWorkbookColumnMap[columnHeader] = {
+            fieldPath,
+            showOnUI: true,
+            mapRelationship: false,
+            numOfUniqueValues: Object.keys(
+              columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+            ).length,
+            valueMapping: {}
+          };
+        }
+      }
+      setColumnMap(newWorkbookColumnMap);
+      // End of workbook column mapping calculation
+    }
+    initColumnMap();
   }, [selectedType]);
 
   // Generate the currently selected value
@@ -438,21 +513,24 @@ export function WorkbookColumnMapping({
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
       fieldPath,
-      numOfUniqueValues: Object.keys(columnUniqueValues?.[sheet]?.[columnName] ?? {}).length,
+      showOnUI: true,
+      numOfUniqueValues: Object.keys(
+        columnUniqueValues?.[sheet]?.[columnName] ?? {}
+      ).length,
       mapRelationship: checked,
       valueMapping: {}
     };
     setColumnMap(newColumnMap);
   }
 
-  function onFieldMappingChange(
-    columnName: string,
-    newFieldPath: string
-  ) {
+  function onFieldMappingChange(columnName: string, newFieldPath: string) {
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
       fieldPath: newFieldPath,
-      numOfUniqueValues: Object.keys(columnUniqueValues?.[sheet]?.[columnName] ?? {}).length,
+      showOnUI: true,
+      numOfUniqueValues: Object.keys(
+        columnUniqueValues?.[sheet]?.[columnName] ?? {}
+      ).length,
       mapRelationship: false,
       valueMapping: {}
     };

@@ -1,7 +1,7 @@
 import { take } from "lodash";
-import { WorkbookJSON, WorkbookRow } from "./types/Workbook";
 import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { WorkbookJSON, WorkbookRow } from "./types/Workbook";
 
 /**
  * This component is currently not used anywhere yet. It will be implemented in a future ticket.
@@ -29,8 +29,11 @@ export function WorkbookDisplay({
   const dataRows = dataToDisplay.map((row: WorkbookRow, index: number) => {
     // Skip the first row since it's already been displayed.
     if (index !== 0) {
+      for (let i = 0; i < numOfColumns - row.content.length; i++) {
+        row.content.push("");
+      }
       return row.content.map((col, i) => (
-        <div key={i} className="cells_content">
+        <div key={i} className="cells_content" title={col}>
           {col}
         </div>
       ));
@@ -93,7 +96,7 @@ export function WorkbookDisplay({
         className="mb-3"
         style={{ width: "100%", overflowX: "auto", height: "70hp" }}
       >
-        <Card.Header style={{fontSize: "1.4em"}}>
+        <Card.Header style={{ fontSize: "1.4em" }}>
           <DinaMessage id="workbookPreviewTitle" /> ({numOfRows} /{" "}
           {workbookJsonData ? workbookJsonData[sheetIndex].length - 1 : 0})
         </Card.Header>

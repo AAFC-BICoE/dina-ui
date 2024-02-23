@@ -1,5 +1,8 @@
-import { FieldMappingConfigType, LinkOrCreateSetting } from "../";
-import { WorkbookDataTypeEnum } from "../";
+import {
+  FieldMappingConfigType,
+  LinkOrCreateSetting,
+  WorkbookDataTypeEnum
+} from "../";
 
 const FieldMappingConfig: FieldMappingConfigType = {
   "material-sample": {
@@ -265,6 +268,18 @@ const FieldMappingConfig: FieldMappingConfigType = {
             typeStatus: { dataType: WorkbookDataTypeEnum.STRING }
           }
         }
+      }
+    },
+    parentMaterialSample: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      relationshipConfig: {
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
+        type: "material-sample",
+        hasGroup: true,
+        baseApiPath: "/collection-api"
+      },
+      attributes: {
+        materialSampleName: { dataType: WorkbookDataTypeEnum.STRING }
       }
     }
   }

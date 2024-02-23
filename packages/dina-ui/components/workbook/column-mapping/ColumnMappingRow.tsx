@@ -1,6 +1,6 @@
 import { startCase } from "lodash";
 import { useMemo, useState } from "react";
-import { Checkbox, SelectField } from "../../../../common-ui/lib";
+import { SelectField } from "../../../../common-ui/lib";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import {
@@ -101,7 +101,9 @@ export function ColumnMappingRow({
   );
 
   function showMapRelationshipCheckbox(colIndex, fieldPath?: string): boolean {
-    if (
+    if (fieldPath && fieldPath.startsWith("parentMaterialSample.")) {
+      return false;
+    } else if (
       columnUniqueValues &&
       headers &&
       fieldPath &&

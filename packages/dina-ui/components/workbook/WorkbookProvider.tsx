@@ -19,13 +19,21 @@ import { calculateColumnUniqueValuesFromSpreadsheetData } from "./utils/workbook
 async function saveWorkbookResourcesInIndexDB(
   type: string,
   workbookResources: WorkbookResourceType[],
-  workbookColumnMap: WorkbookColumnMap,
+  workbookColumnMap: WorkbookColumnMap
 ) {
   const workbook = await db.workbooks.get(type);
   if (workbook) {
-    await db.workbooks.put({ name: type, workbook: workbookResources, relationshipMapping: workbookColumnMap });
+    await db.workbooks.put({
+      name: type,
+      workbook: workbookResources,
+      relationshipMapping: workbookColumnMap
+    });
   } else {
-    await db.workbooks.add({ name: type, workbook: workbookResources, relationshipMapping: workbookColumnMap });
+    await db.workbooks.add({
+      name: type,
+      workbook: workbookResources,
+      relationshipMapping: workbookColumnMap
+    });
   }
 }
 
@@ -46,7 +54,6 @@ type actionType =
   | "RETRIEVE_WORKBOOK_FROM_STORAGE"
   | "SET_COLUMN_MAP"
   | "SET_COLUMN_MAP_VALUE";
-
 
 export type WorkBookSavingStatus =
   | "READY"
@@ -153,12 +160,12 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
     case "SET_COLUMN_MAP":
       return {
         ...state,
-        workbookColumnMap: {...state.workbookColumnMap, ...action.payload}
+        workbookColumnMap: { ...state.workbookColumnMap, ...action.payload }
       };
     case "SET_COLUMN_MAP_VALUE":
       return {
         ...state,
-        workbookColumnMap: {...state.workbookColumnMap, ...action.payload}
+        workbookColumnMap: { ...state.workbookColumnMap, ...action.payload }
       };
     default:
       return state;
@@ -179,8 +186,8 @@ export interface WorkbookUploadContextI {
   error?: Error;
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
-  setColumnMap: (newColumnMap : WorkbookColumnMap) => void;
-  setColumnMapValue: (newColumnMap : WorkbookColumnMap) => void;
+  setColumnMap: (newColumnMap: WorkbookColumnMap) => void;
+  setColumnMapValue: (newColumnMap: WorkbookColumnMap) => void;
   startSavingWorkbook: (
     newWorkbookResources: WorkbookResourceType[],
     newWorkbookColumnMap: WorkbookColumnMap,
@@ -274,7 +281,11 @@ export function WorkbookUploadContextProvider({
       apiBaseUrl: newApiBaseUrl,
       progress: 0
     });
-    await saveWorkbookResourcesInIndexDB(newType, newWorkbookResources, newWorkbookColumnMap);
+    await saveWorkbookResourcesInIndexDB(
+      newType,
+      newWorkbookResources,
+      newWorkbookColumnMap
+    );
     dispatch({
       type: "START_SAVING",
       payload: {
@@ -366,19 +377,19 @@ export function WorkbookUploadContextProvider({
     });
   };
 
-  const setColumnMap = (newColumnMap : WorkbookColumnMap) => {
+  const setColumnMap = (newColumnMap: WorkbookColumnMap) => {
     dispatch({
-      type: 'SET_COLUMN_MAP',
+      type: "SET_COLUMN_MAP",
       payload: newColumnMap
-    })
-  }
+    });
+  };
 
-  const setColumnMapValue = (newColumnMap: WorkbookColumnMap ) => {
+  const setColumnMapValue = (newColumnMap: WorkbookColumnMap) => {
     dispatch({
-      type: 'SET_COLUMN_MAP_VALUE',
+      type: "SET_COLUMN_MAP_VALUE",
       payload: newColumnMap
-    })
-  }
+    });
+  };
 
   return (
     <WorkbookUploadProvider
