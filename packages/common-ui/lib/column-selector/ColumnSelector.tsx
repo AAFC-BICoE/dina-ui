@@ -456,14 +456,17 @@ export function ColumnSelector<TData>({
                 return false;
               }
             );
-            setVisibleIndexMapColumns([
-              ...visibleIndexMapColumns,
-              visibleIndexMapColumn?.columnDef
-            ]);
+            if (visibleIndexMapColumn) {
+              setVisibleIndexMapColumns([
+                ...visibleIndexMapColumns,
+                visibleIndexMapColumn?.columnDef
+              ]);
+            }
           } else {
             setVisibleIndexMapColumns(
               visibleIndexMapColumns.filter(
-                (visibleColumn) => visibleColumn.id !== column.id
+                (visibleColumn) =>
+                  !!visibleColumn && visibleColumn.id !== column.id
               )
             );
           }

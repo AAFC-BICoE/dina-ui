@@ -314,7 +314,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   useEffect(() => {
     visibleIndexMapColumns.forEach((visibleIndexMapColumn) => {
-      if (visibleIndexMapColumn.relationshipType) {
+      if (visibleIndexMapColumn?.relationshipType) {
         if (visibleIndexMapColumn.extensionValue) {
           getIncludedExtensionFieldColumn(
             visibleIndexMapColumn.queryOption,
@@ -322,7 +322,7 @@ export function QueryPage<TData extends KitsuResource>({
             visibleIndexMapColumn.extensionField,
             setSelectedColumnSelectorIndexMapColumns
           );
-        } else if (visibleIndexMapColumn.managedAttribute) {
+        } else if (visibleIndexMapColumn?.managedAttribute) {
           getIncludedManagedAttributeColumn(
             visibleIndexMapColumn.managedAttribute,
             visibleIndexMapColumn.queryOption,
@@ -330,29 +330,31 @@ export function QueryPage<TData extends KitsuResource>({
           );
         } else {
           getIncludedStandardColumns(
-            visibleIndexMapColumn.queryOption,
+            visibleIndexMapColumn?.queryOption,
             setSelectedColumnSelectorIndexMapColumns
           );
         }
       } else {
-        if (visibleIndexMapColumn.extensionValue) {
+        if (visibleIndexMapColumn?.extensionValue) {
           getAttributeExtensionFieldColumn(
             visibleIndexMapColumn.queryOption,
             visibleIndexMapColumn.extensionValue,
             visibleIndexMapColumn.extensionField,
             setSelectedColumnSelectorIndexMapColumns
           );
-        } else if (visibleIndexMapColumn.managedAttribute) {
+        } else if (visibleIndexMapColumn?.managedAttribute) {
           getAttributesManagedAttributeColumn(
             visibleIndexMapColumn.managedAttribute,
             visibleIndexMapColumn.queryOption,
             setSelectedColumnSelectorIndexMapColumns
           );
         } else {
-          getAttributesStandardColumns(
-            visibleIndexMapColumn.queryOption,
-            setSelectedColumnSelectorIndexMapColumns
-          );
+          if (visibleIndexMapColumn) {
+            getAttributesStandardColumns(
+              visibleIndexMapColumn.queryOption,
+              setSelectedColumnSelectorIndexMapColumns
+            );
+          }
         }
       }
     });
