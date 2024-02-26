@@ -151,7 +151,8 @@ describe("Grouped check boxes hook", () => {
     await new Promise(setImmediate);
 
     expect(mockOnSubmit).lastCalledWith({
-      checkedIds: { "1": true, "2": true, "3": true, "4": true, "5": true }
+      checkedIds: { "1": true, "2": true, "3": true, "4": true, "5": true },
+      selectAll: { checkedIds: true }
     });
 
     // Uncheck the check-all box.
@@ -166,6 +167,9 @@ describe("Grouped check boxes hook", () => {
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
 
-    expect(mockOnSubmit).lastCalledWith({ checkedIds: {} });
+    expect(mockOnSubmit).lastCalledWith({
+      checkedIds: {},
+      selectAll: { checkedIds: false }
+    });
   });
 });

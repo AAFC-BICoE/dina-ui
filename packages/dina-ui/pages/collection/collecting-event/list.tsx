@@ -39,7 +39,6 @@ export default function CollectingEventListPage() {
     "dwcFieldNumber",
     "dwcRecordNumber",
     stringArrayCell("otherRecordNumbers"),
-    "createdBy",
     "startEventDateTime",
     "endEventDateTime",
     "verbatimEventDateTime",

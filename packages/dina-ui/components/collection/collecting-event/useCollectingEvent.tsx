@@ -254,6 +254,7 @@ export function useCollectingEventSave({
     }
     delete submittedValues.srcAdminLevels;
     delete submittedValues.selectedSections;
+    delete (submittedValues as any).selectAll;
 
     // Remove the coord system for new Collecting events with no coordinates specified:
     if (
