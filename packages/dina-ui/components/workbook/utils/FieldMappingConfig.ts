@@ -273,7 +273,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
     parentMaterialSample: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
-        linkOrCreateSetting: LinkOrCreateSetting.LINK,
+        linkOrCreateSetting: LinkOrCreateSetting.LINKE_OR_ERROR,
         type: "material-sample",
         hasGroup: true,
         baseApiPath: "/collection-api"
