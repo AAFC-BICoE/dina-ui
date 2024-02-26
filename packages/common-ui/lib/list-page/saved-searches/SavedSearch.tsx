@@ -509,7 +509,12 @@ export function SavedSearch({
       openModal(
         <AreYouSureModal
           actionMessage={<DinaMessage id="removeSavedSearch" />}
-          messageBody={<DinaMessage id="areYouSureRemoveSavedSearch" values={{savedSearchName: savedSearchName}} />}
+          messageBody={
+            <>
+              <strong><DinaMessage id="areYouSureRemoveSavedSearch"/></strong><br/>
+              "{savedSearchName}"
+            </>
+          }
           onYesButtonClicked={deleteSearch}
         />
       );

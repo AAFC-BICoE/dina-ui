@@ -722,7 +722,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Remove Managed Attribute Value: {attributeNames}",
   removeOrganism: "Remove Organism",
   removeSavedSearch: "Remove Saved Search",
-  areYouSureRemoveSavedSearch: "Are you sure you want to remove: \"{savedSearchName}\"?",
+  areYouSureRemoveSavedSearch: "Are you sure you want to remove:",
   removeThisElement: "Remove This {typeName}",
   removeThisPlaceLabel: " Remove this Place",
   requiredField: "Required field",
