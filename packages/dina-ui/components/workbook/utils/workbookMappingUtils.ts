@@ -1,10 +1,10 @@
+import { find, trim } from "lodash";
+import { ValidationError } from "yup";
 import {
   ColumnUniqueValues,
   WorkbookJSON,
   WorkbookRow
 } from "../types/Workbook";
-import { find, trim } from "lodash";
-import { ValidationError } from "yup";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
@@ -35,6 +35,10 @@ export function _toPlainString(value: string) {
   }
 }
 
+const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
+  ["parent.", "parentMaterialSample."]
+]);
+
 /**
  * find the possible field that match the column header
  * @param columnHeader The column header from excel file
@@ -43,33 +47,33 @@ export function _toPlainString(value: string) {
  */
 export function findMatchField(
   columnHeader: string,
-  fieldOptions: 
-    {
-        label: string;
-        value?: string;
-        options?: 
-          {
-            label: string;
-            value: string;
-            parentPath: string;
-          }[]
-      }[]
-    
+  fieldOptions: {
+    label: string;
+    value?: string;
+    options?: {
+      label: string;
+      value: string;
+      parentPath: string;
+    }[];
+  }[]
 ) {
-  const plainOptions: {label: string; value: string}[] = [];
+  const plainOptions: { label: string; value: string }[] = [];
   for (const opt of fieldOptions) {
     if (opt.options) {
       for (const nestOpt of opt.options) {
-        plainOptions.push({label: nestOpt.label, value: nestOpt.value})
+        plainOptions.push({ label: nestOpt.label, value: nestOpt.value });
       }
     } else {
-      plainOptions.push({label: opt.label, value: opt.value!})
+      plainOptions.push({ label: opt.label, value: opt.value! });
     }
   }
   const option = find(plainOptions, (item) => {
     const pos = columnHeader.lastIndexOf(".");
     if (pos !== -1) {
-      const prefix = columnHeader.substring(0, pos + 1);
+      let prefix = columnHeader.substring(0, pos + 1);
+      if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
+        prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
+      }
       if (
         item.value.startsWith(prefix) &&
         _toPlainString(item.label) ===
@@ -349,6 +353,40 @@ export function isObject(value: any) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+export function isEmptyWorkbookValue(value: any): boolean {
+  if (value === undefined || value === null) {
+    return true;
+  }
+  if (typeof value === "string" && value.trim() === "") {
+    return true;
+  }
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return true;
+    } else {
+      let emptyObject = true;
+      for (const item of value) {
+        if (!isEmptyWorkbookValue(item)) {
+          emptyObject = false;
+        }
+      }
+      return emptyObject;
+    }
+  }
+  if (typeof value === "object" && !Array.isArray(value)) {
+    const keys = Object.keys(value).filter((k) => k !== "relationshipConfig");
+    let emptyObject = true;
+    for (const key of keys) {
+      if (!isEmptyWorkbookValue(value[key])) {
+        emptyObject = false;
+        break;
+      }
+    }
+    return emptyObject;
+  }
+  return false;
+}
+
 /**
  * Flattern an object into a one level property:value object. For example, it will convert
  *   mockEntity: {
@@ -394,8 +432,11 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
     for (let colIndex = 0; colIndex < columnNames.length; colIndex++) {
       const counts: { [value: string]: number } = {};
       for (let rowIndex = 1; rowIndex < workbookRows.length; rowIndex++) {
-        const value = workbookRows[rowIndex].content[colIndex];
-        if (value !== undefined) {
+        if (
+          !!workbookRows[rowIndex].content[colIndex] &&
+          workbookRows[rowIndex].content[colIndex].trim() !== ""
+        ) {
+          const value = workbookRows[rowIndex].content[colIndex].trim();
           counts[value] = 1 + (counts[value] || 0);
         }
       }

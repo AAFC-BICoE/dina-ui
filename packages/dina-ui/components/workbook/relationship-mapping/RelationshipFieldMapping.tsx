@@ -1,9 +1,7 @@
+import Accordion from "react-bootstrap/Accordion";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
-import Accordion from "react-bootstrap/Accordion";
-import { pick } from "lodash";
-import { WorkbookColumnMap } from "../types/Workbook";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
@@ -23,7 +21,11 @@ export function RelationshipFieldMapping({
   return columnUniqueValues && columnUniqueValues[sheetIndex] ? (
     <Accordion defaultActiveKey="0">
       {Object.keys(columnUniqueValues[sheetIndex])
-        .filter((columnName) => workbookColumnMap[columnName]?.mapRelationship)
+        .filter(
+          (columnName) =>
+            workbookColumnMap[columnName]?.mapRelationship &&
+            workbookColumnMap[columnName].showOnUI
+        )
         .map((columnName, index) => {
           const thisColumnMap = workbookColumnMap[columnName]!;
           const fieldPath = thisColumnMap.fieldPath;

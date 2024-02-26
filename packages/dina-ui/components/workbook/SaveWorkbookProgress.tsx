@@ -1,4 +1,3 @@
-import { pickBy } from "lodash";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
@@ -50,6 +49,8 @@ export function SaveWorkbookProgress({
   const isSafeToLeave = () => {
     return (
       !statusRef.current ||
+      statusRef.current === "FINISHED" ||
+      statusRef.current === "FAILED" ||
       workbookResources.length === 0 ||
       now === workbookResources.length
     );
@@ -68,7 +69,10 @@ export function SaveWorkbookProgress({
   useEffect(() => {
     const handleWindowClose = (e) => {
       if (isSafeToLeave()) {
-        if (now === workbookResources.length) {
+        if (
+          statusRef.current === "FINISHED" ||
+          statusRef.current === "FAILED"
+        ) {
           finishUpload();
         }
         return;
@@ -78,7 +82,10 @@ export function SaveWorkbookProgress({
     };
     const handleBrowseAway = () => {
       if (isSafeToLeave()) {
-        if (now === workbookResources.length) {
+        if (
+          statusRef.current === "FINISHED" ||
+          statusRef.current === "FAILED"
+        ) {
           finishUpload();
         }
         return;
@@ -107,14 +114,12 @@ export function SaveWorkbookProgress({
     async function saveChunkOfWorkbook(chunkedResources) {
       for (const resource of chunkedResources) {
         for (const key of Object.keys(resource)) {
-          if (resource[key] !== undefined && resource[key] !== null) {
-            await linkRelationshipAttribute(
-              resource,
-              workbookColumnMap,
-              key,
-              group ?? ""
-            );
-          }
+          await linkRelationshipAttribute(
+            resource,
+            workbookColumnMap,
+            key,
+            group ?? ""
+          );
         }
       }
       await save(
@@ -146,7 +151,7 @@ export function SaveWorkbookProgress({
         await delay(10); // Yield to render the progress bar
         break;
       }
-      const next = i+chunkSize;
+      const next = i + chunkSize;
       setNow(next);
       saveProgress(next);
       await delay(10); // Yield to render the progress bar

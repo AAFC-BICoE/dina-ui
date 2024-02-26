@@ -1,7 +1,7 @@
 import { take } from "lodash";
-import { WorkbookJSON, WorkbookRow } from "./types/Workbook";
 import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { WorkbookJSON, WorkbookRow } from "./types/Workbook";
 
 /**
  * This component is currently not used anywhere yet. It will be implemented in a future ticket.
@@ -32,8 +32,11 @@ export function WorkbookDisplay({
 
     // Skip the first row since it's already been displayed.
     if (index !== 0 && !skipRow) {
+      while (row.content.length < numOfColumns) {
+        row.content.push("");
+      }
       return row.content.map((col, i) => (
-        <div key={i} className="cells_content">
+        <div key={i} className="cells_content" title={col}>
           {col}
         </div>
       ));

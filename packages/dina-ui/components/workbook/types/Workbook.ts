@@ -95,6 +95,7 @@ export interface WorkbookColumnMap {
   [columnName: string]: // columnName in the spreadsheet
   {
     fieldPath?: string; // Mapped fieldPath in the configuration
+    showOnUI: boolean;
     mapRelationship: boolean; // If relationship mapping needed.
     numOfUniqueValues: number;
     valueMapping: {

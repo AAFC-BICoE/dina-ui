@@ -430,8 +430,10 @@ describe("useWorkbookConverters", () => {
     jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute } =
-      getWorkbookConverter(mockConfig, "mockEntity");
+    const { linkRelationshipAttribute } = getWorkbookConverter(
+      mockConfig,
+      "mockEntity"
+    );
     const mockResource: any = {
       attr1: 123,
       attr2: "abc",
@@ -467,30 +469,35 @@ describe("useWorkbookConverters", () => {
     const mockWorkbookColumnMap: WorkbookColumnMap = {
       attr1: {
         fieldPath: "attr1",
+        showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
         numOfUniqueValues: 100
       },
       attr2: {
         fieldPath: "attr2",
+        showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
         numOfUniqueValues: 100
       },
       attr3: {
         fieldPath: "attr3",
+        showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
         numOfUniqueValues: 100
       },
       attr4: {
         fieldPath: "attr4",
+        showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
         numOfUniqueValues: 100
       },
       "objectAttr1.name1": {
         fieldPath: "objectAttr1.name1",
+        showOnUI: true,
         mapRelationship: true,
         valueMapping: {
           name1: { id: "id-name1", type: "object-field" }
@@ -499,6 +506,7 @@ describe("useWorkbookConverters", () => {
       },
       "objectArray1.name1": {
         fieldPath: "objectAttr1.name1",
+        showOnUI: true,
         mapRelationship: true,
         valueMapping: {
           name1: { id: "id-name1", type: "object-field" }
@@ -508,7 +516,9 @@ describe("useWorkbookConverters", () => {
     };
 
     for (const key of Object.keys(mockResource)) {
-      await linkRelationshipAttribute( mockResource, mockWorkbookColumnMap,
+      await linkRelationshipAttribute(
+        mockResource,
+        mockWorkbookColumnMap,
         key,
         "group1"
       );
@@ -551,8 +561,10 @@ describe("useWorkbookConverters", () => {
     jest.spyOn(ApiClientContext, "useApiClient").mockReturnValue({
       save: mockSave
     } as any);
-    const { linkRelationshipAttribute } =
-      getWorkbookConverter(mockConfig, "mockEntity");
+    const { linkRelationshipAttribute } = getWorkbookConverter(
+      mockConfig,
+      "mockEntity"
+    );
     const mockResource: any = {
       attr1: 123,
       attr2: "abc",
@@ -589,30 +601,35 @@ describe("useWorkbookConverters", () => {
     const mockWorkbookColumnMap: WorkbookColumnMap = {
       attr1: {
         fieldPath: "attr1",
+        showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
         numOfUniqueValues: 100
       },
       attr2: {
         fieldPath: "attr2",
+        showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
         numOfUniqueValues: 100
       },
       attr3: {
         fieldPath: "attr3",
+        showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
         numOfUniqueValues: 100
       },
       attr4: {
         fieldPath: "attr4",
+        showOnUI: true,
         mapRelationship: false,
         valueMapping: {},
         numOfUniqueValues: 100
       },
       "objectAttr1.name1": {
         fieldPath: "objectAttr1.name1",
+        showOnUI: true,
         mapRelationship: true,
         valueMapping: {
           name1: { id: "id-name1", type: "object-field" }
@@ -621,6 +638,7 @@ describe("useWorkbookConverters", () => {
       },
       "objectArray1.name1": {
         fieldPath: "objectAttr1.name1",
+        showOnUI: true,
         mapRelationship: true,
         valueMapping: {
           name1: { id: "id-name1", type: "object-field" }
@@ -780,8 +798,9 @@ describe("useWorkbookConverters", () => {
     const { searchColumnMap } = getWorkbookConverter(mockConfig, "mockEntity");
 
     const mockWorkbookColumnMap: WorkbookColumnMap = {
-      "displayName":{
+      displayName: {
         fieldPath: "collectingEvent.collectors.displayName",
+        showOnUI: true,
         mapRelationship: true,
         numOfUniqueValues: 3,
         valueMapping: {
@@ -799,8 +818,9 @@ describe("useWorkbookConverters", () => {
           }
         }
       },
-      "name": {
+      name: {
         fieldPath: "collection.collectors.name",
+        showOnUI: true,
         mapRelationship: true,
         numOfUniqueValues: 3,
         valueMapping: {
@@ -820,15 +840,12 @@ describe("useWorkbookConverters", () => {
       }
     };
 
-    expect(
-      searchColumnMap("unkown property", mockWorkbookColumnMap)
-    ).toEqual(undefined);
+    expect(searchColumnMap("unkown property", mockWorkbookColumnMap)).toEqual(
+      undefined
+    );
 
     expect(
-      searchColumnMap(
-        "collectingEvent.collectors",
-        mockWorkbookColumnMap
-      )
+      searchColumnMap("collectingEvent.collectors", mockWorkbookColumnMap)
     ).toEqual({
       "collectingEvent.collectors.displayName": {
         "collector 3": {
@@ -865,9 +882,7 @@ describe("useWorkbookConverters", () => {
       }
     });
 
-    expect(
-      searchColumnMap("collectors", mockWorkbookColumnMap)
-    ).toEqual({
+    expect(searchColumnMap("collectors", mockWorkbookColumnMap)).toEqual({
       "collection.collectors.name": {
         coll1: {
           id: "06a0cf94-9c77-4ec3-a8c1-f7a8ea3ce304",

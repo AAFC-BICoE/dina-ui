@@ -27,6 +27,7 @@ import {
   convertStringArray,
   flattenObject,
   getParentFieldPath,
+  isEmptyWorkbookValue,
   isObject
 } from "./workbookMappingUtils";
 
@@ -145,6 +146,12 @@ export function useWorkbookConverter(
       : undefined;
   }
 
+  /**
+   * Convert workbook from the uploaded file into API resources, which are ready to call the API to save them.
+   * @param workbookData
+   * @param group
+   * @returns
+   */
   function convertWorkbook(
     workbookData: { [key: string]: any }[],
     group: string
@@ -359,10 +366,12 @@ export function useWorkbookConverter(
     fieldPath: string,
     group: string
   ) {
-    // const filteredWorkbookColumnMap =
-    //   filterWorkbookColumnMap(workbookColumnMap);
     const attributeName = fieldPath.substring(fieldPath.lastIndexOf(".") + 1);
     const value = resource[attributeName];
+    if (isEmptyWorkbookValue(value)) {
+      delete resource[attributeName];
+      return;
+    }
     if (attributeName === "relationshipConfig") {
       resource.type = value.type;
       resource.relationships = {};
@@ -375,12 +384,12 @@ export function useWorkbookConverter(
       const relationshipConfig = value.relationshipConfig;
       if (relationshipConfig) {
         // If the value is an Object type, and there is a relationshipConfig defined
+        let valueToLink;
         if (
           relationshipConfig.linkOrCreateSetting === LinkOrCreateSetting.LINK ||
           relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.LINK_OR_CREATE
         ) {
-          let valueToLink;
           // get valueToLink from workbookColumnMap
           const columnMap = searchColumnMap(fieldPath, workbookColumnMap);
           if (columnMap) {
@@ -408,12 +417,22 @@ export function useWorkbookConverter(
             };
             delete resource[attributeName];
             return;
+          } else {
+            if (
+              relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK
+            ) {
+              // if the field is link only, and there is no matching record, then ignore it.
+              delete resource[attributeName];
+              return;
+            }
           }
         }
 
         if (
-          relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.CREATE ||
+          (!valueToLink &&
+            relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.CREATE) ||
           relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.LINK_OR_CREATE
         ) {
@@ -500,6 +519,15 @@ export function useWorkbookConverter(
             }
             if (valueToLink) {
               valuesForRelationship.push(valueToLink);
+            } else {
+              if (
+                relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK
+              ) {
+                // if the field is link only, and there is no matching record, then ignore it.
+                delete resource[attributeName];
+                return;
+              }
             }
           }
 
