@@ -1,6 +1,6 @@
 import { useApiClient } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
-import { filter, get, has, pick } from "lodash";
+import { filter, get, has, pick, unset } from "lodash";
 import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
@@ -123,7 +123,9 @@ export function useWorkbookConverter(
         (parentConfig.relationshipConfig.linkOrCreateSetting ===
           LinkOrCreateSetting.LINK ||
           parentConfig.relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.LINK_OR_CREATE)
+            LinkOrCreateSetting.LINK_OR_CREATE ||
+          parentConfig.relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_OR_ERROR)
       );
     }
     return false;
@@ -388,7 +390,9 @@ export function useWorkbookConverter(
         if (
           relationshipConfig.linkOrCreateSetting === LinkOrCreateSetting.LINK ||
           relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.LINK_OR_CREATE
+            LinkOrCreateSetting.LINK_OR_CREATE ||
+          relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_OR_ERROR
         ) {
           // get valueToLink from workbookColumnMap
           const columnMap = searchColumnMap(fieldPath, workbookColumnMap);
@@ -425,6 +429,15 @@ export function useWorkbookConverter(
               // if the field is link only, and there is no matching record, then ignore it.
               delete resource[attributeName];
               return;
+            } else if (
+              relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK_OR_ERROR
+            ) {
+              // if the field is LINK_OR_ERR, and there is no matching record, then throw new error.
+              unset(value, "relationshipConfig");
+              const notFoundValue = JSON.stringify(value);
+              delete resource[attributeName];
+              throw new Error(`${attributeName} not found: ${notFoundValue}`);
             }
           }
         }
@@ -497,7 +510,9 @@ export function useWorkbookConverter(
             relationshipConfig.linkOrCreateSetting ===
               LinkOrCreateSetting.LINK ||
             relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK_OR_CREATE
+              LinkOrCreateSetting.LINK_OR_CREATE ||
+            relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK_OR_ERROR
           ) {
             // get valueToLink from workbookColumnMap
             const columnMap = searchColumnMap(fieldPath, workbookColumnMap);
@@ -527,6 +542,15 @@ export function useWorkbookConverter(
                 // if the field is link only, and there is no matching record, then ignore it.
                 delete resource[attributeName];
                 return;
+              } else if (
+                relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK_OR_ERROR
+              ) {
+                // if the field is LINK_OR_ERR, and there is no matching record, then throw new error.
+                unset(value, "relationshipConfig");
+                const notFoundValue = JSON.stringify(value);
+                delete resource[attributeName];
+                throw new Error(`${attributeName} not found: ${notFoundValue}`);
               }
             }
           }
