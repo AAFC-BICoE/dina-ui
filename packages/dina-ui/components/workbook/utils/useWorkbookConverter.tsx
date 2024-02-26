@@ -125,7 +125,7 @@ export function useWorkbookConverter(
           parentConfig.relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.LINK_OR_CREATE ||
           parentConfig.relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.LINKE_OR_ERROR)
+            LinkOrCreateSetting.LINK_OR_ERROR)
       );
     }
     return false;
@@ -392,7 +392,7 @@ export function useWorkbookConverter(
           relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.LINK_OR_CREATE ||
           relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.LINKE_OR_ERROR
+            LinkOrCreateSetting.LINK_OR_ERROR
         ) {
           // get valueToLink from workbookColumnMap
           const columnMap = searchColumnMap(fieldPath, workbookColumnMap);
@@ -431,7 +431,7 @@ export function useWorkbookConverter(
               return;
             } else if (
               relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINKE_OR_ERROR
+              LinkOrCreateSetting.LINK_OR_ERROR
             ) {
               // if the field is LINK_OR_ERR, and there is no matching record, then throw new error.
               unset(value, "relationshipConfig");
@@ -512,7 +512,7 @@ export function useWorkbookConverter(
             relationshipConfig.linkOrCreateSetting ===
               LinkOrCreateSetting.LINK_OR_CREATE ||
             relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINKE_OR_ERROR
+              LinkOrCreateSetting.LINK_OR_ERROR
           ) {
             // get valueToLink from workbookColumnMap
             const columnMap = searchColumnMap(fieldPath, workbookColumnMap);
@@ -544,7 +544,7 @@ export function useWorkbookConverter(
                 return;
               } else if (
                 relationshipConfig.linkOrCreateSetting ===
-                LinkOrCreateSetting.LINKE_OR_ERROR
+                LinkOrCreateSetting.LINK_OR_ERROR
               ) {
                 // if the field is LINK_OR_ERR, and there is no matching record, then throw new error.
                 unset(value, "relationshipConfig");
