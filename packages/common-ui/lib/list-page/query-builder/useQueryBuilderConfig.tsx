@@ -40,6 +40,7 @@ import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./query-builder-value-types/QueryBuilderTextSearch";
 import { transformUUIDSearchToDSL } from "./query-builder-value-types/QueryBuilderUUIDSearch";
+import QueryRowGlobalSearchSearch, { transformGlobalSearchToDSL } from "./query-builder-value-types/QueryBuilderGlobalSearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -424,6 +425,15 @@ export function generateBuilderConfig(
       ...BasicConfig.widgets.text,
       type: "globalSearch",
       valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowGlobalSearchSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      ),
+      elasticSearchFormatValue: (_queryType, val, _op, _field, _config) => {
+        return transformGlobalSearchToDSL(val);
+      }
     },
     managedAttribute: {
       ...BasicConfig.widgets.text,

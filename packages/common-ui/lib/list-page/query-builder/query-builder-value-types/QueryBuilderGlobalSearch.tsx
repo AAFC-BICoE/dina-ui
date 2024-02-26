@@ -1,3 +1,6 @@
+import { useIntl } from "react-intl";
+import { TransformToDSLProps } from "../../types";
+
 interface QueryRowGlobalSearchProps {
   /**
    * Retrieve the current value from the Query Builder.
@@ -10,12 +13,27 @@ interface QueryRowGlobalSearchProps {
   setValue?: (fieldPath: string) => void;
 }
 
-// In progress...
-// export default function QueryRowManagedAttributeSearch({
-//   value,
-//   setValue
-// }: QueryRowGlobalSearchProps) {
-//   return (
+export default function QueryRowGlobalSearchSearch({
+  value,
+  setValue
+}: QueryRowGlobalSearchProps) {
+  const { formatMessage } = useIntl();
 
-//   );
-// };
+  return (
+    <input
+      type="text"
+      value={value ?? ""}
+      onChange={(newValue) => setValue?.(newValue?.target?.value)}
+      className="form-control"
+      placeholder={formatMessage({
+        id: "queryBuilder_value_text_placeholder"
+      })}
+    />
+  );
+};
+
+export function transformGlobalSearchToDSL({
+  value
+}: TransformToDSLProps): any {
+  return {};
+};
