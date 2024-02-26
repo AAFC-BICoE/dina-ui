@@ -736,7 +736,19 @@ export function generateBuilderConfig(
           };
           return field;
         })
-      : [])
+      : []),
+
+    // Global Search support
+    {
+      "_globalSearch": {
+        label: "globalSearch",
+        type: "globalSearch",
+        valueSources: ["value"],
+        fieldSettings: {
+          isGlobalSearch: true
+        }
+      }
+    }
   );
 
   return {

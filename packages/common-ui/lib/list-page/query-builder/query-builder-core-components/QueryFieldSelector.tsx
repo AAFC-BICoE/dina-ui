@@ -1,8 +1,8 @@
 import lodash, { startCase, flatMapDeep } from "lodash";
 import { DinaMessage } from "../../../../../dina-ui/intl/dina-ui-intl";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
-import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
 import { ESIndexMapping } from "../../types";
 
 interface QueryFieldSelectorProps {
@@ -29,6 +29,8 @@ export function QueryFieldSelector({
   setField
 }: QueryFieldSelectorProps) {
   const { formatMessage, messages, locale } = useIntl();
+
+  const [isGlobalSearch, setIsGlobalSearch] = useState<boolean>(false);
 
   // Generate the options that can be selected for the field dropdown.
   const queryRowOptions = useMemo(() => {
@@ -145,16 +147,35 @@ export function QueryFieldSelector({
     );
   }, [currentField, locale]);
 
+  const globalSearchOptionSelected = {
+    label: formatMessage({ id: "queryBuilder_globalSearch" }),
+    value: "_globalSearch"
+  }
+
+  const performGlobalSearch = (_inputValue: string) => {
+    setIsGlobalSearch(true);
+    setField?.("_globalSearch");
+  }
+
   return (
     <div style={{ width: "100%" }}>
       {/* Field Selection */}
-      <Select
+      <CreatableSelect
         options={queryRowOptions as any}
         className={`flex-grow-1 me-2 ps-0`}
         styles={customStyles}
-        value={selectedOption}
+        value={isGlobalSearch ? globalSearchOptionSelected : selectedOption}
         placeholder={<DinaMessage id="queryBuilder_field_placeholder" />}
-        onChange={(selected) => setField?.(selected?.value)}
+        onChange={(selected) => {
+          setIsGlobalSearch(false);
+          setField?.(selected?.value)}
+        }
+        
+        // Global Search Specific Props
+        createOptionPosition={"first"}
+        formatCreateLabel={(inputValue) => inputValue === "" ? formatMessage({ id: "queryBuilder_globalSearch" }) : formatMessage({ id: "queryBuilder_globalSearch_withText" }, { "globalSearchTerm": inputValue })}
+        isValidNewOption={(_inputValue) => true}
+        onCreateOption={performGlobalSearch}
       />
     </div>
   );
