@@ -91,7 +91,15 @@ export function GlobalNamesField({
               <Switch id="manualInput" checked={isManualInput} onChange={onToggleManualInput} />
             </div>
             {isManualInput ? (
-              <ClassificationField />
+              <ClassificationField 
+                index={index}
+                setValue={setValue}
+                initValue={value ?? ""}
+                formik={formik}
+                onChange={onChange}
+                isDetermination={isDetermination}
+                dateSupplier={dateSupplier}
+              />
             ) : (
               <GlobalNamesSearchBox
                 fetchJson={fetchJson}
