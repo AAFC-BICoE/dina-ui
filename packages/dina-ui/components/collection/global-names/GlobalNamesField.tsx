@@ -6,8 +6,13 @@ import { useState } from "react";
 import { isArray } from "lodash";
 import DOMPurify from "dompurify";
 import { GlobalNamesSearchBox } from "../global-names/GlobalNamesSearchBox";
+import Switch from "react-switch";
 import { Dispatch, SetStateAction } from "react";
-import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api";
+import {
+  ScientificNameSource,
+  ScientificNameSourceDetails
+} from "../../../../dina-ui/types/collection-api";
+import { ClassificationField } from "../classification/ClassificationField";
 export interface GlobalNamesFieldProps extends FieldWrapperProps {
   scientificNameSourceField?: string;
   onChange?: (selection: string | null, formik: FormikProps<any>) => void;
@@ -33,6 +38,7 @@ export function GlobalNamesField({
   ...fieldWrapperProps
 }: GlobalNamesFieldProps) {
   const [searchInitiated, setSearchInitiated] = useState(false);
+  //const [isManualInput, setManualInput] = useState(scientificNameSourceField === 'CUSTOM')
 
   return (
     <FieldWrapper {...fieldWrapperProps} disableLabelClick={true}>
@@ -45,6 +51,28 @@ export function GlobalNamesField({
           scientificNameDetailsField as any
         ).value as string;
 
+        const scientificNameSourceFieldHelpers = formik.getFieldHelpers(
+          scientificNameSourceField as any
+        );
+
+        const scientificNameSourceFieldVal = formik.getFieldMeta(
+          scientificNameSourceField as any
+        ).value as string;
+
+        const isManualInput =
+          scientificNameSourceFieldVal === ScientificNameSource.CUSTOM;
+
+        function onToggleManualInput(checked) {
+          if (checked) {
+            scientificNameSourceFieldHelpers.setValue(
+              ScientificNameSource.CUSTOM
+            );
+          } else {
+            scientificNameSourceFieldHelpers.setValue(undefined);
+          }
+        }
+
+        console.log(scientificNameSourceFieldVal);
         return scientificNameSrcDetailVal && scientificNameSrcDetailUrlVal ? (
           <SelectedScientificNameView
             value={value}
@@ -57,22 +85,32 @@ export function GlobalNamesField({
             setValue={setValue}
           />
         ) : (
-          <GlobalNamesSearchBox
-            fetchJson={fetchJson}
-            onSelect={(newValue) => {
-              const val = isArray(newValue) ? newValue?.[1] : newValue;
-              onChange?.(newValue as any, formik);
-              setValue(val);
-              setSearchInitiated(true);
-            }}
-            index={index}
-            setValue={setValue}
-            initSearchValue={value ?? ""}
-            formik={formik}
-            onChange={onChange}
-            isDetermination={isDetermination}
-            dateSupplier={dateSupplier}
-          />
+          <>
+            <div className="d-flex align-items-center justify-content-end mb-2">
+              <label className="me-2" htmlFor="manualInput"><DinaMessage id="manual"/></label>
+              <Switch id="manualInput" checked={isManualInput} onChange={onToggleManualInput} />
+            </div>
+            {isManualInput ? (
+              <ClassificationField />
+            ) : (
+              <GlobalNamesSearchBox
+                fetchJson={fetchJson}
+                onSelect={(newValue) => {
+                  const val = isArray(newValue) ? newValue?.[1] : newValue;
+                  onChange?.(newValue as any, formik);
+                  setValue(val);
+                  setSearchInitiated(true);
+                }}
+                index={index}
+                setValue={setValue}
+                initSearchValue={value ?? ""}
+                formik={formik}
+                onChange={onChange}
+                isDetermination={isDetermination}
+                dateSupplier={dateSupplier}
+              />
+            )}
+          </>
         );
       }}
     </FieldWrapper>

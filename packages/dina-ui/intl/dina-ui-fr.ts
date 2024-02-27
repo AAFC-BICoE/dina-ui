@@ -770,7 +770,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   savedSearchOverwriteExisting:
     "Il existe déjà une recherche enregistrée portant le nom « {savedSearchName} ». La création de cette recherche enregistrée écrasera la recherche enregistrée existante.",
   scheduledActions: "Actions prévues",
-  scientificNameSearch: "Recherche de nom scientifique",
+  scientificNameSearch: "Classification",
   searchButton: "Recherche",
   searchOnCOL: "Chercher dans le Catalogue of Life",
   searchPreviousTags: "Consulter les précédentes étiquettes",

@@ -32,5 +32,6 @@ export type ScientificNameSourceDetails = {
 
 export enum ScientificNameSource {
   COLPLUS = "COLPLUS",
-  GNA = "GNA"
+  GNA = "GNA",
+  CUSTOM = "CUSTOM"
 }

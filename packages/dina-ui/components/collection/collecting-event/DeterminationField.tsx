@@ -130,6 +130,10 @@ export function DeterminationField({
             form.values,
             fieldScientificNameSrcDetail
           );
+
+          const scientificNameSourceField = fieldProps('scientificNameSourceField').name;
+          const scientificNameSourceVal = get(form.values, scientificNameSourceField);
+          console.log(scientificNameSourceField, scientificNameSourceVal);
           return (
             <div className="row">
               {!readOnly && !isTemplate && (
