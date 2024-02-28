@@ -654,7 +654,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "You have unsaved data, are you sure you want to leave the page?",
   preparation: "Preparation",
   preparationData: "Preparation Data",
-  preparationManagedAttributes: "Preparations Managed Attributes",
+  preparationManagedAttributes: "Preparation Managed Attributes",
   preparationMethodNameLabel: "Preparation Method Name",
   preparationProtocols: "Preparation Protocols",
   preparationTypeListTitle: "Preparation Type",

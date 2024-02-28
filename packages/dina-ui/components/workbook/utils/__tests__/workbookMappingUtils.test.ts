@@ -266,7 +266,7 @@ describe("workbookMappingUtils functions", () => {
   });
 
   it("isMap", () => {
-    expect(isMap("asdfa : asdfas")).toBeTruthy();
+    expect(isMap("asdfa_1 : asdfas")).toBeTruthy();
     expect(isMap("asdfas: asdfas, adsfasf:asdfasf")).toBeTruthy();
     expect(isMap('asdf:"asdfa  sdfdsf"')).toBeTruthy();
     expect(isMap('asdf:"asdfa sdfdsf" : asd : "sdfsdf "sdf sdf')).toBeFalsy();
@@ -274,6 +274,8 @@ describe("workbookMappingUtils functions", () => {
     expect(isMap('asdf:"asdfa sdfdsf')).toBeFalsy();
     expect(isMap('asdf:asdfa sdfdsf", "sdfsdf "sdf sdf')).toBeFalsy();
     expect(isMap('asdf:"asdfa sdfdsf", asd : "sdfsdf "sdf sdf')).toBeFalsy();
+    expect(isMap("attr_1:ddddss, attr_2:sssddd")).toBeTruthy();
+    expect(isMap("attr_1: 222, attr_2: true")).toBeTruthy();
   });
 
   it("convertNumber", () => {
