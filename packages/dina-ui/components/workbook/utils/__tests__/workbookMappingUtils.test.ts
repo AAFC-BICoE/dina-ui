@@ -171,7 +171,7 @@ describe("workbookMappingUtils functions", () => {
             ]
           },
           0, // Return first sheet.
-          ["field1", "field2", "field3"]
+          [{targetField: "field1", skipped: false}, {targetField: "field2", skipped: false}, {targetField: "field3", skipped: false}, {targetField: "field4", skipped: true}]
         )
       ).toEqual([
         {
@@ -197,7 +197,7 @@ describe("workbookMappingUtils functions", () => {
         getDataFromWorkbook(
           undefined,
           0, // Return first sheet.
-          ["field1", "field2", "field3"]
+          [{targetField: "field1", skipped: false}, {targetField: "field2", skipped: false}, {targetField: "field3", skipped: false}]
         )
       ).toEqual([]);
     });
