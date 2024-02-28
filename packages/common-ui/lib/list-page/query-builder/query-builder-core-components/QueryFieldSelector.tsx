@@ -34,9 +34,13 @@ export function QueryFieldSelector({
   const { formatMessage, messages, locale } = useIntl();
 
   const [isGlobalSearch, setIsGlobalSearch] = useState<boolean>(false);
+
+  // Check if we are currently in global search mode.
   useEffect(() => {
     if (currentField === GLOBAL_SEARCH_FIELDNAME && !isGlobalSearch) {
       setIsGlobalSearch(true);
+    } else {
+      setIsGlobalSearch(false);
     }
   }, [currentField]);
 
@@ -44,7 +48,10 @@ export function QueryFieldSelector({
   const [_globalSearchQuery, setGlobalSearchQuery] =
     useSessionStorage<string | undefined>(
       SHORTCUT_GLOBAL_SEARCH_QUERY,
-      undefined
+      undefined,
+      {
+        initializeWithValue: false
+      }
     );
 
   // Generate the options that can be selected for the field dropdown.
@@ -174,7 +181,6 @@ export function QueryFieldSelector({
       setGlobalSearchQuery(inputValue);
     }
 
-    setIsGlobalSearch(true);
     setField?.(GLOBAL_SEARCH_FIELDNAME);
   }
 
@@ -187,10 +193,7 @@ export function QueryFieldSelector({
         styles={customStyles}
         value={isGlobalSearch ? globalSearchOptionSelected : selectedOption}
         placeholder={<DinaMessage id="queryBuilder_field_placeholder" />}
-        onChange={(selected) => {
-          setIsGlobalSearch(false);
-          setField?.(selected?.value)}
-        }
+        onChange={(selected) => setField?.(selected?.value)}
         
         // Global Search Specific Props
         createOptionPosition={"first"}

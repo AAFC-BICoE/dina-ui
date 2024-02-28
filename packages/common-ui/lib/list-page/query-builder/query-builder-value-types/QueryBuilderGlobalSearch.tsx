@@ -26,15 +26,18 @@ export default function QueryRowGlobalSearchSearch({
   const [globalSearchQuery, setGlobalSearchQuery] =
     useSessionStorage<string | undefined>(
       SHORTCUT_GLOBAL_SEARCH_QUERY,
-      undefined
+      undefined,
+      {
+        initializeWithValue: false
+      }
     );
 
   useEffect(() => {
-    if (globalSearchQuery) {
-      setValue?.(globalSearchQuery);
+    if (globalSearchQuery !== undefined && setValue && value !== globalSearchQuery) {
+      setValue(globalSearchQuery);
       setGlobalSearchQuery(undefined);      
     }
-  }, [globalSearchQuery]);
+  }, [globalSearchQuery, setValue, value]);
 
   return (
     <input
@@ -57,10 +60,9 @@ export function transformGlobalSearchToDSL({
   }
 
   return {
-    multi_match: {
+    simple_query_string: {
       query: value,
-      fields: ["*"],
-      operator: "and"
+      fields: ["*"]
     }
   };
 };
