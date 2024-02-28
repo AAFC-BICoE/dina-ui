@@ -1,9 +1,12 @@
 import lodash, { startCase, flatMapDeep } from "lodash";
 import { DinaMessage } from "../../../../../dina-ui/intl/dina-ui-intl";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import CreatableSelect from "react-select/creatable";
 import { ESIndexMapping } from "../../types";
+import { GLOBAL_SEARCH_FIELDNAME } from "../useQueryBuilderConfig";
+import { useSessionStorage } from "usehooks-ts";
+import { SHORTCUT_GLOBAL_SEARCH_QUERY } from "../query-builder-value-types/QueryBuilderGlobalSearch";
 
 interface QueryFieldSelectorProps {
   /**
@@ -31,6 +34,21 @@ export function QueryFieldSelector({
   const { formatMessage, messages, locale } = useIntl();
 
   const [isGlobalSearch, setIsGlobalSearch] = useState<boolean>(false);
+  useEffect(() => {
+    if (currentField === GLOBAL_SEARCH_FIELDNAME && !isGlobalSearch) {
+      setIsGlobalSearch(true);
+    }
+  }, [currentField]);
+
+  // If using the shortcut for global search.
+  const [_globalSearchQuery, setGlobalSearchQuery] =
+    useSessionStorage<string>(
+      SHORTCUT_GLOBAL_SEARCH_QUERY,
+      "",
+      {
+        initializeWithValue: false
+      }
+    );
 
   // Generate the options that can be selected for the field dropdown.
   const queryRowOptions = useMemo(() => {
@@ -149,12 +167,18 @@ export function QueryFieldSelector({
 
   const globalSearchOptionSelected = {
     label: formatMessage({ id: "queryBuilder_globalSearch" }),
-    value: "_globalSearch"
+    value: GLOBAL_SEARCH_FIELDNAME
   }
 
-  const performGlobalSearch = (_inputValue: string) => {
+  const performGlobalSearch = (inputValue: string) => {
+    // Check if a search was provided during typing, if so save it to the session so it can pre-loaded
+    // in the QueryBuilderGlobalSearch.
+    if (inputValue !== "") {
+      setGlobalSearchQuery(inputValue);
+    }
+
     setIsGlobalSearch(true);
-    setField?.("_globalSearch");
+    setField?.(GLOBAL_SEARCH_FIELDNAME);
   }
 
   return (

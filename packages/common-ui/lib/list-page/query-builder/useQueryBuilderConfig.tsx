@@ -130,6 +130,9 @@ function validateField(value: string, type: string, formatMessage: any) {
   }
 }
 
+// Unique fieldname identifier for global search.
+export const GLOBAL_SEARCH_FIELDNAME = "_globalSearch";
+
 export interface CustomViewField {
   /**
    * The field name used in the Custom View.
@@ -740,8 +743,8 @@ export function generateBuilderConfig(
 
     // Global Search support
     {
-      "_globalSearch": {
-        label: "globalSearch",
+      [GLOBAL_SEARCH_FIELDNAME]: {
+        label: GLOBAL_SEARCH_FIELDNAME,
         type: "globalSearch",
         valueSources: ["value"],
         fieldSettings: {
