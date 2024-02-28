@@ -333,11 +333,9 @@ export function WorkbookColumnMapping({
       // Ask the user if they sure they want to delete the saved search.
       openModal(
         <AreYouSureModal
-          actionMessage={<DinaMessage id="removeSavedSearch" />}
+          actionMessage={<DinaMessage id="proceedWithSkippedColumn" />}
           messageBody={
-            <strong>
-              <DinaMessage id="areYouSureImportWorkbookWithSkippedColumns" />
-            </strong>
+            <DinaMessage id="areYouSureImportWorkbookWithSkippedColumns" />
           }
           onYesButtonClicked={() => {
             importWorkbook(submittedValues);
