@@ -26,12 +26,10 @@ import {
 import { DynamicFieldsMappingConfig } from "../list-page/types";
 import { useIndexMapping } from "../list-page/useIndexMapping";
 
-const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleIndexColumns";
 export interface ColumnSelectorProps<TData> {
   /** A unique identifier to be used for local storage key */
   uniqueName?: string;
-  hideExportButton?: boolean;
   reactTable: Table<TData> | undefined;
   menuOnly?: boolean;
   /**
@@ -84,7 +82,6 @@ export function ColumnSelector<TData>({
   uniqueName,
   reactTable,
   menuOnly,
-  hideExportButton = false,
   indexName,
   dynamicFieldMapping,
   setColumnSelectorIndexMapColumns,
@@ -190,18 +187,9 @@ export function ColumnSelector<TData>({
   }, [reactTable, reactTable?.getAllColumns().length]);
 
   const [loading, setLoading] = useState(false);
-  const [dataExportError, setDataExportError] = useState<JSX.Element>();
 
   // Keep track of column text search value
   const [filterColumsValue, setFilterColumnsValue] = useState<string>("");
-
-  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
-
-  if (queryObject) {
-    delete (queryObject as any)._source;
-  }
-
-  const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
 
   function handleToggleAll(event) {
     const visibilityState = reactTable?.getState()?.columnVisibility;
@@ -258,75 +246,6 @@ export function ColumnSelector<TData>({
     setLocalStorageColumnStates(filteredColumnsState);
   }
 
-  async function exportData() {
-    setLoading(true);
-    // Make query to data-export
-    const exportColumns = reactTable
-      ?.getAllLeafColumns()
-      .filter((column) => {
-        if (NOT_EXPORTABLE_COLUMN_IDS.includes(column.id)) {
-          return false;
-        } else {
-          return column.getIsVisible();
-        }
-      })
-      .map((column) => column.id);
-    const dataExportSaveArg = {
-      resource: {
-        type: "data-export",
-        source: indexName,
-        query: queryString,
-        columns: reactTable ? exportColumns : []
-      },
-      type: "data-export"
-    };
-    const dataExportPostResponse = await save<DataExport>([dataExportSaveArg], {
-      apiBaseUrl: "/dina-export-api"
-    });
-
-    // data-export POST will return immediately but export won't necessarily be available
-    // continue to get status of export until it's COMPLETED
-    let isFetchingDataExport = true;
-    let fetchDataExportRetries = 0;
-    let dataExportGetResponse;
-    while (isFetchingDataExport) {
-      if (fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES) {
-        fetchDataExportRetries += 1;
-        if (dataExportGetResponse?.data?.status === "COMPLETED") {
-          // Get the exported data
-          await downloadDataExport(apiClient, dataExportPostResponse[0].id);
-          isFetchingDataExport = false;
-        } else if (dataExportGetResponse?.data?.status === "ERROR") {
-          isFetchingDataExport = false;
-          setLoading(false);
-          setDataExportError(
-            <div className="alert alert-danger">
-              <DinaMessage id="dataExportError" />
-            </div>
-          );
-        } else {
-          dataExportGetResponse = await apiClient.get<DataExport>(
-            `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
-            {}
-          );
-          // Wait 1 second before retrying
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-      } else {
-        // Max retries reached
-        isFetchingDataExport = false;
-        setLoading(false);
-        setDataExportError(
-          <div className="alert alert-danger">
-            <DinaMessage id="dataExportError" />
-          </div>
-        );
-      }
-    }
-    isFetchingDataExport = false;
-    setLoading(false);
-  }
-
   const CheckboxItem = React.forwardRef((props: any, ref) => {
     return (
       <Checkbox
@@ -358,7 +277,6 @@ export function ColumnSelector<TData>({
           className={props.className}
           aria-labelledby={props.labelledBy}
         >
-          {dataExportError}
           <strong>{<FieldHeader name="filterColumns" />}</strong>
           <input
             autoFocus={true}
@@ -388,19 +306,6 @@ export function ColumnSelector<TData>({
           <Dropdown.Divider />
           {
             <div className="d-flex gap-2">
-              {!hideExportButton && (
-                <Button
-                  disabled={loading}
-                  className="btn btn-primary mt-1 mb-2 bulk-edit-button"
-                  onClick={exportData}
-                >
-                  {loading ? (
-                    <LoadingSpinner loading={loading} />
-                  ) : (
-                    formatMessage({ id: "exportButtonText" })
-                  )}
-                </Button>
-              )}
               {!menuOnly && (
                 <Button
                   disabled={loading}
@@ -525,7 +430,8 @@ export function ColumnSelector<TData>({
 
 export async function downloadDataExport(
   apiClient: Kitsu,
-  id: string | undefined
+  id: string | undefined,
+  name?: string
 ) {
   if (id) {
     const getFileResponse = await apiClient.get(
@@ -539,7 +445,7 @@ export async function downloadDataExport(
     const url = window?.URL.createObjectURL(getFileResponse as any);
     const link = document?.createElement("a");
     link.href = url ?? "";
-    link?.setAttribute("download", `${id}`);
+    link?.setAttribute("download", `${name ?? id}`);
     document?.body?.appendChild(link);
     link?.click();
     window?.URL?.revokeObjectURL(url ?? "");

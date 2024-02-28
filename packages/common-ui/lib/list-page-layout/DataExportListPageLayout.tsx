@@ -27,6 +27,7 @@ export function DataExportListPageLayout({
   };
   const TABLE_COLUMNS: ColumnDefinition<DataExport>[] = [
     "id",
+    "name",
     "status",
     "createdBy",
     dateCell("createdOn"),
