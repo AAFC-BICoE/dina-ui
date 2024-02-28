@@ -1,8 +1,10 @@
 import {
+  AreYouSureModal,
   FieldWrapper,
   SubmitButton,
   useAccount,
   useApiClient,
+  useModal,
   useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
@@ -60,6 +62,7 @@ export function WorkbookColumnMapping({
   setPerformSave
 }: WorkbookColumnMappingProps) {
   const { apiClient } = useApiClient();
+  const { openModal } = useModal();
   const {
     startSavingWorkbook,
     spreadsheetData,
@@ -322,6 +325,29 @@ export function WorkbookColumnMapping({
   const sheetValue = sheetOptions[sheet];
 
   async function onSubmit({ submittedValues }) {
+    if (
+      submittedValues.fieldMap.filter((item) => item === undefined).length > 0
+    ) {
+      // Ask the user if they sure they want to delete the saved search.
+      openModal(
+        <AreYouSureModal
+          actionMessage={<DinaMessage id="removeSavedSearch" />}
+          messageBody={
+            <strong>
+              <DinaMessage id="areYouSureImportWorkbookWithSkippedColumns" />
+            </strong>
+          }
+          onYesButtonClicked={() => {
+            importWorkbook(submittedValues);
+          }}
+        />
+      );
+    } else {
+      importWorkbook(submittedValues);
+    }
+  }
+
+  async function importWorkbook(submittedValues: any) {
     const workbookData = getDataFromWorkbook(
       spreadsheetData,
       sheet,
@@ -598,14 +624,17 @@ export function WorkbookColumnMapping({
                     className="row mb-2"
                     style={{ borderBottom: "solid 1px", paddingBottom: "8px" }}
                   >
-                    <div className="col-4">
+                    <div className="col-md-3">
                       <DinaMessage id="spreadsheetHeader" />
                     </div>
-                    <div className="col-4">
+                    <div className="col-md-3">
                       <DinaMessage id="materialSampleFieldsMapping" />
                     </div>
-                    <div className="col-4">
+                    <div className="col-md-3">
                       <DinaMessage id="mapRelationship" />
+                    </div>
+                    <div className="col-md-3">
+                      <DinaMessage id="skipColumn" />
                     </div>
                   </div>
                   {headers

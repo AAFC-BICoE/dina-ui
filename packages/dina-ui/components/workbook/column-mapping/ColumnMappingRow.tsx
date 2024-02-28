@@ -1,3 +1,4 @@
+import { useFormikContext } from "formik";
 import { startCase } from "lodash";
 import { useMemo, useState } from "react";
 import { SelectField } from "../../../../common-ui/lib";
@@ -118,11 +119,18 @@ export function ColumnMappingRow({
     }
   }
 
+  const { values } = useFormikContext();
+  const [skipColumn, setSkipColumn] = useState<boolean>(
+    !(values as any).fieldMap[columnIndex]
+  );
+
   const fieldPath = workbookColumnMap[columnName]?.fieldPath;
   return (
     <div className="row">
-      <div className="col-md-4 mt-3">{columnName}</div>
-      <div className="col-md-4">
+      <div className="col-md-3 d-flex align-items-center justify-content-start">
+        {columnName}
+      </div>
+      <div className="col-md-3">
         <SelectField
           name={`fieldMap[${columnIndex}]`}
           options={fieldOptions}
@@ -131,11 +139,12 @@ export function ColumnMappingRow({
           styles={customStyles}
           onChange={(newFieldPath) => {
             setChecked(false);
+            setSkipColumn(!newFieldPath);
             onFieldMappingChange(columnName, newFieldPath);
           }}
         />
       </div>
-      <div className="col-md-4 mt-2">
+      <div className="col-md-3 d-flex align-items-center">
         {showMapRelationshipCheckbox(columnIndex, fieldPath) && (
           <input
             type="checkbox"
@@ -152,6 +161,14 @@ export function ColumnMappingRow({
             }}
           />
         )}
+      </div>
+      <div className="col-md-3 d-flex align-items-center">
+        <input
+          type="checkbox"
+          style={{ width: "20px", height: "20px", cursor: "not-allowed" }}
+          checked={skipColumn}
+          readOnly={true}
+        />
       </div>
     </div>
   );
