@@ -40,12 +40,15 @@ import {
 } from "../utils/workbookMappingUtils";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 
-export type FieldMapType = (string | undefined)[];
+export type FieldMapType = {
+  targetField: string | undefined;
+  skipped: boolean;
+};
 
 export interface WorkbookColumnMappingFields {
   sheet: number;
   type: string;
-  fieldMap: FieldMapType;
+  fieldMap: FieldMapType[];
   mapRelationships: boolean[];
   group: string;
 }
@@ -83,8 +86,7 @@ export function WorkbookColumnMapping({
     label: string;
     value: string;
   } | null>(entityTypes[0]);
-  const [fieldMap, setFieldMap] = useState<FieldMapType>([]);
-  // fieldHeaderPair stores the pairs of field name in the configuration and the column header in the excel file.
+  const [fieldMap, setFieldMap] = useState<FieldMapType[]>([]);
 
   const {
     convertWorkbook,
@@ -226,10 +228,10 @@ export function WorkbookColumnMapping({
       const newOptions = nonNestedRowOptions
         ? [...nonNestedRowOptions, ...groupedNestRowOptions]
         : [];
-      const map = [] as FieldMapType;
+      const map: FieldMapType[] = [];
       for (const columnHeader of headers || []) {
         const fieldPath = findMatchField(columnHeader, newOptions);
-        map.push(fieldPath);
+        map.push({ targetField: fieldPath, skipped: fieldPath === undefined });
       }
       setFieldMap(map);
       return newOptions;
@@ -368,23 +370,39 @@ export function WorkbookColumnMapping({
 
   const workbookColumnMappingFormSchema = yup.object({
     fieldMap: yup.array().test({
-      name: "uniqMapping",
+      name: "validateFieldMapping",
       exclusive: false,
-      test: (fieldNames: string[]) => {
+      test: (fieldMaps: FieldMapType[]) => {
         const errors: ValidationError[] = [];
-        for (let i = 0; i < fieldNames.length; i++) {
-          const field = fieldNames[i];
-          if (
-            !!field &&
-            fieldNames.filter((item) => item === field).length > 1
-          ) {
-            errors.push(
-              new ValidationError(
-                formatMessage("workBookDuplicateFieldMap"),
-                field,
-                `fieldMap[${i}]`
-              )
-            );
+        for (let i = 0; i < fieldMaps.length; i++) {
+          const fieldMap = fieldMaps[i];
+          if (!!fieldMap) {
+            if (
+              fieldMap.targetField !== undefined &&
+              fieldMaps.filter(
+                (item) => item.targetField === fieldMap.targetField
+              ).length > 1
+            ) {
+              errors.push(
+                new ValidationError(
+                  formatMessage("workBookDuplicateFieldMap"),
+                  fieldMap.targetField,
+                  `fieldMap[${i}].targetField`
+                )
+              );
+            }
+            if (
+              fieldMap.targetField === undefined &&
+              fieldMap.skipped === false
+            ) {
+              errors.push(
+                new ValidationError(
+                  formatMessage("workBookSkippedField"),
+                  fieldMap.targetField,
+                  `fieldMap[${i}].targetField`
+                )
+              );
+            }
           }
         }
         if (errors.length > 0) {
@@ -393,7 +411,7 @@ export function WorkbookColumnMapping({
         const data = getDataFromWorkbook(
           spreadsheetData,
           sheet,
-          fieldNames,
+          fieldMaps,
           true
         );
         validateData(data, errors);
@@ -631,10 +649,10 @@ export function WorkbookColumnMapping({
                       <DinaMessage id="materialSampleFieldsMapping" />
                     </div>
                     <div className="col-md-3">
-                      <DinaMessage id="mapRelationship" />
+                      <DinaMessage id="skipColumn" />
                     </div>
                     <div className="col-md-3">
-                      <DinaMessage id="skipColumn" />
+                      <DinaMessage id="mapRelationship" />
                     </div>
                   </div>
                   {headers

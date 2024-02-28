@@ -1,7 +1,7 @@
 import { useFormikContext } from "formik";
 import { startCase } from "lodash";
 import { useMemo, useState } from "react";
-import { SelectField } from "../../../../common-ui/lib";
+import { CheckBoxField, SelectField } from "../../../../common-ui/lib";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import {
@@ -119,11 +119,6 @@ export function ColumnMappingRow({
     }
   }
 
-  const { values } = useFormikContext();
-  const [skipColumn, setSkipColumn] = useState<boolean>(
-    !(values as any).fieldMap[columnIndex]
-  );
-
   const fieldPath = workbookColumnMap[columnName]?.fieldPath;
   return (
     <div className="row">
@@ -132,23 +127,28 @@ export function ColumnMappingRow({
       </div>
       <div className="col-md-3">
         <SelectField
-          name={`fieldMap[${columnIndex}]`}
+          name={`fieldMap[${columnIndex}].targetField`}
           options={fieldOptions}
           selectProps={{ isClearable: true }}
           hideLabel={true}
           styles={customStyles}
           onChange={(newFieldPath) => {
             setChecked(false);
-            setSkipColumn(!newFieldPath);
             onFieldMappingChange(columnName, newFieldPath);
           }}
+        />
+      </div>
+      <div className="col-md-3 d-flex align-items-center">
+        <CheckBoxField
+          name={`fieldMap[${columnIndex}].skipped`}
+          hideLabel={true}
         />
       </div>
       <div className="col-md-3 d-flex align-items-center">
         {showMapRelationshipCheckbox(columnIndex, fieldPath) && (
           <input
             type="checkbox"
-            className="mt-2"
+            className="mb-2"
             id={`${columnName}-map-relationship`}
             checked={checked}
             onChange={(e) => {
@@ -161,14 +161,6 @@ export function ColumnMappingRow({
             }}
           />
         )}
-      </div>
-      <div className="col-md-3 d-flex align-items-center">
-        <input
-          type="checkbox"
-          style={{ width: "20px", height: "20px", cursor: "not-allowed" }}
-          checked={skipColumn}
-          readOnly={true}
-        />
       </div>
     </div>
   );

@@ -557,7 +557,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleFieldsMapping: "Material Sample Field",
-  skipColumn: "Skip Column?",
+  skipColumn: "Skip",
   materialSampleFormTemplate: "Material Sample Form Template",
   materialSampleFormTemplates: "Material Sample Form Templates",
   materialSampleInfo: "Material Sample Info",
@@ -889,6 +889,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   withAKeyboard: "With a keyboard",
   withAMouse: "With a mouse",
   workBookDuplicateFieldMap: "This column should not map to the same field",
+  workBookSkippedField: "Please select a field or skip importing it",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}",
   workBookInvalidManagedAttributeDataType:
