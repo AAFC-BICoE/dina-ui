@@ -42,12 +42,9 @@ export function QueryFieldSelector({
 
   // If using the shortcut for global search.
   const [_globalSearchQuery, setGlobalSearchQuery] =
-    useSessionStorage<string>(
+    useSessionStorage<string | undefined>(
       SHORTCUT_GLOBAL_SEARCH_QUERY,
-      "",
-      {
-        initializeWithValue: false
-      }
+      undefined
     );
 
   // Generate the options that can be selected for the field dropdown.

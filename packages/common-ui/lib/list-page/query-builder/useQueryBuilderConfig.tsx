@@ -434,8 +434,13 @@ export function generateBuilderConfig(
           setValue={factoryProps?.setValue}
         />
       ),
-      elasticSearchFormatValue: (_queryType, val, _op, _field, _config) => {
-        return transformGlobalSearchToDSL(val);
+      elasticSearchFormatValue: (_queryType, val, _op, field, _config) => {
+        return transformGlobalSearchToDSL({
+          value: val,
+          fieldPath: field,
+          operation: "",
+          queryType: ""
+        });
       }
     },
     managedAttribute: {

@@ -24,18 +24,15 @@ export default function QueryRowGlobalSearchSearch({
   const { formatMessage } = useIntl();
 
   const [globalSearchQuery, setGlobalSearchQuery] =
-    useSessionStorage<string>(
+    useSessionStorage<string | undefined>(
       SHORTCUT_GLOBAL_SEARCH_QUERY,
-      "",
-      {
-        initializeWithValue: false
-      }
+      undefined
     );
 
   useEffect(() => {
-    if (globalSearchQuery !== "") {
+    if (globalSearchQuery) {
       setValue?.(globalSearchQuery);
-      setGlobalSearchQuery("");      
+      setGlobalSearchQuery(undefined);      
     }
   }, [globalSearchQuery]);
 
@@ -55,5 +52,15 @@ export default function QueryRowGlobalSearchSearch({
 export function transformGlobalSearchToDSL({
   value
 }: TransformToDSLProps): any {
-  return {};
+  if (!value) {
+    return {};
+  }
+
+  return {
+    multi_match: {
+      query: value,
+      fields: ["*"],
+      operator: "and"
+    }
+  };
 };
