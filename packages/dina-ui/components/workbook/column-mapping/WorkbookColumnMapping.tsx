@@ -328,7 +328,7 @@ export function WorkbookColumnMapping({
 
   async function onSubmit({ submittedValues }) {
     if (
-      submittedValues.fieldMap.filter((item) => item === undefined).length > 0
+      submittedValues.fieldMap.filter((item) => item.skipped).length > 0
     ) {
       // Ask the user if they sure they want to delete the saved search.
       openModal(
