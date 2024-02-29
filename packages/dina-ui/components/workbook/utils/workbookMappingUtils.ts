@@ -235,7 +235,7 @@ export function isValidManagedAttribute(
  * @param value string
  * @returns number
  */
-export function convertNumber(value: any): number | null {
+export function convertNumber(value: any, fieldName?: string): number | null {
   if (value !== null && value !== undefined && value !== "" && !isNaN(+value)) {
     return +value;
   } else {
@@ -248,7 +248,7 @@ export function convertNumber(value: any): number | null {
  * @param value string, it can be 'true', 'false', 'yes', or 'no'
  * @returns boolean
  */
-export function convertBoolean(value: any): boolean {
+export function convertBoolean(value: any, fieldName?: string): boolean {
   const strBoolean = String(value).toLowerCase().trim();
   if (strBoolean === "false" || strBoolean === "no" || strBoolean === "0") {
     return false;
@@ -264,7 +264,7 @@ export function convertBoolean(value: any): boolean {
  * @param value Comma separated string, e.g.  `asdb,deeasdf,sdf,"sdf,sadf" , sdfd`
  *
  */
-export function convertStringArray(value: string): string[] {
+export function convertStringArray(value: any, fieldName?: string): string[] {
   const arr = value.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
   return arr.map((str) => trim(trim(str, '"')));
 }
@@ -275,12 +275,12 @@ export function convertStringArray(value: string): string[] {
  * @param value comma separated number string, e.g. "111,222,333,444"
  * Any items that are not number will be filter out.
  */
-export function convertNumberArray(value: string): number[] {
+export function convertNumberArray(value: any, fieldName?: string): number[] {
   const arr = value.split(",");
   return arr
     .map((item) => trim(item))
     .filter((item) => item !== "")
-    .map((item) => convertNumber(item.trim()))
+    .map((item) => convertNumber(item.trim(), fieldName))
     .filter((item) => typeof item === "number" && !isNaN(item)) as number[];
 }
 
@@ -288,12 +288,12 @@ export function convertNumberArray(value: string): number[] {
  * convert comma separated boolean string into array of boolean
  * @param value
  */
-export function convertBooleanArray(value: string): boolean[] {
+export function convertBooleanArray(value: any, fieldName?: string): boolean[] {
   const arr = value.split(",");
   return arr
     .map((item) => trim(item))
     .filter((item) => item !== "")
-    .map((item) => convertBoolean(item.trim())) as boolean[];
+    .map((item) => convertBoolean(item.trim(), fieldName)) as boolean[];
 }
 
 /**
@@ -309,7 +309,7 @@ export function convertBooleanArray(value: string): boolean[] {
  * Any item in the value string has no key or value will be filtered out.
  *
  */
-export function convertMap(value: string): { [key: string]: any } {
+export function convertMap(value: any, fieldName?: string): { [key: string]: any } {
   const regx = /:(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/;
   const items = value
     .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
@@ -336,7 +336,7 @@ export function convertMap(value: string): { [key: string]: any } {
   return map;
 }
 
-export function convertDate(value: string) {
+export function convertDate(value: any, fieldName?: string) {
   if (isNumber(value)) {
     const dateNum = convertNumber(value);
     const excelEpoc = new Date(1900, 0, -1).getTime();

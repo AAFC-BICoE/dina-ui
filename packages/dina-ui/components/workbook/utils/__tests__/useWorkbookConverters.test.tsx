@@ -20,10 +20,14 @@ const mockConfig: FieldMappingConfigType = {
     booleanField: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     stringArrayField: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
     numberArrayField: { dataType: WorkbookDataTypeEnum.NUMBER_ARRAY },
-    mapField: { dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES },
+    mapField: {
+      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+      endpoint: "managed attribute endpoint",
+      managedAttributeComponent: "component"
+    },
     vocabularyField: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
-      vocabularyEndpoint: "vocabulary endpoint"
+      endpoint: "vocabulary endpoint"
     },
     objectField: {
       dataType: WorkbookDataTypeEnum.OBJECT,
