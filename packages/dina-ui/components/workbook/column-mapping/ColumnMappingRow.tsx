@@ -1,6 +1,7 @@
+import { useFormikContext } from "formik";
 import { startCase } from "lodash";
 import { useMemo, useState } from "react";
-import { SelectField } from "../../../../common-ui/lib";
+import { CheckBoxField, SelectField } from "../../../../common-ui/lib";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import {
@@ -121,10 +122,12 @@ export function ColumnMappingRow({
   const fieldPath = workbookColumnMap[columnName]?.fieldPath;
   return (
     <div className="row">
-      <div className="col-md-4 mt-3">{columnName}</div>
-      <div className="col-md-4">
+      <div className="col-md-3 d-flex align-items-center justify-content-start">
+        {columnName}
+      </div>
+      <div className="col-md-3">
         <SelectField
-          name={`fieldMap[${columnIndex}]`}
+          name={`fieldMap[${columnIndex}].targetField`}
           options={fieldOptions}
           selectProps={{ isClearable: true }}
           hideLabel={true}
@@ -135,11 +138,17 @@ export function ColumnMappingRow({
           }}
         />
       </div>
-      <div className="col-md-4 mt-2">
+      <div className="col-md-3 d-flex align-items-center">
+        <CheckBoxField
+          name={`fieldMap[${columnIndex}].skipped`}
+          hideLabel={true}
+        />
+      </div>
+      <div className="col-md-3 d-flex align-items-center">
         {showMapRelationshipCheckbox(columnIndex, fieldPath) && (
           <input
             type="checkbox"
-            className="mt-2"
+            className="mb-2"
             id={`${columnName}-map-relationship`}
             checked={checked}
             onChange={(e) => {

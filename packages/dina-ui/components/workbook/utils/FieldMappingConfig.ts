@@ -18,6 +18,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
     preparationSubstrate: { dataType: WorkbookDataTypeEnum.STRING },
     preparationDate: { dataType: WorkbookDataTypeEnum.DATE },
     preparationRemarks: { dataType: WorkbookDataTypeEnum.STRING },
+    preparationManagedAttributes: {dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES},
     description: { dataType: WorkbookDataTypeEnum.STRING },
     dwcDegreeOfEstablishment: { dataType: WorkbookDataTypeEnum.STRING },
     barcode: { dataType: WorkbookDataTypeEnum.STRING },

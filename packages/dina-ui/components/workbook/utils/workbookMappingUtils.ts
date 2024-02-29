@@ -5,6 +5,7 @@ import {
   WorkbookJSON,
   WorkbookRow
 } from "../types/Workbook";
+import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
@@ -95,14 +96,14 @@ export function findMatchField(
  *
  * @param spreadsheetData Whole spreadsheet data to retrieve the headers from.
  * @param sheetNumber the sheet index (starting from 0) to pull the header columns from.
- * @param fieldNames
+ * @param fieldMaps
  * @param getRowNumber (optional) - if yes, gets the corresponding row number in the workbook for the row data
  * @returns
  */
 export function getDataFromWorkbook(
   spreadsheetData: WorkbookJSON | undefined,
   sheetNumber: number,
-  fieldNames: (string | undefined)[],
+  fieldMaps: FieldMapType[],
   getRowNumber?: boolean
 ) {
   const data: { [key: string]: any }[] = [];
@@ -112,10 +113,10 @@ export function getDataFromWorkbook(
   for (let i = 1; i < (workbookData?.length ?? 0); i++) {
     const row = workbookData?.[i];
     const rowData: { [key: string]: any } = {};
-    for (let index = 0; index < fieldNames.length; index++) {
-      const field = fieldNames[index];
-      if (field !== undefined) {
-        rowData[field] = row?.content[index];
+    for (let index = 0; index < fieldMaps.length; index++) {
+      const fieldMap = fieldMaps[index];
+      if (!fieldMap?.skipped) {
+        rowData[fieldMap.targetField!] = row?.content[index];
       }
     }
     if (!!getRowNumber) {
@@ -181,7 +182,7 @@ export function isBooleanArray(value: string): boolean {
  */
 export function isMap(value: string): boolean {
   const regex =
-    /^[a-zA-Z_]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+))(?:,\s*[a-zA-Z_]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+)))*$/;
+    /^[a-zA-Z_0-9]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+))(?:,\s*[a-zA-Z_0-9]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+)))*$/;
   return !!value && regex.test(value);
 }
 

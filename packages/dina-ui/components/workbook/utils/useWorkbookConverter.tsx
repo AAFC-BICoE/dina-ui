@@ -59,11 +59,11 @@ export function useWorkbookConverter(
    *      dataType: 'object',
    *      attributes: { name: [Object], age: [Object] }
    *      relationshipConfig: {
-            baseApiPath: "fake-api",
-            hasGroup: true,
-            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-            type: "object-field"
-          }
+   *         baseApiPath: "fake-api",
+   *         hasGroup: true,
+   *         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+   *         type: "object-field"
+   *       }
    *    },
    *    'objectField.name': { dataType: 'string' },
    *    'objectField.age': { dataType: 'number' }

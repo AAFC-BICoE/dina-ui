@@ -171,7 +171,7 @@ describe("workbookMappingUtils functions", () => {
             ]
           },
           0, // Return first sheet.
-          ["field1", "field2", "field3"]
+          [{targetField: "field1", skipped: false}, {targetField: "field2", skipped: false}, {targetField: "field3", skipped: false}, {targetField: "field4", skipped: true}]
         )
       ).toEqual([
         {
@@ -197,7 +197,7 @@ describe("workbookMappingUtils functions", () => {
         getDataFromWorkbook(
           undefined,
           0, // Return first sheet.
-          ["field1", "field2", "field3"]
+          [{targetField: "field1", skipped: false}, {targetField: "field2", skipped: false}, {targetField: "field3", skipped: false}]
         )
       ).toEqual([]);
     });
@@ -266,7 +266,7 @@ describe("workbookMappingUtils functions", () => {
   });
 
   it("isMap", () => {
-    expect(isMap("asdfa : asdfas")).toBeTruthy();
+    expect(isMap("asdfa_1 : asdfas")).toBeTruthy();
     expect(isMap("asdfas: asdfas, adsfasf:asdfasf")).toBeTruthy();
     expect(isMap('asdf:"asdfa  sdfdsf"')).toBeTruthy();
     expect(isMap('asdf:"asdfa sdfdsf" : asd : "sdfsdf "sdf sdf')).toBeFalsy();
@@ -274,6 +274,8 @@ describe("workbookMappingUtils functions", () => {
     expect(isMap('asdf:"asdfa sdfdsf')).toBeFalsy();
     expect(isMap('asdf:asdfa sdfdsf", "sdfsdf "sdf sdf')).toBeFalsy();
     expect(isMap('asdf:"asdfa sdfdsf", asd : "sdfsdf "sdf sdf')).toBeFalsy();
+    expect(isMap("attr_1:ddddss, attr_2:sssddd")).toBeTruthy();
+    expect(isMap("attr_1: 222, attr_2: true")).toBeTruthy();
   });
 
   it("convertNumber", () => {
