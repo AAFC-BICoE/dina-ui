@@ -492,7 +492,7 @@ export function useWorkbookConverter(
                 !Array.isArray(childValue)
               ) {
                 valueToLink =
-                  columnMap[fieldPath + "." + attrNameInValue]?.[childValue];
+                  columnMap[fieldPath + "." + attrNameInValue]?.[childValue.trim()];
                 if (valueToLink) {
                   break;
                 }
@@ -612,7 +612,7 @@ export function useWorkbookConverter(
                   !Array.isArray(childValue)
                 ) {
                   valueToLink =
-                    columnMap[fieldPath + "." + attrNameInValue]?.[childValue];
+                    columnMap[fieldPath + "." + attrNameInValue]?.[childValue.trim()];
                   if (valueToLink) {
                     break;
                   }

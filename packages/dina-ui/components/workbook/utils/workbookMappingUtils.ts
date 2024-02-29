@@ -37,7 +37,10 @@ export function _toPlainString(value: string) {
 }
 
 const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
-  ["parent.", "parentMaterialSample."]
+  ["parent.", "parentMaterialSample."],
+  ["parent id", "parentMaterialSample.materialSampleName"],
+  ["preparationMethod", "preparationMethod.name"],
+  ["preparation method", "preparationMethod.name"]
 ]);
 
 /**
@@ -58,6 +61,10 @@ export function findMatchField(
     }[];
   }[]
 ) {
+  let columnHeader2 : string = columnHeader.toLowerCase().trim();
+  if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {
+    columnHeader2 = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(columnHeader2)!;
+  }
   const plainOptions: { label: string; value: string }[] = [];
   for (const opt of fieldOptions) {
     if (opt.options) {
@@ -69,23 +76,24 @@ export function findMatchField(
     }
   }
   const option = find(plainOptions, (item) => {
-    const pos = columnHeader.lastIndexOf(".");
+    const pos = columnHeader2.lastIndexOf(".");
     if (pos !== -1) {
-      let prefix = columnHeader.substring(0, pos + 1);
+      
+      let prefix = columnHeader2.substring(0, pos + 1);
       if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
         prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
       }
       if (
         item.value.startsWith(prefix) &&
         _toPlainString(item.label) ===
-          _toPlainString(columnHeader.substring(pos + 1))
+          _toPlainString(columnHeader2.substring(pos + 1))
       ) {
         return true;
       } else {
         return false;
       }
     } else {
-      return _toPlainString(item.label) === _toPlainString(columnHeader);
+      return _toPlainString(item.label) === _toPlainString(columnHeader2);
     }
   });
   return option ? option.value : undefined;
