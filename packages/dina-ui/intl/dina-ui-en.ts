@@ -904,7 +904,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
   proceedWithSkippedColumn: "Proceed with Skipped Columns?",
-  areYouSureImportWorkbookWithSkippedColumns: "Are you sure you want to import the workbook with skipped columns?",
+  areYouSureImportWorkbookWithSkippedColumns:
+    "Are you sure you want to import the workbook with skipped columns?",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
@@ -930,6 +931,5 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_openedDate: "Opened Date",
   field_closedDate: "Closed Date",
   field_dueDate: "Due Date",
-  unauthorized: "Unauthorized",
-  failedToRenderFile: "Failed to render file"
+  unauthorized: "Unauthorized"
 };
