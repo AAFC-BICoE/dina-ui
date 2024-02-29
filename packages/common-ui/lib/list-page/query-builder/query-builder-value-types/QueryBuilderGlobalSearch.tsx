@@ -2,7 +2,7 @@ import { useIntl } from "react-intl";
 import { TransformToDSLProps } from "../../types";
 import { useSessionStorage } from "usehooks-ts";
 import { useEffect } from "react";
-import { Tooltip } from "packages/common-ui/lib/tooltip/Tooltip";
+import { Tooltip } from "common-ui";
 
 export const SHORTCUT_GLOBAL_SEARCH_QUERY = "globalSearchShortcut";
 
