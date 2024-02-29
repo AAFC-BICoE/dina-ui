@@ -132,15 +132,15 @@ export function useWorkbookConverter(
       convertManagedAttributesFromString,
     [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
     [WorkbookDataTypeEnum.DATE]: convertDate,
-    [WorkbookDataTypeEnum.STRING]: (value: any, fieldName?: string) => value,
-    [WorkbookDataTypeEnum.VOCABULARY]: (value: any, fieldName?: string) => value
+    [WorkbookDataTypeEnum.STRING]: (value: any, _fieldName?: string) => value,
+    [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) => value
   };
 
   /**
    * The data structure in the flatternedConfig is like this
    * {
    *    stringArrayField: { dataType: 'string[]' },
-   *    vocabularyField: { dataType: 'vocabulary', vocabularyEndpoint: 'vocabulary endpoint' },
+   *    vocabularyField: { dataType: 'vocabulary', endpoint: 'vocabulary endpoint' },
    *    objectField: {
    *      dataType: 'object',
    *      attributes: { name: [Object], age: [Object] }
