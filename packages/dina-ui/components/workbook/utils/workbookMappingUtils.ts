@@ -235,7 +235,7 @@ export function isValidManagedAttribute(
  * @param value string
  * @returns number
  */
-export function convertNumber(value: any, fieldName?: string): number | null {
+export function convertNumber(value: any, _fieldName?: string): number | null {
   if (value !== null && value !== undefined && value !== "" && !isNaN(+value)) {
     return +value;
   } else {
@@ -248,7 +248,7 @@ export function convertNumber(value: any, fieldName?: string): number | null {
  * @param value string, it can be 'true', 'false', 'yes', or 'no'
  * @returns boolean
  */
-export function convertBoolean(value: any, fieldName?: string): boolean {
+export function convertBoolean(value: any, _fieldName?: string): boolean {
   const strBoolean = String(value).toLowerCase().trim();
   if (strBoolean === "false" || strBoolean === "no" || strBoolean === "0") {
     return false;
@@ -264,7 +264,7 @@ export function convertBoolean(value: any, fieldName?: string): boolean {
  * @param value Comma separated string, e.g.  `asdb,deeasdf,sdf,"sdf,sadf" , sdfd`
  *
  */
-export function convertStringArray(value: any, fieldName?: string): string[] {
+export function convertStringArray(value: any, _fieldName?: string): string[] {
   const arr = value.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
   return arr.map((str) => trim(trim(str, '"')));
 }
@@ -309,7 +309,7 @@ export function convertBooleanArray(value: any, fieldName?: string): boolean[] {
  * Any item in the value string has no key or value will be filtered out.
  *
  */
-export function convertMap(value: any, fieldName?: string): { [key: string]: any } {
+export function convertMap(value: any, _fieldName?: string): { [key: string]: any } {
   const regx = /:(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/;
   const items = value
     .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
@@ -336,7 +336,7 @@ export function convertMap(value: any, fieldName?: string): { [key: string]: any
   return map;
 }
 
-export function convertDate(value: any, fieldName?: string) {
+export function convertDate(value: any, _fieldName?: string) {
   if (isNumber(value)) {
     const dateNum = convertNumber(value);
     const excelEpoc = new Date(1900, 0, -1).getTime();
