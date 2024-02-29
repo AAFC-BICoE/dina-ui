@@ -93,7 +93,7 @@ export function WorkbookColumnMapping({
     flattenedConfig,
     getPathOfField,
     getFieldRelationshipConfig,
-    isFieldInALinkableRelationshipField
+    FIELD_TO_VOCAB_ELEMS_MAP
   } = useWorkbookConverter(
     FieldMappingConfig,
     selectedType?.value || "material-sample"
@@ -128,41 +128,7 @@ export function WorkbookColumnMapping({
     }
   }, [spreadsheetData]);
 
-  // Have to load end-points up front, save all responses in a map
-  const FIELD_TO_VOCAB_ELEMS_MAP = new Map();
-
-  Object.keys(FieldMappingConfig).forEach((recordType) => {
-    const recordFieldsMap = FieldMappingConfig[recordType];
-    Object.keys(recordFieldsMap).forEach((recordField) => {
-      const { dataType, endpoint } = recordFieldsMap[recordField];
-      switch (dataType) {
-        case WorkbookDataTypeEnum.VOCABULARY:
-          if (endpoint) {
-            const query: any = useQuery({
-              path: endpoint
-            });
-            const vocabElements =
-              query?.response?.data?.vocabularyElements?.map(
-                (vocabElement) => vocabElement.name
-              );
-            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
-          }
-          break;
-        case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
-          if (endpoint) {
-            // load available Managed Attributes
-            const query: any = useQuery({
-              path: endpoint
-            });
-            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, query?.response?.data);
-          }
-          break;
-        default:
-          break;
-      }
-    });
-  });
-
+  
   // Generate field options
   const fieldOptions = useMemo(() => {
     if (!!selectedType) {
