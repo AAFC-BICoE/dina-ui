@@ -2,6 +2,7 @@ import { useIntl } from "react-intl";
 import { TransformToDSLProps } from "../../types";
 import { useSessionStorage } from "usehooks-ts";
 import { useEffect } from "react";
+import { Tooltip } from "packages/common-ui/lib/tooltip/Tooltip";
 
 export const SHORTCUT_GLOBAL_SEARCH_QUERY = "globalSearchShortcut";
 
@@ -40,15 +41,24 @@ export default function QueryRowGlobalSearchSearch({
   }, [globalSearchQuery, setValue, value]);
 
   return (
-    <input
-      type="text"
-      value={value ?? ""}
-      onChange={(newValue) => setValue?.(newValue?.target?.value)}
-      className="form-control"
-      placeholder={formatMessage({
-        id: "queryBuilder_value_text_placeholder"
-      })}
-    />
+    <div className="input-group">
+      <input
+        type="text"
+        value={value ?? ""}
+        onChange={(newValue) => setValue?.(newValue?.target?.value)}
+        className="form-control"
+        placeholder={formatMessage({
+          id: "queryBuilder_value_text_placeholder"
+        })}
+      />
+
+      <Tooltip
+        id={"queryBuilder_globalSearch_tooltip"}
+        link={"https://aafc-bicoe.github.io/dina-documentation/#global_search_syntax"}
+        linkText="queryBuilder_globalSearch_tooltipLink"
+        placement="left"
+      />
+    </div>
   );
 };
 
