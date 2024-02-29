@@ -42,6 +42,7 @@ import { ColumnMappingRow } from "./ColumnMappingRow";
 
 export type FieldMapType = {
   targetField: string | undefined;
+  targetKey?: string; // When targetField is managedAttribute, targetKey stores the key of the managed attribute
   skipped: boolean;
 };
 
@@ -327,9 +328,7 @@ export function WorkbookColumnMapping({
   const sheetValue = sheetOptions[sheet];
 
   async function onSubmit({ submittedValues }) {
-    if (
-      submittedValues.fieldMap.filter((item) => item.skipped).length > 0
-    ) {
+    if (submittedValues.fieldMap.filter((item) => item.skipped).length > 0) {
       // Ask the user if they sure they want to delete the saved search.
       openModal(
         <AreYouSureModal
@@ -378,7 +377,9 @@ export function WorkbookColumnMapping({
             if (
               fieldMap.targetField !== undefined &&
               fieldMaps.filter(
-                (item) => item.targetField === fieldMap.targetField
+                (item) =>
+                  item.targetField + (item.targetKey ?? "") ===
+                  fieldMap.targetField + (fieldMap.targetKey ?? "")
               ).length > 1
             ) {
               errors.push(
@@ -643,13 +644,13 @@ export function WorkbookColumnMapping({
                     <div className="col-md-3">
                       <DinaMessage id="spreadsheetHeader" />
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-6">
                       <DinaMessage id="materialSampleFieldsMapping" />
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-1">
                       <DinaMessage id="skipColumn" />
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-2">
                       <DinaMessage id="mapRelationship" />
                     </div>
                   </div>
