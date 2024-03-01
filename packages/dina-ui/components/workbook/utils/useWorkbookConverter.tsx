@@ -62,7 +62,7 @@ export function useWorkbookConverter(
           case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
             if (endpoint) {
               // load available Managed Attributes
-              apiClient.get(endpoint, { page: { limit: 1000 } }).then((response) => {
+              apiClient.get(endpoint, {}).then((response) => {
                 fieldToVocabElemsMap.set(recordField, response.data);
               });
             }
