@@ -482,11 +482,11 @@ export function QueryPage<TData extends KitsuResource>({
     setElasticSearchQuery({ ...queryDSL });
 
     if (
-      isInitialQueryFinished.current == false ||
+      isInitialQueryFinished.current === false ||
       isActionTriggeredQuery.current
     ) {
       setLoading(true);
-      if (isInitialQueryFinished.current == false) {
+      if (isInitialQueryFinished.current === false) {
         isInitialQueryFinished.current = true;
       }
       // Fetch data using elastic search.
