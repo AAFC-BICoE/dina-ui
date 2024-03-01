@@ -314,19 +314,20 @@ function getAttributesExtensionValuesColumns(
   queryOption: QueryOption,
   setColumnSelectorIndexMapColumns?: React.Dispatch<any>
 ) {
-  for (const extensionValue of extensionValues) {
-    getAttributeExtensionValuesColumn(
-      extensionValue,
-      queryOption,
-      setColumnSelectorIndexMapColumns
-    );
-  }
+  const totalAttributesExtensionValuesCols: any[] = [].concat(
+    ...extensionValues?.map((extensionValue) =>
+      getAttributeExtensionValuesColumn(extensionValue, queryOption)
+    )
+  );
+  setColumnSelectorIndexMapColumns?.((currentColumns) => [
+    ...currentColumns,
+    ...totalAttributesExtensionValuesCols
+  ]);
 }
 
 function getAttributeExtensionValuesColumn(
   extensionValue: any,
-  queryOption: QueryOption,
-  setColumnSelectorIndexMapColumns?: React.Dispatch<any>
+  queryOption: QueryOption
 ) {
   const extensionFields = extensionValue.extension.fields;
   const attributeExtensionValuesColumns = extensionFields?.map(
@@ -337,10 +338,7 @@ function getAttributeExtensionValuesColumn(
         extensionField
       )
   );
-  setColumnSelectorIndexMapColumns?.((currentColumns) => [
-    ...currentColumns,
-    ...attributeExtensionValuesColumns
-  ]);
+  return attributeExtensionValuesColumns;
 }
 
 export function getAttributeExtensionFieldColumn(
@@ -440,19 +438,20 @@ function getIncludedExtensionValuesColumns(
   queryOption: QueryOption,
   setColumnSelectorIndexMapColumns?: React.Dispatch<any>
 ) {
-  for (const extensionValue of extensionValues) {
-    getIncludedExtensionValuesColumn(
-      extensionValue,
-      queryOption,
-      setColumnSelectorIndexMapColumns
-    );
-  }
+  const totalIncludedExtensionValuesCols: any[] = [].concat(
+    ...extensionValues?.map((extensionValue) =>
+      getIncludedExtensionValuesColumn(extensionValue, queryOption)
+    )
+  );
+  setColumnSelectorIndexMapColumns?.((currentColumns) => [
+    ...currentColumns,
+    ...totalIncludedExtensionValuesCols
+  ]);
 }
 
 function getIncludedExtensionValuesColumn(
   extensionValue: any,
-  queryOption: QueryOption,
-  setColumnSelectorIndexMapColumns?: React.Dispatch<any>
+  queryOption: QueryOption
 ) {
   const extensionFields = extensionValue.extension.fields;
   const includedExtensionValuesColumns = extensionFields?.map(
@@ -463,11 +462,7 @@ function getIncludedExtensionValuesColumn(
         extensionField
       )
   );
-
-  setColumnSelectorIndexMapColumns?.((currentColumns) => [
-    ...currentColumns,
-    ...includedExtensionValuesColumns
-  ]);
+  return includedExtensionValuesColumns;
 }
 
 export function getIncludedExtensionFieldColumn(
