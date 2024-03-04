@@ -270,14 +270,17 @@ export function ColumnSelector<TData>({
           ref={ref}
           style={{
             ...props.style,
-            width: "400px",
-            padding: "20px",
+            width: "25rem",
+            padding: "0 1.25rem 1.25rem 1.25rem",
+
             zIndex: 1
           }}
           className={props.className}
           aria-labelledby={props.labelledBy}
         >
-          {!menuOnly && (
+          {menuOnly ? (
+            <strong>{<DinaMessage id="exportColumns" />}</strong>
+          ) : (
             <div>
               {" "}
               <strong>{<FieldHeader name="filterColumns" />}</strong>
