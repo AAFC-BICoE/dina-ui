@@ -37,7 +37,10 @@ export function _toPlainString(value: string) {
 }
 
 const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
-  ["parent.", "parentMaterialSample."]
+  ["parent.", "parentMaterialSample."],
+  ["parent id", "parentMaterialSample.materialSampleName"],
+  ["preparationMethod", "preparationMethod.name"],
+  ["preparation method", "preparationMethod.name"]
 ]);
 
 /**
@@ -58,6 +61,10 @@ export function findMatchField(
     }[];
   }[]
 ) {
+  let columnHeader2 : string = columnHeader.toLowerCase().trim();
+  if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {
+    columnHeader2 = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(columnHeader2)!;
+  }
   const plainOptions: { label: string; value: string }[] = [];
   for (const opt of fieldOptions) {
     if (opt.options) {
@@ -69,23 +76,24 @@ export function findMatchField(
     }
   }
   const option = find(plainOptions, (item) => {
-    const pos = columnHeader.lastIndexOf(".");
+    const pos = columnHeader2.lastIndexOf(".");
     if (pos !== -1) {
-      let prefix = columnHeader.substring(0, pos + 1);
+      
+      let prefix = columnHeader2.substring(0, pos + 1);
       if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
         prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
       }
       if (
         item.value.startsWith(prefix) &&
         _toPlainString(item.label) ===
-          _toPlainString(columnHeader.substring(pos + 1))
+          _toPlainString(columnHeader2.substring(pos + 1))
       ) {
         return true;
       } else {
         return false;
       }
     } else {
-      return _toPlainString(item.label) === _toPlainString(columnHeader);
+      return _toPlainString(item.label) === _toPlainString(columnHeader2);
     }
   });
   return option ? option.value : undefined;
@@ -235,7 +243,7 @@ export function isValidManagedAttribute(
  * @param value string
  * @returns number
  */
-export function convertNumber(value: any): number | null {
+export function convertNumber(value: any, _fieldName?: string): number | null {
   if (value !== null && value !== undefined && value !== "" && !isNaN(+value)) {
     return +value;
   } else {
@@ -248,7 +256,7 @@ export function convertNumber(value: any): number | null {
  * @param value string, it can be 'true', 'false', 'yes', or 'no'
  * @returns boolean
  */
-export function convertBoolean(value: any): boolean {
+export function convertBoolean(value: any, _fieldName?: string): boolean {
   const strBoolean = String(value).toLowerCase().trim();
   if (strBoolean === "false" || strBoolean === "no" || strBoolean === "0") {
     return false;
@@ -264,7 +272,7 @@ export function convertBoolean(value: any): boolean {
  * @param value Comma separated string, e.g.  `asdb,deeasdf,sdf,"sdf,sadf" , sdfd`
  *
  */
-export function convertStringArray(value: string): string[] {
+export function convertStringArray(value: any, _fieldName?: string): string[] {
   const arr = value.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
   return arr.map((str) => trim(trim(str, '"')));
 }
@@ -275,12 +283,12 @@ export function convertStringArray(value: string): string[] {
  * @param value comma separated number string, e.g. "111,222,333,444"
  * Any items that are not number will be filter out.
  */
-export function convertNumberArray(value: string): number[] {
+export function convertNumberArray(value: any, fieldName?: string): number[] {
   const arr = value.split(",");
   return arr
     .map((item) => trim(item))
     .filter((item) => item !== "")
-    .map((item) => convertNumber(item.trim()))
+    .map((item) => convertNumber(item.trim(), fieldName))
     .filter((item) => typeof item === "number" && !isNaN(item)) as number[];
 }
 
@@ -288,12 +296,12 @@ export function convertNumberArray(value: string): number[] {
  * convert comma separated boolean string into array of boolean
  * @param value
  */
-export function convertBooleanArray(value: string): boolean[] {
+export function convertBooleanArray(value: any, fieldName?: string): boolean[] {
   const arr = value.split(",");
   return arr
     .map((item) => trim(item))
     .filter((item) => item !== "")
-    .map((item) => convertBoolean(item.trim())) as boolean[];
+    .map((item) => convertBoolean(item.trim(), fieldName)) as boolean[];
 }
 
 /**
@@ -309,7 +317,7 @@ export function convertBooleanArray(value: string): boolean[] {
  * Any item in the value string has no key or value will be filtered out.
  *
  */
-export function convertMap(value: string): { [key: string]: any } {
+export function convertMap(value: any, _fieldName?: string): { [key: string]: any } {
   const regx = /:(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/;
   const items = value
     .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
@@ -336,7 +344,7 @@ export function convertMap(value: string): { [key: string]: any } {
   return map;
 }
 
-export function convertDate(value: string) {
+export function convertDate(value: any, _fieldName?: string) {
   if (isNumber(value)) {
     const dateNum = convertNumber(value);
     const excelEpoc = new Date(1900, 0, -1).getTime();
