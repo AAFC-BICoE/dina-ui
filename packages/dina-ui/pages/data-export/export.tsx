@@ -312,7 +312,7 @@ export default function ExportPage<TData extends KitsuResource>() {
           )}
           <Link href={`/data-export/list?entityLink=${entityLink}`}>
             <a className="btn btn-primary">
-              <DinaMessage id="dataExports" />
+              <DinaMessage id="viewExportHistoryButton" />
             </a>
           </Link>
         </ButtonBar>

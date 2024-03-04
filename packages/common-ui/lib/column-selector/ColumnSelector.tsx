@@ -277,33 +277,40 @@ export function ColumnSelector<TData>({
           className={props.className}
           aria-labelledby={props.labelledBy}
         >
-          <strong>{<FieldHeader name="filterColumns" />}</strong>
-          <input
-            autoFocus={true}
-            name="filterColumns"
-            className="form-control"
-            type="text"
-            placeholder="Search"
-            value={filterColumsValue}
-            onChange={(event) => {
-              const value = event.target.value;
-              setFilterColumnsValue(value);
-              if (value === "" || !value) {
-                setSearchedColumns(reactTable?.getAllLeafColumns());
-              } else {
-                const searchedColumnsIds = columnSearchMapping
-                  ?.filter((columnMapping) =>
-                    columnMapping.label.includes(value?.toLowerCase())
-                  )
-                  .map((filteredMapping) => filteredMapping.id);
-                const filteredColumns = reactTable
-                  ?.getAllLeafColumns()
-                  .filter((column) => searchedColumnsIds?.includes(column.id));
-                setSearchedColumns(filteredColumns);
-              }
-            }}
-          />
-          <Dropdown.Divider />
+          {!menuOnly && (
+            <div>
+              {" "}
+              <strong>{<FieldHeader name="filterColumns" />}</strong>
+              <input
+                autoFocus={true}
+                name="filterColumns"
+                className="form-control"
+                type="text"
+                placeholder="Search"
+                value={filterColumsValue}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setFilterColumnsValue(value);
+                  if (value === "" || !value) {
+                    setSearchedColumns(reactTable?.getAllLeafColumns());
+                  } else {
+                    const searchedColumnsIds = columnSearchMapping
+                      ?.filter((columnMapping) =>
+                        columnMapping.label.includes(value?.toLowerCase())
+                      )
+                      .map((filteredMapping) => filteredMapping.id);
+                    const filteredColumns = reactTable
+                      ?.getAllLeafColumns()
+                      .filter((column) =>
+                        searchedColumnsIds?.includes(column.id)
+                      );
+                    setSearchedColumns(filteredColumns);
+                  }
+                }}
+              />
+              <Dropdown.Divider />
+            </div>
+          )}
           {
             <div className="d-flex gap-2">
               {!menuOnly && (

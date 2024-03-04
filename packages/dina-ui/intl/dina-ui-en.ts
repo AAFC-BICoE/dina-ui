@@ -927,5 +927,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_closedDate: "Closed Date",
   field_dueDate: "Due Date",
   unauthorized: "Unauthorized",
-  failedToRenderFile: "Failed to render file"
+  failedToRenderFile: "Failed to render file",
+  viewExportHistoryButton: "View Export History"
 };
