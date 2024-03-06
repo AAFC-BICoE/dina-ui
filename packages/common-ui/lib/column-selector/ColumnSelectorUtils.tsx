@@ -1,6 +1,6 @@
 import { FieldHeader, dateCell } from "..";
 import { DynamicField, ESIndexMapping } from "../list-page/types";
-import Kitsu from "kitsu";
+import Kitsu, { GetParams } from "kitsu";
 import lodash, { get, startCase } from "lodash";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -183,14 +183,17 @@ async function getManagedAttributesColumns(
   apiClient: Kitsu,
   setColumnSelectorIndexMapColumns?: React.Dispatch<any>
 ) {
-  const filter = {
-    managedAttributeComponent: queryOption.dynamicField?.component
+  const params = {
+    filter: {
+      managedAttributeComponent: queryOption.dynamicField?.component ?? ""
+    },
+    page: { limit: 1000 }
   };
   try {
     const managedAttributes = await fetchDynamicField(
       apiClient,
       queryOption.dynamicField?.apiEndpoint,
-      filter
+      params
     );
     if (queryOption.parentType) {
       // Handle included managed attribute
@@ -372,11 +375,8 @@ export function getAttributeExtensionFieldColumn(
 }
 
 // Fetch filtered dynamic field from back end
-async function fetchDynamicField(apiClient: Kitsu, path, filter?: any) {
-  const { data } = await apiClient.get(path, {
-    filter,
-    page: { limit: 1000 }
-  });
+async function fetchDynamicField(apiClient: Kitsu, path, params?: GetParams) {
+  const { data } = await apiClient.get(path, params ?? {});
 
   return data;
 }
@@ -404,14 +404,18 @@ async function getExtensionValuesColumns(
   apiClient: Kitsu,
   setColumnSelectorIndexMapColumns?: React.Dispatch<any>
 ) {
-  const filter = {
-    "extension.fields.dinaComponent": queryOption.dynamicField?.component
+  const params = {
+    filter: {
+      "extension.fields.dinaComponent":
+        queryOption.dynamicField?.component ?? ""
+    },
+    page: { limit: 1000 }
   };
   try {
     const extensionValues = await fetchDynamicField(
       apiClient,
       queryOption.dynamicField?.apiEndpoint,
-      filter
+      params
     );
     if (queryOption.parentType) {
       // Handle included extension values
