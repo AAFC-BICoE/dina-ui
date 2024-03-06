@@ -41,7 +41,7 @@ import { VisibilityState, Table } from "@tanstack/react-table";
 import { compact } from "lodash";
 import { Button } from "react-bootstrap";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
-import { DataExport } from "packages/dina-ui/types/dina-export-api";
+import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
 import { useFormikContext } from "formik";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
@@ -64,6 +64,8 @@ export default function ExportPage<TData extends KitsuResource>() {
   );
 
   const [dataExportError, setDataExportError] = useState<JSX.Element>();
+
+  const [exportType, setExportType] = useState<ExportType>("TABULAR_DATA");
 
   // Local storage for Export Objects
   const [localStorageExportObjectIds, setLocalStorageExportObjectIds] =
@@ -280,36 +282,6 @@ export default function ExportPage<TData extends KitsuResource>() {
             entityLink={entityLink}
             byPassView={true}
           />
-          <SubmitButton
-            buttonProps={(formik) => ({
-              style: { width: "8rem" },
-              disabled: loading,
-              onClick: () => {
-                exportData(formik);
-              }
-            })}
-          >
-            <DinaMessage id="exportButtonText" />
-          </SubmitButton>
-          {uniqueName === "object-store-list" && (
-            <div className="me-2">
-              {" "}
-              <Button
-                disabled={loading || disableObjectExportButton}
-                className="btn btn-primary"
-                onClick={exportObjects}
-              >
-                {loading ? (
-                  <LoadingSpinner loading={loading} />
-                ) : (
-                  formatMessage({ id: "exportObjectsButtonText" })
-                )}
-              </Button>
-              {disableObjectExportButton && (
-                <Tooltip id="exportObjectsMaxLimitTooltip" />
-              )}
-            </div>
-          )}
           <Link href={`/data-export/list?entityLink=${entityLink}`}>
             <a className="btn btn-primary">
               <DinaMessage id="viewExportHistoryButton" />
@@ -326,6 +298,65 @@ export default function ExportPage<TData extends KitsuResource>() {
             customName="dataExportName"
             className="col-md-2"
           />
+          <div className="mb-2">
+            <span style={{ padding: "0 1.25rem 0 1.25rem" }}>
+              <label>
+                <input
+                  type="radio"
+                  name="export"
+                  id="data"
+                  checked={exportType === "TABULAR_DATA"}
+                  onClick={() => {
+                    setExportType("TABULAR_DATA");
+                  }}
+                  className="me-1"
+                />
+                <DinaMessage id="dataLabel" />
+              </label>
+            </span>
+            {uniqueName === "object-store-list" && (
+              <span style={{ paddingRight: "1.25rem" }}>
+                <label
+                  style={{
+                    color: disableObjectExportButton ? "grey" : undefined
+                  }}
+                >
+                  {" "}
+                  <input
+                    type="radio"
+                    name="export"
+                    id="objects"
+                    checked={exportType === "OBJECT_ARCHIVE"}
+                    onClick={() => {
+                      setExportType("OBJECT_ARCHIVE");
+                    }}
+                    disabled={disableObjectExportButton}
+                    className="me-1"
+                  />
+                  <DinaMessage id="objectsLabel" />
+                </label>
+              </span>
+            )}
+            <SubmitButton
+              buttonProps={(formik) => ({
+                style: { width: "8rem" },
+                disabled: loading,
+                onClick: () => {
+                  if (exportType === "TABULAR_DATA") {
+                    exportData(formik);
+                  } else {
+                    exportObjects();
+                  }
+                }
+              })}
+            >
+              <DinaMessage id="exportButtonText" />
+            </SubmitButton>
+            {uniqueName === "object-store-list" &&
+              disableObjectExportButton && (
+                <Tooltip id="exportObjectsMaxLimitTooltip" />
+              )}
+          </div>
           {columnSelector}
         </div>
 

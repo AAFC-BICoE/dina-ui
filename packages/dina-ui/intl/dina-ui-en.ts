@@ -929,5 +929,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   unauthorized: "Unauthorized",
   failedToRenderFile: "Failed to render file",
   viewExportHistoryButton: "View Export History",
-  exportColumns: "Export Columns:"
+  exportColumns: "Export Columns:",
+  dataLabel: "Data",
+  objectsLabel: "Objects"
 };
