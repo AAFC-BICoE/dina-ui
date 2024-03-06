@@ -374,7 +374,8 @@ export function getAttributeExtensionFieldColumn(
 // Fetch filtered dynamic field from back end
 async function fetchDynamicField(apiClient: Kitsu, path, filter?: any) {
   const { data } = await apiClient.get(path, {
-    filter
+    filter,
+    page: { limit: 1000 }
   });
 
   return data;
