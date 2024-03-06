@@ -148,7 +148,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
               onClick={onCheckAllCheckBoxClick}
               style={{ height: "20px", width: "20px", marginLeft: "5px" }}
               type="checkbox"
-              checked={value || false}
+              defaultChecked={value || false}
             />
           );
         }}
