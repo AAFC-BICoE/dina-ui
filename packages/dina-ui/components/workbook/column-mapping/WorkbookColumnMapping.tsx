@@ -4,13 +4,15 @@ import {
   SubmitButton,
   useAccount,
   useApiClient,
-  useModal,
-  useQuery
+  useModal
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
 import { chain, startCase } from "lodash";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import {
+  ManagedAttribute,
+  MaterialSample
+} from "packages/dina-ui/types/collection-api";
 import { Ref, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import Select from "react-select";
@@ -27,21 +29,19 @@ import { RelationshipFieldMapping } from "../relationship-mapping/RelationshipFi
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
-  convertMap,
   findMatchField,
   getColumnHeaders,
   getDataFromWorkbook,
   isBoolean,
   isBooleanArray,
-  isMap,
   isNumber,
-  isNumberArray,
-  isValidManagedAttribute
+  isNumberArray
 } from "../utils/workbookMappingUtils";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 
 export type FieldMapType = {
   targetField: string | undefined;
+  targetKey?: ManagedAttribute; // When targetField is managedAttribute, targetKey stores the key of the managed attribute
   skipped: boolean;
 };
 
@@ -128,7 +128,6 @@ export function WorkbookColumnMapping({
     }
   }, [spreadsheetData]);
 
-  
   // Generate field options
   const fieldOptions = useMemo(() => {
     if (!!selectedType) {
@@ -293,9 +292,7 @@ export function WorkbookColumnMapping({
   const sheetValue = sheetOptions[sheet];
 
   async function onSubmit({ submittedValues }) {
-    if (
-      submittedValues.fieldMap.filter((item) => item.skipped).length > 0
-    ) {
+    if (submittedValues.fieldMap.filter((item) => item.skipped).length > 0) {
       // Ask the user if they sure they want to delete the saved search.
       openModal(
         <AreYouSureModal
@@ -340,11 +337,15 @@ export function WorkbookColumnMapping({
         const errors: ValidationError[] = [];
         for (let i = 0; i < fieldMaps.length; i++) {
           const fieldMap = fieldMaps[i];
-          if (!!fieldMap) {
+          if (!!fieldMap && fieldMap.skipped === false) {
+            // validate if there are duplicate mapping
             if (
               fieldMap.targetField !== undefined &&
               fieldMaps.filter(
-                (item) => item.targetField === fieldMap.targetField
+                (item) =>
+                  item.skipped === false &&
+                  item.targetField + (item.targetKey?.name ?? "") ===
+                    fieldMap.targetField + (fieldMap.targetKey?.name ?? "")
               ).length > 1
             ) {
               errors.push(
@@ -355,6 +356,25 @@ export function WorkbookColumnMapping({
                 )
               );
             }
+            // validate if any managed attributes targetKey not set
+            if (
+              fieldMap.skipped === false &&
+              fieldMap.targetField !== undefined &&
+              flattenedConfig[fieldMap.targetField].dataType ===
+                WorkbookDataTypeEnum.MANAGED_ATTRIBUTES &&
+              !fieldMap.targetKey
+            ) {
+              errors.push(
+                new ValidationError(
+                  formatMessage(
+                    "workBookManagedAttributeKeysTargetKeyIsRequired"
+                  ),
+                  fieldMap.targetField,
+                  `fieldMap[${i}].targetKey`
+                )
+              );
+            }
+            // validate if any mappings are not set and not skipped
             if (
               fieldMap.targetField === undefined &&
               fieldMap.skipped === false
@@ -456,28 +476,6 @@ export function WorkbookColumnMapping({
                       "sheet"
                     )
                   );
-                }
-                break;
-              case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
-                if (!isMap(row[fieldPath])) {
-                  param.dataType = WorkbookDataTypeEnum.MANAGED_ATTRIBUTES;
-                  errors.push(
-                    new ValidationError(
-                      formatMessage("workBookInvalidDataFormat", param),
-                      fieldPath,
-                      "sheet"
-                    )
-                  );
-                }
-                const workbookManagedAttributes = convertMap(row[fieldPath]);
-                try {
-                  isValidManagedAttribute(
-                    workbookManagedAttributes,
-                    FIELD_TO_VOCAB_ELEMS_MAP.get(fieldPath),
-                    formatMessage
-                  );
-                } catch (error) {
-                  errors.push(error);
                 }
                 break;
               case WorkbookDataTypeEnum.NUMBER:
@@ -609,13 +607,13 @@ export function WorkbookColumnMapping({
                     <div className="col-md-3">
                       <DinaMessage id="spreadsheetHeader" />
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-6">
                       <DinaMessage id="materialSampleFieldsMapping" />
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-1">
                       <DinaMessage id="skipColumn" />
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-2">
                       <DinaMessage id="mapRelationship" />
                     </div>
                   </div>

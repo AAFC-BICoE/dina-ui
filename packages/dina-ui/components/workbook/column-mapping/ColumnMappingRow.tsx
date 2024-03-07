@@ -1,7 +1,7 @@
-import { useFormikContext } from "formik";
-import { startCase } from "lodash";
-import { useMemo, useState } from "react";
-import { CheckBoxField, SelectField } from "../../../../common-ui/lib";
+import { useCallback, useMemo, useState } from "react";
+import {
+  CheckBoxField
+} from "../../../../common-ui/lib";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import {
@@ -9,6 +9,7 @@ import {
   useWorkbookConverter
 } from "../utils/useWorkbookConverter";
 import { getColumnHeaders } from "../utils/workbookMappingUtils";
+import { WorkbookFieldSelectField } from "./WorkbookFieldSelectField";
 
 export interface ColumnMappingRowProps {
   sheet: number;
@@ -56,51 +57,6 @@ export function ColumnMappingRow({
     return getColumnHeaders(spreadsheetData, sheet);
   }, [sheet]);
 
-  // Custom styling to indent the group option menus.
-  const customStyles = useMemo(
-    () => ({
-      placeholder: (provided, _) => ({
-        ...provided,
-        color: "rgb(87,120,94)"
-      }),
-      menu: (base) => ({ ...base, zIndex: 1050 }),
-      control: (base) => ({
-        ...base
-      }),
-      // Grouped options (relationships) should be indented.
-      option: (baseStyle, { data }) => {
-        if (data?.parentPath) {
-          return {
-            ...baseStyle,
-            paddingLeft: "25px"
-          };
-        }
-
-        // Default style for everything else.
-        return {
-          ...baseStyle
-        };
-      },
-
-      // When viewing a group item, the parent path should be prefixed on to the value.
-      singleValue: (baseStyle, { data }) => {
-        if (data?.parentPath) {
-          return {
-            ...baseStyle,
-            ":before": {
-              content: `'${startCase(data.parentPath)} '`
-            }
-          };
-        }
-
-        return {
-          ...baseStyle
-        };
-      }
-    }),
-    [selectedType]
-  );
-
   function showMapRelationshipCheckbox(colIndex, fieldPath?: string): boolean {
     if (fieldPath && fieldPath.startsWith("parentMaterialSample.")) {
       return false;
@@ -119,32 +75,31 @@ export function ColumnMappingRow({
     }
   }
 
+  const onFieldChanged = useCallback((newFieldPath: string) => {
+    setChecked(false);
+    onFieldMappingChange(columnName, newFieldPath);
+  }, []);
+
   const fieldPath = workbookColumnMap[columnName]?.fieldPath;
   return (
     <div className="row">
       <div className="col-md-3 d-flex align-items-center justify-content-start">
         {columnName}
       </div>
-      <div className="col-md-3">
-        <SelectField
-          name={`fieldMap[${columnIndex}].targetField`}
-          options={fieldOptions}
-          selectProps={{ isClearable: true }}
-          hideLabel={true}
-          styles={customStyles}
-          onChange={(newFieldPath) => {
-            setChecked(false);
-            onFieldMappingChange(columnName, newFieldPath);
-          }}
+      <div className="col-md-6">
+        <WorkbookFieldSelectField
+          columnIndex={columnIndex}
+          fieldOptions={fieldOptions}
+          onFieldChanged={onFieldChanged}
         />
       </div>
-      <div className="col-md-3 d-flex align-items-center">
+      <div className="col-md-1 d-flex align-items-center">
         <CheckBoxField
           name={`fieldMap[${columnIndex}].skipped`}
           hideLabel={true}
         />
       </div>
-      <div className="col-md-3 d-flex align-items-center">
+      <div className="col-md-2 d-flex align-items-center">
         {showMapRelationshipCheckbox(columnIndex, fieldPath) && (
           <input
             type="checkbox"
@@ -165,3 +120,4 @@ export function ColumnMappingRow({
     </div>
   );
 }
+

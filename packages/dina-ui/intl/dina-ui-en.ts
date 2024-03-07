@@ -896,6 +896,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Invalid Managed Attribute data type: managed attribute key {key} expects {type} data type.",
   workBookInvalidManagedAttributeKey:
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
+  workBookManagedAttributeKeysTargetKeyIsRequired: "Please select a Managed Attribute value",
   workbookGroupUploadTitle: "Upload Workbook",
   workbookTitle: "Workbooks",
   workbookPreviewTitle: "Workbook preview",

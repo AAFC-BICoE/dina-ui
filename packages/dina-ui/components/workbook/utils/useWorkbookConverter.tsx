@@ -1,7 +1,6 @@
 import { useApiClient } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
-import { filter, get, has, pick, trim, unset } from "lodash";
-import { VocabularyElementType } from "packages/dina-ui/types/collection-api";
+import { filter, get, has, pick, unset } from "lodash";
 import { useMemo } from "react";
 import {
   FieldMappingConfigType,
@@ -26,6 +25,7 @@ import {
   convertDate,
   convertNumber,
   convertNumberArray,
+  convertString,
   convertStringArray,
   flattenObject,
   getParentFieldPath,
@@ -62,9 +62,11 @@ export function useWorkbookConverter(
           case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
             if (endpoint) {
               // load available Managed Attributes
-              apiClient.get(endpoint, { page: { limit: 1000 } }).then((response) => {
-                fieldToVocabElemsMap.set(recordField, response.data);
-              });
+              apiClient
+                .get(endpoint, { page: { limit: 1000 } })
+                .then((response) => {
+                  fieldToVocabElemsMap.set(recordField, response.data);
+                });
             }
             break;
           default:
@@ -75,65 +77,20 @@ export function useWorkbookConverter(
     return fieldToVocabElemsMap;
   }, [entityName]);
 
-  function convertManagedAttributesFromString(
-    value: any,
-    fieldName?: string
-  ): {
-    [key: string]: any;
-  } {
-    const regx = /:(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/;
-    const items = value
-      .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
-      .map((str) => trim(str));
-    const map = {} as { [key: string]: any };
-    for (const keyValue of items) {
-      if (keyValue) {
-        const arr = keyValue
-          .split(regx)
-          .map((str) => trim(trim(str, '"').replace('"', "")));
-        if (arr && arr.length === 2 && arr[0] !== "" && arr[1] !== "") {
-          const key = arr[0];
-          const strVal = arr[1];
-          const dataType: VocabularyElementType = FIELD_TO_VOCAB_ELEMS_MAP.get(
-            fieldName
-          )?.find((item) => item.key === key)?.vocabularyElementType;
-          if (dataType) {
-            switch (dataType) {
-              case "BOOL":
-                map[key] = convertBoolean(strVal);
-                break;
-              case "INTEGER":
-              case "DECIMAL":
-                map[key] = convertNumber(strVal);
-                break;
-              case "DATE":
-                map[key] = convertDate(strVal);
-                break;
-              case "PICKLIST":
-                throw new Error("Not supported PICKLIST type");
-                break;
-              case "STRING":
-                map[key] = strVal;
-                break;
-            }
-          }
-        }
-      }
-    }
-    return map;
-  }
-
   const DATATYPE_CONVERTER_MAPPING = {
     [WorkbookDataTypeEnum.NUMBER]: convertNumber,
     [WorkbookDataTypeEnum.BOOLEAN]: convertBoolean,
     [WorkbookDataTypeEnum.STRING_ARRAY]: convertStringArray,
     [WorkbookDataTypeEnum.NUMBER_ARRAY]: convertNumberArray,
-    [WorkbookDataTypeEnum.MANAGED_ATTRIBUTES]:
-      convertManagedAttributesFromString,
+    [WorkbookDataTypeEnum.MANAGED_ATTRIBUTES]: (
+      value: any,
+      _fieldName?: string
+    ) => value,
     [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
     [WorkbookDataTypeEnum.DATE]: convertDate,
-    [WorkbookDataTypeEnum.STRING]: (value: any, _fieldName?: string) => value,
-    [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) => value
+    [WorkbookDataTypeEnum.STRING]: convertString,
+    [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
+      value
   };
 
   /**
@@ -492,7 +449,9 @@ export function useWorkbookConverter(
                 !Array.isArray(childValue)
               ) {
                 valueToLink =
-                  columnMap[fieldPath + "." + attrNameInValue]?.[childValue.trim()];
+                  columnMap[fieldPath + "." + attrNameInValue]?.[
+                    childValue.trim()
+                  ];
                 if (valueToLink) {
                   break;
                 }
@@ -612,7 +571,9 @@ export function useWorkbookConverter(
                   !Array.isArray(childValue)
                 ) {
                   valueToLink =
-                    columnMap[fieldPath + "." + attrNameInValue]?.[childValue.trim()];
+                    columnMap[fieldPath + "." + attrNameInValue]?.[
+                      childValue.trim()
+                    ];
                   if (valueToLink) {
                     break;
                   }

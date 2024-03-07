@@ -1,11 +1,11 @@
 import { find, trim } from "lodash";
 import { ValidationError } from "yup";
+import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 import {
   ColumnUniqueValues,
   WorkbookJSON,
   WorkbookRow
 } from "../types/Workbook";
-import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
@@ -61,7 +61,7 @@ export function findMatchField(
     }[];
   }[]
 ) {
-  let columnHeader2 : string = columnHeader.toLowerCase().trim();
+  let columnHeader2: string = columnHeader.toLowerCase().trim();
   if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {
     columnHeader2 = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(columnHeader2)!;
   }
@@ -78,7 +78,6 @@ export function findMatchField(
   const option = find(plainOptions, (item) => {
     const pos = columnHeader2.lastIndexOf(".");
     if (pos !== -1) {
-      
       let prefix = columnHeader2.substring(0, pos + 1);
       if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
         prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
@@ -124,7 +123,33 @@ export function getDataFromWorkbook(
     for (let index = 0; index < fieldMaps.length; index++) {
       const fieldMap = fieldMaps[index];
       if (!fieldMap?.skipped) {
-        rowData[fieldMap.targetField!] = row?.content[index];
+        if (fieldMap.targetKey) {
+          const managedAttributes: { [key: string]: any } =
+            rowData[fieldMap.targetField!] ?? {};
+          let value: any;
+          switch (fieldMap.targetKey.vocabularyElementType) {
+            case "BOOL":
+              value = convertBoolean(row?.content[index]);
+              break;
+            case "INTEGER":
+            case "DECIMAL":
+              value = convertNumber(row?.content[index]);
+              break;
+            case "DATE":
+              value = convertDate(row?.content[index]);
+              break;
+            case "PICKLIST":
+            case "STRING":
+              value = convertString(row?.content[index]);
+              break;
+          }
+          if (value !== null) {
+            managedAttributes[fieldMap.targetKey.key] = value;
+            rowData[fieldMap.targetField!] = managedAttributes;
+          }
+        } else {
+          rowData[fieldMap.targetField!] = row?.content[index];
+        }
       }
     }
     if (!!getRowNumber) {
@@ -317,7 +342,10 @@ export function convertBooleanArray(value: any, fieldName?: string): boolean[] {
  * Any item in the value string has no key or value will be filtered out.
  *
  */
-export function convertMap(value: any, _fieldName?: string): { [key: string]: any } {
+export function convertMap(
+  value: any,
+  _fieldName?: string
+): { [key: string]: any } {
   const regx = /:(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/;
   const items = value
     .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
@@ -351,8 +379,16 @@ export function convertDate(value: any, _fieldName?: string) {
     const msDay = 86400000;
     const date = new Date(excelEpoc + (dateNum ?? 0) * msDay);
     return date.toISOString().split("T")[0];
-  } else if (typeof value === "string") {
-    return value;
+  } else if (typeof value === "string" && value.trim() !== "") {
+    return value.trim();
+  } else {
+    return null;
+  }
+}
+
+export function convertString(value: any, __filename?: string) {
+  if (value && typeof value === "string" && value.trim() != "") {
+    return value.trim();
   } else {
     return null;
   }
