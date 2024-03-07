@@ -108,11 +108,11 @@ export function WorkbookFieldSelectField({
         onChange={onFieldMapChanged}
       />
       {fieldMap[columnIndex].targetField === "managedAttributes" && (
-        <>
+        <div className="flex-fill">
           <ResourceSelectField<ManagedAttribute>
             name={`fieldMap[${columnIndex}].targetKey`}
             hideLabel={true}
-            selectProps={{ className: "flex-fill ms-2" }}
+            selectProps={{ className: "ms-2" }}
             filter={filterBy(["name"], {
               extraFilters: [
                 {
@@ -126,7 +126,7 @@ export function WorkbookFieldSelectField({
             model="collection-api/managed-attribute"
             optionLabel={(cm) => cm.name}
           />
-        </>
+        </div>
       )}
 
       {fieldMap[columnIndex].targetField === "preparationManagedAttributes" && (
