@@ -543,7 +543,14 @@ export function WorkbookColumnMapping({
     setColumnMap(newColumnMap);
   }
 
-  function onFieldMappingChange(columnName: string, newFieldPath: string) {
+  async function onFieldMappingChange(columnName: string, newFieldPath: string) {
+    let valueMapping: {[key: string]: {id: string, type: string}} = {};
+    if (newFieldPath?.startsWith("parentMaterialSample.")) {
+      valueMapping = await resolveParentMapping(
+        columnName,
+        newFieldPath
+      );      
+    }
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
       fieldPath: newFieldPath,
@@ -552,7 +559,7 @@ export function WorkbookColumnMapping({
         columnUniqueValues?.[sheet]?.[columnName] ?? {}
       ).length,
       mapRelationship: false,
-      valueMapping: {}
+      valueMapping
     };
     setColumnMap(newColumnMap);
   }
