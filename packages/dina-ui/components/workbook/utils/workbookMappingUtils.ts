@@ -39,7 +39,9 @@ export function _toPlainString(value: string) {
 const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["parent.", "parentMaterialSample."],
   ["parent id", "parentMaterialSample.materialSampleName"],
-  ["preparationMethod", "preparationMethod.name"],
+  ["parent", "parentMaterialSample.materialSampleName"],
+  ["parent material sample", "parentMaterialSample.materialSampleName"],
+  ["preparationmethod", "preparationMethod.name"],
   ["preparation method", "preparationMethod.name"]
 ]);
 
@@ -75,17 +77,21 @@ export function findMatchField(
       plainOptions.push({ label: opt.label, value: opt.value! });
     }
   }
+  const prefixPos = columnHeader2.lastIndexOf(".");
+  let prefix: string;
+  if (prefixPos !== -1) {
+    prefix = columnHeader2.substring(0, prefixPos + 1);
+  }
   const option = find(plainOptions, (item) => {
-    const pos = columnHeader2.lastIndexOf(".");
-    if (pos !== -1) {
-      let prefix = columnHeader2.substring(0, pos + 1);
+    if (prefix) {
       if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
         prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
       }
       if (
         item.value.startsWith(prefix) &&
-        _toPlainString(item.label) ===
-          _toPlainString(columnHeader2.substring(pos + 1))
+        (item.value === columnHeader2 ||
+          _toPlainString(item.label) ===
+            _toPlainString(columnHeader2.substring(prefixPos + 1)))
       ) {
         return true;
       } else {
