@@ -153,6 +153,7 @@ export function WorkbookColumnMapping({
             const parentPath = fieldPath.substring(0, lastIndex);
             const labelPath = fieldPath.substring(lastIndex + 1);
             const label =
+              formatMessage(fieldPath as any)?.trim() ||
               formatMessage(`field_${labelPath}` as any)?.trim() ||
               formatMessage(labelPath as any)?.trim() ||
               startCase(labelPath);
@@ -182,8 +183,21 @@ export function WorkbookColumnMapping({
       const groupedNestRowOptions = chain(nestedRowOptions)
         .groupBy((prop) => prop.parentPath)
         .map((group, key) => {
+          const keyArr = key.split(".");
+          let label: string | undefined = undefined;
+          for (let i = 0; i < keyArr.length; i++) {
+            const k = keyArr[i];
+            label =
+              label === undefined
+                ? formatMessage(k as any).trim() || k.toUpperCase()
+                : label + (formatMessage(k as any).trim() || k.toUpperCase());
+            if (i < keyArr.length - 1) {
+              label = label + ".";
+            }
+          }
+
           return {
-            label: key.toUpperCase(),
+            label: label!,
             options: group
           };
         })
@@ -529,7 +543,14 @@ export function WorkbookColumnMapping({
     setColumnMap(newColumnMap);
   }
 
-  function onFieldMappingChange(columnName: string, newFieldPath: string) {
+  async function onFieldMappingChange(columnName: string, newFieldPath: string) {
+    let valueMapping: {[key: string]: {id: string, type: string}} = {};
+    if (newFieldPath?.startsWith("parentMaterialSample.")) {
+      valueMapping = await resolveParentMapping(
+        columnName,
+        newFieldPath
+      );      
+    }
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
       fieldPath: newFieldPath,
@@ -538,7 +559,7 @@ export function WorkbookColumnMapping({
         columnUniqueValues?.[sheet]?.[columnName] ?? {}
       ).length,
       mapRelationship: false,
-      valueMapping: {}
+      valueMapping
     };
     setColumnMap(newColumnMap);
   }
