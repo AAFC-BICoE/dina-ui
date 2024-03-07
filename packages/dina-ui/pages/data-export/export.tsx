@@ -93,7 +93,6 @@ export default function ExportPage<TData extends KitsuResource>() {
         setLoadedIndexMapColumns,
         setColumnSelectorIndexMapColumns,
         apiClient,
-        columnSelectorDefaultColumns: columns,
         setLoadingIndexMapColumns: setLoading
       });
     }
