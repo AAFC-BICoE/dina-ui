@@ -905,7 +905,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
   proceedWithSkippedColumn: "Proceed with Skipped Columns?",
-  areYouSureImportWorkbookWithSkippedColumns: "Are you sure you want to import the workbook with skipped columns?",
+  areYouSureImportWorkbookWithSkippedColumns:
+    "Are you sure you want to import the workbook with skipped columns?",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
@@ -932,11 +933,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_closedDate: "Closed Date",
   field_dueDate: "Due Date",
   unauthorized: "Unauthorized",
-  failedToRenderFile: "Failed to render file",
   "parentMaterialSample.materialSampleName": "Primary ID",
   preparationMethod: "Preparation Method",
   collectionMethod: "Collection Method",
   geoReferenceAssertions: "GEO Reference Assertions",
   preparationProtocol: "Preparation Protocol",
-  preparationType: "Pareparation Type"
+  preparationType: "Preparation Type"
 };
