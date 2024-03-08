@@ -1,11 +1,11 @@
 import { transformToRSQL } from "@molgenis/rsql";
 
-interface RsqlFilterOptions {
+export interface RsqlFilterOptions {
   extraFilters?: RsqlFilterObject[];
   nullValueFilters?: {};
 }
 
-interface RsqlFilterObject {
+export interface RsqlFilterObject {
   /** The field name. */
   selector: string;
 

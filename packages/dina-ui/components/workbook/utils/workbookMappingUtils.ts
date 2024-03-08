@@ -1,11 +1,11 @@
 import { find, trim } from "lodash";
 import { ValidationError } from "yup";
+import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 import {
   ColumnUniqueValues,
   WorkbookJSON,
   WorkbookRow
 } from "../types/Workbook";
-import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
@@ -37,7 +37,12 @@ export function _toPlainString(value: string) {
 }
 
 const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
-  ["parent.", "parentMaterialSample."]
+  ["parent.", "parentMaterialSample."],
+  ["parent id", "parentMaterialSample.materialSampleName"],
+  ["parent", "parentMaterialSample.materialSampleName"],
+  ["parent material sample", "parentMaterialSample.materialSampleName"],
+  ["preparationmethod", "preparationMethod.name"],
+  ["preparation method", "preparationMethod.name"]
 ]);
 
 /**
@@ -58,6 +63,10 @@ export function findMatchField(
     }[];
   }[]
 ) {
+  let columnHeader2: string = columnHeader.toLowerCase().trim();
+  if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {
+    columnHeader2 = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(columnHeader2)!;
+  }
   const plainOptions: { label: string; value: string }[] = [];
   for (const opt of fieldOptions) {
     if (opt.options) {
@@ -68,24 +77,28 @@ export function findMatchField(
       plainOptions.push({ label: opt.label, value: opt.value! });
     }
   }
+  const prefixPos = columnHeader2.lastIndexOf(".");
+  let prefix: string;
+  if (prefixPos !== -1) {
+    prefix = columnHeader2.substring(0, prefixPos + 1);
+  }
   const option = find(plainOptions, (item) => {
-    const pos = columnHeader.lastIndexOf(".");
-    if (pos !== -1) {
-      let prefix = columnHeader.substring(0, pos + 1);
+    if (prefix) {
       if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
         prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
       }
       if (
         item.value.startsWith(prefix) &&
-        _toPlainString(item.label) ===
-          _toPlainString(columnHeader.substring(pos + 1))
+        (item.value === columnHeader2 ||
+          _toPlainString(item.label) ===
+            _toPlainString(columnHeader2.substring(prefixPos + 1)))
       ) {
         return true;
       } else {
         return false;
       }
     } else {
-      return _toPlainString(item.label) === _toPlainString(columnHeader);
+      return _toPlainString(item.label) === _toPlainString(columnHeader2);
     }
   });
   return option ? option.value : undefined;
@@ -116,7 +129,33 @@ export function getDataFromWorkbook(
     for (let index = 0; index < fieldMaps.length; index++) {
       const fieldMap = fieldMaps[index];
       if (!fieldMap?.skipped) {
-        rowData[fieldMap.targetField!] = row?.content[index];
+        if (fieldMap.targetKey) {
+          const managedAttributes: { [key: string]: any } =
+            rowData[fieldMap.targetField!] ?? {};
+          let value: any;
+          switch (fieldMap.targetKey.vocabularyElementType) {
+            case "BOOL":
+              value = convertBoolean(row?.content[index]);
+              break;
+            case "INTEGER":
+            case "DECIMAL":
+              value = convertNumber(row?.content[index]);
+              break;
+            case "DATE":
+              value = convertDate(row?.content[index]);
+              break;
+            case "PICKLIST":
+            case "STRING":
+              value = convertString(row?.content[index]);
+              break;
+          }
+          if (value !== null) {
+            managedAttributes[fieldMap.targetKey.key] = value;
+            rowData[fieldMap.targetField!] = managedAttributes;
+          }
+        } else {
+          rowData[fieldMap.targetField!] = row?.content[index];
+        }
       }
     }
     if (!!getRowNumber) {
@@ -235,7 +274,7 @@ export function isValidManagedAttribute(
  * @param value string
  * @returns number
  */
-export function convertNumber(value: any): number | null {
+export function convertNumber(value: any, _fieldName?: string): number | null {
   if (value !== null && value !== undefined && value !== "" && !isNaN(+value)) {
     return +value;
   } else {
@@ -248,7 +287,7 @@ export function convertNumber(value: any): number | null {
  * @param value string, it can be 'true', 'false', 'yes', or 'no'
  * @returns boolean
  */
-export function convertBoolean(value: any): boolean {
+export function convertBoolean(value: any, _fieldName?: string): boolean {
   const strBoolean = String(value).toLowerCase().trim();
   if (strBoolean === "false" || strBoolean === "no" || strBoolean === "0") {
     return false;
@@ -264,7 +303,7 @@ export function convertBoolean(value: any): boolean {
  * @param value Comma separated string, e.g.  `asdb,deeasdf,sdf,"sdf,sadf" , sdfd`
  *
  */
-export function convertStringArray(value: string): string[] {
+export function convertStringArray(value: any, _fieldName?: string): string[] {
   const arr = value.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
   return arr.map((str) => trim(trim(str, '"')));
 }
@@ -275,12 +314,12 @@ export function convertStringArray(value: string): string[] {
  * @param value comma separated number string, e.g. "111,222,333,444"
  * Any items that are not number will be filter out.
  */
-export function convertNumberArray(value: string): number[] {
+export function convertNumberArray(value: any, fieldName?: string): number[] {
   const arr = value.split(",");
   return arr
     .map((item) => trim(item))
     .filter((item) => item !== "")
-    .map((item) => convertNumber(item.trim()))
+    .map((item) => convertNumber(item.trim(), fieldName))
     .filter((item) => typeof item === "number" && !isNaN(item)) as number[];
 }
 
@@ -288,12 +327,12 @@ export function convertNumberArray(value: string): number[] {
  * convert comma separated boolean string into array of boolean
  * @param value
  */
-export function convertBooleanArray(value: string): boolean[] {
+export function convertBooleanArray(value: any, fieldName?: string): boolean[] {
   const arr = value.split(",");
   return arr
     .map((item) => trim(item))
     .filter((item) => item !== "")
-    .map((item) => convertBoolean(item.trim())) as boolean[];
+    .map((item) => convertBoolean(item.trim(), fieldName)) as boolean[];
 }
 
 /**
@@ -309,7 +348,10 @@ export function convertBooleanArray(value: string): boolean[] {
  * Any item in the value string has no key or value will be filtered out.
  *
  */
-export function convertMap(value: string): { [key: string]: any } {
+export function convertMap(
+  value: any,
+  _fieldName?: string
+): { [key: string]: any } {
   const regx = /:(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/;
   const items = value
     .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
@@ -336,15 +378,23 @@ export function convertMap(value: string): { [key: string]: any } {
   return map;
 }
 
-export function convertDate(value: string) {
+export function convertDate(value: any, _fieldName?: string) {
   if (isNumber(value)) {
     const dateNum = convertNumber(value);
     const excelEpoc = new Date(1900, 0, -1).getTime();
     const msDay = 86400000;
     const date = new Date(excelEpoc + (dateNum ?? 0) * msDay);
     return date.toISOString().split("T")[0];
-  } else if (typeof value === "string") {
-    return value;
+  } else if (typeof value === "string" && value.trim() !== "") {
+    return value.trim();
+  } else {
+    return null;
+  }
+}
+
+export function convertString(value: any, __filename?: string) {
+  if (value && typeof value === "string" && value.trim() != "") {
+    return value.trim();
   } else {
     return null;
   }

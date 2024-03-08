@@ -18,7 +18,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
     preparationSubstrate: { dataType: WorkbookDataTypeEnum.STRING },
     preparationDate: { dataType: WorkbookDataTypeEnum.DATE },
     preparationRemarks: { dataType: WorkbookDataTypeEnum.STRING },
-    preparationManagedAttributes: {dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES},
+    preparationManagedAttributes: {
+      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+      endpoint: "collection-api/managed-attribute",
+      managedAttributeComponent: "PREPARATION"
+    },
     description: { dataType: WorkbookDataTypeEnum.STRING },
     dwcDegreeOfEstablishment: { dataType: WorkbookDataTypeEnum.STRING },
     barcode: { dataType: WorkbookDataTypeEnum.STRING },
@@ -29,9 +33,13 @@ const FieldMappingConfig: FieldMappingConfigType = {
     tags: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
     materialSampleType: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
-      vocabularyEndpoint: "/collection-api/vocabulary/materialSampleType"
+      endpoint: "/collection-api/vocabulary/materialSampleType"
     },
-    managedAttributes: { dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES },
+    managedAttributes: {
+      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+      endpoint: "collection-api/managed-attribute",
+      managedAttributeComponent: "MATERIAL_SAMPLE"
+    },
     organismsIndividualEntry: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     useTargetOrganism: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     publiclyReleasable: { dataType: WorkbookDataTypeEnum.BOOLEAN },

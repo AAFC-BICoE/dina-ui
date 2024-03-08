@@ -896,6 +896,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Invalid Managed Attribute data type: managed attribute key {key} expects {type} data type.",
   workBookInvalidManagedAttributeKey:
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
+  workBookManagedAttributeKeysTargetKeyIsRequired: "Please select a Managed Attribute value",
   workbookGroupUploadTitle: "Upload Workbook",
   workbookTitle: "Workbooks",
   workbookPreviewTitle: "Workbook preview",
@@ -931,5 +932,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_openedDate: "Opened Date",
   field_closedDate: "Closed Date",
   field_dueDate: "Due Date",
-  unauthorized: "Unauthorized"
+  unauthorized: "Unauthorized",
+  failedToRenderFile: "Failed to render file",
+  "parentMaterialSample.materialSampleName": "Primary ID",
+  preparationMethod: "Preparation Method",
+  collectionMethod: "Collection Method",
+  geoReferenceAssertions: "GEO Reference Assertions",
+  preparationProtocol: "Preparation Protocol",
+  preparationType: "Preparation Type"
 };
