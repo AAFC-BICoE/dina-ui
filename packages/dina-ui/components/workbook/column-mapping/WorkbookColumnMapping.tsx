@@ -1,14 +1,18 @@
 import {
+  AreYouSureModal,
   FieldWrapper,
   SubmitButton,
   useAccount,
   useApiClient,
-  useQuery
+  useModal
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
 import { chain, startCase } from "lodash";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import {
+  ManagedAttribute,
+  MaterialSample
+} from "packages/dina-ui/types/collection-api";
 import { Ref, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import Select from "react-select";
@@ -25,25 +29,26 @@ import { RelationshipFieldMapping } from "../relationship-mapping/RelationshipFi
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
-  convertMap,
   findMatchField,
   getColumnHeaders,
   getDataFromWorkbook,
   isBoolean,
   isBooleanArray,
-  isMap,
   isNumber,
-  isNumberArray,
-  isValidManagedAttribute
+  isNumberArray
 } from "../utils/workbookMappingUtils";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 
-export type FieldMapType = (string | undefined)[];
+export type FieldMapType = {
+  targetField: string | undefined;
+  targetKey?: ManagedAttribute; // When targetField is managedAttribute, targetKey stores the key of the managed attribute
+  skipped: boolean;
+};
 
 export interface WorkbookColumnMappingFields {
   sheet: number;
   type: string;
-  fieldMap: FieldMapType;
+  fieldMap: FieldMapType[];
   mapRelationships: boolean[];
   group: string;
 }
@@ -60,6 +65,7 @@ export function WorkbookColumnMapping({
   setPerformSave
 }: WorkbookColumnMappingProps) {
   const { apiClient } = useApiClient();
+  const { openModal } = useModal();
   const {
     startSavingWorkbook,
     spreadsheetData,
@@ -80,15 +86,14 @@ export function WorkbookColumnMapping({
     label: string;
     value: string;
   } | null>(entityTypes[0]);
-  const [fieldMap, setFieldMap] = useState<FieldMapType>([]);
-  // fieldHeaderPair stores the pairs of field name in the configuration and the column header in the excel file.
+  const [fieldMap, setFieldMap] = useState<FieldMapType[]>([]);
 
   const {
     convertWorkbook,
     flattenedConfig,
     getPathOfField,
     getFieldRelationshipConfig,
-    isFieldInALinkableRelationshipField
+    FIELD_TO_VOCAB_ELEMS_MAP
   } = useWorkbookConverter(
     FieldMappingConfig,
     selectedType?.value || "material-sample"
@@ -123,41 +128,6 @@ export function WorkbookColumnMapping({
     }
   }, [spreadsheetData]);
 
-  // Have to load end-points up front, save all responses in a map
-  const FIELD_TO_VOCAB_ELEMS_MAP = new Map();
-
-  Object.keys(FieldMappingConfig).forEach((recordType) => {
-    const recordFieldsMap = FieldMappingConfig[recordType];
-    Object.keys(recordFieldsMap).forEach((recordField) => {
-      const { dataType, endpoint } = recordFieldsMap[recordField];
-      switch (dataType) {
-        case WorkbookDataTypeEnum.VOCABULARY:
-          if (endpoint) {
-            const query: any = useQuery({
-              path: endpoint
-            });
-            const vocabElements =
-              query?.response?.data?.vocabularyElements?.map(
-                (vocabElement) => vocabElement.name
-              );
-            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
-          }
-          break;
-        case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
-          if (endpoint) {
-            // load available Managed Attributes
-            const query: any = useQuery({
-              path: endpoint
-            });
-            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, query?.response?.data);
-          }
-          break;
-        default:
-          break;
-      }
-    });
-  });
-
   // Generate field options
   const fieldOptions = useMemo(() => {
     if (!!selectedType) {
@@ -183,6 +153,7 @@ export function WorkbookColumnMapping({
             const parentPath = fieldPath.substring(0, lastIndex);
             const labelPath = fieldPath.substring(lastIndex + 1);
             const label =
+              formatMessage(fieldPath as any)?.trim() ||
               formatMessage(`field_${labelPath}` as any)?.trim() ||
               formatMessage(labelPath as any)?.trim() ||
               startCase(labelPath);
@@ -212,8 +183,21 @@ export function WorkbookColumnMapping({
       const groupedNestRowOptions = chain(nestedRowOptions)
         .groupBy((prop) => prop.parentPath)
         .map((group, key) => {
+          const keyArr = key.split(".");
+          let label: string | undefined = undefined;
+          for (let i = 0; i < keyArr.length; i++) {
+            const k = keyArr[i];
+            label =
+              label === undefined
+                ? formatMessage(k as any).trim() || k.toUpperCase()
+                : label + (formatMessage(k as any).trim() || k.toUpperCase());
+            if (i < keyArr.length - 1) {
+              label = label + ".";
+            }
+          }
+
           return {
-            label: key.toUpperCase(),
+            label: label!,
             options: group
           };
         })
@@ -223,10 +207,10 @@ export function WorkbookColumnMapping({
       const newOptions = nonNestedRowOptions
         ? [...nonNestedRowOptions, ...groupedNestRowOptions]
         : [];
-      const map = [] as FieldMapType;
+      const map: FieldMapType[] = [];
       for (const columnHeader of headers || []) {
         const fieldPath = findMatchField(columnHeader, newOptions);
-        map.push(fieldPath);
+        map.push({ targetField: fieldPath, skipped: fieldPath === undefined });
       }
       setFieldMap(map);
       return newOptions;
@@ -322,6 +306,25 @@ export function WorkbookColumnMapping({
   const sheetValue = sheetOptions[sheet];
 
   async function onSubmit({ submittedValues }) {
+    if (submittedValues.fieldMap.filter((item) => item.skipped).length > 0) {
+      // Ask the user if they sure they want to delete the saved search.
+      openModal(
+        <AreYouSureModal
+          actionMessage={<DinaMessage id="proceedWithSkippedColumn" />}
+          messageBody={
+            <DinaMessage id="areYouSureImportWorkbookWithSkippedColumns" />
+          }
+          onYesButtonClicked={() => {
+            importWorkbook(submittedValues);
+          }}
+        />
+      );
+    } else {
+      importWorkbook(submittedValues);
+    }
+  }
+
+  async function importWorkbook(submittedValues: any) {
     const workbookData = getDataFromWorkbook(
       spreadsheetData,
       sheet,
@@ -342,23 +345,62 @@ export function WorkbookColumnMapping({
 
   const workbookColumnMappingFormSchema = yup.object({
     fieldMap: yup.array().test({
-      name: "uniqMapping",
+      name: "validateFieldMapping",
       exclusive: false,
-      test: (fieldNames: string[]) => {
+      test: (fieldMaps: FieldMapType[]) => {
         const errors: ValidationError[] = [];
-        for (let i = 0; i < fieldNames.length; i++) {
-          const field = fieldNames[i];
-          if (
-            !!field &&
-            fieldNames.filter((item) => item === field).length > 1
-          ) {
-            errors.push(
-              new ValidationError(
-                formatMessage("workBookDuplicateFieldMap"),
-                field,
-                `fieldMap[${i}]`
-              )
-            );
+        for (let i = 0; i < fieldMaps.length; i++) {
+          const fieldMap = fieldMaps[i];
+          if (!!fieldMap && fieldMap.skipped === false) {
+            // validate if there are duplicate mapping
+            if (
+              fieldMap.targetField !== undefined &&
+              fieldMaps.filter(
+                (item) =>
+                  item.skipped === false &&
+                  item.targetField + (item.targetKey?.name ?? "") ===
+                    fieldMap.targetField + (fieldMap.targetKey?.name ?? "")
+              ).length > 1
+            ) {
+              errors.push(
+                new ValidationError(
+                  formatMessage("workBookDuplicateFieldMap"),
+                  fieldMap.targetField,
+                  `fieldMap[${i}].targetField`
+                )
+              );
+            }
+            // validate if any managed attributes targetKey not set
+            if (
+              fieldMap.skipped === false &&
+              fieldMap.targetField !== undefined &&
+              flattenedConfig[fieldMap.targetField].dataType ===
+                WorkbookDataTypeEnum.MANAGED_ATTRIBUTES &&
+              !fieldMap.targetKey
+            ) {
+              errors.push(
+                new ValidationError(
+                  formatMessage(
+                    "workBookManagedAttributeKeysTargetKeyIsRequired"
+                  ),
+                  fieldMap.targetField,
+                  `fieldMap[${i}].targetKey`
+                )
+              );
+            }
+            // validate if any mappings are not set and not skipped
+            if (
+              fieldMap.targetField === undefined &&
+              fieldMap.skipped === false
+            ) {
+              errors.push(
+                new ValidationError(
+                  formatMessage("workBookSkippedField"),
+                  fieldMap.targetField,
+                  `fieldMap[${i}].targetField`
+                )
+              );
+            }
           }
         }
         if (errors.length > 0) {
@@ -367,7 +409,7 @@ export function WorkbookColumnMapping({
         const data = getDataFromWorkbook(
           spreadsheetData,
           sheet,
-          fieldNames,
+          fieldMaps,
           true
         );
         validateData(data, errors);
@@ -450,28 +492,6 @@ export function WorkbookColumnMapping({
                   );
                 }
                 break;
-              case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
-                if (!isMap(row[fieldPath])) {
-                  param.dataType = WorkbookDataTypeEnum.MANAGED_ATTRIBUTES;
-                  errors.push(
-                    new ValidationError(
-                      formatMessage("workBookInvalidDataFormat", param),
-                      fieldPath,
-                      "sheet"
-                    )
-                  );
-                }
-                const workbookManagedAttributes = convertMap(row[fieldPath]);
-                try {
-                  isValidManagedAttribute(
-                    workbookManagedAttributes,
-                    FIELD_TO_VOCAB_ELEMS_MAP.get(fieldPath),
-                    formatMessage
-                  );
-                } catch (error) {
-                  errors.push(error);
-                }
-                break;
               case WorkbookDataTypeEnum.NUMBER:
                 if (!isNumber(row[fieldPath])) {
                   param.dataType = WorkbookDataTypeEnum.NUMBER;
@@ -523,7 +543,14 @@ export function WorkbookColumnMapping({
     setColumnMap(newColumnMap);
   }
 
-  function onFieldMappingChange(columnName: string, newFieldPath: string) {
+  async function onFieldMappingChange(columnName: string, newFieldPath: string) {
+    let valueMapping: {[key: string]: {id: string, type: string}} = {};
+    if (newFieldPath?.startsWith("parentMaterialSample.")) {
+      valueMapping = await resolveParentMapping(
+        columnName,
+        newFieldPath
+      );      
+    }
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
       fieldPath: newFieldPath,
@@ -532,7 +559,7 @@ export function WorkbookColumnMapping({
         columnUniqueValues?.[sheet]?.[columnName] ?? {}
       ).length,
       mapRelationship: false,
-      valueMapping: {}
+      valueMapping
     };
     setColumnMap(newColumnMap);
   }
@@ -598,13 +625,16 @@ export function WorkbookColumnMapping({
                     className="row mb-2"
                     style={{ borderBottom: "solid 1px", paddingBottom: "8px" }}
                   >
-                    <div className="col-4">
+                    <div className="col-md-3">
                       <DinaMessage id="spreadsheetHeader" />
                     </div>
-                    <div className="col-4">
+                    <div className="col-md-6">
                       <DinaMessage id="materialSampleFieldsMapping" />
                     </div>
-                    <div className="col-4">
+                    <div className="col-md-1">
+                      <DinaMessage id="skipColumn" />
+                    </div>
+                    <div className="col-md-2">
                       <DinaMessage id="mapRelationship" />
                     </div>
                   </div>

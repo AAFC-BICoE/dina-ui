@@ -195,7 +195,7 @@ export function FileView({
         ) : errorStatus === 403 ? (
           <DinaMessage id="unauthorized" />
         ) : (
-          <DinaMessage id="failedToRenderFile" />
+          <DinaMessage id="thumbnailNotAvailableText" />
         )
       ) : (
         <DinaMessage id="previewNotAvailable" />
