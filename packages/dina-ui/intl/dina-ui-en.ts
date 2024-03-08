@@ -933,7 +933,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_closedDate: "Closed Date",
   field_dueDate: "Due Date",
   unauthorized: "Unauthorized",
-  failedToRenderFile: "Failed to render file",
   "parentMaterialSample.materialSampleName": "Primary ID",
   preparationMethod: "Preparation Method",
   collectionMethod: "Collection Method",
