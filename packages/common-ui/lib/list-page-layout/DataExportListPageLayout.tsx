@@ -27,6 +27,7 @@ export function DataExportListPageLayout({
   };
   const TABLE_COLUMNS: ColumnDefinition<DataExport>[] = [
     "id",
+    "name",
     "status",
     "createdBy",
     dateCell("createdOn"),
@@ -40,7 +41,7 @@ export function DataExportListPageLayout({
             className="btn btn-primary mt-2 bulk-edit-button"
             onClick={async () => {
               setLoading(true);
-              await downloadDataExport(apiClient, original?.id);
+              await downloadDataExport(apiClient, original?.id, original?.name);
               setLoading(false);
             }}
           >

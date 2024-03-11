@@ -184,7 +184,6 @@ export function DataExportButton<TData extends KitsuResource>({
         await router.push({
           pathname,
           query: {
-            hideTable: true,
             uniqueName,
             indexName,
             entityLink

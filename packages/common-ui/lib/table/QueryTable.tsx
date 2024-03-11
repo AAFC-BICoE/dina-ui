@@ -387,7 +387,6 @@ export function QueryTable<TData extends KitsuResource>({
         // These props are needed for column selector
         setColumnSelector={setColumnSelector}
         uniqueName={path}
-        hideExportButton={true}
         className="-striped"
         columns={mappedColumns}
         data={(displayData as TData[]) ?? []}

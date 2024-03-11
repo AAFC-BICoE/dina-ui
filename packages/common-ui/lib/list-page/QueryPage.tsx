@@ -1061,7 +1061,6 @@ export function QueryPage<TData extends KitsuResource>({
                   setSelectedColumnSelectorIndexMapColumnsProxy
                 }
                 setLoadingIndexMapColumns={setLoadingIndexMapColumns}
-                hideExportButton={true}
                 columnSelectorDefaultColumns={columns}
                 // Column and data props
                 columns={columnsResults}
