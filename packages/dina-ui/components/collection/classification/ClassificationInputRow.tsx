@@ -81,9 +81,7 @@ export function ClassificationInputRow({
       <div style={{ width: "15rem" }}>
         <VocabularySelectField
           name={`taxonomicRank`}
-          sort="name"
           path="collection-api/vocabulary/taxonomicRank"
-          filter={}
           hideLabel={true}
         />
       </div>
