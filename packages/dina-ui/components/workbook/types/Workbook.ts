@@ -48,11 +48,13 @@ export interface PrimitiveField {
 
 export interface ManagedAttributeField {
   dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES;
+  managedAttributeComponent: string;
+  endpoint: string;
 }
 
 export interface VocabularyField {
   dataType: WorkbookDataTypeEnum.VOCABULARY;
-  vocabularyEndpoint: string;
+  endpoint: string;
 }
 
 export interface ObjectField {
