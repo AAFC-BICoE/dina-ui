@@ -209,7 +209,8 @@ export function WorkbookColumnMapping({
         : [];
       const map: FieldMapType[] = [];
       for (const columnHeader of headers || []) {
-        const fieldPath = findMatchField(columnHeader, newOptions);
+        const fieldPath =
+          findMatchField(columnHeader, newOptions) ?? "managedAttributes";
         map.push({ targetField: fieldPath, skipped: fieldPath === undefined });
       }
       setFieldMap(map);
@@ -271,7 +272,8 @@ export function WorkbookColumnMapping({
       // Calculate the workbook column mapping based on the name of the spreadsheet column header name
       const newWorkbookColumnMap: WorkbookColumnMap = {};
       for (const columnHeader of headers || []) {
-        const fieldPath = findMatchField(columnHeader, fieldOptions);
+        const fieldPath =
+          findMatchField(columnHeader, fieldOptions) ?? "managedAttributes";
         if (fieldPath?.startsWith("parentMaterialSample.")) {
           const valueMapping = await resolveParentMapping(
             columnHeader,
@@ -543,13 +545,13 @@ export function WorkbookColumnMapping({
     setColumnMap(newColumnMap);
   }
 
-  async function onFieldMappingChange(columnName: string, newFieldPath: string) {
-    let valueMapping: {[key: string]: {id: string, type: string}} = {};
+  async function onFieldMappingChange(
+    columnName: string,
+    newFieldPath: string
+  ) {
+    let valueMapping: { [key: string]: { id: string; type: string } } = {};
     if (newFieldPath?.startsWith("parentMaterialSample.")) {
-      valueMapping = await resolveParentMapping(
-        columnName,
-        newFieldPath
-      );      
+      valueMapping = await resolveParentMapping(columnName, newFieldPath);
     }
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {
