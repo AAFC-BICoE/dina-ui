@@ -43,7 +43,9 @@ import {
   useCollectingEventQuery,
   useMaterialSampleQuery,
   withOrganismEditorValues,
-  TransactionMaterialDirectionSection
+  TransactionMaterialDirectionSection,
+  MaterialSampleFormTemplateSelect,
+  useMaterialSampleFormTemplateSelectState
 } from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -131,12 +133,57 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       query: transactionQueryDSL
     }
   });
+  const {
+    navOrder,
+    setNavOrder,
+    sampleFormTemplate,
+    setSampleFormTemplateUUID,
+    visibleManagedAttributeKeys,
+    materialSampleInitialValues,
+    collectingEventInitialValues
+  } = useMaterialSampleFormTemplateSelectState({});
 
   return (
     <div>
       {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
         const materialSample = withOrganismEditorValues(materialSampleData);
-        const buttonBar = buttonBarComponent(materialSample);
+        const buttonBar = id && (
+          <ButtonBar className="flex">
+            <BackButton
+              entityId={id}
+              entityLink="/collection/material-sample"
+              byPassView={true}
+              className="me-auto"
+            />
+            <div className="flex-grow-1 d-flex">
+              <div className="mx-auto">
+                <MaterialSampleFormTemplateSelect
+                  value={sampleFormTemplate}
+                  onChange={setSampleFormTemplateUUID}
+                />
+              </div>
+            </div>
+            <EditButton entityId={id} entityLink="collection/material-sample" />
+            <SplitMaterialSampleDropdownButton
+              ids={[id]}
+              disabled={!materialSample.materialSampleName}
+              materialSampleType={materialSample.materialSampleType}
+            />
+            <GenerateLabelDropdownButton materialSample={materialSample} />
+            <Link href={`/collection/material-sample/revisions?id=${id}`}>
+              <a className="btn btn-info ms-5">
+                <DinaMessage id="revisionsButtonText" />
+              </a>
+            </Link>
+            <DeleteButton
+              className="ms-5"
+              id={id}
+              options={{ apiBaseUrl: "/collection-api" }}
+              postDeleteRedirect="/collection/material-sample/list"
+              type="material-sample"
+            />
+          </ButtonBar>
+        );
         const hasPreparations = PREPARATION_FIELDS.some(
           (fieldName) => !isEmpty(materialSample[fieldName])
         );
@@ -170,6 +217,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               <DinaForm<MaterialSample>
                 initialValues={materialSample}
                 readOnly={true}
+                formTemplate={sampleFormTemplate}
               >
                 {buttonBar}
                 <MaterialSampleStateWarning />
@@ -360,42 +408,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Footer />
     </div>
   );
-
-  function buttonBarComponent(
-    materialSample: PersistedResource<MaterialSample>
-  ) {
-    return (
-      id && (
-        <ButtonBar className="flex">
-          <BackButton
-            entityId={id}
-            entityLink="/collection/material-sample"
-            byPassView={true}
-            className="me-auto"
-          />
-          <EditButton entityId={id} entityLink="collection/material-sample" />
-          <SplitMaterialSampleDropdownButton
-            ids={[id]}
-            disabled={!materialSample.materialSampleName}
-            materialSampleType={materialSample.materialSampleType}
-          />
-          <GenerateLabelDropdownButton materialSample={materialSample} />
-          <Link href={`/collection/material-sample/revisions?id=${id}`}>
-            <a className="btn btn-info ms-5">
-              <DinaMessage id="revisionsButtonText" />
-            </a>
-          </Link>
-          <DeleteButton
-            className="ms-5"
-            id={id}
-            options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/material-sample/list"
-            type="material-sample"
-          />
-        </ButtonBar>
-      )
-    );
-  }
 }
 
 export default withRouter(MaterialSampleViewPage);
