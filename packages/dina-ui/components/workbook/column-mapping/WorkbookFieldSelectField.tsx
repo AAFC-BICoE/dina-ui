@@ -92,7 +92,10 @@ export function WorkbookFieldSelectField({
 
   const onFieldMapChanged = (newFieldPath) => {
     setFieldValue(`fieldMap[${columnIndex}].targetKey`, "");
-    setFieldValue(`fieldMap[${columnIndex}].skipped`, newFieldPath === undefined);
+    setFieldValue(
+      `fieldMap[${columnIndex}].skipped`,
+      newFieldPath === undefined
+    );
     onFieldChanged?.(newFieldPath);
   };
 

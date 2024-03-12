@@ -392,8 +392,8 @@ export function convertDate(value: any, _fieldName?: string) {
   }
 }
 
-export function convertString(value: any, __filename?: string) {
-  if (value && typeof value === "string" && value.trim() != "") {
+export function convertString(value: any, _filename?: string) {
+  if (value && typeof value === "string" && value.trim() !== "") {
     return value.trim();
   } else {
     return null;
