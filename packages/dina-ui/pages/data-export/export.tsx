@@ -2,7 +2,6 @@ import {
   DinaForm,
   ReactTable,
   CommonMessage,
-  ButtonBar,
   BackButton,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   DATA_EXPORT_COLUMNS_KEY,
@@ -15,7 +14,6 @@ import {
   NOT_EXPORTABLE_COLUMN_IDS,
   DATA_EXPORT_QUERY_KEY,
   TextField,
-  useDinaFormContext,
   SubmitButton
 } from "packages/common-ui/lib";
 import React, { useEffect } from "react";
@@ -39,10 +37,9 @@ import {
 import { uniqBy } from "lodash";
 import { VisibilityState, Table } from "@tanstack/react-table";
 import { compact } from "lodash";
-import { Button } from "react-bootstrap";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
-import { useFormikContext } from "formik";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
@@ -270,23 +267,20 @@ export default function ExportPage<TData extends KitsuResource>() {
   return loading || !loadedIndexMapColumns ? (
     <LoadingSpinner loading={loading} />
   ) : (
-    <div>
-      <Head title={formatMessage({ id: "exportButtonText" })} />
-      <Nav />
+      <PageLayout titleId="exportButtonText" buttonBarContent={<>
+        <BackButton
+          className="me-auto"
+          entityLink={entityLink}
+          byPassView={true}
+        />
+        <Link href={`/data-export/list?entityLink=${entityLink}`}>
+          <a className="btn btn-primary">
+            <DinaMessage id="viewExportHistoryButton" />
+          </a>
+        </Link>
+      </>}>
       <DinaForm initialValues={{}}>
         {dataExportError}
-        <ButtonBar>
-          <BackButton
-            className="me-auto"
-            entityLink={entityLink}
-            byPassView={true}
-          />
-          <Link href={`/data-export/list?entityLink=${entityLink}`}>
-            <a className="btn btn-primary">
-              <DinaMessage id="viewExportHistoryButton" />
-            </a>
-          </Link>
-        </ButtonBar>
         <div className="ms-2">
           <CommonMessage
             id="tableTotalCount"
@@ -372,6 +366,6 @@ export default function ExportPage<TData extends KitsuResource>() {
         />
       </DinaForm>
       <Footer />
-    </div>
+    </PageLayout>
   );
 }
