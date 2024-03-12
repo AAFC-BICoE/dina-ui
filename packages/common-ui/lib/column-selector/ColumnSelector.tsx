@@ -278,7 +278,7 @@ export function ColumnSelector<TData>({
           aria-labelledby={props.labelledBy}
         >
           {menuOnly ? (
-            <strong>{<DinaMessage id="exportColumns" />}</strong>
+            <><strong>{<DinaMessage id="exportColumns" />}</strong><br/></>
           ) : (
             <div>
               {" "}

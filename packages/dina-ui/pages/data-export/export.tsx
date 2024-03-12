@@ -19,7 +19,7 @@ import {
 import React, { useEffect } from "react";
 import Link from "next/link";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { Footer, Head, Nav } from "packages/dina-ui/components";
+import { Footer } from "packages/dina-ui/components";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
