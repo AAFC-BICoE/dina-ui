@@ -1,10 +1,13 @@
 import {
   AreYouSureModal,
   FieldWrapper,
+  RsqlFilterObject,
   SubmitButton,
+  filterBy,
   useAccount,
   useApiClient,
-  useModal
+  useModal,
+  useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
@@ -71,7 +74,8 @@ export function WorkbookColumnMapping({
     spreadsheetData,
     setColumnMap,
     workbookColumnMap,
-    columnUniqueValues
+    columnUniqueValues,
+    managedAttributes
   } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
@@ -209,9 +213,26 @@ export function WorkbookColumnMapping({
         : [];
       const map: FieldMapType[] = [];
       for (const columnHeader of headers || []) {
-        const fieldPath =
-          findMatchField(columnHeader, newOptions) ?? "managedAttributes";
-        map.push({ targetField: fieldPath, skipped: fieldPath === undefined });
+        const fieldPath = findMatchField(columnHeader, newOptions);
+        if (fieldPath === undefined) {
+          const targetManagedAttr = managedAttributes.find(
+            (item) =>
+              item.name.toLowerCase().trim() ===
+              columnHeader.toLowerCase().trim()
+          );
+          if (targetManagedAttr) {
+            map.push({
+              targetField: "managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr
+            });
+          }
+        } else {
+          map.push({
+            targetField: fieldPath,
+            skipped: fieldPath === undefined
+          });
+        }
       }
       setFieldMap(map);
       return newOptions;
@@ -272,9 +293,30 @@ export function WorkbookColumnMapping({
       // Calculate the workbook column mapping based on the name of the spreadsheet column header name
       const newWorkbookColumnMap: WorkbookColumnMap = {};
       for (const columnHeader of headers || []) {
-        const fieldPath =
-          findMatchField(columnHeader, fieldOptions) ?? "managedAttributes";
-        if (fieldPath?.startsWith("parentMaterialSample.")) {
+        const fieldPath = findMatchField(columnHeader, fieldOptions);
+        if (fieldPath === undefined || fieldPath === "managedAttributes") {
+          const targetManagedAttr = managedAttributes.find(
+            (item) =>
+              item.name.toLowerCase().trim() ===
+              columnHeader.toLowerCase().trim()
+          );
+          if (targetManagedAttr) {
+            newWorkbookColumnMap[columnHeader] = {
+              fieldPath: "managedAttributes",
+              showOnUI: true,
+              mapRelationship: false,
+              numOfUniqueValues: Object.keys(
+                columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+              ).length,
+              valueMapping: {
+                columnHeader: {
+                  id: targetManagedAttr.id,
+                  type: targetManagedAttr.type
+                }
+              }
+            };
+          }
+        } else if (fieldPath?.startsWith("parentMaterialSample.")) {
           const valueMapping = await resolveParentMapping(
             columnHeader,
             fieldPath
