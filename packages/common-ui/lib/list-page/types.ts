@@ -138,6 +138,12 @@ export interface ESIndexMapping {
   keywordMultiFieldSupport: boolean;
 
   /**
+   * Attribute contains a "keyword_numeric" field. If true, this will enable the "Between" operator
+   * for text types.
+   */
+  keywordNumericSupport: boolean;
+
+  /**
    * The path for the attribute without the attribute name. This path does not include the parent
    * path.
    *
