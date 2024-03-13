@@ -226,6 +226,8 @@ export function WorkbookColumnMapping({
               skipped: false,
               targetKey: targetManagedAttr
             });
+          } else {
+            map.push({ targetField: fieldPath, skipped: fieldPath === undefined });
           }
         } else {
           map.push({
@@ -314,6 +316,16 @@ export function WorkbookColumnMapping({
                   type: targetManagedAttr.type
                 }
               }
+            };
+          } else {
+            newWorkbookColumnMap[columnHeader] = {
+              fieldPath,
+              showOnUI: true,
+              mapRelationship: false,
+              numOfUniqueValues: Object.keys(
+                columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+              ).length,
+              valueMapping: {}
             };
           }
         } else if (fieldPath?.startsWith("parentMaterialSample.")) {
