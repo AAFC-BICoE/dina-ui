@@ -1,13 +1,10 @@
 import {
   AreYouSureModal,
   FieldWrapper,
-  RsqlFilterObject,
   SubmitButton,
-  filterBy,
   useAccount,
   useApiClient,
-  useModal,
-  useQuery
+  useModal
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
@@ -22,6 +19,7 @@ import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
 import {
+  LinkOrCreateSetting,
   WorkbookColumnMap,
   WorkbookDataTypeEnum,
   useWorkbookContext
@@ -227,7 +225,10 @@ export function WorkbookColumnMapping({
               targetKey: targetManagedAttr
             });
           } else {
-            map.push({ targetField: fieldPath, skipped: fieldPath === undefined });
+            map.push({
+              targetField: fieldPath,
+              skipped: fieldPath === undefined
+            });
           }
         } else {
           map.push({
@@ -341,10 +342,15 @@ export function WorkbookColumnMapping({
             valueMapping
           };
         } else {
+          const mapRelationship =
+            fieldPath.indexOf(".") > -1 &&
+            flattenedConfig[fieldPath.substring(0, fieldPath.indexOf("."))]
+              ?.relationshipConfig?.linkOrCreateSetting !==
+              LinkOrCreateSetting.CREATE;
           newWorkbookColumnMap[columnHeader] = {
             fieldPath,
             showOnUI: true,
-            mapRelationship: false,
+            mapRelationship,
             numOfUniqueValues: Object.keys(
               columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
             ).length,
@@ -582,23 +588,23 @@ export function WorkbookColumnMapping({
     return errors;
   }
 
-  function onToggleColumnMapping(
-    columnName: string,
-    fieldPath: string,
-    checked: boolean
-  ) {
-    const newColumnMap: WorkbookColumnMap = {};
-    newColumnMap[columnName] = {
-      fieldPath,
-      showOnUI: true,
-      numOfUniqueValues: Object.keys(
-        columnUniqueValues?.[sheet]?.[columnName] ?? {}
-      ).length,
-      mapRelationship: checked,
-      valueMapping: {}
-    };
-    setColumnMap(newColumnMap);
-  }
+  // function onToggleColumnMapping(
+  //   columnName: string,
+  //   fieldPath: string,
+  //   checked: boolean
+  // ) {
+  //   const newColumnMap: WorkbookColumnMap = {};
+  //   newColumnMap[columnName] = {
+  //     fieldPath,
+  //     showOnUI: true,
+  //     numOfUniqueValues: Object.keys(
+  //       columnUniqueValues?.[sheet]?.[columnName] ?? {}
+  //     ).length,
+  //     mapRelationship: checked,
+  //     valueMapping: {}
+  //   };
+  //   setColumnMap(newColumnMap);
+  // }
 
   async function onFieldMappingChange(
     columnName: string,
@@ -682,17 +688,14 @@ export function WorkbookColumnMapping({
                     className="row mb-2"
                     style={{ borderBottom: "solid 1px", paddingBottom: "8px" }}
                   >
-                    <div className="col-md-3">
+                    <div className="col-md-4">
                       <DinaMessage id="spreadsheetHeader" />
                     </div>
                     <div className="col-md-6">
                       <DinaMessage id="materialSampleFieldsMapping" />
                     </div>
-                    <div className="col-md-1">
-                      <DinaMessage id="skipColumn" />
-                    </div>
                     <div className="col-md-2">
-                      <DinaMessage id="mapRelationship" />
+                      <DinaMessage id="skipColumn" />
                     </div>
                   </div>
                   {headers
@@ -705,7 +708,6 @@ export function WorkbookColumnMapping({
                           }
                           columnIndex={index}
                           fieldOptions={fieldOptions}
-                          onToggleColumnMapping={onToggleColumnMapping}
                           onFieldMappingChange={onFieldMappingChange}
                           key={index}
                         />

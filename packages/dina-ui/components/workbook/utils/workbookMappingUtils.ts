@@ -42,7 +42,10 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["parent", "parentMaterialSample.materialSampleName"],
   ["parent material sample", "parentMaterialSample.materialSampleName"],
   ["preparationmethod", "preparationMethod.name"],
-  ["preparation method", "preparationMethod.name"]
+  ["preparation method", "preparationMethod.name"],
+  ["identifier", "materialSampleName"],
+  ["type", "materialSampleType"],
+  ["collection", "collection.name"]
 ]);
 
 /**
@@ -87,9 +90,12 @@ export function findMatchField(
       if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
         prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
       }
+      if (item.value === "parentMaterialSample.materialSampleName") {
+        console.log("here");
+      }
       if (
         item.value.toLowerCase().startsWith(prefix.toLowerCase()) &&
-        (item.value.toLowerCase() === columnHeader2 ||
+        (item.value.toLowerCase() === columnHeader2.toLowerCase() ||
           _toPlainString(item.label) ===
             _toPlainString(columnHeader2.substring(prefixPos + 1)))
       ) {
@@ -98,7 +104,10 @@ export function findMatchField(
         return false;
       }
     } else {
-      return _toPlainString(item.label) === _toPlainString(columnHeader2);
+      return (
+        item.value.toLowerCase() === columnHeader2.toLowerCase() ||
+        _toPlainString(item.label) === _toPlainString(columnHeader2)
+      );
     }
   });
   return option ? option.value : undefined;
