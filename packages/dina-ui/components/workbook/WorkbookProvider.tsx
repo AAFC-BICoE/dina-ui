@@ -15,8 +15,8 @@ import {
 
 import db from "./WorkbookDB";
 import { calculateColumnUniqueValuesFromSpreadsheetData } from "./utils/workbookMappingUtils";
-import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
-import { RsqlFilterObject, filterBy, useAccount, useQuery } from "packages/common-ui/lib";
+import { ManagedAttribute } from "../../types/collection-api";
+import { RsqlFilterObject, filterBy, useAccount, useQuery } from "../../../common-ui/lib";
 import { PersistedResource } from "kitsu";
 
 async function saveWorkbookResourcesInIndexDB(
