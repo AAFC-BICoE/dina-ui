@@ -1,7 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import {
-  CheckBoxField
-} from "../../../../common-ui/lib";
+import { CheckBoxField } from "../../../../common-ui/lib";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import {
@@ -57,14 +55,20 @@ export function ColumnMappingRow({
     return getColumnHeaders(spreadsheetData, sheet);
   }, [sheet]);
 
-  function showMapRelationshipCheckbox(colIndex, fieldPath?: string): boolean {
-    if (fieldPath && fieldPath.startsWith("parentMaterialSample.")) {
+  function showMapRelationshipCheckbox(
+    colIndex,
+    fieldPathInternal?: string
+  ): boolean {
+    if (
+      fieldPathInternal &&
+      fieldPathInternal.startsWith("parentMaterialSample.")
+    ) {
       return false;
     } else if (
       columnUniqueValues &&
       headers &&
-      fieldPath &&
-      isFieldInALinkableRelationshipField(fieldPath)
+      fieldPathInternal &&
+      isFieldInALinkableRelationshipField(fieldPathInternal)
     ) {
       return (
         Object.keys(columnUniqueValues[sheet][headers[colIndex]]).length <=
@@ -120,4 +124,3 @@ export function ColumnMappingRow({
     </div>
   );
 }
-

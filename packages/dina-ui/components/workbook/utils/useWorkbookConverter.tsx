@@ -46,7 +46,7 @@ export function useWorkbookConverter(
     const fieldToVocabElemsMap = new Map();
     for (const recordType of Object.keys(FieldMappingConfig)) {
       const recordFieldsMap = FieldMappingConfig[recordType];
-      for (let recordField of Object.keys(recordFieldsMap)) {
+      for (const recordField of Object.keys(recordFieldsMap)) {
         const { dataType, endpoint } = recordFieldsMap[recordField];
         switch (dataType) {
           case WorkbookDataTypeEnum.VOCABULARY:
