@@ -98,6 +98,34 @@ export function transformTextSearchToDSL({
     case "notIn":
       return inTextQuery(fieldPath, value, parentType, keywordMultiFieldSupport, operation === "notIn");
 
+    // Between, only supported if the numeric keyword exists.
+    case "between":
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    {
+                      range: {
+                        gte: value,
+                        lte: value // TODO
+                      }
+                    },
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
+          }
+        : {
+          range: {
+            gte: value,
+            lte: value // TODO
+          }
+        }
+
     // Prefix partial match
     case "startsWith":
       return prefixQuery(

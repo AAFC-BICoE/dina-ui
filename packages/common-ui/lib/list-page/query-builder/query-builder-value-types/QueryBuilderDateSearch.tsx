@@ -97,6 +97,7 @@ export function transformDateSearchToDSL({
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
+    case "between":
       return parentType
         ? {
             nested: {
@@ -317,6 +318,11 @@ function buildDateRangeObject(matchType, value, subType) {
       ? getTimezone()
       : undefined;
 
+  // Debugging.
+  // console.log(matchType);
+  // console.log(value);
+  // console.log(subType);
+
   switch (matchType) {
     case "containsDate":
       const YEAR_REGEX = /^\d{4}$/;
@@ -357,6 +363,14 @@ function buildDateRangeObject(matchType, value, subType) {
       return { ...timezone, lt: value };
     case "lessThanOrEqualTo":
       return { ...timezone, lte: value };
+    
+    // Support for between two provided values.
+    case "between":
+      return { 
+        ...timezone,
+        gte: value,
+        lte: value // Todo
+      }
 
     // Exact match case:
     default:

@@ -282,6 +282,19 @@ export function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
       cardinality: 1
     },
+    between: {
+      ...BasicConfig.operators.between,
+      label: formatMessage({ id: "queryBuilder_operator_between" }),
+      cardinality: 2,
+      valueLabels: [
+        "Value from",
+        "Value to"
+      ],
+      textSeparators: [
+        "From:",
+        "To:"
+      ]
+    },
     uuid: {
       label: "UUID",
       cardinality: 1
@@ -483,6 +496,7 @@ export function generateBuilderConfig(
             "wildcard",
             "in",
             "notIn",
+            "between", // Only displayed if supported in the mapping for text.
             "startsWith", // Only displayed if supported on the mapping.
             "containsText", // Only displayed if supported on the mapping.
             "endsWith", // Only displayed if supported on the mapping.
@@ -534,6 +548,7 @@ export function generateBuilderConfig(
             "equals",
             "notEquals",
             "containsDate",
+            "between",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",
@@ -554,6 +569,7 @@ export function generateBuilderConfig(
             "notEquals",
             "in",
             "notIn",
+            "between",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",

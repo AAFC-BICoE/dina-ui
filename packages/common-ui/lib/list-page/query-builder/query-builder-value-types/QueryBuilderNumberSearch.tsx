@@ -74,6 +74,7 @@ export function transformNumberSearchToDSL({
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
+    case "between":
       return parentType
         ? {
             nested: {
@@ -249,5 +250,10 @@ function buildNumberRangeObject(matchType, value) {
       return { lt: value };
     case "lessThanOrEqualTo":
       return { lte: value };
+    case "between":
+      return {
+        gte: value,
+        lte: value // Todo
+      }
   }
 }
