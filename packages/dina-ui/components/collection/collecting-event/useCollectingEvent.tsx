@@ -19,6 +19,7 @@ import { Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
+import { uniqBy } from "lodash";
 
 export function useCollectingEventQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -87,6 +88,8 @@ export function useCollectingEventQuery(id?: string | null) {
             data.extensionValues
           );
         }
+        data.attachment = uniqBy(data.attachment, "id");
+        data.collectors = uniqBy(data.collectors, "id");
       }
     }
   );
