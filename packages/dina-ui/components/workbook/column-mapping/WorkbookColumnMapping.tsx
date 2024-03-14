@@ -591,24 +591,6 @@ export function WorkbookColumnMapping({
     return errors;
   }
 
-  // function onToggleColumnMapping(
-  //   columnName: string,
-  //   fieldPath: string,
-  //   checked: boolean
-  // ) {
-  //   const newColumnMap: WorkbookColumnMap = {};
-  //   newColumnMap[columnName] = {
-  //     fieldPath,
-  //     showOnUI: true,
-  //     numOfUniqueValues: Object.keys(
-  //       columnUniqueValues?.[sheet]?.[columnName] ?? {}
-  //     ).length,
-  //     mapRelationship: checked,
-  //     valueMapping: {}
-  //   };
-  //   setColumnMap(newColumnMap);
-  // }
-
   async function onFieldMappingChange(
     columnName: string,
     newFieldPath: string
