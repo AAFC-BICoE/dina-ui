@@ -11,7 +11,8 @@ import {
   wildcardQuery,
   inTextQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
+import { convertStringToBetweenState, useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
+
 
 interface QueryRowTextSearchProps {
   /**
@@ -42,7 +43,7 @@ export default function QueryRowTextSearch({
     matchType,
     setValue,
     value
-  })
+  });
 
   return (
     <>
@@ -114,6 +115,7 @@ export function transformTextSearchToDSL({
 
     // Between, only supported if the numeric keyword exists.
     case "between":
+      const betweenStates = convertStringToBetweenState(value);
       return parentType
         ? {
             nested: {
@@ -123,8 +125,8 @@ export function transformTextSearchToDSL({
                   must: [
                     {
                       range: {
-                        gte: value,
-                        lte: value // TODO
+                        gte: betweenStates.low,
+                        lte: betweenStates.high
                       }
                     },
                     includedTypeQuery(parentType)
@@ -135,8 +137,8 @@ export function transformTextSearchToDSL({
           }
         : {
           range: {
-            gte: value,
-            lte: value // TODO
+            gte: betweenStates.low,
+            lte: betweenStates.high
           }
         }
 

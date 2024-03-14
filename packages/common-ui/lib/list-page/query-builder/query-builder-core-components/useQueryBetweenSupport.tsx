@@ -1,4 +1,5 @@
-import { Form, InputGroup } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { InputGroup } from "react-bootstrap";
 
 export type SupportedBetweenTypes = "number" | "date";
 
@@ -32,24 +33,33 @@ export interface BetweenStates {
   high: any;
 }
 
-export const getDefaultType = (type: SupportedBetweenTypes): BetweenStates => {
-  switch (type) {
-    case "date":
-      return {
-        high: "",
-        low: ""
-      }
-    case "number":
-      return {
-        high: 0,
-        low: 0
-      }
-  }
+export const DEFAULT_TYPE = {
+  low: "",
+  high: ""
 }
 
-// Helper function to check if value is a BetweenStates object
-export const isBetweenValue = (val: any): val is BetweenStates =>
-  typeof val === "object" && "low" in val && "high" in val;
+/**
+ * Helper function to check if value is a BetweenStates object
+ */
+export const isBetweenStateObject = (val: any): val is BetweenStates =>
+  val != null && typeof val === "object" && "low" in val && "high" in val;
+
+/**
+ * Helper function to check if the string contains a JSON of BetweenStates.
+ */
+export const isBetweenStateString = (val: string): val is string => {
+  try {
+    // Attempt to parse the string as a BetweenStates object
+    const parsedState = JSON.parse(val) as BetweenStates;
+
+    // Check if the parsed object has the required properties
+    // and is a valid BetweenStates object
+    return isBetweenStateObject(parsedState);
+  } catch (error) {
+    // Not a valid BetweenStates string
+    return false;
+  }
+};
 
 /**
  * Takes a string that might contain a BetweenStates in JSON string format and converts it into a
@@ -61,11 +71,16 @@ export const isBetweenValue = (val: any): val is BetweenStates =>
  * @param type Is this a date between or a number between?
  * @returns BetweenState object
  */
-export const convertStringToBetweenState = (val: string, type: SupportedBetweenTypes): BetweenStates => {
+export const convertStringToBetweenState = (val: string): BetweenStates => {
   try {
-    return JSON.parse(val) as BetweenStates;
+    const potentialBetweenObject = JSON.parse(val) as BetweenStates;
+    if (isBetweenStateObject(potentialBetweenObject)) {
+      return potentialBetweenObject;
+    } else {
+      return DEFAULT_TYPE;
+    }
   } catch (error) {
-    return getDefaultType(type); // Return default values on parsing error
+    return DEFAULT_TYPE; // Return default values on parsing error
   }
 }
 
@@ -78,12 +93,12 @@ export const convertStringToBetweenState = (val: string, type: SupportedBetweenT
  * @param type Is this a date between or a number between?
  * @returns String to be saved
  */
-export const convertBetweenStateToString = (state: any, type: SupportedBetweenTypes): string => {
+export const convertBetweenStateToString = (state: any): string => {
   // Double check to ensure state is actually a Between State.
-  if (isBetweenValue(state)) {
+  if (isBetweenStateObject(state)) {
     return JSON.stringify(state);
   } else {
-    return JSON.stringify(getDefaultType(type));
+    return JSON.stringify(DEFAULT_TYPE);
   }
 }
 
@@ -93,45 +108,34 @@ export function useQueryBetweenSupport({
   setValue,
   value
 }: QueryBetweenSupportProps) {
-  const handleValueChange = (newValue: any) => {
-    if (matchType === "between") {
-      // Ensure it's a high or low value and it was not altered.
-      if (newValue.target.name !== "high" && newValue.target.name !== "low") {
-        setValue?.(convertBetweenStateToString(getDefaultType(type), type))
-        return;
-      }
+  const [betweenStates, setBetweenStates] = useState<BetweenStates>(value
+    ? JSON.parse(value) : DEFAULT_TYPE);
 
-      // Update BetweenStates object based on current value and new value
-      const currentValues = convertStringToBetweenState(value ?? "", type); // Parse current value
-      const updatedValue: BetweenStates = {
-        ...currentValues,
-        [newValue.target.name]: newValue.target.value, // Update either low or high
-      };
-      setValue?.(convertBetweenStateToString(updatedValue, type)); // Stringify updated value before setting
-    } else {
-      setValue?.(newValue); // Set single value for other match types
+  useEffect(() => {
+    if (setValue && matchType === "between") {
+      setValue(convertBetweenStateToString(betweenStates))
     }
-  };
+  }, [betweenStates, matchType]);
 
-  const BetweenElement = type === "number" ? (
+  const BetweenElement = (
     <InputGroup>
       <InputGroup.Text>From</InputGroup.Text>
-      <Form.Control
+      <input
         type="number"
         name="low"
-        value={convertStringToBetweenState(value ?? "", type)?.low || ""} // Parse and access low value
-        onChange={handleValueChange}
+        className="form-control"
+        value={betweenStates.low}
+        onChange={(event) => { setBetweenStates({...betweenStates, low: Number(event.target.value) ?? betweenStates.low}) }}
       />
       <InputGroup.Text>To</InputGroup.Text>
-      <Form.Control
+      <input
         type="number"
         name="high"
-        value={convertStringToBetweenState(value ?? "", type)?.high || ""} // Parse and access high value
-        onChange={handleValueChange}
+        className="form-control"
+        value={betweenStates.high}
+        onChange={(event) => { setBetweenStates({...betweenStates, high: Number(event.target.value) ?? betweenStates.high}) }}
       />
     </InputGroup>
-  ) : (
-    <></>
   );
 
   return {
