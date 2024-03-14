@@ -49,7 +49,10 @@ import {
 } from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  COLLECTING_EVENT_COMPONENT_NAME,
+  MaterialSample
+} from "../../../types/collection-api";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
@@ -133,15 +136,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       query: transactionQueryDSL
     }
   });
-  const {
-    navOrder,
-    setNavOrder,
-    sampleFormTemplate,
-    setSampleFormTemplateUUID,
-    visibleManagedAttributeKeys,
-    materialSampleInitialValues,
-    collectingEventInitialValues
-  } = useMaterialSampleFormTemplateSelectState({});
+  const { sampleFormTemplate, setSampleFormTemplateUUID } =
+    useMaterialSampleFormTemplateSelectState({});
 
   return (
     <div>
@@ -328,7 +324,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                           />
                         </div>
                       )}
-                      <DinaForm initialValues={colEvent} readOnly={true}>
+                      <DinaForm
+                        initialValues={colEvent}
+                        readOnly={true}
+                        formTemplate={sampleFormTemplate}
+                      >
                         <CollectingEventFormLayout />
                       </DinaForm>
                     </FieldSet>
