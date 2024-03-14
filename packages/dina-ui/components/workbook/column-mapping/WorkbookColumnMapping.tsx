@@ -1,10 +1,13 @@
 import {
   AreYouSureModal,
   FieldWrapper,
+  RsqlFilterObject,
   SubmitButton,
+  filterBy,
   useAccount,
   useApiClient,
-  useModal
+  useModal,
+  useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
@@ -71,7 +74,8 @@ export function WorkbookColumnMapping({
     spreadsheetData,
     setColumnMap,
     workbookColumnMap,
-    columnUniqueValues
+    columnUniqueValues,
+    managedAttributes
   } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
@@ -210,7 +214,27 @@ export function WorkbookColumnMapping({
       const map: FieldMapType[] = [];
       for (const columnHeader of headers || []) {
         const fieldPath = findMatchField(columnHeader, newOptions);
-        map.push({ targetField: fieldPath, skipped: fieldPath === undefined });
+        if (fieldPath === undefined) {
+          const targetManagedAttr = managedAttributes.find(
+            (item) =>
+              item.name.toLowerCase().trim() ===
+              columnHeader.toLowerCase().trim()
+          );
+          if (targetManagedAttr) {
+            map.push({
+              targetField: "managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr
+            });
+          } else {
+            map.push({ targetField: fieldPath, skipped: fieldPath === undefined });
+          }
+        } else {
+          map.push({
+            targetField: fieldPath,
+            skipped: fieldPath === undefined
+          });
+        }
       }
       setFieldMap(map);
       return newOptions;
@@ -272,7 +296,39 @@ export function WorkbookColumnMapping({
       const newWorkbookColumnMap: WorkbookColumnMap = {};
       for (const columnHeader of headers || []) {
         const fieldPath = findMatchField(columnHeader, fieldOptions);
-        if (fieldPath?.startsWith("parentMaterialSample.")) {
+        if (fieldPath === undefined || fieldPath === "managedAttributes") {
+          const targetManagedAttr = managedAttributes.find(
+            (item) =>
+              item.name.toLowerCase().trim() ===
+              columnHeader.toLowerCase().trim()
+          );
+          if (targetManagedAttr) {
+            newWorkbookColumnMap[columnHeader] = {
+              fieldPath: "managedAttributes",
+              showOnUI: true,
+              mapRelationship: false,
+              numOfUniqueValues: Object.keys(
+                columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+              ).length,
+              valueMapping: {
+                columnHeader: {
+                  id: targetManagedAttr.id,
+                  type: targetManagedAttr.type
+                }
+              }
+            };
+          } else {
+            newWorkbookColumnMap[columnHeader] = {
+              fieldPath,
+              showOnUI: true,
+              mapRelationship: false,
+              numOfUniqueValues: Object.keys(
+                columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+              ).length,
+              valueMapping: {}
+            };
+          }
+        } else if (fieldPath?.startsWith("parentMaterialSample.")) {
           const valueMapping = await resolveParentMapping(
             columnHeader,
             fieldPath

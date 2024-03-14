@@ -88,8 +88,8 @@ export function findMatchField(
         prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
       }
       if (
-        item.value.startsWith(prefix) &&
-        (item.value === columnHeader2 ||
+        item.value.toLowerCase().startsWith(prefix.toLowerCase()) &&
+        (item.value.toLowerCase() === columnHeader2 ||
           _toPlainString(item.label) ===
             _toPlainString(columnHeader2.substring(prefixPos + 1)))
       ) {
