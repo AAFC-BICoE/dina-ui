@@ -11,6 +11,7 @@ import {
   wildcardQuery,
   inTextQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
 
 interface QueryRowTextSearchProps {
   /**
@@ -36,19 +37,32 @@ export default function QueryRowTextSearch({
 }: QueryRowTextSearchProps) {
   const { formatMessage } = useIntl();
 
+  const { BetweenElement } = useQueryBetweenSupport({
+    type: "number",
+    matchType,
+    setValue,
+    value
+  })
+
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {matchType !== "empty" && matchType !== "notEmpty" && (
-        <input
-          type="text"
-          value={value ?? ""}
-          onChange={(newValue) => setValue?.(newValue?.target?.value)}
-          className="form-control"
-          placeholder={matchType !== "in" && matchType !== "notIn" ? formatMessage({
-            id: "queryBuilder_value_text_placeholder"
-          }) : formatMessage({ id: "queryBuilder_value_in_placeholder" })}
-        />
+        <>
+          {matchType === "between" ? (
+            BetweenElement
+          ) : (
+            <input
+              type="text"
+              value={value ?? ""}
+              onChange={(newValue) => setValue?.(newValue?.target?.value)}
+              className="form-control"
+              placeholder={matchType !== "in" && matchType !== "notIn" ? formatMessage({
+                id: "queryBuilder_value_text_placeholder"
+              }) : formatMessage({ id: "queryBuilder_value_in_placeholder" })}
+            />  
+          )}
+        </>
       )}
     </>
   );

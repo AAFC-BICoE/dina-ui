@@ -283,17 +283,8 @@ export function generateBuilderConfig(
       cardinality: 1
     },
     between: {
-      ...BasicConfig.operators.between,
       label: formatMessage({ id: "queryBuilder_operator_between" }),
-      cardinality: 2,
-      valueLabels: [
-        "Value from",
-        "Value to"
-      ],
-      textSeparators: [
-        "From:",
-        "To:"
-      ]
+      cardinality: 1
     },
     uuid: {
       label: "UUID",
