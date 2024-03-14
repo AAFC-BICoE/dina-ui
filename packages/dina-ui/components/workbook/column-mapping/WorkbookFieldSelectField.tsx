@@ -92,7 +92,10 @@ export function WorkbookFieldSelectField({
 
   const onFieldMapChanged = (newFieldPath) => {
     setFieldValue(`fieldMap[${columnIndex}].targetKey`, "");
-    setFieldValue(`fieldMap[${columnIndex}].skipped`, newFieldPath === undefined);
+    setFieldValue(
+      `fieldMap[${columnIndex}].skipped`,
+      newFieldPath === undefined
+    );
     onFieldChanged?.(newFieldPath);
   };
 
@@ -107,7 +110,7 @@ export function WorkbookFieldSelectField({
         styles={customStyles}
         onChange={onFieldMapChanged}
       />
-      {fieldMap[columnIndex].targetField === "managedAttributes" && (
+      {fieldMap[columnIndex]?.targetField === "managedAttributes" && (
         <div className="flex-fill">
           <ResourceSelectField<ManagedAttribute>
             name={`fieldMap[${columnIndex}].targetKey`}
@@ -129,7 +132,7 @@ export function WorkbookFieldSelectField({
         </div>
       )}
 
-      {fieldMap[columnIndex].targetField === "preparationManagedAttributes" && (
+      {fieldMap[columnIndex]?.targetField === "preparationManagedAttributes" && (
         <>
           <ResourceSelectField<ManagedAttribute>
             name={`fieldMap[${columnIndex}].targetKey`}

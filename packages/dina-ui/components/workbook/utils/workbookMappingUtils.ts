@@ -88,8 +88,8 @@ export function findMatchField(
         prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
       }
       if (
-        item.value.startsWith(prefix) &&
-        (item.value === columnHeader2 ||
+        item.value.toLowerCase().startsWith(prefix.toLowerCase()) &&
+        (item.value.toLowerCase() === columnHeader2 ||
           _toPlainString(item.label) ===
             _toPlainString(columnHeader2.substring(prefixPos + 1)))
       ) {
@@ -392,8 +392,8 @@ export function convertDate(value: any, _fieldName?: string) {
   }
 }
 
-export function convertString(value: any, __filename?: string) {
-  if (value && typeof value === "string" && value.trim() != "") {
+export function convertString(value: any, _filename?: string) {
+  if (value && typeof value === "string" && value.trim() !== "") {
     return value.trim();
   } else {
     return null;

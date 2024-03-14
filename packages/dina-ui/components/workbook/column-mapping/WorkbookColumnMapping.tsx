@@ -1,10 +1,13 @@
 import {
   AreYouSureModal,
   FieldWrapper,
+  RsqlFilterObject,
   SubmitButton,
+  filterBy,
   useAccount,
   useApiClient,
-  useModal
+  useModal,
+  useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
@@ -71,7 +74,8 @@ export function WorkbookColumnMapping({
     spreadsheetData,
     setColumnMap,
     workbookColumnMap,
-    columnUniqueValues
+    columnUniqueValues,
+    managedAttributes
   } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
@@ -137,7 +141,7 @@ export function WorkbookColumnMapping({
         value: string;
         parentPath: string;
       }[] = [];
-      //const newFieldOptions: { label: string; value: string }[] = [];
+      // const newFieldOptions: { label: string; value: string }[] = [];
       Object.keys(flattenedConfig).forEach((fieldPath) => {
         if (fieldPath === "relationshipConfig") {
           return;
@@ -184,7 +188,7 @@ export function WorkbookColumnMapping({
         .groupBy((prop) => prop.parentPath)
         .map((group, key) => {
           const keyArr = key.split(".");
-          let label: string | undefined = undefined;
+          let label: string | undefined;
           for (let i = 0; i < keyArr.length; i++) {
             const k = keyArr[i];
             label =
@@ -210,7 +214,27 @@ export function WorkbookColumnMapping({
       const map: FieldMapType[] = [];
       for (const columnHeader of headers || []) {
         const fieldPath = findMatchField(columnHeader, newOptions);
-        map.push({ targetField: fieldPath, skipped: fieldPath === undefined });
+        if (fieldPath === undefined) {
+          const targetManagedAttr = managedAttributes.find(
+            (item) =>
+              item.name.toLowerCase().trim() ===
+              columnHeader.toLowerCase().trim()
+          );
+          if (targetManagedAttr) {
+            map.push({
+              targetField: "managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr
+            });
+          } else {
+            map.push({ targetField: fieldPath, skipped: fieldPath === undefined });
+          }
+        } else {
+          map.push({
+            targetField: fieldPath,
+            skipped: fieldPath === undefined
+          });
+        }
       }
       setFieldMap(map);
       return newOptions;
@@ -244,8 +268,8 @@ export function WorkbookColumnMapping({
       };
     } = {};
     if (spreadsheetData) {
-      const headers = spreadsheetData[sheet][0].content;
-      const colIndex = headers.indexOf(columnHeader) ?? -1;
+      const spreadsheetHeaders = spreadsheetData[sheet][0].content;
+      const colIndex = spreadsheetHeaders.indexOf(columnHeader) ?? -1;
       if (colIndex > -1) {
         for (let i = 1; i < spreadsheetData[sheet].length; i++) {
           const parentValue = spreadsheetData[sheet][i].content[colIndex];
@@ -272,7 +296,39 @@ export function WorkbookColumnMapping({
       const newWorkbookColumnMap: WorkbookColumnMap = {};
       for (const columnHeader of headers || []) {
         const fieldPath = findMatchField(columnHeader, fieldOptions);
-        if (fieldPath?.startsWith("parentMaterialSample.")) {
+        if (fieldPath === undefined || fieldPath === "managedAttributes") {
+          const targetManagedAttr = managedAttributes.find(
+            (item) =>
+              item.name.toLowerCase().trim() ===
+              columnHeader.toLowerCase().trim()
+          );
+          if (targetManagedAttr) {
+            newWorkbookColumnMap[columnHeader] = {
+              fieldPath: "managedAttributes",
+              showOnUI: true,
+              mapRelationship: false,
+              numOfUniqueValues: Object.keys(
+                columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+              ).length,
+              valueMapping: {
+                columnHeader: {
+                  id: targetManagedAttr.id,
+                  type: targetManagedAttr.type
+                }
+              }
+            };
+          } else {
+            newWorkbookColumnMap[columnHeader] = {
+              fieldPath,
+              showOnUI: true,
+              mapRelationship: false,
+              numOfUniqueValues: Object.keys(
+                columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+              ).length,
+              valueMapping: {}
+            };
+          }
+        } else if (fieldPath?.startsWith("parentMaterialSample.")) {
           const valueMapping = await resolveParentMapping(
             columnHeader,
             fieldPath
@@ -350,53 +406,54 @@ export function WorkbookColumnMapping({
       test: (fieldMaps: FieldMapType[]) => {
         const errors: ValidationError[] = [];
         for (let i = 0; i < fieldMaps.length; i++) {
-          const fieldMap = fieldMaps[i];
-          if (!!fieldMap && fieldMap.skipped === false) {
+          const fieldMapType = fieldMaps[i];
+          if (!!fieldMapType && fieldMapType.skipped === false) {
             // validate if there are duplicate mapping
             if (
-              fieldMap.targetField !== undefined &&
+              fieldMapType.targetField !== undefined &&
               fieldMaps.filter(
                 (item) =>
                   item.skipped === false &&
                   item.targetField + (item.targetKey?.name ?? "") ===
-                    fieldMap.targetField + (fieldMap.targetKey?.name ?? "")
+                    fieldMapType.targetField +
+                      (fieldMapType.targetKey?.name ?? "")
               ).length > 1
             ) {
               errors.push(
                 new ValidationError(
                   formatMessage("workBookDuplicateFieldMap"),
-                  fieldMap.targetField,
+                  fieldMapType.targetField,
                   `fieldMap[${i}].targetField`
                 )
               );
             }
             // validate if any managed attributes targetKey not set
             if (
-              fieldMap.skipped === false &&
-              fieldMap.targetField !== undefined &&
-              flattenedConfig[fieldMap.targetField].dataType ===
+              fieldMapType.skipped === false &&
+              fieldMapType.targetField !== undefined &&
+              flattenedConfig[fieldMapType.targetField].dataType ===
                 WorkbookDataTypeEnum.MANAGED_ATTRIBUTES &&
-              !fieldMap.targetKey
+              !fieldMapType.targetKey
             ) {
               errors.push(
                 new ValidationError(
                   formatMessage(
                     "workBookManagedAttributeKeysTargetKeyIsRequired"
                   ),
-                  fieldMap.targetField,
+                  fieldMapType.targetField,
                   `fieldMap[${i}].targetKey`
                 )
               );
             }
             // validate if any mappings are not set and not skipped
             if (
-              fieldMap.targetField === undefined &&
-              fieldMap.skipped === false
+              fieldMapType.targetField === undefined &&
+              fieldMapType.skipped === false
             ) {
               errors.push(
                 new ValidationError(
                   formatMessage("workBookSkippedField"),
-                  fieldMap.targetField,
+                  fieldMapType.targetField,
                   `fieldMap[${i}].targetField`
                 )
               );
@@ -543,13 +600,13 @@ export function WorkbookColumnMapping({
     setColumnMap(newColumnMap);
   }
 
-  async function onFieldMappingChange(columnName: string, newFieldPath: string) {
-    let valueMapping: {[key: string]: {id: string, type: string}} = {};
+  async function onFieldMappingChange(
+    columnName: string,
+    newFieldPath: string
+  ) {
+    let valueMapping: { [key: string]: { id: string; type: string } } = {};
     if (newFieldPath?.startsWith("parentMaterialSample.")) {
-      valueMapping = await resolveParentMapping(
-        columnName,
-        newFieldPath
-      );      
+      valueMapping = await resolveParentMapping(columnName, newFieldPath);
     }
     const newColumnMap: WorkbookColumnMap = {};
     newColumnMap[columnName] = {

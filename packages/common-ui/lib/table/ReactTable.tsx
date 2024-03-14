@@ -5,6 +5,7 @@ import {
   PaginationState,
   Row,
   SortingState,
+  Table,
   VisibilityState,
   flexRender,
   getCoreRowModel,
@@ -123,8 +124,9 @@ export interface ReactTableProps<TData> {
   // If true, index map columns are being loaded and processed from back end
   setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
 
-  // Hide column selector export button if true
-  hideExportButton?: boolean;
+  setReactTable?: React.Dispatch<
+    React.SetStateAction<Table<TData> | undefined>
+  >;
 
   // The default visible columns
   columnSelectorDefaultColumns?: any[];
@@ -180,8 +182,8 @@ export function ReactTable<TData>({
   setSelectedColumnSelectorIndexMapColumns,
   setLoadingIndexMapColumns,
   menuOnly,
-  hideExportButton,
-  columnSelectorDefaultColumns
+  columnSelectorDefaultColumns,
+  setReactTable
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>(sort ?? DEFAULT_SORT);
@@ -304,18 +306,20 @@ export function ReactTable<TData>({
         <ColumnSelector
           uniqueName={uniqueName}
           reactTable={table}
-          hideExportButton={hideExportButton}
           menuOnly={menuOnly}
           indexName={indexName}
           dynamicFieldMapping={dynamicFieldMapping}
           setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
           setLoadingIndexMapColumns={setLoadingIndexMapColumns}
           columnSelectorDefaultColumns={columnSelectorDefaultColumns}
-          setSelectedColumnSelectorIndexMapColumns={setSelectedColumnSelectorIndexMapColumns}
+          setSelectedColumnSelectorIndexMapColumns={
+            setSelectedColumnSelectorIndexMapColumns
+          }
         />
       );
       setColumnSelector?.(columnSelector);
     }
+    setReactTable?.(table);
   }, [table.getState().columnVisibility, table.getAllLeafColumns().length]);
 
   return !hideTable ? (

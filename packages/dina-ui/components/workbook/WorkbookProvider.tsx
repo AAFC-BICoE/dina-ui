@@ -15,6 +15,9 @@ import {
 
 import db from "./WorkbookDB";
 import { calculateColumnUniqueValuesFromSpreadsheetData } from "./utils/workbookMappingUtils";
+import { ManagedAttribute } from "../../types/collection-api";
+import { RsqlFilterObject, filterBy, useAccount, useQuery } from "../../../common-ui/lib";
+import { PersistedResource } from "kitsu";
 
 async function saveWorkbookResourcesInIndexDB(
   type: string,
@@ -184,6 +187,7 @@ export interface WorkbookUploadContextI {
   group?: string;
   type?: string;
   error?: Error;
+  managedAttributes: PersistedResource<ManagedAttribute>[];
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
   setColumnMap: (newColumnMap: WorkbookColumnMap) => void;
@@ -229,7 +233,36 @@ export function WorkbookUploadContextProvider({
     workbookResources: [],
     progress: 0
   };
+  const {isAdmin, groupNames} = useAccount();
   const [state, dispatch] = useReducer(reducer, initState);
+  const groupFilter: RsqlFilterObject[] = !isAdmin
+    ? [
+        // Restrict the list to just the user's groups:
+        {
+          selector: "group",
+          comparison: "=in=",
+          arguments: groupNames || []
+        }
+      ]
+    : [];
+
+    const {
+      loading: attrIsLoading,
+      response: attrResponse,
+      error: attrError
+    } = useQuery<ManagedAttribute[]>({
+    path: "collection-api/managed-attribute",
+    filter: filterBy([], {
+      extraFilters: [
+        {
+          selector: "managedAttributeComponent",
+          comparison: "==",
+          arguments: "MATERIAL_SAMPLE"
+        },
+        ...groupFilter
+      ]
+    })("")
+  });
   useEffect(() => {
     const strMetaData = localStorage.getItem("workbookResourceMetaData");
     const workbookMetaDataInLocalStorage: WorkbookMetaData = strMetaData
@@ -404,6 +437,7 @@ export function WorkbookUploadContextProvider({
         apiBaseUrl: state.apiBaseUrl,
         status: state.status,
         error: state.error,
+        managedAttributes: attrResponse?.data ?? [],
 
         uploadWorkbook,
         setColumnMap,
