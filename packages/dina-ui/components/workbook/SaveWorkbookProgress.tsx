@@ -111,9 +111,11 @@ export function SaveWorkbookProgress({
   }, []);
 
   async function saveWorkbook() {
+    const sourceSet = `wb_upload_${Date.now()}`;
     async function saveChunkOfWorkbook(chunkedResources) {
       for (const resource of chunkedResources) {
         for (const key of Object.keys(resource)) {
+          resource.sourceSet = sourceSet;
           await linkRelationshipAttribute(
             resource,
             workbookColumnMap,
