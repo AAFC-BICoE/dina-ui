@@ -685,6 +685,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select extension field to search against...",
   queryBuilder_extension_placeholder: "Select extension to search against...",
   queryBuilder_field_placeholder: "Select a field to search against...",
+  queryBuilder_globalSearch: "Global search",
+  queryBuilder_globalSearch_withText: "Global search for \"{globalSearchTerm}\"",
+  queryBuilder_globalSearch_tooltip: "Global search supports syntax to help refine your search further.",
+  queryBuilder_globalSearch_tooltipLink: "See user documentation for all supported syntax.",
   queryBuilder_managedAttribute_placeholder:
     "Select managed attribute to search against...",
   queryBuilder_operator_containsDate: "Contains",
