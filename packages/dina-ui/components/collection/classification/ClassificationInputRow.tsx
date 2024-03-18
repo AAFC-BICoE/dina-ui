@@ -9,10 +9,7 @@ import {
 import { useFormikContext } from "formik";
 import { find, get } from "lodash";
 import { FaMinus, FaPlus } from "react-icons/fa";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useEffect, useState } from "react";
 import { VocabularySelectField } from "../VocabularySelectField";
 
@@ -77,15 +74,15 @@ export function ClassificationInputRow({
   }
 
   return (
-    <div className="d-flex">
-      <div style={{ width: "15rem" }}>
+    <div className="d-flex w-100">
+      <div className="w-100">
         <VocabularySelectField
           name={`taxonomicRank`}
           path="collection-api/vocabulary/taxonomicRank"
           hideLabel={true}
         />
       </div>
-      <div style={{ width: "15rem", marginLeft: "1rem" }}>
+      <div className="w-100 ms-2">
         <TextField
           name={classificationPathFieldName}
           removeBottomMargin={true}
@@ -98,7 +95,8 @@ export function ClassificationInputRow({
         <div
           style={{
             cursor: "pointer",
-            marginTop: "0.6rem"
+            marginTop: "0.6rem",
+            maxWidth: "2.5rem"
           }}
         >
           {rowIndex === 0 && showPlusIcon ? (
