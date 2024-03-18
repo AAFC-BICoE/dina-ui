@@ -539,7 +539,6 @@ export function generateBuilderConfig(
             "equals",
             "notEquals",
             "containsDate",
-            "between",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",

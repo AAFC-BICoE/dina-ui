@@ -13,17 +13,6 @@ Object {
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions betweenQuery tests 2`] = `
 Object {
-  "range": Object {
-    "data.attribute.createdOn": Object {
-      "gte": "1998-05-19",
-      "lte": "2023-05-19",
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions betweenQuery tests 3`] = `
-Object {
   "nested": Object {
     "path": "included",
     "query": Object {

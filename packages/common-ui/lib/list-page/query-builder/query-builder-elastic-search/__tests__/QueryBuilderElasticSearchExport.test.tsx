@@ -460,7 +460,6 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
 
     test("betweenQuery tests", async () => {
       expect(betweenQuery("data.attribute.materialSampleName", JSON.stringify({ low: 2, high: 5 }), undefined, "text")).toMatchSnapshot();
-      expect(betweenQuery("data.attribute.createdOn", JSON.stringify({ low: "1998-05-19", high: "2023-05-19" }), undefined, "date")).toMatchSnapshot();
       expect(betweenQuery("included.attributes.dwcRecordNumber", JSON.stringify({ low: "10.5", high: "293" }), "collecting-event", "text")).toMatchSnapshot();
     });
 

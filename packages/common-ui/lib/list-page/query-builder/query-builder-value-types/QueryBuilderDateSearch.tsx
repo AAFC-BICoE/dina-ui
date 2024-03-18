@@ -3,12 +3,10 @@ import DatePicker from "react-datepicker";
 import {
   includedTypeQuery,
   rangeQuery,
-  existsQuery,
-  betweenQuery
+  existsQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { DATE_REGEX_PARTIAL } from "common-ui/lib";
-import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
 
 interface QueryBuilderDateSearchProps {
   /**
@@ -32,57 +30,42 @@ export default function QueryBuilderDateSearch({
   value,
   setValue
 }: QueryBuilderDateSearchProps) {
-
-  const { BetweenElement } = useQueryBetweenSupport({
-    type: "date",
-    matchType,
-    setValue,
-    value
-  });
-
   return (
     <>
       {matchType !== "empty" && matchType !== "notEmpty" && matchType !== "in" && matchType !== "notIn" && (
-        <>
-          {matchType === "between" ? (
-            BetweenElement
-          ) : (
-            <DatePicker
-              className="form-control"
-              value={value}
-              onChange={(newDate: Date, event) => {
-                if (
-                  !event ||
-                  event?.type === "click" ||
-                  event?.type === "keydown"
-                ) {
-                  setValue?.(newDate && newDate.toISOString().slice(0, 10));
-                }
-              }}
-              onChangeRaw={(event) => {
-                if (event?.type === "change") {
-                  let newText = event.target.value;
-                  const dashOccurrences = newText.split("-").length - 1;
-                  if (newText.length === 8 && dashOccurrences === 0) {
-                    newText =
-                      newText.slice(0, 4) +
-                      "-" +
-                      newText.slice(4, 6) +
-                      "-" +
-                      newText.slice(6);
-                  }
-                  setValue?.(newText);
-                }
-              }}
-              dateFormat="yyyy-MM-dd"
-              placeholderText="YYYY-MM-DD"
-              isClearable={true}
-              showYearDropdown={true}
-              todayButton="Today"
-            />            
-          )}
-        </>
-
+        <DatePicker
+          className="form-control"
+          value={value}
+          onChange={(newDate: Date, event) => {
+            if (
+              !event ||
+              event?.type === "click" ||
+              event?.type === "keydown"
+            ) {
+              setValue?.(newDate && newDate.toISOString().slice(0, 10));
+            }
+          }}
+          onChangeRaw={(event) => {
+            if (event?.type === "change") {
+              let newText = event.target.value;
+              const dashOccurrences = newText.split("-").length - 1;
+              if (newText.length === 8 && dashOccurrences === 0) {
+                newText =
+                  newText.slice(0, 4) +
+                  "-" +
+                  newText.slice(4, 6) +
+                  "-" +
+                  newText.slice(6);
+              }
+              setValue?.(newText);
+            }
+          }}
+          dateFormat="yyyy-MM-dd"
+          placeholderText="YYYY-MM-DD"
+          isClearable={true}
+          showYearDropdown={true}
+          todayButton="Today"
+        />
       )}
     </>
   );
@@ -131,10 +114,6 @@ export function transformDateSearchToDSL({
             fieldPath,
             buildDateRangeObject(operation, value, subType)
           );
-
-    // Between operator
-    case "between":
-      betweenQuery(fieldPath, value, parentType, "date");
 
     // Not equals match type.
     case "notEquals":
