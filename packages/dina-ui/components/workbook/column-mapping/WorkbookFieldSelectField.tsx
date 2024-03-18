@@ -78,18 +78,7 @@ export function WorkbookFieldSelectField({
     values: { fieldMap },
     setFieldValue
   } = useFormikContext<WorkbookColumnMappingFields>();
-  const { isAdmin, groupNames } = useAccount();
-  const groupFilter: RsqlFilterObject[] = !isAdmin
-    ? [
-        // Restrict the list to just the user's groups:
-        {
-          selector: "group",
-          comparison: "=in=",
-          arguments: groupNames || []
-        }
-      ]
-    : [];
-
+  
   const onFieldMapChanged = (newFieldPath) => {
     setFieldValue(`fieldMap[${columnIndex}].targetKey`, "");
     setFieldValue(
@@ -122,8 +111,7 @@ export function WorkbookFieldSelectField({
                   selector: "managedAttributeComponent",
                   comparison: "==",
                   arguments: "MATERIAL_SAMPLE"
-                },
-                ...groupFilter
+                }
               ]
             })}
             model="collection-api/managed-attribute"
@@ -144,9 +132,7 @@ export function WorkbookFieldSelectField({
                   selector: "managedAttributeComponent",
                   comparison: "==",
                   arguments: "PREPARATION"
-                },
-                // Restrict the list to just the user's groups:
-                ...groupFilter
+                }
               ]
             })}
             model="collection-api/managed-attribute"
