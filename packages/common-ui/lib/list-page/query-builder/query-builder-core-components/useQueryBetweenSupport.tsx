@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { InputGroup } from "react-bootstrap";
 
-export type SupportedBetweenTypes = "number" | "date";
+export type SupportedBetweenTypes = "number" | "text" | "date";
 
 export interface QueryBetweenSupportProps {
   /**

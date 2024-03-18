@@ -9,9 +9,10 @@ import {
   suffixQuery,
   infixQuery,
   wildcardQuery,
-  inTextQuery
+  inTextQuery,
+  betweenQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { convertStringToBetweenState, useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
+import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
 
 
 interface QueryRowTextSearchProps {
@@ -115,32 +116,7 @@ export function transformTextSearchToDSL({
 
     // Between, only supported if the numeric keyword exists.
     case "between":
-      const betweenStates = convertStringToBetweenState(value);
-      return parentType
-        ? {
-            nested: {
-              path: "included",
-              query: {
-                bool: {
-                  must: [
-                    {
-                      range: {
-                        gte: betweenStates.low,
-                        lte: betweenStates.high
-                      }
-                    },
-                    includedTypeQuery(parentType)
-                  ]
-                }
-              }
-            }
-          }
-        : {
-          range: {
-            gte: betweenStates.low,
-            lte: betweenStates.high
-          }
-        }
+      return betweenQuery(fieldPath, value, parentType, "text");
 
     // Prefix partial match
     case "startsWith":
