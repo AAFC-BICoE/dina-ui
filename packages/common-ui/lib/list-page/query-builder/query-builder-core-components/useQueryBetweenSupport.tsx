@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { InputGroup } from "react-bootstrap";
+import DatePicker from "react-datepicker";
 
 export type SupportedBetweenTypes = "number" | "text" | "date";
 
@@ -108,8 +109,7 @@ export function useQueryBetweenSupport({
   setValue,
   value
 }: QueryBetweenSupportProps) {
-  const [betweenStates, setBetweenStates] = useState<BetweenStates>(value
-    ? JSON.parse(value) : DEFAULT_TYPE);
+  const [betweenStates, setBetweenStates] = useState<BetweenStates>(DEFAULT_TYPE);
 
   useEffect(() => {
     if (setValue && matchType === "between") {
@@ -117,7 +117,40 @@ export function useQueryBetweenSupport({
     }
   }, [betweenStates, matchType]);
 
-  const BetweenElement = (
+  useEffect(() => {
+    if (value && matchType === "between") {
+      setBetweenStates(convertStringToBetweenState(value));
+    }
+  }, [matchType]);
+
+  const BetweenElement = (type === "date") ? (
+    <InputGroup>
+      <InputGroup.Text>From</InputGroup.Text>
+      <DatePicker
+        name="low"
+        className="form-control"
+        value={betweenStates.low}
+        onChange={(dateValue: Date) => { setBetweenStates({...betweenStates, low: dateValue && dateValue.toISOString().slice(0, 10) }); }}
+        dateFormat="yyyy-MM-dd"
+        placeholderText="YYYY-MM-DD"
+        isClearable={true}
+        showYearDropdown={true}
+        todayButton="Today"
+      />
+      <InputGroup.Text>To</InputGroup.Text>
+      <DatePicker
+        name="high"
+        className="form-control"
+        value={betweenStates.high}
+        onChange={(dateValue: Date) => { setBetweenStates({...betweenStates, high: dateValue && dateValue.toISOString().slice(0, 10) }); }}
+        dateFormat="yyyy-MM-dd"
+        placeholderText="YYYY-MM-DD"
+        isClearable={true}
+        showYearDropdown={true}
+        todayButton="Today"
+      />
+    </InputGroup>
+  ) : (
     <InputGroup>
       <InputGroup.Text>From</InputGroup.Text>
       <input
