@@ -3,10 +3,8 @@ import { startCase } from "lodash";
 import { useMemo } from "react";
 import {
   ResourceSelectField,
-  RsqlFilterObject,
   SelectField,
-  filterBy,
-  useAccount
+  filterBy
 } from "../../../../common-ui/lib";
 import { ManagedAttribute } from "../../../types/collection-api";
 import { WorkbookColumnMappingFields } from "./WorkbookColumnMapping";
@@ -78,7 +76,7 @@ export function WorkbookFieldSelectField({
     values: { fieldMap },
     setFieldValue
   } = useFormikContext<WorkbookColumnMappingFields>();
-  
+
   const onFieldMapChanged = (newFieldPath) => {
     setFieldValue(`fieldMap[${columnIndex}].targetKey`, "");
     setFieldValue(
@@ -120,7 +118,8 @@ export function WorkbookFieldSelectField({
         </div>
       )}
 
-      {fieldMap[columnIndex]?.targetField === "preparationManagedAttributes" && (
+      {fieldMap[columnIndex]?.targetField ===
+        "preparationManagedAttributes" && (
         <>
           <ResourceSelectField<ManagedAttribute>
             name={`fieldMap[${columnIndex}].targetKey`}
