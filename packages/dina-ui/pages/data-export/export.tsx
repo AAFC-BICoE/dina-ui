@@ -166,8 +166,16 @@ export default function ExportPage<TData extends KitsuResource>() {
       apiBaseUrl: "/dina-export-api"
     });
 
-    // data-export POST will return immediately but export won't necessarily be available
-    // continue to get status of export until it's COMPLETED
+    await getExport(dataExportPostResponse, formik);
+    setLoading(false);
+  }
+
+  // data-export POST will return immediately but export won't necessarily be available
+  // continue to get status of export until it's COMPLETED
+  async function getExport(
+    exportPostResponse: PersistedResource<KitsuResource>[],
+    formik?: any
+  ) {
     let isFetchingDataExport = true;
     let fetchDataExportRetries = 0;
     let dataExportGetResponse;
@@ -178,7 +186,7 @@ export default function ExportPage<TData extends KitsuResource>() {
           // Get the exported data
           await downloadDataExport(
             apiClient,
-            dataExportPostResponse[0].id,
+            exportPostResponse[0].id,
             formik?.values?.name
           );
           isFetchingDataExport = false;
@@ -192,7 +200,7 @@ export default function ExportPage<TData extends KitsuResource>() {
           );
         } else {
           dataExportGetResponse = await apiClient.get<DataExport>(
-            `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
+            `dina-export-api/data-export/${exportPostResponse[0].id}`,
             {}
           );
           // Wait 1 second before retrying
@@ -210,7 +218,6 @@ export default function ExportPage<TData extends KitsuResource>() {
       }
     }
     isFetchingDataExport = false;
-    setLoading(false);
   }
 
   // Function to export and download Objects
@@ -257,7 +264,7 @@ export default function ExportPage<TData extends KitsuResource>() {
           apiBaseUrl: "/objectstore-api"
         }
       );
-      downloadDataExport(apiClient, objectExportResponse[0].id);
+      await getExport(objectExportResponse);
       setLoading(false);
     }
   }
@@ -267,18 +274,23 @@ export default function ExportPage<TData extends KitsuResource>() {
   return loading || !loadedIndexMapColumns ? (
     <LoadingSpinner loading={loading} />
   ) : (
-      <PageLayout titleId="exportButtonText" buttonBarContent={<>
-        <BackButton
-          className="me-auto"
-          entityLink={entityLink}
-          byPassView={true}
-        />
-        <Link href={`/data-export/list?entityLink=${entityLink}`}>
-          <a className="btn btn-primary">
-            <DinaMessage id="viewExportHistoryButton" />
-          </a>
-        </Link>
-      </>}>
+    <PageLayout
+      titleId="exportButtonText"
+      buttonBarContent={
+        <>
+          <BackButton
+            className="me-auto"
+            entityLink={entityLink}
+            byPassView={true}
+          />
+          <Link href={`/data-export/list?entityLink=${entityLink}`}>
+            <a className="btn btn-primary">
+              <DinaMessage id="viewExportHistoryButton" />
+            </a>
+          </Link>
+        </>
+      }
+    >
       <DinaForm initialValues={{}}>
         {dataExportError}
         <div className="ms-2">

@@ -41,7 +41,7 @@ export function RelationshipFieldMapping({
                 >
                   <div className="col-3">Value</div>
                   <div className="col-3">Count</div>
-                  <div className="col-6"></div>
+                  <div className="col-6" />
                 </div>
                 {Object.keys(counts).map((fieldValue) => (
                   <div className="row" key={fieldValue}>
@@ -57,10 +57,17 @@ export function RelationshipFieldMapping({
                             ...thisColumnMap.valueMapping
                           };
                           if (newValue) {
-                            newValueMapping[fieldValue] = {
-                              id: newValue.id,
-                              type: newValue.type
-                            };
+                            if (Array.isArray(newValue)) {
+                              newValueMapping[fieldValue] = {
+                                id: newValue[0].id,
+                                type: newValue[0].type
+                              };
+                            } else {
+                              newValueMapping[fieldValue] = {
+                                id: newValue.id,
+                                type: newValue.type
+                              };
+                            }
                           } else {
                             delete newValueMapping[fieldValue];
                           }
