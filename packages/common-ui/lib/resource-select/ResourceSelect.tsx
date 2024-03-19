@@ -385,7 +385,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       classNamePrefix="react-select"
       value={selectValue}
       // The filtering is already done at the API level:
-      filterOption={() => true}
+      filterOption={({ data }) => filterList?.((data as any)?.resource) ?? true}
       isDisabled={isDisabled}
       // react-sortable-hoc config:
       axis="xy"
