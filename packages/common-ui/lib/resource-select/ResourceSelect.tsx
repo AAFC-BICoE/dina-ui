@@ -167,7 +167,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // "6" is chosen here to give enough room for the main options, the <none> option, and the
   const page = { limit: pageSize ?? 6 };
-  let sort = additionalSort
+  const sort = additionalSort
     ? additionalSort
     : !removeDefaultSort
     ? "-createdOn"
@@ -199,9 +199,9 @@ export function ResourceSelect<TData extends KitsuResource>({
   const groupedResourceOptions = showGroupCategary
     ? chain(resourceOptions)
         .groupBy((item) => (item.resource as any).group)
-        .map((value, label) => ({
+        .map((items, label) => ({
           label,
-          options: value
+          options: items
         }))
         .sort((a, b) => {
           if (a.label === b.label) {
@@ -213,9 +213,9 @@ export function ResourceSelect<TData extends KitsuResource>({
               groupNames?.includes(a.label) &&
               !groupNames.includes(b.label)
             ) {
-              return 1;
-            } else {
               return -1;
+            } else {
+              return 1;
             }
           }
         })
