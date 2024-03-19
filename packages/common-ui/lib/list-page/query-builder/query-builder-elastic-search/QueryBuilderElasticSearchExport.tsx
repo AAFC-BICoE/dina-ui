@@ -3,6 +3,7 @@ import { KitsuResource } from "kitsu";
 import { isEmpty, reject, uniq, compact } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { TableColumn } from "../../types";
+import { SupportedBetweenTypes, convertStringToBetweenState } from "../query-builder-core-components/useQueryBetweenSupport";
 
 export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
   /**
@@ -749,4 +750,45 @@ export function uuidQuery(uuids: string[]) {
       }
     }
   };
+}
+
+/**
+ * Generate a range query for getting all the values between two numbers.
+ * 
+ * @param fieldName Fieldname path for the elastic search query.
+ * @param value String containing the low and high values represented as a JSON.
+ * @param parentType Determines if the query should be nested or not.
+ * @param type If being done on a text field, a specific field should be used. (keyword_numeric)
+ */
+export function betweenQuery(fieldName: string, value: string, parentType: string | undefined, type: SupportedBetweenTypes) {
+  const betweenStates = convertStringToBetweenState(value);
+  return parentType
+    ? {
+      nested: {
+        path: "included",
+        query: {
+          bool: {
+            must: [
+              {
+                range: {
+                  [fieldName + (type === "text" ? ".keyword_numeric" : "")]: {
+                    gte: type === "number" ? Number(betweenStates.low) : betweenStates.low,
+                    lte: type === "number" ? Number(betweenStates.high) : betweenStates.high
+                  }
+                }
+              },
+              includedTypeQuery(parentType)
+            ]
+          }
+        }
+      }
+    }
+    : {
+      range: {
+        [fieldName + (type === "text" ? ".keyword_numeric" : "")]: {
+          gte: type === "number" ? Number(betweenStates.low) : betweenStates.low,
+          lte: type === "number" ? Number(betweenStates.high) : betweenStates.high
+        }
+      }
+    }
 }

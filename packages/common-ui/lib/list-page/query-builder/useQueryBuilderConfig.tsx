@@ -286,6 +286,10 @@ export function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
       cardinality: 1
     },
+    between: {
+      label: formatMessage({ id: "queryBuilder_operator_between" }),
+      cardinality: 1
+    },
     uuid: {
       label: "UUID",
       cardinality: 1
@@ -506,6 +510,7 @@ export function generateBuilderConfig(
             "wildcard",
             "in",
             "notIn",
+            "between", // Only displayed if supported in the mapping for text.
             "startsWith", // Only displayed if supported on the mapping.
             "containsText", // Only displayed if supported on the mapping.
             "endsWith", // Only displayed if supported on the mapping.
@@ -577,6 +582,7 @@ export function generateBuilderConfig(
             "notEquals",
             "in",
             "notIn",
+            "between",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",
@@ -702,7 +708,7 @@ export function generateBuilderConfig(
     canRegroup: true,
     canReorder: true,
     clearValueOnChangeField: false,
-    clearValueOnChangeOp: false,
+    clearValueOnChangeOp: true,
     showErrorMessage: true,
     removeIncompleteRulesOnLoad: false,
     removeEmptyGroupsOnLoad: false
