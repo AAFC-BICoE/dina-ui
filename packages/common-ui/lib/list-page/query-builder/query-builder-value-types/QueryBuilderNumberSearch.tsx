@@ -4,10 +4,12 @@ import {
   rangeQuery,
   termQuery,
   existsQuery,
-  inQuery
+  inQuery,
+  betweenQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
+import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
 
 interface QueryBuilderNumberSearchProps {
   /**
@@ -33,21 +35,35 @@ export default function QueryBuilderNumberSearch({
 }: QueryBuilderNumberSearchProps) {
   const { formatMessage } = useIntl();
 
+  const { BetweenElement } = useQueryBetweenSupport({
+    type: "number",
+    matchType,
+    setValue,
+    value
+  });
+
   const rangeSupport: boolean = matchType === "in" || matchType === "notIn";
 
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {matchType !== "empty" && matchType !== "notEmpty" && (
-        <input
-          type={rangeSupport ? "text" : "number"}
-          value={value ?? ""}
-          onChange={(newValue) => setValue?.(newValue?.target?.value)}
-          className="form-control"
-          placeholder={formatMessage({
-            id: rangeSupport ? "queryBuilder_value_in_placeholder" : "queryBuilder_value_number_placeholder"
-          })}
-        />
+        <>
+          {matchType === "between" ? (
+            BetweenElement
+          ) : (
+            <input
+              type={rangeSupport ? "text" : "number"}
+              value={value ?? ""}
+              onChange={(newValue) => setValue?.(newValue?.target?.value)}
+              className="form-control"
+              placeholder={formatMessage({
+                id: rangeSupport ? "queryBuilder_value_in_placeholder" : "queryBuilder_value_number_placeholder"
+              })}
+            />            
+          )}
+        </>
+
       )}
     </>
   );
@@ -97,6 +113,10 @@ export function transformNumberSearchToDSL({
     case "in":
     case "notIn":
       return inQuery(fieldPath, value, parentType, false, operation === "notIn");
+
+    // Between (range) operator
+    case "between":
+      return betweenQuery(fieldPath, value, parentType, "number");
 
     // Not equals match type.
     case "notEquals":
@@ -249,5 +269,10 @@ function buildNumberRangeObject(matchType, value) {
       return { lt: value };
     case "lessThanOrEqualTo":
       return { lte: value };
+    case "between":
+      return {
+        gte: value,
+        lte: value // Todo
+      }
   }
 }

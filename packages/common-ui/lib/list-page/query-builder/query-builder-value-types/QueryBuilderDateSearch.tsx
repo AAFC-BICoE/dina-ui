@@ -7,8 +7,6 @@ import {
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { DATE_REGEX_PARTIAL } from "common-ui/lib";
-import moment from "moment";
-import { useIntl } from "react-intl";
 
 interface QueryBuilderDateSearchProps {
   /**
@@ -32,8 +30,6 @@ export default function QueryBuilderDateSearch({
   value,
   setValue
 }: QueryBuilderDateSearchProps) {
-  const { formatMessage } = useIntl();
-
   return (
     <>
       {matchType !== "empty" && matchType !== "notEmpty" && matchType !== "in" && matchType !== "notIn" && (
@@ -357,6 +353,14 @@ function buildDateRangeObject(matchType, value, subType) {
       return { ...timezone, lt: value };
     case "lessThanOrEqualTo":
       return { ...timezone, lte: value };
+    
+    // Support for between two provided values.
+    case "between":
+      return { 
+        ...timezone,
+        gte: value,
+        lte: value // Todo
+      }
 
     // Exact match case:
     default:
