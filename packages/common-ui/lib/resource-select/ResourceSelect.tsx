@@ -234,7 +234,8 @@ export function ResourceSelect<TData extends KitsuResource>({
       ? formatMessage({ id: "dropdownSearchResults" })
       : formatMessage({ id: "typeToSearchOrChooseFromNewest" }),
     options: [
-      ...(!isMulti && !searchValue && !omitNullOption ? [NULL_OPTION] : [])
+      ...(!isMulti && !searchValue && !omitNullOption ? [NULL_OPTION] : []),
+      ...(!showGroupCategary ? resourceOptions : [])
     ]
   };
 
@@ -246,7 +247,11 @@ export function ResourceSelect<TData extends KitsuResource>({
   // Show no options while loading: (react-select will show the "Loading..." text.)
   const options = isLoading
     ? []
-    : compact([mainOptions, ...groupedResourceOptions, actionOptions]);
+    : compact([
+        mainOptions,
+        ...(showGroupCategary ? groupedResourceOptions : []),
+        actionOptions
+      ]);
 
   async function onChange(
     newSelectedRaw,
