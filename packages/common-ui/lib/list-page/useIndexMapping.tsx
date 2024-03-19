@@ -96,6 +96,7 @@ export function useIndexMapping({
               distinctTerm: key.distinct_term_agg,
               keywordMultiFieldSupport:
                 key?.fields?.includes("keyword") ?? false,
+              keywordNumericSupport: key?.fields?.includes("keyword_numeric") ?? false,
               optimizedPrefix: key?.fields?.includes("prefix") ?? false,
               containsSupport: key?.fields?.includes("infix") ?? false,
               endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
@@ -137,6 +138,8 @@ export function useIndexMapping({
             // Additional options for the field:
             distinctTerm: relationshipAttribute.distinct_term_agg,
             keywordMultiFieldSupport: true, // Forced for relationships.
+            keywordNumericSupport: 
+              relationshipAttribute?.fields?.includes("keyword_numeric") ?? false,
             optimizedPrefix:
               relationshipAttribute?.fields?.includes("prefix") ?? false,
             containsSupport:
@@ -158,6 +161,7 @@ export function useIndexMapping({
             path: fieldMapping.path,
             type: fieldMapping.type,
             keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
             optimizedPrefix: false,
             containsSupport: false,
             endsWithSupport: false
@@ -179,6 +183,7 @@ export function useIndexMapping({
               path: relationshipFieldMapping.path,
               type: relationshipFieldMapping.type,
               keywordMultiFieldSupport: false,
+              keywordNumericSupport: false,
               optimizedPrefix: false,
               containsSupport: false,
               endsWithSupport: false

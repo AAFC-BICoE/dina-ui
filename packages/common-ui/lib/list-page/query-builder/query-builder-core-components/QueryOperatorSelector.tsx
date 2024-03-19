@@ -82,6 +82,11 @@ export function QueryOperatorSelector({
         return false;
       }
 
+      // Between for the text type should only be displayed if numeric keyword exists.
+      if ((option.key === "between" && selectedFieldMapping?.type === "text") && !selectedFieldMapping?.keywordNumericSupport) {
+        return false;
+      }
+
       return true;
     })
     ?.map<QueryOperationOption>((option) => ({

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext, mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
 
@@ -51,7 +51,7 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
             name: "materialSampleName",
             type: "text",
             path: "data.attributes",
-            fields: ["prefix", "infix", "prefix_reverse"]
+            fields: ["prefix", "infix", "prefix_reverse", "keyword_numeric"]
           },
           {
             name: "materialSampleRemarks",
@@ -88,7 +88,8 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
               {
                 name: "dwcOtherRecordNumbers",
                 type: "text",
-                path: "attributes"
+                path: "attributes",
+                fields: ["keyword_numeric"]
               },
               { name: "dwcRecordNumber", type: "text", path: "attributes" },
               {

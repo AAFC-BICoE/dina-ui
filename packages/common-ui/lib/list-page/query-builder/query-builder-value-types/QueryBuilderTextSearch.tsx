@@ -9,8 +9,11 @@ import {
   suffixQuery,
   infixQuery,
   wildcardQuery,
-  inTextQuery
+  inTextQuery,
+  betweenQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
+
 
 interface QueryRowTextSearchProps {
   /**
@@ -36,19 +39,32 @@ export default function QueryRowTextSearch({
 }: QueryRowTextSearchProps) {
   const { formatMessage } = useIntl();
 
+  const { BetweenElement } = useQueryBetweenSupport({
+    type: "text",
+    matchType,
+    setValue,
+    value
+  });
+
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {matchType !== "empty" && matchType !== "notEmpty" && (
-        <input
-          type="text"
-          value={value ?? ""}
-          onChange={(newValue) => setValue?.(newValue?.target?.value)}
-          className="form-control"
-          placeholder={matchType !== "in" && matchType !== "notIn" ? formatMessage({
-            id: "queryBuilder_value_text_placeholder"
-          }) : formatMessage({ id: "queryBuilder_value_in_placeholder" })}
-        />
+        <>
+          {matchType === "between" ? (
+            BetweenElement
+          ) : (
+            <input
+              type="text"
+              value={value ?? ""}
+              onChange={(newValue) => setValue?.(newValue?.target?.value)}
+              className="form-control"
+              placeholder={matchType !== "in" && matchType !== "notIn" ? formatMessage({
+                id: "queryBuilder_value_text_placeholder"
+              }) : formatMessage({ id: "queryBuilder_value_in_placeholder" })}
+            />  
+          )}
+        </>
       )}
     </>
   );
@@ -97,6 +113,10 @@ export function transformTextSearchToDSL({
     case "in":
     case "notIn":
       return inTextQuery(fieldPath, value, parentType, keywordMultiFieldSupport, operation === "notIn");
+
+    // Between, only supported if the numeric keyword exists.
+    case "between":
+      return betweenQuery(fieldPath, value, parentType, "text");
 
     // Prefix partial match
     case "startsWith":

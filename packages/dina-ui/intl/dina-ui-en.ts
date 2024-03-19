@@ -692,6 +692,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_managedAttribute_placeholder:
     "Select managed attribute to search against...",
   queryBuilder_operator_containsDate: "Contains",
+  queryBuilder_operator_between: "Between",
+  queryBuilder_operator_between_tooltip: "The search results will include the from/to values in the search. (inclusive range)",
+  queryBuilder_operator_from: "From",
+  queryBuilder_operator_to: "To",
   queryBuilder_operator_empty: "Empty",
   queryBuilder_operator_endsWith: "Ends with",
   queryBuilder_operator_equals: "Equals",
