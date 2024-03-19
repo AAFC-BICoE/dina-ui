@@ -1,9 +1,11 @@
 import { useFormikContext } from "formik";
 import { startCase } from "lodash";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { useMemo } from "react";
 import {
   ResourceSelectField,
   SelectField,
+  TooltipSelectOption,
   filterBy
 } from "../../../../common-ui/lib";
 import { ManagedAttribute } from "../../../types/collection-api";
@@ -28,6 +30,7 @@ export function WorkbookFieldSelectField({
   fieldOptions,
   onFieldChanged
 }: WorkbookFieldSelectFieldProps) {
+  const { locale, formatMessage } = useDinaIntl();
   // Custom styling to indent the group option menus.
   const customStyles = useMemo(
     () => ({
@@ -112,8 +115,31 @@ export function WorkbookFieldSelectField({
                 }
               ]
             })}
+            additionalSort={"name"}
+            showGroupCategary={true}
             model="collection-api/managed-attribute"
-            optionLabel={(cm) => cm.name}
+            optionLabel={(ma) => {
+              const multiDescription =
+                ma?.multilingualDescription?.descriptions?.find(
+                  (description) => description.lang === locale
+                )?.desc;
+              const unit = ma?.unit;
+              const unitMessage = formatMessage("dataUnit");
+              const tooltipText = unit
+                ? `${multiDescription}\n${unitMessage}${unit}`
+                : multiDescription;
+              const fallbackTooltipText =
+                ma?.multilingualDescription?.descriptions?.find(
+                  (description) => description.lang !== locale
+                )?.desc;
+              return (
+                <TooltipSelectOption
+                  tooltipText={tooltipText ?? fallbackTooltipText ?? ma.name}
+                >
+                  {ma.name}
+                </TooltipSelectOption>
+              );
+            }}
           />
         </div>
       )}
