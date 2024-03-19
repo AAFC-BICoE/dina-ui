@@ -2,8 +2,9 @@ import { Tooltip } from "common-ui";
 import { useEffect, useState } from "react";
 import { InputGroup } from "react-bootstrap";
 import { useIntl } from "react-intl";
+import DatePicker from "react-datepicker";
 
-export type SupportedBetweenTypes = "number" | "text";
+export type SupportedBetweenTypes = "number" | "text" | "date";
 
 export interface QueryBetweenSupportProps {
   /**
@@ -125,7 +126,7 @@ export function useQueryBetweenSupport({
     }
   }, [matchType]);
 
-  const handleNumberChange = (newValue, bound) => {
+  const handleBetweenChange = (newValue, bound) => {
     if (type === "number") {
       // Validate and update for numeric fields
       const numberRegex = /^\d*\.?\d*$/; // Regex for decimal numbers
@@ -147,22 +148,58 @@ export function useQueryBetweenSupport({
 
   const BetweenElement = (
     <InputGroup>
+
+      {/* Low Bound */}
       <InputGroup.Text>{formatMessage({id: "queryBuilder_operator_from"})}</InputGroup.Text>
-      <input
-        type="text"
-        name="low"
-        className="form-control"
-        value={betweenStates.low}
-        onChange={(event) => handleNumberChange(event.target.value, "low")}
-      />
+      {type === "date" ? (
+        <DatePicker
+          name="low"
+          value={betweenStates.low}
+          onChange={(dateValue: Date) => handleBetweenChange(dateValue.toISOString().slice(0, 10), "low")}
+          dateFormat="yyyy-MM-dd"
+          placeholderText="YYYY-MM-DD"
+          isClearable={true}
+          showYearDropdown={true}
+          todayButton="Today"
+          wrapperClassName="form-control"
+          className="form-control rounded-0"
+        />
+      ) : (
+        <input
+          type="text"
+          name="low"
+          className="form-control"
+          value={betweenStates.low}
+          onChange={(event) => handleBetweenChange(event.target.value, "low")}
+        />        
+      )}
+
+      {/* High Bound */}
       <InputGroup.Text>{formatMessage({id: "queryBuilder_operator_to"})}</InputGroup.Text>
-      <input
-        type="text"
-        name="high"
-        className="form-control"
-        value={betweenStates.high}
-        onChange={(event) => handleNumberChange(event.target.value, "high")}
-      />
+      {type === "date" ? (
+        <DatePicker
+          name="high"
+          value={betweenStates.high}
+          onChange={(dateValue: Date) => handleBetweenChange(dateValue.toISOString().slice(0, 10), "high")}
+          dateFormat="yyyy-MM-dd"
+          placeholderText="YYYY-MM-DD"
+          isClearable={true}
+          showYearDropdown={true}
+          todayButton="Today"
+          wrapperClassName="form-control"
+          className="form-control rounded-0"
+        />
+      ) : (
+        <input
+          type="text"
+          name="high"
+          className="form-control"
+          value={betweenStates.high}
+          onChange={(event) => handleBetweenChange(event.target.value, "high")}
+        />        
+      )}
+
+      {/* Tooltip */}
       <InputGroup.Text>
         <Tooltip
           id={"queryBuilder_operator_between_tooltip"}
