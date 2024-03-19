@@ -676,7 +676,7 @@ export function generateBuilderConfig(
     canRegroup: true,
     canReorder: true,
     clearValueOnChangeField: false,
-    clearValueOnChangeOp: false,
+    clearValueOnChangeOp: true,
     showErrorMessage: true,
     removeIncompleteRulesOnLoad: false,
     removeEmptyGroupsOnLoad: false

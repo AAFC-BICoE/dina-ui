@@ -40,7 +40,7 @@ export default function QueryRowTextSearch({
   const { formatMessage } = useIntl();
 
   const { BetweenElement } = useQueryBetweenSupport({
-    type: "number",
+    type: "text",
     matchType,
     setValue,
     value

@@ -71,9 +71,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           switch (operator) {
             case "in":
             case "notIn":
-              return "1, 2,4"
+              return "1, 2,4";
+            case "between":
+              return JSON.stringify({ low: 1, high: 5 });
             default:
-              return "42"
+              return "42";
           }
         },
         operators: [
@@ -81,6 +83,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "notEquals",
           "in",
           "notIn",
+          "between",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -97,9 +100,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           switch (operator) {
             case "in":
             case "notIn":
-              return "3, 3.1,12.5"
+              return "3, 3.1,12.5";
+            case "between":
+              return JSON.stringify({ low: 1.5, high: 10.5 });
             default:
-              return "3.5"
+              return "3.5";
           }
         },
         operators: [
@@ -107,6 +112,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "notEquals",
           "in",
           "notIn",
+          "between",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -179,6 +185,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                       optimizedPrefix: false,
                       containsSupport: false,
                       endsWithSupport: false,
+                      keywordNumericSupport: false,
                       subType
                     }
                   })
@@ -229,6 +236,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                       optimizedPrefix: false,
                       containsSupport: false,
                       endsWithSupport: false,
+                      keywordNumericSupport: false,
                       subType
                     }
                   })

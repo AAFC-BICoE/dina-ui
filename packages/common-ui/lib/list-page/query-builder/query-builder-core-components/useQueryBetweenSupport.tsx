@@ -1,6 +1,7 @@
+import { Tooltip } from "common-ui";
 import { useEffect, useState } from "react";
 import { InputGroup } from "react-bootstrap";
-import DatePicker from "react-datepicker";
+import { useIntl } from "react-intl";
 
 export type SupportedBetweenTypes = "number" | "text";
 
@@ -109,6 +110,7 @@ export function useQueryBetweenSupport({
   setValue,
   value
 }: QueryBetweenSupportProps) {
+  const { formatMessage } = useIntl();
   const [betweenStates, setBetweenStates] = useState<BetweenStates>(DEFAULT_TYPE);
 
   useEffect(() => {
@@ -125,22 +127,39 @@ export function useQueryBetweenSupport({
 
   const BetweenElement = (
     <InputGroup>
-      <InputGroup.Text>From</InputGroup.Text>
+      <InputGroup.Text>{formatMessage({id: "queryBuilder_operator_from"})}</InputGroup.Text>
       <input
-        type="number"
+        type={type}
         name="low"
         className="form-control"
         value={betweenStates.low}
-        onChange={(event) => { setBetweenStates({...betweenStates, low: Number(event.target.value) ?? betweenStates.low}) }}
+        onChange={(event) => { 
+          setBetweenStates({
+            ...betweenStates, 
+            low: type === "number" ? (Number(event.target.value) ?? betweenStates.low) : event.target.value
+          }) 
+        }}
       />
-      <InputGroup.Text>To</InputGroup.Text>
+      <InputGroup.Text>{formatMessage({id: "queryBuilder_operator_to"})}</InputGroup.Text>
       <input
-        type="number"
+        type={type}
         name="high"
         className="form-control"
         value={betweenStates.high}
-        onChange={(event) => { setBetweenStates({...betweenStates, high: Number(event.target.value) ?? betweenStates.high}) }}
+        onChange={(event) => { 
+          setBetweenStates({
+            ...betweenStates, 
+            high: type === "number" ? (Number(event.target.value) ?? betweenStates.high) : event.target.value
+          }) 
+        }}
       />
+      <InputGroup.Text>
+        <Tooltip
+          id={"queryBuilder_operator_between_tooltip"}
+          placement="left"
+          disableSpanMargin={true}
+        />
+      </InputGroup.Text>
     </InputGroup>
   );
 

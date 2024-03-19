@@ -772,8 +772,8 @@ export function betweenQuery(fieldName: string, value: string, parentType: strin
               {
                 range: {
                   [fieldName + (type === "text" ? ".keyword_numeric" : "")]: {
-                    gte: type === "date" ? betweenStates.low : Number(betweenStates.low),
-                    lte: type === "date" ? betweenStates.high : Number(betweenStates.high)
+                    gte: type === "number" ? Number(betweenStates.low) : betweenStates.low,
+                    lte: type === "number" ? Number(betweenStates.high) : betweenStates.high
                   }
                 }
               },
@@ -786,8 +786,8 @@ export function betweenQuery(fieldName: string, value: string, parentType: strin
     : {
       range: {
         [fieldName + (type === "text" ? ".keyword_numeric" : "")]: {
-          gte: type === "date" ? betweenStates.low : Number(betweenStates.low),
-          lte: type === "date" ? betweenStates.high : Number(betweenStates.high)
+          gte: type === "number" ? Number(betweenStates.low) : betweenStates.low,
+          lte: type === "number" ? Number(betweenStates.high) : betweenStates.high
         }
       }
     }

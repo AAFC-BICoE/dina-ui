@@ -106,6 +106,7 @@ export default function QueryRowManagedAttributeSearch({
           "notEquals",
           "in",
           "notIn",
+          "between",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
