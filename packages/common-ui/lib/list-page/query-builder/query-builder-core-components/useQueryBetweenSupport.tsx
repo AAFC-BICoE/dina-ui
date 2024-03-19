@@ -29,10 +29,10 @@ export interface QueryBetweenSupportProps {
 
 export interface BetweenStates {
   /** Lower bound */
-  low: any;
+  low: string;
 
   /** Upper bound */
-  high: any;
+  high: string;
 }
 
 export const DEFAULT_TYPE = {
@@ -125,33 +125,43 @@ export function useQueryBetweenSupport({
     }
   }, [matchType]);
 
+  const handleNumberChange = (newValue, bound) => {
+    if (type === "number") {
+      // Validate and update for numeric fields
+      const numberRegex = /^\d*\.?\d*$/; // Regex for decimal numbers
+      if (numberRegex.test(newValue) || newValue === "") {
+        // Empty value is to allow the user to erase the value.
+        setBetweenStates({
+          ...betweenStates,
+          [bound]: newValue === "" ? "" : newValue,
+        });
+      }
+    } else {
+      // Update for non-numeric fields (allow any text)
+      setBetweenStates({
+        ...betweenStates,
+        [bound]: newValue,
+      });
+    }
+  };
+
   const BetweenElement = (
     <InputGroup>
       <InputGroup.Text>{formatMessage({id: "queryBuilder_operator_from"})}</InputGroup.Text>
       <input
-        type={type}
+        type="text"
         name="low"
         className="form-control"
         value={betweenStates.low}
-        onChange={(event) => { 
-          setBetweenStates({
-            ...betweenStates, 
-            low: type === "number" ? (Number(event.target.value) ?? betweenStates.low) : event.target.value
-          }) 
-        }}
+        onChange={(event) => handleNumberChange(event.target.value, "low")}
       />
       <InputGroup.Text>{formatMessage({id: "queryBuilder_operator_to"})}</InputGroup.Text>
       <input
-        type={type}
+        type="text"
         name="high"
         className="form-control"
         value={betweenStates.high}
-        onChange={(event) => { 
-          setBetweenStates({
-            ...betweenStates, 
-            high: type === "number" ? (Number(event.target.value) ?? betweenStates.high) : event.target.value
-          }) 
-        }}
+        onChange={(event) => handleNumberChange(event.target.value, "high")}
       />
       <InputGroup.Text>
         <Tooltip
