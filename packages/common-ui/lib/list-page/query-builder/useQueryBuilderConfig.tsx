@@ -40,6 +40,7 @@ import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./query-builder-value-types/QueryBuilderTextSearch";
 import { transformUUIDSearchToDSL } from "./query-builder-value-types/QueryBuilderUUIDSearch";
+import QueryRowGlobalSearchSearch, { transformGlobalSearchToDSL } from "./query-builder-value-types/QueryBuilderGlobalSearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -128,6 +129,9 @@ function validateField(value: string, type: string, formatMessage: any) {
       return true;
   }
 }
+
+// Unique fieldname identifier for global search.
+export const GLOBAL_SEARCH_FIELDNAME = "_globalSearch";
 
 export interface CustomViewField {
   /**
@@ -420,6 +424,25 @@ export function generateBuilderConfig(
         });
       }
     },
+    globalSearch: {
+      ...BasicConfig.widgets.text,
+      type: "globalSearch",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowGlobalSearchSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      ),
+      elasticSearchFormatValue: (_queryType, val, _op, field, _config) => {
+        return transformGlobalSearchToDSL({
+          value: val,
+          fieldPath: field,
+          operation: "",
+          queryType: ""
+        });
+      }
+    },
     managedAttribute: {
       ...BasicConfig.widgets.text,
       type: "managedAttribute",
@@ -573,6 +596,15 @@ export function generateBuilderConfig(
         }
       }
     },
+    globalSearch: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        globalSearch: {
+          operators: ["noOperator"]
+        }
+      }
+    },
     managedAttribute: {
       valueSources: ["value"],
       defaultOperator: "noOperator",
@@ -712,7 +744,19 @@ export function generateBuilderConfig(
           };
           return field;
         })
-      : [])
+      : []),
+
+    // Global Search support
+    {
+      [GLOBAL_SEARCH_FIELDNAME]: {
+        label: GLOBAL_SEARCH_FIELDNAME,
+        type: "globalSearch",
+        valueSources: ["value"],
+        fieldSettings: {
+          isGlobalSearch: true
+        }
+      }
+    }
   );
 
   return {

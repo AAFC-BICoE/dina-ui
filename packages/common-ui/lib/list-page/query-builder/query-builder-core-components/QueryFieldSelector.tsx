@@ -1,9 +1,12 @@
 import lodash, { startCase, flatMapDeep } from "lodash";
 import { DinaMessage } from "../../../../../dina-ui/intl/dina-ui-intl";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
-import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
 import { ESIndexMapping } from "../../types";
+import { GLOBAL_SEARCH_FIELDNAME } from "../useQueryBuilderConfig";
+import { useSessionStorage } from "usehooks-ts";
+import { SHORTCUT_GLOBAL_SEARCH_QUERY } from "../query-builder-value-types/QueryBuilderGlobalSearch";
 
 interface QueryFieldSelectorProps {
   /**
@@ -29,6 +32,27 @@ export function QueryFieldSelector({
   setField
 }: QueryFieldSelectorProps) {
   const { formatMessage, messages, locale } = useIntl();
+
+  const [isGlobalSearch, setIsGlobalSearch] = useState<boolean>(false);
+
+  // Check if we are currently in global search mode.
+  useEffect(() => {
+    if (currentField === GLOBAL_SEARCH_FIELDNAME && !isGlobalSearch) {
+      setIsGlobalSearch(true);
+    } else {
+      setIsGlobalSearch(false);
+    }
+  }, [currentField]);
+
+  // If using the shortcut for global search.
+  const [_globalSearchQuery, setGlobalSearchQuery] =
+    useSessionStorage<string | undefined>(
+      SHORTCUT_GLOBAL_SEARCH_QUERY,
+      undefined,
+      {
+        initializeWithValue: false
+      }
+    );
 
   // Generate the options that can be selected for the field dropdown.
   const queryRowOptions = useMemo(() => {
@@ -145,16 +169,37 @@ export function QueryFieldSelector({
     );
   }, [currentField, locale]);
 
+  const globalSearchOptionSelected = {
+    label: formatMessage({ id: "queryBuilder_globalSearch" }),
+    value: GLOBAL_SEARCH_FIELDNAME
+  }
+
+  const performGlobalSearch = (inputValue: string) => {
+    // Check if a search was provided during typing, if so save it to the session so it can pre-loaded
+    // in the QueryBuilderGlobalSearch.
+    if (inputValue !== "") {
+      setGlobalSearchQuery(inputValue);
+    }
+
+    setField?.(GLOBAL_SEARCH_FIELDNAME);
+  }
+
   return (
     <div style={{ width: "100%" }}>
       {/* Field Selection */}
-      <Select
+      <CreatableSelect
         options={queryRowOptions as any}
         className={`flex-grow-1 me-2 ps-0`}
         styles={customStyles}
-        value={selectedOption}
+        value={isGlobalSearch ? globalSearchOptionSelected : selectedOption}
         placeholder={<DinaMessage id="queryBuilder_field_placeholder" />}
         onChange={(selected) => setField?.(selected?.value)}
+        
+        // Global Search Specific Props
+        createOptionPosition={"first"}
+        formatCreateLabel={(inputValue) => inputValue === "" ? formatMessage({ id: "queryBuilder_globalSearch" }) : formatMessage({ id: "queryBuilder_globalSearch_withText" }, { "globalSearchTerm": inputValue })}
+        isValidNewOption={(_inputValue) => true}
+        onCreateOption={performGlobalSearch}
       />
     </div>
   );
