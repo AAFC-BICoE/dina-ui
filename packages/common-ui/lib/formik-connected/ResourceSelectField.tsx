@@ -4,10 +4,10 @@ import Link from "next/link";
 import { Fragment } from "react";
 import {
   FieldWrapper,
-  isShallowReference,
   FieldWrapperProps,
   ResourceSelect,
   ResourceSelectProps,
+  isShallowReference,
   useBulkGet
 } from "..";
 
@@ -25,14 +25,28 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
 
   /** If true, disable the dropdown when the selected option is the only one available */
   cannotBeChanged?: boolean;
+  /**
+   * Sort order + attribute.
+   * Examples:
+   *  - name
+   *  - -description
+   */
+  additionalSort?: string;
+  showGroupCategary?: boolean;
 }
 
 /** Formik-connected Dropdown select input for selecting a resource from the API. */
 export function ResourceSelectField<TData extends KitsuResource>(
   resourceSelectFieldProps: ResourceSelectFieldProps<TData>
 ) {
-  const { name, onChange, readOnlyRender, ...resourceSelectProps } =
-    resourceSelectFieldProps;
+  const {
+    name,
+    onChange,
+    readOnlyRender,
+    showGroupCategary = false,
+    additionalSort,
+    ...resourceSelectProps
+  } = resourceSelectFieldProps;
 
   const defaultReadOnlyRender = (
     value?: SingleOrArray<PersistedResource<TData> | null>
@@ -63,6 +77,9 @@ export function ResourceSelectField<TData extends KitsuResource>(
               invalid={invalid}
               onChange={onChangeInternal}
               value={value}
+              showGroupCategary={showGroupCategary}
+              additionalSort={additionalSort}
+              optionLabel={resourceSelectProps.optionLabel}
               placeholder={placeholder ?? resourceSelectProps?.placeholder}
             />
           </div>

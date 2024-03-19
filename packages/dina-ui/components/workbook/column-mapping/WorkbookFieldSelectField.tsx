@@ -3,11 +3,11 @@ import { startCase } from "lodash";
 import { useMemo } from "react";
 import {
   ResourceSelectField,
-  RsqlFilterObject,
   SelectField,
-  filterBy,
-  useAccount
+  TooltipSelectOption,
+  filterBy
 } from "../../../../common-ui/lib";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/collection-api";
 import { WorkbookColumnMappingFields } from "./WorkbookColumnMapping";
 
@@ -30,6 +30,7 @@ export function WorkbookFieldSelectField({
   fieldOptions,
   onFieldChanged
 }: WorkbookFieldSelectFieldProps) {
+  const { locale, formatMessage } = useDinaIntl();
   // Custom styling to indent the group option menus.
   const customStyles = useMemo(
     () => ({
@@ -78,17 +79,6 @@ export function WorkbookFieldSelectField({
     values: { fieldMap },
     setFieldValue
   } = useFormikContext<WorkbookColumnMappingFields>();
-  const { isAdmin, groupNames } = useAccount();
-  const groupFilter: RsqlFilterObject[] = !isAdmin
-    ? [
-        // Restrict the list to just the user's groups:
-        {
-          selector: "group",
-          comparison: "=in=",
-          arguments: groupNames || []
-        }
-      ]
-    : [];
 
   const onFieldMapChanged = (newFieldPath) => {
     setFieldValue(`fieldMap[${columnIndex}].targetKey`, "");
@@ -122,17 +112,40 @@ export function WorkbookFieldSelectField({
                   selector: "managedAttributeComponent",
                   comparison: "==",
                   arguments: "MATERIAL_SAMPLE"
-                },
-                ...groupFilter
+                }
               ]
             })}
+            additionalSort={"name"}
+            showGroupCategary={true}
             model="collection-api/managed-attribute"
-            optionLabel={(cm) => cm.name}
+            optionLabel={(ma) => {
+              const multiDescription =
+                ma?.multilingualDescription?.descriptions?.find(
+                  (description) => description.lang === locale
+                )?.desc;
+              const unit = ma?.unit;
+              const unitMessage = formatMessage("dataUnit");
+              const tooltipText = unit
+                ? `${multiDescription}\n${unitMessage}${unit}`
+                : multiDescription;
+              const fallbackTooltipText =
+                ma?.multilingualDescription?.descriptions?.find(
+                  (description) => description.lang !== locale
+                )?.desc;
+              return (
+                <TooltipSelectOption
+                  tooltipText={tooltipText ?? fallbackTooltipText ?? ma.name}
+                >
+                  {ma.name}
+                </TooltipSelectOption>
+              );
+            }}
           />
         </div>
       )}
 
-      {fieldMap[columnIndex]?.targetField === "preparationManagedAttributes" && (
+      {fieldMap[columnIndex]?.targetField ===
+        "preparationManagedAttributes" && (
         <>
           <ResourceSelectField<ManagedAttribute>
             name={`fieldMap[${columnIndex}].targetKey`}
@@ -144,9 +157,7 @@ export function WorkbookFieldSelectField({
                   selector: "managedAttributeComponent",
                   comparison: "==",
                   arguments: "PREPARATION"
-                },
-                // Restrict the list to just the user's groups:
-                ...groupFilter
+                }
               ]
             })}
             model="collection-api/managed-attribute"
