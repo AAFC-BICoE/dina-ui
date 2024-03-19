@@ -1,5 +1,11 @@
-import { DinaForm, processExtensionValuesLoading } from "common-ui";
+import {
+  DinaForm,
+  DinaFormSection,
+  FieldWrapper,
+  processExtensionValuesLoading
+} from "common-ui";
 import { DataEntry, DataEntryProps } from "./DataEntry";
+import { FIELD_EXTENSIONS_COMPONENT_NAME } from "../../../../dina-ui/types/collection-api";
 
 export interface DataEntryViewerProps extends DataEntryProps {
   extensionValues?: any;
@@ -19,14 +25,35 @@ export function DataEntryViewer({
     : processExtensionValuesLoading(extensionValues);
 
   return disableDinaForm ? (
-    <DataEntry
-      legend={legend}
-      name={name}
-      blockOptionsEndpoint={blockOptionsEndpoint}
-      readOnly={true}
-      width={"100%"}
-      blockOptionsFilter={blockOptionsFilter}
-    />
+    <DinaFormSection
+      componentName={FIELD_EXTENSIONS_COMPONENT_NAME}
+      sectionName="field-extension-section"
+    >
+      <FieldWrapper
+        disableLabelClick={true}
+        name={name}
+        hideLabel={true}
+        readOnlyRender={(_value, _form) => (
+          <DataEntry
+            legend={legend}
+            name={name}
+            blockOptionsEndpoint={blockOptionsEndpoint}
+            readOnly={true}
+            width={"100%"}
+            blockOptionsFilter={blockOptionsFilter}
+          />
+        )}
+      >
+        <DataEntry
+          legend={legend}
+          name={name}
+          blockOptionsEndpoint={blockOptionsEndpoint}
+          readOnly={true}
+          width={"100%"}
+          blockOptionsFilter={blockOptionsFilter}
+        />
+      </FieldWrapper>
+    </DinaFormSection>
   ) : (
     <DinaForm
       initialValues={{ extensionValues: processedExtensionValues }}

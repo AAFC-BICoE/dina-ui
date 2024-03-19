@@ -49,24 +49,12 @@ const FieldMappingConfig: FieldMappingConfigType = {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
         hasGroup: true,
-        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
         type: "collection",
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING },
-        code: { dataType: WorkbookDataTypeEnum.STRING },
-        webpage: { dataType: WorkbookDataTypeEnum.STRING },
-        contact: { dataType: WorkbookDataTypeEnum.STRING },
-        address: { dataType: WorkbookDataTypeEnum.STRING },
-        remarks: { dataType: WorkbookDataTypeEnum.STRING },
-        identifiers: {
-          dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
-          attributes: {
-            type: { dataType: WorkbookDataTypeEnum.STRING },
-            uri: { dataType: WorkbookDataTypeEnum.STRING }
-          }
-        }
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
     collectingEvent: {
@@ -157,17 +145,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
           relationshipConfig: {
             hasGroup: false,
             type: "person",
-            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+            linkOrCreateSetting: LinkOrCreateSetting.LINK,
             baseApiPath: "agent-api"
           },
           attributes: {
-            displayName: { dataType: WorkbookDataTypeEnum.STRING },
-            email: { dataType: WorkbookDataTypeEnum.STRING },
-            givenNames: { dataType: WorkbookDataTypeEnum.STRING },
-            familyNames: { dataType: WorkbookDataTypeEnum.STRING },
-            aliases: { dataType: WorkbookDataTypeEnum.STRING },
-            webpage: { dataType: WorkbookDataTypeEnum.STRING },
-            remarks: { dataType: WorkbookDataTypeEnum.STRING }
+            displayName: { dataType: WorkbookDataTypeEnum.STRING }
           }
         }
       }
@@ -214,17 +196,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
       relationshipConfig: {
         hasGroup: false,
         type: "person",
-        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
         baseApiPath: "agent-api"
       },
       attributes: {
-        displayName: { dataType: WorkbookDataTypeEnum.STRING },
-        email: { dataType: WorkbookDataTypeEnum.STRING },
-        givenNames: { dataType: WorkbookDataTypeEnum.STRING },
-        familyNames: { dataType: WorkbookDataTypeEnum.STRING },
-        aliases: { dataType: WorkbookDataTypeEnum.STRING },
-        webpage: { dataType: WorkbookDataTypeEnum.STRING },
-        remarks: { dataType: WorkbookDataTypeEnum.STRING }
+        displayName: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
     storageUnit: {
@@ -236,8 +212,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING },
-        barcode: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
     projects: {
@@ -245,14 +220,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
       relationshipConfig: {
         hasGroup: true,
         type: "project",
-        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
         baseApiPath: "collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING },
-        startDate: { dataType: WorkbookDataTypeEnum.DATE },
-        endDate: { dataType: WorkbookDataTypeEnum.DATE },
-        status: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
     organism: {
