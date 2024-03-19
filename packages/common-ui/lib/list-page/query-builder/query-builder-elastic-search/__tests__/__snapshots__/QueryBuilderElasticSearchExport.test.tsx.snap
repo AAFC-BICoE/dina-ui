@@ -3,7 +3,7 @@
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions betweenQuery tests 1`] = `
 Object {
   "range": Object {
-    "data.attribute.materialSampleName.keyword_numeric": Object {
+    "data.attribute.numberExample": Object {
       "gte": 2,
       "lte": 5,
     },
@@ -13,26 +13,10 @@ Object {
 
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions betweenQuery tests 2`] = `
 Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "range": Object {
-              "included.attributes.dwcRecordNumber.keyword_numeric": Object {
-                "gte": 10.5,
-                "lte": 293,
-              },
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
+  "range": Object {
+    "data.attribute.materialSampleName.keyword_numeric": Object {
+      "gte": "Test100",
+      "lte": "Test200",
     },
   },
 }

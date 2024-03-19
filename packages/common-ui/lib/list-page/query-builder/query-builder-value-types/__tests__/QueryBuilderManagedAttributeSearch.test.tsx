@@ -73,7 +73,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
             case "notIn":
               return "1, 2,4";
             case "between":
-              return JSON.stringify({ low: 1, high: 5 });
+              return "{\\\"low\\\":1,\\\"high\\\":5}";
             default:
               return "42";
           }
@@ -102,7 +102,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
             case "notIn":
               return "3, 3.1,12.5";
             case "between":
-              return JSON.stringify({ low: 1.5, high: 10.5 });
+              return "{\\\"low\\\":1.5,\\\"high\\\":10.5}";
             default:
               return "3.5";
           }
