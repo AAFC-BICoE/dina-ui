@@ -59,6 +59,7 @@ export * from "./modal/modal";
 export * from "./page-split/SplitPagePanel";
 export * from "./resource-select/ResourceSelect";
 export * from "./resource-select/useBulkGet";
+export * from "./resource-select/TooltipSelectOption";
 export * from "./table/BooleanCell";
 export * from "./table/DateCell";
 export * from "./table/multilingual-cells";

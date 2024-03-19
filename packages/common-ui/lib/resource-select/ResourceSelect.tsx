@@ -4,13 +4,21 @@ import {
   KitsuResourceLink,
   PersistedResource
 } from "kitsu";
-import { castArray, compact, isEqual, isUndefined, keys, omitBy } from "lodash";
-import React, { ComponentProps, useState } from "react";
+import {
+  castArray,
+  chain,
+  compact,
+  isEqual,
+  isUndefined,
+  keys,
+  omitBy
+} from "lodash";
+import { ComponentProps, useState } from "react";
 import { useIntl } from "react-intl";
 import Select, {
-  components as reactSelectComponents,
+  ActionMeta,
   StylesConfig,
-  ActionMeta
+  components as reactSelectComponents
 } from "react-select";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDebounce } from "use-debounce";
@@ -33,12 +41,22 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   model: string;
 
   /** Function to get the option label for each resource. */
-  optionLabel: (resource: PersistedResource<TData>) => string | null;
+  optionLabel: (
+    resource: PersistedResource<TData>
+  ) => string | null | JSX.Element;
 
   /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
   filter: (inputValue: string) => FilterParam;
 
   filterList?: (item: any | undefined) => boolean;
+
+  /**
+   * Sort order + attribute.
+   * Examples:
+   *  - name
+   *  - -description
+   */
+  additionalSort?: string;
 
   /** Whether this is a multi-select dropdown. */
   isMulti?: boolean;
@@ -82,6 +100,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** If true, disable the dropdown when the selected option is the only one available */
   cannotBeChanged?: boolean;
+
+  showGroupCategary?: boolean;
 }
 
 type ResourceSelectValue<TData extends KitsuResource> =
@@ -125,10 +145,12 @@ export function ResourceSelect<TData extends KitsuResource>({
   removeDefaultSort,
   placeholder,
   isLoading: loadingProp,
-  cannotBeChanged
+  cannotBeChanged,
+  showGroupCategary = false,
+  additionalSort
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
-  const { isAdmin } = useAccount();
+  const { isAdmin, groupNames } = useAccount();
 
   /** The value of the input element. */
   const [inputValue, setInputValue] = useState("");
@@ -145,7 +167,11 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // "6" is chosen here to give enough room for the main options, the <none> option, and the
   const page = { limit: pageSize ?? 6 };
-  const sort = !removeDefaultSort ? "-createdOn" : undefined;
+  const sort = additionalSort
+    ? additionalSort
+    : !removeDefaultSort
+    ? "-createdOn"
+    : undefined;
 
   // Omit undefined values from the GET params, which would otherwise cause an invalid request.
   // e.g. /api/region?include=undefined
@@ -170,6 +196,31 @@ export function ResourceSelect<TData extends KitsuResource>({
       value: resource.id
     })) ?? [];
 
+  const groupedResourceOptions = showGroupCategary
+    ? chain(resourceOptions)
+        .groupBy((item) => (item.resource as any).group)
+        .map((items, label) => ({
+          label,
+          options: items
+        }))
+        .sort((a, b) => {
+          if (a.label === b.label) {
+            return 0;
+          } else {
+            if (groupNames?.includes(a.label) && groupNames.includes(b.label)) {
+              return a.label.localeCompare(b.label);
+            } else if (
+              groupNames?.includes(a.label) &&
+              !groupNames.includes(b.label)
+            ) {
+              return -1;
+            } else {
+              return 1;
+            }
+          }
+        })
+        .value()
+    : resourceOptions;
   /** An option the user can select to set the relationship to null. */
   const NULL_OPTION = Object.seal({
     label: `<${formatMessage({ id: "none" })}>`,
@@ -184,7 +235,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       : formatMessage({ id: "typeToSearchOrChooseFromNewest" }),
     options: [
       ...(!isMulti && !searchValue && !omitNullOption ? [NULL_OPTION] : []),
-      ...resourceOptions
+      ...(!showGroupCategary ? resourceOptions : [])
     ]
   };
 
@@ -194,7 +245,13 @@ export function ResourceSelect<TData extends KitsuResource>({
   };
 
   // Show no options while loading: (react-select will show the "Loading..." text.)
-  const options = isLoading ? [] : compact([mainOptions, actionOptions]);
+  const options = isLoading
+    ? []
+    : compact([
+        mainOptions,
+        ...(showGroupCategary ? groupedResourceOptions : []),
+        actionOptions
+      ]);
 
   async function onChange(
     newSelectedRaw,
@@ -301,7 +358,21 @@ export function ResourceSelect<TData extends KitsuResource>({
       ...base,
       // Make Action options bold:
       ...(gProps.label === actionOptions?.label ? { fontWeight: "bold" } : {})
-    })
+    }),
+    // Grouped options (relationships) should be indented.
+    option: (baseStyle, { data }) => {
+      if (data?.resource) {
+        return {
+          ...baseStyle,
+          paddingLeft: "25px"
+        };
+      }
+
+      // Default style for everything else.
+      return {
+        ...baseStyle
+      };
+    }
   };
 
   return (
