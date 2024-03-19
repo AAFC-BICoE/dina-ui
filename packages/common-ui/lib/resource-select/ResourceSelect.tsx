@@ -247,7 +247,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   const options = isLoading
     ? []
     : compact([mainOptions, ...groupedResourceOptions, actionOptions]);
-  console.log(options);
+
   async function onChange(
     newSelectedRaw,
     actionMeta: ActionMeta<{ resource: PersistedResource<TData> }>
