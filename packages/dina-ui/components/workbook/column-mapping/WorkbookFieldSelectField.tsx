@@ -1,6 +1,5 @@
 import { useFormikContext } from "formik";
 import { startCase } from "lodash";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { useMemo } from "react";
 import {
   ResourceSelectField,
@@ -8,6 +7,7 @@ import {
   TooltipSelectOption,
   filterBy
 } from "../../../../common-ui/lib";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/collection-api";
 import { WorkbookColumnMappingFields } from "./WorkbookColumnMapping";
 
