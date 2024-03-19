@@ -212,8 +212,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING },
-        barcode: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
     projects: {

@@ -16,7 +16,8 @@ import {
   PreparationMethodSelectField,
   PreparationTypeSelectField,
   ProjectSelectField,
-  ProtocolSelectField
+  ProtocolSelectField,
+  StorageUnitSelectField
 } from "../../resource-select-fields/resource-select-fields";
 import FieldMappingConfig from "./FieldMappingConfig";
 import {
@@ -693,6 +694,8 @@ export function useWorkbookConverter(
         return <PreparationMethodSelectField {...resourceSelectProps} />;
       case "project":
         return <ProjectSelectField {...resourceSelectProps} />;
+      case "storage-unit":
+        return <StorageUnitSelectField resourceProps={resourceSelectProps} />;
     }
   }
 

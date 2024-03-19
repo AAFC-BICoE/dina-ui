@@ -45,7 +45,12 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["preparation method", "preparationMethod.name"],
   ["identifier", "materialSampleName"],
   ["type", "materialSampleType"],
-  ["collection", "collection.name"]
+  ["collection", "collection.name"],
+  ["collections", "collection.name"],
+  ["storage unit", "storageUnit.name"],
+  ["storageunit", "storageUnit.name"],
+  ["project", "projects.name"],
+  ["projects", "projects.name"]
 ]);
 
 /**
@@ -89,9 +94,6 @@ export function findMatchField(
     if (prefix) {
       if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
         prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
-      }
-      if (item.value === "parentMaterialSample.materialSampleName") {
-        console.log("here");
       }
       if (
         item.value.toLowerCase().startsWith(prefix.toLowerCase()) &&
