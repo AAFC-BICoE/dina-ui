@@ -116,7 +116,7 @@ export function FieldWrapper(props: FieldWrapperProps) {
           const visibleManagedAttributes = find(sectionFound.items, {
             name: "managedAttributesOrder"
           })?.defaultValue;
-          return visibleManagedAttributes.includes(
+          return visibleManagedAttributes?.includes(
             templateCheckboxFieldName ?? name
           );
         }
