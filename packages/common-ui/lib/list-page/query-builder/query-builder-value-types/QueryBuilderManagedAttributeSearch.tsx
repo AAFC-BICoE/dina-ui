@@ -143,11 +143,13 @@ export default function QueryRowManagedAttributeSearch({
           "wildcard",
           "in",
           "notIn",
+          // Between is only used if the keyword numeric support is found.
+          managedAttributeConfig?.keywordNumericSupport ? "between" : undefined,
           "startsWith",
           "notEquals",
           "empty",
-          "notEmpty"
-        ];
+          "notEmpty",
+        ].filter(option => option !== undefined) as string[];
       default:
         return [];
     }
