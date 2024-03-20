@@ -7,8 +7,10 @@ import {
   betweenQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
-import { DATE_REGEX_PARTIAL } from "common-ui/lib";
+import { DATE_REGEX_NO_TIME, DATE_REGEX_PARTIAL } from "common-ui";
 import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
+import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import { Config } from "react-awesome-query-builder";
 
 interface QueryBuilderDateSearchProps {
   /**
@@ -395,18 +397,44 @@ function buildDateRangeObject(matchType, value, subType) {
   }
 }
 
-/**
- * Validate the date string to ensure it's something elastic search can accept.
- *
- * Partial dates and multiple dates are supported here.
- * @param value date value
- * @param formatMessage error message translation locale
- * @return null if valid, string error if not valid.
- */
-export function validateDate(value, formatMessage): string | null {
-  if (DATE_REGEX_PARTIAL.test(value)) {
-    return null;
+export function validateDate(
+  fieldName: string,
+  value: string,
+  operator: string,
+  config: Config,
+  formatMessage: any
+): ValidationResult {
+
+  console.log(value);
+
+  switch (operator) {
+    // Contains (Partial formats supported here.)
+    case "containsDate":
+      if (!DATE_REGEX_PARTIAL.test(value)) {
+        return {
+          errorMessage: formatMessage({ id: "dateMustBeFormattedPartial" }),
+          fieldName
+        }
+      }
+
+    // Normal date fields
+    case "equals":
+    case "notEquals":
+    case "greaterThan":
+    case "greaterThanOrEqualTo":
+    case "lessThan":
+    case "lessThanOrEqualTo":
+      if (!DATE_REGEX_NO_TIME.test(value)) {
+        return {
+          errorMessage: formatMessage({ id: "dateMustBeFormattedYyyyMmDd" }),
+          fieldName
+        }
+      }
+
+    // Between (Check the low/high for correct values, ensure it's not greater than the other value.)
+    case "between":
+
   }
 
-  return formatMessage({ id: "dateMustBeFormattedPartial" });
+  return true;
 }

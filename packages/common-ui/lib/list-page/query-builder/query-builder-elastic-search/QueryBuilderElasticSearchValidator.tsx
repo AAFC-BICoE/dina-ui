@@ -1,5 +1,5 @@
-import { DATE_REGEX_PARTIAL } from "packages/common-ui/lib/formik-connected/DateField";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
+import { validateDate } from "../query-builder-value-types/QueryBuilderDateSearch";
 
 export interface ValidationError {
   /** Error message to display to the user. */
@@ -21,6 +21,8 @@ export function getElasticSearchValidationResults(
   formatMessage: any
 ): ValidationError[] {
   const results = elasticSearchFormatValidator(queryTree, config, formatMessage);
+
+  console.log(JSON.stringify(results));
 
   if (isValidationResult(results)) {
     return results === true ? [] : [results];
@@ -132,27 +134,4 @@ function validateEsGroup(
   if (!result.length) return true;
 
   return result;
-}
-
-function validateDate(
-  fieldName: string,
-  value: string,
-  operator: string,
-  config: Config,
-  formatMessage: any
-): ValidationResult {
-
-  switch (operator) {
-    case "contains":
-      if (DATE_REGEX_PARTIAL.test(value)) {
-        return true;
-      } else {
-        return {
-          errorMessage: formatMessage({ id: "dateMustBeFormattedPartial" }),
-          fieldName
-        }
-      }
-  }
-
-  return true;
 }

@@ -73,6 +73,7 @@ import {
   getIncludedStandardColumns
 } from "../column-selector/ColumnSelectorUtils";
 import { useSessionStorage } from "usehooks-ts";
+import { ValidationError, getElasticSearchValidationResults } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -421,6 +422,9 @@ export function QueryPage<TData extends KitsuResource>({
   // Query Page error message state
   const [error, setError] = useState<any>();
 
+  // Query page validation errors
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+
   const defaultGroups = {
     group: groups
   };
@@ -449,6 +453,21 @@ export function QueryPage<TData extends KitsuResource>({
     // Check the tree for any validation issues. Do not submit query if issues exist.
     if (!Utils.isValidTree(submittedQueryBuilderTree)) {
       return;
+    }
+
+    // Custom validation logic.
+    if (!customViewElasticSearchQuery) {
+      const validationErrorsFound = getElasticSearchValidationResults(
+        submittedQueryBuilderTree,
+        queryBuilderConfig,
+        formatMessage
+      )
+      setValidationErrors(validationErrorsFound);
+
+      // If any errors are found, do not continue with the search.
+      if (validationErrorsFound.length > 0) {
+        return;
+      }
     }
 
     // Elastic search query with pagination settings.
