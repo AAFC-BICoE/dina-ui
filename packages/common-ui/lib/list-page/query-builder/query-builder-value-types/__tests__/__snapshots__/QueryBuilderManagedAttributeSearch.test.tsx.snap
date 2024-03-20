@@ -3629,6 +3629,17 @@ Object {
 }
 `;
 
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the between operator, undefined subtype 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.managedAttributes.attributeName.keyword_numeric": Object {
+      "gte": "stringValue1",
+      "lte": "stringValue3",
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Attribute level tests Using the empty operator, undefined subtype 1`] = `
 Object {
   "bool": Object {
@@ -3801,6 +3812,33 @@ Object {
     "data.attributes.managedAttributes.attributeName.keyword": Object {
       "case_insensitive": true,
       "value": "*stringValue*",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderManagedAttributeSearch transformManagedAttributeToDSL function STRING based managed attribute tests Relationship level tests Using the between operator, undefined subtype 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.managedAttributes.attributeName.keyword_numeric": Object {
+                "gte": "stringValue1",
+                "lte": "stringValue3",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
     },
   },
 }
