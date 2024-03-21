@@ -97,6 +97,9 @@ export default function QueryRowManagedAttributeSearch({
     ? "PICK_LIST"
     : managedAttributeSelected?.vocabularyElementType ?? "";
 
+  console.log(JSON.stringify(managedAttributeState));
+  console.log(JSON.stringify(managedAttributeConfig));
+
   const supportedOperatorsForType: (type: string) => string[] = (type) => {
     switch (type) {
       case "INTEGER":
@@ -143,11 +146,14 @@ export default function QueryRowManagedAttributeSearch({
           "wildcard",
           "in",
           "notIn",
+          // Between is only used if the keyword numeric support is found.
+          // Hard-coded solution until properly fixed.
+          (managedAttributeConfig?.keywordNumericSupport || (managedAttributeSelected?.key === "barcode" && managedAttributeConfig?.dynamicField?.apiEndpoint === "objectstore-api/managed-attribute")) ? "between" : undefined,
           "startsWith",
           "notEquals",
           "empty",
-          "notEmpty"
-        ];
+          "notEmpty",
+        ].filter(option => option !== undefined) as string[];
       default:
         return [];
     }

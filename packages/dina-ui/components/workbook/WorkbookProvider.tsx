@@ -13,11 +13,11 @@ import {
   WorkbookResourceType
 } from "./types/Workbook";
 
+import { PersistedResource } from "kitsu";
+import { filterBy, useQuery } from "../../../common-ui/lib";
+import { ManagedAttribute } from "../../types/collection-api";
 import db from "./WorkbookDB";
 import { calculateColumnUniqueValuesFromSpreadsheetData } from "./utils/workbookMappingUtils";
-import { ManagedAttribute } from "../../types/collection-api";
-import { RsqlFilterObject, filterBy, useAccount, useQuery } from "../../../common-ui/lib";
-import { PersistedResource } from "kitsu";
 
 async function saveWorkbookResourcesInIndexDB(
   type: string,
@@ -233,24 +233,8 @@ export function WorkbookUploadContextProvider({
     workbookResources: [],
     progress: 0
   };
-  const {isAdmin, groupNames} = useAccount();
   const [state, dispatch] = useReducer(reducer, initState);
-  const groupFilter: RsqlFilterObject[] = !isAdmin
-    ? [
-        // Restrict the list to just the user's groups:
-        {
-          selector: "group",
-          comparison: "=in=",
-          arguments: groupNames || []
-        }
-      ]
-    : [];
-
-    const {
-      loading: attrIsLoading,
-      response: attrResponse,
-      error: attrError
-    } = useQuery<ManagedAttribute[]>({
+  const { response: attrResponse } = useQuery<ManagedAttribute[]>({
     path: "collection-api/managed-attribute",
     filter: filterBy([], {
       extraFilters: [
@@ -258,8 +242,7 @@ export function WorkbookUploadContextProvider({
           selector: "managedAttributeComponent",
           comparison: "==",
           arguments: "MATERIAL_SAMPLE"
-        },
-        ...groupFilter
+        }
       ]
     })("")
   });

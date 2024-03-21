@@ -136,8 +136,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       query: transactionQueryDSL
     }
   });
-  const { sampleFormTemplate, setSampleFormTemplateUUID } =
-    useMaterialSampleFormTemplateSelectState({});
+  const {
+    sampleFormTemplate,
+    setSampleFormTemplateUUID,
+    visibleManagedAttributeKeys
+  } = useMaterialSampleFormTemplateSelectState({});
 
   return (
     <div>
@@ -334,8 +337,21 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     </FieldSet>
                   );
                 })}
-                {hasPreparations && <PreparationField />}
-                {hasOrganism && <OrganismsField name="organism" />}
+                {hasPreparations && (
+                  <PreparationField
+                    visibleManagedAttributeKeys={
+                      visibleManagedAttributeKeys?.preparations
+                    }
+                  />
+                )}
+                {hasOrganism && (
+                  <OrganismsField
+                    name="organism"
+                    visibleManagedAttributeKeys={
+                      visibleManagedAttributeKeys?.determination
+                    }
+                  />
+                )}
                 {hasInheritedDetermination && (
                   <div className="row">
                     <div className="col-md-6">
@@ -378,6 +394,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       valuesPath="managedAttributes"
                       managedAttributeApiPath="collection-api/managed-attribute"
                       managedAttributeComponent="MATERIAL_SAMPLE"
+                      visibleAttributeKeys={
+                        visibleManagedAttributeKeys?.materialSample
+                      }
                     />
                   </div>
                 </div>
