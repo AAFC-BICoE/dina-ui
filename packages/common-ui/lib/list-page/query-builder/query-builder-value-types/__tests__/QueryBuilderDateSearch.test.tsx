@@ -151,17 +151,78 @@ describe("QueryBuilderDateSearch", () => {
   });
 
   describe("validateDate function", () => {
-    test("Correct date formats", async () => {
-      // Null is expected, since it will return an error message if incorrect.
-      expect(validateDate("1998", jest.fn)).toBeNull();
-      expect(validateDate("1998-05", jest.fn)).toBeNull();
-      expect(validateDate("1998-05-19", jest.fn)).toBeNull();
+    // Mock formatMessage function (replace with your actual implementation)
+    const formatMessage = jest.fn();
+
+    beforeEach(() => {
+      formatMessage.mockReturnValue('Mocked error message');
+    });
+  
+    afterEach(() => {
+      jest.clearAllMocks();
     });
 
-    test("Invalid date formats", async () => {
-      expect(validateDate("19-05-1998", jest.fn)).not.toBeNull();
-      expect(validateDate("today", jest.fn)).not.toBeNull();
-      expect(validateDate("December 19th 2022", jest.fn)).not.toBeNull();
+    it('should return true for valid "equals" operator with formatted date', () => {
+      const result = validateDate('myDate', '2024-03-21', 'equals', formatMessage);
+      expect(result).toBe(true);
+      expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+    });
+
+    it('should return validation error for invalid date format in "equals" operator', () => {
+      const result = validateDate('myDate', 'invalid date', 'equals', formatMessage);
+      expect(result).toEqual({
+        errorMessage: 'Mocked error message',
+        fieldName: 'myDate',
+      });
+      expect(formatMessage).toHaveBeenCalledWith({ id: 'dateMustBeFormattedYyyyMmDd' }); // Specific error message called
+    });
+
+    it('should return true for valid "containsDate" operator with partial date format', () => {
+      const result = validateDate('myDate', '2024-03', 'containsDate', formatMessage);
+      expect(result).toBe(true);
+      expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+    });
+
+    it('should return validation error for invalid date format in "containsDate" operator', () => {
+      const result = validateDate('myDate', 'invalid_date', 'containsDate', formatMessage);
+      expect(result).toEqual({
+        errorMessage: 'Mocked error message',
+        fieldName: 'myDate',
+      });
+      expect(formatMessage).toHaveBeenCalledWith({ id: 'dateMustBeFormattedPartial' }); // Specific error message called
+    });
+
+    it('should return validation error for "between" operator with invalid low date', () => {
+      const result = validateDate('myDate', '{"low": "2023-05","high": "2022-01-19"}', 'between', formatMessage);
+      expect(result).toEqual({
+        errorMessage: 'Mocked error message',
+        fieldName: 'myDate',
+      });
+      expect(formatMessage).toHaveBeenCalledWith({ id: 'dateMustBeFormattedYyyyMmDd' }); // Specific error message called
+    });
+
+    it('should return validation error for "between" operator with invalid high date', () => {
+      const result = validateDate('myDate', '{"low": "2023-05-19","high": "2022-01"}', 'between', formatMessage);
+      expect(result).toEqual({
+        errorMessage: 'Mocked error message',
+        fieldName: 'myDate',
+      });
+      expect(formatMessage).toHaveBeenCalledWith({ id: 'dateMustBeFormattedYyyyMmDd' }); // Specific error message called
+    });
+
+    it('should return validation error for "between" operator with high date less than low date', () => {
+      const result = validateDate('myDate', '{"low": "2023-05-19","high": "2022-01-19"}', 'between', formatMessage);
+      expect(result).toEqual({
+        errorMessage: 'Mocked error message',
+        fieldName: 'myDate',
+      });
+      expect(formatMessage).toHaveBeenCalledWith({ id: 'dateBetweenInvalid' }); // Specific error message called
+    });
+
+    it('should return true for valid "between" operator values', () => {
+      const result = validateDate('myDate', '{"low": "2022-05-19","high": "2023-01-19"}', 'between', formatMessage);
+      expect(result).toBe(true);
+      expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
     });
   });
 });

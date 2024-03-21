@@ -402,12 +402,8 @@ export function validateDate(
   fieldName: string,
   value: string,
   operator: string,
-  config: Config,
   formatMessage: any
 ): ValidationResult {
-
-  console.log(value);
-
   switch (operator) {
     // Contains (Partial formats supported here.)
     case "containsDate":

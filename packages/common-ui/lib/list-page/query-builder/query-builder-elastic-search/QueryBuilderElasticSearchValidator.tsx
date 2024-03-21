@@ -118,7 +118,7 @@ export function validateEsRule(
   // For all the different widgets, a validate date function can be setup to do custom validation.
   switch (widgetName) {
     case "date":
-      return validateDate(fieldName, value, operator, config, formatMessage);
+      return validateDate(fieldName, value, operator, formatMessage);
   }
 
   return true;
