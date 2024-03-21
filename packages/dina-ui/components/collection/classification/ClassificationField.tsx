@@ -1,13 +1,10 @@
+import { useAccount, useQuery, LoadingSpinner } from "common-ui";
+import { FormikProps } from "formik";
 import { useState } from "react";
-import { FormikButton, LoadingSpinner, TextField, useThrottledFetch } from "common-ui";
-import DOMPurify from "dompurify";
-import { Field, FormikProps } from "formik";
-import moment from "moment";
-import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { VocabularySelectField } from "../VocabularySelectField";
 import { ClassificationInputRow } from "./ClassificationInputRow";
-import useVocabularyOptions from "../../../../dina-ui/components/collection/useVocabularyOptions";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { Vocabulary } from "packages/dina-ui/types/collection-api";
+import useVocabularyOptions from "../useVocabularyOptions";
 
 export interface IClassificationFieldProps {
   /** The determination index within the material sample. */
@@ -41,22 +38,49 @@ export function ClassificationField({
 }: IClassificationFieldProps) {
   const [manualClassificationItems, setManualClassificationItems] = useState<
     ManualClassificationItem[]
-  >([{classificationRanks: 'rank1', classificationPath: ""},{classificationRanks: 'rank1', classificationPath: ""}]);
+  >([{ classificationRanks: undefined, classificationPath: undefined }]);
 
-  
+  const { loading, vocabOptions: taxonomicRankOptions } = useVocabularyOptions({
+    path: "collection-api/vocabulary/taxonomicRank"
+  });
+
+  function onAddRow() {
+    setManualClassificationItems([
+      ...manualClassificationItems,
+      ...[{ classificationPath: undefined, classificationRanks: undefined }]
+    ]);
+  }
+
+  function onDeleteRow(row: number) {
+    manualClassificationItems.splice(row, 1);
+    setManualClassificationItems([...manualClassificationItems]);
+  }
 
   return (
     <div className="card card-body">
-      <div className="d-flex flex-column align-items-center">
-        {manualClassificationItems.map((item, idxKey) => (
-          <ClassificationInputRow prevRank={prevRank} rowIndex={idxKey} name="" key={idxKey} showPlusIcon={true} />
-        ))}
+      <div className="d-flex flex-column gap align-items-center">
+        {loading ? (
+          <LoadingSpinner loading={loading} />
+        ) : (
+          manualClassificationItems.map((item, idxKey) => (
+            <ClassificationInputRow
+              taxonomicRanOptions={taxonomicRankOptions}
+              value={item}
+              onAddRow={onAddRow}
+              onDeleteRow={onDeleteRow}
+              prevRank={prevRank}
+              rowIndex={idxKey}
+              name=""
+              key={idxKey}
+              showPlusIcon={true}
+            />
+          ))
+        )}
       </div>
     </div>
   );
 }
-interface ManualClassificationItem {
-  classificationRanks: string;
-  classificationPath: string;
+export interface ManualClassificationItem {
+  classificationRanks?: string;
+  classificationPath?: string;
 }
-

@@ -3,15 +3,22 @@ import {
   CreatableSelectField,
   FieldSpy,
   SelectField,
+  SelectOption,
   TextField,
   Tooltip
 } from "common-ui";
+import classnames from "classnames";
+import Select from "react-select";
 import { useFormikContext } from "formik";
 import { find, get } from "lodash";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useEffect, useState } from "react";
-import { VocabularySelectField } from "../VocabularySelectField";
+import {
+  VocabularyOption,
+  VocabularySelectField
+} from "../VocabularySelectField";
+import { ManualClassificationItem } from "./ClassificationField";
 
 export function getFieldName(
   fieldArrayName: string,
@@ -27,6 +34,10 @@ export interface ClassificationInputRowProps {
   showPlusIcon?: boolean;
   readOnly?: boolean;
   prevRank?: string;
+  onAddRow: () => void;
+  onDeleteRow: (index) => void;
+  taxonomicRanOptions: { label: string; value: string }[] | undefined;
+  value: ManualClassificationItem;
 }
 
 export function ClassificationInputRow({
@@ -34,7 +45,10 @@ export function ClassificationInputRow({
   name,
   showPlusIcon,
   readOnly,
-  prevRank
+  onAddRow,
+  onDeleteRow,
+  taxonomicRanOptions,
+  value
 }: ClassificationInputRowProps) {
   const { locale } = useDinaIntl();
   const classificationRanksFieldName = `${name}.classificationRanks`;
@@ -43,59 +57,22 @@ export function ClassificationInputRow({
 
   const [selectedType, setSelectedType] = useState<any>();
 
-  function onCreatableSelectFieldChange(value, formikCtx) {
-    // if (isVocabularyBasedEnabledForType) {
-    //   formikCtx.setFieldValue(
-    //     vocabularyBasedFieldName,
-    //     !!find(typeOptions, (item) => item.value === value)
-    //   );
-    // }
-  }
-
-  function onTypeSelectFieldChange(value) {
-    // setSelectedType(find(typeOptions, (item) => item.value === value));
-  }
-
-  const rowsPath = name.substring(0, name.lastIndexOf("."));
-  const currentRows = get(formik.values, rowsPath);
-  function addRow() {
-    const newRows = {
-      ...currentRows,
-      [`extensionField-${Object.keys(currentRows).length}`]: ""
-    };
-    formik.setFieldValue(rowsPath, newRows);
-  }
-  function removeRow() {
-    const rowName = name.split(".").at(-1);
-    if (rowName) {
-      const { [rowName]: _, ...newRows } = currentRows;
-      formik.setFieldValue(rowsPath, newRows);
-    }
-  }
-
   return (
-    <div className="d-flex w-100">
+    <div className="d-flex w-100 my-1">
       <div className="w-100">
-        <VocabularySelectField
-          name={`taxonomicRank`}
-          path="collection-api/vocabulary/taxonomicRank"
-          hideLabel={true}
+        <Select
+          options={taxonomicRanOptions as any}
+          value={value.classificationRanks}
         />
       </div>
       <div className="w-100 ms-2">
-        <TextField
-          name={classificationPathFieldName}
-          removeBottomMargin={true}
-          label={<DinaMessage id="dataValue" />}
-          disableTemplateCheckbox={true}
-          hideLabel={true}
-        />
+        <input className="form-control" value={value.classificationPath} />
       </div>
       {!readOnly && (
         <div
           style={{
             cursor: "pointer",
-            marginTop: "0.6rem",
+            marginTop: "0.3rem",
             maxWidth: "2.5rem"
           }}
         >
@@ -104,7 +81,7 @@ export function ClassificationInputRow({
               {
                 <FaPlus
                   className="ms-2"
-                  onClick={addRow}
+                  onClick={onAddRow}
                   size="2em"
                   name={getFieldName(name, "addRow", rowIndex)}
                   onMouseOver={(event) =>
@@ -117,7 +94,7 @@ export function ClassificationInputRow({
           ) : (
             <FaMinus
               className="ms-2"
-              onClick={removeRow}
+              onClick={() => onDeleteRow(rowIndex)}
               size="2em"
               name={getFieldName(name, "removeRow", rowIndex)}
               onMouseOver={(event) =>
