@@ -1,7 +1,8 @@
-import Accordion from "react-bootstrap/Accordion";
+import { Card } from "react-bootstrap";
 import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
@@ -19,76 +20,94 @@ export function RelationshipFieldMapping({
   );
 
   return columnUniqueValues && columnUniqueValues[sheetIndex] ? (
-    <Accordion defaultActiveKey="0">
-      {Object.keys(columnUniqueValues[sheetIndex])
-        .filter(
-          (columnName) =>
-            workbookColumnMap[columnName]?.mapRelationship &&
-            workbookColumnMap[columnName].showOnUI
-        )
-        .map((columnName, index) => {
-          const thisColumnMap = workbookColumnMap[columnName]!;
-          const fieldPath = thisColumnMap.fieldPath;
-
-          const counts = columnUniqueValues[sheetIndex][columnName];
-          return (
-            <Accordion.Item eventKey={"" + index} key={columnName}>
-              <Accordion.Header>{columnName}</Accordion.Header>
-              <Accordion.Body>
-                <div
-                  className="row mb-2"
-                  style={{ borderBottom: "solid 1px", paddingBottom: "8px" }}
-                >
-                  <div className="col-3">Value</div>
-                  <div className="col-3">Count</div>
-                  <div className="col-6" />
-                </div>
-                {Object.keys(counts).map((fieldValue) => (
-                  <div className="row" key={fieldValue}>
-                    <div className="col-3">{fieldValue}</div>
-                    <div className="col-3">{counts[fieldValue]}</div>
-                    <div className="col-6">
-                      {getResourceSelectForRelationshipField(
-                        columnName,
-                        fieldPath!,
-                        fieldValue,
-                        (newValue: any) => {
-                          const newValueMapping = {
-                            ...thisColumnMap.valueMapping
+    <Card
+      className="mb-3"
+      style={{ width: "100%", overflowX: "auto", height: "70hp" }}
+    >
+      <Card.Header style={{ fontSize: "1.4em" }}>
+        <DinaMessage id="mapRelationshipTitle" />
+      </Card.Header>
+      <Card.Body className="mb-3 px-4 py-2">
+        <style>
+          {`
+            .black-border {
+              border-bottom: solid 1px;
+            }
+            .odd {
+              background-color: rgba(0, 0, 0, 0.03)
+            }
+          `}
+        </style>
+        <div className="row mb-2 black-border">
+          <div className="col-3">
+            <DinaMessage id="spreadsheetHeader" />
+          </div>
+          <div className="col-3">
+            <DinaMessage id="value" />
+          </div>
+          <div className="col-3">
+            <DinaMessage id="count" />
+          </div>
+          <div className="col-3" />
+        </div>
+        {Object.keys(columnUniqueValues[sheetIndex])
+          .filter(
+            (columnName) =>
+              workbookColumnMap[columnName]?.mapRelationship &&
+              workbookColumnMap[columnName].showOnUI
+          )
+          .map((columnName, index1) => {
+            const thisColumnMap = workbookColumnMap[columnName]!;
+            const fieldPath = thisColumnMap.fieldPath;
+            const counts = columnUniqueValues[sheetIndex][columnName];
+            return Object.keys(counts).map((fieldValue, index2) => (
+              <div
+                className={`row${index1 % 2 === 0 ? " odd" : ""}`}
+                key={fieldValue}
+              >
+                <div className="col-3">{index2 === 0 ? columnName : ""}</div>
+                <div className="col-3">{fieldValue}</div>
+                <div className="col-3">{counts[fieldValue]}</div>
+                <div className="col-3">
+                  {getResourceSelectForRelationshipField(
+                    columnName,
+                    fieldPath!,
+                    fieldValue,
+                    (newValue: any) => {
+                      const newValueMapping = {
+                        ...thisColumnMap.valueMapping
+                      };
+                      if (newValue) {
+                        if (Array.isArray(newValue)) {
+                          newValueMapping[fieldValue] = {
+                            id: newValue[0].id,
+                            type: newValue[0].type
                           };
-                          if (newValue) {
-                            if (Array.isArray(newValue)) {
-                              newValueMapping[fieldValue] = {
-                                id: newValue[0].id,
-                                type: newValue[0].type
-                              };
-                            } else {
-                              newValueMapping[fieldValue] = {
-                                id: newValue.id,
-                                type: newValue.type
-                              };
-                            }
-                          } else {
-                            delete newValueMapping[fieldValue];
-                          }
-                          const newColumnMap = {
-                            ...workbookColumnMap,
-                            [columnName]: {
-                              ...thisColumnMap,
-                              valueMapping: newValueMapping
-                            }
+                        } else {
+                          newValueMapping[fieldValue] = {
+                            id: newValue.id,
+                            type: newValue.type
                           };
-                          setColumnMapValue(newColumnMap);
                         }
-                      )}{" "}
-                    </div>
-                  </div>
-                ))}
-              </Accordion.Body>
-            </Accordion.Item>
-          );
-        })}
-    </Accordion>
+                      } else {
+                        delete newValueMapping[fieldValue];
+                      }
+                      const newColumnMap = {
+                        ...workbookColumnMap,
+                        [columnName]: {
+                          ...thisColumnMap,
+                          valueMapping: newValueMapping
+                        }
+                      };
+                      setColumnMapValue(newColumnMap);
+                    }
+                  )}{" "}
+                </div>
+              </div>
+            ));
+          })}
+      </Card.Body>
+    </Card>
   ) : (
     <></>
   );
