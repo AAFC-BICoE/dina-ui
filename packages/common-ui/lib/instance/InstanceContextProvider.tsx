@@ -26,8 +26,12 @@ export function DefaultInstanceContextProvider({
         const response = await apiClient.get("/instance.json", {});
         if (response) {
           setInstanceJson({
-            supportedLanguages: response["supported-languages-iso"] ?? "en",
-            instanceMode: response["instance-mode"] ?? "developer"
+            supportedLanguages: !!response["supported-languages-iso"]
+              ? response["supported-languages-iso"]
+              : "en",
+            instanceMode: !!response["instance-mode"]
+              ? response["instance-mode"]
+              : "developer"
           });
         } else {
           setInstanceJson({

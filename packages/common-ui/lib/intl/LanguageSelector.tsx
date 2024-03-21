@@ -13,10 +13,11 @@ export function LanguageSelector() {
   if (!process.browser) {
     return null;
   }
-
   const supportedLanguagesArray: string[] =
-    instanceContext?.supportedLanguages?.split(",") ?? ["en"];
-
+    instanceContext?.supportedLanguages?.split(",")?.length &&
+    instanceContext?.supportedLanguages !== ""
+      ? instanceContext?.supportedLanguages?.split(",")
+      : ["en"];
   return (
     <div data-testid="languageSelector">
       {supportedLanguagesArray
