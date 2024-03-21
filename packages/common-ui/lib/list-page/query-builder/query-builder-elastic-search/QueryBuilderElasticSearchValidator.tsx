@@ -1,5 +1,6 @@
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { validateDate } from "../query-builder-value-types/QueryBuilderDateSearch";
+import { startCase } from "lodash";
 
 export interface ValidationError {
   /** Error message to display to the user. */
@@ -94,6 +95,8 @@ export function validateEsRule(
   formatMessage: any
 ) : ValidationResult {
 
+  console.log(JSON.stringify(config.fields?.[fieldName]));
+
   const widgetName = config.fields?.[fieldName]?.type;
   const widgetConfig = config.widgets[widgetName];
   if (!widgetConfig) return true; // Unable to find the widget.
@@ -115,10 +118,13 @@ export function validateEsRule(
     operatorValue = "empty";
   }
 
+  // Retrieve the field name label
+  const fieldLabel = formatMessage({ id: "field_" + config.fields?.[fieldName]?.label ?? fieldName })
+
   // For all the different widgets, a validate date function can be setup to do custom validation.
   switch (widgetName) {
     case "date":
-      return validateDate(fieldName, value, operator, formatMessage);
+      return validateDate(fieldLabel, value, operator, formatMessage);
   }
 
   return true;

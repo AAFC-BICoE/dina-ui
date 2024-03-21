@@ -404,6 +404,10 @@ export function validateDate(
   operator: string,
   formatMessage: any
 ): ValidationResult {
+  if (value === "") {
+    return true;
+  }
+
   switch (operator) {
     // Contains (Partial formats supported here.)
     case "containsDate":
@@ -433,6 +437,10 @@ export function validateDate(
     // Between (Check the low/high for correct values, ensure it's not greater than the other value.)
     case "between":
       const betweenStates = convertStringToBetweenState(value);
+      if (betweenStates.low === "" && betweenStates.high === "") {
+        return true;
+      }
+
       if (!DATE_REGEX_NO_TIME.test(betweenStates.low) || !DATE_REGEX_NO_TIME.test(betweenStates.high)) {
         return {
           errorMessage: formatMessage({ id: "dateMustBeFormattedYyyyMmDd" }),

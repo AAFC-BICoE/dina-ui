@@ -162,6 +162,12 @@ describe("QueryBuilderDateSearch", () => {
       jest.clearAllMocks();
     });
 
+    it('should return true for valid "equals" operator with empty value', () => {
+      const result = validateDate('myDate', '', 'equals', formatMessage);
+      expect(result).toBe(true);
+      expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+    });
+
     it('should return true for valid "equals" operator with formatted date', () => {
       const result = validateDate('myDate', '2024-03-21', 'equals', formatMessage);
       expect(result).toBe(true);
@@ -221,6 +227,12 @@ describe("QueryBuilderDateSearch", () => {
 
     it('should return true for valid "between" operator values', () => {
       const result = validateDate('myDate', '{"low": "2022-05-19","high": "2023-01-19"}', 'between', formatMessage);
+      expect(result).toBe(true);
+      expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+    });
+
+    it('should return true for valid "between" operator with empty value', () => {
+      const result = validateDate('myDate', '{"low": "","high": ""}', 'between', formatMessage);
       expect(result).toBe(true);
       expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
     });
