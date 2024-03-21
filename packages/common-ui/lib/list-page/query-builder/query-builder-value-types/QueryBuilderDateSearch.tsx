@@ -8,9 +8,10 @@ import {
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { DATE_REGEX_NO_TIME, DATE_REGEX_PARTIAL } from "common-ui";
-import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
+import { convertStringToBetweenState, useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
 import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 import { Config } from "react-awesome-query-builder";
+import moment from "moment";
 
 interface QueryBuilderDateSearchProps {
   /**
@@ -416,6 +417,7 @@ export function validateDate(
           fieldName
         }
       }
+      break;
 
     // Normal date fields
     case "equals":
@@ -430,10 +432,27 @@ export function validateDate(
           fieldName
         }
       }
+      break;
 
     // Between (Check the low/high for correct values, ensure it's not greater than the other value.)
     case "between":
+      const betweenStates = convertStringToBetweenState(value);
+      if (!DATE_REGEX_NO_TIME.test(betweenStates.low) || !DATE_REGEX_NO_TIME.test(betweenStates.high)) {
+        return {
+          errorMessage: formatMessage({ id: "dateMustBeFormattedYyyyMmDd" }),
+          fieldName
+        }
+      }
 
+      const fromMoment = moment(betweenStates.low, "YYYY-MM-DD");
+      const toMoment = moment(betweenStates.high, "YYYY-MM-DD");
+      if (!fromMoment.isSameOrBefore(toMoment)) {
+        return {
+          errorMessage: formatMessage({ id: "dateBetweenInvalid" }),
+          fieldName
+        }
+      }
+      break;
   }
 
   return true;

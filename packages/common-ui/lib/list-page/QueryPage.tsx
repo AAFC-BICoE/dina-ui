@@ -435,6 +435,25 @@ export function QueryPage<TData extends KitsuResource>({
     }
   }, [viewMode, selectedResources]);
 
+  // Determine validation errors after each tree change.
+  useEffect(() => {
+    // Query builder is not setup yet.
+    if (!queryBuilderConfig) {
+      return;
+    }
+
+    // Custom validation logic.
+    if (!customViewElasticSearchQuery) {
+      const validationErrorsFound = getElasticSearchValidationResults(
+        queryBuilderTree,
+        queryBuilderConfig,
+        formatMessage
+      )
+
+      setValidationErrors(validationErrorsFound);
+    }
+  }, [queryBuilderTree])
+
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
     // If in view mode with selected resources, no requests need to be made.
@@ -956,19 +975,39 @@ export function QueryPage<TData extends KitsuResource>({
   return (
     <>
       {!viewMode && (
-        <QueryBuilderMemo
-          indexName={indexName}
-          queryBuilderTree={queryBuilderTree}
-          setQueryBuilderTree={onQueryBuildTreeChange}
-          queryBuilderConfig={queryBuilderConfig}
-          setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-          setPageOffset={setPageOffset}
-          onSubmit={onSubmit}
-          onReset={onReset}
-          setGroups={setGroups}
-          groups={groups}
-          uniqueName={uniqueName}
-        />
+        <>
+          {validationErrors.length > 0 && (
+            <div
+              className="alert alert-danger"
+              style={{
+                whiteSpace: "pre-line"
+              }}
+            >
+              <h5>Validation Errors</h5>
+              <ul>
+                {validationErrors.map((error: ValidationError) => (
+                  <li key={error.fieldName}>
+                    <strong>{error.fieldName}: </strong>
+                    {error.errorMessage}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <QueryBuilderMemo
+            indexName={indexName}
+            queryBuilderTree={queryBuilderTree}
+            setQueryBuilderTree={onQueryBuildTreeChange}
+            queryBuilderConfig={queryBuilderConfig}
+            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+            setPageOffset={setPageOffset}
+            onSubmit={onSubmit}
+            onReset={onReset}
+            setGroups={setGroups}
+            groups={groups}
+            uniqueName={uniqueName}
+          />
+        </>
       )}
       <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
         {/* Group Selection */}

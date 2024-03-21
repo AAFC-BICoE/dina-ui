@@ -34,6 +34,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   dateMustBeFormattedPartial:
     "Date must be formatted as one of the following options: YYYY-MM-DD, YYYY-MM, or YYYY",
   dateMustBeFormattedYyyyMmDd: "Date must be formatted as YYYY-MM-DD",
+  dateBetweenInvalid: "Invalid between search: from date is greater than to date",
   deleteAllButtonText: "Delete All",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",

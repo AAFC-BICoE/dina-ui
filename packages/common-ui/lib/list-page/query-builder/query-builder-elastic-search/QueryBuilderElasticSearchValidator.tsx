@@ -98,6 +98,23 @@ export function validateEsRule(
   const widgetConfig = config.widgets[widgetName];
   if (!widgetConfig) return true; // Unable to find the widget.
 
+  // Use the custom logic by default.
+  let formattedValue = value?.[0] ?? "";
+  if (typeof formattedValue === "string") {
+    formattedValue = formattedValue.trim();
+  }
+
+  // Edge case if nothing is provided for a date (unless operator is empty/not empty)
+  let operatorValue = operator;
+  if (
+    widgetName === "date" &&
+    formattedValue === "" &&
+    operator !== "empty" &&
+    operator !== "notEmpty"
+  ) {
+    operatorValue = "empty";
+  }
+
   // For all the different widgets, a validate date function can be setup to do custom validation.
   switch (widgetName) {
     case "date":
