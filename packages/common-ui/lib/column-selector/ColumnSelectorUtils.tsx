@@ -254,7 +254,7 @@ export function getIncludedManagedAttributeColumn(
     header: () => <FieldHeader name={managedAttribute.name} />,
     accessorKey,
     id: `${queryOption.type}.${managedAttributeKey}`,
-    isKeyword: true,
+    isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: false,
     relationshipType: queryOption.parentType,
     managedAttribute,
@@ -297,7 +297,7 @@ export function getAttributesManagedAttributeColumn(
     header: () => <FieldHeader name={managedAttribute.name} />,
     accessorKey,
     id: `${queryOption.type}.${managedAttributeKey}`,
-    isKeyword: true,
+    isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: false,
     queryOption,
     managedAttribute
