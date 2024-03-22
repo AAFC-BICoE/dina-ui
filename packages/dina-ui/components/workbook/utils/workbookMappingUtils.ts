@@ -54,6 +54,16 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["projects", "projects.name"]
 ]);
 
+export type FieldOptionType = {
+  label: string;
+  value?: string;
+  options?: {
+    label: string;
+    value: string;
+    parentPath: string;
+  }[];
+};
+
 /**
  * find the possible field that match the column header
  * @param columnHeader The column header from excel file
@@ -62,15 +72,7 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
  */
 export function findMatchField(
   columnHeader: string,
-  fieldOptions: {
-    label: string;
-    value?: string;
-    options?: {
-      label: string;
-      value: string;
-      parentPath: string;
-    }[];
-  }[]
+  fieldOptions: FieldOptionType[]
 ) {
   let columnHeader2: string = columnHeader.toLowerCase().trim();
   if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {

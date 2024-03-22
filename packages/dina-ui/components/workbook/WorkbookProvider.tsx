@@ -190,7 +190,6 @@ export interface WorkbookUploadContextI {
   group?: string;
   type?: string;
   error?: Error;
-  managedAttributes: PersistedResource<ManagedAttribute>[];
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
   setColumnMap: (newColumnMap: WorkbookColumnMap) => void;
@@ -237,18 +236,7 @@ export function WorkbookUploadContextProvider({
     progress: 0
   };
   const [state, dispatch] = useReducer(reducer, initState);
-  const { response: attrResponse } = useQuery<ManagedAttribute[]>({
-    path: "collection-api/managed-attribute",
-    filter: filterBy([], {
-      extraFilters: [
-        {
-          selector: "managedAttributeComponent",
-          comparison: "==",
-          arguments: "MATERIAL_SAMPLE"
-        }
-      ]
-    })("")
-  });
+
   useEffect(() => {
     const strMetaData = localStorage.getItem("workbookResourceMetaData");
     const workbookMetaDataInLocalStorage: WorkbookMetaData = strMetaData
@@ -423,7 +411,6 @@ export function WorkbookUploadContextProvider({
         apiBaseUrl: state.apiBaseUrl,
         status: state.status,
         error: state.error,
-        managedAttributes: attrResponse?.data ?? [],
 
         uploadWorkbook,
         setColumnMap,

@@ -1,28 +1,21 @@
 import {
   AreYouSureModal,
   FieldWrapper,
-  RsqlFilterObject,
+  LoadingSpinner,
   SubmitButton,
-  filterBy,
   useAccount,
   useApiClient,
-  useModal,
-  useQuery
+  useModal
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
-import { chain, startCase } from "lodash";
-import {
-  ManagedAttribute,
-  MaterialSample
-} from "packages/dina-ui/types/collection-api";
-import { Ref, useEffect, useMemo, useRef, useState } from "react";
+import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
+import { Ref, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
 import {
-  LinkOrCreateSetting,
   WorkbookColumnMap,
   WorkbookDataTypeEnum,
   useWorkbookContext
@@ -33,8 +26,6 @@ import { RelationshipFieldMapping } from "../relationship-mapping/RelationshipFi
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
-  findMatchField,
-  getColumnHeaders,
   getDataFromWorkbook,
   isBoolean,
   isBooleanArray,
@@ -42,6 +33,7 @@ import {
   isNumberArray
 } from "../utils/workbookMappingUtils";
 import { ColumnMappingRow } from "./ColumnMappingRow";
+import { useColumnMapping } from "./useColumnMapping";
 
 export type FieldMapType = {
   targetField: string | undefined;
@@ -74,9 +66,7 @@ export function WorkbookColumnMapping({
     startSavingWorkbook,
     spreadsheetData,
     setColumnMap,
-    workbookColumnMap,
-    columnUniqueValues,
-    managedAttributes
+    columnUniqueValues
   } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
@@ -91,7 +81,6 @@ export function WorkbookColumnMapping({
     label: string;
     value: string;
   } | null>(entityTypes[0]);
-  const [fieldMap, setFieldMap] = useState<FieldMapType[]>([]);
 
   const {
     convertWorkbook,
@@ -104,6 +93,16 @@ export function WorkbookColumnMapping({
     selectedType?.value || "material-sample"
   );
 
+  const {
+    loading,
+    fieldMap,
+    fieldOptions,
+    headers,
+    sheetOptions,
+    workbookColumnMap,
+    resolveParentMapping
+  } = useColumnMapping(sheet, selectedType?.value || "material-sample");
+
   const buttonBar = (
     <>
       <SubmitButton
@@ -113,260 +112,6 @@ export function WorkbookColumnMapping({
       />
     </>
   );
-
-  // Retrieve a string array of the headers from the uploaded spreadsheet.
-  const headers = useMemo(() => {
-    return getColumnHeaders(spreadsheetData, sheet);
-  }, [sheet]);
-
-  // Generate sheet dropdown options
-  const sheetOptions = useMemo(() => {
-    if (spreadsheetData) {
-      return Object.entries(spreadsheetData).map(([sheetNumberString, _]) => {
-        const sheetNumber = +sheetNumberString;
-        // This label is hardcoded for now, it will eventually be replaced with the sheet name in a
-        // future ticket.
-        return { label: "Sheet " + (sheetNumber + 1), value: sheetNumber };
-      });
-    } else {
-      return [];
-    }
-  }, [spreadsheetData]);
-
-  // Generate field options
-  const fieldOptions = useMemo(() => {
-    if (!!selectedType) {
-      const nonNestedRowOptions: { label: string; value: string }[] = [];
-      const nestedRowOptions: {
-        label: string;
-        value: string;
-        parentPath: string;
-      }[] = [];
-      // const newFieldOptions: { label: string; value: string }[] = [];
-      Object.keys(flattenedConfig).forEach((fieldPath) => {
-        if (fieldPath === "relationshipConfig") {
-          return;
-        }
-        const config = flattenedConfig[fieldPath];
-        if (
-          config.dataType !== WorkbookDataTypeEnum.OBJECT &&
-          config.dataType !== WorkbookDataTypeEnum.OBJECT_ARRAY
-        ) {
-          // Handle creating options for nested path for dropdown component
-          if (fieldPath.includes(".")) {
-            const lastIndex = fieldPath.lastIndexOf(".");
-            const parentPath = fieldPath.substring(0, lastIndex);
-            const labelPath = fieldPath.substring(lastIndex + 1);
-            const label =
-              formatMessage(fieldPath as any)?.trim() ||
-              formatMessage(`field_${labelPath}` as any)?.trim() ||
-              formatMessage(labelPath as any)?.trim() ||
-              startCase(labelPath);
-            const option = {
-              label,
-              value: fieldPath,
-              parentPath
-            };
-            nestedRowOptions.push(option);
-          } else {
-            // Handle creating options for non nested path for dropdown component
-            const label =
-              formatMessage(`field_${fieldPath}` as any)?.trim() ||
-              formatMessage(fieldPath as any)?.trim() ||
-              startCase(fieldPath);
-            const option = {
-              label,
-              value: fieldPath
-            };
-            nonNestedRowOptions.push(option);
-          }
-        }
-      });
-      nonNestedRowOptions.sort((a, b) => a.label.localeCompare(b.label));
-
-      // Using the parent name, group the relationships into sections.
-      const groupedNestRowOptions = chain(nestedRowOptions)
-        .groupBy((prop) => prop.parentPath)
-        .map((group, key) => {
-          const keyArr = key.split(".");
-          let label: string | undefined;
-          for (let i = 0; i < keyArr.length; i++) {
-            const k = keyArr[i];
-            label =
-              label === undefined
-                ? formatMessage(k as any).trim() || k.toUpperCase()
-                : label + (formatMessage(k as any).trim() || k.toUpperCase());
-            if (i < keyArr.length - 1) {
-              label = label + ".";
-            }
-          }
-
-          return {
-            label: label!,
-            options: group
-          };
-        })
-        .sort((a, b) => a.label.localeCompare(b.label))
-        .value();
-
-      const newOptions = nonNestedRowOptions
-        ? [...nonNestedRowOptions, ...groupedNestRowOptions]
-        : [];
-      const map: FieldMapType[] = [];
-      for (const columnHeader of headers || []) {
-        const fieldPath = findMatchField(columnHeader, newOptions);
-        if (fieldPath === undefined) {
-          const targetManagedAttr = managedAttributes.find(
-            (item) =>
-              item.name.toLowerCase().trim() ===
-              columnHeader.toLowerCase().trim()
-          );
-          if (targetManagedAttr) {
-            map.push({
-              targetField: "managedAttributes",
-              skipped: false,
-              targetKey: targetManagedAttr
-            });
-          } else {
-            map.push({
-              targetField: fieldPath,
-              skipped: fieldPath === undefined
-            });
-          }
-        } else {
-          map.push({
-            targetField: fieldPath,
-            skipped: fieldPath === undefined
-          });
-        }
-      }
-      setFieldMap(map);
-      return newOptions;
-    } else {
-      return [];
-    }
-  }, [selectedType]);
-
-  /**
-   * Resolve parentMaterialSample value mapping.
-   * @param columnHeader the column header of parent material sample in the spreadsheet
-   * @param fieldPath the mapped field path
-   * @returns
-   */
-  async function resolveParentMapping(
-    columnHeader: string,
-    fieldPath: string
-  ): Promise<{
-    [value: string]: {
-      id: string;
-      type: string;
-    };
-  }> {
-    const { type, baseApiPath } = getFieldRelationshipConfig();
-    const lastDotPos = fieldPath.lastIndexOf(".");
-    const fieldName = fieldPath.substring(lastDotPos + 1);
-    const valueMapping: {
-      [value: string]: {
-        id: string;
-        type: string;
-      };
-    } = {};
-    if (spreadsheetData) {
-      const spreadsheetHeaders = spreadsheetData[sheet][0].content;
-      const colIndex = spreadsheetHeaders.indexOf(columnHeader) ?? -1;
-      if (colIndex > -1) {
-        for (let i = 1; i < spreadsheetData[sheet].length; i++) {
-          const parentValue = spreadsheetData[sheet][i].content[colIndex];
-          if (parentValue) {
-            const response = await apiClient.get<MaterialSample[]>(
-              `${baseApiPath}/${type}?filter[${fieldName}]=${parentValue}`,
-              {
-                page: { limit: 1 }
-              }
-            );
-            if (response && response.data.length > 0) {
-              valueMapping[parentValue] = { id: response.data[0].id, type };
-            }
-          }
-        }
-      }
-    }
-    return valueMapping;
-  }
-
-  useEffect(() => {
-    async function initColumnMap() {
-      // Calculate the workbook column mapping based on the name of the spreadsheet column header name
-      const newWorkbookColumnMap: WorkbookColumnMap = {};
-      for (const columnHeader of headers || []) {
-        const fieldPath = findMatchField(columnHeader, fieldOptions);
-        if (fieldPath === undefined || fieldPath === "managedAttributes") {
-          const targetManagedAttr = managedAttributes.find(
-            (item) =>
-              item.name.toLowerCase().trim() ===
-              columnHeader.toLowerCase().trim()
-          );
-          if (targetManagedAttr) {
-            newWorkbookColumnMap[columnHeader] = {
-              fieldPath: "managedAttributes",
-              showOnUI: true,
-              mapRelationship: false,
-              numOfUniqueValues: Object.keys(
-                columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
-              ).length,
-              valueMapping: {
-                columnHeader: {
-                  id: targetManagedAttr.id,
-                  type: targetManagedAttr.type
-                }
-              }
-            };
-          } else {
-            newWorkbookColumnMap[columnHeader] = {
-              fieldPath,
-              showOnUI: true,
-              mapRelationship: false,
-              numOfUniqueValues: Object.keys(
-                columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
-              ).length,
-              valueMapping: {}
-            };
-          }
-        } else if (fieldPath?.startsWith("parentMaterialSample.")) {
-          const valueMapping = await resolveParentMapping(
-            columnHeader,
-            fieldPath
-          );
-          newWorkbookColumnMap[columnHeader] = {
-            fieldPath,
-            showOnUI: false,
-            mapRelationship: true,
-            numOfUniqueValues: 1,
-            valueMapping
-          };
-        } else {
-          const mapRelationship =
-            fieldPath.indexOf(".") > -1 &&
-            flattenedConfig[fieldPath.substring(0, fieldPath.indexOf("."))]
-              ?.relationshipConfig?.linkOrCreateSetting !==
-              LinkOrCreateSetting.CREATE;
-          newWorkbookColumnMap[columnHeader] = {
-            fieldPath,
-            showOnUI: true,
-            mapRelationship,
-            numOfUniqueValues: Object.keys(
-              columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
-            ).length,
-            valueMapping: {}
-          };
-        }
-      }
-      setColumnMap(newWorkbookColumnMap);
-      // End of workbook column mapping calculation
-    }
-    initColumnMap();
-  }, [selectedType]);
-
   // Generate the currently selected value
   const sheetValue = sheetOptions[sheet];
 
@@ -612,7 +357,9 @@ export function WorkbookColumnMapping({
     setColumnMap(newColumnMap);
   }
 
-  return (
+  return loading || fieldMap.length === 0 ? (
+    <LoadingSpinner loading={loading} />
+  ) : (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
       initialValues={{
         sheet: 1,
@@ -683,21 +430,15 @@ export function WorkbookColumnMapping({
                       <DinaMessage id="skipColumn" />
                     </div>
                   </div>
-                  {headers
-                    ? headers.map((columnName, index) => (
-                        <ColumnMappingRow
-                          columnName={columnName}
-                          sheet={sheet}
-                          selectedType={
-                            selectedType?.value ?? "material-sample"
-                          }
-                          columnIndex={index}
-                          fieldOptions={fieldOptions}
-                          onFieldMappingChange={onFieldMappingChange}
-                          key={index}
-                        />
-                      ))
-                    : undefined}
+                  {(headers ?? []).map((columnName, index) => (
+                    <ColumnMappingRow
+                      columnName={columnName}
+                      columnIndex={index}
+                      fieldOptions={fieldOptions}
+                      onFieldMappingChange={onFieldMappingChange}
+                      key={index}
+                    />
+                  ))}
                 </Card.Body>
               </Card>
 
