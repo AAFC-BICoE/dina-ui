@@ -138,7 +138,7 @@ export function transformDateSearchToDSL({
 
     // Between operator (range)
     case "between":
-      return betweenQuery(fieldPath, value, parentType, "date");
+      return betweenQuery(fieldPath, value, parentType, "date", subType);
 
     // Not equals match type.
     case "notEquals":
@@ -295,7 +295,7 @@ export function transformDateSearchToDSL({
  * 
  * @returns elasticsearch timezone section, using the users IANA timezone
  */
-function getTimezone() {
+export function getTimezone() {
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const timezoneConfig = {
