@@ -138,7 +138,7 @@ export function transformDateSearchToDSL({
 
     // Between operator (range)
     case "between":
-      betweenQuery(fieldPath, value, parentType, "date");
+      return betweenQuery(fieldPath, value, parentType, "date");
 
     // Not equals match type.
     case "notEquals":
@@ -378,14 +378,6 @@ function buildDateRangeObject(matchType, value, subType) {
       return { ...timezone, lt: value };
     case "lessThanOrEqualTo":
       return { ...timezone, lte: value };
-    
-    // Support for between two provided values.
-    case "between":
-      return { 
-        ...timezone,
-        gte: value,
-        lte: value // Todo
-      }
 
     // Exact match case:
     default:
@@ -404,7 +396,7 @@ export function validateDate(
   operator: string,
   formatMessage: any
 ): ValidationResult {
-  if (value === "") {
+  if (!value) {
     return true;
   }
 

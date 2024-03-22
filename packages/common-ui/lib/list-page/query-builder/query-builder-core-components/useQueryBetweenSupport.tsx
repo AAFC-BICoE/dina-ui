@@ -155,7 +155,30 @@ export function useQueryBetweenSupport({
         <DatePicker
           name="low"
           value={betweenStates.low}
-          onChange={(dateValue: Date) => handleBetweenChange(dateValue.toISOString().slice(0, 10), "low")}
+          onChange={(dateValue: Date, event) => {
+            if (
+              !event ||
+              event?.type === "click" ||
+              event?.type === "keydown"
+            ) {
+              handleBetweenChange(dateValue.toISOString().slice(0, 10), "low")
+            }
+          }}
+          onChangeRaw={(event) => {
+            if (event?.type === "change") {
+              let newText = event.target.value;
+              const dashOccurrences = newText.split("-").length - 1;
+              if (newText.length === 8 && dashOccurrences === 0) {
+                newText =
+                  newText.slice(0, 4) +
+                  "-" +
+                  newText.slice(4, 6) +
+                  "-" +
+                  newText.slice(6);
+              }
+              handleBetweenChange?.(newText, "low");
+            }
+          }}
           dateFormat="yyyy-MM-dd"
           placeholderText="YYYY-MM-DD"
           isClearable={true}
@@ -180,7 +203,30 @@ export function useQueryBetweenSupport({
         <DatePicker
           name="high"
           value={betweenStates.high}
-          onChange={(dateValue: Date) => handleBetweenChange(dateValue.toISOString().slice(0, 10), "high")}
+          onChange={(dateValue: Date, event) => {
+            if (
+              !event ||
+              event?.type === "click" ||
+              event?.type === "keydown"
+            ) {
+              handleBetweenChange(dateValue.toISOString().slice(0, 10), "high")
+            }
+          }}
+          onChangeRaw={(event) => {
+            if (event?.type === "change") {
+              let newText = event.target.value;
+              const dashOccurrences = newText.split("-").length - 1;
+              if (newText.length === 8 && dashOccurrences === 0) {
+                newText =
+                  newText.slice(0, 4) +
+                  "-" +
+                  newText.slice(4, 6) +
+                  "-" +
+                  newText.slice(6);
+              }
+              handleBetweenChange?.(newText, "high");
+            }
+          }}
           dateFormat="yyyy-MM-dd"
           placeholderText="YYYY-MM-DD"
           isClearable={true}
