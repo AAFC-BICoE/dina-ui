@@ -17,7 +17,10 @@ import { PersistedResource } from "kitsu";
 import { filterBy, useQuery } from "../../../common-ui/lib";
 import { ManagedAttribute } from "../../types/collection-api";
 import db from "./WorkbookDB";
-import { calculateColumnUniqueValuesFromSpreadsheetData } from "./utils/workbookMappingUtils";
+import {
+  calculateColumnUniqueValuesFromSpreadsheetData,
+  removeEmptyColumns
+} from "./utils/workbookMappingUtils";
 
 async function saveWorkbookResourcesInIndexDB(
   type: string,
@@ -150,7 +153,7 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         progress: 0
       };
     case "UPLOAD_SPREADSHEET_DATA":
-      const spreadsheetData: WorkbookJSON = action.payload;
+      const spreadsheetData: WorkbookJSON = removeEmptyColumns(action.payload);
       const columnUniqueValues: ColumnUniqueValues =
         calculateColumnUniqueValuesFromSpreadsheetData(spreadsheetData);
       return {

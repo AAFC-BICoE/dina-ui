@@ -48,6 +48,7 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["collection", "collection.name"],
   ["collections", "collection.name"],
   ["storage unit", "storageUnit.name"],
+  ["storage", "storageUnit.name"],
   ["storageunit", "storageUnit.name"],
   ["project", "projects.name"],
   ["projects", "projects.name"]
@@ -516,4 +517,27 @@ export function getParentFieldPath(fieldPath: string) {
   } else {
     return undefined;
   }
+}
+
+export function removeEmptyColumns(data: WorkbookJSON) {
+  for (const sheet of Object.keys(data)) {
+    const sheetData: WorkbookRow[] = data[sheet];
+    const emptyColumnIndexes: number[] = [];
+    if (sheetData.length > 1) {
+      const headerRow = sheetData[0];
+      for (let i = headerRow.content.length - 1; i >= 0; i--) {
+        if (headerRow.content[i].trim() === "") {
+          emptyColumnIndexes.push(i);
+          headerRow.content.splice(i, 1);
+        }
+      }
+      for (let i = 1; i < sheetData.length; i++) {
+        const dataRow = sheetData[i];
+        for (const emptyIdx of emptyColumnIndexes) {
+          dataRow.content.splice(emptyIdx, 1);
+        }
+      }
+    }
+  }
+  return data;
 }
