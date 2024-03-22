@@ -1,6 +1,7 @@
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { validateDate } from "../query-builder-value-types/QueryBuilderDateSearch";
-import { startCase } from "lodash";
+import { validateNumber } from "../query-builder-value-types/QueryBuilderNumberSearch";
+import { validateManagedAttribute } from "../query-builder-value-types/QueryBuilderManagedAttributeSearch";
 
 export interface ValidationError {
   /** Error message to display to the user. */
@@ -123,8 +124,12 @@ export function validateEsRule(
 
   // For all the different widgets, a validate date function can be setup to do custom validation.
   switch (widgetName) {
+    case "number":
+      return validateNumber(fieldLabel, value, operator, formatMessage);
     case "date":
       return validateDate(fieldLabel, value, operator, formatMessage);
+    case "managedAttribute":
+      return validateManagedAttribute(fieldLabel, value, operator, formatMessage);
   }
 
   return true;

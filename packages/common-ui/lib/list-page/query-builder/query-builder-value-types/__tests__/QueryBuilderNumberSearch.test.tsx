@@ -1,6 +1,6 @@
 import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderNumberSearch, {
-  transformNumberSearchToDSL
+  transformNumberSearchToDSL, validateNumber
 } from "../QueryBuilderNumberSearch";
 
 describe("QueryBuilderNumberSearch", () => {
@@ -353,6 +353,91 @@ describe("QueryBuilderNumberSearch", () => {
             queryType: "notEmpty"
           })
         ).toMatchSnapshot();
+      });
+    });
+
+    describe("validateNumber function", () => {
+      // Mock formatMessage function (replace with your actual implementation)
+      const formatMessage = jest.fn();
+  
+      beforeEach(() => {
+        formatMessage.mockReturnValue('Mocked error message');
+      });
+    
+      afterEach(() => {
+        jest.clearAllMocks();
+      });
+  
+      it('should return true for valid "equals" operator with empty value', () => {
+        const result = validateNumber('myNumber', '', 'equals', formatMessage);
+        expect(result).toBe(true);
+        expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+      });
+  
+      it('should return true for valid "equals" operator with decimal number', () => {
+        const result1 = validateNumber('myNumber', '12.3', 'equals', formatMessage);
+        expect(result1).toBe(true);
+
+        const result2 = validateNumber('myNumber', '-3.7312', 'equals', formatMessage);
+        expect(result2).toBe(true);
+        expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+      });
+
+      it('should return true for valid "equals" operator with integer number', () => {
+        const result1 = validateNumber('myNumber', '12', 'equals', formatMessage);
+        expect(result1).toBe(true);
+
+        const result2 = validateNumber('myNumber', '-3', 'equals', formatMessage);
+        expect(result2).toBe(true);
+        expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+      });
+  
+      it('should return validation error for invalid number format in "equals" operator', () => {
+        const result = validateNumber('myNumber', 'ten', 'equals', formatMessage);
+        expect(result).toEqual({
+          errorMessage: 'Mocked error message',
+          fieldName: 'myNumber',
+        });
+        expect(formatMessage).toHaveBeenCalledWith({ id: 'numberInvalid' }); // Specific error message called
+      });
+  
+      it('should return validation error for "between" operator with invalid low number', () => {
+        const result = validateNumber('myNumber', '{"low": "10e","high": "20"}', 'between', formatMessage);
+        expect(result).toEqual({
+          errorMessage: 'Mocked error message',
+          fieldName: 'myNumber',
+        });
+        expect(formatMessage).toHaveBeenCalledWith({ id: 'numberInvalid' }); // Specific error message called
+      });
+  
+      it('should return validation error for "between" operator with invalid high number', () => {
+        const result = validateNumber('myNumber', '{"low": "10","high": "20e"}', 'between', formatMessage);
+        expect(result).toEqual({
+          errorMessage: 'Mocked error message',
+          fieldName: 'myNumber',
+        });
+        expect(formatMessage).toHaveBeenCalledWith({ id: 'numberInvalid' }); // Specific error message called
+      });
+  
+      it('should return validation error for "between" operator with high number less than low number', () => {
+        const result = validateNumber('myNumber', '{"low": "20","high": "5"}', 'between', formatMessage);
+        expect(result).toEqual({
+          errorMessage: 'Mocked error message',
+          fieldName: 'myNumber',
+        });
+        expect(formatMessage).toHaveBeenCalledWith({ id: 'numberBetweenInvalid' }); // Specific error message called
+      });
+  
+      it('should return true for valid "between" operator values', () => {
+        const result = validateNumber('myNumber', '{"low": "-3","high": "60.5"}', 'between', formatMessage);
+        expect(result).toBe(true);
+        expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+      });
+  
+      it('should return true for valid "between" operator with empty value', () => {
+        const result = validateNumber('myNumber', '{"low": "","high": ""}', 'between', formatMessage);
+        expect(result).toBe(true);
+        expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
       });
     });
 

@@ -396,10 +396,6 @@ export function validateDate(
   operator: string,
   formatMessage: any
 ): ValidationResult {
-  if (!value) {
-    return true;
-  }
-
   switch (operator) {
     // Contains (Partial formats supported here.)
     case "containsDate":
