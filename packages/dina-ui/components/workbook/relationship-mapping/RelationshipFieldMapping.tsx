@@ -1,10 +1,9 @@
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { Card } from "react-bootstrap";
 import { useWorkbookContext } from "../WorkbookProvider";
+import { useColumnMapping } from "../column-mapping/useColumnMapping";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { SelectField, useDinaFormContext } from "packages/common-ui/lib";
-import { useColumnMapping } from "../column-mapping/useColumnMapping";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
