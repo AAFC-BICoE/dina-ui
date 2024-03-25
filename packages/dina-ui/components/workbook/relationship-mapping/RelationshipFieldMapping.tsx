@@ -17,11 +17,6 @@ export function RelationshipFieldMapping({
   const selectedType = type ?? "material-sample";
   const { getResourceSelectField } = useColumnMapping(sheetIndex, selectedType);
 
-  const { getResourceSelectForRelationshipField } = useWorkbookConverter(
-    FieldMappingConfig,
-    selectedType
-  );
-
   return columnUniqueValues && columnUniqueValues[sheetIndex] ? (
     <Card
       className="mb-3"
@@ -73,39 +68,6 @@ export function RelationshipFieldMapping({
                 <div className="col-3">{counts[fieldValue]}</div>
                 <div className="col-3">
                   {getResourceSelectField(columnName, fieldPath, fieldValue)}
-                  {/* {getResourceSelectForRelationshipField(
-                    columnName,
-                    fieldPath!,
-                    fieldValue,
-                    (newValue: any) => {
-                      const newValueMapping = {
-                        ...thisColumnMap.valueMapping
-                      };
-                      if (newValue) {
-                        if (Array.isArray(newValue)) {
-                          newValueMapping[fieldValue] = {
-                            id: newValue[0].id,
-                            type: newValue[0].type
-                          };
-                        } else {
-                          newValueMapping[fieldValue] = {
-                            id: newValue.id,
-                            type: newValue.type
-                          };
-                        }
-                      } else {
-                        delete newValueMapping[fieldValue];
-                      }
-                      const newColumnMap = {
-                        ...workbookColumnMap,
-                        [columnName]: {
-                          ...thisColumnMap,
-                          valueMapping: newValueMapping
-                        }
-                      };
-                      setColumnMapValue(newColumnMap);
-                    }
-                  )}{" "} */}
                 </div>
               </div>
             ));
