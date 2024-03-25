@@ -1,6 +1,8 @@
+import { PersistedResource } from "kitsu";
 import { chain, startCase } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import {
+  SelectField,
   filterBy,
   useAccount,
   useApiClient,
@@ -19,7 +21,11 @@ import {
   StorageUnit
 } from "../../../types/collection-api";
 import { useWorkbookContext } from "../WorkbookProvider";
-import { LinkOrCreateSetting, WorkbookColumnMap } from "../types/Workbook";
+import {
+  LinkOrCreateSetting,
+  RelationshipMapping,
+  WorkbookColumnMap
+} from "../types/Workbook";
 import { WorkbookDataTypeEnum } from "../types/WorkbookDataTypeEnum";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
@@ -34,20 +40,13 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
   const {
-    startSavingWorkbook,
     spreadsheetData,
     setColumnMap,
     workbookColumnMap,
     columnUniqueValues
   } = useWorkbookContext();
 
-  const {
-    convertWorkbook,
-    flattenedConfig,
-    getPathOfField,
-    getFieldRelationshipConfig,
-    FIELD_TO_VOCAB_ELEMS_MAP
-  } = useWorkbookConverter(
+  const { flattenedConfig, getFieldRelationshipConfig } = useWorkbookConverter(
     FieldMappingConfig,
     selectedType || "material-sample"
   );
@@ -79,6 +78,8 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
 
   const [fieldOptions, setFieldOptions] = useState<FieldOptionType[]>([]);
   const [fieldMap, setFieldMap] = useState<FieldMapType[]>([]);
+  const [relationshipMapping, setRelationshipMapping] =
+    useState<RelationshipMapping>();
   const { loading: attrLoading, response: attrResp } = useQuery<
     ManagedAttribute[]
   >({
@@ -229,12 +230,12 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
           .sort((a, b) => a.label.localeCompare(b.label))
           .value();
 
-        const newOptions = nonNestedRowOptions
+        const newFieldOptions = nonNestedRowOptions
           ? [...nonNestedRowOptions, ...groupedNestRowOptions]
           : [];
         const map: FieldMapType[] = [];
         for (const columnHeader of headers || []) {
-          const fieldPath = findMatchField(columnHeader, newOptions);
+          const fieldPath = findMatchField(columnHeader, newFieldOptions);
           if (fieldPath === undefined) {
             const targetManagedAttr = managedAttributes.find(
               (item) =>
@@ -261,15 +262,17 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
           }
         }
         setFieldMap(map);
-        setFieldOptions(newOptions);
+        setFieldOptions(newFieldOptions);
+        await initColumnMap(newFieldOptions);
       }
     }
 
-    async function initColumnMap() {
+    async function initColumnMap(theFieldOptions: FieldOptionType[]) {
       // Calculate the workbook column mapping based on the name of the spreadsheet column header name
       const newWorkbookColumnMap: WorkbookColumnMap = {};
+      const newRelationshipMapping: RelationshipMapping = {};
       for (const columnHeader of headers || []) {
-        const fieldPath = findMatchField(columnHeader, fieldOptions);
+        const fieldPath = findMatchField(columnHeader, theFieldOptions);
         if (fieldPath === undefined || fieldPath === "managedAttributes") {
           const targetManagedAttr = managedAttributes.find(
             (item) =>
@@ -329,15 +332,22 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
             ).length,
             valueMapping: {}
           };
+          if (mapRelationship) {
+            resolveRelationships(
+              newRelationshipMapping,
+              columnHeader,
+              fieldPath
+            );
+          }
         }
       }
       setColumnMap(newWorkbookColumnMap);
+      setRelationshipMapping(newRelationshipMapping);
       // End of workbook column mapping calculation
     }
 
     if (!loading) {
       generateFieldOptions();
-      initColumnMap();
     }
   }, [sheet, selectedType, loading]);
 
@@ -388,14 +398,124 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
     return valueMapping;
   }
 
+  function resolveRelationships(
+    theRelationshipMapping: RelationshipMapping,
+    columnHeader: string,
+    fieldPath: string
+  ) {
+    const values = columnUniqueValues?.[sheet][columnHeader];
+    if (values) {
+      for (const value of Object.keys(values)) {
+        let found: PersistedResource<any> | undefined;
+        switch (fieldPath) {
+          case "collection.name":
+            found = collections.find((item) => item.name === value);
+            break;
+          case "preparationType.name":
+            found = preparationTypes.find((item) => item.name === value);
+            break;
+          case "preparationMethod.name":
+            found = preparationMethods.find((item) => item.name === value);
+            break;
+          case "preparationProtocol.name":
+            found = protocols.find((item) => item.name === value);
+            break;
+          case "storageUnit.name":
+            found = storageUnits.find((item) => item.name === value);
+            break;
+          case "projects.name":
+            found = projects.find((item) => item.name === value);
+            break;
+        }
+        if (found) {
+          if (!theRelationshipMapping[columnHeader]) {
+            theRelationshipMapping[columnHeader] = {};
+          }
+          theRelationshipMapping[columnHeader][value] = found.id;
+        }
+      }
+    }
+    return relationshipMapping;
+  }
+
+  function getResourceSelectField(
+    columnHeader: string,
+    fieldPath?: string,
+    fieldValue?: string
+  ) {
+    if (!fieldPath || !fieldValue) {
+      return undefined;
+    }
+    const eleName = `relationshipMapping.${columnHeader
+      .trim()
+      .replaceAll(".", "_")}.${fieldValue}`;
+    let options: any[] = [];
+    switch (fieldPath) {
+      case "storageUnit.name":
+        options = storageUnits.map((resource) => ({
+          label: resource.name,
+          value: resource.id,
+          resource
+        }));
+        break;
+      case "collection.name":
+        options = collections.map((resource) => ({
+          label: resource.name,
+          value: resource.id,
+          resource
+        }));
+        break;
+      case "preparationType.name":
+        options = preparationTypes.map((resource) => ({
+          label: resource.name,
+          value: resource.id,
+          resource
+        }));
+        break;
+      case "preparationMethod.name":
+        options = preparationMethods.map((resource) => ({
+          label: resource.name,
+          value: resource.id,
+          resource
+        }));
+        break;
+      case "preparationProtocol.name":
+        options = protocols.map((resource) => ({
+          label: resource.name,
+          value: resource.id,
+          resource
+        }));
+        break;
+      case "projects.name":
+        options = projects.map((resource) => ({
+          label: resource.name,
+          value: resource.id,
+          resource
+        }));
+        break;
+      default:
+        options = [];
+    }
+    return (
+      <SelectField
+        name={eleName}
+        options={options}
+        hideLabel={true}
+        isMulti={false}
+      />
+    );
+  }
+
   return {
     loading,
     workbookColumnMap,
+    relationshipMapping,
     fieldMap,
     fieldOptions,
     headers,
     sheetOptions,
 
-    resolveParentMapping
+    resolveParentMapping,
+    getResourceSelectField
   };
 }

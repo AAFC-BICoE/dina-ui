@@ -16,6 +16,7 @@ import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
 import {
+  RelationshipMapping,
   WorkbookColumnMap,
   WorkbookDataTypeEnum,
   useWorkbookContext
@@ -47,6 +48,7 @@ export interface WorkbookColumnMappingFields {
   fieldMap: FieldMapType[];
   mapRelationships: boolean[];
   group: string;
+  relationshipMapping: RelationshipMapping;
 }
 
 export interface WorkbookColumnMappingProps {
@@ -85,7 +87,6 @@ export function WorkbookColumnMapping({
   const {
     convertWorkbook,
     flattenedConfig,
-    getPathOfField,
     getFieldRelationshipConfig,
     FIELD_TO_VOCAB_ELEMS_MAP
   } = useWorkbookConverter(
@@ -100,6 +101,7 @@ export function WorkbookColumnMapping({
     headers,
     sheetOptions,
     workbookColumnMap,
+    relationshipMapping,
     resolveParentMapping
   } = useColumnMapping(sheet, selectedType?.value || "material-sample");
 
@@ -357,7 +359,7 @@ export function WorkbookColumnMapping({
     setColumnMap(newColumnMap);
   }
 
-  return loading || fieldMap.length === 0 ? (
+  return loading || fieldMap.length === 0 || !relationshipMapping ? (
     <LoadingSpinner loading={loading} />
   ) : (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
@@ -365,6 +367,7 @@ export function WorkbookColumnMapping({
         sheet: 1,
         type: selectedType?.value || "material-sample",
         fieldMap,
+        relationshipMapping,
         group: groupNames && groupNames.length > 0 ? groupNames[0] : undefined
       }}
       innerRef={formRef}

@@ -3,6 +3,8 @@ import { useWorkbookContext } from "../WorkbookProvider";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { SelectField, useDinaFormContext } from "packages/common-ui/lib";
+import { useColumnMapping } from "../column-mapping/useColumnMapping";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
@@ -14,6 +16,8 @@ export function RelationshipFieldMapping({
   const { columnUniqueValues, type, workbookColumnMap, setColumnMapValue } =
     useWorkbookContext();
   const selectedType = type ?? "material-sample";
+  const { getResourceSelectField } = useColumnMapping(sheetIndex, selectedType);
+
   const { getResourceSelectForRelationshipField } = useWorkbookConverter(
     FieldMappingConfig,
     selectedType
@@ -69,7 +73,8 @@ export function RelationshipFieldMapping({
                 <div className="col-3">{fieldValue}</div>
                 <div className="col-3">{counts[fieldValue]}</div>
                 <div className="col-3">
-                  {getResourceSelectForRelationshipField(
+                  {getResourceSelectField(columnName, fieldPath, fieldValue)}
+                  {/* {getResourceSelectForRelationshipField(
                     columnName,
                     fieldPath!,
                     fieldValue,
@@ -101,7 +106,7 @@ export function RelationshipFieldMapping({
                       };
                       setColumnMapValue(newColumnMap);
                     }
-                  )}{" "}
+                  )}{" "} */}
                 </div>
               </div>
             ));
