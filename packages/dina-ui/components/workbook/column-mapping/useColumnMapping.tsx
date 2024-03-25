@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { chain, startCase } from "lodash";
+import { chain, pick, startCase } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import {
   SelectField,
@@ -431,7 +431,10 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
           if (!theRelationshipMapping[columnHeader]) {
             theRelationshipMapping[columnHeader] = {};
           }
-          theRelationshipMapping[columnHeader][value] = found.id;
+          theRelationshipMapping[columnHeader][value] = pick(found, [
+            "id",
+            "type"
+          ]);
         }
       }
     }
@@ -446,10 +449,14 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
     if (!fieldPath || !fieldValue) {
       return undefined;
     }
-    const eleName = `relationshipMapping.${columnHeader
+    const selectElemName = `relationshipMapping.${columnHeader
       .trim()
-      .replaceAll(".", "_")}.${fieldValue}`;
+      .replaceAll(".", "_")}.${fieldValue}.id`;
+    const hiddenElemName = `relationshipMapping.${columnHeader
+      .trim()
+      .replaceAll(".", "_")}.${fieldValue}.type`;
     let options: any[] = [];
+    let targetType: string = "";
     switch (fieldPath) {
       case "storageUnit.name":
         options = storageUnits.map((resource) => ({
@@ -457,6 +464,7 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
           value: resource.id,
           resource
         }));
+        targetType = "storage-unit";
         break;
       case "collection.name":
         options = collections.map((resource) => ({
@@ -464,6 +472,7 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
           value: resource.id,
           resource
         }));
+        targetType = "collection";
         break;
       case "preparationType.name":
         options = preparationTypes.map((resource) => ({
@@ -471,6 +480,7 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
           value: resource.id,
           resource
         }));
+        targetType = "preparation-type";
         break;
       case "preparationMethod.name":
         options = preparationMethods.map((resource) => ({
@@ -478,6 +488,7 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
           value: resource.id,
           resource
         }));
+        targetType = "preparation-method";
         break;
       case "preparationProtocol.name":
         options = protocols.map((resource) => ({
@@ -485,6 +496,7 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
           value: resource.id,
           resource
         }));
+        targetType = "protocol";
         break;
       case "projects.name":
         options = projects.map((resource) => ({
@@ -492,17 +504,21 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
           value: resource.id,
           resource
         }));
+        targetType = "project";
         break;
       default:
         options = [];
     }
     return (
-      <SelectField
-        name={eleName}
-        options={options}
-        hideLabel={true}
-        isMulti={false}
-      />
+      <>
+        <SelectField
+          name={selectElemName}
+          options={options}
+          hideLabel={true}
+          isMulti={false}
+        />
+        <input type="hidden" name={hiddenElemName} value={targetType} />
+      </>
     );
   }
 

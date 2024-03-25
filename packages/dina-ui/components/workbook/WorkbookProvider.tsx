@@ -8,14 +8,12 @@ import {
 } from "react";
 import {
   ColumnUniqueValues,
+  RelationshipMapping,
   WorkbookColumnMap,
   WorkbookJSON,
   WorkbookResourceType
 } from "./types/Workbook";
 
-import { PersistedResource } from "kitsu";
-import { filterBy, useQuery } from "../../../common-ui/lib";
-import { ManagedAttribute } from "../../types/collection-api";
 import db from "./WorkbookDB";
 import {
   calculateColumnUniqueValuesFromSpreadsheetData,
@@ -197,6 +195,7 @@ export interface WorkbookUploadContextI {
   startSavingWorkbook: (
     newWorkbookResources: WorkbookResourceType[],
     newWorkbookColumnMap: WorkbookColumnMap,
+    relationshipMapping: RelationshipMapping,
     group: string,
     type: string,
     apiBaseUrl: string
@@ -277,10 +276,17 @@ export function WorkbookUploadContextProvider({
   const startSavingWorkbook = async (
     newWorkbookResources: WorkbookResourceType[],
     newWorkbookColumnMap: WorkbookColumnMap,
+    relationshipMapping: RelationshipMapping,
     newGroup: string,
     newType: string,
     newApiBaseUrl: string
   ) => {
+    for (const columnHeader of Object.keys(relationshipMapping)) {
+      if (newWorkbookColumnMap[columnHeader]?.mapRelationship) {
+        newWorkbookColumnMap[columnHeader].valueMapping =
+          relationshipMapping[columnHeader];
+      }
+    }
     writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
       status: "SAVING",
       group: newGroup,

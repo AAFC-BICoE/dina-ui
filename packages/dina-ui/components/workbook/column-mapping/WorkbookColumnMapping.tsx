@@ -148,6 +148,7 @@ export function WorkbookColumnMapping({
       await startSavingWorkbook(
         resources,
         workbookColumnMap,
+        submittedValues.relationshipMapping,
         submittedValues.group,
         type,
         baseApiPath
