@@ -73,6 +73,11 @@ export interface ESIndexMapping {
   label: string;
 
   /**
+   * Determines if the field should be displayed on the field selector.
+   */
+  hideField: boolean;
+
+  /**
    * The attributes type. This can change how the query row is displayed and the options provided.
    *
    * Examples: text, keyword, boolean, date, boolean, long, short, integer...
