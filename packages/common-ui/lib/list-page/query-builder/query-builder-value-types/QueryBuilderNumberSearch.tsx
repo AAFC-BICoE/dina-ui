@@ -290,6 +290,7 @@ export function validateNumber(
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
+      if (value == null || value === "") return true;
       if (!NUMBER_REGEX.test(value)) {
         return {
           errorMessage: formatMessage({ id: "numberInvalid" }),
