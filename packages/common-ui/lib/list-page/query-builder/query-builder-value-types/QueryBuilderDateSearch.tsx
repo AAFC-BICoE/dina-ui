@@ -399,6 +399,7 @@ export function validateDate(
   switch (operator) {
     // Contains (Partial formats supported here.)
     case "containsDate":
+      if (value == null || value === "") return true;
       if (!DATE_REGEX_PARTIAL.test(value)) {
         return {
           errorMessage: formatMessage({ id: "dateMustBeFormattedPartial" }),
@@ -414,6 +415,7 @@ export function validateDate(
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
+      if (value == null || value === "") return true;
       if (!DATE_REGEX_NO_TIME.test(value)) {
         return {
           errorMessage: formatMessage({ id: "dateMustBeFormattedYyyyMmDd" }),
@@ -425,9 +427,7 @@ export function validateDate(
     // Between (Check the low/high for correct values, ensure it's not greater than the other value.)
     case "between":
       const betweenStates = convertStringToBetweenState(value);
-      if (betweenStates.low === "" && betweenStates.high === "") {
-        return true;
-      }
+      if (betweenStates.low === "" && betweenStates.high === "") return true;
 
       if (!DATE_REGEX_NO_TIME.test(betweenStates.low) || !DATE_REGEX_NO_TIME.test(betweenStates.high)) {
         return {

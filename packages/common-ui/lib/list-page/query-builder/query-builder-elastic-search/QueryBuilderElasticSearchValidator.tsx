@@ -24,8 +24,6 @@ export function getElasticSearchValidationResults(
 ): ValidationError[] {
   const results = elasticSearchFormatValidator(queryTree, config, formatMessage);
 
-  console.log(JSON.stringify(results));
-
   if (isValidationResult(results)) {
     return results === true ? [] : [results];
   } else {
@@ -82,11 +80,11 @@ function elasticSearchFormatValidator(
 /**
  * Function for validating a single rule.
  * 
- * @param fieldName 
- * @param value 
- * @param operator 
- * @param config 
- * @returns 
+ * @param fieldName path of the rule being validated.
+ * @param value Unformatted rule.
+ * @param operator Operator being used (e.g. "equals")
+ * @param config Elasticsearch Config
+ * @returns A single validation result.
  */
 export function validateEsRule(
   fieldName: string,
@@ -95,8 +93,6 @@ export function validateEsRule(
   config: Config,
   formatMessage: any
 ) : ValidationResult {
-
-  console.log(JSON.stringify(config.fields?.[fieldName]));
 
   const widgetName = config.fields?.[fieldName]?.type;
   const widgetConfig = config.widgets[widgetName];
@@ -125,11 +121,11 @@ export function validateEsRule(
   // For all the different widgets, a validate date function can be setup to do custom validation.
   switch (widgetName) {
     case "number":
-      return validateNumber(fieldLabel, value, operator, formatMessage);
+      return validateNumber(fieldLabel, formattedValue, operator, formatMessage);
     case "date":
-      return validateDate(fieldLabel, value, operator, formatMessage);
+      return validateDate(fieldLabel, formattedValue, operator, formatMessage);
     case "managedAttribute":
-      return validateManagedAttribute(fieldLabel, value, operator, formatMessage);
+      return validateManagedAttribute(fieldLabel, formattedValue, operator, formatMessage);
   }
 
   return true;

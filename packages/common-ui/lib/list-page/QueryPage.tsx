@@ -1006,6 +1006,7 @@ export function QueryPage<TData extends KitsuResource>({
             setGroups={setGroups}
             groups={groups}
             uniqueName={uniqueName}
+            validationErrors={validationErrors}
           />
         </>
       )}
