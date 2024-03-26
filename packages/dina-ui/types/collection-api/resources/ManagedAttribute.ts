@@ -5,7 +5,7 @@ import { MultilingualDescription } from "../../common";
 export interface ManagedAttributeAttributes<TComponent = string> {
   type: "managed-attribute";
   name: string;
-  vocabularyElementType: string;
+  vocabularyElementType: VocabularyElementType;
   unit?: string;
   managedAttributeComponent?: TComponent;
   acceptedValues?: string[] | null;
