@@ -1,4 +1,4 @@
-import { InputResource, KitsuResource } from "kitsu";
+import { InputResource, KitsuResource, PersistedResource } from "kitsu";
 import { WorkbookDataTypeEnum } from "./WorkbookDataTypeEnum";
 
 export enum LinkOrCreateSetting {
@@ -107,5 +107,11 @@ export interface WorkbookColumnMap {
         type: string;
       };
     };
+  };
+}
+
+export interface RelationshipMapping {
+  [columnHeader: string]: {
+    [value: string]: any;
   };
 }

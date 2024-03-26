@@ -8,16 +8,17 @@ import {
 } from "react";
 import {
   ColumnUniqueValues,
+  RelationshipMapping,
   WorkbookColumnMap,
   WorkbookJSON,
   WorkbookResourceType
 } from "./types/Workbook";
 
-import { PersistedResource } from "kitsu";
-import { filterBy, useQuery } from "../../../common-ui/lib";
-import { ManagedAttribute } from "../../types/collection-api";
 import db from "./WorkbookDB";
-import { calculateColumnUniqueValuesFromSpreadsheetData } from "./utils/workbookMappingUtils";
+import {
+  calculateColumnUniqueValuesFromSpreadsheetData,
+  removeEmptyColumns
+} from "./utils/workbookMappingUtils";
 
 async function saveWorkbookResourcesInIndexDB(
   type: string,
@@ -150,7 +151,7 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         progress: 0
       };
     case "UPLOAD_SPREADSHEET_DATA":
-      const spreadsheetData: WorkbookJSON = action.payload;
+      const spreadsheetData: WorkbookJSON = removeEmptyColumns(action.payload);
       const columnUniqueValues: ColumnUniqueValues =
         calculateColumnUniqueValuesFromSpreadsheetData(spreadsheetData);
       return {
@@ -187,7 +188,6 @@ export interface WorkbookUploadContextI {
   group?: string;
   type?: string;
   error?: Error;
-  managedAttributes: PersistedResource<ManagedAttribute>[];
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
   setColumnMap: (newColumnMap: WorkbookColumnMap) => void;
@@ -195,6 +195,7 @@ export interface WorkbookUploadContextI {
   startSavingWorkbook: (
     newWorkbookResources: WorkbookResourceType[],
     newWorkbookColumnMap: WorkbookColumnMap,
+    relationshipMapping: RelationshipMapping,
     group: string,
     type: string,
     apiBaseUrl: string
@@ -234,18 +235,7 @@ export function WorkbookUploadContextProvider({
     progress: 0
   };
   const [state, dispatch] = useReducer(reducer, initState);
-  const { response: attrResponse } = useQuery<ManagedAttribute[]>({
-    path: "collection-api/managed-attribute",
-    filter: filterBy([], {
-      extraFilters: [
-        {
-          selector: "managedAttributeComponent",
-          comparison: "==",
-          arguments: "MATERIAL_SAMPLE"
-        }
-      ]
-    })("")
-  });
+
   useEffect(() => {
     const strMetaData = localStorage.getItem("workbookResourceMetaData");
     const workbookMetaDataInLocalStorage: WorkbookMetaData = strMetaData
@@ -286,10 +276,17 @@ export function WorkbookUploadContextProvider({
   const startSavingWorkbook = async (
     newWorkbookResources: WorkbookResourceType[],
     newWorkbookColumnMap: WorkbookColumnMap,
+    relationshipMapping: RelationshipMapping,
     newGroup: string,
     newType: string,
     newApiBaseUrl: string
   ) => {
+    for (const columnHeader of Object.keys(relationshipMapping)) {
+      if (newWorkbookColumnMap[columnHeader]?.mapRelationship) {
+        newWorkbookColumnMap[columnHeader].valueMapping =
+          relationshipMapping[columnHeader];
+      }
+    }
     writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
       status: "SAVING",
       group: newGroup,
@@ -420,7 +417,6 @@ export function WorkbookUploadContextProvider({
         apiBaseUrl: state.apiBaseUrl,
         status: state.status,
         error: state.error,
-        managedAttributes: attrResponse?.data ?? [],
 
         uploadWorkbook,
         setColumnMap,
