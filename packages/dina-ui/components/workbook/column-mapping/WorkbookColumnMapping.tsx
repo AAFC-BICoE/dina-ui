@@ -393,6 +393,10 @@ export function WorkbookColumnMapping({
                         onChange={(newOption) =>
                           setSheet(newOption?.value ?? 0)
                         }
+                        menuPortalTarget={document.body}
+                        styles={{
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                        }}
                       />
                     </FieldWrapper>
                     <FieldWrapper name="type" className="flex-grow-1">
@@ -401,6 +405,10 @@ export function WorkbookColumnMapping({
                         value={selectedType}
                         onChange={(entityType) => setSelectedType(entityType)}
                         options={entityTypes}
+                        menuPortalTarget={document.body}
+                        styles={{
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                        }}
                       />
                     </FieldWrapper>
                   </div>
