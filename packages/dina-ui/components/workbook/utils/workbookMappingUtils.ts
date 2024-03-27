@@ -527,6 +527,7 @@ export function removeEmptyColumns(data: WorkbookJSON) {
     const emptyColumnIndexes: number[] = [];
     if (sheetData.length > 1) {
       const headerRow = sheetData[0];
+      headerRow.content = headerRow.content.map((header) => header.trim());
       for (let i = headerRow.content.length - 1; i >= 0; i--) {
         if (headerRow.content[i].trim() === "") {
           emptyColumnIndexes.push(i);
