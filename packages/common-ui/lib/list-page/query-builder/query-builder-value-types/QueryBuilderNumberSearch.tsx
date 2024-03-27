@@ -304,7 +304,7 @@ export function validateNumber(
       if (betweenStates.low === "" && betweenStates.high === "") return true;
 
       // If just one between state is empty, then report an error.
-      if (betweenStates.low.trim() === "" || betweenStates.high.trim() === "") {
+      if (betweenStates.low === "" || betweenStates.high === "") {
         return {
           errorMessage: formatMessage({ id: "numberBetweenMissingValues" }),
           fieldName
