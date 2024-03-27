@@ -95,7 +95,11 @@ export function WorkbookFieldSelectField({
         className="flex-fill"
         name={`fieldMap[${columnIndex}].targetField`}
         options={fieldOptions}
-        selectProps={{ isClearable: true }}
+        selectProps={{
+          isClearable: true,
+          menuPortalTarget: document.body,
+          styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+        }}
         hideLabel={true}
         styles={customStyles}
         onChange={onFieldMapChanged}

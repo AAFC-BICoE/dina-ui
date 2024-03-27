@@ -914,6 +914,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbookGroupUploadTitle: "Upload Workbook",
   workbookTitle: "Workbooks",
   workbookPreviewTitle: "Workbook preview",
+  mapRelationshipTitle: "Relationship Mapping",
+  value: "Value",
+  count: "Count",
   workbookUploadFailure:
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
@@ -936,7 +939,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadWorkbookIsDone: 'The workbook is saved, click "OK" to finish it',
   mapRelationship: "Map Relationship",
   field_storageUnit: "Storage Unit",
-  mapColumns: "Map Columns",
+  mapColumns: "Column Mapping",
   field_transactionNumber: "Transaction Number",
   field_transactionType: "Transaction Type",
   field_materialDirection: "Material Direction",
