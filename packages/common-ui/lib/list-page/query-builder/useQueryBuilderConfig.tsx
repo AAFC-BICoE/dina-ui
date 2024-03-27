@@ -48,7 +48,7 @@ import QueryRowGlobalSearchSearch, { transformGlobalSearchToDSL } from "./query-
  * The index settings has more information than what can be stored in the list, especially for
  * nested fields.
  */
-function fieldValueToIndexSettings(
+export function fieldValueToIndexSettings(
   fieldPath: string,
   indexMap: ESIndexMapping[]
 ): ESIndexMapping | undefined {
@@ -468,7 +468,8 @@ export function generateBuilderConfig(
           operation: op,
           value: val,
           queryType,
-          fieldInfo: indexSettings
+          fieldInfo: indexSettings,
+          indexMap: indexMap
         });
       }
     },
@@ -493,7 +494,8 @@ export function generateBuilderConfig(
           operation: op,
           value: val,
           queryType,
-          fieldInfo: indexSettings
+          fieldInfo: indexSettings,
+          indexMap: indexMap
         });
       }
     }

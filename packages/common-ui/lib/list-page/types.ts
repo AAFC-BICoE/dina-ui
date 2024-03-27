@@ -232,6 +232,11 @@ export interface TransformToDSLProps {
    * The elastic search mapping for the field.
    */
   fieldInfo?: ESIndexMapping;
+
+  /**
+   * All elastic search mapping fields. Used for managed attributes/field extensions.
+   */
+  indexMap?: ESIndexMapping[];
 }
 
 export type DynamicFieldType = "managedAttribute" | "fieldExtension";
