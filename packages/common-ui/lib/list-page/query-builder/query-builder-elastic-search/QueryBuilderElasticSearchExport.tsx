@@ -766,7 +766,7 @@ export function betweenQuery(fieldName: string, value: string, parentType: strin
   const betweenStates = convertStringToBetweenState(value);
 
   // Ignore empty between dates.
-  if (betweenStates.high === "" || betweenStates.low) {
+  if (betweenStates.high === "" || betweenStates.low === "") {
     return {};
   }
 
