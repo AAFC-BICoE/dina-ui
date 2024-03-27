@@ -4,6 +4,7 @@ import { isEmpty, reject, uniq, compact } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { TableColumn } from "../../types";
 import { SupportedBetweenTypes, convertStringToBetweenState } from "../query-builder-core-components/useQueryBetweenSupport";
+import { getTimezone } from "../query-builder-value-types/QueryBuilderDateSearch";
 
 export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
   /**
@@ -759,9 +760,20 @@ export function uuidQuery(uuids: string[]) {
  * @param value String containing the low and high values represented as a JSON.
  * @param parentType Determines if the query should be nested or not.
  * @param type If being done on a text field, a specific field should be used. (keyword_numeric)
+ * @param subType Only applicable for date type, determines if timezone should be included or not.
  */
-export function betweenQuery(fieldName: string, value: string, parentType: string | undefined, type: SupportedBetweenTypes) {
+export function betweenQuery(fieldName: string, value: string, parentType: string | undefined, type: SupportedBetweenTypes, subType?: string | undefined) {
   const betweenStates = convertStringToBetweenState(value);
+
+  // Ignore empty between dates.
+  if (betweenStates.high === "" || betweenStates.low === "") {
+    return {};
+  }
+
+  const timezone = type === "date" ? subType !== "local_date" && subType !== "local_date_time"
+    ? getTimezone()
+    : undefined : undefined;
+
   return parentType
     ? {
       nested: {
@@ -772,8 +784,9 @@ export function betweenQuery(fieldName: string, value: string, parentType: strin
               {
                 range: {
                   [fieldName + (type === "text" ? ".keyword_numeric" : "")]: {
+                    ...timezone,
                     gte: type === "number" ? Number(betweenStates.low) : betweenStates.low,
-                    lte: type === "number" ? Number(betweenStates.high) : betweenStates.high
+                    lte: type === "number" ? Number(betweenStates.high) : betweenStates.high,
                   }
                 }
               },
@@ -786,6 +799,7 @@ export function betweenQuery(fieldName: string, value: string, parentType: strin
     : {
       range: {
         [fieldName + (type === "text" ? ".keyword_numeric" : "")]: {
+          ...timezone,
           gte: type === "number" ? Number(betweenStates.low) : betweenStates.low,
           lte: type === "number" ? Number(betweenStates.high) : betweenStates.high
         }
