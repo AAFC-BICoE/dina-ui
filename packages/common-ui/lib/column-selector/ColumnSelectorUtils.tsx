@@ -253,7 +253,7 @@ export function getIncludedManagedAttributeColumn(
     },
     header: () => <FieldHeader name={managedAttribute.name} />,
     accessorKey,
-    id: `${queryOption.type}.${managedAttributeKey}`,
+    id: `${queryOption.label}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: false,
     relationshipType: queryOption.parentType,
@@ -296,7 +296,7 @@ export function getAttributesManagedAttributeColumn(
   const managedAttributesColumn = {
     header: () => <FieldHeader name={managedAttribute.name} />,
     accessorKey,
-    id: `${queryOption.type}.${managedAttributeKey}`,
+    id: `${queryOption.label}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: false,
     queryOption,
