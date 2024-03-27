@@ -427,6 +427,15 @@ describe("QueryBuilderNumberSearch", () => {
         });
         expect(formatMessage).toHaveBeenCalledWith({ id: 'numberBetweenInvalid' }); // Specific error message called
       });
+
+      it('should return validation error for "between" operator when only one value is provided', () => {
+        const result = validateNumber('myNumber', '{"low": "","high": "5"}', 'between', formatMessage);
+        expect(result).toEqual({
+          errorMessage: 'Mocked error message',
+          fieldName: 'myNumber',
+        });
+        expect(formatMessage).toHaveBeenCalledWith({ id: 'numberBetweenMissingValues' }); // Specific error message called
+      });
   
       it('should return true for valid "between" operator values', () => {
         const result = validateNumber('myNumber', '{"low": "-3","high": "60.5"}', 'between', formatMessage);

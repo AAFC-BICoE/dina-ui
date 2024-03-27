@@ -301,8 +301,14 @@ export function validateNumber(
 
     case "between":
       const betweenStates = convertStringToBetweenState(value);
-      if (betweenStates.low === "" && betweenStates.high === "") {
-        return true;
+      if (betweenStates.low === "" && betweenStates.high === "") return true;
+
+      // If just one between state is empty, then report an error.
+      if (betweenStates.low.trim() === "" || betweenStates.high.trim() === "") {
+        return {
+          errorMessage: formatMessage({ id: "numberBetweenMissingValues" }),
+          fieldName
+        }
       }
 
       if (!NUMBER_REGEX.test(betweenStates.low) || !NUMBER_REGEX.test(betweenStates.high)) {

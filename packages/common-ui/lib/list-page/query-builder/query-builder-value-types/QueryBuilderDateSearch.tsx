@@ -427,7 +427,15 @@ export function validateDate(
     // Between (Check the low/high for correct values, ensure it's not greater than the other value.)
     case "between":
       const betweenStates = convertStringToBetweenState(value);
-      if (betweenStates.low === "" && betweenStates.high === "") return true;
+      if (betweenStates.low.trim() === "" && betweenStates.high.trim() === "") return true;
+
+      // If just one between state is empty, then report an error.
+      if (betweenStates.low.trim() === "" || betweenStates.high.trim() === "") {
+        return {
+          errorMessage: formatMessage({ id: "dateBetweenMissingValues" }),
+          fieldName
+        }
+      }
 
       if (!DATE_REGEX_NO_TIME.test(betweenStates.low) || !DATE_REGEX_NO_TIME.test(betweenStates.high)) {
         return {

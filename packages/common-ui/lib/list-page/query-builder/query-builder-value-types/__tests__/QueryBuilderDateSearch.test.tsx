@@ -225,6 +225,15 @@ describe("QueryBuilderDateSearch", () => {
       expect(formatMessage).toHaveBeenCalledWith({ id: 'dateBetweenInvalid' }); // Specific error message called
     });
 
+    it('should return validation error for "between" operator with only one value provided.', () => {
+      const result = validateDate('myDate', '{"low": "2023-05-19","high": ""}', 'between', formatMessage);
+      expect(result).toEqual({
+        errorMessage: 'Mocked error message',
+        fieldName: 'myDate',
+      });
+      expect(formatMessage).toHaveBeenCalledWith({ id: 'dateBetweenMissingValues' }); // Specific error message called
+    });
+
     it('should return true for valid "between" operator values', () => {
       const result = validateDate('myDate', '{"low": "2022-05-19","high": "2023-01-19"}', 'between', formatMessage);
       expect(result).toBe(true);

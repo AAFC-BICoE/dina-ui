@@ -765,6 +765,11 @@ export function uuidQuery(uuids: string[]) {
 export function betweenQuery(fieldName: string, value: string, parentType: string | undefined, type: SupportedBetweenTypes, subType?: string | undefined) {
   const betweenStates = convertStringToBetweenState(value);
 
+  // Ignore empty between dates.
+  if (betweenStates.high.trim() === "" || betweenStates.low.trim()) {
+    return {};
+  }
+
   const timezone = type === "date" ? subType !== "local_date" && subType !== "local_date_time"
     ? getTimezone()
     : undefined : undefined;
