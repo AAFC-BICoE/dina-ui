@@ -516,6 +516,11 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
           options={options}
           hideLabel={true}
           isMulti={false}
+          selectProps={{
+            isClearable: true,
+            menuPortalTarget: document.body,
+            styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+          }}
         />
         <input type="hidden" name={hiddenElemName} value={targetType} />
       </>
