@@ -36,6 +36,11 @@ interface QueryBuilderManagedAttributeSearchProps {
    * config and will be used to determine what endpoint to use to retrieve the managed attributes.
    */
   managedAttributeConfig?: ESIndexMapping;
+
+  /**
+   * All the possible field settings, this is for linking it to a managed attribute in the index map.
+   */
+  indexMap?: ESIndexMapping[];
 }
 
 export interface ManagedAttributeOption extends SelectOption<string> {
@@ -46,6 +51,9 @@ export interface ManagedAttributeOption extends SelectOption<string> {
 export interface ManagedAttributeSearchStates {
   /** The key of the selected managed attribute to search against. */
   selectedManagedAttribute?: PersistedResource<ManagedAttribute>;
+
+  /** If possible, the managed attribute config from the index map */
+  selectedManagedAttributeConfig?: ESIndexMapping;
 
   /** The type of the selected managed attribute. */
   selectedType: string;
@@ -60,7 +68,8 @@ export interface ManagedAttributeSearchStates {
 export default function QueryRowManagedAttributeSearch({
   value,
   setValue,
-  managedAttributeConfig
+  managedAttributeConfig,
+  indexMap
 }: QueryBuilderManagedAttributeSearchProps) {
   const { formatMessage } = useIntl();
 
@@ -72,6 +81,7 @@ export default function QueryRowManagedAttributeSearch({
             searchValue: "",
             selectedOperator: "",
             selectedManagedAttribute: undefined,
+            selectedManagedAttributeConfig: undefined,
             selectedType: ""
           }
     );
@@ -146,9 +156,8 @@ export default function QueryRowManagedAttributeSearch({
           "wildcard",
           "in",
           "notIn",
-          // Between is only used if the keyword numeric support is found.
-          // Hard-coded solution until properly fixed.
-          (managedAttributeConfig?.keywordNumericSupport || (managedAttributeSelected?.key === "barcode" && managedAttributeConfig?.dynamicField?.apiEndpoint === "objectstore-api/managed-attribute")) ? "between" : undefined,
+          // Check if the managed attribute contains keyword numeric support.
+          (managedAttributeState?.selectedManagedAttributeConfig?.keywordNumericSupport ? "between" : undefined),
           "startsWith",
           "notEquals",
           "empty",
@@ -306,16 +315,19 @@ export default function QueryRowManagedAttributeSearch({
           id: "queryBuilder_managedAttribute_placeholder"
         })}
         pageSize={15}
-        onChange={(newValue) =>
+        onChange={(newValue) => {
+          const fieldPath = (managedAttributeConfig?.path ?? "") + "." + ((newValue as PersistedResource<ManagedAttribute>).key ?? "");
+
           setManagedAttributeState({
             ...managedAttributeState,
             selectedManagedAttribute:
               newValue as PersistedResource<ManagedAttribute>,
+            selectedManagedAttributeConfig: fieldValueToIndexSettings(fieldPath, indexMap ?? []),
             selectedOperator: "",
             selectedType: "",
             searchValue: ""
-          })
-        }
+          });
+        }}
         value={managedAttributeSelected}
         selectProps={{
           controlShouldRenderValue: true,

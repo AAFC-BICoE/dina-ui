@@ -441,6 +441,7 @@ export function generateBuilderConfig(
             (factoryProps?.fieldDefinition?.fieldSettings as any)
               ?.mapping as ESIndexMapping
           }
+          indexMap={indexMap}
         />
       ),
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {
