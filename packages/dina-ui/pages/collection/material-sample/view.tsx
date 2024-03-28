@@ -314,6 +314,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     <FieldSet
                       legend={<DinaMessage id="collectingEvent" />}
                       wrapLegend={legendWrapper()}
+                      componentName={COLLECTING_EVENT_COMPONENT_NAME}
                     >
                       {materialSample.parentMaterialSample && (
                         <div
