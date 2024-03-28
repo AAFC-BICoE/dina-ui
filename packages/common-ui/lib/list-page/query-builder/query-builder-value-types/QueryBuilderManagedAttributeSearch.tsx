@@ -17,9 +17,10 @@ import QueryBuilderTextSearch, {
 } from "./QueryBuilderTextSearch";
 import { get } from "lodash";
 import { PersistedResource } from "kitsu";
+import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 
-interface QueryRowTextSearchProps {
+interface QueryBuilderManagedAttributeSearchProps {
   /**
    * Retrieve the current value from the Query Builder.
    */
@@ -60,7 +61,7 @@ export default function QueryRowManagedAttributeSearch({
   value,
   setValue,
   managedAttributeConfig
-}: QueryRowTextSearchProps) {
+}: QueryBuilderManagedAttributeSearchProps) {
   const { formatMessage } = useIntl();
 
   const [managedAttributeState, setManagedAttributeState] =
@@ -97,9 +98,6 @@ export default function QueryRowManagedAttributeSearch({
   const managedAttributeType = managedAttributeSelected?.acceptedValues
     ? "PICK_LIST"
     : managedAttributeSelected?.vocabularyElementType ?? "";
-
-  console.log(JSON.stringify(managedAttributeState));
-  console.log(JSON.stringify(managedAttributeConfig));
 
   const supportedOperatorsForType: (type: string) => string[] = (type) => {
     switch (type) {
@@ -195,6 +193,7 @@ export default function QueryRowManagedAttributeSearch({
           searchValue: userInput ?? ""
         })
     };
+
     switch (type) {
       case "INTEGER":
       case "DECIMAL":
@@ -357,7 +356,8 @@ export default function QueryRowManagedAttributeSearch({
  */
 export function transformManagedAttributeToDSL({
   value,
-  fieldInfo
+  fieldInfo,
+  indexMap
 }: TransformToDSLProps): any {
   // Parse the managed attribute search options. Trim the search value.
   const managedAttributeSearchValue: ManagedAttributeSearchStates =
@@ -374,15 +374,19 @@ export function transformManagedAttributeToDSL({
     }
   }
 
+  const fieldPath: string = fieldInfo?.path +
+    "." +
+    managedAttributeSearchValue.selectedManagedAttribute?.key;
+
+  // Check if managed attribute can be found within the index map.
+  const managedAttributeFieldInfo = fieldValueToIndexSettings(fieldPath, indexMap ?? []);
+
   const commonProps = {
-    fieldPath:
-      fieldInfo?.path +
-      "." +
-      managedAttributeSearchValue.selectedManagedAttribute?.key,
+    fieldPath,
     operation: managedAttributeSearchValue.selectedOperator,
     queryType: "",
     value: managedAttributeSearchValue.searchValue,
-    fieldInfo: {
+    fieldInfo: managedAttributeFieldInfo ? managedAttributeFieldInfo : {
       ...fieldInfo,
       distinctTerm: false,
 

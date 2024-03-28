@@ -73,6 +73,11 @@ export interface ESIndexMapping {
   label: string;
 
   /**
+   * Determines if the field should be displayed on the field selector.
+   */
+  hideField: boolean;
+
+  /**
    * The attributes type. This can change how the query row is displayed and the options provided.
    *
    * Examples: text, keyword, boolean, date, boolean, long, short, integer...
@@ -227,6 +232,11 @@ export interface TransformToDSLProps {
    * The elastic search mapping for the field.
    */
   fieldInfo?: ESIndexMapping;
+
+  /**
+   * All elastic search mapping fields. Used for managed attributes/field extensions.
+   */
+  indexMap?: ESIndexMapping[];
 }
 
 export type DynamicFieldType = "managedAttribute" | "fieldExtension";
