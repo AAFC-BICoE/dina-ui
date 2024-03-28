@@ -24,8 +24,7 @@ import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
 } from "./query-builder-value-types/QueryBuilderBooleanSearch";
 import QueryBuilderDateSearch, {
-  transformDateSearchToDSL,
-  validateDate
+  transformDateSearchToDSL
 } from "./query-builder-value-types/QueryBuilderDateSearch";
 import QueryRowFieldExtensionSearch, {
   transformFieldExtensionToDSL
@@ -111,23 +110,6 @@ function getQueryBuilderTypeFromIndexType(
 
   // Unsupported type, this will cause an error with the query builder.
   return "unsupported";
-}
-
-/**
- * Depending on the field type, a different validation will need to be performed.
- *
- * @param value string value to validate against.
- * @param type the type of the field, to determine how to validate the value.
- * @param formatMessage internationalization support.
- * @returns null if no validation errors or string with the error message.
- */
-function validateField(value: string, type: string, formatMessage: any) {
-  switch (type) {
-    case "date":
-      return validateDate(value, formatMessage);
-    default:
-      return true;
-  }
 }
 
 // Unique fieldname identifier for global search.
@@ -564,6 +546,7 @@ export function generateBuilderConfig(
             "equals",
             "notEquals",
             "containsDate",
+            "between",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",
@@ -709,7 +692,7 @@ export function generateBuilderConfig(
     showNot: false,
     canRegroup: true,
     canReorder: true,
-    clearValueOnChangeField: false,
+    clearValueOnChangeField: true,
     clearValueOnChangeOp: true,
     showErrorMessage: true,
     removeIncompleteRulesOnLoad: false,
@@ -733,9 +716,7 @@ export function generateBuilderConfig(
         type,
         valueSources: ["value"],
         fieldSettings: {
-          mapping: indexItem,
-          validateValue: (value, _fieldSettings) =>
-            validateField(value, type, formatMessage)
+          mapping: indexItem
         }
       };
       return field;

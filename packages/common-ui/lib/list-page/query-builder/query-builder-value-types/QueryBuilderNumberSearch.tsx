@@ -9,7 +9,11 @@ import {
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
-import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
+import { convertStringToBetweenState, useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
+import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+
+// Decimal / Integer validation (Negative numbers supported.)
+export const NUMBER_REGEX = /^-?\d+(?:\.\d+)?$/;
 
 interface QueryBuilderNumberSearchProps {
   /**
@@ -269,10 +273,59 @@ function buildNumberRangeObject(matchType, value) {
       return { lt: value };
     case "lessThanOrEqualTo":
       return { lte: value };
-    case "between":
-      return {
-        gte: value,
-        lte: value // Todo
-      }
   }
+}
+
+export function validateNumber(
+  fieldName: string,
+  value: string,
+  operator: string,
+  formatMessage: any
+): ValidationResult {
+  switch (operator) {
+    // Ensure a number is provided for these cases.
+    case "equals":
+    case "notEquals":
+    case "greaterThan":
+    case "greaterThanOrEqualTo":
+    case "lessThan":
+    case "lessThanOrEqualTo":
+      if (value == null || value === "") return true;
+      if (!NUMBER_REGEX.test(value)) {
+        return {
+          errorMessage: formatMessage({ id: "numberInvalid" }),
+          fieldName
+        }
+      }
+      break;
+
+    case "between":
+      const betweenStates = convertStringToBetweenState(value);
+      if (betweenStates.low === "" && betweenStates.high === "") return true;
+
+      // If just one between state is empty, then report an error.
+      if (betweenStates.low === "" || betweenStates.high === "") {
+        return {
+          errorMessage: formatMessage({ id: "numberBetweenMissingValues" }),
+          fieldName
+        }
+      }
+
+      if (!NUMBER_REGEX.test(betweenStates.low) || !NUMBER_REGEX.test(betweenStates.high)) {
+        return {
+          errorMessage: formatMessage({ id: "numberInvalid" }),
+          fieldName
+        }
+      }
+
+      if (Number(betweenStates.low) > Number(betweenStates.high)) {
+        return {
+          errorMessage: formatMessage({ id: "numberBetweenInvalid" }),
+          fieldName
+        }
+      }
+      break;
+  }
+
+  return true;
 }

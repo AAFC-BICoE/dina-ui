@@ -11,6 +11,7 @@ import { Button } from "react-bootstrap";
 import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
+import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 interface QueryBuilderProps {
   /**
    * Index name being used for the QueryPage.
@@ -72,6 +73,12 @@ interface QueryBuilderProps {
    * to remain the same across tables, it can share the same name.
    */
   uniqueName: string;
+
+  /**
+   * Validation errors reported. This should disable the "Search" button to prevent the user from
+   * submitting a broken query.
+   */
+  validationErrors: ValidationError[];
 }
 
 function QueryBuilder({
@@ -85,7 +92,8 @@ function QueryBuilder({
   setPageOffset,
   groups,
   setGroups,
-  uniqueName
+  uniqueName,
+  validationErrors
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -138,7 +146,7 @@ function QueryBuilder({
         renderBuilder={renderBuilder}
       />
       <div className="mt-2">
-        <Button onClick={onSubmit} className="me-2">
+        <Button onClick={onSubmit} className="me-2" disabled={validationErrors.length > 0}>
           <DinaMessage id="search" />
         </Button>
         <Button onClick={onReset} variant="secondary">

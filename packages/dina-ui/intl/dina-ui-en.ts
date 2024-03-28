@@ -271,6 +271,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_description: "Description",
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
+  "field_description.de": "German Description",
   field_determination: "Determinations",
   "field_determination.typeStatus": "Type Status",
   "field_determination.verbatimScientificName": "Verbatim Scientific Name",
@@ -638,6 +639,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organismsQuantity: "Organisms Quantity",
   organizationEnglishNameLabel: "English Name",
   organizationFrenchNameLabel: "French Name",
+  organizationGermanNameLabel: "German Name",
   organizationListTitle: "Organizations",
   originalFile: "Original File",
   originalMaterialSampleLabel: "Original Material Sample",
@@ -686,14 +688,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_extension_placeholder: "Select extension to search against...",
   queryBuilder_field_placeholder: "Select a field to search against...",
   queryBuilder_globalSearch: "Global search",
-  queryBuilder_globalSearch_withText: "Global search for \"{globalSearchTerm}\"",
-  queryBuilder_globalSearch_tooltip: "Global search supports syntax to help refine your search further.",
-  queryBuilder_globalSearch_tooltipLink: "See user documentation for all supported syntax.",
+  queryBuilder_globalSearch_withText: 'Global search for "{globalSearchTerm}"',
+  queryBuilder_globalSearch_tooltip:
+    "Global search supports syntax to help refine your search further.",
+  queryBuilder_globalSearch_tooltipLink:
+    "See user documentation for all supported syntax.",
   queryBuilder_managedAttribute_placeholder:
     "Select managed attribute to search against...",
   queryBuilder_operator_containsDate: "Contains",
   queryBuilder_operator_between: "Between",
-  queryBuilder_operator_between_tooltip: "The search results will include the from/to values in the search. (inclusive range)",
+  queryBuilder_operator_between_tooltip:
+    "The search results will include the from/to values in the search. (inclusive range)",
   queryBuilder_operator_from: "From",
   queryBuilder_operator_to: "To",
   queryBuilder_operator_empty: "Empty",
@@ -909,6 +914,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbookGroupUploadTitle: "Upload Workbook",
   workbookTitle: "Workbooks",
   workbookPreviewTitle: "Workbook preview",
+  mapRelationshipTitle: "Relationship Mapping",
+  value: "Value",
+  count: "Count",
   workbookUploadFailure:
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
@@ -931,7 +939,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadWorkbookIsDone: 'The workbook is saved, click "OK" to finish it',
   mapRelationship: "Map Relationship",
   field_storageUnit: "Storage Unit",
-  mapColumns: "Map Columns",
+  mapColumns: "Column Mapping",
   field_transactionNumber: "Transaction Number",
   field_transactionType: "Transaction Type",
   field_materialDirection: "Material Direction",

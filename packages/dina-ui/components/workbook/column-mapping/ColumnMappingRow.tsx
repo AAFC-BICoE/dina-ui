@@ -1,14 +1,8 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { CheckBoxField } from "../../../../common-ui/lib";
-import { useWorkbookContext } from "../WorkbookProvider";
-import FieldMappingConfig from "../utils/FieldMappingConfig";
-import { useWorkbookConverter } from "../utils/useWorkbookConverter";
-import { getColumnHeaders } from "../utils/workbookMappingUtils";
 import { WorkbookFieldSelectField } from "./WorkbookFieldSelectField";
 
 export interface ColumnMappingRowProps {
-  sheet: number;
-  selectedType: string;
   columnName: string;
   columnIndex: number;
   fieldOptions: {
@@ -24,25 +18,11 @@ export interface ColumnMappingRowProps {
 }
 
 export function ColumnMappingRow({
-  sheet,
-  selectedType,
   columnName,
   columnIndex,
   fieldOptions,
   onFieldMappingChange
 }: ColumnMappingRowProps) {
-  const { spreadsheetData, workbookColumnMap } = useWorkbookContext();
-
-  const { isFieldInALinkableRelationshipField } = useWorkbookConverter(
-    FieldMappingConfig,
-    selectedType || "material-sample"
-  );
-
-  // Retrieve a string array of the headers from the uploaded spreadsheet.
-  const headers = useMemo(() => {
-    return getColumnHeaders(spreadsheetData, sheet);
-  }, [sheet]);
-
   const onFieldChanged = useCallback((newFieldPath: string) => {
     onFieldMappingChange(columnName, newFieldPath);
   }, []);

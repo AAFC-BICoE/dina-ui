@@ -6,10 +6,10 @@ import { useEffect } from "react";
 import { filterBy, ResourceSelect, SelectOption, useQuery } from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
-  transformNumberSearchToDSL
+  transformNumberSearchToDSL, validateNumber
 } from "./QueryBuilderNumberSearch";
 import QueryBuilderDateSearch, {
-  transformDateSearchToDSL
+  transformDateSearchToDSL, validateDate
 } from "./QueryBuilderDateSearch";
 import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
 import QueryBuilderTextSearch, {
@@ -18,6 +18,7 @@ import QueryBuilderTextSearch, {
 import { get } from "lodash";
 import { PersistedResource } from "kitsu";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
+import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 
 interface QueryBuilderManagedAttributeSearchProps {
   /**
@@ -120,6 +121,7 @@ export default function QueryRowManagedAttributeSearch({
           "equals",
           "notEquals",
           "containsDate",
+          "between",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -409,4 +411,32 @@ export function transformManagedAttributeToDSL({
     "Unsupported managed attribute type: " +
       managedAttributeSearchValue.selectedType
   );
+}
+
+export function validateManagedAttribute(
+  fieldName: string,
+  value: string,
+  _operator: string,
+  formatMessage: any
+): ValidationResult {
+  try {
+    // Parse the managed attribute search options. Trim the search value.
+    const managedAttributeSearchValue: ManagedAttributeSearchStates = JSON.parse(value);
+    managedAttributeSearchValue.searchValue = managedAttributeSearchValue.searchValue.trim();
+
+    switch (managedAttributeSearchValue.selectedType) {
+      case "INTEGER":
+      case "DECIMAL":
+        return validateNumber(fieldName, managedAttributeSearchValue.searchValue, managedAttributeSearchValue.selectedOperator, formatMessage);
+      case "DATE":
+        return validateDate(fieldName, managedAttributeSearchValue.searchValue, managedAttributeSearchValue.selectedOperator, formatMessage);
+      // case "PICK_LIST":
+      // case "STRING":
+      // case "BOOL":
+    }
+
+    return true;
+  } catch {
+    return true;
+  }
 }
