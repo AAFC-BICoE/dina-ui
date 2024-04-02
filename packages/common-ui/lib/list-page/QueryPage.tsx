@@ -73,6 +73,7 @@ import {
   getIncludedStandardColumns
 } from "../column-selector/ColumnSelectorUtils";
 import { useSessionStorage } from "usehooks-ts";
+import { ValidationError, getElasticSearchValidationResults } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -421,6 +422,9 @@ export function QueryPage<TData extends KitsuResource>({
   // Query Page error message state
   const [error, setError] = useState<any>();
 
+  // Query page validation errors
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+
   const defaultGroups = {
     group: groups
   };
@@ -430,6 +434,25 @@ export function QueryPage<TData extends KitsuResource>({
       setTotalRecords(selectedResources?.length);
     }
   }, [viewMode, selectedResources]);
+
+  // Determine validation errors after each tree change.
+  useEffect(() => {
+    // Query builder is not setup yet.
+    if (!queryBuilderConfig) {
+      return;
+    }
+
+    // Custom validation logic.
+    if (!customViewElasticSearchQuery) {
+      const validationErrorsFound = getElasticSearchValidationResults(
+        queryBuilderTree,
+        queryBuilderConfig,
+        formatMessage
+      )
+
+      setValidationErrors(validationErrorsFound);
+    }
+  }, [queryBuilderTree])
 
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
@@ -449,6 +472,21 @@ export function QueryPage<TData extends KitsuResource>({
     // Check the tree for any validation issues. Do not submit query if issues exist.
     if (!Utils.isValidTree(submittedQueryBuilderTree)) {
       return;
+    }
+
+    // Custom validation logic.
+    if (!customViewElasticSearchQuery) {
+      const validationErrorsFound = getElasticSearchValidationResults(
+        submittedQueryBuilderTree,
+        queryBuilderConfig,
+        formatMessage
+      )
+      setValidationErrors(validationErrorsFound);
+
+      // If any errors are found, do not continue with the search.
+      if (validationErrorsFound.length > 0) {
+        return;
+      }
     }
 
     // Elastic search query with pagination settings.
@@ -937,19 +975,40 @@ export function QueryPage<TData extends KitsuResource>({
   return (
     <>
       {!viewMode && (
-        <QueryBuilderMemo
-          indexName={indexName}
-          queryBuilderTree={queryBuilderTree}
-          setQueryBuilderTree={onQueryBuildTreeChange}
-          queryBuilderConfig={queryBuilderConfig}
-          setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-          setPageOffset={setPageOffset}
-          onSubmit={onSubmit}
-          onReset={onReset}
-          setGroups={setGroups}
-          groups={groups}
-          uniqueName={uniqueName}
-        />
+        <>
+          {validationErrors.length > 0 && (
+            <div
+              className="alert alert-danger"
+              style={{
+                whiteSpace: "pre-line"
+              }}
+            >
+              <h5>Validation Errors</h5>
+              <ul>
+                {validationErrors.map((error: ValidationError) => (
+                  <li key={error.fieldName}>
+                    <strong>{error.fieldName}: </strong>
+                    {error.errorMessage}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <QueryBuilderMemo
+            indexName={indexName}
+            queryBuilderTree={queryBuilderTree}
+            setQueryBuilderTree={onQueryBuildTreeChange}
+            queryBuilderConfig={queryBuilderConfig}
+            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+            setPageOffset={setPageOffset}
+            onSubmit={onSubmit}
+            onReset={onReset}
+            setGroups={setGroups}
+            groups={groups}
+            uniqueName={uniqueName}
+            validationErrors={validationErrors}
+          />
+        </>
       )}
       <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
         {/* Group Selection */}

@@ -1,54 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions betweenQuery tests 1`] = `
-Object {
-  "range": Object {
-    "data.attribute.numberExample": Object {
-      "gte": 2,
-      "lte": 5,
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions betweenQuery tests 2`] = `
-Object {
-  "range": Object {
-    "data.attribute.materialSampleName.keyword_numeric": Object {
-      "gte": "Test100",
-      "lte": "Test200",
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions betweenQuery tests 3`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "range": Object {
-              "included.attributes.dwcRecordNumber": Object {
-                "gte": 10.5,
-                "lte": 293,
-              },
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collecting-event",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
 exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions infixQuery attribute 1`] = `
 Object {
   "match": Object {
@@ -217,6 +168,55 @@ Object {
           Object {
             "prefix": Object {
               "included.attributes.dwcRecordNumber.prefix_reverse": "eulavhcraes",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions betweenQuery tests 1`] = `
+Object {
+  "range": Object {
+    "data.attribute.numberExample": Object {
+      "gte": 2,
+      "lte": 5,
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions betweenQuery tests 2`] = `
+Object {
+  "range": Object {
+    "data.attribute.materialSampleName.keyword_numeric": Object {
+      "gte": "Test100",
+      "lte": "Test200",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions betweenQuery tests 3`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "included.attributes.dwcRecordNumber": Object {
+                "gte": 10.5,
+                "lte": 293,
+              },
             },
           },
           Object {
