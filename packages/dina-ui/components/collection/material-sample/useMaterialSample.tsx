@@ -294,83 +294,100 @@ export function useMaterialSampleSave({
     setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
     setEnableCollectingEvent(
       Boolean(
-        hasColEventTemplate || formTemplate
-          ? find(formTemplate?.components, {
-              name: COLLECTING_EVENT_COMPONENT_NAME
-            })?.visible ?? false
-          : materialSample?.collectingEvent
+        hasColEventTemplate ? true : (
+          formTemplate ? (find(formTemplate?.components, {
+            name: COLLECTING_EVENT_COMPONENT_NAME
+          })?.visible ?? false) : (materialSample?.collectingEvent)
+        )
       )
     );
 
     setEnablePreparations(
       Boolean(
-        hasPreparationsTemplate || formTemplate
-          ? find(formTemplate?.components, {
-              name: PREPARATIONS_COMPONENT_NAME
-            })?.visible ?? false
-          : // Show the preparation section if a field is set or the field is enabled:
+        hasPreparationsTemplate ? true : (
+          formTemplate ? (find(formTemplate?.components, {
+            name: PREPARATIONS_COMPONENT_NAME
+          })?.visible ?? false) : (
             PREPARATION_FIELDS.some(
               (prepFieldName) => !isEmpty(materialSample?.[prepFieldName])
             )
+          )
+        )
       )
     );
 
     setEnableOrganisms(
       Boolean(
-        hasOrganismsTemplate || formTemplate
-          ? find(formTemplate?.components, {
+        hasOrganismsTemplate ? true : (
+          formTemplate
+          ? (find(formTemplate?.components, {
               name: ORGANISMS_COMPONENT_NAME
-            })?.visible ?? false
-          : materialSample?.organism?.length
+            })?.visible ?? false) : (
+               materialSample?.organism?.length
+            )
+        )
       )
     );
 
     setEnableStorage(
       // Show the Storage section if the storage field is set or the template enables it:
       Boolean(
-        hasStorageTemplate || formTemplate
-          ? find(formTemplate?.components, {
+        hasStorageTemplate ? true : (
+          formTemplate ? (
+            find(formTemplate?.components, {
               name: STORAGE_COMPONENT_NAME
             })?.visible ?? false
-          : materialSample?.storageUnit?.id
+          ) : (materialSample?.storageUnit?.id)
+        )
       )
     );
 
     setEnableScheduledActions(
       // Show the Scheduled Actions section if the field is set or the template enables it:
       Boolean(
-        hasScheduledActionsTemplate || formTemplate
-          ? find(formTemplate?.components, {
+        hasScheduledActionsTemplate ? true : (
+          formTemplate ? (
+            find(formTemplate?.components, {
               name: SCHEDULED_ACTIONS_COMPONENT_NAME
             })?.visible ?? false
-          : materialSample?.scheduledActions?.length
+          ) : (
+            materialSample?.scheduledActions?.length
+          )
+        )
       )
     );
 
     setEnableAssociations(
       // Show the associations section if the field is set or the template enables it:
       Boolean(
-        hasAssociationsTemplate || formTemplate
-          ? find(formTemplate?.components, {
+        hasAssociationsTemplate ? true : (
+          formTemplate ? (
+            find(formTemplate?.components, {
               name: ASSOCIATIONS_COMPONENT_NAME
             })?.visible ?? false
-          : materialSample?.associations?.length ||
+          ) : (
+            materialSample?.associations?.length ||
               !isEmpty(materialSample?.hostOrganism) ||
               !isEmpty(materialSample?.associations)
+          )
+        )
       )
     );
 
     setEnableRestrictions(
       Boolean(
-        hasRestrictionsTemplate || formTemplate
-          ? find(formTemplate?.components, {
+        hasRestrictionsTemplate ? true : (
+          formTemplate ? (
+            find(formTemplate?.components, {
               name: RESTRICTION_COMPONENT_NAME
             })?.visible ?? false
-          : // Show the restriction section if a field is set or the field is enabled:
+          ) : (
             RESTRICTIONS_FIELDS.some(
               (restrictFieldName) =>
                 !isEmpty(materialSample?.[restrictFieldName])
             )
+          )
+        )
       )
     );
   }, [formTemplate]);
