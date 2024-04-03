@@ -924,6 +924,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   proceedWithSkippedColumn: "Proceed with Skipped Columns?",
   areYouSureImportWorkbookWithSkippedColumns:
     "Are you sure you want to import the workbook with skipped columns?",
+  proceedWithoutMappingAllRecord: "Proceed without mapping all records",
+  areYouSureImportWorkbookWithoutMappingAllRecords:
+    "Are you sure you want to import the workbook without mapping all related records?",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
@@ -959,5 +962,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   viewExportHistoryButton: "View Export History",
   exportColumns: "Export Columns:",
   dataLabel: "Data",
-  objectsLabel: "Objects"
+  objectsLabel: "Objects",
+  relatedRecord: "Related Record"
 };

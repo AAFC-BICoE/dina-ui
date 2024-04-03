@@ -46,7 +46,9 @@ export function RelationshipFieldMapping({
           <div className="col-3">
             <DinaMessage id="count" />
           </div>
-          <div className="col-3" />
+          <div className="col-3">
+            <DinaMessage id="relatedRecord" />
+          </div>
         </div>
         {Object.keys(columnUniqueValues[sheetIndex])
           .filter(

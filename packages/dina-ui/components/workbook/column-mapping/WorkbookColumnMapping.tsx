@@ -117,14 +117,51 @@ export function WorkbookColumnMapping({
   // Generate the currently selected value
   const sheetValue = sheetOptions[sheet];
 
+  function validateRelationshipMapping() {
+    const relationshipColumnNames = Object.keys(columnUniqueValues![sheet])
+      .filter(
+        (columnName) =>
+          workbookColumnMap[columnName]?.mapRelationship &&
+          workbookColumnMap[columnName].showOnUI
+      )
+      .map((columnName) => columnName);
+    for (const columnName of relationshipColumnNames) {
+      const values = Object.keys(
+        (columnUniqueValues ?? {})[sheet]?.[columnName]
+      );
+      if (!relationshipMapping?.[columnName] && values.length > 0) {
+        return false;
+      } else {
+        const mappedValues = Object.keys(relationshipMapping![columnName]);
+        for (const value of values) {
+          if (mappedValues.indexOf(value) === -1) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
   async function onSubmit({ submittedValues }) {
     if (submittedValues.fieldMap.filter((item) => item.skipped).length > 0) {
-      // Ask the user if they sure they want to delete the saved search.
       openModal(
         <AreYouSureModal
           actionMessage={<DinaMessage id="proceedWithSkippedColumn" />}
           messageBody={
             <DinaMessage id="areYouSureImportWorkbookWithSkippedColumns" />
+          }
+          onYesButtonClicked={() => {
+            importWorkbook(submittedValues);
+          }}
+        />
+      );
+    } else if (!validateRelationshipMapping()) {
+      openModal(
+        <AreYouSureModal
+          actionMessage={<DinaMessage id="proceedWithoutMappingAllRecord" />}
+          messageBody={
+            <DinaMessage id="areYouSureImportWorkbookWithoutMappingAllRecords" />
           }
           onYesButtonClicked={() => {
             importWorkbook(submittedValues);
