@@ -17,6 +17,15 @@ export function isValidationResult(object: any): object is ValidationResult {
   return 'errorMessage' in object;
 }
 
+/**
+ * Given a query tree, this function will return all the validation errors present. An empty array
+ * if no validation errors exist.
+ * 
+ * @param queryTree The current query tree to test for errors.
+ * @param config Query builder configuration
+ * @param formatMessage Instance of the formatMessage for translation of error messages.
+ * @returns ValidationError array, can be an empty array if no errors found.
+ */
 export function getElasticSearchValidationResults(
   queryTree: ImmutableTree,
   config: Config,
@@ -24,7 +33,7 @@ export function getElasticSearchValidationResults(
 ): ValidationError[] {
   const results = elasticSearchFormatValidator(queryTree, config, formatMessage);
 
-  if (isValidationResult(results)) {
+  if (results === true || isValidationResult(results)) {
     return results === true ? [] : [results];
   } else {
     // Filter out "true" values and return only ValidationError objects:
