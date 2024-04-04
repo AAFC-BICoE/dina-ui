@@ -135,7 +135,7 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
     filter: groupFilter
   });
 
-  const loading =
+  const loadingData =
     attrLoading ||
     collectionLoading ||
     collEventLoading ||
@@ -153,6 +153,8 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
   const protocols = protocolResp?.data || [];
   const storageUnits = storageUnitResp?.data || [];
   const projects = projectResp?.data || [];
+
+  const [loading, setLoading] = useState<boolean>(loadingData);
 
   async function resolveColumnMappingAndRelationshipMapping(
     columnHeader: string,
@@ -247,6 +249,7 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
     // End of workbook column mapping calculation
   }
   async function generateFieldOptions() {
+    setLoading(true);
     if (!!selectedType) {
       const nonNestedRowOptions: { label: string; value: string }[] = [];
       const nestedRowOptions: {
@@ -355,14 +358,15 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
       setFieldMap(map);
       setFieldOptions(newFieldOptions);
       await initColumnMap(newFieldOptions);
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    if (!loading) {
+    if (!loadingData) {
       generateFieldOptions();
     }
-  }, [sheet, selectedType, loading]);
+  }, [sheet, selectedType, loadingData]);
 
   /**
    * Resolve parentMaterialSample value mapping.

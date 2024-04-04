@@ -391,7 +391,7 @@ export function WorkbookColumnMapping({
     setRelationshipMapping(newRelationshipMapping);
   }
 
-  return loading || fieldMap.length === 0 || !relationshipMapping ? (
+  return loading || fieldMap.length === 0 ? (
     <LoadingSpinner loading={loading} />
   ) : (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
