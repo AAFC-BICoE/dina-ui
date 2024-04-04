@@ -135,7 +135,7 @@ export class ApiClientImpl implements ApiClientI {
       (successResponse) => successResponse,
       makeAxiosErrorMoreReadable
     );
-    if (this.apiClient.axios?.defaults?.adapter) {
+    if (this.apiClient.axios?.defaults?.adapter && typeof getAdapter === 'function') {
       const ONE_SECOND = 1000;
       const defaultAdapter = getAdapter(this.apiClient.axios.defaults.adapter);
       this.apiClient.axios.defaults.adapter = cacheAdapterEnhancer(

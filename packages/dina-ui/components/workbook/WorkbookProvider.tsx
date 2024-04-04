@@ -57,6 +57,7 @@ type actionType =
   | "RESET"
   | "RETRIEVE_WORKBOOK_FROM_STORAGE"
   | "SET_COLUMN_MAP"
+  | "SET_RELATIONSHIP_MAPPING"
   | "SET_COLUMN_MAP_VALUE";
 
 export type WorkBookSavingStatus =
@@ -72,6 +73,7 @@ type State = {
   columnUniqueValues?: ColumnUniqueValues;
   workbookResources: WorkbookResourceType[];
   workbookColumnMap: WorkbookColumnMap;
+  relationshipMapping?: RelationshipMapping;
   progress: number;
   status?: WorkBookSavingStatus;
   type?: string;
@@ -166,6 +168,14 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         ...state,
         workbookColumnMap: { ...state.workbookColumnMap, ...action.payload }
       };
+    case "SET_RELATIONSHIP_MAPPING":
+      return {
+        ...state,
+        relationshipMapping:
+          action.payload === undefined
+            ? undefined
+            : { ...(state.relationshipMapping ?? {}), ...action.payload }
+      };
     case "SET_COLUMN_MAP_VALUE":
       return {
         ...state,
@@ -181,6 +191,7 @@ export interface WorkbookUploadContextI {
   columnUniqueValues?: ColumnUniqueValues;
   workbookResources: WorkbookResourceType[];
   workbookColumnMap: WorkbookColumnMap;
+  relationshipMapping?: RelationshipMapping;
   progress: number;
   status?: WorkBookSavingStatus;
   saveProgress: (newValue: number) => void;
@@ -191,6 +202,9 @@ export interface WorkbookUploadContextI {
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
   setColumnMap: (newColumnMap: WorkbookColumnMap) => void;
+  setRelationshipMapping: (
+    newRelationshipMapping?: RelationshipMapping
+  ) => void;
   setColumnMapValue: (newColumnMap: WorkbookColumnMap) => void;
   startSavingWorkbook: (
     newWorkbookResources: WorkbookResourceType[],
@@ -397,6 +411,15 @@ export function WorkbookUploadContextProvider({
     });
   };
 
+  const setRelationshipMapping = (
+    newRelationshipMapping?: RelationshipMapping
+  ) => {
+    dispatch({
+      type: "SET_RELATIONSHIP_MAPPING",
+      payload: newRelationshipMapping
+    });
+  };
+
   const setColumnMapValue = (newColumnMap: WorkbookColumnMap) => {
     dispatch({
       type: "SET_COLUMN_MAP_VALUE",
@@ -411,6 +434,7 @@ export function WorkbookUploadContextProvider({
         columnUniqueValues: state.columnUniqueValues,
         workbookResources: state.workbookResources,
         workbookColumnMap: state.workbookColumnMap,
+        relationshipMapping: state.relationshipMapping,
         progress: state.progress,
         type: state.type,
         group: state.group,
@@ -420,6 +444,7 @@ export function WorkbookUploadContextProvider({
 
         uploadWorkbook,
         setColumnMap,
+        setRelationshipMapping,
         setColumnMapValue,
         saveProgress,
         startSavingWorkbook,

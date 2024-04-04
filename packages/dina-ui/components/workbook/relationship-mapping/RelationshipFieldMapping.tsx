@@ -1,9 +1,7 @@
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { Card } from "react-bootstrap";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useWorkbookContext } from "../WorkbookProvider";
 import { useColumnMapping } from "../column-mapping/useColumnMapping";
-import FieldMappingConfig from "../utils/FieldMappingConfig";
-import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
@@ -12,7 +10,7 @@ export interface RelationshipFieldMappingProps {
 export function RelationshipFieldMapping({
   sheetIndex
 }: RelationshipFieldMappingProps) {
-  const { columnUniqueValues, type, workbookColumnMap, setColumnMapValue } =
+  const { columnUniqueValues, type, workbookColumnMap, relationshipMapping } =
     useWorkbookContext();
   const selectedType = type ?? "material-sample";
   const { getResourceSelectField } = useColumnMapping(sheetIndex, selectedType);
@@ -46,7 +44,9 @@ export function RelationshipFieldMapping({
           <div className="col-3">
             <DinaMessage id="count" />
           </div>
-          <div className="col-3" />
+          <div className="col-3">
+            <DinaMessage id="relatedRecord" />
+          </div>
         </div>
         {Object.keys(columnUniqueValues[sheetIndex])
           .filter(

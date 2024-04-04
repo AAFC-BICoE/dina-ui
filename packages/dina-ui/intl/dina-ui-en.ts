@@ -922,9 +922,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
-  proceedWithSkippedColumn: "Proceed with Skipped Columns?",
+  proceedWithWarning: "Proceed with warnings?",
   areYouSureImportWorkbookWithSkippedColumns:
     "Are you sure you want to import the workbook with skipped columns?",
+  areYouSureImportWorkbookWithoutMappingAllRecords:
+    "Are you sure you want to import the workbook without mapping all related records?",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
@@ -960,5 +962,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   viewExportHistoryButton: "View Export History",
   exportColumns: "Export Columns:",
   dataLabel: "Data",
-  objectsLabel: "Objects"
+  objectsLabel: "Objects",
+  relatedRecord: "Related Record"
 };

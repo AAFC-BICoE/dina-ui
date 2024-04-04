@@ -184,6 +184,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                         path: "data.attributes.managedAttributes",
                         apiEndpoint: "collection-api/managed-attribute"
                       },
+                      hideField: true,
                       value: "data.attributes.managedAttributes",
                       distinctTerm: false,
                       label: "managedAttributes",
@@ -233,6 +234,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                         referencedType: "collecting-event",
                         apiEndpoint: "collection-api/managed-attribute"
                       } as any,
+                      hideField: true,
                       parentName: "collectingEvent",
                       parentPath: "included",
                       parentType: "collecting-event",

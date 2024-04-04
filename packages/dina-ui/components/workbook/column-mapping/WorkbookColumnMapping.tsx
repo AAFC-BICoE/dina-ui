@@ -4,7 +4,6 @@ import {
   LoadingSpinner,
   SubmitButton,
   useAccount,
-  useApiClient,
   useModal
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
@@ -17,7 +16,6 @@ import * as yup from "yup";
 import { ValidationError } from "yup";
 import {
   RelationshipMapping,
-  WorkbookColumnMap,
   WorkbookDataTypeEnum,
   useWorkbookContext
 } from "..";
@@ -56,19 +54,20 @@ export interface WorkbookColumnMappingProps {
   setPerformSave: (newValue: boolean) => void;
 }
 
+// Entities that we support to import
 const ENTITY_TYPES = ["material-sample"] as const;
 
 export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const { apiClient } = useApiClient();
   const { openModal } = useModal();
   const {
     startSavingWorkbook,
     spreadsheetData,
     setColumnMap,
-    columnUniqueValues
+    columnUniqueValues,
+    setRelationshipMapping
   } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
@@ -102,7 +101,7 @@ export function WorkbookColumnMapping({
     sheetOptions,
     workbookColumnMap,
     relationshipMapping,
-    resolveParentMapping
+    resolveColumnMappingAndRelationshipMapping
   } = useColumnMapping(sheet, selectedType?.value || "material-sample");
 
   const buttonBar = (
@@ -117,15 +116,57 @@ export function WorkbookColumnMapping({
   // Generate the currently selected value
   const sheetValue = sheetOptions[sheet];
 
-  async function onSubmit({ submittedValues }) {
-    if (submittedValues.fieldMap.filter((item) => item.skipped).length > 0) {
-      // Ask the user if they sure they want to delete the saved search.
-      openModal(
-        <AreYouSureModal
-          actionMessage={<DinaMessage id="proceedWithSkippedColumn" />}
-          messageBody={
-            <DinaMessage id="areYouSureImportWorkbookWithSkippedColumns" />
+  function validateRelationshipMapping() {
+    const relationshipColumnNames = Object.keys(columnUniqueValues![sheet])
+      .filter(
+        (columnName) =>
+          workbookColumnMap[columnName]?.mapRelationship &&
+          workbookColumnMap[columnName].showOnUI
+      )
+      .map((columnName) => columnName);
+    for (const columnName of relationshipColumnNames) {
+      const values = Object.keys(
+        (columnUniqueValues ?? {})[sheet]?.[columnName]
+      );
+      if (!relationshipMapping?.[columnName] && values.length > 0) {
+        return false;
+      } else {
+        const mappedValues = Object.keys(relationshipMapping![columnName]);
+        for (const value of values) {
+          if (mappedValues.indexOf(value) === -1) {
+            return false;
           }
+        }
+      }
+    }
+    return true;
+  }
+
+  async function onSubmit({ submittedValues }) {
+    let showSkipWarning = false;
+    let showMappingWarning = false;
+    const warnningMessage: string[] = [];
+
+    if (submittedValues.fieldMap.filter((item) => item.skipped).length > 0) {
+      showSkipWarning = true;
+      warnningMessage.push(
+        formatMessage("areYouSureImportWorkbookWithSkippedColumns")
+      );
+    }
+    if (!validateRelationshipMapping()) {
+      showMappingWarning = true;
+      warnningMessage.push(
+        formatMessage("areYouSureImportWorkbookWithoutMappingAllRecords")
+      );
+    }
+
+    if (showMappingWarning || showSkipWarning) {
+      await openModal(
+        <AreYouSureModal
+          actionMessage={formatMessage("proceedWithWarning")}
+          messageBody={warnningMessage.map((msg, index) => (
+            <p key={index}>{msg}</p>
+          ))}
           onYesButtonClicked={() => {
             importWorkbook(submittedValues);
           }}
@@ -343,24 +384,16 @@ export function WorkbookColumnMapping({
     columnName: string,
     newFieldPath: string
   ) {
-    let valueMapping: { [key: string]: { id: string; type: string } } = {};
-    if (newFieldPath?.startsWith("parentMaterialSample.")) {
-      valueMapping = await resolveParentMapping(columnName, newFieldPath);
-    }
-    const newColumnMap: WorkbookColumnMap = {};
-    newColumnMap[columnName] = {
-      fieldPath: newFieldPath,
-      showOnUI: true,
-      numOfUniqueValues: Object.keys(
-        columnUniqueValues?.[sheet]?.[columnName] ?? {}
-      ).length,
-      mapRelationship: false,
-      valueMapping
-    };
-    setColumnMap(newColumnMap);
+    const { newWorkbookColumnMap, newRelationshipMapping } =
+      await resolveColumnMappingAndRelationshipMapping(
+        columnName,
+        newFieldPath
+      );
+    setColumnMap(newWorkbookColumnMap);
+    setRelationshipMapping(newRelationshipMapping);
   }
 
-  return loading || fieldMap.length === 0 || !relationshipMapping ? (
+  return loading || fieldMap.length === 0 ? (
     <LoadingSpinner loading={loading} />
   ) : (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
