@@ -921,10 +921,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
-  proceedWithSkippedColumn: "Proceed with Skipped Columns?",
+  proceedWithWarning: "Proceed with Warning?",
   areYouSureImportWorkbookWithSkippedColumns:
     "Are you sure you want to import the workbook with skipped columns?",
-  proceedWithoutMappingAllRecord: "Proceed without mapping all records",
   areYouSureImportWorkbookWithoutMappingAllRecords:
     "Are you sure you want to import the workbook without mapping all related records?",
   year: "Year",

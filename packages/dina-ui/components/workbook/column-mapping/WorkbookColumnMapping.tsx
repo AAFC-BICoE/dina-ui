@@ -143,25 +143,30 @@ export function WorkbookColumnMapping({
   }
 
   async function onSubmit({ submittedValues }) {
+    let showSkipWarning = false;
+    let showMappingWarning = false;
+    const warnningMessage: string[] = [];
+
     if (submittedValues.fieldMap.filter((item) => item.skipped).length > 0) {
-      openModal(
-        <AreYouSureModal
-          actionMessage={<DinaMessage id="proceedWithSkippedColumn" />}
-          messageBody={
-            <DinaMessage id="areYouSureImportWorkbookWithSkippedColumns" />
-          }
-          onYesButtonClicked={() => {
-            importWorkbook(submittedValues);
-          }}
-        />
+      showSkipWarning = true;
+      warnningMessage.push(
+        formatMessage("areYouSureImportWorkbookWithSkippedColumns")
       );
-    } else if (!validateRelationshipMapping()) {
-      openModal(
+    }
+    if (!validateRelationshipMapping()) {
+      showMappingWarning = true;
+      warnningMessage.push(
+        formatMessage("areYouSureImportWorkbookWithoutMappingAllRecords")
+      );
+    }
+
+    if (showMappingWarning || showSkipWarning) {
+      await openModal(
         <AreYouSureModal
-          actionMessage={<DinaMessage id="proceedWithoutMappingAllRecord" />}
-          messageBody={
-            <DinaMessage id="areYouSureImportWorkbookWithoutMappingAllRecords" />
-          }
+          actionMessage={formatMessage("proceedWithWarning")}
+          messageBody={warnningMessage.map((msg, index) => (
+            <p key={index}>{msg}</p>
+          ))}
           onYesButtonClicked={() => {
             importWorkbook(submittedValues);
           }}
