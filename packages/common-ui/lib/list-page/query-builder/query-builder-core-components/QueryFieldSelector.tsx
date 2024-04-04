@@ -59,6 +59,7 @@ export function QueryFieldSelector({
     // Get all of the attributes from the index for the filter dropdown.
     const simpleRowOptions = indexMap
       ?.filter((prop) => !prop.parentPath)
+      ?.filter((prop) => prop.hideField === false)
       ?.map((prop) => ({
         label: messages["field_" + prop.label]
           ? formatMessage({ id: "field_" + prop.label })
@@ -70,6 +71,7 @@ export function QueryFieldSelector({
     // Get all the relationships for the search dropdown.
     const nestedRowOptions = indexMap
       ?.filter((prop) => !!prop.parentPath)
+      ?.filter((prop) => prop.hideField === false)
       ?.map((prop) => {
         return {
           parentName: prop.parentName,

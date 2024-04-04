@@ -17,9 +17,10 @@ import QueryBuilderTextSearch, {
 } from "./QueryBuilderTextSearch";
 import { get } from "lodash";
 import { PersistedResource } from "kitsu";
+import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 
-interface QueryRowTextSearchProps {
+interface QueryBuilderManagedAttributeSearchProps {
   /**
    * Retrieve the current value from the Query Builder.
    */
@@ -35,6 +36,11 @@ interface QueryRowTextSearchProps {
    * config and will be used to determine what endpoint to use to retrieve the managed attributes.
    */
   managedAttributeConfig?: ESIndexMapping;
+
+  /**
+   * All the possible field settings, this is for linking it to a managed attribute in the index map.
+   */
+  indexMap?: ESIndexMapping[];
 }
 
 export interface ManagedAttributeOption extends SelectOption<string> {
@@ -45,6 +51,9 @@ export interface ManagedAttributeOption extends SelectOption<string> {
 export interface ManagedAttributeSearchStates {
   /** The key of the selected managed attribute to search against. */
   selectedManagedAttribute?: PersistedResource<ManagedAttribute>;
+
+  /** If possible, the managed attribute config from the index map */
+  selectedManagedAttributeConfig?: ESIndexMapping;
 
   /** The type of the selected managed attribute. */
   selectedType: string;
@@ -59,8 +68,9 @@ export interface ManagedAttributeSearchStates {
 export default function QueryRowManagedAttributeSearch({
   value,
   setValue,
-  managedAttributeConfig
-}: QueryRowTextSearchProps) {
+  managedAttributeConfig,
+  indexMap
+}: QueryBuilderManagedAttributeSearchProps) {
   const { formatMessage } = useIntl();
 
   const [managedAttributeState, setManagedAttributeState] =
@@ -71,6 +81,7 @@ export default function QueryRowManagedAttributeSearch({
             searchValue: "",
             selectedOperator: "",
             selectedManagedAttribute: undefined,
+            selectedManagedAttributeConfig: undefined,
             selectedType: ""
           }
     );
@@ -97,9 +108,6 @@ export default function QueryRowManagedAttributeSearch({
   const managedAttributeType = managedAttributeSelected?.acceptedValues
     ? "PICK_LIST"
     : managedAttributeSelected?.vocabularyElementType ?? "";
-
-  console.log(JSON.stringify(managedAttributeState));
-  console.log(JSON.stringify(managedAttributeConfig));
 
   const supportedOperatorsForType: (type: string) => string[] = (type) => {
     switch (type) {
@@ -148,9 +156,8 @@ export default function QueryRowManagedAttributeSearch({
           "wildcard",
           "in",
           "notIn",
-          // Between is only used if the keyword numeric support is found.
-          // Hard-coded solution until properly fixed.
-          (managedAttributeConfig?.keywordNumericSupport || (managedAttributeSelected?.key === "barcode" && managedAttributeConfig?.dynamicField?.apiEndpoint === "objectstore-api/managed-attribute")) ? "between" : undefined,
+          // Check if the managed attribute contains keyword numeric support.
+          (managedAttributeState?.selectedManagedAttributeConfig?.keywordNumericSupport ? "between" : undefined),
           "startsWith",
           "notEquals",
           "empty",
@@ -195,6 +202,7 @@ export default function QueryRowManagedAttributeSearch({
           searchValue: userInput ?? ""
         })
     };
+
     switch (type) {
       case "INTEGER":
       case "DECIMAL":
@@ -307,16 +315,19 @@ export default function QueryRowManagedAttributeSearch({
           id: "queryBuilder_managedAttribute_placeholder"
         })}
         pageSize={15}
-        onChange={(newValue) =>
+        onChange={(newValue) => {
+          const fieldPath = (managedAttributeConfig?.path ?? "") + "." + ((newValue as PersistedResource<ManagedAttribute>).key ?? "");
+
           setManagedAttributeState({
             ...managedAttributeState,
             selectedManagedAttribute:
               newValue as PersistedResource<ManagedAttribute>,
+            selectedManagedAttributeConfig: fieldValueToIndexSettings(fieldPath, indexMap ?? []),
             selectedOperator: "",
             selectedType: "",
             searchValue: ""
-          })
-        }
+          });
+        }}
         value={managedAttributeSelected}
         selectProps={{
           controlShouldRenderValue: true,
@@ -357,7 +368,8 @@ export default function QueryRowManagedAttributeSearch({
  */
 export function transformManagedAttributeToDSL({
   value,
-  fieldInfo
+  fieldInfo,
+  indexMap
 }: TransformToDSLProps): any {
   // Parse the managed attribute search options. Trim the search value.
   const managedAttributeSearchValue: ManagedAttributeSearchStates =
@@ -374,15 +386,19 @@ export function transformManagedAttributeToDSL({
     }
   }
 
+  const fieldPath: string = fieldInfo?.path +
+    "." +
+    managedAttributeSearchValue.selectedManagedAttribute?.key;
+
+  // Check if managed attribute can be found within the index map.
+  const managedAttributeFieldInfo = fieldValueToIndexSettings(fieldPath, indexMap ?? []);
+
   const commonProps = {
-    fieldPath:
-      fieldInfo?.path +
-      "." +
-      managedAttributeSearchValue.selectedManagedAttribute?.key,
+    fieldPath,
     operation: managedAttributeSearchValue.selectedOperator,
     queryType: "",
     value: managedAttributeSearchValue.searchValue,
-    fieldInfo: {
+    fieldInfo: managedAttributeFieldInfo ? managedAttributeFieldInfo : {
       ...fieldInfo,
       distinctTerm: false,
 

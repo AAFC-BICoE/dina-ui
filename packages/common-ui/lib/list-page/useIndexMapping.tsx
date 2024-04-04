@@ -65,7 +65,7 @@ export function useIndexMapping({
           (fieldMapping) => fieldMapping.path
         ) ?? [];
 
-      const result: ESIndexMapping[] = [];
+    const result: ESIndexMapping[] = [];
 
       // Read index attributes.
       resp.data?.attributes
@@ -78,30 +78,27 @@ export function useIndexMapping({
             attrPrefix = path.substring(prefix.length + 1);
           }
 
-          // Manually remove managed attributes and extension fields from here,
-          // they are handled using the dynamic mapping config. See the dynamicFieldMapping.
-          if (!fieldsToSkip.some((skipPath) => path.startsWith(skipPath))) {
-            result.push({
-              label: attrPrefix ? attrPrefix + "." + key.name : key.name,
-              value: key.path
-                ? key.path + "." + key.name
-                : key.name === "id"
-                ? "data." + key.name
-                : key.name,
-              type: key.type,
-              subType: key?.subtype ? key.subtype : undefined,
-              path: key.path,
+          result.push({
+            label: attrPrefix ? attrPrefix + "." + key.name : key.name,
+            value: key.path
+              ? key.path + "." + key.name
+              : key.name === "id"
+              ? "data." + key.name
+              : key.name,
+            hideField: fieldsToSkip.some((skipPath) => path.startsWith(skipPath)),
+            type: key.type,
+            subType: key?.subtype ? key.subtype : undefined,
+            path: key.path,
 
-              // Additional options for the field:
-              distinctTerm: key.distinct_term_agg,
-              keywordMultiFieldSupport:
-                key?.fields?.includes("keyword") ?? false,
-              keywordNumericSupport: key?.fields?.includes("keyword_numeric") ?? false,
-              optimizedPrefix: key?.fields?.includes("prefix") ?? false,
-              containsSupport: key?.fields?.includes("infix") ?? false,
-              endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
-            });
-          }
+            // Additional options for the field:
+            distinctTerm: key.distinct_term_agg,
+            keywordMultiFieldSupport:
+              key?.fields?.includes("keyword") ?? false,
+            keywordNumericSupport: key?.fields?.includes("keyword_numeric") ?? false,
+            optimizedPrefix: key?.fields?.includes("prefix") ?? false,
+            containsSupport: key?.fields?.includes("infix") ?? false,
+            endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
+          });
         });
 
       // Read relationship attributes.
@@ -126,6 +123,7 @@ export function useIndexMapping({
           result.push({
             label: attributeLabel,
             value: relationship.referencedBy + "." + attributeLabel,
+            hideField: false,
             type: relationshipAttribute.type,
             subType: relationshipAttribute?.subtype
               ? relationshipAttribute.subtype
@@ -164,7 +162,8 @@ export function useIndexMapping({
             keywordNumericSupport: false,
             optimizedPrefix: false,
             containsSupport: false,
-            endsWithSupport: false
+            endsWithSupport: false,
+            hideField: false
           });
         });
         dynamicFieldMapping.relationshipFields.forEach(
@@ -186,7 +185,8 @@ export function useIndexMapping({
               keywordNumericSupport: false,
               optimizedPrefix: false,
               containsSupport: false,
-              endsWithSupport: false
+              endsWithSupport: false,
+              hideField: false
             });
           }
         );

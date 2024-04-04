@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { mountWithAppContext, mountWithAppContext2 } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
 
@@ -195,7 +195,7 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
 
 describe("Use Index Mapping Hook", () => {
   it("Retrieve index and transform the structure.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext2(
       <UseIndexMappingWrapper
         indexMapRetrieved={(newIndexMap: any) => {
           mockIndexMapRetrieved(newIndexMap);
@@ -211,8 +211,8 @@ describe("Use Index Mapping Hook", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    expect(mockIndexMapRetrieved).toHaveBeenCalledTimes(1);
     expect(mockIndexMapRetrieved).toMatchSnapshot();
   });
 });

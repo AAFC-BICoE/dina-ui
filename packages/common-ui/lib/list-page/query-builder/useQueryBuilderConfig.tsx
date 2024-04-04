@@ -47,7 +47,7 @@ import QueryRowGlobalSearchSearch, { transformGlobalSearchToDSL } from "./query-
  * The index settings has more information than what can be stored in the list, especially for
  * nested fields.
  */
-function fieldValueToIndexSettings(
+export function fieldValueToIndexSettings(
   fieldPath: string,
   indexMap: ESIndexMapping[]
 ): ESIndexMapping | undefined {
@@ -441,6 +441,7 @@ export function generateBuilderConfig(
             (factoryProps?.fieldDefinition?.fieldSettings as any)
               ?.mapping as ESIndexMapping
           }
+          indexMap={indexMap}
         />
       ),
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {
@@ -450,7 +451,8 @@ export function generateBuilderConfig(
           operation: op,
           value: val,
           queryType,
-          fieldInfo: indexSettings
+          fieldInfo: indexSettings,
+          indexMap: indexMap
         });
       }
     },
@@ -475,7 +477,8 @@ export function generateBuilderConfig(
           operation: op,
           value: val,
           queryType,
-          fieldInfo: indexSettings
+          fieldInfo: indexSettings,
+          indexMap: indexMap
         });
       }
     }
