@@ -11,6 +11,9 @@ import { Determination, MaterialSample } from "../../../types/collection-api";
 import { getDeterminations, getScientificNames } from "./organismUtils";
 import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
 import Link from "next/link";
+import Dropdown from 'react-bootstrap/Dropdown';
+import Button from 'react-bootstrap/Button';
+import React from "react";
 
 export function useMaterialSampleRelationshipColumns() {
   const { compareByStringAndNumber } = useStringComparator();
@@ -142,29 +145,45 @@ export function useMaterialSampleRelationshipColumns() {
     stringArrayCell("tags", "data.attributes.tags"),
     {
       id: "action",
-      cell: ({ row: { original } }) => (
-        <div className="d-flex">
-          <EditButton
-            className="mx-2"
-            entityId={original.id as string}
-            entityLink="collection/material-sample"
-            style={{ width: "5rem" }}
-          />
-          <SplitMaterialSampleDropdownButton
-            ids={[original.id ?? "unknown"]}
-            disabled={!(original as any).data?.attributes?.materialSampleName}
-            materialSampleType={
-              (original as any).data?.attributes?.materialSampleType
-            }
-          />
-          <DeleteButton
-            id={original.id as string}
-            options={{ apiBaseUrl: "/collection-api" }}
-            type="material-sample"
-            reload={true}
-          />
-        </div>
-      ),
+      cell: ({ row: { original } }) => {
+        const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+          <Button variant="secondary" size="sm" onClick={(e) => onClick(e)} ref={ref}>
+            {children}
+          </Button>
+        ));
+
+        return (
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Dropdown>
+              <Dropdown.Toggle variant="secondary" as={CustomToggle}>
+                ...
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <EditButton
+                  className="mx-2"
+                  entityId={original.id as string}
+                  entityLink="collection/material-sample"
+                  style={{ width: "5rem" }}
+                />
+                <SplitMaterialSampleDropdownButton
+                  ids={[original.id ?? "unknown"]}
+                  disabled={!(original as any).data?.attributes?.materialSampleName}
+                  materialSampleType={
+                    (original as any).data?.attributes?.materialSampleType
+                  }
+                />
+                <DeleteButton
+                  id={original.id as string}
+                  options={{ apiBaseUrl: "/collection-api" }}
+                  type="material-sample"
+                  reload={true}
+                />
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
+        )
+      },
       header: () => <FieldHeader name="actions" />,
       enableSorting: false
     }
