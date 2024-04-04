@@ -12,7 +12,7 @@ export interface RelationshipFieldMappingProps {
 export function RelationshipFieldMapping({
   sheetIndex
 }: RelationshipFieldMappingProps) {
-  const { columnUniqueValues, type, workbookColumnMap, setColumnMapValue } =
+  const { columnUniqueValues, type, workbookColumnMap, relationshipMapping } =
     useWorkbookContext();
   const selectedType = type ?? "material-sample";
   const { getResourceSelectField } = useColumnMapping(sheetIndex, selectedType);

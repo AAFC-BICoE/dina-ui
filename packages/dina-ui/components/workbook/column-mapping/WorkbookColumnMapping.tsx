@@ -4,11 +4,10 @@ import {
   LoadingSpinner,
   SubmitButton,
   useAccount,
-  useApiClient,
   useModal
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
-import { FieldArray, FormikProps } from "formik";
+import { FieldArray, FormikProps, useFormikContext } from "formik";
 import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
 import { Ref, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
@@ -16,6 +15,7 @@ import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
 import {
+  ColumnUniqueValues,
   RelationshipMapping,
   WorkbookColumnMap,
   WorkbookDataTypeEnum,
@@ -27,6 +27,7 @@ import { RelationshipFieldMapping } from "../relationship-mapping/RelationshipFi
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
+  FieldOptionType,
   getDataFromWorkbook,
   isBoolean,
   isBooleanArray,
@@ -56,19 +57,20 @@ export interface WorkbookColumnMappingProps {
   setPerformSave: (newValue: boolean) => void;
 }
 
+// Entities that we support to import
 const ENTITY_TYPES = ["material-sample"] as const;
 
 export function WorkbookColumnMapping({
   performSave,
   setPerformSave
 }: WorkbookColumnMappingProps) {
-  const { apiClient } = useApiClient();
   const { openModal } = useModal();
   const {
     startSavingWorkbook,
     spreadsheetData,
     setColumnMap,
-    columnUniqueValues
+    columnUniqueValues,
+    setRelationshipMapping
   } = useWorkbookContext();
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
@@ -102,7 +104,7 @@ export function WorkbookColumnMapping({
     sheetOptions,
     workbookColumnMap,
     relationshipMapping,
-    resolveParentMapping
+    resolveColumnMappingAndRelationshipMapping
   } = useColumnMapping(sheet, selectedType?.value || "material-sample");
 
   const buttonBar = (
@@ -380,21 +382,13 @@ export function WorkbookColumnMapping({
     columnName: string,
     newFieldPath: string
   ) {
-    let valueMapping: { [key: string]: { id: string; type: string } } = {};
-    if (newFieldPath?.startsWith("parentMaterialSample.")) {
-      valueMapping = await resolveParentMapping(columnName, newFieldPath);
-    }
-    const newColumnMap: WorkbookColumnMap = {};
-    newColumnMap[columnName] = {
-      fieldPath: newFieldPath,
-      showOnUI: true,
-      numOfUniqueValues: Object.keys(
-        columnUniqueValues?.[sheet]?.[columnName] ?? {}
-      ).length,
-      mapRelationship: false,
-      valueMapping
-    };
-    setColumnMap(newColumnMap);
+    const { newWorkbookColumnMap, newRelationshipMapping } =
+      await resolveColumnMappingAndRelationshipMapping(
+        columnName,
+        newFieldPath
+      );
+    setColumnMap(newWorkbookColumnMap);
+    setRelationshipMapping(newRelationshipMapping);
   }
 
   return loading || fieldMap.length === 0 || !relationshipMapping ? (
