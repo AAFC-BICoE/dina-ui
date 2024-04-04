@@ -7,7 +7,7 @@ import {
   useModal
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
-import { FieldArray, FormikProps, useFormikContext } from "formik";
+import { FieldArray, FormikProps } from "formik";
 import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
 import { Ref, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
@@ -15,9 +15,7 @@ import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
 import {
-  ColumnUniqueValues,
   RelationshipMapping,
-  WorkbookColumnMap,
   WorkbookDataTypeEnum,
   useWorkbookContext
 } from "..";
@@ -27,7 +25,6 @@ import { RelationshipFieldMapping } from "../relationship-mapping/RelationshipFi
 import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
-  FieldOptionType,
   getDataFromWorkbook,
   isBoolean,
   isBooleanArray,
