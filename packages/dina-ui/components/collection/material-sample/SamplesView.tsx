@@ -1,7 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
 import {
-  DeleteButton,
-  EditButton,
   FieldHeader,
   FieldSet,
   ReactTable,
@@ -9,9 +7,9 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { useState } from "react";
-import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
+import { materialSampleActionCell } from "./useMaterialSampleRelationshipColumns";
+import { useIntl } from "react-intl";
 
 export interface SamplesViewProps {
   samples?: MaterialSample[];
@@ -19,9 +17,8 @@ export interface SamplesViewProps {
 }
 
 export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
-  const DEFAULT_PAGE_SIZE = 25;
   const defaultSort = [];
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage } = useIntl();
 
   const CHILD_SAMPLES_COLUMNS: ColumnDef<MaterialSample>[] = [
     {
@@ -58,37 +55,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
       accessorKey: "tags",
       header: () => <FieldHeader name="tags" />
     },
-    {
-      id: "actions",
-      cell: ({
-        row: {
-          original: { id, materialSampleName, materialSampleType }
-        }
-      }) => (
-        <div className="d-flex">
-          <EditButton
-            className="mx-2"
-            entityId={id as string}
-            entityLink="collection/material-sample"
-            style={{ width: "5rem" }}
-          />
-          <SplitMaterialSampleDropdownButton
-            ids={[id ?? "unknown"]}
-            disabled={!materialSampleName}
-            materialSampleType={materialSampleType}
-          />
-          <DeleteButton
-            id={id as string}
-            options={{ apiBaseUrl: "/collection-api" }}
-            type="material-sample"
-            reload={true}
-          />
-        </div>
-      ),
-      size: 300,
-      header: () => <FieldHeader name="actions" />,
-      enableSorting: false
-    }
+    materialSampleActionCell(formatMessage)
   ];
 
   // JSONAPI sort attribute.
