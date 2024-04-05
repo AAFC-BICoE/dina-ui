@@ -109,7 +109,11 @@ export function WorkbookFieldSelectField({
           <ResourceSelectField<ManagedAttribute>
             name={`fieldMap[${columnIndex}].targetKey`}
             hideLabel={true}
-            selectProps={{ className: "ms-2" }}
+            selectProps={{
+              className: "ms-2",
+              menuPortalTarget: document.body,
+              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+            }}
             filter={filterBy(["name"], {
               extraFilters: [
                 {
@@ -154,7 +158,11 @@ export function WorkbookFieldSelectField({
           <ResourceSelectField<ManagedAttribute>
             name={`fieldMap[${columnIndex}].targetKey`}
             hideLabel={true}
-            selectProps={{ className: "flex-fill ms-2" }}
+            selectProps={{
+              className: "flex-fill ms-2",
+              menuPortalTarget: document.body,
+              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+            }}
             filter={filterBy(["name"], {
               extraFilters: [
                 {
