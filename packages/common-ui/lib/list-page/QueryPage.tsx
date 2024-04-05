@@ -7,13 +7,12 @@ import {
 } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { compact, toPairs, uniqBy, uniqWith } from "lodash";
+import { compact, toPairs, uniqBy } from "lodash";
 import React, {
   useCallback,
   useEffect,
   useMemo,
   useState,
-  useReducer,
   useRef
 } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
@@ -25,8 +24,7 @@ import {
   ReactTable,
   ReactTableProps,
   VISIBLE_INDEX_LOCAL_STORAGE_KEY,
-  useAccount,
-  useIsMounted
+  useAccount
 } from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
@@ -457,7 +455,8 @@ export function QueryPage<TData extends KitsuResource>({
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
     // If in view mode with selected resources, no requests need to be made.
-    if (viewMode && selectedResources?.length) {
+    if (viewMode) {
+      setLoading(false);
       return;
     }
 
