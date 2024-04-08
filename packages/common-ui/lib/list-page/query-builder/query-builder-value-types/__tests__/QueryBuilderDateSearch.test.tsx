@@ -245,5 +245,53 @@ describe("QueryBuilderDateSearch", () => {
       expect(result).toBe(true);
       expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
     });
+
+    it('should return validation error for "in" operator with non-dates', () => {
+      const result = validateDate('myDate', '2021-05-19, apple, 2008-01-01', 'in', formatMessage);
+      expect(result).toEqual({
+        errorMessage: 'Mocked error message',
+        fieldName: 'myDate',
+      });
+      expect(formatMessage).toHaveBeenCalledWith({ id: 'dateInRangeInvalid' }); // Specific error message called
+    });
+
+    it('should return validation error for "in" operator with single non-dates', () => {
+      const result = validateDate('myDate', 'apple', 'in', formatMessage);
+      expect(result).toEqual({
+        errorMessage: 'Mocked error message',
+        fieldName: 'myDate',
+      });
+      expect(formatMessage).toHaveBeenCalledWith({ id: 'dateInRangeInvalid' }); // Specific error message called
+    });
+
+    it('should return true for valid "in" operator values', () => {
+      const result = validateDate('myDate', '2021-05-19, 2010-03-09, 2008-01-01,', 'in', formatMessage);
+      expect(result).toBe(true);
+      expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+    });
+
+    it('should return validation error for "notIn" operator with non-dates', () => {
+      const result = validateDate('myDate', '2021-05-19, apple, 2008-01-01', 'notIn', formatMessage);
+      expect(result).toEqual({
+        errorMessage: 'Mocked error message',
+        fieldName: 'myDate',
+      });
+      expect(formatMessage).toHaveBeenCalledWith({ id: 'dateInRangeInvalid' }); // Specific error message called
+    });
+
+    it('should return validation error for "notIn" operator with single non-dates', () => {
+      const result = validateDate('myDate', 'apple', 'notIn', formatMessage);
+      expect(result).toEqual({
+        errorMessage: 'Mocked error message',
+        fieldName: 'myDate',
+      });
+      expect(formatMessage).toHaveBeenCalledWith({ id: 'dateInRangeInvalid' }); // Specific error message called
+    });
+
+    it('should return true for valid "notIn" operator values', () => {
+      const result = validateDate('myDate', '2021-05-19, 2010-03-09, 2008-01-01, ', 'notIn', formatMessage);
+      expect(result).toBe(true);
+      expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+    });
   });
 });

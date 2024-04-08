@@ -40,6 +40,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   dateMustBeFormattedYyyyMmDd: "Date must be formatted as YYYY-MM-DD",
   dateBetweenInvalid: "Invalid between search: from date is greater than to date",
   dateBetweenMissingValues: "Invalid between search: two dates need to be provided.",
+  dateInRangeInvalid: "Invalid in/not in search: Dates must be valid (YYYY-MM-DD) and comma seperated (e.g. 2001-05-19, 2008-12-25, 2023-01-01)",
   deleteAllButtonText: "Delete All",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
