@@ -506,7 +506,12 @@ export function QueryPage<TData extends KitsuResource>({
     );
 
     queryDSL = applyRootQuery(queryDSL);
-    queryDSL = applyGroupFilters(queryDSL, groups);
+
+    // Custom queries should not be adding the group.
+    if (!customViewElasticSearchQuery) {
+      queryDSL = applyGroupFilters(queryDSL, groups);
+    }
+
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
     queryDSL = applySortingRules(queryDSL, sortingRules, combinedColumns);
     queryDSL = applySourceFiltering(queryDSL, combinedColumns);
