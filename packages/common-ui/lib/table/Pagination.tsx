@@ -43,7 +43,7 @@ export function Pagination<TData>({
               type="number"
               value={table.getState().pagination.pageIndex + 1}
               min={1}
-              max={table.getPageCount()}
+              max={table.getPageCount() !== 0 ? table.getPageCount() : 1}
               onChange={(e) => {
                 const page = e.target.value ? Number(e.target.value) - 1 : 0;
                 table.setPageIndex(page);
@@ -51,7 +51,7 @@ export function Pagination<TData>({
             />
           </div>{" "}
           {formatMessage({ id: "of" })}{" "}
-          <span className="-totalPages">{table.getPageCount()}</span>
+          <span className="-totalPages">{table.getPageCount() !== 0 ? table.getPageCount() : 1}</span>
         </span>
         <span className="-select-wrap -pageSizeOptions">
           <span style={{ textTransform: "capitalize" }}>
