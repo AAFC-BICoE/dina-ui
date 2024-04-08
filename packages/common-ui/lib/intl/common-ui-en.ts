@@ -34,7 +34,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   numberInvalid: "Please enter a valid number.",
   numberBetweenInvalid: "Invalid between search: from number is greater than to number",
   numberBetweenMissingValues: "Invalid between search: two numbers need to be provided.",
-  numberInRangeInvalid: "Invalid in/not in search: Numbers must be comma seperated (e.g. 12.5, 2, 4)",
+  numberInRangeInvalid: "Invalid in/not in search: Numbers must be valid and comma seperated (e.g. 12.5, 2, 4)",
   dateMustBeFormattedPartial:
     "Date must be formatted as one of the following options: YYYY-MM-DD, YYYY-MM, or YYYY",
   dateMustBeFormattedYyyyMmDd: "Date must be formatted as YYYY-MM-DD",
