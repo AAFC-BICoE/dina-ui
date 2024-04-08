@@ -24,10 +24,13 @@ export type ScientificNameSourceDetails = {
   labelHtml?: string;
   sourceUrl?: string;
   recordedOn?: string;
-  classificationPath?: string;
-  classificationRanks?: string;
   isSynonym?: boolean;
   currentName?: string;
+} & ClassificationItem;
+
+export type ClassificationItem = {
+  classificationPath?: string;
+  classificationRanks?: string;
 };
 
 export enum ScientificNameSource {

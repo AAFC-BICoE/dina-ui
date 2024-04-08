@@ -8,7 +8,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
-import { get, isArray } from "lodash";
+import { compact, find, get, isArray, pick } from "lodash";
 import { useState } from "react";
 import { PersonSelectField } from "../..";
 import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
@@ -17,15 +17,15 @@ import {
   Determination,
   MaterialSample,
   Organism,
+  ScientificNameSource,
   Vocabulary
 } from "../../../types/collection-api";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
+import { TabbedArrayField } from "../TabbedArrayField";
 import {
   GlobalNamesField,
   SelectedScientificNameView
 } from "../global-names/GlobalNamesField";
-import { TabbedArrayField } from "../TabbedArrayField";
-import { find, compact } from "lodash";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -131,9 +131,17 @@ export function DeterminationField({
             fieldScientificNameSrcDetail
           );
 
-          const scientificNameSourceField = fieldProps('scientificNameSourceField').name;
-          const scientificNameSourceVal = get(form.values, scientificNameSourceField);
-          console.log(scientificNameSourceField, scientificNameSourceVal);
+          const scientificNameSourceField = fieldProps(
+            "scientificNameSource"
+          ).name;
+          const scientificNameSourceVal = get(
+            form.values,
+            scientificNameSourceField
+          );
+
+          const isManualInput =
+            scientificNameSourceVal === ScientificNameSource.CUSTOM;
+
           return (
             <div className="row">
               {!readOnly && !isTemplate && (
@@ -236,7 +244,8 @@ export function DeterminationField({
                 >
                   {/* determination scientific name is used for display readonly and edit plain string entry  */}
 
-                  {((!hideScientificNameInput && !scientificNameSrcDetailVal) ||
+                  {((!hideScientificNameInput &&
+                    (!scientificNameSrcDetailVal || isManualInput)) ||
                     readOnly) && (
                     <>
                       <TextField
@@ -263,17 +272,19 @@ export function DeterminationField({
                           if (newVal && newVal?.trim().length > 0) {
                             _form.setFieldValue(
                               fieldProps("scientificNameSource").name,
-                              "GNA"
+                              isManualInput ? "CUSTOM" : "GNA"
                             );
                           } else {
-                            _form.setFieldValue(
-                              fieldProps("scientificNameSource").name,
-                              null
-                            );
-                            _form.setFieldValue(
-                              fieldProps("scientificNameDetails").name,
-                              null
-                            );
+                            if (!isManualInput) {
+                              _form.setFieldValue(
+                                fieldProps("scientificNameSource").name,
+                                null
+                              );
+                              _form.setFieldValue(
+                                fieldProps("scientificNameDetails").name,
+                                null
+                              );
+                            }
                           }
                         }}
                       />
@@ -304,25 +315,42 @@ export function DeterminationField({
                         fieldProps("scientificNameDetails.sourceUrl").name
                       }
                       onChange={(newValue, formik) => {
-                        formik.setFieldValue(
-                          fieldProps("scientificNameSource").name,
-                          newValue ? "GNA" : null
-                        );
-                        formik.setFieldValue(
-                          fieldProps("scientificNameDetails").name,
-                          newValue && isArray(newValue) ? newValue[0] : null
-                        );
-                        // If selected a result from search , set text input value to null and hide it
-                        // If a search value is removed, show the text input value
-                        if (newValue) {
+                        if (newValue && (newValue as any).isManual) {
                           formik.setFieldValue(
-                            fieldProps("scientificName").name,
-                            newValue?.[1]
+                            fieldProps("scientificNameSource").name,
+                            newValue ? "CUSTOM" : null
                           );
-                          // here need to set the synonym field as well
-                          setHideScientificNameInput(true);
+                          formik.setFieldValue(
+                            fieldProps("scientificNameDetails").name,
+                            newValue
+                              ? pick(newValue, [
+                                  "classificationRanks",
+                                  "classificationPath"
+                                ])
+                              : null
+                          );
                         } else {
-                          setHideScientificNameInput(false);
+                          formik.setFieldValue(
+                            fieldProps("scientificNameSource").name,
+                            newValue ? "GNA" : null
+                          );
+
+                          formik.setFieldValue(
+                            fieldProps("scientificNameDetails").name,
+                            newValue && isArray(newValue) ? newValue[0] : null
+                          );
+                          // If selected a result from search , set text input value to null and hide it
+                          // If a search value is removed, show the text input value
+                          if (newValue) {
+                            formik.setFieldValue(
+                              fieldProps("scientificName").name,
+                              newValue?.[1]
+                            );
+                            // here need to set the synonym field as well
+                            setHideScientificNameInput(true);
+                          } else {
+                            setHideScientificNameInput(false);
+                          }
                         }
                       }}
                       index={index}

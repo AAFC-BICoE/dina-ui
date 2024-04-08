@@ -18,7 +18,7 @@ import {
   VocabularyOption,
   VocabularySelectField
 } from "../VocabularySelectField";
-import { ManualClassificationItem } from "./ClassificationField";
+import { ClassificationItem } from "packages/dina-ui/types/collection-api";
 
 export function getFieldName(
   fieldArrayName: string,
@@ -37,7 +37,8 @@ export interface ClassificationInputRowProps {
   onAddRow: () => void;
   onDeleteRow: (index) => void;
   taxonomicRanOptions: { label: string; value: string }[] | undefined;
-  value: ManualClassificationItem;
+  value: ClassificationItem;
+  onChange: (value: ClassificationItem) => void;
 }
 
 export function ClassificationInputRow({
@@ -47,26 +48,57 @@ export function ClassificationInputRow({
   readOnly,
   onAddRow,
   onDeleteRow,
+  onChange,
   taxonomicRanOptions,
-  value
+  value: valueProp
 }: ClassificationInputRowProps) {
   const { locale } = useDinaIntl();
   const classificationRanksFieldName = `${name}.classificationRanks`;
   const classificationPathFieldName = `${name}.classificationPath`;
   const formik = useFormikContext<any>();
-
   const [selectedType, setSelectedType] = useState<any>();
+
+  const [value, setValue] = useState<ClassificationItem>(valueProp);
+
+  function internalOnRankChange(option) {
+    const rank = option?.value;
+    const newValue = {
+      ...value,
+      classificationRanks: rank
+    };
+    setValue(newValue);
+    onChange(newValue);
+  }
+
+  function internalOnPathChange(event) {
+    const path = event.target.value;
+    const newValue = {
+      ...value,
+      classificationPath: path
+    };
+    setValue(newValue);
+    onChange(newValue);
+  }
 
   return (
     <div className="d-flex w-100 my-1">
       <div className="w-100">
         <Select
-          options={taxonomicRanOptions as any}
-          value={value.classificationRanks}
+          id="classificationRank"
+          options={taxonomicRanOptions}
+          value={taxonomicRanOptions?.find(
+            (item) => item.value === value.classificationRanks
+          )}
+          onChange={internalOnRankChange}
         />
       </div>
       <div className="w-100 ms-2">
-        <input className="form-control" value={value.classificationPath} />
+        <input
+          id="classificationPath"
+          className="form-control"
+          value={value.classificationPath}
+          onChange={internalOnPathChange}
+        />
       </div>
       {!readOnly && (
         <div

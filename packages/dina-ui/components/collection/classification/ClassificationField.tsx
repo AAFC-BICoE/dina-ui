@@ -1,59 +1,91 @@
-import { useAccount, useQuery, LoadingSpinner } from "common-ui";
-import { FormikProps } from "formik";
+import { LoadingSpinner } from "common-ui";
+import {
+  ClassificationItem,
+  ScientificNameSourceDetails
+} from "../../../types/collection-api";
 import { useState } from "react";
-import { ClassificationInputRow } from "./ClassificationInputRow";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { Vocabulary } from "packages/dina-ui/types/collection-api";
 import useVocabularyOptions from "../useVocabularyOptions";
+import { ClassificationInputRow } from "./ClassificationInputRow";
 
 export interface IClassificationFieldProps {
-  /** The determination index within the material sample. */
-  index?: number;
+  onChange?: (
+    newValue?: (ClassificationItem & { isManual: boolean }) | null
+  ) => void;
 
-  setValue?: (newValue: any) => void;
-
-  onChange?: (selection: string | null, formik: FormikProps<any>) => void;
-
-  formik?: FormikProps<any>;
-
-  isDetermination?: boolean;
-
-  initValue: string;
-
-  /** Mock this out in tests so it gives a predictable value. */
-  dateSupplier?: () => string;
+  initValue: ScientificNameSourceDetails;
 
   prevRank?: string;
 }
 
 export function ClassificationField({
-  index,
-  setValue,
   onChange,
-  formik,
-  isDetermination,
   initValue,
-  dateSupplier,
   prevRank
 }: IClassificationFieldProps) {
-  const [manualClassificationItems, setManualClassificationItems] = useState<
-    ManualClassificationItem[]
-  >([{ classificationRanks: undefined, classificationPath: undefined }]);
+  const pathArray = initValue.classificationPath?.split("|");
+  const rankArray = initValue.classificationRanks?.split("|");
+  const initClassifications: ClassificationItem[] = [];
+  if (pathArray && rankArray) {
+    for (let i = 0; i < pathArray.length; i++) {
+      initClassifications.push({
+        classificationPath: pathArray[i],
+        classificationRanks: rankArray[i]
+      });
+    }
+  } else {
+    initClassifications.push({
+      classificationRanks: undefined,
+      classificationPath: undefined
+    });
+  }
+  const [manualClassificationItems, setManualClassificationItems] =
+    useState<ClassificationItem[]>(initClassifications);
 
   const { loading, vocabOptions: taxonomicRankOptions } = useVocabularyOptions({
     path: "collection-api/vocabulary/taxonomicRank"
   });
 
+  function splitClassificationItems(items: ClassificationItem[]) {
+    const strRanks = items
+      .map((item) => item.classificationRanks ?? "")
+      .join("|");
+    const strPath = items
+      .map((item) => item.classificationPath ?? "")
+      .join("|");
+
+    onChange?.({
+      classificationPath: strPath,
+      classificationRanks: strRanks,
+      isManual: true
+    });
+  }
+
   function onAddRow() {
-    setManualClassificationItems([
+    const newItems = [
       ...manualClassificationItems,
       ...[{ classificationPath: undefined, classificationRanks: undefined }]
-    ]);
+    ];
+    setManualClassificationItems(newItems);
+    splitClassificationItems(newItems);
   }
 
   function onDeleteRow(row: number) {
     manualClassificationItems.splice(row, 1);
-    setManualClassificationItems([...manualClassificationItems]);
+    const newItems = [...manualClassificationItems];
+    setManualClassificationItems(newItems);
+    splitClassificationItems(newItems);
+  }
+
+  function onRowChange(
+    row: number,
+    manualClassificationItem: ClassificationItem
+  ) {
+    if (manualClassificationItems[row]) {
+      manualClassificationItems[row] = manualClassificationItem;
+      const newItems = [...manualClassificationItems];
+      setManualClassificationItems(newItems);
+      splitClassificationItems(newItems);
+    }
   }
 
   return (
@@ -62,25 +94,26 @@ export function ClassificationField({
         {loading ? (
           <LoadingSpinner loading={loading} />
         ) : (
-          manualClassificationItems.map((item, idxKey) => (
-            <ClassificationInputRow
-              taxonomicRanOptions={taxonomicRankOptions}
-              value={item}
-              onAddRow={onAddRow}
-              onDeleteRow={onDeleteRow}
-              prevRank={prevRank}
-              rowIndex={idxKey}
-              name=""
-              key={idxKey}
-              showPlusIcon={true}
-            />
-          ))
+          manualClassificationItems.map((item, idxKey) => {
+            return (
+              <ClassificationInputRow
+                taxonomicRanOptions={taxonomicRankOptions}
+                value={item}
+                onAddRow={onAddRow}
+                onDeleteRow={onDeleteRow}
+                prevRank={prevRank}
+                rowIndex={idxKey}
+                name=""
+                key={idxKey}
+                showPlusIcon={true}
+                onChange={(value) => {
+                  onRowChange(idxKey, value);
+                }}
+              />
+            );
+          })
         )}
       </div>
     </div>
   );
-}
-export interface ManualClassificationItem {
-  classificationRanks?: string;
-  classificationPath?: string;
 }
