@@ -301,7 +301,10 @@ export function DeterminationField({
                           : "scientificName"
                       )}
                       label={
-                        hideScientificNameInput || !!scientificNameSrcDetailVal
+                        isManualInput
+                          ? ""
+                          : hideScientificNameInput ||
+                            !!scientificNameSrcDetailVal
                           ? formatMessage("field_scientificNameInput")
                           : formatMessage("scientificNameSearch")
                       }

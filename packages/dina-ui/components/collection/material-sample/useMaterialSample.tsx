@@ -48,7 +48,8 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  STORAGE_COMPONENT_NAME,
+  ScientificNameSource
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
@@ -294,100 +295,95 @@ export function useMaterialSampleSave({
     setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
     setEnableCollectingEvent(
       Boolean(
-        hasColEventTemplate ? true : (
-          formTemplate ? (find(formTemplate?.components, {
-            name: COLLECTING_EVENT_COMPONENT_NAME
-          })?.visible ?? false) : (materialSample?.collectingEvent)
-        )
+        hasColEventTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
+              name: COLLECTING_EVENT_COMPONENT_NAME
+            })?.visible ?? false
+          : materialSample?.collectingEvent
       )
     );
 
     setEnablePreparations(
       Boolean(
-        hasPreparationsTemplate ? true : (
-          formTemplate ? (find(formTemplate?.components, {
-            name: PREPARATIONS_COMPONENT_NAME
-          })?.visible ?? false) : (
-            PREPARATION_FIELDS.some(
+        hasPreparationsTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
+              name: PREPARATIONS_COMPONENT_NAME
+            })?.visible ?? false
+          : PREPARATION_FIELDS.some(
               (prepFieldName) => !isEmpty(materialSample?.[prepFieldName])
             )
-          )
-        )
       )
     );
 
     setEnableOrganisms(
       Boolean(
-        hasOrganismsTemplate ? true : (
-          formTemplate
-          ? (find(formTemplate?.components, {
+        hasOrganismsTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
               name: ORGANISMS_COMPONENT_NAME
-            })?.visible ?? false) : (
-               materialSample?.organism?.length
-            )
-        )
+            })?.visible ?? false
+          : materialSample?.organism?.length
       )
     );
 
     setEnableStorage(
       // Show the Storage section if the storage field is set or the template enables it:
       Boolean(
-        hasStorageTemplate ? true : (
-          formTemplate ? (
-            find(formTemplate?.components, {
+        hasStorageTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
               name: STORAGE_COMPONENT_NAME
             })?.visible ?? false
-          ) : (materialSample?.storageUnit?.id)
-        )
+          : materialSample?.storageUnit?.id
       )
     );
 
     setEnableScheduledActions(
       // Show the Scheduled Actions section if the field is set or the template enables it:
       Boolean(
-        hasScheduledActionsTemplate ? true : (
-          formTemplate ? (
-            find(formTemplate?.components, {
+        hasScheduledActionsTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
               name: SCHEDULED_ACTIONS_COMPONENT_NAME
             })?.visible ?? false
-          ) : (
-            materialSample?.scheduledActions?.length
-          )
-        )
+          : materialSample?.scheduledActions?.length
       )
     );
 
     setEnableAssociations(
       // Show the associations section if the field is set or the template enables it:
       Boolean(
-        hasAssociationsTemplate ? true : (
-          formTemplate ? (
-            find(formTemplate?.components, {
+        hasAssociationsTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
               name: ASSOCIATIONS_COMPONENT_NAME
             })?.visible ?? false
-          ) : (
-            materialSample?.associations?.length ||
-              !isEmpty(materialSample?.hostOrganism) ||
-              !isEmpty(materialSample?.associations)
-          )
-        )
+          : materialSample?.associations?.length ||
+            !isEmpty(materialSample?.hostOrganism) ||
+            !isEmpty(materialSample?.associations)
       )
     );
 
     setEnableRestrictions(
       Boolean(
-        hasRestrictionsTemplate ? true : (
-          formTemplate ? (
-            find(formTemplate?.components, {
+        hasRestrictionsTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
               name: RESTRICTION_COMPONENT_NAME
             })?.visible ?? false
-          ) : (
-            RESTRICTIONS_FIELDS.some(
+          : RESTRICTIONS_FIELDS.some(
               (restrictFieldName) =>
                 !isEmpty(materialSample?.[restrictFieldName])
             )
-          )
-        )
       )
     );
   }, [formTemplate]);
@@ -582,6 +578,38 @@ export function useMaterialSampleSave({
       throw new DoOperationsError(
         formatMessage("field_useTargetOrganismError")
       );
+    }
+
+    // Remote the empty scientificNameDetails.classificationPath and scientificNameDetails.classificationRanks
+    if (
+      materialSampleInput.organism &&
+      materialSampleInput.organism.length > 0
+    ) {
+      materialSampleInput.organism?.forEach((ogsm) => {
+        if (ogsm?.determination && ogsm.determination.length > 0) {
+          ogsm.determination.forEach((dtm) => {
+            // If this is manual classification input
+            if (
+              dtm.scientificNameSource === ScientificNameSource.CUSTOM &&
+              dtm.scientificNameDetails
+            ) {
+              const pathArray =
+                dtm.scientificNameDetails.classificationPath?.split("|") ?? [];
+              const rankArray =
+                dtm.scientificNameDetails.classificationRanks?.split("|") ?? [];
+              const firstEmptyIndex = pathArray.findIndex(
+                (path, index) => path === "" && rankArray[index] === ""
+              );
+              dtm.scientificNameDetails.classificationRanks = rankArray
+                .slice(0, firstEmptyIndex)
+                .join("|");
+              dtm.scientificNameDetails.classificationPath = pathArray
+                .slice(0, firstEmptyIndex)
+                .join("|");
+            }
+          });
+        }
+      });
     }
 
     delete materialSampleInput.phac_animal_rg;

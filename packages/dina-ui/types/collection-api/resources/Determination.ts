@@ -33,6 +33,8 @@ export type ClassificationItem = {
   classificationRanks?: string;
 };
 
+export type ClassificationItemWithId = ClassificationItem & { id: string };
+
 export enum ScientificNameSource {
   COLPLUS = "COLPLUS",
   GNA = "GNA",

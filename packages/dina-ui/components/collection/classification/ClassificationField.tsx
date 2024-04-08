@@ -1,9 +1,11 @@
 import { LoadingSpinner } from "common-ui";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import {
   ClassificationItem,
+  ClassificationItemWithId,
   ScientificNameSourceDetails
 } from "../../../types/collection-api";
-import { useState } from "react";
 import useVocabularyOptions from "../useVocabularyOptions";
 import { ClassificationInputRow } from "./ClassificationInputRow";
 
@@ -13,33 +15,32 @@ export interface IClassificationFieldProps {
   ) => void;
 
   initValue: ScientificNameSourceDetails;
-
-  prevRank?: string;
 }
 
 export function ClassificationField({
   onChange,
-  initValue,
-  prevRank
+  initValue
 }: IClassificationFieldProps) {
   const pathArray = initValue.classificationPath?.split("|");
   const rankArray = initValue.classificationRanks?.split("|");
-  const initClassifications: ClassificationItem[] = [];
+  const initClassifications: ClassificationItemWithId[] = [];
   if (pathArray && rankArray) {
     for (let i = 0; i < pathArray.length; i++) {
       initClassifications.push({
+        id: uuidv4(),
         classificationPath: pathArray[i],
         classificationRanks: rankArray[i]
       });
     }
   } else {
     initClassifications.push({
+      id: uuidv4(),
       classificationRanks: undefined,
       classificationPath: undefined
     });
   }
   const [manualClassificationItems, setManualClassificationItems] =
-    useState<ClassificationItem[]>(initClassifications);
+    useState<ClassificationItemWithId[]>(initClassifications);
 
   const { loading, vocabOptions: taxonomicRankOptions } = useVocabularyOptions({
     path: "collection-api/vocabulary/taxonomicRank"
@@ -63,7 +64,13 @@ export function ClassificationField({
   function onAddRow() {
     const newItems = [
       ...manualClassificationItems,
-      ...[{ classificationPath: undefined, classificationRanks: undefined }]
+      ...[
+        {
+          id: uuidv4(),
+          classificationPath: undefined,
+          classificationRanks: undefined
+        }
+      ]
     ];
     setManualClassificationItems(newItems);
     splitClassificationItems(newItems);
@@ -81,11 +88,53 @@ export function ClassificationField({
     manualClassificationItem: ClassificationItem
   ) {
     if (manualClassificationItems[row]) {
-      manualClassificationItems[row] = manualClassificationItem;
-      const newItems = [...manualClassificationItems];
+      manualClassificationItems[row].classificationPath =
+        manualClassificationItem.classificationPath;
+      manualClassificationItems[row].classificationRanks =
+        manualClassificationItem.classificationRanks;
+      const newItems = clearInvalidClassificationItems([
+        ...manualClassificationItems
+      ]);
       setManualClassificationItems(newItems);
       splitClassificationItems(newItems);
     }
+  }
+
+  function clearInvalidClassificationItems(items: ClassificationItemWithId[]) {
+    let prevIndex = -1;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const curIndex = taxonomicRankOptions.findIndex(
+        (rank) => rank.value === item.classificationRanks
+      );
+      if (curIndex <= prevIndex) {
+        item.classificationRanks = undefined;
+      } else {
+        prevIndex = curIndex;
+      }
+    }
+    return items;
+  }
+
+  function getRankOptions(rowIndex: number) {
+    if (rowIndex === 0) {
+      // this is the first row, then return full option list
+      return taxonomicRankOptions;
+    }
+    const prevItem = manualClassificationItems[rowIndex - 1];
+    if (!prevItem?.classificationRanks) {
+      // if previous item is empty, then return call recursively for the one before previous one.
+      return getRankOptions(rowIndex - 1);
+    }
+    const prevRank = prevItem?.classificationRanks;
+    const prevRankIndex = taxonomicRankOptions.findIndex(
+      (rank) => rank.value === prevRank
+    );
+    const newOptions =
+      prevRankIndex < 0
+        ? taxonomicRankOptions
+        : taxonomicRankOptions.slice(prevRankIndex + 1);
+    return newOptions;
   }
 
   return (
@@ -95,16 +144,15 @@ export function ClassificationField({
           <LoadingSpinner loading={loading} />
         ) : (
           manualClassificationItems.map((item, idxKey) => {
+            const newOptions = getRankOptions(idxKey);
             return (
               <ClassificationInputRow
-                taxonomicRanOptions={taxonomicRankOptions}
+                taxonomicRanOptions={newOptions}
                 value={item}
                 onAddRow={onAddRow}
                 onDeleteRow={onDeleteRow}
-                prevRank={prevRank}
                 rowIndex={idxKey}
-                name=""
-                key={idxKey}
+                key={item.id}
                 showPlusIcon={true}
                 onChange={(value) => {
                   onRowChange(idxKey, value);
