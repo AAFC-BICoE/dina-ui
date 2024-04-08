@@ -428,8 +428,9 @@ export function QueryPage<TData extends KitsuResource>({
   };
 
   useEffect(() => {
-    if (viewMode && selectedResources?.length) {
+    if (viewMode && selectedResources?.length !== undefined) {
       setTotalRecords(selectedResources?.length);
+      setLoading(false);
     }
   }, [viewMode, selectedResources]);
 
@@ -455,7 +456,7 @@ export function QueryPage<TData extends KitsuResource>({
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
     // If in view mode with selected resources, no requests need to be made.
-    if (viewMode) {
+    if (viewMode && selectedResources?.length !== undefined) {
       setLoading(false);
       return;
     }
@@ -505,7 +506,12 @@ export function QueryPage<TData extends KitsuResource>({
     );
 
     queryDSL = applyRootQuery(queryDSL);
-    queryDSL = applyGroupFilters(queryDSL, groups);
+
+    // Custom queries should not be adding the group.
+    if (!customViewElasticSearchQuery) {
+      queryDSL = applyGroupFilters(queryDSL, groups);
+    }
+
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
     queryDSL = applySortingRules(queryDSL, sortingRules, combinedColumns);
     queryDSL = applySourceFiltering(queryDSL, combinedColumns);
@@ -612,9 +618,11 @@ export function QueryPage<TData extends KitsuResource>({
         const newTree = Utils.loadTree(customViewQuery);
         setSubmittedQueryBuilderTree(newTree);
         setQueryBuilderTree(newTree);
+        isActionTriggeredQuery.current = true;
       } else if (customViewElasticSearchQuery) {
         setSubmittedQueryBuilderTree(emptyQueryTree());
         setQueryBuilderTree(emptyQueryTree());
+        isActionTriggeredQuery.current = true;
       }
     }
   }, [
