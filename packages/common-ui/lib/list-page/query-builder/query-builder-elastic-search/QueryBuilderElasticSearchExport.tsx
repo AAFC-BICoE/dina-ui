@@ -431,7 +431,12 @@ export function inQuery(
   not: boolean
 ): any {
   const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
-      .map(value => value.trim());
+      .map(value => value.trim())
+      .filter(value => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
 
   return parentType
   ? {
@@ -474,7 +479,12 @@ export function inTextQuery(
   not: boolean
 ): any {
   const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
-      .map(value => value.trim());
+      .map(value => value.trim())
+      .filter(value => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
 
   return parentType
   ? {
@@ -533,7 +543,12 @@ export function inDateQuery(
   not: boolean
 ): any {
   const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
-    .map(value => value.trim());
+    .map(value => value.trim())
+    .filter(value => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
 
   return parentType
   ? {

@@ -473,7 +473,9 @@ Object {
 }
 `;
 
-exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 7`] = `
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 7`] = `Object {}`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 8`] = `
 Object {
   "bool": Object {
     "must": Object {
@@ -484,8 +486,18 @@ Object {
             "range": Object {
               "fieldTest": Object {
                 "format": "yyyy-MM-dd",
-                "gte": "",
-                "lte": "",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2005-09-23",
+                "lte": "2005-09-23",
                 "time_zone": "UTC",
               },
             },
@@ -590,13 +602,16 @@ Object {
 }
 `;
 
-exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 7`] = `
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 7`] = `Object {}`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 8`] = `
 Object {
   "bool": Object {
     "must": Object {
       "terms": Object {
         "fieldTest.keyword": Array [
-          "",
+          "test1",
+          "test2",
         ],
       },
     },
@@ -833,7 +848,9 @@ Object {
 }
 `;
 
-exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 7`] = `
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 7`] = `Object {}`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inTextQuery 8`] = `
 Object {
   "bool": Object {
     "must": Object {
@@ -844,7 +861,15 @@ Object {
             "term": Object {
               "fieldTest.keyword": Object {
                 "case_insensitive": true,
-                "value": "",
+                "value": "test1",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "fieldTest.keyword": Object {
+                "case_insensitive": true,
+                "value": "test2",
               },
             },
           },

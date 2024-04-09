@@ -316,6 +316,9 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(inQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)).toMatchSnapshot();
       expect(inQuery("fieldTest", " TEST1 ", undefined, true, false)).toMatchSnapshot();
       expect(inQuery("fieldTest", "", undefined, true, false)).toMatchSnapshot();
+
+      // Empty last comma should be ignored.
+      expect(inQuery("fieldTest", "test1, test2, ", undefined, true, false)).toMatchSnapshot();
     });
 
     test("inTextQuery", async () => {
@@ -331,6 +334,9 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(inTextQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)).toMatchSnapshot();
       expect(inTextQuery("fieldTest", " TEST1 ", undefined, true, false)).toMatchSnapshot();
       expect(inTextQuery("fieldTest", "", undefined, true, false)).toMatchSnapshot();
+
+      // Empty last comma should be ignored.
+      expect(inTextQuery("fieldTest", "test1, test2, ", undefined, true, false)).toMatchSnapshot();
     });
 
     test("inDateQuery", async () => {
@@ -346,6 +352,9 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(inDateQuery("fieldTest", "  1998-05-19, 2005-09-23, 2023-01-01  ", undefined, "date_time", false)).toMatchSnapshot();
       expect(inDateQuery("fieldTest", " 1998-05-19 ", undefined, "date_time", false)).toMatchSnapshot();
       expect(inDateQuery("fieldTest", "", undefined, "date_time", false)).toMatchSnapshot();
+
+      // Empty last comma should be ignored.
+      expect(inDateQuery("fieldTest", "1998-05-19, 2005-09-23, ", undefined, "date_time", false)).toMatchSnapshot();
     });
 
     test("inRangeQuery", async () => {
