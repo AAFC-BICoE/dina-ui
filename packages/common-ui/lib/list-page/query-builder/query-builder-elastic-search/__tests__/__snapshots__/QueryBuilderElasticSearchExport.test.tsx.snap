@@ -239,6 +239,264 @@ Object {
 }
 `;
 
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2005-09-23",
+                "lte": "2005-09-23",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2023-01-01",
+                "lte": "2023-01-01",
+                "time_zone": "UTC",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 2`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2005-09-23",
+                "lte": "2005-09-23",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2023-01-01",
+                "lte": "2023-01-01",
+                "time_zone": "UTC",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 3`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2005-09-23",
+                "lte": "2005-09-23",
+                "time_zone": "UTC",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 4`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2005-09-23",
+                "lte": "2005-09-23",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2023-01-01",
+                "lte": "2023-01-01",
+                "time_zone": "UTC",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 5`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2005-09-23",
+                "lte": "2005-09-23",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2023-01-01",
+                "lte": "2023-01-01",
+                "time_zone": "UTC",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 6`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "UTC",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions inDateQuery 7`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "fieldTest": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "",
+                "lte": "",
+                "time_zone": "UTC",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions inQuery 1`] = `
 Object {
   "bool": Object {

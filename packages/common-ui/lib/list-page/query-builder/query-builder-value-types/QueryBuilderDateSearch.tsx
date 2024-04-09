@@ -5,7 +5,8 @@ import {
   rangeQuery,
   existsQuery,
   betweenQuery,
-  inQuery
+  inQuery,
+  inDateQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { DATE_REGEX_NO_TIME, DATE_REGEX_PARTIAL } from "common-ui";
@@ -158,7 +159,7 @@ export function transformDateSearchToDSL({
     // List of dates, comma-separated.
     case "in":
     case "notIn":
-      return inQuery(fieldPath, value, parentType, false, operation === "notIn");
+      return inDateQuery(fieldPath, value, parentType, subType, operation === "notIn");
 
     // Not equals match type.
     case "notEquals":
@@ -351,7 +352,7 @@ export function getTimezone() {
  * @param subType subtype of the date, used to determine if timezone should be included.
  * @returns numerical operator and value.
  */
-function buildDateRangeObject(matchType, value, subType) {
+export function buildDateRangeObject(matchType, value, subType) {
   // Local date does not store timezone, ignore it.
   const timezone =
     subType !== "local_date" && subType !== "local_date_time"

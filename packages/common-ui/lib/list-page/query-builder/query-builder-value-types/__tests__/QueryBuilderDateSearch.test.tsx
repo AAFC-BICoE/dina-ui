@@ -74,6 +74,14 @@ describe("QueryBuilderDateSearch", () => {
       {
         operator: "notEmpty",
         testValues: [null]
+      },
+      {
+        operator: "in",
+        testValues: ["1998-05-19, 2002-12-30"]
+      },
+      {
+        operator: "notIn",
+        testValues: ["1998-05-19, 2002-12-30"]
       }
     ];
 

@@ -17,7 +17,8 @@ import {
   inQuery,
   inTextQuery,
   inRangeQuery,
-  betweenQuery
+  betweenQuery,
+  inDateQuery
 } from "../QueryBuilderElasticSearchExport";
 
 const ELASTIC_SEARCH_QUERY: any = {
@@ -330,6 +331,21 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(inTextQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)).toMatchSnapshot();
       expect(inTextQuery("fieldTest", " TEST1 ", undefined, true, false)).toMatchSnapshot();
       expect(inTextQuery("fieldTest", "", undefined, true, false)).toMatchSnapshot();
+    });
+
+    test("inDateQuery", async () => {
+      // In version
+      expect(inDateQuery("fieldTest", "1998-05-19, 2005-09-23, 2023-01-01", undefined, "date_time", false)).toMatchSnapshot();
+      expect(inDateQuery("fieldTest", "1998-05-19, 2005-09-23, 2023-01-01", undefined, "date_time", false)).toMatchSnapshot();
+
+      // Not in version
+      expect(inDateQuery("fieldTest", "1998-05-19, 2005-09-23", undefined, "date_time", true)).toMatchSnapshot();
+
+      // Comma-separator tests. 
+      expect(inDateQuery("fieldTest", "1998-05-19,2005-09-23,2023-01-01", undefined, "date_time", false)).toMatchSnapshot();
+      expect(inDateQuery("fieldTest", "  1998-05-19, 2005-09-23, 2023-01-01  ", undefined, "date_time", false)).toMatchSnapshot();
+      expect(inDateQuery("fieldTest", " 1998-05-19 ", undefined, "date_time", false)).toMatchSnapshot();
+      expect(inDateQuery("fieldTest", "", undefined, "date_time", false)).toMatchSnapshot();
     });
 
     test("inRangeQuery", async () => {
