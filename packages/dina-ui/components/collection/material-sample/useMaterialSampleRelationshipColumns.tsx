@@ -11,9 +11,69 @@ import { Determination, MaterialSample } from "../../../types/collection-api";
 import { getDeterminations, getScientificNames } from "./organismUtils";
 import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
 import Link from "next/link";
+import Dropdown from 'react-bootstrap/Dropdown';
+import Button from 'react-bootstrap/Button';
+import React from "react";
+import { FaEllipsisV } from "react-icons/fa";
+import { useIntl } from "react-intl";
+
+export function materialSampleActionCell(formatMessage: any): TableColumn<MaterialSample> {
+  return {
+    id: "action",
+    cell: ({ row: { original } }) => {
+      const CustomToggle = React.forwardRef(({ children, onClick }: any, ref) => (
+        <Button variant="secondary" size="sm" className="my-0 mx-2" onClick={(e) => onClick(e)} ref={ref as any}>
+          {children}
+        </Button>
+      ));
+
+      const materialSampleName = original.materialSampleName ?? (original as any)?.data?.attributes?.materialSampleName;
+      const materialSampleType = original.materialSampleType ?? (original as any)?.data?.atrributes?.materialSampleType;
+
+      return (
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Dropdown>
+            <Dropdown.Toggle variant="secondary" as={CustomToggle}>
+              <FaEllipsisV />
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              <Dropdown.ItemText>{formatMessage({ id: "actions" })}</Dropdown.ItemText>
+              <Dropdown.Divider />
+              <div className="px-2">
+                <EditButton
+                  className="w-100"
+                  entityId={original.id as string}
+                  entityLink="collection/material-sample"
+                />
+                <SplitMaterialSampleDropdownButton
+                  ids={[original.id ?? "unknown"]}
+                  disabled={!materialSampleName}
+                  materialSampleType={materialSampleType}
+                  className="my-2 w-100"
+                />
+                <DeleteButton
+                  id={original.id as string}
+                  options={{ apiBaseUrl: "/collection-api" }}
+                  type="material-sample"
+                  reload={true}
+                  className="w-100"
+                />
+              </div>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+      )
+    },
+    header: () => <FieldHeader name="actions" />,
+    enableSorting: false,
+    size: 100
+  }
+}
 
 export function useMaterialSampleRelationshipColumns() {
   const { compareByStringAndNumber } = useStringComparator();
+  const { formatMessage } = useIntl();
 
   const PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN: TableColumn<any>[] = [
     {
@@ -140,34 +200,7 @@ export function useMaterialSampleRelationshipColumns() {
     },
     dateCell("createdOn", "data.attributes.createdOn"),
     stringArrayCell("tags", "data.attributes.tags"),
-    {
-      id: "action",
-      cell: ({ row: { original } }) => (
-        <div className="d-flex">
-          <EditButton
-            className="mx-2"
-            entityId={original.id as string}
-            entityLink="collection/material-sample"
-            style={{ width: "5rem" }}
-          />
-          <SplitMaterialSampleDropdownButton
-            ids={[original.id ?? "unknown"]}
-            disabled={!(original as any).data?.attributes?.materialSampleName}
-            materialSampleType={
-              (original as any).data?.attributes?.materialSampleType
-            }
-          />
-          <DeleteButton
-            id={original.id as string}
-            options={{ apiBaseUrl: "/collection-api" }}
-            type="material-sample"
-            reload={true}
-          />
-        </div>
-      ),
-      header: () => <FieldHeader name="actions" />,
-      enableSorting: false
-    }
+    materialSampleActionCell(formatMessage)
   ];
 
   return {

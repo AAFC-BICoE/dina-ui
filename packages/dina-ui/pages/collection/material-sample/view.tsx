@@ -36,7 +36,6 @@ import {
   ProjectSelectSection,
   AssemblageSelectSection,
   TagSelectReadOnly,
-  SamplesView,
   ScheduledActionsField,
   StorageLinkerField,
   TagsAndRestrictionsSection,
@@ -247,12 +246,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </div>
 
                 <MaterialSampleIdentifiersSection />
-                {materialSample.parentMaterialSample && (
-                  <SamplesView
-                    samples={[materialSample.parentMaterialSample]}
-                    fieldSetId={<DinaMessage id="parentMaterialSample" />}
-                  />
-                )}
 
                 {/* Custom Query View */}
                 <CustomQueryPageView

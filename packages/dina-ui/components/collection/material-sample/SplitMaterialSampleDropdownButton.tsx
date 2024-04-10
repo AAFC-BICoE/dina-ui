@@ -25,12 +25,14 @@ interface SplitMaterialSampleDropdownButtonProps {
   ids: string[];
   disabled: boolean;
   materialSampleType?: string;
+  className?: string;
 }
 
 export function SplitMaterialSampleDropdownButton({
   ids,
   disabled,
-  materialSampleType
+  materialSampleType,
+  className
 }: SplitMaterialSampleDropdownButtonProps) {
   const router = useRouter();
   const { groupNames, username } = useAccount();
@@ -139,14 +141,14 @@ export function SplitMaterialSampleDropdownButton({
       id="splitMaterialSampleNameRequiredTooltip"
       disableSpanMargin={true}
       visibleElement={
-        <button className="btn btn-primary me-2" disabled={true}>
+        <button className={"btn btn-primary " + (className ? className : "me-2")} disabled={true}>
           <DinaMessage id="splitButton" />
         </button>
       }
     />
   ) : (
     <Dropdown>
-      <Dropdown.Toggle className="me-2">
+      <Dropdown.Toggle className={className ? className : "me-2"}>
         <DinaMessage id="splitButton" />
       </Dropdown.Toggle>
       <Dropdown.Menu as={CustomMenu} />
