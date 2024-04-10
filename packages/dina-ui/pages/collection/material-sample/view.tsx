@@ -52,7 +52,7 @@ import { SplitMaterialSampleDropdownButton } from "../../../components/collectio
 import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
-import { MaterialSampleBadges } from "packages/dina-ui/components/collection/material-sample/MaterialSampleBadges";
+import { MaterialSampleBadges } from "../../../components/collection/material-sample/MaterialSampleBadges";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
