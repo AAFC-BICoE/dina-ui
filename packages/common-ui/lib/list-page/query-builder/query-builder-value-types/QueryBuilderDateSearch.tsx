@@ -355,7 +355,7 @@ export function getTimezone() {
 export function buildDateRangeObject(matchType, value, subType) {
   // Local date does not store timezone, ignore it.
   const timezone =
-    subType !== "local_date" && subType !== "local_date_time"
+    subType === "date_time"
       ? getTimezone()
       : undefined;
 
