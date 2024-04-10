@@ -559,20 +559,22 @@ export function inDateQuery(
             must: [
               {
                 bool: {
-                  [not ? "must_not" : "must"]: {
+                  [not ? "must_not" : "must"]: [{
                     bool: {
                       should: matchValuesArray.map(value => ({
-                        must: [
-                          rangeQuery(
-                            fieldName,
-                            buildDateRangeObject("equals", value, subType)
-                          ),
-                          includedTypeQuery(parentType)
-                        ]
+                        bool: {
+                          must: [
+                            rangeQuery(
+                              fieldName,
+                              buildDateRangeObject("equals", value, subType)
+                            ),
+                            includedTypeQuery(parentType)
+                          ]                          
+                        }
                       })),
                       minimum_should_match: 1                      
                     }
-                  }
+                  }]
                 }
               },
               includedTypeQuery(parentType)

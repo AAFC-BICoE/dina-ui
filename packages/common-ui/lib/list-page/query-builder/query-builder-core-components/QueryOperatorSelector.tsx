@@ -77,11 +77,6 @@ export function QueryOperatorSelector({
         return false;
       }
 
-      // "In" and "Not in" options not supported for nested values yet.
-      if ((option.key === "in" || option.key === "notIn") && selectedFieldMapping?.parentName) {
-        return false;
-      }
-
       // Between for the text type should only be displayed if numeric keyword exists.
       if ((option.key === "between" && selectedFieldMapping?.type === "text") && !selectedFieldMapping?.keywordNumericSupport) {
         return false;

@@ -253,7 +253,6 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
-      "time_zone": "UTC",
     },
   },
 }
@@ -290,7 +289,6 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
-      "time_zone": "UTC",
     },
   },
 }
@@ -376,7 +374,6 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19",
       "lte": "1998-05-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -413,7 +410,6 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19",
       "lte": "1998-05-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -435,7 +431,6 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gt": "1998-05-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -466,7 +461,6 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gt": "1998-05-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -488,7 +482,6 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gte": "1998-05-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -519,7 +512,6 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "gte": "1998-05-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -582,7 +574,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -592,7 +583,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2020-01-01",
                 "lte": "2020-01-01",
-                "time_zone": "UTC",
               },
             },
           },
@@ -602,7 +592,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2024-04-08",
                 "lte": "2024-04-08",
-                "time_zone": "UTC",
               },
             },
           },
@@ -708,7 +697,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -718,7 +706,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2020-01-01",
                 "lte": "2020-01-01",
-                "time_zone": "UTC",
               },
             },
           },
@@ -728,7 +715,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2024-04-08",
                 "lte": "2024-04-08",
-                "time_zone": "UTC",
               },
             },
           },
@@ -755,7 +741,6 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lt": "1998-05-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -786,7 +771,6 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lt": "1998-05-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -808,7 +792,6 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lte": "1998-05-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -839,7 +822,6 @@ Object {
   "range": Object {
     "data.attributes.managedAttributes.attributeName": Object {
       "lte": "1998-05-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -929,7 +911,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1023,7 +1004,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1100,7 +1080,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1110,7 +1089,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2020-01-01",
                 "lte": "2020-01-01",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1120,7 +1098,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2024-04-08",
                 "lte": "2024-04-08",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1226,7 +1203,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1236,7 +1212,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2020-01-01",
                 "lte": "2020-01-01",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1246,7 +1221,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2024-04-08",
                 "lte": "2024-04-08",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1437,7 +1411,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1522,7 +1495,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1795,7 +1767,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1880,7 +1851,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19",
                 "lte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1934,7 +1904,6 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gt": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -2013,7 +1982,6 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gt": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -2067,7 +2035,6 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -2146,7 +2113,6 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "gte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -2171,70 +2137,78 @@ Object {
         "must": Array [
           Object {
             "bool": Object {
-              "must": Object {
-                "bool": Object {
-                  "minimum_should_match": 1,
-                  "should": Array [
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "1998-05-19",
-                              "lte": "1998-05-19",
-                              "time_zone": "UTC",
+              "must": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                  "time_zone": "UTC",
+                                },
+                              },
                             },
-                          },
-                        },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2020-01-01",
-                              "lte": "2020-01-01",
-                              "time_zone": "UTC",
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
                             },
-                          },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2024-04-08",
-                              "lte": "2024-04-08",
-                              "time_zone": "UTC",
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2020-01-01",
+                                  "lte": "2020-01-01",
+                                  "time_zone": "UTC",
+                                },
+                              },
                             },
-                          },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2024-04-08",
+                                  "lte": "2024-04-08",
+                                  "time_zone": "UTC",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                      ],
-                    },
-                  ],
+                      },
+                    ],
+                  },
                 },
-              },
+              ],
             },
           },
           Object {
@@ -2258,70 +2232,75 @@ Object {
         "must": Array [
           Object {
             "bool": Object {
-              "must": Object {
-                "bool": Object {
-                  "minimum_should_match": 1,
-                  "should": Array [
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "1998-05-19",
-                              "lte": "1998-05-19",
-                              "time_zone": "UTC",
+              "must": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
                             },
-                          },
-                        },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2020-01-01",
-                              "lte": "2020-01-01",
-                              "time_zone": "UTC",
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
                             },
-                          },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2024-04-08",
-                              "lte": "2024-04-08",
-                              "time_zone": "UTC",
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2020-01-01",
+                                  "lte": "2020-01-01",
+                                },
+                              },
                             },
-                          },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2024-04-08",
+                                  "lte": "2024-04-08",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                      ],
-                    },
-                  ],
+                      },
+                    ],
+                  },
                 },
-              },
+              ],
             },
           },
           Object {
@@ -2345,67 +2324,75 @@ Object {
         "must": Array [
           Object {
             "bool": Object {
-              "must": Object {
-                "bool": Object {
-                  "minimum_should_match": 1,
-                  "should": Array [
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "1998-05-19",
-                              "lte": "1998-05-19",
+              "must": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
                             },
-                          },
-                        },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2020-01-01",
-                              "lte": "2020-01-01",
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
                             },
-                          },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2024-04-08",
-                              "lte": "2024-04-08",
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2020-01-01",
+                                  "lte": "2020-01-01",
+                                },
+                              },
                             },
-                          },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2024-04-08",
+                                  "lte": "2024-04-08",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                      ],
-                    },
-                  ],
+                      },
+                    ],
+                  },
                 },
-              },
+              ],
             },
           },
           Object {
@@ -2429,67 +2416,75 @@ Object {
         "must": Array [
           Object {
             "bool": Object {
-              "must": Object {
-                "bool": Object {
-                  "minimum_should_match": 1,
-                  "should": Array [
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "1998-05-19",
-                              "lte": "1998-05-19",
+              "must": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
                             },
-                          },
-                        },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2020-01-01",
-                              "lte": "2020-01-01",
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
                             },
-                          },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2024-04-08",
-                              "lte": "2024-04-08",
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2020-01-01",
+                                  "lte": "2020-01-01",
+                                },
+                              },
                             },
-                          },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2024-04-08",
+                                  "lte": "2024-04-08",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                      ],
-                    },
-                  ],
+                      },
+                    ],
+                  },
                 },
-              },
+              ],
             },
           },
           Object {
@@ -2513,70 +2508,75 @@ Object {
         "must": Array [
           Object {
             "bool": Object {
-              "must": Object {
-                "bool": Object {
-                  "minimum_should_match": 1,
-                  "should": Array [
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "1998-05-19",
-                              "lte": "1998-05-19",
-                              "time_zone": "UTC",
+              "must": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
                             },
-                          },
-                        },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2020-01-01",
-                              "lte": "2020-01-01",
-                              "time_zone": "UTC",
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
                             },
-                          },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2024-04-08",
-                              "lte": "2024-04-08",
-                              "time_zone": "UTC",
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2020-01-01",
+                                  "lte": "2020-01-01",
+                                },
+                              },
                             },
-                          },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2024-04-08",
+                                  "lte": "2024-04-08",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                      ],
-                    },
-                  ],
+                      },
+                    ],
+                  },
                 },
-              },
+              ],
             },
           },
           Object {
@@ -2629,7 +2629,6 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lt": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -2708,7 +2707,6 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lt": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -2762,7 +2760,6 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -2841,7 +2838,6 @@ Object {
             "range": Object {
               "included.attributes.managedAttributes.attributeName": Object {
                 "lte": "1998-05-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -3058,7 +3054,6 @@ Object {
                     "format": "yyyy-MM-dd",
                     "gte": "1998-05-19",
                     "lte": "1998-05-19",
-                    "time_zone": "UTC",
                   },
                 },
               },
@@ -3239,7 +3234,6 @@ Object {
                     "format": "yyyy-MM-dd",
                     "gte": "1998-05-19",
                     "lte": "1998-05-19",
-                    "time_zone": "UTC",
                   },
                 },
               },
@@ -3289,70 +3283,78 @@ Object {
         "must": Array [
           Object {
             "bool": Object {
-              "must_not": Object {
-                "bool": Object {
-                  "minimum_should_match": 1,
-                  "should": Array [
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "1998-05-19",
-                              "lte": "1998-05-19",
-                              "time_zone": "UTC",
+              "must_not": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                  "time_zone": "UTC",
+                                },
+                              },
                             },
-                          },
-                        },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2020-01-01",
-                              "lte": "2020-01-01",
-                              "time_zone": "UTC",
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
                             },
-                          },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2024-04-08",
-                              "lte": "2024-04-08",
-                              "time_zone": "UTC",
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2020-01-01",
+                                  "lte": "2020-01-01",
+                                  "time_zone": "UTC",
+                                },
+                              },
                             },
-                          },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2024-04-08",
+                                  "lte": "2024-04-08",
+                                  "time_zone": "UTC",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                      ],
-                    },
-                  ],
+                      },
+                    ],
+                  },
                 },
-              },
+              ],
             },
           },
           Object {
@@ -3376,70 +3378,75 @@ Object {
         "must": Array [
           Object {
             "bool": Object {
-              "must_not": Object {
-                "bool": Object {
-                  "minimum_should_match": 1,
-                  "should": Array [
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "1998-05-19",
-                              "lte": "1998-05-19",
-                              "time_zone": "UTC",
+              "must_not": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
                             },
-                          },
-                        },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2020-01-01",
-                              "lte": "2020-01-01",
-                              "time_zone": "UTC",
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
                             },
-                          },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2024-04-08",
-                              "lte": "2024-04-08",
-                              "time_zone": "UTC",
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2020-01-01",
+                                  "lte": "2020-01-01",
+                                },
+                              },
                             },
-                          },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2024-04-08",
+                                  "lte": "2024-04-08",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                      ],
-                    },
-                  ],
+                      },
+                    ],
+                  },
                 },
-              },
+              ],
             },
           },
           Object {
@@ -3463,67 +3470,75 @@ Object {
         "must": Array [
           Object {
             "bool": Object {
-              "must_not": Object {
-                "bool": Object {
-                  "minimum_should_match": 1,
-                  "should": Array [
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "1998-05-19",
-                              "lte": "1998-05-19",
+              "must_not": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
                             },
-                          },
-                        },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2020-01-01",
-                              "lte": "2020-01-01",
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
                             },
-                          },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2024-04-08",
-                              "lte": "2024-04-08",
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2020-01-01",
+                                  "lte": "2020-01-01",
+                                },
+                              },
                             },
-                          },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2024-04-08",
+                                  "lte": "2024-04-08",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                      ],
-                    },
-                  ],
+                      },
+                    ],
+                  },
                 },
-              },
+              ],
             },
           },
           Object {
@@ -3547,67 +3562,75 @@ Object {
         "must": Array [
           Object {
             "bool": Object {
-              "must_not": Object {
-                "bool": Object {
-                  "minimum_should_match": 1,
-                  "should": Array [
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "1998-05-19",
-                              "lte": "1998-05-19",
+              "must_not": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
                             },
-                          },
-                        },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2020-01-01",
-                              "lte": "2020-01-01",
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
                             },
-                          },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2024-04-08",
-                              "lte": "2024-04-08",
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2020-01-01",
+                                  "lte": "2020-01-01",
+                                },
+                              },
                             },
-                          },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2024-04-08",
+                                  "lte": "2024-04-08",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                      ],
-                    },
-                  ],
+                      },
+                    ],
+                  },
                 },
-              },
+              ],
             },
           },
           Object {
@@ -3631,70 +3654,75 @@ Object {
         "must": Array [
           Object {
             "bool": Object {
-              "must_not": Object {
-                "bool": Object {
-                  "minimum_should_match": 1,
-                  "should": Array [
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "1998-05-19",
-                              "lte": "1998-05-19",
-                              "time_zone": "UTC",
+              "must_not": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
                             },
-                          },
-                        },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2020-01-01",
-                              "lte": "2020-01-01",
-                              "time_zone": "UTC",
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
                             },
-                          },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
-                        },
-                      ],
-                    },
-                    Object {
-                      "must": Array [
-                        Object {
-                          "range": Object {
-                            "included.attributes.managedAttributes.attributeName": Object {
-                              "format": "yyyy-MM-dd",
-                              "gte": "2024-04-08",
-                              "lte": "2024-04-08",
-                              "time_zone": "UTC",
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2020-01-01",
+                                  "lte": "2020-01-01",
+                                },
+                              },
                             },
-                          },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                        Object {
-                          "term": Object {
-                            "included.type": "collecting-event",
-                          },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "included.attributes.managedAttributes.attributeName": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2024-04-08",
+                                  "lte": "2024-04-08",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collecting-event",
+                              },
+                            },
+                          ],
                         },
-                      ],
-                    },
-                  ],
+                      },
+                    ],
+                  },
                 },
-              },
+              ],
             },
           },
           Object {
