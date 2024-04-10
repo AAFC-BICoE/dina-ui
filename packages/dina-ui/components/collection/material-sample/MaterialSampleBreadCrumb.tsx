@@ -80,20 +80,22 @@ export function MaterialSampleBreadCrumb({
       </h1>
 
       {/* Material Sample Parents */}
-      <div className="ms-4">
-        <ol
-          className="breadcrumb mb-2"
-          style={{ "--bs-breadcrumb-divider": "'/'" } as any}
-        >
-          {parentPath.map((node) => (
-            <li className="breadcrumb-item" key={node.uuid}>
-              <Link href={`/collection/material-sample/view?id=${node.uuid}`}>
-                <a>{node.name}</a>
-              </Link>
-            </li>
-          ))}
-        </ol>
-      </div>
+      {parentPath.length !== 0 && (
+        <div className="card well px-3 py-2">
+          <ol
+            className="breadcrumb mb-1"
+            style={{ "--bs-breadcrumb-divider": "'/'" } as any}
+          >
+            {parentPath.map((node) => (
+              <li className="breadcrumb-item" key={node.uuid}>
+                <Link href={`/collection/material-sample/view?id=${node.uuid}`}>
+                  <a>{node.name}</a>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </div>        
+      )}
     </>
   );
 }
