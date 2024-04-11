@@ -13,6 +13,7 @@ import {
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { GoCircleSlash } from "react-icons/go";
+import { Tooltip } from "..";
 
 export interface FieldExtensionSelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
@@ -47,12 +48,18 @@ export function FieldExtensionSelectField(
         {...fieldExtensionSelectFieldProps}
         readOnlyRender={(value) =>
           value ? (
-            <div className="card pill py-1 px-2 flex-row align-items-center bg-danger">
-              <GoCircleSlash className="text-white" />
-              <span className="text-white">
-                <strong>{fieldExtensionSelectFieldProps.label + ": "}</strong>{value?.value}
-              </span>
-            </div>
+            <Tooltip
+              visibleElement={(
+                <div className="card pill py-1 px-2 flex-row align-items-center bg-danger">
+                  <GoCircleSlash className="text-white" />
+                  <span className="text-white">
+                    <strong>{fieldExtensionSelectFieldProps.label + ": "}</strong>{value?.value}
+                  </span>
+                </div>
+              )}
+              id="field_restriction"
+              disableSpanMargin={true}
+            />
           ) : null
         }
       >

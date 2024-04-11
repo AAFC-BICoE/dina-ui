@@ -75,7 +75,7 @@ export function CollectionSelectField({
         readOnlyLink="/collection/collection/view?id="
         filter={filter}
         model={resourcePath as any}
-        className={"collection " + (className || "")}
+        className={"collection-field " + (className || "")}
         optionLabel={(coll) =>
           `${coll.name || coll.id}${coll.code ? ` (${coll.code})` : ""}`
         }

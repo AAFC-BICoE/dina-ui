@@ -1,6 +1,7 @@
 import {
   FieldExtensionSelectField,
   TextField,
+  Tooltip,
   useDinaFormContext
 } from "common-ui";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -22,6 +23,7 @@ export function RestrictionWarning(props: RestrictionWarningProps) {
         removeLabel={true}
         label={formatMessage("phacAnimalRGLevel")}
         name="phac_animal_rg"
+        removeBottomMargin={readOnly}
         query={() => ({
           path: "collection-api/extension/phac_animal_rg"
         })}
@@ -30,6 +32,7 @@ export function RestrictionWarning(props: RestrictionWarningProps) {
         name="phac_human_rg"
         removeLabel={true}
         label={formatMessage("phacHumanRGLevel")}
+        removeBottomMargin={readOnly}
         query={() => ({
           path: "collection-api/extension/phac_human_rg"
         })}
@@ -38,6 +41,7 @@ export function RestrictionWarning(props: RestrictionWarningProps) {
         name="cfia_ppc"
         removeLabel={true}
         label={formatMessage("cfiaPPCLevel")}
+        removeBottomMargin={readOnly}
         query={() => ({
           path: "collection-api/extension/cfia_ppc"
         })}
@@ -46,21 +50,26 @@ export function RestrictionWarning(props: RestrictionWarningProps) {
         removeLabel={true}
         label={formatMessage("phacContainmentLevel")}
         name="phac_cl"
+        removeBottomMargin={readOnly}
         query={() => ({
           path: "collection-api/extension/phac_cl"
         })}
       />
       {readOnly && initialValues.restrictionRemarks && (
-        <div>
-          <div className="restrictionRemarks w-100">
-            <div className="card pill py-1 px-2 flex-row align-items-center gap-1 bg-danger">
-              <FaFileAlt className="text-white" />
-              <span className="text-white">
-                {initialValues.restrictionRemarks}
-              </span>
+        <Tooltip
+          visibleElement={(
+            <div>
+              <div className="card pill py-1 px-2 flex-row align-items-center gap-1 bg-danger">
+                <FaFileAlt className="text-white" />
+                <span className="text-white">
+                  {initialValues.restrictionRemarks}
+                </span>
+              </div>
             </div>
-          </div>
-        </div>
+          )}
+          id="field_restrictionRemarks"
+          disableSpanMargin={true}
+        />
       )}
     </div>
   ) : isRestrictionRemarks && !readOnly ? (

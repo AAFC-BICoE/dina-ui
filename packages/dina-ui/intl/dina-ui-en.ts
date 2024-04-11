@@ -431,6 +431,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_remarks: "Remarks",
   field_restrictToCreatedBy: "Private",
   field_restrictions: "Restrictions",
+  field_restriction: "Restriction",
+  field_restrictionRemarks: "Restriction Remarks",
   field_sampleName: "Sample Name",
   field_scientificName: "Scientific Name",
   field_scientificNameInput: "Scientific Name",
