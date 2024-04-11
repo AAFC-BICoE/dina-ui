@@ -23,9 +23,13 @@ export function MaterialSampleBadges({
         <TagsAndRestrictionsSection />
       </div>
       <div className="d-flex flex-row gap-2">
-        <TagSelectReadOnly />
         <ProjectSelectSection />
         <AssemblageSelectSection />
+
+        {/* Tags */}
+        <TagSelectReadOnly />
+
+        
         {withResponse(
           transactionElasticQuery as any,
           ({ data: query }) => {

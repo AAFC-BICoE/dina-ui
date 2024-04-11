@@ -42,7 +42,7 @@ export function TagSelectField({
             {(tagsVal ?? []).map((tag, index) => (
               <div
                 key={index}
-                className="card py-1 px-2 flex-row align-items-center gap-1"
+                className="card pill py-1 px-2 flex-row align-items-center gap-1"
                 style={{ background: "rgb(24, 102, 109)" }}
               >
                 <AiFillTag className="text-white" />

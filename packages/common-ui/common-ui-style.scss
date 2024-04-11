@@ -11,6 +11,17 @@
 }
 
 /*
+ * Pill shaped badges to display information.
+ */
+.pill {
+  border-radius: 30px;
+}
+
+.pill > span, .pill > a {
+  margin-left: 5px;
+}
+
+/*
 * Fixes WCAG contrast issue for react-select input elements
 * Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
 */

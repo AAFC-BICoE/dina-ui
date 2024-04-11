@@ -7,6 +7,7 @@ import {
 import { FaFolderOpen } from "react-icons/fa";
 import { Assemblage } from "../../../dina-ui/types/collection-api/resources/Assemblage";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import Link from "next/link";
 
 export interface AssemblageSelectSectionProps {
   resourcePath?: string;
@@ -68,11 +69,13 @@ export function AssemblageSelectField({
             <div className="d-flex flex-row gap-2">
               {value.map((val, idx) => (
                 <div
-                  className="card py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
+                  className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
                   key={idx}
                 >
                   <FaFolderOpen />
-                  <span>{val.name}</span>
+                  <Link href={"/collection/assemblage/view?id=" + val.id}>
+                    <a>{val.name}</a>
+                  </Link>
                 </div>
               ))}
             </div>

@@ -1,13 +1,10 @@
 import {
   DinaFormSection,
   filterBy,
-  ReadOnlyResourceLink,
   ResourceSelectField,
-  ResourceSelectFieldProps,
   useDinaFormContext
 } from "common-ui";
 import { IoIosListBox } from "react-icons/io";
-import { partialUtil } from "zod/lib/helpers/partialUtil";
 import { Project } from "../../../dina-ui/types/collection-api/resources/Project";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import Link from "next/link";
@@ -72,7 +69,7 @@ export function ProjectsSelectField({
             <div className="d-flex flex-row gap-2">
               {value.map((val, idx) => (
                 <div
-                  className="card py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
+                  className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
                   key={idx}
                 >
                   <IoIosListBox />

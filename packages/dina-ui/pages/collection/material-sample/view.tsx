@@ -223,7 +223,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
                 {/* Material Sample Badges */}
                 <MaterialSampleBadges 
-                  transactionElasticQuery
+                  transactionElasticQuery={transactionElasticQuery}
                 />
 
                 <MaterialSampleIdentifiersSection />
