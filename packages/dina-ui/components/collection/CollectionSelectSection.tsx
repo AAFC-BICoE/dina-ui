@@ -26,13 +26,11 @@ export function CollectionSelectSection({
   ) : (
     <div className={`${classNames} row`}>
       <DinaFormSection horizontal="flex">
-        <div className="col-md-6">
-          <div className="d-flex flex-row gap-1">
-            <CollectionSelectField
-              resourcePath={resourcePath}
-              className="flex-grow-1 mb-2"
-            />
-          </div>
+        <div className="d-flex flex-row gap-1">
+          <CollectionSelectField
+            resourcePath={resourcePath}
+            className="flex-grow-1 mb-2"
+          />
         </div>
       </DinaFormSection>
     </div>
@@ -81,6 +79,7 @@ export function CollectionSelectField({
         }
         hideLabel={readOnly}
         removeLabel={readOnly}
+        removeBottomMargin={true}
         label={
           <span>
             <FaInbox className="me-1" /> <DinaMessage id="collection" />

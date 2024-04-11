@@ -25,13 +25,11 @@ export function AssemblageSelectSection({
   ) : (
     <div className={`${classNames} row`}>
       <DinaFormSection horizontal="flex">
-        <div className="col-md-6">
-          <div className="d-flex flex-row gap-1">
-            <AssemblageSelectField
-              resourcePath={resourcePath}
-              className="flex-grow-1 mb-2"
-            />
-          </div>
+        <div className="d-flex flex-row gap-1">
+          <AssemblageSelectField
+            resourcePath={resourcePath}
+            className="flex-grow-1 mb-2"
+          />
         </div>
       </DinaFormSection>
     </div>

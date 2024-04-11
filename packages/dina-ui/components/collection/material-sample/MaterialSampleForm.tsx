@@ -60,6 +60,7 @@ import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
 import { SplitConfigurationSection } from "./SplitConfigurationSection";
 import { CollectionSelectSection } from "../CollectionSelectSection";
+import { NotPubliclyReleasableSection } from "../../tag-editor/NotPubliclyReleasableSection";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -440,16 +441,17 @@ export function MaterialSampleForm({
                   </div>
                 </div>
               )}
-              <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
-              <ProjectSelectSection
-                resourcePath="collection-api/project"
-              />
-              <AssemblageSelectSection
-                resourcePath="collection-api/assemblage"
-              />
-              <CollectionSelectSection
-                resourcePath="collection-api/collection"
-              />
+              <div className="row">
+                <div className="col-md-8">
+                  <CollectionSelectSection resourcePath="collection-api/collection" />
+                  <ProjectSelectSection resourcePath="collection-api/project" />
+                  <AssemblageSelectSection resourcePath="collection-api/assemblage" />
+                  <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
+                </div>
+                <div className="col-md-4">
+                  <NotPubliclyReleasableSection />
+                </div>
+              </div>
             </>
           )}
           {/* The toggleable / re-arrangeable form sections: */}
