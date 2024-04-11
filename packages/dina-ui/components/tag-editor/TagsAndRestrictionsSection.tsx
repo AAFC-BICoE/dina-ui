@@ -62,9 +62,10 @@ export function TagsAndRestrictionsSection({
           className="col-sm-6 tags"
           name={tagsFieldName}
           groupSelectorName={groupSelectorName}
+          removeBottomMargin={true}
           label={
             <span>
-              <AiFillTags /> <DinaMessage id="tags" />
+              <AiFillTags className="me-1" /> <DinaMessage id="tags" />
             </span>
           }
         />

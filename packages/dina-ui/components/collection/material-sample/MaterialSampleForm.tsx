@@ -59,6 +59,7 @@ import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
 import { SplitConfigurationSection } from "./SplitConfigurationSection";
+import { CollectionSelectSection } from "../CollectionSelectSection";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -441,12 +442,13 @@ export function MaterialSampleForm({
               )}
               <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
               <ProjectSelectSection
-                classNames="mt-3"
                 resourcePath="collection-api/project"
               />
               <AssemblageSelectSection
-                classNames="mt-2"
                 resourcePath="collection-api/assemblage"
+              />
+              <CollectionSelectSection
+                resourcePath="collection-api/collection"
               />
             </>
           )}

@@ -60,9 +60,10 @@ export function AssemblageSelectField({
         optionLabel={(assemblage) => assemblage.name}
         hideLabel={readOnly}
         removeLabel={readOnly}
+        removeBottomMargin={true}
         label={
           <span>
-            <FaFolderOpen /> <DinaMessage id="assemblages" />
+            <FaFolderOpen className="me-1" /> <DinaMessage id="assemblages" />
           </span>
         }
         readOnlyRender={(value, _) =>

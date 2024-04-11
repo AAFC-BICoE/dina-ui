@@ -83,7 +83,7 @@ export function CollectionSelectField({
         removeLabel={readOnly}
         label={
           <span>
-            <FaInbox /> <DinaMessage id="collection" />
+            <FaInbox className="me-1" /> <DinaMessage id="collection" />
           </span>
         }
         readOnlyRender={(value, _) => (

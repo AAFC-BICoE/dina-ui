@@ -60,9 +60,10 @@ export function ProjectsSelectField({
         optionLabel={(prj) => prj.name}
         hideLabel={readOnly}
         removeLabel={readOnly}
+        removeBottomMargin={true}
         label={
           <span>
-            <IoIosListBox /> <DinaMessage id="projects" />
+            <IoIosListBox className="me-1" /> <DinaMessage id="projects" />
           </span>
         }
         readOnlyRender={(value, _) =>
