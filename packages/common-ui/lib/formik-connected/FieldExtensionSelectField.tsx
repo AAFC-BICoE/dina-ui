@@ -12,7 +12,7 @@ import {
 } from "../api-client/useQuery";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { GoCircleSlash } from "react-icons/go";
+import { FaExclamationTriangle } from "react-icons/fa";
 import { Tooltip } from "..";
 
 export interface FieldExtensionSelectFieldProp extends FieldWrapperProps {
@@ -51,7 +51,7 @@ export function FieldExtensionSelectField(
             <Tooltip
               visibleElement={(
                 <div className="card pill py-1 px-2 flex-row align-items-center bg-danger">
-                  <GoCircleSlash className="text-white" />
+                  <FaExclamationTriangle className="text-white" />
                   <span className="text-white">
                     <strong>{fieldExtensionSelectFieldProps.label + ": "}</strong>{value?.value}
                   </span>

@@ -18,20 +18,14 @@ export function MaterialSampleBadges({
 }: MaterialSampleBadgeProps) {
   return (
     <>
-      <MaterialSampleStateWarning />
-
       <div className="d-flex flex-row gap-2">
+        <MaterialSampleStateWarning />
         <TagsAndRestrictionsSection />
       </div>
       <div className="d-flex flex-row gap-2">
         <CollectionSelectSection />
         <ProjectSelectSection />
         <AssemblageSelectSection />
-
-        {/* Tags */}
-        <TagSelectReadOnly />
-
-
         {withResponse(
           transactionElasticQuery as any,
           ({ data: query }) => {
@@ -42,6 +36,9 @@ export function MaterialSampleBadges({
             );
           }
         )}
+
+        {/* Tags */}
+        <TagSelectReadOnly />
       </div>
     </>
   );

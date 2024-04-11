@@ -1,5 +1,5 @@
 import { useDinaFormContext, FieldWrapper, Tooltip, DinaFormSection } from "common-ui";
-import { BsExclamationTriangle } from "react-icons/bs";
+import { FaExclamationCircle } from "react-icons/fa";
 import { useFormikContext } from "formik";
 
 export function MaterialSampleStateWarning() {
@@ -18,7 +18,7 @@ export function MaterialSampleStateWarning() {
             <div
               className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined bg-danger"
             >
-              <BsExclamationTriangle className="text-white"/>
+              <FaExclamationCircle className="text-white"/>
               <span className="text-white"><MaterialSampleStateReadOnlyRender removeLabel={true} /></span>
             </div>                    
           )} 
