@@ -7,6 +7,7 @@ import { TagSelectReadOnly } from "../../tag-editor/TagSelectField";
 import { TagsAndRestrictionsSection } from "../../tag-editor/TagsAndRestrictionsSection";
 import { TransactionMaterialDirectionSection } from "../../transaction/TransactionMaterialDirectionSection";
 import { MaterialSampleStateWarning } from "../MaterialSampleStateWarning";
+import { CollectionSelectSection } from "../CollectionSelectSection";
 
 export interface MaterialSampleBadgeProps {
   transactionElasticQuery: any;
@@ -23,13 +24,14 @@ export function MaterialSampleBadges({
         <TagsAndRestrictionsSection />
       </div>
       <div className="d-flex flex-row gap-2">
+        <CollectionSelectSection />
         <ProjectSelectSection />
         <AssemblageSelectSection />
 
         {/* Tags */}
         <TagSelectReadOnly />
 
-        
+
         {withResponse(
           transactionElasticQuery as any,
           ({ data: query }) => {

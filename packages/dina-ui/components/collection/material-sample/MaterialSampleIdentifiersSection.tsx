@@ -56,11 +56,6 @@ export function MaterialSampleIdentifiersSection({
     >
       <div className="row">
         <div className="col-md-6">
-          <CollectionSelectField
-            name={`${namePrefix}collection`}
-            customName="collection"
-            disableTemplateCheckbox={true}
-          />
           <div className="d-flex">
             <TextField
               disableTemplateCheckbox={true}

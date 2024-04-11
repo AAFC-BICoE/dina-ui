@@ -2,6 +2,7 @@ import {
   DinaFormSection,
   filterBy,
   ResourceSelectField,
+  Tooltip,
   useDinaFormContext
 } from "common-ui";
 import { IoIosListBox } from "react-icons/io";
@@ -68,15 +69,21 @@ export function ProjectsSelectField({
           Array.isArray(value) ? (
             <div className="d-flex flex-row gap-2">
               {value.map((val, idx) => (
-                <div
-                  className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
-                  key={idx}
-                >
-                  <IoIosListBox />
-                  <Link href={"/collection/project/view?id=" + val.id}>
-                    <a>{val.name}</a>
-                  </Link>
-                </div>
+                <Tooltip
+                  visibleElement={(
+                    <div
+                      className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
+                      key={idx}
+                    >
+                      <IoIosListBox />
+                      <Link href={"/collection/project/view?id=" + val.id}>
+                        <a>{val.name}</a>
+                      </Link>
+                    </div>
+                  )}
+                  id="projects"
+                  disableSpanMargin={true}
+                />
               ))}
             </div>
           ) : (

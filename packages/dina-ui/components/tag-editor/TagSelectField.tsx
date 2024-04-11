@@ -1,6 +1,7 @@
 import {
   FieldWrapper,
   FieldWrapperProps,
+  Tooltip,
   filterBy,
   useAccount,
   useQuery
@@ -38,16 +39,22 @@ export function TagSelectField({
       {...props}
       readOnlyRender={(tagsVal) =>
         !!tagsVal?.length && (
-          <div className="d-flex flex-wrap gap-2">
+          <div className="d-flex flex-wrap gap-2 float-end">
             {(tagsVal ?? []).map((tag, index) => (
-              <div
-                key={index}
-                className="card pill py-1 px-2 flex-row align-items-center gap-1"
-                style={{ background: "rgb(24, 102, 109)" }}
-              >
-                <AiFillTag className="text-white" />
-                <span className="text-white">{tag}</span>
-              </div>
+              <Tooltip
+                visibleElement={(
+                  <div
+                    key={index}
+                    className="card pill py-1 px-2 flex-row align-items-center gap-1"
+                    style={{ background: "rgb(24, 102, 109)" }}
+                  >
+                    <AiFillTag className="text-white" />
+                    <span className="text-white">{tag}</span>
+                  </div>
+                )}
+                id="tags"
+                disableSpanMargin={true}
+              />
             ))}
           </div>
         )
@@ -221,7 +228,7 @@ export function TagSelectReadOnly({
   groupSelectorName = "group"
 }: TagSelectReadOnlyProps) {
   return (
-    <div>
+    <div className="ms-auto">
       <TagSelectField
         resourcePath={resourcePath}
         name={tagsFieldName}
