@@ -309,7 +309,9 @@ export function DeterminationField({
                           );
                           formik.setFieldValue(
                             fieldProps("scientificNameDetails").name,
-                            newValue
+                            newValue &&
+                              newValue["classificationRanks"] &&
+                              newValue["classificationPath"]
                               ? pick(newValue, [
                                   "classificationRanks",
                                   "classificationPath"

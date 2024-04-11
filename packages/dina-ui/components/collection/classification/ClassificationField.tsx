@@ -54,11 +54,15 @@ export function ClassificationField({
       .map((item) => item.classificationPath ?? "")
       .join("|");
 
-    onChange?.({
-      classificationPath: strPath,
-      classificationRanks: strRanks,
-      isManual: true
-    });
+    onChange?.(
+      strPath === "" && strRanks === ""
+        ? { isManual: true }
+        : {
+            classificationPath: strPath,
+            classificationRanks: strRanks,
+            isManual: true
+          }
+    );
   }
 
   function onAddRow() {
