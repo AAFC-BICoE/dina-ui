@@ -32,7 +32,6 @@ import {
   OrganismsField,
   PreparationField,
   PREPARATION_FIELDS,
-  SamplesView,
   ScheduledActionsField,
   StorageLinkerField,
   useCollectingEventQuery,
@@ -227,12 +226,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
 
                 <MaterialSampleIdentifiersSection />
-                {materialSample.parentMaterialSample && (
-                  <SamplesView
-                    samples={[materialSample.parentMaterialSample]}
-                    fieldSetId={<DinaMessage id="parentMaterialSample" />}
-                  />
-                )}
 
                 {/* Custom Query View */}
                 <CustomQueryPageView
