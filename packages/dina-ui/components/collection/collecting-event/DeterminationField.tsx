@@ -242,55 +242,46 @@ export function DeterminationField({
                   className="non-strip"
                   sectionName="organism-determination-section"
                 >
-                  {/* determination scientific name is used for display readonly and edit plain string entry  */}
-
-                  {((!hideScientificNameInput &&
-                    (!scientificNameSrcDetailVal || isManualInput)) ||
-                    readOnly) && (
-                    <>
-                      <TextField
-                        {...fieldProps("scientificName")}
-                        readOnlyRender={(value, _form) => {
-                          const scientificNameSrcDetailUrlVal =
-                            _form.getFieldMeta(
-                              fieldProps("scientificNameDetails.sourceUrl").name
-                            ).value as string;
-                          return (
-                            <SelectedScientificNameView
-                              value={value}
-                              formik={_form}
-                              scientificNameDetailsField={
-                                fieldProps("scientificNameDetails").name
-                              }
-                              scientificNameSrcDetailUrlVal={
-                                scientificNameSrcDetailUrlVal
-                              }
-                            />
-                          );
-                        }}
-                        onChangeExternal={(_form, _, newVal) => {
-                          if (newVal && newVal?.trim().length > 0) {
-                            _form.setFieldValue(
-                              fieldProps("scientificNameSource").name,
-                              isManualInput ? "CUSTOM" : "GNA"
-                            );
-                          } else {
-                            if (!isManualInput) {
-                              _form.setFieldValue(
-                                fieldProps("scientificNameSource").name,
-                                null
-                              );
-                              _form.setFieldValue(
-                                fieldProps("scientificNameDetails").name,
-                                null
-                              );
-                            }
+                  <TextField
+                    {...fieldProps("scientificName")}
+                    readOnlyRender={(value, _form) => {
+                      const scientificNameSrcDetailUrlVal = _form.getFieldMeta(
+                        fieldProps("scientificNameDetails.sourceUrl").name
+                      ).value as string;
+                      return (
+                        <SelectedScientificNameView
+                          value={value}
+                          formik={_form}
+                          scientificNameDetailsField={
+                            fieldProps("scientificNameDetails").name
                           }
-                        }}
-                      />
-                      {!readOnly && <hr />}
-                    </>
-                  )}
+                          scientificNameSrcDetailUrlVal={
+                            scientificNameSrcDetailUrlVal
+                          }
+                        />
+                      );
+                    }}
+                    onChangeExternal={(_form, _, newVal) => {
+                      if (newVal && newVal?.trim().length > 0) {
+                        _form.setFieldValue(
+                          fieldProps("scientificNameSource").name,
+                          isManualInput ? "CUSTOM" : "GNA"
+                        );
+                      } else {
+                        if (!isManualInput) {
+                          _form.setFieldValue(
+                            fieldProps("scientificNameSource").name,
+                            null
+                          );
+                          _form.setFieldValue(
+                            fieldProps("scientificNameDetails").name,
+                            null
+                          );
+                        }
+                      }
+                    }}
+                  />
+                  {!readOnly && <hr />}
 
                   {/* determination scientific name search is used for search scientific name and display search result entry in edit mode */}
                   {!readOnly && (
@@ -300,14 +291,7 @@ export function DeterminationField({
                           ? "scientificNameInput"
                           : "scientificName"
                       )}
-                      label={
-                        isManualInput
-                          ? ""
-                          : hideScientificNameInput ||
-                            !!scientificNameSrcDetailVal
-                          ? formatMessage("field_scientificNameInput")
-                          : formatMessage("scientificNameSearch")
-                      }
+                      label={formatMessage("scientificNameSearch")}
                       scientificNameDetailsField={
                         fieldProps("scientificNameDetails").name
                       }

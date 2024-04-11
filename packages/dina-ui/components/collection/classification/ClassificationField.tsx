@@ -1,5 +1,6 @@
 import { LoadingSpinner } from "common-ui";
 import { useState } from "react";
+import { FaPlus } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import {
   ClassificationItem,
@@ -13,7 +14,6 @@ export interface IClassificationFieldProps {
   onChange?: (
     newValue?: (ClassificationItem & { isManual: boolean }) | null
   ) => void;
-
   initValue: ScientificNameSourceDetails;
 }
 
@@ -143,23 +143,44 @@ export function ClassificationField({
         {loading ? (
           <LoadingSpinner loading={loading} />
         ) : (
-          manualClassificationItems.map((item, idxKey) => {
-            const newOptions = getRankOptions(idxKey);
-            return (
-              <ClassificationInputRow
-                taxonomicRanOptions={newOptions}
-                value={item}
-                onAddRow={onAddRow}
-                onDeleteRow={onDeleteRow}
-                rowIndex={idxKey}
-                key={item.id}
-                showPlusIcon={true}
-                onChange={(value) => {
-                  onRowChange(idxKey, value);
+          <>
+            <div className="d-flex w-100 my-1">
+              <div className="w-100" />
+              <div className="w-100 ms-2" />
+              <div
+                style={{
+                  cursor: "pointer",
+                  marginTop: "0.3rem",
+                  maxWidth: "2.5rem"
                 }}
-              />
-            );
-          })
+              >
+                <FaPlus
+                  className="ms-2"
+                  onClick={onAddRow}
+                  size="2em"
+                  onMouseOver={(event) =>
+                    (event.currentTarget.style.color = "blue")
+                  }
+                  onMouseOut={(event) => (event.currentTarget.style.color = "")}
+                />
+              </div>
+            </div>
+            {manualClassificationItems.map((item, idxKey) => {
+              const newOptions = getRankOptions(idxKey);
+              return (
+                <ClassificationInputRow
+                  taxonomicRanOptions={newOptions}
+                  value={item}
+                  onDeleteRow={onDeleteRow}
+                  rowIndex={idxKey}
+                  key={item.id}
+                  onChange={(value) => {
+                    onRowChange(idxKey, value);
+                  }}
+                />
+              );
+            })}
+          </>
         )}
       </div>
     </div>

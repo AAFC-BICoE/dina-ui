@@ -1,18 +1,18 @@
 import { FieldWrapper, FieldWrapperProps, useDinaFormContext } from "common-ui";
 import { FormikProps } from "formik";
 
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { useState } from "react";
-import { isArray } from "lodash";
 import DOMPurify from "dompurify";
-import { GlobalNamesSearchBox } from "../global-names/GlobalNamesSearchBox";
+import { isArray } from "lodash";
+import { Dispatch, SetStateAction, useState } from "react";
 import Switch from "react-switch";
-import { Dispatch, SetStateAction } from "react";
 import {
   ScientificNameSource,
   ScientificNameSourceDetails
 } from "../../../../dina-ui/types/collection-api";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ClassificationField } from "../classification/ClassificationField";
+import { GlobalNamesSearchBox } from "../global-names/GlobalNamesSearchBox";
+
 export interface GlobalNamesFieldProps extends FieldWrapperProps {
   scientificNameSourceField?: string;
   onChange?: (selection: string | null, formik: FormikProps<any>) => void;
@@ -124,12 +124,10 @@ export function GlobalNamesField({
   );
 }
 interface GlobalNamesReadOnlyProps {
-  value: string;
   scientificNameDetails: ScientificNameSourceDetails;
 }
 
 export function GlobalNamesReadOnly({
-  value,
   scientificNameDetails
 }: GlobalNamesReadOnlyProps) {
   const [showMore, setShowMore] = useState(false);
@@ -203,7 +201,6 @@ export function GlobalNamesReadOnly({
 
   return (
     <div>
-      <span style={{ fontSize: "1.5rem" }}> {value} </span>
       {scientificNameDetails?.isSynonym && (
         <div className="flex-grow-1 d-flex align-items-center">
           <span className="me-2">Synonym of: </span>{" "}
@@ -245,14 +242,9 @@ export function getFieldValue(form, fieldName) {
     : null;
 }
 
-export function RenderAsReadonly({ value, form, scientificNameDetailsField }) {
+export function RenderAsReadonly({ form, scientificNameDetailsField }) {
   const scientificNameDetails = getFieldValue(form, scientificNameDetailsField);
-  return (
-    <GlobalNamesReadOnly
-      value={value}
-      scientificNameDetails={scientificNameDetails}
-    />
-  );
+  return <GlobalNamesReadOnly scientificNameDetails={scientificNameDetails} />;
 }
 
 export interface SelectedScientificNameViewProps {
@@ -290,7 +282,6 @@ export function SelectedScientificNameView(
     <div style={{ border: "1px solid #F5F5F5" }}>
       <div className="mt-2">
         <RenderAsReadonly
-          value={value}
           form={formik}
           scientificNameDetailsField={scientificNameDetailsField}
         />

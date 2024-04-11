@@ -1,13 +1,10 @@
 import { ClassificationItem } from "packages/dina-ui/types/collection-api";
 import { useState } from "react";
-import { FaMinus, FaPlus } from "react-icons/fa";
+import { FaMinus } from "react-icons/fa";
 import Select from "react-select";
 
 export interface ClassificationInputRowProps {
   rowIndex: number;
-  showPlusIcon?: boolean;
-  readOnly?: boolean;
-  onAddRow: () => void;
   onDeleteRow: (index) => void;
   taxonomicRanOptions: { label: string; value: string }[] | undefined;
   value: ClassificationItem;
@@ -16,9 +13,6 @@ export interface ClassificationInputRowProps {
 
 export function ClassificationInputRow({
   rowIndex,
-  showPlusIcon,
-  readOnly,
-  onAddRow,
   onDeleteRow,
   onChange,
   taxonomicRanOptions,
@@ -68,41 +62,21 @@ export function ClassificationInputRow({
           onChange={internalOnPathChange}
         />
       </div>
-      {!readOnly && (
-        <div
-          style={{
-            cursor: "pointer",
-            marginTop: "0.3rem",
-            maxWidth: "2.5rem"
-          }}
-        >
-          {rowIndex === 0 && showPlusIcon ? (
-            <>
-              {
-                <FaPlus
-                  className="ms-2"
-                  onClick={onAddRow}
-                  size="2em"
-                  onMouseOver={(event) =>
-                    (event.currentTarget.style.color = "blue")
-                  }
-                  onMouseOut={(event) => (event.currentTarget.style.color = "")}
-                />
-              }
-            </>
-          ) : (
-            <FaMinus
-              className="ms-2"
-              onClick={() => onDeleteRow(rowIndex)}
-              size="2em"
-              onMouseOver={(event) =>
-                (event.currentTarget.style.color = "blue")
-              }
-              onMouseOut={(event) => (event.currentTarget.style.color = "")}
-            />
-          )}
-        </div>
-      )}
+      <div
+        style={{
+          cursor: "pointer",
+          marginTop: "0.3rem",
+          maxWidth: "2.5rem"
+        }}
+      >
+        <FaMinus
+          className="ms-2"
+          onClick={() => onDeleteRow(rowIndex)}
+          size="2em"
+          onMouseOver={(event) => (event.currentTarget.style.color = "blue")}
+          onMouseOut={(event) => (event.currentTarget.style.color = "")}
+        />
+      </div>
     </div>
   );
 }
