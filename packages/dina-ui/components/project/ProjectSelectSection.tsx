@@ -81,7 +81,7 @@ export function ProjectsSelectField({
                       </Link>
                     </div>
                   )}
-                  id="projects"
+                  id="project"
                   disableSpanMargin={true}
                 />
               ))}

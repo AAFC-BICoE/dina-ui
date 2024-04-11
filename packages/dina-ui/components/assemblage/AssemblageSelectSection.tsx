@@ -81,7 +81,7 @@ export function AssemblageSelectField({
                       </Link>
                     </div>                   
                   )} 
-                  id="assemblages"
+                  id="assemblage"
                   disableSpanMargin={true}
                 />
               ))}

@@ -674,6 +674,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   projectAttachments: "Project Attachments",
   projectListTitle: "Projects",
   projects: "Projects",
+  project: "Project",
   protocolAttachments: "Protocol Attachments",
   protocolData: "Protocol Data",
   protocolListTitle: "Protocols",
@@ -845,6 +846,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnitTypeListTitle: "Storage Unit Types",
   storagesCreatedByMe: "Storages Created By Me",
   tags: "Tags",
+  tag: "Tag",
   target: "Target",
   template: "Template",
   thisWillRemoveYourTemplate:

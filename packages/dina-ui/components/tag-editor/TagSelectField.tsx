@@ -52,7 +52,7 @@ export function TagSelectField({
                     <span className="text-white">{tag}</span>
                   </div>
                 )}
-                id="tags"
+                id="tag"
                 disableSpanMargin={true}
               />
             ))}

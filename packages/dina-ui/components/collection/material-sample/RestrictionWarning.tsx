@@ -1,8 +1,10 @@
 import {
   FieldExtensionSelectField,
-  TextField
-} from "../../../../common-ui/lib";
+  TextField,
+  useDinaFormContext
+} from "common-ui";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { FaFileAlt } from "react-icons/fa";
 
 export interface RestrictionWarningProps {
   isRestrictionSelect?: boolean;
@@ -12,9 +14,10 @@ export interface RestrictionWarningProps {
 export function RestrictionWarning(props: RestrictionWarningProps) {
   const { isRestrictionSelect, isRestrictionRemarks } = props;
   const { formatMessage } = useDinaIntl();
+  const { readOnly, initialValues } = useDinaFormContext();
 
   return isRestrictionSelect ? (
-    <div className="d-flex flex-row flex-wrap gap-2">
+    <div className="d-flex flex-row flex-wrap gap-1">
       <FieldExtensionSelectField
         removeLabel={true}
         label={formatMessage("phacAnimalRGLevel")}
@@ -47,8 +50,20 @@ export function RestrictionWarning(props: RestrictionWarningProps) {
           path: "collection-api/extension/phac_cl"
         })}
       />
+      {readOnly && initialValues.restrictionRemarks && (
+        <div>
+          <div className="restrictionRemarks w-100">
+            <div className="card pill py-1 px-2 flex-row align-items-center gap-1 bg-danger">
+              <FaFileAlt className="text-white" />
+              <span className="text-white">
+                {initialValues.restrictionRemarks}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  ) : isRestrictionRemarks ? (
+  ) : isRestrictionRemarks && !readOnly ? (
     <div
       className="card text-white bg-danger py-1 px-2"
       style={{ width: "100%" }}
