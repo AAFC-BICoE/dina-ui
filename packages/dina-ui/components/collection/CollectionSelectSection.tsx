@@ -22,7 +22,10 @@ export function CollectionSelectSection({
 }: CollectionSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
-    <CollectionSelectField resourcePath={resourcePath} />
+    <CollectionSelectField 
+      resourcePath={resourcePath} 
+      className="mb-2"
+    />
   ) : (
     <div className={`${classNames} row`}>
       <DinaFormSection horizontal="flex">
@@ -87,17 +90,18 @@ export function CollectionSelectField({
             <FaInbox className="me-1" /> <DinaMessage id="collection" />
           </span>
         }
+        cannotBeChanged={true}
+        omitNullOption={true}
         readOnlyRender={(value, _) => (
             <div className="d-flex flex-row gap-2">
               <Tooltip 
                 visibleElement={(
                   <div
                     className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
-                    key={value.id}
                   >
                     <FaInbox/>
-                    <Link href={"/collection/collection/view?id=" + value.id}>
-                      <a>{value.name || value.id}{value.code ? ` (${value.code})` : ""}</a>
+                    <Link href={"/collection/collection/view?id=" + value?.id}>
+                      <a>{value?.name || value?.id}{value?.code ? ` (${value.code})` : ""}</a>
                     </Link>
                   </div>                    
                 )} 

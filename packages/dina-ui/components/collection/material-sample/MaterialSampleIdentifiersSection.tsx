@@ -1,6 +1,5 @@
 import {
   CheckBoxField,
-  DinaFormSection,
   FieldSet,
   StringArrayField,
   TextField,
@@ -8,7 +7,6 @@ import {
 } from "common-ui";
 import { useField } from "formik";
 import { useState } from "react";
-import { CollectionSelectField } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   IDENTIFIER_COMPONENT_NAME,
