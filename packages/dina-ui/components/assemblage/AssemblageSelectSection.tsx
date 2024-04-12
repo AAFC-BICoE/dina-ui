@@ -21,7 +21,9 @@ export function AssemblageSelectSection({
 }: AssemblageSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
-    <AssemblageSelectField resourcePath={resourcePath} />
+    <AssemblageSelectField 
+      resourcePath={resourcePath}
+    />
   ) : (
     <div className={`${classNames} row`}>
       <DinaFormSection horizontal="flex">
@@ -65,8 +67,8 @@ export function AssemblageSelectField({
           </span>
         }
         readOnlyRender={(value, _) =>
-          Array.isArray(value) ? (
-            <div className="d-flex flex-row gap-2">
+          (Array.isArray(value) && value.length !== 0) ? (
+            <div className="d-flex flex-row mb-3 me-2">
               {value.map((val, idx) => (
                 <Tooltip 
                   visibleElement={(

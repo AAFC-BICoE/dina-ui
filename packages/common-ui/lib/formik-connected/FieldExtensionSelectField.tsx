@@ -50,7 +50,7 @@ export function FieldExtensionSelectField(
           value ? (
             <Tooltip
               visibleElement={(
-                <div className="card pill py-1 px-2 flex-row align-items-center bg-danger">
+                <div className="card pill py-1 px-2 flex-row align-items-center bg-danger mb-2">
                   <FaExclamationTriangle className="text-white" />
                   <span className="text-white">
                     <strong>{fieldExtensionSelectFieldProps.label + ": "}</strong>{value?.value}

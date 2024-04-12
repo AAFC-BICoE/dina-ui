@@ -22,7 +22,7 @@ export function MaterialSampleBadges({
         <MaterialSampleStateWarning />
         <TagsAndRestrictionsSection />
       </div>
-      <div className="d-flex flex-row gap-2">
+      <div className="d-flex flex-row">
         <CollectionSelectSection />
         <ProjectSelectSection />
         <AssemblageSelectSection />

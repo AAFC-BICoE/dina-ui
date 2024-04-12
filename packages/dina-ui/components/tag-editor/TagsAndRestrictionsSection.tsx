@@ -29,22 +29,21 @@ export function TagsAndRestrictionsSection({
 
   return readOnly ? (
     <>
-      <div className="d-flex flex-column">
-        {((initialValues.restrictionFieldsExtension &&
-          initialValues.isRestricted) ||
-          initialValues.tags?.length > 0) && (
-          <div className="d-flex flex-row">
-            <div className="flex-grow-1">
-              <RestrictionWarning isRestrictionSelect={true} />
+      {(initialValues.restrictionFieldsExtension &&
+        initialValues.isRestricted) && (
+          <div className="d-flex flex-column">
+            <div className="d-flex flex-row">
+              <div className="flex-grow-1">
+                <RestrictionWarning isRestrictionSelect={true} />
+              </div>
             </div>
+            {initialValues.restrictionRemarks && (
+              <div className="d-flex flex-row ">
+                <RestrictionWarning isRestrictionRemarks={true} />
+              </div>
+            )}
           </div>
         )}
-        {initialValues.restrictionRemarks && (
-          <div className="d-flex flex-row ">
-            <RestrictionWarning isRestrictionRemarks={true} />
-          </div>
-        )}
-      </div>
     </>
   ) : (
     <div className="row">

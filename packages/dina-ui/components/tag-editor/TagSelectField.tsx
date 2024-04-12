@@ -14,6 +14,7 @@ import { components as reactSelectComponents } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { useFormikContext } from "formik";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
@@ -227,14 +228,21 @@ export function TagSelectReadOnly({
   tagsFieldName = "tags",
   groupSelectorName = "group"
 }: TagSelectReadOnlyProps) {
+  const { values } = useFormikContext<any>();
+
   return (
-    <div className="ms-auto">
-      <TagSelectField
-        resourcePath={resourcePath}
-        name={tagsFieldName}
-        removeLabel={true}
-        groupSelectorName={groupSelectorName}
-      />
-    </div>
+    <>
+      {values?.tags && values.tags.length !== 0 && (
+        <div className="ms-auto">
+          <TagSelectField
+            resourcePath={resourcePath}
+            name={tagsFieldName}
+            removeLabel={true}
+            groupSelectorName={groupSelectorName}
+            removeBottomMargin={true}
+          />
+        </div>        
+      )}
+    </>
   );
 }
