@@ -70,6 +70,7 @@ export function CollectionSelectField({
       <ResourceSelectField<Collection>
         key={String(isAdmin)}
         name="collection"
+        customName="collection"
         readOnlyLink="/collection/collection/view?id="
         filter={filter}
         model={resourcePath as any}
@@ -80,6 +81,7 @@ export function CollectionSelectField({
         hideLabel={readOnly}
         removeLabel={readOnly}
         removeBottomMargin={true}
+        disableTemplateCheckbox={true}
         label={
           <span>
             <FaInbox className="me-1" /> <DinaMessage id="collection" />
