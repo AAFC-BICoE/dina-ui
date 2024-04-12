@@ -111,13 +111,11 @@ export function DeterminationField({
         typeName={formatMessage("determination")}
         sectionId={id}
         initialIndex={initialIndex}
-        makeNewElement={() =>
-          ({
-            scientificName: "",
-            scientificNameDetails: null,
-            scientificNameSource: null
-          } as any)
-        }
+        makeNewElement={() => ({
+          scientificName: undefined,
+          scientificNameDetails: undefined,
+          scientificNameSource: undefined
+        })}
         renderTab={(det, index) => (
           <span className="m-3">
             {index + 1}

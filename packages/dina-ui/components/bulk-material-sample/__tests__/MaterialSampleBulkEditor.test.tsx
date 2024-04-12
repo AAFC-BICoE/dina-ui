@@ -1,3 +1,4 @@
+import { deleteFromStorage } from "@rehooks/local-storage";
 import Cleave from "cleave.js/react";
 import {
   DoOperationsError,
@@ -8,24 +9,22 @@ import { InputResource, PersistedResource } from "kitsu";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { default as ReactSwitch, default as Switch } from "react-switch";
-import { AttachmentsEditor } from "../..";
+import { AttachmentsEditor, SAMPLE_FORM_TEMPLATE_KEY } from "../..";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
-  blankMaterialSample,
   COLLECTING_EVENT_COMPONENT_NAME,
   FormTemplate,
   IDENTIFIER_COMPONENT_NAME,
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
-  MaterialSample,
   MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+  MaterialSample,
   ORGANISMS_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  StorageUnit
+  StorageUnit,
+  blankMaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
-import { deleteFromStorage } from "@rehooks/local-storage";
-import { SAMPLE_FORM_TEMPLATE_KEY } from "../..";
 
 const TEST_COLLECTING_EVENT = {
   id: "col-event-1",
@@ -1853,7 +1852,10 @@ describe("MaterialSampleBulkEditor", () => {
         determination: [
           {
             verbatimScientificName: "new-scientific-name",
-            determiner: undefined
+            determiner: undefined,
+            scientificName: undefined,
+            scientificNameDetails: undefined,
+            scientificNameSource: undefined
           }
         ],
         type: "organism",
