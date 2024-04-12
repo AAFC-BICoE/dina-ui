@@ -600,12 +600,14 @@ export function useMaterialSampleSave({
               const firstEmptyIndex = pathArray.findIndex(
                 (path, index) => path === "" && rankArray[index] === ""
               );
-              dtm.scientificNameDetails.classificationRanks = rankArray
-                .slice(0, firstEmptyIndex)
-                .join("|");
-              dtm.scientificNameDetails.classificationPath = pathArray
-                .slice(0, firstEmptyIndex)
-                .join("|");
+              if (firstEmptyIndex > -1) {
+                dtm.scientificNameDetails.classificationRanks = rankArray
+                  .slice(0, firstEmptyIndex)
+                  .join("|");
+                dtm.scientificNameDetails.classificationPath = pathArray
+                  .slice(0, firstEmptyIndex)
+                  .join("|");
+              }
             }
           });
         }

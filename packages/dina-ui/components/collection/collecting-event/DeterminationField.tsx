@@ -111,7 +111,13 @@ export function DeterminationField({
         typeName={formatMessage("determination")}
         sectionId={id}
         initialIndex={initialIndex}
-        makeNewElement={() => ({})}
+        makeNewElement={() =>
+          ({
+            scientificName: "",
+            scientificNameDetails: null,
+            scientificNameSource: null
+          } as any)
+        }
         renderTab={(det, index) => (
           <span className="m-3">
             {index + 1}
@@ -265,7 +271,7 @@ export function DeterminationField({
                       if (newVal && newVal?.trim().length > 0) {
                         _form.setFieldValue(
                           fieldProps("scientificNameSource").name,
-                          isManualInput ? "CUSTOM" : "GNA"
+                          isManualInput ? "CUSTOM" : null
                         );
                       } else {
                         if (!isManualInput) {
@@ -310,8 +316,8 @@ export function DeterminationField({
                           formik.setFieldValue(
                             fieldProps("scientificNameDetails").name,
                             newValue &&
-                              newValue["classificationRanks"] &&
-                              newValue["classificationPath"]
+                              (newValue["classificationRanks"] ||
+                                newValue["classificationPath"])
                               ? pick(newValue, [
                                   "classificationRanks",
                                   "classificationPath"
