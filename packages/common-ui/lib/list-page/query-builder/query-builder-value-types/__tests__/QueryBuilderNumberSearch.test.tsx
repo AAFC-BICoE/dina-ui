@@ -448,6 +448,54 @@ describe("QueryBuilderNumberSearch", () => {
         expect(result).toBe(true);
         expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
       });
+
+      it('should return validation error for "in" operator with non-numbers', () => {
+        const result = validateNumber('myNumber', '10, apple, -3', 'in', formatMessage);
+        expect(result).toEqual({
+          errorMessage: 'Mocked error message',
+          fieldName: 'myNumber',
+        });
+        expect(formatMessage).toHaveBeenCalledWith({ id: 'numberInRangeInvalid' }); // Specific error message called
+      });
+
+      it('should return validation error for "in" operator with single non-number', () => {
+        const result = validateNumber('myNumber', 'apple', 'in', formatMessage);
+        expect(result).toEqual({
+          errorMessage: 'Mocked error message',
+          fieldName: 'myNumber',
+        });
+        expect(formatMessage).toHaveBeenCalledWith({ id: 'numberInRangeInvalid' }); // Specific error message called
+      });
+
+      it('should return true for valid "in" operator values', () => {
+        const result = validateNumber('myNumber', '1, -5, 3.5, ', 'in', formatMessage);
+        expect(result).toBe(true);
+        expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+      });
+
+      it('should return validation error for "in" operator with non-numbers', () => {
+        const result = validateNumber('myNumber', '10, apple, -3', 'notIn', formatMessage);
+        expect(result).toEqual({
+          errorMessage: 'Mocked error message',
+          fieldName: 'myNumber',
+        });
+        expect(formatMessage).toHaveBeenCalledWith({ id: 'numberInRangeInvalid' }); // Specific error message called
+      });
+
+      it('should return validation error for "in" operator with single non-number', () => {
+        const result = validateNumber('myNumber', 'apple', 'notIn', formatMessage);
+        expect(result).toEqual({
+          errorMessage: 'Mocked error message',
+          fieldName: 'myNumber',
+        });
+        expect(formatMessage).toHaveBeenCalledWith({ id: 'numberInRangeInvalid' }); // Specific error message called
+      });
+
+      it('should return true for valid "in" operator values', () => {
+        const result = validateNumber('myNumber', '1, -5, 3.5, ', 'notIn', formatMessage);
+        expect(result).toBe(true);
+        expect(formatMessage).not.toHaveBeenCalled(); // No error message formatting should occur
+      });
     });
 
     describe("Edge cases", () => {

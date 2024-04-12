@@ -4,14 +4,16 @@ import {
   includedTypeQuery,
   rangeQuery,
   existsQuery,
-  betweenQuery
+  betweenQuery,
+  inQuery,
+  inDateQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { DATE_REGEX_NO_TIME, DATE_REGEX_PARTIAL } from "common-ui";
 import { convertStringToBetweenState, useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
 import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
-import { Config } from "react-awesome-query-builder";
 import moment from "moment";
+import { useIntl } from "react-intl";
 
 interface QueryBuilderDateSearchProps {
   /**
@@ -36,6 +38,8 @@ export default function QueryBuilderDateSearch({
   setValue
 }: QueryBuilderDateSearchProps) {
 
+  const { formatMessage } = useIntl();
+
   const { BetweenElement } = useQueryBetweenSupport({
     type: "date",
     matchType,
@@ -45,48 +49,60 @@ export default function QueryBuilderDateSearch({
 
   return (
     <>
-      {matchType !== "empty" && matchType !== "notEmpty" && matchType !== "in" && matchType !== "notIn" && (
+      {matchType !== "empty" && matchType !== "notEmpty" && (
         <>
           {matchType === "between" ? (
             BetweenElement
           ) : (
-            <DatePicker
-              className="form-control"
-              value={value}
-              onChange={(newDate: Date, event) => {
-                if (
-                  !event ||
-                  event?.type === "click" ||
-                  event?.type === "keydown"
-                ) {
-                  setValue?.(newDate && newDate.toISOString().slice(0, 10));
-                }
-              }}
-              onChangeRaw={(event) => {
-                if (event?.type === "change") {
-                  let newText = event.target.value;
-                  const dashOccurrences = newText.split("-").length - 1;
-                  if (newText.length === 8 && dashOccurrences === 0) {
-                    newText =
-                      newText.slice(0, 4) +
-                      "-" +
-                      newText.slice(4, 6) +
-                      "-" +
-                      newText.slice(6);
-                  }
-                  setValue?.(newText);
-                }
-              }}
-              dateFormat="yyyy-MM-dd"
-              placeholderText="YYYY-MM-DD"
-              isClearable={true}
-              showYearDropdown={true}
-              todayButton="Today"
-            />            
+            <>
+              {(matchType !== "in" && matchType !== "notIn") ? (
+                <DatePicker
+                  className="form-control"
+                  value={value}
+                  onChange={(newDate: Date, event) => {
+                    if (
+                      !event ||
+                      event?.type === "click" ||
+                      event?.type === "keydown"
+                    ) {
+                      setValue?.(newDate && newDate.toISOString().slice(0, 10));
+                    }
+                  }}
+                  onChangeRaw={(event) => {
+                    if (event?.type === "change") {
+                      let newText = event.target.value;
+                      const dashOccurrences = newText.split("-").length - 1;
+                      if (newText.length === 8 && dashOccurrences === 0) {
+                        newText =
+                          newText.slice(0, 4) +
+                          "-" +
+                          newText.slice(4, 6) +
+                          "-" +
+                          newText.slice(6);
+                      }
+                      setValue?.(newText);
+                    }
+                  }}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="YYYY-MM-DD"
+                  isClearable={true}
+                  showYearDropdown={true}
+                  todayButton="Today"
+                />
+              ) : (
+                <input
+                type={"text"}
+                value={value ?? ""}
+                onChange={(newValue) => setValue?.(newValue?.target?.value)}
+                className="form-control"
+                placeholder={formatMessage({
+                  id: "queryBuilder_value_in_placeholder"
+                })}
+              /> 
+              )}
+            </>
           )}
-
         </>
-
       )}
     </>
   );
@@ -139,6 +155,11 @@ export function transformDateSearchToDSL({
     // Between operator (range)
     case "between":
       return betweenQuery(fieldPath, value, parentType, "date", subType);
+
+    // List of dates, comma-separated.
+    case "in":
+    case "notIn":
+      return inDateQuery(fieldPath, value, parentType, subType, operation === "notIn");
 
     // Not equals match type.
     case "notEquals":
@@ -331,10 +352,10 @@ export function getTimezone() {
  * @param subType subtype of the date, used to determine if timezone should be included.
  * @returns numerical operator and value.
  */
-function buildDateRangeObject(matchType, value, subType) {
+export function buildDateRangeObject(matchType, value, subType) {
   // Local date does not store timezone, ignore it.
   const timezone =
-    subType !== "local_date" && subType !== "local_date_time"
+    subType === "date_time"
       ? getTimezone()
       : undefined;
 
@@ -451,6 +472,25 @@ export function validateDate(
           errorMessage: formatMessage({ id: "dateBetweenInvalid" }),
           fieldName
         }
+      }
+      break;
+
+    case "in":
+    case "notIn":
+      // Retrieve all of the potential dates, by spliting by commas and removing leading/trailing whitespace.
+      let invalidDateFound = false;
+      value.split(",").map(item => item.trim()).forEach((value) => {
+        if (!DATE_REGEX_NO_TIME.test(value) && value !== "") {
+          invalidDateFound = true;
+        }
+      });
+
+      // If an invalid number was found, return an error message.
+      if (invalidDateFound) {
+        return {
+          errorMessage: formatMessage({ id: "dateInRangeInvalid" }),
+          fieldName
+        };
       }
       break;
   }

@@ -299,6 +299,7 @@ export function validateNumber(
       }
       break;
 
+    // Between validation
     case "between":
       const betweenStates = convertStringToBetweenState(value);
       if (betweenStates.low === "" && betweenStates.high === "") return true;
@@ -323,6 +324,25 @@ export function validateNumber(
           errorMessage: formatMessage({ id: "numberBetweenInvalid" }),
           fieldName
         }
+      }
+      break;
+
+    case "in":
+    case "notIn":
+      // Retrieve all of the potential numbers, by spliting by commas and removing leading/trailing whitespace.
+      let invalidNumberFound = false;
+      value.split(",").map(item => item.trim()).forEach((value) => {
+        if (!NUMBER_REGEX.test(value) && value !== "") {
+          invalidNumberFound = true;
+        }
+      });
+
+      // If an invalid number was found, return an error message.
+      if (invalidNumberFound) {
+        return {
+          errorMessage: formatMessage({ id: "numberInRangeInvalid" }),
+          fieldName
+        };
       }
       break;
   }
