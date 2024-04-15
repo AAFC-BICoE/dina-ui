@@ -5,10 +5,13 @@ import { useColumnMapping } from "../column-mapping/useColumnMapping";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
+
+  onChangeRelatedRecord: (columnHeader: string, fieldValue: string, relatedRecord: string) => void;
 }
 
 export function RelationshipFieldMapping({
-  sheetIndex
+  sheetIndex,
+  onChangeRelatedRecord
 }: RelationshipFieldMappingProps) {
   const { columnUniqueValues, type, workbookColumnMap, relationshipMapping } =
     useWorkbookContext();
@@ -67,7 +70,7 @@ export function RelationshipFieldMapping({
                 <div className="col-3">{fieldValue}</div>
                 <div className="col-3">{counts[fieldValue]}</div>
                 <div className="col-3">
-                  {getResourceSelectField(columnName, fieldPath, fieldValue)}
+                  {getResourceSelectField(onChangeRelatedRecord, columnName, fieldPath, fieldValue)}
                 </div>
               </div>
             ));

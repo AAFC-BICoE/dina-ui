@@ -457,9 +457,10 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
   }
 
   function getResourceSelectField(
+    onChangeRelatedRecord: (columnHeader: string, fieldValue: string, relatedRecord: string) => void,
     columnHeader: string,
     fieldPath?: string,
-    fieldValue?: string
+    fieldValue?: string,
   ) {
     if (!fieldPath || !fieldValue) {
       return undefined;
@@ -535,6 +536,9 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
             isClearable: true,
             menuPortalTarget: document.body,
             styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+          }}
+          onChange={(newValue) => {
+            onChangeRelatedRecord(columnHeader, fieldValue, newValue as string);
           }}
         />
 

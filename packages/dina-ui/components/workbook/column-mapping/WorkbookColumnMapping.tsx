@@ -404,6 +404,31 @@ export function WorkbookColumnMapping({
     setRelationshipMapping(newRelationshipMapping);
   }
 
+  /**
+   * When the dropdown value is changed in the relationship mapping section.
+   * 
+   * This will update the relationship mapping to contain the new uuid values.
+   * 
+   * @param columnHeader The spreadsheet column it's being mapped
+   * @param fieldValue The value in the spreadsheet that the related record is being mapped
+   * @param relatedRecord The UUID of the resource selected in the relationship mapping dropdown
+   */
+  async function onRelatedRecordChange(
+    columnHeader: string,
+    fieldValue: string,
+    relatedRecord: string
+  ) {
+    if (relationshipMapping) {
+      setRelationshipMapping({
+        ...relationshipMapping,
+        [columnHeader]: {
+          ...relationshipMapping?.[columnHeader],
+          [fieldValue]: relatedRecord
+        }
+      });
+    }
+  }
+
   return loading || fieldMap.length === 0 ? (
     <LoadingSpinner loading={loading} />
   ) : (
@@ -498,7 +523,7 @@ export function WorkbookColumnMapping({
                 </Card.Body>
               </Card>
 
-              <RelationshipFieldMapping sheetIndex={sheet} />
+              <RelationshipFieldMapping onChangeRelatedRecord={onRelatedRecordChange} sheetIndex={sheet} />
             </>
           );
         }}
