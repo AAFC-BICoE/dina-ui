@@ -5,18 +5,23 @@ import { useColumnMapping } from "../column-mapping/useColumnMapping";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
-
   onChangeRelatedRecord: (columnHeader: string, fieldValue: string, relatedRecord: string, targetType: string) => void;
+  groupName: string;
 }
 
 export function RelationshipFieldMapping({
   sheetIndex,
-  onChangeRelatedRecord
+  onChangeRelatedRecord,
+  groupName
 }: RelationshipFieldMappingProps) {
   const { columnUniqueValues, type, workbookColumnMap, relationshipMapping } =
     useWorkbookContext();
   const selectedType = type ?? "material-sample";
-  const { getResourceSelectField } = useColumnMapping(sheetIndex, selectedType);
+  const { getResourceSelectField } = useColumnMapping(
+    groupName,
+    sheetIndex,
+    selectedType
+  );
 
   return columnUniqueValues && columnUniqueValues[sheetIndex] ? (
     <Card
