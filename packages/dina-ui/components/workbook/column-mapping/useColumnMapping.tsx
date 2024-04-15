@@ -461,19 +461,19 @@ export function useColumnMapping(
   }
 
   function getResourceSelectField(
+    onChangeRelatedRecord: (columnHeader: string, fieldValue: string, relatedRecord: string, targetType: string) => void,
     columnHeader: string,
     fieldPath?: string,
-    fieldValue?: string
+    fieldValue?: string,
   ) {
     if (!fieldPath || !fieldValue) {
       return undefined;
     }
+
     const selectElemName = `relationshipMapping.${columnHeader
       .trim()
       .replaceAll(".", "_")}.${fieldValue}.id`;
-    const hiddenElemName = `relationshipMapping.${columnHeader
-      .trim()
-      .replaceAll(".", "_")}.${fieldValue}.type`;
+
     let options: any[] = [];
     let targetType: string = "";
     switch (fieldPath) {
@@ -540,9 +540,10 @@ export function useColumnMapping(
             menuPortalTarget: document.body,
             styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
           }}
+          onChange={(newValue) => {
+            onChangeRelatedRecord(columnHeader, fieldValue, newValue as string, targetType);
+          }}
         />
-
-        <input type="hidden" name={hiddenElemName} value={targetType} />
       </>
     );
   }
