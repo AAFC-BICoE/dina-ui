@@ -6,7 +6,7 @@ import { useColumnMapping } from "../column-mapping/useColumnMapping";
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
 
-  onChangeRelatedRecord: (columnHeader: string, fieldValue: string, relatedRecord: string) => void;
+  onChangeRelatedRecord: (columnHeader: string, fieldValue: string, relatedRecord: string, targetType: string) => void;
 }
 
 export function RelationshipFieldMapping({

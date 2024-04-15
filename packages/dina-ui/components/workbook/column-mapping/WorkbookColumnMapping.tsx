@@ -189,7 +189,7 @@ export function WorkbookColumnMapping({
       await startSavingWorkbook(
         resources,
         workbookColumnMap,
-        submittedValues.relationshipMapping,
+        relationshipMapping as RelationshipMapping,
         submittedValues.group,
         type,
         baseApiPath
@@ -416,14 +416,18 @@ export function WorkbookColumnMapping({
   async function onRelatedRecordChange(
     columnHeader: string,
     fieldValue: string,
-    relatedRecord: string
+    relatedRecord: string,
+    targetType: string
   ) {
     if (relationshipMapping) {
       setRelationshipMapping({
         ...relationshipMapping,
         [columnHeader]: {
           ...relationshipMapping?.[columnHeader],
-          [fieldValue]: relatedRecord
+          [fieldValue]: {
+            id: relatedRecord,
+            type: targetType
+          }
         }
       });
     }
