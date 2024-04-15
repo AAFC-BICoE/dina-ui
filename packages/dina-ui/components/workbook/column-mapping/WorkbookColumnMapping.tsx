@@ -20,6 +20,7 @@ import {
   useWorkbookContext
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { WorkbookDisplay } from "../WorkbookDisplay";
 import { RelationshipFieldMapping } from "../relationship-mapping/RelationshipFieldMapping";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
@@ -82,6 +83,9 @@ export function WorkbookColumnMapping({
     label: string;
     value: string;
   } | null>(entityTypes[0]);
+  const [groupName, setGroupName] = useState(
+    groupNames && groupNames.length > 0 ? groupNames[0] : ""
+  );
 
   const {
     convertWorkbook,
@@ -102,7 +106,11 @@ export function WorkbookColumnMapping({
     workbookColumnMap,
     relationshipMapping,
     resolveColumnMappingAndRelationshipMapping
-  } = useColumnMapping(sheet, selectedType?.value || "material-sample");
+  } = useColumnMapping(
+    groupName,
+    sheet,
+    selectedType?.value || "material-sample"
+  );
 
   const buttonBar = (
     <>
@@ -402,7 +410,7 @@ export function WorkbookColumnMapping({
         type: selectedType?.value || "material-sample",
         fieldMap,
         relationshipMapping,
-        group: groupNames && groupNames.length > 0 ? groupNames[0] : undefined
+        group: groupName
       }}
       innerRef={formRef}
       onSubmit={onSubmit}
@@ -444,6 +452,19 @@ export function WorkbookColumnMapping({
                         }}
                       />
                     </FieldWrapper>
+                    <GroupSelectField
+                      name="group"
+                      enableStoredDefaultGroup={true}
+                      hideWithOnlyOneGroup={false}
+                      className="flex-grow-1"
+                      onChange={(newGroup) => setGroupName(newGroup)}
+                      selectProps={{
+                        menuPortalTarget: document.body,
+                        styles: {
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                        }
+                      }}
+                    />
                   </div>
                 </Card.Body>
               </Card>
@@ -487,7 +508,10 @@ export function WorkbookColumnMapping({
                 </Card.Body>
               </Card>
 
-              <RelationshipFieldMapping sheetIndex={sheet} />
+              <RelationshipFieldMapping
+                sheetIndex={sheet}
+                groupName={groupName}
+              />
             </>
           );
         }}
