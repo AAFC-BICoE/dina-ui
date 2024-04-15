@@ -36,7 +36,11 @@ import {
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
 
-export function useColumnMapping(sheet: number, selectedType?: string) {
+export function useColumnMapping(
+  groupName: string,
+  sheet: number,
+  selectedType?: string
+) {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
   const {
@@ -71,10 +75,10 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
       return [];
     }
   }, [spreadsheetData]);
-  const { isAdmin, groupNames } = useAccount();
+  const { isAdmin } = useAccount();
   const groupFilter = !isAdmin
     ? {
-        rsql: `group=in=(${groupNames})`
+        rsql: `group==${groupName}`
       }
     : undefined;
 
