@@ -20,9 +20,11 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
   marginBottom?: boolean;
+
+  centered?: boolean;
 }
 
-export function Nav({ marginBottom = true }: NavProps) {
+export function Nav({ marginBottom = true, centered = false }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
   const instanceContext = useInstanceContext();
@@ -40,15 +42,15 @@ export function Nav({ marginBottom = true }: NavProps) {
       <SkipLinks />
 
       <header className={marginBottom ? "mb-4" : undefined}>
-        <Container fluid={true}>
-          <Row xs={1} md={2} className="header-container row d-flex px-5">
+        <Container fluid={true} className={centered ? "centered" : ""}>
+          <Row xs={1} md={2} className={"header-container row d-flex " + (!centered ? "px-5" : "")}>
             {/* Left section of the header */}
-            <Col className="px-1">
+            <Col className={!centered ? "px-1" : ""}>
               <GovernmentLogo />
             </Col>
 
             {/* Right section of the header */}
-            <Col className="px-1 text-end">
+            <Col className={"text-end " + (!centered ? "px-1" : "")}>
               <ul className="list-inline mt-1 mb-1">
                 <li className="list-inline-item mr-1 my-auto">
                   <FeedbackButton />
@@ -67,7 +69,7 @@ export function Nav({ marginBottom = true }: NavProps) {
           </Row>
         </Container>
         <Navbar className="app-bar" expand="lg">
-          <Container fluid={true} className="px-5">
+          <Container fluid={true} className={centered ? "centered" : "px-5"}>
             <Link href="/" passHref={true}>
               <Navbar.Brand href="/" className="app-name">
                 {instanceMode === "PROD" || !instanceMode ? (

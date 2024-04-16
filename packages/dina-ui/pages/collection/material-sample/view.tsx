@@ -146,7 +146,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
         const materialSample = withOrganismEditorValues(materialSampleData);
         const buttonBar = id && (
-          <ButtonBar className="flex">
+          <ButtonBar className="flex" centered={true}>
             <BackButton
               entityId={id}
               entityLink="/collection/material-sample"
@@ -210,14 +210,14 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 primaryID: materialSample?.materialSampleName
               })}
             />
-            <Nav />
-            <main className="container-fluid">
-              <DinaForm<MaterialSample>
-                initialValues={materialSample}
-                readOnly={true}
-                formTemplate={sampleFormTemplate}
-              >
-                {buttonBar}
+            <Nav marginBottom={false} centered={true} />
+            <DinaForm<MaterialSample>
+              initialValues={materialSample}
+              readOnly={true}
+              formTemplate={sampleFormTemplate}
+            >        
+              {buttonBar}    
+              <main className="container-fluid centered">
                 <MaterialSampleStateWarning />
 
                 {/* Material Sample Hierarchy */}
@@ -412,9 +412,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     )}
                   </Field>
                 </div>
-              </DinaForm>
-              {buttonBar}
-            </main>
+              </main>
+            </DinaForm>
           </>
         );
       })}
