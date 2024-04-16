@@ -1,4 +1,4 @@
-import { PersistedResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { chain, pick, startCase } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -35,6 +35,8 @@ import {
   getColumnHeaders
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
+
+type RelationshipResource = { name?: string } & KitsuResource;
 
 export function useColumnMapping(
   groupName: string,
@@ -99,51 +101,39 @@ export function useColumnMapping(
       ]
     })("")
   });
+
   const { loading: collectionLoading, response: collectionResp } = useQuery<
-    Collection[]
+    RelationshipResource[]
   >({
-    path: "collection-api/collection",
-    filter: groupFilter
-  });
-  const { loading: collEventLoading, response: collEventResp } = useQuery<
-    CollectingEvent[]
-  >({
-    path: "collection-api/collecting-event",
-    filter: groupFilter
+    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=collection`
   });
   const { loading: preparationTypeLoading, response: preparationTypeResp } =
-    useQuery<PreparationType[]>({
-      path: "collection-api/preparation-type",
-      filter: groupFilter
+    useQuery<RelationshipResource[]>({
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-type`
     });
   const { loading: preparationMethodLoading, response: preparationMethodResp } =
-    useQuery<PreparationMethod[]>({
-      path: "collection-api/preparation-method",
-      filter: groupFilter
+    useQuery<RelationshipResource[]>({
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-method`
     });
   const { loading: protocolLoading, response: protocolResp } = useQuery<
-    Protocol[]
+    RelationshipResource[]
   >({
-    path: "collection-api/protocol",
-    filter: groupFilter
+    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=protocol`
   });
   const { loading: storageUnitLoading, response: storageUnitResp } = useQuery<
-    StorageUnit[]
+    RelationshipResource[]
   >({
-    path: "collection-api/storage-unit",
-    filter: groupFilter
+    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=storage-unit`
   });
   const { loading: projectLoading, response: projectResp } = useQuery<
-    Project[]
+    RelationshipResource[]
   >({
-    path: "collection-api/project",
-    filter: groupFilter
+    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=project`
   });
 
   const loadingData =
     attrLoading ||
     collectionLoading ||
-    collEventLoading ||
     preparationTypeLoading ||
     preparationMethodLoading ||
     protocolLoading ||
@@ -152,7 +142,6 @@ export function useColumnMapping(
 
   const managedAttributes = attrResp?.data || [];
   const collections = collectionResp?.data || [];
-  const collectingEvents = collEventResp?.data || [];
   const preparationTypes = preparationTypeResp?.data || [];
   const preparationMethods = preparationMethodResp?.data || [];
   const protocols = protocolResp?.data || [];
