@@ -197,7 +197,7 @@ export function WorkbookColumnMapping({
       await startSavingWorkbook(
         resources,
         workbookColumnMap,
-        submittedValues.relationshipMapping,
+        relationshipMapping as RelationshipMapping,
         submittedValues.group,
         type,
         baseApiPath
@@ -397,8 +397,48 @@ export function WorkbookColumnMapping({
         columnName,
         newFieldPath
       );
+
+    // Clear the current data for relationship mapping if possible.
+    if (formRef) {
+      const relationshipMappingsToBeChanged = (formRef as any)?.current?.values?.relationshipMapping?.[columnName];
+      if (relationshipMappingsToBeChanged) {
+        for (const key in relationshipMappingsToBeChanged) {
+          relationshipMappingsToBeChanged[key] = {};
+        }        
+      }
+    }
+
     setColumnMap(newWorkbookColumnMap);
     setRelationshipMapping(newRelationshipMapping);
+  }
+
+  /**
+   * When the dropdown value is changed in the relationship mapping section.
+   * 
+   * This will update the relationship mapping to contain the new uuid values.
+   * 
+   * @param columnHeader The spreadsheet column it's being mapped
+   * @param fieldValue The value in the spreadsheet that the related record is being mapped
+   * @param relatedRecord The UUID of the resource selected in the relationship mapping dropdown
+   */
+  async function onRelatedRecordChange(
+    columnHeader: string,
+    fieldValue: string,
+    relatedRecord: string,
+    targetType: string
+  ) {
+    if (relationshipMapping) {
+      setRelationshipMapping({
+        ...relationshipMapping,
+        [columnHeader]: {
+          ...relationshipMapping?.[columnHeader],
+          [fieldValue]: {
+            id: relatedRecord,
+            type: targetType
+          }
+        }
+      });
+    }
   }
 
   return loading || fieldMap.length === 0 ? (
@@ -511,6 +551,7 @@ export function WorkbookColumnMapping({
               <RelationshipFieldMapping
                 sheetIndex={sheet}
                 groupName={groupName}
+                onChangeRelatedRecord={onRelatedRecordChange}
               />
             </>
           );
