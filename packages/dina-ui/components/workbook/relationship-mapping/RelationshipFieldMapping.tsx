@@ -2,6 +2,8 @@ import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useWorkbookContext } from "../WorkbookProvider";
 import { useColumnMapping } from "../column-mapping/useColumnMapping";
+import { useEffect } from "react";
+import { useFormikContext } from "formik";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
@@ -22,6 +24,16 @@ export function RelationshipFieldMapping({
     sheetIndex,
     selectedType
   );
+
+  const { setValues } = useFormikContext();
+
+  // When the relationship mapping changes, it should update the formik values.
+  useEffect(() => {
+    setValues((values, _validated) => ({
+      ...values,
+      relationshipMapping
+    }));
+  }, [relationshipMapping]);
 
   return columnUniqueValues && columnUniqueValues[sheetIndex] ? (
     <Card

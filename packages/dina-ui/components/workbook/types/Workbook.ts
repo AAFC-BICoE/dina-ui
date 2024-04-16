@@ -115,6 +115,6 @@ export interface RelationshipMapping {
     [value: string]: {
       id: string,
       type: string
-    };
+    } | undefined;
   };
 }
