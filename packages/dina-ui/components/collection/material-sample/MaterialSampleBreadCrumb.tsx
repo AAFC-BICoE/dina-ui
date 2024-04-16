@@ -56,7 +56,6 @@ export function MaterialSampleBreadCrumb({
           ) : (
             <div className="d-inline-flex flex-row align-items-center">
               <span>{displayName}</span>
-              <NotPubliclyReleasableWarning />
             </div>
           )}
         </strong>
@@ -75,7 +74,12 @@ export function MaterialSampleBreadCrumb({
               </DinaFormSection>
             </h6>
           ) : (
-            <GroupLabel groupName={materialSample?.group} />
+            <div className="d-inline-flex flex-row align-self-end">
+              <span className="header-group-text">
+                <GroupLabel groupName={materialSample?.group} />
+              </span>
+              <NotPubliclyReleasableWarning />
+            </div>
           ))}
       </h1>
 
