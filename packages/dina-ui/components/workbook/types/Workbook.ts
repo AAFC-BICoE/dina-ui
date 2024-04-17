@@ -44,6 +44,7 @@ export interface PrimitiveField {
     | WorkbookDataTypeEnum.STRING_ARRAY
     | WorkbookDataTypeEnum.NUMBER_ARRAY
     | WorkbookDataTypeEnum.BOOLEAN_ARRAY;
+  isMappable?: boolean;
 }
 
 export interface ManagedAttributeField {

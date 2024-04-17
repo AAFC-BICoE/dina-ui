@@ -54,7 +54,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true }
       }
     },
     collectingEvent: {
@@ -124,7 +124,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
             baseApiPath: "/collection-api"
           },
           attributes: {
-            name: { dataType: WorkbookDataTypeEnum.STRING }
+            name: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true }
           }
         },
         protocol: {
@@ -136,7 +136,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
             baseApiPath: "/collection-api"
           },
           attributes: {
-            name: { dataType: WorkbookDataTypeEnum.STRING },
+            name: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true },
             protocolType: { dataType: WorkbookDataTypeEnum.STRING }
           }
         },
@@ -149,7 +149,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
             baseApiPath: "agent-api"
           },
           attributes: {
-            displayName: { dataType: WorkbookDataTypeEnum.STRING }
+            displayName: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true }
           }
         }
       }
@@ -163,7 +163,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true }
       }
     },
     preparationMethod: {
@@ -175,7 +175,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true }
       }
     },
     preparationProtocol: {
@@ -187,7 +187,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING },
+        name: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true },
         protocolType: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
@@ -200,7 +200,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "agent-api"
       },
       attributes: {
-        displayName: { dataType: WorkbookDataTypeEnum.STRING }
+        displayName: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true }
       }
     },
     storageUnit: {
@@ -212,7 +212,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true }
       }
     },
     projects: {
@@ -224,7 +224,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true }
       }
     },
     organism: {
@@ -260,7 +260,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/collection-api"
       },
       attributes: {
-        materialSampleName: { dataType: WorkbookDataTypeEnum.STRING }
+        materialSampleName: { dataType: WorkbookDataTypeEnum.STRING, isMappable: true }
       }
     }
   }
