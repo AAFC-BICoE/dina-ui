@@ -2,7 +2,7 @@ import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useWorkbookContext } from "../WorkbookProvider";
 import { useColumnMapping } from "../column-mapping/useColumnMapping";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useFormikContext } from "formik";
 
 export interface RelationshipFieldMappingProps {
@@ -25,7 +25,7 @@ export function RelationshipFieldMapping({
     selectedType
   );
 
-  const { setValues } = useFormikContext();
+  const { setValues, values } = useFormikContext();
 
   // When the relationship mapping changes, it should update the formik values.
   useEffect(() => {
@@ -34,6 +34,17 @@ export function RelationshipFieldMapping({
       relationshipMapping
     }));
   }, [relationshipMapping]);
+
+  // Do not display skipped records on the relationship mapping section, this array contains the path and if it's skipped.
+  const skippedRecords = useMemo(() => {
+    // Check for existence of values?.["fieldMap"] to avoid errors
+    if (!values?.["fieldMap"]) return {};
+  
+    return values?.["fieldMap"].reduce((acc, record) => {
+      acc[record.targetField] = record.skipped;
+      return acc;
+    }, {});
+  }, [values?.["fieldMap"]]);
 
   return columnUniqueValues && columnUniqueValues[sheetIndex] ? (
     <Card
@@ -72,7 +83,8 @@ export function RelationshipFieldMapping({
           .filter(
             (columnName) =>
               workbookColumnMap[columnName]?.mapRelationship &&
-              workbookColumnMap[columnName].showOnUI
+              workbookColumnMap[columnName].showOnUI &&
+              skippedRecords[workbookColumnMap[columnName].fieldPath ?? ""] === false
           )
           .map((columnName, index1) => {
             const thisColumnMap = workbookColumnMap[columnName]!;
