@@ -4,6 +4,7 @@ import { useWorkbookContext } from "../WorkbookProvider";
 import { useColumnMapping } from "../column-mapping/useColumnMapping";
 import { useEffect, useMemo } from "react";
 import { useFormikContext } from "formik";
+import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
@@ -37,11 +38,13 @@ export function RelationshipFieldMapping({
 
   // Do not display skipped records on the relationship mapping section, this array contains the path and if it's skipped.
   const skippedRecords = useMemo(() => {
-    // Check for existence of values?.["fieldMap"] to avoid errors
-    if (!values?.["fieldMap"]) return {};
+    const fieldMap = values?.["fieldMap"] as FieldMapType[] | undefined; // Replace with actual type
+    if (fieldMap === undefined) return {};
   
-    return values?.["fieldMap"].reduce((acc, record) => {
-      acc[record.targetField] = record.skipped;
+    return fieldMap.reduce((acc, record) => {
+      if (record.targetField) {
+        acc[record.targetField] = record.skipped;
+      }
       return acc;
     }, {});
   }, [values?.["fieldMap"]]);
