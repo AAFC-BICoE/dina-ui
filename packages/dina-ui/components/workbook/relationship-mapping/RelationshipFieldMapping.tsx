@@ -47,7 +47,7 @@ export function RelationshipFieldMapping({
       }
       return acc;
     }, {});
-  }, [values?.["fieldMap"]]);
+  }, [values]);
 
   return columnUniqueValues && columnUniqueValues[sheetIndex] ? (
     <Card
