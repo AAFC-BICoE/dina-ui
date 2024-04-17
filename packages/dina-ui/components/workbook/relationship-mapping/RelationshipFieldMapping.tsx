@@ -38,7 +38,7 @@ export function RelationshipFieldMapping({
 
   // Do not display skipped records on the relationship mapping section, this array contains the path and if it's skipped.
   const skippedRecords = useMemo(() => {
-    const fieldMap = values?.["fieldMap"] as FieldMapType[] | undefined; // Replace with actual type
+    const fieldMap = ((values as any)?.["fieldMap"] as FieldMapType[] | undefined);
     if (fieldMap === undefined) return {};
   
     return fieldMap.reduce((acc, record) => {
