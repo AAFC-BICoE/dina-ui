@@ -398,16 +398,6 @@ export function WorkbookColumnMapping({
         newFieldPath
       );
 
-    // Clear the current data for relationship mapping if possible.
-    if (formRef) {
-      const relationshipMappingsToBeChanged = (formRef as any)?.current?.values?.relationshipMapping?.[columnName];
-      if (relationshipMappingsToBeChanged) {
-        for (const key in relationshipMappingsToBeChanged) {
-          relationshipMappingsToBeChanged[key] = {};
-        }        
-      }
-    }
-
     setColumnMap(newWorkbookColumnMap);
     setRelationshipMapping(newRelationshipMapping);
   }

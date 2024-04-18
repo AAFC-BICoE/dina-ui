@@ -11,6 +11,17 @@
 }
 
 /*
+ * Pill shaped badges to display information.
+ */
+.pill {
+  border-radius: 30px;
+}
+
+.pill > span, .pill > a, .pill > span {
+  margin-left: 5px;
+}
+
+/*
  * To be used with the card class.
  */
 .well {

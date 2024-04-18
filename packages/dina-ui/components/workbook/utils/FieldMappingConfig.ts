@@ -187,8 +187,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING },
-        protocolType: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
     preparedBy: {
