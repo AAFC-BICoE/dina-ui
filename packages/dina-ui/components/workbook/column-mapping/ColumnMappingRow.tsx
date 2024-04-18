@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { CheckBoxField } from "../../../../common-ui/lib";
+import { CheckBoxField, FieldSpy } from "../../../../common-ui/lib";
 import { WorkbookFieldSelectField } from "./WorkbookFieldSelectField";
 
 export interface ColumnMappingRowProps {
@@ -33,11 +33,16 @@ export function ColumnMappingRow({
         {columnName}
       </div>
       <div className="col-md-6">
-        <WorkbookFieldSelectField
-          columnIndex={columnIndex}
-          fieldOptions={fieldOptions}
-          onFieldChanged={onFieldChanged}
-        />
+        <FieldSpy<boolean> fieldName={`fieldMap[${columnIndex}].skipped`}>
+          {(isSkipped) => (
+            <WorkbookFieldSelectField
+              columnIndex={columnIndex}
+              fieldOptions={fieldOptions}
+              disabled={isSkipped ?? false}
+              onFieldChanged={onFieldChanged}
+            />
+          )}
+        </FieldSpy>
       </div>
       <div className="col-md-2 d-flex align-items-center">
         <CheckBoxField

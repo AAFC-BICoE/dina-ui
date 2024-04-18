@@ -36,7 +36,11 @@ import {
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
 
-export function useColumnMapping(sheet: number, selectedType?: string) {
+export function useColumnMapping(
+  groupName: string,
+  sheet: number,
+  selectedType?: string
+) {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
   const {
@@ -71,10 +75,10 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
       return [];
     }
   }, [spreadsheetData]);
-  const { isAdmin, groupNames } = useAccount();
+  const { isAdmin } = useAccount();
   const groupFilter = !isAdmin
     ? {
-        rsql: `group=in=(${groupNames})`
+        rsql: `group==${groupName}`
       }
     : undefined;
 
@@ -207,8 +211,9 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
       const mapRelationship =
         fieldPath.indexOf(".") > -1 &&
         flattenedConfig[fieldPath.substring(0, fieldPath.indexOf("."))]
-          ?.relationshipConfig?.linkOrCreateSetting !==
-          LinkOrCreateSetting.CREATE;
+          ?.relationshipConfig?.linkOrCreateSetting ===
+          LinkOrCreateSetting.LINK;
+
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
         showOnUI: true,
@@ -423,6 +428,7 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
   ) {
     theRelationshipMapping[columnHeader] = {};
     const values = columnUniqueValues?.[sheet][columnHeader];
+
     if (values) {
       for (const value of Object.keys(values)) {
         let found: PersistedResource<any> | undefined;
@@ -446,30 +452,34 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
             found = projects.find((item) => item.name === value);
             break;
         }
+
+        // If relationship is found, set it. If not, reset it so it's empty.
         if (found) {
           theRelationshipMapping[columnHeader][value] = pick(found, [
             "id",
             "type"
           ]);
+        } else {
+          theRelationshipMapping[columnHeader][value] = undefined;
         }
       }
     }
   }
 
   function getResourceSelectField(
+    onChangeRelatedRecord: (columnHeader: string, fieldValue: string, relatedRecord: string, targetType: string) => void,
     columnHeader: string,
     fieldPath?: string,
-    fieldValue?: string
+    fieldValue?: string,
   ) {
     if (!fieldPath || !fieldValue) {
       return undefined;
     }
+
     const selectElemName = `relationshipMapping.${columnHeader
       .trim()
       .replaceAll(".", "_")}.${fieldValue}.id`;
-    const hiddenElemName = `relationshipMapping.${columnHeader
-      .trim()
-      .replaceAll(".", "_")}.${fieldValue}.type`;
+
     let options: any[] = [];
     let targetType: string = "";
     switch (fieldPath) {
@@ -536,9 +546,10 @@ export function useColumnMapping(sheet: number, selectedType?: string) {
             menuPortalTarget: document.body,
             styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
           }}
+          onChange={(newValue) => {
+            onChangeRelatedRecord(columnHeader, fieldValue, newValue as string, targetType);
+          }}
         />
-
-        <input type="hidden" name={hiddenElemName} value={targetType} />
       </>
     );
   }
