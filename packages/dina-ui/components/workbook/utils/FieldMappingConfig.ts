@@ -246,7 +246,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
             verbatimScientificName: { dataType: WorkbookDataTypeEnum.STRING },
             verbatimDeterminer: { dataType: WorkbookDataTypeEnum.STRING },
             verbatimDate: { dataType: WorkbookDataTypeEnum.DATE },
-            typeStatus: { dataType: WorkbookDataTypeEnum.STRING }
+            typeStatus: { dataType: WorkbookDataTypeEnum.STRING },
+            scientificName: { dataType: WorkbookDataTypeEnum.STRING },
+            scientificNameDetails: {
+              dataType: WorkbookDataTypeEnum.CLASSIFICATION
+            }
           }
         }
       }

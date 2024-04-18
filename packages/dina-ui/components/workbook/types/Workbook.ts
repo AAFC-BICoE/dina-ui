@@ -1,4 +1,4 @@
-import { InputResource, KitsuResource, PersistedResource } from "kitsu";
+import { InputResource, KitsuResource } from "kitsu";
 import { WorkbookDataTypeEnum } from "./WorkbookDataTypeEnum";
 
 export enum LinkOrCreateSetting {
@@ -69,11 +69,16 @@ export interface ObjectField {
   };
 }
 
+export interface ClassificationType {
+  dataType: WorkbookDataTypeEnum.CLASSIFICATION;
+}
+
 export type FieldConfigType =
   | PrimitiveField
   | VocabularyField
   | ManagedAttributeField
-  | ObjectField;
+  | ObjectField
+  | ClassificationType;
 
 export type WorkbookResourceType = InputResource<
   KitsuResource & {
@@ -102,10 +107,15 @@ export interface WorkbookColumnMap {
     mapRelationship: boolean; // If relationship mapping needed.
     numOfUniqueValues: number;
     valueMapping: {
-      [value: string]: {
-        id: string;
-        type: string;
-      };
+      [value: string]:
+        | {
+            id: string;
+            type: string;
+          }
+        | {
+            key: string;
+            name?: string;
+          };
     };
   };
 }
@@ -113,8 +123,8 @@ export interface WorkbookColumnMap {
 export interface RelationshipMapping {
   [columnHeader: string]: {
     [value: string]: {
-      id: string,
-      type: string
+      id: string;
+      type: string;
     };
   };
 }

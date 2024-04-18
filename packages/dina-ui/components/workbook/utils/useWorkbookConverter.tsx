@@ -33,6 +33,8 @@ import {
   isEmptyWorkbookValue,
   isObject
 } from "./workbookMappingUtils";
+import { string } from "zod";
+import { ScientificNameSource } from "packages/dina-ui/types/collection-api";
 
 export const THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP = 10;
 
@@ -91,7 +93,22 @@ export function useWorkbookConverter(
     [WorkbookDataTypeEnum.DATE]: convertDate,
     [WorkbookDataTypeEnum.STRING]: convertString,
     [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
-      value
+      value,
+    [WorkbookDataTypeEnum.CLASSIFICATION]: (value: {
+      [key: string]: string;
+    }) => {
+      if (value) {
+        return {
+          classificationRanks: Object.keys(value).join("|"),
+          classificationPath: Object.values(value).join("|")
+        };
+      } else {
+        return {
+          classificationRanks: undefined,
+          classificationPath: undefined
+        };
+      }
+    }
   };
 
   /**
@@ -298,6 +315,9 @@ export function useWorkbookConverter(
               workbookRow[fieldNameInWorkbook],
               fieldNameInWorkbook
             );
+            if (fieldPath === "organism.determination.scientificNameDetails") {
+              parent["scientificNameSource"] = ScientificNameSource.CUSTOM;
+            }
           }
         }
       }
@@ -355,14 +375,7 @@ export function useWorkbookConverter(
       }
     });
     if (foundMappings.length > 0) {
-      return foundMappings.reduce<{
-        [fieldPath: string]: {
-          [value: string]: {
-            id: string;
-            type: string;
-          };
-        };
-      }>((accu, curr) => {
+      return foundMappings.reduce((accu, curr) => {
         if (curr.fieldPath) {
           accu[curr.fieldPath] = curr.valueMapping;
         }
