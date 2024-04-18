@@ -29,8 +29,7 @@ export function TagsAndRestrictionsSection({
 
   return readOnly ? (
     <>
-      {(initialValues.restrictionFieldsExtension &&
-        initialValues.isRestricted) && (
+      {(initialValues.restrictionFieldsExtension) && (
           <div className="d-flex flex-column">
             <div className="d-flex flex-row">
               <div className="flex-grow-1">

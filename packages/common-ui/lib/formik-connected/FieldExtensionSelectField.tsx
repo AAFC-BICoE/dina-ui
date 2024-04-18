@@ -17,13 +17,14 @@ import { Tooltip } from "..";
 
 export interface FieldExtensionSelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
+  isRestricted?: boolean;
 }
 
 export function FieldExtensionSelectField(
   fieldExtensionSelectFieldProps: FieldExtensionSelectFieldProp
 ) {
   const { formatMessage } = useDinaIntl();
-  const { query } = fieldExtensionSelectFieldProps;
+  const { query, isRestricted } = fieldExtensionSelectFieldProps;
 
   const fieldExtensionQuery = useQuery<FieldExtension>(query?.() as any);
 
@@ -50,9 +51,9 @@ export function FieldExtensionSelectField(
           value ? (
             <Tooltip
               visibleElement={(
-                <div className="card pill py-1 px-2 flex-row align-items-center bg-danger mb-2">
-                  <FaExclamationTriangle className="text-white" />
-                  <span className="text-white">
+                <div className={"card pill py-1 px-2 flex-row align-items-center mb-2 " + ((isRestricted ?? false) ? "bg-danger" : "bg-warning")}>
+                  <FaExclamationTriangle className={(isRestricted ?? false) ? "text-white" : undefined} />
+                  <span className={(isRestricted ?? false) ? "text-white" : undefined}>
                     <strong>{fieldExtensionSelectFieldProps.label + ": "}</strong>{value?.value}
                   </span>
                 </div>
