@@ -211,13 +211,12 @@ export function useColumnMapping(
       const mapRelationship =
         fieldPath.indexOf(".") > -1 &&
         flattenedConfig[fieldPath.substring(0, fieldPath.indexOf("."))]
-          ?.relationshipConfig?.linkOrCreateSetting !==
-          LinkOrCreateSetting.CREATE;
-      const showMappableField = flattenedConfig[fieldPath]?.isMappable ?? false;
+          ?.relationshipConfig?.linkOrCreateSetting ===
+          LinkOrCreateSetting.LINK;
 
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
-        showOnUI: showMappableField,
+        showOnUI: true,
         mapRelationship,
         numOfUniqueValues: Object.keys(
           columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
