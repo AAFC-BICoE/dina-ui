@@ -14,12 +14,12 @@ import {
   WorkbookResourceType
 } from "./types/Workbook";
 
+import { useAccount } from "../../../common-ui/lib";
 import db from "./WorkbookDB";
 import {
   calculateColumnUniqueValuesFromSpreadsheetData,
   removeEmptyColumns
 } from "./utils/workbookMappingUtils";
-import { useAccount } from "packages/common-ui/lib";
 
 async function saveWorkbookResourcesInIndexDB(
   type: string,

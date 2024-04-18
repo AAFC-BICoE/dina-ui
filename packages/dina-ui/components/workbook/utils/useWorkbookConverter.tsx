@@ -8,6 +8,7 @@ import {
   WorkbookColumnMap,
   WorkbookDataTypeEnum
 } from "..";
+import { ScientificNameSource } from "../../../../dina-ui/types/collection-api";
 import {
   CollectingEventSelectField,
   CollectionMethodSelectField,
@@ -33,8 +34,6 @@ import {
   isEmptyWorkbookValue,
   isObject
 } from "./workbookMappingUtils";
-import { string } from "zod";
-import { ScientificNameSource } from "packages/dina-ui/types/collection-api";
 
 export const THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP = 10;
 
