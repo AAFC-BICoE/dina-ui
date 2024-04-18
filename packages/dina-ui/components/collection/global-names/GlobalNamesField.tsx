@@ -124,10 +124,12 @@ export function GlobalNamesField({
   );
 }
 interface GlobalNamesReadOnlyProps {
+  value: string;
   scientificNameDetails: ScientificNameSourceDetails;
 }
 
 export function GlobalNamesReadOnly({
+  value,
   scientificNameDetails
 }: GlobalNamesReadOnlyProps) {
   const [showMore, setShowMore] = useState(false);
@@ -201,6 +203,7 @@ export function GlobalNamesReadOnly({
 
   return (
     <div>
+      <span style={{ fontSize: "1.5rem" }}> {value} </span>
       {scientificNameDetails?.isSynonym && (
         <div className="flex-grow-1 d-flex align-items-center">
           <span className="me-2">Synonym of: </span>{" "}
@@ -242,9 +245,14 @@ export function getFieldValue(form, fieldName) {
     : null;
 }
 
-export function RenderAsReadonly({ form, scientificNameDetailsField }) {
+export function RenderAsReadonly({ value, form, scientificNameDetailsField }) {
   const scientificNameDetails = getFieldValue(form, scientificNameDetailsField);
-  return <GlobalNamesReadOnly scientificNameDetails={scientificNameDetails} />;
+  return (
+    <GlobalNamesReadOnly
+      scientificNameDetails={scientificNameDetails}
+      value={value}
+    />
+  );
 }
 
 export interface SelectedScientificNameViewProps {
@@ -282,6 +290,7 @@ export function SelectedScientificNameView(
     <div style={{ border: "1px solid #F5F5F5" }}>
       <div className="mt-2">
         <RenderAsReadonly
+          value={value}
           form={formik}
           scientificNameDetailsField={scientificNameDetailsField}
         />
