@@ -36,9 +36,11 @@
  * Group label for the header styles.
  */
 .header-group-text {
+  position: relative;
+  height: 38px;
   color: #525252;
   font-size: 0.65em;
-  margin-top: 5px;
+  padding-top: 6px;
 }
 
 /*

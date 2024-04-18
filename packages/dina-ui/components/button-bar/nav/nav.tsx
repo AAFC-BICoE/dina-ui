@@ -534,13 +534,17 @@ function NavDinaManagementDropdown({ formatMessage }) {
   );
 }
 
-export function Footer() {
+export interface FooterProps {
+  centered?: boolean;
+}
+
+export function Footer({centered = false}: FooterProps) {
   const { formatMessage } = useDinaIntl();
   return (
     <footer id="wb-info" className="mt-3" style={{ zIndex: 0 }}>
       <div className="brand">
-        <Container fluid={true}>
-          <div className="row px-5">
+        <div className={"container-fluid " + (centered ? "centered" : "")}>
+          <div className={"row " + (!centered ? "px-5": "")}>
             <nav className="col-md-10 ftr-urlt-lnk py-3">
               <ul>
                 <li>
@@ -591,7 +595,7 @@ export function Footer() {
               />
             </div>
           </div>
-        </Container>
+        </div>
       </div>
     </footer>
   );
