@@ -2,7 +2,6 @@ import {
   BackButton,
   ButtonBar,
   DeleteButton,
-  DinaFormSection,
   EditButton,
   JsonApiQuerySpec,
   QueryOptions,
@@ -14,7 +13,7 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import { castArray, get } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { Footer, GroupSelectField, Head, Nav } from "..";
+import { Footer, Head, Nav } from "..";
 import { HasDinaMetaInfo } from "../../types/DinaJsonMetaInfo";
 import Link from "next/link";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -159,7 +158,7 @@ export function ViewPageLayout<T extends KitsuResource>({
                   {title}
                   {tooltipNode}
                 </span>
-                <span>{group}</span>
+                <span className="header-group-text">{group}</span>
               </h1>
               <ButtonBar className="gap-2">
                 {specialListUrl ? (

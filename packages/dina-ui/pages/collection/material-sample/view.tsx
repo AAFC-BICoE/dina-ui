@@ -28,21 +28,15 @@ import {
   MaterialSampleBreadCrumb,
   MaterialSampleIdentifiersSection,
   MaterialSampleInfoSection,
-  MaterialSampleStateWarning,
   Nav,
   OrganismsField,
   PreparationField,
   PREPARATION_FIELDS,
-  ProjectSelectSection,
-  AssemblageSelectSection,
-  TagSelectReadOnly,
   ScheduledActionsField,
   StorageLinkerField,
-  TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
   withOrganismEditorValues,
-  TransactionMaterialDirectionSection,
   MaterialSampleFormTemplateSelect,
   useMaterialSampleFormTemplateSelectState
 } from "../../../components";
@@ -53,11 +47,11 @@ import {
   MaterialSample
 } from "../../../types/collection-api";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
-import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
 import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
+import { MaterialSampleBadges } from "../../../components/collection/material-sample/MaterialSampleBadges";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -221,32 +215,17 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             >        
               {buttonBar}    
               <main className="container-fluid centered">
-                <MaterialSampleStateWarning />
-
                 {/* Material Sample Hierarchy */}
                 <MaterialSampleBreadCrumb
                   materialSample={materialSample}
                   disableLastLink={true}
                   enableGroupSelectField={true}
                 />
-                <div className="d-flex flex-row gap-2">
-                  <TagsAndRestrictionsSection />
-                </div>
-                <div className="d-flex flex-row gap-2">
-                  <TagSelectReadOnly />
-                  <ProjectSelectSection />
-                  <AssemblageSelectSection />
-                  {withResponse(
-                    transactionElasticQuery as any,
-                    ({ data: query }) => {
-                      return (
-                        <TransactionMaterialDirectionSection
-                          transactionElasticQuery={query}
-                        />
-                      );
-                    }
-                  )}
-                </div>
+
+                {/* Material Sample Badges */}
+                <MaterialSampleBadges 
+                  transactionElasticQuery={transactionElasticQuery}
+                />
 
                 <MaterialSampleIdentifiersSection />
 
