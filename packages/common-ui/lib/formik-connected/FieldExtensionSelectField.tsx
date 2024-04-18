@@ -12,17 +12,19 @@ import {
 } from "../api-client/useQuery";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { GoCircleSlash } from "react-icons/go";
+import { FaExclamationTriangle } from "react-icons/fa";
+import { Tooltip } from "..";
 
 export interface FieldExtensionSelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
+  isRestricted?: boolean;
 }
 
 export function FieldExtensionSelectField(
   fieldExtensionSelectFieldProps: FieldExtensionSelectFieldProp
 ) {
   const { formatMessage } = useDinaIntl();
-  const { query } = fieldExtensionSelectFieldProps;
+  const { query, isRestricted } = fieldExtensionSelectFieldProps;
 
   const fieldExtensionQuery = useQuery<FieldExtension>(query?.() as any);
 
@@ -47,12 +49,18 @@ export function FieldExtensionSelectField(
         {...fieldExtensionSelectFieldProps}
         readOnlyRender={(value) =>
           value ? (
-            <div className="card py-1 px-2 flex-row align-items-center gap-1 bg-danger">
-              <GoCircleSlash className="text-white" />
-              <span className="text-white">
-                {fieldExtensionSelectFieldProps.label + " : " + value?.value}
-              </span>
-            </div>
+            <Tooltip
+              visibleElement={(
+                <div className={"card pill py-1 px-2 flex-row align-items-center mb-2 " + ((isRestricted ?? false) ? "bg-danger" : "bg-warning")}>
+                  <FaExclamationTriangle className={(isRestricted ?? false) ? "text-white" : undefined} />
+                  <span className={(isRestricted ?? false) ? "text-white" : undefined}>
+                    <strong>{fieldExtensionSelectFieldProps.label + ": "}</strong>{value?.value}
+                  </span>
+                </div>
+              )}
+              id="field_restriction"
+              disableSpanMargin={true}
+            />
           ) : null
         }
       >

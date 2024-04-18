@@ -4,7 +4,7 @@ import { isEmpty, reject, uniq, compact } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { TableColumn } from "../../types";
 import { SupportedBetweenTypes, convertStringToBetweenState } from "../query-builder-core-components/useQueryBetweenSupport";
-import { getTimezone } from "../query-builder-value-types/QueryBuilderDateSearch";
+import { buildDateRangeObject, getTimezone } from "../query-builder-value-types/QueryBuilderDateSearch";
 
 export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
   /**
@@ -431,7 +431,12 @@ export function inQuery(
   not: boolean
 ): any {
   const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
-      .map(value => value.trim());
+      .map(value => value.trim())
+      .filter(value => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
 
   return parentType
   ? {
@@ -474,7 +479,12 @@ export function inTextQuery(
   not: boolean
 ): any {
   const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
-      .map(value => value.trim());
+      .map(value => value.trim())
+      .filter(value => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
 
   return parentType
   ? {
@@ -517,6 +527,71 @@ export function inTextQuery(
                 }
               }
             })),
+            minimum_should_match: 1
+          }
+        }
+      }
+    };
+}
+
+// Multi-search exact date matches (case-insensitive) (in/not in)
+export function inDateQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,
+  subType: string | undefined,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+    .map(value => value.trim())
+    .filter(value => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
+
+  return parentType
+  ? {
+      nested: {
+        path: "included",
+        query: {
+          bool: {
+            must: [
+              {
+                bool: {
+                  [not ? "must_not" : "must"]: [{
+                    bool: {
+                      should: matchValuesArray.map(value => ({
+                        bool: {
+                          must: [
+                            rangeQuery(
+                              fieldName,
+                              buildDateRangeObject("equals", value, subType)
+                            ),
+                            includedTypeQuery(parentType)
+                          ]                          
+                        }
+                      })),
+                      minimum_should_match: 1                      
+                    }
+                  }]
+                }
+              },
+              includedTypeQuery(parentType)
+            ]
+          }
+        }
+      }
+    } : {
+      bool: {
+        [not ? "must_not" : "must"]: {
+          bool: {
+            should: matchValuesArray.map(value => {
+              return rangeQuery(
+                fieldName,
+                buildDateRangeObject("equals", value, subType)
+              )
+            }),
             minimum_should_match: 1
           }
         }

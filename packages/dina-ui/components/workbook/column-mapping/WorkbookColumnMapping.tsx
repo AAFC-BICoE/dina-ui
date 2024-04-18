@@ -20,6 +20,7 @@ import {
   useWorkbookContext
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { WorkbookDisplay } from "../WorkbookDisplay";
 import { RelationshipFieldMapping } from "../relationship-mapping/RelationshipFieldMapping";
 import FieldMappingConfig from "../utils/FieldMappingConfig";
@@ -82,6 +83,9 @@ export function WorkbookColumnMapping({
     label: string;
     value: string;
   } | null>(entityTypes[0]);
+  const [groupName, setGroupName] = useState(
+    groupNames && groupNames.length > 0 ? groupNames[0] : ""
+  );
 
   const {
     convertWorkbook,
@@ -102,7 +106,11 @@ export function WorkbookColumnMapping({
     workbookColumnMap,
     relationshipMapping,
     resolveColumnMappingAndRelationshipMapping
-  } = useColumnMapping(sheet, selectedType?.value || "material-sample");
+  } = useColumnMapping(
+    groupName,
+    sheet,
+    selectedType?.value || "material-sample"
+  );
 
   const buttonBar = (
     <>
@@ -189,7 +197,7 @@ export function WorkbookColumnMapping({
       await startSavingWorkbook(
         resources,
         workbookColumnMap,
-        submittedValues.relationshipMapping,
+        relationshipMapping as RelationshipMapping,
         submittedValues.group,
         type,
         baseApiPath
@@ -389,8 +397,38 @@ export function WorkbookColumnMapping({
         columnName,
         newFieldPath
       );
+
     setColumnMap(newWorkbookColumnMap);
     setRelationshipMapping(newRelationshipMapping);
+  }
+
+  /**
+   * When the dropdown value is changed in the relationship mapping section.
+   * 
+   * This will update the relationship mapping to contain the new uuid values.
+   * 
+   * @param columnHeader The spreadsheet column it's being mapped
+   * @param fieldValue The value in the spreadsheet that the related record is being mapped
+   * @param relatedRecord The UUID of the resource selected in the relationship mapping dropdown
+   */
+  async function onRelatedRecordChange(
+    columnHeader: string,
+    fieldValue: string,
+    relatedRecord: string,
+    targetType: string
+  ) {
+    if (relationshipMapping) {
+      setRelationshipMapping({
+        ...relationshipMapping,
+        [columnHeader]: {
+          ...relationshipMapping?.[columnHeader],
+          [fieldValue]: {
+            id: relatedRecord,
+            type: targetType
+          }
+        }
+      });
+    }
   }
 
   return loading || fieldMap.length === 0 ? (
@@ -402,7 +440,7 @@ export function WorkbookColumnMapping({
         type: selectedType?.value || "material-sample",
         fieldMap,
         relationshipMapping,
-        group: groupNames && groupNames.length > 0 ? groupNames[0] : undefined
+        group: groupName
       }}
       innerRef={formRef}
       onSubmit={onSubmit}
@@ -444,6 +482,19 @@ export function WorkbookColumnMapping({
                         }}
                       />
                     </FieldWrapper>
+                    <GroupSelectField
+                      name="group"
+                      enableStoredDefaultGroup={true}
+                      hideWithOnlyOneGroup={false}
+                      className="flex-grow-1"
+                      onChange={(newGroup) => setGroupName(newGroup)}
+                      selectProps={{
+                        menuPortalTarget: document.body,
+                        styles: {
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                        }
+                      }}
+                    />
                   </div>
                 </Card.Body>
               </Card>
@@ -487,7 +538,11 @@ export function WorkbookColumnMapping({
                 </Card.Body>
               </Card>
 
-              <RelationshipFieldMapping sheetIndex={sheet} />
+              <RelationshipFieldMapping
+                sheetIndex={sheet}
+                groupName={groupName}
+                onChangeRelatedRecord={onRelatedRecordChange}
+              />
             </>
           );
         }}

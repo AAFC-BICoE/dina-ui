@@ -49,11 +49,24 @@ describe("QueryBuilderManagedAttributeSearch", () => {
       },
       {
         type: "DATE",
-        testValue: () => "1998-05-19",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "1998-05-19, 2020-01-01,2024-04-08"
+            case "between":
+              return "{\\\"low\\\":\\\"1998-05-19\\\",\\\"high\\\":\\\"2002-02-10\\\"}";
+            default:
+              return "1998-05-19"
+          }
+        },
         operators: [
           "equals",
           "notEquals",
           "containsDate",
+          "between",
+          "in",
+          "notIn",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",

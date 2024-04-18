@@ -112,6 +112,9 @@ export interface WorkbookColumnMap {
 
 export interface RelationshipMapping {
   [columnHeader: string]: {
-    [value: string]: any;
+    [value: string]: {
+      id: string,
+      type: string
+    } | undefined;
   };
 }
