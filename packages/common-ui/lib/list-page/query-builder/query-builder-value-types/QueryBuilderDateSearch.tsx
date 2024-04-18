@@ -479,8 +479,8 @@ export function validateDate(
     case "notIn":
       // Retrieve all of the potential dates, by spliting by commas and removing leading/trailing whitespace.
       let invalidDateFound = false;
-      value.split(",").map(item => item.trim()).forEach((value) => {
-        if (!DATE_REGEX_NO_TIME.test(value) && value !== "") {
+      value.split(",").map(item => item.trim()).forEach((val) => {
+        if (!DATE_REGEX_NO_TIME.test(val) && val !== "") {
           invalidDateFound = true;
         }
       });

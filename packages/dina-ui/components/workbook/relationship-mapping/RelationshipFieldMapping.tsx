@@ -30,8 +30,8 @@ export function RelationshipFieldMapping({
 
   // When the relationship mapping changes, it should update the formik values.
   useEffect(() => {
-    setValues((values, _validated) => ({
-      ...values,
+    setValues((formikValues, _validated) => ({
+      ...formikValues,
       relationshipMapping
     }));
   }, [relationshipMapping]);

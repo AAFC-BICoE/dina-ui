@@ -43,9 +43,9 @@ export function TagSelectField({
           <div className="d-flex flex-wrap gap-2 float-end">
             {(tagsVal ?? []).map((tag, index) => (
               <Tooltip
+                key={index}
                 visibleElement={(
                   <div
-                    key={index}
                     className="card pill py-1 px-2 flex-row align-items-center gap-1"
                     style={{ background: "rgb(24, 102, 109)" }}
                   >

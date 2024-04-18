@@ -992,10 +992,10 @@ export function QueryPage<TData extends KitsuResource>({
             >
               <h5>Validation Errors</h5>
               <ul>
-                {validationErrors.map((error: ValidationError) => (
-                  <li key={error.fieldName}>
-                    <strong>{error.fieldName}: </strong>
-                    {error.errorMessage}
+                {validationErrors.map((validationError: ValidationError) => (
+                  <li key={validationError.fieldName}>
+                    <strong>{validationError.fieldName}: </strong>
+                    {validationError.errorMessage}
                   </li>
                 ))}
               </ul>
