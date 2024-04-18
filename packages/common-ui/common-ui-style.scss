@@ -29,6 +29,15 @@
 }
 
 /*
+ * Group label for the header styles.
+ */
+.header-group-text {
+  color: #525252;
+  font-size: 0.65em;
+  margin-top: 5px;
+}
+
+/*
 * Fixes WCAG contrast issue for react-select input elements
 * Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
 */
