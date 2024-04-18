@@ -10,7 +10,7 @@ export function ButtonBar({ children, className, centered = false }: ButtonBarPr
 
   if (centered) {
     return (
-      <div className={`button-bar ${className}`}>
+      <div className={`button-bar button-bar-sticky ${className}`}>
         <div className="container-fluid centered">
           <div className="d-flex row">
             {children}

@@ -146,40 +146,43 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
         const materialSample = withOrganismEditorValues(materialSampleData);
         const buttonBar = id && (
-          <ButtonBar className="flex" centered={true}>
-            <BackButton
-              entityId={id}
-              entityLink="/collection/material-sample"
-              byPassView={true}
-              className="me-auto"
-            />
-            <div className="flex-grow-1 d-flex">
-              <div className="mx-auto">
-                <MaterialSampleFormTemplateSelect
-                  value={sampleFormTemplate}
-                  onChange={setSampleFormTemplateUUID}
-                />
-              </div>
+          <ButtonBar centered={true}>
+            <div className="col-md-2 col-sm-12 mt-2">
+              <BackButton
+                entityId={id}
+                entityLink="/collection/material-sample"
+                byPassView={true}
+              />
             </div>
-            <EditButton entityId={id} entityLink="collection/material-sample" />
-            <SplitMaterialSampleDropdownButton
-              ids={[id]}
-              disabled={!materialSample.materialSampleName}
-              materialSampleType={materialSample.materialSampleType}
-            />
-            <GenerateLabelDropdownButton materialSample={materialSample} />
-            <Link href={`/collection/material-sample/revisions?id=${id}`}>
-              <a className="btn btn-info ms-5">
-                <DinaMessage id="revisionsButtonText" />
-              </a>
-            </Link>
-            <DeleteButton
-              className="ms-5"
-              id={id}
-              options={{ apiBaseUrl: "/collection-api" }}
-              postDeleteRedirect="/collection/material-sample/list"
-              type="material-sample"
-            />
+
+            <div className="col-md-5 col-sm-12">
+              <MaterialSampleFormTemplateSelect
+                value={sampleFormTemplate}
+                onChange={setSampleFormTemplateUUID}
+              />
+            </div>
+            <div className="col-md-5 flex d-flex col-sm-12 gap-1">
+              <DeleteButton
+                id={id}
+                options={{ apiBaseUrl: "/collection-api" }}
+                postDeleteRedirect="/collection/material-sample/list"
+                type="material-sample"
+                className="ms-auto"
+              />
+              <Link href={`/collection/material-sample/revisions?id=${id}`}>
+                <a className="btn btn-info me-3">
+                  <DinaMessage id="revisionsButtonText" />
+                </a>
+              </Link>
+              <GenerateLabelDropdownButton materialSample={materialSample} />
+              <SplitMaterialSampleDropdownButton
+                ids={[id]}
+                disabled={!materialSample.materialSampleName}
+                materialSampleType={materialSample.materialSampleType}
+                className="me-0"
+              />
+              <EditButton entityId={id} entityLink="collection/material-sample" />
+            </div>
           </ButtonBar>
         );
         const hasPreparations = PREPARATION_FIELDS.some(
