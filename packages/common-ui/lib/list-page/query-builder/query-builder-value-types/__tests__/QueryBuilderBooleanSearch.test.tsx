@@ -3,6 +3,7 @@ import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
 } from "../QueryBuilderBooleanSearch";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
+import "@testing-library/jest-dom";
 
 describe("QueryBuilderBooleanSearch", () => {
   describe("QueryBuilderBooleanSearch Component", () => {
@@ -20,8 +21,10 @@ describe("QueryBuilderBooleanSearch", () => {
       );
 
       // Expect a snapshot with the text field being displayed.
-      expect(boolSearchEquals.queryByRole("combobox")).toBeInTheDocument;
+      expect(boolSearchEquals.queryByRole("combobox")).toBeInTheDocument();
+    });
 
+    it("Display no dropdown when using empty operator", async () => {
       const boolSearchEmpty = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <QueryBuilderBooleanSearch
@@ -33,7 +36,7 @@ describe("QueryBuilderBooleanSearch", () => {
       );
 
       // Expect a snapshot without the text field being displayed.
-      expect(boolSearchEmpty.queryByRole("combobox")).not.toBeInTheDocument;
+      expect(boolSearchEmpty.queryByRole("combobox")).not.toBeInTheDocument();
     });
   });
 
