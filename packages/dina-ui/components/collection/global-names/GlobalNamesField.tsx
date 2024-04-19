@@ -1,13 +1,18 @@
 import { FieldWrapper, FieldWrapperProps, useDinaFormContext } from "common-ui";
 import { FormikProps } from "formik";
 
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { useState } from "react";
-import { isArray } from "lodash";
 import DOMPurify from "dompurify";
+import { isArray } from "lodash";
+import { Dispatch, SetStateAction, useState } from "react";
+import Switch from "react-switch";
+import {
+  ScientificNameSource,
+  ScientificNameSourceDetails
+} from "../../../../dina-ui/types/collection-api";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ClassificationField } from "../classification/ClassificationField";
 import { GlobalNamesSearchBox } from "../global-names/GlobalNamesSearchBox";
-import { Dispatch, SetStateAction } from "react";
-import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api";
+
 export interface GlobalNamesFieldProps extends FieldWrapperProps {
   scientificNameSourceField?: string;
   onChange?: (selection: string | null, formik: FormikProps<any>) => void;
@@ -45,6 +50,27 @@ export function GlobalNamesField({
           scientificNameDetailsField as any
         ).value as string;
 
+        const scientificNameSourceFieldHelpers = formik.getFieldHelpers(
+          scientificNameSourceField as any
+        );
+
+        const scientificNameSourceFieldVal = formik.getFieldMeta(
+          scientificNameSourceField as any
+        ).value as string;
+
+        const isManualInput =
+          scientificNameSourceFieldVal === ScientificNameSource.CUSTOM;
+
+        function onToggleManualInput(checked) {
+          if (checked) {
+            scientificNameSourceFieldHelpers.setValue(
+              ScientificNameSource.CUSTOM
+            );
+          } else {
+            scientificNameSourceFieldHelpers.setValue(undefined);
+          }
+          setValue(null);
+        }
         return scientificNameSrcDetailVal && scientificNameSrcDetailUrlVal ? (
           <SelectedScientificNameView
             value={value}
@@ -57,22 +83,41 @@ export function GlobalNamesField({
             setValue={setValue}
           />
         ) : (
-          <GlobalNamesSearchBox
-            fetchJson={fetchJson}
-            onSelect={(newValue) => {
-              const val = isArray(newValue) ? newValue?.[1] : newValue;
-              onChange?.(newValue as any, formik);
-              setValue(val);
-              setSearchInitiated(true);
-            }}
-            index={index}
-            setValue={setValue}
-            initSearchValue={value ?? ""}
-            formik={formik}
-            onChange={onChange}
-            isDetermination={isDetermination}
-            dateSupplier={dateSupplier}
-          />
+          <>
+            <div className="d-flex align-items-center justify-content-end mb-2">
+              <label className="me-2" htmlFor="manualInput">
+                <DinaMessage id="manual" />
+              </label>
+              <Switch
+                id="manualInput"
+                checked={isManualInput}
+                onChange={onToggleManualInput}
+              />
+            </div>
+            {isManualInput ? (
+              <ClassificationField
+                initValue={(scientificNameSrcDetailVal as any) ?? ""}
+                onChange={(newValue) => onChange?.(newValue as any, formik)}
+              />
+            ) : (
+              <GlobalNamesSearchBox
+                fetchJson={fetchJson}
+                onSelect={(newValue) => {
+                  const val = isArray(newValue) ? newValue?.[1] : newValue;
+                  onChange?.(newValue as any, formik);
+                  setValue(val);
+                  setSearchInitiated(true);
+                }}
+                index={index}
+                setValue={setValue}
+                initSearchValue={value ?? ""}
+                formik={formik}
+                onChange={onChange}
+                isDetermination={isDetermination}
+                dateSupplier={dateSupplier}
+              />
+            )}
+          </>
         );
       }}
     </FieldWrapper>
@@ -204,8 +249,8 @@ export function RenderAsReadonly({ value, form, scientificNameDetailsField }) {
   const scientificNameDetails = getFieldValue(form, scientificNameDetailsField);
   return (
     <GlobalNamesReadOnly
-      value={value}
       scientificNameDetails={scientificNameDetails}
+      value={value}
     />
   );
 }

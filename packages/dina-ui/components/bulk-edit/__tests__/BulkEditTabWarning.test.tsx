@@ -239,7 +239,14 @@ describe("BulkEditTabWarning", () => {
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
-        determination: [{ verbatimScientificName: "test-name-override" }],
+        determination: [
+          {
+            verbatimScientificName: "test-name-override",
+            scientificName: undefined,
+            scientificNameDetails: undefined,
+            scientificNameSource: undefined
+          }
+        ],
         type: "organism"
       },
       type: "organism"
