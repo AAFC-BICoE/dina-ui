@@ -1,6 +1,9 @@
+import { useFormikContext } from "formik";
+import { useEffect, useMemo } from "react";
 import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useWorkbookContext } from "../WorkbookProvider";
+import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 import { useColumnMapping } from "../column-mapping/useColumnMapping";
 
 export interface RelationshipFieldMappingProps {
@@ -15,9 +18,32 @@ export interface RelationshipFieldMappingProps {
 export function RelationshipFieldMapping({
   onChangeRelatedRecord
 }: RelationshipFieldMappingProps) {
-  const { columnUniqueValues, type, workbookColumnMap, group, sheet } =
+  const { columnUniqueValues, relationshipMapping, workbookColumnMap, sheet } =
     useWorkbookContext();
   const { getResourceSelectField } = useColumnMapping();
+
+  const { setValues, values } = useFormikContext();
+
+  // When the relationship mapping changes, it should update the formik values.
+  useEffect(() => {
+    setValues((formikValues, _validated) => ({
+      ...formikValues,
+      relationshipMapping
+    }));
+  }, [relationshipMapping]);
+
+  // Do not display skipped records on the relationship mapping section, this array contains the path and if it's skipped.
+  const skippedRecords = useMemo(() => {
+    const fieldMap = ((values as any)?.["fieldMap"] as FieldMapType[] | undefined);
+    if (fieldMap === undefined) return {};
+  
+    return fieldMap.reduce((acc, record) => {
+      if (record.targetField) {
+        acc[record.targetField] = record.skipped;
+      }
+      return acc;
+    }, {});
+  }, [values]);
 
   return columnUniqueValues && columnUniqueValues[sheet] ? (
     <Card
@@ -56,7 +82,8 @@ export function RelationshipFieldMapping({
           .filter(
             (columnName) =>
               workbookColumnMap[columnName]?.mapRelationship &&
-              workbookColumnMap[columnName].showOnUI
+              workbookColumnMap[columnName].showOnUI &&
+              skippedRecords[workbookColumnMap[columnName].fieldPath ?? ""] === false
           )
           .map((columnName, index1) => {
             const thisColumnMap = workbookColumnMap[columnName]!;

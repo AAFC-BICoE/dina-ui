@@ -11,10 +11,30 @@
 }
 
 /*
+ * Pill shaped badges to display information.
+ */
+.pill {
+  border-radius: 30px;
+}
+
+.pill > span, .pill > a, .pill > span {
+  margin-left: 5px;
+}
+
+/*
  * To be used with the card class.
  */
 .well {
   background-color: #f5f5f5;
+}
+
+/*
+ * Group label for the header styles.
+ */
+.header-group-text {
+  color: #525252;
+  font-size: 0.65em;
+  margin-top: 5px;
 }
 
 /*

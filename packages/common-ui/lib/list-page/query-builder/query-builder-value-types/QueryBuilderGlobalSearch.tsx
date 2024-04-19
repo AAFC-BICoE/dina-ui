@@ -3,6 +3,7 @@ import { TransformToDSLProps } from "../../types";
 import { useSessionStorage } from "usehooks-ts";
 import { useEffect } from "react";
 import { Tooltip } from "common-ui";
+import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 
 export const SHORTCUT_GLOBAL_SEARCH_QUERY = "globalSearchShortcut";
 
@@ -24,19 +25,23 @@ export default function QueryRowGlobalSearchSearch({
 }: QueryRowGlobalSearchProps) {
   const { formatMessage } = useIntl();
 
-  const [globalSearchQuery, setGlobalSearchQuery] =
-    useSessionStorage<string | undefined>(
-      SHORTCUT_GLOBAL_SEARCH_QUERY,
-      undefined,
-      {
-        initializeWithValue: false
-      }
-    );
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
+
+  const [globalSearchQuery, setGlobalSearchQuery] = useSessionStorage<
+    string | undefined
+  >(SHORTCUT_GLOBAL_SEARCH_QUERY, undefined, {
+    initializeWithValue: false
+  });
 
   useEffect(() => {
-    if (globalSearchQuery !== undefined && setValue && value !== globalSearchQuery) {
+    if (
+      globalSearchQuery !== undefined &&
+      setValue &&
+      value !== globalSearchQuery
+    ) {
       setValue(globalSearchQuery);
-      setGlobalSearchQuery(undefined);      
+      setGlobalSearchQuery(undefined);
     }
   }, [globalSearchQuery, setValue, value]);
 
@@ -50,17 +55,20 @@ export default function QueryRowGlobalSearchSearch({
         placeholder={formatMessage({
           id: "queryBuilder_value_text_placeholder"
         })}
+        onKeyDown={onKeyDown}
       />
 
       <Tooltip
         id={"queryBuilder_globalSearch_tooltip"}
-        link={"https://aafc-bicoe.github.io/dina-documentation/#global_search_syntax"}
+        link={
+          "https://aafc-bicoe.github.io/dina-documentation/#global_search_syntax"
+        }
         linkText="queryBuilder_globalSearch_tooltipLink"
         placement="left"
       />
     </div>
   );
-};
+}
 
 export function transformGlobalSearchToDSL({
   value
@@ -75,4 +83,4 @@ export function transformGlobalSearchToDSL({
       fields: ["*"]
     }
   };
-};
+}

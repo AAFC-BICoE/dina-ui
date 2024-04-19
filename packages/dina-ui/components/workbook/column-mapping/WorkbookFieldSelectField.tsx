@@ -27,12 +27,14 @@ export interface WorkbookFieldSelectFieldProps {
       parentPath: string;
     }[];
   }[];
+  disabled: boolean;
   onFieldChanged?: (newFieldPath) => void;
 }
 
 export function WorkbookFieldSelectField({
   columnIndex,
   fieldOptions,
+  disabled = false,
   onFieldChanged
 }: WorkbookFieldSelectFieldProps) {
   const { locale, formatMessage } = useDinaIntl();
@@ -120,6 +122,7 @@ export function WorkbookFieldSelectField({
         hideLabel={true}
         styles={customStyles}
         onChange={onFieldMapChanged}
+        disabled={disabled}
       />
       {fieldMap[columnIndex]?.targetField === "managedAttributes" && (
         <div className="flex-fill">
@@ -140,6 +143,7 @@ export function WorkbookFieldSelectField({
                 }
               ]
             })}
+            isDisabled={disabled}
             additionalSort={"name"}
             showGroupCategary={true}
             model="collection-api/managed-attribute"
@@ -175,6 +179,7 @@ export function WorkbookFieldSelectField({
           <ResourceSelectField<ManagedAttribute>
             name={`fieldMap[${columnIndex}].targetKey`}
             hideLabel={true}
+            isDisabled={disabled}
             selectProps={{
               className: "flex-fill ms-2",
               menuPortalTarget: document.body,

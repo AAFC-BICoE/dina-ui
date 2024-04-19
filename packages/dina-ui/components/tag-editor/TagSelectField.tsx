@@ -1,6 +1,7 @@
 import {
   FieldWrapper,
   FieldWrapperProps,
+  Tooltip,
   filterBy,
   useAccount,
   useQuery
@@ -13,6 +14,7 @@ import { components as reactSelectComponents } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { useFormikContext } from "formik";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
@@ -38,16 +40,22 @@ export function TagSelectField({
       {...props}
       readOnlyRender={(tagsVal) =>
         !!tagsVal?.length && (
-          <div className="d-flex flex-wrap gap-2">
+          <div className="d-flex flex-wrap gap-2 float-end">
             {(tagsVal ?? []).map((tag, index) => (
-              <div
+              <Tooltip
                 key={index}
-                className="card py-1 px-2 flex-row align-items-center gap-1"
-                style={{ background: "rgb(24, 102, 109)" }}
-              >
-                <AiFillTag className="text-white" />
-                <span className="text-white">{tag}</span>
-              </div>
+                visibleElement={(
+                  <div
+                    className="card pill py-1 px-2 flex-row align-items-center gap-1"
+                    style={{ background: "rgb(24, 102, 109)" }}
+                  >
+                    <AiFillTag className="text-white" />
+                    <span className="text-white">{tag}</span>
+                  </div>
+                )}
+                id="tag"
+                disableSpanMargin={true}
+              />
             ))}
           </div>
         )
@@ -220,14 +228,21 @@ export function TagSelectReadOnly({
   tagsFieldName = "tags",
   groupSelectorName = "group"
 }: TagSelectReadOnlyProps) {
+  const { values } = useFormikContext<any>();
+
   return (
-    <div>
-      <TagSelectField
-        resourcePath={resourcePath}
-        name={tagsFieldName}
-        removeLabel={true}
-        groupSelectorName={groupSelectorName}
-      />
-    </div>
+    <>
+      {values?.tags && values.tags.length !== 0 && (
+        <div className="ms-auto">
+          <TagSelectField
+            resourcePath={resourcePath}
+            name={tagsFieldName}
+            removeLabel={true}
+            groupSelectorName={groupSelectorName}
+            removeBottomMargin={true}
+          />
+        </div>        
+      )}
+    </>
   );
 }

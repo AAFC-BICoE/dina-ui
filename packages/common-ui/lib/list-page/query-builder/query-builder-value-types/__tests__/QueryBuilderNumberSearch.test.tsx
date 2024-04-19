@@ -2,6 +2,7 @@ import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL, validateNumber
 } from "../QueryBuilderNumberSearch";
+import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 
 describe("QueryBuilderNumberSearch", () => {
   describe("QueryBuilderNumberSearch Component", () => {
@@ -9,11 +10,13 @@ describe("QueryBuilderNumberSearch", () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
       const numberSearchEquals = mountWithAppContext2(
-        <QueryBuilderNumberSearch
-          matchType="equals"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderNumberSearch
+            matchType="equals"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
 
       // Expect a snapshot with the number field being displayed.
@@ -22,11 +25,13 @@ describe("QueryBuilderNumberSearch", () => {
       );
 
       const numberSearchEmpty = mountWithAppContext2(
-        <QueryBuilderNumberSearch
-          matchType="empty"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderNumberSearch
+            matchType="empty"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
 
       // Expect a snapshot without the number field being displayed.
@@ -39,11 +44,13 @@ describe("QueryBuilderNumberSearch", () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
       const numberSearchIn = mountWithAppContext2(
-        <QueryBuilderNumberSearch
-          matchType="in"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderNumberSearch
+            matchType="in"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
 
       // Expect a snapshot with specific placeholder.
@@ -52,11 +59,13 @@ describe("QueryBuilderNumberSearch", () => {
       );
 
       const numberSearchNotIn = mountWithAppContext2(
-        <QueryBuilderNumberSearch
-          matchType="notIn"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderNumberSearch
+            matchType="notIn"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
 
       // Expect a snapshot with specific placeholder.

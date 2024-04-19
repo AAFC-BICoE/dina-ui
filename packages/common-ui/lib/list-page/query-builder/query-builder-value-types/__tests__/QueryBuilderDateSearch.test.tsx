@@ -3,6 +3,7 @@ import QueryBuilderDateSearch, {
   transformDateSearchToDSL,
   validateDate
 } from "../QueryBuilderDateSearch";
+import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 
 describe("QueryBuilderDateSearch", () => {
   describe("QueryBuilderDateSearch Component", () => {
@@ -10,11 +11,13 @@ describe("QueryBuilderDateSearch", () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
       const dateSearchEquals = mountWithAppContext2(
-        <QueryBuilderDateSearch
-          matchType="equals"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderDateSearch
+            matchType="equals"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
     
       // Expect a snapshot with the date field being displayed.
@@ -23,11 +26,13 @@ describe("QueryBuilderDateSearch", () => {
       );
     
       const dateSearchEmpty = mountWithAppContext2(
-        <QueryBuilderDateSearch
-          matchType="empty"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderDateSearch
+            matchType="empty"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
     
       // Expect a snapshot without the date field being displayed.
