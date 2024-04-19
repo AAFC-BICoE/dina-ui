@@ -1,5 +1,5 @@
-import { useDinaFormContext, FieldWrapper } from "common-ui";
-import { BsExclamationTriangle } from "react-icons/bs";
+import { useDinaFormContext, FieldWrapper, Tooltip, DinaFormSection } from "common-ui";
+import { FaExclamationCircle } from "react-icons/fa";
 import { useFormikContext } from "formik";
 
 export function MaterialSampleStateWarning() {
@@ -11,14 +11,22 @@ export function MaterialSampleStateWarning() {
   }
 
   return (
-    <div className="bg-danger card text-white py-1 px-3" role="alert">
-      <div className="d-flex gap-2 align-items-center">
-        <BsExclamationTriangle style={{ width: "24px", height: "24px" }} />
-        <div style={{ font: "fw-bold", fontSize: "1.2em" }} className="mt-3">
-          <MaterialSampleStateReadOnlyRender removeLabel={true} />
-        </div>
+    <DinaFormSection horizontal="flex">
+      <div className="d-flex flex-row gap-2 mb-2">
+        <Tooltip 
+          visibleElement={(
+            <div
+              className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined bg-danger"
+            >
+              <FaExclamationCircle className="text-white"/>
+              <span className="text-white"><MaterialSampleStateReadOnlyRender removeLabel={true} /></span>
+            </div>                    
+          )} 
+          id="field_materialSampleState"
+          disableSpanMargin={true}
+        />
       </div>
-    </div>
+    </DinaFormSection>
   );
 }
 
@@ -41,6 +49,8 @@ export function MaterialSampleStateReadOnlyRender({ removeLabel }) {
       name={"materialSampleState"}
       disableLabelClick={true}
       removeLabel={removeLabel}
+      removeBottomMargin={removeLabel}
+      
       readOnlyRender={renderAsReadOnly}
     >
       <></>

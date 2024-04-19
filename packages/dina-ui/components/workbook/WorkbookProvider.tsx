@@ -296,9 +296,9 @@ export function WorkbookUploadContextProvider({
     newApiBaseUrl: string
   ) => {
     for (const columnHeader of Object.keys(relationshipMapping)) {
-      if (newWorkbookColumnMap[columnHeader]?.mapRelationship) {
-        newWorkbookColumnMap[columnHeader].valueMapping =
-          relationshipMapping[columnHeader];
+      const relationshipColumn = relationshipMapping[columnHeader];
+      if (relationshipColumn !== undefined && newWorkbookColumnMap[columnHeader]?.mapRelationship) {
+        newWorkbookColumnMap[columnHeader].valueMapping = relationshipColumn as any;
       }
     }
     writeStorage<WorkbookMetaData>("workbookResourceMetaData", {

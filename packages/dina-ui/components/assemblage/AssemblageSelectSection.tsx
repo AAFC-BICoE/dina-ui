@@ -2,11 +2,13 @@ import {
   DinaFormSection,
   filterBy,
   ResourceSelectField,
+  Tooltip,
   useDinaFormContext
 } from "common-ui";
 import { FaFolderOpen } from "react-icons/fa";
 import { Assemblage } from "../../../dina-ui/types/collection-api/resources/Assemblage";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import Link from "next/link";
 
 export interface AssemblageSelectSectionProps {
   resourcePath?: string;
@@ -19,17 +21,17 @@ export function AssemblageSelectSection({
 }: AssemblageSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
-    <AssemblageSelectField resourcePath={resourcePath} />
+    <AssemblageSelectField 
+      resourcePath={resourcePath}
+    />
   ) : (
     <div className={`${classNames} row`}>
       <DinaFormSection horizontal="flex">
-        <div className="col-md-6">
-          <div className="d-flex flex-row gap-1">
-            <AssemblageSelectField
-              resourcePath={resourcePath}
-              className="flex-grow-1 mb-2"
-            />
-          </div>
+        <div className="d-flex flex-row gap-1">
+          <AssemblageSelectField
+            resourcePath={resourcePath}
+            className="flex-grow-1 mb-2"
+          />
         </div>
       </DinaFormSection>
     </div>
@@ -58,22 +60,31 @@ export function AssemblageSelectField({
         optionLabel={(assemblage) => assemblage.name}
         hideLabel={readOnly}
         removeLabel={readOnly}
+        removeBottomMargin={true}
         label={
           <span>
-            <FaFolderOpen /> <DinaMessage id="assemblages" />
+            <FaFolderOpen className="me-1" /> <DinaMessage id="assemblages" />
           </span>
         }
         readOnlyRender={(value, _) =>
-          Array.isArray(value) ? (
-            <div className="d-flex flex-row gap-2">
+          (Array.isArray(value) && value.length !== 0) ? (
+            <div className="d-flex flex-row mb-3 me-2">
               {value.map((val, idx) => (
-                <div
-                  className="card py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
+                <Tooltip 
                   key={idx}
-                >
-                  <FaFolderOpen />
-                  <span>{val.name}</span>
-                </div>
+                  visibleElement={(
+                    <div
+                      className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
+                    >
+                      <FaFolderOpen />
+                      <Link href={"/collection/assemblage/view?id=" + val.id}>
+                        <a>{val.name}</a>
+                      </Link>
+                    </div>                   
+                  )} 
+                  id="assemblage"
+                  disableSpanMargin={true}
+                />
               ))}
             </div>
           ) : (

@@ -1,7 +1,8 @@
 import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { MaterialSampleIdentifiersSection } from "../MaterialSampleIdentifiersSection";
 import { SetDefaultSampleName } from "../SetDefaultSampleName";
+import { CollectionSelectSection } from "../../CollectionSelectSection";
+import { MaterialSampleIdentifiersSection } from "../MaterialSampleIdentifiersSection";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -29,6 +30,7 @@ describe("SetDefaultSampleName", () => {
       >
         <SetDefaultSampleName />
         <MaterialSampleIdentifiersSection />
+        <CollectionSelectSection resourcePath="collection-api/collection" />
       </DinaForm>,
       testCtx
     );
@@ -75,6 +77,7 @@ describe("SetDefaultSampleName", () => {
       >
         <SetDefaultSampleName />
         <MaterialSampleIdentifiersSection />
+        <CollectionSelectSection resourcePath="collection-api/collection" />
       </DinaForm>,
       testCtx
     );

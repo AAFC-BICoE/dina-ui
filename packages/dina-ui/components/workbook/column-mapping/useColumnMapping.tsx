@@ -200,8 +200,9 @@ export function useColumnMapping(
       const mapRelationship =
         fieldPath.indexOf(".") > -1 &&
         flattenedConfig[fieldPath.substring(0, fieldPath.indexOf("."))]
-          ?.relationshipConfig?.linkOrCreateSetting !==
-          LinkOrCreateSetting.CREATE;
+          ?.relationshipConfig?.linkOrCreateSetting ===
+          LinkOrCreateSetting.LINK;
+
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
         showOnUI: true,
@@ -416,6 +417,7 @@ export function useColumnMapping(
   ) {
     theRelationshipMapping[columnHeader] = {};
     const values = columnUniqueValues?.[sheet][columnHeader];
+
     if (values) {
       for (const value of Object.keys(values)) {
         let found: PersistedResource<any> | undefined;
@@ -439,11 +441,15 @@ export function useColumnMapping(
             found = projects.find((item) => item.name === value);
             break;
         }
+
+        // If relationship is found, set it. If not, reset it so it's empty.
         if (found) {
           theRelationshipMapping[columnHeader][value] = pick(found, [
             "id",
             "type"
           ]);
+        } else {
+          theRelationshipMapping[columnHeader][value] = undefined;
         }
       }
     }
