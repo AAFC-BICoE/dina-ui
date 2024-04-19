@@ -2,6 +2,7 @@ import { mountWithAppContext } from "common-ui/lib/test-util/mock-app-context";
 import { useState } from "react";
 import { FieldItems } from "react-awesome-query-builder";
 import { QueryOperatorSelector } from "../QueryOperatorSelector";
+import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 
 const OPERATOR_OPTIONS: FieldItems = [
   {
@@ -25,11 +26,13 @@ const OPERATOR_OPTIONS: FieldItems = [
 describe("QueryOperatorSelector component", () => {
   test("Snapshot Test", async () => {
     const wrapper = mountWithAppContext(
-      <QueryOperatorSelector
-        options={OPERATOR_OPTIONS}
-        selectedOperator={OPERATOR_OPTIONS[0].key}
-        setOperator={undefined}
-      />
+      <DinaForm initialValues={{}}>
+        <QueryOperatorSelector
+          options={OPERATOR_OPTIONS}
+          selectedOperator={OPERATOR_OPTIONS[0].key}
+          setOperator={undefined}
+        />
+      </DinaForm>
     );
 
     // Simulate opening up the menu.
@@ -46,11 +49,13 @@ describe("QueryOperatorSelector component", () => {
       const [operator, setOperator] = useState<string>(OPERATOR_OPTIONS[0].key);
 
       return (
-        <QueryOperatorSelector
-          options={OPERATOR_OPTIONS}
-          selectedOperator={operator}
-          setOperator={(newOperator) => setOperator(newOperator)}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryOperatorSelector
+            options={OPERATOR_OPTIONS}
+            selectedOperator={operator}
+            setOperator={(newOperator) => setOperator(newOperator)}
+          />
+        </DinaForm>
       );
     }
 

@@ -2,6 +2,7 @@ import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "../QueryBuilderTextSearch";
+import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 
 describe("QueryBuilderTextSearch", () => {
   describe("QueryBuilderTextSearch Component", () => {
@@ -9,11 +10,13 @@ describe("QueryBuilderTextSearch", () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
       const textSearchEquals = mountWithAppContext2(
-        <QueryBuilderTextSearch
-          matchType="equals"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderTextSearch
+            matchType="equals"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
 
       // Expect a snapshot with the text field being displayed.
@@ -22,11 +25,13 @@ describe("QueryBuilderTextSearch", () => {
       );
 
       const textSearchEmpty = mountWithAppContext2(
-        <QueryBuilderTextSearch
-          matchType="empty"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderTextSearch
+            matchType="empty"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
 
       // Expect a snapshot without the text field being displayed.
@@ -39,11 +44,13 @@ describe("QueryBuilderTextSearch", () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
       const textSearchIn = mountWithAppContext2(
-        <QueryBuilderTextSearch
-          matchType="in"
-          value="test1, test2, test3"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderTextSearch
+            matchType="in"
+            value="test1, test2, test3"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
 
       // Expect a snapshot with the text field being with a different placeholder.
@@ -52,11 +59,13 @@ describe("QueryBuilderTextSearch", () => {
       );
 
       const textSearchNotIn = mountWithAppContext2(
-        <QueryBuilderTextSearch
-          matchType="notIn"
-          value="test1, test2, test3"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderTextSearch
+            matchType="notIn"
+            value="test1, test2, test3"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
 
       // Expect a snapshot with the text field being with a different placeholder.
