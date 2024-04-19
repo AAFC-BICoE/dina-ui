@@ -3,12 +3,12 @@ import { useContext } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { intlContext } from "../intl/IntlSupport";
 
-interface multilingualPair {
+interface MultilingualPair {
   lang: string;
   value: string;
 }
 
-function getPreferredPair(original: any, accessorKey: string, type: string, className: string): multilingualPair | undefined {
+function getPreferredPair(original: any, accessorKey: string, type: string, className: string): MultilingualPair | undefined {
   const { locale } = useContext(intlContext);
 
   // Get the multilingual field data provided.

@@ -331,8 +331,8 @@ export function validateNumber(
     case "notIn":
       // Retrieve all of the potential numbers, by spliting by commas and removing leading/trailing whitespace.
       let invalidNumberFound = false;
-      value.split(",").map(item => item.trim()).forEach((value) => {
-        if (!NUMBER_REGEX.test(value) && value !== "") {
+      value.split(",").map(item => item.trim()).forEach((val) => {
+        if (!NUMBER_REGEX.test(val) && val !== "") {
           invalidNumberFound = true;
         }
       });

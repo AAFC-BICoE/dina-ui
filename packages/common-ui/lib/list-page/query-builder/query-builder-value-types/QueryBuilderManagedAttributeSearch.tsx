@@ -222,8 +222,8 @@ export default function QueryRowManagedAttributeSearch({
             options={pickListOptions}
             className={`col ps-0`}
             value={
-              (managedAttributeState.searchValue?.split(',') ?? []).map((value) => {
-                return pickListOptions.find((pickOption) => pickOption.value === value);
+              (managedAttributeState.searchValue?.split(',') ?? []).map((val) => {
+                return pickListOptions.find((pickOption) => pickOption.value === val);
               })
             }
             placeholder={formatMessage({

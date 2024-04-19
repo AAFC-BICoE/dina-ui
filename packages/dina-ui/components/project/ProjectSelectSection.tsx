@@ -71,10 +71,10 @@ export function ProjectsSelectField({
             <div className="d-flex flex-row mb-3 me-2">
               {value.map((val, idx) => (
                 <Tooltip
+                  key={idx}
                   visibleElement={(
                     <div
                       className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
-                      key={idx}
                     >
                       <IoIosListBox />
                       <Link href={"/collection/project/view?id=" + val.id}>
