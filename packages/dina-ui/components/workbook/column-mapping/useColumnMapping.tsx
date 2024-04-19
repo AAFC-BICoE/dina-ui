@@ -394,8 +394,8 @@ export function useColumnMapping(
         for (let i = 1; i < spreadsheetData[sheet].length; i++) {
           const parentValue = spreadsheetData[sheet][i].content[colIndex];
           if (parentValue) {
-            const response = await apiClient.get<MaterialSample[]>(
-              `${baseApiPath}/${type}?filter[${fieldName}]=${parentValue}`,
+            const response = await apiClient.get<RelationshipResource[]>(
+              `/collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=material-sample&filter[name][EQ]=${parentValue}`,
               {
                 page: { limit: 1 }
               }
@@ -456,10 +456,15 @@ export function useColumnMapping(
   }
 
   function getResourceSelectField(
-    onChangeRelatedRecord: (columnHeader: string, fieldValue: string, relatedRecord: string, targetType: string) => void,
+    onChangeRelatedRecord: (
+      columnHeader: string,
+      fieldValue: string,
+      relatedRecord: string,
+      targetType: string
+    ) => void,
     columnHeader: string,
     fieldPath?: string,
-    fieldValue?: string,
+    fieldValue?: string
   ) {
     if (!fieldPath || !fieldValue) {
       return undefined;
@@ -536,7 +541,12 @@ export function useColumnMapping(
             styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
           }}
           onChange={(newValue) => {
-            onChangeRelatedRecord(columnHeader, fieldValue, newValue as string, targetType);
+            onChangeRelatedRecord(
+              columnHeader,
+              fieldValue,
+              newValue as string,
+              targetType
+            );
           }}
         />
       </>
