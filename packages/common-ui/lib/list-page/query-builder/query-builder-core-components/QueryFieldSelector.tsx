@@ -7,6 +7,7 @@ import { ESIndexMapping } from "../../types";
 import { GLOBAL_SEARCH_FIELDNAME } from "../useQueryBuilderConfig";
 import { useSessionStorage } from "usehooks-ts";
 import { SHORTCUT_GLOBAL_SEARCH_QUERY } from "../query-builder-value-types/QueryBuilderGlobalSearch";
+import { useQueryBuilderEnterToSearch } from "./useQueryBuilderEnterToSearch";
 
 interface QueryFieldSelectorProps {
   /**
@@ -33,6 +34,9 @@ export function QueryFieldSelector({
 }: QueryFieldSelectorProps) {
   const { formatMessage, messages, locale } = useIntl();
 
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
+
   const [isGlobalSearch, setIsGlobalSearch] = useState<boolean>(false);
 
   // Check if we are currently in global search mode.
@@ -45,14 +49,11 @@ export function QueryFieldSelector({
   }, [currentField]);
 
   // If using the shortcut for global search.
-  const [_globalSearchQuery, setGlobalSearchQuery] =
-    useSessionStorage<string | undefined>(
-      SHORTCUT_GLOBAL_SEARCH_QUERY,
-      undefined,
-      {
-        initializeWithValue: false
-      }
-    );
+  const [_globalSearchQuery, setGlobalSearchQuery] = useSessionStorage<
+    string | undefined
+  >(SHORTCUT_GLOBAL_SEARCH_QUERY, undefined, {
+    initializeWithValue: false
+  });
 
   // Generate the options that can be selected for the field dropdown.
   const queryRowOptions = useMemo(() => {
@@ -174,7 +175,7 @@ export function QueryFieldSelector({
   const globalSearchOptionSelected = {
     label: formatMessage({ id: "queryBuilder_globalSearch" }),
     value: GLOBAL_SEARCH_FIELDNAME
-  }
+  };
 
   const performGlobalSearch = (inputValue: string) => {
     // Check if a search was provided during typing, if so save it to the session so it can pre-loaded
@@ -184,7 +185,7 @@ export function QueryFieldSelector({
     }
 
     setField?.(GLOBAL_SEARCH_FIELDNAME);
-  }
+  };
 
   return (
     <div style={{ width: "100%" }}>
@@ -196,10 +197,17 @@ export function QueryFieldSelector({
         value={isGlobalSearch ? globalSearchOptionSelected : selectedOption}
         placeholder={<DinaMessage id="queryBuilder_field_placeholder" />}
         onChange={(selected) => setField?.(selected?.value)}
-        
+        onKeyDown={onKeyDown}
         // Global Search Specific Props
         createOptionPosition={"first"}
-        formatCreateLabel={(inputValue) => inputValue === "" ? formatMessage({ id: "queryBuilder_globalSearch" }) : formatMessage({ id: "queryBuilder_globalSearch_withText" }, { "globalSearchTerm": inputValue })}
+        formatCreateLabel={(inputValue) =>
+          inputValue === ""
+            ? formatMessage({ id: "queryBuilder_globalSearch" })
+            : formatMessage(
+                { id: "queryBuilder_globalSearch_withText" },
+                { globalSearchTerm: inputValue }
+              )
+        }
         isValidNewOption={(_inputValue) => true}
         onCreateOption={performGlobalSearch}
       />

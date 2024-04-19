@@ -71,7 +71,10 @@ import {
   getIncludedStandardColumns
 } from "../column-selector/ColumnSelectorUtils";
 import { useSessionStorage } from "usehooks-ts";
-import { ValidationError, getElasticSearchValidationResults } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import {
+  ValidationError,
+  getElasticSearchValidationResults
+} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -421,7 +424,9 @@ export function QueryPage<TData extends KitsuResource>({
   const [error, setError] = useState<any>();
 
   // Query page validation errors
-  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    []
+  );
 
   const defaultGroups = {
     group: groups
@@ -447,11 +452,11 @@ export function QueryPage<TData extends KitsuResource>({
         queryBuilderTree,
         queryBuilderConfig,
         formatMessage
-      )
+      );
 
       setValidationErrors(validationErrorsFound);
     }
-  }, [queryBuilderTree])
+  }, [queryBuilderTree]);
 
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
@@ -480,7 +485,7 @@ export function QueryPage<TData extends KitsuResource>({
         submittedQueryBuilderTree,
         queryBuilderConfig,
         formatMessage
-      )
+      );
       setValidationErrors(validationErrorsFound);
 
       // If any errors are found, do not continue with the search.
@@ -981,43 +986,44 @@ export function QueryPage<TData extends KitsuResource>({
 
   return (
     <>
-      {!viewMode && (
-        <>
-          {validationErrors.length > 0 && (
-            <div
-              className="alert alert-danger"
-              style={{
-                whiteSpace: "pre-line"
-              }}
-            >
-              <h5>Validation Errors</h5>
-              <ul>
-                {validationErrors.map((validationError: ValidationError) => (
-                  <li key={validationError.fieldName}>
-                    <strong>{validationError.fieldName}: </strong>
-                    {validationError.errorMessage}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <QueryBuilderMemo
-            indexName={indexName}
-            queryBuilderTree={queryBuilderTree}
-            setQueryBuilderTree={onQueryBuildTreeChange}
-            queryBuilderConfig={queryBuilderConfig}
-            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-            setPageOffset={setPageOffset}
-            onSubmit={onSubmit}
-            onReset={onReset}
-            setGroups={setGroups}
-            groups={groups}
-            uniqueName={uniqueName}
-            validationErrors={validationErrors}
-          />
-        </>
-      )}
       <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
+        {!viewMode && (
+          <>
+            {validationErrors.length > 0 && (
+              <div
+                className="alert alert-danger"
+                style={{
+                  whiteSpace: "pre-line"
+                }}
+              >
+                <h5>Validation Errors</h5>
+                <ul>
+                  {validationErrors.map((validationError: ValidationError) => (
+                    <li key={validationError.fieldName}>
+                      <strong>{validationError.fieldName}: </strong>
+                      {validationError.errorMessage}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <QueryBuilderMemo
+              indexName={indexName}
+              queryBuilderTree={queryBuilderTree}
+              setQueryBuilderTree={onQueryBuildTreeChange}
+              queryBuilderConfig={queryBuilderConfig}
+              setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+              setPageOffset={setPageOffset}
+              onSubmit={onSubmit}
+              onReset={onReset}
+              setGroups={setGroups}
+              groups={groups}
+              uniqueName={uniqueName}
+              validationErrors={validationErrors}
+            />
+          </>
+        )}
+
         {/* Group Selection */}
         {!viewMode && (
           <DinaFormSection horizontal={"flex"}>

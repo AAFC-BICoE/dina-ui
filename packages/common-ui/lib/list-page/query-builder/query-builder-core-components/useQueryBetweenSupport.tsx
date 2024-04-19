@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { InputGroup } from "react-bootstrap";
 import { useIntl } from "react-intl";
 import DatePicker from "react-datepicker";
+import { useQueryBuilderEnterToSearch } from "./useQueryBuilderEnterToSearch";
 
 export type SupportedBetweenTypes = "number" | "text" | "date";
 
@@ -39,7 +40,7 @@ export interface BetweenStates {
 export const DEFAULT_TYPE = {
   low: "",
   high: ""
-}
+};
 
 /**
  * Helper function to check if value is a BetweenStates object
@@ -67,9 +68,9 @@ export const isBetweenStateString = (val: string): val is string => {
 /**
  * Takes a string that might contain a BetweenStates in JSON string format and converts it into a
  * BetweenStates object.
- * 
+ *
  * If it cannot be found it will just return the default value as a BetweenState object.
- * 
+ *
  * @param val String that might represent a BetweenState.
  * @param type Is this a date between or a number between?
  * @returns BetweenState object
@@ -85,13 +86,13 @@ export const convertStringToBetweenState = (val: string): BetweenStates => {
   } catch (error) {
     return DEFAULT_TYPE; // Return default values on parsing error
   }
-}
+};
 
 /**
  * Takes a potential BetweenState and converts it to a JSON string representing the values.
- * 
+ *
  * If the object is something else, it will just return the default value.
- * 
+ *
  * @param state Object that might be a BetweenState
  * @param type Is this a date between or a number between?
  * @returns String to be saved
@@ -103,7 +104,7 @@ export const convertBetweenStateToString = (state: any): string => {
   } else {
     return JSON.stringify(DEFAULT_TYPE);
   }
-}
+};
 
 export function useQueryBetweenSupport({
   type,
@@ -112,11 +113,15 @@ export function useQueryBetweenSupport({
   value
 }: QueryBetweenSupportProps) {
   const { formatMessage } = useIntl();
-  const [betweenStates, setBetweenStates] = useState<BetweenStates>(DEFAULT_TYPE);
+  const [betweenStates, setBetweenStates] =
+    useState<BetweenStates>(DEFAULT_TYPE);
+
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
 
   useEffect(() => {
     if (setValue && matchType === "between") {
-      setValue(convertBetweenStateToString(betweenStates))
+      setValue(convertBetweenStateToString(betweenStates));
     }
   }, [betweenStates, matchType]);
 
@@ -134,23 +139,24 @@ export function useQueryBetweenSupport({
         // Empty value is to allow the user to erase the value.
         setBetweenStates({
           ...betweenStates,
-          [bound]: newValue === "" ? "" : newValue,
+          [bound]: newValue === "" ? "" : newValue
         });
       }
     } else {
       // Update for non-numeric fields (allow any text)
       setBetweenStates({
         ...betweenStates,
-        [bound]: newValue,
+        [bound]: newValue
       });
     }
   };
 
   const BetweenElement = (
     <InputGroup>
-
       {/* Low Bound */}
-      <InputGroup.Text>{formatMessage({id: "queryBuilder_operator_from"})}</InputGroup.Text>
+      <InputGroup.Text>
+        {formatMessage({ id: "queryBuilder_operator_from" })}
+      </InputGroup.Text>
       {type === "date" ? (
         <DatePicker
           name="low"
@@ -161,7 +167,7 @@ export function useQueryBetweenSupport({
               event?.type === "click" ||
               event?.type === "keydown"
             ) {
-              handleBetweenChange(dateValue.toISOString().slice(0, 10), "low")
+              handleBetweenChange(dateValue.toISOString().slice(0, 10), "low");
             }
           }}
           onChangeRaw={(event) => {
@@ -186,6 +192,7 @@ export function useQueryBetweenSupport({
           todayButton="Today"
           wrapperClassName="form-control"
           className="form-control rounded-0"
+          onKeyDown={onKeyDown}
         />
       ) : (
         <input
@@ -194,11 +201,14 @@ export function useQueryBetweenSupport({
           className="form-control"
           value={betweenStates.low}
           onChange={(event) => handleBetweenChange(event.target.value, "low")}
-        />        
+          onKeyDown={onKeyDown}
+        />
       )}
 
       {/* High Bound */}
-      <InputGroup.Text>{formatMessage({id: "queryBuilder_operator_to"})}</InputGroup.Text>
+      <InputGroup.Text>
+        {formatMessage({ id: "queryBuilder_operator_to" })}
+      </InputGroup.Text>
       {type === "date" ? (
         <DatePicker
           name="high"
@@ -209,7 +219,7 @@ export function useQueryBetweenSupport({
               event?.type === "click" ||
               event?.type === "keydown"
             ) {
-              handleBetweenChange(dateValue.toISOString().slice(0, 10), "high")
+              handleBetweenChange(dateValue.toISOString().slice(0, 10), "high");
             }
           }}
           onChangeRaw={(event) => {
@@ -234,6 +244,7 @@ export function useQueryBetweenSupport({
           todayButton="Today"
           wrapperClassName="form-control"
           className="form-control rounded-0"
+          onKeyDown={onKeyDown}
         />
       ) : (
         <input
@@ -242,7 +253,8 @@ export function useQueryBetweenSupport({
           className="form-control"
           value={betweenStates.high}
           onChange={(event) => handleBetweenChange(event.target.value, "high")}
-        />        
+          onKeyDown={onKeyDown}
+        />
       )}
 
       {/* Tooltip */}
@@ -258,5 +270,5 @@ export function useQueryBetweenSupport({
 
   return {
     BetweenElement
-  }
+  };
 }
