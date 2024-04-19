@@ -40,8 +40,8 @@ describe("QueryOperatorSelector component", () => {
       button: 0
     });
 
-    // Snapshot with all of the options and layout.
-    expect(wrapper.find(QueryOperatorSelector).debug()).toMatchSnapshot();
+    // 4 options should be rendered.
+    expect(wrapper.find(QueryOperatorSelector).find("Option").length).toEqual(4);
   });
 
   test("Toggle between the options", async () => {

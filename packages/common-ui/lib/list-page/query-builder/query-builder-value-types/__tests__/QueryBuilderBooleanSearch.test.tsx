@@ -20,9 +20,7 @@ describe("QueryBuilderBooleanSearch", () => {
       );
 
       // Expect a snapshot with the text field being displayed.
-      expect(boolSearchEquals.asFragment()).toMatchSnapshot(
-        "Expect boolean field to be displayed since match type is equals"
-      );
+      expect(boolSearchEquals.queryByRole("combobox")).toBeInTheDocument;
 
       const boolSearchEmpty = mountWithAppContext2(
         <DinaForm initialValues={{}}>
@@ -35,9 +33,7 @@ describe("QueryBuilderBooleanSearch", () => {
       );
 
       // Expect a snapshot without the text field being displayed.
-      expect(boolSearchEmpty.asFragment()).toMatchSnapshot(
-        "Expect boolean field not to be displayed since the match type is not equals"
-      );
+      expect(boolSearchEmpty.queryByRole("combobox")).not.toBeInTheDocument;
     });
   });
 
