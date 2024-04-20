@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import { noop } from "lodash";
 import { useAccount } from "common-ui/lib";
+import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 
 interface QueryBuilderAutoSuggestionTextSearchProps {
   /**
@@ -49,6 +50,9 @@ function QueryBuilderAutoSuggestionTextSearch({
 }: QueryBuilderAutoSuggestionTextSearchProps) {
   const { formatMessage } = useIntl();
   const { groupNames } = useAccount();
+
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
 
   // Index settings for the field currently selected.
   const [fieldSettings, setFieldSettings] = useState<
@@ -101,7 +105,8 @@ function QueryBuilderAutoSuggestionTextSearch({
     autoComplete: "none",
     className: "form-control",
     onFocus: () => setFocus(true),
-    onBlur: () => setFocus(false)
+    onBlur: () => setFocus(false),
+    onKeyDown
   };
 
   // Filter the suggestion list based on the value.
@@ -172,7 +177,9 @@ function QueryBuilderAutoSuggestionTextSearch({
           value={value ?? ""}
           onChange={(newValue) => setValue?.(newValue?.target?.value)}
           className="form-control"
-          placeholder={formatMessage({ id: "queryBuilder_value_in_placeholder" })}
+          placeholder={formatMessage({
+            id: "queryBuilder_value_in_placeholder"
+          })}
         />
       )}
     </>

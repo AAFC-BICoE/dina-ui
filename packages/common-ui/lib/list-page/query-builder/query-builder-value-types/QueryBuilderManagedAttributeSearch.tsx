@@ -6,10 +6,12 @@ import { useEffect } from "react";
 import { filterBy, ResourceSelect, SelectOption, useQuery } from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import QueryBuilderNumberSearch, {
-  transformNumberSearchToDSL, validateNumber
+  transformNumberSearchToDSL,
+  validateNumber
 } from "./QueryBuilderNumberSearch";
 import QueryBuilderDateSearch, {
-  transformDateSearchToDSL, validateDate
+  transformDateSearchToDSL,
+  validateDate
 } from "./QueryBuilderDateSearch";
 import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
 import QueryBuilderTextSearch, {
@@ -19,6 +21,7 @@ import { get } from "lodash";
 import { PersistedResource } from "kitsu";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 
 interface QueryBuilderManagedAttributeSearchProps {
   /**
@@ -72,6 +75,9 @@ export default function QueryRowManagedAttributeSearch({
   indexMap
 }: QueryBuilderManagedAttributeSearchProps) {
   const { formatMessage } = useIntl();
+
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
 
   const [managedAttributeState, setManagedAttributeState] =
     useState<ManagedAttributeSearchStates>(() =>
@@ -142,14 +148,7 @@ export default function QueryRowManagedAttributeSearch({
           "notEmpty"
         ];
       case "PICK_LIST":
-        return [
-          "equals", 
-          "notEquals", 
-          "in",
-          "notIn",
-          "empty", 
-          "notEmpty"
-        ];
+        return ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"];
       case "BOOL":
         return ["equals", "empty", "notEmpty"];
       case "STRING":
@@ -159,12 +158,15 @@ export default function QueryRowManagedAttributeSearch({
           "in",
           "notIn",
           // Check if the managed attribute contains keyword numeric support.
-          (managedAttributeState?.selectedManagedAttributeConfig?.keywordNumericSupport ? "between" : undefined),
+          managedAttributeState?.selectedManagedAttributeConfig
+            ?.keywordNumericSupport
+            ? "between"
+            : undefined,
           "startsWith",
           "notEquals",
           "empty",
-          "notEmpty",
-        ].filter(option => option !== undefined) as string[];
+          "notEmpty"
+        ].filter((option) => option !== undefined) as string[];
       default:
         return [];
     }
@@ -188,10 +190,7 @@ export default function QueryRowManagedAttributeSearch({
     const operator = managedAttributeState.selectedOperator;
 
     // If the operator is "empty" or "not empty", do not display anything.
-    if (
-      operator === "empty" ||
-      operator === "notEmpty"
-    ) {
+    if (operator === "empty" || operator === "notEmpty") {
       return <></>;
     }
 
@@ -217,15 +216,17 @@ export default function QueryRowManagedAttributeSearch({
             value: pickOption,
             label: pickOption
           })) ?? [];
-        return (operator === "in" || operator === "notIn") ? (
+        return operator === "in" || operator === "notIn" ? (
           <Select
             options={pickListOptions}
             className={`col ps-0`}
-            value={
-              (managedAttributeState.searchValue?.split(',') ?? []).map((val) => {
-                return pickListOptions.find((pickOption) => pickOption.value === val);
-              })
-            }
+            value={(managedAttributeState.searchValue?.split(",") ?? []).map(
+              (val) => {
+                return pickListOptions.find(
+                  (pickOption) => pickOption.value === val
+                );
+              }
+            )}
             placeholder={formatMessage({
               id: "queryBuilder_pickList_multiple_placeholder"
             })}
@@ -233,9 +234,12 @@ export default function QueryRowManagedAttributeSearch({
             onChange={(pickListOption) =>
               setManagedAttributeState({
                 ...managedAttributeState,
-                searchValue: (pickListOption.flat() ?? []).map(item => item?.value ?? "").join(',')
+                searchValue: (pickListOption.flat() ?? [])
+                  .map((item) => item?.value ?? "")
+                  .join(",")
               })
             }
+            onKeyDown={onKeyDown}
           />
         ) : (
           <Select
@@ -254,6 +258,7 @@ export default function QueryRowManagedAttributeSearch({
                 searchValue: pickListOption?.value ?? ""
               })
             }
+            onKeyDown={onKeyDown}
           />
         );
       case "BOOL":
@@ -318,13 +323,19 @@ export default function QueryRowManagedAttributeSearch({
         })}
         pageSize={15}
         onChange={(newValue) => {
-          const fieldPath = (managedAttributeConfig?.path ?? "") + "." + ((newValue as PersistedResource<ManagedAttribute>).key ?? "");
+          const fieldPath =
+            (managedAttributeConfig?.path ?? "") +
+            "." +
+            ((newValue as PersistedResource<ManagedAttribute>).key ?? "");
 
           setManagedAttributeState({
             ...managedAttributeState,
             selectedManagedAttribute:
               newValue as PersistedResource<ManagedAttribute>,
-            selectedManagedAttributeConfig: fieldValueToIndexSettings(fieldPath, indexMap ?? []),
+            selectedManagedAttributeConfig: fieldValueToIndexSettings(
+              fieldPath,
+              indexMap ?? []
+            ),
             selectedOperator: "",
             selectedType: "",
             searchValue: ""
@@ -334,7 +345,8 @@ export default function QueryRowManagedAttributeSearch({
         selectProps={{
           controlShouldRenderValue: true,
           isClearable: false,
-          className: `col me-1 ms-2 ps-0`
+          className: `col me-1 ms-2 ps-0`,
+          onKeyDown
         }}
         omitNullOption={true}
       />
@@ -388,25 +400,31 @@ export function transformManagedAttributeToDSL({
     }
   }
 
-  const fieldPath: string = fieldInfo?.path +
+  const fieldPath: string =
+    fieldInfo?.path +
     "." +
     managedAttributeSearchValue.selectedManagedAttribute?.key;
 
   // Check if managed attribute can be found within the index map.
-  const managedAttributeFieldInfo = fieldValueToIndexSettings(fieldPath, indexMap ?? []);
+  const managedAttributeFieldInfo = fieldValueToIndexSettings(
+    fieldPath,
+    indexMap ?? []
+  );
 
   const commonProps = {
     fieldPath,
     operation: managedAttributeSearchValue.selectedOperator,
     queryType: "",
     value: managedAttributeSearchValue.searchValue,
-    fieldInfo: managedAttributeFieldInfo ? managedAttributeFieldInfo : {
-      ...fieldInfo,
-      distinctTerm: false,
+    fieldInfo: managedAttributeFieldInfo
+      ? managedAttributeFieldInfo
+      : ({
+          ...fieldInfo,
+          distinctTerm: false,
 
-      // All managed attributes have keyword support.
-      keywordMultiFieldSupport: true
-    } as ESIndexMapping
+          // All managed attributes have keyword support.
+          keywordMultiFieldSupport: true
+        } as ESIndexMapping)
   };
 
   switch (managedAttributeSearchValue.selectedType) {
@@ -435,15 +453,27 @@ export function validateManagedAttribute(
 ): ValidationResult {
   try {
     // Parse the managed attribute search options. Trim the search value.
-    const managedAttributeSearchValue: ManagedAttributeSearchStates = JSON.parse(value);
-    managedAttributeSearchValue.searchValue = managedAttributeSearchValue.searchValue.trim();
+    const managedAttributeSearchValue: ManagedAttributeSearchStates =
+      JSON.parse(value);
+    managedAttributeSearchValue.searchValue =
+      managedAttributeSearchValue.searchValue.trim();
 
     switch (managedAttributeSearchValue.selectedType) {
       case "INTEGER":
       case "DECIMAL":
-        return validateNumber(fieldName, managedAttributeSearchValue.searchValue, managedAttributeSearchValue.selectedOperator, formatMessage);
+        return validateNumber(
+          fieldName,
+          managedAttributeSearchValue.searchValue,
+          managedAttributeSearchValue.selectedOperator,
+          formatMessage
+        );
       case "DATE":
-        return validateDate(fieldName, managedAttributeSearchValue.searchValue, managedAttributeSearchValue.selectedOperator, formatMessage);
+        return validateDate(
+          fieldName,
+          managedAttributeSearchValue.searchValue,
+          managedAttributeSearchValue.selectedOperator,
+          formatMessage
+        );
       // case "PICK_LIST":
       // case "STRING":
       // case "BOOL":

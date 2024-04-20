@@ -3,12 +3,19 @@
 exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display different placeholder for in/not in operators: Placeholder expected to be different for in operator. 1`] = `
 <DocumentFragment>
   <div>
-    <input
-      class="form-control"
-      placeholder="queryBuilder_value_in_placeholder"
-      type="text"
-      value="test"
-    />
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_in_placeholder"
+        type="text"
+        value="test"
+      />
+    </form>
   </div>
 </DocumentFragment>
 `;
@@ -16,31 +23,53 @@ exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display dif
 exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display different placeholder for in/not in operators: Placeholder expected to be different for not in operator. 1`] = `
 <DocumentFragment>
   <div>
-    <input
-      class="form-control"
-      placeholder="queryBuilder_value_in_placeholder"
-      type="text"
-      value="test"
-    />
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_in_placeholder"
+        type="text"
+        value="test"
+      />
+    </form>
   </div>
 </DocumentFragment>
 `;
 
 exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display field if match type is equals: Expect number field not to be displayed since the match type is not equals 1`] = `
 <DocumentFragment>
-  <div />
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+    </form>
+  </div>
 </DocumentFragment>
 `;
 
 exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display field if match type is equals: Expect number field to be displayed since match type is equals 1`] = `
 <DocumentFragment>
   <div>
-    <input
-      class="form-control"
-      placeholder="queryBuilder_value_number_placeholder"
-      type="number"
-      value="test"
-    />
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_number_placeholder"
+        type="number"
+        value="test"
+      />
+    </form>
   </div>
 </DocumentFragment>
 `;

@@ -1,12 +1,14 @@
 import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import { QueryBuilderAutoSuggestionTextSearchMemo } from "../QueryBuilderAutoSuggestionSearch";
 import { waitFor } from "@testing-library/react";
+import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
+import { ESIndexMapping } from "../../../types";
 
 const INDEX_NAME = "dina-material-sample-index";
 
 const CURRENT_FIELD_NAME = "data.attributes.materialSampleType";
 
-const INDEX_MAP = [
+const INDEX_MAP: ESIndexMapping[] = [
   {
     label: "materialSampleType",
     value: "data.attributes.materialSampleType",
@@ -16,7 +18,9 @@ const INDEX_MAP = [
     keywordMultiFieldSupport: true,
     optimizedPrefix: false,
     containsSupport: false,
-    endsWithSupport: false
+    endsWithSupport: false,
+    hideField: false,
+    keywordNumericSupport: false
   }
 ]
 
@@ -83,14 +87,16 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
       const autoSuggestionEquals = mountWithAppContext2(
-        <QueryBuilderAutoSuggestionTextSearchMemo
-          indexName={INDEX_NAME}
-          indexMap={INDEX_MAP}
-          currentFieldName={CURRENT_FIELD_NAME}
-          matchType="equals"
-          value="test"
-          setValue={jest.fn}
-        />,
+        <DinaForm initialValues={{}}>
+          <QueryBuilderAutoSuggestionTextSearchMemo
+            indexName={INDEX_NAME}
+            indexMap={INDEX_MAP}
+            currentFieldName={CURRENT_FIELD_NAME}
+            matchType="equals"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>,
         { apiContext: apiClientMock }
       );
     
@@ -100,14 +106,16 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       );
     
       const autoSuggestionEmpty = mountWithAppContext2(
-        <QueryBuilderAutoSuggestionTextSearchMemo
-          indexName={INDEX_NAME}
-          indexMap={INDEX_MAP}
-          currentFieldName={CURRENT_FIELD_NAME}
-          matchType="empty"
-          value="test"
-          setValue={jest.fn}
-        />,
+        <DinaForm initialValues={{}}>
+          <QueryBuilderAutoSuggestionTextSearchMemo
+            indexName={INDEX_NAME}
+            indexMap={INDEX_MAP}
+            currentFieldName={CURRENT_FIELD_NAME}
+            matchType="empty"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>,
         { apiContext: apiClientMock }
       );
     
@@ -121,14 +129,16 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
       const autoSuggestionIn = mountWithAppContext2(
-        <QueryBuilderAutoSuggestionTextSearchMemo
-          indexName={INDEX_NAME}
-          indexMap={INDEX_MAP}
-          currentFieldName={CURRENT_FIELD_NAME}
-          matchType="in"
-          value="test"
-          setValue={jest.fn}
-        />,
+        <DinaForm initialValues={{}}>
+          <QueryBuilderAutoSuggestionTextSearchMemo
+            indexName={INDEX_NAME}
+            indexMap={INDEX_MAP}
+            currentFieldName={CURRENT_FIELD_NAME}
+            matchType="in"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>,
         { apiContext: apiClientMock }
       );
     
@@ -138,14 +148,16 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       );
     
       const autoSuggestionNotIn = mountWithAppContext2(
-        <QueryBuilderAutoSuggestionTextSearchMemo
-          indexName={INDEX_NAME}
-          indexMap={INDEX_MAP}
-          currentFieldName={CURRENT_FIELD_NAME}
-          matchType="notIn"
-          value="test"
-          setValue={jest.fn}
-        />,
+        <DinaForm initialValues={{}}>
+          <QueryBuilderAutoSuggestionTextSearchMemo
+            indexName={INDEX_NAME}
+            indexMap={INDEX_MAP}
+            currentFieldName={CURRENT_FIELD_NAME}
+            matchType="notIn"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>,
         { apiContext: apiClientMock }
       );
     
@@ -157,14 +169,16 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
 
     it("Display suggestions on equals or not equals operators", async () => {
       const autoSuggestionComponent = mountWithAppContext2(
-        <QueryBuilderAutoSuggestionTextSearchMemo
-          indexName={INDEX_NAME}
-          indexMap={INDEX_MAP}
-          currentFieldName={CURRENT_FIELD_NAME}
-          matchType="equals"
-          value=""
-          setValue={jest.fn}
-        />,
+        <DinaForm initialValues={{}}>
+          <QueryBuilderAutoSuggestionTextSearchMemo
+            indexName={INDEX_NAME}
+            indexMap={INDEX_MAP}
+            currentFieldName={CURRENT_FIELD_NAME}
+            matchType="equals"
+            value=""
+            setValue={jest.fn}
+          />
+        </DinaForm>,
         { apiContext: apiClientMock }
       );
 
