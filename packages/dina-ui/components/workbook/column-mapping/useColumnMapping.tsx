@@ -134,12 +134,29 @@ export function useColumnMapping() {
 
   const managedAttributes = attrResp?.data || [];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
-  const collections = collectionResp?.data || [];
-  const preparationTypes = preparationTypeResp?.data || [];
-  const preparationMethods = preparationMethodResp?.data || [];
-  const protocols = protocolResp?.data || [];
-  const storageUnits = storageUnitResp?.data || [];
-  const projects = projectResp?.data || [];
+  const collections = (collectionResp?.data || []).map((item) => ({
+    ...item,
+    type: "collection"
+  }));
+  const preparationTypes = (preparationTypeResp?.data || []).map((item) => ({
+    ...item,
+    type: "preparation-type"
+  }));
+  const preparationMethods = (preparationMethodResp?.data || []).map(
+    (item) => ({ ...item, type: "preparation-method" })
+  );
+  const protocols = (protocolResp?.data || []).map((item) => ({
+    ...item,
+    type: "protocol"
+  }));
+  const storageUnits = (storageUnitResp?.data || []).map((item) => ({
+    ...item,
+    type: "storage-unit"
+  }));
+  const projects = (projectResp?.data || []).map((item) => ({
+    ...item,
+    type: "project"
+  }));
 
   const [loading, setLoading] = useState<boolean>(loadingData);
 
