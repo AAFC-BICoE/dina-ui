@@ -109,9 +109,12 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         progress: 0
       });
       return {
+        ...state,
         workbookColumnMap: {},
         relationshipMapping: {},
         workbookResources: [],
+        columnUniqueValues: undefined,
+        spreadsheetData: undefined,
         progress: 0,
         sheet: 0,
         type: "material-sample",
@@ -156,11 +159,14 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
       };
     case "RESET":
       return {
+        ...state,
         sheet: 0,
         type: "material-sample",
         workbookColumnMap: {},
         relationshipMapping: {},
         workbookResources: [],
+        columnUniqueValues: undefined,
+        spreadsheetData: undefined,
         progress: 0
       };
     case "UPLOAD_SPREADSHEET_DATA":
@@ -332,8 +338,12 @@ export function WorkbookUploadContextProvider({
   ) => {
     for (const columnHeader of Object.keys(relationshipMapping)) {
       const relationshipColumn = relationshipMapping[columnHeader];
-      if (relationshipColumn !== undefined && newWorkbookColumnMap[columnHeader]?.mapRelationship) {
-        newWorkbookColumnMap[columnHeader].valueMapping = relationshipColumn as any;
+      if (
+        relationshipColumn !== undefined &&
+        newWorkbookColumnMap[columnHeader]?.mapRelationship
+      ) {
+        newWorkbookColumnMap[columnHeader].valueMapping =
+          relationshipColumn as any;
       }
     }
     writeStorage<WorkbookMetaData>("workbookResourceMetaData", {

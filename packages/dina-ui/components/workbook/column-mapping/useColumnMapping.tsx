@@ -240,7 +240,7 @@ export function useColumnMapping() {
       ) {
         handleClassificationMapping(columnHeader, newWorkbookColumnMap);
       }
-    } else if (fieldPath === "organism.determination.classification") {
+    } else if (fieldPath === "organism.determination.scientificNameDetails") {
       handleClassificationMapping(columnHeader, newWorkbookColumnMap);
     } else if (fieldPath === "managedAttributes") {
       handleManagedAttributeMapping(columnHeader, newWorkbookColumnMap);
@@ -511,8 +511,6 @@ export function useColumnMapping() {
             "id",
             "type"
           ]);
-        } else {
-          theRelationshipMapping[columnHeader][value] = undefined;
         }
       }
     }
