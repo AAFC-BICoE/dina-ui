@@ -8,11 +8,7 @@ import {
   useQuery
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  ManagedAttribute,
-  MaterialSample,
-  Vocabulary
-} from "../../../types/collection-api";
+import { ManagedAttribute, Vocabulary } from "../../../types/collection-api";
 import { useWorkbookContext } from "../WorkbookProvider";
 import {
   LinkOrCreateSetting,
@@ -95,32 +91,62 @@ export function useColumnMapping() {
 
   const { loading: collectionLoading, response: collectionResp } = useQuery<
     RelationshipResource[]
-  >({
-    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=collection`
-  });
+  >(
+    {
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=collection`
+    },
+    {
+      deps: [groupName]
+    }
+  );
   const { loading: preparationTypeLoading, response: preparationTypeResp } =
-    useQuery<RelationshipResource[]>({
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-type`
-    });
+    useQuery<RelationshipResource[]>(
+      {
+        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-type`
+      },
+      {
+        deps: [groupName]
+      }
+    );
   const { loading: preparationMethodLoading, response: preparationMethodResp } =
-    useQuery<RelationshipResource[]>({
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-method`
-    });
+    useQuery<RelationshipResource[]>(
+      {
+        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-method`
+      },
+      {
+        deps: [groupName]
+      }
+    );
   const { loading: protocolLoading, response: protocolResp } = useQuery<
     RelationshipResource[]
-  >({
-    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=protocol`
-  });
+  >(
+    {
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=protocol`
+    },
+    {
+      deps: [groupName]
+    }
+  );
   const { loading: storageUnitLoading, response: storageUnitResp } = useQuery<
     RelationshipResource[]
-  >({
-    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=storage-unit`
-  });
+  >(
+    {
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=storage-unit`
+    },
+    {
+      deps: [groupName]
+    }
+  );
   const { loading: projectLoading, response: projectResp } = useQuery<
     RelationshipResource[]
-  >({
-    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=project`
-  });
+  >(
+    {
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=project`
+    },
+    {
+      deps: [groupName]
+    }
+  );
 
   const loadingData =
     attrLoading ||
