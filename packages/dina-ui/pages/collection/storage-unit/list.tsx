@@ -46,7 +46,11 @@ export default function storageUnitListPage() {
   return (
     <PageLayout
       titleId="storageUnitListTitle"
-      buttonBarContent={<CreateButton entityLink="/collection/storage-unit" />}
+      buttonBarContent={
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/storage-unit" />
+        </div>
+      }
     >
       <ListPageLayout
         additionalFilters={(filterForm) => ({

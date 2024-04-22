@@ -6,17 +6,18 @@ interface ButtonBarProps {
   centered?: boolean;
 }
 
-export function ButtonBar({ children, className, centered = false }: ButtonBarProps) {
-
+export function ButtonBar({
+  children,
+  className,
+  centered = true
+}: ButtonBarProps) {
   if (centered) {
     return (
       <div className={`button-bar button-bar-sticky ${className}`}>
         <div className="container-fluid centered">
-          <div className="d-flex row">
-            {children}
-          </div>
+          <div className="d-flex row">{children}</div>
         </div>
-      </div>      
+      </div>
     );
   }
 

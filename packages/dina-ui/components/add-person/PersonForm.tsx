@@ -13,7 +13,8 @@ import {
   SaveArgs,
   useApiClient,
   DeleteArgs,
-  BackButton
+  BackButton,
+  ButtonBar
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { Identifier } from "packages/dina-ui/types/agent-api/resources/Identifier";
@@ -22,7 +23,6 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
 import { mapKeys, pick } from "lodash";
-import ButtonBarLayout from "../page/ButtonBarLayout";
 
 interface PersonFormProps {
   person?: Person;
@@ -183,14 +183,14 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   };
 
   const buttonBar = (
-    <ButtonBarLayout>
+    <ButtonBar>
       <BackButton
         entityId={id as string}
         entityLink="/person"
         byPassView={true}
       />
       <SubmitButton className="ms-auto" />
-    </ButtonBarLayout>
+    </ButtonBar>
   );
 
   return (

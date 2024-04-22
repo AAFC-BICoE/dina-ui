@@ -140,7 +140,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
         const materialSample = withOrganismEditorValues(materialSampleData);
         const buttonBar = id && (
-          <ButtonBar centered={true}>
+          <ButtonBar>
             <div className="col-md-2 col-sm-12 mt-2">
               <BackButton
                 entityId={id}
@@ -175,7 +175,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 materialSampleType={materialSample.materialSampleType}
                 className="me-0"
               />
-              <EditButton entityId={id} entityLink="collection/material-sample" />
+              <EditButton
+                entityId={id}
+                entityLink="collection/material-sample"
+              />
             </div>
           </ButtonBar>
         );
@@ -207,13 +210,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 primaryID: materialSample?.materialSampleName
               })}
             />
-            <Nav marginBottom={false} centered={true} />
+            <Nav marginBottom={false} />
             <DinaForm<MaterialSample>
               initialValues={materialSample}
               readOnly={true}
               formTemplate={sampleFormTemplate}
-            >        
-              {buttonBar}    
+            >
+              {buttonBar}
               <main className="container-fluid centered">
                 {/* Material Sample Hierarchy */}
                 <MaterialSampleBreadCrumb
@@ -223,7 +226,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
 
                 {/* Material Sample Badges */}
-                <MaterialSampleBadges 
+                <MaterialSampleBadges
                   transactionElasticQuery={transactionElasticQuery}
                 />
 

@@ -24,7 +24,7 @@ export interface NavProps {
   centered?: boolean;
 }
 
-export function Nav({ marginBottom = true, centered = false }: NavProps) {
+export function Nav({ marginBottom = true, centered = true }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
   const instanceContext = useInstanceContext();
@@ -43,7 +43,13 @@ export function Nav({ marginBottom = true, centered = false }: NavProps) {
 
       <header className={marginBottom ? "mb-4" : undefined}>
         <Container fluid={true} className={centered ? "centered" : ""}>
-          <Row xs={1} md={2} className={"header-container row d-flex " + (!centered ? "px-5" : "")}>
+          <Row
+            xs={1}
+            md={2}
+            className={
+              "header-container row d-flex " + (!centered ? "px-5" : "")
+            }
+          >
             {/* Left section of the header */}
             <Col className={!centered ? "px-1" : ""}>
               <GovernmentLogo />
@@ -538,13 +544,13 @@ export interface FooterProps {
   centered?: boolean;
 }
 
-export function Footer({centered = false}: FooterProps) {
+export function Footer({ centered = true }: FooterProps) {
   const { formatMessage } = useDinaIntl();
   return (
     <footer id="wb-info" className="mt-3" style={{ zIndex: 0 }}>
       <div className="brand">
         <div className={"container-fluid " + (centered ? "centered" : "")}>
-          <div className={"row " + (!centered ? "px-5": "")}>
+          <div className={"row " + (!centered ? "px-5" : "")}>
             <nav className="col-md-10 ftr-urlt-lnk py-3">
               <ul>
                 <li>

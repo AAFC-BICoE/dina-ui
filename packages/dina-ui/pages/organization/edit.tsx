@@ -1,5 +1,6 @@
 import {
   BackButton,
+  ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
   FieldView,
@@ -12,7 +13,6 @@ import {
 import { NextRouter, useRouter } from "next/router";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import PageLayout from "../../components/page/PageLayout";
-import ButtonBarLayout from "../../components/page/ButtonBarLayout";
 import {
   MultiligualName,
   Organization
@@ -137,14 +137,14 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
   };
 
   const buttonBar = (
-    <ButtonBarLayout>
+    <ButtonBar>
       <BackButton
         entityId={id as string}
         entityLink="/organization"
         byPassView={true}
       />
       <SubmitButton className="ms-auto" />
-    </ButtonBarLayout>
+    </ButtonBar>
   );
 
   return (
