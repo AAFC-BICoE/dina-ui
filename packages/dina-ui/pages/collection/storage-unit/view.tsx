@@ -33,6 +33,7 @@ export default function StorageUnitDetailsPage() {
           />
         )
       }
+      showGenerateLabelButton={true}
       nameField={(unit) => storageUnitDisplayName(unit)}
       showRevisionsLink={true}
     />
