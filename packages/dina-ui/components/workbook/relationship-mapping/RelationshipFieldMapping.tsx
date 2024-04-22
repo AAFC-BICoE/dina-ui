@@ -1,30 +1,38 @@
 import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useWorkbookContext } from "../WorkbookProvider";
-import { useColumnMapping } from "../column-mapping/useColumnMapping";
 import { useEffect, useMemo } from "react";
 import { useFormikContext } from "formik";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 
 export interface RelationshipFieldMappingProps {
   sheetIndex: number;
-  onChangeRelatedRecord: (columnHeader: string, fieldValue: string, relatedRecord: string, targetType: string) => void;
-  groupName: string;
+  onChangeRelatedRecord: (
+    columnHeader: string,
+    fieldValue: string,
+    relatedRecord: string,
+    targetType: string
+  ) => void;
+  getResourceSelectField: (
+    onChangeRelatedRecord: (
+      columnHeader: string,
+      fieldValue: string,
+      relatedRecord: string,
+      targetType: string
+    ) => void,
+    columnHeader: string,
+    fieldPath?: string | undefined,
+    fieldValue?: string | undefined
+  ) => JSX.Element | undefined;
 }
 
 export function RelationshipFieldMapping({
   sheetIndex,
   onChangeRelatedRecord,
-  groupName
+  getResourceSelectField
 }: RelationshipFieldMappingProps) {
   const { columnUniqueValues, type, workbookColumnMap, relationshipMapping } =
     useWorkbookContext();
-  const selectedType = type ?? "material-sample";
-  const { getResourceSelectField } = useColumnMapping(
-    groupName,
-    sheetIndex,
-    selectedType
-  );
 
   const { setValues, values } = useFormikContext();
 
@@ -38,9 +46,11 @@ export function RelationshipFieldMapping({
 
   // Do not display skipped records on the relationship mapping section, this array contains the path and if it's skipped.
   const skippedRecords = useMemo(() => {
-    const fieldMap = ((values as any)?.["fieldMap"] as FieldMapType[] | undefined);
+    const fieldMap = (values as any)?.["fieldMap"] as
+      | FieldMapType[]
+      | undefined;
     if (fieldMap === undefined) return {};
-  
+
     return fieldMap.reduce((acc, record) => {
       if (record.targetField) {
         acc[record.targetField] = record.skipped;
@@ -87,7 +97,8 @@ export function RelationshipFieldMapping({
             (columnName) =>
               workbookColumnMap[columnName]?.mapRelationship &&
               workbookColumnMap[columnName].showOnUI &&
-              skippedRecords[workbookColumnMap[columnName].fieldPath ?? ""] === false
+              skippedRecords[workbookColumnMap[columnName].fieldPath ?? ""] ===
+                false
           )
           .map((columnName, index1) => {
             const thisColumnMap = workbookColumnMap[columnName]!;
@@ -102,7 +113,12 @@ export function RelationshipFieldMapping({
                 <div className="col-3">{fieldValue}</div>
                 <div className="col-3">{counts[fieldValue]}</div>
                 <div className="col-3">
-                  {getResourceSelectField(onChangeRelatedRecord, columnName, fieldPath, fieldValue)}
+                  {getResourceSelectField(
+                    onChangeRelatedRecord,
+                    columnName,
+                    fieldPath,
+                    fieldValue
+                  )}
                 </div>
               </div>
             ));
