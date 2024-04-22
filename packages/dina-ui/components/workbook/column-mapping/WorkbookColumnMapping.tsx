@@ -103,7 +103,8 @@ export function WorkbookColumnMapping({
     sheetOptions,
     workbookColumnMap,
     relationshipMapping,
-    resolveColumnMappingAndRelationshipMapping
+    resolveColumnMappingAndRelationshipMapping,
+    getResourceSelectField
   } = useColumnMapping();
 
   const buttonBar = (
@@ -533,6 +534,7 @@ export function WorkbookColumnMapping({
 
               <RelationshipFieldMapping
                 onChangeRelatedRecord={onRelatedRecordChange}
+                getResourceSelectField={getResourceSelectField}
               />
             </>
           );

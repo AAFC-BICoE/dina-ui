@@ -4,7 +4,6 @@ import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useWorkbookContext } from "../WorkbookProvider";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
-import { useColumnMapping } from "../column-mapping/useColumnMapping";
 
 export interface RelationshipFieldMappingProps {
   onChangeRelatedRecord: (
@@ -13,14 +12,25 @@ export interface RelationshipFieldMappingProps {
     relatedRecord: string,
     targetType: string
   ) => void;
+  getResourceSelectField: (
+    onChangeRelatedRecord: (
+      columnHeader: string,
+      fieldValue: string,
+      relatedRecord: string,
+      targetType: string
+    ) => void,
+    columnHeader: string,
+    fieldPath?: string | undefined,
+    fieldValue?: string | undefined
+  ) => JSX.Element | undefined;
 }
 
 export function RelationshipFieldMapping({
-  onChangeRelatedRecord
+  onChangeRelatedRecord,
+  getResourceSelectField
 }: RelationshipFieldMappingProps) {
   const { columnUniqueValues, relationshipMapping, workbookColumnMap, sheet } =
     useWorkbookContext();
-  const { getResourceSelectField } = useColumnMapping();
 
   const { setValues, values } = useFormikContext();
 
