@@ -105,7 +105,8 @@ export function WorkbookColumnMapping({
     sheetOptions,
     workbookColumnMap,
     relationshipMapping,
-    resolveColumnMappingAndRelationshipMapping
+    resolveColumnMappingAndRelationshipMapping,
+    getResourceSelectField
   } = useColumnMapping(
     groupName,
     sheet,
@@ -404,9 +405,9 @@ export function WorkbookColumnMapping({
 
   /**
    * When the dropdown value is changed in the relationship mapping section.
-   * 
+   *
    * This will update the relationship mapping to contain the new uuid values.
-   * 
+   *
    * @param columnHeader The spreadsheet column it's being mapped
    * @param fieldValue The value in the spreadsheet that the related record is being mapped
    * @param relatedRecord The UUID of the resource selected in the relationship mapping dropdown
@@ -540,8 +541,8 @@ export function WorkbookColumnMapping({
 
               <RelationshipFieldMapping
                 sheetIndex={sheet}
-                groupName={groupName}
                 onChangeRelatedRecord={onRelatedRecordChange}
+                getResourceSelectField={getResourceSelectField}
               />
             </>
           );
