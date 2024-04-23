@@ -43,14 +43,16 @@ export default function IndexSetListPage() {
   return (
     <>
       <Head title={formatMessage("indexSetListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/seqdb/index-set" />
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           <SeqdbMessage id="indexSetListTitle" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/seqdb/index-set" />
-        </ButtonBar>
         <ListPageLayout
           filterAttributes={INDEX_SET_FILTER_ATTRIBUTES}
           id="index-set-list"

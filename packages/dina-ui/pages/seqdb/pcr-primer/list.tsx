@@ -66,9 +66,11 @@ export default function PcrPrimerListPage() {
   return (
     <div>
       <Head title={formatMessage("pcrPrimerListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
       <ButtonBar>
-        <CreateButton entityLink="/seqdb/pcr-primer" />
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/seqdb/pcr-primer" />
+        </div>
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">

@@ -182,12 +182,16 @@ export function TransactionForm({
   };
 
   const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={fetchedTransaction?.id}
-        entityLink="/loan-transaction/transaction"
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-4">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={fetchedTransaction?.id}
+          entityLink="/loan-transaction/transaction"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 

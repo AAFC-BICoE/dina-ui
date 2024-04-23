@@ -50,19 +50,25 @@ export default function DinaUserDetailsPage() {
   return (
     <div>
       <Head title={formatMessage("userViewTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="col-md-6 col-sm-12 mt-2">
+          {!hideBackButton && (
+            <BackButton entityLink="/dina-user" className="mt-2" />
+          )}
+        </div>
+        {currentUserCanEdit && (
+          <div className="col-md-6 col-sm-12 d-flex">
+            <EditButton
+              className="ms-auto"
+              entityId={id as string}
+              entityLink="dina-user"
+            />
+          </div>
+        )}
+      </ButtonBar>
       {withResponse(userQuery, ({ data: dinaUser }) => (
         <main className="container">
-          <ButtonBar>
-            {!hideBackButton && <BackButton entityLink="/dina-user" />}
-            {currentUserCanEdit && (
-              <EditButton
-                className="ms-auto"
-                entityId={id as string}
-                entityLink="dina-user"
-              />
-            )}
-          </ButtonBar>
           <h1 id="wb-cont">
             <DinaMessage id={"userViewTitle"} />
           </h1>

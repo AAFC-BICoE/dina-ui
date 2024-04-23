@@ -113,13 +113,18 @@ export function DinaUserForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={initialValues.id as string}
-          entityLink="/dina-user"
-        />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-4">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={initialValues.id as string}
+            entityLink="/dina-user"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
+
       <div>
         <div className="row">
           <FieldView className="col-md-6" name="username" />

@@ -45,12 +45,14 @@ export default function PcrBatchListPage() {
   return (
     <div>
       <Head title={formatMessage("pcrBatchListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/seqdb/pcr-batch" />
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage("pcrBatchListTitle")}</h1>
-        <ButtonBar>
-          <CreateButton entityLink="/seqdb/pcr-batch" />
-        </ButtonBar>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Apply group filter:
