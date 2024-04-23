@@ -215,19 +215,20 @@ export function RevisionsPage({
     <>
       <Head title={pageTitle} />
       <Nav />
-      <main className="container-fluid px-5">
+      <ButtonBar>
+        <Link
+          href={`${detailsPageLink}/${
+            isExternalResourceMetadata ? "external-resource-view" : "view"
+          }?id=${resource?.id}`}
+        >
+          <a className="back-button my-auto me-auto mt-3">
+            <DinaMessage id="detailsPageLink" />
+          </a>
+        </Link>
+      </ButtonBar>
+
+      <main className="container-fluid">
         <h1 id="wb-cont">{pageTitle}</h1>
-        <ButtonBar>
-          <Link
-            href={`${detailsPageLink}/${
-              isExternalResourceMetadata ? "external-resource-view" : "view"
-            }?id=${resource?.id}`}
-          >
-            <a className="back-button my-auto me-auto">
-              <DinaMessage id="detailsPageLink" />
-            </a>
-          </Link>
-        </ButtonBar>
         <RevisionsPageLayout
           auditSnapshotPath={auditSnapshotPath}
           instanceId={`${resourceType}/${id}`}

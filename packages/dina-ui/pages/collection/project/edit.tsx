@@ -12,8 +12,6 @@ import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Head, Nav, ViewPageLayout } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Project } from "../../../types/collection-api/resources/Project";
 import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
 import PageLayout from "../../../components/page/PageLayout";
@@ -28,7 +26,6 @@ export default function ProjectEditPage() {
   const {
     query: { id }
   } = router;
-  const { formatMessage } = useDinaIntl();
 
   async function goToViewPage(project: PersistedResource<Project>) {
     await router.push(`/collection/project/view?id=${project.id}`);
@@ -118,12 +115,16 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={fetchedProject?.id}
-          entityLink="/collection/project"
-        />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-4">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={fetchedProject?.id}
+            entityLink="/collection/project"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <ProjectFormLayout />
     </DinaForm>

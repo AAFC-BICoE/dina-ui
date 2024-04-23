@@ -13,9 +13,7 @@ import {
   CollectingEventFormLayout,
   DEFAULT_VERBATIM_COORDSYS_KEY,
   DEFAULT_VERBATIM_SRS_KEY,
-  Footer,
   Head,
-  Nav,
   useCollectingEventQuery,
   useCollectingEventSave
 } from "../../../components";
@@ -88,12 +86,16 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   };
 
   const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={collectingEvent?.id}
-        entityLink="/collection/collecting-event"
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-4">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={collectingEvent?.id}
+          entityLink="/collection/collecting-event"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 
@@ -114,7 +116,6 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
         setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
         setDefaultVerbatimSRS={setDefaultVerbatimSRS}
       />
-      {buttonBar}
     </DinaForm>
   );
 }
