@@ -1,12 +1,11 @@
+import { useFormikContext } from "formik";
+import { useEffect, useMemo } from "react";
 import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useWorkbookContext } from "../WorkbookProvider";
-import { useEffect, useMemo } from "react";
-import { useFormikContext } from "formik";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 
 export interface RelationshipFieldMappingProps {
-  sheetIndex: number;
   onChangeRelatedRecord: (
     columnHeader: string,
     fieldValue: string,
@@ -27,11 +26,10 @@ export interface RelationshipFieldMappingProps {
 }
 
 export function RelationshipFieldMapping({
-  sheetIndex,
   onChangeRelatedRecord,
   getResourceSelectField
 }: RelationshipFieldMappingProps) {
-  const { columnUniqueValues, type, workbookColumnMap, relationshipMapping } =
+  const { columnUniqueValues, relationshipMapping, workbookColumnMap, sheet } =
     useWorkbookContext();
 
   const { setValues, values } = useFormikContext();
@@ -59,7 +57,7 @@ export function RelationshipFieldMapping({
     }, {});
   }, [values]);
 
-  return columnUniqueValues && columnUniqueValues[sheetIndex] ? (
+  return columnUniqueValues && columnUniqueValues[sheet] ? (
     <Card
       className="mb-3"
       style={{ width: "100%", overflowX: "auto", height: "70hp" }}
@@ -92,7 +90,7 @@ export function RelationshipFieldMapping({
             <DinaMessage id="relatedRecord" />
           </div>
         </div>
-        {Object.keys(columnUniqueValues[sheetIndex])
+        {Object.keys(columnUniqueValues[sheet])
           .filter(
             (columnName) =>
               workbookColumnMap[columnName]?.mapRelationship &&
@@ -103,7 +101,7 @@ export function RelationshipFieldMapping({
           .map((columnName, index1) => {
             const thisColumnMap = workbookColumnMap[columnName]!;
             const fieldPath = thisColumnMap.fieldPath;
-            const counts = columnUniqueValues[sheetIndex][columnName];
+            const counts = columnUniqueValues[sheet][columnName];
             return Object.keys(counts).map((fieldValue, index2) => (
               <div
                 className={`row${index1 % 2 === 0 ? " odd" : ""}`}

@@ -14,6 +14,7 @@ import {
   WorkbookResourceType
 } from "./types/Workbook";
 
+import { useAccount } from "../../../common-ui/lib";
 import db from "./WorkbookDB";
 import {
   calculateColumnUniqueValuesFromSpreadsheetData,
@@ -58,7 +59,10 @@ type actionType =
   | "RETRIEVE_WORKBOOK_FROM_STORAGE"
   | "SET_COLUMN_MAP"
   | "SET_RELATIONSHIP_MAPPING"
-  | "SET_COLUMN_MAP_VALUE";
+  | "SET_COLUMN_MAP_VALUE"
+  | "SET_SHEET"
+  | "SET_GROUP"
+  | "SET_TYPE";
 
 export type WorkBookSavingStatus =
   | "READY"
@@ -73,10 +77,11 @@ type State = {
   columnUniqueValues?: ColumnUniqueValues;
   workbookResources: WorkbookResourceType[];
   workbookColumnMap: WorkbookColumnMap;
-  relationshipMapping?: RelationshipMapping;
+  relationshipMapping: RelationshipMapping;
   progress: number;
   status?: WorkBookSavingStatus;
-  type?: string;
+  type: string;
+  sheet: number;
   group?: string;
   apiBaseUrl?: string;
   error?: Error;
@@ -104,9 +109,15 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         progress: 0
       });
       return {
+        ...state,
         workbookColumnMap: {},
+        relationshipMapping: {},
         workbookResources: [],
+        columnUniqueValues: undefined,
+        spreadsheetData: undefined,
         progress: 0,
+        sheet: 0,
+        type: "material-sample",
         status: "CANCELED"
       };
     case "SAVE_PROGRESS":
@@ -148,8 +159,14 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
       };
     case "RESET":
       return {
+        ...state,
+        sheet: 0,
+        type: "material-sample",
         workbookColumnMap: {},
+        relationshipMapping: {},
         workbookResources: [],
+        columnUniqueValues: undefined,
+        spreadsheetData: undefined,
         progress: 0
       };
     case "UPLOAD_SPREADSHEET_DATA":
@@ -157,6 +174,9 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
       const columnUniqueValues: ColumnUniqueValues =
         calculateColumnUniqueValuesFromSpreadsheetData(spreadsheetData);
       return {
+        ...state,
+        sheet: 0,
+        type: "material-sample",
         spreadsheetData,
         columnUniqueValues,
         workbookResources: [],
@@ -171,15 +191,27 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
     case "SET_RELATIONSHIP_MAPPING":
       return {
         ...state,
-        relationshipMapping:
-          action.payload === undefined
-            ? undefined
-            : { ...(state.relationshipMapping ?? {}), ...action.payload }
+        relationshipMapping: { ...state.relationshipMapping, ...action.payload }
       };
     case "SET_COLUMN_MAP_VALUE":
       return {
         ...state,
         workbookColumnMap: { ...state.workbookColumnMap, ...action.payload }
+      };
+    case "SET_GROUP":
+      return {
+        ...state,
+        group: action.payload
+      };
+    case "SET_SHEET":
+      return {
+        ...state,
+        sheet: action.payload
+      };
+    case "SET_TYPE":
+      return {
+        ...state,
+        type: action.payload
       };
     default:
       return state;
@@ -191,13 +223,14 @@ export interface WorkbookUploadContextI {
   columnUniqueValues?: ColumnUniqueValues;
   workbookResources: WorkbookResourceType[];
   workbookColumnMap: WorkbookColumnMap;
-  relationshipMapping?: RelationshipMapping;
+  relationshipMapping: RelationshipMapping;
   progress: number;
   status?: WorkBookSavingStatus;
   saveProgress: (newValue: number) => void;
   apiBaseUrl?: string;
   group?: string;
-  type?: string;
+  type: string;
+  sheet: number;
   error?: Error;
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
@@ -219,6 +252,9 @@ export interface WorkbookUploadContextI {
   finishSavingWorkbook: () => Promise<void>;
   cancelSavingWorkbook: (type?: string) => Promise<void>;
   failSavingWorkbook: (error: Error) => Promise<void>;
+  setGroup: (group: string) => void;
+  setType: (type: string) => void;
+  setSheet: (sheet: number) => void;
   reset: () => void;
 }
 
@@ -243,10 +279,15 @@ export function WorkbookUploadContextProvider({
 }: {
   children: ReactNode;
 }) {
+  const { groupNames } = useAccount();
   const initState: State = {
     workbookColumnMap: {},
+    relationshipMapping: {},
     workbookResources: [],
-    progress: 0
+    progress: 0,
+    sheet: 0,
+    type: "material-sample",
+    group: groupNames?.[0]
   };
   const [state, dispatch] = useReducer(reducer, initState);
 
@@ -297,8 +338,12 @@ export function WorkbookUploadContextProvider({
   ) => {
     for (const columnHeader of Object.keys(relationshipMapping)) {
       const relationshipColumn = relationshipMapping[columnHeader];
-      if (relationshipColumn !== undefined && newWorkbookColumnMap[columnHeader]?.mapRelationship) {
-        newWorkbookColumnMap[columnHeader].valueMapping = relationshipColumn as any;
+      if (
+        relationshipColumn !== undefined &&
+        newWorkbookColumnMap[columnHeader]?.mapRelationship
+      ) {
+        newWorkbookColumnMap[columnHeader].valueMapping =
+          relationshipColumn as any;
       }
     }
     writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
@@ -427,6 +472,25 @@ export function WorkbookUploadContextProvider({
     });
   };
 
+  const setGroup = (group: string) => {
+    dispatch({
+      type: "SET_GROUP",
+      payload: group
+    });
+  };
+  const setType = (type: string) => {
+    dispatch({
+      type: "SET_TYPE",
+      payload: type
+    });
+  };
+  const setSheet = (sheet: number) => {
+    dispatch({
+      type: "SET_SHEET",
+      payload: sheet
+    });
+  };
+
   return (
     <WorkbookUploadProvider
       value={{
@@ -438,6 +502,7 @@ export function WorkbookUploadContextProvider({
         progress: state.progress,
         type: state.type,
         group: state.group,
+        sheet: state.sheet,
         apiBaseUrl: state.apiBaseUrl,
         status: state.status,
         error: state.error,
@@ -453,6 +518,9 @@ export function WorkbookUploadContextProvider({
         finishSavingWorkbook,
         cancelSavingWorkbook,
         failSavingWorkbook,
+        setGroup,
+        setSheet,
+        setType,
         reset
       }}
     >
