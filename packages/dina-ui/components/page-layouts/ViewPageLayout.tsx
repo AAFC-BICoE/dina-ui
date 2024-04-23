@@ -17,6 +17,7 @@ import { Footer, Head, Nav } from "..";
 import { HasDinaMetaInfo } from "../../types/DinaJsonMetaInfo";
 import Link from "next/link";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import { GenerateLabelDropdownButton } from "../collection/material-sample/GenerateLabelDropdownButton";
 
 /** This Component requires either the "query" or "customQueryHook" prop. */
 type ViewPageLayoutPropsBase<T extends KitsuResource> =
@@ -56,6 +57,7 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
     showDeleteButton?: boolean;
     /** Show the link to the "revisions" page if there is one. */
     showRevisionsLink?: boolean;
+    showGenerateLabelButton?: boolean;
 
     /** Show the link to the "revisions" page at page bottom as link. */
     showRevisionsLinkAtBottom?: boolean;
@@ -100,7 +102,8 @@ export function ViewPageLayout<T extends KitsuResource>({
   showRevisionsLink,
   showRevisionsLinkAtBottom,
   tooltipNode,
-  alterInitialValues
+  alterInitialValues,
+  showGenerateLabelButton
 }: ViewPageLayoutProps<T>) {
   const router = useRouter();
   const id = String(router.query.id);
@@ -174,6 +177,9 @@ export function ViewPageLayout<T extends KitsuResource>({
                     entityLink={entityLink}
                     byPassView={true}
                   />
+                )}
+                {showGenerateLabelButton && (
+                  <GenerateLabelDropdownButton resource={resource} />
                 )}
                 {showEditButton &&
                   canEdit &&
