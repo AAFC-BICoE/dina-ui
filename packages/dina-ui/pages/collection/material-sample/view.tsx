@@ -161,7 +161,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               disabled={!materialSample.materialSampleName}
               materialSampleType={materialSample.materialSampleType}
             />
-            <GenerateLabelDropdownButton materialSample={materialSample} />
+            <GenerateLabelDropdownButton resource={materialSample} />
             <Link href={`/collection/material-sample/revisions?id=${id}`}>
               <a className="btn btn-info ms-5">
                 <DinaMessage id="revisionsButtonText" />
@@ -212,7 +212,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 formTemplate={sampleFormTemplate}
               >
                 {buttonBar}
-                
+
                 {/* Material Sample Hierarchy */}
                 <MaterialSampleBreadCrumb
                   materialSample={materialSample}
@@ -221,7 +221,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
 
                 {/* Material Sample Badges */}
-                <MaterialSampleBadges 
+                <MaterialSampleBadges
                   transactionElasticQuery={transactionElasticQuery}
                 />
 
