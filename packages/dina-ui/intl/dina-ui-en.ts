@@ -908,6 +908,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   withAMouse: "With a mouse",
   workBookDuplicateFieldMap: "This column should not map to the same field",
   workBookSkippedField: "Please select a field or skip importing it",
+  missingParentMaterialSampleNames:
+    "Missing parent material sample names: {missingNames}",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}",
   workBookInvalidManagedAttributeDataType:
