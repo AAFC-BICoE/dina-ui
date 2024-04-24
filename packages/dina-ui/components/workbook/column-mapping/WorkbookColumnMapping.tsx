@@ -263,6 +263,8 @@ export function WorkbookColumnMapping({
           }
         }
         if (errors.length > 0) {
+          // Scroll to top of the page to display error messages.
+          window.scrollTo({ top: 0, behavior: "smooth" });
           return new ValidationError(errors);
         }
         const data = getDataFromWorkbook(
@@ -273,6 +275,8 @@ export function WorkbookColumnMapping({
         );
         validateData(data, errors);
         if (errors.length > 0) {
+          // Scroll to top of the page to display error messages.
+          window.scrollTo({ top: 0, behavior: "smooth" });
           return new ValidationError(errors);
         }
         return true;
