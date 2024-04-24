@@ -1,4 +1,5 @@
 import { useFormikContext } from "formik";
+import { startCase } from "lodash";
 import { useEffect, useMemo } from "react";
 import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
@@ -83,8 +84,11 @@ export function RelationshipFieldMapping({
           <div className="col-3">
             <DinaMessage id="value" />
           </div>
-          <div className="col-3">
+          <div className="col-1">
             <DinaMessage id="count" />
+          </div>
+          <div className="col-2">
+            <DinaMessage id="type" />
           </div>
           <div className="col-3">
             <DinaMessage id="relatedRecord" />
@@ -102,6 +106,8 @@ export function RelationshipFieldMapping({
             const thisColumnMap = workbookColumnMap[columnName]!;
             const fieldPath = thisColumnMap.fieldPath;
             const counts = columnUniqueValues[sheet][columnName];
+            const lastIndex = fieldPath!.lastIndexOf(".");
+            const parentPath = fieldPath!.substring(0, lastIndex);
             return Object.keys(counts).map((fieldValue, index2) => (
               <div
                 className={`row${index1 % 2 === 0 ? " odd" : ""}`}
@@ -109,7 +115,8 @@ export function RelationshipFieldMapping({
               >
                 <div className="col-3">{index2 === 0 ? columnName : ""}</div>
                 <div className="col-3">{fieldValue}</div>
-                <div className="col-3">{counts[fieldValue]}</div>
+                <div className="col-1">{counts[fieldValue]}</div>
+                <div className="col-2">{startCase(parentPath)}</div>
                 <div className="col-3">
                   {getResourceSelectField(
                     onChangeRelatedRecord,
