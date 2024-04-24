@@ -47,6 +47,7 @@ export function WorkbookFieldSelectField({
         color: "rgb(87,120,94)"
       }),
       menu: (base) => ({ ...base, zIndex: 1050 }),
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
       control: (base) => ({
         ...base
       }),
@@ -117,10 +118,9 @@ export function WorkbookFieldSelectField({
         selectProps={{
           isClearable: true,
           menuPortalTarget: document.body,
-          styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+          styles: customStyles
         }}
         hideLabel={true}
-        styles={customStyles}
         onChange={onFieldMapChanged}
         disabled={disabled}
       />
