@@ -81,10 +81,10 @@ export function RelationshipFieldMapping({
           <div className="col-3">
             <DinaMessage id="spreadsheetHeader" />
           </div>
-          <div className="col-3">
+          <div className="col-2">
             <DinaMessage id="value" />
           </div>
-          <div className="col-1">
+          <div className="col-2">
             <DinaMessage id="count" />
           </div>
           <div className="col-2">
@@ -114,8 +114,8 @@ export function RelationshipFieldMapping({
                 key={fieldValue}
               >
                 <div className="col-3">{index2 === 0 ? columnName : ""}</div>
-                <div className="col-3">{fieldValue}</div>
-                <div className="col-1">{counts[fieldValue]}</div>
+                <div className="col-2">{fieldValue}</div>
+                <div className="col-2">{counts[fieldValue]}</div>
                 <div className="col-2">{startCase(parentPath)}</div>
                 <div className="col-3">
                   {getResourceSelectField(
