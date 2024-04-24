@@ -37,6 +37,7 @@ import {
 } from "../utils/workbookMappingUtils";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
+import { error } from "console";
 
 export type FieldMapType = {
   targetField: string | undefined;
@@ -283,103 +284,155 @@ export function WorkbookColumnMapping({
     workbookData: { [field: string]: any }[],
     errors: ValidationError[]
   ) {
+    // get all mapped parent material sample names
+    const parentValueMapping =
+      Object.values(workbookColumnMap ?? {}).find(
+        (item) => item.fieldPath === "parentMaterialSample.materialSampleName"
+      )?.valueMapping ?? {};
+    const mappedParentNames = Object.keys(parentValueMapping);
+    const missingParentMaterialSampleNames: string[] = [];
+
     for (let i = 0; i < workbookData.length; i++) {
       const row = workbookData[i];
       for (const fieldPath of Object.keys(row)) {
         if (fieldPath === "rowNumber") {
           continue;
         }
-        const param: {
-          sheet: number;
-          index: number;
-          field: string;
-          dataType?: WorkbookDataTypeEnum;
-        } = {
-          sheet: sheet + 1,
-          index: row.rowNumber + 1,
-          field: fieldPath
-        };
-        if (!!row[fieldPath]) {
-          switch (flattenedConfig[fieldPath]?.dataType) {
-            case WorkbookDataTypeEnum.BOOLEAN:
-              if (!isBoolean(row[fieldPath])) {
-                param.dataType = WorkbookDataTypeEnum.BOOLEAN;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    fieldPath,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-            case WorkbookDataTypeEnum.NUMBER:
-              if (!isNumber(row[fieldPath])) {
-                param.dataType = WorkbookDataTypeEnum.NUMBER;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    fieldPath,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-            case WorkbookDataTypeEnum.NUMBER_ARRAY:
-              if (!isNumberArray(row[fieldPath])) {
-                param.dataType = WorkbookDataTypeEnum.NUMBER_ARRAY;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    fieldPath,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-            case WorkbookDataTypeEnum.BOOLEAN_ARRAY:
-              if (!isBooleanArray(row[fieldPath])) {
-                param.dataType = WorkbookDataTypeEnum.BOOLEAN_ARRAY;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    fieldPath,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-            case WorkbookDataTypeEnum.NUMBER:
-              if (!isNumber(row[fieldPath])) {
-                param.dataType = WorkbookDataTypeEnum.NUMBER;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    fieldPath,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-            case WorkbookDataTypeEnum.VOCABULARY:
-              const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldPath);
-              if (vocabElements && !vocabElements.includes(row[fieldPath])) {
-                param.dataType = WorkbookDataTypeEnum.VOCABULARY;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    fieldPath,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-          }
+        if (fieldPath === "parentMaterialSample.materialSampleName") {
+          // If there is a parent material-sample name, but the name is not found
+          validateMissingParentMaterialSamples(
+            row,
+            fieldPath,
+            mappedParentNames,
+            missingParentMaterialSampleNames
+          );
+        } else {
+          valiateDataFormat(row, fieldPath, errors);
         }
       }
     }
+    if (missingParentMaterialSampleNames.length > 0) {
+      errors.push(
+        new ValidationError(
+          formatMessage("missingParentMaterialSampleNames", {
+            missingNames: missingParentMaterialSampleNames.join(", ")
+          }),
+          "parentMaterialSample.materialSampleName",
+          "sheet"
+        )
+      );
+    }
 
     return errors;
+  }
+
+  function validateMissingParentMaterialSamples(
+    row: { [field: string]: any },
+    fieldPath: string,
+    mappedParentNames: string[],
+    missingParentMaterialSampleNames: string[]
+  ) {
+    if (
+      !!row[fieldPath] &&
+      row[fieldPath].trim() !== "" &&
+      mappedParentNames.indexOf(row[fieldPath]) < 0
+    ) {
+      missingParentMaterialSampleNames.push(row[fieldPath]);
+    }
+  }
+
+  function valiateDataFormat(
+    row: { [field: string]: any },
+    fieldPath: string,
+    errors: yup.ValidationError[]
+  ) {
+    const param: {
+      sheet: number;
+      index: number;
+      field: string;
+      dataType?: WorkbookDataTypeEnum;
+    } = {
+      sheet: sheet + 1,
+      index: row.rowNumber + 1,
+      field: fieldPath
+    };
+    if (!!row[fieldPath]) {
+      switch (flattenedConfig[fieldPath]?.dataType) {
+        case WorkbookDataTypeEnum.BOOLEAN:
+          if (!isBoolean(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.BOOLEAN;
+            errors.push(
+              new ValidationError(
+                formatMessage("workBookInvalidDataFormat", param),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
+        case WorkbookDataTypeEnum.NUMBER:
+          if (!isNumber(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.NUMBER;
+            errors.push(
+              new ValidationError(
+                formatMessage("workBookInvalidDataFormat", param),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
+        case WorkbookDataTypeEnum.NUMBER_ARRAY:
+          if (!isNumberArray(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.NUMBER_ARRAY;
+            errors.push(
+              new ValidationError(
+                formatMessage("workBookInvalidDataFormat", param),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
+        case WorkbookDataTypeEnum.BOOLEAN_ARRAY:
+          if (!isBooleanArray(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.BOOLEAN_ARRAY;
+            errors.push(
+              new ValidationError(
+                formatMessage("workBookInvalidDataFormat", param),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
+        case WorkbookDataTypeEnum.NUMBER:
+          if (!isNumber(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.NUMBER;
+            errors.push(
+              new ValidationError(
+                formatMessage("workBookInvalidDataFormat", param),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
+        case WorkbookDataTypeEnum.VOCABULARY:
+          const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldPath);
+          if (vocabElements && !vocabElements.includes(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.VOCABULARY;
+            errors.push(
+              new ValidationError(
+                formatMessage("workBookInvalidDataFormat", param),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
+          break;
+      }
+    }
   }
 
   async function onFieldMappingChange(
