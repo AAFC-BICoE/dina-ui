@@ -38,7 +38,7 @@ export function UploadWorkbookPage() {
 
     // Attempt to call the conversion API.
     await apiClient.axios
-      .post("/objectstore-api/conversion/workbook", formData)
+      .post("/objectstore-api/workbook/conversion", formData)
       .then((response) => {
         uploadWorkbook(response.data);
         setLoading(false);
