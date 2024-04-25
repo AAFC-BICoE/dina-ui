@@ -12,6 +12,7 @@ export interface UploadFileParams {
   files: IFileWithMeta[];
   group: string;
   isDerivative?: boolean;
+  isReportTemplate?: boolean;
 }
 
 const FileUploadContext = createContext<FileUploadContextI | null>(null);

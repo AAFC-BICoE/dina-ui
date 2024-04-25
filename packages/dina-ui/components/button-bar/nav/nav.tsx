@@ -511,7 +511,7 @@ function NavDinaManagementDropdown({ formatMessage }) {
       onKeyDown={onKeyDown}
       onMouseLeave={hideDropdown}
       show={show}
-      className="float-right"
+      className="float-right management-dropdown"
       role="menuitem"
       menuRole="menu"
       style={{ marginLeft: "auto" }}
