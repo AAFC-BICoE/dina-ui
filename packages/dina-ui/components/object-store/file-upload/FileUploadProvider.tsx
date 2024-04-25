@@ -37,7 +37,8 @@ export function FileUploadProviderImpl({ children }) {
     for (const { file } of files) {
       // Wrap the file in a FormData:
       const formData = new FormData();
-      formData.append("file", file);
+      const blob = file.slice(0, file.size, "text/x-freemarker-template");
+      formData.append("file", blob, file.name);
 
       // Upload the file:
       const response = await apiClient.axios.post(
