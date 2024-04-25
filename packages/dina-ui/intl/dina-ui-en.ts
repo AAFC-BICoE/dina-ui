@@ -774,7 +774,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedSearchOverwriteExisting:
     'There is currently already a saved search named "{savedSearchName}". Creating this saved search will overwrite the existing saved search.',
   scheduledActions: "Scheduled Actions",
-  scientificNameSearch: "Scientific Name Search",
+  scientificNameSearch: "Classification",
+  manual: "Manual",
   searchButton: "Search",
   searchOnCOL: " Search on Catalogue of Life",
   searchPreviousTags: "Search previous tags",
@@ -907,6 +908,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   withAMouse: "With a mouse",
   workBookDuplicateFieldMap: "This column should not map to the same field",
   workBookSkippedField: "Please select a field or skip importing it",
+  missingParentMaterialSampleNames:
+    "Missing parent material sample names: {missingNames}",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}",
   workBookInvalidManagedAttributeDataType:

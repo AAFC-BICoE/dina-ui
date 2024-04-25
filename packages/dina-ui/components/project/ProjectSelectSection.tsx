@@ -21,9 +21,7 @@ export function ProjectSelectSection({
 }: ProjectSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
-    <ProjectsSelectField 
-      resourcePath={resourcePath}
-    />
+    <ProjectsSelectField resourcePath={resourcePath} />
   ) : (
     <div className={`${classNames} row`}>
       <DinaFormSection horizontal="flex">
@@ -67,21 +65,19 @@ export function ProjectsSelectField({
           </span>
         }
         readOnlyRender={(value, _) =>
-          (Array.isArray(value) && value.length !== 0) ? (
+          Array.isArray(value) && value.length !== 0 ? (
             <div className="d-flex flex-row mb-3 me-2">
               {value.map((val, idx) => (
                 <Tooltip
-                  visibleElement={(
-                    <div
-                      className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
-                      key={idx}
-                    >
+                  key={idx}
+                  visibleElement={
+                    <div className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined">
                       <IoIosListBox />
                       <Link href={"/collection/project/view?id=" + val.id}>
                         <a>{val.name}</a>
                       </Link>
                     </div>
-                  )}
+                  }
                   id="project"
                   disableSpanMargin={true}
                 />

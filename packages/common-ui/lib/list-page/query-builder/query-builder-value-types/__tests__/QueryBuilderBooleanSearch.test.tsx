@@ -2,6 +2,8 @@ import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
 } from "../QueryBuilderBooleanSearch";
+import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
+import "@testing-library/jest-dom";
 
 describe("QueryBuilderBooleanSearch", () => {
   describe("QueryBuilderBooleanSearch Component", () => {
@@ -9,30 +11,30 @@ describe("QueryBuilderBooleanSearch", () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
       const boolSearchEquals = mountWithAppContext2(
-        <QueryBuilderBooleanSearch
-          matchType="equals"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderBooleanSearch
+            matchType="equals"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
 
       // Expect a snapshot with the text field being displayed.
-      expect(boolSearchEquals.asFragment()).toMatchSnapshot(
-        "Expect boolean field to be displayed since match type is equals"
-      );
+      expect(boolSearchEquals.queryByRole("combobox")).toBeInTheDocument();
 
       const boolSearchEmpty = mountWithAppContext2(
-        <QueryBuilderBooleanSearch
-          matchType="empty"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderBooleanSearch
+            matchType="empty"
+            value="test"
+            setValue={jest.fn}
+          />
+        </DinaForm>
       );
 
       // Expect a snapshot without the text field being displayed.
-      expect(boolSearchEmpty.asFragment()).toMatchSnapshot(
-        "Expect boolean field not to be displayed since the match type is not equals"
-      );
+      expect(boolSearchEmpty.queryByRole("combobox")).not.toBeInTheDocument();
     });
   });
 

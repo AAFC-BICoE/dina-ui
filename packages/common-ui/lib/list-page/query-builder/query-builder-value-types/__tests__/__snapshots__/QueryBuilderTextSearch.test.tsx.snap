@@ -2,19 +2,34 @@
 
 exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is equals: Expect text field not to be displayed since the match type is not equals 1`] = `
 <DocumentFragment>
-  <div />
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+    </form>
+  </div>
 </DocumentFragment>
 `;
 
 exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is equals: Expect text field to be displayed since match type is equals 1`] = `
 <DocumentFragment>
   <div>
-    <input
-      class="form-control"
-      placeholder="queryBuilder_value_text_placeholder"
-      type="text"
-      value="test"
-    />
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_text_placeholder"
+        type="text"
+        value="test"
+      />
+    </form>
   </div>
 </DocumentFragment>
 `;
@@ -22,12 +37,19 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
 exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is in or not in: Expect text field to be displayed with a different placeholder. 1`] = `
 <DocumentFragment>
   <div>
-    <input
-      class="form-control"
-      placeholder="queryBuilder_value_in_placeholder"
-      type="text"
-      value="test1, test2, test3"
-    />
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_in_placeholder"
+        type="text"
+        value="test1, test2, test3"
+      />
+    </form>
   </div>
 </DocumentFragment>
 `;
@@ -35,12 +57,19 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
 exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field if match type is in or not in: Expect text field to be displayed with a different placeholder. 2`] = `
 <DocumentFragment>
   <div>
-    <input
-      class="form-control"
-      placeholder="queryBuilder_value_in_placeholder"
-      type="text"
-      value="test1, test2, test3"
-    />
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_in_placeholder"
+        type="text"
+        value="test1, test2, test3"
+      />
+    </form>
   </div>
 </DocumentFragment>
 `;

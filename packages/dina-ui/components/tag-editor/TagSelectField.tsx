@@ -43,16 +43,16 @@ export function TagSelectField({
           <div className="d-flex flex-wrap gap-2 float-end">
             {(tagsVal ?? []).map((tag, index) => (
               <Tooltip
-                visibleElement={(
+                key={index}
+                visibleElement={
                   <div
-                    key={index}
                     className="card pill py-1 px-2 flex-row align-items-center gap-1"
                     style={{ background: "rgb(24, 102, 109)" }}
                   >
                     <AiFillTag className="text-white" />
                     <span className="text-white">{tag}</span>
                   </div>
-                )}
+                }
                 id="tag"
                 disableSpanMargin={true}
               />
@@ -241,7 +241,7 @@ export function TagSelectReadOnly({
             groupSelectorName={groupSelectorName}
             removeBottomMargin={true}
           />
-        </div>        
+        </div>
       )}
     </>
   );

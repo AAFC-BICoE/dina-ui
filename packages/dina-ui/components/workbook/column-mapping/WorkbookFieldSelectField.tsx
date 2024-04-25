@@ -8,8 +8,13 @@ import {
   filterBy
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../types/collection-api";
+import {
+  ManagedAttribute,
+  VocabularyElement
+} from "../../../types/collection-api";
+import { VocabularyOption } from "../../collection/VocabularySelectField";
 import { WorkbookColumnMappingFields } from "./WorkbookColumnMapping";
+import { useColumnMapping } from "./useColumnMapping";
 
 export interface WorkbookFieldSelectFieldProps {
   columnIndex: number;
@@ -33,6 +38,7 @@ export function WorkbookFieldSelectField({
   onFieldChanged
 }: WorkbookFieldSelectFieldProps) {
   const { locale, formatMessage } = useDinaIntl();
+  const { taxonomicRanks } = useColumnMapping();
   // Custom styling to indent the group option menus.
   const customStyles = useMemo(
     () => ({
@@ -41,6 +47,7 @@ export function WorkbookFieldSelectField({
         color: "rgb(87,120,94)"
       }),
       menu: (base) => ({ ...base, zIndex: 1050 }),
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
       control: (base) => ({
         ...base
       }),
@@ -91,6 +98,17 @@ export function WorkbookFieldSelectField({
     onFieldChanged?.(newFieldPath);
   };
 
+  function toOption(value: VocabularyElement): VocabularyOption {
+    const label =
+      (value?.multilingualTitle?.titles || []).find(
+        (item) => item.lang === locale
+      )?.title ||
+      value.name ||
+      "";
+    return { label, value: value.key };
+  }
+  const classificationOptions = taxonomicRanks.map((item) => toOption(item));
+
   return (
     <div className="d-flex">
       <SelectField
@@ -100,10 +118,9 @@ export function WorkbookFieldSelectField({
         selectProps={{
           isClearable: true,
           menuPortalTarget: document.body,
-          styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+          styles: customStyles
         }}
         hideLabel={true}
-        styles={customStyles}
         onChange={onFieldMapChanged}
         disabled={disabled}
       />
@@ -181,6 +198,22 @@ export function WorkbookFieldSelectField({
             optionLabel={(cm) => cm.name}
           />
         </>
+      )}
+
+      {fieldMap[columnIndex]?.targetField ===
+        "organism.determination.scientificNameDetails" && (
+        <div className="flex-fill">
+          <SelectField
+            name={`fieldMap[${columnIndex}].targetKey.key`}
+            options={classificationOptions}
+            hideLabel={true}
+            selectProps={{
+              className: "ms-2",
+              menuPortalTarget: document.body,
+              styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+            }}
+          />
+        </div>
       )}
     </div>
   );

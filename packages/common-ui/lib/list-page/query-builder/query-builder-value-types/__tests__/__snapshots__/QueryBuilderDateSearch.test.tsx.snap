@@ -2,27 +2,42 @@
 
 exports[`QueryBuilderDateSearch QueryBuilderDateSearch Component Display field if match type is equals: Expect date field not to be displayed since the match type is not equals 1`] = `
 <DocumentFragment>
-  <div />
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+    </form>
+  </div>
 </DocumentFragment>
 `;
 
 exports[`QueryBuilderDateSearch QueryBuilderDateSearch Component Display field if match type is equals: Expect date field to be displayed since match type is equals 1`] = `
 <DocumentFragment>
   <div>
-    <div
-      class="react-datepicker-wrapper"
+    <form
+      action="#"
     >
       <div
-        class="react-datepicker__input-container"
+        class="error-viewer"
+      />
+      <div
+        class="react-datepicker-wrapper"
       >
-        <input
-          class="form-control"
-          placeholder="YYYY-MM-DD"
-          type="text"
-          value="test"
-        />
+        <div
+          class="react-datepicker__input-container"
+        >
+          <input
+            class="form-control"
+            placeholder="YYYY-MM-DD"
+            type="text"
+            value="test"
+          />
+        </div>
       </div>
-    </div>
+    </form>
   </div>
 </DocumentFragment>
 `;

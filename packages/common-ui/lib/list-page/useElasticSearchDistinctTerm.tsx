@@ -99,7 +99,10 @@ export function useElasticSearchDistinctTerm({
       })
       .then((resp) => {
         // Ignore the type if provided, just look using the end of the key.
-        const findTermAggregationKey = (aggregations: any, keyName: string): any | undefined => {
+        const findTermAggregationKey = (
+          aggregations: any,
+          keyName: string
+        ): any | undefined => {
           for (const key in aggregations) {
             if (
               (key.includes("#") && key.endsWith("#" + keyName)) ||
@@ -111,11 +114,11 @@ export function useElasticSearchDistinctTerm({
           return undefined;
         };
 
-        let suggestions: string[] | undefined;
+        let suggestionArray: string[] | undefined;
 
         // The path to the results in the response changes if it contains the nested aggregation.
         if (relationshipType) {
-          suggestions = findTermAggregationKey(
+          suggestionArray = findTermAggregationKey(
             findTermAggregationKey(
               findTermAggregationKey(
                 resp?.data?.aggregations,
@@ -126,14 +129,14 @@ export function useElasticSearchDistinctTerm({
             AGGREGATION_NAME
           )?.buckets?.map((bucket) => bucket.key);
         } else {
-          suggestions = findTermAggregationKey(
+          suggestionArray = findTermAggregationKey(
             resp?.data?.aggregations,
             AGGREGATION_NAME
           )?.buckets?.map((bucket) => bucket.key);
         }
 
-        if (suggestions !== undefined) {
-          setSuggestions(suggestions);
+        if (suggestionArray !== undefined) {
+          setSuggestions(suggestionArray);
         } else {
           // Ignore, don't break.
           setSuggestions([]);

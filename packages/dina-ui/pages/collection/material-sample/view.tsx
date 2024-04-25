@@ -156,28 +156,28 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               />
             </div>
             <div className="col-md-5 flex d-flex col-sm-12 gap-1">
-              <DeleteButton
-                id={id}
-                options={{ apiBaseUrl: "/collection-api" }}
-                postDeleteRedirect="/collection/material-sample/list"
-                type="material-sample"
-                className="ms-auto"
+              <EditButton
+                entityId={id}
+                entityLink="collection/material-sample"
               />
-              <Link href={`/collection/material-sample/revisions?id=${id}`}>
-                <a className="btn btn-info me-3">
-                  <DinaMessage id="revisionsButtonText" />
-                </a>
-              </Link>
-              <GenerateLabelDropdownButton materialSample={materialSample} />
               <SplitMaterialSampleDropdownButton
                 ids={[id]}
                 disabled={!materialSample.materialSampleName}
                 materialSampleType={materialSample.materialSampleType}
                 className="me-0"
               />
-              <EditButton
-                entityId={id}
-                entityLink="collection/material-sample"
+              <GenerateLabelDropdownButton resource={materialSample} />
+              <Link href={`/collection/material-sample/revisions?id=${id}`}>
+                <a className="btn btn-info me-3">
+                  <DinaMessage id="revisionsButtonText" />
+                </a>
+              </Link>
+              <DeleteButton
+                id={id}
+                options={{ apiBaseUrl: "/collection-api" }}
+                postDeleteRedirect="/collection/material-sample/list"
+                type="material-sample"
+                className="ms-auto"
               />
             </div>
           </ButtonBar>
