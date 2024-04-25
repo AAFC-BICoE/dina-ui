@@ -518,15 +518,22 @@ function NavDinaManagementDropdown({ formatMessage }) {
     >
       {/* Admins only can view users. */}
       {isAdmin && (
-        <Link
-          href="/dina-user/list"
-          onKeyDown={onKeyDownLastItem}
-          passHref={true}
-        >
-          <NavDropdown.Item role="menuitem">
-            <DinaMessage id="userListTitle" />
-          </NavDropdown.Item>
-        </Link>
+        <>
+          <Link href="/dina-user/list" onKeyDown={onKeyDown} passHref={true}>
+            <NavDropdown.Item role="menuitem">
+              <DinaMessage id="userListTitle" />
+            </NavDropdown.Item>
+          </Link>
+          <Link
+            href="/report-template/upload"
+            onKeyDown={onKeyDownLastItem}
+            passHref={true}
+          >
+            <NavDropdown.Item role="menuitem">
+              <DinaMessage id="reportTemplateUpload" />
+            </NavDropdown.Item>
+          </Link>
+        </>
       )}
     </NavDropdown>
   );
