@@ -38,6 +38,17 @@
 }
 
 /*
+ * Breadcrumb CSS rules
+ */
+.breadcrumb-slash {
+  --bs-breadcrumb-divider: '/';
+}
+
+.breadcrumb-arrow {
+  --bs-breadcrumb-divider: '>';
+}
+
+/*
 * Fixes WCAG contrast issue for react-select input elements
 * Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
 */
