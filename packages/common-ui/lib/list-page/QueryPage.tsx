@@ -13,7 +13,9 @@ import React, {
   useEffect,
   useMemo,
   useState,
-  useRef
+  useRef,
+  createContext,
+  useContext
 } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
@@ -90,6 +92,22 @@ const DEFAULT_SORT: SortingState = [
  * to be used to get the actual total.
  */
 const MAX_COUNT_SIZE: number = 10000;
+
+export interface QueryPageContextI {
+  performSubmit: () => void;
+}
+const QueryPageContext = createContext<QueryPageContextI | null>(null);
+
+/** Exposes the needed features from the query page provider. */
+export function useQueryPageContext(): QueryPageContextI {
+  const ctx = useContext(QueryPageContext);
+  if (!ctx) {
+    throw new Error(
+      "No QueryPageContext available, is this component inside of a QueryPage?"
+    );
+  }
+  return ctx;
+}
 
 export interface QueryPageProps<TData extends KitsuResource> {
   /**
@@ -986,27 +1004,27 @@ export function QueryPage<TData extends KitsuResource>({
 
   return (
     <>
-      <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
-        {!viewMode && (
-          <>
-            {validationErrors.length > 0 && (
-              <div
-                className="alert alert-danger"
-                style={{
-                  whiteSpace: "pre-line"
-                }}
-              >
-                <h5>Validation Errors</h5>
-                <ul>
-                  {validationErrors.map((validationError: ValidationError) => (
-                    <li key={validationError.fieldName}>
-                      <strong>{validationError.fieldName}: </strong>
-                      {validationError.errorMessage}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+      {!viewMode && (
+        <>
+          {validationErrors.length > 0 && (
+            <div
+              className="alert alert-danger"
+              style={{
+                whiteSpace: "pre-line"
+              }}
+            >
+              <h5>Validation Errors</h5>
+              <ul>
+                {validationErrors.map((validationError: ValidationError) => (
+                  <li key={validationError.fieldName}>
+                    <strong>{validationError.fieldName}: </strong>
+                    {validationError.errorMessage}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <QueryPageContext.Provider value={{ performSubmit: onSubmit }}>
             <QueryBuilderMemo
               indexName={indexName}
               queryBuilderTree={queryBuilderTree}
@@ -1021,9 +1039,11 @@ export function QueryPage<TData extends KitsuResource>({
               uniqueName={uniqueName}
               validationErrors={validationErrors}
             />
-          </>
-        )}
+          </QueryPageContext.Provider>
+        </>
+      )}
 
+      <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
         {/* Group Selection */}
         {!viewMode && (
           <DinaFormSection horizontal={"flex"}>
