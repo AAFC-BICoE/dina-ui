@@ -32,13 +32,18 @@ export function FileUploadProviderImpl({ children }) {
   const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useDinaIntl();
 
-  async function uploadFiles({ files, group, isDerivative }: UploadFileParams) {
+  async function uploadFiles({
+    files,
+    group,
+    isDerivative,
+    isReportTemplate
+  }: UploadFileParams) {
     const uploadRespsT: ObjectUpload[] = [];
     for (const { file } of files) {
       // Wrap the file in a FormData:
       const formData = new FormData();
       const blob = file.slice(0, file.size, "text/x-freemarker-template");
-      formData.append("file", blob, file.name);
+      formData.append("file", isReportTemplate ? blob : file, file.name);
 
       // Upload the file:
       const response = await apiClient.axios.post(
