@@ -81,19 +81,22 @@ export function useColumnMapping() {
           arguments: "MATERIAL_SAMPLE"
         }
       ]
-    })("")
+    })(""),
+    page: { limit: 1000 }
   });
 
   const { loading: taxonomicRankLoading, response: taxonomicRankResp } =
     useQuery<Vocabulary>({
-      path: "collection-api/vocabulary/taxonomicRank"
+      path: "collection-api/vocabulary/taxonomicRank",
+      page: { limit: 1000 }
     });
 
   const { loading: collectionLoading, response: collectionResp } = useQuery<
     RelationshipResource[]
   >(
     {
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=collection`
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=collection`,
+      page: { limit: 1000 }
     },
     {
       deps: [groupName]
@@ -102,7 +105,8 @@ export function useColumnMapping() {
   const { loading: preparationTypeLoading, response: preparationTypeResp } =
     useQuery<RelationshipResource[]>(
       {
-        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-type`
+        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-type`,
+        page: { limit: 1000 }
       },
       {
         deps: [groupName]
@@ -111,7 +115,8 @@ export function useColumnMapping() {
   const { loading: preparationMethodLoading, response: preparationMethodResp } =
     useQuery<RelationshipResource[]>(
       {
-        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-method`
+        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-method`,
+        page: { limit: 1000 }
       },
       {
         deps: [groupName]
@@ -121,7 +126,8 @@ export function useColumnMapping() {
     RelationshipResource[]
   >(
     {
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=protocol`
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=protocol`,
+      page: { limit: 1000 }
     },
     {
       deps: [groupName]
@@ -131,7 +137,8 @@ export function useColumnMapping() {
     RelationshipResource[]
   >(
     {
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=storage-unit`
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=storage-unit`,
+      page: { limit: 1000 }
     },
     {
       deps: [groupName]
@@ -141,7 +148,8 @@ export function useColumnMapping() {
     RelationshipResource[]
   >(
     {
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=project`
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=project`,
+      page: { limit: 1000 }
     },
     {
       deps: [groupName]
