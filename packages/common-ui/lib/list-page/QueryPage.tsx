@@ -13,9 +13,7 @@ import React, {
   useEffect,
   useMemo,
   useState,
-  useRef,
-  createContext,
-  useContext
+  useRef
 } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
@@ -92,22 +90,6 @@ const DEFAULT_SORT: SortingState = [
  * to be used to get the actual total.
  */
 const MAX_COUNT_SIZE: number = 10000;
-
-export interface QueryPageContextI {
-  performSubmit: () => void;
-}
-const QueryPageContext = createContext<QueryPageContextI | null>(null);
-
-/** Exposes the needed features from the query page provider. */
-export function useQueryPageContext(): QueryPageContextI {
-  const ctx = useContext(QueryPageContext);
-  if (!ctx) {
-    throw new Error(
-      "No QueryPageContext available, is this component inside of a QueryPage?"
-    );
-  }
-  return ctx;
-}
 
 export interface QueryPageProps<TData extends KitsuResource> {
   /**
@@ -1024,22 +1006,20 @@ export function QueryPage<TData extends KitsuResource>({
               </ul>
             </div>
           )}
-          <QueryPageContext.Provider value={{ performSubmit: onSubmit }}>
-            <QueryBuilderMemo
-              indexName={indexName}
-              queryBuilderTree={queryBuilderTree}
-              setQueryBuilderTree={onQueryBuildTreeChange}
-              queryBuilderConfig={queryBuilderConfig}
-              setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-              setPageOffset={setPageOffset}
-              onSubmit={onSubmit}
-              onReset={onReset}
-              setGroups={setGroups}
-              groups={groups}
-              uniqueName={uniqueName}
-              validationErrors={validationErrors}
-            />
-          </QueryPageContext.Provider>
+          <QueryBuilderMemo
+            indexName={indexName}
+            queryBuilderTree={queryBuilderTree}
+            setQueryBuilderTree={onQueryBuildTreeChange}
+            queryBuilderConfig={queryBuilderConfig}
+            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+            setPageOffset={setPageOffset}
+            onSubmit={onSubmit}
+            onReset={onReset}
+            setGroups={setGroups}
+            groups={groups}
+            uniqueName={uniqueName}
+            validationErrors={validationErrors}
+          />
         </>
       )}
 

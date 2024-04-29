@@ -350,6 +350,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_fileSize: "File Size",
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
+  field__globalSearch: "Global search",
   field_gridLayoutDefinition_column_label: "By Column",
   field_gridLayoutDefinition_row_label: "By Row",
   field_host: "Host",
