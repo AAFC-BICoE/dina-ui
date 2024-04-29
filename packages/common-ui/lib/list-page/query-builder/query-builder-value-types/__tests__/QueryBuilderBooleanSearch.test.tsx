@@ -13,7 +13,7 @@ describe("QueryBuilderBooleanSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const boolSearchEquals = mountWithAppContext2(
+      const { queryByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider value={{ performSubmit: noop }}>
             <QueryBuilderBooleanSearch
@@ -26,14 +26,16 @@ describe("QueryBuilderBooleanSearch", () => {
       );
 
       // Expect a snapshot with the text field being displayed.
-      expect(boolSearchEquals.queryByRole("combobox")).toBeInTheDocument();
+      expect(queryByRole("combobox")).toBeInTheDocument();
+    });
 
-      const boolSearchEmpty = mountWithAppContext2(
+    it("Don't display field if match type is not equals", async () => {
+      const { queryByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider value={{ performSubmit: noop }}>
             <QueryBuilderBooleanSearch
               matchType="empty"
-              value="test"
+              value=""
               setValue={jest.fn}
             />
           </QueryBuilderContextProvider>
@@ -41,7 +43,7 @@ describe("QueryBuilderBooleanSearch", () => {
       );
 
       // Expect a snapshot without the text field being displayed.
-      expect(boolSearchEmpty.queryByRole("combobox")).not.toBeInTheDocument();
+      expect(queryByRole("combobox")).not.toBeInTheDocument();
     });
 
     it("Should call performSubmit on enter key press in combobox", async () => {
