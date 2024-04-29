@@ -1,9 +1,10 @@
 import { useFormikContext } from "formik";
-import { isNil } from "lodash";
+import { isNil, find } from "lodash";
 import { useIntl } from "react-intl";
 import { CommonMessage, Tooltip } from "..";
 import { useDinaFormContext } from "./DinaForm";
 import { MetersField } from "./MetersField";
+import { useMemo } from "react";
 
 export interface NumberRangeFieldsProps {
   /** Min and max field names. */
@@ -16,7 +17,47 @@ export function NumberRangeFields({
   labelMsg
 }: NumberRangeFieldsProps) {
   const { formatMessage } = useIntl();
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, isTemplate, formTemplate, componentName, sectionName } =
+    useDinaFormContext();
+
+  /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
+  const disabledByFormTemplate: {
+    minNameVisible: boolean;
+    maxNameVisible: boolean;
+  } = useMemo(() => {
+    if (isTemplate) {
+      return { minNameVisible: true, maxNameVisible: true };
+    }
+    if (!formTemplate || !componentName || !sectionName) {
+      return { minNameVisible: false, maxNameVisible: false };
+    }
+    // First find the component we are looking for.
+    const componentFound = find(formTemplate?.components, {
+      name: componentName
+    });
+    if (componentFound) {
+      // Next find the right section.
+      const sectionFound = find(componentFound?.sections, {
+        name: sectionName
+      });
+      if (sectionFound) {
+        const minNameVisible =
+          find(sectionFound.items, { name: minName })?.visible ?? false;
+        const maxNameVisible =
+          find(sectionFound.items, { name: maxName })?.visible ?? false;
+        return { minNameVisible, maxNameVisible };
+      }
+    }
+    return { minNameVisible: false, maxNameVisible: false };
+  }, [formTemplate]);
+
+  if (
+    !disabledByFormTemplate.maxNameVisible &&
+    !disabledByFormTemplate.minNameVisible
+  ) {
+    return null;
+  }
+
   const { values } = useFormikContext<any>();
 
   const minVal = values[minName];
@@ -49,16 +90,20 @@ export function NumberRangeFields({
               className="flex-grow-1"
               placeholder={formatMessage({ id: "min" })}
             />
-            <span className="mx-3">
-              <CommonMessage id="to" />
-            </span>
-            <MetersField
-              removeLabel={true}
-              removeBottomMargin={true}
-              name={maxName}
-              className="flex-grow-1"
-              placeholder={formatMessage({ id: "max" })}
-            />
+            {disabledByFormTemplate.maxNameVisible && (
+              <>
+                <span className="mx-3">
+                  <CommonMessage id="to" />
+                </span>
+                <MetersField
+                  removeLabel={true}
+                  removeBottomMargin={true}
+                  name={maxName}
+                  className="flex-grow-1"
+                  placeholder={formatMessage({ id: "max" })}
+                />
+              </>
+            )}
           </div>
         )}
       </div>
