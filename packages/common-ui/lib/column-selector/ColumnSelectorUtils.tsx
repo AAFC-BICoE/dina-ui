@@ -300,7 +300,8 @@ export function getAttributesManagedAttributeColumn(
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: false,
     queryOption,
-    managedAttribute
+    managedAttribute,
+    sortDescFirst: true
   };
   if (setColumnSelectorIndexMapColumns) {
     addColumnToStateVariable(
