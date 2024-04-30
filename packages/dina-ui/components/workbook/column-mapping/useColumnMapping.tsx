@@ -4,22 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import {
   SelectField,
   filterBy,
-  useAccount,
   useApiClient,
   useQuery
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  CollectingEvent,
-  Collection,
-  ManagedAttribute,
-  MaterialSample,
-  PreparationMethod,
-  PreparationType,
-  Project,
-  Protocol,
-  StorageUnit
-} from "../../../types/collection-api";
+import { ManagedAttribute, Vocabulary } from "../../../types/collection-api";
 import { useWorkbookContext } from "../WorkbookProvider";
 import {
   LinkOrCreateSetting,
@@ -38,11 +27,7 @@ import { FieldMapType } from "./WorkbookColumnMapping";
 
 type RelationshipResource = { name?: string } & KitsuResource;
 
-export function useColumnMapping(
-  groupName: string,
-  sheet: number,
-  selectedType?: string
-) {
+export function useColumnMapping() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
   const {
@@ -51,17 +36,20 @@ export function useColumnMapping(
     setRelationshipMapping,
     workbookColumnMap,
     relationshipMapping,
-    columnUniqueValues
+    columnUniqueValues,
+    sheet,
+    type,
+    group: groupName
   } = useWorkbookContext();
 
   const { flattenedConfig, getFieldRelationshipConfig } = useWorkbookConverter(
     FieldMappingConfig,
-    selectedType || "material-sample"
+    type
   );
 
   // Retrieve a string array of the headers from the uploaded spreadsheet.
   const headers = useMemo(() => {
-    return getColumnHeaders(spreadsheetData, sheet);
+    return getColumnHeaders(spreadsheetData, sheet ?? 0);
   }, [sheet]);
 
   // Generate sheet dropdown options
@@ -77,12 +65,6 @@ export function useColumnMapping(
       return [];
     }
   }, [spreadsheetData]);
-  const { isAdmin } = useAccount();
-  const groupFilter = !isAdmin
-    ? {
-        rsql: `group==${groupName}`
-      }
-    : undefined;
 
   const [fieldOptions, setFieldOptions] = useState<FieldOptionType[]>([]);
   const [fieldMap, setFieldMap] = useState<FieldMapType[]>([]);
@@ -99,37 +81,80 @@ export function useColumnMapping(
           arguments: "MATERIAL_SAMPLE"
         }
       ]
-    })("")
+    })(""),
+    page: { limit: 1000 }
   });
+
+  const { loading: taxonomicRankLoading, response: taxonomicRankResp } =
+    useQuery<Vocabulary>({
+      path: "collection-api/vocabulary/taxonomicRank",
+      page: { limit: 1000 }
+    });
 
   const { loading: collectionLoading, response: collectionResp } = useQuery<
     RelationshipResource[]
-  >({
-    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=collection`
-  });
+  >(
+    {
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=collection`,
+      page: { limit: 1000 }
+    },
+    {
+      deps: [groupName]
+    }
+  );
   const { loading: preparationTypeLoading, response: preparationTypeResp } =
-    useQuery<RelationshipResource[]>({
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-type`
-    });
+    useQuery<RelationshipResource[]>(
+      {
+        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-type`,
+        page: { limit: 1000 }
+      },
+      {
+        deps: [groupName]
+      }
+    );
   const { loading: preparationMethodLoading, response: preparationMethodResp } =
-    useQuery<RelationshipResource[]>({
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-method`
-    });
+    useQuery<RelationshipResource[]>(
+      {
+        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-method`,
+        page: { limit: 1000 }
+      },
+      {
+        deps: [groupName]
+      }
+    );
   const { loading: protocolLoading, response: protocolResp } = useQuery<
     RelationshipResource[]
-  >({
-    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=protocol`
-  });
+  >(
+    {
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=protocol`,
+      page: { limit: 1000 }
+    },
+    {
+      deps: [groupName]
+    }
+  );
   const { loading: storageUnitLoading, response: storageUnitResp } = useQuery<
     RelationshipResource[]
-  >({
-    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=storage-unit`
-  });
+  >(
+    {
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=storage-unit`,
+      page: { limit: 1000 }
+    },
+    {
+      deps: [groupName]
+    }
+  );
   const { loading: projectLoading, response: projectResp } = useQuery<
     RelationshipResource[]
-  >({
-    path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=project`
-  });
+  >(
+    {
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=project`,
+      page: { limit: 1000 }
+    },
+    {
+      deps: [groupName]
+    }
+  );
 
   const loadingData =
     attrLoading ||
@@ -138,17 +163,110 @@ export function useColumnMapping(
     preparationMethodLoading ||
     protocolLoading ||
     storageUnitLoading ||
-    projectLoading;
+    projectLoading ||
+    taxonomicRankLoading;
 
   const managedAttributes = attrResp?.data || [];
-  const collections = collectionResp?.data || [];
-  const preparationTypes = preparationTypeResp?.data || [];
-  const preparationMethods = preparationMethodResp?.data || [];
-  const protocols = protocolResp?.data || [];
-  const storageUnits = storageUnitResp?.data || [];
-  const projects = projectResp?.data || [];
+  const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
+  const collections = (collectionResp?.data || []).map((item) => ({
+    ...item,
+    type: "collection"
+  }));
+  const preparationTypes = (preparationTypeResp?.data || []).map((item) => ({
+    ...item,
+    type: "preparation-type"
+  }));
+  const preparationMethods = (preparationMethodResp?.data || []).map(
+    (item) => ({ ...item, type: "preparation-method" })
+  );
+  const protocols = (protocolResp?.data || []).map((item) => ({
+    ...item,
+    type: "protocol"
+  }));
+  const storageUnits = (storageUnitResp?.data || []).map((item) => ({
+    ...item,
+    type: "storage-unit"
+  }));
+  const projects = (projectResp?.data || []).map((item) => ({
+    ...item,
+    type: "project"
+  }));
 
   const [loading, setLoading] = useState<boolean>(loadingData);
+
+  function handleManagedAttributeMapping(
+    columnHeader: string,
+    newWorkbookColumnMap: WorkbookColumnMap
+  ) {
+    const fieldPath = "managedAttributes";
+    const targetManagedAttr = managedAttributes.find(
+      (item) =>
+        item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+    );
+    if (targetManagedAttr) {
+      newWorkbookColumnMap[columnHeader] = {
+        fieldPath,
+        showOnUI: true,
+        mapRelationship: false,
+        numOfUniqueValues: Object.keys(
+          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+        ).length,
+        valueMapping: {
+          columnHeader: {
+            id: targetManagedAttr.id,
+            type: targetManagedAttr.type
+          }
+        }
+      };
+    } else {
+      newWorkbookColumnMap[columnHeader] = {
+        fieldPath,
+        showOnUI: true,
+        mapRelationship: false,
+        numOfUniqueValues: Object.keys(
+          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+        ).length,
+        valueMapping: {}
+      };
+    }
+  }
+
+  function handleClassificationMapping(
+    columnHeader: string,
+    newWorkbookColumnMap: WorkbookColumnMap
+  ) {
+    const fieldPath = "organism.determination.scientificNameDetails";
+    const targetTaxonomicRank = taxonomicRanks.find(
+      (item) =>
+        item.name?.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+    );
+    if (targetTaxonomicRank) {
+      newWorkbookColumnMap[columnHeader] = {
+        fieldPath,
+        showOnUI: true,
+        mapRelationship: false,
+        numOfUniqueValues: Object.keys(
+          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+        ).length,
+        valueMapping: {
+          columnHeader: {
+            key: targetTaxonomicRank.key,
+            name: targetTaxonomicRank.name
+          }
+        }
+      };
+    } else {
+      newWorkbookColumnMap[columnHeader] = {
+        fieldPath,
+        showOnUI: true,
+        mapRelationship: false,
+        numOfUniqueValues: Object.keys(
+          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+        ).length,
+        valueMapping: {}
+      };
+    }
+  }
 
   async function resolveColumnMappingAndRelationshipMapping(
     columnHeader: string,
@@ -156,37 +274,27 @@ export function useColumnMapping(
   ) {
     const newWorkbookColumnMap: WorkbookColumnMap = {};
     const newRelationshipMapping: RelationshipMapping = {};
-    if (fieldPath === undefined || fieldPath === "managedAttributes") {
-      const targetManagedAttr = managedAttributes.find(
-        (item) =>
-          item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
-      );
-      if (targetManagedAttr) {
-        newWorkbookColumnMap[columnHeader] = {
-          fieldPath: "managedAttributes",
-          showOnUI: true,
-          mapRelationship: false,
-          numOfUniqueValues: Object.keys(
-            columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
-          ).length,
-          valueMapping: {
-            columnHeader: {
-              id: targetManagedAttr.id,
-              type: targetManagedAttr.type
-            }
-          }
-        };
-      } else {
-        newWorkbookColumnMap[columnHeader] = {
-          fieldPath,
-          showOnUI: true,
-          mapRelationship: false,
-          numOfUniqueValues: Object.keys(
-            columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
-          ).length,
-          valueMapping: {}
-        };
+    if (fieldPath === undefined) {
+      if (
+        managedAttributes.findIndex(
+          (item) =>
+            item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+        ) > -1
+      ) {
+        handleManagedAttributeMapping(columnHeader, newWorkbookColumnMap);
+      } else if (
+        taxonomicRanks.findIndex(
+          (item) =>
+            item.name?.toLowerCase().trim() ===
+            columnHeader.toLowerCase().trim()
+        ) > -1
+      ) {
+        handleClassificationMapping(columnHeader, newWorkbookColumnMap);
       }
+    } else if (fieldPath === "organism.determination.scientificNameDetails") {
+      handleClassificationMapping(columnHeader, newWorkbookColumnMap);
+    } else if (fieldPath === "managedAttributes") {
+      handleManagedAttributeMapping(columnHeader, newWorkbookColumnMap);
     } else if (fieldPath?.startsWith("parentMaterialSample.")) {
       const valueMapping = await resolveParentMapping(columnHeader, fieldPath);
       newWorkbookColumnMap[columnHeader] = {
@@ -236,132 +344,138 @@ export function useColumnMapping(
       Object.assign(newRelationshipMapping, result.newRelationshipMapping);
     }
     setColumnMap(newWorkbookColumnMap);
-    setRelationshipMapping(
-      Object.keys(newRelationshipMapping).length === 0
-        ? undefined
-        : newRelationshipMapping
-    );
+    setRelationshipMapping(newRelationshipMapping);
     // End of workbook column mapping calculation
   }
   async function generateFieldOptions() {
     setLoading(true);
-    if (!!selectedType) {
-      const nonNestedRowOptions: { label: string; value: string }[] = [];
-      const nestedRowOptions: {
-        label: string;
-        value: string;
-        parentPath: string;
-      }[] = [];
-      // const newFieldOptions: { label: string; value: string }[] = [];
-      Object.keys(flattenedConfig).forEach((fieldPath) => {
-        if (fieldPath === "relationshipConfig") {
-          return;
-        }
-        const config = flattenedConfig[fieldPath];
-        if (
-          config.dataType !== WorkbookDataTypeEnum.OBJECT &&
-          config.dataType !== WorkbookDataTypeEnum.OBJECT_ARRAY
-        ) {
-          // Handle creating options for nested path for dropdown component
-          if (fieldPath.includes(".")) {
-            const lastIndex = fieldPath.lastIndexOf(".");
-            const parentPath = fieldPath.substring(0, lastIndex);
-            const labelPath = fieldPath.substring(lastIndex + 1);
-            const label =
-              formatMessage(fieldPath as any)?.trim() ||
-              formatMessage(`field_${labelPath}` as any)?.trim() ||
-              formatMessage(labelPath as any)?.trim() ||
-              startCase(labelPath);
-            const option = {
-              label,
-              value: fieldPath,
-              parentPath
-            };
-            nestedRowOptions.push(option);
-          } else {
-            // Handle creating options for non nested path for dropdown component
-            const label =
-              formatMessage(`field_${fieldPath}` as any)?.trim() ||
-              formatMessage(fieldPath as any)?.trim() ||
-              startCase(fieldPath);
-            const option = {
-              label,
-              value: fieldPath
-            };
-            nonNestedRowOptions.push(option);
-          }
-        }
-      });
-      nonNestedRowOptions.sort((a, b) => a.label.localeCompare(b.label));
-
-      // Using the parent name, group the relationships into sections.
-      const groupedNestRowOptions = chain(nestedRowOptions)
-        .groupBy((prop) => prop.parentPath)
-        .map((group, key) => {
-          const keyArr = key.split(".");
-          let label: string | undefined;
-          for (let i = 0; i < keyArr.length; i++) {
-            const k = keyArr[i];
-            label =
-              label === undefined
-                ? formatMessage(k as any).trim() || k.toUpperCase()
-                : label + (formatMessage(k as any).trim() || k.toUpperCase());
-            if (i < keyArr.length - 1) {
-              label = label + ".";
-            }
-          }
-
-          return {
-            label: label!,
-            options: group
+    const nonNestedRowOptions: { label: string; value: string }[] = [];
+    const nestedRowOptions: {
+      label: string;
+      value: string;
+      parentPath: string;
+    }[] = [];
+    // const newFieldOptions: { label: string; value: string }[] = [];
+    Object.keys(flattenedConfig).forEach((fieldPath) => {
+      if (fieldPath === "relationshipConfig") {
+        return;
+      }
+      const config = flattenedConfig[fieldPath];
+      if (
+        config.dataType !== WorkbookDataTypeEnum.OBJECT &&
+        config.dataType !== WorkbookDataTypeEnum.OBJECT_ARRAY
+      ) {
+        // Handle creating options for nested path for dropdown component
+        if (fieldPath.includes(".")) {
+          const lastIndex = fieldPath.lastIndexOf(".");
+          const parentPath = fieldPath.substring(0, lastIndex);
+          const labelPath = fieldPath.substring(lastIndex + 1);
+          const label =
+            formatMessage(fieldPath as any)?.trim() ||
+            formatMessage(`field_${labelPath}` as any)?.trim() ||
+            formatMessage(labelPath as any)?.trim() ||
+            startCase(labelPath);
+          const option = {
+            label,
+            value: fieldPath,
+            parentPath
           };
-        })
-        .sort((a, b) => a.label.localeCompare(b.label))
-        .value();
+          nestedRowOptions.push(option);
+        } else {
+          // Handle creating options for non nested path for dropdown component
+          const label =
+            formatMessage(`field_${fieldPath}` as any)?.trim() ||
+            formatMessage(fieldPath as any)?.trim() ||
+            startCase(fieldPath);
+          const option = {
+            label,
+            value: fieldPath
+          };
+          nonNestedRowOptions.push(option);
+        }
+      }
+    });
+    nonNestedRowOptions.sort((a, b) => a.label.localeCompare(b.label));
 
-      const newFieldOptions = nonNestedRowOptions
-        ? [...nonNestedRowOptions, ...groupedNestRowOptions]
-        : [];
-      const map: FieldMapType[] = [];
-      for (const columnHeader of headers || []) {
-        const fieldPath = findMatchField(columnHeader, newFieldOptions);
-        if (fieldPath === undefined) {
-          const targetManagedAttr = managedAttributes.find(
-            (item) =>
-              item.name.toLowerCase().trim() ===
-              columnHeader.toLowerCase().trim()
-          );
-          if (targetManagedAttr) {
-            map.push({
-              targetField: "managedAttributes",
-              skipped: false,
-              targetKey: targetManagedAttr
-            });
-          } else {
-            map.push({
-              targetField: fieldPath,
-              skipped: fieldPath === undefined
-            });
+    // Using the parent name, group the relationships into sections.
+    const groupedNestRowOptions = chain(nestedRowOptions)
+      .groupBy((prop) => prop.parentPath)
+      .map((group, key) => {
+        const keyArr = key.split(".");
+        let label: string | undefined;
+        for (let i = 0; i < keyArr.length; i++) {
+          const k = keyArr[i];
+          label =
+            label === undefined
+              ? formatMessage(k as any).trim() || k.toUpperCase()
+              : label + (formatMessage(k as any).trim() || k.toUpperCase());
+          if (i < keyArr.length - 1) {
+            label = label + ".";
           }
+        }
+
+        return {
+          label: label!,
+          options: group
+        };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .value();
+
+    const newFieldOptions = nonNestedRowOptions
+      ? [...nonNestedRowOptions, ...groupedNestRowOptions]
+      : [];
+    const map: FieldMapType[] = [];
+    for (const columnHeader of headers || []) {
+      const fieldPath = findMatchField(columnHeader, newFieldOptions);
+      if (fieldPath === undefined) {
+        // check if the columnHeader is one of managedAttributes
+        const targetManagedAttr = managedAttributes.find(
+          (item) =>
+            item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+        );
+        // check if the columnHeader is one of taxonomicRankss
+        const targetTaxonomicRank = taxonomicRanks.find(
+          (item) =>
+            item.name?.toLowerCase().trim() ===
+            columnHeader.toLowerCase().trim()
+        );
+        if (targetManagedAttr) {
+          map.push({
+            targetField: "managedAttributes",
+            skipped: false,
+            targetKey: targetManagedAttr
+          });
+        } else if (targetTaxonomicRank) {
+          map.push({
+            targetField: "organism.determination.scientificNameDetails",
+            skipped: false,
+            targetKey: targetTaxonomicRank
+          });
         } else {
           map.push({
             targetField: fieldPath,
             skipped: fieldPath === undefined
           });
         }
+      } else {
+        map.push({
+          targetField: fieldPath,
+          skipped: fieldPath === undefined
+        });
       }
-      setFieldMap(map);
-      setFieldOptions(newFieldOptions);
-      await initColumnMap(newFieldOptions);
-      setLoading(false);
     }
+    setFieldMap(map);
+    setFieldOptions(newFieldOptions);
+    await initColumnMap(newFieldOptions);
+    setLoading(false);
   }
 
   useEffect(() => {
     if (!loadingData) {
       generateFieldOptions();
     }
-  }, [sheet, selectedType, loadingData]);
+  }, [sheet, type, groupName, loadingData]);
 
   /**
    * Resolve parentMaterialSample value mapping.
@@ -378,7 +492,7 @@ export function useColumnMapping(
       type: string;
     };
   }> {
-    const { type, baseApiPath } = getFieldRelationshipConfig();
+    const { baseApiPath } = getFieldRelationshipConfig();
     const lastDotPos = fieldPath.lastIndexOf(".");
     const fieldName = fieldPath.substring(lastDotPos + 1);
     const valueMapping: {
@@ -448,8 +562,6 @@ export function useColumnMapping(
             "id",
             "type"
           ]);
-        } else {
-          theRelationshipMapping[columnHeader][value] = undefined;
         }
       }
     }
@@ -561,6 +673,7 @@ export function useColumnMapping(
     fieldOptions,
     headers,
     sheetOptions,
+    taxonomicRanks,
 
     resolveParentMapping,
     resolveColumnMappingAndRelationshipMapping,

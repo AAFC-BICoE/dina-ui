@@ -144,28 +144,36 @@ export function getDataFromWorkbook(
       const fieldMap = fieldMaps[index];
       if (!fieldMap?.skipped) {
         if (fieldMap.targetKey) {
-          const managedAttributes: { [key: string]: any } =
-            rowData[fieldMap.targetField!] ?? {};
-          let value: any;
-          switch (fieldMap.targetKey.vocabularyElementType) {
-            case "BOOL":
-              value = convertBoolean(row?.content[index]);
-              break;
-            case "INTEGER":
-            case "DECIMAL":
-              value = convertNumber(row?.content[index]);
-              break;
-            case "DATE":
-              value = convertDate(row?.content[index]);
-              break;
-            case "PICKLIST":
-            case "STRING":
-              value = convertString(row?.content[index]);
-              break;
-          }
-          if (value !== null) {
-            managedAttributes[fieldMap.targetKey.key] = value;
-            rowData[fieldMap.targetField!] = managedAttributes;
+          if ("vocabularyElementType" in fieldMap.targetKey) {
+            const managedAttributes: { [key: string]: any } =
+              rowData[fieldMap.targetField!] ?? {};
+            let value: any;
+            switch (fieldMap.targetKey.vocabularyElementType) {
+              case "BOOL":
+                value = convertBoolean(row?.content[index]);
+                break;
+              case "INTEGER":
+              case "DECIMAL":
+                value = convertNumber(row?.content[index]);
+                break;
+              case "DATE":
+                value = convertDate(row?.content[index]);
+                break;
+              case "PICKLIST":
+              case "STRING":
+                value = convertString(row?.content[index]);
+                break;
+            }
+            if (value !== null) {
+              managedAttributes[fieldMap.targetKey.key] = value;
+              rowData[fieldMap.targetField!] = managedAttributes;
+            }
+          } else if ("key" in fieldMap.targetKey) {
+            if (!rowData[fieldMap.targetField!]) {
+              rowData[fieldMap.targetField!] = {};
+            }
+            rowData[fieldMap.targetField!][fieldMap.targetKey.key] =
+              row?.content[index];
           }
         } else {
           rowData[fieldMap.targetField!] = row?.content[index];
