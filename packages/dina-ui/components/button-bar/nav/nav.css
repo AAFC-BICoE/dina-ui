@@ -62,3 +62,7 @@ a.nav-link.dropdown-toggle {
   padding-left: 8px;
   padding-right: 8px;
 }
+
+.management-dropdown .dropdown-menu {
+  left: -40px;
+}

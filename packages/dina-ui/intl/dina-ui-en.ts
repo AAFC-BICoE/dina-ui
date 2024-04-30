@@ -970,5 +970,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   exportColumns: "Export Columns:",
   dataLabel: "Data",
   objectsLabel: "Objects",
-  relatedRecord: "Related Record"
+  relatedRecord: "Related Record",
+  reportTemplateUpload: "Report Template Upload"
 };
