@@ -639,6 +639,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organismState: "Organism State",
   organisms: "Organisms",
   organismsQuantity: "Organisms Quantity",
+  organismManagedAttributes: "Organism Managed Attributes",
   organizationEnglishNameLabel: "English Name",
   organizationFrenchNameLabel: "French Name",
   organizationGermanNameLabel: "German Name",

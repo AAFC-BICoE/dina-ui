@@ -423,6 +423,9 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
             id: "organism[0].remarks"
           },
           {
+            id: "organism[0].managedAttributes"
+          },
+          {
             id: "organism"
           }
         ]
