@@ -1529,6 +1529,11 @@ describe("Form template edit page", () => {
                   name: "organism[0].remarks",
                   visible: false
                 },
+                {
+                  defaultValue: undefined,
+                  name: "organism[0].managedAttributes",
+                  visible: false
+                },
                 { defaultValue: undefined, name: "organism", visible: false }
               ]
             },
