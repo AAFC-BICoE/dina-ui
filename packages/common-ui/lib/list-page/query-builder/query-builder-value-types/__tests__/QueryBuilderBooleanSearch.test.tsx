@@ -3,6 +3,9 @@ import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
 } from "../QueryBuilderBooleanSearch";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
+import { QueryBuilderContextProvider } from "../../QueryBuilder";
+import { noop } from "lodash";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 describe("QueryBuilderBooleanSearch", () => {
@@ -10,33 +13,66 @@ describe("QueryBuilderBooleanSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const boolSearchEquals = mountWithAppContext2(
+      const { queryByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderBooleanSearch
-            matchType="equals"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderBooleanSearch
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>
       );
 
       // Expect a snapshot with the text field being displayed.
-      expect(boolSearchEquals.queryByRole("combobox")).toBeInTheDocument();
+      expect(queryByRole("combobox")).toBeInTheDocument();
     });
 
-    it("Display no dropdown when using empty operator", async () => {
-      const boolSearchEmpty = mountWithAppContext2(
+    it("Don't display field if match type is not equals", async () => {
+      const { queryByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderBooleanSearch
-            matchType="empty"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderBooleanSearch
+              matchType="empty"
+              value=""
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>
       );
 
       // Expect a snapshot without the text field being displayed.
-      expect(boolSearchEmpty.queryByRole("combobox")).not.toBeInTheDocument();
+      expect(queryByRole("combobox")).not.toBeInTheDocument();
+    });
+
+    it("Should call performSubmit on enter key press in combobox", async () => {
+      const mockPerformSubmit = jest.fn();
+      const { getByRole } = mountWithAppContext2(
+        <DinaForm initialValues={{}}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: mockPerformSubmit }}
+          >
+            <QueryBuilderBooleanSearch
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
+        </DinaForm>
+      );
+
+      // Find the combobox element
+      const combobox = getByRole("combobox");
+
+      // Expect performSubmit to not be called yet.
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(0);
+
+      // Simulate user typing "enter" key
+      userEvent.type(combobox, "{enter}");
+
+      // Expect performSubmit to be called once
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(1);
     });
   });
 

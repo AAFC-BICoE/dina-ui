@@ -986,44 +986,44 @@ export function QueryPage<TData extends KitsuResource>({
 
   return (
     <>
-      <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
-        {!viewMode && (
-          <>
-            {validationErrors.length > 0 && (
-              <div
-                className="alert alert-danger"
-                style={{
-                  whiteSpace: "pre-line"
-                }}
-              >
-                <h5>Validation Errors</h5>
-                <ul>
-                  {validationErrors.map((validationError: ValidationError) => (
-                    <li key={validationError.fieldName}>
-                      <strong>{validationError.fieldName}: </strong>
-                      {validationError.errorMessage}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <QueryBuilderMemo
-              indexName={indexName}
-              queryBuilderTree={queryBuilderTree}
-              setQueryBuilderTree={onQueryBuildTreeChange}
-              queryBuilderConfig={queryBuilderConfig}
-              setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-              setPageOffset={setPageOffset}
-              onSubmit={onSubmit}
-              onReset={onReset}
-              setGroups={setGroups}
-              groups={groups}
-              uniqueName={uniqueName}
-              validationErrors={validationErrors}
-            />
-          </>
-        )}
+      {!viewMode && (
+        <>
+          {validationErrors.length > 0 && (
+            <div
+              className="alert alert-danger"
+              style={{
+                whiteSpace: "pre-line"
+              }}
+            >
+              <h5>Validation Errors</h5>
+              <ul>
+                {validationErrors.map((validationError: ValidationError) => (
+                  <li key={validationError.fieldName}>
+                    <strong>{validationError.fieldName}: </strong>
+                    {validationError.errorMessage}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <QueryBuilderMemo
+            indexName={indexName}
+            queryBuilderTree={queryBuilderTree}
+            setQueryBuilderTree={onQueryBuildTreeChange}
+            queryBuilderConfig={queryBuilderConfig}
+            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+            setPageOffset={setPageOffset}
+            onSubmit={onSubmit}
+            onReset={onReset}
+            setGroups={setGroups}
+            groups={groups}
+            uniqueName={uniqueName}
+            validationErrors={validationErrors}
+          />
+        </>
+      )}
 
+      <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
         {/* Group Selection */}
         {!viewMode && (
           <DinaFormSection horizontal={"flex"}>

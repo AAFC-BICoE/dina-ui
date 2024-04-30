@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "../..";
 import { Query, Builder, Utils, JsonTree } from "react-awesome-query-builder";
-import { useCallback } from "react";
+import { createContext, useCallback, useContext } from "react";
 import {
   Config,
   ImmutableTree,
@@ -12,6 +12,26 @@ import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
 import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+
+export interface QueryBuilderContextI {
+  performSubmit: () => void;
+}
+
+const QueryBuilderContext = createContext<QueryBuilderContextI | null>(null);
+
+export const QueryBuilderContextProvider = QueryBuilderContext.Provider;
+
+/** Exposes the needed features from the query page provider. */
+export function useQueryBuilderContext(): QueryBuilderContextI {
+  const ctx = useContext(QueryBuilderContext);
+  if (!ctx) {
+    throw new Error(
+      "No QueryBuilderContext available, is this component inside of a QueryPage?"
+    );
+  }
+  return ctx;
+}
+
 interface QueryBuilderProps {
   /**
    * Index name being used for the QueryPage.
@@ -117,42 +137,48 @@ function QueryBuilder({
 
   return (
     <>
-      <label
-        style={{
-          fontSize: 20,
-          fontFamily: "sans-serif",
-          fontWeight: "bold"
-        }}
-        className="mb-2"
-      >
-        <DinaMessage id="search" />
-      </label>
-      <SavedSearch
-        indexName={indexName}
-        queryBuilderTree={queryBuilderTree}
-        setQueryBuilderTree={setQueryBuilderTree}
-        queryBuilderConfig={queryBuilderConfig}
-        setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-        performSubmit={onSubmit}
-        setPageOffset={setPageOffset}
-        groups={groups}
-        setGroups={setGroups}
-        uniqueName={uniqueName}
-      />
-      <Query
-        {...queryBuilderConfig}
-        value={queryBuilderTree}
-        onChange={onChange}
-        renderBuilder={renderBuilder}
-      />
-      <div className="mt-2">
-        <Button onClick={onSubmit} className="me-2" disabled={validationErrors.length > 0}>
+      <QueryBuilderContextProvider value={{ performSubmit: onSubmit }}>
+        <label
+          style={{
+            fontSize: 20,
+            fontFamily: "sans-serif",
+            fontWeight: "bold"
+          }}
+          className="mb-2"
+        >
           <DinaMessage id="search" />
-        </Button>
-        <Button onClick={onReset} variant="secondary">
-          <CommonMessage id="resetButtonText" />
-        </Button>
-      </div>
+        </label>
+        <SavedSearch
+          indexName={indexName}
+          queryBuilderTree={queryBuilderTree}
+          setQueryBuilderTree={setQueryBuilderTree}
+          queryBuilderConfig={queryBuilderConfig}
+          setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+          performSubmit={onSubmit}
+          setPageOffset={setPageOffset}
+          groups={groups}
+          setGroups={setGroups}
+          uniqueName={uniqueName}
+        />
+        <Query
+          {...queryBuilderConfig}
+          value={queryBuilderTree}
+          onChange={onChange}
+          renderBuilder={renderBuilder}
+        />
+        <div className="mt-2">
+          <Button
+            onClick={onSubmit}
+            className="me-2"
+            disabled={validationErrors.length > 0}
+          >
+            <DinaMessage id="search" />
+          </Button>
+          <Button onClick={onReset} variant="secondary">
+            <CommonMessage id="resetButtonText" />
+          </Button>
+        </div>
+      </QueryBuilderContextProvider>
     </>
   );
 }
