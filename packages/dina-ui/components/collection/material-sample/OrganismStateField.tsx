@@ -1,14 +1,14 @@
 import {
   AutoSuggestTextField,
+  DinaFormSection,
   FieldSpy,
   TextField,
-  useDinaFormContext,
   ToggleField,
-  DinaFormSection
+  useDinaFormContext
 } from "common-ui";
 import { DeterminationField, ManagedAttributesEditor } from "../..";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 /**
  * List of field names in the OrganismStateField component.
