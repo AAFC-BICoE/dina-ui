@@ -3,6 +3,9 @@ import { QueryBuilderAutoSuggestionTextSearchMemo } from "../QueryBuilderAutoSug
 import { waitFor } from "@testing-library/react";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { ESIndexMapping } from "../../../types";
+import { QueryBuilderContextProvider } from "../../QueryBuilder";
+import { noop } from "lodash";
+import userEvent from "@testing-library/user-event";
 
 const INDEX_NAME = "dina-material-sample-index";
 
@@ -22,7 +25,7 @@ const INDEX_MAP: ESIndexMapping[] = [
     hideField: false,
     keywordNumericSupport: false
   }
-]
+];
 
 const mockAutoSuggestionRequest = jest.fn<any, any>(async (path) => {
   if (path === "search-api/search-ws/search") {
@@ -76,10 +79,9 @@ const apiClientMock = {
   apiClient: {
     axios: { post: mockAutoSuggestionRequest } as any
   }
-}
+};
 
 describe("QueryBuilderAutoSuggestionSearch", () => {
-
   beforeEach(jest.clearAllMocks);
 
   describe("QueryBuilderAutoSuggestionSearch Component", () => {
@@ -88,37 +90,41 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const autoSuggestionEquals = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderAutoSuggestionTextSearchMemo
-            indexName={INDEX_NAME}
-            indexMap={INDEX_MAP}
-            currentFieldName={CURRENT_FIELD_NAME}
-            matchType="equals"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>,
         { apiContext: apiClientMock }
       );
-    
+
       // Expect a snapshot with the date field being displayed.
       expect(autoSuggestionEquals.asFragment()).toMatchSnapshot(
         "Expect date field to be displayed since match type is equals"
       );
-    
+
       const autoSuggestionEmpty = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderAutoSuggestionTextSearchMemo
-            indexName={INDEX_NAME}
-            indexMap={INDEX_MAP}
-            currentFieldName={CURRENT_FIELD_NAME}
-            matchType="empty"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="empty"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>,
         { apiContext: apiClientMock }
       );
-    
+
       // Expect a snapshot without the date field being displayed.
       expect(autoSuggestionEmpty.asFragment()).toMatchSnapshot(
         "Expect date field not to be displayed since the match type is not equals"
@@ -130,37 +136,41 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const autoSuggestionIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderAutoSuggestionTextSearchMemo
-            indexName={INDEX_NAME}
-            indexMap={INDEX_MAP}
-            currentFieldName={CURRENT_FIELD_NAME}
-            matchType="in"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="in"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>,
         { apiContext: apiClientMock }
       );
-    
+
       // Expect a snapshot with a specific placeholder.
       expect(autoSuggestionIn.asFragment()).toMatchSnapshot(
         "Expect auto-suggestion field to be displayed with a different placeholder."
       );
-    
+
       const autoSuggestionNotIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderAutoSuggestionTextSearchMemo
-            indexName={INDEX_NAME}
-            indexMap={INDEX_MAP}
-            currentFieldName={CURRENT_FIELD_NAME}
-            matchType="notIn"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="notIn"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>,
         { apiContext: apiClientMock }
       );
-    
+
       // Expect a snapshot with a specific placeholder.
       expect(autoSuggestionNotIn.asFragment()).toMatchSnapshot(
         "Expect auto-suggestion field to be displayed with a different placeholder."
@@ -170,20 +180,24 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
     it("Display suggestions on equals or not equals operators", async () => {
       const autoSuggestionComponent = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderAutoSuggestionTextSearchMemo
-            indexName={INDEX_NAME}
-            indexMap={INDEX_MAP}
-            currentFieldName={CURRENT_FIELD_NAME}
-            matchType="equals"
-            value=""
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="equals"
+              value=""
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>,
         { apiContext: apiClientMock }
       );
 
       // Wait for the auto-suggestion element to be loaded in.
-      await waitFor(() => expect(autoSuggestionComponent.findByRole("textbox")).not.toBeNull());
+      await waitFor(() =>
+        expect(autoSuggestionComponent.findByRole("textbox")).not.toBeNull()
+      );
 
       // Wait for the api call to be made.
       await waitFor(() => expect(mockAutoSuggestionRequest).toBeCalledTimes(1));
@@ -196,35 +210,69 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
             term_aggregation: {
               terms: {
                 field: "data.attributes.materialSampleType.keyword",
-                size: 100,
-              },
-            },
+                size: 100
+              }
+            }
           },
           query: {
             terms: {
-              "data.attributes.group": ["aafc", "cnc"],
-            },
+              "data.attributes.group": ["aafc", "cnc"]
+            }
           },
-          size: 0,
+          size: 0
         },
-        {"params": {"indexName": "dina-material-sample-index"}}
+        { params: { indexName: "dina-material-sample-index" } }
       );
 
       // Simulate focus, to display the suggestions dialog.
       autoSuggestionComponent.getByRole("textbox").focus();
 
       // Wait for the component to update after focus change
-      await waitFor(() => expect(autoSuggestionComponent.getByRole("textbox")).toHaveFocus);
+      await waitFor(
+        () => expect(autoSuggestionComponent.getByRole("textbox")).toHaveFocus
+      );
 
       // Get each suggestion item and assert its content
-      const suggestions = autoSuggestionComponent.getAllByRole('option');
+      const suggestions = autoSuggestionComponent.getAllByRole("option");
       expect(suggestions.length).toBe(4); // Ensure there are 4 options
 
       // Assert the text content of each suggestion
-      expect(suggestions[0].textContent).toBe('WHOLE_ORGANISM');
-      expect(suggestions[1].textContent).toBe('MIXED_ORGANISMS');
-      expect(suggestions[2].textContent).toBe('MOLECULAR_SAMPLE');
-      expect(suggestions[3].textContent).toBe('CULTURE_STRAIN');
+      expect(suggestions[0].textContent).toBe("WHOLE_ORGANISM");
+      expect(suggestions[1].textContent).toBe("MIXED_ORGANISMS");
+      expect(suggestions[2].textContent).toBe("MOLECULAR_SAMPLE");
+      expect(suggestions[3].textContent).toBe("CULTURE_STRAIN");
+    });
+
+    it("Should call performSubmit on enter key press in textfield", async () => {
+      const mockPerformSubmit = jest.fn();
+      const { getByRole } = mountWithAppContext2(
+        <DinaForm initialValues={{}}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: mockPerformSubmit }}
+          >
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
+        </DinaForm>
+      );
+
+      // Find the text field element
+      const textField = getByRole("textbox");
+
+      // Expect performSubmit to not be called yet.
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(0);
+
+      // Simulate user typing "enter" key
+      userEvent.type(textField, "{enter}");
+
+      // Expect performSubmit to be called once
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(1);
     });
   });
 });
