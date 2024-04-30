@@ -16,8 +16,12 @@ export default function MetadataEditPage() {
   const title = id ? "editMetadataTitle" : "addMetadataTitle";
   const buttonBar = (
     <ButtonBar>
-      <BackButton entityId={id} entityLink="/object-store/object" />
-      <SubmitButton className="ms-auto" />
+      <div className="col-md-6 mt-2">
+        <BackButton entityId={id} entityLink="/object-store/object" />
+      </div>
+      <div className="col-md-6 flex d-flex ms-auto">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 

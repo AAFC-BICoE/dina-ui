@@ -83,7 +83,9 @@ export default function NgsWorkFlowPoolingRunPage() {
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/ngs-workflow-pooling" />
+      <div className="col-md-4">
+        <BackToListButton entityLink="/seqdb/ngs-workflow-pooling" />
+      </div>
       {editMode ? (
         <>
           <Button

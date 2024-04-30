@@ -183,14 +183,12 @@ export default function UploadPage() {
           </div>
         ) : (
           <DinaForm<OnSubmitValues> initialValues={{}}>
-            <div className="container">
-              <div className="row">
-                <GroupSelectField
-                  className="col-md-3"
-                  name="group"
-                  enableStoredDefaultGroup={true}
-                />
-              </div>
+            <div className="row">
+              <GroupSelectField
+                className="col-md-3"
+                name="group"
+                enableStoredDefaultGroup={true}
+              />
             </div>
             <div>
               <FileUploader onSubmit={onSubmit} />

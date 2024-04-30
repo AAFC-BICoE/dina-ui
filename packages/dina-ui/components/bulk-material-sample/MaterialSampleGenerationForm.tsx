@@ -198,7 +198,7 @@ export function MaterialSampleGenerationForm({
           </TabPanel>
         )}
       </Tabs>
-      <ButtonBar>
+      <ButtonBar centered={false}>
         <BackToListButton
           className="ms-auto"
           entityLink="/collection/material-sample"
@@ -218,10 +218,10 @@ export function MaterialSampleGenerationForm({
 }
 
 export const GENERATION_MODES = ["BATCH", "SERIES"] as const;
-export type GenerationMode = typeof GENERATION_MODES[number];
+export type GenerationMode = (typeof GENERATION_MODES)[number];
 
 export const INCREMENT_MODES = ["NUMERICAL", "LETTER"] as const;
-export type IncrementMode = typeof INCREMENT_MODES[number];
+export type IncrementMode = (typeof INCREMENT_MODES)[number];
 
 interface GeneratorFieldsProps {
   generationMode: GenerationMode;

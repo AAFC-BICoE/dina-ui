@@ -286,19 +286,19 @@ export default function MaterialSampleListPage() {
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <CreateButton entityLink="/collection/material-sample" />
+        <Link href={`/collection/material-sample/bulk-create`}>
+          <a className="btn btn-primary">
+            <DinaMessage id="bulkCreate" />
+          </a>
+        </Link>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="materialSampleListTitle" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/material-sample" />
-          <Link href={`/collection/material-sample/bulk-create`}>
-            <a className="btn btn-primary">
-              <DinaMessage id="bulkCreate" />
-            </a>
-          </Link>
-        </ButtonBar>
         <QueryPage
           rowStyling={rowStyling}
           indexName={"dina_material_sample_index"}
