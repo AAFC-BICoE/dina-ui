@@ -3,6 +3,9 @@ import { QueryBuilderAutoSuggestionTextSearchMemo } from "../QueryBuilderAutoSug
 import { waitFor } from "@testing-library/react";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { ESIndexMapping } from "../../../types";
+import { QueryBuilderContextProvider } from "../../QueryBuilder";
+import { noop } from "lodash";
+import userEvent from "@testing-library/user-event";
 
 const INDEX_NAME = "dina-material-sample-index";
 
@@ -87,14 +90,16 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const autoSuggestionEquals = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderAutoSuggestionTextSearchMemo
-            indexName={INDEX_NAME}
-            indexMap={INDEX_MAP}
-            currentFieldName={CURRENT_FIELD_NAME}
-            matchType="equals"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>,
         { apiContext: apiClientMock }
       );
@@ -106,14 +111,16 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
 
       const autoSuggestionEmpty = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderAutoSuggestionTextSearchMemo
-            indexName={INDEX_NAME}
-            indexMap={INDEX_MAP}
-            currentFieldName={CURRENT_FIELD_NAME}
-            matchType="empty"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="empty"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>,
         { apiContext: apiClientMock }
       );
@@ -129,14 +136,16 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const autoSuggestionIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderAutoSuggestionTextSearchMemo
-            indexName={INDEX_NAME}
-            indexMap={INDEX_MAP}
-            currentFieldName={CURRENT_FIELD_NAME}
-            matchType="in"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="in"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>,
         { apiContext: apiClientMock }
       );
@@ -148,14 +157,16 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
 
       const autoSuggestionNotIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderAutoSuggestionTextSearchMemo
-            indexName={INDEX_NAME}
-            indexMap={INDEX_MAP}
-            currentFieldName={CURRENT_FIELD_NAME}
-            matchType="notIn"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="notIn"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>,
         { apiContext: apiClientMock }
       );
@@ -169,14 +180,16 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
     it("Display suggestions on equals or not equals operators", async () => {
       const autoSuggestionComponent = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderAutoSuggestionTextSearchMemo
-            indexName={INDEX_NAME}
-            indexMap={INDEX_MAP}
-            currentFieldName={CURRENT_FIELD_NAME}
-            matchType="equals"
-            value=""
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="equals"
+              value=""
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>,
         { apiContext: apiClientMock }
       );
@@ -228,6 +241,38 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       expect(suggestions[1].textContent).toBe("MIXED_ORGANISMS");
       expect(suggestions[2].textContent).toBe("MOLECULAR_SAMPLE");
       expect(suggestions[3].textContent).toBe("CULTURE_STRAIN");
+    });
+
+    it("Should call performSubmit on enter key press in textfield", async () => {
+      const mockPerformSubmit = jest.fn();
+      const { getByRole } = mountWithAppContext2(
+        <DinaForm initialValues={{}}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: mockPerformSubmit }}
+          >
+            <QueryBuilderAutoSuggestionTextSearchMemo
+              indexName={INDEX_NAME}
+              indexMap={INDEX_MAP}
+              currentFieldName={CURRENT_FIELD_NAME}
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
+        </DinaForm>
+      );
+
+      // Find the text field element
+      const textField = getByRole("textbox");
+
+      // Expect performSubmit to not be called yet.
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(0);
+
+      // Simulate user typing "enter" key
+      userEvent.type(textField, "{enter}");
+
+      // Expect performSubmit to be called once
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(1);
     });
   });
 });

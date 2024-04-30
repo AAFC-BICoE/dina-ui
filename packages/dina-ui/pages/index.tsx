@@ -343,11 +343,18 @@ export function Home() {
 
                 <Stack style={{ display: "inline-flex" }}>
                   {isAdmin && (
-                    <Link href="/dina-user/list">
-                      <a>
-                        <DinaMessage id="userListTitle" />
-                      </a>
-                    </Link>
+                    <>
+                      <Link href="/dina-user/list">
+                        <a>
+                          <DinaMessage id="userListTitle" />
+                        </a>
+                      </Link>
+                      <Link href="/report-template/upload">
+                        <a>
+                          <DinaMessage id="reportTemplateUpload" />
+                        </a>
+                      </Link>
+                    </>
                   )}
                 </Stack>
               </Col>

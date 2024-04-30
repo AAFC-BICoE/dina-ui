@@ -1,11 +1,10 @@
-import { useFormikContext } from "formik";
+import { useQueryBuilderContext } from "../QueryBuilder";
 
 export function useQueryBuilderEnterToSearch() {
-  const { submitForm } = useFormikContext();
-
+  const { performSubmit } = useQueryBuilderContext();
   const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      submitForm();
+    if (event.key === "Enter" && performSubmit) {
+      performSubmit();
     }
   };
 

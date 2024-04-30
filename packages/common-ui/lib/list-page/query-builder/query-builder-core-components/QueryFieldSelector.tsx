@@ -7,7 +7,6 @@ import { ESIndexMapping } from "../../types";
 import { GLOBAL_SEARCH_FIELDNAME } from "../useQueryBuilderConfig";
 import { useSessionStorage } from "usehooks-ts";
 import { SHORTCUT_GLOBAL_SEARCH_QUERY } from "../query-builder-value-types/QueryBuilderGlobalSearch";
-import { useQueryBuilderEnterToSearch } from "./useQueryBuilderEnterToSearch";
 
 interface QueryFieldSelectorProps {
   /**
@@ -33,9 +32,6 @@ export function QueryFieldSelector({
   setField
 }: QueryFieldSelectorProps) {
   const { formatMessage, messages, locale } = useIntl();
-
-  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = useQueryBuilderEnterToSearch();
 
   const [isGlobalSearch, setIsGlobalSearch] = useState<boolean>(false);
 
@@ -197,7 +193,6 @@ export function QueryFieldSelector({
         value={isGlobalSearch ? globalSearchOptionSelected : selectedOption}
         placeholder={<DinaMessage id="queryBuilder_field_placeholder" />}
         onChange={(selected) => setField?.(selected?.value)}
-        onKeyDown={onKeyDown}
         // Global Search Specific Props
         createOptionPosition={"first"}
         formatCreateLabel={(inputValue) =>

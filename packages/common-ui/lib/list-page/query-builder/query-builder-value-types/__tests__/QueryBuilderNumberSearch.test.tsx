@@ -4,6 +4,9 @@ import QueryBuilderNumberSearch, {
   validateNumber
 } from "../QueryBuilderNumberSearch";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
+import { QueryBuilderContextProvider } from "../../QueryBuilder";
+import { noop } from "lodash";
+import userEvent from "@testing-library/user-event";
 
 describe("QueryBuilderNumberSearch", () => {
   describe("QueryBuilderNumberSearch Component", () => {
@@ -12,11 +15,13 @@ describe("QueryBuilderNumberSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const numberSearchEquals = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderNumberSearch
-            matchType="equals"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderNumberSearch
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>
       );
 
@@ -27,11 +32,13 @@ describe("QueryBuilderNumberSearch", () => {
 
       const numberSearchEmpty = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderNumberSearch
-            matchType="empty"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderNumberSearch
+              matchType="empty"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>
       );
 
@@ -46,11 +53,13 @@ describe("QueryBuilderNumberSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const numberSearchIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderNumberSearch
-            matchType="in"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderNumberSearch
+              matchType="in"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>
       );
 
@@ -61,11 +70,13 @@ describe("QueryBuilderNumberSearch", () => {
 
       const numberSearchNotIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderNumberSearch
-            matchType="notIn"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderNumberSearch
+              matchType="notIn"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>
       );
 
@@ -73,6 +84,35 @@ describe("QueryBuilderNumberSearch", () => {
       expect(numberSearchNotIn.asFragment()).toMatchSnapshot(
         "Placeholder expected to be different for not in operator."
       );
+    });
+
+    it("Should call performSubmit on enter key press in textfield", async () => {
+      const mockPerformSubmit = jest.fn();
+      const { getByRole } = mountWithAppContext2(
+        <DinaForm initialValues={{}}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: mockPerformSubmit }}
+          >
+            <QueryBuilderNumberSearch
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
+        </DinaForm>
+      );
+
+      // Find the text field element
+      const textField = getByRole("spinbutton");
+
+      // Expect performSubmit to not be called yet.
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(0);
+
+      // Simulate user typing "enter" key
+      userEvent.type(textField, "{enter}");
+
+      // Expect performSubmit to be called once
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(1);
     });
   });
 

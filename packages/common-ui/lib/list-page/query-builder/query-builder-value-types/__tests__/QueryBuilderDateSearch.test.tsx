@@ -4,6 +4,9 @@ import QueryBuilderDateSearch, {
   validateDate
 } from "../QueryBuilderDateSearch";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
+import { QueryBuilderContextProvider } from "../../QueryBuilder";
+import { noop } from "lodash";
+import userEvent from "@testing-library/user-event";
 
 describe("QueryBuilderDateSearch", () => {
   describe("QueryBuilderDateSearch Component", () => {
@@ -12,11 +15,13 @@ describe("QueryBuilderDateSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const dateSearchEquals = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderDateSearch
-            matchType="equals"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderDateSearch
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>
       );
 
@@ -27,11 +32,13 @@ describe("QueryBuilderDateSearch", () => {
 
       const dateSearchEmpty = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderDateSearch
-            matchType="empty"
-            value="test"
-            setValue={jest.fn}
-          />
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderDateSearch
+              matchType="empty"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
         </DinaForm>
       );
 
@@ -39,6 +46,35 @@ describe("QueryBuilderDateSearch", () => {
       expect(dateSearchEmpty.asFragment()).toMatchSnapshot(
         "Expect date field not to be displayed since the match type is not equals"
       );
+    });
+
+    it("Should call performSubmit on enter key press in textfield", async () => {
+      const mockPerformSubmit = jest.fn();
+      const { getByRole } = mountWithAppContext2(
+        <DinaForm initialValues={{}}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: mockPerformSubmit }}
+          >
+            <QueryBuilderDateSearch
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
+        </DinaForm>
+      );
+
+      // Find the text field element
+      const textField = getByRole("textbox");
+
+      // Expect performSubmit to not be called yet.
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(0);
+
+      // Simulate user typing "enter" key
+      userEvent.type(textField, "{enter}");
+
+      // Expect performSubmit to be called once
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(1);
     });
   });
 
