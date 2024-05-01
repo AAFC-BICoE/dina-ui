@@ -74,34 +74,38 @@ export function UploadWorkbookPage() {
   const buttonBar =
     !isThereAnActiveUpload() && !!spreadsheetData ? (
       <>
-        <Button
-          variant={"secondary"}
-          style={{ width: "10rem" }}
-          onClick={() => backToUpload()}
-        >
-          <DinaMessage id="cancelButtonText" />
-        </Button>
-        <Button
-          variant={"primary"}
-          className="ms-auto"
-          onClick={() => setPerformSave(true)}
-          style={{ width: "10rem" }}
-        >
-          {performSave ? (
-            <>
-              <Spinner
-                as="span"
-                animation="border"
-                size="sm"
-                role="status"
-                aria-hidden="true"
-              />
-              <span className="visually-hidden">Loading...</span>
-            </>
-          ) : (
-            <DinaMessage id="save" />
-          )}
-        </Button>
+        <div className="col-md-6 col-sm-12">
+          <Button
+            variant={"secondary"}
+            style={{ width: "10rem" }}
+            onClick={() => backToUpload()}
+          >
+            <DinaMessage id="cancelButtonText" />
+          </Button>
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <Button
+            variant={"primary"}
+            className="ms-auto"
+            onClick={() => setPerformSave(true)}
+            style={{ width: "10rem" }}
+          >
+            {performSave ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                <span className="visually-hidden">Loading...</span>
+              </>
+            ) : (
+              <DinaMessage id="save" />
+            )}
+          </Button>
+        </div>
       </>
     ) : undefined;
 

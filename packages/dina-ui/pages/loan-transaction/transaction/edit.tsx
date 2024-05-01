@@ -29,6 +29,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import {
   AttachmentsField,
+  Footer,
   GroupSelectField,
   Head,
   Nav,
@@ -90,7 +91,7 @@ export default function TransactionEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         <div>
           <h1 id="wb-cont">
             <DinaMessage id={title} />
@@ -107,6 +108,7 @@ export default function TransactionEditPage() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
@@ -205,7 +207,6 @@ export function TransactionForm({
         selectedResources={selectedResources}
         setSelectedResources={setSelectedResources}
       />
-      {buttonBar}
     </DinaForm>
   );
 }

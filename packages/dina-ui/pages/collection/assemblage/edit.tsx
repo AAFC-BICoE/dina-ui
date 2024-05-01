@@ -22,6 +22,7 @@ import { Assemblage } from "../../../..//dina-ui/types/collection-api/resources/
 import { useContext } from "react";
 import {
   AttachmentsField,
+  Footer,
   GroupSelectField,
   Head,
   Nav
@@ -78,6 +79,7 @@ export default function AssemblageEditPage() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

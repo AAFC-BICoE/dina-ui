@@ -278,16 +278,20 @@ export default function ExportPage<TData extends KitsuResource>() {
       titleId="exportButtonText"
       buttonBarContent={
         <>
-          <BackButton
-            className="me-auto"
-            entityLink={entityLink}
-            byPassView={true}
-          />
-          <Link href={`/data-export/list?entityLink=${entityLink}`}>
-            <a className="btn btn-primary">
-              <DinaMessage id="viewExportHistoryButton" />
-            </a>
-          </Link>
+          <div className="col-md-6 col-sm-12 mt-2">
+            <BackButton
+              className="me-auto"
+              entityLink={entityLink}
+              byPassView={true}
+            />
+          </div>
+          <div className="col-md-6 col-sm-12 d-flex">
+            <Link href={`/data-export/list?entityLink=${entityLink}`}>
+              <a className="btn btn-primary ms-auto">
+                <DinaMessage id="viewExportHistoryButton" />
+              </a>
+            </Link>
+          </div>
         </>
       }
     >
@@ -377,7 +381,6 @@ export default function ExportPage<TData extends KitsuResource>() {
           columnSelectorDefaultColumns={columns}
         />
       </DinaForm>
-      <Footer />
     </PageLayout>
   );
 }

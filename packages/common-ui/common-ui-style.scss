@@ -29,9 +29,13 @@
 }
 
 .container-fluid.centered, main {
-  max-width: 1400px !important;
+  max-width: 1400px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.large-container-fluid {
+  max-width: 1500px !important;
 }
 
 /*

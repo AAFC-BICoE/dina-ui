@@ -17,6 +17,7 @@ import { keys, last, omit, uniq } from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import Select from "react-select";
 import {
+  Footer,
   GroupLabel,
   Head,
   Nav,
@@ -57,7 +58,7 @@ export default function DinaUserEditPage() {
     <div>
       <Head title={formatMessage("editDinaUserTitle")} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="editDinaUserTitle" />
         </h1>
@@ -65,6 +66,7 @@ export default function DinaUserEditPage() {
           <DinaUserForm dinaUser={response.data} router={router} />
         ))}
       </main>
+      <Footer />
     </div>
   );
 }

@@ -46,7 +46,7 @@ export default function CollectionMethodEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         <div>
           <h1 id="wb-cont">
             <DinaMessage id={title} />

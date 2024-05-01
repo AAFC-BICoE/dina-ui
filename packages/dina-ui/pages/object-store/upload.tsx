@@ -173,7 +173,7 @@ export default function UploadPage() {
     <div>
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="uploadPageTitle" />
         </h1>

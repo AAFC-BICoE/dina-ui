@@ -66,7 +66,7 @@ export default function TransactionListPage() {
           <CreateButton entityLink="/loan-transaction/transaction" />
         </div>
       </ButtonBar>
-      <main>
+      <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="transactions" />
         </h1>

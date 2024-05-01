@@ -15,7 +15,7 @@ export default function MetadataEditPage() {
   const query = useMetadataEditQuery(id);
   const title = id ? "editMetadataTitle" : "addMetadataTitle";
   const buttonBar = (
-    <ButtonBar>
+    <ButtonBar className="mb-3">
       <div className="col-md-6 mt-2">
         <BackButton entityId={id} entityLink="/object-store/object" />
       </div>
@@ -32,7 +32,7 @@ export default function MetadataEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>

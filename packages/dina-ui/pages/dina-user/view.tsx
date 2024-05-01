@@ -68,7 +68,7 @@ export default function DinaUserDetailsPage() {
         )}
       </ButtonBar>
       {withResponse(userQuery, ({ data: dinaUser }) => (
-        <main className="container">
+        <main className="container-fluid">
           <h1 id="wb-cont">
             <DinaMessage id={"userViewTitle"} />
           </h1>

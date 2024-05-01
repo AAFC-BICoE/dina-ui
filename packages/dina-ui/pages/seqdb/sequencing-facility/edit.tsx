@@ -18,7 +18,7 @@ import {
   SequencingFacilityContacts,
   SequencingFacilityProps
 } from "../../../../dina-ui/components/seqdb";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import {
   SequencingFacilityVO,
@@ -99,6 +99,7 @@ export function SequencingFacilityEditPage({ router }: WithRouterProps) {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

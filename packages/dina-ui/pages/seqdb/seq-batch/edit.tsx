@@ -77,7 +77,7 @@ export default function SeqBatchEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         <h1 id="wb-cont">
           <SeqdbMessage id={title} />
         </h1>
