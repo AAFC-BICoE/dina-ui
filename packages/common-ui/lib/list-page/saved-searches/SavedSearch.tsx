@@ -392,6 +392,7 @@ export function SavedSearch({
         setChangesMade(true);
       }
       setColumnVisibility?.(savedSearchToLoad.columnVisibility);
+      setLocalStorageColumnStates(savedSearchToLoad.columnVisibility);
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
