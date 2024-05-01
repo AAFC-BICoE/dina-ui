@@ -107,7 +107,7 @@ export default function FieldListPage() {
   return (
     <PageLayout titleId="extensionListTitle">
       <div className="d-flex flex-column">
-        <span style={{ fontWeight: "bold" }} className="mt-3">
+        <span style={{ fontWeight: "bold" }} className="mt-1">
           {" "}
           {formatMessage("selectAnExtenstion")}{" "}
         </span>

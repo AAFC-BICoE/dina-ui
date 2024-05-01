@@ -7,7 +7,7 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { groupCell, Head, Nav } from "../../../components";
+import { Footer, groupCell, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Institution } from "../../../types/collection-api";
 
@@ -37,16 +37,18 @@ export default function InstitutionListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
-    <div>
+    <>
       <Head title={formatMessage("institutionListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/institution" />
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="institutionListTitle" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/institution" />
-        </ButtonBar>
         <ListPageLayout
           filterAttributes={FILTER_ATTRIBUTES}
           id="institution-list"
@@ -56,6 +58,7 @@ export default function InstitutionListPage() {
           }}
         />
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }

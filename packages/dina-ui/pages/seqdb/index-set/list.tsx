@@ -6,7 +6,7 @@ import {
   dateCell
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav, groupCell } from "../../../components";
+import { Footer, Head, Nav, groupCell } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { IndexSet } from "../../../types/seqdb-api";
 
@@ -62,6 +62,7 @@ export default function IndexSetListPage() {
           }}
         />
       </main>
+      <Footer />
     </>
   );
 }

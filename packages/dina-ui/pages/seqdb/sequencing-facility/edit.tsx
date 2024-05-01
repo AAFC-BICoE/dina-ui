@@ -141,12 +141,16 @@ function SequencingFacilityForm({
   };
 
   const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={id as string}
-        entityLink="/seqdb/sequencing-facility"
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={id as string}
+          entityLink="/seqdb/sequencing-facility"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 

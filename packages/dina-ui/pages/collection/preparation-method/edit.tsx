@@ -125,12 +125,16 @@ export function PreparationMethodForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={fetchedPrepMethod?.id}
-          entityLink="/collection/preparation-method"
-        />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={fetchedPrepMethod?.id}
+            entityLink="/collection/preparation-method"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <PreparationMethodFormLayout />
     </DinaForm>

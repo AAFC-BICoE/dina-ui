@@ -31,6 +31,7 @@ import {
 import { ReactNode, useState } from "react";
 import {
   AttachmentsField,
+  Footer,
   GroupSelectField,
   Head,
   Nav,
@@ -84,7 +85,7 @@ export default function PcrBatchEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container">
+      <main className="container">
         <h1 id="wb-cont">
           <SeqdbMessage id={title} />
         </h1>
@@ -95,7 +96,8 @@ export default function PcrBatchEditPage() {
         ) : (
           <PcrBatchForm onSaved={moveToViewPage} />
         )}
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }
@@ -112,9 +114,13 @@ export function PcrBatchForm({
   pcrBatch,
   onSaved,
   buttonBar = (
-    <ButtonBar>
-      <BackButton entityId={pcrBatch?.id} entityLink="/seqdb/pcr-batch" />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton entityId={pcrBatch?.id} entityLink="/seqdb/pcr-batch" />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   ),
   readOnlyOverride

@@ -288,12 +288,15 @@ export default function MaterialSampleListPage() {
       <Head title={formatMessage("materialSampleListTitle")} />
       <Nav marginBottom={false} />
       <ButtonBar>
-        <CreateButton entityLink="/collection/material-sample" />
-        <Link href={`/collection/material-sample/bulk-create`}>
-          <a className="btn btn-primary">
-            <DinaMessage id="bulkCreate" />
-          </a>
-        </Link>
+        <div className="col-md-12 d-flex gap-2">
+          <div className="ms-auto" />
+          <CreateButton entityLink="/collection/material-sample" />
+          <Link href={`/collection/material-sample/bulk-create`}>
+            <a className="btn btn-primary">
+              <DinaMessage id="bulkCreate" />
+            </a>
+          </Link>
+        </div>
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">

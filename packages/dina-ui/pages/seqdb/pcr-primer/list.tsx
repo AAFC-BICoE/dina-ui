@@ -6,7 +6,7 @@ import {
   dateCell
 } from "common-ui";
 import Link from "next/link";
-import { groupCell, Head, Nav } from "../../../components";
+import { Footer, groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 
@@ -86,6 +86,7 @@ export default function PcrPrimerListPage() {
           }}
         />
       </main>
+      <Footer />
     </div>
   );
 }

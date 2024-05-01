@@ -15,7 +15,7 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import { toPairs, fromPairs } from "lodash";
 import { useRouter } from "next/router";
-import { Head, Nav, IdentifierFields } from "../../../components";
+import { Head, Nav, IdentifierFields, Footer } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Institution } from "../../../types/collection-api";
 import { Field } from "formik";
@@ -44,7 +44,7 @@ export default function InstitutionEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container">
+      <main className="container">
         <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
@@ -55,7 +55,8 @@ export default function InstitutionEditPage() {
         ) : (
           <InstitutionForm onSaved={goToViewPage} />
         )}
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }
@@ -112,12 +113,16 @@ export function InstitutionForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={institution?.id}
-          entityLink="/collection/institution"
-        />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={institution?.id}
+            entityLink="/collection/institution"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <InstitutionFormLayout />
     </DinaForm>

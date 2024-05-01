@@ -137,13 +137,17 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
   };
 
   const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={id as string}
-        entityLink="/organization"
-        byPassView={true}
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={id as string}
+          entityLink="/organization"
+          byPassView={true}
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 

@@ -7,7 +7,13 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { groupCell, GroupSelectField, Head, Nav } from "../../../components";
+import {
+  Footer,
+  groupCell,
+  GroupSelectField,
+  Head,
+  Nav
+} from "../../../components";
 import { useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 
@@ -78,6 +84,7 @@ export default function PcrBatchListPage() {
           )}
         />
       </main>
+      <Footer />
     </div>
   );
 }
