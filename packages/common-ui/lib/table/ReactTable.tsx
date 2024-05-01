@@ -235,6 +235,10 @@ export function ReactTable<TData>({
     columnVisibilityExternal
   );
 
+  useEffect(() => {
+    setColumnVisibility(columnVisibilityExternal);
+  }, [columnVisibilityExternal]);
+
   const tableOption = {
     data,
     columns,

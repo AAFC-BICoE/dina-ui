@@ -28,6 +28,8 @@ import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
 import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useIntl } from "react-intl";
 import { useSessionStorage } from "usehooks-ts";
+import { VisibilityState } from "@tanstack/react-table";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 export interface SavedSearchProps {
   /**
@@ -89,6 +91,13 @@ export interface SavedSearchProps {
    * to remain the same across tables, it can share the same name.
    */
   uniqueName: string;
+
+  /**
+   * Set the column visilibity to be loaded, used for the saved search.
+   */
+  setColumnVisibility?: React.Dispatch<
+    React.SetStateAction<VisibilityState | undefined>
+  >;
 }
 
 /**
@@ -114,7 +123,8 @@ export function SavedSearch({
   groups,
   setGroups,
   performSubmit,
-  uniqueName
+  uniqueName,
+  setColumnVisibility
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -144,6 +154,13 @@ export function SavedSearch({
 
   const [selectedSavedSearchName, setSelectedSavedSearchName] =
     useState<string>();
+
+  // Local storage for saving columns visibility
+  const [localStorageColumnStates, setLocalStorageColumnStates] =
+    useLocalStorage<VisibilityState | undefined>(
+      `${uniqueName}_columnSelector`,
+      {}
+    );
 
   // Functionality for the last loaded search.
   useLastSavedSearch({
@@ -374,7 +391,7 @@ export function SavedSearch({
         setQueryError(formatMessage({ id: "queryBuilder_invalid_query" }));
         setChangesMade(true);
       }
-
+      setColumnVisibility?.(savedSearchToLoad.columnVisibility);
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
@@ -416,6 +433,9 @@ export function SavedSearch({
           [savedSearchName]: {
             version: SAVED_SEARCH_VERSION,
             default: setAsDefault,
+
+            // Save selected columns
+            columnVisibility: localStorageColumnStates,
 
             // If updateQueryTree is true, then we will retrieve the current query tree from the
             // query builder, otherwise it will remain the same as before.
@@ -511,8 +531,10 @@ export function SavedSearch({
           actionMessage={<DinaMessage id="removeSavedSearch" />}
           messageBody={
             <>
-              <strong><DinaMessage id="areYouSureRemoveSavedSearch"/></strong><br/>
-              "{savedSearchName}"
+              <strong>
+                <DinaMessage id="areYouSureRemoveSavedSearch" />
+              </strong>
+              <br />"{savedSearchName}"
             </>
           }
           onYesButtonClicked={deleteSearch}

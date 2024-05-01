@@ -12,6 +12,7 @@ import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
 import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import { VisibilityState } from "@tanstack/react-table";
 
 export interface QueryBuilderContextI {
   performSubmit: () => void;
@@ -99,6 +100,13 @@ interface QueryBuilderProps {
    * submitting a broken query.
    */
   validationErrors: ValidationError[];
+
+  /**
+   * Set the column visilibity to be loaded, used for the saved search.
+   */
+  setColumnVisibility?: React.Dispatch<
+    React.SetStateAction<VisibilityState | undefined>
+  >;
 }
 
 function QueryBuilder({
@@ -113,7 +121,8 @@ function QueryBuilder({
   groups,
   setGroups,
   uniqueName,
-  validationErrors
+  validationErrors,
+  setColumnVisibility
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -159,6 +168,7 @@ function QueryBuilder({
           groups={groups}
           setGroups={setGroups}
           uniqueName={uniqueName}
+          setColumnVisibility={setColumnVisibility}
         />
         <Query
           {...queryBuilderConfig}

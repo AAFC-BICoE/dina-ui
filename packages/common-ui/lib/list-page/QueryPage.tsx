@@ -792,15 +792,19 @@ export function QueryPage<TData extends KitsuResource>({
         )
       : reactTableProps;
 
-  const columnVisibility = compact(
-    totalColumns.map((col) =>
-      col.isColumnVisible === false
-        ? { id: col.id, visibility: false }
-        : undefined
+  const [columnVisibility, setColumnVisibility] = useState<
+    VisibilityState | undefined
+  >(
+    compact(
+      totalColumns.map((col) =>
+        col.isColumnVisible === false
+          ? { id: col.id, visibility: false }
+          : undefined
+      )
+    ).reduce<VisibilityState>(
+      (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
+      {}
     )
-  ).reduce<VisibilityState>(
-    (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
-    {}
   );
 
   // Local storage for saving columns visibility
@@ -1019,6 +1023,7 @@ export function QueryPage<TData extends KitsuResource>({
             groups={groups}
             uniqueName={uniqueName}
             validationErrors={validationErrors}
+            setColumnVisibility={setColumnVisibility}
           />
         </>
       )}

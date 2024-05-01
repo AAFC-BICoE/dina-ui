@@ -1,3 +1,4 @@
+import { VisibilityState } from "@tanstack/react-table";
 import { JsonTree } from "react-awesome-query-builder";
 
 /**
@@ -32,6 +33,11 @@ export interface SingleSavedSearch {
    * Query builder structure.
    */
   queryTree?: JsonTree;
+
+  /**
+   * Selected columns visibility structure.
+   */
+  columnVisibility?: VisibilityState;
 
   /**
    * Groups to load in.
