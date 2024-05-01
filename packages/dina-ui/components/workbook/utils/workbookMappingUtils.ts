@@ -51,7 +51,13 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["storage", "storageUnit.name"],
   ["storageunit", "storageUnit.name"],
   ["project", "projects.name"],
-  ["projects", "projects.name"]
+  ["projects", "projects.name"],
+  ["preparation type", "preparationType.name"],
+  ["preparationtype", "preparationType.name"],
+  ["prepared by", "preparedBy.displayName"],
+  ["preparedby", "preparedBy.displayName"],
+  ["preparationprotocol", "preparationProtocol.name"],
+  ["preparation protocol", "preparationProtocol.name"]
 ]);
 
 export type FieldOptionType = {
@@ -74,7 +80,7 @@ export function findMatchField(
   columnHeader: string,
   fieldOptions: FieldOptionType[]
 ) {
-  let columnHeader2: string = columnHeader.toLowerCase().trim();
+  let columnHeader2: string = columnHeader.toLowerCase();
   if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {
     columnHeader2 = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(columnHeader2)!;
   }
@@ -111,7 +117,7 @@ export function findMatchField(
     } else {
       return (
         item.value.toLowerCase() === columnHeader2.toLowerCase() ||
-        _toPlainString(item.label) === _toPlainString(columnHeader2)
+        _toPlainString(item.label) === _toPlainString(columnHeader)
       );
     }
   });
@@ -551,4 +557,16 @@ export function removeEmptyColumns(data: WorkbookJSON) {
     }
   }
   return data;
+}
+
+export function trimSpace(workbookData: WorkbookJSON) {
+  for (const rows of Object.values(workbookData)) {
+    for (const row of rows as WorkbookRow[]) {
+      for (let i = 0; i < row.content.length; i++) {
+        const value = row.content[i];
+        row.content[i] = value.trim();
+      }
+    }
+  }
+  return workbookData;
 }

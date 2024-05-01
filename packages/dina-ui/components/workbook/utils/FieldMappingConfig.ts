@@ -266,6 +266,18 @@ const FieldMappingConfig: FieldMappingConfigType = {
         materialSampleName: { dataType: WorkbookDataTypeEnum.STRING }
       }
     }
+    // assemblages: {
+    //   dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+    //   relationshipConfig: {
+    //     hasGroup: true,
+    //     linkOrCreateSetting: LinkOrCreateSetting.LINK,
+    //     type: "assemblage",
+    //     baseApiPath: "/collection-api"
+    //   },
+    //   attributes: {
+    //     name: { dataType: WorkbookDataTypeEnum.STRING }
+    //   }
+    // }
   }
 };
 

@@ -424,7 +424,12 @@ export function WorkbookColumnMapping({
           break;
         case WorkbookDataTypeEnum.VOCABULARY:
           const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldPath);
-          if (vocabElements && !vocabElements.includes(row[fieldPath])) {
+          if (
+            vocabElements &&
+            !vocabElements.includes(
+              row[fieldPath].toUpperCase().replace(" ", "_")
+            )
+          ) {
             param.dataType = WorkbookDataTypeEnum.VOCABULARY;
             errors.push(
               new ValidationError(
