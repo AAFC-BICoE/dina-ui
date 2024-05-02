@@ -92,7 +92,7 @@ export function useWorkbookConverter(
     [WorkbookDataTypeEnum.DATE]: convertDate,
     [WorkbookDataTypeEnum.STRING]: convertString,
     [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
-      value,
+      value.toUpperCase().replace(" ", "_"),
     [WorkbookDataTypeEnum.CLASSIFICATION]: (value: {
       [key: string]: string;
     }) => {

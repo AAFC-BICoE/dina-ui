@@ -8,6 +8,7 @@ import {
   WorkbookColumnMapping,
   WorkbookJSON,
   WorkbookUpload,
+  trimSpace,
   useWorkbookContext
 } from "../../components";
 import { IFileWithMeta } from "../../components/object-store";
@@ -40,7 +41,7 @@ export function UploadWorkbookPage() {
     await apiClient.axios
       .post("/objectstore-api/conversion/workbook", formData)
       .then((response) => {
-        uploadWorkbook(response.data);
+        uploadWorkbook(trimSpace(response.data));
         setLoading(false);
         setFailed(false);
       })

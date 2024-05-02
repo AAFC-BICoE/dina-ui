@@ -17,7 +17,8 @@ import {
   isMap,
   isNumber,
   calculateColumnUniqueValuesFromSpreadsheetData,
-  isEmptyWorkbookValue as isEmptyWorkbookValue
+  isEmptyWorkbookValue as isEmptyWorkbookValue,
+  trimSpace
 } from "../workbookMappingUtils";
 
 const mockConfig: FieldMappingConfigType = {
@@ -448,5 +449,29 @@ describe("workbookMappingUtils functions", () => {
         }
       ])
     ).toBeFalsy();
+  });
+
+  it("trimSpace", () => {
+    expect(
+      trimSpace({
+        "0": [
+          { rowNumber: 0, content: ["header1 ", "header2 ", "header3 "] },
+          { rowNumber: 1, content: ["data1 ", " data2", " data3"] }
+        ],
+        "1": [
+          { rowNumber: 0, content: ["header4 ", " header5", "header6 "] },
+          { rowNumber: 1, content: ["data4 ", " data5", "data6 "] }
+        ]
+      })
+    ).toEqual({
+      "0": [
+        { rowNumber: 0, content: ["header1", "header2", "header3"] },
+        { rowNumber: 1, content: ["data1", "data2", "data3"] }
+      ],
+      "1": [
+        { rowNumber: 0, content: ["header4", "header5", "header6"] },
+        { rowNumber: 1, content: ["data4", "data5", "data6"] }
+      ]
+    });
   });
 });
