@@ -254,7 +254,8 @@ export default function ExportPage<TData extends KitsuResource>() {
       const objectExportSaveArg = {
         resource: {
           type: "object-export",
-          fileIdentifiers
+          fileIdentifiers,
+          name: formik?.values?.name
         },
         type: "object-export"
       };
