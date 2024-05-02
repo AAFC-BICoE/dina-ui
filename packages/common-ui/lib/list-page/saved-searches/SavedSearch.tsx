@@ -386,12 +386,14 @@ export function SavedSearch({
         setQueryError(formatMessage({ id: "queryBuilder_invalid_query" }));
         setChangesMade(true);
       }
+      getColumnVisibility(savedSearchToLoad.columnVisibility);
       // Set ReactTable's column visibility
-      reactTable?.setColumnVisibility?.(
-        savedSearchToLoad.columnVisibility ?? {}
+      const columnVisibility: VisibilityState = getColumnVisibility(
+        savedSearchToLoad.columnVisibility
       );
+      reactTable?.setColumnVisibility?.(columnVisibility);
       // Set local storage column visibility for navigating around the website
-      setLocalStorageColumnStates(savedSearchToLoad.columnVisibility);
+      setLocalStorageColumnStates(columnVisibility);
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
@@ -435,7 +437,7 @@ export function SavedSearch({
             default: setAsDefault,
 
             // Save selected columns
-            columnVisibility: reactTable?.getState().columnVisibility,
+            columnVisibility: saveColumnVisibility(),
 
             // If updateQueryTree is true, then we will retrieve the current query tree from the
             // query builder, otherwise it will remain the same as before.
@@ -639,4 +641,32 @@ export function SavedSearch({
       {queryError && <Alert variant={"danger"}>{queryError}</Alert>}
     </>
   );
+
+  function saveColumnVisibility(): string[] | undefined {
+    const savedColumnVisibility = reactTable?.getState().columnVisibility
+      ? Object.keys(reactTable?.getState().columnVisibility).filter(
+          (columnKey) =>
+            reactTable?.getState().columnVisibility[columnKey] === true
+        )
+      : undefined;
+    return savedColumnVisibility;
+  }
+
+  function getColumnVisibility(
+    savedColumnVisibility: string[] | undefined
+  ): VisibilityState {
+    const columnVisibility: VisibilityState = {};
+    if (reactTable?.getState().columnVisibility) {
+      Object.keys(reactTable?.getState().columnVisibility).forEach(
+        (columnKey) => {
+          columnVisibility[columnKey] = savedColumnVisibility?.includes(
+            columnKey
+          )
+            ? true
+            : false;
+        }
+      );
+    }
+    return columnVisibility;
+  }
 }

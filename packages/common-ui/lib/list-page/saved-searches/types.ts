@@ -37,7 +37,7 @@ export interface SingleSavedSearch {
   /**
    * Selected columns visibility structure.
    */
-  columnVisibility?: VisibilityState;
+  columnVisibility?: string[];
 
   /**
    * Groups to load in.

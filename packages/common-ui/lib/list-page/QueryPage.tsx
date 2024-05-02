@@ -797,7 +797,7 @@ export function QueryPage<TData extends KitsuResource>({
     totalColumns?.map((col) =>
       col.isColumnVisible === false
         ? { id: col.id, visibility: false }
-        : undefined
+        : { id: col.id, visibility: true }
     )
   ).reduce<VisibilityState>(
     (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
