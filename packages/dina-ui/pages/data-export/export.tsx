@@ -362,7 +362,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                 <Tooltip id="exportObjectsMaxLimitTooltip" />
               )}
           </div>
-          {columnSelector}
+          {exportType === "TABULAR_DATA" && columnSelector}
         </div>
 
         <ReactTable<TData>
