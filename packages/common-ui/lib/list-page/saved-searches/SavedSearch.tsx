@@ -28,7 +28,7 @@ import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
 import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useIntl } from "react-intl";
 import { useSessionStorage } from "usehooks-ts";
-import { VisibilityState } from "@tanstack/react-table";
+import { Table, VisibilityState } from "@tanstack/react-table";
 import { useLocalStorage } from "@rehooks/local-storage";
 
 export interface SavedSearchProps {
@@ -92,12 +92,7 @@ export interface SavedSearchProps {
    */
   uniqueName: string;
 
-  /**
-   * Set the column visilibity to be loaded, used for the saved search.
-   */
-  setColumnVisibility?: React.Dispatch<
-    React.SetStateAction<VisibilityState | undefined>
-  >;
+  reactTable?: Table<any>;
 }
 
 /**
@@ -124,7 +119,7 @@ export function SavedSearch({
   setGroups,
   performSubmit,
   uniqueName,
-  setColumnVisibility
+  reactTable
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -392,7 +387,9 @@ export function SavedSearch({
         setChangesMade(true);
       }
       // Set ReactTable's column visibility
-      setColumnVisibility?.(savedSearchToLoad.columnVisibility);
+      reactTable?.setColumnVisibility?.(
+        savedSearchToLoad.columnVisibility ?? {}
+      );
       // Set local storage column visibility for navigating around the website
       setLocalStorageColumnStates(savedSearchToLoad.columnVisibility);
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
@@ -438,7 +435,7 @@ export function SavedSearch({
             default: setAsDefault,
 
             // Save selected columns
-            columnVisibility: localStorageColumnStates,
+            columnVisibility: reactTable?.getState().columnVisibility,
 
             // If updateQueryTree is true, then we will retrieve the current query tree from the
             // query builder, otherwise it will remain the same as before.
