@@ -91,6 +91,18 @@ export function useColumnMapping() {
       page: { limit: 1000 }
     });
 
+  const { loading: assemblageLoading, response: assemblageResp } = useQuery<
+    RelationshipResource[]
+  >(
+    {
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=assemblage`,
+      page: { limit: 1000 }
+    },
+    {
+      deps: [groupName]
+    }
+  );
+
   const { loading: collectionLoading, response: collectionResp } = useQuery<
     RelationshipResource[]
   >(
@@ -155,19 +167,31 @@ export function useColumnMapping() {
       deps: [groupName]
     }
   );
+  const { loading: personLoading, response: personResp } = useQuery<
+    RelationshipResource[]
+  >({
+    path: `agent-api/person`,
+    page: { limit: 1000 }
+  });
 
   const loadingData =
     attrLoading ||
+    assemblageLoading ||
     collectionLoading ||
     preparationTypeLoading ||
     preparationMethodLoading ||
     protocolLoading ||
     storageUnitLoading ||
     projectLoading ||
+    personLoading ||
     taxonomicRankLoading;
 
   const managedAttributes = attrResp?.data || [];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
+  const assemblages = (assemblageResp?.data || []).map((item) => ({
+    ...item,
+    type: "assemblage"
+  }));
   const collections = (collectionResp?.data || []).map((item) => ({
     ...item,
     type: "collection"
@@ -190,6 +214,10 @@ export function useColumnMapping() {
   const projects = (projectResp?.data || []).map((item) => ({
     ...item,
     type: "project"
+  }));
+  const persons = (personResp?.data || []).map((item) => ({
+    ...item,
+    type: "person"
   }));
 
   const [loading, setLoading] = useState<boolean>(loadingData);
@@ -296,7 +324,7 @@ export function useColumnMapping() {
     } else if (fieldPath === "managedAttributes") {
       handleManagedAttributeMapping(columnHeader, newWorkbookColumnMap);
     } else if (fieldPath?.startsWith("parentMaterialSample.")) {
-      const valueMapping = await resolveParentMapping(columnHeader, fieldPath);
+      const valueMapping = await resolveParentMapping(columnHeader);
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
         showOnUI: false,
@@ -306,8 +334,10 @@ export function useColumnMapping() {
       };
     } else {
       const mapRelationship =
-        fieldPath.indexOf(".") > -1 &&
-        flattenedConfig[fieldPath.substring(0, fieldPath.indexOf("."))]
+        // Check if there's a dot in the fieldPath
+        fieldPath.lastIndexOf(".") > -1 &&
+        // Extract everything except the last dot
+        flattenedConfig[fieldPath.substring(0, fieldPath.lastIndexOf("."))]
           ?.relationshipConfig?.linkOrCreateSetting ===
           LinkOrCreateSetting.LINK;
 
@@ -483,18 +513,12 @@ export function useColumnMapping() {
    * @param fieldPath the mapped field path
    * @returns
    */
-  async function resolveParentMapping(
-    columnHeader: string,
-    fieldPath: string
-  ): Promise<{
+  async function resolveParentMapping(columnHeader: string): Promise<{
     [value: string]: {
       id: string;
       type: string;
     };
   }> {
-    const { baseApiPath } = getFieldRelationshipConfig();
-    const lastDotPos = fieldPath.lastIndexOf(".");
-    const fieldName = fieldPath.substring(lastDotPos + 1);
     const valueMapping: {
       [value: string]: {
         id: string;
@@ -536,6 +560,9 @@ export function useColumnMapping() {
       for (const value of Object.keys(values)) {
         let found: PersistedResource<any> | undefined;
         switch (fieldPath) {
+          case "assemblages.name":
+            found = assemblages.find((item) => item.name === value);
+            break;
           case "collection.name":
             found = collections.find((item) => item.name === value);
             break;
@@ -553,6 +580,12 @@ export function useColumnMapping() {
             break;
           case "projects.name":
             found = projects.find((item) => item.name === value);
+            break;
+          case "collectingEvent.collectors.displayName":
+          case "preparedBy.displayName":
+            found = persons.find(
+              (item) => (item as any)?.displayName === value
+            );
             break;
         }
 
@@ -597,6 +630,14 @@ export function useColumnMapping() {
         }));
         targetType = "storage-unit";
         break;
+      case "assemblages.name":
+        options = assemblages.map((resource) => ({
+          label: resource.name,
+          value: resource.id,
+          resource
+        }));
+        targetType = "assemblage";
+        break;
       case "collection.name":
         options = collections.map((resource) => ({
           label: resource.name,
@@ -636,6 +677,15 @@ export function useColumnMapping() {
           resource
         }));
         targetType = "project";
+        break;
+      case "collectingEvent.collectors.displayName":
+      case "preparedBy.displayName":
+        options = persons.map((resource) => ({
+          label: (resource as any)?.displayName ?? "",
+          value: resource.id,
+          resource
+        }));
+        targetType = "person";
         break;
       default:
         options = [];

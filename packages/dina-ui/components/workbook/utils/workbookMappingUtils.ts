@@ -57,7 +57,11 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["prepared by", "preparedBy.displayName"],
   ["preparedby", "preparedBy.displayName"],
   ["preparationprotocol", "preparationProtocol.name"],
-  ["preparation protocol", "preparationProtocol.name"]
+  ["preparation protocol", "preparationProtocol.name"],
+  ["assemblage", "assemblages.name"],
+  ["assemblages", "assemblages.name"],
+  ["collectors", "collectingEvent.collectors.displayName"],
+  ["collector", "collectingEvent.collectors.displayName"]
 ]);
 
 export type FieldOptionType = {
