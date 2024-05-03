@@ -450,7 +450,7 @@ export function WorkbookColumnMapping({
   ) {
     const { newWorkbookColumnMap, newRelationshipMapping } =
       await resolveColumnMappingAndRelationshipMapping(
-        columnName,
+        columnName.replace(".", "_"),
         newFieldPath
       );
 
@@ -473,12 +473,15 @@ export function WorkbookColumnMapping({
     relatedRecord: string,
     targetType: string
   ) {
+    const columnHeaderFormatted = columnHeader.replaceAll(".", "_");
+    const fieldValueFormatted = fieldValue.replaceAll(".", "_");
+
     if (relationshipMapping) {
       setRelationshipMapping({
         ...relationshipMapping,
-        [columnHeader]: {
-          ...relationshipMapping?.[columnHeader],
-          [fieldValue]: {
+        [columnHeaderFormatted]: {
+          ...relationshipMapping?.[columnHeaderFormatted],
+          [fieldValueFormatted]: {
             id: relatedRecord,
             type: targetType
           }
