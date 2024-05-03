@@ -63,12 +63,14 @@ export function useMaterialSampleFormTemplateProps<
             ).some((value) => !!value && value !== "");
           }
           if (determinationHasDefaultValue) {
+            // If there is any default value of determination in the form template, populate one determination.
             return {
               ...org,
               type: "organism",
               determination: [{ ...org.determination[0], isPrimary: true }]
             };
           } else {
+            // If there is no default value of determination in the form template, DO NOT populate determination.
             return {
               ...org,
               type: "organism",
