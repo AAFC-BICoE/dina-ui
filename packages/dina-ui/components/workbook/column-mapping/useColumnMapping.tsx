@@ -24,6 +24,7 @@ import {
   getColumnHeaders
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
+import { Person } from "../../../types/agent-api/resources/Person";
 
 type RelationshipResource = { name?: string } & KitsuResource;
 
@@ -42,10 +43,7 @@ export function useColumnMapping() {
     group: groupName
   } = useWorkbookContext();
 
-  const { flattenedConfig, getFieldRelationshipConfig } = useWorkbookConverter(
-    FieldMappingConfig,
-    type
-  );
+  const { flattenedConfig } = useWorkbookConverter(FieldMappingConfig, type);
 
   // Retrieve a string array of the headers from the uploaded spreadsheet.
   const headers = useMemo(() => {
@@ -167,9 +165,7 @@ export function useColumnMapping() {
       deps: [groupName]
     }
   );
-  const { loading: personLoading, response: personResp } = useQuery<
-    RelationshipResource[]
-  >({
+  const { loading: personLoading, response: personResp } = useQuery<Person[]>({
     path: `agent-api/person`,
     page: { limit: 1000 }
   });
@@ -350,6 +346,7 @@ export function useColumnMapping() {
         ).length,
         valueMapping: {}
       };
+
       if (mapRelationship) {
         resolveRelationships(newRelationshipMapping, columnHeader, fieldPath);
       }
@@ -367,12 +364,13 @@ export function useColumnMapping() {
     for (const columnHeader of headers || []) {
       const fieldPath = findMatchField(columnHeader, theFieldOptions);
       const result = await resolveColumnMappingAndRelationshipMapping(
-        columnHeader,
+        columnHeader.replace(".", "_"),
         fieldPath
       );
       Object.assign(newWorkbookColumnMap, result.newWorkbookColumnMap);
       Object.assign(newRelationshipMapping, result.newRelationshipMapping);
     }
+
     setColumnMap(newWorkbookColumnMap);
     setRelationshipMapping(newRelationshipMapping);
     // End of workbook column mapping calculation
@@ -583,18 +581,16 @@ export function useColumnMapping() {
             break;
           case "collectingEvent.collectors.displayName":
           case "preparedBy.displayName":
-            found = persons.find(
-              (item) => (item as any)?.displayName === value
-            );
+            found = persons.find((item) => item.displayName === value);
             break;
         }
 
         // If relationship is found, set it. If not, reset it so it's empty.
         if (found) {
-          theRelationshipMapping[columnHeader][value] = pick(found, [
-            "id",
-            "type"
-          ]);
+          theRelationshipMapping[columnHeader][value.replace(".", "_")] = pick(
+            found,
+            ["id", "type"]
+          );
         }
       }
     }
@@ -615,9 +611,10 @@ export function useColumnMapping() {
       return undefined;
     }
 
-    const selectElemName = `relationshipMapping.${columnHeader
-      .trim()
-      .replaceAll(".", "_")}.${fieldValue}.id`;
+    const selectElemName = `relationshipMapping.${columnHeader.replaceAll(
+      ".",
+      "_"
+    )}.${fieldValue.replaceAll(".", "_")}.id`;
 
     let options: any[] = [];
     let targetType: string = "";
@@ -681,7 +678,7 @@ export function useColumnMapping() {
       case "collectingEvent.collectors.displayName":
       case "preparedBy.displayName":
         options = persons.map((resource) => ({
-          label: (resource as any)?.displayName ?? "",
+          label: resource.displayName,
           value: resource.id,
           resource
         }));

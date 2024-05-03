@@ -678,9 +678,10 @@ export function useWorkbookConverter(
   ) {
     const parentPath = getParentFieldPath(fieldPath);
     const relationshipConfig = getFieldRelationshipConfig(parentPath);
-    const eleName = `relationshipMapping.${columnName
-      .trim()
-      .replaceAll(".", "_")}.${value}`;
+    const eleName = `relationshipMapping.${columnName.replaceAll(
+      ".",
+      "_"
+    )}.${value.replaceAll(".", "_")}`;
     const resourceSelectProps = {
       hideLabel: true,
       selectProps: { isClearable: true },
