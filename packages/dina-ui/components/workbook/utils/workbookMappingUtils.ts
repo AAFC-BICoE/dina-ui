@@ -523,7 +523,7 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
           counts[value] = 1 + (counts[value] || 0);
         }
       }
-      columnUniqueValues[columnNames[colIndex]] = counts;
+      columnUniqueValues[columnNames[colIndex].replace(".", "_")] = counts;
     }
     result[sheet] = columnUniqueValues;
   }
