@@ -3,8 +3,17 @@ import { fromPairs } from "lodash";
 import { ViewPageLayout } from "../../../components";
 import { ReportTemplateFormLayout } from "./edit";
 import { ReportTemplate } from "../../../types/dina-export-api";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import Link from "next/link";
 
 export default function ReportTemplateDetailsPage() {
+  const backButton = (
+    <Link href={"/export/report-template/upload"}>
+      <a className="back-button my-auto me-auto">
+        <DinaMessage id={"backToUpload"} />
+      </a>
+    </Link>
+  );
   return (
     <ViewPageLayout<ReportTemplate>
       form={(props) => (
@@ -29,7 +38,7 @@ export default function ReportTemplateDetailsPage() {
       entityLink="/export/report-template"
       type="report-template"
       apiBaseUrl="/dina-export-api"
-      specialListUrl="/export/report-template/upload"
+      backButton={backButton}
     />
   );
 }
