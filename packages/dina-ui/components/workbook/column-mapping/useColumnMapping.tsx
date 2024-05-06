@@ -222,6 +222,9 @@ export function useColumnMapping() {
     columnHeader: string,
     newWorkbookColumnMap: WorkbookColumnMap
   ) {
+    const originalColumnHeader = columnHeader;
+    columnHeader = columnHeader.replace(".", "_");
+
     const fieldPath = "managedAttributes";
     const targetManagedAttr = managedAttributes.find(
       (item) =>
@@ -230,6 +233,7 @@ export function useColumnMapping() {
     if (targetManagedAttr) {
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
@@ -245,6 +249,7 @@ export function useColumnMapping() {
     } else {
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
@@ -259,6 +264,9 @@ export function useColumnMapping() {
     columnHeader: string,
     newWorkbookColumnMap: WorkbookColumnMap
   ) {
+    const originalColumnHeader = columnHeader;
+    columnHeader = columnHeader.replace(".", "_");
+
     const fieldPath = "organism.determination.scientificNameDetails";
     const targetTaxonomicRank = taxonomicRanks.find(
       (item) =>
@@ -267,6 +275,7 @@ export function useColumnMapping() {
     if (targetTaxonomicRank) {
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
@@ -282,6 +291,7 @@ export function useColumnMapping() {
     } else {
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
@@ -296,6 +306,9 @@ export function useColumnMapping() {
     columnHeader: string,
     fieldPath?: string
   ) {
+    const originalColumnHeader = columnHeader;
+    columnHeader = columnHeader.replace(".", "_");
+
     const newWorkbookColumnMap: WorkbookColumnMap = {};
     const newRelationshipMapping: RelationshipMapping = {};
     if (fieldPath === undefined) {
@@ -305,7 +318,10 @@ export function useColumnMapping() {
             item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
         ) > -1
       ) {
-        handleManagedAttributeMapping(columnHeader, newWorkbookColumnMap);
+        handleManagedAttributeMapping(
+          originalColumnHeader,
+          newWorkbookColumnMap
+        );
       } else if (
         taxonomicRanks.findIndex(
           (item) =>
@@ -313,16 +329,17 @@ export function useColumnMapping() {
             columnHeader.toLowerCase().trim()
         ) > -1
       ) {
-        handleClassificationMapping(columnHeader, newWorkbookColumnMap);
+        handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
       }
     } else if (fieldPath === "organism.determination.scientificNameDetails") {
-      handleClassificationMapping(columnHeader, newWorkbookColumnMap);
+      handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath === "managedAttributes") {
-      handleManagedAttributeMapping(columnHeader, newWorkbookColumnMap);
+      handleManagedAttributeMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath?.startsWith("parentMaterialSample.")) {
       const valueMapping = await resolveParentMapping(columnHeader);
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: false,
         mapRelationship: true,
         numOfUniqueValues: 1,
@@ -339,6 +356,7 @@ export function useColumnMapping() {
 
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship,
         numOfUniqueValues: Object.keys(
@@ -364,7 +382,7 @@ export function useColumnMapping() {
     for (const columnHeader of headers || []) {
       const fieldPath = findMatchField(columnHeader, theFieldOptions);
       const result = await resolveColumnMappingAndRelationshipMapping(
-        columnHeader.replace(".", "_"),
+        columnHeader,
         fieldPath
       );
       Object.assign(newWorkbookColumnMap, result.newWorkbookColumnMap);
