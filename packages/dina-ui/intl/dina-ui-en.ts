@@ -979,5 +979,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_reportTemplateName: "Report Template Name",
   field_includesBarcode: "Includes Barcode",
   field_templateOutputMediaType: "Template Output Media Type",
-  field_outputMediaType: "Output Media Type"
+  field_outputMediaType: "Output Media Type",
+  field_reportType: "Report Type",
+  field_reportVariables: "Report Variables"
 };

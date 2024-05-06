@@ -6,7 +6,8 @@ import {
   SubmitButton,
   TextField,
   MultilingualDescription,
-  ToggleField
+  ToggleField,
+  StringArrayField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -143,7 +144,18 @@ export function ReportTemplateFormLayout() {
         />
       </div>
       <div className="row">
-        {" "}
+        <TextField
+          className="col-md-6 name"
+          name="reportType"
+          label={formatMessage("field_reportType")}
+        />
+        <StringArrayField
+          className="col-md-6 name"
+          name="reportVariables"
+          label={formatMessage("field_reportVariables")}
+        />
+      </div>
+      <div className="row">
         <TextField
           className="col-md-6 name"
           name="templateOutputMediaType"
