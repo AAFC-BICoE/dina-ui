@@ -8,7 +8,7 @@ import {
   MultilingualDescription,
   ToggleField
 } from "common-ui";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
@@ -19,15 +19,17 @@ import Link from "next/link";
 
 interface ReportTemplateFormProps {
   fetchedReportTemplate?: ReportTemplate;
-  onSaved: () => Promise<void>;
+  onSaved: (reportTemplate: PersistedResource<ReportTemplate>) => Promise<void>;
 }
 
 export default function ReportEditPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
 
-  async function redirectHandler() {
-    await router.push(`/export/report-template/upload`);
+  async function goToViewPage(
+    reportTemplate: PersistedResource<ReportTemplate>
+  ) {
+    await router.push(`/export/report-template/view?id=${reportTemplate.id}`);
   }
 
   const title = "addReportTemplateTitle";
@@ -41,7 +43,7 @@ export default function ReportEditPage() {
           <h1 id="wb-cont">
             <DinaMessage id={title} />
           </h1>
-          <ReportTemplateForm onSaved={redirectHandler} />
+          <ReportTemplateForm onSaved={goToViewPage} />
         </div>
       </main>
     </div>
@@ -102,7 +104,7 @@ export function ReportTemplateForm({
       }
     );
 
-    await onSaved();
+    await onSaved(savedReportTemplate);
   };
 
   return (
