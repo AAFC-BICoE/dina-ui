@@ -56,6 +56,8 @@ export default function UploadPage() {
           fileName: unsupportedFile.meta.name
         })
       );
+    } else if (acceptedFiles.length > 1) {
+      throw new Error(formatMessage("maxNumUploadExceeded"));
     }
 
     const uploadRespsT = await uploadFiles({
@@ -65,110 +67,69 @@ export default function UploadPage() {
       isReportTemplate: true
     });
 
-    // Handle linking derivative to metadata object
-    if (router?.query?.derivativeType) {
-      const derivativeObjectUpload = uploadRespsT[0];
-      await apiClient.axios.post(
-        `/objectstore-api/derivative`,
-        {
-          data: {
-            type: "derivative",
-            attributes: {
-              bucket: derivativeObjectUpload.bucket,
-              derivativeType: router.query.derivativeType,
-              fileIdentifier: derivativeObjectUpload.fileIdentifier,
-              dcType: derivativeObjectUpload.dcType
-            },
-            relationships: {
-              acDerivedFrom: {
-                data: {
-                  type: "metadata",
-                  id: router.query.acDerivedFrom
-                }
-              }
-            }
-          }
-        },
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json"
-          }
-        }
+    // Handle redirecting to metadata edit page for creating metadata objects
+    const uploadDuplicates = uploadRespsT
+      .filter((resp) => resp.meta?.warnings?.duplicate_found)
+      .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
+
+    const navigateToEditReportTemplate = async () => {
+      const objectUploadIds = uploadRespsT.map(
+        ({ fileIdentifier }) => fileIdentifier
       );
-      await navigateToList();
-    } else {
-      // Handle redirecting to metadata edit page for creating metadata objects
-      const objectUploadDuplicates = uploadRespsT
-        .filter((resp) => resp.meta?.warnings?.duplicate_found)
-        .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
-
-      const navigateToEditMetadata = async () => {
-        const objectUploadIds = uploadRespsT.map(
-          ({ fileIdentifier }) => fileIdentifier
-        );
-        deleteFromStorage(BULK_EDIT_IDS_KEY);
-        writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
-        if (objectUploadIds.length === 1) {
-          await router.push({
-            pathname: "/object-store/metadata/edit",
-            query: {
-              group
-            }
-          });
-        } else {
-          await router.push({
-            pathname: "/object-store/metadata/bulk-edit",
-            query: {
-              group
-            }
-          });
-        }
-      };
-
-      if (Object.keys(objectUploadDuplicates)?.length === 0) {
-        // No duplicate files, proceed to edit metadata page
-        await navigateToEditMetadata();
-      } else {
-        openModal(
-          <AreYouSureModal
-            actionMessage={
-              <span>
-                <DinaMessage id="proceedToCreateMetadata" />
-                <p>
-                  {`(${objectUploadDuplicates.length} `}
-                  {formatMessage("duplicateFilesFound") + " )"}
-                </p>
-              </span>
-            }
-            messageBody={
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th style={{ width: "30%" }}>
-                      <DinaMessage id="field_originalFilename" />
-                    </th>
-                    <th style={{ width: "40%" }}>
-                      <DinaMessage id="warningMessage" />
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {objectUploadDuplicates.map(
-                    (dup, idx) =>
-                      dup.originalFilename && (
-                        <tr key={idx} className={`${idx}-row`}>
-                          <td>{dup.originalFilename}</td>
-                          <td>{dup.meta?.warnings?.duplicate_found}</td>
-                        </tr>
-                      )
-                  )}
-                </tbody>
-              </table>
-            }
-            onYesButtonClicked={navigateToEditMetadata}
-          />
-        );
+      if (objectUploadIds.length === 1) {
+        await router.push({
+          pathname: "/export/report-template/edit",
+          query: {
+            group,
+            objectUploadId: objectUploadIds[0]
+          }
+        });
       }
+    };
+
+    if (Object.keys(uploadDuplicates)?.length === 0) {
+      // No duplicate files, proceed to edit metadata page
+      await navigateToEditReportTemplate();
+    } else {
+      openModal(
+        <AreYouSureModal
+          actionMessage={
+            <span>
+              <DinaMessage id="proceedToCreateMetadata" />
+              <p>
+                {`(${uploadDuplicates.length} `}
+                {formatMessage("duplicateFilesFound") + " )"}
+              </p>
+            </span>
+          }
+          messageBody={
+            <table className="table table-bordered">
+              <thead>
+                <tr>
+                  <th style={{ width: "30%" }}>
+                    <DinaMessage id="field_originalFilename" />
+                  </th>
+                  <th style={{ width: "40%" }}>
+                    <DinaMessage id="warningMessage" />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {uploadDuplicates.map(
+                  (dup, idx) =>
+                    dup.originalFilename && (
+                      <tr key={idx} className={`${idx}-row`}>
+                        <td>{dup.originalFilename}</td>
+                        <td>{dup.meta?.warnings?.duplicate_found}</td>
+                      </tr>
+                    )
+                )}
+              </tbody>
+            </table>
+          }
+          onYesButtonClicked={navigateToEditReportTemplate}
+        />
+      );
     }
   }
 
