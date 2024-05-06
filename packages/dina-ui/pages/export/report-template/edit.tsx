@@ -1,13 +1,10 @@
 import {
   ApiClientContext,
-  BackButton,
   ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
   SubmitButton,
   TextField,
-  useQuery,
-  withResponse,
   MultilingualDescription,
   ToggleField
 } from "common-ui";
@@ -27,20 +24,13 @@ interface ReportTemplateFormProps {
 
 export default function ReportEditPage() {
   const router = useRouter();
-  const {
-    query: { id }
-  } = router;
   const { formatMessage } = useDinaIntl();
 
   async function redirectHandler() {
     await router.push(`/export/report-template/upload`);
   }
 
-  const title = id ? "editReportTemplateTitle" : "addReportTemplateTitle";
-
-  const query = useQuery<ReportTemplate>({
-    path: `dina-export-api/report-template/${id}`
-  });
+  const title = "addReportTemplateTitle";
 
   return (
     <div>
@@ -51,16 +41,7 @@ export default function ReportEditPage() {
           <h1 id="wb-cont">
             <DinaMessage id={title} />
           </h1>
-          {id ? (
-            withResponse(query, ({ data }) => (
-              <ReportTemplateForm
-                fetchedReportTemplate={data}
-                onSaved={redirectHandler}
-              />
-            ))
-          ) : (
-            <ReportTemplateForm onSaved={redirectHandler} />
-          )}
+          <ReportTemplateForm onSaved={redirectHandler} />
         </div>
       </main>
     </div>
@@ -120,6 +101,7 @@ export function ReportTemplateForm({
         apiBaseUrl: "/dina-export-api"
       }
     );
+
     await onSaved();
   };
 

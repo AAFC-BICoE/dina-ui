@@ -974,7 +974,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   relatedRecord: "Related Record",
   reportTemplateUpload: "Report Template Upload",
   maxNumUploadExceeded: "Max number of uploads exceeded",
-  editReportTemplateTitle: "Edit Report Template",
   addReportTemplateTitle: "Add Report Template",
   backToUpload: "Back to Upload",
   field_reportTemplateName: "Report Template Name",
