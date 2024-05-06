@@ -387,7 +387,7 @@ export default function MaterialSampleListPage() {
           }}
           bulkEditPath="/collection/material-sample/bulk-edit"
           dataExportProps={{
-            dataExportPath: "/data-export/export",
+            dataExportPath: "/export/data-export/export",
             entityLink: "/collection/material-sample"
           }}
           // bulkSplitPath="/collection/material-sample/bulk-split"

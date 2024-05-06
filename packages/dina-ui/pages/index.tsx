@@ -349,7 +349,7 @@ export function Home() {
                           <DinaMessage id="userListTitle" />
                         </a>
                       </Link>
-                      <Link href="/report-template/upload">
+                      <Link href="/export/report-template/upload">
                         <a>
                           <DinaMessage id="reportTemplateUpload" />
                         </a>

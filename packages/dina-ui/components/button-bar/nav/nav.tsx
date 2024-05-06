@@ -525,7 +525,7 @@ function NavDinaManagementDropdown({ formatMessage }) {
             </NavDropdown.Item>
           </Link>
           <Link
-            href="/report-template/upload"
+            href="/export/report-template/upload"
             onKeyDown={onKeyDownLastItem}
             passHref={true}
           >

@@ -8,14 +8,14 @@ import {
   useApiClient
 } from "common-ui";
 import { useRouter } from "next/router";
-import { Footer, Head, Nav } from "../../components";
-import { GroupSelectField } from "../../components/group-select/GroupSelectField";
+import { Footer, Head, Nav } from "../../../components";
+import { GroupSelectField } from "../../../components/group-select/GroupSelectField";
 import {
   FileUploader,
   FileUploaderOnSubmitArgs
-} from "../../components/object-store";
-import { useFileUpload } from "../../components/object-store/file-upload/FileUploadProvider";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+} from "../../../components/object-store";
+import { useFileUpload } from "../../../components/object-store/file-upload/FileUploadProvider";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { writeStorage, deleteFromStorage } from "@rehooks/local-storage";
 
 export const BULK_ADD_IDS_KEY = "bulkAddIds";
