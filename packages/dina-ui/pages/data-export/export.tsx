@@ -221,7 +221,7 @@ export default function ExportPage<TData extends KitsuResource>() {
   }
 
   // Function to export and download Objects
-  async function exportObjects() {
+  async function exportObjects(formik) {
     {
       setLoading(true);
       const paths = localStorageExportObjectIds.map(
@@ -254,7 +254,8 @@ export default function ExportPage<TData extends KitsuResource>() {
       const objectExportSaveArg = {
         resource: {
           type: "object-export",
-          fileIdentifiers
+          fileIdentifiers,
+          name: formik?.values?.name
         },
         type: "object-export"
       };
@@ -264,7 +265,7 @@ export default function ExportPage<TData extends KitsuResource>() {
           apiBaseUrl: "/objectstore-api"
         }
       );
-      await getExport(objectExportResponse);
+      await getExport(objectExportResponse, formik);
       setLoading(false);
     }
   }
@@ -300,7 +301,7 @@ export default function ExportPage<TData extends KitsuResource>() {
           />
           <TextField
             name={"name"}
-            customName="dataExportName"
+            customName="exportName"
             className="col-md-2"
           />
           <div className="mb-2">
@@ -350,7 +351,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                   if (exportType === "TABULAR_DATA") {
                     exportData(formik);
                   } else {
-                    exportObjects();
+                    exportObjects(formik);
                   }
                 }
               })}
@@ -362,7 +363,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                 <Tooltip id="exportObjectsMaxLimitTooltip" />
               )}
           </div>
-          {columnSelector}
+          {exportType === "TABULAR_DATA" && columnSelector}
         </div>
 
         <ReactTable<TData>
