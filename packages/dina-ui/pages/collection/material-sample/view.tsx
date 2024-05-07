@@ -358,7 +358,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   }}
                 />
                 <div className="row">
-                  <div className="col-md-6">
+                  <div className="col-md-12">
                     <ManagedAttributesEditor
                       fieldSetProps={{
                         legend: (
