@@ -146,10 +146,9 @@ export function SavedSearch({
     useState<string>();
 
   // Functionality for the last loaded search.
-  useLastSavedSearch({
+  const { loadLastSavedSearch } = useLastSavedSearch({
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
-    setDefaultLoadedIn,
     performSubmit,
     uniqueName
   });
@@ -215,18 +214,22 @@ export function SavedSearch({
     // exists and pre-load it in.
     const defaultSavedSearch = getDefaultSavedSearch();
 
-    if (defaultSavedSearch && defaultSavedSearch.savedSearchName) {
-      if (defaultSavedSearch?.queryTree) {
-        const isQueryChanged = getDefaultSavedSearchChanged(defaultSavedSearch);
-        if (isQueryChanged) {
-          setSelectedSavedSearchName(defaultSavedSearch.savedSearchName);
-          setChangesMade(true);
-          setCurrentIsDefault(defaultSavedSearch.default);
-        } else {
-          loadSavedSearch(defaultSavedSearch.savedSearchName);
-        }
+    if (
+      defaultSavedSearch &&
+      defaultSavedSearch.savedSearchName &&
+      defaultSavedSearch?.queryTree
+    ) {
+      const isQueryChanged = getDefaultSavedSearchChanged(defaultSavedSearch);
+      if (isQueryChanged) {
+        loadLastSavedSearch();
+      } else {
+        loadSavedSearch(defaultSavedSearch.savedSearchName);
       }
+    } else {
+      // Default search not loaded in, check if last saved search can be loaded in.
+      loadLastSavedSearch();
     }
+
     setDefaultLoadedIn(true);
   }, [userPreferences]);
 
@@ -511,8 +514,10 @@ export function SavedSearch({
           actionMessage={<DinaMessage id="removeSavedSearch" />}
           messageBody={
             <>
-              <strong><DinaMessage id="areYouSureRemoveSavedSearch"/></strong><br/>
-              "{savedSearchName}"
+              <strong>
+                <DinaMessage id="areYouSureRemoveSavedSearch" />
+              </strong>
+              <br />"{savedSearchName}"
             </>
           }
           onYesButtonClicked={deleteSearch}
