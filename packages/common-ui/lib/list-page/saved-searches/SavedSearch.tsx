@@ -386,14 +386,18 @@ export function SavedSearch({
         setQueryError(formatMessage({ id: "queryBuilder_invalid_query" }));
         setChangesMade(true);
       }
-      getColumnVisibility(savedSearchToLoad.columnVisibility);
-      // Set ReactTable's column visibility
-      const columnVisibility: VisibilityState = getColumnVisibility(
-        savedSearchToLoad.columnVisibility
-      );
-      reactTable?.setColumnVisibility?.(columnVisibility);
-      // Set local storage column visibility for navigating around the website
-      setLocalStorageColumnStates(columnVisibility);
+
+      if (savedSearchToLoad.columnVisibility) {
+        getColumnVisibility(savedSearchToLoad.columnVisibility);
+        // Set ReactTable's column visibility
+        const columnVisibility: VisibilityState = getColumnVisibility(
+          savedSearchToLoad.columnVisibility
+        );
+        reactTable?.setColumnVisibility?.(columnVisibility);
+        // Set local storage column visibility for navigating around the website
+        setLocalStorageColumnStates(columnVisibility);
+      }
+
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
