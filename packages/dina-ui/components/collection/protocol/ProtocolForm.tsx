@@ -77,12 +77,16 @@ export function ProtocolForm({ fetchedProtocol, onSaved }: ProtocolFormProps) {
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={fetchedProtocol?.id}
-          entityLink="/collection/protocol"
-        />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={fetchedProtocol?.id}
+            entityLink="/collection/protocol"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <ProtocolFormLayout />
     </DinaForm>

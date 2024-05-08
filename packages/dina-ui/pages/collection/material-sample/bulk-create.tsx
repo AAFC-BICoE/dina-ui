@@ -4,6 +4,7 @@ import { withRouter } from "next/router";
 import { useState } from "react";
 import { writeStorage } from "@rehooks/local-storage";
 import {
+  Footer,
   Head,
   MaterialSampleBulkEditor,
   MaterialSampleGenerationForm,
@@ -48,7 +49,7 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className={mode === "EDIT" ? "container-fluid" : "container"}>
+      <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage(title)}</h1>
         {mode === "EDIT" && generatedSamples && (
           <MaterialSampleBulkEditor
@@ -66,6 +67,7 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
           />
         )}
       </main>
+      <Footer />
     </div>
   );
 }

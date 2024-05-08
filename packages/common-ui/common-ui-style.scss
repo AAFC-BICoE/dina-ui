@@ -28,13 +28,25 @@
   background-color: #f5f5f5;
 }
 
+.container-fluid.centered, main {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.large-container-fluid {
+  max-width: 1500px !important;
+}
+
 /*
  * Group label for the header styles.
  */
 .header-group-text {
+  position: relative;
+  height: 38px;
   color: #525252;
   font-size: 0.65em;
-  margin-top: 5px;
+  padding-top: 6px;
 }
 
 /*

@@ -60,14 +60,16 @@ export default function TransactionListPage() {
   return (
     <div>
       <Head title={formatMessage("transactions")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/loan-transaction/transaction" />
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="transactions" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/loan-transaction/transaction" />
-        </ButtonBar>
         <QueryPage
           indexName={"dina_loan_transaction_index"}
           uniqueName="transaction-list-material-samples"

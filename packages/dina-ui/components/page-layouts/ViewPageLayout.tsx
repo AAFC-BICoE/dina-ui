@@ -99,7 +99,7 @@ export function ViewPageLayout<T extends KitsuResource>({
   deleteButton,
   showDeleteButton = true,
   showEditButton = true,
-  mainClass = "container-fluid px-5",
+  mainClass = "container-fluid",
   showRevisionsLink,
   showRevisionsLinkAtBottom,
   tooltipNode,
@@ -119,53 +119,47 @@ export function ViewPageLayout<T extends KitsuResource>({
 
   return (
     <div>
-      <Nav />
-      <main className={mainClass}>
-        {withResponse(resourceQuery, ({ data }) => {
-          const resource = data as PersistedResource<T>;
+      <Nav marginBottom={false} />
 
-          const formProps = {
-            initialValues: alterInitialValues?.(resource) ?? resource,
-            readOnly: true
-          };
+      {withResponse(resourceQuery, ({ data }) => {
+        const resource = data as PersistedResource<T>;
 
-          // Check the request to see if a permission provider is present.
-          const permissionsProvided = data.meta?.permissionsProvider;
+        const formProps = {
+          initialValues: alterInitialValues?.(resource) ?? resource,
+          readOnly: true
+        };
 
-          const canEdit = permissionsProvided
-            ? data.meta?.permissions?.includes("update") ?? false
-            : true;
-          const canDelete = permissionsProvided
-            ? data.meta?.permissions?.includes("delete") ?? false
-            : true;
+        // Check the request to see if a permission provider is present.
+        const permissionsProvided = data.meta?.permissionsProvider;
 
-          const nameFields = castArray(nameField);
-          let title = [...nameFields, "id"].reduce(
-            (lastValue, currentField) =>
-              lastValue ||
-              (typeof currentField === "function"
-                ? currentField(resource)
-                : get(data, currentField)),
-            ""
-          );
-          const group = get(data, "group")?.toUpperCase();
-          // if title is array, only take first element
-          if (Array.isArray(title)) {
-            title = title[0];
-          }
+        const canEdit = permissionsProvided
+          ? data.meta?.permissions?.includes("update") ?? false
+          : true;
+        const canDelete = permissionsProvided
+          ? data.meta?.permissions?.includes("delete") ?? false
+          : true;
 
-          return (
-            <>
-              <Head title={title} />
+        const nameFields = castArray(nameField);
+        let title = [...nameFields, "id"].reduce(
+          (lastValue, currentField) =>
+            lastValue ||
+            (typeof currentField === "function"
+              ? currentField(resource)
+              : get(data, currentField)),
+          ""
+        );
+        const group = get(data, "group")?.toUpperCase();
+        // if title is array, only take first element
+        if (Array.isArray(title)) {
+          title = title[0];
+        }
 
-              <h1 id="wb-cont" className="d-flex justify-content-between">
-                <span>
-                  {title}
-                  {tooltipNode}
-                </span>
-                <span className="header-group-text">{group}</span>
-              </h1>
-              <ButtonBar className="gap-2">
+        return (
+          <>
+            <Head title={title} />
+
+            <ButtonBar>
+              <div className="col-md-2 mt-2">
                 {backButton ? (
                   backButton
                 ) : specialListUrl ? (
@@ -182,6 +176,9 @@ export function ViewPageLayout<T extends KitsuResource>({
                     byPassView={true}
                   />
                 )}
+              </div>
+              <div className="col-md-10 flex d-flex col-sm-12 gap-1">
+                <span className="ms-auto" />
                 {showGenerateLabelButton && (
                   <GenerateLabelDropdownButton resource={resource} />
                 )}
@@ -211,7 +208,18 @@ export function ViewPageLayout<T extends KitsuResource>({
                       type={type}
                     />
                   ))}
-              </ButtonBar>
+              </div>
+            </ButtonBar>
+
+            <main className={mainClass}>
+              <h1 id="wb-cont" className="d-flex justify-content-between">
+                <span>
+                  {title}
+                  {tooltipNode}
+                </span>
+                <span className="header-group-text">{group}</span>
+              </h1>
+
               {form(formProps)}
               {showRevisionsLinkAtBottom && (
                 <Link href={`${entityLink}/revisions?id=${id}`}>
@@ -220,10 +228,10 @@ export function ViewPageLayout<T extends KitsuResource>({
                   </a>
                 </Link>
               )}
-            </>
-          );
-        })}
-      </main>
+            </main>
+          </>
+        );
+      })}
       <Footer />
     </div>
   );

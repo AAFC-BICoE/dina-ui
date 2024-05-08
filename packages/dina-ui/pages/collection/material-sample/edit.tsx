@@ -60,9 +60,11 @@ export default function MaterialSampleEditPage() {
     collectingEventInitialValues,
     enableStoredDefaultGroup: true,
     buttonBar: (
-      <ButtonBar>
-        <BackButton entityId={id} entityLink="/collection/material-sample" />
-        <div className="flex-grow-1 d-flex">
+      <ButtonBar className="mb-3">
+        <div className="col-md-3 col-sm-12 mt-2">
+          <BackButton entityId={id} entityLink="/collection/material-sample" />
+        </div>
+        <div className="col-md-4 flex-grow-1 d-flex">
           <div className="mx-auto">
             <MaterialSampleFormTemplateSelect
               value={sampleFormTemplate}
@@ -70,19 +72,22 @@ export default function MaterialSampleEditPage() {
             />
           </div>
         </div>
-        {!id && (
+        <div className="col-md-3 flex-grow-1 d-flex gap-2">
+          <div className="ms-auto" />
+          {!id && (
+            <SubmitButton
+              buttonProps={() => ({
+                style: { width: "12rem" },
+                onClick: () => setSaveRedirect("CREATE_NEXT")
+              })}
+            >
+              <DinaMessage id="saveAndCopyToNext" />
+            </SubmitButton>
+          )}
           <SubmitButton
-            buttonProps={() => ({
-              style: { width: "12rem" },
-              onClick: () => setSaveRedirect("CREATE_NEXT")
-            })}
-          >
-            <DinaMessage id="saveAndCopyToNext" />
-          </SubmitButton>
-        )}
-        <SubmitButton
-          buttonProps={() => ({ onClick: () => setSaveRedirect("VIEW") })}
-        />
+            buttonProps={() => ({ onClick: () => setSaveRedirect("VIEW") })}
+          />
+        </div>
       </ButtonBar>
     ),
     // On save either redirect to the view page or create the next sample with the same values:

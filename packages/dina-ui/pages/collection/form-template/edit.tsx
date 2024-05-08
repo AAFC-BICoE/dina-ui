@@ -267,24 +267,29 @@ export function FormTemplateEditPageLoaded({
 
   const buttonBarContent = (
     <>
-      <BackButton
-        entityId={id}
-        className="me-auto"
-        entityLink="/collection/form-template"
-        byPassView={true}
-      />
-
-      {id && (
-        <DeleteButton
-          id={id}
-          options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collection/form-template/list"
-          type="form-template"
-          className="me-3"
+      <div className="col-md-6 mt-2">
+        <BackButton
+          entityId={id}
+          className="me-auto"
+          entityLink="/collection/form-template"
+          byPassView={true}
         />
-      )}
+      </div>
 
-      <SubmitButton />
+      <div className="col-md-6 d-flex">
+        <div className="ms-auto" />
+        {id && (
+          <DeleteButton
+            id={id}
+            options={{ apiBaseUrl: "/collection-api" }}
+            postDeleteRedirect="/collection/form-template/list"
+            type="form-template"
+            className="me-2"
+          />
+        )}
+
+        <SubmitButton />
+      </div>
     </>
   );
 

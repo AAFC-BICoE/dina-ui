@@ -38,7 +38,11 @@ const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition<Organization>[] = [
 ];
 
 export default function OrganizationListPage() {
-  const buttonBarContent = <CreateButton entityLink="/organization" />;
+  const buttonBarContent = (
+    <div className="flex d-flex ms-auto">
+      <CreateButton entityLink="/organization" />
+    </div>
+  );
 
   return (
     <PageLayout

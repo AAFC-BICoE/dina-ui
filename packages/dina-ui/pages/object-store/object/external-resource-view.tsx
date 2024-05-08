@@ -29,46 +29,47 @@ export default function ExternalResourceMetadataViewPage() {
     const metadata = response.data;
 
     const buttonBar = (
-      <ButtonBar>
-        <BackToListButton entityLink="/object-store/object" />
-        <Link href={`/object-store/metadata/external-resource-edit?id=${id}`}>
-          <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
-            <DinaMessage id="editButtonText" />
-          </a>
-        </Link>
-        <UploadDerivativeButton acDerivedFrom={id} />
-        <Link
-          href={`/object-store/metadata/revisions?id=${id}&isExternalResourceMetadata=true`}
-        >
-          <a className="btn btn-info">
-            <DinaMessage id="revisionsButtonText" />
-          </a>
-        </Link>
-        <DeleteButton
-          className="ms-5"
-          id={id}
-          options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/object-store/object/list"
-          type="metadata"
-        />
+      <ButtonBar className="mb-3">
+        <div className="col-md-3">
+          <BackToListButton entityLink="/object-store/object" />
+        </div>
+        <div className="col-md-9 flex d-flex gap-2">
+          <Link href={`/object-store/metadata/external-resource-edit?id=${id}`}>
+            <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
+              <DinaMessage id="editButtonText" />
+            </a>
+          </Link>
+          <UploadDerivativeButton acDerivedFrom={id} />
+          <Link
+            href={`/object-store/metadata/revisions?id=${id}&isExternalResourceMetadata=true`}
+          >
+            <a className="btn btn-info">
+              <DinaMessage id="revisionsButtonText" />
+            </a>
+          </Link>
+          <DeleteButton
+            className="ms-5"
+            id={id}
+            options={{ apiBaseUrl: "/objectstore-api" }}
+            postDeleteRedirect="/object-store/object/list"
+            type="metadata"
+          />
+        </div>
       </ButtonBar>
     );
 
     return (
       <div>
         <Head title={metadata.originalFilename} />
-        <Nav />
+        <Nav marginBottom={false} />
+        {buttonBar}
         <main className="container-fluid">
-          {buttonBar}
-          <div className="container">
-            <DinaForm initialValues={metadata} readOnly={true}>
-              {metadata.derivatives && (
-                <MetadataFileView metadata={metadata} imgHeight="15rem" />
-              )}
-              <MetadataDetails metadata={metadata} />
-            </DinaForm>
-          </div>
-          {buttonBar}
+          <DinaForm initialValues={metadata} readOnly={true}>
+            {metadata.derivatives && (
+              <MetadataFileView metadata={metadata} imgHeight="15rem" />
+            )}
+            <MetadataDetails metadata={metadata} />
+          </DinaForm>
         </main>
         <Footer />
       </div>

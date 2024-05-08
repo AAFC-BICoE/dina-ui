@@ -30,6 +30,7 @@ import {
 } from "packages/dina-ui/types/collection-api";
 import { ReactNode } from "react";
 import {
+  Footer,
   GroupSelectField,
   Head,
   Nav,
@@ -76,7 +77,7 @@ export default function SeqBatchEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container">
+      <main className="container-fluid">
         <h1 id="wb-cont">
           <SeqdbMessage id={title} />
         </h1>
@@ -87,7 +88,8 @@ export default function SeqBatchEditPage() {
         ) : (
           <SeqBatchForm onSaved={moveToViewPage} />
         )}
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }
@@ -103,9 +105,13 @@ export function SeqBatchForm({
   seqBatch,
   onSaved,
   buttonBar = (
-    <ButtonBar>
-      <BackButton entityId={seqBatch?.id} entityLink="/seqdb/seq-batch" />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton entityId={seqBatch?.id} entityLink="/seqdb/seq-batch" />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   ),
   readOnlyOverride
