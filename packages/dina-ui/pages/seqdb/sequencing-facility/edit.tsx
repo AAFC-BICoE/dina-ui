@@ -18,7 +18,7 @@ import {
   SequencingFacilityContacts,
   SequencingFacilityProps
 } from "../../../../dina-ui/components/seqdb";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import {
   SequencingFacilityVO,
@@ -99,6 +99,7 @@ export function SequencingFacilityEditPage({ router }: WithRouterProps) {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
@@ -141,12 +142,16 @@ function SequencingFacilityForm({
   };
 
   const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={id as string}
-        entityLink="/seqdb/sequencing-facility"
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={id as string}
+          entityLink="/seqdb/sequencing-facility"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 

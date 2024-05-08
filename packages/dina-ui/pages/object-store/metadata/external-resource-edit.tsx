@@ -66,7 +66,7 @@ export default function ExternalResourceMetadataPage() {
     <div>
       <Head title={formatMessage("externalResourceListTitle")} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         {id ? (
           <div>
             <h1 id="wb-cont">
@@ -182,9 +182,13 @@ function ExternalResourceMetadataForm({
   };
 
   const buttonBar = (
-    <ButtonBar>
-      <BackToListButton entityLink="/object-store/object" />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12">
+        <BackToListButton entityLink="/object-store/object" />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 
@@ -279,7 +283,6 @@ function ExternalResourceMetadataForm({
           />
         </div>
       </FieldSet>
-      {buttonBar}
     </DinaForm>
   );
 }

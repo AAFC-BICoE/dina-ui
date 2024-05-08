@@ -1,7 +1,7 @@
 import { useQuery, withResponse } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { ThermocyclerProfile } from "../../../types/seqdb-api/resources/ThermocyclerProfile";
 import { ThermocyclerProfileForm } from "../../../components/thermocycler-profile/ThermocyclerProfileForm";
@@ -45,6 +45,7 @@ export function ThermocyclerProfileEditPage({ router }: WithRouterProps) {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

@@ -8,14 +8,16 @@ interface MultilingualPair {
   value: string;
 }
 
-function getPreferredPair(original: any, accessorKey: string, type: string, className: string): MultilingualPair | undefined {
+function getPreferredPair(
+  original: any,
+  accessorKey: string,
+  type: string,
+  className: string
+): MultilingualPair | undefined {
   const { locale } = useContext(intlContext);
 
   // Get the multilingual field data provided.
-  const multilingualField: any | null = get(
-    original,
-    accessorKey
-  );
+  const multilingualField: any | null = get(original, accessorKey);
 
   // If no data is provided, just leave the cell blank.
   if (
@@ -37,24 +39,26 @@ function getPreferredPair(original: any, accessorKey: string, type: string, clas
       return {
         lang: fieldPair.lang,
         value: fieldPair[type]
-      }
+      };
     }
   }
 
   // Preferred language could not be found above. Use another language and make sure it's indicated.
   // There is also the possibility that this is blank.
-  return fieldPairs.length !== 0 && fieldPairs[0] !== null ? {
-    lang: fieldPairs[0].lang,
-    value: fieldPairs[0][type]
-  } : undefined;
+  return fieldPairs.length !== 0 && fieldPairs[0] !== null
+    ? {
+        lang: fieldPairs[0].lang,
+        value: fieldPairs[0][type]
+      }
+    : undefined;
 }
 
 /**
  * Used for multilingual fields which contain multiple translations of an item.
- * 
+ *
  * This function should not be exported, see the titleCell and descriptionCell for exportable
  * versions.
- * 
+ *
  * @param displayAll If true, display all languages available. Used for revisions to display all the
  *    changes.
  * @param allowSorting Enable local sorting support. Cannot be used for tables with pagination, only
@@ -64,54 +68,81 @@ function getPreferredPair(original: any, accessorKey: string, type: string, clas
  * @param className Long hand version of what's being accessed (ex. description) - Type is used
  *    if not provided.
  */
-function multilingualFieldCell(displayAll: boolean, allowSorting: boolean, accessorKey: string, type: string, className?: string) {
+function multilingualFieldCell(
+  displayAll: boolean,
+  allowSorting: boolean,
+  accessorKey: string,
+  type: string,
+  className?: string
+) {
   if (!className) {
     className = type;
   }
 
-  return displayAll ? {
-    cell: ({ row: { original } }) => {
-      return original.value?.[`${className}s`]?.map(
-        (field, index) =>
-        field?.[type] && (
-            <div className="pb-2" key={index}>
-              {field?.[type]} {languageBadge(field?.lang)}
-            </div>
-          )
-      ) ?? null
-    },
-    accessorKey,
-    enableSorting: false
-  } : {
-    cell: ({ row: { original } }) => {
-      const preferredPair = getPreferredPair(original, accessorKey, type, className ?? type);
-
-      if (!preferredPair) {
-        return <></>;
-      } else {
-        return (
-          <>
-            <span className={`${className} list-inline-item`}>{preferredPair.value}</span>
-            {languageBadge(preferredPair.lang)}
-          </>
-        )
+  return displayAll
+    ? {
+        cell: ({ row: { original } }) => {
+          return (
+            original.value?.[`${className}s`]?.map(
+              (field, index) =>
+                field?.[type] && (
+                  <div className="pb-2" key={index}>
+                    {field?.[type]} {languageBadge(field?.lang)}
+                  </div>
+                )
+            ) ?? null
+          );
+        },
+        accessorKey,
+        enableSorting: false
       }
-    },
-    accessorKey,
-    enableSorting: allowSorting,
-    sortingFn: (rowa: any, rowb: any, _: string): number => {
-      // Retrieve both languages in the users preferred language.
-      const descA =
-        getPreferredPair(rowa.original, accessorKey, type, className ?? type)?.value ??
-        "";
-      const descB =
-        getPreferredPair(rowb.original, accessorKey, type, className ?? type)?.value ??
-        "";
+    : {
+        cell: ({ row: { original } }) => {
+          const preferredPair = getPreferredPair(
+            original,
+            accessorKey,
+            type,
+            className ?? type
+          );
 
-      return descA.localeCompare(descB);
-    },
-    header: () => <FieldHeader name={`multilingual${capitalize(className)}`} />
-  };
+          if (!preferredPair) {
+            return <></>;
+          } else {
+            return (
+              <>
+                <span className={`${className} list-inline-item`}>
+                  {preferredPair.value}
+                </span>
+                {languageBadge(preferredPair.lang)}
+              </>
+            );
+          }
+        },
+        accessorKey,
+        enableSorting: allowSorting,
+        sortingFn: (rowa: any, rowb: any, _: string): number => {
+          // Retrieve both languages in the users preferred language.
+          const descA =
+            getPreferredPair(
+              rowa.original,
+              accessorKey,
+              type,
+              className ?? type
+            )?.value ?? "";
+          const descB =
+            getPreferredPair(
+              rowb.original,
+              accessorKey,
+              type,
+              className ?? type
+            )?.value ?? "";
+
+          return descA.localeCompare(descB);
+        },
+        header: () => (
+          <FieldHeader name={`multilingual${capitalize(className)}`} />
+        )
+      };
 }
 
 /**
@@ -119,7 +150,7 @@ function multilingualFieldCell(displayAll: boolean, allowSorting: boolean, acces
  * string.
  *
  * This badge will automatically get translated as well.
- * 
+ *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames
  * @param language MultilingualDescription or MultilingualTitle lang string.
  * @returns Language description or title badge element.
@@ -136,5 +167,20 @@ function languageBadge(language) {
   );
 }
 
-export const descriptionCell = (displayAll: boolean, allowSorting: boolean, accessorKey: string) => multilingualFieldCell(displayAll, allowSorting, accessorKey, "desc", "description");
-export const titleCell = (displayAll: boolean, allowSorting: boolean, accessorKey: string) => multilingualFieldCell(displayAll, allowSorting, accessorKey, "title");
+export const descriptionCell = (
+  displayAll: boolean,
+  allowSorting: boolean,
+  accessorKey: string
+) =>
+  multilingualFieldCell(
+    displayAll,
+    allowSorting,
+    accessorKey,
+    "desc",
+    "description"
+  );
+export const titleCell = (
+  displayAll: boolean,
+  allowSorting: boolean,
+  accessorKey: string
+) => multilingualFieldCell(displayAll, allowSorting, accessorKey, "title");

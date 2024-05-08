@@ -11,10 +11,7 @@ export function UploadDerivativeButton({
   acDerivedFrom
 }: UploadDerivativeButtonProps) {
   return (
-    <DropdownButton
-      title={<CommonMessage id="uploadDerivative" />}
-      className="me-2"
-    >
+    <DropdownButton title={<CommonMessage id="uploadDerivative" />}>
       <Dropdown.Item
         href={`/object-store/upload?derivativeType=THUMBNAIL_IMAGE&acDerivedFrom=${acDerivedFrom}`}
       >

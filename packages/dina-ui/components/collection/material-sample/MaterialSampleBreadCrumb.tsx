@@ -75,9 +75,9 @@ export function MaterialSampleBreadCrumb({
             </h6>
           ) : (
             <div className="d-inline-flex flex-row align-self-end">
-              <span className="header-group-text">
+              <div className="header-group-text">
                 <GroupLabel groupName={materialSample?.group} />
-              </span>
+              </div>
               <NotPubliclyReleasableWarning />
             </div>
           ))}

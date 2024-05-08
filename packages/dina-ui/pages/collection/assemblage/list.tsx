@@ -31,7 +31,11 @@ const ASSEMBLAGE_TABLE_COLUMNS: ColumnDefinition<Assemblage>[] = [
 ];
 
 export default function assemblageListPage() {
-  const buttonBarContent = <CreateButton entityLink="/collection/assemblage" />;
+  const buttonBarContent = (
+    <div className="flex d-flex ms-auto">
+      <CreateButton entityLink="/collection/assemblage" />
+    </div>
+  );
 
   return (
     <PageLayout

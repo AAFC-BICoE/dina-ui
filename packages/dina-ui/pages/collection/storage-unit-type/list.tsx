@@ -44,7 +44,9 @@ export default function StorageUnitTypeListPage() {
     <PageLayout
       titleId={formatMessage("storageUnitTypeListTitle")}
       buttonBarContent={
-        <CreateButton entityLink="/collection/storage-unit-type" />
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/storage-unit-type" />
+        </div>
       }
     >
       <ListPageLayout
