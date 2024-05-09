@@ -274,6 +274,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_description.de": "German Description",
   field_determination: "Determinations",
   "field_determination.typeStatus": "Type Status",
+  "field_determination.scientificName": "Scientific Name",
   "field_determination.verbatimScientificName": "Verbatim Scientific Name",
   field_determinationRemarks: "Determination Remarks",
   field_displayName: "Display Name",
@@ -443,6 +444,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_startEventDateTime_tooltip:
     "Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_tags: "Tags",
+  field_targetOrganismPrimaryScientificName:
+    "Target Organism Primary Scientific Name",
   field_title: "Title",
   "field_title.en": "English Title",
   "field_title.fr": "French Title",
