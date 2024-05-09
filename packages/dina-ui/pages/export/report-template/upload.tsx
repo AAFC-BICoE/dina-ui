@@ -1,12 +1,4 @@
-import {
-  DinaForm,
-  FormikButton,
-  useAccount,
-  useModal,
-  AreYouSureModal,
-  BULK_EDIT_IDS_KEY,
-  useApiClient
-} from "common-ui";
+import { DinaForm, useAccount, useModal, AreYouSureModal } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { GroupSelectField } from "../../../components/group-select/GroupSelectField";
@@ -16,7 +8,6 @@ import {
 } from "../../../components/object-store";
 import { useFileUpload } from "../../../components/object-store/file-upload/FileUploadProvider";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { writeStorage, deleteFromStorage } from "@rehooks/local-storage";
 
 export const BULK_ADD_IDS_KEY = "bulkAddIds";
 
@@ -30,7 +21,6 @@ export default function UploadPage() {
   const { initialized: accountInitialized, groupNames } = useAccount();
   const { uploadFiles } = useFileUpload();
   const { openModal } = useModal();
-  const { apiClient } = useApiClient();
 
   async function onSubmit({
     acceptedFiles,
@@ -39,14 +29,6 @@ export default function UploadPage() {
     if (!group) {
       throw new Error(formatMessage("groupMustBeSelected"));
     }
-    const navigateToList = async () => {
-      await router.push({
-        pathname: `/object-store/object/list`,
-        query: {
-          group
-        }
-      });
-    };
     const unsupportedFile = acceptedFiles.find(
       (file) => !file.meta.name.endsWith(".ftlh")
     );
@@ -132,14 +114,6 @@ export default function UploadPage() {
       );
     }
   }
-
-  // Fix the place holder text ...Select has not enough contrast ratio to the background issue
-  const customStyles = {
-    placeholder: (provided, _) => ({
-      ...provided,
-      color: "rgb(51,51,51)"
-    })
-  };
 
   return (
     <div>

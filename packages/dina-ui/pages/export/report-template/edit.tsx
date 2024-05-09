@@ -7,7 +7,11 @@ import {
   TextField,
   MultilingualDescription,
   ToggleField,
-  StringArrayField
+  StringArrayField,
+  useQuery,
+  withResponse,
+  SelectField,
+  SelectOption
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -15,7 +19,10 @@ import { useRouter } from "next/router";
 import { useContext } from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ReportTemplate } from "packages/dina-ui/types/dina-export-api";
+import {
+  ReportTemplate,
+  ReportType
+} from "packages/dina-ui/types/dina-export-api";
 import Link from "next/link";
 
 interface ReportTemplateFormProps {
@@ -25,6 +32,9 @@ interface ReportTemplateFormProps {
 
 export default function ReportEditPage() {
   const router = useRouter();
+  const {
+    query: { id }
+  } = router;
   const { formatMessage } = useDinaIntl();
 
   async function goToViewPage(
@@ -33,7 +43,10 @@ export default function ReportEditPage() {
     await router.push(`/export/report-template/view?id=${reportTemplate.id}`);
   }
 
-  const title = "addReportTemplateTitle";
+  const title = id ? "editReportTemplateTitle" : "addReportTemplateTitle";
+  const query = useQuery<ReportTemplate>({
+    path: `dina-export-api/report-template/${id}`
+  });
 
   return (
     <div>
@@ -44,7 +57,16 @@ export default function ReportEditPage() {
           <h1 id="wb-cont">
             <DinaMessage id={title} />
           </h1>
-          <ReportTemplateForm onSaved={goToViewPage} />
+          {id ? (
+            withResponse(query, ({ data }) => (
+              <ReportTemplateForm
+                fetchedReportTemplate={data}
+                onSaved={goToViewPage}
+              />
+            ))
+          ) : (
+            <ReportTemplateForm onSaved={goToViewPage} />
+          )}
         </div>
       </main>
       <Footer />
@@ -133,7 +155,11 @@ export function ReportTemplateForm({
 
 export function ReportTemplateFormLayout() {
   const { formatMessage } = useDinaIntl();
-
+  const options = Object.keys(ReportType)
+    .filter((v) => isNaN(Number(v)))
+    .map((key) => {
+      return { label: key, value: key };
+    });
   return (
     <div>
       <div className="row">
@@ -149,10 +175,11 @@ export function ReportTemplateFormLayout() {
         />
       </div>
       <div className="row">
-        <TextField
+        <SelectField
           className="col-md-6 name"
           name="reportType"
           label={formatMessage("field_reportType")}
+          options={options}
         />
         <StringArrayField
           className="col-md-6 name"

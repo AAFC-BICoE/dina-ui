@@ -16,6 +16,9 @@ export interface ReportTemplateAttributes {
   reportType?: ReportType;
 }
 
-export type ReportType = "MATERIAL_SAMPLE_LABEL" | "STORAGE_LABEL";
+export enum ReportType {
+  "MATERIAL_SAMPLE_LABEL",
+  "STORAGE_LABEL"
+}
 
 export type ReportTemplate = KitsuResource & ReportTemplateAttributes;

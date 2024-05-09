@@ -981,5 +981,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_templateOutputMediaType: "Template Output Media Type",
   field_outputMediaType: "Output Media Type",
   field_reportType: "Report Type",
-  field_reportVariables: "Report Variables"
+  field_reportVariables: "Report Variables",
+  editReportTemplateTitle: "Edit Report Template"
 };
