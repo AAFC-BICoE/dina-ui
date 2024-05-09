@@ -972,5 +972,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataLabel: "Data",
   objectsLabel: "Objects",
   relatedRecord: "Related Record",
-  reportTemplateUpload: "Report Template Upload"
+  reportTemplateUpload: "Report Template Upload",
+  managedBy: "Managed By"
 };

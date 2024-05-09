@@ -1,6 +1,7 @@
 import { FieldWrapper, FieldWrapperProps, useQuery } from "common-ui";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
+import Link from "next/link";
 
 export type GroupFieldViewProps = Omit<FieldWrapperProps, "children">;
 
@@ -18,8 +19,8 @@ export function GroupFieldView(props: GroupFieldViewProps) {
 
 /** Renders the group label (if available) or the group name. */
 export function GroupLabel({ groupName }) {
-  const label = useGroupLabel(groupName);
-  return <>{label}</>;
+  const { label, id } = useGroupLabel(groupName);
+  return <Link href={`/group/view?id=${id}`}>{label}</Link>;
 }
 
 /** Renders the Group label in the QueryTable. */
@@ -38,8 +39,11 @@ function useGroupLabel(groupName: string) {
   const { locale } = useDinaIntl();
   const { response } = useQuery<Group[]>({
     path: "user-api/group",
-    filter: { name: groupName }
+    filter: { name: groupName?.toLowerCase() }
   });
 
-  return response?.data?.[0]?.labels?.[locale] ?? groupName;
+  return {
+    label: response?.data?.[0]?.labels?.[locale] ?? groupName,
+    id: response?.data?.[0]?.id
+  };
 }
