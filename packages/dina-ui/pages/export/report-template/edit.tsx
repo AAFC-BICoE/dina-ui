@@ -13,7 +13,7 @@ import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ReportTemplate } from "packages/dina-ui/types/dina-export-api";
 import Link from "next/link";
@@ -39,7 +39,7 @@ export default function ReportEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container-fluid px-5">
+      <main className="container-fluid">
         <div>
           <h1 id="wb-cont">
             <DinaMessage id={title} />
@@ -47,6 +47,7 @@ export default function ReportEditPage() {
           <ReportTemplateForm onSaved={goToViewPage} />
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
@@ -113,13 +114,17 @@ export function ReportTemplateForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <Link href={"/export/report-template/upload"}>
-          <a className={`back-button my-auto`}>
-            <DinaMessage id={"backToUpload"} />
-          </a>
-        </Link>
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <Link href={"/export/report-template/upload"}>
+            <a className={`back-button my-auto`}>
+              <DinaMessage id={"backToUpload"} />
+            </a>
+          </Link>
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <ReportTemplateFormLayout />
     </DinaForm>
