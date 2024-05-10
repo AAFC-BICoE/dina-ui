@@ -92,7 +92,7 @@ export function useWorkbookConverter(
     [WorkbookDataTypeEnum.DATE]: convertDate,
     [WorkbookDataTypeEnum.STRING]: convertString,
     [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
-      value,
+      value.toUpperCase().replace(" ", "_"),
     [WorkbookDataTypeEnum.CLASSIFICATION]: (value: {
       [key: string]: string;
     }) => {
@@ -463,7 +463,7 @@ export function useWorkbookConverter(
               ) {
                 valueToLink =
                   columnMap[fieldPath + "." + attrNameInValue]?.[
-                    childValue.trim()
+                    childValue.trim().replace(".", "_")
                   ];
                 if (valueToLink) {
                   break;
@@ -585,7 +585,7 @@ export function useWorkbookConverter(
                 ) {
                   valueToLink =
                     columnMap[fieldPath + "." + attrNameInValue]?.[
-                      childValue.trim()
+                      childValue.trim().replace(".", "_")
                     ];
                   if (valueToLink) {
                     break;
@@ -678,9 +678,10 @@ export function useWorkbookConverter(
   ) {
     const parentPath = getParentFieldPath(fieldPath);
     const relationshipConfig = getFieldRelationshipConfig(parentPath);
-    const eleName = `relationshipMapping.${columnName
-      .trim()
-      .replaceAll(".", "_")}.${value}`;
+    const eleName = `relationshipMapping.${columnName.replaceAll(
+      ".",
+      "_"
+    )}.${value.replaceAll(".", "_")}`;
     const resourceSelectProps = {
       hideLabel: true,
       selectProps: { isClearable: true },

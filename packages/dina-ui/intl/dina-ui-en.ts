@@ -350,6 +350,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_fileSize: "File Size",
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
+  field__globalSearch: "Global search",
   field_gridLayoutDefinition_column_label: "By Column",
   field_gridLayoutDefinition_row_label: "By Row",
   field_host: "Host",
@@ -639,6 +640,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organismState: "Organism State",
   organisms: "Organisms",
   organismsQuantity: "Organisms Quantity",
+  organismManagedAttributes: "Organism Managed Attributes",
   organizationEnglishNameLabel: "English Name",
   organizationFrenchNameLabel: "French Name",
   organizationGermanNameLabel: "German Name",
@@ -969,5 +971,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   exportColumns: "Export Columns:",
   dataLabel: "Data",
   objectsLabel: "Objects",
-  relatedRecord: "Related Record"
+  relatedRecord: "Related Record",
+  reportTemplateUpload: "Report Template Upload"
 };

@@ -56,16 +56,20 @@ export function MaterialSampleSplitGenerationForm({
   const buttonBar = (
     <>
       {/* Back Button (Changes depending on the number of records) */}
-      {isMultiple ? (
-        <BackToListButton entityLink={ENTITY_LINK} />
-      ) : (
-        <BackButton entityLink={ENTITY_LINK} entityId={ids[0]} />
-      )}
+      <div className="col-md-6 col-sm-12 mt-2">
+        {isMultiple ? (
+          <BackToListButton entityLink={ENTITY_LINK} />
+        ) : (
+          <BackButton entityLink={ENTITY_LINK} entityId={ids[0]} />
+        )}
+      </div>
 
       {/* Submit Button */}
-      <SubmitButton className={"ms-auto"}>
-        <DinaMessage id="splitButton" />
-      </SubmitButton>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className={"ms-auto"}>
+          <DinaMessage id="splitButton" />
+        </SubmitButton>
+      </div>
     </>
   );
 

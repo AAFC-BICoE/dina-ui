@@ -109,17 +109,19 @@ export function MaterialSampleBulkEditor({
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <ButtonBar className="gap-4">
+        <ButtonBar className="mb-3">
           {onPreviousClick && (
-            <FormikButton
-              className="btn btn-outline-secondary previous-button"
-              onClick={onPreviousClick}
-              buttonProps={() => ({ style: { width: "13rem" } })}
-            >
-              <DinaMessage id="goToThePreviousStep" />
-            </FormikButton>
+            <div className="col-md-4">
+              <FormikButton
+                className="btn btn-outline-secondary previous-button"
+                onClick={onPreviousClick}
+                buttonProps={() => ({ style: { width: "13rem" } })}
+              >
+                <DinaMessage id="goToThePreviousStep" />
+              </FormikButton>
+            </div>
           )}
-          <div className="flex-grow-1">
+          <div className="col-md-5">
             <div className="mx-auto">
               <MaterialSampleFormTemplateSelect
                 value={sampleFormTemplate}
@@ -127,13 +129,17 @@ export function MaterialSampleBulkEditor({
               />
             </div>
           </div>
-          <FormikButton
-            className="btn btn-primary bulk-save-button"
-            onClick={saveAll}
-            buttonProps={() => ({ style: { width: "10rem" } })}
-          >
-            <DinaMessage id="saveAll" />
-          </FormikButton>
+          <div className="col-md-3 flex d-flex">
+            <div className="ms-auto">
+              <FormikButton
+                className="btn btn-primary bulk-save-button"
+                onClick={saveAll}
+                buttonProps={() => ({ style: { width: "10rem" } })}
+              >
+                <DinaMessage id="saveAll" />
+              </FormikButton>
+            </div>
+          </div>
         </ButtonBar>
       </DinaForm>
       {selectedTab && (

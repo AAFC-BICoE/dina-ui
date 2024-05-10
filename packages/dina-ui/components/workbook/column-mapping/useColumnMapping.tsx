@@ -24,6 +24,7 @@ import {
   getColumnHeaders
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
+import { Person } from "../../../types/agent-api/resources/Person";
 
 type RelationshipResource = { name?: string } & KitsuResource;
 
@@ -42,10 +43,7 @@ export function useColumnMapping() {
     group: groupName
   } = useWorkbookContext();
 
-  const { flattenedConfig, getFieldRelationshipConfig } = useWorkbookConverter(
-    FieldMappingConfig,
-    type
-  );
+  const { flattenedConfig } = useWorkbookConverter(FieldMappingConfig, type);
 
   // Retrieve a string array of the headers from the uploaded spreadsheet.
   const headers = useMemo(() => {
@@ -81,19 +79,34 @@ export function useColumnMapping() {
           arguments: "MATERIAL_SAMPLE"
         }
       ]
-    })("")
+    })(""),
+    page: { limit: 1000 }
   });
 
   const { loading: taxonomicRankLoading, response: taxonomicRankResp } =
     useQuery<Vocabulary>({
-      path: "collection-api/vocabulary/taxonomicRank"
+      path: "collection-api/vocabulary/taxonomicRank",
+      page: { limit: 1000 }
     });
+
+  const { loading: assemblageLoading, response: assemblageResp } = useQuery<
+    RelationshipResource[]
+  >(
+    {
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=assemblage`,
+      page: { limit: 1000 }
+    },
+    {
+      deps: [groupName]
+    }
+  );
 
   const { loading: collectionLoading, response: collectionResp } = useQuery<
     RelationshipResource[]
   >(
     {
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=collection`
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=collection`,
+      page: { limit: 1000 }
     },
     {
       deps: [groupName]
@@ -102,7 +115,8 @@ export function useColumnMapping() {
   const { loading: preparationTypeLoading, response: preparationTypeResp } =
     useQuery<RelationshipResource[]>(
       {
-        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-type`
+        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-type`,
+        page: { limit: 1000 }
       },
       {
         deps: [groupName]
@@ -111,7 +125,8 @@ export function useColumnMapping() {
   const { loading: preparationMethodLoading, response: preparationMethodResp } =
     useQuery<RelationshipResource[]>(
       {
-        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-method`
+        path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-method`,
+        page: { limit: 1000 }
       },
       {
         deps: [groupName]
@@ -121,7 +136,8 @@ export function useColumnMapping() {
     RelationshipResource[]
   >(
     {
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=protocol`
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=protocol`,
+      page: { limit: 1000 }
     },
     {
       deps: [groupName]
@@ -131,7 +147,8 @@ export function useColumnMapping() {
     RelationshipResource[]
   >(
     {
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=storage-unit`
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=storage-unit`,
+      page: { limit: 1000 }
     },
     {
       deps: [groupName]
@@ -141,25 +158,36 @@ export function useColumnMapping() {
     RelationshipResource[]
   >(
     {
-      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=project`
+      path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=project`,
+      page: { limit: 1000 }
     },
     {
       deps: [groupName]
     }
   );
+  const { loading: personLoading, response: personResp } = useQuery<Person[]>({
+    path: `agent-api/person`,
+    page: { limit: 1000 }
+  });
 
   const loadingData =
     attrLoading ||
+    assemblageLoading ||
     collectionLoading ||
     preparationTypeLoading ||
     preparationMethodLoading ||
     protocolLoading ||
     storageUnitLoading ||
     projectLoading ||
+    personLoading ||
     taxonomicRankLoading;
 
   const managedAttributes = attrResp?.data || [];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
+  const assemblages = (assemblageResp?.data || []).map((item) => ({
+    ...item,
+    type: "assemblage"
+  }));
   const collections = (collectionResp?.data || []).map((item) => ({
     ...item,
     type: "collection"
@@ -183,6 +211,10 @@ export function useColumnMapping() {
     ...item,
     type: "project"
   }));
+  const persons = (personResp?.data || []).map((item) => ({
+    ...item,
+    type: "person"
+  }));
 
   const [loading, setLoading] = useState<boolean>(loadingData);
 
@@ -190,6 +222,9 @@ export function useColumnMapping() {
     columnHeader: string,
     newWorkbookColumnMap: WorkbookColumnMap
   ) {
+    const originalColumnHeader = columnHeader;
+    columnHeader = columnHeader.replace(".", "_");
+
     const fieldPath = "managedAttributes";
     const targetManagedAttr = managedAttributes.find(
       (item) =>
@@ -198,6 +233,7 @@ export function useColumnMapping() {
     if (targetManagedAttr) {
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
@@ -213,6 +249,7 @@ export function useColumnMapping() {
     } else {
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
@@ -227,6 +264,9 @@ export function useColumnMapping() {
     columnHeader: string,
     newWorkbookColumnMap: WorkbookColumnMap
   ) {
+    const originalColumnHeader = columnHeader;
+    columnHeader = columnHeader.replace(".", "_");
+
     const fieldPath = "organism.determination.scientificNameDetails";
     const targetTaxonomicRank = taxonomicRanks.find(
       (item) =>
@@ -235,6 +275,7 @@ export function useColumnMapping() {
     if (targetTaxonomicRank) {
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
@@ -250,6 +291,7 @@ export function useColumnMapping() {
     } else {
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship: false,
         numOfUniqueValues: Object.keys(
@@ -264,6 +306,9 @@ export function useColumnMapping() {
     columnHeader: string,
     fieldPath?: string
   ) {
+    const originalColumnHeader = columnHeader;
+    columnHeader = columnHeader.replace(".", "_");
+
     const newWorkbookColumnMap: WorkbookColumnMap = {};
     const newRelationshipMapping: RelationshipMapping = {};
     if (fieldPath === undefined) {
@@ -273,7 +318,10 @@ export function useColumnMapping() {
             item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
         ) > -1
       ) {
-        handleManagedAttributeMapping(columnHeader, newWorkbookColumnMap);
+        handleManagedAttributeMapping(
+          originalColumnHeader,
+          newWorkbookColumnMap
+        );
       } else if (
         taxonomicRanks.findIndex(
           (item) =>
@@ -281,16 +329,17 @@ export function useColumnMapping() {
             columnHeader.toLowerCase().trim()
         ) > -1
       ) {
-        handleClassificationMapping(columnHeader, newWorkbookColumnMap);
+        handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
       }
     } else if (fieldPath === "organism.determination.scientificNameDetails") {
-      handleClassificationMapping(columnHeader, newWorkbookColumnMap);
+      handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath === "managedAttributes") {
-      handleManagedAttributeMapping(columnHeader, newWorkbookColumnMap);
+      handleManagedAttributeMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath?.startsWith("parentMaterialSample.")) {
-      const valueMapping = await resolveParentMapping(columnHeader, fieldPath);
+      const valueMapping = await resolveParentMapping(columnHeader);
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: false,
         mapRelationship: true,
         numOfUniqueValues: 1,
@@ -298,13 +347,16 @@ export function useColumnMapping() {
       };
     } else {
       const mapRelationship =
-        fieldPath.indexOf(".") > -1 &&
-        flattenedConfig[fieldPath.substring(0, fieldPath.indexOf("."))]
+        // Check if there's a dot in the fieldPath
+        fieldPath.lastIndexOf(".") > -1 &&
+        // Extract everything except the last dot
+        flattenedConfig[fieldPath.substring(0, fieldPath.lastIndexOf("."))]
           ?.relationshipConfig?.linkOrCreateSetting ===
           LinkOrCreateSetting.LINK;
 
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
+        originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship,
         numOfUniqueValues: Object.keys(
@@ -312,6 +364,7 @@ export function useColumnMapping() {
         ).length,
         valueMapping: {}
       };
+
       if (mapRelationship) {
         resolveRelationships(newRelationshipMapping, columnHeader, fieldPath);
       }
@@ -335,6 +388,7 @@ export function useColumnMapping() {
       Object.assign(newWorkbookColumnMap, result.newWorkbookColumnMap);
       Object.assign(newRelationshipMapping, result.newRelationshipMapping);
     }
+
     setColumnMap(newWorkbookColumnMap);
     setRelationshipMapping(newRelationshipMapping);
     // End of workbook column mapping calculation
@@ -475,18 +529,12 @@ export function useColumnMapping() {
    * @param fieldPath the mapped field path
    * @returns
    */
-  async function resolveParentMapping(
-    columnHeader: string,
-    fieldPath: string
-  ): Promise<{
+  async function resolveParentMapping(columnHeader: string): Promise<{
     [value: string]: {
       id: string;
       type: string;
     };
   }> {
-    const { baseApiPath } = getFieldRelationshipConfig();
-    const lastDotPos = fieldPath.lastIndexOf(".");
-    const fieldName = fieldPath.substring(lastDotPos + 1);
     const valueMapping: {
       [value: string]: {
         id: string;
@@ -528,6 +576,9 @@ export function useColumnMapping() {
       for (const value of Object.keys(values)) {
         let found: PersistedResource<any> | undefined;
         switch (fieldPath) {
+          case "assemblages.name":
+            found = assemblages.find((item) => item.name === value);
+            break;
           case "collection.name":
             found = collections.find((item) => item.name === value);
             break;
@@ -546,14 +597,18 @@ export function useColumnMapping() {
           case "projects.name":
             found = projects.find((item) => item.name === value);
             break;
+          case "collectingEvent.collectors.displayName":
+          case "preparedBy.displayName":
+            found = persons.find((item) => item.displayName === value);
+            break;
         }
 
         // If relationship is found, set it. If not, reset it so it's empty.
         if (found) {
-          theRelationshipMapping[columnHeader][value] = pick(found, [
-            "id",
-            "type"
-          ]);
+          theRelationshipMapping[columnHeader][value.replace(".", "_")] = pick(
+            found,
+            ["id", "type"]
+          );
         }
       }
     }
@@ -574,9 +629,10 @@ export function useColumnMapping() {
       return undefined;
     }
 
-    const selectElemName = `relationshipMapping.${columnHeader
-      .trim()
-      .replaceAll(".", "_")}.${fieldValue}.id`;
+    const selectElemName = `relationshipMapping.${columnHeader.replaceAll(
+      ".",
+      "_"
+    )}.${fieldValue.replaceAll(".", "_")}.id`;
 
     let options: any[] = [];
     let targetType: string = "";
@@ -588,6 +644,14 @@ export function useColumnMapping() {
           resource
         }));
         targetType = "storage-unit";
+        break;
+      case "assemblages.name":
+        options = assemblages.map((resource) => ({
+          label: resource.name,
+          value: resource.id,
+          resource
+        }));
+        targetType = "assemblage";
         break;
       case "collection.name":
         options = collections.map((resource) => ({
@@ -628,6 +692,15 @@ export function useColumnMapping() {
           resource
         }));
         targetType = "project";
+        break;
+      case "collectingEvent.collectors.displayName":
+      case "preparedBy.displayName":
+        options = persons.map((resource) => ({
+          label: resource.displayName,
+          value: resource.id,
+          resource
+        }));
+        targetType = "person";
         break;
       default:
         options = [];

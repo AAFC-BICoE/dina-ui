@@ -1,7 +1,6 @@
 import Select from "react-select";
 import { FieldItems } from "react-awesome-query-builder";
 import { ESIndexMapping } from "../../types";
-import { useQueryBuilderEnterToSearch } from "./useQueryBuilderEnterToSearch";
 
 interface QueryOperatorSelectorProps {
   options?: FieldItems;
@@ -34,9 +33,6 @@ export function QueryOperatorSelector({
   setOperator,
   selectedFieldMapping
 }: QueryOperatorSelectorProps) {
-  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = useQueryBuilderEnterToSearch();
-
   // Do not render if no operators are available, specifically the managed attributes.
   if (options?.length === 1 && options[0].key === "noOperator") {
     setOperator?.("noOperator");
@@ -109,7 +105,6 @@ export function QueryOperatorSelector({
         styles={customStyles}
         value={selectedOption}
         onChange={(newValue) => setOperator?.(newValue?.value ?? "")}
-        onKeyDown={onKeyDown}
       />
     </div>
   );

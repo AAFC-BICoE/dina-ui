@@ -1,20 +1,12 @@
-import {
-  TextField,
-  DATA_EXPORT_QUERY_KEY,
-  useApiClient,
-  LoadingSpinner,
-  LabelView,
-  FieldHeader
-} from "..";
+import { useApiClient, LoadingSpinner, FieldHeader } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
-import { compact, startCase } from "lodash";
+import { startCase } from "lodash";
 import { Button } from "react-bootstrap";
 import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
-import { DataExport } from "packages/dina-ui/types/dina-export-api";
 import Kitsu from "kitsu";
 import { Table, VisibilityState, Column } from "@tanstack/react-table";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
@@ -102,7 +94,7 @@ export function ColumnSelector<TData>({
     hideDropdown: hideDropdownMenu,
     onKeyDown: onKeyPressDown
   } = menuDisplayControl();
-  const { apiClient, save } = useApiClient();
+  const { apiClient } = useApiClient();
   let groupedIndexMappings;
   let indexMap;
   if (indexName) {
@@ -278,7 +270,10 @@ export function ColumnSelector<TData>({
           aria-labelledby={props.labelledBy}
         >
           {menuOnly ? (
-            <><strong>{<DinaMessage id="exportColumns" />}</strong><br/></>
+            <>
+              <strong>{<DinaMessage id="exportColumns" />}</strong>
+              <br />
+            </>
           ) : (
             <div>
               {" "}

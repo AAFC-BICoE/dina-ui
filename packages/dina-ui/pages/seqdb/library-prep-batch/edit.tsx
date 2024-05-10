@@ -21,7 +21,7 @@ import { PersistedResource } from "kitsu";
 import { cloneDeep } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Protocol } from "../../../types/collection-api";
 import {
@@ -58,23 +58,26 @@ export default function LibraryPrepBatchEditPage() {
   }
 
   return (
-    <main className="container-fluid">
+    <>
       <Head title={formatMessage(title)} />
       <Nav />
-      <h1 id="wb-cont">
-        <SeqdbMessage id={title} />
-      </h1>
-      {id ? (
-        withResponse(resourceQuery, ({ data: libraryPrepBatchData }) => (
-          <LibraryPrepBatchForm
-            libraryPrepBatch={libraryPrepBatchData}
-            onSaved={moveToViewPage}
-          />
-        ))
-      ) : (
-        <LibraryPrepBatchForm onSaved={moveToViewPage} />
-      )}
-    </main>
+      <main className="container-fluid">
+        <h1 id="wb-cont">
+          <SeqdbMessage id={title} />
+        </h1>
+        {id ? (
+          withResponse(resourceQuery, ({ data: libraryPrepBatchData }) => (
+            <LibraryPrepBatchForm
+              libraryPrepBatch={libraryPrepBatchData}
+              onSaved={moveToViewPage}
+            />
+          ))
+        ) : (
+          <LibraryPrepBatchForm onSaved={moveToViewPage} />
+        )}
+      </main>
+      <Footer />
+    </>
   );
 }
 
@@ -90,12 +93,16 @@ export function LibraryPrepBatchForm({
   libraryPrepBatch,
   onSaved,
   buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={libraryPrepBatch?.id}
-        entityLink="/seqdb/library-prep-batch"
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={libraryPrepBatch?.id}
+          entityLink="/seqdb/library-prep-batch"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   ),
   readOnlyOverride

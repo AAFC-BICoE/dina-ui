@@ -12,7 +12,7 @@ import {
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
@@ -53,6 +53,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
@@ -83,9 +84,13 @@ function ProductForm({ product, router }: ProductFormProps) {
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar>
-        <BackButton entityId={id as string} entityLink="/seqdb/product" />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton entityId={id as string} entityLink="/seqdb/product" />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <ProductFormFields />
     </DinaForm>

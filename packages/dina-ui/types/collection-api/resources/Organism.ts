@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { Determination } from "..";
+import { Determination, ManagedAttributeValues } from "..";
 
 export interface OrganismAttributes {
   type: "organism";
@@ -9,6 +9,7 @@ export interface OrganismAttributes {
   remarks?: string | null;
   isTarget?: boolean | null;
   determination?: Determination[] | null;
+  managedAttributes?: ManagedAttributeValues;
   createdOn?: string;
   createdBy?: string;
 }

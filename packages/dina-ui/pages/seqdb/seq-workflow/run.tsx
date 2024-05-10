@@ -71,7 +71,9 @@ export default function SangerWorkFlowSequencingRunPage() {
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/seq-workflow" />
+      <div className="col-md-4">
+        <BackToListButton entityLink="/seqdb/seq-workflow" />
+      </div>
       {editMode ? (
         <>
           <Button

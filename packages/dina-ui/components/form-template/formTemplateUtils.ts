@@ -2,7 +2,9 @@ import {
   COLLECTING_EVENT_COMPONENT_NAME,
   SPLIT_CONFIGURATION_COMPONENT_NAME,
   FormTemplate,
-  MATERIAL_SAMPLE_INFO_COMPONENT_NAME
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
+  ORGANISMS_COMPONENT_NAME,
+  FormTemplateSectionItem
 } from "../../types/collection-api";
 import { sortBy, get, isEmpty, compact } from "lodash";
 import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
@@ -37,6 +39,85 @@ export function getFormTemplateCheckboxes(
   return {
     templateCheckboxes: templateCheckboxesValues
   };
+}
+
+export function getComponentArrayValues(
+  comp: string,
+  formTemplate: FormTemplate | undefined,
+  invisibleUndefined: boolean
+) {
+  let componentValues: any;
+  const templateCheckboxes: Record<string, true | undefined> = {};
+  if (formTemplate) {
+    formTemplate.components?.forEach((component) => {
+      if (component.name === comp) {
+        if (component.visible) {
+          const valuableItems: FormTemplateSectionItem[] = [];
+          component.sections?.forEach((section) => {
+            section.items?.forEach((item) => {
+              if (item.name && (item.visible || item.defaultValue)) {
+                valuableItems.push(item);
+                templateCheckboxes[
+                  component.name + "." + section.name + "." + item.name
+                ] = true;
+              }
+            });
+          });
+          componentValues = buildObjectFromArray(valuableItems);
+        }
+      }
+    });
+  }
+
+  if (
+    invisibleUndefined &&
+    isEmpty(componentValues) &&
+    isEmpty(templateCheckboxes)
+  ) {
+    return undefined;
+  }
+  return { componentValues, templateCheckboxes };
+}
+
+function buildObjectFromArray(data?: FormTemplateSectionItem[]) {
+  if (!data) {
+    return undefined;
+  }
+
+  const obj: any = {};
+  data.forEach((item) => {
+    const path = item.name!;
+    const value = item.defaultValue;
+    const segments = path.split(".");
+    let current = obj;
+
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      const isArray = /\[\d+\]/.test(segment);
+
+      if (isArray) {
+        const [key, index] = segment.split(/\[|\]/).filter(Boolean); // remove null or undefined items
+        current[key] = current[key] || [];
+        if (!current[key][index]) {
+          if (i === segments.length - 1) {
+            current[key][index] = value;
+          } else {
+            current[key][index] = {};
+          }
+        }
+        current = current[key][index];
+      } else {
+        if (i === segments.length - 1) {
+          current[segment] = value;
+        } else {
+          current[segment] = current[segment] || {};
+        }
+        current = current[segment];
+      }
+    }
+  });
+
+  return obj;
 }
 
 /**
@@ -101,12 +182,13 @@ export function getMaterialSampleComponentValues(
     formTemplate.components?.forEach((component) => {
       if (
         component.name !== COLLECTING_EVENT_COMPONENT_NAME &&
-        component.name !== SPLIT_CONFIGURATION_COMPONENT_NAME
+        component.name !== SPLIT_CONFIGURATION_COMPONENT_NAME &&
+        component.name !== ORGANISMS_COMPONENT_NAME
       ) {
         if (component.visible) {
           component.sections?.forEach((section) => {
             section.items?.forEach((item) => {
-              if ((item.name && item.visible) || item.name === "organism") {
+              if (item.name && item.visible) {
                 componentValues[item.name] = item.defaultValue;
                 templateCheckboxes[
                   component.name + "." + section.name + "." + item.name
@@ -117,8 +199,20 @@ export function getMaterialSampleComponentValues(
         }
       }
     });
+    const ogsmComponentValues = getComponentArrayValues(
+      ORGANISMS_COMPONENT_NAME,
+      formTemplate,
+      true
+    );
+    ret = {
+      ...componentValues,
+      ...ogsmComponentValues?.componentValues,
+      templateCheckboxes: {
+        ...templateCheckboxes,
+        ...ogsmComponentValues?.templateCheckboxes
+      }
+    };
   }
-  ret = { ...componentValues, templateCheckboxes };
   return ret;
 }
 

@@ -22,6 +22,7 @@ import { Assemblage } from "../../../..//dina-ui/types/collection-api/resources/
 import { useContext } from "react";
 import {
   AttachmentsField,
+  Footer,
   GroupSelectField,
   Head,
   Nav
@@ -56,7 +57,7 @@ export default function AssemblageEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container-fluid px-5">
+      <main className="container-fluid">
         <div>
           <h1 id="wb-cont">
             <DinaMessage id={title} />
@@ -78,6 +79,7 @@ export default function AssemblageEditPage() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
@@ -158,12 +160,16 @@ export function AssemblageForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={fetchedAssemblage?.id}
-          entityLink="/collection/assemblage"
-        />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-4">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={fetchedAssemblage?.id}
+            entityLink="/collection/assemblage"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <AssemblageFormLayout />
     </DinaForm>

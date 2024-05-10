@@ -25,7 +25,7 @@ export function Home() {
       <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
       <Nav />
       <main role="main">
-        <Container fluid={true} className="px-5">
+        <Container fluid={true}>
           {/* Quick create menu */}
           <Card bg="light" className="mb-4">
             <Card.Body>
@@ -73,7 +73,7 @@ export function Home() {
           </Card>
 
           {/* Split page into lg sections */}
-          <Row lg={4} md={2} xs={1} className="mb-5">
+          <Row lg={4} md={2} xs={1}>
             {/* Collection Links */}
             <Col className="mb-4">
               <h2>
@@ -343,11 +343,18 @@ export function Home() {
 
                 <Stack style={{ display: "inline-flex" }}>
                   {isAdmin && (
-                    <Link href="/dina-user/list">
-                      <a>
-                        <DinaMessage id="userListTitle" />
-                      </a>
-                    </Link>
+                    <>
+                      <Link href="/dina-user/list">
+                        <a>
+                          <DinaMessage id="userListTitle" />
+                        </a>
+                      </Link>
+                      <Link href="/report-template/upload">
+                        <a>
+                          <DinaMessage id="reportTemplateUpload" />
+                        </a>
+                      </Link>
+                    </>
                   )}
                 </Stack>
               </Col>

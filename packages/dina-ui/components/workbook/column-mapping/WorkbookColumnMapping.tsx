@@ -3,7 +3,6 @@ import {
   FieldWrapper,
   LoadingSpinner,
   SubmitButton,
-  useAccount,
   useModal
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
@@ -37,7 +36,6 @@ import {
 } from "../utils/workbookMappingUtils";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
-import { error } from "console";
 
 export type FieldMapType = {
   targetField: string | undefined;
@@ -121,13 +119,13 @@ export function WorkbookColumnMapping({
   const sheetValue = sheetOptions[sheet];
 
   function validateRelationshipMapping() {
-    const relationshipColumnNames = Object.keys(columnUniqueValues![sheet])
-      .filter(
-        (columnName) =>
-          workbookColumnMap[columnName]?.mapRelationship &&
-          workbookColumnMap[columnName].showOnUI
-      )
-      .map((columnName) => columnName);
+    const relationshipColumnNames = Object.keys(
+      columnUniqueValues![sheet]
+    ).filter(
+      (columnName) =>
+        workbookColumnMap[columnName]?.mapRelationship &&
+        workbookColumnMap[columnName].showOnUI
+    );
     for (const columnName of relationshipColumnNames) {
       const values = Object.keys(
         (columnUniqueValues ?? {})[sheet]?.[columnName]
@@ -137,7 +135,7 @@ export function WorkbookColumnMapping({
       } else {
         const mappedValues = Object.keys(relationshipMapping[columnName]);
         for (const value of values) {
-          if (mappedValues.indexOf(value) === -1) {
+          if (mappedValues.indexOf(value.replace(".", "_")) === -1) {
             return false;
           }
         }
@@ -424,7 +422,12 @@ export function WorkbookColumnMapping({
           break;
         case WorkbookDataTypeEnum.VOCABULARY:
           const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(fieldPath);
-          if (vocabElements && !vocabElements.includes(row[fieldPath])) {
+          if (
+            vocabElements &&
+            !vocabElements.includes(
+              row[fieldPath].toUpperCase().replace(" ", "_")
+            )
+          ) {
             param.dataType = WorkbookDataTypeEnum.VOCABULARY;
             errors.push(
               new ValidationError(
@@ -445,7 +448,7 @@ export function WorkbookColumnMapping({
   ) {
     const { newWorkbookColumnMap, newRelationshipMapping } =
       await resolveColumnMappingAndRelationshipMapping(
-        columnName,
+        columnName.replace(".", "_"),
         newFieldPath
       );
 
@@ -468,12 +471,15 @@ export function WorkbookColumnMapping({
     relatedRecord: string,
     targetType: string
   ) {
+    const columnHeaderFormatted = columnHeader.replaceAll(".", "_");
+    const fieldValueFormatted = fieldValue.replaceAll(".", "_");
+
     if (relationshipMapping) {
       setRelationshipMapping({
         ...relationshipMapping,
-        [columnHeader]: {
-          ...relationshipMapping?.[columnHeader],
-          [fieldValue]: {
+        [columnHeaderFormatted]: {
+          ...relationshipMapping?.[columnHeaderFormatted],
+          [fieldValueFormatted]: {
             id: relatedRecord,
             type: targetType
           }

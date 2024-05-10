@@ -15,6 +15,7 @@ import {
   withResponse
 } from "../../../../common-ui";
 import {
+  Footer,
   GroupSelectField,
   Head,
   Nav,
@@ -46,9 +47,13 @@ export default function IndexSetEditPage() {
   );
 
   const buttonBar = (
-    <ButtonBar>
-      <BackButton entityId={id} entityLink="/seqdb/index-set" />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton entityId={id} entityLink="/seqdb/index-set" />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 
@@ -96,37 +101,39 @@ export default function IndexSetEditPage() {
   }
 
   return (
-    <main className="container-fluid">
+    <>
       <Head title={formatMessage(title)} />
       <Nav />
-
-      <h1 id="wb-cont">
-        <SeqdbMessage id={title} />
-      </h1>
-      {id ? (
-        withResponse(resourceQuery, ({ data }) => {
-          return (
-            <IndexSetForm
-              dinaFormProps={{ initialValues: data, onSubmit }}
-              onRemoveNgsIndex={onRemoveNgsIndex}
-              buttonBar={buttonBar}
-            />
-          );
-        })
-      ) : (
-        <IndexSetForm
-          dinaFormProps={{
-            initialValues: {
-              createdBy: username,
-              type: "index-set"
-            } as IndexSet,
-            onSubmit
-          }}
-          onRemoveNgsIndex={onRemoveNgsIndex}
-          buttonBar={buttonBar}
-        />
-      )}
-    </main>
+      <main className="container-fluid">
+        <h1 id="wb-cont">
+          <SeqdbMessage id={title} />
+        </h1>
+        {id ? (
+          withResponse(resourceQuery, ({ data }) => {
+            return (
+              <IndexSetForm
+                dinaFormProps={{ initialValues: data, onSubmit }}
+                onRemoveNgsIndex={onRemoveNgsIndex}
+                buttonBar={buttonBar}
+              />
+            );
+          })
+        ) : (
+          <IndexSetForm
+            dinaFormProps={{
+              initialValues: {
+                createdBy: username,
+                type: "index-set"
+              } as IndexSet,
+              onSubmit
+            }}
+            onRemoveNgsIndex={onRemoveNgsIndex}
+            buttonBar={buttonBar}
+          />
+        )}
+      </main>
+      <Footer />
+    </>
   );
 }
 

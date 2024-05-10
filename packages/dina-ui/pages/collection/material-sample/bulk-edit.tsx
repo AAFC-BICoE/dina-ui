@@ -4,6 +4,7 @@ import { BULK_EDIT_IDS_KEY } from "common-ui";
 import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
 import {
   ExistingMaterialSampleBulkEditor,
+  Footer,
   Head,
   Nav
 } from "../../../components";
@@ -59,6 +60,7 @@ export default function MaterialSampleBulkEditPage() {
           />
         )}
       </main>
+      <Footer />
     </div>
   );
 }

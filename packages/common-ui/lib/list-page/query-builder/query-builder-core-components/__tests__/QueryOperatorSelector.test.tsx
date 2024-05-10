@@ -41,7 +41,9 @@ describe("QueryOperatorSelector component", () => {
     });
 
     // 4 options should be rendered.
-    expect(wrapper.find(QueryOperatorSelector).find("Option").length).toEqual(4);
+    expect(wrapper.find(QueryOperatorSelector).find("Option").length).toEqual(
+      4
+    );
   });
 
   test("Toggle between the options", async () => {

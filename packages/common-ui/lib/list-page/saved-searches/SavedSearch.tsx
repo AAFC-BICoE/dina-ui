@@ -28,6 +28,8 @@ import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
 import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useIntl } from "react-intl";
 import { useSessionStorage } from "usehooks-ts";
+import { Table, VisibilityState } from "@tanstack/react-table";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 export interface SavedSearchProps {
   /**
@@ -89,6 +91,8 @@ export interface SavedSearchProps {
    * to remain the same across tables, it can share the same name.
    */
   uniqueName: string;
+
+  reactTable?: Table<any>;
 }
 
 /**
@@ -114,7 +118,8 @@ export function SavedSearch({
   groups,
   setGroups,
   performSubmit,
-  uniqueName
+  uniqueName,
+  reactTable
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -145,11 +150,17 @@ export function SavedSearch({
   const [selectedSavedSearchName, setSelectedSavedSearchName] =
     useState<string>();
 
+  // Local storage for saving columns visibility
+  const [localStorageColumnStates, setLocalStorageColumnStates] =
+    useLocalStorage<VisibilityState | undefined>(
+      `${uniqueName}_columnSelector`,
+      {}
+    );
+
   // Functionality for the last loaded search.
-  useLastSavedSearch({
+  const { loadLastSavedSearch } = useLastSavedSearch({
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
-    setDefaultLoadedIn,
     performSubmit,
     uniqueName
   });
@@ -215,18 +226,22 @@ export function SavedSearch({
     // exists and pre-load it in.
     const defaultSavedSearch = getDefaultSavedSearch();
 
-    if (defaultSavedSearch && defaultSavedSearch.savedSearchName) {
-      if (defaultSavedSearch?.queryTree) {
-        const isQueryChanged = getDefaultSavedSearchChanged(defaultSavedSearch);
-        if (isQueryChanged) {
-          setSelectedSavedSearchName(defaultSavedSearch.savedSearchName);
-          setChangesMade(true);
-          setCurrentIsDefault(defaultSavedSearch.default);
-        } else {
-          loadSavedSearch(defaultSavedSearch.savedSearchName);
-        }
+    if (
+      defaultSavedSearch &&
+      defaultSavedSearch.savedSearchName &&
+      defaultSavedSearch?.queryTree
+    ) {
+      const isQueryChanged = getDefaultSavedSearchChanged(defaultSavedSearch);
+      if (isQueryChanged) {
+        loadLastSavedSearch();
+      } else {
+        loadSavedSearch(defaultSavedSearch.savedSearchName);
       }
+    } else {
+      // Default search not loaded in, check if last saved search can be loaded in.
+      loadLastSavedSearch();
     }
+
     setDefaultLoadedIn(true);
   }, [userPreferences]);
 
@@ -375,6 +390,17 @@ export function SavedSearch({
         setChangesMade(true);
       }
 
+      if (savedSearchToLoad.columnVisibility) {
+        getColumnVisibility(savedSearchToLoad.columnVisibility);
+        // Set ReactTable's column visibility
+        const columnVisibility: VisibilityState = getColumnVisibility(
+          savedSearchToLoad.columnVisibility
+        );
+        reactTable?.setColumnVisibility?.(columnVisibility);
+        // Set local storage column visibility for navigating around the website
+        setLocalStorageColumnStates(columnVisibility);
+      }
+
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
@@ -416,6 +442,9 @@ export function SavedSearch({
           [savedSearchName]: {
             version: SAVED_SEARCH_VERSION,
             default: setAsDefault,
+
+            // Save selected columns
+            columnVisibility: saveColumnVisibility(),
 
             // If updateQueryTree is true, then we will retrieve the current query tree from the
             // query builder, otherwise it will remain the same as before.
@@ -511,8 +540,10 @@ export function SavedSearch({
           actionMessage={<DinaMessage id="removeSavedSearch" />}
           messageBody={
             <>
-              <strong><DinaMessage id="areYouSureRemoveSavedSearch"/></strong><br/>
-              "{savedSearchName}"
+              <strong>
+                <DinaMessage id="areYouSureRemoveSavedSearch" />
+              </strong>
+              <br />"{savedSearchName}"
             </>
           }
           onYesButtonClicked={deleteSearch}
@@ -617,4 +648,32 @@ export function SavedSearch({
       {queryError && <Alert variant={"danger"}>{queryError}</Alert>}
     </>
   );
+
+  function saveColumnVisibility(): string[] | undefined {
+    const savedColumnVisibility = reactTable?.getState().columnVisibility
+      ? Object.keys(reactTable?.getState().columnVisibility).filter(
+          (columnKey) =>
+            reactTable?.getState().columnVisibility[columnKey] === true
+        )
+      : undefined;
+    return savedColumnVisibility;
+  }
+
+  function getColumnVisibility(
+    savedColumnVisibility: string[] | undefined
+  ): VisibilityState {
+    const columnVisibility: VisibilityState = {};
+    if (reactTable?.getState().columnVisibility) {
+      Object.keys(reactTable?.getState().columnVisibility).forEach(
+        (columnKey) => {
+          columnVisibility[columnKey] = savedColumnVisibility?.includes(
+            columnKey
+          )
+            ? true
+            : false;
+        }
+      );
+    }
+    return columnVisibility;
+  }
 }

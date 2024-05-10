@@ -47,11 +47,22 @@ export default function UploadPage() {
         }
       });
     };
+    const unsupportedFile = acceptedFiles.find(
+      (file) => !file.meta.name.endsWith(".ftlh")
+    );
+    if (unsupportedFile) {
+      throw new Error(
+        formatMessage("unsupportedFileTypeError", {
+          fileName: unsupportedFile.meta.name
+        })
+      );
+    }
 
     const uploadRespsT = await uploadFiles({
       files: acceptedFiles,
       group,
-      isDerivative: router?.query?.derivativeType ? true : false
+      isDerivative: router?.query?.derivativeType ? true : false,
+      isReportTemplate: true
     });
 
     // Handle linking derivative to metadata object
@@ -171,11 +182,11 @@ export default function UploadPage() {
 
   return (
     <div>
-      <Head title={formatMessage("uploadPageTitle")} />
+      <Head title={formatMessage("reportTemplateUpload")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
-          <DinaMessage id="uploadPageTitle" />
+          <DinaMessage id="reportTemplateUpload" />
         </h1>
         {!accountInitialized || !groupNames?.length ? (
           <div className="alert alert-warning no-group-alert">

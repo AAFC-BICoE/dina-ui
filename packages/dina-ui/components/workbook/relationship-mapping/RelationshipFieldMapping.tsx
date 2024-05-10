@@ -113,7 +113,9 @@ export function RelationshipFieldMapping({
                 className={`row${index1 % 2 === 0 ? " odd" : ""}`}
                 key={fieldValue}
               >
-                <div className="col-3">{index2 === 0 ? columnName : ""}</div>
+                <div className="col-3">
+                  {index2 === 0 ? thisColumnMap.originalColumnName : ""}
+                </div>
                 <div className="col-2">{fieldValue}</div>
                 <div className="col-2">{counts[fieldValue]}</div>
                 <div className="col-2">{startCase(parentPath)}</div>

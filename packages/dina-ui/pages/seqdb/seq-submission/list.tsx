@@ -6,7 +6,7 @@ import {
   dateCell
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav, groupCell } from "../../../components";
+import { Footer, Head, Nav, groupCell } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqSubmission } from "../../../types/seqdb-api/resources/SeqSubmission";
 
@@ -36,9 +36,11 @@ export default function SeqSubmissionListPage() {
   return (
     <>
       <Head title={formatMessage("seqSubmissionListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
       <ButtonBar>
-        <CreateButton entityLink="/seqdb/seq-submission" />
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/seqdb/seq-submission" />
+        </div>
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
@@ -53,6 +55,7 @@ export default function SeqSubmissionListPage() {
           }}
         />
       </main>
+      <Footer />
     </>
   );
 }

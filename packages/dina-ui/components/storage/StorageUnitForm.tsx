@@ -46,20 +46,24 @@ export function StorageUnitForm({
   onSaved,
   parentIdInURL,
   buttonBar = (
-    <ButtonBar>
-      {parentIdInURL ? (
-        <BackButton
-          entityId={parentIdInURL}
-          entityLink={`/collection/storage-unit`}
-          buttonMsg={"backToParentUnit"}
-        />
-      ) : (
-        <BackButton
-          entityId={storageUnit?.id}
-          entityLink="/collection/storage-unit"
-        />
-      )}
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-4">
+      <div className="col-md-6 col-sm-12 mt-2">
+        {parentIdInURL ? (
+          <BackButton
+            entityId={parentIdInURL}
+            entityLink={`/collection/storage-unit`}
+            buttonMsg={"backToParentUnit"}
+          />
+        ) : (
+          <BackButton
+            entityId={storageUnit?.id}
+            entityLink="/collection/storage-unit"
+          />
+        )}
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   )
 }: StorageUnitFormProps) {
@@ -109,7 +113,6 @@ export function StorageUnitForm({
     >
       {buttonBar}
       <StorageUnitFormFields parentIdInURL={parentIdInURL} />
-      {buttonBar}
     </DinaForm>
   );
 }

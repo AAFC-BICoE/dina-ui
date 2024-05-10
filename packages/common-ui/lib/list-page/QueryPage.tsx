@@ -3,6 +3,7 @@ import {
   ColumnSort,
   Row,
   SortingState,
+  Table,
   VisibilityState
 } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
@@ -295,7 +296,7 @@ export function QueryPage<TData extends KitsuResource>({
   const { groupNames } = useAccount();
   const isInitialQueryFinished = useRef(false);
   const isActionTriggeredQuery = useRef(false);
-
+  const [reactTable, setReactTable] = useState<Table<TData> | undefined>();
   const [visibleIndexMapColumns] = useLocalStorage<any[]>(
     `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
     []
@@ -794,10 +795,10 @@ export function QueryPage<TData extends KitsuResource>({
       : reactTableProps;
 
   const columnVisibility = compact(
-    totalColumns.map((col) =>
+    totalColumns?.map((col) =>
       col.isColumnVisible === false
         ? { id: col.id, visibility: false }
-        : undefined
+        : { id: col.id, visibility: true }
     )
   ).reduce<VisibilityState>(
     (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
@@ -987,44 +988,45 @@ export function QueryPage<TData extends KitsuResource>({
 
   return (
     <>
-      <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
-        {!viewMode && (
-          <>
-            {validationErrors.length > 0 && (
-              <div
-                className="alert alert-danger"
-                style={{
-                  whiteSpace: "pre-line"
-                }}
-              >
-                <h5>Validation Errors</h5>
-                <ul>
-                  {validationErrors.map((validationError: ValidationError) => (
-                    <li key={validationError.fieldName}>
-                      <strong>{validationError.fieldName}: </strong>
-                      {validationError.errorMessage}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <QueryBuilderMemo
-              indexName={indexName}
-              queryBuilderTree={queryBuilderTree}
-              setQueryBuilderTree={onQueryBuildTreeChange}
-              queryBuilderConfig={queryBuilderConfig}
-              setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-              setPageOffset={setPageOffset}
-              onSubmit={onSubmit}
-              onReset={onReset}
-              setGroups={setGroups}
-              groups={groups}
-              uniqueName={uniqueName}
-              validationErrors={validationErrors}
-            />
-          </>
-        )}
+      {!viewMode && (
+        <>
+          {validationErrors.length > 0 && (
+            <div
+              className="alert alert-danger"
+              style={{
+                whiteSpace: "pre-line"
+              }}
+            >
+              <h5>Validation Errors</h5>
+              <ul>
+                {validationErrors.map((validationError: ValidationError) => (
+                  <li key={validationError.fieldName}>
+                    <strong>{validationError.fieldName}: </strong>
+                    {validationError.errorMessage}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <QueryBuilderMemo
+            indexName={indexName}
+            queryBuilderTree={queryBuilderTree}
+            setQueryBuilderTree={onQueryBuildTreeChange}
+            queryBuilderConfig={queryBuilderConfig}
+            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+            setPageOffset={setPageOffset}
+            onSubmit={onSubmit}
+            onReset={onReset}
+            setGroups={setGroups}
+            groups={groups}
+            uniqueName={uniqueName}
+            validationErrors={validationErrors}
+            reactTable={reactTable}
+          />
+        </>
+      )}
 
+      <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
         {/* Group Selection */}
         {!viewMode && (
           <DinaFormSection horizontal={"flex"}>
@@ -1125,6 +1127,7 @@ export function QueryPage<TData extends KitsuResource>({
               )}
               <ReactTable<TData>
                 // These props are needed for column selector
+                setReactTable={setReactTable}
                 setColumnSelector={setColumnSelector}
                 uniqueName={uniqueName}
                 indexName={indexName}
