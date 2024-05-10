@@ -3,6 +3,7 @@ import {
   ColumnSort,
   Row,
   SortingState,
+  Table,
   VisibilityState
 } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
@@ -294,7 +295,7 @@ export function QueryPage<TData extends KitsuResource>({
   const { groupNames } = useAccount();
   const isInitialQueryFinished = useRef(false);
   const isActionTriggeredQuery = useRef(false);
-
+  const [reactTable, setReactTable] = useState<Table<TData> | undefined>();
   const [visibleIndexMapColumns] = useLocalStorage<any[]>(
     `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
     []
@@ -793,10 +794,10 @@ export function QueryPage<TData extends KitsuResource>({
       : reactTableProps;
 
   const columnVisibility = compact(
-    totalColumns.map((col) =>
+    totalColumns?.map((col) =>
       col.isColumnVisible === false
         ? { id: col.id, visibility: false }
-        : undefined
+        : { id: col.id, visibility: true }
     )
   ).reduce<VisibilityState>(
     (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
@@ -1019,6 +1020,7 @@ export function QueryPage<TData extends KitsuResource>({
             groups={groups}
             uniqueName={uniqueName}
             validationErrors={validationErrors}
+            reactTable={reactTable}
           />
         </>
       )}
@@ -1124,6 +1126,7 @@ export function QueryPage<TData extends KitsuResource>({
               )}
               <ReactTable<TData>
                 // These props are needed for column selector
+                setReactTable={setReactTable}
                 setColumnSelector={setColumnSelector}
                 uniqueName={uniqueName}
                 indexName={indexName}
