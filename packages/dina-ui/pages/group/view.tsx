@@ -1,9 +1,8 @@
-import { DinaForm, Tooltip } from "common-ui";
-import { fromPairs } from "lodash";
-import { ViewPageLayout } from "packages/dina-ui/components";
-import { Group } from "packages/dina-ui/types/user-api";
-import { GroupFormLayout } from "packages/dina-ui/components/group/GroupFormLayout";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaForm } from "common-ui";
+import { ViewPageLayout } from "../../components";
+import { Group } from "../../types/user-api";
+import { GroupFormLayout } from "../../components/group/GroupFormLayout";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 
 export default function GroupDetailsPage() {
   const { locale } = useDinaIntl();

@@ -3,12 +3,12 @@ import {
   useQuery,
   withResponse,
   useBulkGet
-} from "packages/common-ui/lib";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+} from "../../../common-ui/lib";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useRouter } from "next/router";
-import { GroupMembership } from "packages/dina-ui/types/user-api/resources/GroupMembership";
+import { GroupMembership } from "../../../dina-ui/types/user-api/resources/GroupMembership";
 import Link from "next/link";
-import { Person } from "packages/dina-ui/types/agent-api";
+import { Person } from "../../../dina-ui/types/agent-api";
 
 export function GroupFormLayout() {
   const router = useRouter();
