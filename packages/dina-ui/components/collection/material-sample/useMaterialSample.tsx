@@ -172,6 +172,9 @@ export interface UseMaterialSampleSaveParams {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
+  /** Show parent attributes initial state (Form Template Only) */
+  showParentAttributesInitialState?: boolean;
+
   /** Split Configuration (Form Template Only) */
   splitConfigurationInitialState?: boolean;
 
@@ -209,6 +212,7 @@ export function useMaterialSampleSave({
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
   splitConfigurationInitialState,
+  showParentAttributesInitialState,
   reduceRendering,
   disableNestedFormEdits,
   showChangedIndicatorsInNestedForms,
@@ -278,6 +282,8 @@ export function useMaterialSampleSave({
     );
 
   // Enable Switch States:
+  const [enableShowParentAttributes, setEnableShowParentAttributes] =
+    useState<boolean>(false);
   const [enableSplitConfiguration, setEnableSplitConfiguration] =
     useState<boolean>(false);
   const [enableCollectingEvent, setEnableCollectingEvent] =
@@ -292,6 +298,7 @@ export function useMaterialSampleSave({
 
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
+    setEnableShowParentAttributes(showParentAttributesInitialState ?? false);
     setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
     setEnableCollectingEvent(
       Boolean(
@@ -405,7 +412,9 @@ export function useMaterialSampleSave({
     enableRestrictions,
     setEnableRestrictions,
     enableSplitConfiguration,
-    setEnableSplitConfiguration
+    setEnableSplitConfiguration,
+    enableShowParentAttributes,
+    setEnableShowParentAttributes
   };
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
