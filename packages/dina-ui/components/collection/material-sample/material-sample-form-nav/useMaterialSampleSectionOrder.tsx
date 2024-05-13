@@ -16,6 +16,7 @@ import { ScrollTarget } from "./MaterialSampleFormNav";
 import { AssociationsSwitch } from "./AssociationsSwitch";
 import { OrganismsSwitch } from "./OrganismsSwitch";
 import { useMaterialSampleSave } from "../useMaterialSample";
+import { ShowParentAttributesSwitch } from "./ShowParentAttributesSwitch";
 
 export interface MaterialSampleSectionOrderParams {
   dataComponentState: ReturnType<
@@ -44,7 +45,8 @@ export function useMaterialSampleSectionOrder({
   const scrollTargetSwitches: { [key: string]: Partial<ScrollTarget> } = {
     [SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableShowParentAttributes,
-      setEnabled: dataComponentState.setEnableShowParentAttributes
+      setEnabled: dataComponentState.setEnableShowParentAttributes,
+      customSwitch: ShowParentAttributesSwitch
     },
     [SPLIT_CONFIGURATION_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableSplitConfiguration,

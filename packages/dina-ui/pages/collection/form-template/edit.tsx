@@ -51,6 +51,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
   SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
@@ -118,6 +119,9 @@ export function FormTemplateEditPageLoaded({
     allMaterialSampleComponentValues.associations = [{}];
   }
 
+  // debugger;
+  // const showParentAttributesInitialState = fetchedFormTemplate;
+
   // collecting event components need to be isolated for useMaterialSample hook
   const collectingEventInitialValues =
     getComponentValues(
@@ -159,7 +163,12 @@ export function FormTemplateEditPageLoaded({
     colEventFormRef: collectingEvtFormRef,
     splitConfigurationInitialState: !_.isUndefined(
       splitConfigurationInitialValues
-    )
+    ),
+    showParentAttributesInitialState:
+      fetchedFormTemplate?.components?.find(
+        (comp) =>
+          comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME && comp.visible
+      ) !== undefined
   });
   const dataComponentState = materialSampleSaveHook.dataComponentState;
 
@@ -363,6 +372,8 @@ export function FormTemplateEditPageLoaded({
 }
 function getDataComponentsStateMap(dataComponentState) {
   const dataComponentEnabledMap = {};
+  dataComponentEnabledMap[SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME] =
+    dataComponentState.enableShowParentAttributes;
   dataComponentEnabledMap[SPLIT_CONFIGURATION_COMPONENT_NAME] =
     dataComponentState.enableSplitConfiguration;
   dataComponentEnabledMap[IDENTIFIER_COMPONENT_NAME] = true;

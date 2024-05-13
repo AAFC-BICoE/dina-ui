@@ -49,7 +49,8 @@ import {
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
-  ScientificNameSource
+  ScientificNameSource,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
@@ -170,6 +171,7 @@ export interface UseMaterialSampleSaveParams {
   };
   materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
+    parentAttributes?: string[];
   };
 
   /** Show parent attributes initial state (Form Template Only) */
@@ -298,8 +300,8 @@ export function useMaterialSampleSave({
 
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
-    setEnableShowParentAttributes(showParentAttributesInitialState ?? false);
     setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
+    setEnableShowParentAttributes(showParentAttributesInitialState ?? false);
     setEnableCollectingEvent(
       Boolean(
         hasColEventTemplate
