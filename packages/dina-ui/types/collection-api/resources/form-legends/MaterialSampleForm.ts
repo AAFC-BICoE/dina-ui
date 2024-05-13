@@ -33,7 +33,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
     id: SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
     labelKey: "materialSampleShowParentAttributes",
     maxGridSizeX: 2,
-    formTemplateOnly: true,
+    formTemplateOnly: false,
     sections: [
       {
         id: "parent-attributes-section",

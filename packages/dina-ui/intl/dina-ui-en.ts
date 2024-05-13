@@ -569,7 +569,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleName: "Material Sample Name",
   materialSampleShowParentAttributes: "Parent Attributes",
-  showParentAttributes: "Show Parent Material Sample Attributes",
+  showParentAttributes: "Parent Material",
   materialSampleSplitConfiguration: "Split Configuration",
   materialSampleSplitConfigurationCondition: "Condition",
   materialSampleSplitConfigurationConditionType: "Condition Type",

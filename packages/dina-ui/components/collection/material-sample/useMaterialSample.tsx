@@ -174,9 +174,6 @@ export interface UseMaterialSampleSaveParams {
     parentAttributes?: string[];
   };
 
-  /** Show parent attributes initial state (Form Template Only) */
-  showParentAttributesInitialState?: boolean;
-
   /** Split Configuration (Form Template Only) */
   splitConfigurationInitialState?: boolean;
 
@@ -214,7 +211,6 @@ export function useMaterialSampleSave({
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
   splitConfigurationInitialState,
-  showParentAttributesInitialState,
   reduceRendering,
   disableNestedFormEdits,
   showChangedIndicatorsInNestedForms,
@@ -283,6 +279,10 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasShowParentAttributes =
+    isTemplate &&
+    (materialSampleTemplateInitialValues?.parentAttributes?.length ?? 0) > 0;
+
   // Enable Switch States:
   const [enableShowParentAttributes, setEnableShowParentAttributes] =
     useState<boolean>(false);
@@ -301,7 +301,17 @@ export function useMaterialSampleSave({
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
     setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
-    setEnableShowParentAttributes(showParentAttributesInitialState ?? false);
+    setEnableShowParentAttributes(
+      Boolean(
+        hasShowParentAttributes
+          ? true
+          : formTemplate?.components?.find(
+              (comp) =>
+                comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME &&
+                comp.visible
+            )?.visible ?? false
+      )
+    );
     setEnableCollectingEvent(
       Boolean(
         hasColEventTemplate

@@ -119,9 +119,6 @@ export function FormTemplateEditPageLoaded({
     allMaterialSampleComponentValues.associations = [{}];
   }
 
-  // debugger;
-  // const showParentAttributesInitialState = fetchedFormTemplate;
-
   // collecting event components need to be isolated for useMaterialSample hook
   const collectingEventInitialValues =
     getComponentValues(
@@ -163,12 +160,7 @@ export function FormTemplateEditPageLoaded({
     colEventFormRef: collectingEvtFormRef,
     splitConfigurationInitialState: !_.isUndefined(
       splitConfigurationInitialValues
-    ),
-    showParentAttributesInitialState:
-      fetchedFormTemplate?.components?.find(
-        (comp) =>
-          comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME && comp.visible
-      ) !== undefined
+    )
   });
   const dataComponentState = materialSampleSaveHook.dataComponentState;
 
