@@ -53,11 +53,11 @@ const typeOptions = [
 
 const mockGet = jest.fn(async (path) => {
   switch (path) {
-    case "collection-api/vocabulary/protocolData":
+    case "collection-api/vocabulary2/protocolData":
       return { data: blockOptions };
     case "collection-api/protocol-element":
       return { data: typeOptions };
-    case "collection-api/vocabulary/unitsOfMeasurement":
+    case "collection-api/vocabulary2/unitsOfMeasurement":
       return { data: unitsOptions };
   }
 });
@@ -90,9 +90,9 @@ describe("DataEntry", () => {
           legend={<DinaMessage id="fieldExtensions" />}
           isVocabularyBasedEnabledForBlock={true}
           isVocabularyBasedEnabledForType={true}
-          blockOptionsEndpoint={"collection-api/vocabulary/protocolData"}
+          blockOptionsEndpoint={"collection-api/vocabulary2/protocolData"}
           typeOptionsEndpoint={"collection-api/protocol-element"}
-          unitOptionsEndpoint={"collection-api/vocabulary/unitsOfMeasurement"}
+          unitOptionsEndpoint={"collection-api/vocabulary2/unitsOfMeasurement"}
           name={name}
         />
       </DinaForm>,

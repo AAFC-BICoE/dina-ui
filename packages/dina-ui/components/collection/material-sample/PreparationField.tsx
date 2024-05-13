@@ -159,7 +159,7 @@ export function PreparationField({
             {...fieldProps("dwcDegreeOfEstablishment")}
             jsonApiBackend={{
               query: () => ({
-                path: "collection-api/vocabulary/degreeOfEstablishment"
+                path: "collection-api/vocabulary2/degreeOfEstablishment"
               }),
               option: (vocabElement) =>
                 compact(

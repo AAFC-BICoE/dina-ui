@@ -33,7 +33,7 @@ const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
       }
     }) => (
       <VocabularyReadOnlyView
-        path={"collection-api/vocabulary/protocolType"}
+        path={"collection-api/vocabulary2/protocolType"}
         value={protocolType}
       />
     ),

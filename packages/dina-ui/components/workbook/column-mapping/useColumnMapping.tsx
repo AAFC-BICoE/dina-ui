@@ -85,7 +85,7 @@ export function useColumnMapping() {
 
   const { loading: taxonomicRankLoading, response: taxonomicRankResp } =
     useQuery<Vocabulary>({
-      path: "collection-api/vocabulary/taxonomicRank",
+      path: "collection-api/vocabulary2/taxonomicRank",
       page: { limit: 1000 }
     });
 

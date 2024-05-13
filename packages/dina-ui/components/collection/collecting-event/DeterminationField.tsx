@@ -210,7 +210,7 @@ export function DeterminationField({
                     {...fieldProps("typeStatus")}
                     jsonApiBackend={{
                       query: () => ({
-                        path: "collection-api/vocabulary/typeStatus"
+                        path: "collection-api/vocabulary2/typeStatus"
                       }),
                       option: (vocabElement, searchValue) =>
                         compact(

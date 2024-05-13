@@ -46,7 +46,7 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
           <ControlledVocabularySelectField
             name="materialSampleType"
             query={() => ({
-              path: "collection-api/vocabulary/materialSampleType"
+              path: "collection-api/vocabulary2/materialSampleType"
             })}
           />
           {!readOnly ? (
@@ -54,7 +54,7 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
               name="materialSampleState"
               jsonApiBackend={{
                 query: () => ({
-                  path: "collection-api/vocabulary/materialSampleState"
+                  path: "collection-api/vocabulary2/materialSampleState"
                 }),
                 option: (vocabElement) =>
                   compact(
