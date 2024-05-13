@@ -214,7 +214,7 @@ export function ShowParentAttributesField({
                 />
               </div>
 
-              {parentAttributes?.map((pa, idx) => (
+              {parentAttributes?.map((_pa: string, idx: number) => (
                 <div key={idx} className="d-flex justify-content-between">
                   <SelectField
                     className="flex-grow-1"
