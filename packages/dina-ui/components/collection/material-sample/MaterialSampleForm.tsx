@@ -223,7 +223,16 @@ export function MaterialSampleForm({
     [SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
       dataComponentState.enableShowParentAttributes && (
-        <ShowParentAttributesField id={id} />
+        <ShowParentAttributesField
+          id={id}
+          isTemplate={isTemplate}
+          attrList={
+            formTemplate?.components?.find(
+              (comp) => comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
+            )?.sections?.[0].items?.[0].defaultValue
+          }
+          materialSample={materialSample}
+        />
       ),
     [SPLIT_CONFIGURATION_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
