@@ -44,7 +44,8 @@ import { AttachmentReadOnlySection } from "../../../components/object-store/atta
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   COLLECTING_EVENT_COMPONENT_NAME,
-  MaterialSample
+  MaterialSample,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
@@ -52,6 +53,7 @@ import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data
 import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 import { MaterialSampleBadges } from "../../../components/collection/material-sample/MaterialSampleBadges";
+import { ShowParentAttributesField } from "packages/dina-ui/components/collection/material-sample/ShowParentAttributesField";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -203,6 +205,15 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             (fieldName) => materialSample.hostOrganism?.[fieldName]
           );
 
+        const hasShowParentAttributes =
+          (!!materialSample.parentMaterialSample &&
+            sampleFormTemplate?.components?.find(
+              (comp) =>
+                comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME &&
+                comp.visible
+            )?.visible) ??
+          false;
+
         return (
           <>
             <Head
@@ -229,6 +240,20 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <MaterialSampleBadges
                   transactionElasticQuery={transactionElasticQuery}
                 />
+
+                {hasShowParentAttributes && (
+                  <ShowParentAttributesField
+                    id={id}
+                    isTemplate={false}
+                    attrList={
+                      sampleFormTemplate?.components?.find(
+                        (comp) =>
+                          comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
+                      )?.sections?.[0].items?.[0].defaultValue
+                    }
+                    materialSample={materialSample}
+                  />
+                )}
 
                 <MaterialSampleIdentifiersSection />
 
