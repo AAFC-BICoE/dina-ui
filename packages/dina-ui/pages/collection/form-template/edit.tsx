@@ -169,6 +169,9 @@ export function FormTemplateEditPageLoaded({
     submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
     // Get collecting event checkboxes and values
+    submittedValues.parentAttributes = _.compact(
+      submittedValues.parentAttributes
+    );
     const {
       templateCheckboxes: collectingEventCheckboxes,
       ...collectinEventFormRefValues

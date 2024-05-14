@@ -53,7 +53,7 @@ import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data
 import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 import { MaterialSampleBadges } from "../../../components/collection/material-sample/MaterialSampleBadges";
-import { ShowParentAttributesField } from "packages/dina-ui/components/collection/material-sample/ShowParentAttributesField";
+import { ShowParentAttributesField } from "../../../components/collection/material-sample/ShowParentAttributesField";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
