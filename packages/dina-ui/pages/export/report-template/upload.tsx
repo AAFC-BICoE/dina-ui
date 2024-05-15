@@ -1,4 +1,10 @@
-import { DinaForm, useAccount, useModal, AreYouSureModal } from "common-ui";
+import {
+  DinaForm,
+  useAccount,
+  useModal,
+  AreYouSureModal,
+  useApiClient
+} from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { GroupSelectField } from "../../../components/group-select/GroupSelectField";
@@ -8,6 +14,8 @@ import {
 } from "../../../components/object-store";
 import { useFileUpload } from "../../../components/object-store/file-upload/FileUploadProvider";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ReportTemplateUpload } from "packages/dina-ui/types/objectstore-api/resources/ReportTemplateUpload";
+import { InputResource } from "kitsu";
 
 export const BULK_ADD_IDS_KEY = "bulkAddIds";
 
@@ -21,6 +29,7 @@ export default function UploadPage() {
   const { initialized: accountInitialized, groupNames } = useAccount();
   const { uploadFiles } = useFileUpload();
   const { openModal } = useModal();
+  const { save } = useApiClient();
 
   async function onSubmit({
     acceptedFiles,
@@ -48,6 +57,23 @@ export default function UploadPage() {
       isDerivative: router?.query?.derivativeType ? true : false,
       isReportTemplate: true
     });
+
+    const input: InputResource<ReportTemplateUpload> = {
+      fileIdentifier: uploadRespsT?.[0]?.fileIdentifier,
+      type: "report-template-upload"
+    };
+
+    await save<ReportTemplateUpload>(
+      [
+        {
+          resource: input,
+          type: "report-template-upload"
+        }
+      ],
+      {
+        apiBaseUrl: "/objectstore-api"
+      }
+    );
 
     // Handle redirecting to metadata edit page for creating metadata objects
     const uploadDuplicates = uploadRespsT
