@@ -63,7 +63,7 @@ export default function UploadPage() {
       type: "report-template-upload"
     };
 
-    await save<ReportTemplateUpload>(
+    const reportTemplateUploadResp = await save<ReportTemplateUpload>(
       [
         {
           resource: input,
@@ -89,7 +89,7 @@ export default function UploadPage() {
           pathname: "/export/report-template/edit",
           query: {
             group,
-            objectUploadId: objectUploadIds[0]
+            objectUploadId: reportTemplateUploadResp[0].id
           }
         });
       }
