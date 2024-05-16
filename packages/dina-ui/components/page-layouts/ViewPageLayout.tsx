@@ -68,6 +68,7 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
     tooltipNode?: ReactNode;
 
     alterInitialValues?: (resource: PersistedResource<T>) => any;
+    backButton?: JSX.Element;
   };
 
 export interface ResourceFormProps<T extends KitsuResource> {
@@ -107,7 +108,8 @@ export function ViewPageLayout<T extends KitsuResource>({
   showRevisionsLinkAtBottom,
   tooltipNode,
   alterInitialValues,
-  showGenerateLabelButton
+  showGenerateLabelButton,
+  backButton
 }: ViewPageLayoutProps<T>) {
   const router = useRouter();
   const id = String(router.query.id);
@@ -163,7 +165,9 @@ export function ViewPageLayout<T extends KitsuResource>({
             <ButtonBar>
               <div className="col-md-2 mt-2">
                 {showBackButton &&
-                  (specialListUrl ? (
+                  (backButton ? (
+                    backButton
+                  ) : specialListUrl ? (
                     <Link href={specialListUrl}>
                       <a className="back-button my-auto me-auto">
                         <DinaMessage id="backToList" />

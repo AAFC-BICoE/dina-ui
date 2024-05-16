@@ -98,7 +98,7 @@ export function MaterialSampleBreadCrumb({
               </li>
             ))}
           </ol>
-        </div>        
+        </div>
       )}
     </>
   );
