@@ -44,9 +44,12 @@ export default function ReportEditPage() {
   }
 
   const title = id ? "editReportTemplateTitle" : "addReportTemplateTitle";
-  const query = useQuery<ReportTemplate>({
-    path: `dina-export-api/report-template/${id}`
-  });
+  let query: any;
+  if (id) {
+    query = useQuery<ReportTemplate>({
+      path: `dina-export-api/report-template/${id}`
+    });
+  }
 
   return (
     <div>
@@ -58,7 +61,7 @@ export default function ReportEditPage() {
             <DinaMessage id={title} />
           </h1>
           {id ? (
-            withResponse(query, ({ data }) => (
+            withResponse(query, ({ data }: { data: ReportTemplate }) => (
               <ReportTemplateForm
                 fetchedReportTemplate={data}
                 onSaved={goToViewPage}
