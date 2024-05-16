@@ -14,7 +14,7 @@ import {
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { TableColumn } from "../../../../common-ui/lib/list-page/types";
-import { useState } from "react";
+import { useState, CSSProperties } from "react";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
@@ -278,10 +278,12 @@ export default function MaterialSampleListPage() {
     dateCell("createdOn", "data.attributes.createdOn")
   ];
 
-  const rowStyling = (row: Row<any>) =>
-    row?.original?.data?.attributes?.materialSampleState && {
-      opacity: 0.4
-    };
+  const rowStyling = (row: Row<any>): CSSProperties | undefined => {
+    if (row?.original?.data?.attributes?.materialSampleState) {
+      return { opacity: 0.4 };
+    }
+    return undefined;
+  };
 
   return (
     <div>
