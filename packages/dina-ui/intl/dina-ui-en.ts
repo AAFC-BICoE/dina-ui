@@ -975,5 +975,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataLabel: "Data",
   objectsLabel: "Objects",
   relatedRecord: "Related Record",
-  reportTemplateUpload: "Report Template Upload"
+  reportTemplateUpload: "Report Template Upload",
+  maxNumUploadExceeded: "Max number of uploads exceeded",
+  addReportTemplateTitle: "Add Report Template",
+  backToUpload: "Back to Upload",
+  field_reportTemplateName: "Report Template Name",
+  field_includesBarcode: "Includes Barcode",
+  field_templateOutputMediaType: "Template Output Media Type",
+  field_outputMediaType: "Output Media Type",
+  field_reportType: "Report Type",
+  field_reportVariables: "Report Variables",
+  editReportTemplateTitle: "Edit Report Template"
 };
