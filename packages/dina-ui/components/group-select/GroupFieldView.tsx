@@ -20,7 +20,13 @@ export function GroupFieldView(props: GroupFieldViewProps) {
 /** Renders the group label (if available) or the group name. */
 export function GroupLabel({ groupName }) {
   const { label, id } = useGroupLabel(groupName);
-  return id ? <Link href={`/group/view?id=${id}`}>{label}</Link> : <>{label}</>;
+  return id ? (
+    <Link href={`/group/view?id=${id}`}>
+      {<a style={{ color: "#525252" }}>{label}</a>}
+    </Link>
+  ) : (
+    <>{label}</>
+  );
 }
 
 /** Renders the Group label in the QueryTable. */

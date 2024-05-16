@@ -28,7 +28,8 @@ export default function GroupDetailsPage() {
       showDeleteButton={false}
       showGroup={false}
       showBackButton={false}
-      nameField={`labels.${locale}`}
+      nameField={[`labels.${locale}`, "name"]}
+      forceTitleUppercase={true}
     />
   );
 }

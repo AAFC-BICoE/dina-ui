@@ -69,6 +69,7 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
 
     alterInitialValues?: (resource: PersistedResource<T>) => any;
     backButton?: JSX.Element;
+    forceTitleUppercase?: boolean;
   };
 
 export interface ResourceFormProps<T extends KitsuResource> {
@@ -109,7 +110,8 @@ export function ViewPageLayout<T extends KitsuResource>({
   tooltipNode,
   alterInitialValues,
   showGenerateLabelButton,
-  backButton
+  backButton,
+  forceTitleUppercase
 }: ViewPageLayoutProps<T>) {
   const router = useRouter();
   const id = String(router.query.id);
@@ -156,6 +158,9 @@ export function ViewPageLayout<T extends KitsuResource>({
         // if title is array, only take first element
         if (Array.isArray(title)) {
           title = title[0];
+        }
+        if (forceTitleUppercase) {
+          title = title.toUpperCase();
         }
 
         return (

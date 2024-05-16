@@ -25,16 +25,35 @@ export function GroupFormLayout() {
     ids: managedBy?.map((it) => String(it.agentId)) ?? [],
     listPath: "agent-api/person"
   });
-  const pairs: Record<string, string> =
+
+  // Get pairs of user:agent
+  const pairs: Record<string, any> =
     managedBy?.reduce((acc, curr, index) => {
       if (curr.username) {
         acc[curr.username] =
           agentsResp?.dataWithNullForMissing?.[index] && curr.agentId
-            ? curr.agentId
-            : "";
+            ? agentsResp?.data?.[index]
+            : {};
       }
       return acc;
-    }, {} as { [key: string]: string }) ?? {};
+    }, {} as { [key: string]: any }) ?? {};
+
+  // For each pair of user:agent, process the agent cell
+  const customValueCells =
+    managedBy?.reduce((acc, curr) => {
+      if (curr.username) {
+        acc[curr.username] = ({ row: { original } }) => {
+          return original?.value?.id ? (
+            <Link href={`/person/view?id=${original?.value?.id}`}>
+              {original?.value?.displayName}
+            </Link>
+          ) : (
+            <></>
+          );
+        };
+      }
+      return acc;
+    }, {} as { [key: string]: any }) ?? {};
 
   return (
     <div>
@@ -47,17 +66,7 @@ export function GroupFormLayout() {
                 attributeCell={({ row: { original } }) => {
                   return <strong>{original.field}</strong>;
                 }}
-                customValueCells={{
-                  agentId: ({ row: { original } }) => {
-                    return (
-                      <strong>
-                        <Link href={`/person/view?id=/${original.value}`}>
-                          <DinaMessage id="agentLink" />
-                        </Link>
-                      </strong>
-                    );
-                  }
-                }}
+                customValueCells={customValueCells}
                 attributeHeader={<DinaMessage id="managedBy" />}
                 valueHeader={<DinaMessage id="associatedAgent" />}
               />
