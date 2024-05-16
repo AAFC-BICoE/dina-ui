@@ -277,6 +277,18 @@ const FieldMappingConfig: FieldMappingConfigType = {
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING }
       }
+    },
+    attachment: {
+      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+      relationshipConfig: {
+        hasGroup: false,
+        type: "metadata",
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
+        baseApiPath: "/objectstore-api"
+      },
+      attributes: {
+        originalFilename: { dataType: WorkbookDataTypeEnum.STRING }
+      }
     }
   }
 };

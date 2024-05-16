@@ -25,6 +25,7 @@ import {
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
 
 type RelationshipResource = { name?: string } & KitsuResource;
 
@@ -169,6 +170,17 @@ export function useColumnMapping() {
     path: `agent-api/person`,
     page: { limit: 1000 }
   });
+  const { loading: metadataLoading, response: metadataResp } = useQuery<
+    Metadata[]
+  >(
+    {
+      path: `objectstore-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=metadata`,
+      page: { limit: 1000 }
+    },
+    {
+      deps: [groupName]
+    }
+  );
 
   const loadingData =
     attrLoading ||
@@ -180,7 +192,8 @@ export function useColumnMapping() {
     storageUnitLoading ||
     projectLoading ||
     personLoading ||
-    taxonomicRankLoading;
+    taxonomicRankLoading ||
+    metadataLoading;
 
   const managedAttributes = attrResp?.data || [];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
@@ -214,6 +227,10 @@ export function useColumnMapping() {
   const persons = (personResp?.data || []).map((item) => ({
     ...item,
     type: "person"
+  }));
+  const metadatas = (metadataResp?.data || []).map((item) => ({
+    ...item,
+    type: "metadata"
   }));
 
   const [loading, setLoading] = useState<boolean>(loadingData);
@@ -601,6 +618,9 @@ export function useColumnMapping() {
           case "preparedBy.displayName":
             found = persons.find((item) => item.displayName === value);
             break;
+          case "attachment.originalFilename":
+            found = metadatas.find((item) => item.originalFilename === value);
+            break;
         }
 
         // If relationship is found, set it. If not, reset it so it's empty.
@@ -701,6 +721,14 @@ export function useColumnMapping() {
           resource
         }));
         targetType = "person";
+        break;
+      case "metadata.originalFilename":
+        options = metadatas.map((resource) => ({
+          label: resource.originalFilename,
+          value: resource.id,
+          resource
+        }));
+        targetType = "metadata";
         break;
       default:
         options = [];
