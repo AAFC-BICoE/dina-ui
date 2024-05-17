@@ -17,7 +17,7 @@ interface ContainerGridProps {
 }
 
 export interface PcrBatchItemSample {
-  batchItemId?: string;
+  pcrBatchItemId?: string;
   wellRow?: string;
   wellColumn?: number;
   sampleId?: string;
@@ -97,7 +97,7 @@ export function usePCRBatchItemGridControls({
             (item) => item.sampleId === sample.id
           );
           return {
-            batchItemId: batchItem?.batchItemId,
+            pcrBatchItemId: batchItem?.pcrBatchItemId,
             sampleId: sample.id,
             sampleName: sample?.materialSampleName ?? sample.id,
             wellColumn: batchItem?.wellColumn,
@@ -348,7 +348,7 @@ export function usePCRBatchItemGridControls({
         return {
           resource: {
             type: "pcr-batch-item",
-            id: item.batchItemId,
+            id: item.pcrBatchItemId,
             wellColumn: item.wellColumn ?? null,
             wellRow: item.wellRow ?? null
           } as PcrBatchItem,
