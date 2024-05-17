@@ -1,27 +1,23 @@
 import { useDrop } from "react-dnd";
-import {
-  DraggableSeqReactionBox,
-  ITEM_BOX_DRAG_KEY
-} from "./DraggableSeqReactionBox";
-import { SeqReactionSample } from "./useSeqSelectCoordinatesControls";
+import { DraggableItemBox, ITEM_BOX_DRAG_KEY } from "./DraggableItemBox";
 
-interface DraggableSeqReactionListProps {
-  availableItems: SeqReactionSample[];
-  movedItems: SeqReactionSample[];
-  onDrop: (item: { seqReactionSample: SeqReactionSample }) => void;
-  selectedItems: SeqReactionSample[];
-  onClick: (PcrBatchItem, e) => void;
+interface DraggableItemListProps<ItemType extends { sampleId?: string }> {
+  availableItems: ItemType[];
+  movedItems: ItemType[];
+  onDrop: (item: { batchItemSample: ItemType }) => void;
+  selectedItems: ItemType[];
+  onClick: (batchItem, e) => void;
   editMode: boolean;
 }
 
-export function DraggableSeqReactionList({
+export function DraggableItemList<ItemType extends { sampleId?: any }>({
   availableItems,
   movedItems,
   selectedItems,
   onClick,
   onDrop,
   editMode
-}: DraggableSeqReactionListProps) {
+}: DraggableItemListProps<ItemType>) {
   const [{ dragHover, dragging }, dropRef] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
     drop: (item) => {
@@ -52,10 +48,10 @@ export function DraggableSeqReactionList({
       }}
     >
       {availableItems.map((item) => (
-        <DraggableSeqReactionBox
+        <DraggableItemBox<ItemType>
           key={String(item?.sampleId)}
           wasMoved={movedItems.includes(item)}
-          seqReactionSample={item}
+          batchItemSample={item}
           onClick={(e) => onClick(item, e)}
           selected={selectedItems.includes(item)}
           editMode={editMode}

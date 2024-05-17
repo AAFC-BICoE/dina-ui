@@ -4,9 +4,13 @@ import { noop } from "lodash";
 import Link from "next/link";
 import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
 import { useEffect } from "react";
-import { ContainerGrid } from "./ContainerGrid";
-import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
-import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
+
+import {
+  PcrBatchItemSample,
+  usePCRBatchItemGridControls
+} from "./usePCRBatchItemGridControls";
+import { DraggableItemList } from "../../container-grid/DraggableItemList";
+import { ContainerGrid } from "../../container-grid/ContainerGrid";
 
 export interface PCRBatchItemGridProps {
   pcrBatchId: string;
@@ -151,7 +155,7 @@ export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
           <strong>
             Selected Material Samples ({availableItems.length} in list)
           </strong>
-          <DraggablePCRBatchItemList
+          <DraggableItemList<PcrBatchItemSample>
             availableItems={availableItems}
             selectedItems={selectedItems}
             movedItems={movedItems}
@@ -174,8 +178,8 @@ export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
         </div>
         <div className="col-9">
           <strong>Container wells</strong>
-          <ContainerGrid
-            pcrBatch={pcrBatch}
+          <ContainerGrid<PcrBatch, PcrBatchItemSample>
+            batch={pcrBatch}
             cellGrid={cellGrid}
             movedItems={movedItems}
             onDrop={onGridDrop}
