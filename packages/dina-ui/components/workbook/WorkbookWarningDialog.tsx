@@ -19,7 +19,7 @@ export function WorkbookWarningDialog({
   unmappedRelationshipsError
 }: WorkbookWarningDialogProps) {
   /** The maximum columns to be displayed if not opened. */
-  const MAX_VISIBLE_ELEMENTS = 3;
+  const MAX_VISIBLE_ELEMENTS = 2;
 
   const [isSkippedColumnExpanded, setIsSkippedColumnExpanded] = useState(false);
   const [isUnmappedRelationshipsExpanded, setIsUnmappedRelationshipsExpanded] =
@@ -47,8 +47,17 @@ export function WorkbookWarningDialog({
           <div className="card well px-2 py-2 mb-3">
             <span>
               <span style={{ lineHeight: "31px" }}>
-                {displayedColumns(skippedColumns, isSkippedColumnExpanded).join(
-                  ", "
+                {!isSkippedColumnExpanded ? (
+                  displayedColumns(
+                    skippedColumns,
+                    isSkippedColumnExpanded
+                  ).join(", ")
+                ) : (
+                  <ul style={{ textAlign: "left" }}>
+                    {skippedColumns.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
                 )}
                 {!isSkippedColumnExpanded && "..."}
               </span>
@@ -84,10 +93,18 @@ export function WorkbookWarningDialog({
           </p>
           <div className="card well px-2 py-2 mb-3">
             <span>
-              {displayedColumns(
-                unmappedRelationshipsError,
-                isUnmappedRelationshipsExpanded
-              ).join(", ")}
+              {!isUnmappedRelationshipsExpanded ? (
+                displayedColumns(
+                  unmappedRelationshipsError,
+                  isUnmappedRelationshipsExpanded
+                ).join(", ")
+              ) : (
+                <ul style={{ textAlign: "left" }}>
+                  {unmappedRelationshipsError.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              )}
               {!isUnmappedRelationshipsExpanded && "..."}
               {unmappedRelationshipsError.length > MAX_VISIBLE_ELEMENTS && (
                 <Button

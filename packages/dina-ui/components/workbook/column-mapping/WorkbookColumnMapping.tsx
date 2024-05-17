@@ -39,6 +39,7 @@ import { useColumnMapping } from "./useColumnMapping";
 import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
 
 export type FieldMapType = {
+  columnHeader: string;
   targetField: string | undefined;
   targetKey?: ManagedAttribute | VocabularyElement; // When targetField is managedAttribute, targetKey stores the matching managed attribute
   // When targetField is scientificNameDetails, targetKey stores the matching taxonomicRank
@@ -148,8 +149,11 @@ export function WorkbookColumnMapping({
   async function onSubmit({ submittedValues }) {
     let showSkipWarning = false;
     let showMappingWarning = false;
+    const skippedColumns = submittedValues.fieldMap.filter(
+      (item) => item.skipped
+    );
 
-    if (submittedValues.fieldMap.filter((item) => item.skipped).length > 0) {
+    if (skippedColumns.length > 0) {
       showSkipWarning = true;
     }
     if (!validateRelationshipMapping()) {
@@ -162,17 +166,7 @@ export function WorkbookColumnMapping({
           actionMessage={formatMessage("proceedWithWarning")}
           messageBody={
             <WorkbookWarningDialog
-              skippedColumns={[
-                "column1",
-                "column2",
-                "column3",
-                "column4",
-                "column5",
-                "column6",
-                "column7",
-                "column8",
-                "column9"
-              ]}
+              skippedColumns={skippedColumns.map((item) => item.columnHeader)}
               unmappedRelationshipsError={[
                 "column1",
                 "column2",
