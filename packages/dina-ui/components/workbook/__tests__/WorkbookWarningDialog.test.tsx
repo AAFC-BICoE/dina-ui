@@ -20,12 +20,38 @@ describe("WorkbookWarningDialog", () => {
     ).not.toBeInTheDocument();
 
     // Check initial display of skipped columns (truncated)
-    expect(screen.getByText("Column1, Column2...")).toBeInTheDocument();
+    expect(screen.getByText("Column1, Column2")).toBeInTheDocument();
+    expect(screen.getByText("...")).toBeInTheDocument();
 
-    // Check "Show all..." button is rendered
+    // Check "Show all" button is rendered
     expect(
       screen.getByRole("button", { name: "Show More" })
     ).toBeInTheDocument();
+  });
+
+  it("renders skipped columns warning under the maximum amount, don't display show more button", () => {
+    const skippedColumns = ["Column1", "Column2"];
+    mountWithAppContext2(
+      <WorkbookWarningDialog
+        skippedColumns={skippedColumns}
+        unmappedRelationshipsError={[]}
+      />
+    );
+
+    // Ensure the skipped column section is displayed, but not the unmapped relationships one.
+    expect(screen.queryByText("Skipped Columns")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Unmapped Relationships")
+    ).not.toBeInTheDocument();
+
+    // Check initial display of skipped columns (truncated)
+    expect(screen.queryByText("Column1, Column2")).toBeInTheDocument();
+    expect(screen.queryByText("...")).not.toBeInTheDocument();
+
+    // Check "Show all" button is not rendered
+    expect(
+      screen.queryByRole("button", { name: "Show More" })
+    ).not.toBeInTheDocument();
   });
 
   it("expands skipped columns on button click", () => {
@@ -37,7 +63,7 @@ describe("WorkbookWarningDialog", () => {
       />
     );
 
-    // Click the "Show all..." button
+    // Click the "Show all" button
     const showAllButton = screen.getByRole("button", { name: "Show More" });
     fireEvent.click(showAllButton);
 
@@ -71,13 +97,39 @@ describe("WorkbookWarningDialog", () => {
 
     // Check initial display of unmapped relationships (truncated)
     expect(
-      screen.getByText("Relationship1, Relationship2...")
+      screen.getByText("Relationship1, Relationship2")
     ).toBeInTheDocument();
+    expect(screen.getByText("...")).toBeInTheDocument();
 
     // Check "Show More" button is rendered
     expect(
       screen.getByRole("button", { name: "Show More" })
     ).toBeInTheDocument();
+  });
+
+  it("renders unmapped relationships warning under the maximum amount, don't display show more button", () => {
+    const unmappedRelationshipsError = ["Relationship1", "Relationship2"];
+    mountWithAppContext2(
+      <WorkbookWarningDialog
+        skippedColumns={[]}
+        unmappedRelationshipsError={unmappedRelationshipsError}
+      />
+    );
+
+    // Ensure the skipped column section is displayed, but not the unmapped relationships one.
+    expect(screen.queryByText("Unmapped Relationships")).toBeInTheDocument();
+    expect(screen.queryByText("Skipped Columns")).not.toBeInTheDocument();
+
+    // Check initial display of skipped columns (truncated)
+    expect(
+      screen.queryByText("Relationship1, Relationship2")
+    ).toBeInTheDocument();
+    expect(screen.queryByText("...")).not.toBeInTheDocument();
+
+    // Check "Show all" button is not rendered
+    expect(
+      screen.queryByRole("button", { name: "Show More" })
+    ).not.toBeInTheDocument();
   });
 
   it("expands unmapped relationships on button click", () => {

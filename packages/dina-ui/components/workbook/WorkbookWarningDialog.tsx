@@ -95,18 +95,20 @@ export function WorkbookWarningDialog({
           </p>
           <div className="card well px-2 py-2 mb-3">
             <span>
-              {!isUnmappedRelationshipsExpanded ? (
-                displayedColumns(
-                  unmappedRelationshipsError,
-                  isUnmappedRelationshipsExpanded
-                ).join(", ")
-              ) : (
-                <ul style={{ textAlign: "left" }}>
-                  {unmappedRelationshipsError.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              )}
+              <span style={{ lineHeight: "31px" }}>
+                {!isUnmappedRelationshipsExpanded ? (
+                  displayedColumns(
+                    unmappedRelationshipsError,
+                    isUnmappedRelationshipsExpanded
+                  ).join(", ")
+                ) : (
+                  <ul style={{ textAlign: "left" }}>
+                    {unmappedRelationshipsError.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+              </span>
               {unmappedRelationshipsError.length > MAX_VISIBLE_ELEMENTS && (
                 <>
                   {!isUnmappedRelationshipsExpanded && "..."}
