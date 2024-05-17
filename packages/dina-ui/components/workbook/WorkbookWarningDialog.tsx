@@ -1,3 +1,4 @@
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 
@@ -35,56 +36,80 @@ export function WorkbookWarningDialog({
 
   return (
     <>
-      <h4>Skipped Columns</h4>
-      <p>
-        The workbook contains columns that will be skipped during import. These
-        columns might contain important data.
-      </p>
-      <div className="card well px-2 py-2 mb-3">
-        <span>
-          {displayedColumns(skippedColumns, isSkippedColumnExpanded).join(", ")}
-          {skippedColumns.length > MAX_VISIBLE_ELEMENTS && (
-            <Button
-              size={"sm"}
-              variant="secondary"
-              className="ms-3"
-              onClick={handleToggle(
-                isSkippedColumnExpanded,
-                setIsSkippedColumnExpanded
+      {skippedColumns.length !== 0 && (
+        <>
+          <h4>
+            <DinaMessage id="skippedColumnsTitle" />
+          </h4>
+          <p>
+            <DinaMessage id="skippedColumnsDescription" />
+          </p>
+          <div className="card well px-2 py-2 mb-3">
+            <span>
+              <span style={{ lineHeight: "31px" }}>
+                {displayedColumns(skippedColumns, isSkippedColumnExpanded).join(
+                  ", "
+                )}
+                {!isSkippedColumnExpanded && "..."}
+              </span>
+              {skippedColumns.length > MAX_VISIBLE_ELEMENTS && (
+                <Button
+                  size={"sm"}
+                  variant="secondary"
+                  className="ms-3"
+                  onClick={handleToggle(
+                    isSkippedColumnExpanded,
+                    setIsSkippedColumnExpanded
+                  )}
+                >
+                  {isSkippedColumnExpanded ? (
+                    <DinaMessage id="showLess" />
+                  ) : (
+                    <DinaMessage id="showMore" />
+                  )}
+                </Button>
               )}
-            >
-              {isSkippedColumnExpanded ? "Hide" : " Show all..."}
-            </Button>
-          )}
-        </span>
-      </div>
+            </span>
+          </div>
+        </>
+      )}
 
-      <h4>Unmapped Relationships</h4>
-      <p>
-        The import identified relationships in the workbook that could not be
-        automatically mapped. This might lead to incomplete data transfer.
-      </p>
-      <div className="card well px-2 py-2 mb-3">
-        <span>
-          {displayedColumns(
-            unmappedRelationshipsError,
-            isUnmappedRelationshipsExpanded
-          ).join(", ")}
-          {unmappedRelationshipsError.length > MAX_VISIBLE_ELEMENTS && (
-            <Button
-              size={"sm"}
-              variant="secondary"
-              className="ms-3"
-              onClick={handleToggle(
-                isUnmappedRelationshipsExpanded,
-                setIsUnmappedRelationshipsExpanded
+      {unmappedRelationshipsError.length !== 0 && (
+        <>
+          <h4>
+            <DinaMessage id="unmappedRelationshipsTitle" />
+          </h4>
+          <p>
+            <DinaMessage id="unmappedRelationshipsDescription" />
+          </p>
+          <div className="card well px-2 py-2 mb-3">
+            <span>
+              {displayedColumns(
+                unmappedRelationshipsError,
+                isUnmappedRelationshipsExpanded
+              ).join(", ")}
+              {!isUnmappedRelationshipsExpanded && "..."}
+              {unmappedRelationshipsError.length > MAX_VISIBLE_ELEMENTS && (
+                <Button
+                  size={"sm"}
+                  variant="secondary"
+                  className="ms-3"
+                  onClick={handleToggle(
+                    isUnmappedRelationshipsExpanded,
+                    setIsUnmappedRelationshipsExpanded
+                  )}
+                >
+                  {isUnmappedRelationshipsExpanded ? (
+                    <DinaMessage id="showLess" />
+                  ) : (
+                    <DinaMessage id="showMore" />
+                  )}
+                </Button>
               )}
-            >
-              {isUnmappedRelationshipsExpanded ? "Hide" : " Show all..."}
-            </Button>
-          )}
-        </span>
-      </div>
+            </span>
+          </div>
+        </>
+      )}
     </>
   );
 }

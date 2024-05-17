@@ -934,10 +934,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
   proceedWithWarning: "Proceed with warnings?",
-  areYouSureImportWorkbookWithSkippedColumns:
-    "Are you sure you want to import the workbook with skipped columns?",
-  areYouSureImportWorkbookWithoutMappingAllRecords:
-    "Are you sure you want to import the workbook without mapping all related records?",
+  workbookImportAnywayButton: "Import anyway",
+  skippedColumnsTitle: "Skipped Columns",
+  skippedColumnsDescription:
+    "The workbook contains columns that will be skipped during import. These columns might contain important data.",
+  unmappedRelationshipsTitle: "Unmapped Relationships",
+  unmappedRelationshipsDescription:
+    "The import identified relationships in the workbook that could not be automatically mapped. This might lead to incomplete data transfer.",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",

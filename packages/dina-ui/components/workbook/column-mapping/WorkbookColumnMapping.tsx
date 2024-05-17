@@ -148,19 +148,12 @@ export function WorkbookColumnMapping({
   async function onSubmit({ submittedValues }) {
     let showSkipWarning = false;
     let showMappingWarning = false;
-    const warnningMessage: string[] = [];
 
     if (submittedValues.fieldMap.filter((item) => item.skipped).length > 0) {
       showSkipWarning = true;
-      warnningMessage.push(
-        formatMessage("areYouSureImportWorkbookWithSkippedColumns")
-      );
     }
     if (!validateRelationshipMapping()) {
       showMappingWarning = true;
-      warnningMessage.push(
-        formatMessage("areYouSureImportWorkbookWithoutMappingAllRecords")
-      );
     }
 
     if (showMappingWarning || showSkipWarning) {
