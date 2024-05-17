@@ -14,7 +14,8 @@ import React, {
   useEffect,
   useMemo,
   useState,
-  useRef
+  useRef,
+  CSSProperties
 } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
@@ -244,7 +245,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Styling to be applied to each row of the React Table
    */
-  rowStyling?: (row: Row<TData>) => any;
+  rowStyling?: (row: Row<TData>) => CSSProperties | undefined;
 
   enableDnd?: boolean;
 
