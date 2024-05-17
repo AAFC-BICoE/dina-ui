@@ -117,7 +117,7 @@ export function ProtocolFormLayout() {
         <VocabularySelectField
           className="col-md-6"
           name="protocolType"
-          path="collection-api/vocabulary/protocolType"
+          path="collection-api/vocabulary2/protocolType"
         />
       </div>
       <MultilingualDescription />

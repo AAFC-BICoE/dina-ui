@@ -815,19 +815,19 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/collecting-event":
     case "objectstore-api/metadata":
     case "agent-api/person":
-    case "collection-api/vocabulary/typeStatus":
-    case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/vocabulary2/typeStatus":
+    case "collection-api/vocabulary2/degreeOfEstablishment":
     case "collection-api/preparation-type":
     case "collection-api/material-sample":
     case "collection-api/managed-attribute":
-    case "collection-api/vocabulary/materialSampleState":
+    case "collection-api/vocabulary2/materialSampleState":
     case "collection-api/material-sample-type":
     case "collection-api/project":
     case "user-api/group":
-    case "collection-api/vocabulary/associationType":
-    case "collection-api/vocabulary/srs":
-    case "collection-api/vocabulary/coordinateSystem":
-    case "collection-api/vocabulary/materialSampleType":
+    case "collection-api/vocabulary2/associationType":
+    case "collection-api/vocabulary2/srs":
+    case "collection-api/vocabulary2/coordinateSystem":
+    case "collection-api/vocabulary2/materialSampleType":
       return { data: [] };
   }
 });

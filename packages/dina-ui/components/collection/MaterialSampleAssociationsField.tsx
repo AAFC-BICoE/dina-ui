@@ -65,7 +65,7 @@ export function MaterialSampleAssociationsField({
             {assoc.associationType && (
               <VocabularyReadOnlyView
                 value={assoc.associationType}
-                path="collection-api/vocabulary/associationType"
+                path="collection-api/vocabulary2/associationType"
               />
             )}
             {assoc.associatedSample && (
@@ -118,7 +118,7 @@ function AssociationTabPanel({
           <div className="association-type">
             <VocabularySelectField
               {...fieldProps("associationType")}
-              path="collection-api/vocabulary/associationType"
+              path="collection-api/vocabulary2/associationType"
             />
           </div>
           <div className="associated-sample">

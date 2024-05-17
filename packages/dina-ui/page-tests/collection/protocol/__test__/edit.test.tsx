@@ -60,7 +60,7 @@ const mockGet = jest.fn(async (path) => {
           group: "protocol-test-group"
         }
       };
-    case "collection-api/vocabulary/protocolData":
+    case "collection-api/vocabulary2/protocolData":
       return {
         data: {
           id: "protocolData",
@@ -93,7 +93,7 @@ const mockGet = jest.fn(async (path) => {
           }
         }
       };
-    case "collection-api/vocabulary/unitsOfMeasurement":
+    case "collection-api/vocabulary2/unitsOfMeasurement":
       return {
         data: {
           id: "unitsOfMeasurement",

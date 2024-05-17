@@ -29,11 +29,11 @@ export function SeqProtocolReactionTable({
   seqReactions?: SeqReaction[];
 }) {
   const { vocabOptions: unitsOfMeasurement } = useVocabularyOptions({
-    path: "collection-api/vocabulary/unitsOfMeasurement"
+    path: "collection-api/vocabulary2/unitsOfMeasurement"
   });
 
   const { vocabOptions: protocolData } = useVocabularyOptions({
-    path: "collection-api/vocabulary/protocolData"
+    path: "collection-api/vocabulary2/protocolData"
   });
 
   const primerRxnsNumber = useMemo<{

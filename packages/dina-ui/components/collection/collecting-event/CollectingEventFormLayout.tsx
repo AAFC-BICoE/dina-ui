@@ -747,7 +747,7 @@ export function CollectingEventFormLayout({
               name="dwcVerbatimCoordinateSystem"
               jsonApiBackend={{
                 query: () => ({
-                  path: "collection-api/vocabulary/coordinateSystem"
+                  path: "collection-api/vocabulary2/coordinateSystem"
                 }),
                 option: (vocabElement) =>
                   compact(
@@ -849,7 +849,7 @@ export function CollectingEventFormLayout({
               name="dwcVerbatimSRS"
               jsonApiBackend={{
                 query: () => ({
-                  path: "collection-api/vocabulary/srs"
+                  path: "collection-api/vocabulary2/srs"
                 }),
                 option: (vocabElement) =>
                   compact(

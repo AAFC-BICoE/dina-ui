@@ -65,11 +65,11 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
-    case "collection-api/vocabulary/srs":
-    case "collection-api/vocabulary/coordinateSystem":
-    case "collection-api/vocabulary/degreeOfEstablishment":
-    case "collection-api/vocabulary/materialSampleState":
-    case "collection-api/vocabulary/typeStatus":
+    case "collection-api/vocabulary2/srs":
+    case "collection-api/vocabulary2/coordinateSystem":
+    case "collection-api/vocabulary2/degreeOfEstablishment":
+    case "collection-api/vocabulary2/materialSampleState":
+    case "collection-api/vocabulary2/typeStatus":
     case "collection-api/storage-unit-type":
     case "collection-api/storage-unit":
     case "objectstore-api/metadata":
@@ -77,9 +77,9 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/collection-method":
     case "collection-api/storage-unit/76575":
     case "collection-api/project":
-    case "collection-api/vocabulary/associationType":
+    case "collection-api/vocabulary2/associationType":
     case "collection-api/form-template":
-    case "collection-api/vocabulary/materialSampleType":
+    case "collection-api/vocabulary2/materialSampleType":
     case "collection-api/organism":
       return { data: [], meta: { totalResourceCount: 0 } };
   }

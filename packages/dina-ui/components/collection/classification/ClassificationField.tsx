@@ -43,7 +43,7 @@ export function ClassificationField({
     useState<ClassificationItemWithId[]>(initClassifications);
 
   const { loading, vocabOptions: taxonomicRankOptions } = useVocabularyOptions({
-    path: "collection-api/vocabulary/taxonomicRank"
+    path: "collection-api/vocabulary2/taxonomicRank"
   });
 
   function splitClassificationItems(items: ClassificationItem[]) {

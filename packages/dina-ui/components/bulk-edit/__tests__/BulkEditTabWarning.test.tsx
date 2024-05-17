@@ -21,7 +21,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
         }
       };
     case "collection-api/collection":
-    case "collection-api/vocabulary/materialSampleState":
+    case "collection-api/vocabulary2/materialSampleState":
     case "collection-api/material-sample-type":
     case "collection-api/project":
     case "collection-api/material-sample":

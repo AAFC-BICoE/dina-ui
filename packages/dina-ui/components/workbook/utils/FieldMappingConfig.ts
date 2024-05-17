@@ -33,7 +33,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
     tags: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
     materialSampleType: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
-      endpoint: "/collection-api/vocabulary/materialSampleType"
+      endpoint: "/collection-api/vocabulary2/materialSampleType"
     },
     managedAttributes: {
       dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
