@@ -171,7 +171,7 @@ export function useColumnMapping() {
     page: { limit: 1000 }
   });
   const { loading: metadataLoading, response: metadataResp } = useQuery<
-    Metadata[]
+    RelationshipResource[]
   >(
     {
       path: `objectstore-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=metadata`,
@@ -618,8 +618,8 @@ export function useColumnMapping() {
           case "preparedBy.displayName":
             found = persons.find((item) => item.displayName === value);
             break;
-          case "attachment.originalFilename":
-            found = metadatas.find((item) => item.originalFilename === value);
+          case "attachment.name":
+            found = metadatas.find((item) => item.name === value);
             break;
         }
 
@@ -722,9 +722,9 @@ export function useColumnMapping() {
         }));
         targetType = "person";
         break;
-      case "attachment.originalFilename":
+      case "attachment.name":
         options = metadatas.map((resource) => ({
-          label: resource.originalFilename,
+          label: resource.name,
           value: resource.id,
           resource
         }));

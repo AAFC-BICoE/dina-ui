@@ -287,7 +287,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/objectstore-api"
       },
       attributes: {
-        originalFilename: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     }
   }
