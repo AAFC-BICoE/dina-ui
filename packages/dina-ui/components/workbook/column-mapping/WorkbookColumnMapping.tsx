@@ -121,6 +121,8 @@ export function WorkbookColumnMapping({
   const sheetValue = sheetOptions[sheet];
 
   function validateRelationshipMapping() {
+    const unmappedColumnNames: string[] = [];
+
     const relationshipColumnNames = Object.keys(
       columnUniqueValues![sheet]
     ).filter(
@@ -128,37 +130,41 @@ export function WorkbookColumnMapping({
         workbookColumnMap[columnName]?.mapRelationship &&
         workbookColumnMap[columnName].showOnUI
     );
+
     for (const columnName of relationshipColumnNames) {
       const values = Object.keys(
-        (columnUniqueValues ?? {})[sheet]?.[columnName]
+        (columnUniqueValues ?? {})[sheet]?.[columnName] || {}
       );
       if (!relationshipMapping[columnName] && values.length > 0) {
-        return false;
+        unmappedColumnNames.push(
+          workbookColumnMap[columnName].originalColumnName
+        );
       } else {
-        const mappedValues = Object.keys(relationshipMapping[columnName]);
+        const mappedValues = Object.keys(relationshipMapping[columnName] || {});
         for (const value of values) {
           if (mappedValues.indexOf(value.replace(".", "_")) === -1) {
-            return false;
+            unmappedColumnNames.push(
+              workbookColumnMap[columnName].originalColumnName
+            );
+            break; // Early exit if a single value is unmapped
           }
         }
       }
     }
-    return true;
+
+    return unmappedColumnNames;
   }
 
   async function onSubmit({ submittedValues }) {
-    let showSkipWarning = false;
-    let showMappingWarning = false;
-    const skippedColumns = submittedValues.fieldMap.filter(
-      (item) => item.skipped
+    const skippedColumns: string[] = submittedValues.fieldMap
+      .filter((item) => item.skipped)
+      .map((item) => item.columnHeader);
+    const unmappedRelationships = validateRelationshipMapping().filter(
+      (item) => !skippedColumns.includes(item)
     );
 
-    if (skippedColumns.length > 0) {
-      showSkipWarning = true;
-    }
-    if (!validateRelationshipMapping()) {
-      showMappingWarning = true;
-    }
+    const showSkipWarning = skippedColumns.length > 0;
+    const showMappingWarning = unmappedRelationships.length > 0;
 
     if (showMappingWarning || showSkipWarning) {
       await openModal(
@@ -166,21 +172,15 @@ export function WorkbookColumnMapping({
           actionMessage={formatMessage("proceedWithWarning")}
           messageBody={
             <WorkbookWarningDialog
-              skippedColumns={skippedColumns.map((item) => item.columnHeader)}
-              unmappedRelationshipsError={[
-                "column1",
-                "column2",
-                "column3",
-                "column4",
-                "column5"
-              ]}
+              skippedColumns={skippedColumns}
+              unmappedRelationshipsError={unmappedRelationships}
             />
           }
           onYesButtonClicked={() => {
             importWorkbook(submittedValues);
           }}
-          yesButtonText={<>Import anyway</>}
-          noButtonText={<>Cancel</>}
+          yesButtonText={formatMessage("workbookImportAnywayButton")}
+          noButtonText={formatMessage("cancelButtonText")}
         />
       );
     } else {

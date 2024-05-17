@@ -59,24 +59,26 @@ export function WorkbookWarningDialog({
                     ))}
                   </ul>
                 )}
-                {!isSkippedColumnExpanded && "..."}
               </span>
               {skippedColumns.length > MAX_VISIBLE_ELEMENTS && (
-                <Button
-                  size={"sm"}
-                  variant="secondary"
-                  className="ms-3"
-                  onClick={handleToggle(
-                    isSkippedColumnExpanded,
-                    setIsSkippedColumnExpanded
-                  )}
-                >
-                  {isSkippedColumnExpanded ? (
-                    <DinaMessage id="showLess" />
-                  ) : (
-                    <DinaMessage id="showMore" />
-                  )}
-                </Button>
+                <>
+                  {!isSkippedColumnExpanded && "..."}
+                  <Button
+                    size={"sm"}
+                    variant="secondary"
+                    className="ms-3"
+                    onClick={handleToggle(
+                      isSkippedColumnExpanded,
+                      setIsSkippedColumnExpanded
+                    )}
+                  >
+                    {isSkippedColumnExpanded ? (
+                      <DinaMessage id="showLess" />
+                    ) : (
+                      <DinaMessage id="showMore" />
+                    )}
+                  </Button>
+                </>
               )}
             </span>
           </div>
@@ -105,23 +107,25 @@ export function WorkbookWarningDialog({
                   ))}
                 </ul>
               )}
-              {!isUnmappedRelationshipsExpanded && "..."}
               {unmappedRelationshipsError.length > MAX_VISIBLE_ELEMENTS && (
-                <Button
-                  size={"sm"}
-                  variant="secondary"
-                  className="ms-3"
-                  onClick={handleToggle(
-                    isUnmappedRelationshipsExpanded,
-                    setIsUnmappedRelationshipsExpanded
-                  )}
-                >
-                  {isUnmappedRelationshipsExpanded ? (
-                    <DinaMessage id="showLess" />
-                  ) : (
-                    <DinaMessage id="showMore" />
-                  )}
-                </Button>
+                <>
+                  {!isUnmappedRelationshipsExpanded && "..."}
+                  <Button
+                    size={"sm"}
+                    variant="secondary"
+                    className="ms-3"
+                    onClick={handleToggle(
+                      isUnmappedRelationshipsExpanded,
+                      setIsUnmappedRelationshipsExpanded
+                    )}
+                  >
+                    {isUnmappedRelationshipsExpanded ? (
+                      <DinaMessage id="showLess" />
+                    ) : (
+                      <DinaMessage id="showMore" />
+                    )}
+                  </Button>
+                </>
               )}
             </span>
           </div>
