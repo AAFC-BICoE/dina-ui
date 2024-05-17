@@ -1,4 +1,4 @@
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 
