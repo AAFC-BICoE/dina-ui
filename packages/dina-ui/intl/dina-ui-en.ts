@@ -985,5 +985,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_outputMediaType: "Output Media Type",
   field_reportType: "Report Type",
   field_reportVariables: "Report Variables",
-  editReportTemplateTitle: "Edit Report Template"
+  editReportTemplateTitle: "Edit Report Template",
+  duplicateResourcesFound:
+    "Warning: duplicate resources found {duplicateResources}"
 };

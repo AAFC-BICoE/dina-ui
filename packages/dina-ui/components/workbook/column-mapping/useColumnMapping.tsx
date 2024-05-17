@@ -3,8 +3,10 @@ import { chain, pick, startCase } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import {
   SelectField,
+  Tooltip,
   filterBy,
   useApiClient,
+  useDinaFormContext,
   useQuery
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -25,7 +27,8 @@ import {
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { FaExclamationTriangle } from "react-icons/fa";
+import { get } from "lodash";
 
 type RelationshipResource = { name?: string } & KitsuResource;
 
@@ -733,9 +736,26 @@ export function useColumnMapping() {
       default:
         options = [];
     }
+
+    // Find duplicate resources to warn the user
+    const seen = new Set();
+    const duplicateResources: string[] = [];
+    options.forEach((option) => {
+      if (seen.has(option.label)) {
+        duplicateResources.push(option.label);
+      } else {
+        seen.add(option.label);
+      }
+    });
+    const hasDuplicatesResources = duplicateResources.length > 0;
+    const duplicateResourcesSelected = duplicateResources.includes(fieldValue);
+    const showDuplicateWarningTooltip =
+      hasDuplicatesResources && duplicateResourcesSelected;
+
     return (
-      <>
+      <div className="d-flex">
         <SelectField
+          className="flex-fill"
           name={selectElemName}
           options={options}
           hideLabel={true}
@@ -743,7 +763,9 @@ export function useColumnMapping() {
           selectProps={{
             isClearable: true,
             menuPortalTarget: document.body,
-            styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+            styles: {
+              menuPortal: (base) => ({ ...base, zIndex: 9999 })
+            }
           }}
           onChange={(newValue) => {
             onChangeRelatedRecord(
@@ -754,7 +776,21 @@ export function useColumnMapping() {
             );
           }}
         />
-      </>
+        {showDuplicateWarningTooltip && (
+          <Tooltip
+            disableSpanMargin={true}
+            className="mt-3 ms-1"
+            visibleElement={
+              <div className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined bg-warning">
+                <FaExclamationTriangle />
+              </div>
+            }
+            directText={formatMessage("duplicateResourcesFound", {
+              duplicateResources: duplicateResources.join(", ")
+            })}
+          />
+        )}
+      </div>
     );
   }
 
