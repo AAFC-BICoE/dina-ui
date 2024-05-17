@@ -722,7 +722,7 @@ export function useColumnMapping() {
         }));
         targetType = "person";
         break;
-      case "metadata.originalFilename":
+      case "attachment.originalFilename":
         options = metadatas.map((resource) => ({
           label: resource.originalFilename,
           value: resource.id,

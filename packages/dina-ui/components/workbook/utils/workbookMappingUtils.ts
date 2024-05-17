@@ -61,7 +61,9 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["assemblage", "assemblages.name"],
   ["assemblages", "assemblages.name"],
   ["collectors", "collectingEvent.collectors.displayName"],
-  ["collector", "collectingEvent.collectors.displayName"]
+  ["collector", "collectingEvent.collectors.displayName"],
+  ["attachment", "attachment.originalFilename"],
+  ["attachments", "attachment.originalFilename"]
 ]);
 
 export type FieldOptionType = {
