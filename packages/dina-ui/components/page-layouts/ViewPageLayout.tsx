@@ -13,7 +13,7 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import { castArray, get } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { Footer, Head, Nav } from "..";
+import { Footer, GroupLabel, Head, Nav } from "..";
 import { HasDinaMetaInfo } from "../../types/DinaJsonMetaInfo";
 import Link from "next/link";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -55,6 +55,8 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
     deleteButton?: (formProps: ResourceFormProps<T>) => ReactNode;
     showEditButton?: boolean;
     showDeleteButton?: boolean;
+    showGroup?: boolean;
+    showBackButton?: boolean;
     /** Show the link to the "revisions" page if there is one. */
     showRevisionsLink?: boolean;
     showGenerateLabelButton?: boolean;
@@ -67,6 +69,7 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
 
     alterInitialValues?: (resource: PersistedResource<T>) => any;
     backButton?: JSX.Element;
+    forceTitleUppercase?: boolean;
   };
 
 export interface ResourceFormProps<T extends KitsuResource> {
@@ -99,13 +102,16 @@ export function ViewPageLayout<T extends KitsuResource>({
   deleteButton,
   showDeleteButton = true,
   showEditButton = true,
+  showGroup = true,
+  showBackButton = true,
   mainClass = "container-fluid",
   showRevisionsLink,
   showRevisionsLinkAtBottom,
   tooltipNode,
   alterInitialValues,
   showGenerateLabelButton,
-  backButton
+  backButton,
+  forceTitleUppercase
 }: ViewPageLayoutProps<T>) {
   const router = useRouter();
   const id = String(router.query.id);
@@ -153,6 +159,9 @@ export function ViewPageLayout<T extends KitsuResource>({
         if (Array.isArray(title)) {
           title = title[0];
         }
+        if (forceTitleUppercase) {
+          title = title.toUpperCase();
+        }
 
         return (
           <>
@@ -160,22 +169,23 @@ export function ViewPageLayout<T extends KitsuResource>({
 
             <ButtonBar>
               <div className="col-md-2 mt-2">
-                {backButton ? (
-                  backButton
-                ) : specialListUrl ? (
-                  <Link href={specialListUrl}>
-                    <a className="back-button my-auto me-auto">
-                      <DinaMessage id="backToList" />
-                    </a>
-                  </Link>
-                ) : (
-                  <BackButton
-                    entityId={id}
-                    className="me-auto"
-                    entityLink={entityLink}
-                    byPassView={true}
-                  />
-                )}
+                {showBackButton &&
+                  (backButton ? (
+                    backButton
+                  ) : specialListUrl ? (
+                    <Link href={specialListUrl}>
+                      <a className="back-button my-auto me-auto">
+                        <DinaMessage id="backToList" />
+                      </a>
+                    </Link>
+                  ) : (
+                    <BackButton
+                      entityId={id}
+                      className="me-auto"
+                      entityLink={entityLink}
+                      byPassView={true}
+                    />
+                  ))}
               </div>
               <div className="col-md-10 flex d-flex col-sm-12 gap-1">
                 <span className="ms-auto" />
@@ -217,7 +227,11 @@ export function ViewPageLayout<T extends KitsuResource>({
                   {title}
                   {tooltipNode}
                 </span>
-                <span className="header-group-text">{group}</span>
+                {showGroup && (
+                  <span className="header-group-text">
+                    {<GroupLabel groupName={group} />}
+                  </span>
+                )}
               </h1>
 
               {form(formProps)}
