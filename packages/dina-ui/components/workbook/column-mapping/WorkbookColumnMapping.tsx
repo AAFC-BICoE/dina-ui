@@ -11,7 +11,7 @@ import {
   ManagedAttribute,
   VocabularyElement
 } from "packages/dina-ui/types/collection-api";
-import { Ref, useRef, useState } from "react";
+import { Ref, useRef } from "react";
 import { Card } from "react-bootstrap";
 import Select from "react-select";
 import * as yup from "yup";
@@ -36,6 +36,7 @@ import {
 } from "../utils/workbookMappingUtils";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
+import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
 
 export type FieldMapType = {
   targetField: string | undefined;
@@ -166,12 +167,33 @@ export function WorkbookColumnMapping({
       await openModal(
         <AreYouSureModal
           actionMessage={formatMessage("proceedWithWarning")}
-          messageBody={warnningMessage.map((msg, index) => (
-            <p key={index}>{msg}</p>
-          ))}
+          messageBody={
+            <WorkbookWarningDialog
+              skippedColumns={[
+                "column1",
+                "column2",
+                "column3",
+                "column4",
+                "column5",
+                "column6",
+                "column7",
+                "column8",
+                "column9"
+              ]}
+              unmappedRelationshipsError={[
+                "column1",
+                "column2",
+                "column3",
+                "column4",
+                "column5"
+              ]}
+            />
+          }
           onYesButtonClicked={() => {
             importWorkbook(submittedValues);
           }}
+          yesButtonText={<>Import anyway</>}
+          noButtonText={<>Cancel</>}
         />
       );
     } else {
