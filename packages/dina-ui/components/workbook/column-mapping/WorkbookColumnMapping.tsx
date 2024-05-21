@@ -484,18 +484,29 @@ export function WorkbookColumnMapping({
     const fieldValueFormatted = fieldValue.replaceAll(".", "_");
 
     if (relationshipMapping) {
-      setRelationshipMapping({
-        ...relationshipMapping,
-        [columnHeaderFormatted]: {
-          ...relationshipMapping?.[columnHeaderFormatted],
-          [fieldValueFormatted]: {
-            id: relatedRecord,
-            type: targetType
-          }
+      // Check if the dropdown option selected is undefined (was cleared)
+      if (!relatedRecord) {
+        // Create a copy of the mapping then delete the relationship since it was unset.
+        const updatedMapping = { ...relationshipMapping };
+        if (updatedMapping[columnHeaderFormatted]) {
+          delete updatedMapping[columnHeaderFormatted][fieldValueFormatted];
+          setRelationshipMapping(updatedMapping);
         }
-      });
+      } else {
+        setRelationshipMapping({
+          ...relationshipMapping,
+          [columnHeaderFormatted]: {
+            ...relationshipMapping?.[columnHeaderFormatted],
+            [fieldValueFormatted]: {
+              id: relatedRecord,
+              type: targetType
+            }
+          }
+        });
+      }
     }
   }
+
   const selectedType = entityTypes.find((item) => item.value === type);
   return loading || fieldMap.length === 0 ? (
     <LoadingSpinner loading={loading} />
