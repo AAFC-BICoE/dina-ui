@@ -215,7 +215,7 @@ describe("BulkEditTabWarning", () => {
     wrapper
       .find("." + ORGANISMS_COMPONENT_NAME + " button.override-all-button")
       .simulate("click");
-    wrapper.find(".are-you-sure-modal form").simulate("submit");
+    wrapper.find("form .are-you-sure-modal").simulate("submit");
     await new Promise(setImmediate);
     wrapper.update();
 
@@ -477,7 +477,7 @@ describe("BulkEditTabWarning", () => {
     wrapper
       .find("." + ORGANISMS_COMPONENT_NAME + " button.override-all-button")
       .simulate("click");
-    wrapper.find(".are-you-sure-modal form").simulate("submit");
+    wrapper.find("form .are-you-sure-modal").simulate("submit");
     await new Promise(setImmediate);
     wrapper.update();
 

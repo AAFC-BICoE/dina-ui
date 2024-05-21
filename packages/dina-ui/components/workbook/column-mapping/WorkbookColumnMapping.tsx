@@ -11,7 +11,7 @@ import {
   ManagedAttribute,
   VocabularyElement
 } from "packages/dina-ui/types/collection-api";
-import { Ref, useRef, useState } from "react";
+import { Ref, useRef } from "react";
 import { Card } from "react-bootstrap";
 import Select from "react-select";
 import * as yup from "yup";
@@ -36,8 +36,10 @@ import {
 } from "../utils/workbookMappingUtils";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
+import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
 
 export type FieldMapType = {
+  columnHeader: string;
   targetField: string | undefined;
   targetKey?: ManagedAttribute | VocabularyElement; // When targetField is managedAttribute, targetKey stores the matching managed attribute
   // When targetField is scientificNameDetails, targetKey stores the matching taxonomicRank
@@ -119,6 +121,8 @@ export function WorkbookColumnMapping({
   const sheetValue = sheetOptions[sheet];
 
   function validateRelationshipMapping() {
+    const unmappedColumnNames: string[] = [];
+
     const relationshipColumnNames = Object.keys(
       columnUniqueValues![sheet]
     ).filter(
@@ -126,52 +130,57 @@ export function WorkbookColumnMapping({
         workbookColumnMap[columnName]?.mapRelationship &&
         workbookColumnMap[columnName].showOnUI
     );
+
     for (const columnName of relationshipColumnNames) {
       const values = Object.keys(
-        (columnUniqueValues ?? {})[sheet]?.[columnName]
+        (columnUniqueValues ?? {})[sheet]?.[columnName] || {}
       );
       if (!relationshipMapping[columnName] && values.length > 0) {
-        return false;
+        unmappedColumnNames.push(
+          workbookColumnMap[columnName].originalColumnName
+        );
       } else {
-        const mappedValues = Object.keys(relationshipMapping[columnName]);
+        const mappedValues = Object.keys(relationshipMapping[columnName] || {});
         for (const value of values) {
           if (mappedValues.indexOf(value.replace(".", "_")) === -1) {
-            return false;
+            unmappedColumnNames.push(
+              workbookColumnMap[columnName].originalColumnName
+            );
+            break; // Early exit if a single value is unmapped
           }
         }
       }
     }
-    return true;
+
+    return unmappedColumnNames;
   }
 
   async function onSubmit({ submittedValues }) {
-    let showSkipWarning = false;
-    let showMappingWarning = false;
-    const warnningMessage: string[] = [];
+    const skippedColumns: string[] = submittedValues.fieldMap
+      .filter((item) => item.skipped)
+      .map((item) => item.columnHeader);
+    const unmappedRelationships = validateRelationshipMapping().filter(
+      (item) => !skippedColumns.includes(item)
+    );
 
-    if (submittedValues.fieldMap.filter((item) => item.skipped).length > 0) {
-      showSkipWarning = true;
-      warnningMessage.push(
-        formatMessage("areYouSureImportWorkbookWithSkippedColumns")
-      );
-    }
-    if (!validateRelationshipMapping()) {
-      showMappingWarning = true;
-      warnningMessage.push(
-        formatMessage("areYouSureImportWorkbookWithoutMappingAllRecords")
-      );
-    }
+    const showSkipWarning = skippedColumns.length > 0;
+    const showMappingWarning = unmappedRelationships.length > 0;
 
     if (showMappingWarning || showSkipWarning) {
       await openModal(
         <AreYouSureModal
           actionMessage={formatMessage("proceedWithWarning")}
-          messageBody={warnningMessage.map((msg, index) => (
-            <p key={index}>{msg}</p>
-          ))}
+          messageBody={
+            <WorkbookWarningDialog
+              skippedColumns={skippedColumns}
+              unmappedRelationshipsError={unmappedRelationships}
+            />
+          }
           onYesButtonClicked={() => {
             importWorkbook(submittedValues);
           }}
+          yesButtonText={formatMessage("workbookImportAnywayButton")}
+          noButtonText={formatMessage("cancelButtonText")}
         />
       );
     } else {
@@ -475,18 +484,29 @@ export function WorkbookColumnMapping({
     const fieldValueFormatted = fieldValue.replaceAll(".", "_");
 
     if (relationshipMapping) {
-      setRelationshipMapping({
-        ...relationshipMapping,
-        [columnHeaderFormatted]: {
-          ...relationshipMapping?.[columnHeaderFormatted],
-          [fieldValueFormatted]: {
-            id: relatedRecord,
-            type: targetType
-          }
+      // Check if the dropdown option selected is undefined (was cleared)
+      if (!relatedRecord) {
+        // Create a copy of the mapping then delete the relationship since it was unset.
+        const updatedMapping = { ...relationshipMapping };
+        if (updatedMapping[columnHeaderFormatted]) {
+          delete updatedMapping[columnHeaderFormatted][fieldValueFormatted];
+          setRelationshipMapping(updatedMapping);
         }
-      });
+      } else {
+        setRelationshipMapping({
+          ...relationshipMapping,
+          [columnHeaderFormatted]: {
+            ...relationshipMapping?.[columnHeaderFormatted],
+            [fieldValueFormatted]: {
+              id: relatedRecord,
+              type: targetType
+            }
+          }
+        });
+      }
     }
   }
+
   const selectedType = entityTypes.find((item) => item.value === type);
   return loading || fieldMap.length === 0 ? (
     <LoadingSpinner loading={loading} />

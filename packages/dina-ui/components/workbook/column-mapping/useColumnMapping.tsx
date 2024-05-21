@@ -490,24 +490,28 @@ export function useColumnMapping() {
           map.push({
             targetField: "managedAttributes",
             skipped: false,
-            targetKey: targetManagedAttr
+            targetKey: targetManagedAttr,
+            columnHeader
           });
         } else if (targetTaxonomicRank) {
           map.push({
             targetField: "organism.determination.scientificNameDetails",
             skipped: false,
-            targetKey: targetTaxonomicRank
+            targetKey: targetTaxonomicRank,
+            columnHeader
           });
         } else {
           map.push({
             targetField: fieldPath,
-            skipped: fieldPath === undefined
+            skipped: fieldPath === undefined,
+            columnHeader
           });
         }
       } else {
         map.push({
           targetField: fieldPath,
-          skipped: fieldPath === undefined
+          skipped: fieldPath === undefined,
+          columnHeader
         });
       }
     }

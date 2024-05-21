@@ -1693,7 +1693,7 @@ describe("MaterialSampleBulkEditor", () => {
       "#" + SCHEDULED_ACTIONS_COMPONENT_NAME
     ]) {
       wrapper.find(`${section} button.override-all-button`).simulate("click");
-      wrapper.find(".are-you-sure-modal form").simulate("submit");
+      wrapper.find("form .are-you-sure-modal").simulate("submit");
       await new Promise(setImmediate);
       wrapper.update();
     }
