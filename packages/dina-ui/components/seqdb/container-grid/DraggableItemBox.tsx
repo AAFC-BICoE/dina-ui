@@ -1,30 +1,31 @@
 import { noop } from "lodash";
 import { useDrag } from "react-dnd";
 import RcTooltip from "rc-tooltip";
-import { SeqReactionSample } from "./useSeqSelectCoordinatesControls";
 
-interface DraggableSeqReactionBoxProps {
+interface DraggableItemBoxProps<ItemType extends { sampleName?: string }> {
   onClick?: (e: any) => void;
-  seqReactionSample: SeqReactionSample;
+  batchItemSample: ItemType;
   coordinates: string | null;
   selected: boolean;
   wasMoved: boolean;
   editMode: boolean;
 }
 
-export const ITEM_BOX_DRAG_KEY = "seqReactionMaterialSampleItem";
+export const ITEM_BOX_DRAG_KEY = "materialSampleItem";
 
-export function DraggableSeqReactionBox({
+export function DraggableItemBox<
+  ItemType extends { sampleId?: string; sampleName?: string }
+>({
   onClick = noop,
-  seqReactionSample,
+  batchItemSample,
   coordinates,
   selected,
   wasMoved,
   editMode
-}: DraggableSeqReactionBoxProps) {
+}: DraggableItemBoxProps<ItemType>) {
   const [, drag] = useDrag({
     type: ITEM_BOX_DRAG_KEY,
-    item: { seqReactionSample, type: ITEM_BOX_DRAG_KEY },
+    item: { batchItemSample, type: ITEM_BOX_DRAG_KEY },
     canDrag: () => {
       return editMode;
     }
@@ -55,7 +56,7 @@ export function DraggableSeqReactionBox({
                 <>
                   {coordinates}
                   <br />
-                  {`${seqReactionSample.sampleName} (${seqReactionSample.primerName}|${seqReactionSample.primerDirection})`}
+                  {batchItemSample.sampleName}
                 </>
               </div>
             )}
@@ -69,9 +70,7 @@ export function DraggableSeqReactionBox({
             cursor: editMode ? "move" : "default"
           }}
         >
-          <span className="sample-box-text">
-            {`${seqReactionSample.sampleName} (${seqReactionSample.primerName}|${seqReactionSample.primerDirection})`}
-          </span>
+          <span className="sample-box-text">{batchItemSample.sampleName}</span>
         </div>
       </RcTooltip>
     </li>
