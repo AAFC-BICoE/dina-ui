@@ -162,7 +162,7 @@ export function SplitConfigurationSection({
                   disableTemplateCheckbox={true}
                   disabled={selected !== TYPE_BASED_STRATEGY}
                   query={() => ({
-                    path: "collection-api/vocabulary/materialSampleType"
+                    path: "collection-api/vocabulary2/materialSampleType"
                   })}
                   isMulti={true}
                 />

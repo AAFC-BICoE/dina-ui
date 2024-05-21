@@ -16,9 +16,9 @@ export function ProtocolsField() {
       typesAddable={true}
       isVocabularyBasedEnabledForBlock={true}
       isVocabularyBasedEnabledForType={true}
-      blockOptionsEndpoint={"collection-api/vocabulary/protocolData"}
+      blockOptionsEndpoint={"collection-api/vocabulary2/protocolData"}
       typeOptionsEndpoint={"collection-api/protocol-element"}
-      unitOptionsEndpoint={"collection-api/vocabulary/unitsOfMeasurement"}
+      unitOptionsEndpoint={"collection-api/vocabulary2/unitsOfMeasurement"}
     />
   );
 }

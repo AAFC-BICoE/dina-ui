@@ -11,7 +11,7 @@ import {
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
@@ -50,6 +50,7 @@ export function RegionEditPage({ router }: WithRouterProps) {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
@@ -78,9 +79,13 @@ function RegionForm({ region, router }: RegionFormProps) {
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar>
-        <BackButton entityId={id as string} entityLink="/seqdb/region" />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton entityId={id as string} entityLink="/seqdb/region" />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <RegionFormFields />
     </DinaForm>

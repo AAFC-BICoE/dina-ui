@@ -2,8 +2,8 @@ import {
   useAccount,
   BackButton,
   DataExportListPageLayout
-} from "../../../common-ui/lib";
-import PageLayout from "../../components/page/PageLayout";
+} from "../../../../common-ui/lib";
+import PageLayout from "../../../components/page/PageLayout";
 import { useRouter } from "next/router";
 
 export default function DataExportListPage() {

@@ -17,7 +17,7 @@ import {
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 import { Region } from "../../../types/seqdb-api/resources/Region";
@@ -60,6 +60,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
@@ -94,9 +95,13 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar>
-        <BackButton entityId={id as string} entityLink="/seqdb/pcr-primer" />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton entityId={id as string} entityLink="/seqdb/pcr-primer" />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <PcrPrimerFormFields />
     </DinaForm>

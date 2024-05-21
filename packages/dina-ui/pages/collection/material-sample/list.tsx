@@ -14,7 +14,7 @@ import {
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { TableColumn } from "../../../../common-ui/lib/list-page/types";
-import { useState } from "react";
+import { useState, CSSProperties } from "react";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
@@ -278,27 +278,32 @@ export default function MaterialSampleListPage() {
     dateCell("createdOn", "data.attributes.createdOn")
   ];
 
-  const rowStyling = (row: Row<any>) =>
-    row?.original?.data?.attributes?.materialSampleState && {
-      opacity: 0.4
-    };
+  const rowStyling = (row: Row<any>): CSSProperties | undefined => {
+    if (row?.original?.data?.attributes?.materialSampleState) {
+      return { opacity: 0.4 };
+    }
+    return undefined;
+  };
 
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="materialSampleListTitle" />
-        </h1>
-        <ButtonBar>
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="col-md-12 d-flex gap-2">
+          <div className="ms-auto" />
           <CreateButton entityLink="/collection/material-sample" />
           <Link href={`/collection/material-sample/bulk-create`}>
             <a className="btn btn-primary">
               <DinaMessage id="bulkCreate" />
             </a>
           </Link>
-        </ButtonBar>
+        </div>
+      </ButtonBar>
+      <main className="container-fluid">
+        <h1 id="wb-cont">
+          <DinaMessage id="materialSampleListTitle" />
+        </h1>
         <QueryPage
           rowStyling={rowStyling}
           indexName={"dina_material_sample_index"}
@@ -387,7 +392,7 @@ export default function MaterialSampleListPage() {
           }}
           bulkEditPath="/collection/material-sample/bulk-edit"
           dataExportProps={{
-            dataExportPath: "/data-export/export",
+            dataExportPath: "/export/data-export/export",
             entityLink: "/collection/material-sample"
           }}
           // bulkSplitPath="/collection/material-sample/bulk-split"

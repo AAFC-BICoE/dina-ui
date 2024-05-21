@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { TableColumn } from "../../../../common-ui/lib/list-page/types";
 import { Component, useMemo, useState } from "react";
-import { Head, Nav, ThumbnailCell } from "../../../components";
+import { Footer, Head, Nav, ThumbnailCell } from "../../../components";
 import {
   MetadataPreview,
   StoredObjectGallery
@@ -152,7 +152,7 @@ export default function MetadataListPage() {
     <div>
       <Head title={formatMessage("objectListTitle")} />
       <Nav />
-      <main className="container-fluid">
+      <main className="large-container-fluid">
         <div className="list-inline">
           <div className="list-inline-item">
             <h1 id="wb-cont">
@@ -197,7 +197,7 @@ export default function MetadataListPage() {
                 }}
                 bulkEditPath={"/object-store/metadata/bulk-edit"}
                 dataExportProps={{
-                  dataExportPath: "/data-export/export",
+                  dataExportPath: "/export/data-export/export",
                   entityLink: "/object-store/object"
                 }}
                 singleEditPath={"/object-store/metadata/edit"}
@@ -271,6 +271,7 @@ export default function MetadataListPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

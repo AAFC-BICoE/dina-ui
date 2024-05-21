@@ -99,7 +99,10 @@ export function useElasticSearchDistinctTerm({
       })
       .then((resp) => {
         // Ignore the type if provided, just look using the end of the key.
-        const findTermAggregationKey = (aggregations: any, keyName: string): any | undefined => {
+        const findTermAggregationKey = (
+          aggregations: any,
+          keyName: string
+        ): any | undefined => {
           for (const key in aggregations) {
             if (
               (key.includes("#") && key.endsWith("#" + keyName)) ||

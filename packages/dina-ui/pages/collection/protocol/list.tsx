@@ -33,7 +33,7 @@ const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
       }
     }) => (
       <VocabularyReadOnlyView
-        path={"collection-api/vocabulary/protocolType"}
+        path={"collection-api/vocabulary2/protocolType"}
         value={protocolType}
       />
     ),
@@ -50,14 +50,16 @@ export default function protocolListPage() {
   return (
     <div>
       <Head title={formatMessage("protocolListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/protocol" />
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="protocolListTitle" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/protocol" />
-        </ButtonBar>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Apply group filter:

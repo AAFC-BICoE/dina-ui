@@ -39,9 +39,9 @@ const mockGet = jest.fn(async (model) => {
     return { data: testCollectingEvent() };
   } else if (model === "agent-api/person") {
     return { data: [testAgent()] };
-  } else if (model === "collection-api/vocabulary/srs") {
+  } else if (model === "collection-api/vocabulary2/srs") {
     return { data: [testSrs()] };
-  } else if (model === "collection-api/vocabulary/coordinateSystem") {
+  } else if (model === "collection-api/vocabulary2/coordinateSystem") {
     return { data: [testCoordinates()] };
   } else if (model === "collection-api/collecting-event") {
     return { data: [] };

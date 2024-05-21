@@ -2,11 +2,10 @@ import { ApiClientContext, LoadingSpinner } from "common-ui";
 import { withRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { SaveWorkbookProgress } from "packages/dina-ui/components/workbook/SaveWorkbookProgress";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import {
   WorkbookColumnMapping,
-  WorkbookJSON,
   WorkbookUpload,
   trimSpace,
   useWorkbookContext
@@ -39,7 +38,7 @@ export function UploadWorkbookPage() {
 
     // Attempt to call the conversion API.
     await apiClient.axios
-      .post("/objectstore-api/conversion/workbook", formData)
+      .post("/objectstore-api/workbook/conversion", formData)
       .then((response) => {
         uploadWorkbook(trimSpace(response.data));
         setLoading(false);
@@ -76,30 +75,38 @@ export function UploadWorkbookPage() {
   const buttonBar =
     !isThereAnActiveUpload() && !!spreadsheetData ? (
       <>
-        <button onClick={() => backToUpload()} className="btn btn-secondary">
-          <DinaMessage id="cancelButtonText" />
-        </button>
-        <Button
-          variant={"primary"}
-          className="ms-auto"
-          onClick={() => setPerformSave(true)}
-          style={{ width: "10rem" }}
-        >
-          {performSave ? (
-            <>
-              <Spinner
-                as="span"
-                animation="border"
-                size="sm"
-                role="status"
-                aria-hidden="true"
-              />
-              <span className="visually-hidden">Loading...</span>
-            </>
-          ) : (
-            <DinaMessage id="save" />
-          )}
-        </Button>
+        <div className="col-md-6 col-sm-12">
+          <Button
+            variant={"secondary"}
+            style={{ width: "10rem" }}
+            onClick={() => backToUpload()}
+          >
+            <DinaMessage id="cancelButtonText" />
+          </Button>
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <Button
+            variant={"primary"}
+            className="ms-auto"
+            onClick={() => setPerformSave(true)}
+            style={{ width: "10rem" }}
+          >
+            {performSave ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                <span className="visually-hidden">Loading...</span>
+              </>
+            ) : (
+              <DinaMessage id="save" />
+            )}
+          </Button>
+        </div>
       </>
     ) : undefined;
 

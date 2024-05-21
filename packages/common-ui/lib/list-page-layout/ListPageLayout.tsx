@@ -26,7 +26,6 @@ import {
 import { FilterForm } from "./FilterForm";
 import { ColumnSort, SortingState } from "@tanstack/react-table";
 import { FreeTextFilterForm } from "./FreeTextFilterForm";
-import { number } from "mathjs";
 
 export enum ListLayoutFilterType {
   FREE_TEXT = "FREE_TEXT",

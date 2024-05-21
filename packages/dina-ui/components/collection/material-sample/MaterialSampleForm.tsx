@@ -168,12 +168,16 @@ export function MaterialSampleForm({
   disableCollectingEventSwitch,
   enableReinitialize,
   buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={materialSample?.id}
-        entityLink="/collection/material-sample"
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={materialSample?.id}
+          entityLink="/collection/material-sample"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   )
 }: MaterialSampleFormProps) {
@@ -480,7 +484,6 @@ export function MaterialSampleForm({
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}
       {formLayout}
-      {buttonBar}
     </DinaForm>
   );
 }

@@ -10,7 +10,7 @@ import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientCont
 interface ReportTemplateOption {
   label: string;
   value: string;
-  includesBarcode: boolean;
+  includesBarcode?: boolean;
 }
 
 export type CustomMenuProps = {

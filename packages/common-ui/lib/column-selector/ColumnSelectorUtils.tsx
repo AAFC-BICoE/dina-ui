@@ -81,10 +81,18 @@ export function getAttributesStandardColumns(
       queryOption
     };
   }
-  setColumnSelectorIndexMapColumns?.((currentColumns) => [
-    ...currentColumns,
-    column
-  ]);
+  setColumnSelectorIndexMapColumns?.((currentColumns) => {
+    if (
+      currentColumns &&
+      !currentColumns.find(
+        (currentColumn) => currentColumn.accessorKey === column.accessorKey
+      )
+    ) {
+      return [...currentColumns, column];
+    } else {
+      return currentColumns;
+    }
+  });
 }
 
 // Get standard columns that are the included relationships of the resource

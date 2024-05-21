@@ -274,6 +274,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_description.de": "German Description",
   field_determination: "Determinations",
   "field_determination.typeStatus": "Type Status",
+  "field_determination.scientificName": "Scientific Name",
   "field_determination.verbatimScientificName": "Verbatim Scientific Name",
   field_determinationRemarks: "Determination Remarks",
   field_displayName: "Display Name",
@@ -443,6 +444,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_startEventDateTime_tooltip:
     "Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_tags: "Tags",
+  field_targetOrganismPrimaryScientificName:
+    "Target Organism Primary Scientific Name",
   field_title: "Title",
   "field_title.en": "English Title",
   "field_title.fr": "French Title",
@@ -931,10 +934,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
   proceedWithWarning: "Proceed with warnings?",
-  areYouSureImportWorkbookWithSkippedColumns:
-    "Are you sure you want to import the workbook with skipped columns?",
-  areYouSureImportWorkbookWithoutMappingAllRecords:
-    "Are you sure you want to import the workbook without mapping all related records?",
+  workbookImportAnywayButton: "Import anyway",
+  skippedColumnsTitle: "Skipped Columns",
+  skippedColumnsDescription:
+    "The workbook contains columns that will be skipped during import. These columns might contain important data.",
+  unmappedRelationshipsTitle: "Unmapped Relationships",
+  unmappedRelationshipsDescription:
+    "The import identified relationships in the workbook that could not be automatically mapped. This might lead to incomplete data transfer.",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
@@ -972,5 +978,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataLabel: "Data",
   objectsLabel: "Objects",
   relatedRecord: "Related Record",
-  reportTemplateUpload: "Report Template Upload"
+  reportTemplateUpload: "Report Template Upload",
+  managedBy: "Managed By",
+  agentId: "Agent Link",
+  maxNumUploadExceeded: "Max number of uploads exceeded",
+  addReportTemplateTitle: "Add Report Template",
+  backToUpload: "Back to Upload",
+  field_reportTemplateName: "Report Template Name",
+  field_includesBarcode: "Includes Barcode",
+  field_templateOutputMediaType: "Template Output Media Type",
+  field_outputMediaType: "Output Media Type",
+  field_reportType: "Report Type",
+  field_reportVariables: "Report Variables",
+  editReportTemplateTitle: "Edit Report Template",
+  duplicateResourcesFound:
+    "Warning: duplicate resources found {duplicateResources}"
 };

@@ -6,7 +6,7 @@ import {
   dateCell
 } from "common-ui";
 import Link from "next/link";
-import { groupCell, Head, Nav } from "../../../components";
+import { Footer, groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SequencingFacility } from "../../../types/seqdb-api/resources/SequencingFacility";
 
@@ -37,9 +37,11 @@ export default function RegionListPage() {
   return (
     <>
       <Head title={formatMessage("sequencingFacilityListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
       <ButtonBar>
-        <CreateButton entityLink="/seqdb/sequencing-facility" />
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/seqdb/sequencing-facility" />
+        </div>
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
@@ -54,6 +56,7 @@ export default function RegionListPage() {
           }}
         />
       </main>
+      <Footer />
     </>
   );
 }

@@ -198,7 +198,7 @@ export function MaterialSampleGenerationForm({
           </TabPanel>
         )}
       </Tabs>
-      <ButtonBar>
+      <ButtonBar centered={false}>
         <BackToListButton
           className="ms-auto"
           entityLink="/collection/material-sample"

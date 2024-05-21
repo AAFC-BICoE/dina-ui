@@ -41,14 +41,16 @@ export default function collectionMethodListPage() {
   return (
     <div>
       <Head title={formatMessage("collectionMethodListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/collection-method" />
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="collectionMethodListTitle" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/collection-method" />
-        </ButtonBar>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Apply group filter:

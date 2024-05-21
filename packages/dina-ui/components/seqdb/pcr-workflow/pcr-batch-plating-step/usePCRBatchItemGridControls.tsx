@@ -9,7 +9,7 @@ import { compact, isEmpty, omitBy } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
-import { CellGrid } from "./ContainerGrid";
+import { CellGrid } from "../../container-grid/ContainerGrid";
 
 interface ContainerGridProps {
   pcrBatchId: string;
@@ -61,7 +61,7 @@ export function usePCRBatchItemGridControls({
     // Available PcrBatchItems with no well coordinates.
     availableItems: [] as PcrBatchItemSample[],
     // The grid of PcrBatchItems that have well coordinates.
-    cellGrid: {} as CellGrid,
+    cellGrid: {} as CellGrid<PcrBatchItemSample>,
     // PcrBatchItems that have been moved since data initialization.
     movedItems: [] as PcrBatchItemSample[]
   });
@@ -113,7 +113,7 @@ export function usePCRBatchItemGridControls({
         (item) => !item.wellRow && !item.wellColumn
       );
 
-      const newCellGrid: CellGrid = {};
+      const newCellGrid: CellGrid<PcrBatchItemSample> = {};
       pcrBatchItemsWithCoords.forEach((item) => {
         newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item;
       });
@@ -205,8 +205,9 @@ export function usePCRBatchItemGridControls({
   function moveItems(items: PcrBatchItemSample[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the PcrBatchItem from the grid.
-      const newCellGrid: CellGrid = omitBy(cellGrid, (item) =>
-        items.includes(item)
+      const newCellGrid: CellGrid<PcrBatchItemSample> = omitBy(
+        cellGrid,
+        (item) => items.includes(item)
       );
 
       // Remove the PcrBatchItem from the available PcrBatchItems.
@@ -293,8 +294,8 @@ export function usePCRBatchItemGridControls({
     }
   }
 
-  function onListDrop(item: { pcrBatchItemSample: PcrBatchItemSample }) {
-    moveItems([item.pcrBatchItemSample]);
+  function onListDrop(item: { batchItemSample: PcrBatchItemSample }) {
+    moveItems([item.batchItemSample]);
   }
 
   function onItemClick(item, e) {

@@ -38,7 +38,11 @@ const AGENT_TABLE_COLUMNS: ColumnDefinition<Person>[] = [
 ];
 
 export default function AgentListPage() {
-  const buttonBarContent = <CreateButton entityLink="/person" />;
+  const buttonBarContent = (
+    <div className="flex d-flex ms-auto">
+      <CreateButton entityLink="/person" />
+    </div>
+  );
 
   return (
     <PageLayout titleId="personListTitle" buttonBarContent={buttonBarContent}>

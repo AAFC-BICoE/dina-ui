@@ -73,7 +73,9 @@ export default function NgsWorkFlowRunPage() {
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/ngs-workflow" />
+      <div className="col-md-4">
+        <BackToListButton entityLink="/seqdb/ngs-workflow" />
+      </div>
       {editMode ? (
         <>
           <Button

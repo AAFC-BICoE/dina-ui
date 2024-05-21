@@ -30,7 +30,7 @@ const mockConfig: FieldMappingConfigType = {
     },
     stringField: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
-      endpoint: "/collection-api/vocabulary/materialSampleType"
+      endpoint: "/collection-api/vocabulary2/materialSampleType"
     },
     numberField: { dataType: WorkbookDataTypeEnum.NUMBER },
     booleanField: { dataType: WorkbookDataTypeEnum.BOOLEAN },
@@ -344,7 +344,7 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.stringArrayField.dataType": "string[]",
       "mockEntity.stringField.dataType": "vocabulary",
       "mockEntity.stringField.endpoint":
-        "/collection-api/vocabulary/materialSampleType",
+        "/collection-api/vocabulary2/materialSampleType",
       "mockEntity.objectField1.attributes.address.attributes.addressLine1.dataType":
         "string",
       "mockEntity.objectField1.attributes.address.attributes.city.dataType":

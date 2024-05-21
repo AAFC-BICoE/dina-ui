@@ -78,7 +78,9 @@ export default function PCRWorkFlowRunPage() {
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/pcr-workflow" />
+      <div className="col-md-4">
+        <BackToListButton entityLink="/seqdb/pcr-workflow" />
+      </div>
       {editMode ? (
         <>
           <Button
