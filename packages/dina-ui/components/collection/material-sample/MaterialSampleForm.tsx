@@ -229,6 +229,7 @@ export function MaterialSampleForm({
         <MaterialSampleIdentifiersSection
           id={id}
           disableSampleNameField={disableSampleNameField}
+          visibleManagedAttributeKeys={visibleManagedAttributeKeys}
           hideUseSequence={hideUseSequence}
         />
       ),
