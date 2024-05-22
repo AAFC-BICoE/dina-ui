@@ -229,6 +229,7 @@ export function MaterialSampleForm({
         <MaterialSampleIdentifiersSection
           id={id}
           disableSampleNameField={disableSampleNameField}
+          visibleManagedAttributeKeys={visibleManagedAttributeKeys}
           hideUseSequence={hideUseSequence}
         />
       ),
@@ -348,7 +349,7 @@ export function MaterialSampleForm({
           sectionName="managed-attributes-section"
         >
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-md-12">
               <ManagedAttributesEditor
                 valuesPath="managedAttributes"
                 managedAttributeApiPath="collection-api/managed-attribute"

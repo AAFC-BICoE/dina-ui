@@ -21,7 +21,7 @@ export interface ManagedAttributeFieldProps {
 
 export interface ManagedAttributeFieldWithLabelProps
   extends ManagedAttributeFieldProps {
-  onRemoveClick: (attributeKey: string) => void;
+  onRemoveClick?: (attributeKey: string) => void;
 }
 
 /** Single Managed Attribute Formik-connected field wrapped in a label. */
@@ -69,7 +69,7 @@ export function ManagedAttributeFieldWithLabel(
             onClick={(_, form) => {
               // Delete the value and hide the managed attribute:
               form.setFieldValue(attributePath, undefined);
-              onRemoveClick(attributeKey);
+              onRemoveClick?.(attributeKey);
             }}
           >
             <RiDeleteBinLine size="1.8em" />

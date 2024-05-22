@@ -202,7 +202,7 @@ export function PreparationField({
         </div>
       </div>
       <div className="row">
-        <div className="col-md-6">
+        <div className="col-md-12">
           <ManagedAttributesEditor
             valuesPath="preparationManagedAttributes"
             managedAttributeApiPath="collection-api/managed-attribute"

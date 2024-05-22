@@ -12,6 +12,8 @@ import {
   IDENTIFIER_COMPONENT_NAME,
   MaterialSample
 } from "../../../types/collection-api";
+import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
+import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 
 export interface MaterialSampleIdentifiersSectionProps {
   disableSampleNameField?: boolean;
@@ -21,6 +23,7 @@ export interface MaterialSampleIdentifiersSectionProps {
   sampleNamePlaceHolder?: string;
   id?: string;
   hideUseSequence?: boolean;
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
 /** The fields in the Identifiers section. */
@@ -38,6 +41,7 @@ export function MaterialSampleIdentifiersSection({
   namePrefix = "",
   sampleNamePlaceHolder,
   hideUseSequence,
+  visibleManagedAttributeKeys,
   id = IDENTIFIER_COMPONENT_NAME
 }: MaterialSampleIdentifiersSectionProps) {
   const [{ value }] = useField("collection");
@@ -91,6 +95,23 @@ export function MaterialSampleIdentifiersSection({
           />
         </div>
       </div>
+      {readOnly && (
+        <div className="row">
+          <div className="col-md-12">
+            <ManagedAttributesEditor
+              valuesPath="managedAttributes"
+              managedAttributeApiPath="collection-api/managed-attribute"
+              managedAttributeComponent="MATERIAL_SAMPLE"
+              fieldSetProps={{
+                id,
+                legend: <DinaMessage id="materialSampleManagedAttributes" />
+              }}
+              managedAttributeOrderFieldName="managedAttributesOrder"
+              visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
+            />
+          </div>
+        </div>
+      )}
     </FieldSet>
   );
 }
