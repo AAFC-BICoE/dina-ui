@@ -57,6 +57,11 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   setDisplayedColumns: React.Dispatch<
     React.SetStateAction<TableColumn<TData>[]>
   >;
+
+  /**
+   * The default columns to be loaded in if no columns are found in the local storage.
+   */
+  defaultColumns: TableColumn<TData>[];
 }
 
 // Ids of columns not supported for exporting
@@ -66,16 +71,27 @@ export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
   "viewPreviewButtonText"
 ];
 
+interface NonAppliedOptionChange<TData extends KitsuResource> {
+  column: TableColumn<TData>;
+
+  /** True is the column being activated on, false is the column being activated off */
+  state: boolean;
+}
+
 export function ColumnSelector<TData extends KitsuResource>({
   uniqueName,
   menuOnly,
   indexMapping,
   dynamicFieldMapping,
   displayedColumns,
-  setDisplayedColumns
+  setDisplayedColumns,
+  defaultColumns
 }: ColumnSelectorProps<TData>) {
+  const { apiClient } = useApiClient();
+  const { formatMessage, messages } = useIntl();
+
   // Loading state, specifically for dynamically loaded columns.
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Search value for filtering the options.
   const [searchValue, setSearchValue] = useState("");
@@ -83,11 +99,27 @@ export function ColumnSelector<TData extends KitsuResource>({
   // These are all the possible columns displayed to the user.
   const [columnOptions, setColumnOptions] = useState<TableColumn<TData>[]>([]);
 
-  const [localStorageColumnStates, setLocalStorageColumnStates] =
-    useLocalStorage<VisibilityState | undefined>(
-      `${uniqueName}_columnSelector`,
-      {}
+  // Stores all of the options selected but not applied yet.
+  const [nonAppliedOptions, setNonAppliedOptions] = useState<
+    NonAppliedOptionChange<TData>[]
+  >([]);
+
+  // Local storage of the displayed columns that are saved.
+  const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
+    useLocalStorage<any[] | undefined>(
+      `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
+      []
     );
+
+  useEffect(() => {
+    if (
+      !localStorageDisplayedColumns ||
+      localStorageDisplayedColumns?.length === 0
+    ) {
+      // No local storage to load from, load the default columns in.
+      setDisplayedColumns(defaultColumns);
+    }
+  }, [localStorageDisplayedColumns]);
 
   const {
     show: showMenu,
@@ -96,23 +128,22 @@ export function ColumnSelector<TData extends KitsuResource>({
     onKeyDown: onKeyPressDown
   } = menuDisplayControl();
 
-  const [visibleIndexMapColumns, setVisibleIndexMapColumns] = useLocalStorage<
-    any[]
-  >(`${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`, []);
-
   function menuDisplayControl() {
     const [show, setShow] = useState(false);
 
     const showDropdown = async () => {
       // Check if the dropdown has been loaded yet, if not then load in dynamic fields.
-      if (!loading) {
+      if (loading) {
         // This will be where the dynamic fields will be loaded in...
         await getColumnSelectorIndexMapColumns<TData>({
           indexMapping,
-          setColumnOptions
+          setColumnOptions,
+          apiClient,
+          dynamicFieldMapping
         });
         setLoading(false);
       }
+
       setShow(true);
     };
 
@@ -143,8 +174,6 @@ export function ColumnSelector<TData extends KitsuResource>({
     return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
   }
 
-  const { formatMessage, messages } = useIntl();
-
   // For finding columns using text search
   // const columnSearchMapping: { label: string; id: string }[] | undefined =
   //   reactTable?.getAllLeafColumns().map((column) => {
@@ -155,12 +184,38 @@ export function ColumnSelector<TData extends KitsuResource>({
   //     return { label: label.toLowerCase(), id: column.id };
   //   });
 
-  // Keep track of user selected options for when user presses "Apply"
-  const filteredColumnsState: VisibilityState = localStorageColumnStates
-    ? localStorageColumnStates
-    : {};
+  function isChecked(columnId: string | undefined): boolean {
+    // First check the nonAppliedOptions if it has been altered.
+    const nonAppliedFound = nonAppliedOptions.find(
+      (item) => item.column.id === columnId
+    );
+    if (nonAppliedFound !== undefined) {
+      return nonAppliedFound.state;
+    }
+
+    // Now check if it's currently being displayed on the table, but not applied yet.
+    const displayedColumnFound = displayedColumns.find(
+      (item) => item.id === columnId
+    );
+    if (displayedColumnFound !== undefined) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function toggleColumn(columnId: string | undefined) {
+    // Check if the column is already being displayed
+    const displayedColumnFound = displayedColumns.find(
+      (item) => item.id === columnId
+    );
+    if (displayedColumnFound !== undefined) {
+      return true;
+    }
+  }
 
   function handleToggleAll(event) {
+    setDisplayedColumns([]);
     // const visibilityState = reactTable?.getState()?.columnVisibility;
     // if (visibilityState) {
     //   Object.keys(visibilityState).forEach((columnId) => {
@@ -182,6 +237,7 @@ export function ColumnSelector<TData extends KitsuResource>({
   }
 
   function applyFilterColumns() {
+    setDisplayedColumns([]);
     // setSelectedColumnSelectorIndexMapColumns?.([]);
     // if (filteredColumnsState) {
     //   const checkedColumnIds = Object.keys(filteredColumnsState)
@@ -221,7 +277,6 @@ export function ColumnSelector<TData extends KitsuResource>({
         id={props.id}
         isChecked={props.isChecked}
         isField={props.isField}
-        filteredColumnsState={filteredColumnsState}
         ref={ref}
         handleClick={props.handleClick}
       />
@@ -239,8 +294,7 @@ export function ColumnSelector<TData extends KitsuResource>({
           style={{
             ...props.style,
             width: "25rem",
-            padding: "0 1.25rem 1.25rem 1.25rem",
-
+            padding: "1.25rem 1.25rem 1.25rem 1.25rem",
             zIndex: 1
           }}
           className={props.className}
@@ -262,7 +316,9 @@ export function ColumnSelector<TData extends KitsuResource>({
                 type="text"
                 placeholder="Search"
                 value={searchValue}
-                onChange={(event) => setSearchValue(event.target.value)}
+                onChange={(event) => {
+                  setSearchValue(event.target.value);
+                }}
               />
               <Dropdown.Divider />
             </div>
@@ -290,9 +346,7 @@ export function ColumnSelector<TData extends KitsuResource>({
     }
   );
 
-  return loading ? (
-    <LoadingSpinner loading={loading} />
-  ) : menuOnly ? (
+  return menuOnly ? (
     <ColumnSelectorMenu>
       <Dropdown.Item
         id="selectAll"
@@ -301,52 +355,13 @@ export function ColumnSelector<TData extends KitsuResource>({
         as={CheckboxItem}
       />
       {columnOptions?.map((column) => {
-        function handleToggle(event) {
-          // const reactTableToggleHandler = column?.getToggleVisibilityHandler();
-          // reactTableToggleHandler(event);
-          // const columnId = column.id;
-          // setLocalStorageColumnStates({
-          //   ...localStorageColumnStates,
-          //   [columnId]: event.target.checked
-          // });
-          // if (event.target.checked) {
-          //   const visibleIndexMapColumn = searchedColumns?.find(
-          //     (searchedColumn) => {
-          //       if (
-          //         !NOT_EXPORTABLE_COLUMN_IDS.includes(column.id) &&
-          //         !columnSelectorDefaultColumns?.find(
-          //           (defaultColumn) => defaultColumn.id === column.id
-          //         ) &&
-          //         searchedColumn.id === column.id
-          //       ) {
-          //         return true;
-          //       }
-          //       return false;
-          //     }
-          //   );
-          //   if (visibleIndexMapColumn) {
-          //     setVisibleIndexMapColumns([
-          //       ...visibleIndexMapColumns,
-          //       visibleIndexMapColumn?.columnDef
-          //     ]);
-          //   }
-          // } else {
-          //   setVisibleIndexMapColumns(
-          //     visibleIndexMapColumns.filter(
-          //       (visibleColumn) =>
-          //         !!visibleColumn && visibleColumn.id !== column.id
-          //     )
-          //   );
-          // }
-        }
         return (
           <>
             <Dropdown.Item
               key={column?.id}
               id={column?.id}
-              isChecked={false}
-              isField={true}
-              handleClick={handleToggle}
+              isChecked={isChecked(column?.id)}
+              handleClick={() => toggleColumn(column?.id)}
               as={CheckboxItem}
             />
           </>
@@ -367,25 +382,31 @@ export function ColumnSelector<TData extends KitsuResource>({
         as={ColumnSelectorMenu}
         style={{ maxHeight: "20rem", overflowY: "scroll" }}
       >
-        <Dropdown.Item
-          id="selectAll"
-          handleClick={handleToggleAll}
-          isChecked={false}
-          as={CheckboxItem}
-        />
-        {columnOptions?.map((column) => {
-          return (
-            <>
-              <Dropdown.Item
-                key={column?.id}
-                id={column?.id}
-                isChecked={false}
-                isField={true}
-                as={CheckboxItem}
-              />
-            </>
-          );
-        })}
+        {loading ? (
+          <LoadingSpinner loading={loading} />
+        ) : (
+          <>
+            <Dropdown.Item
+              id="selectAll"
+              handleClick={handleToggleAll}
+              isChecked={false}
+              as={CheckboxItem}
+            />
+            {columnOptions?.map((column) => {
+              return (
+                <>
+                  <Dropdown.Item
+                    key={column?.id}
+                    id={column?.id}
+                    isChecked={isChecked(column?.id)}
+                    handleClick={() => toggleColumn(column?.id)}
+                    as={CheckboxItem}
+                  />
+                </>
+              );
+            })}
+          </>
+        )}
       </Dropdown.Menu>
     </Dropdown>
   );

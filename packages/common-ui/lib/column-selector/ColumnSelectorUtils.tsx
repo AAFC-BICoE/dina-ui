@@ -1,5 +1,10 @@
 import { FieldHeader, dateCell } from "..";
-import { DynamicField, ESIndexMapping, TableColumn } from "../list-page/types";
+import {
+  DynamicField,
+  DynamicFieldsMappingConfig,
+  ESIndexMapping,
+  TableColumn
+} from "../list-page/types";
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
 import lodash, { get, startCase } from "lodash";
 import { useMemo } from "react";
@@ -8,12 +13,19 @@ import { useIntl } from "react-intl";
 export interface ColumnSelectorIndexMapColumns<TData extends KitsuResource> {
   indexMapping?: ESIndexMapping[];
   setColumnOptions?: React.Dispatch<React.SetStateAction<TableColumn<TData>[]>>;
+  apiClient: Kitsu;
+  dynamicFieldMapping?: DynamicFieldsMappingConfig;
 }
 
 // Hook to get all of index map columns to be added to column selector
 export async function getColumnSelectorIndexMapColumns<
   TData extends KitsuResource
->({ indexMapping, setColumnOptions }: ColumnSelectorIndexMapColumns<TData>) {
+>({
+  indexMapping,
+  setColumnOptions,
+  apiClient,
+  dynamicFieldMapping
+}: ColumnSelectorIndexMapColumns<TData>) {
   const columnOptions: TableColumn<TData>[] = [];
 
   if (indexMapping) {

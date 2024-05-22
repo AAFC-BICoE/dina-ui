@@ -1043,6 +1043,7 @@ export function QueryPage<TData extends KitsuResource>({
                       dynamicFieldMapping={dynamicFieldMapping}
                       displayedColumns={displayedColumns}
                       setDisplayedColumns={setDisplayedColumns}
+                      defaultColumns={columns}
                     />
                   )}
                   {bulkEditPath && (
