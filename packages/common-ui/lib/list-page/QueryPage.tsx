@@ -3,7 +3,6 @@ import {
   ColumnSort,
   Row,
   SortingState,
-  Table,
   VisibilityState
 } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
@@ -22,6 +21,7 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
 import {
+  ColumnSelector,
   FormikButton,
   ReactTable,
   ReactTableProps,
@@ -64,14 +64,6 @@ import {
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
 import { DynamicFieldsMappingConfig, TableColumn } from "./types";
-import {
-  getAttributeExtensionFieldColumn,
-  getAttributesManagedAttributeColumn,
-  getAttributesStandardColumns,
-  getIncludedExtensionFieldColumn,
-  getIncludedManagedAttributeColumn,
-  getIncludedStandardColumns
-} from "../column-selector/ColumnSelectorUtils";
 import { useSessionStorage } from "usehooks-ts";
 import {
   ValidationError,
@@ -96,6 +88,8 @@ const MAX_COUNT_SIZE: number = 10000;
 export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Columns to render on the table. This will also be used to map the data to a specific column.
+   *
+   * If the column selector is being used, this is the default columns to be shown for new users.
    */
   columns: TableColumn<TData>[];
 
@@ -249,6 +243,11 @@ export interface QueryPageProps<TData extends KitsuResource> {
 
   enableDnd?: boolean;
 
+  /**
+   * Display the column selector, this will display all the same columns from the QueryBuilder.
+   *
+   * Default is true.
+   */
   enableColumnSelector?: boolean;
 }
 
@@ -261,6 +260,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
  * * Sorting
  * * Filtering using ElasticSearch Indexing
  * * Saved Searches
+ * * Column Selector
  */
 export function QueryPage<TData extends KitsuResource>({
   indexName,
@@ -296,73 +296,58 @@ export function QueryPage<TData extends KitsuResource>({
   const { groupNames } = useAccount();
   const isInitialQueryFinished = useRef(false);
   const isActionTriggeredQuery = useRef(false);
-  const [reactTable, setReactTable] = useState<Table<TData> | undefined>();
   const [visibleIndexMapColumns] = useLocalStorage<any[]>(
     `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
     []
   );
-  // Combined columns from passed in columns
-  const [totalColumns, setTotalColumns] =
-    useState<TableColumn<TData>[]>(columns);
-  const [
-    selectedColumnSelectorIndexMapColumns,
-    setSelectedColumnSelectorIndexMapColumns
-  ] = useState<any[]>([]);
-  const [loadingIndexMapColumns, setLoadingIndexMapColumns] =
-    useState<boolean>(false);
 
-  function setSelectedColumnSelectorIndexMapColumnsProxy(params: any[]) {
-    setSelectedColumnSelectorIndexMapColumns(params);
-    isActionTriggeredQuery.current = true;
-  }
-
-  useEffect(() => {
-    visibleIndexMapColumns.forEach((visibleIndexMapColumn) => {
-      if (visibleIndexMapColumn?.relationshipType) {
-        if (visibleIndexMapColumn.extensionValue) {
-          getIncludedExtensionFieldColumn(
-            visibleIndexMapColumn.queryOption,
-            visibleIndexMapColumn.extensionValue,
-            visibleIndexMapColumn.extensionField,
-            setSelectedColumnSelectorIndexMapColumns
-          );
-        } else if (visibleIndexMapColumn?.managedAttribute) {
-          getIncludedManagedAttributeColumn(
-            visibleIndexMapColumn.managedAttribute,
-            visibleIndexMapColumn.queryOption,
-            setSelectedColumnSelectorIndexMapColumns
-          );
-        } else {
-          getIncludedStandardColumns(
-            visibleIndexMapColumn?.queryOption,
-            setSelectedColumnSelectorIndexMapColumns
-          );
-        }
-      } else {
-        if (visibleIndexMapColumn?.extensionValue) {
-          getAttributeExtensionFieldColumn(
-            visibleIndexMapColumn.queryOption,
-            visibleIndexMapColumn.extensionValue,
-            visibleIndexMapColumn.extensionField,
-            setSelectedColumnSelectorIndexMapColumns
-          );
-        } else if (visibleIndexMapColumn?.managedAttribute) {
-          getAttributesManagedAttributeColumn(
-            visibleIndexMapColumn.managedAttribute,
-            visibleIndexMapColumn.queryOption,
-            setSelectedColumnSelectorIndexMapColumns
-          );
-        } else {
-          if (visibleIndexMapColumn) {
-            getAttributesStandardColumns(
-              visibleIndexMapColumn.queryOption,
-              setSelectedColumnSelectorIndexMapColumns
-            );
-          }
-        }
-      }
-    });
-  }, []);
+  // useEffect(() => {
+  //   visibleIndexMapColumns.forEach((visibleIndexMapColumn) => {
+  //     if (visibleIndexMapColumn?.relationshipType) {
+  //       if (visibleIndexMapColumn.extensionValue) {
+  //         getIncludedExtensionFieldColumn(
+  //           visibleIndexMapColumn.queryOption,
+  //           visibleIndexMapColumn.extensionValue,
+  //           visibleIndexMapColumn.extensionField,
+  //           setSelectedColumnSelectorIndexMapColumns
+  //         );
+  //       } else if (visibleIndexMapColumn?.managedAttribute) {
+  //         getIncludedManagedAttributeColumn(
+  //           visibleIndexMapColumn.managedAttribute,
+  //           visibleIndexMapColumn.queryOption,
+  //           setSelectedColumnSelectorIndexMapColumns
+  //         );
+  //       } else {
+  //         getIncludedStandardColumns(
+  //           visibleIndexMapColumn?.queryOption,
+  //           setSelectedColumnSelectorIndexMapColumns
+  //         );
+  //       }
+  //     } else {
+  //       if (visibleIndexMapColumn?.extensionValue) {
+  //         getAttributeExtensionFieldColumn(
+  //           visibleIndexMapColumn.queryOption,
+  //           visibleIndexMapColumn.extensionValue,
+  //           visibleIndexMapColumn.extensionField,
+  //           setSelectedColumnSelectorIndexMapColumns
+  //         );
+  //       } else if (visibleIndexMapColumn?.managedAttribute) {
+  //         getAttributesManagedAttributeColumn(
+  //           visibleIndexMapColumn.managedAttribute,
+  //           visibleIndexMapColumn.queryOption,
+  //           setSelectedColumnSelectorIndexMapColumns
+  //         );
+  //       } else {
+  //         if (visibleIndexMapColumn) {
+  //           getAttributesStandardColumns(
+  //             visibleIndexMapColumn.queryOption,
+  //             setSelectedColumnSelectorIndexMapColumns
+  //           );
+  //         }
+  //       }
+  //     }
+  //   });
+  // }, []);
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -370,6 +355,12 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Total number of records from the query. This is not the total displayed on the screen.
   const [totalRecords, setTotalRecords] = useState<number>(0);
+
+  // Columns to be displayed on the table, if column selector is used this can be anything. Default
+  // is the columns prop if not being used.
+  const [displayedColumns, setDisplayedColumns] = useState<
+    TableColumn<TData>[]
+  >([]);
 
   // User applied sorting rules for elastic search to use.
   const localStorageLastUsedSortKey = uniqueName + "-last-used-sort";
@@ -404,7 +395,7 @@ export function QueryPage<TData extends KitsuResource>({
     useState<ImmutableTree>(defaultQueryTree());
 
   // The query builder configuration.
-  const { queryBuilderConfig } = useQueryBuilderConfig({
+  const { queryBuilderConfig, indexMap } = useQueryBuilderConfig({
     indexName,
     dynamicFieldMapping,
     customViewFields
@@ -433,6 +424,13 @@ export function QueryPage<TData extends KitsuResource>({
   const defaultGroups = {
     group: groups
   };
+
+  /** If column selector is not being used, just load the default columns in. */
+  useEffect(() => {
+    if (!enableColumnSelector) {
+      setDisplayedColumns(columns);
+    }
+  }, [enableColumnSelector]);
 
   useEffect(() => {
     if (viewMode && selectedResources?.length !== undefined) {
@@ -507,10 +505,7 @@ export function QueryPage<TData extends KitsuResource>({
       );
     }
 
-    const combinedColumns = uniqBy(
-      [...columns, ...selectedColumnSelectorIndexMapColumns],
-      "id"
-    );
+    const combinedColumns = uniqBy([...columns, ...displayedColumns], "id");
 
     queryDSL = applyRootQuery(queryDSL);
 
@@ -614,8 +609,7 @@ export function QueryPage<TData extends KitsuResource>({
     sortingRules,
     submittedQueryBuilderTree,
     groups,
-    loadingIndexMapColumns,
-    selectedColumnSelectorIndexMapColumns
+    displayedColumns
   ]);
 
   // Once the configuration is setup, we can display change the tree.
@@ -795,7 +789,7 @@ export function QueryPage<TData extends KitsuResource>({
       : reactTableProps;
 
   const columnVisibility = compact(
-    totalColumns?.map((col) =>
+    displayedColumns?.map((col) =>
       col.isColumnVisible === false
         ? { id: col.id, visibility: false }
         : { id: col.id, visibility: true }
@@ -817,7 +811,7 @@ export function QueryPage<TData extends KitsuResource>({
       ...columnVisibility,
       ...localStorageColumnStates
     });
-  }, [totalColumns]);
+  }, [displayedColumns]);
 
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     sort: sortingRules,
@@ -841,8 +835,7 @@ export function QueryPage<TData extends KitsuResource>({
             }
           ]
         : []),
-      ...totalColumns,
-      ...selectedColumnSelectorIndexMapColumns
+      ...displayedColumns
     ],
     "id"
   );
@@ -981,8 +974,6 @@ export function QueryPage<TData extends KitsuResource>({
     }
   }
 
-  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
-
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
 
@@ -1021,7 +1012,6 @@ export function QueryPage<TData extends KitsuResource>({
             groups={groups}
             uniqueName={uniqueName}
             validationErrors={validationErrors}
-            reactTable={reactTable}
           />
         </>
       )}
@@ -1045,7 +1035,16 @@ export function QueryPage<TData extends KitsuResource>({
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (
                 <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
-                  {enableColumnSelector && columnSelector}
+                  {enableColumnSelector && (
+                    <ColumnSelector
+                      uniqueName={uniqueName}
+                      menuOnly={true}
+                      indexMapping={indexMap}
+                      dynamicFieldMapping={dynamicFieldMapping}
+                      displayedColumns={displayedColumns}
+                      setDisplayedColumns={setDisplayedColumns}
+                    />
+                  )}
                   {bulkEditPath && (
                     <BulkEditButton
                       pathname={bulkEditPath}
@@ -1126,18 +1125,6 @@ export function QueryPage<TData extends KitsuResource>({
                 </div>
               )}
               <ReactTable<TData>
-                // These props are needed for column selector
-                setReactTable={setReactTable}
-                setColumnSelector={setColumnSelector}
-                uniqueName={uniqueName}
-                indexName={indexName}
-                dynamicFieldMapping={dynamicFieldMapping}
-                setColumnSelectorIndexMapColumns={setTotalColumns}
-                setSelectedColumnSelectorIndexMapColumns={
-                  setSelectedColumnSelectorIndexMapColumnsProxy
-                }
-                setLoadingIndexMapColumns={setLoadingIndexMapColumns}
-                columnSelectorDefaultColumns={columns}
                 // Column and data props
                 columns={columnsResults}
                 data={

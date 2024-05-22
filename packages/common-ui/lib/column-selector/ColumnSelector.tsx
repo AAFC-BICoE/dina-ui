@@ -7,7 +7,7 @@ import { useIntl } from "react-intl";
 import { startCase } from "lodash";
 import { Button } from "react-bootstrap";
 import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
-import Kitsu from "kitsu";
+import Kitsu, { KitsuResource } from "kitsu";
 import { Table, VisibilityState, Column } from "@tanstack/react-table";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
 import {
@@ -15,27 +15,27 @@ import {
   getColumnSelectorIndexMapColumns,
   getGroupedIndexMappings
 } from "./ColumnSelectorUtils";
-import { DynamicFieldsMappingConfig } from "../list-page/types";
+import {
+  DynamicFieldsMappingConfig,
+  ESIndexMapping,
+  TableColumn
+} from "../list-page/types";
 import { useIndexMapping } from "../list-page/useIndexMapping";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleIndexColumns";
-export interface ColumnSelectorProps<TData> {
-  /** A unique identifier to be used for local storage key */
-  uniqueName?: string;
-  reactTable: Table<TData> | undefined;
-  menuOnly?: boolean;
+
+export interface ColumnSelectorProps<TData extends KitsuResource> {
   /**
-   * Used for the listing page to understand which columns can be provided. Filters are generated
-   * based on the index provided.
-   *
-   * Also used to store saved searches under a specific type:
-   *
-   * `UserPreference.savedSearches.[INDEX_NAME].[SAVED_SEARCH_NAME]`
-   *
-   * For example, to get the default saved searches for the material sample index:
-   * `UserPreference.savedSearches.dina_material_sample_index.default.filters`
+   * A unique identifier to be used for local storage key
    */
-  indexName?: string;
+  uniqueName?: string;
+
+  menuOnly?: boolean;
+
+  /**
+   * Index mapping containing all of the fields that should be displayed in the list.
+   */
+  indexMapping: ESIndexMapping[] | undefined;
 
   /**
    * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
@@ -46,21 +46,17 @@ export interface ColumnSelectorProps<TData> {
    */
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
-  // State setter to pass the processed index map columns to parent components
-  setColumnSelectorIndexMapColumns?: React.Dispatch<
-    React.SetStateAction<any[]>
+  /**
+   * The currently displayed columns on the table.
+   */
+  displayedColumns: TableColumn<TData>[];
+
+  /**
+   * Once the selection is applied, this will be used to set the current columns.
+   */
+  setDisplayedColumns: React.Dispatch<
+    React.SetStateAction<TableColumn<TData>[]>
   >;
-
-  // State setter to pass the processed index map columns to parent components
-  setSelectedColumnSelectorIndexMapColumns?: React.Dispatch<
-    React.SetStateAction<any[]>
-  >;
-
-  // If true, index map columns are being loaded and processed from back end
-  setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
-
-  // The default visible columns
-  columnSelectorDefaultColumns?: any[];
 }
 
 // Ids of columns not supported for exporting
@@ -70,24 +66,23 @@ export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
   "viewPreviewButtonText"
 ];
 
-export function ColumnSelector<TData>({
+export function ColumnSelector<TData extends KitsuResource>({
   uniqueName,
-  reactTable,
   menuOnly,
-  indexName,
+  indexMapping,
   dynamicFieldMapping,
-  setColumnSelectorIndexMapColumns,
-  setLoadingIndexMapColumns,
-  columnSelectorDefaultColumns,
-  setSelectedColumnSelectorIndexMapColumns
+  displayedColumns,
+  setDisplayedColumns
 }: ColumnSelectorProps<TData>) {
   const [localStorageColumnStates, setLocalStorageColumnStates] =
     useLocalStorage<VisibilityState | undefined>(
       `${uniqueName}_columnSelector`,
       {}
     );
+
   const [loadedIndexMapColumns, setLoadedIndexMapColumns] =
     useState<boolean>(false);
+
   const {
     show: showMenu,
     showDropdown: showDropdownMenu,
@@ -95,16 +90,6 @@ export function ColumnSelector<TData>({
     onKeyDown: onKeyPressDown
   } = menuDisplayControl();
   const { apiClient } = useApiClient();
-  let groupedIndexMappings;
-  let indexMap;
-  if (indexName) {
-    const indexObject = useIndexMapping({
-      indexName,
-      dynamicFieldMapping
-    });
-    indexMap = indexObject.indexMap;
-    groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
-  }
 
   const [visibleIndexMapColumns, setVisibleIndexMapColumns] = useLocalStorage<
     any[]
@@ -116,19 +101,22 @@ export function ColumnSelector<TData>({
     const showDropdown = async () => {
       if (!loadedIndexMapColumns) {
         setLoading(true);
-        await getColumnSelectorIndexMapColumns({
-          groupedIndexMappings,
-          setLoadedIndexMapColumns,
-          setColumnSelectorIndexMapColumns,
-          apiClient
-        });
+        // This will be where the dynamic fields will be loaded in...
+        // await getColumnSelectorIndexMapColumns({
+        //   groupedIndexMappings,
+        //   setLoadedIndexMapColumns,
+        //   setColumnSelectorIndexMapColumns,
+        //   apiClient
+        // });
         setLoading(false);
       }
       setShow(true);
     };
+
     const hideDropdown = () => {
       setShow(false);
     };
+
     function onKeyDown(e) {
       if (
         e.key === "ArrowDown" ||
@@ -142,24 +130,27 @@ export function ColumnSelector<TData>({
         hideDropdown();
       }
     }
+
     function onKeyDownLastItem(e) {
       if (!e.shiftKey && e.key === "Tab") {
         hideDropdown();
       }
     }
+
     return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
   }
 
   const { formatMessage, messages } = useIntl();
+
   // For finding columns using text search
-  const columnSearchMapping: { label: string; id: string }[] | undefined =
-    reactTable?.getAllLeafColumns().map((column) => {
-      const messageKey = `field_${column.id}`;
-      const label = messages[messageKey]
-        ? formatMessage({ id: messageKey as any })
-        : startCase(column.id);
-      return { label: label.toLowerCase(), id: column.id };
-    });
+  // const columnSearchMapping: { label: string; id: string }[] | undefined =
+  //   reactTable?.getAllLeafColumns().map((column) => {
+  //     const messageKey = `field_${column.id}`;
+  //     const label = messages[messageKey]
+  //       ? formatMessage({ id: messageKey as any })
+  //       : startCase(column.id);
+  //     return { label: label.toLowerCase(), id: column.id };
+  //   });
 
   // Keep track of user selected options for when user presses "Apply"
   const filteredColumnsState: VisibilityState = localStorageColumnStates
@@ -169,72 +160,63 @@ export function ColumnSelector<TData>({
   const [searchedColumns, setSearchedColumns] =
     useState<Column<TData, unknown>[]>();
 
-  // Set initial columns for column selector dropdown and local storage
-  useEffect(() => {
-    if (localStorageColumnStates) {
-      reactTable?.setColumnVisibility(localStorageColumnStates);
-    }
-    setSearchedColumns(reactTable?.getAllLeafColumns());
-  }, [reactTable, reactTable?.getAllColumns().length]);
-
   const [loading, setLoading] = useState(false);
 
   // Keep track of column text search value
   const [filterColumsValue, setFilterColumnsValue] = useState<string>("");
 
   function handleToggleAll(event) {
-    const visibilityState = reactTable?.getState()?.columnVisibility;
-    if (visibilityState) {
-      Object.keys(visibilityState).forEach((columnId) => {
-        visibilityState[columnId] = event.target.checked;
-      });
-      NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
-        visibilityState[columnId] = true;
-      });
-      setLocalStorageColumnStates(visibilityState);
-    }
-    const reactTableToggleAllHander =
-      reactTable?.getToggleAllColumnsVisibilityHandler();
-    if (reactTableToggleAllHander) {
-      reactTableToggleAllHander(event);
-      NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
-        reactTable?.getColumn(columnId)?.toggleVisibility(true);
-      });
-    }
+    // const visibilityState = reactTable?.getState()?.columnVisibility;
+    // if (visibilityState) {
+    //   Object.keys(visibilityState).forEach((columnId) => {
+    //     visibilityState[columnId] = event.target.checked;
+    //   });
+    //   NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
+    //     visibilityState[columnId] = true;
+    //   });
+    //   setLocalStorageColumnStates(visibilityState);
+    // }
+    // const reactTableToggleAllHander =
+    //   reactTable?.getToggleAllColumnsVisibilityHandler();
+    // if (reactTableToggleAllHander) {
+    //   reactTableToggleAllHander(event);
+    //   NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
+    //     reactTable?.getColumn(columnId)?.toggleVisibility(true);
+    //   });
+    // }
   }
 
   function applyFilterColumns() {
-    setSelectedColumnSelectorIndexMapColumns?.([]);
-    if (filteredColumnsState) {
-      const checkedColumnIds = Object.keys(filteredColumnsState)
-        .filter((key) => {
-          return filteredColumnsState[key];
-        })
-        .filter((id) => !NOT_EXPORTABLE_COLUMN_IDS.includes(id));
-      checkedColumnIds.forEach((id) => {
-        const columnToAddToIndexMapColumns = searchedColumns?.find(
-          (column) => column.id === id
-        );
-        if (columnToAddToIndexMapColumns) {
-          addColumnToStateVariable(
-            columnToAddToIndexMapColumns.columnDef,
-            setSelectedColumnSelectorIndexMapColumns,
-            columnSelectorDefaultColumns
-          );
-        }
-      });
-
-      reactTable?.setColumnVisibility(filteredColumnsState);
-      setSelectedColumnSelectorIndexMapColumns?.((selectedIndexMapColumns) => {
-        writeStorage(
-          `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
-          selectedIndexMapColumns
-        );
-        return selectedIndexMapColumns;
-      });
-    }
-    setLoadingIndexMapColumns?.((current) => !current);
-    setLocalStorageColumnStates(filteredColumnsState);
+    // setSelectedColumnSelectorIndexMapColumns?.([]);
+    // if (filteredColumnsState) {
+    //   const checkedColumnIds = Object.keys(filteredColumnsState)
+    //     .filter((key) => {
+    //       return filteredColumnsState[key];
+    //     })
+    //     .filter((id) => !NOT_EXPORTABLE_COLUMN_IDS.includes(id));
+    //   checkedColumnIds.forEach((id) => {
+    //     const columnToAddToIndexMapColumns = searchedColumns?.find(
+    //       (column) => column.id === id
+    //     );
+    //     if (columnToAddToIndexMapColumns) {
+    //       addColumnToStateVariable(
+    //         columnToAddToIndexMapColumns.columnDef,
+    //         setSelectedColumnSelectorIndexMapColumns,
+    //         columnSelectorDefaultColumns
+    //       );
+    //     }
+    //   });
+    //   reactTable?.setColumnVisibility(filteredColumnsState);
+    //   setSelectedColumnSelectorIndexMapColumns?.((selectedIndexMapColumns) => {
+    //     writeStorage(
+    //       `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
+    //       selectedIndexMapColumns
+    //     );
+    //     return selectedIndexMapColumns;
+    //   });
+    // }
+    // setLoadingIndexMapColumns?.((current) => !current);
+    // setLocalStorageColumnStates(filteredColumnsState);
   }
 
   const CheckboxItem = React.forwardRef((props: any, ref) => {
@@ -286,23 +268,23 @@ export function ColumnSelector<TData>({
                 placeholder="Search"
                 value={filterColumsValue}
                 onChange={(event) => {
-                  const value = event.target.value;
-                  setFilterColumnsValue(value);
-                  if (value === "" || !value) {
-                    setSearchedColumns(reactTable?.getAllLeafColumns());
-                  } else {
-                    const searchedColumnsIds = columnSearchMapping
-                      ?.filter((columnMapping) =>
-                        columnMapping.label.includes(value?.toLowerCase())
-                      )
-                      .map((filteredMapping) => filteredMapping.id);
-                    const filteredColumns = reactTable
-                      ?.getAllLeafColumns()
-                      .filter((column) =>
-                        searchedColumnsIds?.includes(column.id)
-                      );
-                    setSearchedColumns(filteredColumns);
-                  }
+                  // const value = event.target.value;
+                  // setFilterColumnsValue(value);
+                  // if (value === "" || !value) {
+                  //   setSearchedColumns(reactTable?.getAllLeafColumns());
+                  // } else {
+                  //   const searchedColumnsIds = columnSearchMapping
+                  //     ?.filter((columnMapping) =>
+                  //       columnMapping.label.includes(value?.toLowerCase())
+                  //     )
+                  //     .map((filteredMapping) => filteredMapping.id);
+                  //   const filteredColumns = reactTable
+                  //     ?.getAllLeafColumns()
+                  //     .filter((column) =>
+                  //       searchedColumnsIds?.includes(column.id)
+                  //     );
+                  //   setSearchedColumns(filteredColumns);
+                  // }
                 }}
               />
               <Dropdown.Divider />
@@ -338,47 +320,47 @@ export function ColumnSelector<TData>({
       <Dropdown.Item
         id="selectAll"
         handleClick={handleToggleAll}
-        isChecked={reactTable?.getIsAllColumnsVisible()}
+        isChecked={false}
         as={CheckboxItem}
       />
       {searchedColumns?.map((column) => {
         function handleToggle(event) {
-          const reactTableToggleHandler = column?.getToggleVisibilityHandler();
-          reactTableToggleHandler(event);
-          const columnId = column.id;
-          setLocalStorageColumnStates({
-            ...localStorageColumnStates,
-            [columnId]: event.target.checked
-          });
-          if (event.target.checked) {
-            const visibleIndexMapColumn = searchedColumns?.find(
-              (searchedColumn) => {
-                if (
-                  !NOT_EXPORTABLE_COLUMN_IDS.includes(column.id) &&
-                  !columnSelectorDefaultColumns?.find(
-                    (defaultColumn) => defaultColumn.id === column.id
-                  ) &&
-                  searchedColumn.id === column.id
-                ) {
-                  return true;
-                }
-                return false;
-              }
-            );
-            if (visibleIndexMapColumn) {
-              setVisibleIndexMapColumns([
-                ...visibleIndexMapColumns,
-                visibleIndexMapColumn?.columnDef
-              ]);
-            }
-          } else {
-            setVisibleIndexMapColumns(
-              visibleIndexMapColumns.filter(
-                (visibleColumn) =>
-                  !!visibleColumn && visibleColumn.id !== column.id
-              )
-            );
-          }
+          // const reactTableToggleHandler = column?.getToggleVisibilityHandler();
+          // reactTableToggleHandler(event);
+          // const columnId = column.id;
+          // setLocalStorageColumnStates({
+          //   ...localStorageColumnStates,
+          //   [columnId]: event.target.checked
+          // });
+          // if (event.target.checked) {
+          //   const visibleIndexMapColumn = searchedColumns?.find(
+          //     (searchedColumn) => {
+          //       if (
+          //         !NOT_EXPORTABLE_COLUMN_IDS.includes(column.id) &&
+          //         !columnSelectorDefaultColumns?.find(
+          //           (defaultColumn) => defaultColumn.id === column.id
+          //         ) &&
+          //         searchedColumn.id === column.id
+          //       ) {
+          //         return true;
+          //       }
+          //       return false;
+          //     }
+          //   );
+          //   if (visibleIndexMapColumn) {
+          //     setVisibleIndexMapColumns([
+          //       ...visibleIndexMapColumns,
+          //       visibleIndexMapColumn?.columnDef
+          //     ]);
+          //   }
+          // } else {
+          //   setVisibleIndexMapColumns(
+          //     visibleIndexMapColumns.filter(
+          //       (visibleColumn) =>
+          //         !!visibleColumn && visibleColumn.id !== column.id
+          //     )
+          //   );
+          // }
         }
         return (
           <>
@@ -411,7 +393,7 @@ export function ColumnSelector<TData>({
         <Dropdown.Item
           id="selectAll"
           handleClick={handleToggleAll}
-          isChecked={reactTable?.getIsAllColumnsVisible()}
+          isChecked={false}
           as={CheckboxItem}
         />
         {searchedColumns?.map((column) => {

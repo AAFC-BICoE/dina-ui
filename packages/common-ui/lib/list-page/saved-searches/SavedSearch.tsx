@@ -91,8 +91,6 @@ export interface SavedSearchProps {
    * to remain the same across tables, it can share the same name.
    */
   uniqueName: string;
-
-  reactTable?: Table<any>;
 }
 
 /**
@@ -118,8 +116,7 @@ export function SavedSearch({
   groups,
   setGroups,
   performSubmit,
-  uniqueName,
-  reactTable
+  uniqueName
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -391,14 +388,14 @@ export function SavedSearch({
       }
 
       if (savedSearchToLoad.columnVisibility) {
-        getColumnVisibility(savedSearchToLoad.columnVisibility);
+        // getColumnVisibility(savedSearchToLoad.columnVisibility);
         // Set ReactTable's column visibility
-        const columnVisibility: VisibilityState = getColumnVisibility(
-          savedSearchToLoad.columnVisibility
-        );
-        reactTable?.setColumnVisibility?.(columnVisibility);
+        // const columnVisibility: VisibilityState = getColumnVisibility(
+        //   savedSearchToLoad.columnVisibility
+        // );
+        // reactTable?.setColumnVisibility?.(columnVisibility);
         // Set local storage column visibility for navigating around the website
-        setLocalStorageColumnStates(columnVisibility);
+        // setLocalStorageColumnStates(columnVisibility);
       }
 
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
@@ -444,7 +441,7 @@ export function SavedSearch({
             default: setAsDefault,
 
             // Save selected columns
-            columnVisibility: saveColumnVisibility(),
+            // columnVisibility: saveColumnVisibility(),
 
             // If updateQueryTree is true, then we will retrieve the current query tree from the
             // query builder, otherwise it will remain the same as before.
@@ -649,31 +646,31 @@ export function SavedSearch({
     </>
   );
 
-  function saveColumnVisibility(): string[] | undefined {
-    const savedColumnVisibility = reactTable?.getState().columnVisibility
-      ? Object.keys(reactTable?.getState().columnVisibility).filter(
-          (columnKey) =>
-            reactTable?.getState().columnVisibility[columnKey] === true
-        )
-      : undefined;
-    return savedColumnVisibility;
-  }
+  // function saveColumnVisibility(): string[] | undefined {
+  //   const savedColumnVisibility = reactTable?.getState().columnVisibility
+  //     ? Object.keys(reactTable?.getState().columnVisibility).filter(
+  //         (columnKey) =>
+  //           reactTable?.getState().columnVisibility[columnKey] === true
+  //       )
+  //     : undefined;
+  //   return savedColumnVisibility;
+  // }
 
-  function getColumnVisibility(
-    savedColumnVisibility: string[] | undefined
-  ): VisibilityState {
-    const columnVisibility: VisibilityState = {};
-    if (reactTable?.getState().columnVisibility) {
-      Object.keys(reactTable?.getState().columnVisibility).forEach(
-        (columnKey) => {
-          columnVisibility[columnKey] = savedColumnVisibility?.includes(
-            columnKey
-          )
-            ? true
-            : false;
-        }
-      );
-    }
-    return columnVisibility;
-  }
+  // function getColumnVisibility(
+  //   savedColumnVisibility: string[] | undefined
+  // ): VisibilityState {
+  //   const columnVisibility: VisibilityState = {};
+  //   if (reactTable?.getState().columnVisibility) {
+  //     Object.keys(reactTable?.getState().columnVisibility).forEach(
+  //       (columnKey) => {
+  //         columnVisibility[columnKey] = savedColumnVisibility?.includes(
+  //           columnKey
+  //         )
+  //           ? true
+  //           : false;
+  //       }
+  //     );
+  //   }
+  //   return columnVisibility;
+  // }
 }

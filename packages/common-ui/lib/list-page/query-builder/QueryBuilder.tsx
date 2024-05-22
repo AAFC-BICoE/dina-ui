@@ -100,8 +100,6 @@ interface QueryBuilderProps {
    * submitting a broken query.
    */
   validationErrors: ValidationError[];
-
-  reactTable?: Table<any>;
 }
 
 function QueryBuilder({
@@ -116,8 +114,7 @@ function QueryBuilder({
   groups,
   setGroups,
   uniqueName,
-  validationErrors,
-  reactTable
+  validationErrors
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -163,7 +160,6 @@ function QueryBuilder({
           groups={groups}
           setGroups={setGroups}
           uniqueName={uniqueName}
-          reactTable={reactTable}
         />
         <Query
           {...queryBuilderConfig}
