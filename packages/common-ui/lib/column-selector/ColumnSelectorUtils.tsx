@@ -1,142 +1,94 @@
 import { FieldHeader, dateCell } from "..";
-import { DynamicField, ESIndexMapping } from "../list-page/types";
-import Kitsu, { GetParams } from "kitsu";
+import { DynamicField, ESIndexMapping, TableColumn } from "../list-page/types";
+import Kitsu, { GetParams, KitsuResource } from "kitsu";
 import lodash, { get, startCase } from "lodash";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
-export interface ColumnSelectorIndexMapColumns {
-  groupedIndexMappings: any;
-  setLoadedIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
-  setColumnSelectorIndexMapColumns?: React.Dispatch<
-    React.SetStateAction<any[]>
-  >;
-  setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
-  apiClient: Kitsu;
+export interface ColumnSelectorIndexMapColumns<TData extends KitsuResource> {
+  indexMapping?: ESIndexMapping[];
+  setColumnOptions?: React.Dispatch<React.SetStateAction<TableColumn<TData>[]>>;
 }
 
 // Hook to get all of index map columns to be added to column selector
-export async function getColumnSelectorIndexMapColumns({
-  groupedIndexMappings,
-  setLoadedIndexMapColumns,
-  setColumnSelectorIndexMapColumns,
-  apiClient,
-  setLoadingIndexMapColumns
-}: ColumnSelectorIndexMapColumns) {
-  setLoadingIndexMapColumns?.(true);
-  if (groupedIndexMappings) {
-    for (const groupedIndexMapping of groupedIndexMappings) {
-      const groupedIndexMappingOptions = groupedIndexMapping.options;
-      for (const queryOption of groupedIndexMappingOptions) {
-        if (queryOption.dynamicField) {
-          await getDynamicFieldColumns(
-            queryOption,
-            apiClient,
-            setColumnSelectorIndexMapColumns
+export async function getColumnSelectorIndexMapColumns<
+  TData extends KitsuResource
+>({ indexMapping, setColumnOptions }: ColumnSelectorIndexMapColumns<TData>) {
+  const columnOptions: TableColumn<TData>[] = [];
+
+  if (indexMapping) {
+    for (const indexColumn of indexMapping) {
+      if (indexColumn.parentType) {
+        const accessorKey = `${indexColumn.parentPath}.${indexColumn.path}.${indexColumn.label}`;
+
+        if (indexColumn.type === "date") {
+          columnOptions.push(
+            dateCell(
+              indexColumn.value,
+              accessorKey,
+              indexColumn.parentType,
+              false,
+              indexColumn
+            )
           );
         } else {
-          getStandardColumns(queryOption, setColumnSelectorIndexMapColumns);
+          columnOptions.push({
+            id: indexColumn.value,
+            header: () => <FieldHeader name={indexColumn.value} />,
+            accessorKey,
+            isKeyword: indexColumn.keywordMultiFieldSupport,
+            isColumnVisible: false,
+            cell: ({ row: { original } }) => {
+              const relationshipAccessor = accessorKey?.split(".");
+              relationshipAccessor?.splice(
+                1,
+                0,
+                indexColumn.parentType ? indexColumn.parentType : ""
+              );
+              const valuePath = relationshipAccessor?.join(".");
+              const value = get(original, valuePath);
+              return <>{value}</>;
+            },
+            relationshipType: indexColumn.parentType
+          });
+        }
+      } else {
+        if (indexColumn.type === "date") {
+          columnOptions.push(
+            dateCell(
+              indexColumn?.label,
+              indexColumn?.value,
+              undefined,
+              false,
+              indexColumn
+            )
+          );
+        } else {
+          columnOptions.push({
+            id: indexColumn?.label,
+            header: () => <FieldHeader name={indexColumn?.label} />,
+            accessorKey: indexColumn?.value,
+            isKeyword: indexColumn?.keywordMultiFieldSupport
+          });
         }
       }
+
+      setColumnOptions?.(columnOptions);
+
+      // const groupedIndexMappingOptions = groupedIndexMapping.options;
+      // for (const queryOption of groupedIndexMappingOptions) {
+      //   if (queryOption.dynamicField) {
+      //     await getDynamicFieldColumns(
+      //       queryOption,
+      //       apiClient,
+      //       setColumnSelectorIndexMapColumns
+      //     );
+      //   } else {
+      //     getStandardColumns(queryOption, setColumnSelectorIndexMapColumns);
+      //   }
+      // }
     }
   }
-
-  setLoadingIndexMapColumns?.(false);
-  setLoadedIndexMapColumns?.(true);
-}
-
-// Get standard columns that don't have dynamicField
-function getStandardColumns(
-  queryOption: QueryOption,
-  setColumnSelectorIndexMapColumns?: React.Dispatch<any>
-) {
-  if (queryOption.parentType) {
-    getIncludedStandardColumns(queryOption, setColumnSelectorIndexMapColumns);
-  } else {
-    getAttributesStandardColumns(queryOption, setColumnSelectorIndexMapColumns);
-  }
-}
-
-// Get standard columns that are the default attributes of the resource
-export function getAttributesStandardColumns(
-  queryOption: QueryOption,
-  setColumnSelectorIndexMapColumns?: React.Dispatch<any>
-) {
-  let column;
-  if (queryOption?.type === "date") {
-    column = dateCell(
-      queryOption?.label,
-      queryOption?.value,
-      undefined,
-      false,
-      queryOption
-    );
-  } else {
-    column = {
-      id: queryOption?.label,
-      header: () => <FieldHeader name={queryOption?.label} />,
-      accessorKey: queryOption?.value,
-      isKeyword: queryOption?.keywordMultiFieldSupport,
-      isColumnVisible: false,
-      queryOption
-    };
-  }
-  setColumnSelectorIndexMapColumns?.((currentColumns) => {
-    if (
-      currentColumns &&
-      !currentColumns.find(
-        (currentColumn) => currentColumn.accessorKey === column.accessorKey
-      )
-    ) {
-      return [...currentColumns, column];
-    } else {
-      return currentColumns;
-    }
-  });
-}
-
-// Get standard columns that are the included relationships of the resource
-export function getIncludedStandardColumns(
-  queryOption: QueryOption,
-  setColumnSelectorIndexMapColumns?: React.Dispatch<any>
-) {
-  let column;
-
-  const accessorKey = `${queryOption.parentPath}.${queryOption.path}.${queryOption.label}`;
-  if (queryOption.type === "date") {
-    column = dateCell(
-      queryOption.value,
-      accessorKey,
-      queryOption.parentType,
-      false,
-      queryOption
-    );
-  } else {
-    column = {
-      id: queryOption.value,
-      header: () => <FieldHeader name={queryOption.value} />,
-      accessorKey,
-      isKeyword: queryOption.keywordMultiFieldSupport,
-      isColumnVisible: false,
-      cell: ({ row: { original } }) => {
-        const relationshipAccessor = accessorKey?.split(".");
-        relationshipAccessor?.splice(
-          1,
-          0,
-          queryOption.parentType ? queryOption.parentType : ""
-        );
-        const valuePath = relationshipAccessor?.join(".");
-        const value = get(original, valuePath);
-        return <>{value}</>;
-      },
-      relationshipType: queryOption.parentType,
-      queryOption
-    };
-  }
-  setColumnSelectorIndexMapColumns?.((currentColumns) => [
-    ...currentColumns,
-    column
-  ]);
 }
 
 export function addColumnToStateVariable(

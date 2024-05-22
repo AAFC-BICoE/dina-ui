@@ -1038,7 +1038,7 @@ export function QueryPage<TData extends KitsuResource>({
                   {enableColumnSelector && (
                     <ColumnSelector
                       uniqueName={uniqueName}
-                      menuOnly={true}
+                      menuOnly={false}
                       indexMapping={indexMap}
                       dynamicFieldMapping={dynamicFieldMapping}
                       displayedColumns={displayedColumns}

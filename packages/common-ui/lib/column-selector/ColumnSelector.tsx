@@ -74,14 +74,20 @@ export function ColumnSelector<TData extends KitsuResource>({
   displayedColumns,
   setDisplayedColumns
 }: ColumnSelectorProps<TData>) {
+  // Loading state, specifically for dynamically loaded columns.
+  const [loading, setLoading] = useState(false);
+
+  // Search value for filtering the options.
+  const [searchValue, setSearchValue] = useState("");
+
+  // These are all the possible columns displayed to the user.
+  const [columnOptions, setColumnOptions] = useState<TableColumn<TData>[]>([]);
+
   const [localStorageColumnStates, setLocalStorageColumnStates] =
     useLocalStorage<VisibilityState | undefined>(
       `${uniqueName}_columnSelector`,
       {}
     );
-
-  const [loadedIndexMapColumns, setLoadedIndexMapColumns] =
-    useState<boolean>(false);
 
   const {
     show: showMenu,
@@ -89,7 +95,6 @@ export function ColumnSelector<TData extends KitsuResource>({
     hideDropdown: hideDropdownMenu,
     onKeyDown: onKeyPressDown
   } = menuDisplayControl();
-  const { apiClient } = useApiClient();
 
   const [visibleIndexMapColumns, setVisibleIndexMapColumns] = useLocalStorage<
     any[]
@@ -99,15 +104,13 @@ export function ColumnSelector<TData extends KitsuResource>({
     const [show, setShow] = useState(false);
 
     const showDropdown = async () => {
-      if (!loadedIndexMapColumns) {
-        setLoading(true);
+      // Check if the dropdown has been loaded yet, if not then load in dynamic fields.
+      if (!loading) {
         // This will be where the dynamic fields will be loaded in...
-        // await getColumnSelectorIndexMapColumns({
-        //   groupedIndexMappings,
-        //   setLoadedIndexMapColumns,
-        //   setColumnSelectorIndexMapColumns,
-        //   apiClient
-        // });
+        await getColumnSelectorIndexMapColumns<TData>({
+          indexMapping,
+          setColumnOptions
+        });
         setLoading(false);
       }
       setShow(true);
@@ -156,14 +159,6 @@ export function ColumnSelector<TData extends KitsuResource>({
   const filteredColumnsState: VisibilityState = localStorageColumnStates
     ? localStorageColumnStates
     : {};
-  // Columns filtered from text search
-  const [searchedColumns, setSearchedColumns] =
-    useState<Column<TData, unknown>[]>();
-
-  const [loading, setLoading] = useState(false);
-
-  // Keep track of column text search value
-  const [filterColumsValue, setFilterColumnsValue] = useState<string>("");
 
   function handleToggleAll(event) {
     // const visibilityState = reactTable?.getState()?.columnVisibility;
@@ -266,26 +261,8 @@ export function ColumnSelector<TData extends KitsuResource>({
                 className="form-control"
                 type="text"
                 placeholder="Search"
-                value={filterColumsValue}
-                onChange={(event) => {
-                  // const value = event.target.value;
-                  // setFilterColumnsValue(value);
-                  // if (value === "" || !value) {
-                  //   setSearchedColumns(reactTable?.getAllLeafColumns());
-                  // } else {
-                  //   const searchedColumnsIds = columnSearchMapping
-                  //     ?.filter((columnMapping) =>
-                  //       columnMapping.label.includes(value?.toLowerCase())
-                  //     )
-                  //     .map((filteredMapping) => filteredMapping.id);
-                  //   const filteredColumns = reactTable
-                  //     ?.getAllLeafColumns()
-                  //     .filter((column) =>
-                  //       searchedColumnsIds?.includes(column.id)
-                  //     );
-                  //   setSearchedColumns(filteredColumns);
-                  // }
-                }}
+                value={searchValue}
+                onChange={(event) => setSearchValue(event.target.value)}
               />
               <Dropdown.Divider />
             </div>
@@ -323,7 +300,7 @@ export function ColumnSelector<TData extends KitsuResource>({
         isChecked={false}
         as={CheckboxItem}
       />
-      {searchedColumns?.map((column) => {
+      {columnOptions?.map((column) => {
         function handleToggle(event) {
           // const reactTableToggleHandler = column?.getToggleVisibilityHandler();
           // reactTableToggleHandler(event);
@@ -367,7 +344,7 @@ export function ColumnSelector<TData extends KitsuResource>({
             <Dropdown.Item
               key={column?.id}
               id={column?.id}
-              isChecked={column?.getIsVisible()}
+              isChecked={false}
               isField={true}
               handleClick={handleToggle}
               as={CheckboxItem}
@@ -396,13 +373,13 @@ export function ColumnSelector<TData extends KitsuResource>({
           isChecked={false}
           as={CheckboxItem}
         />
-        {searchedColumns?.map((column) => {
+        {columnOptions?.map((column) => {
           return (
             <>
               <Dropdown.Item
                 key={column?.id}
                 id={column?.id}
-                isChecked={column?.getIsVisible()}
+                isChecked={false}
                 isField={true}
                 as={CheckboxItem}
               />
