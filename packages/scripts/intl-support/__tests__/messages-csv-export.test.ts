@@ -39,8 +39,7 @@ describe("Csv intl messages export", () => {
         "app1,hello,hello,bonjour",
         "app1,goodbye,goodbye,",
         "app2,yes,YES,",
-        "app2,no,NO,",
-        ""
+        "app2,no,NO,"
       ].join("\n")
     );
   });
