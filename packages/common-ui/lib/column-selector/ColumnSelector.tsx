@@ -70,10 +70,12 @@ export function ColumnSelector<TData extends KitsuResource>({
   const { formatMessage, messages } = useIntl();
 
   // Loading state, specifically for dynamically loaded columns.
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Search value for filtering the options.
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState<string>("");
+
+  const [selectAll, setSelectAll] = useState<boolean>(false);
 
   // These are all the possible columns displayed to the user.
   const [columnOptions, setColumnOptions] = useState<TableColumn<TData>[]>([]);
@@ -156,15 +158,26 @@ export function ColumnSelector<TData extends KitsuResource>({
     return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
   }
 
-  // For finding columns using text search
-  // const columnSearchMapping: { label: string; id: string }[] | undefined =
-  //   reactTable?.getAllLeafColumns().map((column) => {
-  //     const messageKey = `field_${column.id}`;
-  //     const label = messages[messageKey]
-  //       ? formatMessage({ id: messageKey as any })
-  //       : startCase(column.id);
-  //     return { label: label.toLowerCase(), id: column.id };
-  //   });
+  /**
+   * Search filter function, this is used to search through all the possible columns to display
+   * specific ones first.
+   *
+   * @param item Column definition.
+   * @returns true if it should be included in the results, false if not.
+   */
+  function searchFilter(item: TableColumn<TData>) {
+    // If empty search, skip filtering.
+    if (searchValue === "") {
+      return true;
+    }
+
+    // If field extension we want to search by the field value or the package.
+    // if ((item as any)?.columnMapping?.dynamicField?.type === "fieldExtension") {
+    //   return (item as any)?.
+    // }
+    // console.log(startCase(item.id));
+    return item?.id?.toLowerCase()?.indexOf(searchValue.toLowerCase()) !== -1;
+  }
 
   /**
    * This function is used to determine if a checkbox is selected or not. It checks the displayed
@@ -243,60 +256,49 @@ export function ColumnSelector<TData extends KitsuResource>({
     }
   }
 
+  /**
+   * Apply all the available columns to the tracked changes so it can be applied.
+   * @param event Used to determine if the checkbox is checked or unchecked.
+   */
   function handleToggleAll(event) {
-    setDisplayedColumns([]);
-    // const visibilityState = reactTable?.getState()?.columnVisibility;
-    // if (visibilityState) {
-    //   Object.keys(visibilityState).forEach((columnId) => {
-    //     visibilityState[columnId] = event.target.checked;
-    //   });
-    //   NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
-    //     visibilityState[columnId] = true;
-    //   });
-    //   setLocalStorageColumnStates(visibilityState);
-    // }
-    // const reactTableToggleAllHander =
-    //   reactTable?.getToggleAllColumnsVisibilityHandler();
-    // if (reactTableToggleAllHander) {
-    //   reactTableToggleAllHander(event);
-    //   NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
-    //     reactTable?.getColumn(columnId)?.toggleVisibility(true);
-    //   });
-    // }
+    const checked = event.target.checked;
+
+    // Apply to everything.
+    setNonAppliedOptions(
+      columnOptions.map<NonAppliedOptionChange<TData>>((item) => ({
+        column: item,
+        state: checked
+      }))
+    );
+
+    setSelectAll(checked);
   }
 
+  /**
+   * Once the user has selected everything they would like to add/remove, this function will actually
+   * apply the changes to the displayed columns.
+   */
   function applyFilterColumns() {
-    setDisplayedColumns([]);
-    // setSelectedColumnSelectorIndexMapColumns?.([]);
-    // if (filteredColumnsState) {
-    //   const checkedColumnIds = Object.keys(filteredColumnsState)
-    //     .filter((key) => {
-    //       return filteredColumnsState[key];
-    //     })
-    //     .filter((id) => !NOT_EXPORTABLE_COLUMN_IDS.includes(id));
-    //   checkedColumnIds.forEach((id) => {
-    //     const columnToAddToIndexMapColumns = searchedColumns?.find(
-    //       (column) => column.id === id
-    //     );
-    //     if (columnToAddToIndexMapColumns) {
-    //       addColumnToStateVariable(
-    //         columnToAddToIndexMapColumns.columnDef,
-    //         setSelectedColumnSelectorIndexMapColumns,
-    //         columnSelectorDefaultColumns
-    //       );
-    //     }
-    //   });
-    //   reactTable?.setColumnVisibility(filteredColumnsState);
-    //   setSelectedColumnSelectorIndexMapColumns?.((selectedIndexMapColumns) => {
-    //     writeStorage(
-    //       `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
-    //       selectedIndexMapColumns
-    //     );
-    //     return selectedIndexMapColumns;
-    //   });
-    // }
-    // setLoadingIndexMapColumns?.((current) => !current);
-    // setLocalStorageColumnStates(filteredColumnsState);
+    // Create a clone of the displayed columns to apply the changes in one go.
+    let newDisplayedColumns = displayedColumns;
+
+    for (const nonAppliedOption of nonAppliedOptions) {
+      // Check if the non applied option needs to be added (true) or removed (false).
+      if (nonAppliedOption.state === true) {
+        newDisplayedColumns = [...newDisplayedColumns, nonAppliedOption.column];
+      } else {
+        // Remove the displayed column.
+        newDisplayedColumns = newDisplayedColumns.filter(
+          (item) => item.id !== nonAppliedOption.column.id
+        );
+      }
+    }
+
+    // Apply the changes...
+    setDisplayedColumns(newDisplayedColumns);
+
+    // Empty the tracked changes...
+    setNonAppliedOptions([]);
   }
 
   const CheckboxItem = React.forwardRef((props: any, ref) => {
@@ -339,6 +341,7 @@ export function ColumnSelector<TData extends KitsuResource>({
             <div>
               <strong>{<FieldHeader name="filterColumns" />}</strong>
               <input
+                autoFocus={true}
                 name="filterColumns"
                 className="form-control"
                 type="text"
@@ -384,10 +387,10 @@ export function ColumnSelector<TData extends KitsuResource>({
       <Dropdown.Item
         id="selectAll"
         handleClick={handleToggleAll}
-        isChecked={false}
+        isChecked={selectAll}
         as={CheckboxItem}
       />
-      {columnOptions?.map((column) => {
+      {columnOptions.filter(searchFilter).map((column) => {
         return (
           <>
             <Dropdown.Item
@@ -422,10 +425,10 @@ export function ColumnSelector<TData extends KitsuResource>({
             <Dropdown.Item
               id="selectAll"
               handleClick={handleToggleAll}
-              isChecked={false}
+              isChecked={selectAll}
               as={CheckboxItem}
             />
-            {columnOptions?.map((column) => {
+            {columnOptions.filter(searchFilter).map((column) => {
               return (
                 <>
                   <Dropdown.Item
