@@ -4,23 +4,12 @@ import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
-import { startCase } from "lodash";
 import { Button } from "react-bootstrap";
 import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
 import Kitsu, { KitsuResource } from "kitsu";
-import { Table, VisibilityState, Column } from "@tanstack/react-table";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
-import {
-  addColumnToStateVariable,
-  getColumnSelectorIndexMapColumns,
-  getGroupedIndexMappings
-} from "./ColumnSelectorUtils";
-import {
-  DynamicFieldsMappingConfig,
-  ESIndexMapping,
-  TableColumn
-} from "../list-page/types";
-import { useIndexMapping } from "../list-page/useIndexMapping";
+import { getColumnSelectorIndexMapColumns } from "./ColumnSelectorUtils";
+import { ESIndexMapping, TableColumn } from "../list-page/types";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleIndexColumns";
 
@@ -111,6 +100,10 @@ export function ColumnSelector<TData extends KitsuResource>({
     }
   }, [localStorageDisplayedColumns]);
 
+  // useEffect(() => {
+  //   console.log(nonAppliedOptions);
+  // }, [nonAppliedOptions]);
+
   const {
     show: showMenu,
     showDropdown: showDropdownMenu,
@@ -173,6 +166,13 @@ export function ColumnSelector<TData extends KitsuResource>({
   //     return { label: label.toLowerCase(), id: column.id };
   //   });
 
+  /**
+   * This function is used to determine if a checkbox is selected or not. It checks the displayed
+   * columns and the nonAppliedOptions to see if it should be checked or not.
+   *
+   * @param columnId the column ID of the column being checked.
+   * @returns true if it shuold be checked, false if not.
+   */
   function isChecked(columnId: string | undefined): boolean {
     // First check the nonAppliedOptions if it has been altered.
     const nonAppliedFound = nonAppliedOptions.find(
@@ -193,13 +193,53 @@ export function ColumnSelector<TData extends KitsuResource>({
     return false;
   }
 
+  /**
+   * This function is used to determine the changes made. Since the changes are not applied until
+   * the apply button is clicked, the changes are tracked using the nonAppliedOptions.
+   *
+   * @param columnId The column ID being toggled.
+   */
   function toggleColumn(columnId: string | undefined) {
     // Check if the column is already being displayed
     const displayedColumnFound = displayedColumns.find(
       (item) => item.id === columnId
     );
-    if (displayedColumnFound !== undefined) {
-      return true;
+
+    // Check if the column is being altered.
+    const nonAppliedFound = nonAppliedOptions.find(
+      (item) => item.column.id === columnId
+    );
+
+    // Find the source of the column.
+    const sourceColumn = columnOptions.find((item) => item.id === columnId);
+
+    // Was this column already being displayed?
+    if (displayedColumnFound) {
+      if (nonAppliedFound) {
+        // Remove from nonAppliedFound.
+        setNonAppliedOptions(
+          nonAppliedOptions.filter((item) => item.column.id !== columnId)
+        );
+      } else if (sourceColumn) {
+        // Add the column to the non-applied options since we are removing it as a displayed option.
+        setNonAppliedOptions([
+          ...nonAppliedOptions.filter((item) => item.column.id !== columnId),
+          { column: sourceColumn, state: false }
+        ]);
+      }
+    } else {
+      if (nonAppliedFound) {
+        // Remove from nonAppliedFound.
+        setNonAppliedOptions(
+          nonAppliedOptions.filter((item) => item.column.id !== columnId)
+        );
+      } else if (sourceColumn) {
+        // Add the column to the non-applied options since we are adding it as a displayed option.
+        setNonAppliedOptions([
+          ...nonAppliedOptions.filter((item) => item.column.id !== columnId),
+          { column: sourceColumn, state: true }
+        ]);
+      }
     }
   }
 
@@ -277,6 +317,7 @@ export function ColumnSelector<TData extends KitsuResource>({
       if (props.style) {
         props.style.transform = "translate(0px, 40px)";
       }
+
       return (
         <div
           ref={ref}
@@ -296,10 +337,8 @@ export function ColumnSelector<TData extends KitsuResource>({
             </>
           ) : (
             <div>
-              {" "}
               <strong>{<FieldHeader name="filterColumns" />}</strong>
               <input
-                autoFocus={true}
                 name="filterColumns"
                 className="form-control"
                 type="text"
@@ -313,21 +352,26 @@ export function ColumnSelector<TData extends KitsuResource>({
             </div>
           )}
           {
-            <div className="d-flex gap-2">
-              {!menuOnly && (
-                <Button
-                  disabled={loading}
-                  className="btn btn-primary mt-1 mb-2 bulk-edit-button"
-                  onClick={applyFilterColumns}
-                >
-                  {loading ? (
-                    <LoadingSpinner loading={loading} />
-                  ) : (
-                    formatMessage({ id: "applyButtonText" })
-                  )}
-                </Button>
-              )}
-            </div>
+            <>
+              <div className="d-flex gap-2 column-selector-apply-button">
+                {!menuOnly && (
+                  <Button
+                    disabled={loading || nonAppliedOptions.length === 0}
+                    className="btn btn-primary mt-1 mb-2 bulk-edit-button w-100"
+                    onClick={applyFilterColumns}
+                  >
+                    {loading ? (
+                      <LoadingSpinner loading={loading} />
+                    ) : (
+                      formatMessage({ id: "applyButtonText" }) +
+                      (nonAppliedOptions.length > 0
+                        ? " (" + nonAppliedOptions.length + ")"
+                        : "")
+                    )}
+                  </Button>
+                )}
+              </div>
+            </>
           }
           {props.children}
         </div>
