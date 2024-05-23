@@ -38,15 +38,6 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   indexMapping: ESIndexMapping[] | undefined;
 
   /**
-   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
-   * be searched against. It will also define the path and data component if required.
-   *
-   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
-   * or grouped terms.
-   */
-  dynamicFieldMapping?: DynamicFieldsMappingConfig;
-
-  /**
    * The currently displayed columns on the table.
    */
   displayedColumns: TableColumn<TData>[];
@@ -82,7 +73,6 @@ export function ColumnSelector<TData extends KitsuResource>({
   uniqueName,
   menuOnly,
   indexMapping,
-  dynamicFieldMapping,
   displayedColumns,
   setDisplayedColumns,
   defaultColumns
@@ -138,8 +128,7 @@ export function ColumnSelector<TData extends KitsuResource>({
         await getColumnSelectorIndexMapColumns<TData>({
           indexMapping,
           setColumnOptions,
-          apiClient,
-          dynamicFieldMapping
+          apiClient
         });
         setLoading(false);
       }
