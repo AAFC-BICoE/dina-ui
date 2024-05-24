@@ -1,7 +1,7 @@
 import { useApiClient, LoadingSpinner, FieldHeader } from "..";
 import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { Button } from "react-bootstrap";
@@ -10,6 +10,7 @@ import Kitsu, { KitsuResource } from "kitsu";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
 import { getColumnSelectorIndexMapColumns } from "./ColumnSelectorUtils";
 import { ESIndexMapping, TableColumn } from "../list-page/types";
+import { startCase } from "lodash";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleIndexColumns";
 
@@ -171,12 +172,28 @@ export function ColumnSelector<TData extends KitsuResource>({
       return true;
     }
 
-    // If field extension we want to search by the field value or the package.
-    // if ((item as any)?.columnMapping?.dynamicField?.type === "fieldExtension") {
-    //   return (item as any)?.
-    // }
-    // console.log(startCase(item.id));
-    return item?.id?.toLowerCase()?.indexOf(searchValue.toLowerCase()) !== -1;
+    // Todo: FormatMessage should be used as well for searching.
+
+    return (
+      startCase(item.id).toLowerCase()?.indexOf(searchValue.toLowerCase()) !==
+      -1
+    );
+  }
+
+  function sortCheckboxes(a: TableColumn<TData>, b: TableColumn<TData>) {
+    // Check if a column is checked
+    const isAChecked = isChecked(a.id);
+    const isBChecked = isChecked(b.id);
+
+    // Checked columns come before unchecked columns
+    if (isAChecked && !isBChecked) {
+      return -1; // Sort a before b (a comes first)
+    } else if (!isAChecked && isBChecked) {
+      return 1; // Sort b before a (b comes first)
+    } else {
+      // If both checked or unchecked, sort by their original order (e.g., by ID)
+      return (a.id ?? "").localeCompare(b.id ?? "");
+    }
   }
 
   /**
@@ -186,25 +203,28 @@ export function ColumnSelector<TData extends KitsuResource>({
    * @param columnId the column ID of the column being checked.
    * @returns true if it shuold be checked, false if not.
    */
-  function isChecked(columnId: string | undefined): boolean {
-    // First check the nonAppliedOptions if it has been altered.
-    const nonAppliedFound = nonAppliedOptions.find(
-      (item) => item.column.id === columnId
-    );
-    if (nonAppliedFound !== undefined) {
-      return nonAppliedFound.state;
-    }
+  const isChecked = useCallback(
+    (columnId: string | undefined) => {
+      // First check the nonAppliedOptions if it has been altered.
+      const nonAppliedFound = nonAppliedOptions.find(
+        (item) => item.column.id === columnId
+      );
+      if (nonAppliedFound !== undefined) {
+        return nonAppliedFound.state;
+      }
 
-    // Now check if it's currently being displayed on the table, but not applied yet.
-    const displayedColumnFound = displayedColumns.find(
-      (item) => item.id === columnId
-    );
-    if (displayedColumnFound !== undefined) {
-      return true;
-    }
+      // Now check if it's currently being displayed on the table, but not applied yet.
+      const displayedColumnFound = displayedColumns.find(
+        (item) => item.id === columnId
+      );
+      if (displayedColumnFound !== undefined) {
+        return true;
+      }
 
-    return false;
-  }
+      return false;
+    },
+    [nonAppliedOptions, displayedColumns]
+  );
 
   /**
    * This function is used to determine the changes made. Since the changes are not applied until
@@ -390,19 +410,22 @@ export function ColumnSelector<TData extends KitsuResource>({
         isChecked={selectAll}
         as={CheckboxItem}
       />
-      {columnOptions.filter(searchFilter).map((column) => {
-        return (
-          <>
-            <Dropdown.Item
-              key={column?.id}
-              id={column?.id}
-              isChecked={isChecked(column?.id)}
-              handleClick={() => toggleColumn(column?.id)}
-              as={CheckboxItem}
-            />
-          </>
-        );
-      })}
+      {columnOptions
+        .filter(searchFilter)
+        .sort(sortCheckboxes)
+        .map((column) => {
+          return (
+            <>
+              <Dropdown.Item
+                key={column?.id}
+                id={column?.id}
+                isChecked={isChecked(column?.id)}
+                handleClick={() => toggleColumn(column?.id)}
+                as={CheckboxItem}
+              />
+            </>
+          );
+        })}
     </ColumnSelectorMenu>
   ) : (
     <Dropdown
@@ -428,19 +451,22 @@ export function ColumnSelector<TData extends KitsuResource>({
               isChecked={selectAll}
               as={CheckboxItem}
             />
-            {columnOptions.filter(searchFilter).map((column) => {
-              return (
-                <>
-                  <Dropdown.Item
-                    key={column?.id}
-                    id={column?.id}
-                    isChecked={isChecked(column?.id)}
-                    handleClick={() => toggleColumn(column?.id)}
-                    as={CheckboxItem}
-                  />
-                </>
-              );
-            })}
+            {columnOptions
+              .filter(searchFilter)
+              .sort(sortCheckboxes)
+              .map((column) => {
+                return (
+                  <>
+                    <Dropdown.Item
+                      key={column?.id}
+                      id={column?.id}
+                      isChecked={isChecked(column?.id)}
+                      handleClick={() => toggleColumn(column?.id)}
+                      as={CheckboxItem}
+                    />
+                  </>
+                );
+              })}
           </>
         )}
       </Dropdown.Menu>

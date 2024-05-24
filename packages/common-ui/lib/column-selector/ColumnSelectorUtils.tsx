@@ -82,28 +82,9 @@ export async function getColumnSelectorIndexMapColumns<
           }
         }
       }
-
-      setColumnOptions?.(columnOptions);
     }
-  }
-}
 
-export function addColumnToStateVariable<TData extends KitsuResource>(
-  column,
-  columnOptions: TableColumn<TData>[],
-  columnSelectorDefaultColumns?: any[]
-) {
-  if (
-    !columnOptions.find(
-      (currentColumn) => currentColumn.id === (column as any).id
-    ) &&
-    !columnSelectorDefaultColumns?.find(
-      (defaultColumn) =>
-        defaultColumn.accessorKey === column.accessorKey &&
-        defaultColumn.relationshipType === column.relationshipType
-    )
-  ) {
-    columnOptions.push(column);
+    setColumnOptions?.(columnOptions);
   }
 }
 
@@ -166,21 +147,15 @@ function getIncludedManagedAttributeColumns<TData extends KitsuResource>(
 ) {
   const includedManagedAttributeColumns = managedAttributes?.map(
     (managedAttribute) =>
-      getIncludedManagedAttributeColumn<TData>(
-        managedAttribute,
-        columnMapping,
-        columnOptions
-      )
+      getIncludedManagedAttributeColumn(managedAttribute, columnMapping)
   );
 
-  columnOptions.push(includedManagedAttributeColumns);
+  columnOptions.push(...includedManagedAttributeColumns);
 }
 
-export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
+export function getIncludedManagedAttributeColumn(
   managedAttribute: any,
-  columnMapping: ESIndexMapping,
-  columnOptions?: TableColumn<TData>[],
-  columnSelectorDefaultColumns?: any[]
+  columnMapping: ESIndexMapping
 ) {
   const managedAttributeKey = managedAttribute.key;
   const accessorKey = `${columnMapping.path}.${managedAttributeKey}`;
@@ -207,14 +182,6 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
     columnMapping
   };
 
-  if (columnOptions) {
-    addColumnToStateVariable(
-      managedAttributesColumn,
-      columnOptions,
-      columnSelectorDefaultColumns
-    );
-  }
-
   return managedAttributesColumn;
 }
 
@@ -225,23 +192,15 @@ function getAttributesManagedAttributeColumns<TData extends KitsuResource>(
 ) {
   const attributesManagedAttributeColumns = managedAttributes?.map(
     (managedAttribute) =>
-      getAttributesManagedAttributeColumn<TData>(
-        managedAttribute,
-        columnMapping,
-        columnOptions
-      )
+      getAttributesManagedAttributeColumn(managedAttribute, columnMapping)
   );
 
-  columnOptions.push(attributesManagedAttributeColumns);
+  columnOptions.push(...attributesManagedAttributeColumns);
 }
 
-export function getAttributesManagedAttributeColumn<
-  TData extends KitsuResource
->(
+export function getAttributesManagedAttributeColumn(
   managedAttribute: any,
-  columnMapping: ESIndexMapping,
-  columnOptions?: TableColumn<TData>[],
-  columnSelectorDefaultColumns?: any[]
+  columnMapping: ESIndexMapping
 ) {
   const managedAttributeKey = managedAttribute.key;
   const accessorKey = `${columnMapping.path}.${managedAttributeKey}`;
@@ -255,13 +214,7 @@ export function getAttributesManagedAttributeColumn<
     managedAttribute,
     sortDescFirst: true
   };
-  if (columnOptions) {
-    addColumnToStateVariable<TData>(
-      managedAttributesColumn,
-      columnOptions,
-      columnSelectorDefaultColumns
-    );
-  }
+
   return managedAttributesColumn;
 }
 
@@ -295,12 +248,10 @@ function getAttributeExtensionValuesColumn(
   return attributeExtensionValuesColumns;
 }
 
-export function getAttributeExtensionFieldColumn<TData extends KitsuResource>(
+export function getAttributeExtensionFieldColumn(
   columnMapping: ESIndexMapping,
   extensionValue: any,
-  extensionField: any,
-  columnOptions?: TableColumn<TData>[],
-  columnSelectorDefaultColumns?: any[]
+  extensionField: any
 ) {
   const fieldExtensionResourceType = columnMapping.path.split(".").at(-1);
   const extensionValuesColumn = {
@@ -315,13 +266,7 @@ export function getAttributeExtensionFieldColumn<TData extends KitsuResource>(
     extensionValue,
     extensionField
   };
-  if (columnOptions) {
-    addColumnToStateVariable<TData>(
-      extensionValuesColumn,
-      columnOptions,
-      columnSelectorDefaultColumns
-    );
-  }
+
   return extensionValuesColumn;
 }
 
@@ -330,23 +275,6 @@ async function fetchDynamicField(apiClient: Kitsu, path, params?: GetParams) {
   const { data } = await apiClient.get(path, params ?? {});
 
   return data;
-}
-
-interface QueryOption {
-  parentName: any;
-  value: string;
-  label: string;
-  type: string;
-  subType?: string | undefined;
-  distinctTerm: boolean;
-  optimizedPrefix: boolean;
-  containsSupport: boolean;
-  endsWithSupport: boolean;
-  keywordMultiFieldSupport: boolean;
-  path: string;
-  parentPath?: string | undefined;
-  parentType?: string | undefined;
-  dynamicField?: DynamicField | undefined;
 }
 
 // Get attribute and included extension values columns
@@ -419,12 +347,10 @@ function getIncludedExtensionValuesColumn(
   return includedExtensionValuesColumns;
 }
 
-export function getIncludedExtensionFieldColumn<TData extends KitsuResource>(
+export function getIncludedExtensionFieldColumn(
   columnMapping: ESIndexMapping,
   extensionValue: any,
-  extensionField: any,
-  columnOptions?: TableColumn<TData>[],
-  columnSelectorDefaultColumns?: any[]
+  extensionField: any
 ) {
   const fieldExtensionResourceType = columnMapping.path.split(".").at(-1);
   const accessorKey = `${columnMapping.path}.${extensionValue.id}.${extensionField.key}`;
@@ -452,13 +378,7 @@ export function getIncludedExtensionFieldColumn<TData extends KitsuResource>(
     extensionValue,
     extensionField
   };
-  if (columnOptions) {
-    addColumnToStateVariable<TData>(
-      extensionValuesColumn,
-      columnOptions,
-      columnSelectorDefaultColumns
-    );
-  }
+
   return extensionValuesColumn;
 }
 

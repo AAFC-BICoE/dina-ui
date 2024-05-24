@@ -25,7 +25,6 @@ import {
   FormikButton,
   ReactTable,
   ReactTableProps,
-  VISIBLE_INDEX_LOCAL_STORAGE_KEY,
   useAccount
 } from "..";
 import { GroupSelectField } from "../../../dina-ui/components";
@@ -296,58 +295,6 @@ export function QueryPage<TData extends KitsuResource>({
   const { groupNames } = useAccount();
   const isInitialQueryFinished = useRef(false);
   const isActionTriggeredQuery = useRef(false);
-  const [visibleIndexMapColumns] = useLocalStorage<any[]>(
-    `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
-    []
-  );
-
-  // useEffect(() => {
-  //   visibleIndexMapColumns.forEach((visibleIndexMapColumn) => {
-  //     if (visibleIndexMapColumn?.relationshipType) {
-  //       if (visibleIndexMapColumn.extensionValue) {
-  //         getIncludedExtensionFieldColumn(
-  //           visibleIndexMapColumn.queryOption,
-  //           visibleIndexMapColumn.extensionValue,
-  //           visibleIndexMapColumn.extensionField,
-  //           setSelectedColumnSelectorIndexMapColumns
-  //         );
-  //       } else if (visibleIndexMapColumn?.managedAttribute) {
-  //         getIncludedManagedAttributeColumn(
-  //           visibleIndexMapColumn.managedAttribute,
-  //           visibleIndexMapColumn.queryOption,
-  //           setSelectedColumnSelectorIndexMapColumns
-  //         );
-  //       } else {
-  //         getIncludedStandardColumns(
-  //           visibleIndexMapColumn?.queryOption,
-  //           setSelectedColumnSelectorIndexMapColumns
-  //         );
-  //       }
-  //     } else {
-  //       if (visibleIndexMapColumn?.extensionValue) {
-  //         getAttributeExtensionFieldColumn(
-  //           visibleIndexMapColumn.queryOption,
-  //           visibleIndexMapColumn.extensionValue,
-  //           visibleIndexMapColumn.extensionField,
-  //           setSelectedColumnSelectorIndexMapColumns
-  //         );
-  //       } else if (visibleIndexMapColumn?.managedAttribute) {
-  //         getAttributesManagedAttributeColumn(
-  //           visibleIndexMapColumn.managedAttribute,
-  //           visibleIndexMapColumn.queryOption,
-  //           setSelectedColumnSelectorIndexMapColumns
-  //         );
-  //       } else {
-  //         if (visibleIndexMapColumn) {
-  //           getAttributesStandardColumns(
-  //             visibleIndexMapColumn.queryOption,
-  //             setSelectedColumnSelectorIndexMapColumns
-  //           );
-  //         }
-  //       }
-  //     }
-  //   });
-  // }, []);
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
