@@ -150,7 +150,7 @@ export function ListPageLayout<TData extends KitsuResource>({
     CheckBoxHeader,
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
-    fieldName: "selectedResources"
+    fieldName: "itemIdsToSelect"
   });
 
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
