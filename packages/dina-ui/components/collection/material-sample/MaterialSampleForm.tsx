@@ -229,12 +229,16 @@ export function MaterialSampleForm({
         <MaterialSampleIdentifiersSection
           id={id}
           disableSampleNameField={disableSampleNameField}
-          visibleManagedAttributeKeys={visibleManagedAttributeKeys}
           hideUseSequence={hideUseSequence}
         />
       ),
     [MATERIAL_SAMPLE_INFO_COMPONENT_NAME]: (id) =>
-      !reduceRendering && <MaterialSampleInfoSection id={id} />,
+      !reduceRendering && (
+        <MaterialSampleInfoSection
+          id={id}
+          visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+        />
+      ),
     [COLLECTING_EVENT_COMPONENT_NAME]: (id) =>
       dataComponentState.enableCollectingEvent && (
         <TabbedResourceLinker<CollectingEvent>
