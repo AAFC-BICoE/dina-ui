@@ -625,12 +625,6 @@ export function CollectingEventFormLayout({
                 )}
               </div>
             </div>
-            <div className="row">
-              {readOnly &&
-              JSON.stringify(initialValues?.managedAttributes) !== "{}" // if read-only, check for managed attributes
-                ? collectingEventManagedAttributesComponent
-                : null}
-            </div>
           </FieldSet>
         </div>
         <div className="col-md-6">
@@ -978,6 +972,12 @@ export function CollectingEventFormLayout({
               labelMsg={<DinaMessage id="depthInMeters" />}
             />
             <TextField name="remarks" multiLines={true} />
+            <div className="row">
+              {readOnly &&
+              JSON.stringify(initialValues?.managedAttributes) !== "{}" // if read-only, check for managed attributes
+                ? collectingEventManagedAttributesComponent
+                : null}
+            </div>
           </FieldSet>
         </div>
       </div>
