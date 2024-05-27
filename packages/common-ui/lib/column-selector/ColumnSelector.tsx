@@ -103,10 +103,6 @@ export function ColumnSelector<TData extends KitsuResource>({
     }
   }, [localStorageDisplayedColumns]);
 
-  // useEffect(() => {
-  //   console.log(nonAppliedOptions);
-  // }, [nonAppliedOptions]);
-
   const {
     show: showMenu,
     showDropdown: showDropdownMenu,
@@ -124,6 +120,7 @@ export function ColumnSelector<TData extends KitsuResource>({
         await getColumnSelectorIndexMapColumns<TData>({
           indexMapping,
           setColumnOptions,
+          defaultColumns,
           apiClient
         });
         setLoading(false);
@@ -421,6 +418,7 @@ export function ColumnSelector<TData extends KitsuResource>({
                 id={column?.id}
                 isChecked={isChecked(column?.id)}
                 handleClick={() => toggleColumn(column?.id)}
+                isField={true}
                 as={CheckboxItem}
               />
             </>
@@ -462,6 +460,7 @@ export function ColumnSelector<TData extends KitsuResource>({
                       id={column?.id}
                       isChecked={isChecked(column?.id)}
                       handleClick={() => toggleColumn(column?.id)}
+                      isField={true}
                       as={CheckboxItem}
                     />
                   </>

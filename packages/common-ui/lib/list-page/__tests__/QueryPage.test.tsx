@@ -308,7 +308,7 @@ describe("QueryPage test", () => {
 
       // Collection Name (External Relationship)
       {
-        id: "collectionName",
+        id: "collection.name",
         cell: ({
           row: {
             original: { included }

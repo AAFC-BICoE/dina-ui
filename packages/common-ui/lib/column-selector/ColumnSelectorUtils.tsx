@@ -1,13 +1,29 @@
 import { FieldHeader, dateCell } from "..";
-import { DynamicField, ESIndexMapping, TableColumn } from "../list-page/types";
+import { ESIndexMapping, TableColumn } from "../list-page/types";
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
 import lodash, { get, startCase } from "lodash";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
 export interface ColumnSelectorIndexMapColumns<TData extends KitsuResource> {
+  /**
+   * Index mapping used to determine all the supported fields that can be displayed.
+   */
   indexMapping?: ESIndexMapping[];
+
+  /**
+   * Any missing items or preferred table mappings
+   */
+  defaultColumns?: TableColumn<TData>[];
+
+  /**
+   * State to be set which will hold all the options.
+   */
   setColumnOptions?: React.Dispatch<React.SetStateAction<TableColumn<TData>[]>>;
+
+  /**
+   * API client to be used for the dynamic fields.
+   */
   apiClient: Kitsu;
 }
 
@@ -16,10 +32,12 @@ export async function getColumnSelectorIndexMapColumns<
   TData extends KitsuResource
 >({
   indexMapping,
+  defaultColumns,
   setColumnOptions,
   apiClient
 }: ColumnSelectorIndexMapColumns<TData>) {
   const columnOptions: TableColumn<TData>[] = [];
+  let defaultColumnsCopy = defaultColumns;
 
   if (indexMapping) {
     for (const indexColumn of indexMapping) {
@@ -28,6 +46,18 @@ export async function getColumnSelectorIndexMapColumns<
         await getDynamicFieldColumns(indexColumn, apiClient, columnOptions);
       } else {
         if (indexColumn.parentType) {
+          // Check if it's mapped in the default columns, and just use that definition.
+          const defaultColumnFound = defaultColumnsCopy?.find(
+            (item) => item.id === indexColumn.value
+          );
+          if (defaultColumnFound) {
+            columnOptions.push(defaultColumnFound);
+            defaultColumnsCopy = defaultColumnsCopy?.filter(
+              (item) => item.id !== indexColumn.value
+            );
+            continue;
+          }
+
           const accessorKey = `${indexColumn.parentPath}.${indexColumn.path}.${indexColumn.label}`;
 
           if (indexColumn.type === "date") {
@@ -62,6 +92,18 @@ export async function getColumnSelectorIndexMapColumns<
             });
           }
         } else {
+          // Check if it's mapped in the default columns, and just use that definition.
+          const defaultColumnFound = defaultColumnsCopy?.find(
+            (item) => item.id === indexColumn.label
+          );
+          if (defaultColumnFound) {
+            columnOptions.push(defaultColumnFound);
+            defaultColumnsCopy = defaultColumnsCopy?.filter(
+              (item) => item.id !== indexColumn.label
+            );
+            continue;
+          }
+
           if (indexColumn.type === "date") {
             columnOptions.push(
               dateCell(
@@ -74,7 +116,7 @@ export async function getColumnSelectorIndexMapColumns<
             );
           } else {
             columnOptions.push({
-              id: indexColumn?.label,
+              id: indexColumn.label,
               header: () => <FieldHeader name={indexColumn?.label} />,
               accessorKey: indexColumn?.value,
               isKeyword: indexColumn?.keywordMultiFieldSupport
@@ -82,6 +124,11 @@ export async function getColumnSelectorIndexMapColumns<
           }
         }
       }
+    }
+
+    // Add the rest of the default options not added yet.
+    if (defaultColumnsCopy) {
+      columnOptions.push(...defaultColumnsCopy);
     }
 
     setColumnOptions?.(columnOptions);
