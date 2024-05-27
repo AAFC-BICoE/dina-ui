@@ -146,6 +146,22 @@ export function ColumnSelector<TData extends KitsuResource>({
     }
   }, [localStorageDisplayedColumns]);
 
+  // If in menuOnly mode, load all the options automatically.
+  useEffect(() => {
+    (async () => {
+      if (menuOnly) {
+        await getColumnSelectorIndexMapColumns<TData>({
+          indexMapping,
+          setColumnOptions,
+          defaultColumns,
+          apiClient
+        });
+
+        setLoading(false);
+      }
+    })();
+  }, [menuOnly]);
+
   const {
     show: showMenu,
     showDropdown: showDropdownMenu,

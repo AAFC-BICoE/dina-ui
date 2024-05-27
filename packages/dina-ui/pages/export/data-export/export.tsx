@@ -1,25 +1,22 @@
 import {
   DinaForm,
-  ReactTable,
   CommonMessage,
   BackButton,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
-  DATA_EXPORT_COLUMNS_KEY,
   DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY,
   useApiClient,
   LoadingSpinner,
   OBJECT_EXPORT_IDS_KEY,
   downloadDataExport,
   Tooltip,
-  NOT_EXPORTABLE_COLUMN_IDS,
   DATA_EXPORT_QUERY_KEY,
   TextField,
-  SubmitButton
+  SubmitButton,
+  ColumnSelector
 } from "packages/common-ui/lib";
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { Footer } from "packages/dina-ui/components";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
@@ -30,13 +27,6 @@ import {
   TableColumn
 } from "packages/common-ui/lib/list-page/types";
 import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMapping";
-import {
-  getColumnSelectorIndexMapColumns,
-  getGroupedIndexMappings
-} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
-import { uniqBy } from "lodash";
-import { VisibilityState, Table } from "@tanstack/react-table";
-import { compact } from "lodash";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
@@ -55,8 +45,7 @@ export default function ExportPage<TData extends KitsuResource>() {
   const { formatMessage, formatNumber } = useIntl();
   const { bulkGet } = useApiClient();
 
-  const [columns] = useLocalStorage<TableColumn<TData>[]>(
-    `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`,
+  const [columnsToExport, setColumnsToExport] = useState<TableColumn<TData>[]>(
     []
   );
 
@@ -65,28 +54,14 @@ export default function ExportPage<TData extends KitsuResource>() {
   const [exportType, setExportType] = useState<ExportType>("TABULAR_DATA");
 
   // Local storage for Export Objects
-  const [localStorageExportObjectIds, setLocalStorageExportObjectIds] =
-    useLocalStorage<string[]>(OBJECT_EXPORT_IDS_KEY, []);
+  const [localStorageExportObjectIds] = useLocalStorage<string[]>(
+    OBJECT_EXPORT_IDS_KEY,
+    []
+  );
 
-  // Local storage for saving columns visibility
-  const [localStorageColumnStates, setLocalStorageColumnStates] =
-    useLocalStorage<VisibilityState | undefined>(
-      `${uniqueName}_columnSelector`,
-      {}
-    );
   const [dynamicFieldMapping] = useLocalStorage<
     DynamicFieldsMappingConfig | undefined
   >(`${uniqueName}_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`, undefined);
-  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
-  const [columnSelectorIndexMapColumns, setColumnSelectorIndexMapColumns] =
-    useState<any[]>([]);
-  const [loadedIndexMapColumns, setLoadedIndexMapColumns] =
-    useState<boolean>(false);
-
-  const [reactTable, setReactTable] = useState<Table<TData>>();
-  // Combined columns from passed in columns
-  const [totalColumns, setTotalColumns] =
-    useState<TableColumn<TData>[]>(columns);
 
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
 
@@ -99,69 +74,25 @@ export default function ExportPage<TData extends KitsuResource>() {
   const { apiClient, save } = useApiClient();
   const [loading, setLoading] = useState(false);
 
-  let groupedIndexMappings;
   const { indexMap } = useIndexMapping({
     indexName,
     dynamicFieldMapping
   });
-  groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
-  useEffect(() => {
-    if (indexMap) {
-      getColumnSelectorIndexMapColumns({
-        groupedIndexMappings,
-        setLoadedIndexMapColumns,
-        setColumnSelectorIndexMapColumns,
-        apiClient,
-        setLoadingIndexMapColumns: setLoading
-      });
-    }
-  }, [indexMap]);
-
-  useEffect(() => {
-    const combinedColumns = uniqBy(
-      [...totalColumns, ...columnSelectorIndexMapColumns],
-      "id"
-    );
-    const columnVisibility = compact(
-      combinedColumns.map((col) =>
-        col.isColumnVisible === false
-          ? { id: col.id, visibility: false }
-          : undefined
-      )
-    ).reduce<VisibilityState>(
-      (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
-      {}
-    );
-    setLocalStorageColumnStates({
-      ...columnVisibility,
-      ...localStorageColumnStates
-    });
-    setTotalColumns(combinedColumns);
-  }, [loadedIndexMapColumns]);
 
   async function exportData(formik) {
     setLoading(true);
     // Make query to data-export
-    const exportColumns = reactTable
-      ?.getAllLeafColumns()
-      .filter((column) => {
-        if (NOT_EXPORTABLE_COLUMN_IDS.includes(column.id)) {
-          return false;
-        } else {
-          return column.getIsVisible();
-        }
-      })
-      .map((column) => column.id);
     const dataExportSaveArg = {
       resource: {
         type: "data-export",
         source: indexName,
         query: queryString,
-        columns: reactTable ? exportColumns : [],
+        columns: columnsToExport.map((item) => item.id),
         name: formik?.values?.name
       },
       type: "data-export"
     };
+
     const dataExportPostResponse = await save<DataExport>([dataExportSaveArg], {
       apiBaseUrl: "/dina-export-api"
     });
@@ -272,7 +203,7 @@ export default function ExportPage<TData extends KitsuResource>() {
   const disableObjectExportButton =
     localStorageExportObjectIds.length < 1 || totalRecords > 100;
 
-  return loading || !loadedIndexMapColumns ? (
+  return loading ? (
     <LoadingSpinner loading={loading} />
   ) : (
     <PageLayout
@@ -367,20 +298,15 @@ export default function ExportPage<TData extends KitsuResource>() {
                 <Tooltip id="exportObjectsMaxLimitTooltip" />
               )}
           </div>
-          {exportType === "TABULAR_DATA" && columnSelector}
+          <ColumnSelector
+            menuOnly={true}
+            defaultColumns={[]}
+            displayedColumns={columnsToExport}
+            setDisplayedColumns={setColumnsToExport}
+            indexMapping={indexMap}
+            uniqueName={uniqueName}
+          />
         </div>
-
-        <ReactTable<TData>
-          columns={totalColumns}
-          data={[]}
-          setColumnSelector={setColumnSelector}
-          setReactTable={setReactTable}
-          hideTable={true}
-          uniqueName={uniqueName}
-          menuOnly={true}
-          indexName={indexName}
-          columnSelectorDefaultColumns={columns}
-        />
       </DinaForm>
     </PageLayout>
   );
