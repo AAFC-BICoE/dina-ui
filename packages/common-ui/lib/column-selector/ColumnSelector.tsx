@@ -10,7 +10,7 @@ import Kitsu, { KitsuResource } from "kitsu";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
 import { getColumnSelectorIndexMapColumns } from "./ColumnSelectorUtils";
 import { ESIndexMapping, TableColumn } from "../list-page/types";
-import { startCase } from "lodash";
+import { get, startCase } from "lodash";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleIndexColumns";
 
@@ -88,11 +88,12 @@ export function ColumnSelector<TData extends KitsuResource>({
 
   // Local storage of the displayed columns that are saved.
   const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
-    useLocalStorage<any[] | undefined>(
+    useLocalStorage<TableColumn<TData>[]>(
       `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
       []
     );
 
+  // This useEffect is responsible for loading in the new local storage displayed columns.
   useEffect(() => {
     if (
       !localStorageDisplayedColumns ||
@@ -100,6 +101,48 @@ export function ColumnSelector<TData extends KitsuResource>({
     ) {
       // No local storage to load from, load the default columns in.
       setDisplayedColumns(defaultColumns);
+    } else {
+      const columnsToBeDisplayed = localStorageDisplayedColumns.map(
+        (localColumn) => {
+          // If the column is a default column, just grab that definition.
+          const defaultColumnFound = defaultColumns.find(
+            (defaultColumn) => defaultColumn.id === localColumn.id
+          );
+          if (defaultColumnFound) {
+            return defaultColumnFound;
+          }
+
+          // Reinject the header and relationship cell to be displayed.
+          if (localColumn.relationshipType) {
+            return {
+              header: () => <FieldHeader name={localColumn.id ?? ""} />,
+              cell: ({ row: { original } }) => {
+                const relationshipAccessor = (
+                  localColumn as any
+                )?.accessorKey?.split(".");
+                relationshipAccessor?.splice(
+                  1,
+                  0,
+                  localColumn.relationshipType
+                    ? localColumn.relationshipType
+                    : ""
+                );
+                const valuePath = relationshipAccessor?.join(".");
+                const value = get(original, valuePath);
+                return <>{value}</>;
+              },
+              ...localColumn
+            };
+          } else {
+            return {
+              header: () => <FieldHeader name={localColumn.id ?? ""} />,
+              ...localColumn
+            };
+          }
+        }
+      );
+
+      setDisplayedColumns(columnsToBeDisplayed);
     }
   }, [localStorageDisplayedColumns]);
 
@@ -169,11 +212,22 @@ export function ColumnSelector<TData extends KitsuResource>({
       return true;
     }
 
-    // Todo: FormatMessage should be used as well for searching.
+    // Check if either label or id exists and has a corresponding message
+    if (
+      (item.label && messages["field_" + item.label]) ||
+      (item.id && messages["field_" + item.id])
+    ) {
+      // Format the message and check for search value (case-insensitive)
+      return (
+        formatMessage({ id: "field_" + (item.label || item.id) })
+          .toLowerCase()
+          .indexOf(searchValue.toLowerCase()) !== -1
+      );
+    }
 
+    // Otherwise, just use the ID.
     return (
-      startCase(item.id).toLowerCase()?.indexOf(searchValue.toLowerCase()) !==
-      -1
+      (item.id ?? "").toLowerCase()?.indexOf(searchValue.toLowerCase()) !== -1
     );
   }
 
@@ -313,6 +367,9 @@ export function ColumnSelector<TData extends KitsuResource>({
 
     // Apply the changes...
     setDisplayedColumns(newDisplayedColumns);
+
+    // Save to local storage...
+    setLocalStorageDisplayedColumns(newDisplayedColumns);
 
     // Empty the tracked changes...
     setNonAppliedOptions([]);
