@@ -911,7 +911,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   whoAmITitle: "Who Am I",
   withAKeyboard: "With a keyboard",
   withAMouse: "With a mouse",
-  workBookDuplicateFieldMap: "This column should not map to the same field",
+  workBookDuplicateFieldMap:
+    "This column should not map to the same field ({fieldName})",
   workBookSkippedField: "Please select a field or skip importing it",
   missingParentMaterialSampleNames:
     "Missing parent material sample names: {missingNames}",
