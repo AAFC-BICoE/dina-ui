@@ -109,6 +109,7 @@ export interface MaterialSampleRelationships {
   storageUnit?: StorageUnit;
   projects?: Project[];
   assemblages?: Assemblage[];
+  organism?: Organism[];
 }
 
 interface MaterialSampleChildren extends MaterialSample {

@@ -45,6 +45,13 @@ const FieldMappingConfig: FieldMappingConfigType = {
     publiclyReleasable: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     useNextSequence: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     isRestricted: { dataType: WorkbookDataTypeEnum.BOOLEAN },
+    hostOrganism: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING },
+        remarks: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
     collection: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
