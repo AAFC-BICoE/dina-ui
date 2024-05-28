@@ -258,7 +258,14 @@ export function ColumnSelector<TData extends KitsuResource>({
     } else if (!isAChecked && isBChecked) {
       return 1; // Sort b before a (b comes first)
     } else {
-      // If both checked or unchecked, sort by their original order (e.g., by ID)
+      // If checked, keep the same order as the displayedColumns.
+      if (isAChecked && isBChecked) {
+        const aIndex = displayedColumns.findIndex((col) => col.id === a.id);
+        const bIndex = displayedColumns.findIndex((col) => col.id === b.id);
+        return aIndex < bIndex ? -1 : aIndex > bIndex ? 1 : 0;
+      }
+
+      // If both unchecked, sort by their original order (e.g., by ID)
       return (a.id ?? "").localeCompare(b.id ?? "");
     }
   }
