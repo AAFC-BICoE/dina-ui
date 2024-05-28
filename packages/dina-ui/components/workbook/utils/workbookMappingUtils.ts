@@ -65,7 +65,9 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["attachment", "attachment.name"],
   ["attachments", "attachment.name"],
   ["hostorganism", "hostOrganism.name"],
-  ["host organism", "hostOrganism.name"]
+  ["host organism", "hostOrganism.name"],
+  ["hostremarks", "hostOrganism.remarks"],
+  ["host remarks", "hostOrganism.remarks"]
 ]);
 
 export type FieldOptionType = {
