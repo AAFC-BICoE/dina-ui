@@ -53,7 +53,7 @@ export function StorageUnitBreadCrumb({
             ) : (
               unitDisplayName
             )}
-            {parentPath.length && (
+            {!!parentPath.length && (
               <Tooltip
                 directComponent={hierarchy.map((unit, index) => {
                   return (

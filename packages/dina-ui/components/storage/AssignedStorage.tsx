@@ -1,4 +1,4 @@
-import { FormikButton, withResponse } from "common-ui";
+import { FormikButton, SelectField, TextField, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -29,31 +29,58 @@ export function AssignedStorage({
 
   return value?.id ? (
     <div>
-      {withResponse(storageQuery, ({ data: storageUnit }) => (
-        <div>
-          <div className="list-inline mb-3">
-            <div className="storage-path list-inline-item">
-              <StorageUnitBreadCrumb
-                storageUnit={storageUnit}
-                newTab={!readOnly}
-              />
+      {withResponse(storageQuery, ({ data: storageUnit }) => {
+        // function genCharArray(charA, charZ) {
+        //   const a: string[] = [];
+        //   let i = charA.charCodeAt(0);
+        //   let j = charZ.charCodeAt(0);
+        //   for (; i <= j; ++i) {
+        //     a.push(String.fromCharCode(i));
+        //   }
+        //   return a;
+        // }
+        // const options = genCharArray("A", "Z").map((char) => ({ label: char }));
+        return (
+          <div>
+            <div className="list-inline mb-3">
+              <div className="storage-path list-inline-item">
+                <StorageUnitBreadCrumb
+                  storageUnit={storageUnit}
+                  newTab={!readOnly}
+                />
+              </div>
+              {storageUnit.storageUnitType?.isInseperable && (
+                <div className="list-inline-item">
+                  (<DinaMessage id="keepContentsTogether" />)
+                </div>
+              )}
+              {!readOnly && !parentIdInURL && (
+                <FormikButton
+                  className="remove-storage btn mb-3 list-inline-item"
+                  onClick={async () => await onChange?.({ id: null })}
+                >
+                  <RiDeleteBinLine size="1.8em" />
+                </FormikButton>
+              )}
             </div>
-            {storageUnit.storageUnitType?.isInseperable && (
-              <div className="list-inline-item">
-                (<DinaMessage id="keepContentsTogether" />)
+            {!!storageUnit.storageUnitType?.gridLayoutDefinition && (
+              <div className="list-inline mb-3">
+                <SelectField
+                  options={undefined}
+                  name={"wellRow"}
+                  customName={"row"}
+                  className="list-inline-item"
+                />
+                <TextField
+                  name={"wellColumn"}
+                  customName="column"
+                  className="list-inline-item"
+                />
               </div>
             )}
-            {!readOnly && !parentIdInURL && (
-              <FormikButton
-                className="remove-storage btn mb-3"
-                onClick={async () => await onChange?.({ id: null })}
-              >
-                <RiDeleteBinLine size="1.8em" />
-              </FormikButton>
-            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   ) : (
     noneMessage ?? <DinaMessage id="none" />
