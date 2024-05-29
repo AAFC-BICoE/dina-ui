@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { StorageUnit } from "../../types/collection-api";
+import { Tooltip } from "packages/common-ui/lib";
 
 export interface StorageUnitBreadCrumbProps {
   disableLastLink?: boolean;
@@ -22,17 +23,26 @@ export function StorageUnitBreadCrumb({
 
   const unitDisplayName = storageUnitDisplayName(storageUnit);
 
+  // Add parents to hierarchy array
+  const hierarchy = parentPath.map((node, index) => (
+    <Link href={`/collection/storage-unit/view?id=${node.uuid}`} key={index}>
+      <a style={{ color: "#fff" }}>
+        {node.name} ({node.typeName})
+      </a>
+    </Link>
+  ));
+
+  // Add selected storage unit to array
+  hierarchy.push(
+    <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
+      <a style={{ color: "#fff" }} target={newTab ? "_blank" : undefined}>
+        {unitDisplayName}
+      </a>
+    </Link>
+  );
+
   return (
     <ol className="breadcrumb breadcrumb-arrow mb-0">
-      {parentPath.map((node) => (
-        <li className="breadcrumb-item" key={node.uuid}>
-          <Link href={`/collection/storage-unit/view?id=${node.uuid}`}>
-            <a>
-              {node.name} ({node.typeName})
-            </a>
-          </Link>
-        </li>
-      ))}
       {!hideThisUnit && (
         <li className="breadcrumb-item">
           <strong>
@@ -42,6 +52,17 @@ export function StorageUnitBreadCrumb({
               </Link>
             ) : (
               unitDisplayName
+            )}
+            {parentPath.length && (
+              <Tooltip
+                directComponent={hierarchy.map((unit, index) => {
+                  return (
+                    <>
+                      {unit} {index !== hierarchy.length - 1 && " > "}
+                    </>
+                  );
+                })}
+              />
             )}
           </strong>
         </li>

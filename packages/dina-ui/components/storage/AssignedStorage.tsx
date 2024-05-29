@@ -5,6 +5,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useStorageUnit } from "../../pages/collection/storage-unit/edit";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 export interface AssignedStorageProps {
   readOnly?: boolean;
@@ -42,15 +43,15 @@ export function AssignedStorage({
                 (<DinaMessage id="keepContentsTogether" />)
               </div>
             )}
+            {!readOnly && !parentIdInURL && (
+              <FormikButton
+                className="remove-storage btn mb-3"
+                onClick={async () => await onChange?.({ id: null })}
+              >
+                <RiDeleteBinLine size="1.8em" />
+              </FormikButton>
+            )}
           </div>
-          {!readOnly && !parentIdInURL && (
-            <FormikButton
-              className="remove-storage btn btn-danger mb-3"
-              onClick={async () => await onChange?.({ id: null })}
-            >
-              <DinaMessage id="removeFromParentStorageUnit" />
-            </FormikButton>
-          )}
         </div>
       ))}
     </div>
