@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { StorageUnit } from "../../types/collection-api";
-import { Tooltip } from "packages/common-ui/lib";
+import { Tooltip } from "../../../common-ui/lib";
 
 export interface StorageUnitBreadCrumbProps {
   disableLastLink?: boolean;
