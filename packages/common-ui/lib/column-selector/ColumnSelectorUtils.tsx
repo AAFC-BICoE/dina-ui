@@ -2,7 +2,7 @@ import { FieldHeader, dateCell } from "..";
 import { ESIndexMapping, TableColumn } from "../list-page/types";
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
 import lodash, { get, startCase } from "lodash";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { useIntl } from "react-intl";
 
 export interface ColumnSelectorIndexMapColumns<TData extends KitsuResource> {
@@ -22,6 +22,11 @@ export interface ColumnSelectorIndexMapColumns<TData extends KitsuResource> {
   setColumnOptions?: React.Dispatch<React.SetStateAction<TableColumn<TData>[]>>;
 
   /**
+   * Once the list has been loaded, the loading can be set as completed.
+   */
+  setLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+
+  /**
    * API client to be used for the dynamic fields.
    */
   apiClient: Kitsu;
@@ -34,6 +39,7 @@ export async function getColumnSelectorIndexMapColumns<
   indexMapping,
   defaultColumns,
   setColumnOptions,
+  setLoading,
   apiClient
 }: ColumnSelectorIndexMapColumns<TData>) {
   const columnOptions: TableColumn<TData>[] = [];
@@ -132,6 +138,7 @@ export async function getColumnSelectorIndexMapColumns<
     }
 
     setColumnOptions?.(columnOptions);
+    setLoading?.(false);
   }
 }
 

@@ -148,19 +148,16 @@ export function ColumnSelector<TData extends KitsuResource>({
 
   // If in menuOnly mode, load all the options automatically.
   useEffect(() => {
-    (async () => {
-      if (menuOnly) {
-        await getColumnSelectorIndexMapColumns<TData>({
-          indexMapping,
-          setColumnOptions,
-          defaultColumns,
-          apiClient
-        });
-
-        setLoading(false);
-      }
-    })();
-  }, [menuOnly]);
+    if (menuOnly && indexMapping) {
+      getColumnSelectorIndexMapColumns<TData>({
+        indexMapping,
+        setColumnOptions,
+        setLoading,
+        defaultColumns,
+        apiClient
+      });
+    }
+  }, [menuOnly, indexMapping]);
 
   const {
     show: showMenu,
@@ -179,10 +176,10 @@ export function ColumnSelector<TData extends KitsuResource>({
         await getColumnSelectorIndexMapColumns<TData>({
           indexMapping,
           setColumnOptions,
+          setLoading,
           defaultColumns,
           apiClient
         });
-        setLoading(false);
       }
 
       setShow(true);

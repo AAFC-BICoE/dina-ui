@@ -34,23 +34,34 @@ import PageLayout from "packages/dina-ui/components/page/PageLayout";
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
 export default function ExportPage<TData extends KitsuResource>() {
+  const { formatMessage, formatNumber } = useIntl();
+  const { bulkGet, apiClient, save } = useApiClient();
   const router = useRouter();
+
+  // Unique name to be used for the local storage.
+  const uniqueName = String(router.query.uniqueName);
+
+  // Index mapping name to retrieve all the possible fields.
+  const indexName = String(router.query.indexName);
+
+  // Determines where the back button should link to.
+  const entityLink = String(router.query.entityLink);
+
+  // ElasticSearch query to be used to perform the export against.
+  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
+
+  // The total number of results that will be exported.
   const [totalRecords] = useLocalStorage<number>(
     DATA_EXPORT_TOTAL_RECORDS_KEY,
     0
   );
-  const uniqueName = String(router.query.uniqueName);
-  const indexName = String(router.query.indexName);
-  const entityLink = String(router.query.entityLink);
-  const { formatMessage, formatNumber } = useIntl();
-  const { bulkGet } = useApiClient();
 
+  // Columns selected on the dropdown.
   const [columnsToExport, setColumnsToExport] = useState<TableColumn<TData>[]>(
     []
   );
 
-  const [dataExportError, setDataExportError] = useState<JSX.Element>();
-
+  // State holding the current export type. For example, Data export / Object export.
   const [exportType, setExportType] = useState<ExportType>("TABULAR_DATA");
 
   // Local storage for Export Objects
@@ -59,19 +70,12 @@ export default function ExportPage<TData extends KitsuResource>() {
     []
   );
 
+  // Dynamic mappings from the list page to be applied for the export.
   const [dynamicFieldMapping] = useLocalStorage<
     DynamicFieldsMappingConfig | undefined
   >(`${uniqueName}_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`, undefined);
 
-  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
-
-  if (queryObject) {
-    delete (queryObject as any)._source;
-  }
-
-  const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
-
-  const { apiClient, save } = useApiClient();
+  const [dataExportError, setDataExportError] = useState<JSX.Element>();
   const [loading, setLoading] = useState(false);
 
   const { indexMap } = useIndexMapping({
@@ -81,6 +85,13 @@ export default function ExportPage<TData extends KitsuResource>() {
 
   async function exportData(formik) {
     setLoading(true);
+
+    // Prepare the query to be used for exporting purposes.
+    if (queryObject) {
+      delete (queryObject as any)._source;
+    }
+    const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
+
     // Make query to data-export
     const dataExportSaveArg = {
       resource: {
