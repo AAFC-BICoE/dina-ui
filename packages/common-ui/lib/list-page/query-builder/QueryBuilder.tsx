@@ -12,7 +12,7 @@ import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
 import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
-import { Table, VisibilityState } from "@tanstack/react-table";
+import { KitsuResource } from "kitsu";
 
 export interface QueryBuilderContextI {
   performSubmit: () => void;
@@ -102,7 +102,7 @@ interface QueryBuilderProps {
   validationErrors: ValidationError[];
 }
 
-function QueryBuilder({
+function QueryBuilder<TData extends KitsuResource>({
   indexName,
   queryBuilderConfig,
   queryBuilderTree,
@@ -149,7 +149,7 @@ function QueryBuilder({
         >
           <DinaMessage id="search" />
         </label>
-        <SavedSearch
+        <SavedSearch<TData>
           indexName={indexName}
           queryBuilderTree={queryBuilderTree}
           setQueryBuilderTree={setQueryBuilderTree}
