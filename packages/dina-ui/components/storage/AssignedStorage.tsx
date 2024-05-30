@@ -1,4 +1,10 @@
-import { FormikButton, SelectField, TextField, withResponse } from "common-ui";
+import {
+  FormikButton,
+  SelectField,
+  SelectOption,
+  TextField,
+  withResponse
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -6,6 +12,7 @@ import { useStorageUnit } from "../../pages/collection/storage-unit/edit";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
 import { RiDeleteBinLine } from "react-icons/ri";
+import AlphanumericEncoder from "alphanumeric-encoder";
 
 export interface AssignedStorageProps {
   readOnly?: boolean;
@@ -26,20 +33,22 @@ export function AssignedStorage({
   parentIdInURL
 }: AssignedStorageProps) {
   const storageQuery = useStorageUnit(value?.id);
-
+  const encoder = new AlphanumericEncoder();
   return value?.id ? (
     <div>
       {withResponse(storageQuery, ({ data: storageUnit }) => {
-        // function genCharArray(charA, charZ) {
-        //   const a: string[] = [];
-        //   let i = charA.charCodeAt(0);
-        //   let j = charZ.charCodeAt(0);
-        //   for (; i <= j; ++i) {
-        //     a.push(String.fromCharCode(i));
-        //   }
-        //   return a;
-        // }
-        // const options = genCharArray("A", "Z").map((char) => ({ label: char }));
+        // Create storageUnitCoordinates Row options
+        const options: SelectOption<string>[] = [];
+        for (
+          let i = 1;
+          i <= storageUnit.storageUnitType?.gridLayoutDefinition?.numberOfRows;
+          i++
+        ) {
+          options.push({
+            label: encoder.encode(i) ?? "",
+            value: encoder.encode(i) ?? ""
+          });
+        }
         return (
           <div>
             <div className="list-inline mb-3">
@@ -66,13 +75,13 @@ export function AssignedStorage({
             {!!storageUnit.storageUnitType?.gridLayoutDefinition && (
               <div className="list-inline mb-3">
                 <SelectField
-                  options={undefined}
-                  name={"wellRow"}
+                  options={options}
+                  name={"storageUnitCoordinates.wellRow"}
                   customName={"row"}
                   className="list-inline-item"
                 />
                 <TextField
-                  name={"wellColumn"}
+                  name={"storageUnitCoordinates.wellColumn"}
                   customName="column"
                   className="list-inline-item"
                 />
