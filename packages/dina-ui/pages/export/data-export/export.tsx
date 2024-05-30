@@ -14,14 +14,13 @@ import {
   SubmitButton,
   ColumnSelector
 } from "packages/common-ui/lib";
-import React from "react";
 import Link from "next/link";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   DynamicFieldsMappingConfig,
   TableColumn
@@ -310,7 +309,7 @@ export default function ExportPage<TData extends KitsuResource>() {
               )}
           </div>
           <ColumnSelector
-            menuOnly={true}
+            exportMode={true}
             defaultColumns={[]}
             displayedColumns={columnsToExport}
             setDisplayedColumns={setColumnsToExport}

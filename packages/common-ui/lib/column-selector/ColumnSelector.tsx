@@ -10,9 +10,19 @@ import Kitsu, { KitsuResource } from "kitsu";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
 import { getColumnSelectorIndexMapColumns } from "./ColumnSelectorUtils";
 import { ESIndexMapping, TableColumn } from "../list-page/types";
-import { get, startCase } from "lodash";
+import { get } from "lodash";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleIndexColumns";
+
+// IDs of columns not supported for exporting
+export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
+  "selectColumn",
+  "thumbnail",
+  "viewPreviewButtonText"
+];
+
+// IDs of columns that the user cannot configure, they are mandatory.
+export const MANDATORY_DISPLAYED_COLUMNS: string[] = ["selectColumn"];
 
 export interface ColumnSelectorProps<TData extends KitsuResource> {
   /**
@@ -20,7 +30,11 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    */
   uniqueName?: string;
 
-  menuOnly?: boolean;
+  /**
+   * Display the column selector for exporting purposes instead of what columns to display in a list
+   * table.
+   */
+  exportMode?: boolean;
 
   /**
    * Index mapping containing all of the fields that should be displayed in the list.
@@ -45,13 +59,6 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   defaultColumns: TableColumn<TData>[];
 }
 
-// Ids of columns not supported for exporting
-export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
-  "selectColumn",
-  "thumbnail",
-  "viewPreviewButtonText"
-];
-
 interface NonAppliedOptionChange<TData extends KitsuResource> {
   column: TableColumn<TData>;
 
@@ -61,7 +68,7 @@ interface NonAppliedOptionChange<TData extends KitsuResource> {
 
 export function ColumnSelector<TData extends KitsuResource>({
   uniqueName,
-  menuOnly,
+  exportMode,
   indexMapping,
   displayedColumns,
   setDisplayedColumns,
@@ -76,6 +83,7 @@ export function ColumnSelector<TData extends KitsuResource>({
   // Search value for filtering the options.
   const [searchValue, setSearchValue] = useState<string>("");
 
+  // State indicating if the select all option has been selected.
   const [selectAll, setSelectAll] = useState<boolean>(false);
 
   // These are all the possible columns displayed to the user.
@@ -101,6 +109,9 @@ export function ColumnSelector<TData extends KitsuResource>({
     ) {
       // No local storage to load from, load the default columns in.
       setDisplayedColumns(defaultColumns);
+
+      // Set the default columns into local storage.
+      setLocalStorageDisplayedColumns(defaultColumns);
     } else {
       const columnsToBeDisplayed = localStorageDisplayedColumns.map(
         (localColumn) => {
@@ -146,9 +157,9 @@ export function ColumnSelector<TData extends KitsuResource>({
     }
   }, [localStorageDisplayedColumns]);
 
-  // If in menuOnly mode, load all the options automatically.
+  // If in exportMode mode, load all the options automatically.
   useEffect(() => {
-    if (menuOnly && indexMapping) {
+    if (exportMode && indexMapping) {
       getColumnSelectorIndexMapColumns<TData>({
         indexMapping,
         setColumnOptions,
@@ -157,7 +168,14 @@ export function ColumnSelector<TData extends KitsuResource>({
         apiClient
       });
     }
-  }, [menuOnly, indexMapping]);
+  }, [exportMode, indexMapping]);
+
+  // In exportMode, automatically apply the changes without saving it to local storage.
+  useEffect(() => {
+    if (exportMode && nonAppliedOptions.length > 0) {
+      applyFilterColumns(false);
+    }
+  }, [exportMode, nonAppliedOptions]);
 
   const {
     show: showMenu,
@@ -242,6 +260,21 @@ export function ColumnSelector<TData extends KitsuResource>({
     return (
       (item.id ?? "").toLowerCase()?.indexOf(searchValue.toLowerCase()) !== -1
     );
+  }
+
+  /**
+   * Based on the `NOT_EXPORTABLE_COLUMN_IDS` list of column ids, filter out columns that should not
+   * be shown to the user.
+   *
+   * @param item Column definition.
+   * @returns true if it should be included in the results, false if not.
+   */
+  function hiddenColumnFilter(item: TableColumn<TData>) {
+    if (exportMode) {
+      return !NOT_EXPORTABLE_COLUMN_IDS.includes(item.id ?? "");
+    } else {
+      return !MANDATORY_DISPLAYED_COLUMNS.includes(item.id ?? "");
+    }
   }
 
   function sortCheckboxes(a: TableColumn<TData>, b: TableColumn<TData>) {
@@ -369,7 +402,7 @@ export function ColumnSelector<TData extends KitsuResource>({
    * Once the user has selected everything they would like to add/remove, this function will actually
    * apply the changes to the displayed columns.
    */
-  function applyFilterColumns() {
+  function applyFilterColumns(saveToLocalStorage: boolean) {
     // Create a clone of the displayed columns to apply the changes in one go.
     let newDisplayedColumns = displayedColumns;
 
@@ -388,11 +421,13 @@ export function ColumnSelector<TData extends KitsuResource>({
     // Apply the changes...
     setDisplayedColumns(newDisplayedColumns);
 
-    // Save to local storage...
-    setLocalStorageDisplayedColumns(newDisplayedColumns);
-
     // Empty the tracked changes...
     setNonAppliedOptions([]);
+
+    if (saveToLocalStorage) {
+      // Save to local storage...
+      setLocalStorageDisplayedColumns(newDisplayedColumns);
+    }
   }
 
   const CheckboxItem = React.forwardRef((props: any, ref) => {
@@ -419,14 +454,14 @@ export function ColumnSelector<TData extends KitsuResource>({
           ref={ref}
           style={{
             ...props.style,
-            width: "25rem",
-            padding: "1.25rem 1.25rem 1.25rem 1.25rem",
+            width: exportMode ? "100%" : "25rem",
+            padding: exportMode ? "0" : "1.25rem 1.25rem 1.25rem 1.25rem",
             zIndex: 1
           }}
           className={props.className}
           aria-labelledby={props.labelledBy}
         >
-          {menuOnly ? (
+          {exportMode ? (
             <>
               <strong>{<DinaMessage id="exportColumns" />}</strong>
               <br />
@@ -451,11 +486,11 @@ export function ColumnSelector<TData extends KitsuResource>({
           {
             <>
               <div className="d-flex gap-2 column-selector-apply-button">
-                {!menuOnly && (
+                {!exportMode && (
                   <Button
                     disabled={loading || nonAppliedOptions.length === 0}
                     className="btn btn-primary mt-1 mb-2 bulk-edit-button w-100"
-                    onClick={applyFilterColumns}
+                    onClick={() => applyFilterColumns(true)}
                   >
                     {loading ? (
                       <LoadingSpinner loading={loading} />
@@ -476,7 +511,7 @@ export function ColumnSelector<TData extends KitsuResource>({
     }
   );
 
-  return menuOnly ? (
+  return exportMode ? (
     <ColumnSelectorMenu>
       <Dropdown.Item
         id="selectAll"
@@ -485,6 +520,7 @@ export function ColumnSelector<TData extends KitsuResource>({
         as={CheckboxItem}
       />
       {columnOptions
+        .filter(hiddenColumnFilter)
         .filter(searchFilter)
         .sort(sortCheckboxes)
         .map((column) => {
@@ -527,6 +563,7 @@ export function ColumnSelector<TData extends KitsuResource>({
               as={CheckboxItem}
             />
             {columnOptions
+              .filter(hiddenColumnFilter)
               .filter(searchFilter)
               .sort(sortCheckboxes)
               .map((column) => {
