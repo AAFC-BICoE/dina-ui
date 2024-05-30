@@ -26,9 +26,7 @@ export function StorageUnitBreadCrumb({
   // Add parents to hierarchy array
   const hierarchy = parentPath.map((node, index) => (
     <Link href={`/collection/storage-unit/view?id=${node.uuid}`} key={index}>
-      <a style={{ color: "#fff" }}>
-        {node.name} ({node.typeName})
-      </a>
+      <a style={{ color: "#fff" }}>{`${node.name} (${node.typeName})`}</a>
     </Link>
   ));
 
