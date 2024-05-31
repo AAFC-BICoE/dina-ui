@@ -20,14 +20,11 @@ import {
   MetaWithTotal,
   ReactTable,
   ReactTableProps,
-  ColumnSelector,
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
-import { Tooltip } from "../tooltip/Tooltip";
-import { Table } from "@tanstack/react-table";
 import { MultiSortTooltip } from "../list-page/MultiSortTooltip";
 
 /**
@@ -131,8 +128,6 @@ export interface QueryTableProps<TData extends KitsuResource> {
   topRightCorner?: ReactNode;
 
   ariaLabel?: string;
-
-  enableColumnChooser?: boolean;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -163,8 +158,7 @@ export function QueryTable<TData extends KitsuResource>({
   ariaLabel,
   enableFilters = false,
   defaultColumnFilters = [],
-  onColumnFiltersChange,
-  enableColumnChooser
+  onColumnFiltersChange
 }: QueryTableProps<TData>) {
   const { formatMessage, formatNumber } = useIntl();
 
@@ -354,7 +348,6 @@ export function QueryTable<TData extends KitsuResource>({
     });
   });
 
-  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   return (
@@ -374,19 +367,13 @@ export function QueryTable<TData extends KitsuResource>({
           </span>
         )}
         <div className="ms-auto">
-          <div>
-            {enableColumnChooser && columnSelector}
-            {topRightCorner}
-          </div>
+          <div>{topRightCorner}</div>
 
           {/* Multi sort tooltip - Only shown if it's possible to sort */}
           {resolvedReactTableProps.enableMultiSort && <MultiSortTooltip />}
         </div>
       </div>
       <ReactTable<TData>
-        // These props are needed for column selector
-        setColumnSelector={setColumnSelector}
-        uniqueName={path}
         className="-striped"
         columns={mappedColumns}
         data={(displayData as TData[]) ?? []}

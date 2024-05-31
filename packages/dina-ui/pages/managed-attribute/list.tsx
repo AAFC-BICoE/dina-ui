@@ -206,8 +206,7 @@ function CollectionAttributeListView() {
         id="collections-module-managed-attribute-list"
         queryTableProps={{
           columns: COLLECTION_ATTRIBUTES_LIST_COLUMNS,
-          path: "collection-api/managed-attribute?page[limit]=1000",
-          enableColumnChooser: true
+          path: "collection-api/managed-attribute?page[limit]=1000"
         }}
         additionalFilters={(filterForm) => ({
           isCompleted: false,
@@ -303,8 +302,7 @@ function ObjectStoreAttributeListView() {
         id="object-store-module-managed-attribute-list"
         queryTableProps={{
           columns: OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS,
-          path: "objectstore-api/managed-attribute",
-          enableColumnChooser: true
+          path: "objectstore-api/managed-attribute"
         }}
       />
     </>
@@ -383,8 +381,7 @@ function TransactionAttributeListView() {
         id="loan-transaction-module-managed-attribute-list"
         queryTableProps={{
           columns: TRANSACTION_ATTRIBUTES_LIST_COLUMNS,
-          path: "loan-transaction-api/managed-attribute",
-          enableColumnChooser: true
+          path: "loan-transaction-api/managed-attribute"
         }}
         additionalFilters={(filterForm) => ({
           isCompleted: false,
