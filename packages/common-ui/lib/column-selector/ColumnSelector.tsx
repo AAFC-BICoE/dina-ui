@@ -5,14 +5,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { Button } from "react-bootstrap";
-import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
+import useLocalStorage from "@rehooks/local-storage";
 import Kitsu, { KitsuResource } from "kitsu";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
 import { getColumnSelectorIndexMapColumns } from "./ColumnSelectorUtils";
 import { ESIndexMapping, TableColumn } from "../list-page/types";
-import { get } from "lodash";
 
-export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleIndexColumns";
+export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
 
 // IDs of columns not supported for exporting
 export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
@@ -96,7 +95,7 @@ export function ColumnSelector<TData extends KitsuResource>({
 
   // Local storage of the displayed columns that are saved.
   const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
-    useLocalStorage<TableColumn<TData>[]>(
+    useLocalStorage<string[]>(
       `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
       []
     );
@@ -111,55 +110,26 @@ export function ColumnSelector<TData extends KitsuResource>({
       setDisplayedColumns(defaultColumns);
 
       // Set the default columns into local storage.
-      setLocalStorageDisplayedColumns(defaultColumns);
-    } else {
-      const columnsToBeDisplayed = localStorageDisplayedColumns.map(
-        (localColumn) => {
-          // If the column is a default column, just grab that definition.
-          const defaultColumnFound = defaultColumns.find(
-            (defaultColumn) => defaultColumn.id === localColumn.id
-          );
-          if (defaultColumnFound) {
-            return defaultColumnFound;
-          }
-
-          // Reinject the header and relationship cell to be displayed.
-          if (localColumn.relationshipType) {
-            return {
-              header: () => <FieldHeader name={localColumn.id ?? ""} />,
-              cell: ({ row: { original } }) => {
-                const relationshipAccessor = (
-                  localColumn as any
-                )?.accessorKey?.split(".");
-                relationshipAccessor?.splice(
-                  1,
-                  0,
-                  localColumn.relationshipType
-                    ? localColumn.relationshipType
-                    : ""
-                );
-                const valuePath = relationshipAccessor?.join(".");
-                const value = get(original, valuePath);
-                return <>{value}</>;
-              },
-              ...localColumn
-            };
-          } else {
-            return {
-              header: () => <FieldHeader name={localColumn.id ?? ""} />,
-              ...localColumn
-            };
-          }
-        }
+      setLocalStorageDisplayedColumns(
+        defaultColumns.map((column) => column.id)
       );
+    } else {
+      if (columnOptions.length > 0) {
+        const columnsToBeDisplayed = localStorageDisplayedColumns.map<
+          TableColumn<TData>
+        >((localColumn) => {
+          return columnOptions.find((column) => column.id === localColumn);
+        });
 
-      setDisplayedColumns(columnsToBeDisplayed);
+        setDisplayedColumns(columnsToBeDisplayed);
+      }
     }
-  }, [localStorageDisplayedColumns]);
+  }, [localStorageDisplayedColumns, columnOptions]);
 
-  // If in exportMode mode, load all the options automatically.
+  // Load all the possible options, these are needed incase the user has saved columns to refer to
+  // them.
   useEffect(() => {
-    if (exportMode && indexMapping) {
+    if (indexMapping) {
       getColumnSelectorIndexMapColumns<TData>({
         indexMapping,
         setColumnOptions,
@@ -168,7 +138,7 @@ export function ColumnSelector<TData extends KitsuResource>({
         apiClient
       });
     }
-  }, [exportMode, indexMapping]);
+  }, [indexMapping]);
 
   // In exportMode, automatically apply the changes without saving it to local storage.
   useEffect(() => {
@@ -187,19 +157,7 @@ export function ColumnSelector<TData extends KitsuResource>({
   function menuDisplayControl() {
     const [show, setShow] = useState(false);
 
-    const showDropdown = async () => {
-      // Check if the dropdown has been loaded yet, if not then load in dynamic fields.
-      if (loading) {
-        // This will be where the dynamic fields will be loaded in...
-        await getColumnSelectorIndexMapColumns<TData>({
-          indexMapping,
-          setColumnOptions,
-          setLoading,
-          defaultColumns,
-          apiClient
-        });
-      }
-
+    const showDropdown = () => {
       setShow(true);
     };
 
@@ -426,7 +384,9 @@ export function ColumnSelector<TData extends KitsuResource>({
 
     if (saveToLocalStorage) {
       // Save to local storage...
-      setLocalStorageDisplayedColumns(newDisplayedColumns);
+      setLocalStorageDisplayedColumns(
+        newDisplayedColumns.map((column) => column.id)
+      );
     }
   }
 

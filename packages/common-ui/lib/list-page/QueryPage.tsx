@@ -746,20 +746,6 @@ export function QueryPage<TData extends KitsuResource>({
     {}
   );
 
-  // Local storage for saving columns visibility
-  const [localStorageColumnStates, setLocalStorageColumnStates] =
-    useLocalStorage<VisibilityState | undefined>(
-      `${uniqueName}_columnSelector`,
-      {}
-    );
-
-  useEffect(() => {
-    setLocalStorageColumnStates({
-      ...columnVisibility,
-      ...localStorageColumnStates
-    });
-  }, [displayedColumns]);
-
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     sort: sortingRules,
     columnVisibility,
