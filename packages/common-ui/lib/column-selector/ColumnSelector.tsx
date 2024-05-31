@@ -111,14 +111,16 @@ export function ColumnSelector<TData extends KitsuResource>({
 
       // Set the default columns into local storage.
       setLocalStorageDisplayedColumns(
-        defaultColumns.map((column) => column.id)
+        defaultColumns.map((column) => column?.id ?? "")
       );
     } else {
       if (columnOptions.length > 0) {
-        const columnsToBeDisplayed = localStorageDisplayedColumns.map<
+        const columnsToBeDisplayed = localStorageDisplayedColumns.flatMap<
           TableColumn<TData>
         >((localColumn) => {
-          return columnOptions.find((column) => column.id === localColumn);
+          return (
+            columnOptions.find((column) => column.id === localColumn) ?? []
+          );
         });
 
         setDisplayedColumns(columnsToBeDisplayed);
@@ -385,7 +387,7 @@ export function ColumnSelector<TData extends KitsuResource>({
     if (saveToLocalStorage) {
       // Save to local storage...
       setLocalStorageDisplayedColumns(
-        newDisplayedColumns.map((column) => column.id)
+        newDisplayedColumns.map((column) => column?.id ?? "")
       );
     }
   }

@@ -33,7 +33,6 @@ import { validateQueryTree } from "../query-builder/query-builder-validator/quer
 import { useIntl } from "react-intl";
 import { useSessionStorage } from "usehooks-ts";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { TableColumn } from "../types";
 
 export interface SavedSearchProps {
   /**
@@ -110,7 +109,7 @@ export interface SavedSearchProps {
  * The Saved Search contains a couple of dropdown menus and modals to allow the user to manage their
  * saved searches.
  */
-export function SavedSearch<TData extends KitsuResource>({
+export function SavedSearch({
   indexName,
   queryBuilderTree,
   setQueryBuilderTree,
@@ -153,7 +152,7 @@ export function SavedSearch<TData extends KitsuResource>({
 
   // Local storage of the displayed columns that are saved.
   const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
-    useLocalStorage<TableColumn<TData>[]>(
+    useLocalStorage<string[]>(
       `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
       []
     );
@@ -273,12 +272,10 @@ export function SavedSearch<TData extends KitsuResource>({
     }
 
     // Check if the columns displayed has changed.
-    // console.log(sortBy(savedSearch?.columnVisibility));
-    // console.log(sortBy(localStorageDisplayedColumns?.map((item) => item.id)));
     if (
       !isEqual(
         sortBy(savedSearch?.columnVisibility),
-        sortBy(localStorageDisplayedColumns?.map((item) => item.id))
+        sortBy(localStorageDisplayedColumns)
       )
     ) {
       isQueryChanged = true;
@@ -403,15 +400,9 @@ export function SavedSearch<TData extends KitsuResource>({
         setChangesMade(true);
       }
 
+      // Load the displayed columns for this search.
       if (savedSearchToLoad.columnVisibility) {
-        // getColumnVisibility(savedSearchToLoad.columnVisibility);
-        // Set ReactTable's column visibility
-        // const columnVisibility: VisibilityState = getColumnVisibility(
-        //   savedSearchToLoad.columnVisibility
-        // );
-        // reactTable?.setColumnVisibility?.(columnVisibility);
-        // Set local storage column visibility for navigating around the website
-        // setLocalStorageColumnStates(columnVisibility);
+        setLocalStorageDisplayedColumns(savedSearchToLoad.columnVisibility);
       }
 
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
@@ -457,7 +448,7 @@ export function SavedSearch<TData extends KitsuResource>({
             default: setAsDefault,
 
             // Save selected columns
-            // columnVisibility: saveColumnVisibility(),
+            columnVisibility: localStorageDisplayedColumns,
 
             // If updateQueryTree is true, then we will retrieve the current query tree from the
             // query builder, otherwise it will remain the same as before.
@@ -507,7 +498,7 @@ export function SavedSearch<TData extends KitsuResource>({
       setChangesMade(false);
       setQueryError(undefined);
     },
-    [userPreferences, queryBuilderTree, groups]
+    [userPreferences, queryBuilderTree, groups, localStorageDisplayedColumns]
   );
 
   /**
