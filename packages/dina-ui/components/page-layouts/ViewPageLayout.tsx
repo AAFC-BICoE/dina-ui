@@ -10,7 +10,7 @@ import {
   withResponse
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { castArray, get } from "lodash";
+import { castArray, get, upperCase } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { Footer, GroupLabel, Head, Nav } from "..";
@@ -154,8 +154,7 @@ export function ViewPageLayout<T extends KitsuResource>({
               : get(data, currentField)),
           ""
         );
-        const group = get(data, "group") as string;
-        const uppercasedGroup = group.toUpperCase();
+        const group = upperCase(get(data, "group") as string);
 
         // if title is array, only take first element
         if (Array.isArray(title)) {
@@ -231,7 +230,7 @@ export function ViewPageLayout<T extends KitsuResource>({
                 </span>
                 {showGroup && (
                   <span className="header-group-text">
-                    {<GroupLabel groupName={uppercasedGroup} />}
+                    {<GroupLabel groupName={group} />}
                   </span>
                 )}
               </h1>
