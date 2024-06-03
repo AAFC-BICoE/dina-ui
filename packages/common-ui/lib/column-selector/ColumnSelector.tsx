@@ -56,6 +56,11 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    * The default columns to be loaded in if no columns are found in the local storage.
    */
   defaultColumns: TableColumn<TData>[];
+
+  /**
+   * Indicate if all the columns have been loading in...
+   */
+  setColumnSelectorLoading?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface NonAppliedOptionChange<TData extends KitsuResource> {
@@ -71,7 +76,8 @@ export function ColumnSelector<TData extends KitsuResource>({
   indexMapping,
   displayedColumns,
   setDisplayedColumns,
-  defaultColumns
+  defaultColumns,
+  setColumnSelectorLoading
 }: ColumnSelectorProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage, messages } = useIntl();
@@ -131,11 +137,16 @@ export function ColumnSelector<TData extends KitsuResource>({
   // Load all the possible options, these are needed incase the user has saved columns to refer to
   // them.
   useEffect(() => {
+    function setInternalLoading(value: boolean) {
+      setLoading(value);
+      setColumnSelectorLoading?.(value);
+    }
+
     if (indexMapping) {
       getColumnSelectorIndexMapColumns<TData>({
         indexMapping,
         setColumnOptions,
-        setLoading,
+        setLoading: setInternalLoading,
         defaultColumns,
         apiClient
       });

@@ -290,6 +290,8 @@ export function QueryPage<TData extends KitsuResource>({
 }: QueryPageProps<TData>) {
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
+  const [columnSelectorLoading, setColumnSelectorLoading] =
+    useState<boolean>(true);
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
@@ -976,6 +978,7 @@ export function QueryPage<TData extends KitsuResource>({
                       displayedColumns={displayedColumns}
                       setDisplayedColumns={setDisplayedColumns}
                       defaultColumns={columns}
+                      setColumnSelectorLoading={setColumnSelectorLoading}
                     />
                   )}
                   {bulkEditPath && (
@@ -1018,8 +1021,8 @@ export function QueryPage<TData extends KitsuResource>({
               <div className="d-flex align-items-end">
                 <span id="queryPageCount">
                   {/* Loading indicator when total is not calculated yet. */}
-                  {loading ? (
-                    <LoadingSpinner loading={true} />
+                  {loading || columnSelectorLoading ? (
+                    <></>
                   ) : (
                     <CommonMessage
                       id="tableTotalCount"
@@ -1057,41 +1060,45 @@ export function QueryPage<TData extends KitsuResource>({
                   </button>
                 </div>
               )}
-              <ReactTable<TData>
-                // Column and data props
-                columns={columnsResults}
-                data={
-                  (viewMode
-                    ? customViewFields
-                      ? searchResults
-                      : selectedResources
-                    : searchResults) ?? []
-                }
-                // Loading Table props
-                loading={loading}
-                // Pagination props
-                manualPagination={
-                  viewMode && selectedResources?.length ? false : true
-                }
-                pageSize={pageSize}
-                pageCount={
-                  totalRecords ? Math.ceil(totalRecords / pageSize) : 0
-                }
-                page={pageOffset / pageSize}
-                onPageChange={onPageChanged}
-                onPageSizeChange={onPageSizeChanged}
-                // Sorting props
-                manualSorting={
-                  viewMode && selectedResources?.length ? false : true
-                }
-                onSortingChange={onSortChange}
-                sort={sortingRules}
-                // Table customization props
-                {...resolvedReactTableProps}
-                className="-striped react-table-overflow"
-                rowStyling={rowStyling}
-                showPagination={true}
-              />
+              {loading || columnSelectorLoading ? (
+                <LoadingSpinner loading={true} />
+              ) : (
+                <ReactTable<TData>
+                  // Column and data props
+                  columns={columnsResults}
+                  data={
+                    (viewMode
+                      ? customViewFields
+                        ? searchResults
+                        : selectedResources
+                      : searchResults) ?? []
+                  }
+                  // Loading Table props
+                  loading={loading || columnSelectorLoading}
+                  // Pagination props
+                  manualPagination={
+                    viewMode && selectedResources?.length ? false : true
+                  }
+                  pageSize={pageSize}
+                  pageCount={
+                    totalRecords ? Math.ceil(totalRecords / pageSize) : 0
+                  }
+                  page={pageOffset / pageSize}
+                  onPageChange={onPageChanged}
+                  onPageSizeChange={onPageSizeChanged}
+                  // Sorting props
+                  manualSorting={
+                    viewMode && selectedResources?.length ? false : true
+                  }
+                  onSortingChange={onSortChange}
+                  sort={sortingRules}
+                  // Table customization props
+                  {...resolvedReactTableProps}
+                  className="-striped react-table-overflow"
+                  rowStyling={rowStyling}
+                  showPagination={true}
+                />
+              )}
             </div>
             {selectionMode && (
               <>
