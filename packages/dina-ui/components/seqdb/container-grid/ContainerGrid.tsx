@@ -1,53 +1,51 @@
-import { useDrop } from "react-dnd";
 import { ColumnDef } from "@tanstack/react-table";
-import { PcrBatch } from "../../../../types/seqdb-api";
-import {
-  DraggablePCRBatchItemBox,
-  ITEM_BOX_DRAG_KEY
-} from "./DraggablePCRBatchItemBox";
-import { useState, useEffect, useMemo } from "react";
-import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
 import RcTooltip from "rc-tooltip";
-import { ReactTable } from "../../../../../common-ui/lib";
+import { useEffect, useMemo, useState } from "react";
+import { useDrop } from "react-dnd";
+import { ReactTable } from "../../../../common-ui/lib";
+import { DraggableItemBox, ITEM_BOX_DRAG_KEY } from "./DraggableItemBox";
 
-interface ContainerGridProps {
-  pcrBatch: PcrBatch;
-  cellGrid: CellGrid;
-  movedItems: PcrBatchItemSample[];
-  onDrop: (item: PcrBatchItemSample, coords: string) => void;
+interface ContainerGridProps<BatchType, ItemType> {
+  batch: BatchType;
+  cellGrid: CellGrid<ItemType>;
+  movedItems: ItemType[];
+  onDrop: (item: ItemType, coords: string) => void;
   editMode: boolean;
 }
 
-interface GridCellProps {
-  onDrop: (item: { pcrBatchItemSample: PcrBatchItemSample }) => void;
-  movedItems: PcrBatchItemSample[];
-  pcrBatchItemSample: PcrBatchItemSample;
+interface GridCellProps<ItemType> {
+  onDrop: (item: { batchItemSample: ItemType }) => void;
+  movedItems: ItemType[];
+  batchItemSample: ItemType;
   coordinates: string;
   editMode: boolean;
 }
 
-export interface CellGrid {
-  [key: string]: PcrBatchItemSample;
+export interface CellGrid<ItemType> {
+  [key: string]: ItemType;
 }
 
-export function ContainerGrid({
-  pcrBatch,
+export function ContainerGrid<
+  BatchType extends { storageRestriction?: any },
+  ItemType extends { sampleName?: string }
+>({
+  batch,
   cellGrid,
   movedItems,
   onDrop,
   editMode
-}: ContainerGridProps) {
+}: ContainerGridProps<BatchType, ItemType>) {
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
   const [numberOfColumns, setNumberOfColumns] = useState<number>(0);
 
   useEffect(() => {
-    if (!pcrBatch) return;
+    if (!batch) return;
 
-    if (pcrBatch?.storageRestriction) {
-      setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
-      setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
+    if (batch?.storageRestriction) {
+      setNumberOfRows(batch.storageRestriction.layout.numberOfRows);
+      setNumberOfColumns(batch.storageRestriction.layout.numberOfColumns);
     }
-  }, [pcrBatch]);
+  }, [batch]);
 
   // Generate table columns, only when the row/column number changes.
   const tableColumns: ColumnDef<any>[] = useMemo(() => {
@@ -83,12 +81,12 @@ export function ContainerGrid({
 
           return (
             <div className={`well-${coords}`} style={{ height: "40px" }}>
-              <GridCell
+              <GridCell<ItemType>
                 movedItems={movedItems}
-                onDrop={({ pcrBatchItemSample: newItem }) =>
+                onDrop={({ batchItemSample: newItem }) =>
                   onDrop(newItem, coords)
                 }
-                pcrBatchItemSample={cellGrid[coords]}
+                batchItemSample={cellGrid[coords]}
                 editMode={editMode}
                 coordinates={coords.replace("_", "")}
               />
@@ -123,13 +121,13 @@ export function ContainerGrid({
   );
 }
 
-function GridCell({
+function GridCell<ItemType extends { sampleName?: string }>({
   onDrop,
-  pcrBatchItemSample,
+  batchItemSample: batchItemSample,
   coordinates,
   movedItems,
   editMode
-}: GridCellProps) {
+}: GridCellProps<ItemType>) {
   const [hover, setHover] = useState<boolean>(false);
 
   const [{ dragHover }, drop] = useDrop({
@@ -146,7 +144,7 @@ function GridCell({
     <RcTooltip
       placement="top"
       trigger={"hover"}
-      visible={(dragHover || hover) && pcrBatchItemSample === undefined}
+      visible={(dragHover || hover) && batchItemSample === undefined}
       overlay={<div style={{ maxWidth: "15rem" }}>{coordinates}</div>}
     >
       <div
@@ -159,11 +157,11 @@ function GridCell({
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
-        {pcrBatchItemSample && (
-          <DraggablePCRBatchItemBox
-            pcrBatchItemSample={pcrBatchItemSample}
+        {batchItemSample && (
+          <DraggableItemBox<ItemType>
+            batchItemSample={batchItemSample}
             selected={false}
-            wasMoved={movedItems.includes(pcrBatchItemSample)}
+            wasMoved={movedItems.includes(batchItemSample)}
             editMode={editMode}
             coordinates={coordinates}
           />

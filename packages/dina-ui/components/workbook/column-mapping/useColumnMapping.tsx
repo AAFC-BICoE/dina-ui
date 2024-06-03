@@ -3,8 +3,10 @@ import { chain, pick, startCase } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import {
   SelectField,
+  Tooltip,
   filterBy,
   useApiClient,
+  useDinaFormContext,
   useQuery
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -25,6 +27,8 @@ import {
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
+import { FaExclamationTriangle } from "react-icons/fa";
+import { get } from "lodash";
 
 type RelationshipResource = { name?: string } & KitsuResource;
 
@@ -85,7 +89,7 @@ export function useColumnMapping() {
 
   const { loading: taxonomicRankLoading, response: taxonomicRankResp } =
     useQuery<Vocabulary>({
-      path: "collection-api/vocabulary/taxonomicRank",
+      path: "collection-api/vocabulary2/taxonomicRank",
       page: { limit: 1000 }
     });
 
@@ -169,6 +173,17 @@ export function useColumnMapping() {
     path: `agent-api/person`,
     page: { limit: 1000 }
   });
+  const { loading: metadataLoading, response: metadataResp } = useQuery<
+    RelationshipResource[]
+  >(
+    {
+      path: `objectstore-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=metadata`,
+      page: { limit: 1000 }
+    },
+    {
+      deps: [groupName]
+    }
+  );
 
   const loadingData =
     attrLoading ||
@@ -180,7 +195,8 @@ export function useColumnMapping() {
     storageUnitLoading ||
     projectLoading ||
     personLoading ||
-    taxonomicRankLoading;
+    taxonomicRankLoading ||
+    metadataLoading;
 
   const managedAttributes = attrResp?.data || [];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
@@ -214,6 +230,10 @@ export function useColumnMapping() {
   const persons = (personResp?.data || []).map((item) => ({
     ...item,
     type: "person"
+  }));
+  const metadatas = (metadataResp?.data || []).map((item) => ({
+    ...item,
+    type: "metadata"
   }));
 
   const [loading, setLoading] = useState<boolean>(loadingData);
@@ -453,8 +473,8 @@ export function useColumnMapping() {
           const k = keyArr[i];
           label =
             label === undefined
-              ? formatMessage(k as any).trim() || k.toUpperCase()
-              : label + (formatMessage(k as any).trim() || k.toUpperCase());
+              ? formatMessage(k as any).trim() || startCase(k)
+              : label + (formatMessage(k as any).trim() || startCase(k));
           if (i < keyArr.length - 1) {
             label = label + ".";
           }
@@ -490,24 +510,28 @@ export function useColumnMapping() {
           map.push({
             targetField: "managedAttributes",
             skipped: false,
-            targetKey: targetManagedAttr
+            targetKey: targetManagedAttr,
+            columnHeader
           });
         } else if (targetTaxonomicRank) {
           map.push({
             targetField: "organism.determination.scientificNameDetails",
             skipped: false,
-            targetKey: targetTaxonomicRank
+            targetKey: targetTaxonomicRank,
+            columnHeader
           });
         } else {
           map.push({
             targetField: fieldPath,
-            skipped: fieldPath === undefined
+            skipped: fieldPath === undefined,
+            columnHeader
           });
         }
       } else {
         map.push({
           targetField: fieldPath,
-          skipped: fieldPath === undefined
+          skipped: fieldPath === undefined,
+          columnHeader
         });
       }
     }
@@ -600,6 +624,9 @@ export function useColumnMapping() {
           case "collectingEvent.collectors.displayName":
           case "preparedBy.displayName":
             found = persons.find((item) => item.displayName === value);
+            break;
+          case "attachment.name":
+            found = metadatas.find((item) => item.name === value);
             break;
         }
 
@@ -702,12 +729,37 @@ export function useColumnMapping() {
         }));
         targetType = "person";
         break;
+      case "attachment.name":
+        options = metadatas.map((resource) => ({
+          label: resource.name,
+          value: resource.id,
+          resource
+        }));
+        targetType = "metadata";
+        break;
       default:
         options = [];
     }
+
+    // Find duplicate resources to warn the user
+    const seen = new Set();
+    const duplicateResources: string[] = [];
+    options.forEach((option) => {
+      if (seen.has(option.label)) {
+        duplicateResources.push(option.label);
+      } else {
+        seen.add(option.label);
+      }
+    });
+    const hasDuplicatesResources = duplicateResources.length > 0;
+    const duplicateResourcesSelected = duplicateResources.includes(fieldValue);
+    const showDuplicateWarningTooltip =
+      hasDuplicatesResources && duplicateResourcesSelected;
+
     return (
-      <>
+      <div className="d-flex">
         <SelectField
+          className="flex-fill"
           name={selectElemName}
           options={options}
           hideLabel={true}
@@ -715,7 +767,9 @@ export function useColumnMapping() {
           selectProps={{
             isClearable: true,
             menuPortalTarget: document.body,
-            styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+            styles: {
+              menuPortal: (base) => ({ ...base, zIndex: 9999 })
+            }
           }}
           onChange={(newValue) => {
             onChangeRelatedRecord(
@@ -726,7 +780,21 @@ export function useColumnMapping() {
             );
           }}
         />
-      </>
+        {showDuplicateWarningTooltip && (
+          <Tooltip
+            disableSpanMargin={true}
+            className="mt-3 ms-1"
+            visibleElement={
+              <div className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined bg-warning">
+                <FaExclamationTriangle />
+              </div>
+            }
+            directText={formatMessage("duplicateResourcesFound", {
+              duplicateResources: duplicateResources.join(", ")
+            })}
+          />
+        )}
+      </div>
     );
   }
 

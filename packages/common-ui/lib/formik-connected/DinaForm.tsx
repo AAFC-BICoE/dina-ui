@@ -12,6 +12,7 @@ import { FormTemplate } from "../../../dina-ui/types/collection-api";
 import {
   createContext,
   PropsWithChildren,
+  ReactNode,
   useCallback,
   useContext,
   useMemo
@@ -27,6 +28,7 @@ export interface DinaFormProps<TValues>
   extends Omit<FormikConfig<TValues>, "onSubmit">,
     Omit<DinaFormContextI, "initialValues"> {
   onSubmit?: DinaFormOnSubmit<TValues>;
+  customErrorViewerMessage?: (field: string, error: any) => string;
 }
 
 /** Values available to form elements. */
@@ -89,7 +91,11 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
 
   const isNestedForm = !!useContext(DinaFormContext);
 
-  const { children: childrenProp, onSubmit: onSubmitProp, readOnly } = props;
+  const {
+    children: childrenProp,
+    onSubmit: onSubmitProp,
+    customErrorViewerMessage
+  } = props;
 
   /** Wrapped onSubmit prop with erorr handling and API/Account params. */
   const onSubmitInternal = safeSubmit(async (submittedValues, formik) => {
@@ -112,9 +118,15 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     | ((formikProps: FormikProps<Values>) => React.ReactNode)
     | React.ReactNode =
     typeof childrenProp === "function" ? (
-      (formikProps) => <FormWrapper>{childrenProp(formikProps)}</FormWrapper>
+      (formikProps) => (
+        <FormWrapper customErrorViewerMessage={customErrorViewerMessage}>
+          {childrenProp(formikProps)}
+        </FormWrapper>
+      )
     ) : (
-      <FormWrapper>{childrenProp}</FormWrapper>
+      <FormWrapper customErrorViewerMessage={customErrorViewerMessage}>
+        {childrenProp}
+      </FormWrapper>
     );
 
   // Clone the initialValues object so it isn't modified in the form:
@@ -162,8 +174,13 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   );
 }
 
+interface FormWrapperProps {
+  children: ReactNode;
+  customErrorViewerMessage?: (field: string, error: any) => string;
+}
+
 /** Wraps the inner content with the Form + ErrorViewer components. */
-function FormWrapper({ children }: PropsWithChildren<{}>) {
+function FormWrapper({ children, customErrorViewerMessage }: FormWrapperProps) {
   const { isNestedForm } = useDinaFormContext();
 
   // Disable enter to submit form in nested forms.
@@ -190,7 +207,7 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
     <Wrapper
       onKeyDown={isNestedForm ? disableEnterToSubmitOuterForm : undefined}
     >
-      <ErrorViewer />
+      <ErrorViewer customErrorViewerMessage={customErrorViewerMessage} />
       <FormikConsumer>
         {(formik) => (
           <>

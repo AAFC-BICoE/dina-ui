@@ -159,7 +159,7 @@ export function PreparationField({
             {...fieldProps("dwcDegreeOfEstablishment")}
             jsonApiBackend={{
               query: () => ({
-                path: "collection-api/vocabulary/degreeOfEstablishment"
+                path: "collection-api/vocabulary2/degreeOfEstablishment"
               }),
               option: (vocabElement) =>
                 compact(
@@ -202,7 +202,7 @@ export function PreparationField({
         </div>
       </div>
       <div className="row">
-        <div className="col-md-6">
+        <div className="col-md-12">
           <ManagedAttributesEditor
             valuesPath="preparationManagedAttributes"
             managedAttributeApiPath="collection-api/managed-attribute"

@@ -21,7 +21,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
         }
       };
     case "collection-api/collection":
-    case "collection-api/vocabulary/materialSampleState":
+    case "collection-api/vocabulary2/materialSampleState":
     case "collection-api/material-sample-type":
     case "collection-api/project":
     case "collection-api/material-sample":
@@ -215,7 +215,7 @@ describe("BulkEditTabWarning", () => {
     wrapper
       .find("." + ORGANISMS_COMPONENT_NAME + " button.override-all-button")
       .simulate("click");
-    wrapper.find(".are-you-sure-modal form").simulate("submit");
+    wrapper.find("form .are-you-sure-modal").simulate("submit");
     await new Promise(setImmediate);
     wrapper.update();
 
@@ -477,7 +477,7 @@ describe("BulkEditTabWarning", () => {
     wrapper
       .find("." + ORGANISMS_COMPONENT_NAME + " button.override-all-button")
       .simulate("click");
-    wrapper.find(".are-you-sure-modal form").simulate("submit");
+    wrapper.find("form .are-you-sure-modal").simulate("submit");
     await new Promise(setImmediate);
     wrapper.update();
 

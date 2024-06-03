@@ -387,24 +387,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
                   }}
                 />
-                <div className="row">
-                  <div className="col-md-6">
-                    <ManagedAttributesEditor
-                      fieldSetProps={{
-                        legend: (
-                          <DinaMessage id="materialSampleManagedAttributes" />
-                        )
-                      }}
-                      valuesPath="managedAttributes"
-                      managedAttributeApiPath="collection-api/managed-attribute"
-                      managedAttributeComponent="MATERIAL_SAMPLE"
-                      visibleAttributeKeys={
-                        visibleManagedAttributeKeys?.materialSample
-                      }
-                    />
-                  </div>
-                </div>
-
                 <CollapsibleSection id="transactions" headerKey="transactions">
                   <MaterialSampleTransactionList
                     transactionQueryDSL={transactionQueryDSL}

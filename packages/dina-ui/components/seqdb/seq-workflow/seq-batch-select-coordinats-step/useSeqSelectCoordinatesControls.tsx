@@ -8,7 +8,7 @@ import {
   SeqBatch,
   SeqReaction
 } from "../../../../types/seqdb-api";
-import { CellGrid } from "./ContainerGrid";
+import { CellGrid } from "../../container-grid/ContainerGrid";
 
 interface SeqSelectCoordinatesControlsProps {
   seqBatchId: string;
@@ -66,7 +66,7 @@ export function useSeqSelectCoordinatesControls({
     // Available SeqBatchItems with no well coordinates.
     availableItems: [] as SeqReactionSample[],
     // The grid of SeqBatchItems that have well coordinates.
-    cellGrid: {} as CellGrid,
+    cellGrid: {} as CellGrid<SeqReactionSample>,
     // SeqBatchItems that have been moved since data initialization.
     movedItems: [] as SeqReactionSample[]
   });
@@ -116,7 +116,7 @@ export function useSeqSelectCoordinatesControls({
         (item) => !item.wellRow && !item.wellColumn
       );
 
-      const newCellGrid: CellGrid = {};
+      const newCellGrid: CellGrid<SeqReactionSample> = {};
       seqBatchItemsWithCoords.forEach((item) => {
         newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item;
       });
@@ -249,8 +249,9 @@ export function useSeqSelectCoordinatesControls({
   function moveItems(items: SeqReactionSample[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the SeqBatchItem from the grid.
-      const newCellGrid: CellGrid = omitBy(cellGrid, (item) =>
-        items.includes(item)
+      const newCellGrid: CellGrid<SeqReactionSample> = omitBy(
+        cellGrid,
+        (item) => items.includes(item)
       );
 
       // Remove the SeqBatchItem from the available SeqBatchItems.
@@ -335,8 +336,8 @@ export function useSeqSelectCoordinatesControls({
     }
   }
 
-  function onListDrop(item: { seqReactionSample: SeqReactionSample }) {
-    moveItems([item.seqReactionSample]);
+  function onListDrop(item: { batchItemSample: SeqReactionSample }) {
+    moveItems([item.batchItemSample]);
   }
 
   function onItemClick(item, e) {

@@ -249,7 +249,12 @@ export function MaterialSampleForm({
         />
       ),
     [MATERIAL_SAMPLE_INFO_COMPONENT_NAME]: (id) =>
-      !reduceRendering && <MaterialSampleInfoSection id={id} />,
+      !reduceRendering && (
+        <MaterialSampleInfoSection
+          id={id}
+          visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+        />
+      ),
     [COLLECTING_EVENT_COMPONENT_NAME]: (id) =>
       dataComponentState.enableCollectingEvent && (
         <TabbedResourceLinker<CollectingEvent>
@@ -364,7 +369,7 @@ export function MaterialSampleForm({
           sectionName="managed-attributes-section"
         >
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-md-12">
               <ManagedAttributesEditor
                 valuesPath="managedAttributes"
                 managedAttributeApiPath="collection-api/managed-attribute"

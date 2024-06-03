@@ -913,7 +913,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   whoAmITitle: "Who Am I",
   withAKeyboard: "With a keyboard",
   withAMouse: "With a mouse",
-  workBookDuplicateFieldMap: "This column should not map to the same field",
+  workBookDuplicateFieldMap:
+    "This column should not map to the same field ({fieldName})",
   workBookSkippedField: "Please select a field or skip importing it",
   missingParentMaterialSampleNames:
     "Missing parent material sample names: {missingNames}",
@@ -936,10 +937,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
   proceedWithWarning: "Proceed with warnings?",
-  areYouSureImportWorkbookWithSkippedColumns:
-    "Are you sure you want to import the workbook with skipped columns?",
-  areYouSureImportWorkbookWithoutMappingAllRecords:
-    "Are you sure you want to import the workbook without mapping all related records?",
+  workbookImportAnywayButton: "Import anyway",
+  skippedColumnsTitle: "Skipped Columns",
+  skippedColumnsDescription:
+    "The workbook contains columns that will be skipped during import. These columns might contain important data.",
+  unmappedRelationshipsTitle: "Unmapped Relationships",
+  unmappedRelationshipsDescription:
+    "The import identified relationships in the workbook that could not be automatically mapped. This might lead to incomplete data transfer.",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
@@ -977,5 +981,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataLabel: "Data",
   objectsLabel: "Objects",
   relatedRecord: "Related Record",
-  reportTemplateUpload: "Report Template Upload"
+  reportTemplateUpload: "Report Template Upload",
+  managedBy: "Managed By",
+  agentId: "Agent Link",
+  maxNumUploadExceeded: "Max number of uploads exceeded",
+  addReportTemplateTitle: "Add Report Template",
+  backToUpload: "Back to Upload",
+  field_reportTemplateName: "Report Template Name",
+  field_includesBarcode: "Includes Barcode",
+  field_templateOutputMediaType: "Template Output Media Type",
+  field_outputMediaType: "Output Media Type",
+  field_reportType: "Report Type",
+  field_reportVariables: "Report Variables",
+  editReportTemplateTitle: "Edit Report Template",
+  duplicateResourcesFound:
+    "Warning: duplicate resources found {duplicateResources}"
 };

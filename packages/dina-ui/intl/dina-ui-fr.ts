@@ -910,7 +910,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   withAKeyboard: "Avec un clavier",
   withAMouse: "Avec une souris",
   workBookDuplicateFieldMap:
-    "Cette colonne ne doit pas être mise en correspondance avec le même champ",
+    "Cette colonne ne doit pas être mise en correspondance avec le même champ ({fieldName})",
   workBookInvalidDataFormat:
     "Format de données invalide, feuille : {sheet}, rangée : {index}, champ : {field}, le type de données doit être {dataType}",
   workBookInvalidManagedAttributeDataType:

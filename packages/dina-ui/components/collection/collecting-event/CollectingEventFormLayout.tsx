@@ -1,27 +1,28 @@
-import useSWR from "swr";
 import {
   AutoSuggestTextField,
   CheckBoxWithoutWrapper,
+  DataEntryField,
   DinaFormSection,
   FieldSet,
-  filterBy,
+  FieldSpy,
   FormattedTextField,
   FormikButton,
   LoadingSpinner,
   NominatumApiSearchResult,
   NumberRangeFields,
   PlaceSectionsSelectionField,
+  ResourceSelectField,
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
-  useDinaFormContext,
-  FieldSpy,
-  DataEntryField,
-  useQuery,
-  ResourceSelectField
+  filterBy,
+  useDinaFormContext
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
+import { compact, find } from "lodash";
+import Link from "next/link";
 import { ChangeEvent, useRef, useState } from "react";
+import useSWR from "swr";
 import {
   AttachmentsField,
   CollectionMethodSelectField,
@@ -32,6 +33,7 @@ import {
   PersonSelectField,
   TagsAndRestrictionsSection
 } from "../..";
+import { ManagedAttributesEditor } from "../../";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   COLLECTING_EVENT_COMPONENT_NAME,
@@ -47,21 +49,17 @@ import {
   CoordinateSystemEnumPlaceHolder
 } from "../../../types/collection-api/resources/CoordinateSystem";
 import {
-  geographicPlaceSourceUrl,
-  SourceAdministrativeLevel
+  SourceAdministrativeLevel,
+  geographicPlaceSourceUrl
 } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { AllowAttachmentsConfig } from "../../object-store";
-import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import {
-  nominatimAddressDetailSearch,
   NominatimAddressDetailSearchProps,
-  NominatumApiAddressDetailSearchResult
+  NominatumApiAddressDetailSearchResult,
+  nominatimAddressDetailSearch
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
-import Link from "next/link";
-import { find, compact } from "lodash";
-import { FieldExtension } from "packages/dina-ui/types/collection-api/resources/FieldExtension";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -599,7 +597,7 @@ export function CollectingEventFormLayout({
         <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
       </DinaFormSection>
       <div className="row mb-3">
-        <div>
+        <div className="col-md-12">
           <FieldSet
             legend={<DinaMessage id="identifiers" />}
             id="identifiers"
@@ -747,7 +745,7 @@ export function CollectingEventFormLayout({
               name="dwcVerbatimCoordinateSystem"
               jsonApiBackend={{
                 query: () => ({
-                  path: "collection-api/vocabulary/coordinateSystem"
+                  path: "collection-api/vocabulary2/coordinateSystem"
                 }),
                 option: (vocabElement) =>
                   compact(
@@ -849,7 +847,7 @@ export function CollectingEventFormLayout({
               name="dwcVerbatimSRS"
               jsonApiBackend={{
                 query: () => ({
-                  path: "collection-api/vocabulary/srs"
+                  path: "collection-api/vocabulary2/srs"
                 }),
                 option: (vocabElement) =>
                   compact(
@@ -974,6 +972,12 @@ export function CollectingEventFormLayout({
               labelMsg={<DinaMessage id="depthInMeters" />}
             />
             <TextField name="remarks" multiLines={true} />
+            <div className="row">
+              {readOnly &&
+              JSON.stringify(initialValues?.managedAttributes) !== "{}" // if read-only, check for managed attributes
+                ? collectingEventManagedAttributesComponent
+                : null}
+            </div>
           </FieldSet>
         </div>
       </div>
@@ -1014,13 +1018,7 @@ export function CollectingEventFormLayout({
           />
         </DinaFormSection>
       </div>
-      <>
-        {!readOnly
-          ? collectingEventManagedAttributesComponent
-          : JSON.stringify(initialValues?.managedAttributes) !== "{}" // if read-only, check for managed attributes
-          ? collectingEventManagedAttributesComponent
-          : null}
-      </>
+      <>{!readOnly ? collectingEventManagedAttributesComponent : null}</>
       <div className="mb-3">
         {!readOnly
           ? collectingEventAttachmentsComponent

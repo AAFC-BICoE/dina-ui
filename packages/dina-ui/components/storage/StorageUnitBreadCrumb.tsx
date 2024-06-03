@@ -23,10 +23,7 @@ export function StorageUnitBreadCrumb({
   const unitDisplayName = storageUnitDisplayName(storageUnit);
 
   return (
-    <ol
-      className="breadcrumb mb-0"
-      style={{ "--bs-breadcrumb-divider": "'>'" } as any}
-    >
+    <ol className="breadcrumb breadcrumb-arrow mb-0">
       {parentPath.map((node) => (
         <li className="breadcrumb-item" key={node.uuid}>
           <Link href={`/collection/storage-unit/view?id=${node.uuid}`}>

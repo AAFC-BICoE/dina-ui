@@ -51,7 +51,7 @@ describe("StorageLinker", () => {
       "Storage A is empty. Would you like to permanently delete this Storage Container?"
     );
     // Confirm "yes":
-    wrapper.find(".modal-body form").simulate("submit");
+    wrapper.find("form .modal-body").simulate("submit");
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -89,7 +89,7 @@ describe("StorageLinker", () => {
       "Storage A is empty. Would you like to permanently delete this Storage Container?"
     );
     // Confirm "yes":
-    wrapper.find(".modal-body form").simulate("submit");
+    wrapper.find("form .modal-body").simulate("submit");
 
     await new Promise(setImmediate);
     wrapper.update();

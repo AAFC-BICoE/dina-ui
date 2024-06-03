@@ -33,7 +33,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
     tags: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
     materialSampleType: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
-      endpoint: "/collection-api/vocabulary/materialSampleType"
+      endpoint: "/collection-api/vocabulary2/materialSampleType"
     },
     managedAttributes: {
       dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
@@ -45,6 +45,13 @@ const FieldMappingConfig: FieldMappingConfigType = {
     publiclyReleasable: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     useNextSequence: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     isRestricted: { dataType: WorkbookDataTypeEnum.BOOLEAN },
+    hostOrganism: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING },
+        remarks: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
     collection: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
@@ -273,6 +280,18 @@ const FieldMappingConfig: FieldMappingConfigType = {
         linkOrCreateSetting: LinkOrCreateSetting.LINK,
         type: "assemblage",
         baseApiPath: "/collection-api"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
+    attachment: {
+      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+      relationshipConfig: {
+        hasGroup: false,
+        type: "metadata",
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
+        baseApiPath: "/objectstore-api"
       },
       attributes: {
         name: { dataType: WorkbookDataTypeEnum.STRING }

@@ -197,7 +197,7 @@ export default function MetadataListPage() {
                 }}
                 bulkEditPath={"/object-store/metadata/bulk-edit"}
                 dataExportProps={{
-                  dataExportPath: "/data-export/export",
+                  dataExportPath: "/export/data-export/export",
                   entityLink: "/object-store/object"
                 }}
                 singleEditPath={"/object-store/metadata/edit"}
