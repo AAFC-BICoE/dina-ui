@@ -1,9 +1,8 @@
 import { FieldHeader, dateCell } from "..";
 import { ESIndexMapping, TableColumn } from "../list-page/types";
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
-import lodash, { get, startCase } from "lodash";
-import React, { useMemo } from "react";
-import { useIntl } from "react-intl";
+import { get } from "lodash";
+import React from "react";
 
 export interface ColumnSelectorIndexMapColumns<TData extends KitsuResource> {
   /**
@@ -434,73 +433,4 @@ export function getIncludedExtensionFieldColumn(
   };
 
   return extensionValuesColumn;
-}
-
-export function getGroupedIndexMappings(
-  indexName: string,
-  indexMap: ESIndexMapping[] | undefined
-) {
-  const { formatMessage, locale, messages } = useIntl();
-  return useMemo(() => {
-    // Get all of the attributes from the index for the filter dropdown.
-    const columnSelectorParentNameMap = {
-      dina_material_sample_index: "Material Sample",
-      dina_loan_transaction_index: "Loan Transaction",
-      dina_object_store_index: "Object Store"
-    };
-    const attributeMappings = indexMap
-      ?.filter((indexMapping) => !indexMapping.parentPath)
-      ?.map((indexMapping) => ({
-        ...indexMapping,
-        parentName: columnSelectorParentNameMap[indexName]
-      }))
-      ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
-
-    // Get all the relationships for the search dropdown.
-    const relationshipMappings = indexMap
-      ?.filter((indexMapping) => !!indexMapping.parentPath)
-      ?.map((indexMapping) => {
-        return {
-          parentName: indexMapping.parentName,
-          ...indexMapping
-        };
-      })
-      ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
-
-    // Using the parent name, group the attributes into section
-    const groupedAttributeMappings = lodash
-      .chain(attributeMappings)
-      .groupBy((prop) => prop.parentName)
-      .map((group, key) => {
-        return {
-          label: messages["title_" + key]
-            ? formatMessage({ id: "title_" + key })
-            : startCase(key),
-          options: group
-        };
-      })
-      .sort((aProp, bProp) => aProp.label.localeCompare(bProp.label))
-      .value();
-
-    // Using the parent name, group the relationships into sections.
-    const groupedRelationshipMappings = lodash
-      .chain(relationshipMappings)
-      .groupBy((prop) => prop.parentName)
-      .map((group, key) => {
-        return {
-          label: messages["title_" + key]
-            ? formatMessage({ id: "title_" + key })
-            : startCase(key),
-          options: group
-        };
-      })
-      .sort((aProp, bProp) => aProp.label.localeCompare(bProp.label))
-      .value();
-    const groupedMappings = [
-      ...groupedAttributeMappings,
-      ...groupedRelationshipMappings
-    ];
-
-    return groupedAttributeMappings ? groupedMappings : [];
-  }, [indexMap, locale]);
 }

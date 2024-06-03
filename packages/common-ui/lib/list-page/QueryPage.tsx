@@ -582,6 +582,13 @@ export function QueryPage<TData extends KitsuResource>({
     customViewElasticSearchQuery
   ]);
 
+  // If column selector is disabled, the loading spinner should be turned off.
+  useEffect(() => {
+    if (!enableColumnSelector) {
+      setColumnSelectorLoading(false);
+    }
+  }, [enableColumnSelector]);
+
   /**
    * Used for selection mode only.
    *
