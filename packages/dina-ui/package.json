@@ -17,6 +17,8 @@
     "cleave.js": "^1.6.0",
     "common-ui": "link:../common-ui",
     "coordinate-parser": "^1.0.7",
+    "dexie": "^3.2.4",
+    "dexie-react-hooks": "^1.1.6",
     "esri-loader": "^3.3.0",
     "esri-loader-hooks": "^0.4.0",
     "moment": "^2.29.4",
@@ -27,9 +29,7 @@
     "react-file-viewer": "^1.2.1",
     "react-switch": "^6.0.0",
     "react-tabs": "^3.2.3",
-    "zod": "^3.11.6",
-    "dexie": "^3.2.4",
-    "dexie-react-hooks": "^1.1.6"
+    "zod": "^3.11.6"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
