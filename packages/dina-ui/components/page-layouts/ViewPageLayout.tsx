@@ -154,7 +154,9 @@ export function ViewPageLayout<T extends KitsuResource>({
               : get(data, currentField)),
           ""
         );
-        const group = get(data, "group")?.toUpperCase();
+        const group = get(data, "group") as string;
+        const uppercasedGroup = group.toUpperCase();
+
         // if title is array, only take first element
         if (Array.isArray(title)) {
           title = title[0];
@@ -229,7 +231,7 @@ export function ViewPageLayout<T extends KitsuResource>({
                 </span>
                 {showGroup && (
                   <span className="header-group-text">
-                    {<GroupLabel groupName={group} />}
+                    {<GroupLabel groupName={uppercasedGroup} />}
                   </span>
                 )}
               </h1>
