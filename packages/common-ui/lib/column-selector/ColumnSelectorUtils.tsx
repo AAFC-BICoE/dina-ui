@@ -49,6 +49,9 @@ export async function getColumnSelectorIndexMapColumns<
       // Check if it's a dynamic field that needs to be loaded in using the API client.
       if (indexColumn.dynamicField) {
         await getDynamicFieldColumns(indexColumn, apiClient, columnOptions);
+      } else if (indexColumn.hideField) {
+        // Skip this field, it shouldn't be displayed.
+        continue;
       } else {
         if (indexColumn.parentType) {
           // Check if it's mapped in the default columns, and just use that definition.
@@ -102,7 +105,7 @@ function getEntityColumns<TData extends KitsuResource>(
         indexColumn?.label,
         indexColumn?.value,
         undefined,
-        false,
+        true,
         indexColumn
       )
     );
@@ -128,7 +131,7 @@ function getNestedColumns<TData extends KitsuResource>(
         indexColumn.value,
         accessorKey,
         indexColumn.parentType,
-        false,
+        true,
         indexColumn
       )
     );

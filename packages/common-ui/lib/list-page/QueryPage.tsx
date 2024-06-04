@@ -844,6 +844,18 @@ export function QueryPage<TData extends KitsuResource>({
   }, []);
 
   /**
+   * When the displayed columns are changed from the column selector, we need to trigger
+   * a new elastic search query since the _source changes.
+   */
+  const onDisplayedColumnsChange = useCallback(
+    (newDisplayedColumns: TableColumn<TData>[]) => {
+      isActionTriggeredQuery.current = true;
+      setDisplayedColumns(newDisplayedColumns);
+    },
+    []
+  );
+
+  /**
    * When the query builder tree has changed, store the new tree here.
    */
   const onQueryBuildTreeChange = useCallback((newTree: ImmutableTree) => {
@@ -983,7 +995,7 @@ export function QueryPage<TData extends KitsuResource>({
                       exportMode={false}
                       indexMapping={indexMap}
                       displayedColumns={displayedColumns}
-                      setDisplayedColumns={setDisplayedColumns}
+                      setDisplayedColumns={onDisplayedColumnsChange}
                       defaultColumns={columns}
                       setColumnSelectorLoading={setColumnSelectorLoading}
                     />
