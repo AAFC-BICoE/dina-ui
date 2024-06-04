@@ -60,7 +60,7 @@ export function BulkDeleteButton({
                   op: "DELETE",
                   path: `${typeName}/${id}`
                 })),
-                { apiBaseUrl }
+                { apiBaseUrl, returnNullForMissingResource: true }
               );
 
               // Refresh the page:
