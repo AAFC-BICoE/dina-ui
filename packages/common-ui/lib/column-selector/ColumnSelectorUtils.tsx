@@ -63,39 +63,7 @@ export async function getColumnSelectorIndexMapColumns<
             continue;
           }
 
-          const accessorKey = `${indexColumn.parentPath}.${indexColumn.path}.${indexColumn.label}`;
-
-          if (indexColumn.type === "date") {
-            columnOptions.push(
-              dateCell(
-                indexColumn.value,
-                accessorKey,
-                indexColumn.parentType,
-                false,
-                indexColumn
-              )
-            );
-          } else {
-            columnOptions.push({
-              id: indexColumn.value,
-              header: () => <FieldHeader name={indexColumn.value} />,
-              accessorKey,
-              isKeyword: indexColumn.keywordMultiFieldSupport,
-              isColumnVisible: false,
-              cell: ({ row: { original } }) => {
-                const relationshipAccessor = accessorKey?.split(".");
-                relationshipAccessor?.splice(
-                  1,
-                  0,
-                  indexColumn.parentType ? indexColumn.parentType : ""
-                );
-                const valuePath = relationshipAccessor?.join(".");
-                const value = get(original, valuePath);
-                return <>{value}</>;
-              },
-              relationshipType: indexColumn.parentType
-            });
-          }
+          getNestedColumns(indexColumn, columnOptions);
         } else {
           // Check if it's mapped in the default columns, and just use that definition.
           const defaultColumnFound = defaultColumnsCopy?.find(
@@ -109,24 +77,7 @@ export async function getColumnSelectorIndexMapColumns<
             continue;
           }
 
-          if (indexColumn.type === "date") {
-            columnOptions.push(
-              dateCell(
-                indexColumn?.label,
-                indexColumn?.value,
-                undefined,
-                false,
-                indexColumn
-              )
-            );
-          } else {
-            columnOptions.push({
-              id: indexColumn.label,
-              header: () => <FieldHeader name={indexColumn?.label} />,
-              accessorKey: indexColumn?.value,
-              isKeyword: indexColumn?.keywordMultiFieldSupport
-            });
-          }
+          getEntityColumns(indexColumn, columnOptions);
         }
       }
     }
@@ -138,6 +89,69 @@ export async function getColumnSelectorIndexMapColumns<
 
     setColumnOptions?.(columnOptions);
     setLoading?.(false);
+  }
+}
+
+function getEntityColumns<TData extends KitsuResource>(
+  indexColumn: ESIndexMapping,
+  columnOptions: TableColumn<TData>[]
+) {
+  if (indexColumn.type === "date") {
+    columnOptions.push(
+      dateCell(
+        indexColumn?.label,
+        indexColumn?.value,
+        undefined,
+        false,
+        indexColumn
+      )
+    );
+  } else {
+    columnOptions.push({
+      id: indexColumn.label,
+      header: () => <FieldHeader name={indexColumn?.label} />,
+      accessorKey: indexColumn?.value,
+      isKeyword: indexColumn?.keywordMultiFieldSupport
+    });
+  }
+}
+
+function getNestedColumns<TData extends KitsuResource>(
+  indexColumn: ESIndexMapping,
+  columnOptions: TableColumn<TData>[]
+) {
+  const accessorKey = `${indexColumn.parentPath}.${indexColumn.path}.${indexColumn.label}`;
+
+  if (indexColumn.type === "date") {
+    columnOptions.push(
+      dateCell(
+        indexColumn.value,
+        accessorKey,
+        indexColumn.parentType,
+        false,
+        indexColumn
+      )
+    );
+  } else {
+    columnOptions.push({
+      id: indexColumn.value,
+      header: () => <FieldHeader name={indexColumn.value} />,
+      accessorKey,
+      isKeyword: indexColumn.keywordMultiFieldSupport,
+      isColumnVisible: true,
+      cell: ({ row: { original } }) => {
+        const relationshipAccessor = accessorKey?.split(".");
+        relationshipAccessor?.splice(
+          1,
+          0,
+          indexColumn.parentType ? indexColumn.parentType : ""
+        );
+        const valuePath = relationshipAccessor?.join(".");
+        const value = get(original, valuePath);
+        return <>{value}</>;
+      },
+      relationshipType: indexColumn.parentType
+    });
   }
 }
 
@@ -229,7 +243,7 @@ export function getIncludedManagedAttributeColumn(
     accessorKey,
     id: `${columnMapping.label}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
-    isColumnVisible: false,
+    isColumnVisible: true,
     relationshipType: columnMapping.parentType,
     managedAttribute,
     columnMapping
@@ -262,7 +276,7 @@ export function getAttributesManagedAttributeColumn(
     accessorKey,
     id: `${columnMapping.label}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
-    isColumnVisible: false,
+    isColumnVisible: true,
     columnMapping,
     managedAttribute,
     sortDescFirst: true
@@ -314,7 +328,7 @@ export function getAttributeExtensionFieldColumn(
       <FieldHeader name={`${extensionValue.id}.${extensionField.key}`} />
     ),
     isKeyword: columnMapping.keywordMultiFieldSupport,
-    isColumnVisible: false,
+    isColumnVisible: true,
     columnMapping,
     extensionValue,
     extensionField
@@ -425,7 +439,7 @@ export function getIncludedExtensionFieldColumn(
       <FieldHeader name={`${extensionValue.id}.${extensionField.key}`} />
     ),
     isKeyword: columnMapping.keywordMultiFieldSupport,
-    isColumnVisible: false,
+    isColumnVisible: true,
     relationshipType: columnMapping.parentType,
     columnMapping,
     extensionValue,
