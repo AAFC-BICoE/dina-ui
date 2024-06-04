@@ -414,7 +414,8 @@ describe("Metadata List Page", () => {
         }
       ],
       {
-        apiBaseUrl: "/objectstore-api"
+        apiBaseUrl: "/objectstore-api",
+        returnNullForMissingResource: true
       }
     );
     expect(mockReload).toHaveBeenCalledTimes(1);
