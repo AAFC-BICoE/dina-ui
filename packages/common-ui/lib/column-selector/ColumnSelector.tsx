@@ -1,5 +1,4 @@
 import { useApiClient, LoadingSpinner, FieldHeader } from "..";
-import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect, useCallback } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -160,47 +159,6 @@ export function ColumnSelector<TData extends KitsuResource>({
     }
   }, [exportMode, nonAppliedOptions]);
 
-  const {
-    show: showMenu,
-    showDropdown: showDropdownMenu,
-    hideDropdown: hideDropdownMenu,
-    onKeyDown: onKeyPressDown
-  } = menuDisplayControl();
-
-  function menuDisplayControl() {
-    const [show, setShow] = useState(false);
-
-    const showDropdown = () => {
-      setShow(true);
-    };
-
-    const hideDropdown = () => {
-      setShow(false);
-    };
-
-    function onKeyDown(e) {
-      if (
-        e.key === "ArrowDown" ||
-        e.key === "ArrowUp" ||
-        e.key === "Space" ||
-        e.key === " " ||
-        e.key === "Enter"
-      ) {
-        showDropdown();
-      } else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab")) {
-        hideDropdown();
-      }
-    }
-
-    function onKeyDownLastItem(e) {
-      if (!e.shiftKey && e.key === "Tab") {
-        hideDropdown();
-      }
-    }
-
-    return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
-  }
-
   /**
    * Search filter function, this is used to search through all the possible columns to display
    * specific ones first.
@@ -250,8 +208,8 @@ export function ColumnSelector<TData extends KitsuResource>({
 
   function sortCheckboxes(a: TableColumn<TData>, b: TableColumn<TData>) {
     // Check if a column is checked
-    const isAChecked = isChecked(a.id);
-    const isBChecked = isChecked(b.id);
+    const isAChecked = isChecked(a.id, true);
+    const isBChecked = isChecked(b.id, true);
 
     // Checked columns come before unchecked columns
     if (isAChecked && !isBChecked) {
@@ -279,13 +237,15 @@ export function ColumnSelector<TData extends KitsuResource>({
    * @returns true if it shuold be checked, false if not.
    */
   const isChecked = useCallback(
-    (columnId: string | undefined) => {
+    (columnId: string | undefined, skipNonApplied: boolean) => {
       // First check the nonAppliedOptions if it has been altered.
-      const nonAppliedFound = nonAppliedOptions.find(
-        (item) => item.column.id === columnId
-      );
-      if (nonAppliedFound !== undefined) {
-        return nonAppliedFound.state;
+      if (!skipNonApplied) {
+        const nonAppliedFound = nonAppliedOptions.find(
+          (item) => item.column.id === columnId
+        );
+        if (nonAppliedFound !== undefined) {
+          return nonAppliedFound.state;
+        }
       }
 
       // Now check if it's currently being displayed on the table, but not applied yet.
@@ -406,7 +366,7 @@ export function ColumnSelector<TData extends KitsuResource>({
   const CheckboxItem = React.forwardRef((props: any, ref) => {
     return (
       <Checkbox
-        key={props.id}
+        key={props.accessKey}
         id={props.id}
         isChecked={props.isChecked}
         isField={props.isField}
@@ -416,77 +376,13 @@ export function ColumnSelector<TData extends KitsuResource>({
     );
   });
 
-  const ColumnSelectorMenu = React.forwardRef(
-    (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
-      if (props.style) {
-        props.style.transform = "translate(0px, 40px)";
-      }
-
-      return (
-        <div
-          ref={ref}
-          style={{
-            ...props.style,
-            width: exportMode ? "100%" : "25rem",
-            padding: exportMode ? "0" : "1.25rem 1.25rem 1.25rem 1.25rem",
-            zIndex: 1
-          }}
-          className={props.className}
-          aria-labelledby={props.labelledBy}
-        >
-          {exportMode ? (
-            <>
-              <strong>{<DinaMessage id="exportColumns" />}</strong>
-              <br />
-            </>
-          ) : (
-            <div>
-              <strong>{<FieldHeader name="filterColumns" />}</strong>
-              <input
-                autoFocus={true}
-                name="filterColumns"
-                className="form-control"
-                type="text"
-                placeholder="Search"
-                value={searchValue}
-                onChange={(event) => {
-                  setSearchValue(event.target.value);
-                }}
-              />
-              <Dropdown.Divider />
-            </div>
-          )}
-          {
-            <>
-              <div className="d-flex gap-2 column-selector-apply-button">
-                {!exportMode && (
-                  <Button
-                    disabled={loading || nonAppliedOptions.length === 0}
-                    className="btn btn-primary mt-1 mb-2 bulk-edit-button w-100"
-                    onClick={() => applyFilterColumns(true)}
-                  >
-                    {loading ? (
-                      <LoadingSpinner loading={loading} />
-                    ) : (
-                      formatMessage({ id: "applyButtonText" }) +
-                      (nonAppliedOptions.length > 0
-                        ? " (" + nonAppliedOptions.length + ")"
-                        : "")
-                    )}
-                  </Button>
-                )}
-              </div>
-            </>
-          }
-          {props.children}
-        </div>
-      );
-    }
-  );
-
   return exportMode ? (
-    <ColumnSelectorMenu>
+    <>
+      <strong>{<DinaMessage id="exportColumns" />}</strong>
+      <br />
+
       <Dropdown.Item
+        key="__selectall"
         id="selectAll"
         handleClick={handleToggleAll}
         isChecked={selectAll}
@@ -496,67 +392,84 @@ export function ColumnSelector<TData extends KitsuResource>({
         .filter(hiddenColumnFilter)
         .filter(searchFilter)
         .sort(sortCheckboxes)
-        .map((column) => {
+        .map((column, index) => {
           return (
-            <>
-              <Dropdown.Item
-                key={column?.id}
-                id={column?.id}
-                isChecked={isChecked(column?.id)}
-                handleClick={() => toggleColumn(column?.id)}
-                isField={true}
-                as={CheckboxItem}
-              />
-            </>
-          );
-        })}
-    </ColumnSelectorMenu>
-  ) : (
-    <Dropdown
-      onMouseDown={showDropdownMenu}
-      onKeyDown={onKeyPressDown}
-      onMouseLeave={hideDropdownMenu}
-      show={showMenu}
-    >
-      <Dropdown.Toggle>
-        <DinaMessage id="selectColumn" />
-      </Dropdown.Toggle>
-      <Dropdown.Menu
-        as={ColumnSelectorMenu}
-        style={{ maxHeight: "20rem", overflowY: "scroll" }}
-      >
-        {loading ? (
-          <LoadingSpinner loading={loading} />
-        ) : (
-          <>
             <Dropdown.Item
-              id="selectAll"
-              handleClick={handleToggleAll}
-              isChecked={selectAll}
+              key={index + "_" + column?.id}
+              id={column?.id}
+              isChecked={isChecked(column?.id, false)}
+              handleClick={() => toggleColumn(column?.id)}
+              isField={true}
+              accessKey={index + "_" + column?.id + "_checkbox"}
               as={CheckboxItem}
             />
-            {columnOptions
-              .filter(hiddenColumnFilter)
-              .filter(searchFilter)
-              .sort(sortCheckboxes)
-              .map((column) => {
-                return (
-                  <>
-                    <Dropdown.Item
-                      key={column?.id}
-                      id={column?.id}
-                      isChecked={isChecked(column?.id)}
-                      handleClick={() => toggleColumn(column?.id)}
-                      isField={true}
-                      as={CheckboxItem}
-                    />
-                  </>
-                );
-              })}
-          </>
-        )}
-      </Dropdown.Menu>
-    </Dropdown>
+          );
+        })}
+    </>
+  ) : (
+    <>
+      {loading ? (
+        <LoadingSpinner loading={loading} />
+      ) : (
+        <>
+          <div>
+            <strong>{<FieldHeader name="filterColumns" />}</strong>
+            <input
+              autoFocus={true}
+              name="filterColumns"
+              className="form-control"
+              type="text"
+              placeholder="Search"
+              value={searchValue}
+              onChange={(event) => {
+                setSearchValue(event.target.value);
+              }}
+            />
+            <Dropdown.Divider />
+          </div>
+
+          <div className="d-flex gap-2 column-selector-apply-button">
+            <Button
+              disabled={loading || nonAppliedOptions.length === 0}
+              className="btn btn-primary mt-1 mb-2 bulk-edit-button w-100"
+              onClick={() => applyFilterColumns(true)}
+            >
+              {formatMessage({ id: "applyButtonText" }) +
+                (nonAppliedOptions.length > 0
+                  ? " (" + nonAppliedOptions.length + ")"
+                  : "")}
+            </Button>
+          </div>
+
+          <Dropdown.Item
+            key="__selectall"
+            id="selectAll"
+            handleClick={handleToggleAll}
+            isChecked={selectAll}
+            as={CheckboxItem}
+          />
+          {columnOptions
+            .filter(hiddenColumnFilter)
+            .filter(searchFilter)
+            .sort(sortCheckboxes)
+            .map((column, index) => {
+              return (
+                <>
+                  <Dropdown.Item
+                    key={index + "_" + column?.id}
+                    id={column?.id}
+                    isChecked={isChecked(column?.id, false)}
+                    handleClick={() => toggleColumn(column?.id)}
+                    isField={true}
+                    accessKey={index + "_" + column?.id + "_checkbox"}
+                    as={CheckboxItem}
+                  />
+                </>
+              );
+            })}
+        </>
+      )}
+    </>
   );
 }
 
