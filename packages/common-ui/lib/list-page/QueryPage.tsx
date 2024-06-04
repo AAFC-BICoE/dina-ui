@@ -21,7 +21,7 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
 import {
-  ColumnSelectorDropdown,
+  ColumnSelector,
   FormikButton,
   ReactTable,
   ReactTableProps,
@@ -978,7 +978,7 @@ export function QueryPage<TData extends KitsuResource>({
               {!selectionMode && (
                 <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
                   {enableColumnSelector && (
-                    <ColumnSelectorDropdown
+                    <ColumnSelector
                       uniqueName={uniqueName}
                       exportMode={false}
                       indexMapping={indexMap}

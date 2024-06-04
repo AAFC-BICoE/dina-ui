@@ -12,7 +12,7 @@ import {
   DATA_EXPORT_QUERY_KEY,
   TextField,
   SubmitButton,
-  ColumnSelectorDropdown
+  ColumnSelector
 } from "packages/common-ui/lib";
 import Link from "next/link";
 import { KitsuResource, PersistedResource } from "kitsu";
@@ -308,7 +308,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                 <Tooltip id="exportObjectsMaxLimitTooltip" />
               )}
           </div>
-          <ColumnSelectorDropdown
+          <ColumnSelector
             exportMode={true}
             defaultColumns={[]}
             displayedColumns={columnsToExport}
