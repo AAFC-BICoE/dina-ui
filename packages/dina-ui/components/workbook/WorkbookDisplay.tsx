@@ -48,14 +48,14 @@ export function WorkbookDisplay({
           .cells {
             position: relative;
             display: grid;
-            grid-template-columns: 40px repeat(${numOfColumns}, calc((100% - 53px) / ${numOfColumns}));
+            grid-template-columns: 40px repeat(${numOfColumns}, auto);
             grid-template-rows: 50px repeat(${numOfRows}, 30px);
             grid-gap: 1px;
             background: #cdcdcd;
             grid-auto-flow: dense;
             max-width: 100%;
-            overflow: hidden;
             height: calc(51px + ${numOfRows}*31px);
+            overflow-x: auto;
           }
           .cells_spacer {
             background: #e6e6e6;
@@ -75,7 +75,10 @@ export function WorkbookDisplay({
             display: flex;
             justify-content: center;
             align-items: center;
-            word-wrap: anywhere;
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: clip;
+            padding: 0 10px; /* Adds padding to the left and right */
           }
           .cells_number {
             background: #e6e6e6;
@@ -94,10 +97,10 @@ export function WorkbookDisplay({
             padding: 6px;
             background: #f3f2f1;
           }
-        `}</style>
+  `}</style>
       <Card
         className="mb-3"
-        style={{ width: "100%", overflowX: "scroll", height: "70hp" }}
+        style={{ width: "100%", overflowX: "auto", height: "70hp" }}
       >
         <Card.Header style={{ fontSize: "1.4em" }}>
           <DinaMessage id="workbookPreviewTitle" /> ({numOfRows} /{" "}
