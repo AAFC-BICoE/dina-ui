@@ -123,7 +123,9 @@ function getNestedColumns<TData extends KitsuResource>(
   indexColumn: ESIndexMapping,
   columnOptions: TableColumn<TData>[]
 ) {
-  const accessorKey = `${indexColumn.parentPath}.${indexColumn.path}.${indexColumn.label}`;
+  const accessorKey = `${indexColumn.parentPath}.${
+    indexColumn.path.split(".")[0]
+  }.${indexColumn.label}`;
 
   if (indexColumn.type === "date") {
     columnOptions.push(

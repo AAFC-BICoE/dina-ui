@@ -18,11 +18,19 @@ import useLocalStorage from "@rehooks/local-storage";
 export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
   "selectColumn",
   "thumbnail",
-  "viewPreviewButtonText"
+  "viewPreviewButtonText",
+  "organism.determination.verbatimScientificName",
+  "organism.determination.scientificName",
+  "organism.determination.typeStatus"
 ];
 
 // IDs of columns that the user cannot configure, they are mandatory.
-export const MANDATORY_DISPLAYED_COLUMNS: string[] = ["selectColumn"];
+export const MANDATORY_DISPLAYED_COLUMNS: string[] = [
+  "selectColumn",
+  "organism.determination.verbatimScientificName",
+  "organism.determination.scientificName",
+  "organism.determination.typeStatus"
+];
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -91,17 +99,38 @@ export function ColumnSelectorList<TData extends KitsuResource>({
       (item.id && messages["field_" + item.id])
     ) {
       // Format the message and check for search value (case-insensitive)
-      return (
+      if (
         formatMessage({ id: "field_" + (item.label || item.id) })
           .toLowerCase()
           .indexOf(searchValue.toLowerCase()) !== -1
-      );
+      ) {
+        return true;
+      }
+    }
+
+    // Search for the relationship type
+    if (
+      (item.relationshipType ?? "")
+        .replace("-", " ")
+        .toLowerCase()
+        ?.indexOf(searchValue.toLowerCase()) !== -1
+    ) {
+      return true;
     }
 
     // Otherwise, just use the ID.
-    return (
-      (item.id ?? "").toLowerCase()?.indexOf(searchValue.toLowerCase()) !== -1
-    );
+    if (
+      (item.id ?? "")
+        .replace(".", " ")
+        .replace("_", " ")
+        .replace("-", " ")
+        .toLowerCase()
+        ?.indexOf(searchValue.toLowerCase()) !== -1
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
