@@ -3,6 +3,8 @@ import {
   SelectField,
   SelectOption,
   TextField,
+  useBulkEditTabContext,
+  useDinaFormContext,
   withResponse
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -34,6 +36,7 @@ export function AssignedStorage({
 }: AssignedStorageProps) {
   const storageQuery = useStorageUnit(value?.id);
   const encoder = new AlphanumericEncoder();
+  const { isTemplate } = useDinaFormContext();
   return value?.id ? (
     <div>
       {withResponse(storageQuery, ({ data: storageUnit }) => {
@@ -79,11 +82,15 @@ export function AssignedStorage({
                   name={"storageUnitCoordinates.wellRow"}
                   customName={"row"}
                   className="list-inline-item"
+                  disableTemplateCheckbox={true}
+                  disabled={isTemplate}
                 />
                 <TextField
                   name={"storageUnitCoordinates.wellColumn"}
                   customName="column"
                   className="list-inline-item"
+                  disableTemplateCheckbox={true}
+                  disabled={isTemplate}
                 />
               </div>
             )}
