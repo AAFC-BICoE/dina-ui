@@ -36,7 +36,7 @@ export function AssignedStorage({
 }: AssignedStorageProps) {
   const storageQuery = useStorageUnit(value?.id);
   const encoder = new AlphanumericEncoder();
-  const { isTemplate } = useDinaFormContext();
+  const { isTemplate, isBulkEditAllTab } = useDinaFormContext();
   return value?.id ? (
     <div>
       {withResponse(storageQuery, ({ data: storageUnit }) => {
@@ -75,25 +75,26 @@ export function AssignedStorage({
                 </FormikButton>
               )}
             </div>
-            {!!storageUnit.storageUnitType?.gridLayoutDefinition && (
-              <div className="list-inline mb-3">
-                <SelectField
-                  options={options}
-                  name={"storageUnitCoordinates.wellRow"}
-                  customName={"row"}
-                  className="list-inline-item"
-                  disableTemplateCheckbox={true}
-                  disabled={isTemplate}
-                />
-                <TextField
-                  name={"storageUnitCoordinates.wellColumn"}
-                  customName="column"
-                  className="list-inline-item"
-                  disableTemplateCheckbox={true}
-                  disabled={isTemplate}
-                />
-              </div>
-            )}
+            {!!storageUnit.storageUnitType?.gridLayoutDefinition &&
+              !isBulkEditAllTab && (
+                <div className="list-inline mb-3">
+                  <SelectField
+                    options={options}
+                    name={"storageUnitCoordinates.wellRow"}
+                    customName={"row"}
+                    className="list-inline-item"
+                    disableTemplateCheckbox={true}
+                    disabled={isTemplate}
+                  />
+                  <TextField
+                    name={"storageUnitCoordinates.wellColumn"}
+                    customName="column"
+                    className="list-inline-item"
+                    disableTemplateCheckbox={true}
+                    disabled={isTemplate}
+                  />
+                </div>
+              )}
           </div>
         );
       })}
