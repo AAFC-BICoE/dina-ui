@@ -145,6 +145,8 @@ export interface MaterialSampleFormProps {
    * When this prop is enabled, formik initialValues can be reinitialized
    */
   enableReinitialize?: boolean;
+
+  isBulkEditAllTab?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -179,7 +181,8 @@ export function MaterialSampleForm({
         <SubmitButton className="ms-auto" />
       </div>
     </ButtonBar>
-  )
+  ),
+  isBulkEditAllTab
 }: MaterialSampleFormProps) {
   const { isTemplate, readOnly } = useContext(DinaFormContext) ?? {};
   const {
@@ -485,6 +488,7 @@ export function MaterialSampleForm({
       innerRef={materialSampleFormRef}
       initialValues={initialValues}
       onSubmit={onSubmit}
+      isBulkEditAllTab={isBulkEditAllTab}
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}

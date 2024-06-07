@@ -1369,6 +1369,11 @@ aggregate-error@^3.0.0:
     clean-stack "^2.0.0"
     indent-string "^4.0.0"
 
+alphanumeric-encoder@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/alphanumeric-encoder/-/alphanumeric-encoder-1.6.1.tgz#24e42c639f72af07da4fd058e41e4a2a66d924cf"
+  integrity sha512-eIcWh7SklWzUMQ0ooP19hVYRpqwaTxeRd2xp/170V2rjvhNqigXFVZ6FnjEntOxRHWlk+Z4ilgVglZNseB3/VA==
+
 ansi-escapes@^4.2.1, ansi-escapes@^4.3.0:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-4.3.2.tgz#6b2291d1db7d98b6521d5f1efa42d0f3a9feb65e"

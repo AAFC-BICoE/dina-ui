@@ -43,6 +43,7 @@ export interface TooltipProps {
   setVisible?: React.Dispatch<React.SetStateAction<boolean>>;
   visible?: boolean;
   className?: string;
+  directComponent?: JSX.Element | JSX.Element[];
 }
 
 export type tooltipPlacements = "top" | "bottom" | "left" | "right";
@@ -50,6 +51,7 @@ export type tooltipPlacements = "top" | "bottom" | "left" | "right";
 export function Tooltip({
   id,
   directText,
+  directComponent,
   intlValues,
   visibleElement,
   link,
@@ -113,6 +115,7 @@ export function Tooltip({
         overlay={
           <div style={{ maxWidth: "25rem", whiteSpace: "pre-wrap" }}>
             {tooltipMessage}
+            {directComponent}
             {tooltipImage}
             {tooltipLink}
           </div>

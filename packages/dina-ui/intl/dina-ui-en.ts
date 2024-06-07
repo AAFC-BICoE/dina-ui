@@ -993,5 +993,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_reportVariables: "Report Variables",
   editReportTemplateTitle: "Edit Report Template",
   duplicateResourcesFound:
-    "Warning: duplicate resources found {duplicateResources}"
+    "Warning: duplicate resources found {duplicateResources}",
+  field_row: "Row",
+  field_column: "Column"
 };
