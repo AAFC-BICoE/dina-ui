@@ -40,12 +40,13 @@ import { compact } from "lodash";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { useSessionStorage } from "usehooks-ts";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
 export default function ExportPage<TData extends KitsuResource>() {
   const router = useRouter();
-  const [totalRecords] = useLocalStorage<number>(
+  const [totalRecords] = useSessionStorage<number>(
     DATA_EXPORT_TOTAL_RECORDS_KEY,
     0
   );
@@ -65,8 +66,10 @@ export default function ExportPage<TData extends KitsuResource>() {
   const [exportType, setExportType] = useState<ExportType>("TABULAR_DATA");
 
   // Local storage for Export Objects
-  const [localStorageExportObjectIds, setLocalStorageExportObjectIds] =
-    useLocalStorage<string[]>(OBJECT_EXPORT_IDS_KEY, []);
+  const [exportObjectIds, setExportObjectIds] = useSessionStorage<string[]>(
+    OBJECT_EXPORT_IDS_KEY,
+    []
+  );
 
   // Local storage for saving columns visibility
   const [localStorageColumnStates, setLocalStorageColumnStates] =
@@ -224,7 +227,7 @@ export default function ExportPage<TData extends KitsuResource>() {
   async function exportObjects(formik) {
     {
       setLoading(true);
-      const paths = localStorageExportObjectIds.map(
+      const paths = exportObjectIds.map(
         (id) => `metadata/${id}?include=derivatives`
       );
       const metadatas: PersistedResource<Metadata>[] = await bulkGet(paths, {
@@ -270,7 +273,7 @@ export default function ExportPage<TData extends KitsuResource>() {
     }
   }
   const disableObjectExportButton =
-    localStorageExportObjectIds.length < 1 || totalRecords > 100;
+    exportObjectIds.length < 1 || totalRecords > 100;
 
   return loading || !loadedIndexMapColumns ? (
     <LoadingSpinner loading={loading} />
