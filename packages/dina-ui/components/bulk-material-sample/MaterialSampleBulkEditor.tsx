@@ -341,6 +341,7 @@ function getMaterialSampleForm(
       // Disable the nav's Are You Sure prompt when removing components,
       // because you aren't actually deleting data.
       disableNavRemovePrompt={true}
+      isBulkEditAllTab={true}
     />
   );
 }

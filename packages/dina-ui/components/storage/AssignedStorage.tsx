@@ -1,10 +1,20 @@
-import { FormikButton, withResponse } from "common-ui";
+import {
+  FormikButton,
+  SelectField,
+  SelectOption,
+  TextField,
+  useBulkEditTabContext,
+  useDinaFormContext,
+  withResponse
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useStorageUnit } from "../../pages/collection/storage-unit/edit";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
+import { RiDeleteBinLine } from "react-icons/ri";
+import AlphanumericEncoder from "alphanumeric-encoder";
 
 export interface AssignedStorageProps {
   readOnly?: boolean;
@@ -25,34 +35,69 @@ export function AssignedStorage({
   parentIdInURL
 }: AssignedStorageProps) {
   const storageQuery = useStorageUnit(value?.id);
-
+  const encoder = new AlphanumericEncoder();
+  const { isTemplate, isBulkEditAllTab } = useDinaFormContext();
   return value?.id ? (
     <div>
-      {withResponse(storageQuery, ({ data: storageUnit }) => (
-        <div>
-          <div className="list-inline mb-3">
-            <div className="storage-path list-inline-item">
-              <StorageUnitBreadCrumb
-                storageUnit={storageUnit}
-                newTab={!readOnly}
-              />
-            </div>
-            {storageUnit.storageUnitType?.isInseperable && (
-              <div className="list-inline-item">
-                (<DinaMessage id="keepContentsTogether" />)
+      {withResponse(storageQuery, ({ data: storageUnit }) => {
+        // Create storageUnitCoordinates Row options
+        const options: SelectOption<string>[] = [];
+        for (
+          let i = 1;
+          i <= storageUnit.storageUnitType?.gridLayoutDefinition?.numberOfRows;
+          i++
+        ) {
+          options.push({
+            label: encoder.encode(i) ?? "",
+            value: encoder.encode(i) ?? ""
+          });
+        }
+        return (
+          <div>
+            <div className="list-inline mb-3">
+              <div className="storage-path list-inline-item">
+                <StorageUnitBreadCrumb
+                  storageUnit={storageUnit}
+                  newTab={!readOnly}
+                />
               </div>
-            )}
+              {storageUnit.storageUnitType?.isInseperable && (
+                <div className="list-inline-item">
+                  (<DinaMessage id="keepContentsTogether" />)
+                </div>
+              )}
+              {!readOnly && !parentIdInURL && (
+                <FormikButton
+                  className="remove-storage btn mb-3 list-inline-item"
+                  onClick={async () => await onChange?.({ id: null })}
+                >
+                  <RiDeleteBinLine size="1.8em" />
+                </FormikButton>
+              )}
+            </div>
+            {!!storageUnit.storageUnitType?.gridLayoutDefinition &&
+              !isBulkEditAllTab && (
+                <div className="list-inline mb-3">
+                  <SelectField
+                    options={options}
+                    name={"storageUnitCoordinates.wellRow"}
+                    customName={"row"}
+                    className="list-inline-item"
+                    disableTemplateCheckbox={true}
+                    disabled={isTemplate}
+                  />
+                  <TextField
+                    name={"storageUnitCoordinates.wellColumn"}
+                    customName="column"
+                    className="list-inline-item"
+                    disableTemplateCheckbox={true}
+                    disabled={isTemplate}
+                  />
+                </div>
+              )}
           </div>
-          {!readOnly && !parentIdInURL && (
-            <FormikButton
-              className="remove-storage btn btn-danger mb-3"
-              onClick={async () => await onChange?.({ id: null })}
-            >
-              <DinaMessage id="removeFromParentStorageUnit" />
-            </FormikButton>
-          )}
-        </div>
-      ))}
+        );
+      })}
     </div>
   ) : (
     noneMessage ?? <DinaMessage id="none" />

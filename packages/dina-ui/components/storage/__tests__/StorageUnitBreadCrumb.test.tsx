@@ -1,7 +1,13 @@
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import {
+  mountWithAppContext,
+  mountWithAppContext2
+} from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitBreadCrumb } from "../StorageUnitBreadCrumb";
+import userEvent from "@testing-library/user-event";
+import { screen } from "@testing-library/react";
+import { render } from "enzyme";
 
 const storageUnitWithHierarchy: PersistedResource<StorageUnit> = {
   id: "A",
@@ -48,28 +54,46 @@ describe("StorageUnitBreadCrumb component", () => {
     const wrapper = mountWithAppContext(
       <StorageUnitBreadCrumb storageUnit={storageUnitWithHierarchy} />
     );
+    const tooltip = wrapper.find("Tooltip");
 
-    expect(
-      wrapper.find("li.breadcrumb-item").map((node) => node.text().trim())
-    ).toEqual(["C (Room)", "B (Cabinet)", "A (Box)"]);
-    expect(wrapper.find("a").map((node) => node.prop("href"))).toEqual([
+    const directComponent: any[] = tooltip.prop("directComponent");
+    expect(directComponent.length).toEqual(3);
+
+    const hrefs = directComponent.map((fragment) => {
+      return fragment.props.children[0].props.href;
+    });
+    expect(hrefs).toEqual([
       "/collection/storage-unit/view?id=C",
       "/collection/storage-unit/view?id=B",
       "/collection/storage-unit/view?id=A"
     ]);
+    const texts = directComponent.map((fragment) => {
+      return fragment.props.children[0].props.children.props.children;
+    });
+    expect(texts).toEqual(["C (Room)", "B (Cabinet)", "A (Box)"]);
   });
   it("Renders the breadcrumb path from the parent's hierarchy", async () => {
     const wrapper = mountWithAppContext(
       <StorageUnitBreadCrumb storageUnit={storageUnitWithParentHierarchy} />
     );
 
-    expect(
-      wrapper.find("li.breadcrumb-item").map((node) => node.text().trim())
-    ).toEqual(["C (Room)", "B (Cabinet)", "A (Box)"]);
-    expect(wrapper.find("a").map((node) => node.prop("href"))).toEqual([
+    const tooltip = wrapper.find("Tooltip");
+
+    const directComponent: any[] = tooltip.prop("directComponent");
+    expect(directComponent.length).toEqual(3);
+
+    const hrefs = directComponent.map((fragment) => {
+      return fragment.props.children[0].props.href;
+    });
+    expect(hrefs).toEqual([
       "/collection/storage-unit/view?id=C",
       "/collection/storage-unit/view?id=B",
       "/collection/storage-unit/view?id=A"
     ]);
+
+    const texts = directComponent.map((fragment) => {
+      return fragment.props.children[0].props.children.props.children;
+    });
+    expect(texts).toEqual(["C (Room)", "B (Cabinet)", "A (Box)"]);
   });
 });
