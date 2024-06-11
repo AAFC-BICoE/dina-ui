@@ -56,10 +56,7 @@ export function ShowParentMaterialSample({
     } else if (typeof value === "boolean") {
       return formatMessage(value ? "true" : "false");
     } else if (Array.isArray(value)) {
-      return new Intl.ListFormat(navigator.language, {
-        style: "short",
-        type: "unit"
-      }).format(value.filter((item) => item !== "")); // Join elements with comma and space
+      return value.filter((item) => item !== "").join(", ");
     } else {
       return value.toString(); // Convert to string for other types
     }
