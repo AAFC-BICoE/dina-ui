@@ -640,6 +640,7 @@ export function useMaterialSampleSave({
     delete materialSampleInput.phac_human_rg;
     delete materialSampleInput.cfia_ppc;
     delete materialSampleInput.useTargetOrganism;
+    delete materialSampleInput.parentAttributes;
 
     return materialSampleInput;
   }
