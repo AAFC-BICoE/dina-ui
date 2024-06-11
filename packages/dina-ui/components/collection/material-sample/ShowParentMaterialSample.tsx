@@ -59,7 +59,7 @@ export function ShowParentMaterialSample({
       return new Intl.ListFormat(navigator.language, {
         style: "short",
         type: "unit"
-      }).format(value); // Join elements with comma and space
+      }).format(value.filter((item) => item !== "")); // Join elements with comma and space
     } else {
       return value.toString(); // Convert to string for other types
     }
@@ -100,40 +100,51 @@ export function ShowParentMaterialSample({
               </div>
             );
           } else {
-            const attributes: string[][] = [];
-            for (const ogsm of parentMaterialSample?.organism ?? []) {
-              for (const pair of Object.entries(
-                ogsm?.managedAttributes ?? {}
-              )) {
-                const foundAttr = attrResp?.data?.find(
-                  (item) => item.key === pair[0]
-                );
-                const label =
-                  foundAttr?.multilingualDescription?.descriptions?.find(
-                    (description) => description.lang === locale
-                  )?.desc ?? pair[0];
-                const value = pair[1];
-                attributes.push([label, value]);
-              }
+            // Find the managed attribute that this matches.
+            const foundManagedAttribute = attrResp?.data?.find(
+              (item) => item.key === attr
+            );
+            if (!foundManagedAttribute) {
+              return;
             }
+
+            const label =
+              foundManagedAttribute?.multilingualDescription?.descriptions?.find(
+                (description) => description.lang === locale
+              )?.desc ?? attr;
+
+            const value = getHumanReadableString(
+              parentMaterialSample?.organism?.map((item) => {
+                const foundValue = item?.managedAttributes?.[attr];
+                if (foundValue === undefined) {
+                  return "";
+                }
+
+                // If it's a boolean managed attribute, display it with translations.
+                if (foundManagedAttribute.vocabularyElementType === "BOOL") {
+                  return item?.managedAttributes?.[attr] === "true"
+                    ? getHumanReadableString(true)
+                    : getHumanReadableString(false);
+                }
+
+                return foundValue;
+              }) ?? ""
+            );
+
             return (
-              <>
-                {attributes.map((pair, idx2) => (
-                  <div
-                    key={idx2}
-                    className="flex-grow-0 flex-shrink-0 w-50 align-items-center mb-2"
-                  >
-                    <label>
-                      <div className="field-label label-col me-2">
-                        <strong>
-                          <div>{pair[0]}</div>
-                        </strong>
-                      </div>
-                    </label>
-                    <div className="me-2">{pair[1]}</div>
+              <div
+                key={idx}
+                className="flex-grow-0 flex-shrink-0 w-50 align-items-center mb-2"
+              >
+                <label>
+                  <div className="field-label label-col me-2">
+                    <strong>
+                      <div>{label}</div>
+                    </strong>
                   </div>
-                ))}
-              </>
+                </label>
+                <div className="me-2">{value}</div>
+              </div>
             );
           }
         })}
