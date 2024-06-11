@@ -20,6 +20,7 @@ interface ShowParentAttributeTemplateProps {
   className?: string;
   id?: string;
 }
+
 export function ShowParentAttributeTemplate({
   className,
   id
@@ -29,6 +30,61 @@ export function ShowParentAttributeTemplate({
   const formik = useFormikContext<any>();
   const fieldArrayName = `parentAttributes`;
   const parentAttributes = get(formik.values, fieldArrayName);
+
+  // All the options that appear in the dropdown list.
+  const [selectOptions, setSelectOptions] = useState<SelectOption<string>[]>(
+    []
+  );
+
+  // Managed attributes loaded from the request.
+  const [organismManagedAttributes, setOrganismManagedAttributes] = useState<
+    ManagedAttribute[]
+  >([]);
+  const [organismManagedAttributesLoaded, setOrganismManagedAttributesLoaded] =
+    useState<boolean>(false);
+
+  const maFieldOptions = useMemo(
+    () =>
+      MATERIAL_SAMPLE_ATTR_NAMES.map((fieldName) =>
+        convertFieldOption(
+          "materialSample",
+          fieldName,
+          formatMessage(`field_${fieldName}` as any) ??
+            formatMessage(fieldName as any)
+        )
+      ),
+    [MATERIAL_SAMPLE_ATTR_NAMES, formatMessage]
+  );
+
+  useEffect(() => {
+    if (!organismManagedAttributesLoaded) {
+      setSelectOptions([
+        {
+          label: formatMessage("materialSample"),
+          options: maFieldOptions
+        },
+        {
+          label: `${formatMessage("organism")} ${formatMessage(
+            "managedAttributes"
+          )}`,
+          options: organismManagedAttributes.map<SelectOption<string>>(
+            (item) => {
+              const label =
+                item.multilingualDescription?.descriptions?.find(
+                  (description) => description.lang === locale
+                )?.desc ?? item.name;
+
+              return convertFieldOption(
+                "organism.managedAttributes",
+                item.key,
+                label
+              );
+            }
+          )
+        }
+      ]);
+    }
+  }, [maFieldOptions, organismManagedAttributesLoaded]);
 
   useLayoutEffect(() => {
     toggleIsOptionDisabled();
@@ -51,75 +107,33 @@ export function ShowParentAttributeTemplate({
     };
   }
 
-  const maFieldOptions = MATERIAL_SAMPLE_ATTR_NAMES.map((fieldName) =>
-    convertFieldOption(
-      "materialSample",
-      fieldName,
-      formatMessage(`field_${fieldName}` as any) ??
-        formatMessage(fieldName as any)
-    )
-  );
-
-  const { response: attrResp } = useQuery<ManagedAttribute[]>({
-    path: "collection-api/managed-attribute",
-    filter: filterBy([], {
-      extraFilters: [
-        {
-          selector: "managedAttributeComponent",
-          comparison: "==",
-          arguments: "ORGANISM"
-        }
-      ]
-    })(""),
-    page: { limit: 1000 }
-  });
-
-  const ogsmManagedAttributesOptions: SelectOption<string>[] = [];
-  if (attrResp) {
-    attrResp.data.forEach((attr) => {
-      const label =
-        attr.multilingualDescription?.descriptions?.find(
-          (description) => description.lang === locale
-        )?.desc ?? attr.name;
-      ogsmManagedAttributesOptions.push(
-        convertFieldOption("organism.managedAttributes", attr.key, label)
-      );
-    });
-  }
-
-  useEffect(() => {
-    setSelectOptions([
-      {
-        label: formatMessage("materialSample"),
-        options: maFieldOptions
-      },
-      {
-        label: `${formatMessage("organism")} ${formatMessage(
-          "managedAttributes"
-        )}`,
-        options: ogsmManagedAttributesOptions
-      }
-    ]);
-  }, [ogsmManagedAttributesOptions]);
-
-  const [selectOptions, setSelectOptions] = useState([
+  useQuery<ManagedAttribute[]>(
     {
-      label: formatMessage("materialSample"),
-      options: maFieldOptions
+      path: "collection-api/managed-attribute",
+      filter: filterBy([], {
+        extraFilters: [
+          {
+            selector: "managedAttributeComponent",
+            comparison: "==",
+            arguments: "ORGANISM"
+          }
+        ]
+      })(""),
+      page: { limit: 1000 }
     },
     {
-      label: `${formatMessage("organism")} ${formatMessage(
-        "managedAttributes"
-      )}`,
-      options: ogsmManagedAttributesOptions
+      onSuccess(response) {
+        setOrganismManagedAttributes(response.data);
+        setOrganismManagedAttributesLoaded(true);
+      }
     }
-  ]);
+  );
 
   function toggleIsOptionDisabled() {
     setSelectOptions(
       selectOptions.map((item) => ({
         ...item,
-        options: item.options.map((subItem) =>
+        options: item?.options?.map((subItem) =>
           parentAttributes?.indexOf(subItem.value) > -1
             ? { ...subItem, isDisabled: true }
             : { ...subItem, isDisabled: false }

@@ -222,6 +222,7 @@ export function MaterialSampleForm({
   const formSections: Record<string, (id: string) => ReactNode> = {
     [SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
+      (isTemplate || readOnly) &&
       dataComponentState.enableShowParentAttributes && (
         <ShowParentAttributesField
           id={id}
