@@ -40,6 +40,31 @@ export function ShowParentMaterialSample({
     page: { limit: 1000 }
   });
 
+  /**
+   * Display the human readable value.
+   *
+   * @param value Can be any type, it will check can display it as a human readable string.
+   * @returns A string.
+   */
+  function getHumanReadableString(value) {
+    if (value === undefined || value === null) {
+      return "";
+    }
+
+    if (typeof value === "string") {
+      return value;
+    } else if (typeof value === "boolean") {
+      return formatMessage(value ? "true" : "false");
+    } else if (Array.isArray(value)) {
+      return new Intl.ListFormat(navigator.language, {
+        style: "short",
+        type: "unit"
+      }).format(value); // Join elements with comma and space
+    } else {
+      return value.toString(); // Convert to string for other types
+    }
+  }
+
   return (
     <FieldSet
       className={className}
@@ -51,7 +76,9 @@ export function ShowParentMaterialSample({
       <div className="d-flex flex-wrap w-100">
         {attrList?.map((attr, idx) => {
           if (MATERIAL_SAMPLE_ATTR_NAMES.includes(attr)) {
-            const value = get(parentMaterialSample, attr);
+            const value = getHumanReadableString(
+              get(parentMaterialSample, attr)
+            );
             const label =
               formatMessage(`field_${attr}` as any) ??
               formatMessage(attr as any) ??

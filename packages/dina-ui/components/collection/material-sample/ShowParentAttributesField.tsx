@@ -15,7 +15,6 @@ export const MATERIAL_SAMPLE_ATTR_NAMES = [
   "preparationSubstrate",
   "preparationDate",
   "preparationRemarks",
-  "description",
   "dwcDegreeOfEstablishment",
   "barcode",
   "materialSampleState",
@@ -23,10 +22,7 @@ export const MATERIAL_SAMPLE_ATTR_NAMES = [
   "notPubliclyReleasableReason",
   "dwcOtherCatalogNumbers",
   "tags",
-  "organismsIndividualEntry",
-  "useTargetOrganism",
   "publiclyReleasable",
-  "useNextSequence",
   "isRestricted"
 ];
 
