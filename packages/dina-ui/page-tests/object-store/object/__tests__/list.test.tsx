@@ -217,12 +217,15 @@ const TEST_OBJECTUPLOAD: PersistedResource<ObjectUpload> = {
 
 const mockDoOperations = jest.fn();
 
+const mockDelete = jest.fn();
+
 const apiContext: any = {
   apiClient: {
     get: mockGet,
     axios: {
       get: mockGet,
-      post: mockPost
+      post: mockPost,
+      delete: mockDelete
     }
   },
   doOperations: mockDoOperations
@@ -401,21 +404,9 @@ describe("Metadata List Page", () => {
     await new Promise(setImmediate);
     buttonWrapper.update();
 
-    expect(mockDoOperations).toHaveBeenCalledTimes(1);
-    expect(mockDoOperations).lastCalledWith(
-      [
-        {
-          op: "DELETE",
-          path: "metadata/00000000-0000-0000-0000-000000000000"
-        },
-        {
-          op: "DELETE",
-          path: "metadata/11111111-1111-1111-1111-111111111111"
-        }
-      ],
-      {
-        apiBaseUrl: "/objectstore-api"
-      }
+    expect(mockDelete).toHaveBeenCalledTimes(2);
+    expect(mockDelete).lastCalledWith(
+      `/objectstore-api/metadata/11111111-1111-1111-1111-111111111111`
     );
     expect(mockReload).toHaveBeenCalledTimes(1);
   });

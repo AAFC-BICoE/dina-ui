@@ -36,7 +36,7 @@ export function BulkDeleteButton({
 }: BulkDeleteButtonProps) {
   const router = useRouter();
   const { openModal } = useModal();
-  const { doOperations } = useApiClient();
+  const { apiClient } = useApiClient();
 
   return (
     <FormikButton
@@ -56,13 +56,19 @@ export function BulkDeleteButton({
               </span>
             }
             onYesButtonClicked={async () => {
-              await doOperations(
-                resourceIds.map((id) => ({
-                  op: "DELETE",
-                  path: `${typeName}/${id}`
-                })),
-                { apiBaseUrl }
-              );
+              for (const resourceId of resourceIds) {
+                try {
+                  await apiClient.axios.delete(
+                    `${apiBaseUrl}/${typeName}/${resourceId}`
+                  );
+                } catch (e) {
+                  if (e.cause.status === 404) {
+                    console.warn(e.cause);
+                  } else {
+                    throw e;
+                  }
+                }
+              }
 
               // Refresh the page:
               await router.reload();
