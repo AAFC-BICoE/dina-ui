@@ -995,5 +995,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   duplicateResourcesFound:
     "Warning: duplicate resources found {duplicateResources}",
   field_row: "Row",
-  field_column: "Column"
+  field_column: "Column",
+  deleteFailedImport: "Delete Failed Import"
 };

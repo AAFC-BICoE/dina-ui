@@ -3,12 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { useIntl } from "react-intl";
-import { useApiClient } from "../../../common-ui/lib";
+import { rsql, useApiClient } from "../../../common-ui/lib";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
 import { delay } from "./utils/workbookMappingUtils";
+import { PersistedResource, KitsuResource } from "kitsu";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
 
 export interface SaveWorkbookProgressProps {
   onWorkbookSaved: () => void;
@@ -38,13 +40,17 @@ export function SaveWorkbookProgress({
     workbookColumnMap
   } = useWorkbookContext();
 
-  const { save } = useApiClient();
+  const { save, apiClient, doOperations } = useApiClient();
   const statusRef = useRef<WorkBookSavingStatus>(status ?? "CANCELED");
   const router = useRouter();
   const { formatMessage } = useIntl();
   const warningText = formatMessage({ id: "leaveSaveWorkbookWarning" });
 
   const [now, setNow] = useState<number>(progress);
+  const [sourceSet, setSourceSet] = useState<string>();
+  const [savedResources, setSavedResources] = useState<
+    PersistedResource<KitsuResource>[]
+  >([]);
 
   const isSafeToLeave = () => {
     return (
@@ -111,11 +117,12 @@ export function SaveWorkbookProgress({
   }, []);
 
   async function saveWorkbook() {
-    const sourceSet = `wb_upload_${Date.now()}`;
+    const sourceSetInternal = `wb_upload_${Date.now()}`;
+    setSourceSet(sourceSetInternal);
     async function saveChunkOfWorkbook(chunkedResources) {
       for (const resource of chunkedResources) {
         for (const key of Object.keys(resource)) {
-          resource.sourceSet = sourceSet;
+          resource.sourceSet = sourceSetInternal;
           await linkRelationshipAttribute(
             resource,
             workbookColumnMap,
@@ -124,7 +131,7 @@ export function SaveWorkbookProgress({
           );
         }
       }
-      await save(
+      const savedArgs = await save(
         chunkedResources.map(
           (item) =>
             ({
@@ -134,6 +141,7 @@ export function SaveWorkbookProgress({
         ),
         { apiBaseUrl }
       );
+      setSavedResources([...savedResources, ...savedArgs]);
     }
 
     // Split big array into small chunks, which chunk size is 5.
@@ -170,6 +178,40 @@ export function SaveWorkbookProgress({
     pauseSavingWorkbook();
   }
 
+  async function deleteFailedImport() {
+    const fetchedMaterialSamples = await apiClient.get<MaterialSample[]>(
+      "/collection-api/material-sample",
+      {
+        include: "collectingEvent",
+        filter: {
+          rsql: `sourceSet==${sourceSet}`
+        }
+      }
+    );
+    const collectingEventIds = fetchedMaterialSamples?.data.map(
+      (materialSample) => materialSample.collectingEvent?.id
+    );
+    const materialSampleIds = fetchedMaterialSamples?.data.map(
+      (materialSample) => materialSample.id
+    );
+    await doOperations(
+      materialSampleIds.map((id) => ({
+        op: "DELETE",
+        path: `material-sample/${id}`
+      })),
+      { apiBaseUrl }
+    );
+    await doOperations(
+      collectingEventIds.map((id) => ({
+        op: "DELETE",
+        path: `collecting-event/${id}`
+      })),
+      { apiBaseUrl }
+    );
+
+    onWorkbookFailed?.();
+  }
+
   return (
     <>
       <ProgressBar
@@ -201,9 +243,17 @@ export function SaveWorkbookProgress({
       {statusRef.current === "FAILED" && (
         <div className="mt-3 text-center">
           <p className="text-start">{`Error: ${error?.message}`}</p>
-          <Button className="mt-1 mb-2" onClick={() => onWorkbookFailed?.()}>
+          <Button
+            className="mt-1 mb-2 me-2"
+            onClick={() => onWorkbookFailed?.()}
+          >
             OK
           </Button>
+          {!!savedResources.length && (
+            <Button className="mt-1 mb-2" onClick={deleteFailedImport}>
+              <DinaMessage id="deleteFailedImport" />
+            </Button>
+          )}
         </div>
       )}
       {statusRef.current === "PAUSED" && now < workbookResources.length && (
