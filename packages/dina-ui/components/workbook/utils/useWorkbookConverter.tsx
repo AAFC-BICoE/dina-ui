@@ -508,6 +508,9 @@ export function useWorkbookConverter(
           relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.LINK_OR_CREATE
         ) {
+          if (attributeName === "wellRow" || attributeName === "wellColumn") {
+            // console.log(resource);
+          }
           // if there is no mapping in workbookColumnMap, then create it
           for (const childName of Object.keys(value)) {
             await linkRelationshipAttribute(

@@ -221,6 +221,19 @@ const FieldMappingConfig: FieldMappingConfigType = {
         name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
+    storageUnitCoordinates: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      relationshipConfig: {
+        hasGroup: false,
+        linkOrCreateSetting: LinkOrCreateSetting.CREATE,
+        type: "storage-unit-coordinates",
+        baseApiPath: "/collection-api"
+      },
+      attributes: {
+        wellColumn: { dataType: WorkbookDataTypeEnum.NUMBER },
+        wellRow: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
     projects: {
       dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
       relationshipConfig: {
