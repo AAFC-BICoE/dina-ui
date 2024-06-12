@@ -56,7 +56,8 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   displayedColumns,
   setDisplayedColumns,
   columnOptions,
-  loading
+  loading,
+  disabled
 }: ColumnSelectorListProps<TData>) {
   const { formatMessage, messages } = useIntl();
 
@@ -327,6 +328,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
         ref={ref}
         handleClick={props.handleClick}
         forceLabel={props.accessKey}
+        disabled={disabled}
       />
     );
   });

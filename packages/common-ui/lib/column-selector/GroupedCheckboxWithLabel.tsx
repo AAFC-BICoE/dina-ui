@@ -7,6 +7,7 @@ export interface CheckboxProps {
   id: string;
   name?: string;
   isChecked?: boolean;
+  disabled?: boolean;
   isField?: boolean;
   filteredColumnsState?: VisibilityState;
   handleClick?: (e: any) => void;
@@ -24,7 +25,8 @@ export function Checkbox({
   handleClick,
   ref,
   hideLabel,
-  forceLabel
+  forceLabel,
+  disabled
 }: CheckboxProps) {
   const { formatMessage, messages } = useIntl();
   const [checked, setChecked] = useState<boolean>(isChecked ?? false);
@@ -55,6 +57,7 @@ export function Checkbox({
         type={"checkbox"}
         onChange={handleClick ?? internalHandleClick}
         checked={checked}
+        disabled={disabled}
         style={{
           marginRight: "0.3rem",
           height: "1.3rem",

@@ -24,6 +24,11 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   exportMode?: boolean;
 
   /**
+   * Should all the options be disabled.
+   */
+  disabled?: boolean;
+
+  /**
    * Index mapping containing all of the fields that should be displayed in the list.
    */
   indexMapping: ESIndexMapping[] | undefined;

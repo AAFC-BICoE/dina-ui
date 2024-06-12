@@ -141,10 +141,19 @@ export default function ExportPage<TData extends KitsuResource>() {
             </div>
           );
         } else {
-          dataExportGetResponse = await apiClient.get<DataExport>(
-            `dina-export-api/data-export/${exportPostResponse[0].id}`,
-            {}
-          );
+          try {
+            dataExportGetResponse = await apiClient.get<DataExport>(
+              `dina-export-api/data-export/${exportPostResponse[0].id}`,
+              {}
+            );
+          } catch (e) {
+            if (e.cause.status === 404) {
+              console.warn(e.cause);
+            } else {
+              throw e;
+            }
+          }
+
           // Wait 1 second before retrying
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
@@ -316,6 +325,7 @@ export default function ExportPage<TData extends KitsuResource>() {
             setDisplayedColumns={setColumnsToExport}
             indexMapping={indexMap}
             uniqueName={uniqueName}
+            disabled={exportType === "OBJECT_ARCHIVE"}
           />
         </div>
       </DinaForm>
