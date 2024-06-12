@@ -27,6 +27,9 @@ export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
 // IDs of columns that the user cannot configure, they are mandatory.
 export const MANDATORY_DISPLAYED_COLUMNS: string[] = [
   "selectColumn",
+  "thumbnail",
+  "originalFilename",
+  "materialSampleName",
   "organism.determination.verbatimScientificName",
   "organism.determination.scientificName",
   "organism.determination.typeStatus"
