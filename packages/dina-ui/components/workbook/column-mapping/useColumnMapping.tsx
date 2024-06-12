@@ -523,14 +523,14 @@ export function useColumnMapping() {
         } else {
           map.push({
             targetField: fieldPath,
-            skipped: fieldPath === undefined,
+            skipped: false,
             columnHeader
           });
         }
       } else {
         map.push({
           targetField: fieldPath,
-          skipped: fieldPath === undefined,
+          skipped: false,
           columnHeader
         });
       }
