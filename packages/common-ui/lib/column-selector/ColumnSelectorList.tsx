@@ -19,9 +19,11 @@ export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
   "selectColumn",
   "thumbnail",
   "viewPreviewButtonText",
-  "organism.determination.verbatimScientificName",
-  "organism.determination.scientificName",
-  "organism.determination.typeStatus"
+  "assemblages.",
+  "projects.",
+  "organism.",
+  "collectingEvent.extensionValues.",
+  "collectingEvent.managedAttributes."
 ];
 
 // IDs of columns that the user cannot configure, they are mandatory.
@@ -30,9 +32,9 @@ export const MANDATORY_DISPLAYED_COLUMNS: string[] = [
   "thumbnail",
   "originalFilename",
   "materialSampleName",
-  "organism.determination.verbatimScientificName",
-  "organism.determination.scientificName",
-  "organism.determination.typeStatus"
+  "assemblages.",
+  "projects.",
+  "organism."
 ];
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
@@ -140,14 +142,21 @@ export function ColumnSelectorList<TData extends KitsuResource>({
    * Based on the `NOT_EXPORTABLE_COLUMN_IDS` list of column ids, filter out columns that should not
    * be shown to the user.
    *
+   * The list is searched by starting with so you can include a whole bunch of paths just by
+   * getting the parent or a specific one.
+   *
    * @param item Column definition.
    * @returns true if it should be included in the results, false if not.
    */
   function hiddenColumnFilter(item: TableColumn<TData>) {
     if (exportMode) {
-      return !NOT_EXPORTABLE_COLUMN_IDS.includes(item.id ?? "");
+      return !NOT_EXPORTABLE_COLUMN_IDS.some((id) =>
+        (item?.id ?? "").startsWith(id)
+      );
     } else {
-      return !MANDATORY_DISPLAYED_COLUMNS.includes(item.id ?? "");
+      return !MANDATORY_DISPLAYED_COLUMNS.some((id) =>
+        (item?.id ?? "").startsWith(id)
+      );
     }
   }
 
@@ -311,12 +320,13 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   const CheckboxItem = React.forwardRef((props: any, ref) => {
     return (
       <Checkbox
-        key={props.accessKey}
+        key={props.id}
         id={props.id}
         isChecked={props.isChecked}
         isField={props.isField}
         ref={ref}
         handleClick={props.handleClick}
+        forceLabel={props.accessKey}
       />
     );
   });
@@ -349,7 +359,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                   isChecked={isChecked(column?.id, false)}
                   handleClick={() => toggleColumn(column?.id)}
                   isField={true}
-                  accessKey={index + "_" + column?.id + "_checkbox"}
+                  accessKey={column.label}
                   as={CheckboxItem}
                 />
               );
@@ -412,7 +422,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                     isChecked={isChecked(column?.id, false)}
                     handleClick={() => toggleColumn(column?.id)}
                     isField={true}
-                    accessKey={index + "_" + column?.id + "_checkbox"}
+                    accessKey={column.label}
                     as={CheckboxItem}
                   />
                 </>

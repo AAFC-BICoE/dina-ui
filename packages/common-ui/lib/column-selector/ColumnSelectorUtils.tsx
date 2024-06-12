@@ -140,7 +140,7 @@ function getNestedColumns<TData extends KitsuResource>(
   } else {
     columnOptions.push({
       id: indexColumn.value,
-      header: () => <FieldHeader name={indexColumn.value} />,
+      header: () => <FieldHeader name={indexColumn.label} />,
       accessorKey,
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
@@ -246,7 +246,7 @@ export function getIncludedManagedAttributeColumn(
     },
     header: () => <FieldHeader name={managedAttribute.name} />,
     accessorKey,
-    id: `${columnMapping.label}.${managedAttributeKey}`,
+    id: `${columnMapping.parentName}.${columnMapping.label}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: true,
     relationshipType: columnMapping.parentType,
@@ -329,9 +329,8 @@ export function getAttributeExtensionFieldColumn(
   const extensionValuesColumn = {
     accessorKey: `${columnMapping.path}.${extensionValue.id}.${extensionField.key}`,
     id: `${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
-    header: () => (
-      <FieldHeader name={`${extensionValue.id}.${extensionField.key}`} />
-    ),
+    header: () => `${extensionValue.extension.name} - ${extensionField.name}`,
+    label: `${extensionValue.extension.name} - ${extensionField.name}`,
     isKeyword: columnMapping.keywordMultiFieldSupport,
     isColumnVisible: true,
     columnMapping,
@@ -439,10 +438,9 @@ export function getIncludedExtensionFieldColumn(
       return <>{value}</>;
     },
     accessorKey,
-    id: `${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
-    header: () => (
-      <FieldHeader name={`${extensionValue.id}.${extensionField.key}`} />
-    ),
+    id: `${columnMapping.parentName}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
+    header: () => `${extensionValue.extension.name} - ${extensionField.name}`,
+    label: `${extensionValue.extension.name} - ${extensionField.name}`,
     isKeyword: columnMapping.keywordMultiFieldSupport,
     isColumnVisible: true,
     relationshipType: columnMapping.parentType,

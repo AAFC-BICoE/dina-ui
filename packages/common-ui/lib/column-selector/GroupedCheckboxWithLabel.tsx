@@ -12,6 +12,7 @@ export interface CheckboxProps {
   handleClick?: (e: any) => void;
   ref?: React.ForwardedRef<any>;
   hideLabel?: boolean;
+  forceLabel?: string;
 }
 
 export function Checkbox({
@@ -22,19 +23,22 @@ export function Checkbox({
   filteredColumnsState,
   handleClick,
   ref,
-  hideLabel
+  hideLabel,
+  forceLabel
 }: CheckboxProps) {
   const { formatMessage, messages } = useIntl();
   const [checked, setChecked] = useState<boolean>(isChecked ?? false);
   // Try to use dina messages first, if not just use the string directly.
   const messageKey = isField ? `field_${id}` : id;
   const label =
+    forceLabel ??
     name ??
     (messages[messageKey]
       ? formatMessage({ id: messageKey as any })
       : messages[id]
       ? formatMessage({ id: id as any })
       : startCase(id));
+
   function internalHandleClick(event) {
     const checkedState = event?.target?.checked;
     setChecked(checkedState);
@@ -42,6 +46,7 @@ export function Checkbox({
       filteredColumnsState[id] = checkedState;
     }
   }
+
   return (
     <div ref={ref}>
       <input
