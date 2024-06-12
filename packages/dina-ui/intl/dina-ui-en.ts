@@ -911,7 +911,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   whoAmITitle: "Who Am I",
   withAKeyboard: "With a keyboard",
   withAMouse: "With a mouse",
-  workBookDuplicateFieldMap: "This column should not map to the same field",
+  workBookDuplicateFieldMap:
+    "This column should not map to the same field ({fieldName})",
   workBookSkippedField: "Please select a field or skip importing it",
   missingParentMaterialSampleNames:
     "Missing parent material sample names: {missingNames}",
@@ -992,5 +993,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_reportVariables: "Report Variables",
   editReportTemplateTitle: "Edit Report Template",
   duplicateResourcesFound:
-    "Warning: duplicate resources found {duplicateResources}"
+    "Warning: duplicate resources found {duplicateResources}",
+  field_row: "Row",
+  field_column: "Column",
+  deleteFailedImport: "Delete Failed Import"
 };

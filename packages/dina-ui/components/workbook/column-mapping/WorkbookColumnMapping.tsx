@@ -228,9 +228,23 @@ export function WorkbookColumnMapping({
                       (fieldMapType.targetKey?.name ?? "")
               ).length > 1
             ) {
+              const allFieldOptions = fieldOptions.flatMap((item) => {
+                return item.options
+                  ? item.options.map((option) => ({
+                      label: item.label + " " + option.label,
+                      value: option.value
+                    }))
+                  : [item];
+              });
+              const fieldNameFormatted = allFieldOptions.find(
+                (option) => option.value === fieldMapType.targetField
+              );
+
               errors.push(
                 new ValidationError(
-                  formatMessage("workBookDuplicateFieldMap"),
+                  formatMessage("workBookDuplicateFieldMap", {
+                    fieldName: fieldNameFormatted?.label ?? ""
+                  }),
                   fieldMapType.targetField,
                   `fieldMap[${i}].targetField`
                 )
@@ -290,6 +304,28 @@ export function WorkbookColumnMapping({
       }
     })
   });
+
+  /**
+   * Instead of displaying "FieldMap.1.TargetField", display the column header to the user.
+   *
+   * @param field Original error field name.
+   * @param error Error message to display.
+   * @returns String with the new error message.
+   */
+  function handleErrorSummary(field: string, error: any): string {
+    // Field map should be changed to display a more user-friendly value.
+    if (field.startsWith("Field Map")) {
+      const indexFound = parseInt(field.split(".")[1], 10) - 1;
+      field = fieldMap[indexFound].columnHeader;
+    }
+
+    // Any sheet specific errors, just display the error message.
+    if (field === "Sheet") {
+      return error;
+    }
+
+    return field + " - " + error;
+  }
 
   function validateData(
     workbookData: { [field: string]: any }[],
@@ -522,6 +558,7 @@ export function WorkbookColumnMapping({
       innerRef={formRef}
       onSubmit={onSubmit}
       validationSchema={workbookColumnMappingFormSchema}
+      customErrorViewerMessage={handleErrorSummary}
     >
       {buttonBar}
       <FieldArray name="fieldMap">

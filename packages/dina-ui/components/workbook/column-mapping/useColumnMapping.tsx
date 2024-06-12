@@ -473,8 +473,8 @@ export function useColumnMapping() {
           const k = keyArr[i];
           label =
             label === undefined
-              ? formatMessage(k as any).trim() || k.toUpperCase()
-              : label + (formatMessage(k as any).trim() || k.toUpperCase());
+              ? formatMessage(k as any).trim() || startCase(k)
+              : label + (formatMessage(k as any).trim() || startCase(k));
           if (i < keyArr.length - 1) {
             label = label + ".";
           }

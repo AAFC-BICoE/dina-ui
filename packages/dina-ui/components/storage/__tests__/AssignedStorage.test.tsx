@@ -87,11 +87,14 @@ describe("AssignedStorage component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(
-      wrapper
-        .find(".storage-path li.breadcrumb-item")
-        .map((node) => node.text().trim())
-    ).toEqual([
+    const tooltip = wrapper.find("Tooltip");
+
+    const directComponent: any[] = tooltip.prop("directComponent");
+    const texts = directComponent.map((fragment) => {
+      return fragment.props.children[0].props.children.props.children;
+    });
+
+    expect(texts).toEqual([
       "E (Building)",
       "D (Room)",
       "C (Cabinet)",

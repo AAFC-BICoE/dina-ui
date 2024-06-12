@@ -4,7 +4,9 @@ import {
   dateCell,
   useApiClient,
   LoadingSpinner,
-  downloadDataExport
+  downloadDataExport,
+  DinaForm,
+  BulkDeleteButton
 } from "..";
 import { DataExport } from "../../../dina-ui/types/dina-export-api";
 import { Button } from "react-bootstrap";
@@ -57,29 +59,46 @@ export function DataExportListPageLayout({
     }
   ];
   return (
-    <ListPageLayout
-      additionalFilters={{
-        rsql: `createdBy==${username}`
-      }}
-      id="data-export-list"
-      queryTableProps={{
-        columns: TABLE_COLUMNS,
-        path: `dina-export-api/data-export/`,
-        topRightCorner: (
-          <Button
-            disabled={loading}
-            className="btn btn-primary mt-2 bulk-edit-button"
-            onClick={handleRefresh}
-          >
-            {loading ? (
-              <LoadingSpinner loading={loading} />
-            ) : (
-              formatMessage({ id: "refreshButtonText" })
-            )}
-          </Button>
-        ),
-        deps: [timestamp]
-      }}
-    />
+    <DinaForm initialValues={{}}>
+      {" "}
+      <ListPageLayout
+        bulkDeleteButtonProps={{
+          typeName: "data-export",
+          apiBaseUrl: "/dina-export-api"
+        }}
+        additionalFilters={{
+          rsql: `createdBy==${username}`
+        }}
+        id="data-export-list"
+        queryTableProps={{
+          columns: TABLE_COLUMNS,
+          path: `dina-export-api/data-export/`,
+          topRightCorner: (
+            <div className="d-flex gap-3">
+              {
+                <Button
+                  disabled={loading}
+                  className="btn btn-primary bulk-edit-button"
+                  onClick={handleRefresh}
+                >
+                  {loading ? (
+                    <LoadingSpinner loading={loading} />
+                  ) : (
+                    formatMessage({ id: "refreshButtonText" })
+                  )}
+                </Button>
+              }
+              {
+                <BulkDeleteButton
+                  typeName="data-export"
+                  apiBaseUrl="/dina-export-api"
+                />
+              }
+            </div>
+          ),
+          deps: [timestamp]
+        }}
+      />
+    </DinaForm>
   );
 }

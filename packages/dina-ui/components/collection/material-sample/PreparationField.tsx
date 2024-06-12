@@ -48,7 +48,7 @@ export const PREPARATION_FIELDS = [
 
 /** Blank values for all Preparation fields. */
 export const BLANK_PREPARATION: Required<
-  Pick<InputResource<MaterialSample>, typeof PREPARATION_FIELDS[number]>
+  Pick<InputResource<MaterialSample>, (typeof PREPARATION_FIELDS)[number]>
 > = Object.seal({
   preparationType: Object.seal({ id: null, type: "preparation-type" }),
   preparationDate: null,
@@ -202,7 +202,7 @@ export function PreparationField({
         </div>
       </div>
       <div className="row">
-        <div className="col-md-6">
+        <div className="col-md-12">
           <ManagedAttributesEditor
             valuesPath="preparationManagedAttributes"
             managedAttributeApiPath="collection-api/managed-attribute"

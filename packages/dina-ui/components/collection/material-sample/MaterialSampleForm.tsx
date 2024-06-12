@@ -145,6 +145,8 @@ export interface MaterialSampleFormProps {
    * When this prop is enabled, formik initialValues can be reinitialized
    */
   enableReinitialize?: boolean;
+
+  isBulkEditAllTab?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -179,7 +181,8 @@ export function MaterialSampleForm({
         <SubmitButton className="ms-auto" />
       </div>
     </ButtonBar>
-  )
+  ),
+  isBulkEditAllTab
 }: MaterialSampleFormProps) {
   const { isTemplate, readOnly } = useContext(DinaFormContext) ?? {};
   const {
@@ -233,7 +236,12 @@ export function MaterialSampleForm({
         />
       ),
     [MATERIAL_SAMPLE_INFO_COMPONENT_NAME]: (id) =>
-      !reduceRendering && <MaterialSampleInfoSection id={id} />,
+      !reduceRendering && (
+        <MaterialSampleInfoSection
+          id={id}
+          visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+        />
+      ),
     [COLLECTING_EVENT_COMPONENT_NAME]: (id) =>
       dataComponentState.enableCollectingEvent && (
         <TabbedResourceLinker<CollectingEvent>
@@ -348,7 +356,7 @@ export function MaterialSampleForm({
           sectionName="managed-attributes-section"
         >
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-md-12">
               <ManagedAttributesEditor
                 valuesPath="managedAttributes"
                 managedAttributeApiPath="collection-api/managed-attribute"
@@ -480,6 +488,7 @@ export function MaterialSampleForm({
       innerRef={materialSampleFormRef}
       initialValues={initialValues}
       onSubmit={onSubmit}
+      isBulkEditAllTab={isBulkEditAllTab}
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}

@@ -29,6 +29,7 @@ import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMappin
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { useSessionStorage } from "usehooks-ts";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
@@ -50,7 +51,7 @@ export default function ExportPage<TData extends KitsuResource>() {
   const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
 
   // The total number of results that will be exported.
-  const [totalRecords] = useLocalStorage<number>(
+  const [totalRecords] = useSessionStorage<number>(
     DATA_EXPORT_TOTAL_RECORDS_KEY,
     0
   );
@@ -64,7 +65,7 @@ export default function ExportPage<TData extends KitsuResource>() {
   const [exportType, setExportType] = useState<ExportType>("TABULAR_DATA");
 
   // Local storage for Export Objects
-  const [localStorageExportObjectIds] = useLocalStorage<string[]>(
+  const [localStorageExportObjectIds] = useSessionStorage<string[]>(
     OBJECT_EXPORT_IDS_KEY,
     []
   );

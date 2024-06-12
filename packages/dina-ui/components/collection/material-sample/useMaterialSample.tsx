@@ -56,6 +56,7 @@ import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
+import { StorageUnitCoordinates } from "../../../types/collection-api/resources/StorageUnitCoordinates";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -77,7 +78,8 @@ export function useMaterialSampleQuery(id?: string | null) {
         "materialSampleChildren",
         "parentMaterialSample",
         "projects",
-        "assemblages"
+        "assemblages",
+        "storageUnitCoordinates"
       ].join(",")
     },
     {
@@ -644,6 +646,32 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
+    // Take user input storageUnitCoordinates to create storageUnitCoordinates resource
+    if (msDiff.storageUnitCoordinates) {
+      const storageUnitCoordinatesSaveArgs: SaveArgs<StorageUnitCoordinates>[] =
+        [
+          {
+            type: "storage-unit-coordinates",
+            resource: {
+              ...msDiff.storageUnitCoordinates,
+              storageUnit: submittedValues.storageUnit,
+              type: "storage-unit-coordinates",
+              id: undefined
+            }
+          }
+        ];
+
+      const savedStorageUnitCoordinates = await save<StorageUnitCoordinates>(
+        storageUnitCoordinatesSaveArgs,
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      );
+
+      // Create link between material sample and created StorageUnitCoordinates resource
+      msDiff.storageUnitCoordinates = savedStorageUnitCoordinates[0];
+    }
+
     const organismsWereChanged =
       !!msDiff.organism ||
       msDiff.organismsQuantity !== undefined ||
@@ -652,7 +680,6 @@ export function useMaterialSampleSave({
     const msDiffWithOrganisms = organismsWereChanged
       ? { ...msDiff, organism: await saveAndAttachOrganisms(msPreprocessed) }
       : msDiff;
-
     /** Input to submit to the back-end API. */
     const msInputWithRelationships: InputResource<MaterialSample> & {
       relationships: any;

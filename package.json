@@ -41,7 +41,7 @@
     "tslint-plugin-prettier": "^2.3.0",
     "tslint-react": "^5.0.0",
     "typescript": "^4.5.5",
-    "xlsx": "^0.17.4"
+    "xlsx": "npm:@e965/xlsx@0.20.0"
   },
   "resolutions": {
     "kitsu/axios": "^0.21.1",
@@ -59,7 +59,8 @@
     "underscore": "1.13.1",
     "@babel/traverse": "7.23.2",
     "follow-redirects": "^1.15.4",
-    "axios": "1.6.0"
+    "axios": "1.6.0",
+    "pdfjs-dist": "4.2.67"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -70,5 +71,9 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72",
+  "dependencies": {
+    "canvas": "^2.11.2"
   }
 }

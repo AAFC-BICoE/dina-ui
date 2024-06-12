@@ -19,7 +19,7 @@ import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
 export default function DinaUserDetailsPage() {
   const router = useRouter();
-  const { isAdmin, rolesPerGroup, subject, username } = useAccount();
+  const { isAdmin, rolesPerGroup, subject } = useAccount();
 
   // Get the user ID from the URL, otherwise use the current user:
   const id = router.query.id?.toString() ?? subject;
@@ -96,7 +96,7 @@ export default function DinaUserDetailsPage() {
                     <h2>
                       <DinaMessage id="dataExports" />
                     </h2>
-                    <DataExportListPageLayout username={username} />
+                    <DataExportListPageLayout username={dinaUser.username} />
                   </div>
                 </div>
               </div>
