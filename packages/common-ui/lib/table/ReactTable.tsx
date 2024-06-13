@@ -5,7 +5,6 @@ import {
   PaginationState,
   Row,
   SortingState,
-  Table,
   VisibilityState,
   flexRender,
   getCoreRowModel,
@@ -17,10 +16,7 @@ import {
 } from "@tanstack/react-table";
 import classnames from "classnames";
 import { Fragment, useEffect, useState } from "react";
-
 import { useIntl } from "react-intl";
-import { ColumnSelector } from "../column-selector/ColumnSelector";
-import { DynamicFieldsMappingConfig } from "../list-page/types";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
@@ -80,56 +76,6 @@ export interface ReactTableProps<TData> {
 
   // Hides the table rendering. Useful for accessing table states but don't want to render table
   hideTable?: boolean;
-
-  // Column Selector only get menu, no dropdown button
-  menuOnly?: boolean;
-
-  // Pass the Column Selector to parent caller
-  setColumnSelector?: React.Dispatch<React.SetStateAction<JSX.Element>>;
-
-  // uniqueName used for local storage
-  uniqueName?: string;
-
-  /**
-   * Used for the listing page to understand which columns can be provided. Filters are generated
-   * based on the index provided.
-   *
-   * Also used to store saved searches under a specific type:
-   *
-   * `UserPreference.savedSearches.[INDEX_NAME].[SAVED_SEARCH_NAME]`
-   *
-   * For example, to get the default saved searches for the material sample index:
-   * `UserPreference.savedSearches.dina_material_sample_index.default.filters`
-   */
-  indexName?: string;
-
-  /**
-   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
-   * be searched against. It will also define the path and data component if required.
-   *
-   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
-   * or grouped terms.
-   */
-  dynamicFieldMapping?: DynamicFieldsMappingConfig;
-
-  // State setter to pass the processed index map columns to parent components
-  setColumnSelectorIndexMapColumns?: React.Dispatch<
-    React.SetStateAction<any[]>
-  >;
-  // State setter to pass the processed index map columns to parent components
-  setSelectedColumnSelectorIndexMapColumns?: React.Dispatch<
-    React.SetStateAction<any[]>
-  >;
-
-  // If true, index map columns are being loaded and processed from back end
-  setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
-
-  setReactTable?: React.Dispatch<
-    React.SetStateAction<Table<TData> | undefined>
-  >;
-
-  // The default visible columns
-  columnSelectorDefaultColumns?: any[];
 }
 
 const DEFAULT_SORT: SortingState = [
@@ -173,17 +119,7 @@ export function ReactTable<TData>({
   manualFiltering = false,
   onColumnFiltersChange,
   defaultColumnFilters = [],
-  hideTable = false,
-  setColumnSelector,
-  uniqueName,
-  indexName,
-  dynamicFieldMapping,
-  setColumnSelectorIndexMapColumns,
-  setSelectedColumnSelectorIndexMapColumns,
-  setLoadingIndexMapColumns,
-  menuOnly,
-  columnSelectorDefaultColumns,
-  setReactTable
+  hideTable = false
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>(sort ?? DEFAULT_SORT);
@@ -299,28 +235,6 @@ export function ReactTable<TData>({
   };
 
   const table = useReactTable<TData>(tableOption);
-
-  useEffect(() => {
-    if (setColumnSelector) {
-      const columnSelector = (
-        <ColumnSelector
-          uniqueName={uniqueName}
-          reactTable={table}
-          menuOnly={menuOnly}
-          indexName={indexName}
-          dynamicFieldMapping={dynamicFieldMapping}
-          setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
-          setLoadingIndexMapColumns={setLoadingIndexMapColumns}
-          columnSelectorDefaultColumns={columnSelectorDefaultColumns}
-          setSelectedColumnSelectorIndexMapColumns={
-            setSelectedColumnSelectorIndexMapColumns
-          }
-        />
-      );
-      setColumnSelector?.(columnSelector);
-    }
-    setReactTable?.(table);
-  }, [table.getState().columnVisibility, table.getAllLeafColumns().length]);
 
   return !hideTable ? (
     <div

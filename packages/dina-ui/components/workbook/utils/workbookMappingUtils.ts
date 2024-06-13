@@ -113,6 +113,7 @@ export function findMatchField(
   if (prefixPos !== -1) {
     prefix = columnHeader2.substring(0, prefixPos + 1);
   }
+
   const option = find(plainOptions, (item) => {
     if (prefix) {
       if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
@@ -129,13 +130,57 @@ export function findMatchField(
         return false;
       }
     } else {
+      const validOptionLabel = isValidOptionLabel(
+        item,
+        plainOptions,
+        columnHeader
+      );
       return (
         item.value.toLowerCase() === columnHeader2.toLowerCase() ||
-        _toPlainString(item.label) === _toPlainString(columnHeader)
+        validOptionLabel
       );
     }
   });
   return option ? option.value : undefined;
+}
+
+/**
+ * Determine if the given option is valid to be used for column mapping based on option's label
+ * An option is valid if its label matches the columnHeader and the option value is not nested
+ * If the option value is nested, the option label must not have duplicates in plainOptions
+ * @param option Dropdown option to be used for column mapping
+ * @param plainOptions Dropdown options that can be used for column mapping
+ * @param columnHeader The column header from excel file
+ * @returns true if given option should be used for column mapping, false otherwise
+ */
+function isValidOptionLabel(
+  option: {
+    label: string;
+    value: string;
+  },
+  plainOptions: { label: string; value: string }[],
+  columnHeader: string
+): boolean {
+  const duplicateLabelOptions = plainOptions
+    .map((plainOption) =>
+      _toPlainString(plainOption.label) === _toPlainString(columnHeader)
+        ? plainOption
+        : undefined
+    )
+    .filter((plainOption) => plainOption !== undefined);
+  duplicateLabelOptions.find((duplicateLabelOption) =>
+    duplicateLabelOption?.value.includes(".")
+  );
+  if (option.value?.includes(".")) {
+    // If option value is nested, the option label must match the column header and must not have duplicates
+    return (
+      _toPlainString(option.label) === _toPlainString(columnHeader) &&
+      duplicateLabelOptions.length < 2
+    );
+  } else {
+    // Option value is not nested, it must match the column header
+    return _toPlainString(option.label) === _toPlainString(columnHeader);
+  }
 }
 
 /**

@@ -165,7 +165,11 @@ export function CustomQueryPageView<TData extends KitsuResource>({
         </>
       ) : (
         <>
-          <QueryPage<TData> viewMode={true} {...queryPageProps} />
+          <QueryPage<TData>
+            viewMode={true}
+            enableColumnSelector={false}
+            {...queryPageProps}
+          />
         </>
       )}
     </FieldSet>

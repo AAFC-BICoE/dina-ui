@@ -6,10 +6,14 @@ import { useAccount } from "../../account/AccountProvider";
 import { useModal } from "../../modal/modal";
 import { SaveArgs, useApiClient } from "../../api-client/ApiClientContext";
 import { AreYouSureModal } from "../../modal/AreYouSureModal";
-import { FilterParam } from "kitsu";
+import { FilterParam, KitsuResource } from "kitsu";
 import { Alert, Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
-import { LoadingSpinner, defaultJsonTree } from "../..";
+import {
+  LoadingSpinner,
+  VISIBLE_INDEX_LOCAL_STORAGE_KEY,
+  defaultJsonTree
+} from "../..";
 import {
   Config,
   ImmutableTree,
@@ -28,7 +32,6 @@ import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
 import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useIntl } from "react-intl";
 import { useSessionStorage } from "usehooks-ts";
-import { Table, VisibilityState } from "@tanstack/react-table";
 import { useLocalStorage } from "@rehooks/local-storage";
 
 export interface SavedSearchProps {
@@ -91,8 +94,6 @@ export interface SavedSearchProps {
    * to remain the same across tables, it can share the same name.
    */
   uniqueName: string;
-
-  reactTable?: Table<any>;
 }
 
 /**
@@ -118,8 +119,7 @@ export function SavedSearch({
   groups,
   setGroups,
   performSubmit,
-  uniqueName,
-  reactTable
+  uniqueName
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -150,11 +150,11 @@ export function SavedSearch({
   const [selectedSavedSearchName, setSelectedSavedSearchName] =
     useState<string>();
 
-  // Local storage for saving columns visibility
-  const [localStorageColumnStates, setLocalStorageColumnStates] =
-    useLocalStorage<VisibilityState | undefined>(
-      `${uniqueName}_columnSelector`,
-      {}
+  // Local storage of the displayed columns that are saved.
+  const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
+    useLocalStorage<string[]>(
+      `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
+      []
     );
 
   // Functionality for the last loaded search.
@@ -271,8 +271,18 @@ export function SavedSearch({
       isQueryChanged = true;
     }
 
+    // Check if the columns displayed has changed.
+    if (
+      !isEqual(
+        sortBy(savedSearch?.columnVisibility),
+        sortBy(localStorageDisplayedColumns)
+      )
+    ) {
+      isQueryChanged = true;
+    }
+
     setChangesMade(isQueryChanged);
-  }, [queryBuilderTree, groups]);
+  }, [queryBuilderTree, groups, localStorageDisplayedColumns]);
 
   function getDefaultSavedSearchChanged(defaultSavedSearch: SingleSavedSearch) {
     let isQueryChanged = false;
@@ -390,15 +400,9 @@ export function SavedSearch({
         setChangesMade(true);
       }
 
+      // Load the displayed columns for this search.
       if (savedSearchToLoad.columnVisibility) {
-        getColumnVisibility(savedSearchToLoad.columnVisibility);
-        // Set ReactTable's column visibility
-        const columnVisibility: VisibilityState = getColumnVisibility(
-          savedSearchToLoad.columnVisibility
-        );
-        reactTable?.setColumnVisibility?.(columnVisibility);
-        // Set local storage column visibility for navigating around the website
-        setLocalStorageColumnStates(columnVisibility);
+        setLocalStorageDisplayedColumns(savedSearchToLoad.columnVisibility);
       }
 
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
@@ -444,7 +448,7 @@ export function SavedSearch({
             default: setAsDefault,
 
             // Save selected columns
-            columnVisibility: saveColumnVisibility(),
+            columnVisibility: localStorageDisplayedColumns,
 
             // If updateQueryTree is true, then we will retrieve the current query tree from the
             // query builder, otherwise it will remain the same as before.
@@ -494,7 +498,7 @@ export function SavedSearch({
       setChangesMade(false);
       setQueryError(undefined);
     },
-    [userPreferences, queryBuilderTree, groups]
+    [userPreferences, queryBuilderTree, groups, localStorageDisplayedColumns]
   );
 
   /**
@@ -648,32 +652,4 @@ export function SavedSearch({
       {queryError && <Alert variant={"danger"}>{queryError}</Alert>}
     </>
   );
-
-  function saveColumnVisibility(): string[] | undefined {
-    const savedColumnVisibility = reactTable?.getState().columnVisibility
-      ? Object.keys(reactTable?.getState().columnVisibility).filter(
-          (columnKey) =>
-            reactTable?.getState().columnVisibility[columnKey] === true
-        )
-      : undefined;
-    return savedColumnVisibility;
-  }
-
-  function getColumnVisibility(
-    savedColumnVisibility: string[] | undefined
-  ): VisibilityState {
-    const columnVisibility: VisibilityState = {};
-    if (reactTable?.getState().columnVisibility) {
-      Object.keys(reactTable?.getState().columnVisibility).forEach(
-        (columnKey) => {
-          columnVisibility[columnKey] = savedColumnVisibility?.includes(
-            columnKey
-          )
-            ? true
-            : false;
-        }
-      );
-    }
-    return columnVisibility;
-  }
 }

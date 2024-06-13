@@ -12,7 +12,6 @@ import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
 import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
-import { Table, VisibilityState } from "@tanstack/react-table";
 
 export interface QueryBuilderContextI {
   performSubmit: () => void;
@@ -100,8 +99,6 @@ interface QueryBuilderProps {
    * submitting a broken query.
    */
   validationErrors: ValidationError[];
-
-  reactTable?: Table<any>;
 }
 
 function QueryBuilder({
@@ -116,8 +113,7 @@ function QueryBuilder({
   groups,
   setGroups,
   uniqueName,
-  validationErrors,
-  reactTable
+  validationErrors
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -163,7 +159,6 @@ function QueryBuilder({
           groups={groups}
           setGroups={setGroups}
           uniqueName={uniqueName}
-          reactTable={reactTable}
         />
         <Query
           {...queryBuilderConfig}

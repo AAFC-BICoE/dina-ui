@@ -1,42 +1,31 @@
 import {
   DinaForm,
-  ReactTable,
   CommonMessage,
   BackButton,
   DATA_EXPORT_TOTAL_RECORDS_KEY,
-  DATA_EXPORT_COLUMNS_KEY,
   DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY,
   useApiClient,
   LoadingSpinner,
   OBJECT_EXPORT_IDS_KEY,
   downloadDataExport,
   Tooltip,
-  NOT_EXPORTABLE_COLUMN_IDS,
   DATA_EXPORT_QUERY_KEY,
   TextField,
-  SubmitButton
+  SubmitButton,
+  ColumnSelector
 } from "packages/common-ui/lib";
-import React, { useEffect } from "react";
 import Link from "next/link";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { Footer } from "packages/dina-ui/components";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   DynamicFieldsMappingConfig,
   TableColumn
 } from "packages/common-ui/lib/list-page/types";
 import { useIndexMapping } from "packages/common-ui/lib/list-page/useIndexMapping";
-import {
-  getColumnSelectorIndexMapColumns,
-  getGroupedIndexMappings
-} from "packages/common-ui/lib/column-selector/ColumnSelectorUtils";
-import { uniqBy } from "lodash";
-import { VisibilityState, Table } from "@tanstack/react-table";
-import { compact } from "lodash";
 import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
@@ -45,126 +34,76 @@ import { useSessionStorage } from "usehooks-ts";
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
 export default function ExportPage<TData extends KitsuResource>() {
+  const { formatMessage, formatNumber } = useIntl();
+  const { bulkGet, apiClient, save } = useApiClient();
   const router = useRouter();
+
+  // Unique name to be used for the local storage.
+  const uniqueName = String(router.query.uniqueName);
+
+  // Index mapping name to retrieve all the possible fields.
+  const indexName = String(router.query.indexName);
+
+  // Determines where the back button should link to.
+  const entityLink = String(router.query.entityLink);
+
+  // ElasticSearch query to be used to perform the export against.
+  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
+
+  // The total number of results that will be exported.
   const [totalRecords] = useSessionStorage<number>(
     DATA_EXPORT_TOTAL_RECORDS_KEY,
     0
   );
-  const uniqueName = String(router.query.uniqueName);
-  const indexName = String(router.query.indexName);
-  const entityLink = String(router.query.entityLink);
-  const { formatMessage, formatNumber } = useIntl();
-  const { bulkGet } = useApiClient();
 
-  const [columns] = useLocalStorage<TableColumn<TData>[]>(
-    `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`,
+  // Columns selected on the dropdown.
+  const [columnsToExport, setColumnsToExport] = useState<TableColumn<TData>[]>(
     []
   );
 
-  const [dataExportError, setDataExportError] = useState<JSX.Element>();
-
+  // State holding the current export type. For example, Data export / Object export.
   const [exportType, setExportType] = useState<ExportType>("TABULAR_DATA");
 
   // Local storage for Export Objects
-  const [exportObjectIds, setExportObjectIds] = useSessionStorage<string[]>(
+  const [localStorageExportObjectIds] = useSessionStorage<string[]>(
     OBJECT_EXPORT_IDS_KEY,
     []
   );
 
-  // Local storage for saving columns visibility
-  const [localStorageColumnStates, setLocalStorageColumnStates] =
-    useLocalStorage<VisibilityState | undefined>(
-      `${uniqueName}_columnSelector`,
-      {}
-    );
+  // Dynamic mappings from the list page to be applied for the export.
   const [dynamicFieldMapping] = useLocalStorage<
     DynamicFieldsMappingConfig | undefined
   >(`${uniqueName}_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`, undefined);
-  const [columnSelector, setColumnSelector] = useState<JSX.Element>(<></>);
-  const [columnSelectorIndexMapColumns, setColumnSelectorIndexMapColumns] =
-    useState<any[]>([]);
-  const [loadedIndexMapColumns, setLoadedIndexMapColumns] =
-    useState<boolean>(false);
 
-  const [reactTable, setReactTable] = useState<Table<TData>>();
-  // Combined columns from passed in columns
-  const [totalColumns, setTotalColumns] =
-    useState<TableColumn<TData>[]>(columns);
-
-  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
-
-  if (queryObject) {
-    delete (queryObject as any)._source;
-  }
-
-  const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
-
-  const { apiClient, save } = useApiClient();
+  const [dataExportError, setDataExportError] = useState<JSX.Element>();
   const [loading, setLoading] = useState(false);
 
-  let groupedIndexMappings;
   const { indexMap } = useIndexMapping({
     indexName,
     dynamicFieldMapping
   });
-  groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
-  useEffect(() => {
-    if (indexMap) {
-      getColumnSelectorIndexMapColumns({
-        groupedIndexMappings,
-        setLoadedIndexMapColumns,
-        setColumnSelectorIndexMapColumns,
-        apiClient,
-        setLoadingIndexMapColumns: setLoading
-      });
-    }
-  }, [indexMap]);
-
-  useEffect(() => {
-    const combinedColumns = uniqBy(
-      [...totalColumns, ...columnSelectorIndexMapColumns],
-      "id"
-    );
-    const columnVisibility = compact(
-      combinedColumns.map((col) =>
-        col.isColumnVisible === false
-          ? { id: col.id, visibility: false }
-          : undefined
-      )
-    ).reduce<VisibilityState>(
-      (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
-      {}
-    );
-    setLocalStorageColumnStates({
-      ...columnVisibility,
-      ...localStorageColumnStates
-    });
-    setTotalColumns(combinedColumns);
-  }, [loadedIndexMapColumns]);
 
   async function exportData(formik) {
     setLoading(true);
+
+    // Prepare the query to be used for exporting purposes.
+    if (queryObject) {
+      delete (queryObject as any)._source;
+    }
+    const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
+
     // Make query to data-export
-    const exportColumns = reactTable
-      ?.getAllLeafColumns()
-      .filter((column) => {
-        if (NOT_EXPORTABLE_COLUMN_IDS.includes(column.id)) {
-          return false;
-        } else {
-          return column.getIsVisible();
-        }
-      })
-      .map((column) => column.id);
     const dataExportSaveArg = {
       resource: {
         type: "data-export",
         source: indexName,
         query: queryString,
-        columns: reactTable ? exportColumns : [],
+        columns: columnsToExport.map((item) => item.id),
         name: formik?.values?.name
       },
       type: "data-export"
     };
+
     const dataExportPostResponse = await save<DataExport>([dataExportSaveArg], {
       apiBaseUrl: "/dina-export-api"
     });
@@ -202,10 +141,19 @@ export default function ExportPage<TData extends KitsuResource>() {
             </div>
           );
         } else {
-          dataExportGetResponse = await apiClient.get<DataExport>(
-            `dina-export-api/data-export/${exportPostResponse[0].id}`,
-            {}
-          );
+          try {
+            dataExportGetResponse = await apiClient.get<DataExport>(
+              `dina-export-api/data-export/${exportPostResponse[0].id}`,
+              {}
+            );
+          } catch (e) {
+            if (e.cause.status === 404) {
+              console.warn(e.cause);
+            } else {
+              throw e;
+            }
+          }
+
           // Wait 1 second before retrying
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
@@ -227,7 +175,7 @@ export default function ExportPage<TData extends KitsuResource>() {
   async function exportObjects(formik) {
     {
       setLoading(true);
-      const paths = exportObjectIds.map(
+      const paths = localStorageExportObjectIds.map(
         (id) => `metadata/${id}?include=derivatives`
       );
       const metadatas: PersistedResource<Metadata>[] = await bulkGet(paths, {
@@ -273,9 +221,9 @@ export default function ExportPage<TData extends KitsuResource>() {
     }
   }
   const disableObjectExportButton =
-    exportObjectIds.length < 1 || totalRecords > 100;
+    localStorageExportObjectIds.length < 1 || totalRecords > 100;
 
-  return loading || !loadedIndexMapColumns ? (
+  return loading ? (
     <LoadingSpinner loading={loading} />
   ) : (
     <PageLayout
@@ -370,20 +318,16 @@ export default function ExportPage<TData extends KitsuResource>() {
                 <Tooltip id="exportObjectsMaxLimitTooltip" />
               )}
           </div>
-          {exportType === "TABULAR_DATA" && columnSelector}
+          <ColumnSelector
+            exportMode={true}
+            defaultColumns={[]}
+            displayedColumns={columnsToExport}
+            setDisplayedColumns={setColumnsToExport}
+            indexMapping={indexMap}
+            uniqueName={uniqueName}
+            disabled={exportType === "OBJECT_ARCHIVE"}
+          />
         </div>
-
-        <ReactTable<TData>
-          columns={totalColumns}
-          data={[]}
-          setColumnSelector={setColumnSelector}
-          setReactTable={setReactTable}
-          hideTable={true}
-          uniqueName={uniqueName}
-          menuOnly={true}
-          indexName={indexName}
-          columnSelectorDefaultColumns={columns}
-        />
       </DinaForm>
     </PageLayout>
   );

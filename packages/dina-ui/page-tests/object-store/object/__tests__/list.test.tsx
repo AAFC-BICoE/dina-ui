@@ -88,6 +88,8 @@ const mockGet = jest.fn<any, any>(async (path) => {
       return TEST_GROUP;
     case "user-api/user-preference":
       return USER_PREFERENCE;
+    case "objectstore-api/managed-attribute":
+      return { data: [] };
   }
 });
 
