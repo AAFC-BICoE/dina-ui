@@ -49,6 +49,19 @@
   padding-top: 6px;
 }
 
+.preview-buttonbar {
+  height: 3rem;
+  position: sticky;
+  top: -1rem;
+  background: white;
+  z-index: 100;
+  margin-bottom: 20px; 
+}
+
+.offcanvas-end {
+  width: 500px !important;
+}
+
 /*
  * Breadcrumb CSS rules
  */

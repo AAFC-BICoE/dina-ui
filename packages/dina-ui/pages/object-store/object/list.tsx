@@ -4,8 +4,8 @@ import {
   FieldHeader,
   FilterAttribute,
   filterBy,
+  LoadingSpinner,
   QueryPage,
-  SplitPagePanel,
   stringArrayCell
 } from "common-ui";
 import Link from "next/link";
@@ -18,6 +18,7 @@ import {
 } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata, Person } from "../../../types/objectstore-api";
+import Offcanvas from "react-bootstrap/Offcanvas";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
@@ -54,9 +55,7 @@ export default function MetadataListPage() {
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
   const [previewMetadata, setPreviewMetadata] = useState<any | null>(null);
-  const [tableSectionWidth, previewSectionWidth] = previewMetadata?.id
-    ? [8, 4]
-    : [12, 0];
+  const tableSectionWidth = previewMetadata?.id ? 10 : 12;
 
   const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
     ThumbnailCell({
@@ -175,7 +174,7 @@ export default function MetadataListPage() {
         </div>
         <div className="row">
           <div className={`table-section col-${tableSectionWidth}`}>
-            <SplitPagePanel>
+            <div className="split-page-panel">
               <QueryPage
                 indexName={"dina_object_store_index"}
                 uniqueName="object-store-list"
@@ -238,37 +237,74 @@ export default function MetadataListPage() {
                   };
                 }}
               />
-            </SplitPagePanel>
+            </div>
           </div>
-          <div className={`preview-section col-${previewSectionWidth}`}>
-            <SplitPagePanel>
-              {previewMetadata?.id && (
+
+          <Offcanvas
+            show={previewMetadata !== null}
+            placement="end"
+            scroll={true}
+            backdrop={false}
+            onHide={() => setPreviewMetadata(null)}
+          >
+            <Offcanvas.Header closeButton={true}>
+              <Offcanvas.Title>
+                <DinaMessage id="previewLabel" />
+              </Offcanvas.Title>
+            </Offcanvas.Header>
+            <Offcanvas.Body>
+              {previewMetadata?.id ? (
                 <>
-                  <div style={{ height: "2.5rem" }}>
-                    <Link
-                      href={`/object-store/object/${
-                        previewMetadata.data?.attributes?.resourceExternalURL
-                          ? "external-resource-view"
-                          : "view"
-                      }?id=${previewMetadata.id}`}
-                    >
-                      <a>
-                        <DinaMessage id="detailsPageLink" />
-                      </a>
-                    </Link>
-                    <button
-                      className="btn btn-dark float-end preview-button"
-                      type="button"
-                      onClick={() => setPreviewMetadata(null)}
-                    >
-                      <DinaMessage id="closePreviewButtonText" />
-                    </button>
+                  <div className="row align-items-center preview-buttonbar">
+                    <div className="col">
+                      {" "}
+                      <Link
+                        href={`/object-store/object/${
+                          previewMetadata.data?.attributes?.resourceExternalURL
+                            ? "external-resource-view"
+                            : "view"
+                        }?id=${previewMetadata.id}`}
+                      >
+                        <a>
+                          <DinaMessage id="detailsPageLink" />
+                        </a>
+                      </Link>
+                    </div>
+                    <div className="col-auto d-flex justify-content-end">
+                      {" "}
+                      <div className="metadata-edit-link me-2">
+                        {" "}
+                        <Link
+                          href={`/object-store/metadata/${
+                            previewMetadata?.data?.resourceExternalURL
+                              ? "external-resource-edit"
+                              : "edit"
+                          }?id=${previewMetadata.id}`}
+                        >
+                          <a className="btn btn-primary metadata-edit-link">
+                            <DinaMessage id="editButtonText" />
+                          </a>
+                        </Link>
+                      </div>
+                      <Link
+                        href={`/object-store/metadata/revisions?id=${
+                          previewMetadata?.id
+                        }&isExternalResourceMetadata=${!!previewMetadata?.data
+                          ?.resourceExternalURL}`}
+                      >
+                        <a className="btn btn-info metadata-revisions-link">
+                          <DinaMessage id="revisionsButtonText" />
+                        </a>
+                      </Link>
+                    </div>
                   </div>
                   <MetadataPreview metadataId={previewMetadata?.id} />
                 </>
+              ) : (
+                <LoadingSpinner loading={true} />
               )}
-            </SplitPagePanel>
-          </div>
+            </Offcanvas.Body>
+          </Offcanvas>
         </div>
       </main>
       <Footer />
