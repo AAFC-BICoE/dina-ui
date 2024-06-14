@@ -51,8 +51,8 @@ export default function StorageUnitGrid({ storageUnit }: StorageUnitGridProps) {
         cellGrid={cellGrid}
         movedItems={[]}
         onDrop={(
-          item: { sampleName?: string | undefined },
-          coords: string
+          _item: { sampleName?: string | undefined },
+          _coords: string
         ): void => {
           throw new Error("Function not implemented.");
         }}
