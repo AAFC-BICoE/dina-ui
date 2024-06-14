@@ -274,6 +274,7 @@ export function NgsSampleSelectionStep({
         indexName={"dina_material_sample_index"}
         uniqueName="ngs-material-sample-selection-step"
         columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
+        enableColumnSelector={false}
         selectionMode={editMode}
         selectionResources={selectedResources}
         setSelectionResources={setSelectedResourcesAndSaveOrder}

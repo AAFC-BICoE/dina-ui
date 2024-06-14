@@ -279,6 +279,7 @@ export function SangerSampleSelectionStep({
         indexName={"dina_material_sample_index"}
         uniqueName="pcr-material-sample-selection-step"
         columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
+        enableColumnSelector={false}
         selectionMode={editMode}
         selectionResources={selectedResources}
         setSelectionResources={setSelectedResourcesAndSaveOrder}
