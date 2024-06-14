@@ -11,6 +11,7 @@ interface ContainerGridProps<BatchType, ItemType> {
   movedItems: ItemType[];
   onDrop: (item: ItemType, coords: string) => void;
   editMode: boolean;
+  className?: string;
 }
 
 interface GridCellProps<ItemType> {
@@ -21,6 +22,11 @@ interface GridCellProps<ItemType> {
   editMode: boolean;
 }
 
+/**
+ * key: `${resource.wellRow}_${resource.wellColumn}`
+ *
+ * value: {sampleName, ...resource}
+ */
 export interface CellGrid<ItemType> {
   [key: string]: ItemType;
 }
@@ -33,7 +39,8 @@ export function ContainerGrid<
   cellGrid,
   movedItems,
   onDrop,
-  editMode
+  editMode,
+  className
 }: ContainerGridProps<BatchType, ItemType>) {
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
   const [numberOfColumns, setNumberOfColumns] = useState<number>(0);
@@ -113,6 +120,7 @@ export function ContainerGrid<
         }
       `}</style>
       <ReactTable<any>
+        className={className}
         columns={tableColumns}
         data={tableData}
         showPagination={false}
