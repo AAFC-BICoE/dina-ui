@@ -508,9 +508,6 @@ export function useWorkbookConverter(
           relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.LINK_OR_CREATE
         ) {
-          if (attributeName === "wellRow" || attributeName === "wellColumn") {
-            // console.log(resource);
-          }
           // if there is no mapping in workbookColumnMap, then create it
           for (const childName of Object.keys(value)) {
             await linkRelationshipAttribute(
@@ -520,6 +517,28 @@ export function useWorkbookConverter(
               group
             );
           }
+
+          // Link storageUnit to storageUnitCoordinates before creating storageUnitCoordinates
+          if (
+            resource.type === "material-sample" &&
+            (resource as any).storageUnit &&
+            attributeName === "storageUnitCoordinates"
+          ) {
+            // Get possible storageUnits from workbookColumnMap
+            const columnMap = searchColumnMap("storageUnit", workbookColumnMap);
+            if (columnMap) {
+              // Get storageUnitToLink that matches the resource's storageUnit by name
+              const storageUnitToLink =
+                columnMap["storageUnit.name"]?.[
+                  (resource as any).storageUnit.name
+                ];
+              // Link storageUnit to storageUnitCoordinates
+              value.relationships["storageUnit"] = {
+                data: storageUnitToLink
+              };
+            }
+          }
+
           const newCreatedValue = await save(
             [
               {
