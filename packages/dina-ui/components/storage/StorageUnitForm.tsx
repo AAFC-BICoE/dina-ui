@@ -206,7 +206,7 @@ export function StorageUnitFormFields({
           parentStorageUnitUUID={initialValues.id}
         />
       )}
-      {initialValues.storageUnitType?.enableGrid && (
+      {initialValues.storageUnitType?.gridLayoutDefinition && (
         <StorageUnitGrid storageUnit={initialValues} />
       )}
       {readOnly && <StorageUnitChildrenViewer storageUnit={initialValues} />}
