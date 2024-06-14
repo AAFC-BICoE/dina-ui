@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { TableColumn } from "../../../../common-ui/lib/list-page/types";
-import { Component, useMemo, useState } from "react";
+import { Component, useMemo, useState, useEffect } from "react";
 import { Footer, Head, Nav, ThumbnailCell } from "../../../components";
 import {
   MetadataPreview,
@@ -54,8 +54,42 @@ export default function MetadataListPage() {
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup function to remove event listener on component unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Function to determine col-# based on the screensize. This can be adjusted for specific sizes
+  // to make sure the query page is still visible on the screen.
+  const getTableSectionWidth = (width) => {
+    if (width < 1100) {
+      return 5;
+    } else if (width < 1200) {
+      return 6;
+    } else if (width < 1500) {
+      return 7;
+    } else if (width < 1800) {
+      return 8;
+    } else if (width < 2000) {
+      return 9;
+    } else if (width < 2300) {
+      return 10;
+    } else if (width < 2400) {
+      return 11;
+    } else {
+      return 12;
+    }
+  };
+
   const [previewMetadata, setPreviewMetadata] = useState<any | null>(null);
-  const tableSectionWidth = previewMetadata?.id ? 10 : 12;
+  const tableSectionWidth = previewMetadata?.id
+    ? getTableSectionWidth(screenWidth)
+    : 12;
 
   const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
     ThumbnailCell({
