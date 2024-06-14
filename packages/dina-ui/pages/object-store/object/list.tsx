@@ -288,52 +288,7 @@ export default function MetadataListPage() {
             </Offcanvas.Header>
             <Offcanvas.Body>
               {previewMetadata?.id ? (
-                <>
-                  <div className="row align-items-center preview-buttonbar">
-                    <div className="col">
-                      {" "}
-                      <Link
-                        href={`/object-store/object/${
-                          previewMetadata.data?.attributes?.resourceExternalURL
-                            ? "external-resource-view"
-                            : "view"
-                        }?id=${previewMetadata.id}`}
-                      >
-                        <a>
-                          <DinaMessage id="detailsPageLink" />
-                        </a>
-                      </Link>
-                    </div>
-                    <div className="col-auto d-flex justify-content-end">
-                      {" "}
-                      <div className="metadata-edit-link me-2">
-                        {" "}
-                        <Link
-                          href={`/object-store/metadata/${
-                            previewMetadata?.data?.resourceExternalURL
-                              ? "external-resource-edit"
-                              : "edit"
-                          }?id=${previewMetadata.id}`}
-                        >
-                          <a className="btn btn-primary metadata-edit-link">
-                            <DinaMessage id="editButtonText" />
-                          </a>
-                        </Link>
-                      </div>
-                      <Link
-                        href={`/object-store/metadata/revisions?id=${
-                          previewMetadata?.id
-                        }&isExternalResourceMetadata=${!!previewMetadata?.data
-                          ?.resourceExternalURL}`}
-                      >
-                        <a className="btn btn-info metadata-revisions-link">
-                          <DinaMessage id="revisionsButtonText" />
-                        </a>
-                      </Link>
-                    </div>
-                  </div>
-                  <MetadataPreview metadataId={previewMetadata?.id} />
-                </>
+                <MetadataPreview metadataId={previewMetadata?.id} />
               ) : (
                 <LoadingSpinner loading={true} />
               )}

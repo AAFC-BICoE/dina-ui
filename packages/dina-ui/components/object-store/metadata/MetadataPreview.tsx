@@ -5,8 +5,10 @@ import {
 } from "../..";
 import { ExifView } from "../exif-view/ExifView";
 import { MetadataDetails } from "./MetadataDetails";
-import { MetadataFileView, getFileToDisplay } from "./MetadataFileView";
+import { MetadataFileView } from "./MetadataFileView";
 import { useMetadataViewQuery } from "./useMetadata";
+import Link from "next/link";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 interface MetadataPreviewProps {
   metadataId: string;
@@ -36,6 +38,46 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
       <div className="metadata-preview">
         <DinaForm initialValues={metadata} readOnly={true}>
           <style>{METADATA_PREVIEW_STYLE}</style>
+          <div className="row align-items-center preview-buttonbar">
+            <div className="col">
+              {" "}
+              <Link
+                href={`/object-store/object/${
+                  metadata?.resourceExternalURL
+                    ? "external-resource-view"
+                    : "view"
+                }?id=${metadataId}`}
+              >
+                <a>
+                  <DinaMessage id="detailsPageLink" />
+                </a>
+              </Link>
+            </div>
+            <div className="col-auto d-flex justify-content-end">
+              {" "}
+              <div className="metadata-edit-link me-2">
+                {" "}
+                <Link
+                  href={`/object-store/metadata/${
+                    metadata?.resourceExternalURL
+                      ? "external-resource-edit"
+                      : "edit"
+                  }?id=${metadataId}`}
+                >
+                  <a className="btn btn-primary metadata-edit-link">
+                    <DinaMessage id="editButtonText" />
+                  </a>
+                </Link>
+              </div>
+              <Link
+                href={`/object-store/metadata/revisions?id=${metadataId}&isExternalResourceMetadata=${!!metadata?.resourceExternalURL}`}
+              >
+                <a className="btn btn-info metadata-revisions-link">
+                  <DinaMessage id="revisionsButtonText" />
+                </a>
+              </Link>
+            </div>
+          </div>
           {metadata.resourceExternalURL && metadata.derivatives && (
             <MetadataFileView metadata={metadata} preview={true} />
           )}
