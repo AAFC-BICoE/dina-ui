@@ -40,12 +40,24 @@ export function useAccount(): AccountContextI {
 
 /** Converts the Keycloak context to the generic AccountContextI. */
 export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
+  const accountContext = useContext(AccountContext);
+
+  // Check if the context already exists.
+  if (accountContext) {
+    return <>{children}</>;
+  }
+
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [initialized, setInitialized] = useState<boolean>(false);
 
   // Setup keycloak when this is first mounted.
   useEffect(() => {
+    if (accountContext) {
+      // Account context has already been setup, skip keycloak.json call.
+      return;
+    }
+
     const keycloakInstance = new Keycloak("/keycloak.json");
     keycloakInstance
       .init({
