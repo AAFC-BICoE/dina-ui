@@ -21,9 +21,7 @@ export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
   "viewPreviewButtonText",
   "assemblages.",
   "projects.",
-  "organism.",
-  "collectingEvent.extensionValues.",
-  "collectingEvent.managedAttributes."
+  "organism."
 ];
 
 // IDs of columns that the user cannot configure, they are mandatory.
