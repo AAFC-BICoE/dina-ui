@@ -3,7 +3,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useSessionStorage } from "usehooks-ts";
 import { defaultJsonTree } from "common-ui/lib/list-page/query-builder/QueryBuilder";
 import { JsonTree } from "react-awesome-query-builder";
-import { createSessionStorageLastUsedTreeKey } from "packages/common-ui/lib/list-page/saved-searches/SavedSearch";
+import { createSessionStorageLastUsedTreeKey } from "common-ui/lib/list-page/saved-searches/SavedSearch";
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
 
