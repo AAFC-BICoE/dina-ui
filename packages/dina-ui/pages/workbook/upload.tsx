@@ -30,6 +30,7 @@ export function UploadWorkbookPage() {
   const [failed, setFailed] = useState<boolean>(false);
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
+  const [completed, setCompleted] = useState<boolean>(false);
 
   /**
    * Call the object store backend API that takes in a spreadsheet and returns
@@ -58,10 +59,17 @@ export function UploadWorkbookPage() {
       });
   }
 
-  function backToUpload() {
+  /**
+   * Return to the upload page.
+   * @param resetCompleted If true, the completed state is returned to false.
+   */
+  function backToUpload(resetCompleted: boolean) {
     setFailed(false);
     setLoading(false);
     setPerformSave(false);
+    if (resetCompleted) {
+      setCompleted(false);
+    }
     reset();
   }
 
@@ -81,9 +89,20 @@ export function UploadWorkbookPage() {
   }
 
   function isThereACompletedUpload(): boolean {
-    return (
-      workbookResources && workbookResources.length > 0 && status === "FINISHED"
-    );
+    // Check if it has already been determined.
+    if (completed) {
+      return true;
+    }
+
+    const isCompleted =
+      workbookResources &&
+      workbookResources.length > 0 &&
+      status === "FINISHED";
+    if (isCompleted) {
+      setCompleted(true);
+    }
+
+    return isCompleted;
   }
 
   const buttonBar =
@@ -95,7 +114,7 @@ export function UploadWorkbookPage() {
           <Button
             variant={"secondary"}
             style={{ width: "10rem" }}
-            onClick={() => backToUpload()}
+            onClick={() => backToUpload(true)}
           >
             <DinaMessage id="cancelButtonText" />
           </Button>
@@ -135,8 +154,8 @@ export function UploadWorkbookPage() {
           {isThereAnActiveUpload() ? (
             // If there is an unfinished upload
             <SaveWorkbookProgress
-              onWorkbookCanceled={backToUpload}
-              onWorkbookFailed={backToUpload}
+              onWorkbookCanceled={() => backToUpload(true)}
+              onWorkbookFailed={() => backToUpload(true)}
             />
           ) : isThereACompletedUpload() ? (
             <WorkbookConfirmation

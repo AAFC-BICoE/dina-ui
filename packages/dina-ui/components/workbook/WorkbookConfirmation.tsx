@@ -18,7 +18,7 @@ interface WorkbookConfirmationProps {
   groupUsed: string;
 
   /** Callback function to reset the workbook back to the upload page. */
-  onWorkbookReset: () => void;
+  onWorkbookReset: (resetCompleted: boolean) => void;
 }
 
 export function WorkbookConfirmation({
@@ -64,11 +64,11 @@ export function WorkbookConfirmation({
     setSessionStorageQueryTree(sourceSetQuery);
     writeStorage(GROUP_STORAGE_KEY, [groupUsed]);
 
+    // Reset the workbook at this point, so if the user comes back they see the upload page.
+    onWorkbookReset(false);
+
     // Redirect to to material-sample list page.
     router.push("/collection/material-sample/list");
-
-    // Reset the workbook at this point, so if the user comes back they see the upload page.
-    onWorkbookReset();
   };
 
   return (
@@ -98,7 +98,7 @@ export function WorkbookConfirmation({
       <div className="row d-flex gap-2 mt-4 mb-5 align-items-center justify-content-center">
         <button
           className="btn btn-secondary col-sm-3"
-          onClick={onWorkbookReset}
+          onClick={() => onWorkbookReset(true)}
         >
           <DinaMessage id="workbook_confirmation_new" />
         </button>
