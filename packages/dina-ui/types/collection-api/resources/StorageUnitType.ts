@@ -16,5 +16,6 @@ export interface StorageUnitTypeAttributes {
 export interface GridLayoutDefinition {
   numberOfRows: number;
   numberOfColumns: number;
+  fillDirection: string;
 }
 export type StorageUnitType = KitsuResource & StorageUnitTypeAttributes;

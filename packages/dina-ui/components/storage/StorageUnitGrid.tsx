@@ -33,7 +33,9 @@ export default function StorageUnitGrid({ storageUnit }: StorageUnitGridProps) {
   const cellGrid: CellGrid<any> = {};
   storageUnitContents.forEach((item) => {
     cellGrid[
-      `${item.storageUnitCoordinates?.wellRow}_${item.storageUnitCoordinates?.wellColumn}`
+      `${item.storageUnitCoordinates?.wellRow?.toUpperCase()}_${
+        item.storageUnitCoordinates?.wellColumn
+      }`
     ] = { sampleName: item.materialSampleName, ...item };
   });
 
