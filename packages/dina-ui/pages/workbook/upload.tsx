@@ -30,7 +30,7 @@ export function UploadWorkbookPage() {
   const [failed, setFailed] = useState<boolean>(false);
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
-  const [completed, setCompleted] = useState<boolean>(false);
+  const [redirecting, setRedirecting] = useState<boolean>(false);
 
   /**
    * Call the object store backend API that takes in a spreadsheet and returns
@@ -63,14 +63,15 @@ export function UploadWorkbookPage() {
    * Return to the upload page.
    * @param resetCompleted If true, the completed state is returned to false.
    */
-  function backToUpload(resetCompleted: boolean) {
+  function backToUpload() {
     setFailed(false);
     setLoading(false);
     setPerformSave(false);
-    if (resetCompleted) {
-      setCompleted(false);
-    }
     reset();
+  }
+
+  function preventRendering() {
+    setRedirecting(true);
   }
 
   const failedMessage = failed ? (
@@ -89,20 +90,12 @@ export function UploadWorkbookPage() {
   }
 
   function isThereACompletedUpload(): boolean {
-    // Check if it has already been determined.
-    if (completed) {
-      return true;
-    }
-
-    const isCompleted =
-      workbookResources &&
-      workbookResources.length > 0 &&
-      status === "FINISHED";
-    if (isCompleted) {
-      setCompleted(true);
-    }
-
-    return isCompleted;
+    return (
+      redirecting ||
+      (workbookResources &&
+        workbookResources.length > 0 &&
+        status === "FINISHED")
+    );
   }
 
   const buttonBar =
@@ -114,7 +107,7 @@ export function UploadWorkbookPage() {
           <Button
             variant={"secondary"}
             style={{ width: "10rem" }}
-            onClick={() => backToUpload(true)}
+            onClick={backToUpload}
           >
             <DinaMessage id="cancelButtonText" />
           </Button>
@@ -154,8 +147,8 @@ export function UploadWorkbookPage() {
           {isThereAnActiveUpload() ? (
             // If there is an unfinished upload
             <SaveWorkbookProgress
-              onWorkbookCanceled={() => backToUpload(true)}
-              onWorkbookFailed={() => backToUpload(true)}
+              onWorkbookCanceled={backToUpload}
+              onWorkbookFailed={backToUpload}
             />
           ) : isThereACompletedUpload() ? (
             <WorkbookConfirmation
@@ -163,6 +156,7 @@ export function UploadWorkbookPage() {
               sourceSetValue={sourceSet ?? ""}
               groupUsed={group ?? ""}
               onWorkbookReset={backToUpload}
+              preventRendering={preventRendering}
             />
           ) : spreadsheetData ? (
             <WorkbookColumnMapping

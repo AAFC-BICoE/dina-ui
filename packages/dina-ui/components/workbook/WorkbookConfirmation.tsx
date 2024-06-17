@@ -19,14 +19,18 @@ interface WorkbookConfirmationProps {
   groupUsed: string;
 
   /** Callback function to reset the workbook back to the upload page. */
-  onWorkbookReset: (resetCompleted: boolean) => void;
+  onWorkbookReset: () => void;
+
+  /** When this callback is triggered, it will prevent the workbook uploader from updating the state. */
+  preventRendering: () => void;
 }
 
 export function WorkbookConfirmation({
   totalRecordsCreated,
   sourceSetValue,
   groupUsed,
-  onWorkbookReset
+  onWorkbookReset,
+  preventRendering
 }: WorkbookConfirmationProps) {
   const router = useRouter();
   const uniqueName = "material-sample-list";
@@ -40,6 +44,9 @@ export function WorkbookConfirmation({
   const GROUP_STORAGE_KEY = uniqueName + "_groupStorage";
 
   const onViewWorkbook = () => {
+    // Stop rendering this page since we will be redirecting and don't need to see updates anymore.
+    preventRendering();
+
     // Set the query to be displayed on the material sample list page.
     const groupId = "71024654-0076-403c-b331-8b805c970760";
     const ruleId = "cabda278-e560-475c-8f36-58438308a10d";
@@ -65,9 +72,6 @@ export function WorkbookConfirmation({
     setSessionStorageQueryTree(sourceSetQuery);
     writeStorage(GROUP_STORAGE_KEY, [groupUsed]);
 
-    // Reset the workbook at this point, so if the user comes back they see the upload page.
-    onWorkbookReset(false);
-
     // Redirect to to material-sample list page.
     router.push("/collection/material-sample/list");
   };
@@ -75,10 +79,10 @@ export function WorkbookConfirmation({
   /** Handle if they leave without selecting an option, reset the uploader. */
   useEffect(() => {
     const handleWindowClose = () => {
-      onWorkbookReset(false);
+      onWorkbookReset();
     };
     const handleBrowseAway = () => {
-      onWorkbookReset(false);
+      onWorkbookReset();
     };
 
     window.addEventListener("beforeunload", handleWindowClose);
@@ -116,7 +120,7 @@ export function WorkbookConfirmation({
       <div className="row d-flex gap-2 mt-4 mb-5 align-items-center justify-content-center">
         <button
           className="btn btn-secondary col-sm-3"
-          onClick={() => onWorkbookReset(true)}
+          onClick={() => onWorkbookReset()}
         >
           <DinaMessage id="workbook_confirmation_new" />
         </button>
