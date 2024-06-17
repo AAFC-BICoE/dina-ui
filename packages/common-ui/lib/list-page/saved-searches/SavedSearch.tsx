@@ -96,6 +96,10 @@ export interface SavedSearchProps {
   uniqueName: string;
 }
 
+export function createSessionStorageLastUsedTreeKey(uniqueName: string) {
+  return `${uniqueName}-last-used-tree`;
+}
+
 /**
  * This component contains the following logic:
  *
@@ -201,9 +205,11 @@ export function SavedSearch({
     return undefined;
   }, [selectedSavedSearch, userPreferences]);
 
-  const sessionStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
   const [sessionStorageQueryTree, setSessionStorageQueryTree] =
-    useSessionStorage<JsonTree>(sessionStorageLastUsedTreeKey, defaultJsonTree);
+    useSessionStorage<JsonTree>(
+      createSessionStorageLastUsedTreeKey(uniqueName),
+      defaultJsonTree
+    );
 
   // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {

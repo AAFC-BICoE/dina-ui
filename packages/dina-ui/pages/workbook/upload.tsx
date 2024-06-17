@@ -16,8 +16,15 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
-  const { workbookResources, status, reset, spreadsheetData, uploadWorkbook } =
-    useWorkbookContext();
+  const {
+    workbookResources,
+    status,
+    reset,
+    spreadsheetData,
+    uploadWorkbook,
+    sourceSet,
+    group
+  } = useWorkbookContext();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [failed, setFailed] = useState<boolean>(false);
@@ -134,6 +141,8 @@ export function UploadWorkbookPage() {
           ) : isThereACompletedUpload() ? (
             <WorkbookConfirmation
               totalRecordsCreated={workbookResources.length}
+              sourceSetValue={sourceSet ?? ""}
+              groupUsed={group ?? ""}
               onWorkbookReset={backToUpload}
             />
           ) : spreadsheetData ? (

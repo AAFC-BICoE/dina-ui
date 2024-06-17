@@ -1,16 +1,76 @@
 import { FaRegCheckCircle } from "react-icons/fa";
-import Link from "next/link";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
+import { useSessionStorage } from "usehooks-ts";
+import { defaultJsonTree } from "common-ui/lib/list-page/query-builder/QueryBuilder";
+import { JsonTree } from "react-awesome-query-builder";
+import { createSessionStorageLastUsedTreeKey } from "packages/common-ui/lib/list-page/saved-searches/SavedSearch";
+import { useRouter } from "next/router";
+import { writeStorage } from "@rehooks/local-storage";
 
 interface WorkbookConfirmationProps {
+  /** To display the number of records created to the user. */
   totalRecordsCreated: number;
+
+  /** Used for generating the search query on the material sample list page. */
+  sourceSetValue: string;
+
+  /** Used for generating the search query group on the material sample list page. */
+  groupUsed: string;
+
+  /** Callback function to reset the workbook back to the upload page. */
   onWorkbookReset: () => void;
 }
 
 export function WorkbookConfirmation({
   totalRecordsCreated,
+  sourceSetValue,
+  groupUsed,
   onWorkbookReset
 }: WorkbookConfirmationProps) {
+  const router = useRouter();
+  const uniqueName = "material-sample-list";
+
+  const [_, setSessionStorageQueryTree] = useSessionStorage<JsonTree>(
+    createSessionStorageLastUsedTreeKey(uniqueName),
+    defaultJsonTree
+  );
+
+  // Groups selected for the search.
+  const GROUP_STORAGE_KEY = uniqueName + "_groupStorage";
+
+  const onViewWorkbook = () => {
+    // Set the query to be displayed on the material sample list page.
+    const groupId = "71024654-0076-403c-b331-8b805c970760";
+    const ruleId = "cabda278-e560-475c-8f36-58438308a10d";
+    const sourceSetQuery = {
+      id: groupId,
+      type: "group",
+      children1: [
+        {
+          id: ruleId,
+          type: "rule",
+          properties: {
+            field: "data.attributes.sourceSet",
+            operator: "exactMatch",
+            value: [sourceSetValue],
+            valueSrc: ["value"],
+            valueError: [],
+            valueType: ["text"]
+          }
+        }
+      ],
+      properties: { conjunction: "AND" }
+    } as JsonTree;
+    setSessionStorageQueryTree(sourceSetQuery);
+    writeStorage(GROUP_STORAGE_KEY, [groupUsed]);
+
+    // Redirect to to material-sample list page.
+    router.push("/collection/material-sample/list");
+
+    // Reset the workbook at this point, so if the user comes back they see the upload page.
+    onWorkbookReset();
+  };
+
   return (
     <>
       <style>{`
@@ -43,7 +103,7 @@ export function WorkbookConfirmation({
           <DinaMessage id="workbook_confirmation_new" />
         </button>
 
-        <button className="btn btn-primary col-sm-3">
+        <button className="btn btn-primary col-sm-3" onClick={onViewWorkbook}>
           <DinaMessage id="workbook_confirmation_view" />
         </button>
       </div>

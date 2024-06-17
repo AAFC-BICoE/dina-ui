@@ -85,6 +85,7 @@ type State = {
   group?: string;
   apiBaseUrl?: string;
   error?: Error;
+  sourceSet?: string;
 };
 
 interface WorkbookMetaData {
@@ -155,7 +156,7 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
       return {
         ...state,
         status: "FINISHED",
-        progress: action.payload
+        sourceSet: action.payload
       };
     case "RESET":
       return {
@@ -232,6 +233,7 @@ export interface WorkbookUploadContextI {
   type: string;
   sheet: number;
   error?: Error;
+  sourceSet?: string;
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
   setColumnMap: (newColumnMap: WorkbookColumnMap) => void;
@@ -249,7 +251,7 @@ export interface WorkbookUploadContextI {
   ) => Promise<void>;
   pauseSavingWorkbook: () => void;
   resumeSavingWorkbook: () => void;
-  finishSavingWorkbook: () => Promise<void>;
+  finishSavingWorkbook: (sourceSet: string) => Promise<void>;
   cancelSavingWorkbook: (type?: string) => Promise<void>;
   failSavingWorkbook: (error: Error) => Promise<void>;
   setGroup: (group: string) => void;
@@ -402,7 +404,7 @@ export function WorkbookUploadContextProvider({
     });
   };
 
-  const finishSavingWorkbook = async () => {
+  const finishSavingWorkbook = async (sourceSet: string) => {
     writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
       status: "FINISHED",
       group: state.group,
@@ -412,7 +414,8 @@ export function WorkbookUploadContextProvider({
     });
     await clearWorkbookResources();
     dispatch({
-      type: "FINISH_SAVING"
+      type: "FINISH_SAVING",
+      payload: sourceSet
     });
   };
 
@@ -506,6 +509,7 @@ export function WorkbookUploadContextProvider({
         apiBaseUrl: state.apiBaseUrl,
         status: state.status,
         error: state.error,
+        sourceSet: state.sourceSet,
 
         uploadWorkbook,
         setColumnMap,
