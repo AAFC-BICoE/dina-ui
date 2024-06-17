@@ -996,5 +996,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Warning: duplicate resources found {duplicateResources}",
   field_row: "Row",
   field_column: "Column",
-  deleteFailedImport: "Delete Failed Import"
+  deleteFailedImport: "Delete Failed Import",
+  workbook_confirmation_title: "Import Complete!",
+  workbook_confirmation_total: "{total} new material samples were created.",
+  workbook_confirmation_new: "Upload New Workbook",
+  workbook_confirmation_view: "View Imported Material Samples"
 };

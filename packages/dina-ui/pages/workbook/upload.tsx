@@ -6,6 +6,7 @@ import { useContext, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import {
   WorkbookColumnMapping,
+  WorkbookConfirmation,
   WorkbookUpload,
   trimSpace,
   useWorkbookContext
@@ -72,8 +73,16 @@ export function UploadWorkbookPage() {
     );
   }
 
+  function isThereACompletedUpload(): boolean {
+    return (
+      workbookResources && workbookResources.length > 0 && status === "FINISHED"
+    );
+  }
+
   const buttonBar =
-    !isThereAnActiveUpload() && !!spreadsheetData ? (
+    !isThereAnActiveUpload() &&
+    !isThereACompletedUpload() &&
+    !!spreadsheetData ? (
       <>
         <div className="col-md-6 col-sm-12">
           <Button
@@ -119,9 +128,13 @@ export function UploadWorkbookPage() {
           {isThereAnActiveUpload() ? (
             // If there is an unfinished upload
             <SaveWorkbookProgress
-              onWorkbookSaved={backToUpload}
               onWorkbookCanceled={backToUpload}
               onWorkbookFailed={backToUpload}
+            />
+          ) : isThereACompletedUpload() ? (
+            <WorkbookConfirmation
+              totalRecordsCreated={workbookResources.length}
+              onWorkbookReset={backToUpload}
             />
           ) : spreadsheetData ? (
             <WorkbookColumnMapping

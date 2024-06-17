@@ -13,13 +13,11 @@ import { PersistedResource, KitsuResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 
 export interface SaveWorkbookProgressProps {
-  onWorkbookSaved: () => void;
   onWorkbookCanceled: () => void;
   onWorkbookFailed: () => void;
 }
 
 export function SaveWorkbookProgress({
-  onWorkbookSaved,
   onWorkbookCanceled,
   onWorkbookFailed
 }: SaveWorkbookProgressProps) {
@@ -64,7 +62,6 @@ export function SaveWorkbookProgress({
 
   const finishUpload = () => {
     finishSavingWorkbook();
-    onWorkbookSaved?.();
   };
 
   const { linkRelationshipAttribute } = useWorkbookConverter(
