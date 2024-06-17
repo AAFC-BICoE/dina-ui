@@ -34,6 +34,7 @@ import {
   isEmptyWorkbookValue,
   isObject
 } from "./workbookMappingUtils";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 
 export const THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP = 10;
 
@@ -521,21 +522,30 @@ export function useWorkbookConverter(
           // Link storageUnit to storageUnitCoordinates before creating storageUnitCoordinates
           if (
             resource.type === "material-sample" &&
-            (resource as any).storageUnit &&
             attributeName === "storageUnitCoordinates"
           ) {
-            // Get possible storageUnits from workbookColumnMap
-            const columnMap = searchColumnMap("storageUnit", workbookColumnMap);
-            if (columnMap) {
-              // Get storageUnitToLink that matches the resource's storageUnit by name
-              const storageUnitToLink =
-                columnMap["storageUnit.name"]?.[
-                  (resource as any).storageUnit.name
-                ];
-              // Link storageUnit to storageUnitCoordinates
-              value.relationships["storageUnit"] = {
-                data: storageUnitToLink
-              };
+            // Check that storage unit is given if row has well column and well row
+            if (!!(resource as any).storageUnit.name) {
+              // Get possible storageUnits from workbookColumnMap
+              const columnMap = searchColumnMap(
+                "storageUnit",
+                workbookColumnMap
+              );
+              if (columnMap) {
+                // Get storageUnitToLink that matches the resource's storageUnit by name
+                const storageUnitToLink =
+                  columnMap["storageUnit.name"]?.[
+                    (resource as any).storageUnit.name
+                  ];
+                // Link storageUnit to storageUnitCoordinates
+                value.relationships["storageUnit"] = {
+                  data: storageUnitToLink
+                };
+              }
+            } else {
+              throw new Error(
+                "Storage unit not provided. Must provide valid storage unit for well row and well column."
+              );
             }
           }
 
