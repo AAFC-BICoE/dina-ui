@@ -7,10 +7,14 @@ import { SelectOption } from "../formik-connected/SelectField";
 
 export function Pagination<TData>({
   table,
-  pageSizeOptions
+  pageSizeOptions,
+  isTop,
+  displayFirstAndLastOptions
 }: {
   table: Table<TData>;
   pageSizeOptions: number[];
+  isTop: boolean;
+  displayFirstAndLastOptions: boolean;
 }) {
   const { formatMessage } = useIntl();
   const [selectOptions, setSelectOptions] = useState<
@@ -23,7 +27,24 @@ export function Pagination<TData>({
   );
 
   return (
-    <div className="-pagination" data-testid="pagination">
+    <div
+      className={
+        "-pagination" + (isTop ? " -pagination-top" : " -pagination-bottom")
+      }
+      data-testid="pagination"
+    >
+      {displayFirstAndLastOptions && (
+        <div className="-first">
+          <button
+            type="button"
+            className="-btn"
+            onClick={() => table.firstPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            {formatMessage({ id: "first" })}
+          </button>
+        </div>
+      )}
       <div className="-previous">
         <button
           type="button"
@@ -51,7 +72,9 @@ export function Pagination<TData>({
             />
           </div>{" "}
           {formatMessage({ id: "of" })}{" "}
-          <span className="-totalPages">{table.getPageCount() !== 0 ? table.getPageCount() : 1}</span>
+          <span className="-totalPages">
+            {table.getPageCount() !== 0 ? table.getPageCount() : 1}
+          </span>
         </span>
         <span className="-select-wrap -pageSizeOptions">
           <span style={{ textTransform: "capitalize" }}>
@@ -81,7 +104,7 @@ export function Pagination<TData>({
             }}
             options={selectOptions}
             formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
-          ></CreatableSelect>
+          />
         </span>
       </div>
       <div className="-next">
@@ -94,6 +117,18 @@ export function Pagination<TData>({
           {formatMessage({ id: "next" })}
         </button>
       </div>
+      {displayFirstAndLastOptions && (
+        <div className="-last">
+          <button
+            type="button"
+            className="-btn"
+            onClick={() => table.lastPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            {formatMessage({ id: "last" })}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

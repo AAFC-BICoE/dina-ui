@@ -247,7 +247,14 @@ export function ReactTable<TData>({
     >
       {showPagination && showPaginationTop && (
         <div className="pagination-top">
-          <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+          <Pagination
+            table={table}
+            pageSizeOptions={pageSizeOptions}
+            isTop={true}
+            displayFirstAndLastOptions={
+              enableSorting && !!sort && sort?.length > 0
+            }
+          />
         </div>
       )}
       <table className="w-100">
@@ -365,7 +372,14 @@ export function ReactTable<TData>({
       </table>
       {showPagination && (
         <div className="pagination-bottom">
-          <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+          <Pagination
+            table={table}
+            pageSizeOptions={pageSizeOptions}
+            isTop={false}
+            displayFirstAndLastOptions={
+              enableSorting && !!sort && sort?.length > 0
+            }
+          />
         </div>
       )}
     </div>

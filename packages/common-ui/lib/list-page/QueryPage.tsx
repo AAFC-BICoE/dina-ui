@@ -1116,8 +1116,20 @@ export function QueryPage<TData extends KitsuResource>({
                   className="-striped react-table-overflow"
                   rowStyling={rowStyling}
                   showPagination={true}
+                  showPaginationTop={true}
                 />
               )}
+              <div className="mt-2">
+                {/* Loading indicator when total is not calculated yet. */}
+                {loading || columnSelectorLoading ? (
+                  <></>
+                ) : (
+                  <CommonMessage
+                    id="tableTotalCount"
+                    values={{ totalCount: formatNumber(totalRecords) }}
+                  />
+                )}
+              </div>
             </div>
             {selectionMode && (
               <>
