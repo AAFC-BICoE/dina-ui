@@ -6,6 +6,7 @@ import { JsonTree } from "react-awesome-query-builder";
 import { createSessionStorageLastUsedTreeKey } from "common-ui/lib/list-page/saved-searches/SavedSearch";
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
+import { useEffect } from "react";
 
 interface WorkbookConfirmationProps {
   /** To display the number of records created to the user. */
@@ -70,6 +71,23 @@ export function WorkbookConfirmation({
     // Redirect to to material-sample list page.
     router.push("/collection/material-sample/list");
   };
+
+  /** Handle if they leave without selecting an option, reset the uploader. */
+  useEffect(() => {
+    const handleWindowClose = () => {
+      onWorkbookReset(false);
+    };
+    const handleBrowseAway = () => {
+      onWorkbookReset(false);
+    };
+
+    window.addEventListener("beforeunload", handleWindowClose);
+    router.events.on("routeChangeStart", handleBrowseAway);
+    return () => {
+      window.removeEventListener("beforeunload", handleWindowClose);
+      router.events.off("routeChangeStart", handleBrowseAway);
+    };
+  }, []);
 
   return (
     <>
