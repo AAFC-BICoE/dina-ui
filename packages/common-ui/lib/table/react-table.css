@@ -169,17 +169,19 @@
 .ReactTable .-pagination .-next,
 .ReactTable .-pagination .-first,
 .ReactTable .-pagination .-last {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
+  height: 35px;
+  width: 115px;
+  margin-top: 5px;
   text-align: center;
+  margin-left: 5px;
 }
 
-.ReactTable .-pagination .-first {
-  margin-right: 10px;
-}
 .ReactTable .-pagination .-last {
-  margin-left: 10px;
+  margin-right: 5px;
+}
+
+.ReactTable .-pagination-icon {
+  margin-top: -3px;
 }
 
 .ReactTable .-pagination .-center {

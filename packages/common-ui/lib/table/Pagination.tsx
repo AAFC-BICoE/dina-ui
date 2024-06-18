@@ -4,6 +4,12 @@ import { useState } from "react";
 import { useIntl } from "react-intl";
 import CreatableSelect from "react-select/creatable";
 import { SelectOption } from "../formik-connected/SelectField";
+import {
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight,
+  FaAngleLeft,
+  FaAngleRight
+} from "react-icons/fa";
 
 export function Pagination<TData>({
   table,
@@ -41,6 +47,7 @@ export function Pagination<TData>({
             onClick={() => table.firstPage()}
             disabled={!table.getCanPreviousPage()}
           >
+            <FaAngleDoubleLeft className="me-2 -pagination-icon" />
             {formatMessage({ id: "first" })}
           </button>
         </div>
@@ -52,6 +59,7 @@ export function Pagination<TData>({
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
+          <FaAngleLeft className="me-2 -pagination-icon" />
           {formatMessage({ id: "previous" })}
         </button>
       </div>
@@ -115,6 +123,7 @@ export function Pagination<TData>({
           disabled={!table.getCanNextPage()}
         >
           {formatMessage({ id: "next" })}
+          <FaAngleRight className="ms-2 -pagination-icon" />
         </button>
       </div>
       {displayFirstAndLastOptions && (
@@ -126,6 +135,7 @@ export function Pagination<TData>({
             disabled={!table.getCanNextPage()}
           >
             {formatMessage({ id: "last" })}
+            <FaAngleDoubleRight className="ms-2 -pagination-icon" />
           </button>
         </div>
       )}
