@@ -917,13 +917,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   missingParentMaterialSampleNames:
     "Missing parent material sample names: {missingNames}",
   workBookInvalidDataFormat:
-    "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}",
+    "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be a {dataType}",
   workBookInvalidManagedAttributeDataType:
     "Invalid Managed Attribute data type: managed attribute key {key} expects {type} data type.",
   workBookInvalidManagedAttributeKey:
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
   workBookManagedAttributeKeysTargetKeyIsRequired:
     "Please select a Managed Attribute value",
+  workBookStorageUnitIsRequired:
+    "Storage unit not provided. Must provide valid storage unit for well row and well column.",
   workbookGroupUploadTitle: "Upload Workbook",
   workbookTitle: "Workbooks",
   workbookPreviewTitle: "Workbook preview",

@@ -43,6 +43,7 @@ export function useWorkbookConverter(
   entityName: string
 ) {
   const { apiClient, save } = useApiClient();
+  const { formatMessage } = useDinaIntl();
 
   const FIELD_TO_VOCAB_ELEMS_MAP = useMemo(() => {
     // Have to load end-points up front, save all responses in a map
@@ -92,6 +93,7 @@ export function useWorkbookConverter(
     [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
     [WorkbookDataTypeEnum.DATE]: convertDate,
     [WorkbookDataTypeEnum.STRING]: convertString,
+    [WorkbookDataTypeEnum.STRING_LETTER]: convertString,
     [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
       value.toUpperCase().replace(" ", "_"),
     [WorkbookDataTypeEnum.CLASSIFICATION]: (value: {
@@ -525,27 +527,13 @@ export function useWorkbookConverter(
             attributeName === "storageUnitCoordinates"
           ) {
             // Check that storage unit is given if row has well column and well row
-            if (!!(resource as any).storageUnit.name) {
-              // Get possible storageUnits from workbookColumnMap
-              const columnMap = searchColumnMap(
-                "storageUnit",
-                workbookColumnMap
-              );
-              if (columnMap) {
-                // Get storageUnitToLink that matches the resource's storageUnit by name
-                const storageUnitToLink =
-                  columnMap["storageUnit.name"]?.[
-                    (resource as any).storageUnit.name
-                  ];
-                // Link storageUnit to storageUnitCoordinates
-                value.relationships["storageUnit"] = {
-                  data: storageUnitToLink
-                };
-              }
+            if (!!(resource as any)?.relationships?.storageUnit?.data?.id) {
+              // Link storageUnit to storageUnitCoordinates
+              value.relationships["storageUnit"] = {
+                data: (resource as any)?.relationships?.storageUnit?.data
+              };
             } else {
-              throw new Error(
-                "Storage unit not provided. Must provide valid storage unit for well row and well column."
-              );
+              throw new Error(formatMessage("workBookStorageUnitIsRequired"));
             }
           }
 

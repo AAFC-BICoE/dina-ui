@@ -40,6 +40,7 @@ export interface PrimitiveField {
     | WorkbookDataTypeEnum.NUMBER
     | WorkbookDataTypeEnum.BOOLEAN
     | WorkbookDataTypeEnum.STRING
+    | WorkbookDataTypeEnum.STRING_LETTER
     | WorkbookDataTypeEnum.DATE
     | WorkbookDataTypeEnum.STRING_ARRAY
     | WorkbookDataTypeEnum.NUMBER_ARRAY
