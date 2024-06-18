@@ -74,6 +74,18 @@
 }
 
 /*
+ * Column Selector CSS rules
+ */
+.column-selector-apply-button {
+  position: sticky;
+  top: -1.25em;
+  left: -1.25em; 
+  background: white;
+  padding-top: 5px;
+
+}
+
+/*
 * Fixes WCAG contrast issue for react-select input elements
 * Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
 */

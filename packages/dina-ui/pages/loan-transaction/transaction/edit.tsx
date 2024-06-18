@@ -405,6 +405,7 @@ export function TransactionFormLayout({
             indexName={"dina_material_sample_index"}
             uniqueName="transaction-edit-material-sample"
             columns={ELASTIC_SEARCH_COLUMN}
+            enableColumnSelector={false}
             selectionMode={!readOnly}
             selectionResources={
               readOnly ? selectedResourcesView : selectedResources

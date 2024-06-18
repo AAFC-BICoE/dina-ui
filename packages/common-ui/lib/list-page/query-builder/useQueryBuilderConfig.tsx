@@ -39,7 +39,9 @@ import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./query-builder-value-types/QueryBuilderTextSearch";
 import { transformUUIDSearchToDSL } from "./query-builder-value-types/QueryBuilderUUIDSearch";
-import QueryRowGlobalSearchSearch, { transformGlobalSearchToDSL } from "./query-builder-value-types/QueryBuilderGlobalSearch";
+import QueryRowGlobalSearchSearch, {
+  transformGlobalSearchToDSL
+} from "./query-builder-value-types/QueryBuilderGlobalSearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -173,7 +175,7 @@ export function useQueryBuilderConfig({
     );
   }, [indexMap, customViewFields, locale]);
 
-  return { queryBuilderConfig };
+  return { queryBuilderConfig, indexMap };
 }
 
 /**
@@ -452,7 +454,7 @@ export function generateBuilderConfig(
           value: val,
           queryType,
           fieldInfo: indexSettings,
-          indexMap: indexMap
+          indexMap
         });
       }
     },
@@ -478,7 +480,7 @@ export function generateBuilderConfig(
           value: val,
           queryType,
           fieldInfo: indexSettings,
-          indexMap: indexMap
+          indexMap
         });
       }
     }
@@ -511,14 +513,7 @@ export function generateBuilderConfig(
       defaultOperator: "equals",
       widgets: {
         autoComplete: {
-          operators: [
-            "equals", 
-            "notEquals", 
-            "in",
-            "notIn",
-            "empty", 
-            "notEmpty"
-          ]
+          operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"]
         }
       }
     },

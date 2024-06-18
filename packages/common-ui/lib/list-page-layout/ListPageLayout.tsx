@@ -216,11 +216,12 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   return (
     <div>
-      {filterAttributes && filterType === ListLayoutFilterType.FILTER_BUILDER && (
-        <FilterForm filterAttributes={filterAttributes} id={id}>
-          {filterFormchildren}
-        </FilterForm>
-      )}
+      {filterAttributes &&
+        filterType === ListLayoutFilterType.FILTER_BUILDER && (
+          <FilterForm filterAttributes={filterAttributes} id={id}>
+            {filterFormchildren}
+          </FilterForm>
+        )}
       {filterAttributes && filterType === ListLayoutFilterType.FREE_TEXT && (
         <FreeTextFilterForm filterAttributes={filterAttributes} id={id}>
           {filterFormchildren}
