@@ -318,7 +318,7 @@ describe("Metadata List Page", () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
     // Preview section is initially hidden:
-    expect(wrapper.find(".preview-section").hasClass("col-0")).toEqual(true);
+    expect(wrapper.find(".offcanvas").exists()).toEqual(false);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -330,7 +330,7 @@ describe("Metadata List Page", () => {
     wrapper.update();
 
     // Preview section is visible:
-    expect(wrapper.find(".preview-section").hasClass("col-4")).toEqual(true);
+    expect(wrapper.find(".offcanvas").hasClass("show")).toEqual(true);
   });
 
   it("Disables the bulk edit button when no Metadatas are selected.", async () => {

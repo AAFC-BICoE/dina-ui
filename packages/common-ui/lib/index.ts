@@ -57,7 +57,6 @@ export * from "./list-page-layout/bulk-buttons";
 export * from "./loading-spinner/LoadingSpinner";
 export * from "./modal/AreYouSureModal";
 export * from "./modal/modal";
-export * from "./page-split/SplitPagePanel";
 export * from "./resource-select/ResourceSelect";
 export * from "./resource-select/useBulkGet";
 export * from "./resource-select/TooltipSelectOption";
