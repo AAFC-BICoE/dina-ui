@@ -34,7 +34,7 @@ import {
   isEmptyWorkbookValue,
   isObject
 } from "./workbookMappingUtils";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export const THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP = 10;
 
