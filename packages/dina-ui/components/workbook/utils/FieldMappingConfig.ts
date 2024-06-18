@@ -231,7 +231,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
       },
       attributes: {
         wellColumn: { dataType: WorkbookDataTypeEnum.NUMBER },
-        wellRow: { dataType: WorkbookDataTypeEnum.STRING_LETTER }
+        wellRow: { dataType: WorkbookDataTypeEnum.STRING_COORDINATE }
       }
     },
     projects: {

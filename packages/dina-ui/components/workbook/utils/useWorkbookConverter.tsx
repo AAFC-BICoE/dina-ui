@@ -93,7 +93,10 @@ export function useWorkbookConverter(
     [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
     [WorkbookDataTypeEnum.DATE]: convertDate,
     [WorkbookDataTypeEnum.STRING]: convertString,
-    [WorkbookDataTypeEnum.STRING_LETTER]: convertString,
+    [WorkbookDataTypeEnum.STRING_COORDINATE]: (
+      value: any,
+      _fieldName?: string
+    ) => convertString((value as string).toUpperCase(), _fieldName),
     [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
       value.toUpperCase().replace(" ", "_"),
     [WorkbookDataTypeEnum.CLASSIFICATION]: (value: {
