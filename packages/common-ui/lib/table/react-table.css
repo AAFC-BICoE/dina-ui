@@ -216,6 +216,7 @@
 .ReactTable .-pagination .-pageJump input {
   width: 70px;
   text-align: center;
+  height: 30px;
 }
 .ReactTable .-pagination .-select-wrap {
   display: flex;
@@ -223,7 +224,7 @@
   gap: 0.3em;
 }
 .ReactTable .-pagination .-pageSizeOptions {
-  margin: 3px 10px;
+  margin: 8px 10px;
 }
 
 .ReactTable .-pagination select:focus {

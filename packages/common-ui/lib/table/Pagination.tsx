@@ -110,6 +110,26 @@ export function Pagination<TData>({
                 table.setPageSize(numValue);
               }
             }}
+            styles={{
+              control: (base) => ({
+                ...base,
+                minHeight: "30px",
+                height: "30px"
+              }),
+              indicatorSeparator: (base) => ({
+                ...base,
+                marginTop: "0px"
+              }),
+              dropdownIndicator: (base) => ({
+                ...base,
+                paddingTop: "0px"
+              }),
+              singleValue: (base) => ({
+                ...base,
+                marginTop: "-8px"
+              })
+            }}
+            classNamePrefix="react-select"
             options={selectOptions}
             formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
           />
