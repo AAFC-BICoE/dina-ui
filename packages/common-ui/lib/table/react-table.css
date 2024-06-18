@@ -23,24 +23,13 @@
   text-align: center;
 }
 
-.ReactTable thead th.-sort-asc,
-.ReactTable thead td.-sort-asc {
+.ReactTable thead .-sort-desc,
+.ReactTable thead .-sort-desc,
+.ReactTable thead .-sort-asc,
+.ReactTable thead .-sort-asc {
   box-shadow: none !important;
-  &:before {
-    content: "▲";
-    float: right;
-    pointer-events: none;
-  }
-}
-
-.ReactTable thead th.-sort-desc,
-.ReactTable thead td.-sort-desc {
-  box-shadow: none !important;
-  &:before {
-    content: "▼";
-    float: right;
-    pointer-events: none;
-  }
+  pointer-events: none;
+  margin-left: 5px;
 }
 
 .ReactTable th,
@@ -104,14 +93,12 @@
   background-color: rgb(222, 252, 222);
 }
 
-.ReactTable .-pagination .-pagination-top {
+.ReactTable .pagination-top {
   box-shadow: 0 0 -15px 0 rgba(0, 0, 0, 0.1);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
-.ReactTable .-pagination .-pagination-bottom {
+.ReactTable .pagination-bottom {
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
-  border-top: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 .ReactTable .-pagination {
@@ -177,6 +164,11 @@
 }
 
 .ReactTable .-pagination .-last {
+  margin-right: 5px;
+  margin-left: 0px;
+}
+
+.ReactTable .-pagination .-next {
   margin-right: 5px;
 }
 
