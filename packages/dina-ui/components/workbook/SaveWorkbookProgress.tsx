@@ -188,9 +188,9 @@ export function SaveWorkbookProgress({
         }
       }
     );
-    const collectingEventIds = fetchedMaterialSamples?.data.map(
-      (materialSample) => materialSample.collectingEvent?.id
-    );
+    const collectingEventIds = fetchedMaterialSamples?.data
+      .map((materialSample) => materialSample.collectingEvent?.id)
+      .filter((collectingEventId) => collectingEventId !== undefined);
     const materialSampleIds = fetchedMaterialSamples?.data.map(
       (materialSample) => materialSample.id
     );
@@ -206,7 +206,7 @@ export function SaveWorkbookProgress({
         op: "DELETE",
         path: `collecting-event/${id}`
       })),
-      { apiBaseUrl }
+      { apiBaseUrl, returnNullForMissingResource: true }
     );
 
     onWorkbookFailed?.();

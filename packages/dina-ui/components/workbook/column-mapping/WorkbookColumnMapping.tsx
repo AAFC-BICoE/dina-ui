@@ -483,6 +483,17 @@ export function WorkbookColumnMapping({
             );
           }
           break;
+        case WorkbookDataTypeEnum.STRING_COORDINATE:
+          if (!/[a-zA-Z]/.test(row[fieldPath])) {
+            param.dataType = WorkbookDataTypeEnum.STRING_COORDINATE;
+            errors.push(
+              new ValidationError(
+                formatMessage("workBookInvalidDataFormat", param),
+                fieldPath,
+                "sheet"
+              )
+            );
+          }
       }
     }
   }

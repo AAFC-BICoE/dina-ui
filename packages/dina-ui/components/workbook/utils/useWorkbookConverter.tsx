@@ -34,6 +34,7 @@ import {
   isEmptyWorkbookValue,
   isObject
 } from "./workbookMappingUtils";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export const THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP = 10;
 
@@ -42,6 +43,7 @@ export function useWorkbookConverter(
   entityName: string
 ) {
   const { apiClient, save } = useApiClient();
+  const { formatMessage } = useDinaIntl();
 
   const FIELD_TO_VOCAB_ELEMS_MAP = useMemo(() => {
     // Have to load end-points up front, save all responses in a map
@@ -91,6 +93,10 @@ export function useWorkbookConverter(
     [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
     [WorkbookDataTypeEnum.DATE]: convertDate,
     [WorkbookDataTypeEnum.STRING]: convertString,
+    [WorkbookDataTypeEnum.STRING_COORDINATE]: (
+      value: any,
+      _fieldName?: string
+    ) => convertString((value as string).toUpperCase(), _fieldName),
     [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
       value.toUpperCase().replace(" ", "_"),
     [WorkbookDataTypeEnum.CLASSIFICATION]: (value: {
@@ -517,6 +523,23 @@ export function useWorkbookConverter(
               group
             );
           }
+
+          // Link storageUnit to storageUnitCoordinates before creating storageUnitCoordinates
+          if (
+            resource.type === "material-sample" &&
+            attributeName === "storageUnitCoordinates"
+          ) {
+            // Check that storage unit is given if row has well column and well row
+            if (!!(resource as any)?.relationships?.storageUnit?.data?.id) {
+              // Link storageUnit to storageUnitCoordinates
+              value.relationships["storageUnit"] = {
+                data: (resource as any)?.relationships?.storageUnit?.data
+              };
+            } else {
+              throw new Error(formatMessage("workBookStorageUnitIsRequired"));
+            }
+          }
+
           const newCreatedValue = await save(
             [
               {

@@ -7,6 +7,7 @@ import {
   WorkbookDataTypeEnum
 } from "../..";
 import { useWorkbookConverter } from "../useWorkbookConverter";
+import { DinaIntlProvider } from "../../../../intl/dina-ui-intl";
 
 const mockConfig: FieldMappingConfigType = {
   mockEntity: {
@@ -116,7 +117,11 @@ function getWorkbookConverter(
     Object.assign(returnVal, useWorkbookConverter(mappingConfig, entityName));
     return <></>;
   }
-  mount(<TestComponent />);
+  mount(
+    <DinaIntlProvider>
+      <TestComponent />
+    </DinaIntlProvider>
+  );
   return returnVal;
 }
 
