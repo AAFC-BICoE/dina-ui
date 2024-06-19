@@ -209,3 +209,5 @@ export function ColumnSelector<TData extends KitsuResource>(
     );
   }
 }
+
+export const ColumnSelectorMemo = React.memo(ColumnSelector);
