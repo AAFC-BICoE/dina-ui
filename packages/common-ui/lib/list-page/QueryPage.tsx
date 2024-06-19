@@ -1,10 +1,5 @@
 import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
-import {
-  ColumnSort,
-  Row,
-  SortingState,
-  VisibilityState
-} from "@tanstack/react-table";
+import { ColumnSort, Row, SortingState } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { compact, toPairs, uniqBy } from "lodash";
@@ -744,27 +739,15 @@ export function QueryPage<TData extends KitsuResource>({
         )
       : reactTableProps;
 
-  const columnVisibility = compact(
-    displayedColumns?.map((col) =>
-      col.isColumnVisible === false
-        ? { id: col.id, visibility: false }
-        : { id: col.id, visibility: true }
-    )
-  ).reduce<VisibilityState>(
-    (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
-    {}
-  );
-
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     sort: sortingRules,
-    columnVisibility,
     ...computedReactTableProps
   };
 
   // Columns generated for the search results.
-  const columnsResults: TableColumn<TData>[] = uniqBy(
-    [
-      ...(showRowCheckboxes || selectionMode
+  const columnsResults = useMemo(() => {
+    const baseColumns =
+      showRowCheckboxes || selectionMode
         ? [
             {
               id: "selectColumn",
@@ -776,11 +759,10 @@ export function QueryPage<TData extends KitsuResource>({
               size: 200
             }
           ]
-        : []),
-      ...displayedColumns
-    ],
-    "id"
-  );
+        : [];
+
+    return uniqBy([...baseColumns, ...displayedColumns], "id");
+  }, [showRowCheckboxes, selectionMode, displayedColumns]); // Define dependencies
 
   // Columns generated for the selected resources, only in selection mode.
   const columnsSelected: TableColumn<TData>[] = [

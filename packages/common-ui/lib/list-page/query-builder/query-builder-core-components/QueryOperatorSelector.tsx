@@ -33,9 +33,13 @@ export function QueryOperatorSelector({
   setOperator,
   selectedFieldMapping
 }: QueryOperatorSelectorProps) {
+  const handleOperatorChange = (newValue) => {
+    setOperator?.(newValue?.value ?? "");
+  };
+
   // Do not render if no operators are available, specifically the managed attributes.
   if (options?.length === 1 && options[0].key === "noOperator") {
-    setOperator?.("noOperator");
+    handleOperatorChange({ value: "noOperator" });
     return <></>;
   }
 
@@ -104,7 +108,7 @@ export function QueryOperatorSelector({
         className={`flex-grow-1 me-2 ps-0`}
         styles={customStyles}
         value={selectedOption}
-        onChange={(newValue) => setOperator?.(newValue?.value ?? "")}
+        onChange={handleOperatorChange}
       />
     </div>
   );
