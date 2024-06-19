@@ -326,16 +326,20 @@ export function QueryPage<TData extends KitsuResource>({
   const {
     queryBuilderConfig,
     indexMap,
+    validationErrors,
     queryBuilderTree,
     submittedQueryBuilderTree,
     submitQueryBuilderTree,
     setDefaultQueryBuilderTree,
     setEmptyQueryBuilderTree,
     updateQueryBuilderTree,
-    updateSubmittedQueryBuilderTree
+    updateSubmittedQueryBuilderTree,
+    checkForValidationErrors,
+    MemoizedValidationErrors
   } = useQueryBuilder({
     indexName,
     uniqueName,
+    isCustomViewElasticSearchQuery: !!customViewElasticSearchQuery,
     dynamicFieldMapping,
     customViewFields
   });
@@ -347,6 +351,10 @@ export function QueryPage<TData extends KitsuResource>({
     groupNames ?? []
   );
 
+  const defaultGroups = useMemo(() => {
+    return { group: groups };
+  }, [groups]);
+
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(
     bulkDeleteButtonProps || bulkEditPath || dataExportProps
@@ -354,15 +362,6 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Query Page error message state
   const [error, setError] = useState<any>();
-
-  // Query page validation errors
-  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
-    []
-  );
-
-  const defaultGroups = useMemo(() => {
-    return { group: groups };
-  }, [groups]);
 
   /** If column selector is not being used, just load the default columns in. */
   useEffect(() => {
@@ -377,25 +376,6 @@ export function QueryPage<TData extends KitsuResource>({
       setLoading(false);
     }
   }, [viewMode, selectedResources]);
-
-  // Determine validation errors after each tree change.
-  useEffect(() => {
-    // Query builder is not setup yet.
-    if (!queryBuilderConfig) {
-      return;
-    }
-
-    // Custom validation logic.
-    if (!customViewElasticSearchQuery) {
-      const validationErrorsFound = getElasticSearchValidationResults(
-        queryBuilderTree,
-        queryBuilderConfig,
-        formatMessage
-      );
-
-      setValidationErrors(validationErrorsFound);
-    }
-  }, [queryBuilderTree]);
 
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
@@ -419,18 +399,9 @@ export function QueryPage<TData extends KitsuResource>({
     }
 
     // Custom validation logic.
-    if (!customViewElasticSearchQuery) {
-      const validationErrorsFound = getElasticSearchValidationResults(
-        submittedQueryBuilderTree,
-        queryBuilderConfig,
-        formatMessage
-      );
-      setValidationErrors(validationErrorsFound);
-
-      // If any errors are found, do not continue with the search.
-      if (validationErrorsFound.length > 0) {
-        return;
-      }
+    if (checkForValidationErrors()) {
+      // If errors are found, do not continue with the search.
+      return;
     }
 
     // Elastic search query with pagination settings.
@@ -898,24 +869,7 @@ export function QueryPage<TData extends KitsuResource>({
     <>
       {!viewMode && (
         <>
-          {validationErrors.length > 0 && (
-            <div
-              className="alert alert-danger"
-              style={{
-                whiteSpace: "pre-line"
-              }}
-            >
-              <h5>Validation Errors</h5>
-              <ul>
-                {validationErrors.map((validationError: ValidationError) => (
-                  <li key={validationError.fieldName}>
-                    <strong>{validationError.fieldName}: </strong>
-                    {validationError.errorMessage}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <MemoizedValidationErrors />
           <QueryBuilderMemo
             indexName={indexName}
             queryBuilderTree={queryBuilderTree}

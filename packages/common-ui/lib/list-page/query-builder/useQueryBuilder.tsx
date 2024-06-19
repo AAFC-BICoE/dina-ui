@@ -52,6 +52,11 @@ import {
 } from "./QueryBuilder";
 import { writeStorage } from "@rehooks/local-storage";
 import { useSessionStorage } from "usehooks-ts";
+import {
+  ValidationError,
+  getElasticSearchValidationResults
+} from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import React from "react";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -144,6 +149,8 @@ export interface UseQueryBuilderProps {
 
   uniqueName: string;
 
+  isCustomViewElasticSearchQuery: boolean;
+
   /**
    * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
    * be searched against. It will also define the path and data component if required.
@@ -162,6 +169,7 @@ export interface UseQueryBuilderProps {
 export function useQueryBuilder({
   indexName,
   uniqueName,
+  isCustomViewElasticSearchQuery,
   dynamicFieldMapping,
   customViewFields
 }: UseQueryBuilderProps) {
@@ -183,6 +191,11 @@ export function useQueryBuilder({
   // The submitted query builder tree. If this changes, a search should be performed.
   const [submittedQueryBuilderTree, setSubmittedQueryBuilderTree] =
     useState<ImmutableTree>(defaultQueryTree());
+
+  // Query page validation errors
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    []
+  );
 
   const sessionStorageLastUsedKeyTreeKey = uniqueName + "-last-used-tree";
   const localStorageLastUsedSavedSearchChangedKey =
@@ -228,6 +241,32 @@ export function useQueryBuilder({
     setSubmittedQueryBuilderTree(updatedTree);
   };
 
+  const checkForValidationErrors = () => {
+    // Query builder is not setup yet.
+    if (!queryBuilderConfig) {
+      return false;
+    }
+
+    // Custom validation logic.
+    if (!isCustomViewElasticSearchQuery) {
+      const validationErrorsFound = getElasticSearchValidationResults(
+        queryBuilderTree,
+        queryBuilderConfig,
+        formatMessage
+      );
+
+      setValidationErrors(validationErrorsFound);
+      return validationErrors.length > 0;
+    }
+
+    return false;
+  };
+
+  // Determine validation errors after each tree change.
+  useEffect(() => {
+    checkForValidationErrors();
+  }, [queryBuilderTree, queryBuilderConfig, isCustomViewElasticSearchQuery]);
+
   // When the index map has been provided (or changed) it can be generated.
   useEffect(() => {
     if (!indexMap) return;
@@ -242,16 +281,38 @@ export function useQueryBuilder({
     );
   }, [indexMap, customViewFields, locale]);
 
+  const MemoizedValidationErrors = React.memo(() => {
+    if (validationErrors.length > 0) {
+      return (
+        <div className="alert alert-danger" style={{ whiteSpace: "pre-line" }}>
+          <h5>Validation Errors</h5>
+          <ul>
+            {validationErrors.map((validationError: ValidationError) => (
+              <li key={validationError.fieldName}>
+                <strong>{validationError.fieldName}: </strong>
+                {validationError.errorMessage}
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    return null;
+  });
+
   return {
     queryBuilderConfig,
     indexMap,
+    validationErrors,
     queryBuilderTree,
     submittedQueryBuilderTree,
     submitQueryBuilderTree,
     setDefaultQueryBuilderTree,
     setEmptyQueryBuilderTree,
     updateQueryBuilderTree,
-    updateSubmittedQueryBuilderTree
+    updateSubmittedQueryBuilderTree,
+    checkForValidationErrors,
+    MemoizedValidationErrors
   };
 }
 
