@@ -1,13 +1,8 @@
 import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
-import {
-  ColumnSort,
-  Row,
-  SortingState,
-  VisibilityState
-} from "@tanstack/react-table";
+import { ColumnSort, Row, SortingState } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { compact, toPairs, uniqBy } from "lodash";
+import { toPairs, uniqBy } from "lodash";
 import React, {
   useCallback,
   useEffect,
@@ -27,7 +22,6 @@ import {
   ReactTableProps,
   useAccount
 } from "..";
-import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import {
@@ -68,6 +62,8 @@ import {
   ValidationError,
   getElasticSearchValidationResults
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import { MemoizedReactTable } from "./QueryPageTable";
+import { GroupSelectFieldMemoized } from "./QueryGroupSelection";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -744,43 +740,31 @@ export function QueryPage<TData extends KitsuResource>({
         )
       : reactTableProps;
 
-  const columnVisibility = compact(
-    displayedColumns?.map((col) =>
-      col.isColumnVisible === false
-        ? { id: col.id, visibility: false }
-        : { id: col.id, visibility: true }
-    )
-  ).reduce<VisibilityState>(
-    (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
-    {}
-  );
-
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
     sort: sortingRules,
-    columnVisibility,
     ...computedReactTableProps
   };
 
   // Columns generated for the search results.
-  const columnsResults: TableColumn<TData>[] = uniqBy(
-    [
-      ...(showRowCheckboxes || selectionMode
-        ? [
-            {
-              id: "selectColumn",
-              cell: ({ row: { original: resource } }) => (
-                <SelectCheckBox key={resource.id} resource={resource} />
-              ),
-              header: () => <SelectCheckBoxHeader />,
-              enableSorting: false,
-              size: 200
-            }
-          ]
-        : []),
-      ...displayedColumns
-    ],
-    "id"
-  );
+  const columnsResults = useMemo(() => {
+    const showSelectColumn = showRowCheckboxes || selectionMode;
+
+    const selectColumn = showSelectColumn
+      ? [
+          {
+            id: "selectColumn",
+            cell: ({ row: { original: resource } }) => (
+              <SelectCheckBox key={resource.id} resource={resource} />
+            ),
+            header: () => <SelectCheckBoxHeader />,
+            enableSorting: false,
+            size: 200
+          }
+        ]
+      : [];
+
+    return uniqBy([...selectColumn, ...displayedColumns], "id");
+  }, [showRowCheckboxes, selectionMode, displayedColumns]);
 
   // Columns generated for the selected resources, only in selection mode.
   const columnsSelected: TableColumn<TData>[] = [
@@ -975,15 +959,11 @@ export function QueryPage<TData extends KitsuResource>({
         {!viewMode && (
           <DinaFormSection horizontal={"flex"}>
             <div className="row">
-              <GroupSelectField
+              <GroupSelectFieldMemoized
                 isMulti={true}
                 name="group"
                 className="col-md-4 mt-3"
-                onChange={(newGroups) =>
-                  setImmediate(() => {
-                    onGroupChange(newGroups);
-                  })
-                }
+                onChange={onGroupChange}
                 groups={groups}
               />
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
@@ -1082,9 +1062,9 @@ export function QueryPage<TData extends KitsuResource>({
               {loading || columnSelectorLoading ? (
                 <LoadingSpinner loading={true} />
               ) : (
-                <ReactTable<TData>
+                <MemoizedReactTable
                   // Column and data props
-                  columns={columnsResults}
+                  columns={columnsResults as any}
                   data={
                     (viewMode
                       ? customViewFields
