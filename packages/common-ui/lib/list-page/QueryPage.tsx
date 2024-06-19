@@ -68,7 +68,6 @@ import {
   ValidationError,
   getElasticSearchValidationResults
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchValidator";
-import { QueryPageTableMemo } from "./QueryPageTable";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
