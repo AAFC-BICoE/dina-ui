@@ -13,13 +13,11 @@ import { PersistedResource, KitsuResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 
 export interface SaveWorkbookProgressProps {
-  onWorkbookSaved: () => void;
   onWorkbookCanceled: () => void;
   onWorkbookFailed: () => void;
 }
 
 export function SaveWorkbookProgress({
-  onWorkbookSaved,
   onWorkbookCanceled,
   onWorkbookFailed
 }: SaveWorkbookProgressProps) {
@@ -62,9 +60,8 @@ export function SaveWorkbookProgress({
     );
   };
 
-  const finishUpload = () => {
-    finishSavingWorkbook();
-    onWorkbookSaved?.();
+  const finishUpload = (sourceSetValue?: string) => {
+    finishSavingWorkbook(sourceSetValue ?? "");
   };
 
   const { linkRelationshipAttribute } = useWorkbookConverter(
@@ -170,6 +167,7 @@ export function SaveWorkbookProgress({
       statusRef.current = "FINISHED";
       setNow(workbookResources.length);
       saveProgress(workbookResources.length);
+      finishUpload(sourceSetInternal);
     }
   }
 
@@ -227,18 +225,6 @@ export function SaveWorkbookProgress({
           </Button>
         </div>
       )}
-      {statusRef.current === "FINISHED" &&
-        workbookResources.length > 0 &&
-        now >= workbookResources.length && (
-          <div className="mt-3 text-center">
-            <p>
-              <DinaMessage id="uploadWorkbookIsDone" />
-            </p>
-            <Button className="mt-1 mb-2" onClick={() => finishUpload()}>
-              OK
-            </Button>
-          </div>
-        )}
 
       {statusRef.current === "FAILED" && (
         <div className="mt-3 text-center">

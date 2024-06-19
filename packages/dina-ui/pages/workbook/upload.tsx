@@ -6,6 +6,7 @@ import { useContext, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import {
   WorkbookColumnMapping,
+  WorkbookConfirmation,
   WorkbookUpload,
   trimSpace,
   useWorkbookContext
@@ -15,13 +16,21 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
-  const { workbookResources, status, reset, spreadsheetData, uploadWorkbook } =
-    useWorkbookContext();
+  const {
+    workbookResources,
+    status,
+    reset,
+    spreadsheetData,
+    uploadWorkbook,
+    sourceSet,
+    group
+  } = useWorkbookContext();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [failed, setFailed] = useState<boolean>(false);
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
+  const [redirecting, setRedirecting] = useState<boolean>(false);
 
   /**
    * Call the object store backend API that takes in a spreadsheet and returns
@@ -50,11 +59,19 @@ export function UploadWorkbookPage() {
       });
   }
 
+  /**
+   * Return to the upload page.
+   * @param resetCompleted If true, the completed state is returned to false.
+   */
   function backToUpload() {
     setFailed(false);
     setLoading(false);
     setPerformSave(false);
     reset();
+  }
+
+  function preventRendering() {
+    setRedirecting(true);
   }
 
   const failedMessage = failed ? (
@@ -72,14 +89,25 @@ export function UploadWorkbookPage() {
     );
   }
 
+  function isThereACompletedUpload(): boolean {
+    return (
+      redirecting ||
+      (workbookResources &&
+        workbookResources.length > 0 &&
+        status === "FINISHED")
+    );
+  }
+
   const buttonBar =
-    !isThereAnActiveUpload() && !!spreadsheetData ? (
+    !isThereAnActiveUpload() &&
+    !isThereACompletedUpload() &&
+    !!spreadsheetData ? (
       <>
         <div className="col-md-6 col-sm-12">
           <Button
             variant={"secondary"}
             style={{ width: "10rem" }}
-            onClick={() => backToUpload()}
+            onClick={backToUpload}
           >
             <DinaMessage id="cancelButtonText" />
           </Button>
@@ -119,9 +147,16 @@ export function UploadWorkbookPage() {
           {isThereAnActiveUpload() ? (
             // If there is an unfinished upload
             <SaveWorkbookProgress
-              onWorkbookSaved={backToUpload}
               onWorkbookCanceled={backToUpload}
               onWorkbookFailed={backToUpload}
+            />
+          ) : isThereACompletedUpload() ? (
+            <WorkbookConfirmation
+              totalRecordsCreated={workbookResources.length}
+              sourceSetValue={sourceSet ?? ""}
+              groupUsed={group ?? ""}
+              onWorkbookReset={backToUpload}
+              preventRendering={preventRendering}
             />
           ) : spreadsheetData ? (
             <WorkbookColumnMapping

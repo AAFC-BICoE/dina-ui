@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { useSessionStorage } from "usehooks-ts";
 import { defaultJsonTree } from "../..";
+import { createSessionStorageLastUsedTreeKey } from "../saved-searches/SavedSearch";
 
 interface UseLastSavedSearchProps {
   /**
@@ -47,12 +48,10 @@ export function useLastSavedSearch({
   performSubmit,
   uniqueName
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
-  const sessionStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
-
   const [queryLoaded, setQueryLoaded] = useState<boolean>(false);
 
   const [sessionStorageQueryTree] = useSessionStorage<JsonTree>(
-    sessionStorageLastUsedTreeKey,
+    createSessionStorageLastUsedTreeKey(uniqueName),
     defaultJsonTree
   );
 
