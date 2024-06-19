@@ -561,6 +561,8 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
   spreadsheetData: WorkbookJSON
 ): ColumnUniqueValues {
   const result: ColumnUniqueValues = {};
+  // Define the regex pattern to match the right single quotation mark
+  const pattern: RegExp = /’/g;
   for (const sheet of Object.keys(spreadsheetData)) {
     const columnUniqueValues: {
       [columnName: string]: { [value: string]: number };
@@ -574,7 +576,10 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
           !!workbookRows[rowIndex].content[colIndex] &&
           workbookRows[rowIndex].content[colIndex].trim() !== ""
         ) {
-          const value = workbookRows[rowIndex].content[colIndex].trim();
+          // Replace right single quotation mark with normal apostrophe
+          const value = workbookRows[rowIndex].content[colIndex]
+            .trim()
+            .replace(pattern, "'");
           counts[value] = 1 + (counts[value] || 0);
         }
       }
