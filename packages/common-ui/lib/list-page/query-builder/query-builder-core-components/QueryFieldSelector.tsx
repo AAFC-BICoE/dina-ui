@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import CreatableSelect from "react-select/creatable";
 import { ESIndexMapping } from "../../types";
-import { GLOBAL_SEARCH_FIELDNAME } from "../useQueryBuilderConfig";
+import { GLOBAL_SEARCH_FIELDNAME } from "../useQueryBuilder";
 import { useSessionStorage } from "usehooks-ts";
 import { SHORTCUT_GLOBAL_SEARCH_QUERY } from "../query-builder-value-types/QueryBuilderGlobalSearch";
 

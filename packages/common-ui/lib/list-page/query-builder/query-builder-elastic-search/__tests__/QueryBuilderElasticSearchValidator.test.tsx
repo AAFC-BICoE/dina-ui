@@ -1,6 +1,6 @@
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { ESIndexMapping } from "../../../types";
-import { generateBuilderConfig } from "../../useQueryBuilderConfig";
+import { generateBuilderConfig } from "../../useQueryBuilder";
 import { getElasticSearchValidationResults } from "../QueryBuilderElasticSearchValidator";
 
 const mockFormatMessage = jest.fn((message) => message.id);

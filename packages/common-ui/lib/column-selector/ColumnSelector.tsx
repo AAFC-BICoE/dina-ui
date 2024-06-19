@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { ColumnSelectorList } from "./ColumnSelectorList";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import React from "react";
 import { Dropdown } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
@@ -171,6 +171,17 @@ export function ColumnSelector<TData extends KitsuResource>(
     return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
   }
 
+  const menuStyles = useMemo(
+    () => ({
+      maxHeight: "20rem",
+      overflowY: "scroll",
+      width: exportMode ? "100%" : "25rem",
+      padding: exportMode ? "0" : "1.25rem 1.25rem 1.25rem 1.25rem",
+      zIndex: 1
+    }),
+    [exportMode]
+  );
+
   if (exportMode) {
     return (
       <ColumnSelectorList
@@ -190,15 +201,7 @@ export function ColumnSelector<TData extends KitsuResource>(
         <Dropdown.Toggle>
           <DinaMessage id="selectColumn" />
         </Dropdown.Toggle>
-        <Dropdown.Menu
-          style={{
-            maxHeight: "20rem",
-            overflowY: "scroll",
-            width: exportMode ? "100%" : "25rem",
-            padding: exportMode ? "0" : "1.25rem 1.25rem 1.25rem 1.25rem",
-            zIndex: 1
-          }}
-        >
+        <Dropdown.Menu style={menuStyles as any}>
           <ColumnSelectorList
             {...props}
             loading={loading}

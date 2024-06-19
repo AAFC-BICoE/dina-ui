@@ -6,7 +6,7 @@ import Select from "react-select";
 import { FieldSet, QueryPage, QueryPageProps } from "..";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../dina-ui/intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { CustomViewField } from "../list-page/query-builder/useQueryBuilderConfig";
+import { CustomViewField } from "../list-page/query-builder/useQueryBuilder";
 
 export interface CustomQueryOption {
   /**

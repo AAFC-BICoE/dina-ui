@@ -1,6 +1,6 @@
 import { JsonTree } from "react-awesome-query-builder";
 import { validateQueryTree } from "../queryBuilderValidator";
-import { generateBuilderConfig } from "../../useQueryBuilderConfig";
+import { generateBuilderConfig } from "../../useQueryBuilder";
 import { ESIndexMapping } from "../../../types";
 
 const mockFormatMessage = jest.fn((message) => message.id);
@@ -12,6 +12,7 @@ const testIndexMap: ESIndexMapping[] = [
     endsWithSupport: false,
     keywordMultiFieldSupport: true,
     keywordNumericSupport: false,
+    hideField: false,
     label: "dwcRecordNumber",
     optimizedPrefix: false,
     parentName: "collectingEvent",

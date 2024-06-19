@@ -19,7 +19,7 @@ import QueryBuilderTextSearch, {
 } from "./QueryBuilderTextSearch";
 import { get } from "lodash";
 import { PersistedResource } from "kitsu";
-import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
+import { fieldValueToIndexSettings } from "../useQueryBuilder";
 import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 
