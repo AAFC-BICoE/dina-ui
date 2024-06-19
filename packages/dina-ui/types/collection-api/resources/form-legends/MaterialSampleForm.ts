@@ -1,6 +1,8 @@
 import { FormLegendComponentInformation } from "packages/dina-ui/types/common/resources/FormLegendInformation";
 
 // Data Components for Material Samples.
+export const SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME: string =
+  "show-parent-attributes-component";
 export const SPLIT_CONFIGURATION_COMPONENT_NAME: string =
   "split-configuration-component";
 export const IDENTIFIER_COMPONENT_NAME: string = "identifiers-component";
@@ -27,6 +29,25 @@ export const FIELD_EXTENSIONS_COMPONENT_NAME: string =
  * This array is the source of truth for the section ID names and their order.
  */
 export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
+  {
+    id: SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
+    labelKey: "materialSampleShowParentAttributes",
+    maxGridSizeX: 2,
+    formTemplateOnly: true,
+    sections: [
+      {
+        id: "parent-attributes-section",
+        labelKey: "materialSampleShowParentAttributes",
+        maxGridSizeX: 2,
+        items: [
+          {
+            id: "parentAttributes",
+            visible: true
+          }
+        ]
+      }
+    ]
+  },
   {
     id: SPLIT_CONFIGURATION_COMPONENT_NAME,
     labelKey: "materialSampleSplitConfiguration",

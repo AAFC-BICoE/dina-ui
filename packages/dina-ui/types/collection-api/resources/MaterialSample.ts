@@ -77,6 +77,9 @@ export interface MaterialSampleAttributes {
   restrictionRemarks?: string | null;
   extensionValues?: any;
   version?: string;
+
+  // Client side for parent attributes
+  parentAttributes?: any;
 }
 
 export interface HostOrganism {

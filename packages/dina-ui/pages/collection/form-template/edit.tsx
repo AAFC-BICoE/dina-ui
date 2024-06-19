@@ -51,6 +51,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
   SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
@@ -168,6 +169,9 @@ export function FormTemplateEditPageLoaded({
     submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
     // Get collecting event checkboxes and values
+    submittedValues.parentAttributes = _.compact(
+      submittedValues.parentAttributes
+    );
     const {
       templateCheckboxes: collectingEventCheckboxes,
       ...collectinEventFormRefValues
@@ -363,6 +367,8 @@ export function FormTemplateEditPageLoaded({
 }
 function getDataComponentsStateMap(dataComponentState) {
   const dataComponentEnabledMap = {};
+  dataComponentEnabledMap[SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME] =
+    dataComponentState.enableShowParentAttributes;
   dataComponentEnabledMap[SPLIT_CONFIGURATION_COMPONENT_NAME] =
     dataComponentState.enableSplitConfiguration;
   dataComponentEnabledMap[IDENTIFIER_COMPONENT_NAME] = true;

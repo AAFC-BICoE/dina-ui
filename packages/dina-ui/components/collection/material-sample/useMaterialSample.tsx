@@ -49,7 +49,8 @@ import {
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
-  ScientificNameSource
+  ScientificNameSource,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
@@ -172,6 +173,7 @@ export interface UseMaterialSampleSaveParams {
   };
   materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
+    parentAttributes?: string[];
   };
 
   /** Split Configuration (Form Template Only) */
@@ -279,7 +281,13 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasShowParentAttributes =
+    isTemplate &&
+    (materialSampleTemplateInitialValues?.parentAttributes?.length ?? 0) > 0;
+
   // Enable Switch States:
+  const [enableShowParentAttributes, setEnableShowParentAttributes] =
+    useState<boolean>(false);
   const [enableSplitConfiguration, setEnableSplitConfiguration] =
     useState<boolean>(false);
   const [enableCollectingEvent, setEnableCollectingEvent] =
@@ -295,6 +303,17 @@ export function useMaterialSampleSave({
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
     setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
+    setEnableShowParentAttributes(
+      Boolean(
+        hasShowParentAttributes
+          ? true
+          : formTemplate?.components?.find(
+              (comp) =>
+                comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME &&
+                comp.visible
+            )?.visible ?? false
+      )
+    );
     setEnableCollectingEvent(
       Boolean(
         hasColEventTemplate
@@ -407,7 +426,9 @@ export function useMaterialSampleSave({
     enableRestrictions,
     setEnableRestrictions,
     enableSplitConfiguration,
-    setEnableSplitConfiguration
+    setEnableSplitConfiguration,
+    enableShowParentAttributes,
+    setEnableShowParentAttributes
   };
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
@@ -621,6 +642,7 @@ export function useMaterialSampleSave({
     delete materialSampleInput.phac_human_rg;
     delete materialSampleInput.cfia_ppc;
     delete materialSampleInput.useTargetOrganism;
+    delete materialSampleInput.parentAttributes;
 
     return materialSampleInput;
   }

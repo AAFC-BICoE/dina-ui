@@ -17,41 +17,43 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
+import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import {
   AssociationsField,
   CollectingEventFormLayout,
   Footer,
-  Head,
   HOST_ORGANISM_FIELDS,
+  Head,
   ManagedAttributesEditor,
   MaterialSampleBreadCrumb,
+  MaterialSampleFormTemplateSelect,
   MaterialSampleIdentifiersSection,
   MaterialSampleInfoSection,
   Nav,
   OrganismsField,
-  PreparationField,
   PREPARATION_FIELDS,
+  PreparationField,
   ScheduledActionsField,
   StorageLinkerField,
   useCollectingEventQuery,
+  useMaterialSampleFormTemplateSelectState,
   useMaterialSampleQuery,
-  withOrganismEditorValues,
-  MaterialSampleFormTemplateSelect,
-  useMaterialSampleFormTemplateSelectState
+  withOrganismEditorValues
 } from "../../../components";
+import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
+import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
+import { MaterialSampleBadges } from "../../../components/collection/material-sample/MaterialSampleBadges";
+import { ShowParentAttributesField } from "../../../components/collection/material-sample/ShowParentAttributesField";
+import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
+import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
+import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   COLLECTING_EVENT_COMPONENT_NAME,
-  MaterialSample
+  MaterialSample,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
-import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
-import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
-import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
-import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
-import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
-import { MaterialSampleBadges } from "../../../components/collection/material-sample/MaterialSampleBadges";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -203,6 +205,15 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             (fieldName) => materialSample.hostOrganism?.[fieldName]
           );
 
+        const hasShowParentAttributes =
+          (!!materialSample.parentMaterialSample &&
+            sampleFormTemplate?.components?.find(
+              (comp) =>
+                comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME &&
+                comp.visible
+            )?.visible) ??
+          false;
+
         return (
           <>
             <Head
@@ -229,6 +240,20 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <MaterialSampleBadges
                   transactionElasticQuery={transactionElasticQuery}
                 />
+
+                {hasShowParentAttributes && (
+                  <ShowParentAttributesField
+                    id={id}
+                    isTemplate={false}
+                    attrList={
+                      sampleFormTemplate?.components?.find(
+                        (comp) =>
+                          comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
+                      )?.sections?.[0].items?.[0].defaultValue
+                    }
+                    materialSample={materialSample}
+                  />
+                )}
 
                 <MaterialSampleIdentifiersSection />
 

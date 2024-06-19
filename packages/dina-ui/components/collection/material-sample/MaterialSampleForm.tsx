@@ -44,7 +44,8 @@ import {
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   SPLIT_CONFIGURATION_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  STORAGE_COMPONENT_NAME,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { AssociationsField } from "../AssociationsField";
@@ -61,6 +62,7 @@ import { RestrictionField } from "./RestrictionField";
 import { SplitConfigurationSection } from "./SplitConfigurationSection";
 import { CollectionSelectSection } from "../CollectionSelectSection";
 import { NotPubliclyReleasableSection } from "../../tag-editor/NotPubliclyReleasableSection";
+import { ShowParentAttributesField } from "./ShowParentAttributesField";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -221,6 +223,21 @@ export function MaterialSampleForm({
    * - The value is the section's render function given the ID as a param.
    */
   const formSections: Record<string, (id: string) => ReactNode> = {
+    [SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME]: (id) =>
+      !reduceRendering &&
+      (isTemplate || readOnly) &&
+      dataComponentState.enableShowParentAttributes && (
+        <ShowParentAttributesField
+          id={id}
+          isTemplate={isTemplate}
+          attrList={
+            formTemplate?.components?.find(
+              (comp) => comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
+            )?.sections?.[0].items?.[0].defaultValue
+          }
+          materialSample={materialSample}
+        />
+      ),
     [SPLIT_CONFIGURATION_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
       isTemplate &&
