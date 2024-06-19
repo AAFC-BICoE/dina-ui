@@ -6,7 +6,6 @@ import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 import { useIntl } from "react-intl";
 import { useFormikContext } from "formik";
-import React from "react";
 
 export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
@@ -56,10 +55,8 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
     const computedAvailableItems =
       (defaultAvailableItems as TData[]) ?? availableItems;
 
-    const FieldMemo = React.memo(Field);
-
     return (
-      <FieldMemo name={thisBoxFieldName}>
+      <Field name={thisBoxFieldName}>
         {({ field: { value }, form: { setFieldValue, setFieldTouched } }) => {
           function onCheckBoxClick(e) {
             setFieldValue(thisBoxFieldName, e.target.checked);
@@ -114,7 +111,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
             </div>
           );
         }}
-      </FieldMemo>
+      </Field>
     );
   }
 
@@ -194,9 +191,9 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   });
 
   return {
-    CheckAllCheckBox: React.memo(CheckAllCheckBox),
-    CheckBoxField: React.memo(CheckBoxField),
-    CheckBoxHeader: React.memo(CheckBoxHeader),
+    CheckAllCheckBox,
+    CheckBoxField,
+    CheckBoxHeader,
     setAvailableItems,
     availableItems,
     DetachedTotalSelected
