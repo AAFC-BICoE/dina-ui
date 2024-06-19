@@ -21,7 +21,7 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
 import {
-  ColumnSelector,
+  ColumnSelectorMemo,
   FormikButton,
   ReactTable,
   ReactTableProps,
@@ -68,6 +68,7 @@ import {
   ValidationError,
   getElasticSearchValidationResults
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import { QueryPageTableMemo } from "./QueryPageTable";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -990,13 +991,13 @@ export function QueryPage<TData extends KitsuResource>({
               {!selectionMode && (
                 <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
                   {enableColumnSelector && (
-                    <ColumnSelector
+                    <ColumnSelectorMemo
                       uniqueName={uniqueName}
                       exportMode={false}
                       indexMapping={indexMap}
-                      displayedColumns={displayedColumns}
-                      setDisplayedColumns={onDisplayedColumnsChange}
-                      defaultColumns={columns}
+                      displayedColumns={displayedColumns as any}
+                      setDisplayedColumns={onDisplayedColumnsChange as any}
+                      defaultColumns={columns as any}
                       setColumnSelectorLoading={setColumnSelectorLoading}
                     />
                   )}
