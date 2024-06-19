@@ -371,9 +371,9 @@ export function QueryPage<TData extends KitsuResource>({
     []
   );
 
-  const defaultGroups = {
-    group: groups
-  };
+  const defaultGroups = useMemo(() => {
+    return { group: groups };
+  }, [groups]);
 
   /** If column selector is not being used, just load the default columns in. */
   useEffect(() => {
