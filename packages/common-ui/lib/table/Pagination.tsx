@@ -4,13 +4,23 @@ import { useState } from "react";
 import { useIntl } from "react-intl";
 import CreatableSelect from "react-select/creatable";
 import { SelectOption } from "../formik-connected/SelectField";
+import {
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight,
+  FaAngleLeft,
+  FaAngleRight
+} from "react-icons/fa";
 
 export function Pagination<TData>({
   table,
-  pageSizeOptions
+  pageSizeOptions,
+  isTop,
+  displayFirstAndLastOptions
 }: {
   table: Table<TData>;
   pageSizeOptions: number[];
+  isTop: boolean;
+  displayFirstAndLastOptions: boolean;
 }) {
   const { formatMessage } = useIntl();
   const [selectOptions, setSelectOptions] = useState<
@@ -23,7 +33,25 @@ export function Pagination<TData>({
   );
 
   return (
-    <div className="-pagination" data-testid="pagination">
+    <div
+      className={
+        "-pagination" + (isTop ? " -pagination-top" : " -pagination-bottom")
+      }
+      data-testid="pagination"
+    >
+      {displayFirstAndLastOptions && (
+        <div className="-first">
+          <button
+            type="button"
+            className="-btn"
+            onClick={() => table.firstPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <FaAngleDoubleLeft className="me-2 -pagination-icon" />
+            {formatMessage({ id: "first" })}
+          </button>
+        </div>
+      )}
       <div className="-previous">
         <button
           type="button"
@@ -31,6 +59,7 @@ export function Pagination<TData>({
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
+          <FaAngleLeft className="me-2 -pagination-icon" />
           {formatMessage({ id: "previous" })}
         </button>
       </div>
@@ -51,7 +80,9 @@ export function Pagination<TData>({
             />
           </div>{" "}
           {formatMessage({ id: "of" })}{" "}
-          <span className="-totalPages">{table.getPageCount() !== 0 ? table.getPageCount() : 1}</span>
+          <span className="-totalPages">
+            {table.getPageCount() !== 0 ? table.getPageCount() : 1}
+          </span>
         </span>
         <span className="-select-wrap -pageSizeOptions">
           <span style={{ textTransform: "capitalize" }}>
@@ -79,9 +110,29 @@ export function Pagination<TData>({
                 table.setPageSize(numValue);
               }
             }}
+            styles={{
+              control: (base) => ({
+                ...base,
+                minHeight: "30px",
+                height: "30px"
+              }),
+              indicatorSeparator: (base) => ({
+                ...base,
+                marginTop: "0px"
+              }),
+              dropdownIndicator: (base) => ({
+                ...base,
+                paddingTop: "0px"
+              }),
+              singleValue: (base) => ({
+                ...base,
+                marginTop: "-8px"
+              })
+            }}
+            classNamePrefix="react-select"
             options={selectOptions}
             formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
-          ></CreatableSelect>
+          />
         </span>
       </div>
       <div className="-next">
@@ -92,8 +143,22 @@ export function Pagination<TData>({
           disabled={!table.getCanNextPage()}
         >
           {formatMessage({ id: "next" })}
+          <FaAngleRight className="ms-2 -pagination-icon" />
         </button>
       </div>
+      {displayFirstAndLastOptions && (
+        <div className="-last">
+          <button
+            type="button"
+            className="-btn"
+            onClick={() => table.lastPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            {formatMessage({ id: "last" })}
+            <FaAngleDoubleRight className="ms-2 -pagination-icon" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

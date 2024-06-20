@@ -21,6 +21,7 @@ import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
+import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500, 1000];
 
@@ -247,7 +248,14 @@ export function ReactTable<TData>({
     >
       {showPagination && showPaginationTop && (
         <div className="pagination-top">
-          <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+          <Pagination
+            table={table}
+            pageSizeOptions={pageSizeOptions}
+            isTop={true}
+            displayFirstAndLastOptions={
+              enableSorting && !!sort && sort?.length > 0
+            }
+          />
         </div>
       )}
       <table className="w-100">
@@ -258,16 +266,20 @@ export function ReactTable<TData>({
                 const defaultSortRule = sort?.find(
                   (sortRule) => sortRule.id === header.id
                 );
+
+                const isSortedDesc =
+                  header.column.getIsSorted() === "asc" ||
+                  defaultSortRule?.desc === false;
+                const isSortedAsc =
+                  header.column.getIsSorted() === "desc" ||
+                  defaultSortRule?.desc === true;
+
                 return (
                   <th
                     key={header.id}
                     colSpan={header.colSpan}
                     className={classnames(
-                      header.column.getCanSort() && "-cursor-pointer",
-                      header.column.getIsSorted() === "asc" && "-sort-asc",
-                      header.column.getIsSorted() === "desc" && "-sort-desc",
-                      defaultSortRule?.desc === false && "-sort-asc",
-                      defaultSortRule?.desc === true && "-sort-desc"
+                      header.column.getCanSort() && "-cursor-pointer"
                     )}
                     style={{
                       width:
@@ -275,20 +287,34 @@ export function ReactTable<TData>({
                           ? "auto"
                           : header.column.columnDef.size
                     }}
+                    onClick={header.column.getToggleSortingHandler()}
                   >
                     {header.isPlaceholder ? null : (
                       <div
                         className={
                           header.column.getCanSort()
-                            ? "-cursor-pointer select-none"
-                            : ""
+                            ? "-cursor-pointer select-none column-header"
+                            : "column-header"
                         }
-                        onClick={header.column.getToggleSortingHandler()}
                       >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        <span className="d-flex align-items-center justify-content-center">
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          {isSortedAsc && (
+                            <FaArrowDown
+                              className="-sort-asc"
+                              onClick={header.column.getToggleSortingHandler()}
+                            />
+                          )}
+                          {isSortedDesc && (
+                            <FaArrowUp
+                              className="-sort-desc"
+                              onClick={header.column.getToggleSortingHandler()}
+                            />
+                          )}
+                        </span>
                       </div>
                     )}
                     {header.column.getCanFilter() ? (
@@ -365,7 +391,14 @@ export function ReactTable<TData>({
       </table>
       {showPagination && (
         <div className="pagination-bottom">
-          <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+          <Pagination
+            table={table}
+            pageSizeOptions={pageSizeOptions}
+            isTop={false}
+            displayFirstAndLastOptions={
+              enableSorting && !!sort && sort?.length > 0
+            }
+          />
         </div>
       )}
     </div>

@@ -422,6 +422,16 @@ export function QueryTable<TData extends KitsuResource>({
             : resolvedReactTableProps.TbodyComponent
         }
       />
+      {!omitPaging && (
+        <div className="mt-2">
+          <span>
+            <CommonMessage
+              id="tableTotalCount"
+              values={{ totalCount: formatNumber(totalCount) }}
+            />
+          </span>
+        </div>
+      )}
     </div>
   );
 }
