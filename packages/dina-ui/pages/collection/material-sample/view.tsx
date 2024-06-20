@@ -54,6 +54,8 @@ import {
   MaterialSample,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
+import { Row } from "@tanstack/react-table";
+import { CSSProperties } from "react";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -136,6 +138,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     setSampleFormTemplateUUID,
     visibleManagedAttributeKeys
   } = useMaterialSampleFormTemplateSelectState({});
+
+  const rowStyling = (row: Row<any>): CSSProperties | undefined => {
+    if (row?.original?.data?.attributes?.materialSampleState) {
+      return { opacity: 0.4 };
+    }
+    return undefined;
+  };
 
   return (
     <div>
@@ -259,6 +268,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
                 {/* Custom Query View */}
                 <CustomQueryPageView
+                  rowStyling={rowStyling}
                   indexName="dina_material_sample_index"
                   columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
                   uniqueName="material-sample-children"
