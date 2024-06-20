@@ -603,49 +603,51 @@ export function useColumnMapping() {
         switch (fieldPath) {
           case "assemblages.name":
             found = assemblages.find((item) =>
-              compareAlphanumeric(item.name, value)
+              item.name === value ? true : compareAlphanumeric(item.name, value)
             );
             break;
           case "collection.name":
             found = collections.find((item) =>
-              compareAlphanumeric(item.name, value)
+              item.name === value ? true : compareAlphanumeric(item.name, value)
             );
             break;
           case "preparationType.name":
             found = preparationTypes.find((item) =>
-              compareAlphanumeric(item.name, value)
+              item.name === value ? true : compareAlphanumeric(item.name, value)
             );
             break;
           case "preparationMethod.name":
             found = preparationMethods.find((item) =>
-              compareAlphanumeric(item.name, value)
+              item.name === value ? true : compareAlphanumeric(item.name, value)
             );
             break;
           case "preparationProtocol.name":
             found = protocols.find((item) =>
-              compareAlphanumeric(item.name, value)
+              item.name === value ? true : compareAlphanumeric(item.name, value)
             );
             break;
           case "storageUnit.name":
             found = storageUnits.find((item) =>
-              compareAlphanumeric(item.name, value)
+              item.name === value ? true : compareAlphanumeric(item.name, value)
             );
 
             break;
           case "projects.name":
             found = projects.find((item) =>
-              compareAlphanumeric(item.name, value)
+              item.name === value ? true : compareAlphanumeric(item.name, value)
             );
             break;
           case "collectingEvent.collectors.displayName":
           case "preparedBy.displayName":
             found = persons.find((item) =>
-              compareAlphanumeric(item.displayName, value)
+              item.displayName === value
+                ? true
+                : compareAlphanumeric(item.displayName, value)
             );
             break;
           case "attachment.name":
             found = metadatas.find((item) =>
-              compareAlphanumeric(item.name, value)
+              item.name === value ? true : compareAlphanumeric(item.name, value)
             );
             break;
         }
