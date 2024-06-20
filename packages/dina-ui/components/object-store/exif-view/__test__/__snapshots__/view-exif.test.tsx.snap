@@ -18,26 +18,30 @@ exports[`View Exif page renders exif props when received file upload response 1`
             <table className=\\"w-100\\">
               <thead>
                 <tr>
-                  <th colSpan={1} className=\\"-cursor-pointer\\" style={{...}}>
-                    <div className=\\"-cursor-pointer select-none\\" onClick={[Function (anonymous)]}>
-                      <header table={{...}} header={{...}} column={{...}}>
-                        <FormattedMessage id=\\"attributeLabel\\">
-                          <FormattedMessage defaultMessage=\\" \\" id=\\"attributeLabel\\">
-                            Attribute
+                  <th colSpan={1} className=\\"-cursor-pointer\\" style={{...}} onClick={[Function (anonymous)]}>
+                    <div className=\\"-cursor-pointer select-none column-header\\">
+                      <span className=\\"d-flex align-items-center justify-content-center\\">
+                        <header table={{...}} header={{...}} column={{...}}>
+                          <FormattedMessage id=\\"attributeLabel\\">
+                            <FormattedMessage defaultMessage=\\" \\" id=\\"attributeLabel\\">
+                              Attribute
+                            </FormattedMessage>
                           </FormattedMessage>
-                        </FormattedMessage>
-                      </header>
+                        </header>
+                      </span>
                     </div>
                   </th>
-                  <th colSpan={1} className=\\"-cursor-pointer\\" style={{...}}>
-                    <div className=\\"-cursor-pointer select-none\\" onClick={[Function (anonymous)]}>
-                      <header table={{...}} header={{...}} column={{...}}>
-                        <FormattedMessage id=\\"valueLabel\\">
-                          <FormattedMessage defaultMessage=\\" \\" id=\\"valueLabel\\">
-                            Value
+                  <th colSpan={1} className=\\"-cursor-pointer\\" style={{...}} onClick={[Function (anonymous)]}>
+                    <div className=\\"-cursor-pointer select-none column-header\\">
+                      <span className=\\"d-flex align-items-center justify-content-center\\">
+                        <header table={{...}} header={{...}} column={{...}}>
+                          <FormattedMessage id=\\"valueLabel\\">
+                            <FormattedMessage defaultMessage=\\" \\" id=\\"valueLabel\\">
+                              Value
+                            </FormattedMessage>
                           </FormattedMessage>
-                        </FormattedMessage>
-                      </header>
+                        </header>
+                      </span>
                     </div>
                   </th>
                 </tr>
