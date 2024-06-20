@@ -6,6 +6,7 @@ import {
   WorkbookJSON,
   WorkbookRow
 } from "../types/Workbook";
+import _ from "lodash";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
@@ -557,12 +558,33 @@ export function flattenObject(source: any) {
 
 export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+export const NON_ALPHA_NUMERIC_REGEX = /[^a-z0-9]/gi; // Matches any character except a-z and 0-9 (case-insensitive)
+
+/**
+ *
+ * @param str1 string to compare
+ * @param str2 string to compare
+ * @returns true if strings are equal, false otherwise
+ */
+export function compareAlphanumeric(str1, str2) {
+  if (str1 === str2) {
+    return true;
+  }
+  const str1NoSpecialChars = _.deburr(str1).replace(
+    NON_ALPHA_NUMERIC_REGEX,
+    ""
+  );
+  const str2NoSpecialChars = _.deburr(str2).replace(
+    NON_ALPHA_NUMERIC_REGEX,
+    ""
+  );
+  return str1NoSpecialChars.localeCompare(str2NoSpecialChars) === 0;
+}
+
 export function calculateColumnUniqueValuesFromSpreadsheetData(
   spreadsheetData: WorkbookJSON
 ): ColumnUniqueValues {
   const result: ColumnUniqueValues = {};
-  // Define the regex pattern to match the right single quotation mark
-  const pattern: RegExp = /’/g;
   for (const sheet of Object.keys(spreadsheetData)) {
     const columnUniqueValues: {
       [columnName: string]: { [value: string]: number };
@@ -577,9 +599,7 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
           workbookRows[rowIndex].content[colIndex].trim() !== ""
         ) {
           // Replace right single quotation mark with normal apostrophe
-          const value = workbookRows[rowIndex].content[colIndex]
-            .trim()
-            .replace(pattern, "'");
+          const value = workbookRows[rowIndex].content[colIndex].trim();
           counts[value] = 1 + (counts[value] || 0);
         }
       }

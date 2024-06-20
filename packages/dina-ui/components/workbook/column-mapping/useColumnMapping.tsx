@@ -22,6 +22,7 @@ import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
   FieldOptionType,
+  compareAlphanumeric,
   findMatchField,
   getColumnHeaders
 } from "../utils/workbookMappingUtils";
@@ -601,32 +602,51 @@ export function useColumnMapping() {
         let found: PersistedResource<any> | undefined;
         switch (fieldPath) {
           case "assemblages.name":
-            found = assemblages.find((item) => item.name === value);
+            found = assemblages.find((item) =>
+              compareAlphanumeric(item.name, value)
+            );
             break;
           case "collection.name":
-            found = collections.find((item) => item.name === value);
+            found = collections.find((item) =>
+              compareAlphanumeric(item.name, value)
+            );
             break;
           case "preparationType.name":
-            found = preparationTypes.find((item) => item.name === value);
+            found = preparationTypes.find((item) =>
+              compareAlphanumeric(item.name, value)
+            );
             break;
           case "preparationMethod.name":
-            found = preparationMethods.find((item) => item.name === value);
+            found = preparationMethods.find((item) =>
+              compareAlphanumeric(item.name, value)
+            );
             break;
           case "preparationProtocol.name":
-            found = protocols.find((item) => item.name === value);
+            found = protocols.find((item) =>
+              compareAlphanumeric(item.name, value)
+            );
             break;
           case "storageUnit.name":
-            found = storageUnits.find((item) => item.name === value);
+            found = storageUnits.find((item) =>
+              compareAlphanumeric(item.name, value)
+            );
+
             break;
           case "projects.name":
-            found = projects.find((item) => item.name === value);
+            found = projects.find((item) =>
+              compareAlphanumeric(item.name, value)
+            );
             break;
           case "collectingEvent.collectors.displayName":
           case "preparedBy.displayName":
-            found = persons.find((item) => item.displayName === value);
+            found = persons.find((item) =>
+              compareAlphanumeric(item.displayName, value)
+            );
             break;
           case "attachment.name":
-            found = metadatas.find((item) => item.name === value);
+            found = metadatas.find((item) =>
+              compareAlphanumeric(item.name, value)
+            );
             break;
         }
 
