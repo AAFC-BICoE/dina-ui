@@ -578,7 +578,11 @@ export function compareAlphanumeric(str1, str2) {
     NON_ALPHA_NUMERIC_REGEX,
     ""
   );
-  return str1NoSpecialChars.localeCompare(str2NoSpecialChars) === 0;
+  return (
+    str1NoSpecialChars.localeCompare(str2NoSpecialChars, undefined, {
+      sensitivity: "base"
+    }) === 0
+  );
 }
 
 export function calculateColumnUniqueValuesFromSpreadsheetData(
