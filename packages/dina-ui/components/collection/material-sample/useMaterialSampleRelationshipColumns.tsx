@@ -11,34 +11,50 @@ import { Determination, MaterialSample } from "../../../types/collection-api";
 import { getDeterminations, getScientificNames } from "./organismUtils";
 import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
 import Link from "next/link";
-import Dropdown from 'react-bootstrap/Dropdown';
-import Button from 'react-bootstrap/Button';
+import Dropdown from "react-bootstrap/Dropdown";
+import Button from "react-bootstrap/Button";
 import React from "react";
 import { FaEllipsisV } from "react-icons/fa";
 import { useIntl } from "react-intl";
 
-export function materialSampleActionCell(formatMessage: any): TableColumn<MaterialSample> {
+export function materialSampleActionCell(
+  formatMessage: any
+): TableColumn<MaterialSample> {
   return {
     id: "action",
     cell: ({ row: { original } }) => {
-      const CustomToggle = React.forwardRef(({ children, onClick }: any, ref) => (
-        <Button variant="secondary" size="sm" className="my-0 mx-2" onClick={(e) => onClick(e)} ref={ref as any}>
-          {children}
-        </Button>
-      ));
+      const CustomToggle = React.forwardRef(
+        ({ children, onClick }: any, ref) => (
+          <Button
+            variant="secondary"
+            size="sm"
+            className="my-0 mx-2"
+            onClick={(e) => onClick(e)}
+            ref={ref as any}
+          >
+            {children}
+          </Button>
+        )
+      );
 
-      const materialSampleName = original.materialSampleName ?? (original as any)?.data?.attributes?.materialSampleName;
-      const materialSampleType = original.materialSampleType ?? (original as any)?.data?.atrributes?.materialSampleType;
+      const materialSampleName =
+        original.materialSampleName ??
+        (original as any)?.data?.attributes?.materialSampleName;
+      const materialSampleType =
+        original.materialSampleType ??
+        (original as any)?.data?.atrributes?.materialSampleType;
 
       return (
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Dropdown>
             <Dropdown.Toggle variant="secondary" as={CustomToggle}>
               <FaEllipsisV />
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
-              <Dropdown.ItemText>{formatMessage({ id: "actions" })}</Dropdown.ItemText>
+              <Dropdown.ItemText>
+                {formatMessage({ id: "actions" })}
+              </Dropdown.ItemText>
               <Dropdown.Divider />
               <div className="px-2">
                 <EditButton
@@ -63,12 +79,12 @@ export function materialSampleActionCell(formatMessage: any): TableColumn<Materi
             </Dropdown.Menu>
           </Dropdown>
         </div>
-      )
+      );
     },
     header: () => <FieldHeader name="actions" />,
     enableSorting: false,
     size: 100
-  }
+  };
 }
 
 export function useMaterialSampleRelationshipColumns() {
@@ -198,7 +214,14 @@ export function useMaterialSampleRelationshipColumns() {
       header: () => <FieldHeader name="materialSampleType" />,
       isKeyword: true
     },
+    {
+      id: "materialSampleState",
+      header: () => <FieldHeader name="materialSampleState" />,
+      accessorKey: "data.attributes.materialSampleState",
+      isKeyword: true
+    },
     dateCell("createdOn", "data.attributes.createdOn"),
+
     stringArrayCell("tags", "data.attributes.tags"),
     materialSampleActionCell(formatMessage)
   ];
