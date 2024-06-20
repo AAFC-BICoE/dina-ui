@@ -602,53 +602,59 @@ export function useColumnMapping() {
         let found: PersistedResource<any> | undefined;
         switch (fieldPath) {
           case "assemblages.name":
-            found = assemblages.find((item) =>
-              item.name === value ? true : compareAlphanumeric(item.name, value)
-            );
+            found =
+              assemblages.find((item) => item.name === value) ??
+              assemblages.find((item) => compareAlphanumeric(item.name, value));
             break;
           case "collection.name":
-            found = collections.find((item) =>
-              item.name === value ? true : compareAlphanumeric(item.name, value)
-            );
+            found =
+              collections.find((item) => item.name === value) ??
+              collections.find((item) => compareAlphanumeric(item.name, value));
             break;
           case "preparationType.name":
-            found = preparationTypes.find((item) =>
-              item.name === value ? true : compareAlphanumeric(item.name, value)
-            );
+            found =
+              preparationTypes.find((item) => item.name === value) ??
+              preparationTypes.find((item) =>
+                compareAlphanumeric(item.name, value)
+              );
             break;
           case "preparationMethod.name":
-            found = preparationMethods.find((item) =>
-              item.name === value ? true : compareAlphanumeric(item.name, value)
-            );
+            found =
+              preparationMethods.find((item) => item.name === value) ??
+              preparationMethods.find((item) =>
+                compareAlphanumeric(item.name, value)
+              );
             break;
           case "preparationProtocol.name":
-            found = protocols.find((item) =>
-              item.name === value ? true : compareAlphanumeric(item.name, value)
-            );
+            found =
+              protocols.find((item) => item.name === value) ??
+              protocols.find((item) => compareAlphanumeric(item.name, value));
             break;
           case "storageUnit.name":
-            found = storageUnits.find((item) =>
-              item.name === value ? true : compareAlphanumeric(item.name, value)
-            );
+            found =
+              storageUnits.find((item) => item.name === value) ??
+              storageUnits.find((item) =>
+                compareAlphanumeric(item.name, value)
+              );
 
             break;
           case "projects.name":
-            found = projects.find((item) =>
-              item.name === value ? true : compareAlphanumeric(item.name, value)
-            );
+            found =
+              projects.find((item) => item.name === value) ??
+              projects.find((item) => compareAlphanumeric(item.name, value));
             break;
           case "collectingEvent.collectors.displayName":
           case "preparedBy.displayName":
-            found = persons.find((item) =>
-              item.displayName === value
-                ? true
-                : compareAlphanumeric(item.displayName, value)
-            );
+            found =
+              persons.find((item) => item.displayName === value) ??
+              persons.find((item) =>
+                compareAlphanumeric(item.displayName, value)
+              );
             break;
           case "attachment.name":
-            found = metadatas.find((item) =>
-              item.name === value ? true : compareAlphanumeric(item.name, value)
-            );
+            found =
+              metadatas.find((item) => item.name === value) ??
+              metadatas.find((item) => compareAlphanumeric(item.name, value));
             break;
         }
 
