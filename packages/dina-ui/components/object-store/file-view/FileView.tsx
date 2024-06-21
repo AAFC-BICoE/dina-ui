@@ -43,6 +43,8 @@ export const IMG_TAG_SUPPORTED_FORMATS = [
 
 const SPREADSHEET_FORMATS = ["ods", "xls", "xlsm", "xlsx", "csv"];
 
+const TEXT_FORMATS = ["doc", "docx"];
+
 export function FileView({
   clickToDownload,
   filePath,
@@ -65,6 +67,7 @@ export function FileView({
   }
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
+  const isTextDoc = TEXT_FORMATS.includes(fileType.toLowerCase());
   const [isFallbackRender, setIsFallBackRender] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const shownTypeIndicatorFallback = (
@@ -76,6 +79,7 @@ export function FileView({
     </div>
   );
   const showFile = !isSpreadsheet;
+
   function onSuccess(response) {
     setObjectURL(window?.URL?.createObjectURL(response));
   }
@@ -88,7 +92,6 @@ export function FileView({
         : false
     }
   );
-
   if (preview || (!isImage && fileType !== "pdf")) {
     clickToDownload = false;
   }
@@ -156,7 +159,6 @@ export function FileView({
     return <LoadingSpinner loading={true} />;
   }
   const errorStatus = (resp.error as any)?.cause?.status;
-
   return (
     <div className="file-viewer-wrapper text-center">
       {showFile ? (
@@ -183,6 +185,8 @@ export function FileView({
                   (event.currentTarget.style.display = "none")
                 }
               />
+            ) : isTextDoc ? (
+              fallBackRender()
             ) : (
               <FileViewer
                 filePath={objectURL}
