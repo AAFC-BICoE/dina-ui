@@ -3,27 +3,23 @@ import { CellGrid, ContainerGrid } from "../seqdb/container-grid/ContainerGrid";
 import { LoadingSpinner, useQuery } from "../../../common-ui/lib";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { useState, useEffect } from "react";
-import { isArray } from "lodash";
-import { noop } from "lodash";
+import { isArray, noop } from "lodash";
+import { PersistedResource } from "kitsu";
 
 export interface StorageUnitGridProps {
   storageUnit: StorageUnit;
+  materialSamples: PersistedResource<MaterialSample>[] | undefined;
 }
 
-export default function StorageUnitGrid({ storageUnit }: StorageUnitGridProps) {
-  const { cellGrid, loading: loadingMaterialSamples } =
-    useMaterialSampleSelectCoordinatesControls({
-      storageUnit
-    });
-  const [loading, setLoading] = useState<boolean>(false);
+export default function StorageUnitGrid({
+  storageUnit,
+  materialSamples
+}: StorageUnitGridProps) {
+  const { cellGrid } = useMaterialSampleSelectCoordinatesControls({
+    materialSamples
+  });
 
-  useEffect(() => {
-    setLoading(loadingMaterialSamples);
-  }, [loadingMaterialSamples]);
-
-  return loading ? (
-    <LoadingSpinner loading={true} />
-  ) : (
+  return (
     <div>
       <ContainerGrid
         className="mb-3"
@@ -42,10 +38,10 @@ export default function StorageUnitGrid({ storageUnit }: StorageUnitGridProps) {
 }
 
 export interface MaterialSampleSelectCoordinatesControls {
-  storageUnit: StorageUnit;
+  materialSamples: PersistedResource<MaterialSample>[] | undefined;
 }
 export function useMaterialSampleSelectCoordinatesControls({
-  storageUnit
+  materialSamples
 }: MaterialSampleSelectCoordinatesControls) {
   const [gridState, setGridState] = useState({
     // The grid of SeqBatchItems that have well coordinates.
@@ -54,42 +50,24 @@ export function useMaterialSampleSelectCoordinatesControls({
     movedItems: [] as (MaterialSample & { sampleName?: string })[]
   });
 
-  const newCellGrid: CellGrid<MaterialSample & { sampleName?: string }> = {};
-  const materialSamplesQuery = useQuery<MaterialSample>(
-    {
-      path: "collection-api/material-sample",
-      filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` },
-      include: "storageUnitCoordinates"
-    },
-    {
-      onSuccess(response) {
-        if (isArray(response.data)) {
-          response.data.forEach((item) => {
-            newCellGrid[
-              `${item.storageUnitCoordinates?.wellRow?.toUpperCase()}_${
-                item.storageUnitCoordinates?.wellColumn
-              }`
-            ] = { sampleName: item.materialSampleName, ...item };
-          });
-        } else {
-          newCellGrid[
-            `${response.data.storageUnitCoordinates?.wellRow?.toUpperCase()}_${
-              response.data.storageUnitCoordinates?.wellColumn
-            }`
-          ] = {
-            sampleName: response.data.materialSampleName,
-            ...response.data
-          };
-        }
-
-        // Initialize grid state
-        setGridState({
-          cellGrid: newCellGrid,
-          movedItems: []
-        });
-      }
+  useEffect(() => {
+    const newCellGrid: CellGrid<MaterialSample & { sampleName?: string }> = {};
+    if (isArray(materialSamples)) {
+      materialSamples.forEach((item) => {
+        newCellGrid[
+          `${item.storageUnitCoordinates?.wellRow?.toUpperCase()}_${
+            item.storageUnitCoordinates?.wellColumn
+          }`
+        ] = { sampleName: item.materialSampleName, ...item };
+      });
     }
-  );
 
-  return { ...gridState, loading: materialSamplesQuery.loading };
+    // Initialize grid state
+    setGridState({
+      cellGrid: newCellGrid,
+      movedItems: []
+    });
+  }, []);
+
+  return { ...gridState };
 }

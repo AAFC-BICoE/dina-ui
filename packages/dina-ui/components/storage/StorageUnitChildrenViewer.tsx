@@ -1,9 +1,11 @@
 import {
-  ColumnDefinition,
+  FieldHeader,
   FieldSet,
-  QueryTable,
+  LoadingSpinner,
+  ReactTable,
   useApiClient,
-  useDinaFormContext
+  useDinaFormContext,
+  useQuery
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -13,6 +15,8 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import StorageUnitGrid from "./StorageUnitGrid";
 
 export interface StorageTreeFieldProps {
   storageUnit: StorageUnit;
@@ -28,11 +32,21 @@ export function StorageUnitChildrenViewer({
   const { apiClient, save } = useApiClient();
   const [actionMode, setActionMode] = useState<StorageActionMode>("VIEW");
   const [hideMoveContents, setHideMoveContents] = useState<boolean>(false);
-
-  const samplesQueryParams = {
-    path: "collection-api/material-sample",
-    filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` }
-  };
+  const materialSamplesQuery = useQuery<MaterialSample[]>(
+    {
+      path: "collection-api/material-sample",
+      filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` },
+      include: "storageUnitCoordinates",
+      page: { limit: 1000 }
+    },
+    {
+      onSuccess(response) {
+        if (response?.data?.length === 0) {
+          setHideMoveContents(true);
+        }
+      }
+    }
+  );
 
   async function moveAllContent(targetUnit: PersistedResource<StorageUnit>) {
     const childStoragePath = `collection-api/storage-unit/${storageUnit?.id}?include=storageUnitChildren`;
@@ -44,7 +58,10 @@ export function StorageUnitChildrenViewer({
       // As of writing this code the "limit" is ignored and the API returns all children:
       { page: { limit: 1000 } }
     );
-
+    const samplesQueryParams = {
+      path: "collection-api/material-sample",
+      filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` }
+    };
     const { data: childSamples } = await apiClient.get<MaterialSample[]>(
       samplesQueryParams.path,
       {
@@ -97,8 +114,16 @@ export function StorageUnitChildrenViewer({
     await router.reload();
   }
 
-  return (
+  return materialSamplesQuery.loading ? (
+    <LoadingSpinner loading={true} />
+  ) : (
     <div className="mb-3">
+      {storageUnit?.storageUnitType?.gridLayoutDefinition && (
+        <StorageUnitGrid
+          storageUnit={storageUnit}
+          materialSamples={materialSamplesQuery.response?.data}
+        />
+      )}
       {actionMode !== "VIEW" && (
         <FieldSet
           legend={
@@ -165,8 +190,8 @@ export function StorageUnitChildrenViewer({
             )}
           </div>
           <StorageUnitContents
-            onEmptyMaterialSamples={() => setHideMoveContents(true)}
             storageUnit={storageUnit}
+            materialSamples={materialSamplesQuery.response?.data}
           />
         </div>
       )}
@@ -176,15 +201,15 @@ export function StorageUnitChildrenViewer({
 
 export interface StorageUnitContentsProps {
   storageUnit: StorageUnit;
-  onEmptyMaterialSamples: () => void;
+  materialSamples: PersistedResource<MaterialSample>[] | undefined;
 }
 
 /** Material Sample table and nested Storage Units UI. */
 export function StorageUnitContents({
   storageUnit,
-  onEmptyMaterialSamples
+  materialSamples
 }: StorageUnitContentsProps) {
-  const materialSampleColumns: ColumnDefinition<MaterialSample>[] = [
+  const materialSampleColumns: TableColumn<MaterialSample>[] = [
     {
       cell: ({
         row: {
@@ -197,7 +222,13 @@ export function StorageUnitContents({
       ),
       accessorKey: "materialSampleName"
     },
-    "materialSampleType",
+    // Material Sample Type
+    {
+      id: "materialSampleType",
+      header: () => <FieldHeader name="materialSampleType" />,
+      accessorKey: "data.attributes.materialSampleType",
+      isKeyword: true
+    },
     {
       cell: ({
         row: {
@@ -231,18 +262,9 @@ export function StorageUnitContents({
         <strong>
           <DinaMessage id="materialSamples" />
         </strong>
-
-        <QueryTable
+        <ReactTable<MaterialSample>
           columns={materialSampleColumns}
-          path="collection-api/material-sample"
-          filter={{
-            rsql: `storageUnit.uuid==${storageUnit.id}`
-          }}
-          onSuccess={({ meta }) => {
-            if (meta.totalResourceCount === 0) {
-              onEmptyMaterialSamples();
-            }
-          }}
+          data={materialSamples ?? []}
         />
       </div>
     </>

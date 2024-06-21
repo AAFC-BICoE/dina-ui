@@ -27,7 +27,6 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { StorageUnit, StorageUnitType } from "../../types/collection-api";
 
 import { useState } from "react";
-import StorageUnitGrid from "./StorageUnitGrid";
 
 export const storageUnitFormSchema = yup.object({
   storageUnitType: yup.object().required()
@@ -205,9 +204,6 @@ export function StorageUnitFormFields({
           parentIdInURL={parentIdInURL}
           parentStorageUnitUUID={initialValues.id}
         />
-      )}
-      {readOnly && initialValues.storageUnitType?.gridLayoutDefinition && (
-        <StorageUnitGrid storageUnit={initialValues} />
       )}
       {readOnly && <StorageUnitChildrenViewer storageUnit={initialValues} />}
       {readOnly && (
