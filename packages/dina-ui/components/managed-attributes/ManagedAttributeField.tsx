@@ -33,22 +33,11 @@ export function ManagedAttributeFieldWithLabel(
   const { locale, formatMessage } = useDinaIntl();
   const attributeKey = attribute.key;
   const attributePath = `${valuesPath}.${attributeKey}`;
-  const multiDescription =
-    attribute?.multilingualDescription?.descriptions?.find(
-      (description) => description.lang === locale
-    )?.desc;
-  const unit = attribute?.unit;
-
-  const unitMessage = formatMessage("dataUnit");
-
-  const tooltipText = unit
-    ? `${multiDescription}\n${unitMessage}${unit}`
-    : multiDescription;
-
-  const fallbackTooltipText =
-    attribute?.multilingualDescription?.descriptions?.find(
-      (description) => description.lang !== locale
-    )?.desc;
+  const tooltipText = getManagedAttributeTooltipText(
+    attribute,
+    locale,
+    formatMessage
+  );
 
   return (
     <label
@@ -59,9 +48,7 @@ export function ManagedAttributeFieldWithLabel(
       <div className="mb-2 d-flex align-items-center">
         <strong className="me-auto">
           {attribute.name ?? attributeKey}
-          <Tooltip
-            directText={tooltipText ?? fallbackTooltipText ?? attribute.name}
-          />
+          <Tooltip directText={tooltipText} />
         </strong>
         {!readOnly && (
           <FormikButton
@@ -79,6 +66,30 @@ export function ManagedAttributeFieldWithLabel(
       <ManagedAttributeField {...props} />
     </label>
   );
+}
+
+export function getManagedAttributeTooltipText(
+  attribute: PersistedResource<ManagedAttribute>,
+  locale: string,
+  formatMessage: any
+) {
+  const multiDescription =
+    attribute?.multilingualDescription?.descriptions?.find(
+      (description) => description.lang === locale
+    )?.desc;
+  const unit = attribute?.unit;
+
+  const unitMessage = formatMessage("dataUnit");
+
+  const tooltipText = unit
+    ? `${multiDescription}\n${unitMessage}${unit}`
+    : multiDescription;
+
+  const fallbackTooltipText =
+    attribute?.multilingualDescription?.descriptions?.find(
+      (description) => description.lang !== locale
+    )?.desc;
+  return tooltipText ?? fallbackTooltipText ?? attribute.name;
 }
 
 /** Formik-connected field for a single Managed Attribute. No surrounding label tag. */
