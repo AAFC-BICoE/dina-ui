@@ -220,13 +220,15 @@ export function StorageUnitContents({
           {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
         </Link>
       ),
+      header: () => <FieldHeader name="materialSampleName" />,
+      id: "materialSampleName",
       accessorKey: "materialSampleName"
     },
     // Material Sample Type
     {
       id: "materialSampleType",
       header: () => <FieldHeader name="materialSampleType" />,
-      accessorKey: "data.attributes.materialSampleType",
+      accessorKey: "materialSampleType",
       isKeyword: true
     },
     {
@@ -235,7 +237,9 @@ export function StorageUnitContents({
           original: { tags }
         }
       }) => <>{tags?.join(", ")}</>,
-      accessorKey: "tags"
+      accessorKey: "tags",
+      id: "tags",
+      header: () => <FieldHeader name="tags" />
     }
   ];
 
@@ -265,6 +269,7 @@ export function StorageUnitContents({
         <ReactTable<MaterialSample>
           columns={materialSampleColumns}
           data={materialSamples ?? []}
+          showPagination={true}
         />
       </div>
     </>
