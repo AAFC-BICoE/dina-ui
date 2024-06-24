@@ -9,8 +9,7 @@ import {
   resourceDifference,
   SaveArgs,
   useApiClient,
-  useQuery,
-  withResponse
+  useQuery
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -531,9 +530,14 @@ export function useMaterialSampleSave({
         organismsQuantity: undefined,
         organism: []
       }),
-
+      // Remove storageUnit and storageUnitCoordinates if toggle is disabled
       ...(!enableStorage && {
-        storageUnit: { id: null, type: "storage-unit" }
+        storageUnit: { id: null, type: "storage-unit" },
+        storageUnitCoordinates: { id: null, type: "storage-unit-coordinates" }
+      }),
+      // Remove storageUnitCoordinates if toggle is enabled but no storageUnit edge case
+      ...(!submittedValues.storageUnit?.id && {
+        storageUnitCoordinates: { id: null, type: "storage-unit-coordinates" }
       }),
       ...(!enableCollectingEvent && {
         collectingEvent: { id: null, type: "collecting-event" }
@@ -667,9 +671,8 @@ export function useMaterialSampleSave({
           updated: msPreprocessed
         })
       : msPreprocessed;
-
     // Take user input storageUnitCoordinates to create storageUnitCoordinates resource
-    if (msDiff.storageUnitCoordinates) {
+    if (msDiff.storageUnitCoordinates && msDiff.storageUnit?.id) {
       const storageUnitCoordinatesSaveArgs: SaveArgs<StorageUnitCoordinates>[] =
         [
           {
@@ -874,7 +877,6 @@ export function useMaterialSampleSave({
     const materialSampleSaveOp = await prepareSampleSaveOperation({
       submittedValues
     });
-
     async function saveToBackend() {
       delete materialSampleSaveOp.resource.useNextSequence;
       const [savedMaterialSample] = await withDuplicateSampleNameCheck(
@@ -884,6 +886,22 @@ export function useMaterialSampleSave({
           }),
         formik
       );
+      if (!enableStorage || !submittedValues.storageUnit?.id) {
+        await save<StorageUnitCoordinates>(
+          [
+            {
+              delete: {
+                id: submittedValues.storageUnitCoordinates?.id ?? null,
+                type: "storage-unit-coordinates"
+              }
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        );
+      }
+
       await onSaved?.(savedMaterialSample?.id);
     }
 
