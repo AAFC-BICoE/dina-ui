@@ -764,7 +764,7 @@ export function QueryPage<TData extends KitsuResource>({
       : [];
 
     return uniqBy([...selectColumn, ...displayedColumns], "id");
-  }, [showRowCheckboxes, selectionMode, displayedColumns]);
+  }, [showRowCheckboxes, selectionMode, displayedColumns, searchResults]);
 
   // Columns generated for the selected resources, only in selection mode.
   const columnsSelected: TableColumn<TData>[] = [
