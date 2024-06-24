@@ -886,7 +886,11 @@ export function useMaterialSampleSave({
           }),
         formik
       );
-      if (!enableStorage || !submittedValues.storageUnit?.id) {
+      if (
+        !enableStorage ||
+        (!submittedValues.storageUnit?.id &&
+          submittedValues.storageUnitCoordinates?.id)
+      ) {
         await save<StorageUnitCoordinates>(
           [
             {
