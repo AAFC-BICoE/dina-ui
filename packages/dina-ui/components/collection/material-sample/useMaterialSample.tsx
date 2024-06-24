@@ -886,6 +886,8 @@ export function useMaterialSampleSave({
           }),
         formik
       );
+
+      // Delete StorageUnitCoordinates if there is one when no StorageUnit linked
       if (
         (!enableStorage || !submittedValues.storageUnit?.id) &&
         submittedValues.storageUnitCoordinates?.id
