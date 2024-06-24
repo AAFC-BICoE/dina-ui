@@ -43,7 +43,7 @@ export const IMG_TAG_SUPPORTED_FORMATS = [
 
 const SPREADSHEET_FORMATS = ["ods", "xls", "xlsm", "xlsx", "csv"];
 
-const TEXT_FORMATS = ["doc", "docx"];
+const DOCUMENT_FORMATS = ["doc", "docx", "pdf"];
 
 export function FileView({
   clickToDownload,
@@ -67,7 +67,7 @@ export function FileView({
   }
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
-  const isTextDoc = TEXT_FORMATS.includes(fileType.toLowerCase());
+  const isTextDoc = DOCUMENT_FORMATS.includes(fileType.toLowerCase());
   const [isFallbackRender, setIsFallBackRender] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const shownTypeIndicatorFallback = (
