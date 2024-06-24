@@ -78,7 +78,7 @@ export function FileView({
       {` ${formatMessage("thumbnail")}`}
     </div>
   );
-  const showFile = !isSpreadsheet;
+  const showFile = !(isSpreadsheet || isTextDoc);
 
   function onSuccess(response) {
     setObjectURL(window?.URL?.createObjectURL(response));
@@ -185,8 +185,6 @@ export function FileView({
                   (event.currentTarget.style.display = "none")
                 }
               />
-            ) : isTextDoc ? (
-              fallBackRender()
             ) : (
               <FileViewer
                 filePath={objectURL}
