@@ -22,6 +22,9 @@ export interface FieldNameProps {
 
   /** Optional link text, should be used when adding a link. */
   tooltipLinkText?: string;
+
+  /** Optional flag to make label of the field StartCase. */
+  startCaseLabel?: boolean;
 }
 
 /** Get the field label and tooltip given the camelCase field key. */
@@ -34,7 +37,8 @@ export function useFieldLabels() {
     tooltipImage,
     tooltipImageAlt,
     tooltipLink,
-    tooltipLinkText
+    tooltipLinkText,
+    startCaseLabel = true
   }: FieldNameProps) {
     const messageKey = `field_${name}`;
     const tooltipKey = tooltipOverride
@@ -55,7 +59,9 @@ export function useFieldLabels() {
 
     const fieldLabel = messages[messageKey]
       ? formatMessage({ id: messageKey as any })
-      : startCase(name);
+      : startCaseLabel
+      ? startCase(name)
+      : name;
 
     return { tooltip, fieldLabel };
   }
@@ -75,7 +81,8 @@ export function FieldHeader({
   tooltipImage,
   tooltipImageAlt,
   tooltipLink,
-  tooltipLinkText
+  tooltipLinkText,
+  startCaseLabel
 }: FieldNameProps) {
   const { getFieldLabel } = useFieldLabels();
   const { fieldLabel, tooltip } = getFieldLabel({
@@ -84,7 +91,8 @@ export function FieldHeader({
     tooltipImage,
     tooltipImageAlt,
     tooltipLink,
-    tooltipLinkText
+    tooltipLinkText,
+    startCaseLabel
   });
 
   return (
