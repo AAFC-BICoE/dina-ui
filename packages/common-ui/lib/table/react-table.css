@@ -163,6 +163,13 @@
   margin-left: 5px;
 }
 
+.ReactTable .-pagination-small .-previous,
+.ReactTable .-pagination-small .-next,
+.ReactTable .-pagination-small .-first,
+.ReactTable .-pagination-small .-last {
+  width: 35px !important;
+}
+
 .ReactTable .-pagination .-last {
   margin-right: 5px;
   margin-left: 0px;

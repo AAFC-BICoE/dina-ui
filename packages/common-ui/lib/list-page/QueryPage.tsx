@@ -1097,6 +1097,7 @@ export function QueryPage<TData extends KitsuResource>({
                   rowStyling={rowStyling}
                   showPagination={true}
                   showPaginationTop={true}
+                  smallPaginationButtons={selectionMode}
                 />
               )}
               <div className="mt-2">
@@ -1147,6 +1148,7 @@ export function QueryPage<TData extends KitsuResource>({
                     enableSorting={!enableDnd}
                     showPagination={!enableDnd}
                     manualPagination={true}
+                    smallPaginationButtons={true}
                   />
                 </div>
               </>
