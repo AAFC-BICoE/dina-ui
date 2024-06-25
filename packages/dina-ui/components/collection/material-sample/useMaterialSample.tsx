@@ -671,8 +671,10 @@ export function useMaterialSampleSave({
           updated: msPreprocessed
         })
       : msPreprocessed;
+
     // Take user input storageUnitCoordinates to create storageUnitCoordinates resource
-    if (msDiff.storageUnitCoordinates && msDiff.storageUnit?.id) {
+    if (msDiff.storageUnitCoordinates && msPreprocessed.storageUnit?.id) {
+      // Create new storageUnitCoordinates
       const storageUnitCoordinatesSaveArgs: SaveArgs<StorageUnitCoordinates>[] =
         [
           {
@@ -763,7 +765,8 @@ export function useMaterialSampleSave({
           collection: {
             data: pick(msDiffWithOrganisms.collection, "id", "type")
           }
-        })
+        }),
+        ...getStorageUnitCoordinatesRelationship()
       },
 
       // Set the attributes to undefined after they've been moved to "relationships":
@@ -771,9 +774,9 @@ export function useMaterialSampleSave({
       projects: undefined,
       organism: undefined,
       assemblages: undefined,
-      preparedBy: undefined
+      preparedBy: undefined,
+      storageUnitCoordinates: undefined
     };
-
     // delete the association if associated sample is left unfilled
     if (
       msInputWithRelationships.associations?.length === 1 &&
@@ -787,6 +790,28 @@ export function useMaterialSampleSave({
     };
 
     return saveOperation;
+
+    function getStorageUnitCoordinatesRelationship() {
+      if (msDiffWithOrganisms.storageUnitCoordinates) {
+        if (!!msDiffWithOrganisms?.storageUnitCoordinates.id) {
+          return {
+            storageUnitCoordinates: {
+              data: pick(
+                msDiffWithOrganisms.storageUnitCoordinates,
+                "id",
+                "type"
+              )
+            }
+          };
+        } else {
+          return {
+            storageUnitCoordinates: {
+              data: null
+            }
+          };
+        }
+      }
+    }
   }
 
   /**
