@@ -9,6 +9,7 @@ import {
   FieldSet,
   generateDirectMaterialSampleChildrenTree,
   materialSampleCultureStrainChildrenQuery,
+  useApiClient,
   useElasticSearchQuery,
   withResponse
 } from "common-ui";
@@ -56,12 +57,14 @@ import {
 } from "../../../types/collection-api";
 import { Row } from "@tanstack/react-table";
 import { CSSProperties } from "react";
+import { StorageUnitCoordinates } from "packages/dina-ui/types/collection-api/resources/StorageUnitCoordinates";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
   const { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW } =
     useMaterialSampleRelationshipColumns();
   const id = router.query.id?.toString();
+  const { save } = useApiClient();
 
   const materialSampleQuery = useMaterialSampleQuery(id);
 
@@ -189,6 +192,26 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 postDeleteRedirect="/collection/material-sample/list"
                 type="material-sample"
                 className="ms-auto"
+                onDeleted={async () => {
+                  // Delete StorageUnitCoordinates if there is one linked
+                  if (materialSampleData.storageUnitCoordinates?.id) {
+                    await save<StorageUnitCoordinates>(
+                      [
+                        {
+                          delete: {
+                            id:
+                              materialSampleData.storageUnitCoordinates?.id ??
+                              null,
+                            type: "storage-unit-coordinates"
+                          }
+                        }
+                      ],
+                      {
+                        apiBaseUrl: "/collection-api"
+                      }
+                    );
+                  }
+                }}
               />
             </div>
           </ButtonBar>
