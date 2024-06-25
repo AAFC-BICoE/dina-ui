@@ -75,7 +75,10 @@ export function ManagedAttributesViewer({
       multilingualDescription:
         allAttrKeyNameMap[item.key]?.multilingualDescription
     }))
-    .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    .sort((a, b) =>
+      a?.name?.localeCompare(b?.name, locale, { sensitivity: "base" })
+    );
+
   const managedAttributesInitialValues = managedAttributeValues?.reduce(
     (prev, curr) => ({ ...prev, [curr.key]: curr.value }),
     {}
