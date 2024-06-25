@@ -59,6 +59,8 @@ export interface ReactTableProps<TData> {
   showPagination?: boolean;
   // Show pagination on the top
   showPaginationTop?: boolean;
+  // Display pagination with the icons only. Perfect for small tables.
+  smallPaginationButtons?: boolean;
   pageSizeOptions?: number[];
   defaultExpanded?: ExpandedState;
   // A function to render the SubComponent in the expanded area.
@@ -97,6 +99,7 @@ export function ReactTable<TData>({
   showPagination = false,
   showPaginationTop = false,
   manualPagination = false,
+  smallPaginationButtons = false,
   pageSize: initPageSize,
   pageCount,
   page,
@@ -255,6 +258,7 @@ export function ReactTable<TData>({
             displayFirstAndLastOptions={
               enableSorting && !!sort && sort?.length > 0
             }
+            smallPaginationButtons={smallPaginationButtons}
           />
         </div>
       )}
@@ -398,6 +402,7 @@ export function ReactTable<TData>({
             displayFirstAndLastOptions={
               enableSorting && !!sort && sort?.length > 0
             }
+            smallPaginationButtons={smallPaginationButtons}
           />
         </div>
       )}

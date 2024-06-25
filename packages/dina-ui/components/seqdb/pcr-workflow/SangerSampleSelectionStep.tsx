@@ -277,7 +277,9 @@ export function SangerSampleSelectionStep({
       )}
       <QueryPage<any>
         indexName={"dina_material_sample_index"}
-        uniqueName="pcr-material-sample-selection-step"
+        uniqueName={
+          "pcr-material-sample-selection-step" + (editMode ? "-edit" : "-read")
+        }
         columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
         enableColumnSelector={false}
         selectionMode={editMode}

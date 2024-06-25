@@ -10,17 +10,20 @@ import {
   FaAngleLeft,
   FaAngleRight
 } from "react-icons/fa";
+import classNames from "classnames";
 
 export function Pagination<TData>({
   table,
   pageSizeOptions,
   isTop,
-  displayFirstAndLastOptions
+  displayFirstAndLastOptions,
+  smallPaginationButtons
 }: {
   table: Table<TData>;
   pageSizeOptions: number[];
   isTop: boolean;
   displayFirstAndLastOptions: boolean;
+  smallPaginationButtons: boolean;
 }) {
   const { formatMessage } = useIntl();
   const [selectOptions, setSelectOptions] = useState<
@@ -34,9 +37,11 @@ export function Pagination<TData>({
 
   return (
     <div
-      className={
-        "-pagination" + (isTop ? " -pagination-top" : " -pagination-bottom")
-      }
+      className={classNames(
+        "-pagination",
+        isTop ? " -pagination-top" : " -pagination-bottom",
+        smallPaginationButtons && "-pagination-small"
+      )}
       data-testid="pagination"
     >
       {displayFirstAndLastOptions && (
@@ -47,8 +52,14 @@ export function Pagination<TData>({
             onClick={() => table.firstPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <FaAngleDoubleLeft className="me-2 -pagination-icon" />
-            {formatMessage({ id: "first" })}
+            <FaAngleDoubleLeft
+              className={
+                smallPaginationButtons
+                  ? "-pagination-icon"
+                  : "me-2 -pagination-icon"
+              }
+            />
+            {!smallPaginationButtons && formatMessage({ id: "first" })}
           </button>
         </div>
       )}
@@ -59,8 +70,14 @@ export function Pagination<TData>({
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
-          <FaAngleLeft className="me-2 -pagination-icon" />
-          {formatMessage({ id: "previous" })}
+          <FaAngleLeft
+            className={
+              smallPaginationButtons
+                ? "-pagination-icon"
+                : "me-2 -pagination-icon"
+            }
+          />
+          {!smallPaginationButtons && formatMessage({ id: "previous" })}
         </button>
       </div>
       <div className="-center">
@@ -142,8 +159,14 @@ export function Pagination<TData>({
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
-          {formatMessage({ id: "next" })}
-          <FaAngleRight className="ms-2 -pagination-icon" />
+          {!smallPaginationButtons && formatMessage({ id: "next" })}
+          <FaAngleRight
+            className={
+              smallPaginationButtons
+                ? "-pagination-icon"
+                : "ms-2 -pagination-icon"
+            }
+          />
         </button>
       </div>
       {displayFirstAndLastOptions && (
@@ -154,8 +177,14 @@ export function Pagination<TData>({
             onClick={() => table.lastPage()}
             disabled={!table.getCanNextPage()}
           >
-            {formatMessage({ id: "last" })}
-            <FaAngleDoubleRight className="ms-2 -pagination-icon" />
+            {!smallPaginationButtons && formatMessage({ id: "last" })}
+            <FaAngleDoubleRight
+              className={
+                smallPaginationButtons
+                  ? "-pagination-icon"
+                  : "ms-2 -pagination-icon"
+              }
+            />
           </button>
         </div>
       )}

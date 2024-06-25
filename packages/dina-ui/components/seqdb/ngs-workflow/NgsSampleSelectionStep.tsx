@@ -87,10 +87,10 @@ export function NgsSampleSelectionStep({
   function sortMaterialSamples(samples: MaterialSampleSummary[]) {
     if (materialSampleSortOrder) {
       const sorted = materialSampleSortOrder.map((sampleId) =>
-        samples.find((item) => item.id === sampleId)
+        samples.find((item) => item?.id === sampleId)
       );
       samples.forEach((item) => {
-        if (materialSampleSortOrder.indexOf(item.id ?? "unknown") === -1) {
+        if (materialSampleSortOrder.indexOf(item?.id ?? "unknown") === -1) {
           sorted.push(item);
         }
       });
