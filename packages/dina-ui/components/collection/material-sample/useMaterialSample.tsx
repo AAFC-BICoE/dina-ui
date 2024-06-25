@@ -680,10 +680,9 @@ export function useMaterialSampleSave({
           {
             type: "storage-unit-coordinates",
             resource: {
-              ...msDiff.storageUnitCoordinates,
+              ...(msDiff.storageUnitCoordinates as StorageUnitCoordinates),
               storageUnit: submittedValues.storageUnit,
-              type: "storage-unit-coordinates",
-              id: undefined
+              type: "storage-unit-coordinates"
             }
           }
         ];
