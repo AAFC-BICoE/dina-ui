@@ -217,7 +217,10 @@ describe("Material Sample Edit Page", () => {
               hostOrganism: null,
               managedAttributes: {},
               publiclyReleasable: true, // Default value
-              relationships: { organism: { data: [] } },
+              relationships: {
+                organism: { data: [] },
+                storageUnitCoordinates: { data: null }
+              },
               type: "material-sample",
               attachment: undefined,
               organism: undefined,
@@ -231,10 +234,7 @@ describe("Material Sample Edit Page", () => {
               preparedBy: undefined,
               collection: undefined,
               assemblages: undefined,
-              storageUnitCoordinates: {
-                id: null,
-                type: "storage-unit-coordinates"
-              }
+              storageUnitCoordinates: undefined
             },
             type: "material-sample"
           }
@@ -296,7 +296,10 @@ describe("Material Sample Edit Page", () => {
               hostOrganism: null,
               managedAttributes: {},
               publiclyReleasable: true, // Default value
-              relationships: { organism: { data: [] } },
+              relationships: {
+                organism: { data: [] },
+                storageUnitCoordinates: { data: null }
+              },
               type: "material-sample",
               attachment: undefined,
               organism: undefined,
@@ -310,10 +313,7 @@ describe("Material Sample Edit Page", () => {
               preparedBy: undefined,
               collection: undefined,
               assemblages: undefined,
-              storageUnitCoordinates: {
-                id: null,
-                type: "storage-unit-coordinates"
-              }
+              storageUnitCoordinates: undefined
             },
             type: "material-sample"
           }
