@@ -174,7 +174,8 @@ describe("StorageUnitChildrenViewer component", () => {
         accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
       }
     );
-
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper.find("button.enable-move-content").simulate("click");
 
     await new Promise(setImmediate);
@@ -223,7 +224,8 @@ describe("StorageUnitChildrenViewer component", () => {
         accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
       }
     );
-
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper.find("button.add-existing-as-child").simulate("click");
 
     await new Promise(setImmediate);
