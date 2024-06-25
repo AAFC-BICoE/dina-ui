@@ -178,7 +178,7 @@ export function StorageUnitSelectField({
           restrictedFieldValue
         })
       }
-      readOnlyLink="/storageUnit/view?id="
+      readOnlyLink="/collection/storage-unit/view?id="
       filter={filterBy(["name"])}
       model="collection-api/storage-unit"
       optionLabel={(storageUnit) => {

@@ -291,6 +291,7 @@ export function SangerSampleSelectionStep({
           enableSorting: true,
           enableMultiSort: true
         }}
+        enableColumnSelector={false}
       />
     </div>
   );

@@ -42,16 +42,20 @@ export function AssignedStorage({
       {withResponse(storageQuery, ({ data: storageUnit }) => {
         // Create storageUnitCoordinates Row options
         const options: SelectOption<string>[] = [];
-        for (
-          let i = 1;
-          i <= storageUnit.storageUnitType?.gridLayoutDefinition?.numberOfRows;
-          i++
-        ) {
-          options.push({
-            label: encoder.encode(i) ?? "",
-            value: encoder.encode(i) ?? ""
-          });
+        if (storageUnit.storageUnitType?.gridLayoutDefinition?.numberOfRows) {
+          for (
+            let i = 1;
+            i <=
+            storageUnit.storageUnitType?.gridLayoutDefinition?.numberOfRows;
+            i++
+          ) {
+            options.push({
+              label: encoder.encode(i) ?? "",
+              value: encoder.encode(i) ?? ""
+            });
+          }
         }
+
         return (
           <div>
             <div className="list-inline mb-3">

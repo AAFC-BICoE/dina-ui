@@ -7,8 +7,15 @@ export interface StorageUnitTypeAttributes {
   createdBy?: string;
   createdOn?: string;
   isInseperable?: boolean | null;
+  gridLayoutDefinition?: GridLayoutDefinition;
+
+  // client side attribute
   enableGrid?: boolean;
-  gridLayoutDefinition?: any;
 }
 
+export interface GridLayoutDefinition {
+  numberOfRows: number;
+  numberOfColumns: number;
+  fillDirection: string;
+}
 export type StorageUnitType = KitsuResource & StorageUnitTypeAttributes;
