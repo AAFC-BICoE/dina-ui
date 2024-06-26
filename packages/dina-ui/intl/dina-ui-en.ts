@@ -1,3 +1,5 @@
+import { ColumnSelector } from "packages/common-ui/lib";
+
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */
@@ -697,6 +699,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select extension field to search against...",
   queryBuilder_extension_placeholder: "Select extension to search against...",
   queryBuilder_field_placeholder: "Select a field to search against...",
+  columnSelector_field_placeholder: "Select a field to add as a column...",
   queryBuilder_globalSearch: "Global search",
   queryBuilder_globalSearch_withText: 'Global search for "{globalSearchTerm}"',
   queryBuilder_globalSearch_tooltip:
