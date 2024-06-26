@@ -58,6 +58,14 @@ export function QueryOperatorSelector({
   // Some options are displayed only if it is supported.
   const operationOptions = options
     ?.filter((option) => {
+      // Only display the exact match option if keyword support exist.
+      if (
+        (option.key === "exactMatch" || option.key === "notEquals") &&
+        !selectedFieldMapping?.keywordMultiFieldSupport
+      ) {
+        return false;
+      }
+
       // Only display the infix option if it is supported in the mapping.
       if (
         option.key === "containsText" &&
