@@ -5,7 +5,7 @@ import React from "react";
 import { Dropdown } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { ESIndexMapping, TableColumn } from "../list-page/types";
-import { getColumnSelectorIndexMapColumns } from "./ColumnSelectorUtils";
+import { generateColumnDefinition } from "./ColumnSelectorUtils";
 import { useApiClient } from "../api-client/ApiClientContext";
 import useLocalStorage from "@rehooks/local-storage";
 
@@ -85,6 +85,31 @@ export function ColumnSelector<TData extends KitsuResource>(
 
   // This useEffect is responsible for loading in the new local storage displayed columns.
   useEffect(() => {
+    function isDefinedColumn(
+      column: TableColumn<TData> | undefined
+    ): column is TableColumn<TData> {
+      return column !== undefined && column.id !== undefined;
+    }
+
+    async function loadColumnsFromLocalStorage() {
+      if (indexMapping) {
+        const promises = localStorageDisplayedColumns.map(
+          async (localColumn) => {
+            const newColumnDefinition = await generateColumnDefinition({
+              indexMappings: indexMapping,
+              apiClient,
+              defaultColumns,
+              path: localColumn
+            });
+            return newColumnDefinition;
+          }
+        );
+
+        const columns = (await Promise.all(promises)).filter(isDefinedColumn);
+        setDisplayedColumns(columns);
+      }
+    }
+
     if (
       !localStorageDisplayedColumns ||
       localStorageDisplayedColumns?.length === 0
@@ -97,38 +122,12 @@ export function ColumnSelector<TData extends KitsuResource>(
         defaultColumns.map((column) => column?.id ?? "")
       );
     } else {
-      if (columnOptions.length > 0) {
-        const columnsToBeDisplayed = localStorageDisplayedColumns.flatMap<
-          TableColumn<TData>
-        >((localColumn) => {
-          return (
-            columnOptions.find((column) => column.id === localColumn) ?? []
-          );
-        });
-
-        setDisplayedColumns(columnsToBeDisplayed);
-      }
+      // Translate the path into columns to be displayed.
+      loadColumnsFromLocalStorage();
+      setLoading(false);
+      setColumnSelectorLoading?.(false);
     }
-  }, [localStorageDisplayedColumns, columnOptions]);
-
-  // Load all the possible options, these are needed incase the user has saved columns to refer to
-  // them.
-  useEffect(() => {
-    function setInternalLoading(value: boolean) {
-      setLoading(value);
-      setColumnSelectorLoading?.(value);
-    }
-
-    if (indexMapping) {
-      getColumnSelectorIndexMapColumns<TData>({
-        indexMapping,
-        setColumnOptions,
-        setLoading: setInternalLoading,
-        defaultColumns,
-        apiClient
-      });
-    }
-  }, [indexMapping]);
+  }, [localStorageDisplayedColumns, columnOptions, indexMapping]);
 
   const {
     show: showMenu,

@@ -2,7 +2,8 @@ import {
   LoadingSpinner,
   FieldHeader,
   VISIBLE_INDEX_LOCAL_STORAGE_KEY,
-  ColumnSelectorProps
+  ColumnSelectorProps,
+  useApiClient
 } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect, useCallback } from "react";
@@ -26,6 +27,7 @@ import QueryRowFieldExtensionSearch, {
   FieldExtensionSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
 import { GLOBAL_SEARCH_FIELDNAME } from "../list-page/query-builder/useQueryBuilderConfig";
+import { generateColumnDefinition } from "./ColumnSelectorUtils";
 
 // IDs of columns not supported for exporting
 export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
@@ -62,9 +64,11 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   columnOptions,
   loading,
   disabled,
+  defaultColumns,
   indexMapping
 }: ColumnSelectorListProps<TData>) {
   const { formatMessage, messages } = useIntl();
+  const { apiClient } = useApiClient();
 
   // The selected field from the query field selector.
   const [selectedField, setSelectedField] = useState<ESIndexMapping>();
@@ -138,7 +142,31 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     );
   };
 
-  const onColumnItemInsert = (columnPath: string) => {
+  const onColumnItemInsert = async () => {
+    if (isValidField && selectedField && indexMapping) {
+      const newColumnDefinition = await generateColumnDefinition({
+        indexMappings: indexMapping,
+        path: selectedField.value,
+        defaultColumns,
+        apiClient
+      });
+
+      if (newColumnDefinition) {
+        // Add new option to the bottom of the list.
+        const newDisplayedColumns: TableColumn<TData>[] = [
+          ...displayedColumns,
+          newColumnDefinition
+        ];
+
+        setDisplayedColumns(newDisplayedColumns);
+        setLocalStorageDisplayedColumns(
+          newDisplayedColumns.map((column) => column?.id ?? "")
+        );
+      }
+    }
+  };
+
+  const onColumnItemSelected = (columnPath: string) => {
     if (indexMapping) {
       const columnIndex = indexMapping.find(
         (index) => index.value === columnPath
@@ -159,7 +187,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
           <QueryFieldSelector
             indexMap={indexMapping}
             currentField={selectedField?.value}
-            setField={onColumnItemInsert}
+            setField={onColumnItemSelected}
             isInColumnSelector={true}
           />
           {selectedField?.dynamicField?.type === "managedAttribute" && (
@@ -180,11 +208,14 @@ export function ColumnSelectorList<TData extends KitsuResource>({
             />
           )}
           <div className="mt-2 d-grid">
-            <Button className="btn btn-primary" disabled={!isValidField}>
+            <Button
+              className="btn btn-primary"
+              disabled={!isValidField}
+              onClick={onColumnItemInsert}
+            >
               Add column
             </Button>
           </div>
-
           <br />
 
           <strong>Currently displayed columns:</strong>

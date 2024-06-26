@@ -15,7 +15,7 @@ export function ColumnItem<TData extends KitsuResource>({
   return (
     <>
       <Card className="mt-2">
-        <Card.Body>
+        <Card.Body style={{ padding: "0.5rem 0.5rem" }}>
           <Card.Text>
             <Stack direction="horizontal" gap={3}>
               {/* Name of the Column */}
