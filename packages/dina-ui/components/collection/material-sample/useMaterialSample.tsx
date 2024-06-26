@@ -9,8 +9,7 @@ import {
   resourceDifference,
   SaveArgs,
   useApiClient,
-  useQuery,
-  withResponse
+  useQuery
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -531,9 +530,14 @@ export function useMaterialSampleSave({
         organismsQuantity: undefined,
         organism: []
       }),
-
+      // Remove storageUnit and storageUnitCoordinates if toggle is disabled
       ...(!enableStorage && {
-        storageUnit: { id: null, type: "storage-unit" }
+        storageUnit: { id: null, type: "storage-unit" },
+        storageUnitCoordinates: { id: null, type: "storage-unit-coordinates" }
+      }),
+      // Remove storageUnitCoordinates if toggle is enabled but no storageUnit edge case
+      ...(!submittedValues.storageUnit?.id && {
+        storageUnitCoordinates: { id: null, type: "storage-unit-coordinates" }
       }),
       ...(!enableCollectingEvent && {
         collectingEvent: { id: null, type: "collecting-event" }
@@ -669,16 +673,16 @@ export function useMaterialSampleSave({
       : msPreprocessed;
 
     // Take user input storageUnitCoordinates to create storageUnitCoordinates resource
-    if (msDiff.storageUnitCoordinates) {
+    if (msDiff.storageUnitCoordinates && msPreprocessed.storageUnit?.id) {
+      // Create new storageUnitCoordinates
       const storageUnitCoordinatesSaveArgs: SaveArgs<StorageUnitCoordinates>[] =
         [
           {
             type: "storage-unit-coordinates",
             resource: {
-              ...msDiff.storageUnitCoordinates,
+              ...(msDiff.storageUnitCoordinates as StorageUnitCoordinates),
               storageUnit: submittedValues.storageUnit,
-              type: "storage-unit-coordinates",
-              id: undefined
+              type: "storage-unit-coordinates"
             }
           }
         ];
@@ -760,7 +764,8 @@ export function useMaterialSampleSave({
           collection: {
             data: pick(msDiffWithOrganisms.collection, "id", "type")
           }
-        })
+        }),
+        ...getStorageUnitCoordinatesRelationship()
       },
 
       // Set the attributes to undefined after they've been moved to "relationships":
@@ -768,9 +773,9 @@ export function useMaterialSampleSave({
       projects: undefined,
       organism: undefined,
       assemblages: undefined,
-      preparedBy: undefined
+      preparedBy: undefined,
+      storageUnitCoordinates: undefined
     };
-
     // delete the association if associated sample is left unfilled
     if (
       msInputWithRelationships.associations?.length === 1 &&
@@ -784,6 +789,28 @@ export function useMaterialSampleSave({
     };
 
     return saveOperation;
+
+    function getStorageUnitCoordinatesRelationship() {
+      if (msDiffWithOrganisms.storageUnitCoordinates) {
+        if (!!msDiffWithOrganisms?.storageUnitCoordinates.id) {
+          return {
+            storageUnitCoordinates: {
+              data: pick(
+                msDiffWithOrganisms.storageUnitCoordinates,
+                "id",
+                "type"
+              )
+            }
+          };
+        } else {
+          return {
+            storageUnitCoordinates: {
+              data: null
+            }
+          };
+        }
+      }
+    }
   }
 
   /**
@@ -874,7 +901,6 @@ export function useMaterialSampleSave({
     const materialSampleSaveOp = await prepareSampleSaveOperation({
       submittedValues
     });
-
     async function saveToBackend() {
       delete materialSampleSaveOp.resource.useNextSequence;
       const [savedMaterialSample] = await withDuplicateSampleNameCheck(
@@ -884,6 +910,27 @@ export function useMaterialSampleSave({
           }),
         formik
       );
+
+      // Delete StorageUnitCoordinates if there is one when no StorageUnit linked
+      if (
+        (!enableStorage || !submittedValues.storageUnit?.id) &&
+        submittedValues.storageUnitCoordinates?.id
+      ) {
+        await save<StorageUnitCoordinates>(
+          [
+            {
+              delete: {
+                id: submittedValues.storageUnitCoordinates?.id ?? null,
+                type: "storage-unit-coordinates"
+              }
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        );
+      }
+
       await onSaved?.(savedMaterialSample?.id);
     }
 

@@ -217,7 +217,10 @@ describe("Material Sample Edit Page", () => {
               hostOrganism: null,
               managedAttributes: {},
               publiclyReleasable: true, // Default value
-              relationships: { organism: { data: [] } },
+              relationships: {
+                organism: { data: [] },
+                storageUnitCoordinates: { data: null }
+              },
               type: "material-sample",
               attachment: undefined,
               organism: undefined,
@@ -228,8 +231,10 @@ describe("Material Sample Edit Page", () => {
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
               scheduledAction: undefined,
-              preparationMethod: undefined,
-              collection: undefined
+              preparedBy: undefined,
+              collection: undefined,
+              assemblages: undefined,
+              storageUnitCoordinates: undefined
             },
             type: "material-sample"
           }
@@ -290,22 +295,25 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
-              collection: undefined,
               publiclyReleasable: true, // Default value
+              relationships: {
+                organism: { data: [] },
+                storageUnitCoordinates: { data: null }
+              },
               type: "material-sample",
               attachment: undefined,
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationMethod: undefined,
               projects: undefined,
               isRestricted: false,
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
               scheduledAction: undefined,
-              relationships: {
-                organism: { data: [] }
-              }
+              preparedBy: undefined,
+              collection: undefined,
+              assemblages: undefined,
+              storageUnitCoordinates: undefined
             },
             type: "material-sample"
           }
