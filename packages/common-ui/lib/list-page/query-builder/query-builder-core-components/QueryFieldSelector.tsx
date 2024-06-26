@@ -216,7 +216,7 @@ export function QueryFieldSelector({
                 { globalSearchTerm: inputValue }
               )
         }
-        isValidNewOption={(_inputValue) => true}
+        isValidNewOption={(_inputValue) => !isInColumnSelector}
         onCreateOption={performGlobalSearch}
       />
     </div>

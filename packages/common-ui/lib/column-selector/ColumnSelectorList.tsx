@@ -8,7 +8,7 @@ import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect, useCallback } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
-import { Button } from "react-bootstrap";
+import { Button, Toast } from "react-bootstrap";
 import Kitsu, { KitsuResource } from "kitsu";
 import { Checkbox } from "./GroupedCheckboxWithLabel";
 import {
@@ -19,8 +19,13 @@ import {
 import useLocalStorage from "@rehooks/local-storage";
 import { QueryFieldSelector } from "../list-page/query-builder/query-builder-core-components/QueryFieldSelector";
 import { ColumnItem } from "./ColumnItem";
-import QueryRowManagedAttributeSearch from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
-import QueryRowFieldExtensionSearch from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
+import QueryRowManagedAttributeSearch, {
+  ManagedAttributeSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import QueryRowFieldExtensionSearch, {
+  FieldExtensionSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
+import { GLOBAL_SEARCH_FIELDNAME } from "../list-page/query-builder/useQueryBuilderConfig";
 
 // IDs of columns not supported for exporting
 export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
@@ -67,6 +72,9 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   // Used for dynamic fields to store the specific dynamic value selected.
   const [dynamicFieldValue, setDynamicFieldValue] = useState<string>();
 
+  // Used for the "Add column" button to determine if it should be disabled or not.
+  const [isValidField, setIsValidField] = useState<boolean>(false);
+
   // Local storage of the displayed columns that are saved.
   const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
     useLocalStorage<string[]>(
@@ -75,15 +83,50 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     );
 
   // Handle what happens when the user selects an option from the Query Field Selector. If a dynamic
-  // field is selected, more dropdowns have to appear.
-  // useEffect(() => {
-  //   if (selectedField && indexMapping) {
-  //     // Check if it's a dynamic type.
-  //     if (!selectedField.dynamicField) {
-  //       ...
-  //     }
-  //   }
-  // }, [selectedField, indexMapping]);
+  // field is selected, verify we are at a point where it can be added.
+  useEffect(() => {
+    if (selectedField && indexMapping) {
+      // Check if it's a dynamic type.
+      if (selectedField.dynamicField) {
+        if (dynamicFieldValue) {
+          switch (selectedField.dynamicField.type) {
+            case "managedAttribute":
+              const managedAttributeValues: ManagedAttributeSearchStates =
+                JSON.parse(dynamicFieldValue);
+              if (managedAttributeValues?.selectedManagedAttribute?.id) {
+                setIsValidField(true);
+                return;
+              }
+              break;
+            case "fieldExtension":
+              const fieldExtensionValues: FieldExtensionSearchStates =
+                JSON.parse(dynamicFieldValue);
+              if (
+                fieldExtensionValues.selectedExtension &&
+                fieldExtensionValues.selectedField
+              ) {
+                setIsValidField(true);
+                return;
+              }
+              break;
+          }
+        }
+      } else {
+        // Regular field selected, not dynamic and requires more options.
+        setIsValidField(true);
+        return;
+      }
+    }
+
+    setIsValidField(false);
+  }, [selectedField, dynamicFieldValue, indexMapping]);
+
+  // Reset the dynamic field value so it doesn't get mixed with another one.
+  useEffect(() => {
+    if (selectedField) {
+      setDynamicFieldValue(undefined);
+    }
+  }, [selectedField]);
 
   const onColumnItemDelete = (columnId: string) => {
     const newDisplayedColumns = displayedColumns.filter(
@@ -136,6 +179,12 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               isInColumnSelector={true}
             />
           )}
+          <div className="mt-2 d-grid">
+            <Button className="btn btn-primary" disabled={!isValidField}>
+              Add column
+            </Button>
+          </div>
+
           <br />
 
           <strong>Currently displayed columns:</strong>
