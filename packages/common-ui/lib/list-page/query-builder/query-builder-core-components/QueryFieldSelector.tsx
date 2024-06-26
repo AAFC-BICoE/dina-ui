@@ -195,7 +195,7 @@ export function QueryFieldSelector({
       {/* Field Selection */}
       <CreatableSelect
         options={queryRowOptions as any}
-        className={`flex-grow-1 me-2 ps-0`}
+        className={isInColumnSelector ? "ps-0" : "flex-grow-1 me-2 ps-0"}
         styles={customStyles}
         value={isGlobalSearch ? globalSearchOptionSelected : selectedOption}
         placeholder={

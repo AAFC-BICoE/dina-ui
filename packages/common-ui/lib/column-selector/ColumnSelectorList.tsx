@@ -20,6 +20,7 @@ import useLocalStorage from "@rehooks/local-storage";
 import { QueryFieldSelector } from "../list-page/query-builder/query-builder-core-components/QueryFieldSelector";
 import { ColumnItem } from "./ColumnItem";
 import QueryRowManagedAttributeSearch from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import QueryRowFieldExtensionSearch from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
 
 // IDs of columns not supported for exporting
 export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
@@ -62,6 +63,9 @@ export function ColumnSelectorList<TData extends KitsuResource>({
 
   // The selected field from the query field selector.
   const [selectedField, setSelectedField] = useState<ESIndexMapping>();
+
+  // Used for dynamic fields to store the specific dynamic value selected.
+  const [dynamicFieldValue, setDynamicFieldValue] = useState<string>();
 
   // Local storage of the displayed columns that are saved.
   const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
@@ -119,6 +123,16 @@ export function ColumnSelectorList<TData extends KitsuResource>({
             <QueryRowManagedAttributeSearch
               indexMap={indexMapping}
               managedAttributeConfig={selectedField}
+              isInColumnSelector={true}
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
+            />
+          )}
+          {selectedField?.dynamicField?.type === "fieldExtension" && (
+            <QueryRowFieldExtensionSearch
+              fieldExtensionConfig={selectedField}
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
               isInColumnSelector={true}
             />
           )}
