@@ -70,9 +70,6 @@ export function ColumnSelector<TData extends KitsuResource>(
     setDisplayedColumns
   } = props;
 
-  // These are all the possible columns displayed to the user.
-  const [columnOptions, setColumnOptions] = useState<TableColumn<TData>[]>([]);
-
   // Loading state, specifically for dynamically loaded columns.
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -122,12 +119,11 @@ export function ColumnSelector<TData extends KitsuResource>(
         defaultColumns.map((column) => column?.id ?? "")
       );
     } else {
-      // Translate the path into columns to be displayed.
       loadColumnsFromLocalStorage();
       setLoading(false);
       setColumnSelectorLoading?.(false);
     }
-  }, [localStorageDisplayedColumns, columnOptions, indexMapping]);
+  }, [localStorageDisplayedColumns, indexMapping]);
 
   const {
     show: showMenu,
@@ -171,13 +167,7 @@ export function ColumnSelector<TData extends KitsuResource>(
   }
 
   if (exportMode) {
-    return (
-      <ColumnSelectorList
-        {...props}
-        loading={loading}
-        columnOptions={columnOptions}
-      />
-    );
+    return <ColumnSelectorList {...props} loading={loading} />;
   } else {
     return (
       <Dropdown
@@ -198,11 +188,7 @@ export function ColumnSelector<TData extends KitsuResource>(
             zIndex: 1
           }}
         >
-          <ColumnSelectorList
-            {...props}
-            loading={loading}
-            columnOptions={columnOptions}
-          />
+          <ColumnSelectorList {...props} loading={loading} />
         </Dropdown.Menu>
       </Dropdown>
     );

@@ -31,7 +31,9 @@ export async function generateColumnDefinition<TData extends KitsuResource>({
   TableColumn<TData> | undefined
 > {
   // Link the path to a index mapping.
-  const indexMapping = indexMappings.find((mapping) => mapping.value);
+  const indexMapping = indexMappings.find(
+    (mapping) => mapping.label === path || mapping.value === path
+  );
 
   // Check if it's a dynamic field if it could not be found directly in the index mapping.
   if (!indexMapping) {
@@ -126,6 +128,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
   path: string,
   apiClient: Kitsu
 ): Promise<TableColumn<TData> | undefined> {
+  // if (path.includes("extensionValues."))
   // if (columnMapping.type === "fieldExtension") {
   //   // return await getExtensionValuesColumn(columnMapping, apiClient);
   // } else if (columnMapping.type === "managedAttribute") {
@@ -133,7 +136,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
   // } else {
   //   throw Error("Uncaught queryOption type.");
   // }
-  throw Error("Uncaught queryOption type.");
+  return undefined;
 }
 
 async function getManagedAttributesColumn<TData extends KitsuResource>(

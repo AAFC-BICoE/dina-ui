@@ -1,22 +1,15 @@
 import {
   LoadingSpinner,
-  FieldHeader,
   VISIBLE_INDEX_LOCAL_STORAGE_KEY,
   ColumnSelectorProps,
   useApiClient
 } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect, useCallback } from "react";
-import Dropdown from "react-bootstrap/Dropdown";
 import { useIntl } from "react-intl";
 import { Button, Toast } from "react-bootstrap";
 import Kitsu, { KitsuResource } from "kitsu";
-import { Checkbox } from "./GroupedCheckboxWithLabel";
-import {
-  DynamicFieldType,
-  ESIndexMapping,
-  TableColumn
-} from "../list-page/types";
+import { ESIndexMapping, TableColumn } from "../list-page/types";
 import useLocalStorage from "@rehooks/local-storage";
 import { QueryFieldSelector } from "../list-page/query-builder/query-builder-core-components/QueryFieldSelector";
 import { ColumnItem } from "./ColumnItem";
@@ -26,7 +19,6 @@ import QueryRowManagedAttributeSearch, {
 import QueryRowFieldExtensionSearch, {
   FieldExtensionSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
-import { GLOBAL_SEARCH_FIELDNAME } from "../list-page/query-builder/useQueryBuilderConfig";
 import { generateColumnDefinition } from "./ColumnSelectorUtils";
 
 // IDs of columns not supported for exporting
@@ -52,18 +44,16 @@ export const MANDATORY_DISPLAYED_COLUMNS: string[] = [
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
-  columnOptions: TableColumn<TData>[];
   loading: boolean;
 }
 
 export function ColumnSelectorList<TData extends KitsuResource>({
-  exportMode,
+  // exportMode,
   uniqueName,
   displayedColumns,
   setDisplayedColumns,
-  columnOptions,
   loading,
-  disabled,
+  // disabled,
   defaultColumns,
   indexMapping
 }: ColumnSelectorListProps<TData>) {
