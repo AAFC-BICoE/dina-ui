@@ -974,6 +974,7 @@ export function QueryPage<TData extends KitsuResource>({
                       uniqueName={uniqueName}
                       exportMode={false}
                       indexMapping={indexMap}
+                      dynamicFieldsMappingConfig={dynamicFieldMapping}
                       displayedColumns={displayedColumns as any}
                       setDisplayedColumns={onDisplayedColumnsChange as any}
                       defaultColumns={columns as any}

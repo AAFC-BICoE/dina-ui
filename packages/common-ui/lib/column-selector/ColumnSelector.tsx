@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import React from "react";
 import { Dropdown } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import { ESIndexMapping, TableColumn } from "../list-page/types";
+import {
+  DynamicFieldsMappingConfig,
+  ESIndexMapping,
+  TableColumn
+} from "../list-page/types";
 import { generateColumnDefinition } from "./ColumnSelectorUtils";
 import { useApiClient } from "../api-client/ApiClientContext";
 import useLocalStorage from "@rehooks/local-storage";
@@ -32,6 +36,11 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    * Index mapping containing all of the fields that should be displayed in the list.
    */
   indexMapping: ESIndexMapping[] | undefined;
+
+  /**
+   * Dynamic field mapping configuration.
+   */
+  dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig;
 
   /**
    * The currently displayed columns on the table.
@@ -64,6 +73,7 @@ export function ColumnSelector<TData extends KitsuResource>(
   const {
     exportMode,
     indexMapping,
+    dynamicFieldsMappingConfig,
     uniqueName,
     defaultColumns,
     setColumnSelectorLoading,
@@ -94,6 +104,7 @@ export function ColumnSelector<TData extends KitsuResource>(
           async (localColumn) => {
             const newColumnDefinition = await generateColumnDefinition({
               indexMappings: indexMapping,
+              dynamicFieldsMappingConfig,
               apiClient,
               defaultColumns,
               path: localColumn

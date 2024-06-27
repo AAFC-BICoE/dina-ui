@@ -19,7 +19,10 @@ import QueryRowManagedAttributeSearch, {
 import QueryRowFieldExtensionSearch, {
   FieldExtensionSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
-import { generateColumnDefinition } from "./ColumnSelectorUtils";
+import {
+  generateColumnDefinition,
+  generateColumnPath
+} from "./ColumnSelectorUtils";
 
 // IDs of columns not supported for exporting
 export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
@@ -55,7 +58,8 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   loading,
   // disabled,
   defaultColumns,
-  indexMapping
+  indexMapping,
+  dynamicFieldsMappingConfig
 }: ColumnSelectorListProps<TData>) {
   const { formatMessage, messages } = useIntl();
   const { apiClient } = useApiClient();
@@ -136,7 +140,11 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     if (isValidField && selectedField && indexMapping) {
       const newColumnDefinition = await generateColumnDefinition({
         indexMappings: indexMapping,
-        path: selectedField.value,
+        dynamicFieldsMappingConfig,
+        path: generateColumnPath({
+          indexMapping: selectedField,
+          dynamicFieldValue
+        }),
         defaultColumns,
         apiClient
       });
