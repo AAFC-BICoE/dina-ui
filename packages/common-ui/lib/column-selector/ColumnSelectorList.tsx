@@ -192,15 +192,36 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     });
   }, [displayedColumns, exportMode]);
 
+  const indexMappingFiltered = useMemo(() => {
+    if (indexMapping) {
+      return indexMapping.filter((mapping) => {
+        if (exportMode) {
+          return !NOT_EXPORTABLE_COLUMN_IDS.some(
+            (id) =>
+              (mapping?.value ?? "").startsWith(id) ||
+              (mapping?.label ?? "").startsWith(id)
+          );
+        } else {
+          return !MANDATORY_DISPLAYED_COLUMNS.some(
+            (id) =>
+              (mapping?.value ?? "").startsWith(id) ||
+              (mapping?.label ?? "").startsWith(id)
+          );
+        }
+      });
+    }
+    return undefined;
+  }, [indexMapping, exportMode]);
+
   return (
     <>
-      {loading || !indexMapping ? (
+      {loading || !indexMappingFiltered || !indexMapping ? (
         <LoadingSpinner loading={loading} />
       ) : (
         <>
           <strong>Add a new column:</strong>
           <QueryFieldSelector
-            indexMap={indexMapping}
+            indexMap={indexMappingFiltered}
             currentField={selectedField?.value}
             setField={onColumnItemSelected}
             isInColumnSelector={true}
@@ -233,9 +254,9 @@ export function ColumnSelectorList<TData extends KitsuResource>({
           </div>
           <br />
 
-          <strong>Currently displayed columns:</strong>
-          {displayedColumnsFiltered.length > 0 ? (
+          {displayedColumnsFiltered.length > 0 && (
             <>
+              <strong>Currently displayed columns:</strong>
               {displayedColumnsFiltered.map((column) => {
                 return (
                   <ColumnItem
@@ -245,10 +266,6 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                   />
                 );
               })}
-            </>
-          ) : (
-            <>
-              <p>Nothing is here... Try adding a column above.</p>
             </>
           )}
         </>

@@ -238,11 +238,11 @@ export function ColumnSelector<TData extends KitsuResource>(
         </Dropdown.Toggle>
         <Dropdown.Menu
           style={{
-            maxHeight: "30rem",
+            height: "30rem",
             overflowY: "scroll",
             width: exportMode ? "100%" : "25rem",
             padding: exportMode ? "0" : "1.25rem 1.25rem 1.25rem 1.25rem",
-            zIndex: 1
+            zIndex: 9999
           }}
         >
           <ColumnSelectorList
