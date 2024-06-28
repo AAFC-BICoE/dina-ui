@@ -83,12 +83,52 @@ export function ColumnSelector<TData extends KitsuResource>(
   // Loading state, specifically for dynamically loaded columns.
   const [loading, setLoading] = useState<boolean>(true);
 
+  const [injectedIndexMapping, setInjectedIndexMapping] =
+    useState<ESIndexMapping[]>();
+
   // Local storage of the displayed columns that are saved.
   const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
     useLocalStorage<string[]>(
       `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
       []
     );
+
+  useEffect(() => {
+    if (indexMapping && defaultColumns) {
+      const injectedMappings = defaultColumns
+        .map<ESIndexMapping | undefined>((column) => {
+          // Check if this exists within the index mapping already, if not we do not need to inject it inside.
+          if (
+            indexMapping.find(
+              (mapping) =>
+                mapping.label === column.id || mapping.value === column.id
+            )
+          ) {
+            return undefined;
+          }
+
+          return {
+            label: column.id ?? column.label ?? "",
+            path: (column as any)?.accessorKey,
+            type: "text",
+            value: (column as any)?.accessorKey,
+            hideField: false,
+            distinctTerm: false,
+            keywordMultiFieldSupport: column.isKeyword ?? false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            containsSupport: false,
+            endsWithSupport: false
+          };
+        })
+        .filter((injected) => injected !== undefined);
+
+      setInjectedIndexMapping([
+        ...indexMapping,
+        ...(injectedMappings as ESIndexMapping[])
+      ]);
+    }
+  }, [indexMapping, defaultColumns]);
 
   // This useEffect is responsible for loading in the new local storage displayed columns.
   useEffect(() => {
@@ -99,11 +139,11 @@ export function ColumnSelector<TData extends KitsuResource>(
     }
 
     async function loadColumnsFromLocalStorage() {
-      if (indexMapping) {
+      if (injectedIndexMapping) {
         const promises = localStorageDisplayedColumns.map(
           async (localColumn) => {
             const newColumnDefinition = await generateColumnDefinition({
-              indexMappings: indexMapping,
+              indexMappings: injectedIndexMapping,
               dynamicFieldsMappingConfig,
               apiClient,
               defaultColumns,
@@ -134,7 +174,7 @@ export function ColumnSelector<TData extends KitsuResource>(
       setLoading(false);
       setColumnSelectorLoading?.(false);
     }
-  }, [localStorageDisplayedColumns, indexMapping]);
+  }, [localStorageDisplayedColumns, injectedIndexMapping]);
 
   const {
     show: showMenu,
@@ -178,7 +218,13 @@ export function ColumnSelector<TData extends KitsuResource>(
   }
 
   if (exportMode) {
-    return <ColumnSelectorList {...props} loading={loading} />;
+    return (
+      <ColumnSelectorList
+        {...props}
+        indexMapping={injectedIndexMapping}
+        loading={loading}
+      />
+    );
   } else {
     return (
       <Dropdown
@@ -199,7 +245,11 @@ export function ColumnSelector<TData extends KitsuResource>(
             zIndex: 1
           }}
         >
-          <ColumnSelectorList {...props} loading={loading} />
+          <ColumnSelectorList
+            {...props}
+            indexMapping={injectedIndexMapping}
+            loading={loading}
+          />
         </Dropdown.Menu>
       </Dropdown>
     );

@@ -5,7 +5,7 @@ import {
   useApiClient
 } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { Button, Toast } from "react-bootstrap";
 import Kitsu, { KitsuResource } from "kitsu";
@@ -51,7 +51,7 @@ export interface ColumnSelectorListProps<TData extends KitsuResource>
 }
 
 export function ColumnSelectorList<TData extends KitsuResource>({
-  // exportMode,
+  exportMode,
   uniqueName,
   displayedColumns,
   setDisplayedColumns,
@@ -177,6 +177,21 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     }
   };
 
+  // Filter the list to not include columns that cannot be removed/exported.
+  const displayedColumnsFiltered = useMemo(() => {
+    return displayedColumns.filter((column) => {
+      if (exportMode) {
+        return !NOT_EXPORTABLE_COLUMN_IDS.some((id) =>
+          (column?.id ?? "").startsWith(id)
+        );
+      } else {
+        return !MANDATORY_DISPLAYED_COLUMNS.some((id) =>
+          (column?.id ?? "").startsWith(id)
+        );
+      }
+    });
+  }, [displayedColumns, exportMode]);
+
   return (
     <>
       {loading || !indexMapping ? (
@@ -219,9 +234,9 @@ export function ColumnSelectorList<TData extends KitsuResource>({
           <br />
 
           <strong>Currently displayed columns:</strong>
-          {displayedColumns.length > 0 ? (
+          {displayedColumnsFiltered.length > 0 ? (
             <>
-              {displayedColumns.map((column) => {
+              {displayedColumnsFiltered.map((column) => {
                 return (
                   <ColumnItem
                     key={column.id}
