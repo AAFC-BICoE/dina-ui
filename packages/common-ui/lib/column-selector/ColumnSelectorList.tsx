@@ -132,7 +132,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     );
     setDisplayedColumns(newDisplayedColumns);
     setLocalStorageDisplayedColumns(
-      newDisplayedColumns.map((column) => column?.id ?? "")
+      newDisplayedColumns.map((column) => column?.columnSelectorString ?? "")
     );
   };
 
@@ -158,7 +158,9 @@ export function ColumnSelectorList<TData extends KitsuResource>({
 
         setDisplayedColumns(newDisplayedColumns);
         setLocalStorageDisplayedColumns(
-          newDisplayedColumns.map((column) => column?.id ?? "")
+          newDisplayedColumns.map(
+            (column) => column?.columnSelectorString ?? ""
+          )
         );
       }
     }

@@ -7,7 +7,7 @@ import {
   TableColumn
 } from "../list-page/types";
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
-import { get } from "lodash";
+import { get, startCase } from "lodash";
 import React from "react";
 import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
@@ -106,45 +106,51 @@ export async function generateColumnDefinition<TData extends KitsuResource>({
       (item) => item.id === indexMapping.value
     );
     if (defaultColumnFound) {
-      return defaultColumnFound;
+      return { ...defaultColumnFound, columnSelectorString: path };
     }
 
-    return getNestedColumn(indexMapping);
+    return getNestedColumn(path, indexMapping);
   } else {
     // Check if it's mapped in the default columns, and just use that definition.
     const defaultColumnFound = defaultColumns?.find(
       (item) => item.id === indexMapping.label
     );
     if (defaultColumnFound) {
-      return defaultColumnFound;
+      return { ...defaultColumnFound, columnSelectorString: path };
     }
 
-    return getEntityColumn(indexMapping);
+    return getEntityColumn(path, indexMapping);
   }
 }
 
 function getEntityColumn<TData extends KitsuResource>(
+  path: string,
   indexColumn: ESIndexMapping
 ): TableColumn<TData> {
   if (indexColumn.type === "date") {
-    return dateCell(
-      indexColumn?.label,
-      indexColumn?.value,
-      undefined,
-      true,
-      indexColumn
-    );
+    return {
+      ...dateCell(
+        indexColumn?.label,
+        indexColumn?.value,
+        undefined,
+        true,
+        indexColumn
+      ),
+      columnSelectorString: path
+    };
   } else {
     return {
       id: indexColumn.label,
       header: () => <FieldHeader name={indexColumn?.label} />,
       accessorKey: indexColumn?.value,
-      isKeyword: indexColumn?.keywordMultiFieldSupport
+      isKeyword: indexColumn?.keywordMultiFieldSupport,
+      columnSelectorString: path
     };
   }
 }
 
 function getNestedColumn<TData extends KitsuResource>(
+  path: string,
   indexColumn: ESIndexMapping
 ): TableColumn<TData> {
   const accessorKey = `${indexColumn.parentPath}.${
@@ -152,17 +158,25 @@ function getNestedColumn<TData extends KitsuResource>(
   }.${indexColumn.label}`;
 
   if (indexColumn.type === "date") {
-    return dateCell(
-      indexColumn.value,
-      accessorKey,
-      indexColumn.parentType,
-      true,
-      indexColumn
-    );
+    return {
+      ...dateCell(
+        indexColumn.value,
+        accessorKey,
+        indexColumn.parentType,
+        true,
+        indexColumn
+      ),
+      columnSelectorString: path
+    };
   } else {
     return {
       id: indexColumn.value,
-      header: () => <FieldHeader name={indexColumn.label} />,
+      header: () => (
+        <span>
+          {startCase(indexColumn.parentName + " ")}
+          <FieldHeader name={indexColumn.label} />
+        </span>
+      ),
       accessorKey,
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
@@ -177,7 +191,8 @@ function getNestedColumn<TData extends KitsuResource>(
         const value = get(original, valuePath);
         return <>{value}</>;
       },
-      relationshipType: indexColumn.parentType
+      relationshipType: indexColumn.parentType,
+      columnSelectorString: path
     };
   }
 }
@@ -195,6 +210,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
       const component = pathParts[1];
       const key = pathParts[2];
       return getManagedAttributesColumn(
+        path,
         component,
         key,
         apiClient,
@@ -215,6 +231,7 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
 }
 
 async function getManagedAttributesColumn<TData extends KitsuResource>(
+  path: string,
   component: string,
   key: string,
   apiClient: Kitsu,
@@ -260,6 +277,7 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
 
       if (managedAttribute[0]) {
         return getAttributesManagedAttributeColumn<TData>(
+          path,
           managedAttribute[0],
           fieldConfigMatch
         );
@@ -275,6 +293,7 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
       );
       if (managedAttribute[0]) {
         return getIncludedManagedAttributeColumn<TData>(
+          path,
           managedAttribute[0],
           relationshipConfigMatch
         );
@@ -289,6 +308,7 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
 }
 
 export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
+  path: string,
   managedAttribute: any,
   config: RelationshipDynamicField
 ): TableColumn<TData> {
@@ -314,7 +334,8 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
     isColumnVisible: true,
     relationshipType: config.referencedType,
     managedAttribute,
-    config
+    config,
+    columnSelectorString: path
   };
 
   return managedAttributesColumn;
@@ -322,7 +343,11 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
 
 export function getAttributesManagedAttributeColumn<
   TData extends KitsuResource
->(managedAttribute: any, config: DynamicField): TableColumn<TData> {
+>(
+  path: string,
+  managedAttribute: any,
+  config: DynamicField
+): TableColumn<TData> {
   const managedAttributeKey = managedAttribute.key;
   const accessorKey = `${config.path}.${managedAttributeKey}`;
   const managedAttributesColumn = {
@@ -333,7 +358,8 @@ export function getAttributesManagedAttributeColumn<
     isColumnVisible: true,
     config,
     managedAttribute,
-    sortDescFirst: true
+    sortDescFirst: true,
+    columnSelectorString: path
   };
 
   return managedAttributesColumn;
