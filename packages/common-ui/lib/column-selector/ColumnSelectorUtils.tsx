@@ -223,6 +223,14 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
       const component = pathParts[1];
       const extension = pathParts[2];
       const field = pathParts[3];
+      return getFieldExtensionColumn(
+        path,
+        component,
+        extension,
+        field,
+        apiClient,
+        dynamicFieldsMappingConfig
+      );
     }
   }
 
@@ -365,22 +373,151 @@ export function getAttributesManagedAttributeColumn<
   return managedAttributesColumn;
 }
 
+// Get attribute and included extension values columns
+async function getFieldExtensionColumn<TData extends KitsuResource>(
+  path: string,
+  component: string,
+  extension: string,
+  field: string,
+  apiClient: Kitsu,
+  dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
+): Promise<TableColumn<TData> | undefined> {
+  // API request params:
+  const params = {
+    filter: {
+      "extension.fields.dinaComponent": component,
+      "extension.fields.key": field,
+      "extension.key": extension
+    },
+    page: { limit: 1 }
+  };
+
+  // Figure out API endpoint using the dynamicFieldsMappingConfig.
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find(
+    (config) =>
+      config.type === "fieldExtension" && config.component === component
+  );
+  const relationshipConfigMatch =
+    dynamicFieldsMappingConfig.relationshipFields.find(
+      (config) =>
+        config.type === "fieldExtension" && config.component === component
+    );
+
+  if (!fieldConfigMatch && !relationshipConfigMatch) {
+    console.error(
+      "Field Extension Config for the following component: " +
+        component +
+        " could not be determined."
+    );
+    return;
+  }
+
+  try {
+    if (fieldConfigMatch) {
+      // API request for the field extension.
+      const extensionValueRequest = await fetchDynamicField(
+        apiClient,
+        fieldConfigMatch.apiEndpoint,
+        params
+      );
+      const extensionPackage = extensionValueRequest?.[0];
+      const fieldDefinition =
+        extensionValueRequest?.[0]?.extension?.fields?.find(
+          (extensionField) => extensionField?.key === field
+        );
+
+      if (extensionPackage && fieldDefinition) {
+        return getAttributeExtensionFieldColumn(
+          path,
+          fieldConfigMatch,
+          extensionPackage,
+          fieldDefinition
+        );
+      }
+    }
+
+    if (relationshipConfigMatch) {
+      // API request for the field extension.
+      const extensionValueRequest = await fetchDynamicField(
+        apiClient,
+        relationshipConfigMatch.apiEndpoint,
+        params
+      );
+      const extensionPackage = extensionValueRequest?.[0];
+      const fieldDefinition =
+        extensionValueRequest?.[0]?.extension?.fields?.find(
+          (extensionField) => extensionField?.key === field
+        );
+
+      if (extensionPackage && fieldDefinition) {
+        return getIncludedExtensionFieldColumn(
+          path,
+          relationshipConfigMatch,
+          extensionPackage,
+          fieldDefinition
+        );
+      }
+    }
+  } catch (error) {
+    // Handle the error here, e.g., log it or display an error message.
+    throw error;
+  }
+}
+
 export function getAttributeExtensionFieldColumn<TData extends KitsuResource>(
-  columnMapping: ESIndexMapping,
+  path: string,
+  config: DynamicField,
   extensionValue: any,
   extensionField: any
 ): TableColumn<TData> {
-  const fieldExtensionResourceType = columnMapping.path.split(".").at(-1);
+  const fieldExtensionResourceType = config.path.split(".").at(-1);
   const extensionValuesColumn = {
-    accessorKey: `${columnMapping.path}.${extensionValue.id}.${extensionField.key}`,
+    accessorKey: `${config.path}.${extensionValue.id}.${extensionField.key}`,
     id: `${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
     header: () => `${extensionValue.extension.name} - ${extensionField.name}`,
     label: `${extensionValue.extension.name} - ${extensionField.name}`,
-    isKeyword: columnMapping.keywordMultiFieldSupport,
+    isKeyword: true,
     isColumnVisible: true,
-    columnMapping,
+    config,
     extensionValue,
-    extensionField
+    extensionField,
+    columnSelectorString: path
+  };
+
+  return extensionValuesColumn;
+}
+
+export function getIncludedExtensionFieldColumn(
+  path: string,
+  config: RelationshipDynamicField,
+  extensionValue: any,
+  extensionField: any
+) {
+  const fieldExtensionResourceType = config.path.split(".").at(-1);
+  const accessorKey = `${config.path}.${extensionValue.id}.${extensionField.key}`;
+  const extensionValuesColumn = {
+    cell: ({ row: { original } }) => {
+      const relationshipAccessor = accessorKey?.split(".");
+      relationshipAccessor?.splice(
+        1,
+        0,
+        config.referencedType ? config.referencedType : ""
+      );
+      const valuePath = relationshipAccessor?.join(".");
+      const value = get(original, valuePath);
+      return <>{value}</>;
+    },
+    accessorKey,
+    id: `${config.referencedBy}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
+    header: () => `${extensionValue.extension.name} - ${extensionField.name}`,
+    label: `${extensionValue.extension.name} - ${extensionField.name}`,
+    isKeyword: true,
+    isColumnVisible: true,
+    relationshipType: config.referencedType,
+    config,
+    extensionValue,
+    extensionField,
+    columnSelectorString: path
   };
 
   return extensionValuesColumn;
@@ -389,110 +526,5 @@ export function getAttributeExtensionFieldColumn<TData extends KitsuResource>(
 // Fetch filtered dynamic field from back end
 async function fetchDynamicField(apiClient: Kitsu, path, params?: GetParams) {
   const { data } = await apiClient.get(path, params ?? {});
-
   return data;
-}
-
-// Get attribute and included extension values columns
-async function getExtensionValuesColumn<TData extends KitsuResource>(
-  columnMapping: ESIndexMapping,
-  apiClient: Kitsu,
-  columnOptions: TableColumn<TData>[]
-) {
-  const params = {
-    filter: {
-      "extension.fields.dinaComponent":
-        columnMapping.dynamicField?.component ?? ""
-    },
-    page: { limit: 1000 }
-  };
-  try {
-    const extensionValues = await fetchDynamicField(
-      apiClient,
-      columnMapping.dynamicField?.apiEndpoint,
-      params
-    );
-    if (columnMapping.parentType) {
-      // Handle included extension values
-      getIncludedExtensionValuesColumns(
-        extensionValues,
-        columnMapping,
-        columnOptions
-      );
-    } else {
-      // getAttributesExtensionValuesColumns(
-      //  extensionValues,
-      //  columnMapping,
-      //  columnOptions
-      // );
-    }
-  } catch (error) {
-    // Handle the error here, e.g., log it or display an error message.
-    throw error;
-  }
-}
-
-// Get included Extension Values column from ES field
-function getIncludedExtensionValuesColumns<TData extends KitsuResource>(
-  extensionValues,
-  columnMapping: ESIndexMapping,
-  columnOptions: TableColumn<TData>[]
-) {
-  const totalIncludedExtensionValuesCols: TableColumn<TData>[] = [].concat(
-    ...extensionValues?.map((extensionValue) =>
-      getIncludedExtensionValuesColumn(extensionValue, columnMapping)
-    )
-  );
-
-  columnOptions.push(...totalIncludedExtensionValuesCols);
-}
-
-function getIncludedExtensionValuesColumn(
-  extensionValue: any,
-  columnMapping: ESIndexMapping
-) {
-  const extensionFields = extensionValue.extension.fields;
-  const includedExtensionValuesColumns = extensionFields?.map(
-    (extensionField) =>
-      getIncludedExtensionFieldColumn(
-        columnMapping,
-        extensionValue,
-        extensionField
-      )
-  );
-  return includedExtensionValuesColumns;
-}
-
-export function getIncludedExtensionFieldColumn(
-  columnMapping: ESIndexMapping,
-  extensionValue: any,
-  extensionField: any
-) {
-  const fieldExtensionResourceType = columnMapping.path.split(".").at(-1);
-  const accessorKey = `${columnMapping.path}.${extensionValue.id}.${extensionField.key}`;
-  const extensionValuesColumn = {
-    cell: ({ row: { original } }) => {
-      const relationshipAccessor = accessorKey?.split(".");
-      relationshipAccessor?.splice(
-        1,
-        0,
-        columnMapping.parentType ? columnMapping.parentType : ""
-      );
-      const valuePath = relationshipAccessor?.join(".");
-      const value = get(original, valuePath);
-      return <>{value}</>;
-    },
-    accessorKey,
-    id: `${columnMapping.parentName}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
-    header: () => `${extensionValue.extension.name} - ${extensionField.name}`,
-    label: `${extensionValue.extension.name} - ${extensionField.name}`,
-    isKeyword: columnMapping.keywordMultiFieldSupport,
-    isColumnVisible: true,
-    relationshipType: columnMapping.parentType,
-    columnMapping,
-    extensionValue,
-    extensionField
-  };
-
-  return extensionValuesColumn;
 }
