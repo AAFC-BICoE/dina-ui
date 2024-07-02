@@ -6,11 +6,13 @@ import { KitsuResource } from "kitsu";
 export interface ColumnItemProps<TData extends KitsuResource> {
   column: TableColumn<TData>;
   onColumnItemDelete: (columnId: string) => void;
+  isMandatoryField: boolean;
 }
 
 export function ColumnItem<TData extends KitsuResource>({
   column,
-  onColumnItemDelete
+  onColumnItemDelete,
+  isMandatoryField
 }: ColumnItemProps<TData>) {
   return (
     <>
@@ -34,6 +36,7 @@ export function ColumnItem<TData extends KitsuResource>({
               <Button
                 className="ms-auto"
                 variant="danger"
+                disabled={isMandatoryField}
                 onClick={() => column.id && onColumnItemDelete(column.id)}
               >
                 <FaTrash />

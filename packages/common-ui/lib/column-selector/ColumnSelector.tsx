@@ -240,9 +240,9 @@ export function ColumnSelector<TData extends KitsuResource>(
           style={{
             height: "30rem",
             overflowY: "scroll",
-            width: exportMode ? "100%" : "25rem",
-            padding: exportMode ? "0" : "1.25rem 1.25rem 1.25rem 1.25rem",
-            zIndex: 9999
+            width: "25rem",
+            padding: "1.25rem 1.25rem 1.25rem 1.25rem",
+            zIndex: 9000
           }}
         >
           <ColumnSelectorList

@@ -796,6 +796,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectColumn: "Select Column",
+  columnSelector_currentlyDisplayed: "Currently displayed columns:",
+  columnSelector_columnsToBeExported: "Columns to be exported:",
+  columnSelector_addNewColumn: "Add a new column:",
+  columnSelector_addColumnButton: "Add Column",
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
   selectRuleSet: "Select Rule Set",

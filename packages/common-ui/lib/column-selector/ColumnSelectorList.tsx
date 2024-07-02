@@ -5,9 +5,8 @@ import {
   useApiClient
 } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useIntl } from "react-intl";
-import { Button, Toast } from "react-bootstrap";
+import React, { useState, useEffect, useMemo } from "react";
+import { Button } from "react-bootstrap";
 import Kitsu, { KitsuResource } from "kitsu";
 import { ESIndexMapping, TableColumn } from "../list-page/types";
 import useLocalStorage from "@rehooks/local-storage";
@@ -56,12 +55,16 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   displayedColumns,
   setDisplayedColumns,
   loading,
-  // disabled,
+  disabled,
   defaultColumns,
   indexMapping,
   dynamicFieldsMappingConfig
 }: ColumnSelectorListProps<TData>) {
-  const { formatMessage, messages } = useIntl();
+  // If disabled, do not display the column selector.
+  if (disabled) {
+    return <></>;
+  }
+
   const { apiClient } = useApiClient();
 
   // The selected field from the query field selector.
@@ -74,7 +77,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   const [isValidField, setIsValidField] = useState<boolean>(false);
 
   // Local storage of the displayed columns that are saved.
-  const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
+  const [_localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
     useLocalStorage<string[]>(
       `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
       []
@@ -131,9 +134,13 @@ export function ColumnSelectorList<TData extends KitsuResource>({
       (column) => column.id !== columnId
     );
     setDisplayedColumns(newDisplayedColumns);
-    setLocalStorageDisplayedColumns(
-      newDisplayedColumns.map((column) => column?.columnSelectorString ?? "")
-    );
+
+    // Do not save it locally when in export mode, since you can delete columns that are mandatory.
+    if (!exportMode) {
+      setLocalStorageDisplayedColumns(
+        newDisplayedColumns.map((column) => column?.columnSelectorString ?? "")
+      );
+    }
   };
 
   const onColumnItemInsert = async () => {
@@ -157,11 +164,15 @@ export function ColumnSelectorList<TData extends KitsuResource>({
         ];
 
         setDisplayedColumns(newDisplayedColumns);
-        setLocalStorageDisplayedColumns(
-          newDisplayedColumns.map(
-            (column) => column?.columnSelectorString ?? ""
-          )
-        );
+
+        // Do not save when in export mode since manage fields that are mandatory to the list view.
+        if (!exportMode) {
+          setLocalStorageDisplayedColumns(
+            newDisplayedColumns.map(
+              (column) => column?.columnSelectorString ?? ""
+            )
+          );
+        }
       }
     }
   };
@@ -184,11 +195,8 @@ export function ColumnSelectorList<TData extends KitsuResource>({
         return !NOT_EXPORTABLE_COLUMN_IDS.some((id) =>
           (column?.id ?? "").startsWith(id)
         );
-      } else {
-        return !MANDATORY_DISPLAYED_COLUMNS.some((id) =>
-          (column?.id ?? "").startsWith(id)
-        );
       }
+      return true;
     });
   }, [displayedColumns, exportMode]);
 
@@ -219,7 +227,9 @@ export function ColumnSelectorList<TData extends KitsuResource>({
         <LoadingSpinner loading={loading} />
       ) : (
         <>
-          <strong>Add a new column:</strong>
+          <strong>
+            <DinaMessage id="columnSelector_addNewColumn" />
+          </strong>
           <QueryFieldSelector
             indexMap={indexMappingFiltered}
             currentField={selectedField?.value}
@@ -249,19 +259,34 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               disabled={!isValidField}
               onClick={onColumnItemInsert}
             >
-              Add column
+              <DinaMessage id="columnSelector_addColumnButton" />
             </Button>
           </div>
           <br />
 
           {displayedColumnsFiltered.length > 0 && (
             <>
-              <strong>Currently displayed columns:</strong>
+              <strong>
+                <DinaMessage
+                  id={
+                    exportMode
+                      ? "columnSelector_columnsToBeExported"
+                      : "columnSelector_currentlyDisplayed"
+                  }
+                />
+              </strong>
               {displayedColumnsFiltered.map((column) => {
                 return (
                   <ColumnItem
                     key={column.id}
                     column={column}
+                    isMandatoryField={
+                      exportMode
+                        ? false
+                        : MANDATORY_DISPLAYED_COLUMNS.some((id) =>
+                            (column?.id ?? "").startsWith(id)
+                          )
+                    }
                     onColumnItemDelete={onColumnItemDelete}
                   />
                 );
