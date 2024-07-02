@@ -956,7 +956,7 @@ export function QueryPage<TData extends KitsuResource>({
 
       <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
         {/* Group Selection */}
-        {!viewMode && (
+        {!viewMode ? (
           <DinaFormSection horizontal={"flex"}>
             <div className="row">
               <GroupSelectFieldMemoized
@@ -1003,6 +1003,28 @@ export function QueryPage<TData extends KitsuResource>({
                   )}
                   {bulkSplitPath && (
                     <BulkSplitButton pathname={bulkSplitPath} />
+                  )}
+                </div>
+              )}
+            </div>
+          </DinaFormSection>
+        ) : (
+          <DinaFormSection horizontal={"flex"}>
+            <div className="row">
+              {/* Bulk edit buttons - Only shown when not in selection mode. */}
+              {!selectionMode && (
+                <div className="col-md-12 mt-3 d-flex gap-2 justify-content-end align-items-start">
+                  {enableColumnSelector && (
+                    <ColumnSelectorMemo
+                      uniqueName={uniqueName}
+                      exportMode={false}
+                      indexMapping={indexMap}
+                      displayedColumns={displayedColumns as any}
+                      setDisplayedColumns={onDisplayedColumnsChange as any}
+                      defaultColumns={columns as any}
+                      setColumnSelectorLoading={setColumnSelectorLoading}
+                      excludedRelationshipTypes={["collecting-event"]}
+                    />
                   )}
                 </div>
               )}

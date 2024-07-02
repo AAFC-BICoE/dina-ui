@@ -29,6 +29,11 @@ export interface ColumnSelectorIndexMapColumns<TData extends KitsuResource> {
    * API client to be used for the dynamic fields.
    */
   apiClient: Kitsu;
+
+  /**
+   * Array of relationshipType columns to be excluded from the dropdown menu
+   */
+  excludedRelationshipTypes?: string[];
 }
 
 // Hook to get all of index map columns to be added to column selector
@@ -39,9 +44,10 @@ export async function getColumnSelectorIndexMapColumns<
   defaultColumns,
   setColumnOptions,
   setLoading,
-  apiClient
+  apiClient,
+  excludedRelationshipTypes
 }: ColumnSelectorIndexMapColumns<TData>) {
-  const columnOptions: TableColumn<TData>[] = [];
+  let columnOptions: TableColumn<TData>[] = [];
   let defaultColumnsCopy = defaultColumns;
 
   if (indexMapping) {
@@ -88,6 +94,14 @@ export async function getColumnSelectorIndexMapColumns<
     // Add the rest of the default options not added yet.
     if (defaultColumnsCopy) {
       columnOptions.push(...defaultColumnsCopy);
+    }
+    if (excludedRelationshipTypes) {
+      const excludedColumnOptions = columnOptions.filter((columnOption) =>
+        columnOption.relationshipType
+          ? !excludedRelationshipTypes.includes(columnOption.relationshipType)
+          : true
+      );
+      columnOptions = excludedColumnOptions;
     }
 
     setColumnOptions?.(columnOptions);
