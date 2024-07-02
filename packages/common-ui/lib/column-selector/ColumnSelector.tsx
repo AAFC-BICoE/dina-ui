@@ -28,11 +28,6 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   exportMode?: boolean;
 
   /**
-   * Should all the options be disabled.
-   */
-  disabled?: boolean;
-
-  /**
    * Index mapping containing all of the fields that should be displayed in the list.
    */
   indexMapping: ESIndexMapping[] | undefined;
@@ -57,7 +52,7 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   /**
    * The default columns to be loaded in if no columns are found in the local storage.
    */
-  defaultColumns: TableColumn<TData>[];
+  defaultColumns?: TableColumn<TData>[];
 
   /**
    * Indicate if all the columns have been loading in...
@@ -94,39 +89,43 @@ export function ColumnSelector<TData extends KitsuResource>(
     );
 
   useEffect(() => {
-    if (indexMapping && defaultColumns) {
-      const injectedMappings = defaultColumns
-        .map<ESIndexMapping | undefined>((column) => {
-          // Check if this exists within the index mapping already, if not we do not need to inject it inside.
-          if (
-            indexMapping.find(
-              (mapping) =>
-                mapping.label === column.id || mapping.value === column.id
-            )
-          ) {
-            return undefined;
-          }
+    if (indexMapping) {
+      if (defaultColumns) {
+        const injectedMappings = defaultColumns
+          .map<ESIndexMapping | undefined>((column) => {
+            // Check if this exists within the index mapping already, if not we do not need to inject it inside.
+            if (
+              indexMapping.find(
+                (mapping) =>
+                  mapping.label === column.id || mapping.value === column.id
+              )
+            ) {
+              return undefined;
+            }
 
-          return {
-            label: column.id ?? column.label ?? "",
-            path: (column as any)?.accessorKey,
-            type: "text",
-            value: (column as any)?.accessorKey,
-            hideField: false,
-            distinctTerm: false,
-            keywordMultiFieldSupport: column.isKeyword ?? false,
-            keywordNumericSupport: false,
-            optimizedPrefix: false,
-            containsSupport: false,
-            endsWithSupport: false
-          };
-        })
-        .filter((injected) => injected !== undefined);
+            return {
+              label: column.id ?? column.label ?? "",
+              path: (column as any)?.accessorKey,
+              type: "text",
+              value: (column as any)?.accessorKey,
+              hideField: false,
+              distinctTerm: false,
+              keywordMultiFieldSupport: column.isKeyword ?? false,
+              keywordNumericSupport: false,
+              optimizedPrefix: false,
+              containsSupport: false,
+              endsWithSupport: false
+            };
+          })
+          .filter((injected) => injected !== undefined);
 
-      setInjectedIndexMapping([
-        ...indexMapping,
-        ...(injectedMappings as ESIndexMapping[])
-      ]);
+        setInjectedIndexMapping([
+          ...indexMapping,
+          ...(injectedMappings as ESIndexMapping[])
+        ]);
+      } else {
+        setInjectedIndexMapping(indexMapping);
+      }
     }
   }, [indexMapping, defaultColumns]);
 
@@ -163,12 +162,14 @@ export function ColumnSelector<TData extends KitsuResource>(
       localStorageDisplayedColumns?.length === 0
     ) {
       // No local storage to load from, load the default columns in.
-      setDisplayedColumns(defaultColumns);
+      setDisplayedColumns(defaultColumns ?? []);
 
       // Set the default columns into local storage.
-      setLocalStorageDisplayedColumns(
-        defaultColumns.map((column) => column?.id ?? "")
-      );
+      if (defaultColumns) {
+        setLocalStorageDisplayedColumns(
+          defaultColumns.map((column) => column?.id ?? "")
+        );
+      }
     } else {
       loadColumnsFromLocalStorage();
       setLoading(false);

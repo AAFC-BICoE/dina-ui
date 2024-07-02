@@ -55,16 +55,10 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   displayedColumns,
   setDisplayedColumns,
   loading,
-  disabled,
   defaultColumns,
   indexMapping,
   dynamicFieldsMappingConfig
 }: ColumnSelectorListProps<TData>) {
-  // If disabled, do not display the column selector.
-  if (disabled) {
-    return <></>;
-  }
-
   const { apiClient } = useApiClient();
 
   // The selected field from the query field selector.

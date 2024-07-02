@@ -318,16 +318,16 @@ export default function ExportPage<TData extends KitsuResource>() {
                 <Tooltip id="exportObjectsMaxLimitTooltip" />
               )}
           </div>
-          <ColumnSelectorMemo
-            exportMode={true}
-            defaultColumns={[]}
-            displayedColumns={columnsToExport as any}
-            setDisplayedColumns={setColumnsToExport as any}
-            indexMapping={indexMap}
-            uniqueName={uniqueName}
-            disabled={exportType === "OBJECT_ARCHIVE"}
-            dynamicFieldsMappingConfig={dynamicFieldMapping}
-          />
+          {exportType === "TABULAR_DATA" && (
+            <ColumnSelectorMemo
+              exportMode={true}
+              displayedColumns={columnsToExport as any}
+              setDisplayedColumns={setColumnsToExport as any}
+              indexMapping={indexMap}
+              uniqueName={uniqueName}
+              dynamicFieldsMappingConfig={dynamicFieldMapping}
+            />
+          )}
         </div>
       </DinaForm>
     </PageLayout>
