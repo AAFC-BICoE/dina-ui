@@ -52,7 +52,11 @@ export function generateColumnPath({
     }
   }
 
-  return indexMapping.value;
+  if (indexMapping.parentType) {
+    return indexMapping.value;
+  } else {
+    return indexMapping.label;
+  }
 }
 
 export interface GenerateColumnDefinitionProps<TData extends KitsuResource> {
@@ -172,10 +176,10 @@ function getNestedColumn<TData extends KitsuResource>(
     return {
       id: indexColumn.value,
       header: () => (
-        <span>
-          {startCase(indexColumn.parentName + " ")}
-          <FieldHeader name={indexColumn.label} />
-        </span>
+        <FieldHeader
+          name={indexColumn.label}
+          prefixName={startCase(indexColumn.parentName)}
+        />
       ),
       accessorKey,
       isKeyword: indexColumn.keywordMultiFieldSupport,

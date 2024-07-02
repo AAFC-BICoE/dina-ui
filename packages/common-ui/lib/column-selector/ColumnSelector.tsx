@@ -107,7 +107,7 @@ export function ColumnSelector<TData extends KitsuResource>(
               label: column.id ?? column.label ?? "",
               path: (column as any)?.accessorKey,
               type: "text",
-              value: (column as any)?.accessorKey,
+              value: column.id ?? column.label ?? "",
               hideField: false,
               distinctTerm: false,
               keywordMultiFieldSupport: column.isKeyword ?? false,

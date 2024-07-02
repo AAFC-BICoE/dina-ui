@@ -146,7 +146,7 @@ export default function MetadataListPage() {
     },
     stringArrayCell("acTags", "data.attributes.acTags"),
     {
-      id: "viewPreviewButtonText",
+      id: "objectStorePreview",
       cell: ({ row: { original } }) => (
         <div className="d-flex h-100">
           <button

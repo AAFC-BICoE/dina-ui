@@ -27,7 +27,7 @@ import {
 export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
   "selectColumn",
   "thumbnail",
-  "viewPreviewButtonText",
+  "objectStorePreview",
   "assemblages.",
   "projects.",
   "organism."
@@ -37,6 +37,7 @@ export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
 export const MANDATORY_DISPLAYED_COLUMNS: string[] = [
   "selectColumn",
   "thumbnail",
+  "objectStorePreview",
   "originalFilename",
   "materialSampleName",
   "assemblages.",
@@ -118,9 +119,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
 
   // Reset the dynamic field value so it doesn't get mixed with another one.
   useEffect(() => {
-    if (selectedField) {
-      setDynamicFieldValue(undefined);
-    }
+    setDynamicFieldValue(undefined);
   }, [selectedField]);
 
   const onColumnItemDelete = (columnId: string) => {
@@ -139,18 +138,32 @@ export function ColumnSelectorList<TData extends KitsuResource>({
 
   const onColumnItemInsert = async () => {
     if (isValidField && selectedField && indexMapping) {
+      const generatedColumnPath = generateColumnPath({
+        indexMapping: selectedField,
+        dynamicFieldValue
+      });
+
       const newColumnDefinition = await generateColumnDefinition({
         indexMappings: indexMapping,
         dynamicFieldsMappingConfig,
-        path: generateColumnPath({
-          indexMapping: selectedField,
-          dynamicFieldValue
-        }),
+        path: generatedColumnPath,
         defaultColumns,
         apiClient
       });
 
       if (newColumnDefinition) {
+        // If the column already exists do not add it again.
+        if (
+          displayedColumns.find(
+            (column) =>
+              column.columnSelectorString ===
+              newColumnDefinition.columnSelectorString
+          )
+        ) {
+          setSelectedField(undefined);
+          return;
+        }
+
         // Add new option to the bottom of the list.
         const newDisplayedColumns: TableColumn<TData>[] = [
           ...displayedColumns,
@@ -158,6 +171,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
         ];
 
         setDisplayedColumns(newDisplayedColumns);
+        setSelectedField(undefined);
 
         // Do not save when in export mode since manage fields that are mandatory to the list view.
         if (!exportMode) {
@@ -197,6 +211,16 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   const indexMappingFiltered = useMemo(() => {
     if (indexMapping) {
       return indexMapping.filter((mapping) => {
+        // Check if it's already been used, does not need to shown again since they are already displaying it.
+        const alreadyUsed = displayedColumns?.find(
+          (column) =>
+            mapping?.value === column?.columnSelectorString ||
+            mapping?.label === column?.columnSelectorString
+        );
+        if (alreadyUsed) {
+          return false;
+        }
+
         if (exportMode) {
           return !NOT_EXPORTABLE_COLUMN_IDS.some(
             (id) =>
@@ -213,7 +237,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
       });
     }
     return undefined;
-  }, [indexMapping, exportMode]);
+  }, [indexMapping, exportMode, displayedColumns]);
 
   return (
     <>

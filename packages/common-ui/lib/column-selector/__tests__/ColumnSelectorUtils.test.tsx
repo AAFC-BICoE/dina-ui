@@ -135,7 +135,7 @@ describe("ColumnSelectorUtils", () => {
             endsWithSupport: false
           }
         })
-      ).toEqual("data.attributes.materialSampleState");
+      ).toEqual("materialSampleState");
     });
 
     it("Generate relationship level path", () => {
