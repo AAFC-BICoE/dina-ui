@@ -91,7 +91,12 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
                 path: "attributes",
                 fields: ["keyword_numeric"]
               },
-              { name: "dwcRecordNumber", type: "text", path: "attributes" },
+              {
+                name: "dwcRecordNumber",
+                type: "text",
+                path: "attributes",
+                fields: ["keyword"]
+              },
               {
                 name: "startEventDateTime",
                 type: "date",
