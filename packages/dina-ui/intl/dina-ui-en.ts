@@ -352,6 +352,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
   field__globalSearch: "Global search",
+  field__relationshipPresence: "Relationship Presence",
   field_gridLayoutDefinition_column_label: "By Column",
   field_gridLayoutDefinition_row_label: "By Row",
   field_host: "Host",
@@ -705,6 +706,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "See user documentation for all supported syntax.",
   queryBuilder_managedAttribute_placeholder:
     "Select managed attribute to search against...",
+  queryBuilder_operator_presence: "Presence",
+  queryBuilder_operator_absence: "Absence",
   queryBuilder_operator_containsDate: "Contains",
   queryBuilder_operator_between: "Between",
   queryBuilder_operator_between_tooltip:

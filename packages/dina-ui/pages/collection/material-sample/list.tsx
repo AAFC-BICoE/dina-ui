@@ -385,6 +385,7 @@ export default function MaterialSampleListPage() {
               }
             ]
           }}
+          enableRelationshipPresence={true}
           columns={columns}
           bulkDeleteButtonProps={{
             typeName: "material-sample",

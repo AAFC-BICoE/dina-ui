@@ -239,7 +239,10 @@ export interface TransformToDSLProps {
   indexMap?: ESIndexMapping[];
 }
 
-export type DynamicFieldType = "managedAttribute" | "fieldExtension";
+export type DynamicFieldType =
+  | "managedAttribute"
+  | "fieldExtension"
+  | "relationshipPresence";
 
 export interface DynamicFieldsMappingConfig {
   /** Attribute level dynamic fields */

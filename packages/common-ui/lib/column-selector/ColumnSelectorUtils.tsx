@@ -184,6 +184,9 @@ async function getDynamicFieldColumns<TData extends KitsuResource>(
     await getExtensionValuesColumns(columnMapping, apiClient, columnOptions);
   } else if (columnMapping.type === "managedAttribute") {
     await getManagedAttributesColumns(columnMapping, apiClient, columnOptions);
+  } else if (columnMapping.type === "relationshipPresence") {
+    // To be implemented.
+    return;
   } else {
     throw Error("Uncaught queryOption type.");
   }

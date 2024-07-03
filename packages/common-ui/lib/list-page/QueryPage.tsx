@@ -120,6 +120,11 @@ export interface QueryPageProps<TData extends KitsuResource> {
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
   /**
+   * This will add an option to the QueryBuilder to allow users to check if a relationship exists.
+   */
+  enableRelationshipPresence?: boolean;
+
+  /**
    * By default, the QueryPage will try sorting using `createdOn` attribute. You can override this
    * setting by providing your own default sort.
    */
@@ -261,6 +266,7 @@ export function QueryPage<TData extends KitsuResource>({
   indexName,
   uniqueName,
   dynamicFieldMapping,
+  enableRelationshipPresence = false,
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
@@ -343,6 +349,7 @@ export function QueryPage<TData extends KitsuResource>({
   const { queryBuilderConfig, indexMap } = useQueryBuilderConfig({
     indexName,
     dynamicFieldMapping,
+    enableRelationshipPresence,
     customViewFields
   });
 
