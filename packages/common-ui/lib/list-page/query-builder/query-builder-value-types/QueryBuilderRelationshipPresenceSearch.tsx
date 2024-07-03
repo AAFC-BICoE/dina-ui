@@ -113,6 +113,23 @@ export default function QueryRowRelationshipPresenceSearch({
         onInputChange={(inputValue) => setRelationshipSearchValue(inputValue)}
         inputValue={relationshipSearchValue}
       />
+
+      {/* Operator Selector */}
+      {selectedRelationship && (
+        <>
+          <Select<SelectOption<string>>
+            options={operatorOptions}
+            className={`col me-1 ps-0`}
+            value={selectedOperator}
+            onChange={(selected) =>
+              setRelationshipPresenceState({
+                ...relationshipPresenceState,
+                selectedOperator: selected?.value ?? ""
+              })
+            }
+          />
+        </>
+      )}
     </div>
   );
 }
