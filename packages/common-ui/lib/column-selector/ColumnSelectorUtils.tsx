@@ -1,160 +1,186 @@
 import { FieldHeader, dateCell } from "..";
-import { ESIndexMapping, TableColumn } from "../list-page/types";
+import {
+  DynamicField,
+  DynamicFieldsMappingConfig,
+  ESIndexMapping,
+  RelationshipDynamicField,
+  TableColumn
+} from "../list-page/types";
 import Kitsu, { GetParams, KitsuResource } from "kitsu";
-import { get } from "lodash";
+import { get, startCase } from "lodash";
 import React from "react";
+import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
 
-export interface ColumnSelectorIndexMapColumns<TData extends KitsuResource> {
-  /**
-   * Index mapping used to determine all the supported fields that can be displayed.
-   */
-  indexMapping?: ESIndexMapping[];
+export interface GenerateColumnPathProps {
+  /** Index mapping for the column to generate the column path. */
+  indexMapping: ESIndexMapping;
+
+  /** Dynamic field value passed from the query builder managed attribute/field extension components */
+  dynamicFieldValue?: string;
+}
+
+export function generateColumnPath({
+  indexMapping,
+  dynamicFieldValue
+}: GenerateColumnPathProps) {
+  // Handle the path for dynamic fields.
+  if (indexMapping.dynamicField && dynamicFieldValue) {
+    switch (indexMapping.dynamicField.type) {
+      case "managedAttribute":
+        const managedAttributeValues: ManagedAttributeSearchStates =
+          JSON.parse(dynamicFieldValue);
+        return (
+          indexMapping.dynamicField.type +
+          "/" +
+          (indexMapping.dynamicField?.component ?? "ENTITY") +
+          "/" +
+          managedAttributeValues?.selectedManagedAttribute?.key
+        );
+      case "fieldExtension":
+        const fieldExtensionValues: FieldExtensionSearchStates =
+          JSON.parse(dynamicFieldValue);
+        return (
+          indexMapping.dynamicField.type +
+          "/" +
+          (indexMapping.dynamicField?.component ?? "ENTITY") +
+          "/" +
+          fieldExtensionValues?.selectedExtension +
+          "/" +
+          fieldExtensionValues?.selectedField
+        );
+    }
+  }
+
+  if (indexMapping.parentType) {
+    return indexMapping.value;
+  } else {
+    return indexMapping.label;
+  }
+}
+
+export interface GenerateColumnDefinitionProps<TData extends KitsuResource> {
+  /** The index mapping for the field to be added. */
+  indexMappings: ESIndexMapping[];
+
+  /** Dynamic field mapping configuration. */
+  dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig;
+
+  /** The path of the column to be generated. This is used to search against the index mappings. */
+  path: string;
 
   /**
-   * Any missing items or preferred table mappings
+   * Preferred mappings to use instead of generating a new column.
    */
   defaultColumns?: TableColumn<TData>[];
 
   /**
-   * State to be set which will hold all the options.
-   */
-  setColumnOptions?: React.Dispatch<React.SetStateAction<TableColumn<TData>[]>>;
-
-  /**
-   * Once the list has been loaded, the loading can be set as completed.
-   */
-  setLoading?: React.Dispatch<React.SetStateAction<boolean>>;
-
-  /**
-   * API client to be used for the dynamic fields.
+   * API client to be used for generating the dynamic fields.
    */
   apiClient: Kitsu;
-
-  /**
-   * Array of relationshipType columns to be excluded from the dropdown menu
-   */
-  excludedRelationshipTypes?: string[];
 }
 
-// Hook to get all of index map columns to be added to column selector
-export async function getColumnSelectorIndexMapColumns<
-  TData extends KitsuResource
->({
-  indexMapping,
+export async function generateColumnDefinition<TData extends KitsuResource>({
+  indexMappings,
+  dynamicFieldsMappingConfig,
+  path,
   defaultColumns,
-  setColumnOptions,
-  setLoading,
-  apiClient,
-  excludedRelationshipTypes
-}: ColumnSelectorIndexMapColumns<TData>) {
-  let columnOptions: TableColumn<TData>[] = [];
-  let defaultColumnsCopy = defaultColumns;
+  apiClient
+}: GenerateColumnDefinitionProps<TData>): Promise<
+  TableColumn<TData> | undefined
+> {
+  // Link the path to a index mapping.
+  const indexMapping = indexMappings.find(
+    (mapping) => mapping.label === path || mapping.value === path
+  );
 
-  if (indexMapping) {
-    for (const indexColumn of indexMapping) {
-      // Check if it's a dynamic field that needs to be loaded in using the API client.
-      if (indexColumn.dynamicField) {
-        await getDynamicFieldColumns(indexColumn, apiClient, columnOptions);
-      } else if (indexColumn.hideField) {
-        // Skip this field, it shouldn't be displayed.
-        continue;
-      } else {
-        if (indexColumn.parentType) {
-          // Check if it's mapped in the default columns, and just use that definition.
-          const defaultColumnFound = defaultColumnsCopy?.find(
-            (item) => item.id === indexColumn.value
-          );
-          if (defaultColumnFound) {
-            columnOptions.push(defaultColumnFound);
-            defaultColumnsCopy = defaultColumnsCopy?.filter(
-              (item) => item.id !== indexColumn.value
-            );
-            continue;
-          }
+  // Check if it's a dynamic field if it could not be found directly in the index mapping.
+  if (!indexMapping || indexMapping?.dynamicField) {
+    return await getDynamicFieldColumn(
+      path,
+      apiClient,
+      dynamicFieldsMappingConfig
+    );
+  }
 
-          getNestedColumns(indexColumn, columnOptions);
-        } else {
-          // Check if it's mapped in the default columns, and just use that definition.
-          const defaultColumnFound = defaultColumnsCopy?.find(
-            (item) => item.id === indexColumn.label
-          );
-          if (defaultColumnFound) {
-            columnOptions.push(defaultColumnFound);
-            defaultColumnsCopy = defaultColumnsCopy?.filter(
-              (item) => item.id !== indexColumn.label
-            );
-            continue;
-          }
-
-          getEntityColumns(indexColumn, columnOptions);
-        }
-      }
+  // Check if it's a nested relationship.
+  if (indexMapping.parentType) {
+    // Check if it's mapped in the default columns, and just use that definition.
+    const defaultColumnFound = defaultColumns?.find(
+      (item) => item.id === indexMapping.value
+    );
+    if (defaultColumnFound) {
+      return { ...defaultColumnFound, columnSelectorString: path };
     }
 
-    // Add the rest of the default options not added yet.
-    if (defaultColumnsCopy) {
-      columnOptions.push(...defaultColumnsCopy);
-    }
-    if (excludedRelationshipTypes) {
-      const excludedColumnOptions = columnOptions.filter((columnOption) =>
-        columnOption.relationshipType
-          ? !excludedRelationshipTypes.includes(columnOption.relationshipType)
-          : true
-      );
-      columnOptions = excludedColumnOptions;
+    return getNestedColumn(path, indexMapping);
+  } else {
+    // Check if it's mapped in the default columns, and just use that definition.
+    const defaultColumnFound = defaultColumns?.find(
+      (item) => item.id === indexMapping.label
+    );
+    if (defaultColumnFound) {
+      return { ...defaultColumnFound, columnSelectorString: path };
     }
 
-    setColumnOptions?.(columnOptions);
-    setLoading?.(false);
+    return getEntityColumn(path, indexMapping);
   }
 }
 
-function getEntityColumns<TData extends KitsuResource>(
-  indexColumn: ESIndexMapping,
-  columnOptions: TableColumn<TData>[]
-) {
+function getEntityColumn<TData extends KitsuResource>(
+  path: string,
+  indexColumn: ESIndexMapping
+): TableColumn<TData> {
   if (indexColumn.type === "date") {
-    columnOptions.push(
-      dateCell(
+    return {
+      ...dateCell(
         indexColumn?.label,
         indexColumn?.value,
         undefined,
         true,
         indexColumn
-      )
-    );
+      ),
+      columnSelectorString: path
+    };
   } else {
-    columnOptions.push({
+    return {
       id: indexColumn.label,
       header: () => <FieldHeader name={indexColumn?.label} />,
       accessorKey: indexColumn?.value,
-      isKeyword: indexColumn?.keywordMultiFieldSupport
-    });
+      isKeyword: indexColumn?.keywordMultiFieldSupport,
+      columnSelectorString: path
+    };
   }
 }
 
-function getNestedColumns<TData extends KitsuResource>(
-  indexColumn: ESIndexMapping,
-  columnOptions: TableColumn<TData>[]
-) {
+function getNestedColumn<TData extends KitsuResource>(
+  path: string,
+  indexColumn: ESIndexMapping
+): TableColumn<TData> {
   const accessorKey = `${indexColumn.parentPath}.${
     indexColumn.path.split(".")[0]
   }.${indexColumn.label}`;
 
   if (indexColumn.type === "date") {
-    columnOptions.push(
-      dateCell(
+    return {
+      ...dateCell(
         indexColumn.value,
         accessorKey,
         indexColumn.parentType,
         true,
         indexColumn
-      )
-    );
+      ),
+      columnSelectorString: path
+    };
   } else {
-    columnOptions.push({
+    return {
       id: indexColumn.value,
-      header: () => <FieldHeader name={indexColumn.label} />,
+      header: () => (
+        <FieldHeader
+          name={indexColumn.label}
+          prefixName={startCase(indexColumn.parentName)}
+        />
+      ),
       accessorKey,
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
@@ -169,82 +195,137 @@ function getNestedColumns<TData extends KitsuResource>(
         const value = get(original, valuePath);
         return <>{value}</>;
       },
-      relationshipType: indexColumn.parentType
-    });
+      relationshipType: indexColumn.parentType,
+      columnSelectorString: path
+    };
   }
 }
 
 // Handle getting columns from query options that contain dynamicField
-async function getDynamicFieldColumns<TData extends KitsuResource>(
-  columnMapping: ESIndexMapping,
+async function getDynamicFieldColumn<TData extends KitsuResource>(
+  path: string,
   apiClient: Kitsu,
-  columnOptions: TableColumn<TData>[]
-) {
-  if (columnMapping.type === "fieldExtension") {
-    await getExtensionValuesColumns(columnMapping, apiClient, columnOptions);
-  } else if (columnMapping.type === "managedAttribute") {
-    await getManagedAttributesColumns(columnMapping, apiClient, columnOptions);
-  } else {
-    throw Error("Uncaught queryOption type.");
+  dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig
+): Promise<TableColumn<TData> | undefined> {
+  const pathParts = path.split("/");
+  if (dynamicFieldsMappingConfig && pathParts.length > 0) {
+    // Handle managed attribute paths.
+    if (pathParts.length === 3 && pathParts[0] === "managedAttribute") {
+      const component = pathParts[1];
+      const key = pathParts[2];
+      return getManagedAttributesColumn(
+        path,
+        component,
+        key,
+        apiClient,
+        dynamicFieldsMappingConfig
+      );
+    }
+
+    // Handle field extension paths.
+    if (pathParts.length === 4 && pathParts[0] === "fieldExtension") {
+      const component = pathParts[1];
+      const extension = pathParts[2];
+      const field = pathParts[3];
+      return getFieldExtensionColumn(
+        path,
+        component,
+        extension,
+        field,
+        apiClient,
+        dynamicFieldsMappingConfig
+      );
+    }
   }
+
+  // Unable to process path.
+  return undefined;
 }
 
-async function getManagedAttributesColumns<TData extends KitsuResource>(
-  columnMapping: ESIndexMapping,
+async function getManagedAttributesColumn<TData extends KitsuResource>(
+  path: string,
+  component: string,
+  key: string,
   apiClient: Kitsu,
-  columnOptions: TableColumn<TData>[]
-) {
+  dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
+): Promise<TableColumn<TData> | undefined> {
+  // API request params:
   const params = {
     filter: {
-      managedAttributeComponent: columnMapping.dynamicField?.component ?? ""
+      managedAttributeComponent: component,
+      key
     },
-    page: { limit: 1000 }
+    page: { limit: 1 }
   };
-  try {
-    const managedAttributes = await fetchDynamicField(
-      apiClient,
-      columnMapping.dynamicField?.apiEndpoint,
-      params
+
+  // Figure out API endpoint using the dynamicFieldsMappingConfig.
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find(
+    (config) =>
+      config.type === "managedAttribute" && config.component === component
+  );
+  const relationshipConfigMatch =
+    dynamicFieldsMappingConfig.relationshipFields.find(
+      (config) =>
+        config.type === "managedAttribute" && config.component === component
     );
-    if (columnMapping.parentType) {
-      // Handle included managed attribute
-      getIncludedManagedAttributeColumns<TData>(
-        managedAttributes,
-        columnMapping,
-        columnOptions
+
+  if (!fieldConfigMatch && !relationshipConfigMatch) {
+    console.error(
+      "Managed Attribute Config for the following component: " +
+        component +
+        " could not be determined."
+    );
+    return;
+  }
+
+  try {
+    if (fieldConfigMatch) {
+      // API request for the managed attribute.
+      const managedAttribute = await fetchDynamicField(
+        apiClient,
+        fieldConfigMatch.apiEndpoint,
+        params
       );
-    } else {
-      getAttributesManagedAttributeColumns<TData>(
-        managedAttributes,
-        columnMapping,
-        columnOptions
+
+      if (managedAttribute[0]) {
+        return getAttributesManagedAttributeColumn<TData>(
+          path,
+          managedAttribute[0],
+          fieldConfigMatch
+        );
+      }
+    }
+
+    if (relationshipConfigMatch) {
+      // API request for the managed attribute.
+      const managedAttribute = await fetchDynamicField(
+        apiClient,
+        relationshipConfigMatch.apiEndpoint,
+        params
       );
+      if (managedAttribute[0]) {
+        return getIncludedManagedAttributeColumn<TData>(
+          path,
+          managedAttribute[0],
+          relationshipConfigMatch
+        );
+      }
     }
   } catch (error) {
     // Handle the error here, e.g., log it or display an error message.
     throw error;
   }
+
+  return undefined;
 }
 
-function getIncludedManagedAttributeColumns<TData extends KitsuResource>(
-  managedAttributes,
-  columnMapping: ESIndexMapping,
-  columnOptions: TableColumn<TData>[]
-) {
-  const includedManagedAttributeColumns = managedAttributes?.map(
-    (managedAttribute) =>
-      getIncludedManagedAttributeColumn(managedAttribute, columnMapping)
-  );
-
-  columnOptions.push(...includedManagedAttributeColumns);
-}
-
-export function getIncludedManagedAttributeColumn(
+export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
+  path: string,
   managedAttribute: any,
-  columnMapping: ESIndexMapping
-) {
+  config: RelationshipDynamicField
+): TableColumn<TData> {
   const managedAttributeKey = managedAttribute.key;
-  const accessorKey = `${columnMapping.path}.${managedAttributeKey}`;
+  const accessorKey = `${config.path}.${managedAttributeKey}`;
 
   const managedAttributesColumn = {
     cell: ({ row: { original } }) => {
@@ -252,7 +333,7 @@ export function getIncludedManagedAttributeColumn(
       relationshipAccessor?.splice(
         1,
         0,
-        columnMapping.parentType ? columnMapping.parentType : ""
+        config.referencedType ? config.referencedType : ""
       );
       const valuePath = relationshipAccessor?.join(".");
       const value = get(original, valuePath);
@@ -260,96 +341,187 @@ export function getIncludedManagedAttributeColumn(
     },
     header: () => <FieldHeader name={managedAttribute.name} />,
     accessorKey,
-    id: `${columnMapping.parentName}.${columnMapping.label}.${managedAttributeKey}`,
+    id: `${config.referencedBy}.${config.label}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: true,
-    relationshipType: columnMapping.parentType,
+    relationshipType: config.referencedType,
     managedAttribute,
-    columnMapping
+    config,
+    columnSelectorString: path
   };
 
   return managedAttributesColumn;
 }
 
-function getAttributesManagedAttributeColumns<TData extends KitsuResource>(
-  managedAttributes,
-  columnMapping: ESIndexMapping,
-  columnOptions: TableColumn<TData>[]
-) {
-  const attributesManagedAttributeColumns = managedAttributes?.map(
-    (managedAttribute) =>
-      getAttributesManagedAttributeColumn(managedAttribute, columnMapping)
-  );
-
-  columnOptions.push(...attributesManagedAttributeColumns);
-}
-
-export function getAttributesManagedAttributeColumn(
+export function getAttributesManagedAttributeColumn<
+  TData extends KitsuResource
+>(
+  path: string,
   managedAttribute: any,
-  columnMapping: ESIndexMapping
-) {
+  config: DynamicField
+): TableColumn<TData> {
   const managedAttributeKey = managedAttribute.key;
-  const accessorKey = `${columnMapping.path}.${managedAttributeKey}`;
+  const accessorKey = `${config.path}.${managedAttributeKey}`;
   const managedAttributesColumn = {
     header: () => <FieldHeader name={managedAttribute.name} />,
     accessorKey,
-    id: `${columnMapping.label}.${managedAttributeKey}`,
+    id: `${config.label}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: true,
-    columnMapping,
+    config,
     managedAttribute,
-    sortDescFirst: true
+    sortDescFirst: true,
+    columnSelectorString: path
   };
 
   return managedAttributesColumn;
 }
 
-function getAttributesExtensionValuesColumns<TData extends KitsuResource>(
-  extensionValues,
-  columnMapping: ESIndexMapping,
-  columnOptions: TableColumn<TData>[]
-) {
-  const totalAttributesExtensionValuesCols: TableColumn<TData>[] = [].concat(
-    ...extensionValues?.map((extensionValue) =>
-      getAttributeExtensionValuesColumn(extensionValue, columnMapping)
-    )
-  );
+// Get attribute and included extension values columns
+async function getFieldExtensionColumn<TData extends KitsuResource>(
+  path: string,
+  component: string,
+  extension: string,
+  field: string,
+  apiClient: Kitsu,
+  dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
+): Promise<TableColumn<TData> | undefined> {
+  // API request params:
+  const params = {
+    filter: {
+      "extension.fields.dinaComponent": component,
+      "extension.fields.key": field,
+      "extension.key": extension
+    },
+    page: { limit: 1 }
+  };
 
-  columnOptions.push(...totalAttributesExtensionValuesCols);
+  // Figure out API endpoint using the dynamicFieldsMappingConfig.
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find(
+    (config) =>
+      config.type === "fieldExtension" && config.component === component
+  );
+  const relationshipConfigMatch =
+    dynamicFieldsMappingConfig.relationshipFields.find(
+      (config) =>
+        config.type === "fieldExtension" && config.component === component
+    );
+
+  if (!fieldConfigMatch && !relationshipConfigMatch) {
+    console.error(
+      "Field Extension Config for the following component: " +
+        component +
+        " could not be determined."
+    );
+    return;
+  }
+
+  try {
+    if (fieldConfigMatch) {
+      // API request for the field extension.
+      const extensionValueRequest = await fetchDynamicField(
+        apiClient,
+        fieldConfigMatch.apiEndpoint,
+        params
+      );
+      const extensionPackage = extensionValueRequest?.[0];
+      const fieldDefinition =
+        extensionValueRequest?.[0]?.extension?.fields?.find(
+          (extensionField) => extensionField?.key === field
+        );
+
+      if (extensionPackage && fieldDefinition) {
+        return getAttributeExtensionFieldColumn(
+          path,
+          fieldConfigMatch,
+          extensionPackage,
+          fieldDefinition
+        );
+      }
+    }
+
+    if (relationshipConfigMatch) {
+      // API request for the field extension.
+      const extensionValueRequest = await fetchDynamicField(
+        apiClient,
+        relationshipConfigMatch.apiEndpoint,
+        params
+      );
+      const extensionPackage = extensionValueRequest?.[0];
+      const fieldDefinition =
+        extensionValueRequest?.[0]?.extension?.fields?.find(
+          (extensionField) => extensionField?.key === field
+        );
+
+      if (extensionPackage && fieldDefinition) {
+        return getIncludedExtensionFieldColumn(
+          path,
+          relationshipConfigMatch,
+          extensionPackage,
+          fieldDefinition
+        );
+      }
+    }
+  } catch (error) {
+    // Handle the error here, e.g., log it or display an error message.
+    throw error;
+  }
 }
 
-function getAttributeExtensionValuesColumn(
-  extensionValue: any,
-  columnMapping: ESIndexMapping
-) {
-  const extensionFields = extensionValue.extension.fields;
-  const attributeExtensionValuesColumns = extensionFields?.map(
-    (extensionField) =>
-      getAttributeExtensionFieldColumn(
-        columnMapping,
-        extensionValue,
-        extensionField
-      )
-  );
-  return attributeExtensionValuesColumns;
-}
-
-export function getAttributeExtensionFieldColumn(
-  columnMapping: ESIndexMapping,
+export function getAttributeExtensionFieldColumn<TData extends KitsuResource>(
+  path: string,
+  config: DynamicField,
   extensionValue: any,
   extensionField: any
-) {
-  const fieldExtensionResourceType = columnMapping.path.split(".").at(-1);
+): TableColumn<TData> {
+  const fieldExtensionResourceType = config.path.split(".").at(-1);
   const extensionValuesColumn = {
-    accessorKey: `${columnMapping.path}.${extensionValue.id}.${extensionField.key}`,
+    accessorKey: `${config.path}.${extensionValue.id}.${extensionField.key}`,
     id: `${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
     header: () => `${extensionValue.extension.name} - ${extensionField.name}`,
     label: `${extensionValue.extension.name} - ${extensionField.name}`,
-    isKeyword: columnMapping.keywordMultiFieldSupport,
+    isKeyword: true,
     isColumnVisible: true,
-    columnMapping,
+    config,
     extensionValue,
-    extensionField
+    extensionField,
+    columnSelectorString: path
+  };
+
+  return extensionValuesColumn;
+}
+
+export function getIncludedExtensionFieldColumn(
+  path: string,
+  config: RelationshipDynamicField,
+  extensionValue: any,
+  extensionField: any
+) {
+  const fieldExtensionResourceType = config.path.split(".").at(-1);
+  const accessorKey = `${config.path}.${extensionValue.id}.${extensionField.key}`;
+  const extensionValuesColumn = {
+    cell: ({ row: { original } }) => {
+      const relationshipAccessor = accessorKey?.split(".");
+      relationshipAccessor?.splice(
+        1,
+        0,
+        config.referencedType ? config.referencedType : ""
+      );
+      const valuePath = relationshipAccessor?.join(".");
+      const value = get(original, valuePath);
+      return <>{value}</>;
+    },
+    accessorKey,
+    id: `${config.referencedBy}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
+    header: () => `${extensionValue.extension.name} - ${extensionField.name}`,
+    label: `${extensionValue.extension.name} - ${extensionField.name}`,
+    isKeyword: true,
+    isColumnVisible: true,
+    relationshipType: config.referencedType,
+    config,
+    extensionValue,
+    extensionField,
+    columnSelectorString: path
   };
 
   return extensionValuesColumn;
@@ -358,110 +530,5 @@ export function getAttributeExtensionFieldColumn(
 // Fetch filtered dynamic field from back end
 async function fetchDynamicField(apiClient: Kitsu, path, params?: GetParams) {
   const { data } = await apiClient.get(path, params ?? {});
-
   return data;
-}
-
-// Get attribute and included extension values columns
-async function getExtensionValuesColumns<TData extends KitsuResource>(
-  columnMapping: ESIndexMapping,
-  apiClient: Kitsu,
-  columnOptions: TableColumn<TData>[]
-) {
-  const params = {
-    filter: {
-      "extension.fields.dinaComponent":
-        columnMapping.dynamicField?.component ?? ""
-    },
-    page: { limit: 1000 }
-  };
-  try {
-    const extensionValues = await fetchDynamicField(
-      apiClient,
-      columnMapping.dynamicField?.apiEndpoint,
-      params
-    );
-    if (columnMapping.parentType) {
-      // Handle included extension values
-      getIncludedExtensionValuesColumns(
-        extensionValues,
-        columnMapping,
-        columnOptions
-      );
-    } else {
-      getAttributesExtensionValuesColumns(
-        extensionValues,
-        columnMapping,
-        columnOptions
-      );
-    }
-  } catch (error) {
-    // Handle the error here, e.g., log it or display an error message.
-    throw error;
-  }
-}
-
-// Get included Extension Values column from ES field
-function getIncludedExtensionValuesColumns<TData extends KitsuResource>(
-  extensionValues,
-  columnMapping: ESIndexMapping,
-  columnOptions: TableColumn<TData>[]
-) {
-  const totalIncludedExtensionValuesCols: TableColumn<TData>[] = [].concat(
-    ...extensionValues?.map((extensionValue) =>
-      getIncludedExtensionValuesColumn(extensionValue, columnMapping)
-    )
-  );
-
-  columnOptions.push(...totalIncludedExtensionValuesCols);
-}
-
-function getIncludedExtensionValuesColumn(
-  extensionValue: any,
-  columnMapping: ESIndexMapping
-) {
-  const extensionFields = extensionValue.extension.fields;
-  const includedExtensionValuesColumns = extensionFields?.map(
-    (extensionField) =>
-      getIncludedExtensionFieldColumn(
-        columnMapping,
-        extensionValue,
-        extensionField
-      )
-  );
-  return includedExtensionValuesColumns;
-}
-
-export function getIncludedExtensionFieldColumn(
-  columnMapping: ESIndexMapping,
-  extensionValue: any,
-  extensionField: any
-) {
-  const fieldExtensionResourceType = columnMapping.path.split(".").at(-1);
-  const accessorKey = `${columnMapping.path}.${extensionValue.id}.${extensionField.key}`;
-  const extensionValuesColumn = {
-    cell: ({ row: { original } }) => {
-      const relationshipAccessor = accessorKey?.split(".");
-      relationshipAccessor?.splice(
-        1,
-        0,
-        columnMapping.parentType ? columnMapping.parentType : ""
-      );
-      const valuePath = relationshipAccessor?.join(".");
-      const value = get(original, valuePath);
-      return <>{value}</>;
-    },
-    accessorKey,
-    id: `${columnMapping.parentName}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
-    header: () => `${extensionValue.extension.name} - ${extensionField.name}`,
-    label: `${extensionValue.extension.name} - ${extensionField.name}`,
-    isKeyword: columnMapping.keywordMultiFieldSupport,
-    isColumnVisible: true,
-    relationshipType: columnMapping.parentType,
-    columnMapping,
-    extensionValue,
-    extensionField
-  };
-
-  return extensionValuesColumn;
 }

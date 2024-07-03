@@ -120,6 +120,11 @@ export interface QueryPageProps<TData extends KitsuResource> {
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
   /**
+   * Array of relationshipType columns to be excluded from the dropdown menu
+   */
+  excludedRelationshipTypes?: string[];
+
+  /**
    * By default, the QueryPage will try sorting using `createdOn` attribute. You can override this
    * setting by providing your own default sort.
    */
@@ -261,6 +266,7 @@ export function QueryPage<TData extends KitsuResource>({
   indexName,
   uniqueName,
   dynamicFieldMapping,
+  excludedRelationshipTypes,
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
@@ -974,10 +980,12 @@ export function QueryPage<TData extends KitsuResource>({
                       uniqueName={uniqueName}
                       exportMode={false}
                       indexMapping={indexMap}
+                      dynamicFieldsMappingConfig={dynamicFieldMapping}
                       displayedColumns={displayedColumns as any}
                       setDisplayedColumns={onDisplayedColumnsChange as any}
                       defaultColumns={columns as any}
                       setColumnSelectorLoading={setColumnSelectorLoading}
+                      excludedRelationshipTypes={excludedRelationshipTypes}
                     />
                   )}
                   {bulkEditPath && (
@@ -1023,7 +1031,8 @@ export function QueryPage<TData extends KitsuResource>({
                       setDisplayedColumns={onDisplayedColumnsChange as any}
                       defaultColumns={columns as any}
                       setColumnSelectorLoading={setColumnSelectorLoading}
-                      excludedRelationshipTypes={["collecting-event"]}
+                      dynamicFieldsMappingConfig={dynamicFieldMapping}
+                      excludedRelationshipTypes={excludedRelationshipTypes}
                     />
                   )}
                 </div>

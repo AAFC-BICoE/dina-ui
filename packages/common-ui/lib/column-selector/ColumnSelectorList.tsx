@@ -1,24 +1,33 @@
 import {
   LoadingSpinner,
-  FieldHeader,
   VISIBLE_INDEX_LOCAL_STORAGE_KEY,
-  ColumnSelectorProps
+  ColumnSelectorProps,
+  useApiClient
 } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState, useEffect, useCallback } from "react";
-import Dropdown from "react-bootstrap/Dropdown";
-import { useIntl } from "react-intl";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "react-bootstrap";
 import Kitsu, { KitsuResource } from "kitsu";
-import { Checkbox } from "./GroupedCheckboxWithLabel";
-import { TableColumn } from "../list-page/types";
+import { ESIndexMapping, TableColumn } from "../list-page/types";
 import useLocalStorage from "@rehooks/local-storage";
+import { QueryFieldSelector } from "../list-page/query-builder/query-builder-core-components/QueryFieldSelector";
+import { ColumnItem } from "./ColumnItem";
+import QueryRowManagedAttributeSearch, {
+  ManagedAttributeSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import QueryRowFieldExtensionSearch, {
+  FieldExtensionSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
+import {
+  generateColumnDefinition,
+  generateColumnPath
+} from "./ColumnSelectorUtils";
 
 // IDs of columns not supported for exporting
 export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
   "selectColumn",
   "thumbnail",
-  "viewPreviewButtonText",
+  "objectStorePreview",
   "assemblages.",
   "projects.",
   "organism."
@@ -37,15 +46,7 @@ export const MANDATORY_DISPLAYED_COLUMNS: string[] = [
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
-  columnOptions: TableColumn<TData>[];
   loading: boolean;
-}
-
-interface NonAppliedOptionChange<TData extends KitsuResource> {
-  column: TableColumn<TData>;
-
-  /** True is the column being activated on, false is the column being activated off */
-  state: boolean;
 }
 
 export function ColumnSelectorList<TData extends KitsuResource>({
@@ -53,381 +54,262 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   uniqueName,
   displayedColumns,
   setDisplayedColumns,
-  columnOptions,
   loading,
-  disabled
+  defaultColumns,
+  indexMapping,
+  dynamicFieldsMappingConfig
 }: ColumnSelectorListProps<TData>) {
-  const { formatMessage, messages } = useIntl();
+  const { apiClient } = useApiClient();
 
-  // Search value for filtering the options.
-  const [searchValue, setSearchValue] = useState<string>("");
+  // The selected field from the query field selector.
+  const [selectedField, setSelectedField] = useState<ESIndexMapping>();
 
-  // State indicating if the select all option has been selected.
-  const [selectAll, setSelectAll] = useState<boolean>(false);
+  // Used for dynamic fields to store the specific dynamic value selected.
+  const [dynamicFieldValue, setDynamicFieldValue] = useState<string>();
 
-  // Stores all of the options selected but not applied yet.
-  const [nonAppliedOptions, setNonAppliedOptions] = useState<
-    NonAppliedOptionChange<TData>[]
-  >([]);
+  // Used for the "Add column" button to determine if it should be disabled or not.
+  const [isValidField, setIsValidField] = useState<boolean>(false);
 
   // Local storage of the displayed columns that are saved.
-  const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
+  const [_localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
     useLocalStorage<string[]>(
       `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
       []
     );
 
-  // In exportMode, automatically apply the changes without saving it to local storage.
+  // Handle what happens when the user selects an option from the Query Field Selector. If a dynamic
+  // field is selected, verify we are at a point where it can be added.
   useEffect(() => {
-    if (exportMode && nonAppliedOptions.length > 0) {
-      applyFilterColumns(false);
-    }
-  }, [exportMode, nonAppliedOptions]);
-
-  /**
-   * Search filter function, this is used to search through all the possible columns to display
-   * specific ones first.
-   *
-   * @param item Column definition.
-   * @returns true if it should be included in the results, false if not.
-   */
-  function searchFilter(item: TableColumn<TData>) {
-    // If empty search, skip filtering.
-    if (searchValue === "") {
-      return true;
-    }
-
-    // Check if either label or id exists and has a corresponding message
-    if (
-      (item.label && messages["field_" + item.label]) ||
-      (item.id && messages["field_" + item.id])
-    ) {
-      // Format the message and check for search value (case-insensitive)
-      if (
-        formatMessage({ id: "field_" + (item.label || item.id) })
-          .toLowerCase()
-          .indexOf(searchValue.toLowerCase()) !== -1
-      ) {
-        return true;
-      }
-    }
-
-    // Search for the relationship type
-    if (
-      (item.relationshipType ?? "")
-        .replace("-", " ")
-        .toLowerCase()
-        ?.indexOf(searchValue.toLowerCase()) !== -1
-    ) {
-      return true;
-    }
-
-    // Otherwise, just use the ID.
-    if (
-      (item.id ?? "")
-        .replace(".", " ")
-        .replace("_", " ")
-        .replace("-", " ")
-        .toLowerCase()
-        ?.indexOf(searchValue.toLowerCase()) !== -1
-    ) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Based on the `NOT_EXPORTABLE_COLUMN_IDS` list of column ids, filter out columns that should not
-   * be shown to the user.
-   *
-   * The list is searched by starting with so you can include a whole bunch of paths just by
-   * getting the parent or a specific one.
-   *
-   * @param item Column definition.
-   * @returns true if it should be included in the results, false if not.
-   */
-  function hiddenColumnFilter(item: TableColumn<TData>) {
-    if (exportMode) {
-      return !NOT_EXPORTABLE_COLUMN_IDS.some((id) =>
-        (item?.id ?? "").startsWith(id)
-      );
-    } else {
-      return !MANDATORY_DISPLAYED_COLUMNS.some((id) =>
-        (item?.id ?? "").startsWith(id)
-      );
-    }
-  }
-
-  function sortCheckboxes(a: TableColumn<TData>, b: TableColumn<TData>) {
-    // Check if a column is checked
-    const isAChecked = isChecked(a.id, true);
-    const isBChecked = isChecked(b.id, true);
-
-    // Checked columns come before unchecked columns
-    if (isAChecked && !isBChecked) {
-      return -1; // Sort a before b (a comes first)
-    } else if (!isAChecked && isBChecked) {
-      return 1; // Sort b before a (b comes first)
-    } else {
-      // If checked, keep the same order as the displayedColumns.
-      if (isAChecked && isBChecked) {
-        const aIndex = displayedColumns.findIndex((col) => col.id === a.id);
-        const bIndex = displayedColumns.findIndex((col) => col.id === b.id);
-        return aIndex < bIndex ? -1 : aIndex > bIndex ? 1 : 0;
-      }
-
-      // If both unchecked, sort by their original order (e.g., by ID)
-      return (a.id ?? "").localeCompare(b.id ?? "");
-    }
-  }
-
-  /**
-   * This function is used to determine if a checkbox is selected or not. It checks the displayed
-   * columns and the nonAppliedOptions to see if it should be checked or not.
-   *
-   * @param columnId the column ID of the column being checked.
-   * @returns true if it shuold be checked, false if not.
-   */
-  const isChecked = useCallback(
-    (columnId: string | undefined, skipNonApplied: boolean) => {
-      // First check the nonAppliedOptions if it has been altered.
-      if (!skipNonApplied) {
-        const nonAppliedFound = nonAppliedOptions.find(
-          (item) => item.column.id === columnId
-        );
-        if (nonAppliedFound !== undefined) {
-          return nonAppliedFound.state;
+    if (selectedField && indexMapping) {
+      // Check if it's a dynamic type.
+      if (selectedField.dynamicField) {
+        if (dynamicFieldValue) {
+          switch (selectedField.dynamicField.type) {
+            case "managedAttribute":
+              const managedAttributeValues: ManagedAttributeSearchStates =
+                JSON.parse(dynamicFieldValue);
+              if (managedAttributeValues?.selectedManagedAttribute?.id) {
+                setIsValidField(true);
+                return;
+              }
+              break;
+            case "fieldExtension":
+              const fieldExtensionValues: FieldExtensionSearchStates =
+                JSON.parse(dynamicFieldValue);
+              if (
+                fieldExtensionValues.selectedExtension &&
+                fieldExtensionValues.selectedField
+              ) {
+                setIsValidField(true);
+                return;
+              }
+              break;
+          }
         }
-      }
-
-      // Now check if it's currently being displayed on the table, but not applied yet.
-      const displayedColumnFound = displayedColumns.find(
-        (item) => item.id === columnId
-      );
-      if (displayedColumnFound !== undefined) {
-        return true;
-      }
-
-      return false;
-    },
-    [nonAppliedOptions, displayedColumns]
-  );
-
-  /**
-   * This function is used to determine the changes made. Since the changes are not applied until
-   * the apply button is clicked, the changes are tracked using the nonAppliedOptions.
-   *
-   * @param columnId The column ID being toggled.
-   */
-  function toggleColumn(columnId: string | undefined) {
-    // Check if the column is already being displayed
-    const displayedColumnFound = displayedColumns.find(
-      (item) => item.id === columnId
-    );
-
-    // Check if the column is being altered.
-    const nonAppliedFound = nonAppliedOptions.find(
-      (item) => item.column.id === columnId
-    );
-
-    // Find the source of the column.
-    const sourceColumn = columnOptions.find((item) => item.id === columnId);
-
-    // Was this column already being displayed?
-    if (displayedColumnFound) {
-      if (nonAppliedFound) {
-        // Remove from nonAppliedFound.
-        setNonAppliedOptions(
-          nonAppliedOptions.filter((item) => item.column.id !== columnId)
-        );
-      } else if (sourceColumn) {
-        // Add the column to the non-applied options since we are removing it as a displayed option.
-        setNonAppliedOptions([
-          ...nonAppliedOptions.filter((item) => item.column.id !== columnId),
-          { column: sourceColumn, state: false }
-        ]);
-      }
-    } else {
-      if (nonAppliedFound) {
-        // Remove from nonAppliedFound.
-        setNonAppliedOptions(
-          nonAppliedOptions.filter((item) => item.column.id !== columnId)
-        );
-      } else if (sourceColumn) {
-        // Add the column to the non-applied options since we are adding it as a displayed option.
-        setNonAppliedOptions([
-          ...nonAppliedOptions.filter((item) => item.column.id !== columnId),
-          { column: sourceColumn, state: true }
-        ]);
-      }
-    }
-  }
-
-  /**
-   * Apply all the available columns to the tracked changes so it can be applied.
-   * @param event Used to determine if the checkbox is checked or unchecked.
-   */
-  function handleToggleAll(event) {
-    const checked = event.target.checked;
-
-    // Apply to everything.
-    setNonAppliedOptions(
-      columnOptions.map<NonAppliedOptionChange<TData>>((item) => ({
-        column: item,
-        state: checked
-      }))
-    );
-
-    setSelectAll(checked);
-  }
-
-  /**
-   * Once the user has selected everything they would like to add/remove, this function will actually
-   * apply the changes to the displayed columns.
-   */
-  function applyFilterColumns(saveToLocalStorage: boolean) {
-    // Create a clone of the displayed columns to apply the changes in one go.
-    let newDisplayedColumns = displayedColumns;
-
-    for (const nonAppliedOption of nonAppliedOptions) {
-      // Check if the non applied option needs to be added (true) or removed (false).
-      if (nonAppliedOption.state === true) {
-        newDisplayedColumns = [...newDisplayedColumns, nonAppliedOption.column];
       } else {
-        // Remove the displayed column.
-        newDisplayedColumns = newDisplayedColumns.filter(
-          (item) => item.id !== nonAppliedOption.column.id
-        );
+        // Regular field selected, not dynamic and requires more options.
+        setIsValidField(true);
+        return;
       }
     }
 
-    // Apply the changes...
+    setIsValidField(false);
+  }, [selectedField, dynamicFieldValue, indexMapping]);
+
+  // Reset the dynamic field value so it doesn't get mixed with another one.
+  useEffect(() => {
+    setDynamicFieldValue(undefined);
+  }, [selectedField]);
+
+  const onColumnItemDelete = (columnId: string) => {
+    const newDisplayedColumns = displayedColumns.filter(
+      (column) => column.id !== columnId
+    );
     setDisplayedColumns(newDisplayedColumns);
 
-    // Empty the tracked changes...
-    setNonAppliedOptions([]);
-
-    if (saveToLocalStorage) {
-      // Save to local storage...
+    // Do not save it locally when in export mode, since you can delete columns that are mandatory.
+    if (!exportMode) {
       setLocalStorageDisplayedColumns(
-        newDisplayedColumns.map((column) => column?.id ?? "")
+        newDisplayedColumns.map((column) => column?.columnSelectorString ?? "")
       );
     }
-  }
+  };
 
-  const CheckboxItem = React.forwardRef((props: any, ref) => {
-    return (
-      <Checkbox
-        key={props.id}
-        id={props.id}
-        isChecked={props.isChecked}
-        isField={props.isField}
-        ref={ref}
-        handleClick={props.handleClick}
-        forceLabel={props.accessKey}
-        disabled={disabled}
-      />
-    );
-  });
+  const onColumnItemInsert = async () => {
+    if (isValidField && selectedField && indexMapping) {
+      const generatedColumnPath = generateColumnPath({
+        indexMapping: selectedField,
+        dynamicFieldValue
+      });
 
-  return exportMode ? (
+      const newColumnDefinition = await generateColumnDefinition({
+        indexMappings: indexMapping,
+        dynamicFieldsMappingConfig,
+        path: generatedColumnPath,
+        defaultColumns,
+        apiClient
+      });
+
+      if (newColumnDefinition) {
+        // If the column already exists do not add it again.
+        if (
+          displayedColumns.find(
+            (column) =>
+              column.columnSelectorString ===
+              newColumnDefinition.columnSelectorString
+          )
+        ) {
+          setSelectedField(undefined);
+          return;
+        }
+
+        // Add new option to the bottom of the list.
+        const newDisplayedColumns: TableColumn<TData>[] = [
+          ...displayedColumns,
+          newColumnDefinition
+        ];
+
+        setDisplayedColumns(newDisplayedColumns);
+        setSelectedField(undefined);
+
+        // Do not save when in export mode since manage fields that are mandatory to the list view.
+        if (!exportMode) {
+          setLocalStorageDisplayedColumns(
+            newDisplayedColumns.map(
+              (column) => column?.columnSelectorString ?? ""
+            )
+          );
+        }
+      }
+    }
+  };
+
+  const onColumnItemSelected = (columnPath: string) => {
+    if (indexMapping) {
+      const columnIndex = indexMapping.find(
+        (index) => index.value === columnPath
+      );
+      if (columnIndex) {
+        setSelectedField(columnIndex);
+      }
+    }
+  };
+
+  // Filter the list to not include columns that cannot be removed/exported.
+  const displayedColumnsFiltered = useMemo(() => {
+    return displayedColumns.filter((column) => {
+      if (exportMode) {
+        return !NOT_EXPORTABLE_COLUMN_IDS.some((id) =>
+          (column?.id ?? "").startsWith(id)
+        );
+      }
+      return true;
+    });
+  }, [displayedColumns, exportMode]);
+
+  const indexMappingFiltered = useMemo(() => {
+    if (indexMapping) {
+      return indexMapping.filter((mapping) => {
+        // Check if it's already been used, does not need to shown again since they are already displaying it.
+        const alreadyUsed = displayedColumns?.find(
+          (column) =>
+            mapping?.value === column?.columnSelectorString ||
+            mapping?.label === column?.columnSelectorString
+        );
+        if (alreadyUsed) {
+          return false;
+        }
+
+        if (exportMode) {
+          return !NOT_EXPORTABLE_COLUMN_IDS.some(
+            (id) =>
+              (mapping?.value ?? "").startsWith(id) ||
+              (mapping?.label ?? "").startsWith(id)
+          );
+        } else {
+          return !MANDATORY_DISPLAYED_COLUMNS.some(
+            (id) =>
+              (mapping?.value ?? "").startsWith(id) ||
+              (mapping?.label ?? "").startsWith(id)
+          );
+        }
+      });
+    }
+    return undefined;
+  }, [indexMapping, exportMode, displayedColumns]);
+
+  return (
     <>
-      {loading ? (
+      {loading || !indexMappingFiltered || !indexMapping ? (
         <LoadingSpinner loading={loading} />
       ) : (
         <>
-          <strong>{<DinaMessage id="exportColumns" />}</strong>
-          <br />
-
-          <Dropdown.Item
-            key="__selectall"
-            id="selectAll"
-            handleClick={handleToggleAll}
-            isChecked={selectAll}
-            as={CheckboxItem}
+          <strong>
+            <DinaMessage id="columnSelector_addNewColumn" />
+          </strong>
+          <QueryFieldSelector
+            indexMap={indexMappingFiltered}
+            currentField={selectedField?.value}
+            setField={onColumnItemSelected}
+            isInColumnSelector={true}
           />
-          {columnOptions
-            .filter(hiddenColumnFilter)
-            .filter(searchFilter)
-            .sort(sortCheckboxes)
-            .map((column, index) => {
-              return (
-                <Dropdown.Item
-                  key={index + "_" + column?.id}
-                  id={column?.id}
-                  isChecked={isChecked(column?.id, false)}
-                  handleClick={() => toggleColumn(column?.id)}
-                  isField={true}
-                  accessKey={column.label}
-                  as={CheckboxItem}
-                />
-              );
-            })}
-        </>
-      )}
-    </>
-  ) : (
-    <>
-      {loading ? (
-        <LoadingSpinner loading={loading} />
-      ) : (
-        <>
-          <div>
-            <strong>{<FieldHeader name="filterColumns" />}</strong>
-            <input
-              autoFocus={true}
-              name="filterColumns"
-              className="form-control"
-              type="text"
-              placeholder="Search"
-              value={searchValue}
-              onChange={(event) => {
-                setSearchValue(event.target.value);
-              }}
+          {selectedField?.dynamicField?.type === "managedAttribute" && (
+            <QueryRowManagedAttributeSearch
+              indexMap={indexMapping}
+              managedAttributeConfig={selectedField}
+              isInColumnSelector={true}
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
             />
-            <Dropdown.Divider />
-          </div>
-
-          <div className="d-flex gap-2 column-selector-apply-button">
+          )}
+          {selectedField?.dynamicField?.type === "fieldExtension" && (
+            <QueryRowFieldExtensionSearch
+              fieldExtensionConfig={selectedField}
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
+              isInColumnSelector={true}
+            />
+          )}
+          <div className="mt-2 d-grid">
             <Button
-              disabled={loading || nonAppliedOptions.length === 0}
-              className="btn btn-primary mt-1 mb-2 bulk-edit-button w-100"
-              onClick={() => applyFilterColumns(true)}
+              className="btn btn-primary"
+              disabled={!isValidField}
+              onClick={onColumnItemInsert}
             >
-              {formatMessage({ id: "applyButtonText" }) +
-                (nonAppliedOptions.length > 0
-                  ? " (" + nonAppliedOptions.length + ")"
-                  : "")}
+              <DinaMessage id="columnSelector_addColumnButton" />
             </Button>
           </div>
+          <br />
 
-          <Dropdown.Item
-            key="__selectall"
-            id="selectAll"
-            handleClick={handleToggleAll}
-            isChecked={selectAll}
-            as={CheckboxItem}
-          />
-          {columnOptions
-            .filter(hiddenColumnFilter)
-            .filter(searchFilter)
-            .sort(sortCheckboxes)
-            .map((column, index) => {
-              return (
-                <>
-                  <Dropdown.Item
-                    key={index + "_" + column?.id}
-                    id={column?.id}
-                    isChecked={isChecked(column?.id, false)}
-                    handleClick={() => toggleColumn(column?.id)}
-                    isField={true}
-                    accessKey={column.label}
-                    as={CheckboxItem}
+          {displayedColumnsFiltered.length > 0 && (
+            <>
+              <strong>
+                <DinaMessage
+                  id={
+                    exportMode
+                      ? "columnSelector_columnsToBeExported"
+                      : "columnSelector_currentlyDisplayed"
+                  }
+                />
+              </strong>
+              {displayedColumnsFiltered.map((column) => {
+                return (
+                  <ColumnItem
+                    key={column.id}
+                    column={column}
+                    isMandatoryField={
+                      exportMode
+                        ? false
+                        : MANDATORY_DISPLAYED_COLUMNS.some((id) =>
+                            (column?.id ?? "").startsWith(id)
+                          )
+                    }
+                    onColumnItemDelete={onColumnItemDelete}
                   />
-                </>
-              );
-            })}
+                );
+              })}
+            </>
+          )}
         </>
       )}
     </>

@@ -5,6 +5,9 @@ import { Tooltip } from "../tooltip/Tooltip";
 export interface FieldNameProps {
   name: string;
 
+  /** Custom text to put at the beginning of the name. Useful for relationship fields. */
+  prefixName?: string;
+
   /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
   customName?: string;
 
@@ -76,6 +79,7 @@ export function useFieldLabels() {
  */
 export function FieldHeader({
   name,
+  prefixName,
   customName,
   tooltipOverride,
   tooltipImage,
@@ -97,6 +101,7 @@ export function FieldHeader({
 
   return (
     <div className={`${customName ?? name}-field-header`}>
+      {prefixName ? prefixName + " " : ""}
       {fieldLabel}
       {tooltip}
     </div>
