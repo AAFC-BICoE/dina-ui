@@ -54,6 +54,11 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    * Indicate if all the columns have been loading in...
    */
   setColumnSelectorLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+
+  /**
+   * Array of relationshipType columns to be excluded from the dropdown menu
+   */
+  excludedRelationshipTypes?: string[];
 }
 
 export function ColumnSelector<TData extends KitsuResource>(
@@ -67,7 +72,8 @@ export function ColumnSelector<TData extends KitsuResource>(
     uniqueName,
     defaultColumns,
     setColumnSelectorLoading,
-    setDisplayedColumns
+    setDisplayedColumns,
+    excludedRelationshipTypes
   } = props;
 
   // These are all the possible columns displayed to the user.
@@ -125,7 +131,8 @@ export function ColumnSelector<TData extends KitsuResource>(
         setColumnOptions,
         setLoading: setInternalLoading,
         defaultColumns,
-        apiClient
+        apiClient,
+        excludedRelationshipTypes
       });
     }
   }, [indexMapping]);
