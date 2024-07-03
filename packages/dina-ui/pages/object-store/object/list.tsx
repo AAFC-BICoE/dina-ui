@@ -218,7 +218,8 @@ export default function MetadataListPage() {
                       type: "managedAttribute",
                       label: "managedAttributes",
                       path: "data.attributes.managedAttributes",
-                      apiEndpoint: "objectstore-api/managed-attribute"
+                      apiEndpoint: "objectstore-api/managed-attribute",
+                      component: "ENTITY"
                     }
                   ],
                   relationshipFields: []
