@@ -508,6 +508,7 @@ export function generateBuilderConfig(
         <QueryRowRelationshipPresenceSearch
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
+          indexMapping={indexMap}
         />
       ),
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {
@@ -654,7 +655,7 @@ export function generateBuilderConfig(
       valueSources: ["value"],
       defaultOperator: "noOperator",
       widgets: {
-        fieldExtension: {
+        relationshipPresence: {
           operators: ["noOperator"]
         }
       }

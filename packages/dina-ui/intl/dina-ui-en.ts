@@ -697,6 +697,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_extension_field_placeholder:
     "Select extension field to search against...",
   queryBuilder_extension_placeholder: "Select extension to search against...",
+  queryBuilder_relationship_placeholder:
+    "Select relationship to search against...",
   queryBuilder_field_placeholder: "Select a field to search against...",
   queryBuilder_globalSearch: "Global search",
   queryBuilder_globalSearch_withText: 'Global search for "{globalSearchTerm}"',

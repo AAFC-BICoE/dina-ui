@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { SelectOption } from "common-ui";
-import { TransformToDSLProps } from "../../types";
+import { ESIndexMapping, TransformToDSLProps } from "../../types";
+import Select from "react-select";
+import { startCase } from "lodash";
 
 export interface QueryRowRelationshipPresenceSearchProps {
   /**
@@ -13,6 +15,11 @@ export interface QueryRowRelationshipPresenceSearchProps {
    * Pass the selected value to the Query Builder to store.
    */
   setValue?: (fieldPath: string) => void;
+
+  /**
+   * Index mapping to determine the different relationships to select from.
+   */
+  indexMapping: ESIndexMapping[];
 }
 
 export interface RelationshipPresenceSearchStates {
@@ -27,11 +34,13 @@ export interface RelationshipPresenceSearchStates {
 }
 
 export default function QueryRowRelationshipPresenceSearch({
-  value
+  value,
+  setValue,
+  indexMapping
 }: QueryRowRelationshipPresenceSearchProps) {
   const { formatMessage } = useIntl();
 
-  const [relationshipPresenceStates, setRelationshipPresenceStates] =
+  const [relationshipPresenceState, setRelationshipPresenceState] =
     useState<RelationshipPresenceSearchStates>(() =>
       value
         ? JSON.parse(value)
@@ -42,6 +51,25 @@ export default function QueryRowRelationshipPresenceSearch({
           }
     );
 
+  // Convert the state in this component to a value that can be stored in the Query Builder.
+  useEffect(() => {
+    if (setValue) {
+      setValue(JSON.stringify(relationshipPresenceState));
+    }
+  }, [relationshipPresenceState, setValue]);
+
+  const relationshipOptions: SelectOption<string>[] =
+    retrieveRelationshipsFromIndexMapping(indexMapping);
+  const [relationshipSearchValue, setRelationshipSearchValue] =
+    useState<string>("");
+
+  // Currently selected relationship.
+  const selectedRelationship =
+    relationshipOptions?.find(
+      (relationship) =>
+        relationship.value === relationshipPresenceState.selectedRelationship
+    ) ?? null;
+
   // Generate the operator options
   const operatorOptions = ["presence", "absence"].map<SelectOption<string>>(
     (option) => ({
@@ -50,7 +78,67 @@ export default function QueryRowRelationshipPresenceSearch({
     })
   );
 
-  return <></>;
+  // Currently selected option, if no option can be found just select the first one.
+  const selectedOperator =
+    operatorOptions?.find(
+      (operator) =>
+        operator.value === relationshipPresenceState.selectedOperator
+    ) ?? null;
+
+  // Automatically set the operator.
+  if (!selectedOperator && operatorOptions?.[0]) {
+    setRelationshipPresenceState({
+      ...relationshipPresenceState,
+      selectedOperator: operatorOptions?.[0].value ?? ""
+    });
+  }
+
+  return (
+    <div className="row">
+      {/* Relationship Selector */}
+      <Select<SelectOption<string>>
+        options={relationshipOptions}
+        className={`col me-1 ms-2 ps-0`}
+        value={selectedRelationship}
+        placeholder={formatMessage({
+          id: "queryBuilder_relationship_placeholder"
+        })}
+        onChange={(selected) =>
+          setRelationshipPresenceState({
+            selectedRelationship: selected?.value ?? "",
+            selectedOperator: "",
+            selectedValue: 0
+          })
+        }
+        onInputChange={(inputValue) => setRelationshipSearchValue(inputValue)}
+        inputValue={relationshipSearchValue}
+      />
+    </div>
+  );
+}
+
+/**
+ * Retrieves relationships from an array of ESIndexMapping objects.
+ *
+ * @param {ESIndexMapping[]} indexMapping An array of ESIndexMapping objects.
+ * @returns {SelectOption<string>[]} An array of SelectOption objects containing unique labels and values representing relationships.
+ */
+function retrieveRelationshipsFromIndexMapping(
+  indexMapping: ESIndexMapping[]
+): SelectOption<string>[] {
+  return indexMapping.reduce<SelectOption<string>[]>((acc, mapping) => {
+    // Check if the mapping has a parentType and if it already exists in the accumulator
+    if (
+      mapping.parentType &&
+      !acc.find((item) => item.value === mapping.parentType)
+    ) {
+      acc.push({
+        label: startCase(mapping.parentName),
+        value: mapping.parentType
+      } as SelectOption<string>);
+    }
+    return acc;
+  }, []);
 }
 
 /**
