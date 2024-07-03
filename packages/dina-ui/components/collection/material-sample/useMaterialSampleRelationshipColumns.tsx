@@ -191,6 +191,7 @@ export function useMaterialSampleRelationshipColumns() {
 
   const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn<MaterialSample>[] = [
     {
+      id: "materialSampleName",
       cell: ({ row: { original } }) => (
         <Link href={`/collection/material-sample/view?id=${original.id}`}>
           <a>
@@ -210,6 +211,7 @@ export function useMaterialSampleRelationshipColumns() {
       isKeyword: true
     },
     {
+      id: "materialSampleType",
       accessorKey: "data.attributes.materialSampleType",
       header: () => <FieldHeader name="materialSampleType" />,
       isKeyword: true

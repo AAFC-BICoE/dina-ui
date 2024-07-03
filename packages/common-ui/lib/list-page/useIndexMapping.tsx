@@ -65,7 +65,7 @@ export function useIndexMapping({
           (fieldMapping) => fieldMapping.path
         ) ?? [];
 
-    const result: ESIndexMapping[] = [];
+      const result: ESIndexMapping[] = [];
 
       // Read index attributes.
       resp.data?.attributes
@@ -85,16 +85,18 @@ export function useIndexMapping({
               : key.name === "id"
               ? "data." + key.name
               : key.name,
-            hideField: fieldsToSkip.some((skipPath) => path.startsWith(skipPath)),
+            hideField: fieldsToSkip.some((skipPath) =>
+              path.startsWith(skipPath)
+            ),
             type: key.type,
             subType: key?.subtype ? key.subtype : undefined,
             path: key.path,
 
             // Additional options for the field:
             distinctTerm: key.distinct_term_agg,
-            keywordMultiFieldSupport:
-              key?.fields?.includes("keyword") ?? false,
-            keywordNumericSupport: key?.fields?.includes("keyword_numeric") ?? false,
+            keywordMultiFieldSupport: key?.fields?.includes("keyword") ?? false,
+            keywordNumericSupport:
+              key?.fields?.includes("keyword_numeric") ?? false,
             optimizedPrefix: key?.fields?.includes("prefix") ?? false,
             containsSupport: key?.fields?.includes("infix") ?? false,
             endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
@@ -135,9 +137,11 @@ export function useIndexMapping({
 
             // Additional options for the field:
             distinctTerm: relationshipAttribute.distinct_term_agg,
-            keywordMultiFieldSupport: true, // Forced for relationships.
-            keywordNumericSupport: 
-              relationshipAttribute?.fields?.includes("keyword_numeric") ?? false,
+            keywordMultiFieldSupport:
+              relationshipAttribute?.fields?.includes("keyword") ?? false,
+            keywordNumericSupport:
+              relationshipAttribute?.fields?.includes("keyword_numeric") ??
+              false,
             optimizedPrefix:
               relationshipAttribute?.fields?.includes("prefix") ?? false,
             containsSupport:

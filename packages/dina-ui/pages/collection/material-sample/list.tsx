@@ -13,7 +13,10 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { TableColumn } from "../../../../common-ui/lib/list-page/types";
+import {
+  DynamicFieldsMappingConfig,
+  TableColumn
+} from "../../../../common-ui/lib/list-page/types";
 import { useState, CSSProperties } from "react";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -190,6 +193,81 @@ export function SampleListLayout({
   );
 }
 
+export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
+  {
+    fields: [
+      // Managed Attributes
+      {
+        type: "managedAttribute",
+        label: "managedAttributes",
+        component: "MATERIAL_SAMPLE",
+        path: "data.attributes.managedAttributes",
+        apiEndpoint: "collection-api/managed-attribute"
+      },
+
+      // Field Extensions
+      {
+        type: "fieldExtension",
+        label: "fieldExtensions",
+        component: "MATERIAL_SAMPLE",
+        path: "data.attributes.extensionValues",
+        apiEndpoint: "collection-api/extension"
+      },
+
+      // Restrictions
+      {
+        type: "fieldExtension",
+        label: "restrictions",
+        component: "RESTRICTION",
+        path: "data.attributes.restrictionFieldsExtension",
+        apiEndpoint: "collection-api/extension"
+      }
+    ],
+    relationshipFields: [
+      // Assemblage
+      {
+        type: "managedAttribute",
+        label: "managedAttributes",
+        component: "ASSEMBLAGE",
+        path: "included.attributes.managedAttributes",
+        referencedBy: "assemblages",
+        referencedType: "assemblage",
+        apiEndpoint: "collection-api/managed-attribute"
+      },
+
+      // Collecting Event
+      {
+        type: "managedAttribute",
+        label: "managedAttributes",
+        component: "COLLECTING_EVENT",
+        path: "included.attributes.managedAttributes",
+        referencedBy: "collectingEvent",
+        referencedType: "collecting-event",
+        apiEndpoint: "collection-api/managed-attribute"
+      },
+      {
+        type: "fieldExtension",
+        label: "fieldExtensions",
+        component: "COLLECTING_EVENT",
+        path: "included.attributes.extensionValues",
+        referencedBy: "collectingEvent",
+        referencedType: "collecting-event",
+        apiEndpoint: "collection-api/extension"
+      },
+
+      // Determination
+      {
+        type: "managedAttribute",
+        label: "managedAttributes",
+        component: "DETERMINATION",
+        path: "included.attributes.determination.managedAttributes",
+        referencedBy: "organism",
+        referencedType: "organism",
+        apiEndpoint: "collection-api/managed-attribute"
+      }
+    ]
+  };
+
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
 
@@ -312,79 +390,7 @@ export default function MaterialSampleListPage() {
             enableSorting: true,
             enableMultiSort: true
           }}
-          dynamicFieldMapping={{
-            fields: [
-              // Managed Attributes
-              {
-                type: "managedAttribute",
-                label: "managedAttributes",
-                component: "MATERIAL_SAMPLE",
-                path: "data.attributes.managedAttributes",
-                apiEndpoint: "collection-api/managed-attribute"
-              },
-
-              // Field Extensions
-              {
-                type: "fieldExtension",
-                label: "fieldExtensions",
-                component: "MATERIAL_SAMPLE",
-                path: "data.attributes.extensionValues",
-                apiEndpoint: "collection-api/extension"
-              },
-
-              // Restrictions
-              {
-                type: "fieldExtension",
-                label: "restrictions",
-                component: "RESTRICTION",
-                path: "data.attributes.restrictionFieldsExtension",
-                apiEndpoint: "collection-api/extension"
-              }
-            ],
-            relationshipFields: [
-              // Assemblage
-              {
-                type: "managedAttribute",
-                label: "managedAttributes",
-                component: "ASSEMBLAGE",
-                path: "included.attributes.managedAttributes",
-                referencedBy: "assemblages",
-                referencedType: "assemblage",
-                apiEndpoint: "collection-api/managed-attribute"
-              },
-
-              // Collecting Event
-              {
-                type: "managedAttribute",
-                label: "managedAttributes",
-                component: "COLLECTING_EVENT",
-                path: "included.attributes.managedAttributes",
-                referencedBy: "collectingEvent",
-                referencedType: "collecting-event",
-                apiEndpoint: "collection-api/managed-attribute"
-              },
-              {
-                type: "fieldExtension",
-                label: "fieldExtensions",
-                component: "COLLECTING_EVENT",
-                path: "included.attributes.extensionValues",
-                referencedBy: "collectingEvent",
-                referencedType: "collecting-event",
-                apiEndpoint: "collection-api/extension"
-              },
-
-              // Determination
-              {
-                type: "managedAttribute",
-                label: "managedAttributes",
-                component: "DETERMINATION",
-                path: "included.attributes.determination.managedAttributes",
-                referencedBy: "organism",
-                referencedType: "organism",
-                apiEndpoint: "collection-api/managed-attribute"
-              }
-            ]
-          }}
+          dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
           columns={columns}
           bulkDeleteButtonProps={{
             typeName: "material-sample",

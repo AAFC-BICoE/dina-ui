@@ -37,7 +37,6 @@ export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
 export const MANDATORY_DISPLAYED_COLUMNS: string[] = [
   "selectColumn",
   "thumbnail",
-  "objectStorePreview",
   "originalFilename",
   "materialSampleName",
   "assemblages.",

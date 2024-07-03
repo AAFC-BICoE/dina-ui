@@ -58,6 +58,11 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    * Indicate if all the columns have been loading in...
    */
   setColumnSelectorLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+
+  /**
+   * Array of relationshipType columns to be excluded from the dropdown menu
+   */
+  excludedRelationshipTypes?: string[];
 }
 
 export function ColumnSelector<TData extends KitsuResource>(
@@ -72,7 +77,8 @@ export function ColumnSelector<TData extends KitsuResource>(
     uniqueName,
     defaultColumns,
     setColumnSelectorLoading,
-    setDisplayedColumns
+    setDisplayedColumns,
+    excludedRelationshipTypes
   } = props;
 
   // Loading state, specifically for dynamically loaded columns.
@@ -89,9 +95,11 @@ export function ColumnSelector<TData extends KitsuResource>(
     );
 
   useEffect(() => {
+    let injectedMappings: (ESIndexMapping | undefined)[] = [];
+
     if (indexMapping) {
       if (defaultColumns) {
-        const injectedMappings = defaultColumns
+        injectedMappings = defaultColumns
           .map<ESIndexMapping | undefined>((column) => {
             // Check if this exists within the index mapping already, if not we do not need to inject it inside.
             if (
@@ -119,13 +127,27 @@ export function ColumnSelector<TData extends KitsuResource>(
           })
           .filter((injected) => injected !== undefined);
 
-        setInjectedIndexMapping([
+        // Combine index mapping fields.
+        injectedMappings = [
           ...indexMapping,
           ...(injectedMappings as ESIndexMapping[])
-        ]);
+        ];
       } else {
-        setInjectedIndexMapping(indexMapping);
+        // Combine index mapping fields.
+        injectedMappings = indexMapping;
       }
+
+      // Remove excluded relationships from the list if provided.
+      if (excludedRelationshipTypes && excludedRelationshipTypes?.length > 0) {
+        injectedMappings = injectedMappings.filter((mapping) => {
+          return mapping?.parentType
+            ? !excludedRelationshipTypes.includes(mapping?.parentType)
+            : true;
+        });
+      }
+
+      // Finally, set it as the state.
+      setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
     }
   }, [indexMapping, defaultColumns]);
 
