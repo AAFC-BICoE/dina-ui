@@ -74,6 +74,7 @@ export function materialSampleActionCell(
                   type="material-sample"
                   reload={true}
                   className="w-100"
+                  deleteRelationships={true}
                 />
               </div>
             </Dropdown.Menu>

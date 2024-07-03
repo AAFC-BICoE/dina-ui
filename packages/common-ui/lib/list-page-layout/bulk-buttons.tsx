@@ -86,12 +86,15 @@ export function BulkDeleteButton({
                 typeName === "material-sample" &&
                 materialSamples.length > 0
               ) {
-                const deleteOperations: Operation[] = materialSamples.map(
-                  (materialSample) => ({
+                const deleteOperations: Operation[] = materialSamples
+                  .filter(
+                    (materialSample) =>
+                      !!materialSample.storageUnitCoordinates?.id
+                  )
+                  .map((materialSample) => ({
                     op: "DELETE",
                     path: `storage-unit-coordinates/${materialSample.storageUnitCoordinates?.id}`
-                  })
-                );
+                  }));
 
                 await doOperations(deleteOperations, {
                   apiBaseUrl: "/collection-api"
