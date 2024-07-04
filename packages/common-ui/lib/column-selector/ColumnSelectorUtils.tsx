@@ -13,7 +13,7 @@ import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-b
 import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
 import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
