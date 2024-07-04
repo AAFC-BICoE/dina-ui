@@ -501,7 +501,8 @@ export function QueryPage<TData extends KitsuResource>({
               id: rslt._source?.data?.id,
               type: rslt._source?.data?.type,
               data: {
-                attributes: rslt._source?.data?.attributes
+                attributes: rslt._source?.data?.attributes,
+                relationships: rslt._source?.data?.relationships
               },
               included: rslt._source?.included?.reduce(
                 (includedAccumulator, currentIncluded) => {

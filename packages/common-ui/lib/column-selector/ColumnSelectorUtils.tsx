@@ -12,6 +12,8 @@ import React from "react";
 import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
 import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
+import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
@@ -63,7 +65,7 @@ export function generateColumnPath({
           "/" +
           relationshipPresenceValues.selectedRelationship +
           "/" +
-          relationshipPresenceValues.selectedOperator
+          "presence" // In the future, other operators can be supported.
         );
     }
   }
@@ -556,8 +558,37 @@ export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
   operator: string
 ): TableColumn<TData> {
   return {
+    accessorKey: `data.relationships`,
+    id: `relationshipPresence.${relationship}.${operator}`,
+    header: () => (
+      <DinaMessage
+        id="field__relationshipPresence_column"
+        values={{ relationshipName: relationship }}
+      />
+    ),
+    cell: ({ row: { original } }) => {
+      const relationshipExists = get(
+        original,
+        `data.relationships.${relationship}.data`
+      );
+      // Relationship could be an array or object.
+      if (
+        (Array.isArray(relationshipExists) && relationshipExists.length > 0) ||
+        (relationshipExists as any)?.id
+      ) {
+        return <FaCheckSquare />;
+      }
+
+      // No relationship found.
+      return <FaRegSquare />;
+    },
+    relationshipType: relationship,
+    label: startCase(`${relationship}`),
+    isKeyword: true,
+    isColumnVisible: true,
+    enableSorting: false,
     columnSelectorString: path
-  } as any;
+  };
 }
 
 // Fetch filtered dynamic field from back end
