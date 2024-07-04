@@ -56,6 +56,7 @@ import {
 } from "../../../types/collection-api";
 import { Row } from "@tanstack/react-table";
 import { CSSProperties } from "react";
+import { dynamicFieldMappingForMaterialSample } from "./list";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -301,6 +302,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   defaultSort={[
                     { id: "data.attributes.materialSampleName", desc: false }
                   ]}
+                  dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
+                  enableColumnSelector={true}
+                  excludedRelationshipTypes={["collecting-event"]}
                 />
 
                 <MaterialSampleInfoSection />

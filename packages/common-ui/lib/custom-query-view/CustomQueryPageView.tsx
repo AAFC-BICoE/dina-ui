@@ -153,6 +153,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
       {customQuerySelected ? (
         <>
           <QueryPage<TData>
+            enableColumnSelector={false}
             {...queryPageProps}
             customViewQuery={customQuerySelected.customQuery}
             customViewFields={customQuerySelected.customViewFields ?? []}

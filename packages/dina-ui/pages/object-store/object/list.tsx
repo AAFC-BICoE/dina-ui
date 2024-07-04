@@ -146,7 +146,7 @@ export default function MetadataListPage() {
     },
     stringArrayCell("acTags", "data.attributes.acTags"),
     {
-      id: "viewPreviewButtonText",
+      id: "objectStorePreview",
       cell: ({ row: { original } }) => (
         <div className="d-flex h-100">
           <button
@@ -218,7 +218,8 @@ export default function MetadataListPage() {
                       type: "managedAttribute",
                       label: "managedAttributes",
                       path: "data.attributes.managedAttributes",
-                      apiEndpoint: "objectstore-api/managed-attribute"
+                      apiEndpoint: "objectstore-api/managed-attribute",
+                      component: "ENTITY"
                     }
                   ],
                   relationshipFields: []

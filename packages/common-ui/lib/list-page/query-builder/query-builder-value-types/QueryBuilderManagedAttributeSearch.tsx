@@ -17,7 +17,7 @@ import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./QueryBuilderTextSearch";
-import { get } from "lodash";
+import { get, noop } from "lodash";
 import { PersistedResource } from "kitsu";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
@@ -44,6 +44,11 @@ interface QueryBuilderManagedAttributeSearchProps {
    * All the possible field settings, this is for linking it to a managed attribute in the index map.
    */
   indexMap?: ESIndexMapping[];
+
+  /**
+   * If being used in the column selector, operators do not need to be displayed.
+   */
+  isInColumnSelector: boolean;
 }
 
 export interface ManagedAttributeOption extends SelectOption<string> {
@@ -72,12 +77,13 @@ export default function QueryRowManagedAttributeSearch({
   value,
   setValue,
   managedAttributeConfig,
-  indexMap
+  indexMap,
+  isInColumnSelector
 }: QueryBuilderManagedAttributeSearchProps) {
   const { formatMessage } = useIntl();
 
   // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
-  const onKeyDown = useQueryBuilderEnterToSearch();
+  const onKeyDown = isInColumnSelector ? noop : useQueryBuilderEnterToSearch();
 
   const [managedAttributeState, setManagedAttributeState] =
     useState<ManagedAttributeSearchStates>(() =>
@@ -298,7 +304,7 @@ export default function QueryRowManagedAttributeSearch({
   }
 
   return (
-    <div className="row">
+    <div className={isInColumnSelector ? "" : "row"}>
       {/* Managed Attribute Selection */}
       <ResourceSelect<ManagedAttribute>
         filter={(input) => ({
@@ -345,14 +351,14 @@ export default function QueryRowManagedAttributeSearch({
         selectProps={{
           controlShouldRenderValue: true,
           isClearable: false,
-          className: `col me-1 ms-2 ps-0`,
+          className: isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0",
           onKeyDown
         }}
         omitNullOption={true}
       />
 
       {/* Operator */}
-      {operatorOptions.length !== 0 ? (
+      {!isInColumnSelector && operatorOptions.length !== 0 ? (
         <Select<SelectOption<string>>
           options={operatorOptions}
           className={`col me-1 ps-0`}
@@ -369,9 +375,11 @@ export default function QueryRowManagedAttributeSearch({
       )}
 
       {/* Value Searching (changes based ont he type selected) */}
-      <div className="col ps-0">
-        {supportedValueForType(managedAttributeType)}
-      </div>
+      {!isInColumnSelector && (
+        <div className="col ps-0">
+          {supportedValueForType(managedAttributeType)}
+        </div>
+      )}
     </div>
   );
 }

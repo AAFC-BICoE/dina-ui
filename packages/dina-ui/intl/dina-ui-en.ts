@@ -1,3 +1,5 @@
+import { ColumnSelector } from "packages/common-ui/lib";
+
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */
@@ -700,6 +702,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_relationship_placeholder:
     "Select relationship to search against...",
   queryBuilder_field_placeholder: "Select a field to search against...",
+  columnSelector_field_placeholder: "Select a field to add as a column...",
   queryBuilder_globalSearch: "Global search",
   queryBuilder_globalSearch_withText: 'Global search for "{globalSearchTerm}"',
   queryBuilder_globalSearch_tooltip:
@@ -798,6 +801,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectColumn: "Select Column",
+  columnSelector_currentlyDisplayed: "Currently displayed columns:",
+  columnSelector_columnsToBeExported: "Columns to be exported:",
+  columnSelector_addNewColumn: "Add a new column:",
+  columnSelector_addColumnButton: "Add Column",
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
   selectRuleSet: "Select Rule Set",
