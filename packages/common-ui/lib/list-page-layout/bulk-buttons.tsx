@@ -7,14 +7,15 @@ import {
   BulkSelectableFormValues,
   CommonMessage,
   FormikButton,
+  Operation,
   useApiClient,
   useModal
 } from "..";
 import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
-import { KitsuResource } from "kitsu";
-import { useEffect } from "react";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { useSessionStorage } from "usehooks-ts";
+import { MaterialSample } from "../../../dina-ui/types/collection-api";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -36,7 +37,7 @@ export function BulkDeleteButton({
 }: BulkDeleteButtonProps) {
   const router = useRouter();
   const { openModal } = useModal();
-  const { apiClient } = useApiClient();
+  const { apiClient, bulkGet, doOperations } = useApiClient();
 
   return (
     <FormikButton
@@ -56,6 +57,17 @@ export function BulkDeleteButton({
               </span>
             }
             onYesButtonClicked={async () => {
+              // Fetch the resources linked with material-sample for deletion
+              let materialSamples: PersistedResource<MaterialSample>[] = [];
+              if (typeName === "material-sample") {
+                materialSamples = await bulkGet<MaterialSample>(
+                  resourceIds.map(
+                    (id) =>
+                      `/material-sample/${id}?include=storageUnitCoordinates`
+                  ),
+                  { apiBaseUrl: "/collection-api" }
+                );
+              }
               for (const resourceId of resourceIds) {
                 try {
                   await apiClient.axios.delete(
@@ -68,6 +80,25 @@ export function BulkDeleteButton({
                     throw e;
                   }
                 }
+              }
+              // Delete resources linked to the deleted material samples
+              if (
+                typeName === "material-sample" &&
+                materialSamples.length > 0
+              ) {
+                const deleteOperations: Operation[] = materialSamples
+                  .filter(
+                    (materialSample) =>
+                      !!materialSample.storageUnitCoordinates?.id
+                  )
+                  .map((materialSample) => ({
+                    op: "DELETE",
+                    path: `storage-unit-coordinates/${materialSample.storageUnitCoordinates?.id}`
+                  }));
+
+                await doOperations(deleteOperations, {
+                  apiBaseUrl: "/collection-api"
+                });
               }
 
               // Refresh the page:

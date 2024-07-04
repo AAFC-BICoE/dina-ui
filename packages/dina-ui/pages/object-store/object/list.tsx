@@ -224,6 +224,7 @@ export default function MetadataListPage() {
                   ],
                   relationshipFields: []
                 }}
+                enableRelationshipPresence={true}
                 columns={METADATA_TABLE_COLUMNS}
                 bulkDeleteButtonProps={{
                   typeName: "metadata",

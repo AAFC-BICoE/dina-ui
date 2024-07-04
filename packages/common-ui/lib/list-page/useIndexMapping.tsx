@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "..";
 import { DynamicFieldsMappingConfig, ESIndexMapping } from "./types";
+import { RELATIONSHIP_PRESENCE_FIELDNAME } from "./query-builder/useQueryBuilderConfig";
 
 export interface UseIndexMappingProps {
   indexName: string;
@@ -13,6 +14,11 @@ export interface UseIndexMappingProps {
    * or grouped terms.
    */
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
+
+  /**
+   * This will add an option to the QueryBuilder to allow users to check if a relationship exists.
+   */
+  enableRelationshipPresence?: boolean;
 }
 
 /**
@@ -25,7 +31,8 @@ export interface UseIndexMappingProps {
  */
 export function useIndexMapping({
   indexName,
-  dynamicFieldMapping
+  dynamicFieldMapping,
+  enableRelationshipPresence
 }: UseIndexMappingProps) {
   const { apiClient } = useApiClient();
 
@@ -194,6 +201,29 @@ export function useIndexMapping({
             });
           }
         );
+      }
+
+      // Add relationship presence to the query builder list.
+      if (enableRelationshipPresence === true) {
+        result.push({
+          dynamicField: {
+            apiEndpoint: RELATIONSHIP_PRESENCE_FIELDNAME,
+            label: RELATIONSHIP_PRESENCE_FIELDNAME,
+            path: RELATIONSHIP_PRESENCE_FIELDNAME,
+            type: "relationshipPresence"
+          },
+          value: RELATIONSHIP_PRESENCE_FIELDNAME,
+          distinctTerm: false,
+          label: RELATIONSHIP_PRESENCE_FIELDNAME,
+          path: RELATIONSHIP_PRESENCE_FIELDNAME,
+          type: "relationshipPresence",
+          keywordMultiFieldSupport: false,
+          keywordNumericSupport: false,
+          optimizedPrefix: false,
+          containsSupport: false,
+          endsWithSupport: false,
+          hideField: false
+        });
       }
 
       return result;

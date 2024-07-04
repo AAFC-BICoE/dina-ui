@@ -390,6 +390,7 @@ export default function MaterialSampleListPage() {
             enableSorting: true,
             enableMultiSort: true
           }}
+          enableRelationshipPresence={true}
           dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
           columns={columns}
           bulkDeleteButtonProps={{

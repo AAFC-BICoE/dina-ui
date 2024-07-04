@@ -11,6 +11,9 @@ import { get, startCase } from "lodash";
 import React from "react";
 import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
+import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
+import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
@@ -27,6 +30,7 @@ export function generateColumnPath({
   // Handle the path for dynamic fields.
   if (indexMapping.dynamicField && dynamicFieldValue) {
     switch (indexMapping.dynamicField.type) {
+      // Managed Attribute (managedAttribute/[COMPONENT]/[MANAGED_ATTRIBUTE_KEY])
       case "managedAttribute":
         const managedAttributeValues: ManagedAttributeSearchStates =
           JSON.parse(dynamicFieldValue);
@@ -37,6 +41,8 @@ export function generateColumnPath({
           "/" +
           managedAttributeValues?.selectedManagedAttribute?.key
         );
+
+      // Field Extension (fieldExtension/[COMPONENT]/[EXTENSION_PACKAGE]/[EXTENSION_KEY])
       case "fieldExtension":
         const fieldExtensionValues: FieldExtensionSearchStates =
           JSON.parse(dynamicFieldValue);
@@ -48,6 +54,18 @@ export function generateColumnPath({
           fieldExtensionValues?.selectedExtension +
           "/" +
           fieldExtensionValues?.selectedField
+        );
+
+      // Relationship Presence (relationshipPresence/[RELATIONSHIP]/[OPERATOR])
+      case "relationshipPresence":
+        const relationshipPresenceValues: RelationshipPresenceSearchStates =
+          JSON.parse(dynamicFieldValue);
+        return (
+          indexMapping.dynamicField.type +
+          "/" +
+          relationshipPresenceValues.selectedRelationship +
+          "/" +
+          "presence" // In the future, other operators can be supported.
         );
     }
   }
@@ -235,6 +253,13 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
         apiClient,
         dynamicFieldsMappingConfig
       );
+    }
+
+    // Handle relationship presence paths.
+    if (pathParts.length === 3 && pathParts[0] === "relationshipPresence") {
+      const relationship = pathParts[1];
+      const operator = pathParts[2];
+      return getRelationshipPresenceFieldColumn(path, relationship, operator);
     }
   }
 
@@ -525,6 +550,45 @@ export function getIncludedExtensionFieldColumn(
   };
 
   return extensionValuesColumn;
+}
+
+export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
+  path: string,
+  relationship: string,
+  operator: string
+): TableColumn<TData> {
+  return {
+    accessorKey: `data.relationships`,
+    id: `relationshipPresence.${relationship}.${operator}`,
+    header: () => (
+      <DinaMessage
+        id="field__relationshipPresence_column"
+        values={{ relationshipName: relationship }}
+      />
+    ),
+    cell: ({ row: { original } }) => {
+      const relationshipExists = get(
+        original,
+        `data.relationships.${relationship}.data`
+      );
+      // Relationship could be an array or object.
+      if (
+        (Array.isArray(relationshipExists) && relationshipExists.length > 0) ||
+        (relationshipExists as any)?.id
+      ) {
+        return <FaCheckSquare />;
+      }
+
+      // No relationship found.
+      return <FaRegSquare />;
+    },
+    relationshipType: relationship,
+    label: startCase(`${relationship}`),
+    isKeyword: true,
+    isColumnVisible: true,
+    enableSorting: false,
+    columnSelectorString: path
+  };
 }
 
 // Fetch filtered dynamic field from back end
