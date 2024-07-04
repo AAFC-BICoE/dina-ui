@@ -58,6 +58,7 @@ import {
 import { Row } from "@tanstack/react-table";
 import { CSSProperties } from "react";
 import { StorageUnitCoordinates } from "packages/dina-ui/types/collection-api/resources/StorageUnitCoordinates";
+import { dynamicFieldMappingForMaterialSample } from "./list";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -324,6 +325,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   defaultSort={[
                     { id: "data.attributes.materialSampleName", desc: false }
                   ]}
+                  dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
+                  enableColumnSelector={true}
+                  excludedRelationshipTypes={["collecting-event"]}
                 />
 
                 <MaterialSampleInfoSection />

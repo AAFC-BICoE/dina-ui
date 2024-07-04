@@ -24,6 +24,11 @@ interface QueryRowTextSearchProps {
    * config and will be used to determine what endpoint to use to retrieve the field extensions.
    */
   fieldExtensionConfig?: ESIndexMapping;
+
+  /**
+   * If being used in the column selector, operators and different styling is applied.
+   */
+  isInColumnSelector: boolean;
 }
 
 export interface FieldExtensionPackageOption extends SelectOption<string> {
@@ -51,7 +56,8 @@ export interface FieldExtensionSearchStates {
 export default function QueryRowFieldExtensionSearch({
   value,
   setValue,
-  fieldExtensionConfig
+  fieldExtensionConfig,
+  isInColumnSelector
 }: QueryRowTextSearchProps) {
   const { formatMessage } = useIntl();
 
@@ -166,11 +172,11 @@ export default function QueryRowFieldExtensionSearch({
   }
 
   return (
-    <div className="row">
+    <div className={isInColumnSelector ? "" : "row"}>
       {/* Extension Selector */}
       <Select<FieldExtensionPackageOption>
         options={extensionOptions}
-        className={`col me-1 ms-2 ps-0`}
+        className={isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"}
         value={selectedExtension}
         placeholder={formatMessage({
           id: "queryBuilder_extension_placeholder"
@@ -192,7 +198,7 @@ export default function QueryRowFieldExtensionSearch({
         <>
           <Select<FieldExtensionOption>
             options={selectedExtension?.fieldOptions}
-            className={`col me-1 ps-0`}
+            className={isInColumnSelector ? "ps-0 mt-2" : "col me-1 ps-0"}
             value={selectedField}
             placeholder={formatMessage({
               id: "queryBuilder_extension_field_placeholder"
@@ -212,7 +218,7 @@ export default function QueryRowFieldExtensionSearch({
       )}
 
       {/* Operator Selector */}
-      {selectedField ? (
+      {!isInColumnSelector && selectedField ? (
         <>
           <Select<SelectOption<string>>
             options={operatorOptions}

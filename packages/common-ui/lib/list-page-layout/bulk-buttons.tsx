@@ -135,7 +135,7 @@ export function BulkEditButton({
   return (
     <FormikButton
       buttonProps={bulkButtonProps}
-      className="btn btn-primary ms-2 bulk-edit-button"
+      className="btn btn-primary bulk-edit-button"
       onClick={async (values: BulkSelectableFormValues) => {
         const ids = toPairs(values.itemIdsToSelect)
           .filter((pair) => pair[1])
@@ -199,7 +199,7 @@ export function DataExportButton<TData extends KitsuResource>({
   return (
     <FormikButton
       buttonProps={(_ctx) => ({ disabled: totalRecords === 0 })}
-      className="btn btn-primary ms-2"
+      className="btn btn-primary"
       onClick={async (values: BulkSelectableFormValues) => {
         const selectedResourceIds: string[] = values.itemIdsToSelect
           ? Object.keys(values.itemIdsToSelect)

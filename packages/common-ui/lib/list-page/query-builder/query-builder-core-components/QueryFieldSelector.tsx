@@ -24,12 +24,19 @@ interface QueryFieldSelectorProps {
    * Pass the selected option to the Query Builder.
    */
   setField: ((fieldPath: string) => void) | undefined;
+
+  /**
+   * Is this component being used in the column selector, this changes the placeholder and
+   * displays different options not available for the search.
+   */
+  isInColumnSelector: boolean;
 }
 
 export function QueryFieldSelector({
   indexMap,
   currentField,
-  setField
+  setField,
+  isInColumnSelector = false
 }: QueryFieldSelectorProps) {
   const { formatMessage, messages, locale } = useIntl();
 
@@ -188,10 +195,16 @@ export function QueryFieldSelector({
       {/* Field Selection */}
       <CreatableSelect
         options={queryRowOptions as any}
-        className={`flex-grow-1 me-2 ps-0`}
+        className={isInColumnSelector ? "ps-0" : "flex-grow-1 me-2 ps-0"}
         styles={customStyles}
         value={isGlobalSearch ? globalSearchOptionSelected : selectedOption}
-        placeholder={<DinaMessage id="queryBuilder_field_placeholder" />}
+        placeholder={
+          isInColumnSelector ? (
+            <DinaMessage id="columnSelector_field_placeholder" />
+          ) : (
+            <DinaMessage id="queryBuilder_field_placeholder" />
+          )
+        }
         onChange={(selected) => setField?.(selected?.value)}
         // Global Search Specific Props
         createOptionPosition={"first"}
@@ -203,7 +216,7 @@ export function QueryFieldSelector({
                 { globalSearchTerm: inputValue }
               )
         }
-        isValidNewOption={(_inputValue) => true}
+        isValidNewOption={(_inputValue) => !isInColumnSelector}
         onCreateOption={performGlobalSearch}
       />
     </div>

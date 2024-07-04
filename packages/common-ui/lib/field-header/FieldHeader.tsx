@@ -5,6 +5,9 @@ import { Tooltip } from "../tooltip/Tooltip";
 export interface FieldNameProps {
   name: string;
 
+  /** Custom text to put at the beginning of the name. Useful for relationship fields. */
+  prefixName?: string;
+
   /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
   customName?: string;
 
@@ -22,6 +25,9 @@ export interface FieldNameProps {
 
   /** Optional link text, should be used when adding a link. */
   tooltipLinkText?: string;
+
+  /** Optional flag to make label of the field StartCase. */
+  startCaseLabel?: boolean;
 }
 
 /** Get the field label and tooltip given the camelCase field key. */
@@ -34,7 +40,8 @@ export function useFieldLabels() {
     tooltipImage,
     tooltipImageAlt,
     tooltipLink,
-    tooltipLinkText
+    tooltipLinkText,
+    startCaseLabel = true
   }: FieldNameProps) {
     const messageKey = `field_${name}`;
     const tooltipKey = tooltipOverride
@@ -55,7 +62,9 @@ export function useFieldLabels() {
 
     const fieldLabel = messages[messageKey]
       ? formatMessage({ id: messageKey as any })
-      : startCase(name);
+      : startCaseLabel
+      ? startCase(name)
+      : name;
 
     return { tooltip, fieldLabel };
   }
@@ -70,12 +79,14 @@ export function useFieldLabels() {
  */
 export function FieldHeader({
   name,
+  prefixName,
   customName,
   tooltipOverride,
   tooltipImage,
   tooltipImageAlt,
   tooltipLink,
-  tooltipLinkText
+  tooltipLinkText,
+  startCaseLabel
 }: FieldNameProps) {
   const { getFieldLabel } = useFieldLabels();
   const { fieldLabel, tooltip } = getFieldLabel({
@@ -84,11 +95,13 @@ export function FieldHeader({
     tooltipImage,
     tooltipImageAlt,
     tooltipLink,
-    tooltipLinkText
+    tooltipLinkText,
+    startCaseLabel
   });
 
   return (
     <div className={`${customName ?? name}-field-header`}>
+      {prefixName ? prefixName + " " : ""}
       {fieldLabel}
       {tooltip}
     </div>

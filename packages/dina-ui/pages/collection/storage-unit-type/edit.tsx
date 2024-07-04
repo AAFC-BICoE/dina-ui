@@ -79,7 +79,7 @@ export function StorageUnitTypeForm({
       submittedValues.enableGrid === false &&
       submittedValues.gridLayoutDefinition
     ) {
-      submittedValues.gridLayoutDefinition = null;
+      delete submittedValues.gridLayoutDefinition;
     }
     delete submittedValues.enableGrid;
 

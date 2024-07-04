@@ -73,6 +73,9 @@ export interface FieldWrapperProps {
   children?:
     | JSX.Element
     | ((renderProps: FieldWrapperRenderProps) => JSX.Element);
+
+  /** Optional flag to make label of the field StartCase. */
+  startCaseLabel?: boolean;
 }
 
 export interface FieldWrapperRenderProps {
@@ -171,7 +174,8 @@ function LabelWrapper({
     tooltipImageAlt,
     tooltipLink,
     tooltipLinkText,
-    disableTemplateCheckbox
+    disableTemplateCheckbox,
+    startCaseLabel
   },
   fieldSpyProps: {
     field: { value },
@@ -195,6 +199,7 @@ function LabelWrapper({
       tooltipImageAlt={tooltipImageAlt}
       tooltipLink={tooltipLink}
       tooltipLinkText={tooltipLinkText}
+      startCaseLabel={startCaseLabel}
     />
   );
 

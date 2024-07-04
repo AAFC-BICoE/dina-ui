@@ -87,12 +87,12 @@ export default function NgsWorkFlowRunPage() {
             Cancel
           </Button>
 
-          {currentStep !== 3 ? (
+          {currentStep !== 2 ? (
             <Button
               variant={"primary"}
               className="ms-2"
               onClick={() => setPerformSave(true)}
-              style={{ width: "10rem" }}
+              style={{ width: "10rem", marginRight: "15px" }}
             >
               {performSave ? (
                 <>
@@ -113,7 +113,7 @@ export default function NgsWorkFlowRunPage() {
             </Button>
           ) : (
             <>
-              <Dropdown as={ButtonGroup}>
+              <Dropdown as={ButtonGroup} style={{ width: "12rem" }}>
                 <Button
                   variant={"primary"}
                   className="ms-2"
@@ -172,7 +172,7 @@ export default function NgsWorkFlowRunPage() {
           variant={"primary"}
           className="ms-auto"
           onClick={() => setEditMode(true)}
-          style={{ width: "10rem" }}
+          style={{ width: "10rem", marginRight: "15px" }}
         >
           <SeqdbMessage id="editButtonText" />
         </Button>

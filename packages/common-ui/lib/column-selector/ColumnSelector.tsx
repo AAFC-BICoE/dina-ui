@@ -4,8 +4,12 @@ import { useState, useEffect } from "react";
 import React from "react";
 import { Dropdown } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import { ESIndexMapping, TableColumn } from "../list-page/types";
-import { getColumnSelectorIndexMapColumns } from "./ColumnSelectorUtils";
+import {
+  DynamicFieldsMappingConfig,
+  ESIndexMapping,
+  TableColumn
+} from "../list-page/types";
+import { generateColumnDefinition } from "./ColumnSelectorUtils";
 import { useApiClient } from "../api-client/ApiClientContext";
 import useLocalStorage from "@rehooks/local-storage";
 
@@ -24,14 +28,14 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   exportMode?: boolean;
 
   /**
-   * Should all the options be disabled.
-   */
-  disabled?: boolean;
-
-  /**
    * Index mapping containing all of the fields that should be displayed in the list.
    */
   indexMapping: ESIndexMapping[] | undefined;
+
+  /**
+   * Dynamic field mapping configuration.
+   */
+  dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig;
 
   /**
    * The currently displayed columns on the table.
@@ -48,12 +52,17 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   /**
    * The default columns to be loaded in if no columns are found in the local storage.
    */
-  defaultColumns: TableColumn<TData>[];
+  defaultColumns?: TableColumn<TData>[];
 
   /**
    * Indicate if all the columns have been loading in...
    */
   setColumnSelectorLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+
+  /**
+   * Array of relationshipType columns to be excluded from the dropdown menu
+   */
+  excludedRelationshipTypes?: string[];
 }
 
 export function ColumnSelector<TData extends KitsuResource>(
@@ -64,17 +73,19 @@ export function ColumnSelector<TData extends KitsuResource>(
   const {
     exportMode,
     indexMapping,
+    dynamicFieldsMappingConfig,
     uniqueName,
     defaultColumns,
     setColumnSelectorLoading,
-    setDisplayedColumns
+    setDisplayedColumns,
+    excludedRelationshipTypes
   } = props;
-
-  // These are all the possible columns displayed to the user.
-  const [columnOptions, setColumnOptions] = useState<TableColumn<TData>[]>([]);
 
   // Loading state, specifically for dynamically loaded columns.
   const [loading, setLoading] = useState<boolean>(true);
+
+  const [injectedIndexMapping, setInjectedIndexMapping] =
+    useState<ESIndexMapping[]>();
 
   // Local storage of the displayed columns that are saved.
   const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
@@ -83,52 +94,110 @@ export function ColumnSelector<TData extends KitsuResource>(
       []
     );
 
+  useEffect(() => {
+    let injectedMappings: (ESIndexMapping | undefined)[] = [];
+
+    if (indexMapping) {
+      if (defaultColumns) {
+        injectedMappings = defaultColumns
+          .map<ESIndexMapping | undefined>((column) => {
+            // Check if this exists within the index mapping already, if not we do not need to inject it inside.
+            if (
+              indexMapping.find(
+                (mapping) =>
+                  mapping.label === column.id || mapping.value === column.id
+              )
+            ) {
+              return undefined;
+            }
+
+            return {
+              label: column.id ?? column.label ?? "",
+              path: (column as any)?.accessorKey,
+              type: "text",
+              value: column.id ?? column.label ?? "",
+              hideField: false,
+              distinctTerm: false,
+              keywordMultiFieldSupport: column.isKeyword ?? false,
+              keywordNumericSupport: false,
+              optimizedPrefix: false,
+              containsSupport: false,
+              endsWithSupport: false
+            };
+          })
+          .filter((injected) => injected !== undefined);
+
+        // Combine index mapping fields.
+        injectedMappings = [
+          ...indexMapping,
+          ...(injectedMappings as ESIndexMapping[])
+        ];
+      } else {
+        // Combine index mapping fields.
+        injectedMappings = indexMapping;
+      }
+
+      // Remove excluded relationships from the list if provided.
+      if (excludedRelationshipTypes && excludedRelationshipTypes?.length > 0) {
+        injectedMappings = injectedMappings.filter((mapping) => {
+          return mapping?.parentType
+            ? !excludedRelationshipTypes.includes(mapping?.parentType)
+            : true;
+        });
+      }
+
+      // Finally, set it as the state.
+      setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
+    }
+  }, [indexMapping, defaultColumns]);
+
   // This useEffect is responsible for loading in the new local storage displayed columns.
   useEffect(() => {
+    function isDefinedColumn(
+      column: TableColumn<TData> | undefined
+    ): column is TableColumn<TData> {
+      return column !== undefined && column.id !== undefined;
+    }
+
+    async function loadColumnsFromLocalStorage() {
+      if (injectedIndexMapping) {
+        const promises = localStorageDisplayedColumns.map(
+          async (localColumn) => {
+            const newColumnDefinition = await generateColumnDefinition({
+              indexMappings: injectedIndexMapping,
+              dynamicFieldsMappingConfig,
+              apiClient,
+              defaultColumns,
+              path: localColumn
+            });
+            return newColumnDefinition;
+          }
+        );
+
+        const columns = (await Promise.all(promises)).filter(isDefinedColumn);
+        setDisplayedColumns(columns);
+      }
+    }
+
     if (
       !localStorageDisplayedColumns ||
       localStorageDisplayedColumns?.length === 0
     ) {
       // No local storage to load from, load the default columns in.
-      setDisplayedColumns(defaultColumns);
+      setDisplayedColumns(defaultColumns ?? []);
 
       // Set the default columns into local storage.
-      setLocalStorageDisplayedColumns(
-        defaultColumns.map((column) => column?.id ?? "")
-      );
-    } else {
-      if (columnOptions.length > 0) {
-        const columnsToBeDisplayed = localStorageDisplayedColumns.flatMap<
-          TableColumn<TData>
-        >((localColumn) => {
-          return (
-            columnOptions.find((column) => column.id === localColumn) ?? []
-          );
-        });
-
-        setDisplayedColumns(columnsToBeDisplayed);
+      if (defaultColumns) {
+        setLocalStorageDisplayedColumns(
+          defaultColumns.map((column) => column?.id ?? "")
+        );
       }
+    } else {
+      loadColumnsFromLocalStorage();
+      setLoading(false);
+      setColumnSelectorLoading?.(false);
     }
-  }, [localStorageDisplayedColumns, columnOptions]);
-
-  // Load all the possible options, these are needed incase the user has saved columns to refer to
-  // them.
-  useEffect(() => {
-    function setInternalLoading(value: boolean) {
-      setLoading(value);
-      setColumnSelectorLoading?.(value);
-    }
-
-    if (indexMapping) {
-      getColumnSelectorIndexMapColumns<TData>({
-        indexMapping,
-        setColumnOptions,
-        setLoading: setInternalLoading,
-        defaultColumns,
-        apiClient
-      });
-    }
-  }, [indexMapping]);
+  }, [localStorageDisplayedColumns, injectedIndexMapping]);
 
   const {
     show: showMenu,
@@ -175,8 +244,8 @@ export function ColumnSelector<TData extends KitsuResource>(
     return (
       <ColumnSelectorList
         {...props}
+        indexMapping={injectedIndexMapping}
         loading={loading}
-        columnOptions={columnOptions}
       />
     );
   } else {
@@ -192,17 +261,17 @@ export function ColumnSelector<TData extends KitsuResource>(
         </Dropdown.Toggle>
         <Dropdown.Menu
           style={{
-            maxHeight: "20rem",
+            height: "30rem",
             overflowY: "scroll",
-            width: exportMode ? "100%" : "25rem",
-            padding: exportMode ? "0" : "1.25rem 1.25rem 1.25rem 1.25rem",
-            zIndex: 1
+            width: "25rem",
+            padding: "1.25rem 1.25rem 1.25rem 1.25rem",
+            zIndex: 9000
           }}
         >
           <ColumnSelectorList
             {...props}
+            indexMapping={injectedIndexMapping}
             loading={loading}
-            columnOptions={columnOptions}
           />
         </Dropdown.Menu>
       </Dropdown>

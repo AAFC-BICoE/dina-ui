@@ -12,7 +12,7 @@ import {
   DATA_EXPORT_QUERY_KEY,
   TextField,
   SubmitButton,
-  ColumnSelector
+  ColumnSelectorMemo
 } from "packages/common-ui/lib";
 import Link from "next/link";
 import { KitsuResource, PersistedResource } from "kitsu";
@@ -34,7 +34,7 @@ import { useSessionStorage } from "usehooks-ts";
 const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
 
 export default function ExportPage<TData extends KitsuResource>() {
-  const { formatMessage, formatNumber } = useIntl();
+  const { formatNumber } = useIntl();
   const { bulkGet, apiClient, save } = useApiClient();
   const router = useRouter();
 
@@ -318,15 +318,16 @@ export default function ExportPage<TData extends KitsuResource>() {
                 <Tooltip id="exportObjectsMaxLimitTooltip" />
               )}
           </div>
-          <ColumnSelector
-            exportMode={true}
-            defaultColumns={[]}
-            displayedColumns={columnsToExport}
-            setDisplayedColumns={setColumnsToExport}
-            indexMapping={indexMap}
-            uniqueName={uniqueName}
-            disabled={exportType === "OBJECT_ARCHIVE"}
-          />
+          {exportType === "TABULAR_DATA" && (
+            <ColumnSelectorMemo
+              exportMode={true}
+              displayedColumns={columnsToExport as any}
+              setDisplayedColumns={setColumnsToExport as any}
+              indexMapping={indexMap}
+              uniqueName={uniqueName}
+              dynamicFieldsMappingConfig={dynamicFieldMapping}
+            />
+          )}
         </div>
       </DinaForm>
     </PageLayout>

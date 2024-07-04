@@ -6,12 +6,16 @@ import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 
 const OPERATOR_OPTIONS: FieldItems = [
   {
-    key: "exactMatch",
-    label: "Exact Match"
+    key: "contains",
+    label: "Contains"
   },
   {
-    key: "notEquals",
-    label: "Not Equals"
+    key: "in",
+    label: "In"
+  },
+  {
+    key: "notIn",
+    label: "Not In"
   },
   {
     key: "empty",
@@ -42,7 +46,7 @@ describe("QueryOperatorSelector component", () => {
 
     // 4 options should be rendered.
     expect(wrapper.find(QueryOperatorSelector).find("Option").length).toEqual(
-      4
+      5
     );
   });
 

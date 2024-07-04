@@ -444,6 +444,7 @@ export function generateBuilderConfig(
               ?.mapping as ESIndexMapping
           }
           indexMap={indexMap}
+          isInColumnSelector={false}
         />
       ),
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {
@@ -470,6 +471,7 @@ export function generateBuilderConfig(
             (factoryProps?.fieldDefinition?.fieldSettings as any)
               ?.mapping as ESIndexMapping
           }
+          isInColumnSelector={false}
         />
       ),
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {
@@ -651,6 +653,7 @@ export function generateBuilderConfig(
         indexMap={indexMap}
         currentField={fieldDropdownProps?.selectedPath?.join(".") ?? ""}
         setField={fieldDropdownProps?.setField}
+        isInColumnSelector={false}
       />
     ),
     renderOperator: (operatorDropdownProps) => {
