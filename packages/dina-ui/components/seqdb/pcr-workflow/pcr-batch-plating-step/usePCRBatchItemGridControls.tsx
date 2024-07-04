@@ -2,14 +2,16 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   filterBy,
+  SaveArgs,
   useQuery,
   useStringComparator
 } from "common-ui";
-import { compact, isEmpty, omitBy } from "lodash";
+import { compact, isEmpty, omitBy, pick } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { CellGrid } from "../../container-grid/ContainerGrid";
+import { StorageUnitCoordinates } from "packages/dina-ui/types/collection-api/resources/StorageUnitCoordinates";
 
 interface ContainerGridProps {
   pcrBatchId: string;
@@ -184,7 +186,7 @@ export function usePCRBatchItemGridControls({
       })(""),
       page: { limit: 1000 },
       path: `/seqdb-api/pcr-batch-item`,
-      include: "materialSample"
+      include: "materialSample,storageUnitCoordinates"
     },
     {
       deps: [lastSave],
@@ -343,20 +345,52 @@ export function usePCRBatchItemGridControls({
 
         return movedItem;
       });
-
-      const saveArgs = materialSampleItemsToSave.map((item) => {
-        return {
+      // Save storageUnitCoordinates resource
+      const storageUnitCoordinatesSaveArgs: SaveArgs<StorageUnitCoordinates>[] =
+        materialSampleItemsToSave.map((item) => ({
+          type: "storage-unit-coordinates",
           resource: {
-            type: "pcr-batch-item",
-            id: item.pcrBatchItemId,
-            wellColumn: item.wellColumn ?? null,
-            wellRow: item.wellRow ?? null
-          } as PcrBatchItem,
-          type: "pcr-batch-item"
-        };
-      });
+            wellColumn: item.wellColumn,
+            wellRow: item.wellRow,
+            storageUnit: pcrBatch.storageUnit,
+            type: "storage-unit-coordinates",
+            id: undefined
+          }
+        }));
 
-      await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
+      const savedStorageUnitCoordinates = await save<StorageUnitCoordinates>(
+        storageUnitCoordinatesSaveArgs,
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      );
+
+      const saveArgs: SaveArgs<PcrBatchItem>[] = materialSampleItemsToSave.map(
+        (item) => {
+          return {
+            resource: {
+              type: "pcr-batch-item",
+              id: item.pcrBatchItemId,
+              relationships: {
+                storageUnitCoordinates: {
+                  data: pick(
+                    savedStorageUnitCoordinates.find(
+                      (storageUnitCoordinate) =>
+                        storageUnitCoordinate.wellColumn === item.wellColumn &&
+                        storageUnitCoordinate.wellRow === item.wellRow
+                    ),
+                    "id",
+                    "type"
+                  )
+                }
+              }
+            },
+            type: "pcr-batch-item"
+          };
+        }
+      );
+
+      await save<PcrBatchItem>(saveArgs, { apiBaseUrl: "/seqdb-api" });
 
       setLastSave(Date.now());
     } catch (err) {
