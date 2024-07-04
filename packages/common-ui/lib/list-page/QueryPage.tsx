@@ -120,6 +120,11 @@ export interface QueryPageProps<TData extends KitsuResource> {
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
   /**
+   * This will add an option to the QueryBuilder to allow users to check if a relationship exists.
+   */
+  enableRelationshipPresence?: boolean;
+
+  /**
    * Array of relationshipType columns to be excluded from the dropdown menu
    */
   excludedRelationshipTypes?: string[];
@@ -266,6 +271,7 @@ export function QueryPage<TData extends KitsuResource>({
   indexName,
   uniqueName,
   dynamicFieldMapping,
+  enableRelationshipPresence = false,
   excludedRelationshipTypes,
   columns,
   bulkDeleteButtonProps,
@@ -349,6 +355,7 @@ export function QueryPage<TData extends KitsuResource>({
   const { queryBuilderConfig, indexMap } = useQueryBuilderConfig({
     indexName,
     dynamicFieldMapping,
+    enableRelationshipPresence,
     customViewFields
   });
 
@@ -494,7 +501,8 @@ export function QueryPage<TData extends KitsuResource>({
               id: rslt._source?.data?.id,
               type: rslt._source?.data?.type,
               data: {
-                attributes: rslt._source?.data?.attributes
+                attributes: rslt._source?.data?.attributes,
+                relationships: rslt._source?.data?.relationships
               },
               included: rslt._source?.included?.reduce(
                 (includedAccumulator, currentIncluded) => {

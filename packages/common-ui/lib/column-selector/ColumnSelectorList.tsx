@@ -22,6 +22,9 @@ import {
   generateColumnDefinition,
   generateColumnPath
 } from "./ColumnSelectorUtils";
+import QueryRowRelationshipPresenceSearch, {
+  RelationshipPresenceSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
 
 // IDs of columns not supported for exporting
 export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
@@ -104,6 +107,13 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                 return;
               }
               break;
+            case "relationshipPresence":
+              const relationshipPresenceValues: RelationshipPresenceSearchStates =
+                JSON.parse(dynamicFieldValue);
+              if (relationshipPresenceValues.selectedRelationship) {
+                setIsValidField(true);
+                return;
+              }
           }
         }
       } else {
@@ -267,6 +277,14 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               fieldExtensionConfig={selectedField}
               setValue={setDynamicFieldValue}
               value={dynamicFieldValue}
+              isInColumnSelector={true}
+            />
+          )}
+          {selectedField?.dynamicField?.type === "relationshipPresence" && (
+            <QueryRowRelationshipPresenceSearch
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
+              indexMapping={indexMapping}
               isInColumnSelector={true}
             />
           )}

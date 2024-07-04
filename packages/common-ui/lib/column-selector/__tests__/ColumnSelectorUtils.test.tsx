@@ -118,6 +118,33 @@ describe("ColumnSelectorUtils", () => {
       ).toEqual("fieldExtension/COLLECTING_EVENT/mixs_water_v4/alkalinity");
     });
 
+    it("Generate relationship presence path", () => {
+      expect(
+        generateColumnPath({
+          indexMapping: {
+            dynamicField: {
+              apiEndpoint: "_relationshipPresence",
+              label: "_relationshipPresence",
+              path: "_relationshipPresence",
+              type: "relationshipPresence"
+            },
+            value: "_relationshipPresence",
+            distinctTerm: false,
+            label: "_relationshipPresence",
+            path: "_relationshipPresence",
+            type: "relationshipPresence",
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            containsSupport: false,
+            endsWithSupport: false,
+            hideField: false
+          },
+          dynamicFieldValue: `{"selectedRelationship":"organism","selectedOperator":"presence","selectedValue":0}`
+        })
+      ).toEqual("relationshipPresence/organism/presence");
+    });
+
     it("Generate entity level path", () => {
       expect(
         generateColumnPath({

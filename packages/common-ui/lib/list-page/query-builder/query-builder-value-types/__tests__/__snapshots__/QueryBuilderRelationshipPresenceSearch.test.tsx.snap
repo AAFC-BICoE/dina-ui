@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryBuilderRelationshipPresenceSearch transformRelationshipPresenceToDSL function Absence operation 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "exists": Object {
+        "field": "data.relationships.organism.data.id",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderRelationshipPresenceSearch transformRelationshipPresenceToDSL function Presence operation 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "exists": Object {
+        "field": "data.relationships.collection.data.id",
+      },
+    },
+  },
+}
+`;

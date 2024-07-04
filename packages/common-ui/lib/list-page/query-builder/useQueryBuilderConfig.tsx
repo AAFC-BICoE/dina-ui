@@ -42,6 +42,9 @@ import { transformUUIDSearchToDSL } from "./query-builder-value-types/QueryBuild
 import QueryRowGlobalSearchSearch, {
   transformGlobalSearchToDSL
 } from "./query-builder-value-types/QueryBuilderGlobalSearch";
+import QueryRowRelationshipPresenceSearch, {
+  transformRelationshipPresenceToDSL
+} from "./query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -91,6 +94,7 @@ function getQueryBuilderTypeFromIndexType(
     case "boolean":
     case "managedAttribute":
     case "fieldExtension":
+    case "relationshipPresence":
       return type;
 
     // If it's stored directly as a keyword, it's considered a text field.
@@ -117,6 +121,9 @@ function getQueryBuilderTypeFromIndexType(
 // Unique fieldname identifier for global search.
 export const GLOBAL_SEARCH_FIELDNAME = "_globalSearch";
 
+// Unique fieldname identifier for relationship presence.
+export const RELATIONSHIP_PRESENCE_FIELDNAME = "_relationshipPresence";
+
 export interface CustomViewField {
   /**
    * The field name used in the Custom View.
@@ -141,6 +148,11 @@ export interface UseQueryBuilderConfigProps {
    */
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
+  /**
+   * This will add an option to the QueryBuilder to allow users to check if a relationship exists.
+   */
+  enableRelationshipPresence?: boolean;
+
   customViewFields?: CustomViewField[];
 }
 
@@ -150,12 +162,14 @@ export interface UseQueryBuilderConfigProps {
 export function useQueryBuilderConfig({
   indexName,
   dynamicFieldMapping,
+  enableRelationshipPresence,
   customViewFields
 }: UseQueryBuilderConfigProps) {
   // Load index map using the index name.
   const { indexMap } = useIndexMapping({
     indexName,
-    dynamicFieldMapping
+    dynamicFieldMapping,
+    enableRelationshipPresence
   });
   const { formatMessage, locale } = useIntl();
 
@@ -170,7 +184,8 @@ export function useQueryBuilderConfig({
         indexMap,
         indexName,
         formatMessage,
-        customViewFields
+        customViewFields,
+        enableRelationshipPresence
       )
     );
   }, [indexMap, customViewFields, locale]);
@@ -189,7 +204,8 @@ export function generateBuilderConfig(
   indexMap: ESIndexMapping[],
   indexName: string,
   formatMessage: any,
-  customViewFields?: CustomViewField[]
+  customViewFields?: CustomViewField[],
+  enableRelationshipPresence?: boolean
 ): Config {
   // If the index map doesn't exist, then there is no point of loading the config yet.
   if (!indexMap) {
@@ -485,6 +501,30 @@ export function generateBuilderConfig(
           indexMap
         });
       }
+    },
+    relationshipPresence: {
+      ...BasicConfig.widgets.text,
+      type: "relationshipPresence",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowRelationshipPresenceSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          indexMapping={indexMap}
+          isInColumnSelector={false}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformRelationshipPresenceToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings,
+          indexMap
+        });
+      }
     }
   };
 
@@ -610,6 +650,15 @@ export function generateBuilderConfig(
       defaultOperator: "noOperator",
       widgets: {
         fieldExtension: {
+          operators: ["noOperator"]
+        }
+      }
+    },
+    relationshipPresence: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        relationshipPresence: {
           operators: ["noOperator"]
         }
       }
@@ -746,7 +795,20 @@ export function generateBuilderConfig(
           isGlobalSearch: true
         }
       }
-    }
+    },
+
+    // Relationship Presence support
+    ...(enableRelationshipPresence === true
+      ? [
+          {
+            [RELATIONSHIP_PRESENCE_FIELDNAME]: {
+              label: RELATIONSHIP_PRESENCE_FIELDNAME,
+              type: "relationshipPresence",
+              valueSources: ["value"]
+            }
+          }
+        ]
+      : [])
   );
 
   return {
