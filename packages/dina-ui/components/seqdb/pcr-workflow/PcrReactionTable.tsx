@@ -137,9 +137,10 @@ export function PcrReactionTable({
       id: "wellCoordinates",
       cell: ({ row }) => (
         <>
-          {row.original?.wellRow === null || row.original?.wellColumn === null
+          {row.original?.storageUnitCoordinates?.wellRow === null ||
+          row.original?.storageUnitCoordinates?.wellColumn === null
             ? ""
-            : `${row.original.wellRow}${row.original.wellColumn}`}
+            : `${row.original.storageUnitCoordinates?.wellRow}${row.original.storageUnitCoordinates?.wellColumn}`}
         </>
       ),
       header: () => <FieldHeader name={"wellCoordinates"} />
@@ -147,7 +148,11 @@ export function PcrReactionTable({
     {
       id: "tubeNumber",
       cell: ({ row: { original } }) =>
-        original?.cellNumber === undefined ? <></> : <>{original.cellNumber}</>,
+        original?.storageUnitCoordinates?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitCoordinates?.cellNumber}</>
+        ),
       header: () => <FieldHeader name={"tubeNumber"} />
     },
     {

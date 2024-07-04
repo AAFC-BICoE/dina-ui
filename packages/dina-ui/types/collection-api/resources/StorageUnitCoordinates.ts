@@ -7,6 +7,7 @@ export interface StorageUnitCoordinatesAttributes {
   wellRow?: string;
   createdOn?: string;
   createdBy?: string;
+  cellNumber?: number;
 }
 
 export interface StorageUnitCoordinatesRelationships {

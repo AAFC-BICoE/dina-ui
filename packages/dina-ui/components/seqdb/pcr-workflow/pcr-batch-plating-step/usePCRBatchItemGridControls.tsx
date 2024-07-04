@@ -194,8 +194,8 @@ export function usePCRBatchItemGridControls({
           pcrBatchItem.map((item) => ({
             pcrBatchItemId: item.id,
             sampleId: item?.materialSample?.id,
-            wellColumn: item.wellColumn,
-            wellRow: item.wellRow
+            wellColumn: item.storageUnitCoordinates?.wellColumn,
+            wellRow: item.storageUnitCoordinates?.wellRow
           }))
         );
       }
