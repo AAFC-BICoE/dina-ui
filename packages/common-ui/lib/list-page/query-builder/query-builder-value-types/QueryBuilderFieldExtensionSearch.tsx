@@ -286,8 +286,14 @@ export function transformFieldExtensionToDSL({
   fieldInfo
 }: TransformToDSLProps): any {
   // Parse the field extension search options. Trim the search value.
-  const fieldExtensionSearchValue: FieldExtensionSearchStates =
-    JSON.parse(value);
+  let fieldExtensionSearchValue: FieldExtensionSearchStates;
+  try {
+    fieldExtensionSearchValue = JSON.parse(value);
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+
   fieldExtensionSearchValue.searchValue =
     fieldExtensionSearchValue.searchValue.trim();
 
