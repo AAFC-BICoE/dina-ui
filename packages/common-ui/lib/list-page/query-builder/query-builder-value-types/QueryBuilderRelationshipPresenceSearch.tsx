@@ -4,6 +4,7 @@ import { SelectOption } from "common-ui";
 import { ESIndexMapping, TransformToDSLProps } from "../../types";
 import Select from "react-select";
 import { startCase } from "lodash";
+import { existsQuery } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 export interface QueryRowRelationshipPresenceSearchProps {
   /**
@@ -144,14 +145,14 @@ function retrieveRelationshipsFromIndexMapping(
   indexMapping: ESIndexMapping[]
 ): SelectOption<string>[] {
   return indexMapping.reduce<SelectOption<string>[]>((acc, mapping) => {
-    // Check if the mapping has a parentType and if it already exists in the accumulator
+    // Check if the mapping has a parentName and if it already exists in the accumulator
     if (
-      mapping.parentType &&
-      !acc.find((item) => item.value === mapping.parentType)
+      mapping.parentName &&
+      !acc.find((item) => item.value === mapping.parentName)
     ) {
       acc.push({
         label: startCase(mapping.parentName),
-        value: mapping.parentType
+        value: mapping.parentName
       } as SelectOption<string>);
     }
     return acc;
@@ -162,8 +163,46 @@ function retrieveRelationshipsFromIndexMapping(
  * Using the query row for a relationship presence search, generate the elastic search request to be
  * made.
  */
-export function transformRelationshipPresenceToDSL({}: // value,
-// fieldInfo
-TransformToDSLProps): any {
-  return {};
+export function transformRelationshipPresenceToDSL({
+  value
+}: TransformToDSLProps): any {
+  try {
+    // Parse the field extension search options.
+    const {
+      selectedRelationship,
+      selectedOperator
+    }: RelationshipPresenceSearchStates = JSON.parse(value);
+
+    // Determine if we have all the required fields to perform a search.
+    if (!selectedRelationship || !selectedOperator) {
+      return;
+    }
+
+    // Based on the operator, generate the elastic search query.
+    switch (selectedOperator) {
+      case "presence":
+        return {
+          bool: {
+            must: existsQuery(
+              "data.relationships." + selectedRelationship + ".data.id"
+            )
+          }
+        };
+
+      case "absence":
+        return {
+          bool: {
+            must_not: existsQuery(
+              "data.relationships." + selectedRelationship + ".data.id"
+            )
+          }
+        };
+    }
+
+    // Unsupported operator...
+    return;
+  } catch (e) {
+    console.error(e);
+    return;
+  }
 }
