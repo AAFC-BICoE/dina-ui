@@ -21,6 +21,11 @@ export interface QueryRowRelationshipPresenceSearchProps {
    * Index mapping to determine the different relationships to select from.
    */
   indexMapping: ESIndexMapping[];
+
+  /**
+   * If being used in the column selector, operators and different styling is applied.
+   */
+  isInColumnSelector: boolean;
 }
 
 export interface RelationshipPresenceSearchStates {
@@ -37,7 +42,8 @@ export interface RelationshipPresenceSearchStates {
 export default function QueryRowRelationshipPresenceSearch({
   value,
   setValue,
-  indexMapping
+  indexMapping,
+  isInColumnSelector
 }: QueryRowRelationshipPresenceSearchProps) {
   const { formatMessage } = useIntl();
 
@@ -95,11 +101,11 @@ export default function QueryRowRelationshipPresenceSearch({
   }
 
   return (
-    <div className="row">
+    <div className={isInColumnSelector ? "" : "row"}>
       {/* Relationship Selector */}
       <Select<SelectOption<string>>
         options={relationshipOptions}
-        className={`col me-1 ms-2 ps-0`}
+        className={isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"}
         value={selectedRelationship}
         placeholder={formatMessage({
           id: "queryBuilder_relationship_placeholder"
@@ -116,11 +122,11 @@ export default function QueryRowRelationshipPresenceSearch({
       />
 
       {/* Operator Selector */}
-      {selectedRelationship && (
+      {!isInColumnSelector && selectedRelationship && (
         <>
           <Select<SelectOption<string>>
             options={operatorOptions}
-            className={`col me-1 ps-0`}
+            className={isInColumnSelector ? "ps-0 mt-2" : "col me-1 ps-0"}
             value={selectedOperator}
             onChange={(selected) =>
               setRelationshipPresenceState({

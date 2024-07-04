@@ -511,6 +511,7 @@ export function generateBuilderConfig(
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
           indexMapping={indexMap}
+          isInColumnSelector={false}
         />
       ),
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {
