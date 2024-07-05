@@ -1,6 +1,7 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
+  DeleteArgs,
   filterBy,
   SaveArgs,
   useQuery,
@@ -18,14 +19,8 @@ interface ContainerGridProps {
   pcrBatch: PcrBatch;
 }
 
-export interface PcrBatchItemSample {
-  pcrBatchItemId?: string;
-  wellRow?: string;
-  wellColumn?: number;
-  sampleId?: string;
+export interface PcrBatchItemSample extends PcrBatchItem {
   sampleName?: string;
-  storageUnitCoordinates?: StorageUnitCoordinates;
-  materialSample?: MaterialSample;
 }
 
 export function usePCRBatchItemGridControls({
@@ -93,16 +88,7 @@ export function usePCRBatchItemGridControls({
     },
     {
       deps: [lastSave],
-      onSuccess: async ({ data: fetchedPcrBatchItems }) => {
-        let pcrBatchItems: PcrBatchItemSample[] = fetchedPcrBatchItems.map(
-          (item) => ({
-            pcrBatchItemId: item.id,
-            sampleId: item.materialSample?.id,
-            storageUnitCoordinates: item.storageUnitCoordinates,
-            materialSample: item.materialSample
-          })
-        );
-
+      onSuccess: async ({ data: pcrBatchItems }) => {
         if (!pcrBatchItems) return;
 
         /**
@@ -154,8 +140,8 @@ export function usePCRBatchItemGridControls({
 
           await bulkGet<MaterialSample>(
             pcrBatchItems
-              .filter((item) => item.sampleId)
-              .map((item) => "/material-sample/" + item.sampleId),
+              .filter((item) => item.materialSample?.id)
+              .map((item) => "/material-sample/" + item.materialSample?.id),
             { apiBaseUrl: "/collection-api" }
           ).then((response) => {
             const materialSamplesTransformed = compact(
@@ -176,26 +162,33 @@ export function usePCRBatchItemGridControls({
           const pcrBatchItemsWithSampleNames =
             materialSamples.map<PcrBatchItemSample>((sample) => {
               const batchItem = pcrBatchItems.find(
-                (item) => item.sampleId === sample.id
+                (item) => item.materialSample?.id === sample.id
               );
               return {
                 ...batchItem,
+                type: "pcr-batch-item",
                 sampleId: sample.id,
                 sampleName: sample?.materialSampleName ?? sample.id
               };
             });
 
           const pcrBatchItemsWithCoords = pcrBatchItemsWithSampleNames.filter(
-            (item) => item.wellRow && item.wellColumn
+            (item) =>
+              item.storageUnitCoordinates?.wellRow &&
+              item.storageUnitCoordinates?.wellColumn
           );
 
           const pcrBatchItemsNoCoords = pcrBatchItemsWithSampleNames.filter(
-            (item) => !item.wellRow && !item.wellColumn
+            (item) =>
+              !item.storageUnitCoordinates?.wellRow &&
+              !item.storageUnitCoordinates?.wellColumn
           );
 
           const newCellGrid: CellGrid<PcrBatchItemSample> = {};
           pcrBatchItemsWithCoords.forEach((item) => {
-            newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item;
+            newCellGrid[
+              `${item.storageUnitCoordinates?.wellRow}_${item.storageUnitCoordinates?.wellColumn}`
+            ] = item;
           });
 
           setGridState({
@@ -227,11 +220,13 @@ export function usePCRBatchItemGridControls({
   function sortAvailableItems(batchItemSamples: PcrBatchItemSample[]) {
     if (materialSampleSortOrder) {
       const sorted = materialSampleSortOrder.map((sampleId) =>
-        batchItemSamples.find((item) => item.sampleId === sampleId)
+        batchItemSamples.find((item) => item.materialSample?.id === sampleId)
       );
       batchItemSamples.forEach((item) => {
         if (
-          materialSampleSortOrder.indexOf(item.sampleId ?? "unknown") === -1
+          materialSampleSortOrder.indexOf(
+            item.materialSample?.id ?? "unknown"
+          ) === -1
         ) {
           sorted.push(item);
         }
@@ -377,49 +372,62 @@ export function usePCRBatchItemGridControls({
           newWellColumn = Number(col);
           newWellRow = row;
         }
-
-        movedItem.wellColumn = newWellColumn;
-        movedItem.wellRow = newWellRow;
+        if (movedItem.storageUnitCoordinates) {
+          movedItem.storageUnitCoordinates.wellColumn = newWellColumn;
+          movedItem.storageUnitCoordinates.wellRow = newWellRow;
+        } else {
+          movedItem.storageUnitCoordinates = {
+            wellColumn: newWellColumn,
+            wellRow: newWellRow,
+            type: "storage-unit-coordinates"
+          };
+        }
 
         return movedItem;
       });
-      // Save storageUnitCoordinates resource
+      // Save storageUnitCoordinates resources with valid wellColumn and wellRow
       const storageUnitCoordinatesSaveArgs: SaveArgs<StorageUnitCoordinates>[] =
-        materialSampleItemsToSave.map((item) => ({
-          type: "storage-unit-coordinates",
-          resource: {
-            wellColumn: item.wellColumn,
-            wellRow: item.wellRow,
-            storageUnit: pcrBatch.storageUnit,
+        materialSampleItemsToSave
+          .filter(
+            (item) =>
+              item.storageUnitCoordinates?.wellColumn &&
+              item.storageUnitCoordinates?.wellRow
+          )
+          .map((item) => ({
             type: "storage-unit-coordinates",
-            id: item.storageUnitCoordinates?.id
-          }
-        }));
-
-      const savedStorageUnitCoordinates = await save<StorageUnitCoordinates>(
-        storageUnitCoordinatesSaveArgs,
-        {
-          apiBaseUrl: "/collection-api"
-        }
-      );
+            resource: {
+              wellColumn: item.storageUnitCoordinates?.wellColumn,
+              wellRow: item.storageUnitCoordinates?.wellRow,
+              storageUnit: pcrBatch.storageUnit,
+              type: "storage-unit-coordinates",
+              id: item.storageUnitCoordinates?.id
+            }
+          }));
+      const savedStorageUnitCoordinates = storageUnitCoordinatesSaveArgs.length
+        ? await save<StorageUnitCoordinates>(storageUnitCoordinatesSaveArgs, {
+            apiBaseUrl: "/collection-api"
+          })
+        : [];
 
       const saveArgs: SaveArgs<PcrBatchItem>[] = materialSampleItemsToSave.map(
         (item) => {
+          const matchedStorageunitCoordinates =
+            savedStorageUnitCoordinates.find(
+              (storageUnitCoordinate) =>
+                storageUnitCoordinate.wellColumn ===
+                  item.storageUnitCoordinates?.wellColumn &&
+                storageUnitCoordinate.wellRow ===
+                  item.storageUnitCoordinates?.wellRow
+            );
           return {
             resource: {
               type: "pcr-batch-item",
-              id: item.pcrBatchItemId,
+              id: item.id,
               relationships: {
                 storageUnitCoordinates: {
-                  data: pick(
-                    savedStorageUnitCoordinates.find(
-                      (storageUnitCoordinate) =>
-                        storageUnitCoordinate.wellColumn === item.wellColumn &&
-                        storageUnitCoordinate.wellRow === item.wellRow
-                    ),
-                    "id",
-                    "type"
-                  )
+                  data: matchedStorageunitCoordinates
+                    ? pick(matchedStorageunitCoordinates, "id", "type")
+                    : null
                 }
               }
             },
@@ -429,6 +437,27 @@ export function usePCRBatchItemGridControls({
       );
 
       await save<PcrBatchItem>(saveArgs, { apiBaseUrl: "/seqdb-api" });
+
+      // Delete storageUnitCoordinates resources without wellColumn or wellRow (presumably removed from grid)
+      const deleteStorageUnitCoordinatesArgs: DeleteArgs[] =
+        materialSampleItemsToSave
+          .filter(
+            (item) =>
+              !item.storageUnitCoordinates?.wellColumn ||
+              !item.storageUnitCoordinates?.wellRow ||
+              !item.storageUnitCoordinates?.id
+          )
+          .map((item) => ({
+            delete: {
+              id: item.storageUnitCoordinates?.id ?? null,
+              type: "storage-unit-coordinates"
+            }
+          }));
+      if (deleteStorageUnitCoordinatesArgs.length) {
+        await save<StorageUnitCoordinates>(deleteStorageUnitCoordinatesArgs, {
+          apiBaseUrl: "/collection-api"
+        });
+      }
 
       setLastSave(Date.now());
     } catch (err) {
