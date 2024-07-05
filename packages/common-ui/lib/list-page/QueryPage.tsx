@@ -560,6 +560,7 @@ export function QueryPage<TData extends KitsuResource>({
         .finally(() => {
           // No matter the end result, loading should stop.
           setLoading(false);
+          isActionTriggeredQuery.current = false;
         });
     }
   }, [
@@ -578,10 +579,6 @@ export function QueryPage<TData extends KitsuResource>({
         const newTree = Utils.loadTree(customViewQuery);
         setSubmittedQueryBuilderTree(newTree);
         setQueryBuilderTree(newTree);
-        isActionTriggeredQuery.current = true;
-      } else if (customViewElasticSearchQuery) {
-        setSubmittedQueryBuilderTree(emptyQueryTree());
-        setQueryBuilderTree(emptyQueryTree());
         isActionTriggeredQuery.current = true;
       }
     }
