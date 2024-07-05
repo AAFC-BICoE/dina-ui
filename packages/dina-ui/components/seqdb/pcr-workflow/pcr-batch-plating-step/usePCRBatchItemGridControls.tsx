@@ -24,6 +24,8 @@ export interface PcrBatchItemSample {
   wellColumn?: number;
   sampleId?: string;
   sampleName?: string;
+  storageUnitCoordinates?: StorageUnitCoordinates;
+  materialSample?: MaterialSample;
 }
 
 export function usePCRBatchItemGridControls({
@@ -32,7 +34,6 @@ export function usePCRBatchItemGridControls({
 }: ContainerGridProps) {
   const { save, bulkGet } = useContext(ApiClientContext);
 
-  const [itemsLoading, setItemsLoading] = useState<boolean>(true);
   const { compareByStringAndNumber } = useStringComparator();
 
   // Whether the grid is submitting.
@@ -51,8 +52,6 @@ export function usePCRBatchItemGridControls({
 
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
 
-  const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItemSample[]>();
-
   const [isStorage, setIsStorage] = useState<boolean>(false);
 
   const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
@@ -67,110 +66,14 @@ export function usePCRBatchItemGridControls({
     // PcrBatchItems that have been moved since data initialization.
     movedItems: [] as PcrBatchItemSample[]
   });
+  const [loadingRelationships, setLoadingRelationships] =
+    useState<boolean>(false);
 
   // Boolean if the grid contains any of items.
   const gridIsPopulated = useMemo(
     () => !isEmpty(gridState.cellGrid),
     [gridState]
   );
-
-  useEffect(() => {
-    if (!pcrBatch) return;
-
-    if (pcrBatch?.storageRestriction) {
-      setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
-      setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
-      setFillMode(
-        pcrBatch.storageRestriction.layout.fillDirection === "BY_ROW"
-          ? "ROW"
-          : "COLUMN"
-      );
-      setIsStorage(true);
-    }
-  }, [pcrBatch]);
-
-  useEffect(() => {
-    if (!pcrBatchItems) return;
-
-    fetchSamples((materialSamples) => {
-      const pcrBatchItemsWithSampleNames =
-        materialSamples.map<PcrBatchItemSample>((sample) => {
-          const batchItem = pcrBatchItems.find(
-            (item) => item.sampleId === sample.id
-          );
-          return {
-            pcrBatchItemId: batchItem?.pcrBatchItemId,
-            sampleId: sample.id,
-            sampleName: sample?.materialSampleName ?? sample.id,
-            wellColumn: batchItem?.wellColumn,
-            wellRow: batchItem?.wellRow
-          };
-        });
-
-      const pcrBatchItemsWithCoords = pcrBatchItemsWithSampleNames.filter(
-        (item) => item.wellRow && item.wellColumn
-      );
-
-      const pcrBatchItemsNoCoords = pcrBatchItemsWithSampleNames.filter(
-        (item) => !item.wellRow && !item.wellColumn
-      );
-
-      const newCellGrid: CellGrid<PcrBatchItemSample> = {};
-      pcrBatchItemsWithCoords.forEach((item) => {
-        newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item;
-      });
-
-      setGridState({
-        availableItems: sortAvailableItems(pcrBatchItemsNoCoords),
-        cellGrid: newCellGrid,
-        movedItems: []
-      });
-      setItemsLoading(false);
-    });
-  }, [pcrBatchItems]);
-
-  function sortAvailableItems(batchItemSamples: PcrBatchItemSample[]) {
-    if (materialSampleSortOrder) {
-      const sorted = materialSampleSortOrder.map((sampleId) =>
-        batchItemSamples.find((item) => item.sampleId === sampleId)
-      );
-      batchItemSamples.forEach((item) => {
-        if (
-          materialSampleSortOrder.indexOf(item.sampleId ?? "unknown") === -1
-        ) {
-          sorted.push(item);
-        }
-      });
-      return compact(sorted);
-    } else {
-      return compact(batchItemSamples);
-    }
-  }
-
-  /**
-   * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
-   * operation.
-   */
-  async function fetchSamples(callback: (response: MaterialSample[]) => void) {
-    if (!pcrBatchItems) return;
-
-    await bulkGet<MaterialSample>(
-      pcrBatchItems
-        .filter((item) => item.sampleId)
-        .map((item) => "/material-sample/" + item.sampleId),
-      { apiBaseUrl: "/collection-api" }
-    ).then((response) => {
-      const materialSamplesTransformed = compact(response).map<MaterialSample>(
-        (resource) => ({
-          materialSampleName: resource.materialSampleName,
-          id: resource.id,
-          type: resource.type
-        })
-      );
-
-      callback(materialSamplesTransformed);
-    });
-  }
 
   // PcrBatchItem queries.
   const { loading: materialSampleItemsLoading } = useQuery<PcrBatchItem[]>(
@@ -190,19 +93,154 @@ export function usePCRBatchItemGridControls({
     },
     {
       deps: [lastSave],
-      onSuccess: async ({ data: pcrBatchItem }) => {
-        setItemsLoading(true);
-        setPcrBatchItems(
-          pcrBatchItem.map((item) => ({
+      onSuccess: async ({ data: fetchedPcrBatchItems }) => {
+        let pcrBatchItems: PcrBatchItemSample[] = fetchedPcrBatchItems.map(
+          (item) => ({
             pcrBatchItemId: item.id,
-            sampleId: item?.materialSample?.id,
-            wellColumn: item.storageUnitCoordinates?.wellColumn,
-            wellRow: item.storageUnitCoordinates?.wellRow
-          }))
+            sampleId: item.materialSample?.id,
+            storageUnitCoordinates: item.storageUnitCoordinates,
+            materialSample: item.materialSample
+          })
         );
+
+        if (!pcrBatchItems) return;
+
+        /**
+         * Fetch StorageUnitCoordinates linked to each PcrBatchItem
+         * @returns
+         */
+        async function fetchStorageUnitCoordinates() {
+          if (!pcrBatchItems) return;
+
+          const storageUnitCoordinatesQuery =
+            await bulkGet<StorageUnitCoordinates>(
+              pcrBatchItems
+                .filter((item) => item.storageUnitCoordinates?.id)
+                .map(
+                  (item) =>
+                    "/storage-unit-coordinates/" +
+                    item.storageUnitCoordinates?.id
+                ),
+              { apiBaseUrl: "/collection-api" }
+            );
+
+          const pcrBatchItemsWithStorageUnitCoordinates = pcrBatchItems.map(
+            (pcrBatchItem) => {
+              const queryStorageUnitCoordinates =
+                storageUnitCoordinatesQuery.find(
+                  (storageUnitCoordinate) =>
+                    storageUnitCoordinate.id ===
+                    pcrBatchItem.storageUnitCoordinates?.id
+                );
+              return {
+                ...pcrBatchItem,
+                wellColumn: queryStorageUnitCoordinates?.wellColumn,
+                wellRow: queryStorageUnitCoordinates?.wellRow,
+                storageUnitCoordinates: queryStorageUnitCoordinates
+              };
+            }
+          );
+          pcrBatchItems = pcrBatchItemsWithStorageUnitCoordinates;
+        }
+
+        /**
+         * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
+         * operation.
+         */
+        async function fetchSamples(
+          callback: (response: MaterialSample[]) => void
+        ) {
+          if (!pcrBatchItems) return;
+
+          await bulkGet<MaterialSample>(
+            pcrBatchItems
+              .filter((item) => item.sampleId)
+              .map((item) => "/material-sample/" + item.sampleId),
+            { apiBaseUrl: "/collection-api" }
+          ).then((response) => {
+            const materialSamplesTransformed = compact(
+              response
+            ).map<MaterialSample>((resource) => ({
+              materialSampleName: resource.materialSampleName,
+              id: resource.id,
+              type: resource.type
+            }));
+
+            callback(materialSamplesTransformed);
+          });
+        }
+
+        setLoadingRelationships(true);
+        fetchStorageUnitCoordinates();
+        fetchSamples((materialSamples) => {
+          const pcrBatchItemsWithSampleNames =
+            materialSamples.map<PcrBatchItemSample>((sample) => {
+              const batchItem = pcrBatchItems.find(
+                (item) => item.sampleId === sample.id
+              );
+              return {
+                ...batchItem,
+                sampleId: sample.id,
+                sampleName: sample?.materialSampleName ?? sample.id
+              };
+            });
+
+          const pcrBatchItemsWithCoords = pcrBatchItemsWithSampleNames.filter(
+            (item) => item.wellRow && item.wellColumn
+          );
+
+          const pcrBatchItemsNoCoords = pcrBatchItemsWithSampleNames.filter(
+            (item) => !item.wellRow && !item.wellColumn
+          );
+
+          const newCellGrid: CellGrid<PcrBatchItemSample> = {};
+          pcrBatchItemsWithCoords.forEach((item) => {
+            newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item;
+          });
+
+          setGridState({
+            availableItems: sortAvailableItems(pcrBatchItemsNoCoords),
+            cellGrid: newCellGrid,
+            movedItems: []
+          });
+        });
+        setLoadingRelationships(false);
       }
     }
   );
+
+  useEffect(() => {
+    if (!pcrBatch) return;
+
+    if (pcrBatch?.storageRestriction) {
+      setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
+      setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
+      setFillMode(
+        pcrBatch.storageRestriction.layout.fillDirection === "BY_ROW"
+          ? "ROW"
+          : "COLUMN"
+      );
+      setIsStorage(true);
+    }
+  }, [pcrBatch]);
+
+  function sortAvailableItems(batchItemSamples: PcrBatchItemSample[]) {
+    if (materialSampleSortOrder) {
+      const sorted = materialSampleSortOrder.map((sampleId) =>
+        batchItemSamples.find((item) => item.sampleId === sampleId)
+      );
+      batchItemSamples.forEach((item) => {
+        if (
+          materialSampleSortOrder.indexOf(item.sampleId ?? "unknown") === -1
+        ) {
+          sorted.push(item);
+        }
+      });
+      return compact(sorted);
+    } else {
+      return compact(batchItemSamples);
+    }
+  }
 
   function moveItems(items: PcrBatchItemSample[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
@@ -354,7 +392,7 @@ export function usePCRBatchItemGridControls({
             wellRow: item.wellRow,
             storageUnit: pcrBatch.storageUnit,
             type: "storage-unit-coordinates",
-            id: undefined
+            id: item.storageUnitCoordinates?.id
           }
         }));
 
@@ -421,7 +459,8 @@ export function usePCRBatchItemGridControls({
     moveItems(items, "A_1");
   }
 
-  const loading = materialSampleItemsLoading || itemsLoading || submitting;
+  const loading =
+    materialSampleItemsLoading || submitting || loadingRelationships;
 
   return {
     ...gridState,
