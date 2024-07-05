@@ -226,9 +226,13 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
   dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig
 ): Promise<TableColumn<TData> | undefined> {
   const pathParts = path.split("/");
-  if (dynamicFieldsMappingConfig && pathParts.length > 0) {
+  if (pathParts.length > 0) {
     // Handle managed attribute paths.
-    if (pathParts.length === 3 && pathParts[0] === "managedAttribute") {
+    if (
+      dynamicFieldsMappingConfig &&
+      pathParts.length === 3 &&
+      pathParts[0] === "managedAttribute"
+    ) {
       const component = pathParts[1];
       const key = pathParts[2];
       return getManagedAttributesColumn(
@@ -241,7 +245,11 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
     }
 
     // Handle field extension paths.
-    if (pathParts.length === 4 && pathParts[0] === "fieldExtension") {
+    if (
+      dynamicFieldsMappingConfig &&
+      pathParts.length === 4 &&
+      pathParts[0] === "fieldExtension"
+    ) {
       const component = pathParts[1];
       const extension = pathParts[2];
       const field = pathParts[3];
@@ -563,7 +571,7 @@ export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
     header: () => (
       <DinaMessage
         id="field__relationshipPresence_column"
-        values={{ relationshipName: relationship }}
+        values={{ relationshipName: startCase(relationship) }}
       />
     ),
     cell: ({ row: { original } }) => {
