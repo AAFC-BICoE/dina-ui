@@ -224,6 +224,16 @@ export default function MetadataListPage() {
                   ],
                   relationshipFields: []
                 }}
+                mandatoryDisplayedColumns={[
+                  "selectColumn",
+                  "thumbnail",
+                  "originalFilename"
+                ]}
+                nonExportableColumns={[
+                  "selectColumn",
+                  "thumbnail",
+                  "objectStorePreview"
+                ]}
                 enableRelationshipPresence={true}
                 columns={METADATA_TABLE_COLUMNS}
                 bulkDeleteButtonProps={{

@@ -25,7 +25,7 @@ const columns: TableColumn<any>[] = [
 
   // Storage Unit Type
   {
-    id: "storageUnitType",
+    id: "storageUnitType.name",
     cell: ({
       row: {
         original: { included }
@@ -58,7 +58,12 @@ const columns: TableColumn<any>[] = [
       row: {
         original: { data }
       }
-    }) => <StorageUnitBreadCrumb storageUnit={data?.attributes} />,
+    }) => (
+      <StorageUnitBreadCrumb
+        storageUnit={data?.attributes}
+        hideThisUnit={true}
+      />
+    ),
     header: () => <FieldHeader name="location" />,
     enableSorting: false,
     isKeyword: true
@@ -103,6 +108,7 @@ export default function storageUnitListPage() {
         }}
         enableRelationshipPresence={true}
         columns={columns}
+        mandatoryDisplayedColumns={["name"]}
       />
     </PageLayout>
   );

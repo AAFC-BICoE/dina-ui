@@ -26,27 +26,6 @@ import QueryRowRelationshipPresenceSearch, {
   RelationshipPresenceSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
 
-// IDs of columns not supported for exporting
-export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
-  "selectColumn",
-  "thumbnail",
-  "objectStorePreview",
-  "assemblages.",
-  "projects.",
-  "organism."
-];
-
-// IDs of columns that the user cannot configure, they are mandatory.
-export const MANDATORY_DISPLAYED_COLUMNS: string[] = [
-  "selectColumn",
-  "thumbnail",
-  "originalFilename",
-  "materialSampleName",
-  "assemblages.",
-  "projects.",
-  "organism."
-];
-
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
   loading: boolean;
@@ -60,7 +39,9 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   loading,
   defaultColumns,
   indexMapping,
-  dynamicFieldsMappingConfig
+  dynamicFieldsMappingConfig,
+  mandatoryDisplayedColumns,
+  nonExportableColumns
 }: ColumnSelectorListProps<TData>) {
   const { apiClient } = useApiClient();
 
@@ -209,7 +190,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   const displayedColumnsFiltered = useMemo(() => {
     return displayedColumns.filter((column) => {
       if (exportMode) {
-        return !NOT_EXPORTABLE_COLUMN_IDS.some((id) =>
+        return !(nonExportableColumns ?? []).some((id) =>
           (column?.id ?? "").startsWith(id)
         );
       }
@@ -221,23 +202,26 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     if (indexMapping) {
       return indexMapping.filter((mapping) => {
         // Check if it's already been used, does not need to shown again since they are already displaying it.
-        const alreadyUsed = displayedColumns?.find(
-          (column) =>
-            mapping?.value === column?.columnSelectorString ||
-            mapping?.label === column?.columnSelectorString
-        );
+        const alreadyUsed = displayedColumns?.find((column) => {
+          // Check if it's a nested field or normal field:
+          if (mapping.parentType) {
+            return mapping?.value === column?.columnSelectorString;
+          } else {
+            return mapping?.label === column?.columnSelectorString;
+          }
+        });
         if (alreadyUsed) {
           return false;
         }
 
         if (exportMode) {
-          return !NOT_EXPORTABLE_COLUMN_IDS.some(
+          return !(nonExportableColumns ?? []).some(
             (id) =>
               (mapping?.value ?? "").startsWith(id) ||
               (mapping?.label ?? "").startsWith(id)
           );
         } else {
-          return !MANDATORY_DISPLAYED_COLUMNS.some(
+          return !(mandatoryDisplayedColumns ?? []).some(
             (id) =>
               (mapping?.value ?? "").startsWith(id) ||
               (mapping?.label ?? "").startsWith(id)
@@ -318,7 +302,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                     isMandatoryField={
                       exportMode
                         ? false
-                        : MANDATORY_DISPLAYED_COLUMNS.some((id) =>
+                        : (mandatoryDisplayedColumns ?? []).some((id) =>
                             (column?.id ?? "").startsWith(id)
                           )
                     }
