@@ -67,10 +67,14 @@ export function useIndexMapping({
       });
 
       // Fields that are dynamic do not need to be listed here.
-      const fieldsToSkip =
-        dynamicFieldMapping?.fields?.map<string>(
+      const fieldsToSkip = [
+        ...(dynamicFieldMapping?.fields?.map<string>(
           (fieldMapping) => fieldMapping.path
-        ) ?? [];
+        ) ?? []),
+        ...(dynamicFieldMapping?.relationshipFields?.map<string>(
+          (relationshipFieldMapping) => relationshipFieldMapping.path
+        ) ?? [])
+      ];
 
       const result: ESIndexMapping[] = [];
 
@@ -129,10 +133,19 @@ export function useIndexMapping({
             attributeLabel = `${relationship.referencedBy}.${relationshipAttribute.name}`;
           }
 
+          const fullPath =
+            relationship.path +
+            "." +
+            relationshipAttribute.path +
+            "." +
+            attributeLabel;
+
           result.push({
             label: attributeLabel,
             value: relationship.referencedBy + "." + attributeLabel,
-            hideField: false,
+            hideField: fieldsToSkip.some((skipPath) =>
+              fullPath.startsWith(skipPath)
+            ),
             type: relationshipAttribute.type,
             subType: relationshipAttribute?.subtype
               ? relationshipAttribute.subtype
