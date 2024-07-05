@@ -19,7 +19,8 @@ const columns: TableColumn<any>[] = [
       </Link>
     ),
     header: () => <FieldHeader name="name" />,
-    accessorKey: "data.attributes.name"
+    accessorKey: "data.attributes.name",
+    isKeyword: true
   },
 
   // Storage Unit Type
@@ -30,18 +31,24 @@ const columns: TableColumn<any>[] = [
         original: { included }
       }
     }) => {
+      if (!included?.["storage-unit-type"]?.id) {
+        return null;
+      }
+
       return (
         <Link
-          href={`/collection/storage-unit-type/view?id=${included?.storageUnitType?.id}`}
+          href={`/collection/storage-unit-type/view?id=${included?.["storage-unit-type"]?.id}`}
+          passHref={true}
         >
-          <>{included?.storageUnitType?.attributes?.name}</>
+          <a>{included?.["storage-unit-type"]?.attributes?.name}</a>
         </Link>
       );
     },
     header: () => <FieldHeader name="storageUnitType" />,
     accessorKey: "included.attributes.name",
     relationshipType: "storage-unit-type",
-    enableSorting: false
+    enableSorting: false,
+    isKeyword: true
   },
 
   // Location
@@ -51,16 +58,18 @@ const columns: TableColumn<any>[] = [
       row: {
         original: { data }
       }
-    }) => <StorageUnitBreadCrumb storageUnit={data} hideThisUnit={true} />,
+    }) => <StorageUnitBreadCrumb storageUnit={data?.attributes} />,
     header: () => <FieldHeader name="location" />,
-    enableSorting: false
+    enableSorting: false,
+    isKeyword: true
   },
 
   // Group
   {
     id: "group",
     header: () => <FieldHeader name="group" />,
-    accessorKey: "data.attributes.group"
+    accessorKey: "data.attributes.group",
+    isKeyword: true
   },
 
   // Created By
