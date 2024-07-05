@@ -1063,6 +1063,8 @@ export function QueryPage<TData extends KitsuResource>({
                       setColumnSelectorLoading={setColumnSelectorLoading}
                       dynamicFieldsMappingConfig={dynamicFieldMapping}
                       excludedRelationshipTypes={excludedRelationshipTypes}
+                      mandatoryDisplayedColumns={mandatoryDisplayedColumns}
+                      nonExportableColumns={nonExportableColumns}
                     />
                   )}
                 </div>
