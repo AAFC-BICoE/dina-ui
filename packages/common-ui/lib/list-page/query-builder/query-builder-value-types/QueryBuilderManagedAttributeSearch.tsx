@@ -394,8 +394,13 @@ export function transformManagedAttributeToDSL({
   indexMap
 }: TransformToDSLProps): any {
   // Parse the managed attribute search options. Trim the search value.
-  const managedAttributeSearchValue: ManagedAttributeSearchStates =
-    JSON.parse(value);
+  let managedAttributeSearchValue: ManagedAttributeSearchStates;
+  try {
+    managedAttributeSearchValue = JSON.parse(value);
+  } catch (e) {
+    console.error(e);
+    return;
+  }
   managedAttributeSearchValue.searchValue =
     managedAttributeSearchValue.searchValue.trim();
 

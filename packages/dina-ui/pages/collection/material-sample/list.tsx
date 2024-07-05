@@ -264,6 +264,17 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "organism",
         referencedType: "organism",
         apiEndpoint: "collection-api/managed-attribute"
+      },
+
+      // Attachment
+      {
+        type: "managedAttribute",
+        label: "managedAttributes",
+        path: "included.attributes.managedAttributes",
+        apiEndpoint: "objectstore-api/managed-attribute",
+        component: "ENTITY",
+        referencedBy: "attachment",
+        referencedType: "metadata"
       }
     ]
   };
