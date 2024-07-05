@@ -1,45 +1,78 @@
-import {
-  ColumnDefinition,
-  CreateButton,
-  ListPageLayout,
-  dateCell
-} from "common-ui";
+import { CreateButton, FieldHeader, QueryPage, dateCell } from "common-ui";
 import Link from "next/link";
-import { GroupSelectField, StorageUnitBreadCrumb } from "../../../components";
+import { StorageUnitBreadCrumb } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
-import { StorageUnit } from "../../../types/collection-api";
+import { TableColumn } from "common-ui/lib/list-page/types";
 
-const STORAGE_UNIT_FILTER_ATTRIBUTES = ["name", "createdBy", "barcode"];
-const STORAGE_UNIT_TABLE_COLUMNS: ColumnDefinition<StorageUnit>[] = [
+// Columns for the elastic search list page.
+const columns: TableColumn<any>[] = [
+  // Name
   {
-    cell: ({ row: { original: storage } }) => (
-      <Link href={`/collection/storage-unit/view?id=${storage.id}`}>
-        {storage.name}
+    id: "name",
+    cell: ({
+      row: {
+        original: { id, data }
+      }
+    }) => (
+      <Link href={`/collection/storage-unit/view?id=${id}`} passHref={true}>
+        <a>{data?.attributes?.name}</a>
       </Link>
     ),
-    accessorKey: "name"
+    header: () => <FieldHeader name="name" />,
+    accessorKey: "data.attributes.name"
   },
+
+  // Storage Unit Type
   {
-    cell: ({ row: { original: storage } }) => (
-      <Link
-        href={`/collection/storage-unit-type/view?id=${storage?.storageUnitType?.id}`}
-      >
-        {storage?.storageUnitType?.name}
-      </Link>
-    ),
-    accessorKey: "storageUnitType",
+    id: "storageUnitType",
+    cell: ({
+      row: {
+        original: { included }
+      }
+    }) => {
+      return (
+        <Link
+          href={`/collection/storage-unit-type/view?id=${included?.storageUnitType?.id}`}
+        >
+          <>{included?.storageUnitType?.attributes?.name}</>
+        </Link>
+      );
+    },
+    header: () => <FieldHeader name="storageUnitType" />,
+    accessorKey: "included.attributes.name",
+    relationshipType: "storage-unit-type",
     enableSorting: false
   },
+
+  // Location
   {
-    cell: ({ row: { original } }) => (
-      <StorageUnitBreadCrumb storageUnit={original} hideThisUnit={true} />
-    ),
-    accessorKey: "location",
+    id: "location",
+    cell: ({
+      row: {
+        original: { data }
+      }
+    }) => <StorageUnitBreadCrumb storageUnit={data} hideThisUnit={true} />,
+    header: () => <FieldHeader name="location" />,
     enableSorting: false
   },
-  "group",
-  "createdBy",
-  dateCell("createdOn")
+
+  // Group
+  {
+    id: "group",
+    header: () => <FieldHeader name="group" />,
+    accessorKey: "data.attributes.group"
+  },
+
+  // Created By
+  {
+    id: "createdBy",
+    header: () => <FieldHeader name="createdBy" />,
+    accessorKey: "data.attributes.createdBy",
+    isKeyword: true
+  },
+
+  // Created On
+  dateCell("createdOn", "data.attributes.createdOn")
 ];
 
 export default function storageUnitListPage() {
@@ -52,29 +85,15 @@ export default function storageUnitListPage() {
         </div>
       }
     >
-      <ListPageLayout
-        additionalFilters={(filterForm) => ({
-          // Apply group filter:
-          ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-        })}
-        filterAttributes={STORAGE_UNIT_FILTER_ATTRIBUTES}
-        id="storage-unit-list"
-        queryTableProps={{
-          columns: STORAGE_UNIT_TABLE_COLUMNS,
-          path: "collection-api/storage-unit",
-          include: "hierarchy,storageUnitType"
+      <QueryPage
+        indexName={"dina_storage_index"}
+        uniqueName="storage-unit-list"
+        reactTableProps={{
+          enableSorting: true,
+          enableMultiSort: true
         }}
-        filterFormchildren={({ submitForm }) => (
-          <div className="mb-3">
-            <div style={{ width: "300px" }}>
-              <GroupSelectField
-                onChange={() => setImmediate(submitForm)}
-                name="group"
-                showAnyOption={true}
-              />
-            </div>
-          </div>
-        )}
+        enableRelationshipPresence={true}
+        columns={columns}
       />
     </PageLayout>
   );
