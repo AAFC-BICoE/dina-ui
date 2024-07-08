@@ -2,7 +2,7 @@ import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
 import { ColumnSort, Row, SortingState } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { toPairs, uniqBy } from "lodash";
+import { isEqualWith, toPairs, uniqBy } from "lodash";
 import React, {
   useCallback,
   useEffect,
@@ -844,13 +844,28 @@ export function QueryPage<TData extends KitsuResource>({
   /**
    * When the displayed columns are changed from the column selector, we need to trigger
    * a new elastic search query since the _source changes.
+   *
+   * Elasticsearch query is not regenerated if the order only changed since we still have all
+   * the fields required.
    */
   const onDisplayedColumnsChange = useCallback(
     (newDisplayedColumns: TableColumn<TData>[]) => {
-      isActionTriggeredQuery.current = true;
+      // Check if the order has changed
+      const orderChanged = !isEqualWith(
+        newDisplayedColumns,
+        displayedColumns,
+        (a, b) => {
+          return a.id === b.id;
+        }
+      );
+
+      // Update the flag based on order change
+      isActionTriggeredQuery.current = orderChanged;
+
+      // Update displayedColumns regardless of order change
       setDisplayedColumns(newDisplayedColumns);
     },
-    []
+    [displayedColumns] // Only re-render if displayedColumns changes
   );
 
   /**
