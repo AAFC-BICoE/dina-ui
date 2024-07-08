@@ -76,18 +76,19 @@ export function SeqReactionDndTable({
     {
       id: "wellCoordinates",
       cell: ({ row }) =>
-        row.original?.pcrBatchItem?.wellRow === null ||
-        row.original?.pcrBatchItem?.wellColumn === null
+        row.original?.pcrBatchItem?.storageUnitCoordinates?.wellRow === null ||
+        row.original?.pcrBatchItem?.storageUnitCoordinates?.wellColumn === null
           ? ""
-          : row.original.pcrBatchItem?.wellRow +
+          : row.original.pcrBatchItem?.storageUnitCoordinates?.wellRow +
             "" +
-            row.original.pcrBatchItem?.wellColumn,
+            row.original.pcrBatchItem?.storageUnitCoordinates?.wellColumn,
       header: () => <FieldHeader name={"wellCoordinates"} />,
       enableSorting: false
     },
     {
       id: "tubeNumber",
-      cell: ({ row }) => row.original?.pcrBatchItem?.cellNumber || "",
+      cell: ({ row }) =>
+        row.original?.pcrBatchItem?.storageUnitCoordinates?.cellNumber || "",
       header: () => <FieldHeader name={"tubeNumber"} />,
       enableSorting: false
     },
@@ -125,6 +126,7 @@ export function SeqReactionDndTable({
       data={selectedSeqReactions}
       onRowMove={onRowMove}
       enableDnd={editMode}
+      enableSorting={false}
     />
   );
 }

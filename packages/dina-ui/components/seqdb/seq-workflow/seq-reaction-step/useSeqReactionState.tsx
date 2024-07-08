@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { compact } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useLocalStorage } from "@rehooks/local-storage";
+import { StorageUnitCoordinates } from "packages/dina-ui/types/collection-api/resources/StorageUnitCoordinates";
 
 export function useSeqReactionState(seqBatchId?: string) {
   const [selectedResources, setSelectedResources] = useState<SeqReaction[]>([]);
+  const [loadingSeqReactions, setLoadingSeqReactions] = useState<boolean>(true);
   const { apiClient, save, bulkGet } = useApiClient();
   // The map key is pcrBatchItem.id + "_" + seqPrimer.id
   // the map value is the real UUID from the database.
@@ -62,11 +64,11 @@ export function useSeqReactionState(seqBatchId?: string) {
       }
     );
 
-    const pcrBatchItems = compact(
+    let pcrBatchItems = compact(
       await bulkGet<PcrBatchItem, true>(
         seqReactions?.map(
           (item) =>
-            `/pcr-batch-item/${item.pcrBatchItem?.id}?include=materialSample,pcrBatch`
+            `/pcr-batch-item/${item.pcrBatchItem?.id}?include=materialSample,pcrBatch,storageUnitCoordinates`
         ),
         {
           apiBaseUrl: "/seqdb-api",
@@ -74,6 +76,24 @@ export function useSeqReactionState(seqBatchId?: string) {
         }
       )
     );
+    const storageUnitCoordinates = compact(
+      await bulkGet<StorageUnitCoordinates>(
+        pcrBatchItems?.map(
+          (item) =>
+            `/storage-unit-coordinates/${item.storageUnitCoordinates?.id}`
+        ),
+        {
+          apiBaseUrl: "/collection-api",
+          returnNullForMissingResource: true
+        }
+      )
+    );
+    pcrBatchItems = pcrBatchItems.map((pcrBatchItem) => ({
+      ...pcrBatchItem,
+      storageUnitCoordinates: storageUnitCoordinates.find(
+        (suc) => suc.id === pcrBatchItem.storageUnitCoordinates?.id
+      )
+    }));
 
     const materialSamples = compact(
       await bulkGet<MaterialSample, true>(
@@ -87,7 +107,7 @@ export function useSeqReactionState(seqBatchId?: string) {
       )
     );
 
-    seqReactions.map((item) => {
+    seqReactions.forEach((item) => {
       if (item.pcrBatchItem && item.pcrBatchItem?.id) {
         item.pcrBatchItem = pcrBatchItems.find(
           (pbi) => pbi.id === item.pcrBatchItem?.id
@@ -123,6 +143,7 @@ export function useSeqReactionState(seqBatchId?: string) {
     }
     const sorted = sortSeqReactions(seqReactions);
     setSelectedResources(sorted);
+    setLoadingSeqReactions(false);
   };
 
   return {
@@ -131,6 +152,7 @@ export function useSeqReactionState(seqBatchId?: string) {
     previouslySelectedResourcesIDMap,
     setPreviouslySelectedResourcesIDMap,
     seqReactionSortOrder,
-    setSeqReactionSortOrder
+    setSeqReactionSortOrder,
+    loadingSeqReactions
   };
 }
