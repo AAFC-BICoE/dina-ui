@@ -29,7 +29,7 @@ const STORAGE_UNIT_COORDINATES_ID_5 = "storage-unit-coordinates-5";
 const GRID_ROW_SIZE = 5;
 const GRID_COL_SIZE = 8;
 
-const STORAGE_UNIT_1: StorageUnit = {
+let STORAGE_UNIT_1: StorageUnit = {
   id: "storage-unit-1",
   type: "storage-unit",
   name: "storage unit 1",
@@ -46,20 +46,20 @@ const STORAGE_UNIT_1: StorageUnit = {
   }
 };
 
-const STORAGE_UNIT_COORDINATES_4 = {
+let STORAGE_UNIT_COORDINATES_4 = {
   id: STORAGE_UNIT_COORDINATES_ID_4,
   type: "storage-unit-coordinates",
   wellColumn: 1,
   wellRow: "A"
 };
-const STORAGE_UNIT_COORDINATES_5 = {
+let STORAGE_UNIT_COORDINATES_5 = {
   id: STORAGE_UNIT_COORDINATES_ID_5,
   type: "storage-unit-coordinates",
   wellColumn: 2,
   wellRow: "A"
 };
 
-const PCR_BATCH: PcrBatch = {
+let PCR_BATCH: PcrBatch = {
   name: "pcr-batch-name",
   type: "pcr-batch",
   isCompleted: false,
@@ -74,14 +74,14 @@ const PCR_BATCH: PcrBatch = {
   storageUnit: STORAGE_UNIT_1 as any
 };
 
-const PCR_BATCH_NO_STORAGE: PcrBatch = {
+let PCR_BATCH_NO_STORAGE: PcrBatch = {
   name: "pcr-batch-name",
   type: "pcr-batch",
   isCompleted: false,
   id: PCR_BATCH_ID
 };
 
-const PCR_BATCH_ITEMS: PcrBatchItem[] = [
+let PCR_BATCH_ITEMS: PcrBatchItem[] = [
   {
     id: PCR_BATCH_ITEM_ID_1,
     type: "pcr-batch-item",
@@ -207,6 +207,120 @@ const mockOnSaved = jest.fn();
 
 describe("SangerPcrBatchItemGridStep component", () => {
   beforeEach(jest.clearAllMocks);
+  afterEach(() => {
+    STORAGE_UNIT_1 = {
+      id: "storage-unit-1",
+      type: "storage-unit",
+      name: "storage unit 1",
+      group: "aafc",
+      storageUnitType: {
+        type: "storage-unit-type",
+        name: "storage unit type 1",
+        group: "aafc",
+        gridLayoutDefinition: {
+          numberOfColumns: GRID_COL_SIZE,
+          numberOfRows: GRID_ROW_SIZE,
+          fillDirection: "BY_COLUMN"
+        }
+      }
+    };
+
+    STORAGE_UNIT_COORDINATES_4 = {
+      id: STORAGE_UNIT_COORDINATES_ID_4,
+      type: "storage-unit-coordinates",
+      wellColumn: 1,
+      wellRow: "A"
+    };
+    STORAGE_UNIT_COORDINATES_5 = {
+      id: STORAGE_UNIT_COORDINATES_ID_5,
+      type: "storage-unit-coordinates",
+      wellColumn: 2,
+      wellRow: "A"
+    };
+
+    PCR_BATCH = {
+      name: "pcr-batch-name",
+      type: "pcr-batch",
+      isCompleted: false,
+      id: PCR_BATCH_ID,
+      storageRestriction: {
+        layout: {
+          numberOfColumns: GRID_COL_SIZE,
+          numberOfRows: GRID_ROW_SIZE,
+          fillDirection: "BY_COLUMN"
+        }
+      },
+      storageUnit: STORAGE_UNIT_1 as any
+    };
+
+    PCR_BATCH_NO_STORAGE = {
+      name: "pcr-batch-name",
+      type: "pcr-batch",
+      isCompleted: false,
+      id: PCR_BATCH_ID
+    };
+
+    PCR_BATCH_ITEMS = [
+      {
+        id: PCR_BATCH_ITEM_ID_1,
+        type: "pcr-batch-item",
+        createdBy: "dina-admin",
+        group: "aafc",
+        materialSample: {
+          id: MATERIAL_SAMPLE_ID_1,
+          type: "material-sample"
+        }
+      },
+      {
+        id: PCR_BATCH_ITEM_ID_2,
+        type: "pcr-batch-item",
+        createdBy: "dina-admin",
+        group: "aafc",
+        materialSample: {
+          id: MATERIAL_SAMPLE_ID_2,
+          type: "material-sample"
+        }
+      },
+      {
+        id: PCR_BATCH_ITEM_ID_3,
+        type: "pcr-batch-item",
+        createdBy: "dina-admin",
+        group: "aafc",
+        materialSample: {
+          id: MATERIAL_SAMPLE_ID_3,
+          type: "material-sample"
+        }
+      },
+      {
+        id: PCR_BATCH_ITEM_ID_4,
+        type: "pcr-batch-item",
+        createdBy: "dina-admin",
+        group: "aafc",
+        storageUnitCoordinates: {
+          id: STORAGE_UNIT_COORDINATES_ID_4,
+          type: "storage-unit-coordinates"
+        },
+        materialSample: {
+          id: MATERIAL_SAMPLE_ID_4,
+          type: "material-sample"
+        }
+      },
+      {
+        id: PCR_BATCH_ITEM_ID_5,
+        type: "pcr-batch-item",
+        createdBy: "dina-admin",
+        group: "aafc",
+        storageUnitCoordinates: {
+          id: STORAGE_UNIT_COORDINATES_ID_5,
+          type: "storage-unit-coordinates"
+        },
+        materialSample: {
+          id: MATERIAL_SAMPLE_ID_5,
+          type: "material-sample"
+        }
+      }
+    ];
+  });
 
   it("Display material samples in selection list", async () => {
     const wrapper = mountWithAppContext(
