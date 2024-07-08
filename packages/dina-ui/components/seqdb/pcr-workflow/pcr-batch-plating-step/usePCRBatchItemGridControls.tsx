@@ -41,8 +41,6 @@ export function usePCRBatchItemGridControls({
   // Grid fill direction when you move multiple PcrBatchItems into the grid.
   const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");
 
-  const [lastSave, setLastSave] = useState<number>();
-
   const [numberOfColumns, setNumberOfColumns] = useState<number>(0);
 
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
@@ -87,7 +85,6 @@ export function usePCRBatchItemGridControls({
       include: "materialSample,storageUnitCoordinates"
     },
     {
-      deps: [lastSave],
       onSuccess: async ({ data: pcrBatchItems }) => {
         if (!pcrBatchItems) return;
 
@@ -458,8 +455,6 @@ export function usePCRBatchItemGridControls({
           apiBaseUrl: "/collection-api"
         });
       }
-
-      setLastSave(Date.now());
     } catch (err) {
       alert(err);
     }

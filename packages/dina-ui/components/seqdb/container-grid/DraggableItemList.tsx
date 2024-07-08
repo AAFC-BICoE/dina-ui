@@ -1,7 +1,7 @@
 import { useDrop } from "react-dnd";
 import { DraggableItemBox, ITEM_BOX_DRAG_KEY } from "./DraggableItemBox";
 
-interface DraggableItemListProps<ItemType extends { sampleId?: string }> {
+interface DraggableItemListProps<ItemType> {
   availableItems: ItemType[];
   movedItems: ItemType[];
   onDrop: (item: { batchItemSample: ItemType }) => void;
@@ -10,7 +10,7 @@ interface DraggableItemListProps<ItemType extends { sampleId?: string }> {
   editMode: boolean;
 }
 
-export function DraggableItemList<ItemType extends { sampleId?: any }>({
+export function DraggableItemList<ItemType extends { sampleName?: string }>({
   availableItems,
   movedItems,
   selectedItems,
@@ -47,9 +47,9 @@ export function DraggableItemList<ItemType extends { sampleId?: any }>({
         background: dragHover ? "#f7fbff" : dragging ? "#f2f2f2" : undefined
       }}
     >
-      {availableItems.map((item) => (
+      {availableItems.map((item, index) => (
         <DraggableItemBox<ItemType>
-          key={String(item?.sampleId)}
+          key={index}
           wasMoved={movedItems.includes(item)}
           batchItemSample={item}
           onClick={(e) => onClick(item, e)}
