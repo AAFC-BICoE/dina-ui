@@ -18,6 +18,7 @@ import {
   pcrBatchItemResultColor
 } from "../../../types/seqdb-api";
 import { getDeterminations } from "../../collection/material-sample/organismUtils";
+import { StorageUnitCoordinates } from "packages/dina-ui/types/collection-api/resources/StorageUnitCoordinates";
 
 export function usePcrReactionData(pcrBatchId?: string) {
   const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>([]);
@@ -50,27 +51,49 @@ export function usePcrReactionData(pcrBatchId?: string) {
               }
             ]
           })(""),
-          include: "materialSample",
+          include: "materialSample,storageUnitCoordinates",
           page: {
             limit: 1000 // Maximum page limit
           }
         })
-        .then((response) => {
+        .then(async (response) => {
           const batchItems: PersistedResource<PcrBatchItem>[] =
             response.data?.filter(
               (item) => item?.materialSample?.id !== undefined
             );
-          fetchMaterialSamples(batchItems);
+          await fetchMaterialSamples(batchItems);
         });
     }
   }
 
-  function fetchMaterialSamples(batchItems: PersistedResource<PcrBatchItem>[]) {
+  async function fetchMaterialSamples(
+    batchItems: PersistedResource<PcrBatchItem>[]
+  ) {
     if (!batchItems || batchItems.length === 0) {
       setLoading(false);
       return;
     }
-    bulkGet<MaterialSampleSummary>(
+    let processedPcrBatchItems: PcrBatchItem[] = [];
+    const fetchedStorageUnitCoordinates = await bulkGet<StorageUnitCoordinates>(
+      batchItems.map(
+        (item) =>
+          "/storage-unit-coordinates/" + item?.storageUnitCoordinates?.id
+      ),
+      {
+        apiBaseUrl: "/collection-api",
+        returnNullForMissingResource: true
+      }
+    );
+    processedPcrBatchItems = batchItems.map((batchItem) => ({
+      ...batchItem,
+      storageUnitCoordinates: fetchedStorageUnitCoordinates.find(
+        (fetchedStorageUnitCoordinate) =>
+          fetchedStorageUnitCoordinate.id ===
+          batchItem.storageUnitCoordinates?.id
+      )
+    }));
+
+    const fetchedMaterialSampleSummary = await bulkGet<MaterialSampleSummary>(
       batchItems.map(
         (item) => "/material-sample-summary/" + item?.materialSample?.id
       ),
@@ -78,20 +101,20 @@ export function usePcrReactionData(pcrBatchId?: string) {
         apiBaseUrl: "/collection-api",
         returnNullForMissingResource: true
       }
-    ).then((response) => {
-      const sampleSummaries = compact(response ?? []);
-      batchItems = batchItems.filter(
-        (item) =>
-          !!sampleSummaries.find(
-            (sample) =>
-              item.materialSample?.id && sample.id === item.materialSample?.id
-          )
-      );
-      sortPcrBatchItems(batchItems, sampleSummaries);
-      setPcrBatchItems(batchItems);
-      setMaterialSampleSummaries(sampleSummaries);
-      setLoading(false);
-    });
+    );
+    const sampleSummaries = compact(fetchedMaterialSampleSummary ?? []);
+    processedPcrBatchItems = processedPcrBatchItems.filter(
+      (item) =>
+        !!sampleSummaries.find(
+          (sample) =>
+            item.materialSample?.id && sample.id === item.materialSample?.id
+        )
+    );
+
+    sortPcrBatchItems(processedPcrBatchItems, sampleSummaries);
+    setPcrBatchItems(processedPcrBatchItems);
+    setMaterialSampleSummaries(sampleSummaries);
+    setLoading(false);
   }
 
   function sortPcrBatchItems(
@@ -227,6 +250,7 @@ export function PcrReactionTable({
       data={sortBy(pcrBatchItems, "cellNumber")}
       showPagination={false}
       manualPagination={true}
+      enableSorting={false}
     />
   );
 }
