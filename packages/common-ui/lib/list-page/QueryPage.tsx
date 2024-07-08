@@ -580,6 +580,10 @@ export function QueryPage<TData extends KitsuResource>({
         setSubmittedQueryBuilderTree(newTree);
         setQueryBuilderTree(newTree);
         isActionTriggeredQuery.current = true;
+      } else if (customViewElasticSearchQuery && !enableColumnSelector) {
+        setSubmittedQueryBuilderTree(emptyQueryTree());
+        setQueryBuilderTree(emptyQueryTree());
+        isActionTriggeredQuery.current = true;
       }
     }
   }, [
