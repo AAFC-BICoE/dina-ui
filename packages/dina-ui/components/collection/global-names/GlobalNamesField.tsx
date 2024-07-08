@@ -126,13 +126,15 @@ export function GlobalNamesField({
 interface GlobalNamesReadOnlyProps {
   value: string;
   scientificNameDetails: ScientificNameSourceDetails;
+  displayFull?: boolean;
 }
 
 export function GlobalNamesReadOnly({
   value,
-  scientificNameDetails
+  scientificNameDetails,
+  displayFull
 }: GlobalNamesReadOnlyProps) {
-  const [showMore, setShowMore] = useState(false);
+  const [showMore, setShowMore] = useState(displayFull ?? false);
   const { formatMessage } = useDinaIntl();
 
   let safeHtmlLink: string = "";
@@ -218,19 +220,21 @@ export function GlobalNamesReadOnly({
       ) : (
         <div className="mt-1">
           {showMore ? fullTaxonTree : initTaxonTree}
-          <a
-            role="button"
-            className="btn-link"
-            onClick={() => setShowMore(!showMore)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                setShowMore(!showMore);
-              }
-            }}
-            tabIndex={0}
-          >
-            {showMore ? formatMessage("showLess") : formatMessage("showMore")}{" "}
-          </a>
+          {!displayFull && (
+            <a
+              role="button"
+              className="btn-link"
+              onClick={() => setShowMore(!showMore)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  setShowMore(!showMore);
+                }
+              }}
+              tabIndex={0}
+            >
+              {showMore ? formatMessage("showLess") : formatMessage("showMore")}{" "}
+            </a>
+          )}
         </div>
       )}
     </div>
