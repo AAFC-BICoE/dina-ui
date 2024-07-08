@@ -106,13 +106,12 @@ export function usePCRBatchItemGridControls({
                 ),
               { apiBaseUrl: "/collection-api" }
             );
-
           const pcrBatchItemsWithStorageUnitCoordinates = pcrBatchItems.map(
             (pcrBatchItem) => {
               const queryStorageUnitCoordinates =
                 storageUnitCoordinatesQuery.find(
                   (storageUnitCoordinate) =>
-                    storageUnitCoordinate.id ===
+                    storageUnitCoordinate?.id ===
                     pcrBatchItem.storageUnitCoordinates?.id
                 );
               return {

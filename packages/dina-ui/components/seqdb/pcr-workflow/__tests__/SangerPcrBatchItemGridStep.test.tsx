@@ -1,5 +1,6 @@
+import { StorageUnit } from "../../../../types/collection-api";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { PcrBatch } from "../../../../types/seqdb-api";
+import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { SangerPcrBatchItemGridStep } from "../pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { noop } from "lodash";
 
@@ -22,8 +23,41 @@ const MATERIAL_SAMPLE_NAME_3 = "Name 3";
 const MATERIAL_SAMPLE_NAME_4 = "Name 4";
 const MATERIAL_SAMPLE_NAME_5 = "Name 5";
 
+const STORAGE_UNIT_COORDINATES_ID_4 = "storage-unit-coordinates-4";
+const STORAGE_UNIT_COORDINATES_ID_5 = "storage-unit-coordinates-5";
+
 const GRID_ROW_SIZE = 5;
 const GRID_COL_SIZE = 8;
+
+const STORAGE_UNIT_1: StorageUnit = {
+  id: "storage-unit-1",
+  type: "storage-unit",
+  name: "storage unit 1",
+  group: "aafc",
+  storageUnitType: {
+    type: "storage-unit-type",
+    name: "storage unit type 1",
+    group: "aafc",
+    gridLayoutDefinition: {
+      numberOfColumns: GRID_COL_SIZE,
+      numberOfRows: GRID_ROW_SIZE,
+      fillDirection: "BY_COLUMN"
+    }
+  }
+};
+
+const STORAGE_UNIT_COORDINATES_4 = {
+  id: STORAGE_UNIT_COORDINATES_ID_4,
+  type: "storage-unit-coordinates",
+  wellColumn: 1,
+  wellRow: "A"
+};
+const STORAGE_UNIT_COORDINATES_5 = {
+  id: STORAGE_UNIT_COORDINATES_ID_5,
+  type: "storage-unit-coordinates",
+  wellColumn: 2,
+  wellRow: "A"
+};
 
 const PCR_BATCH: PcrBatch = {
   name: "pcr-batch-name",
@@ -36,7 +70,8 @@ const PCR_BATCH: PcrBatch = {
       numberOfRows: GRID_ROW_SIZE,
       fillDirection: "BY_COLUMN"
     }
-  }
+  },
+  storageUnit: STORAGE_UNIT_1 as any
 };
 
 const PCR_BATCH_NO_STORAGE: PcrBatch = {
@@ -46,72 +81,71 @@ const PCR_BATCH_NO_STORAGE: PcrBatch = {
   id: PCR_BATCH_ID
 };
 
+const PCR_BATCH_ITEMS: PcrBatchItem[] = [
+  {
+    id: PCR_BATCH_ITEM_ID_1,
+    type: "pcr-batch-item",
+    createdBy: "dina-admin",
+    group: "aafc",
+    materialSample: {
+      id: MATERIAL_SAMPLE_ID_1,
+      type: "material-sample"
+    }
+  },
+  {
+    id: PCR_BATCH_ITEM_ID_2,
+    type: "pcr-batch-item",
+    createdBy: "dina-admin",
+    group: "aafc",
+    materialSample: {
+      id: MATERIAL_SAMPLE_ID_2,
+      type: "material-sample"
+    }
+  },
+  {
+    id: PCR_BATCH_ITEM_ID_3,
+    type: "pcr-batch-item",
+    createdBy: "dina-admin",
+    group: "aafc",
+    materialSample: {
+      id: MATERIAL_SAMPLE_ID_3,
+      type: "material-sample"
+    }
+  },
+  {
+    id: PCR_BATCH_ITEM_ID_4,
+    type: "pcr-batch-item",
+    createdBy: "dina-admin",
+    group: "aafc",
+    storageUnitCoordinates: {
+      id: STORAGE_UNIT_COORDINATES_ID_4,
+      type: "storage-unit-coordinates"
+    },
+    materialSample: {
+      id: MATERIAL_SAMPLE_ID_4,
+      type: "material-sample"
+    }
+  },
+  {
+    id: PCR_BATCH_ITEM_ID_5,
+    type: "pcr-batch-item",
+    createdBy: "dina-admin",
+    group: "aafc",
+    storageUnitCoordinates: {
+      id: STORAGE_UNIT_COORDINATES_ID_5,
+      type: "storage-unit-coordinates"
+    },
+    materialSample: {
+      id: MATERIAL_SAMPLE_ID_5,
+      type: "material-sample"
+    }
+  }
+];
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "/seqdb-api/pcr-batch-item":
       return {
-        data: [
-          {
-            id: PCR_BATCH_ITEM_ID_1,
-            type: "pcr-batch-item",
-            createdBy: "dina-admin",
-            group: "aafc",
-            wellColumn: null,
-            wellRow: null,
-            materialSample: {
-              id: MATERIAL_SAMPLE_ID_1,
-              type: "material-sample"
-            }
-          },
-          {
-            id: PCR_BATCH_ITEM_ID_2,
-            type: "pcr-batch-item",
-            createdBy: "dina-admin",
-            group: "aafc",
-            wellColumn: null,
-            wellRow: null,
-            materialSample: {
-              id: MATERIAL_SAMPLE_ID_2,
-              type: "material-sample"
-            }
-          },
-          {
-            id: PCR_BATCH_ITEM_ID_3,
-            type: "pcr-batch-item",
-            createdBy: "dina-admin",
-            group: "aafc",
-            wellColumn: null,
-            wellRow: null,
-            materialSample: {
-              id: MATERIAL_SAMPLE_ID_3,
-              type: "material-sample"
-            }
-          },
-          {
-            id: PCR_BATCH_ITEM_ID_4,
-            type: "pcr-batch-item",
-            createdBy: "dina-admin",
-            group: "aafc",
-            wellColumn: 1,
-            wellRow: "A",
-            materialSample: {
-              id: MATERIAL_SAMPLE_ID_4,
-              type: "material-sample"
-            }
-          },
-          {
-            id: PCR_BATCH_ITEM_ID_5,
-            type: "pcr-batch-item",
-            createdBy: "dina-admin",
-            group: "aafc",
-            wellColumn: 2,
-            wellRow: "A",
-            materialSample: {
-              id: MATERIAL_SAMPLE_ID_5,
-              type: "material-sample"
-            }
-          }
-        ]
+        data: PCR_BATCH_ITEMS
       };
   }
 });
@@ -149,6 +183,10 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_5
         };
+      case "/storage-unit-coordinates/" + STORAGE_UNIT_COORDINATES_ID_4:
+        return STORAGE_UNIT_COORDINATES_4;
+      case "/storage-unit-coordinates/" + STORAGE_UNIT_COORDINATES_ID_5:
+        return STORAGE_UNIT_COORDINATES_5;
     }
   });
 });
@@ -407,51 +445,56 @@ describe("SangerPcrBatchItemGridStep component", () => {
       [
         {
           resource: {
-            id: PCR_BATCH_ITEM_ID_4,
-            type: "pcr-batch-item",
+            id: STORAGE_UNIT_COORDINATES_ID_4,
+            type: "storage-unit-coordinates",
             wellColumn: 4,
-            wellRow: "A"
+            wellRow: "A",
+            storageUnit: STORAGE_UNIT_1
           },
-          type: "pcr-batch-item"
+          type: "storage-unit-coordinates"
         },
         {
           resource: {
-            id: PCR_BATCH_ITEM_ID_5,
-            type: "pcr-batch-item",
+            id: "storage-unit-coordinates-5",
+            type: "storage-unit-coordinates",
             wellColumn: 5,
-            wellRow: "A"
+            wellRow: "A",
+            storageUnit: STORAGE_UNIT_1
           },
-          type: "pcr-batch-item"
+          type: "storage-unit-coordinates"
         },
         {
           resource: {
-            id: PCR_BATCH_ITEM_ID_1,
-            type: "pcr-batch-item",
+            id: undefined,
+            type: "storage-unit-coordinates",
             wellColumn: 1,
-            wellRow: "A"
+            wellRow: "A",
+            storageUnit: STORAGE_UNIT_1
           },
-          type: "pcr-batch-item"
+          type: "storage-unit-coordinates"
         },
         {
           resource: {
-            id: PCR_BATCH_ITEM_ID_2,
-            type: "pcr-batch-item",
+            id: undefined,
+            type: "storage-unit-coordinates",
             wellColumn: 2,
-            wellRow: "A"
+            wellRow: "A",
+            storageUnit: STORAGE_UNIT_1
           },
-          type: "pcr-batch-item"
+          type: "storage-unit-coordinates"
         },
         {
           resource: {
-            id: PCR_BATCH_ITEM_ID_3,
-            type: "pcr-batch-item",
+            id: undefined,
+            type: "storage-unit-coordinates",
             wellColumn: 3,
-            wellRow: "A"
+            wellRow: "A",
+            storageUnit: STORAGE_UNIT_1
           },
-          type: "pcr-batch-item"
+          type: "storage-unit-coordinates"
         }
       ],
-      { apiBaseUrl: "/seqdb-api" }
+      { apiBaseUrl: "/collection-api" }
     );
   });
 
@@ -464,7 +507,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
         setEditMode={noop}
         performSave={false}
         setPerformSave={noop}
-        onSaved={mockOnSaved}
+        onSaved={jest.fn()}
       />,
       testCtx
     );
@@ -526,25 +569,19 @@ describe("SangerPcrBatchItemGridStep component", () => {
     expect(mockSave).lastCalledWith(
       [
         {
-          resource: {
-            id: PCR_BATCH_ITEM_ID_4,
-            type: "pcr-batch-item",
-            wellColumn: null,
-            wellRow: null
-          },
-          type: "pcr-batch-item"
+          delete: {
+            id: "storage-unit-coordinates-4",
+            type: "storage-unit-coordinates"
+          }
         },
         {
-          resource: {
-            id: PCR_BATCH_ITEM_ID_5,
-            type: "pcr-batch-item",
-            wellColumn: null,
-            wellRow: null
-          },
-          type: "pcr-batch-item"
+          delete: {
+            id: "storage-unit-coordinates-5",
+            type: "storage-unit-coordinates"
+          }
         }
       ],
-      { apiBaseUrl: "/seqdb-api" }
+      { apiBaseUrl: "/collection-api" }
     );
   });
 
