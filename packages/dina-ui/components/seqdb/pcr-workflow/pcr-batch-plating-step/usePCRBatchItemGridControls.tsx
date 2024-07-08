@@ -443,13 +443,13 @@ export function usePCRBatchItemGridControls({
         materialSampleItemsToSave
           .filter(
             (item) =>
-              !item.storageUnitCoordinates?.wellColumn ||
-              !item.storageUnitCoordinates?.wellRow ||
-              !item.storageUnitCoordinates?.id
+              (!item.storageUnitCoordinates?.wellColumn ||
+                !item.storageUnitCoordinates?.wellRow) &&
+              item.storageUnitCoordinates?.id
           )
           .map((item) => ({
             delete: {
-              id: item.storageUnitCoordinates?.id ?? null,
+              id: item.storageUnitCoordinates?.id ?? "",
               type: "storage-unit-coordinates"
             }
           }));
