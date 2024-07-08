@@ -107,63 +107,71 @@ export function ScientificNameField({
             />
           );
         }}
-        // onChangeExternal={(_form, _, newVal) => {
-        //   if (newVal && newVal?.trim().length > 0) {
-        //     setInputValue(newVal);
-        //     _form.setFieldValue(
-        //       fieldProps("scientificNameSource").name,
-        //       isManualInput ? "CUSTOM" : null
-        //     );
-        //   } else {
-        //     if (!isManualInput) {
-        //       _form.setFieldValue(
-        //         fieldProps("scientificNameSource").name,
-        //         null
-        //       );
-        //       _form.setFieldValue(
-        //         fieldProps("scientificNameDetails").name,
-        //         null
-        //       );
-        //     }
-        //   }
-        // }}
       />
     </>
   ) : (
     <>
       <div className="autosuggest">
-        <AutoSuggest<Determination>
-          multiSection={false}
-          suggestions={suggestions}
-          getSuggestionValue={(s) => s.scientificName ?? ""}
-          onSuggestionsFetchRequested={({ value: fetchValue }) =>
-            setInputValue?.(fetchValue)
-          }
-          // onSuggestionSelected={(_event, data) =>
-          //   // setInputValue?.(data.suggestion)
-          // }
-          onSuggestionsClearRequested={noop}
-          renderSuggestion={(determination) => (
-            <>
-              {determination.scientificNameDetails && (
-                <GlobalNamesReadOnly
-                  scientificNameDetails={determination.scientificNameDetails}
-                  value={determination.scientificName ?? ""}
-                  displayFull={true}
-                />
-              )}
-            </>
-          )}
-          inputProps={inputProps}
-          alwaysRenderSuggestions={focus}
-          theme={{
-            suggestionsList: "list-group",
-            suggestion: "list-group-item",
-            suggestionHighlighted: "suggestion-highlighted",
-            suggestionsContainerOpen: "suggestions-container-open",
-            suggestionsContainer: "suggestions-container",
-            container: "autosuggest-container"
+        <TextField
+          {...fieldProps("scientificName")}
+          onChangeExternal={(_form, _, newVal) => {
+            if (newVal && newVal?.trim().length > 0) {
+              setInputValue(newVal);
+              _form.setFieldValue(
+                fieldProps("scientificNameSource").name,
+                isManualInput ? "CUSTOM" : null
+              );
+            } else {
+              if (!isManualInput) {
+                _form.setFieldValue(
+                  fieldProps("scientificNameSource").name,
+                  null
+                );
+                _form.setFieldValue(
+                  fieldProps("scientificNameDetails").name,
+                  null
+                );
+              }
+            }
           }}
+          customInput={(props) => (
+            <AutoSuggest<Determination>
+              multiSection={false}
+              suggestions={suggestions}
+              getSuggestionValue={(s) => s.scientificName ?? ""}
+              onSuggestionsFetchRequested={({ value: fetchValue }) =>
+                setInputValue?.(fetchValue)
+              }
+              // onSuggestionSelected={(_event, data) =>
+              //   console.log(data)
+              //   // setInputValue?.(data.suggestion)
+              // }
+              onSuggestionsClearRequested={noop}
+              renderSuggestion={(determination) => (
+                <>
+                  {determination.scientificNameDetails && (
+                    <GlobalNamesReadOnly
+                      scientificNameDetails={
+                        determination.scientificNameDetails
+                      }
+                      value={determination.scientificName ?? ""}
+                      displayFull={true}
+                    />
+                  )}
+                </>
+              )}
+              inputProps={inputProps}
+              alwaysRenderSuggestions={focus}
+              theme={{
+                suggestionsList: "list-group",
+                suggestion: "list-group-item",
+                suggestionHighlighted: "suggestion-highlighted",
+                suggestionsContainerOpen: "suggestions-container-open",
+                suggestionsContainer: "suggestions-container",
+                container: "autosuggest-container"
+              }}
+            />
+          )}
         />
       </div>
       <hr />
