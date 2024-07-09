@@ -145,6 +145,45 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     }
   };
 
+  const onColumnItemChangeOrder = (
+    direction: "up" | "down",
+    columnId: string
+  ) => {
+    // Create a copy of the displayedColumns array
+    const newDisplayedColumns = [...displayedColumns];
+
+    // Find the index of the column to be moved
+    const columnIndex = newDisplayedColumns.findIndex(
+      (column) => column.id === columnId
+    );
+
+    // Check if the column exists and the direction is valid
+    if (columnIndex !== -1 && (direction === "up" || direction === "down")) {
+      // Swap the column with its neighbor based on direction
+      const targetIndex =
+        direction === "up" ? columnIndex - 1 : columnIndex + 1;
+
+      // Check if the target index is within bounds
+      if (targetIndex >= 0 && targetIndex < newDisplayedColumns.length) {
+        // Swap elements:
+        [newDisplayedColumns[columnIndex], newDisplayedColumns[targetIndex]] = [
+          newDisplayedColumns[targetIndex],
+          newDisplayedColumns[columnIndex]
+        ];
+      }
+    }
+
+    // Update the displayedColumns state with the modified array
+    setDisplayedColumns(newDisplayedColumns);
+
+    // Update local storage if not in export mode
+    if (!exportMode) {
+      setLocalStorageDisplayedColumns(
+        newDisplayedColumns.map((column) => column?.columnSelectorString ?? "")
+      );
+    }
+  };
+
   const onColumnItemInsert = async () => {
     if (isValidField && selectedField && indexMapping) {
       const generatedColumnPath = generateColumnPath({
@@ -310,11 +349,13 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                   }
                 />
               </strong>
-              {displayedColumnsFiltered.map((column) => {
+              {displayedColumnsFiltered.map((column, index) => {
                 return (
                   <ColumnItem
                     key={column.id}
                     column={column}
+                    isTop={index === 0}
+                    isBottom={index === displayedColumnsFiltered.length - 1}
                     isMandatoryField={
                       exportMode
                         ? false
@@ -323,6 +364,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                           )
                     }
                     onColumnItemDelete={onColumnItemDelete}
+                    onColumnItemChangeOrder={onColumnItemChangeOrder}
                   />
                 );
               })}
