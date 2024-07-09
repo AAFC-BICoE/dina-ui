@@ -12,11 +12,31 @@ import { useState } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
 import { noop } from "lodash";
 import { Determination } from "packages/dina-ui/types/collection-api/resources/Determination";
+import { includedTypeQuery } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
 export interface ScientificNameFieldProps {
   fieldProps: (fieldName: string) => FieldWrapperProps;
   isManualInput: boolean;
 }
+
+export const DETERMINATION_FIELDS_TO_SET: string[] = [
+  "verbatimScientificName",
+  "verbatimDeterminer",
+  "verbatimDate",
+  "typeStatus",
+  "typeStatusEvidence",
+  "determiner",
+  "determinedOn",
+  "verbatimRemarks",
+  "scientificNameSource",
+  "scientificName",
+  "transcriberRemarks",
+  "isPrimary",
+  "scientificNameDetails",
+  "isFiledAs",
+  "determinationRemarks",
+  "managedAttributes"
+];
 
 export function ScientificNameField({
   fieldProps,
@@ -39,14 +59,30 @@ export function ScientificNameField({
         nested: {
           path: "included",
           query: {
-            prefix: {
-              "included.attributes.determination.scientificName.keyword": {
-                value: inputValue,
-                case_insensitive: true
-              }
+            bool: {
+              must: [
+                {
+                  prefix: {
+                    "included.attributes.determination.scientificName.keyword":
+                      {
+                        value: inputValue,
+                        case_insensitive: true
+                      }
+                  }
+                },
+                includedTypeQuery("organism")
+              ]
             }
           }
         }
+      },
+      _source: {
+        includes: [
+          "included.type",
+          ...DETERMINATION_FIELDS_TO_SET.map(
+            (field) => "included.attributes.determination." + field
+          )
+        ]
       }
     },
     deps: [inputValue],
@@ -123,7 +159,7 @@ export function ScientificNameField({
               }
             }
           }}
-          customInput={(props) => {
+          customInput={(props, form) => {
             const inputProps: InputProps<any> = {
               placeholder: "",
               value: (props.value as string) ?? "",
@@ -141,6 +177,27 @@ export function ScientificNameField({
               onBlur: () => setFocus(false)
             };
 
+            /**
+             * Based on the suggestion clicked, this will set all the fields required.
+             *
+             * See the DETERMINATION_FIELDS_TO_SET constant for the fields that should be set.
+             *
+             * @param selectedDetermination Determination from the elasticsearch result.
+             */
+            const suggestionSelected = (
+              selectedDetermination: Determination
+            ) => {
+              DETERMINATION_FIELDS_TO_SET.forEach((fieldName) => {
+                form.setFieldValue(
+                  fieldProps(fieldName).name,
+                  selectedDetermination[fieldName]
+                );
+              });
+
+              // Remove focus.
+              // props?.onBlur?.();
+            };
+
             return (
               <AutoSuggest<Determination>
                 {...props}
@@ -150,10 +207,9 @@ export function ScientificNameField({
                 onSuggestionsFetchRequested={({ value: fetchValue }) =>
                   setInputValue?.(fetchValue)
                 }
-                // onSuggestionSelected={(_event, data) =>
-                //   console.log(data)
-                //   // setInputValue?.(data.suggestion)
-                // }
+                onSuggestionSelected={(_event, data) =>
+                  suggestionSelected(data.suggestion)
+                }
                 onSuggestionsClearRequested={noop}
                 renderSuggestion={(determination) => (
                   <>
