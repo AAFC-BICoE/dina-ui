@@ -560,6 +560,7 @@ export function QueryPage<TData extends KitsuResource>({
         .finally(() => {
           // No matter the end result, loading should stop.
           setLoading(false);
+          isActionTriggeredQuery.current = false;
         });
     }
   }, [
@@ -579,7 +580,7 @@ export function QueryPage<TData extends KitsuResource>({
         setSubmittedQueryBuilderTree(newTree);
         setQueryBuilderTree(newTree);
         isActionTriggeredQuery.current = true;
-      } else if (customViewElasticSearchQuery) {
+      } else if (customViewElasticSearchQuery && !enableColumnSelector) {
         setSubmittedQueryBuilderTree(emptyQueryTree());
         setQueryBuilderTree(emptyQueryTree());
         isActionTriggeredQuery.current = true;
