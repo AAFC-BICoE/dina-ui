@@ -83,7 +83,8 @@ export function ScientificNameField({
             (field) => "included.attributes.determination." + field
           )
         ]
-      }
+      },
+      size: 10
     },
     deps: [inputValue],
     disabled: readOnly,
@@ -195,7 +196,8 @@ export function ScientificNameField({
               });
 
               // Remove focus.
-              // props?.onBlur?.();
+              props?.onBlur?.({} as any);
+              setFocus(false);
             };
 
             return (
