@@ -40,8 +40,10 @@ export function ScientificNameField({
           path: "included",
           query: {
             prefix: {
-              "included.attributes.determination.scientificName.keyword":
-                inputValue
+              "included.attributes.determination.scientificName.keyword": {
+                value: inputValue,
+                case_insensitive: true
+              }
             }
           }
         }
@@ -76,18 +78,6 @@ export function ScientificNameField({
     }
   });
 
-  const inputProps: InputProps<any> = {
-    placeholder: "",
-    value: inputValue ?? "",
-    onChange: (_event, { newValue }) => {
-      setInputValue?.(newValue);
-    },
-    autoComplete: "none",
-    className: "form-control",
-    onFocus: () => setFocus(true),
-    onBlur: () => setFocus(false)
-  };
-
   return readOnly ? (
     <>
       <TextField
@@ -116,7 +106,6 @@ export function ScientificNameField({
           {...fieldProps("scientificName")}
           onChangeExternal={(_form, _, newVal) => {
             if (newVal && newVal?.trim().length > 0) {
-              setInputValue(newVal);
               _form.setFieldValue(
                 fieldProps("scientificNameSource").name,
                 isManualInput ? "CUSTOM" : null
@@ -134,44 +123,64 @@ export function ScientificNameField({
               }
             }
           }}
-          customInput={(props) => (
-            <AutoSuggest<Determination>
-              multiSection={false}
-              suggestions={suggestions}
-              getSuggestionValue={(s) => s.scientificName ?? ""}
-              onSuggestionsFetchRequested={({ value: fetchValue }) =>
-                setInputValue?.(fetchValue)
-              }
-              // onSuggestionSelected={(_event, data) =>
-              //   console.log(data)
-              //   // setInputValue?.(data.suggestion)
-              // }
-              onSuggestionsClearRequested={noop}
-              renderSuggestion={(determination) => (
-                <>
-                  {determination.scientificNameDetails && (
-                    <GlobalNamesReadOnly
-                      scientificNameDetails={
-                        determination.scientificNameDetails
-                      }
-                      value={determination.scientificName ?? ""}
-                      displayFull={true}
-                    />
-                  )}
-                </>
-              )}
-              inputProps={inputProps}
-              alwaysRenderSuggestions={focus}
-              theme={{
-                suggestionsList: "list-group",
-                suggestion: "list-group-item",
-                suggestionHighlighted: "suggestion-highlighted",
-                suggestionsContainerOpen: "suggestions-container-open",
-                suggestionsContainer: "suggestions-container",
-                container: "autosuggest-container"
-              }}
-            />
-          )}
+          customInput={(props) => {
+            const inputProps: InputProps<any> = {
+              placeholder: "",
+              value: (props.value as string) ?? "",
+              onChange: (e, { newValue }) => {
+                setInputValue?.(newValue);
+
+                const isBlank = newValue === "";
+                props?.onChange?.(
+                  isBlank ? ({ target: { value: null } } as any) : e
+                );
+              },
+              autoComplete: "none",
+              className: "form-control",
+              onFocus: () => setFocus(true),
+              onBlur: () => setFocus(false)
+            };
+
+            return (
+              <AutoSuggest<Determination>
+                {...props}
+                multiSection={false}
+                suggestions={suggestions}
+                getSuggestionValue={(s) => s.scientificName ?? ""}
+                onSuggestionsFetchRequested={({ value: fetchValue }) =>
+                  setInputValue?.(fetchValue)
+                }
+                // onSuggestionSelected={(_event, data) =>
+                //   console.log(data)
+                //   // setInputValue?.(data.suggestion)
+                // }
+                onSuggestionsClearRequested={noop}
+                renderSuggestion={(determination) => (
+                  <>
+                    {determination.scientificNameDetails && (
+                      <GlobalNamesReadOnly
+                        scientificNameDetails={
+                          determination.scientificNameDetails
+                        }
+                        value={determination.scientificName ?? ""}
+                        displayFull={true}
+                      />
+                    )}
+                  </>
+                )}
+                inputProps={inputProps}
+                alwaysRenderSuggestions={focus}
+                theme={{
+                  suggestionsList: "list-group",
+                  suggestion: "list-group-item",
+                  suggestionHighlighted: "suggestion-highlighted",
+                  suggestionsContainerOpen: "suggestions-container-open",
+                  suggestionsContainer: "suggestions-container",
+                  container: "autosuggest-container"
+                }}
+              />
+            );
+          }}
         />
       </div>
       <hr />
