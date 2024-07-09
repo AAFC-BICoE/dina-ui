@@ -161,6 +161,10 @@ function retrieveRelationshipsFromIndexMapping(
         value: mapping.parentName
       } as SelectOption<string>);
     }
+
+    // Sort the accumulator at this point.
+    acc.sort((a, b) => a.label.localeCompare(b.label));
+
     return acc;
   }, []);
 }
