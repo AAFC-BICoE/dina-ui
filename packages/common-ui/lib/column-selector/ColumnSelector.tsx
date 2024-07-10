@@ -50,6 +50,20 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   >;
 
   /**
+   * IDs of the columns that should always be displayed and cannot be deleted.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   */
+  mandatoryDisplayedColumns?: string[];
+
+  /**
+   * IDs of the columns that should always be displayed and cannot be deleted.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   */
+  nonExportableColumns?: string[];
+
+  /**
    * The default columns to be loaded in if no columns are found in the local storage.
    */
   defaultColumns?: TableColumn<TData>[];

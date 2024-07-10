@@ -404,6 +404,13 @@ export default function MaterialSampleListPage() {
           enableRelationshipPresence={true}
           dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
           columns={columns}
+          mandatoryDisplayedColumns={["selectColumn", "materialSampleName"]}
+          nonExportableColumns={[
+            "selectColumn",
+            "assemblages.",
+            "projects.",
+            "organism."
+          ]}
           bulkDeleteButtonProps={{
             typeName: "material-sample",
             apiBaseUrl: "/collection-api"

@@ -531,11 +531,10 @@ export function generateBuilderConfig(
   const types: Types = {
     text: {
       valueSources: ["value"],
-      defaultOperator: "exactMatch",
       widgets: {
         text: {
           operators: [
-            "exactMatch",
+            "exactMatch", // Only displayed if keyword support exists.
             "wildcard",
             "in",
             "notIn",

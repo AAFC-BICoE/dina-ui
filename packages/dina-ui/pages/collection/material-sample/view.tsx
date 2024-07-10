@@ -327,6 +327,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   ]}
                   dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
                   enableColumnSelector={true}
+                  mandatoryDisplayedColumns={["materialSampleName"]}
                   excludedRelationshipTypes={["collecting-event"]}
                 />
 
