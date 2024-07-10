@@ -1,6 +1,7 @@
 import {
   FieldWrapperProps,
   TextField,
+  useApiClient,
   useDinaFormContext,
   useElasticSearchQuery
 } from "common-ui";
@@ -8,11 +9,12 @@ import {
   GlobalNamesReadOnly,
   SelectedScientificNameView
 } from "../global-names/GlobalNamesField";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
-import { noop } from "lodash";
+import { noop, compact } from "lodash";
 import { Determination } from "packages/dina-ui/types/collection-api/resources/Determination";
 import { includedTypeQuery } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { Person } from "packages/dina-ui/types/agent-api";
 
 export interface ScientificNameFieldProps {
   fieldProps: (fieldName: string) => FieldWrapperProps;
@@ -43,6 +45,9 @@ export function ScientificNameField({
   isManualInput
 }: ScientificNameFieldProps) {
   const { readOnly } = useDinaFormContext();
+  const { bulkGet } = useApiClient();
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   /** Current search value. */
   const [inputValue, setInputValue] = useState<string>("");
@@ -175,7 +180,8 @@ export function ScientificNameField({
               autoComplete: "none",
               className: "form-control",
               onFocus: () => setFocus(true),
-              onBlur: () => setFocus(false)
+              onBlur: () => setFocus(false),
+              ref: inputRef
             };
 
             /**
@@ -185,7 +191,7 @@ export function ScientificNameField({
              *
              * @param selectedDetermination Determination from the elasticsearch result.
              */
-            const suggestionSelected = (
+            const suggestionSelected = async (
               selectedDetermination: Determination
             ) => {
               DETERMINATION_FIELDS_TO_SET.forEach((fieldName) => {
@@ -195,8 +201,33 @@ export function ScientificNameField({
                 );
               });
 
-              // Remove focus.
-              props?.onBlur?.({} as any);
+              // Determiner needs to be handled differently if provided.
+              if (Array.isArray(selectedDetermination?.["determiner"])) {
+                form.setFieldValue(
+                  fieldProps("determiner").name,
+                  compact(
+                    await bulkGet<Person, true>(
+                      selectedDetermination["determiner"].map(
+                        (personId: string) => `/person/${personId}`
+                      ) ?? [],
+                      {
+                        apiBaseUrl: "/agent-api",
+                        returnNullForMissingResource: true
+                      }
+                    )
+                  )
+                );
+              }
+
+              // Determination Managed Attributes
+              // if (selectedDetermination.managedAttributes) {
+
+              // }
+
+              // Remove focus - timeout is needed to trick the browser into performing this last.
+              setTimeout(
+                () => (inputRef.current && inputRef.current.blur(), 0)
+              );
               setFocus(false);
             };
 
