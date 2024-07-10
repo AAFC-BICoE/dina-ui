@@ -47,6 +47,7 @@ export function ScientificNameField({
   const { readOnly } = useDinaFormContext();
   const { bulkGet } = useApiClient();
 
+  // Scientific Field Input Reference (Used for triggering the blur() event after a selection is made.)
   const inputRef = useRef<HTMLInputElement>(null);
 
   /** Current search value. */
@@ -218,11 +219,6 @@ export function ScientificNameField({
                   )
                 );
               }
-
-              // Determination Managed Attributes
-              // if (selectedDetermination.managedAttributes) {
-
-              // }
 
               // Remove focus - timeout is needed to trick the browser into performing this last.
               setTimeout(

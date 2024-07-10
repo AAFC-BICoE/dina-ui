@@ -85,7 +85,7 @@ export function ManagedAttributesEditor({
           setVisibleAttributeKeys(
             visibleAttributeKeysProp ?? getAttributeKeysInUse()
           );
-        }, [visibleAttributeKeysProp]);
+        }, [visibleAttributeKeysProp, currentValue]);
 
         // Fetch the attributes, but omit any that are missing e.g. were deleted.
         const { dataWithNullForMissing: fetchedAttributes, loading } =
