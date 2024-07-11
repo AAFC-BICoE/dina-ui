@@ -1,7 +1,6 @@
 import {
   FieldWrapperProps,
   TextField,
-  useApiClient,
   useDinaFormContext,
   useElasticSearchQuery
 } from "common-ui";
@@ -11,10 +10,9 @@ import {
 } from "../global-names/GlobalNamesField";
 import { useState, useRef } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
-import { noop, compact } from "lodash";
+import { noop } from "lodash";
 import { Determination } from "packages/dina-ui/types/collection-api/resources/Determination";
 import { includedTypeQuery } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { Person } from "packages/dina-ui/types/agent-api";
 
 export interface ScientificNameFieldProps {
   fieldProps: (fieldName: string) => FieldWrapperProps;
@@ -22,22 +20,9 @@ export interface ScientificNameFieldProps {
 }
 
 export const DETERMINATION_FIELDS_TO_SET: string[] = [
-  "verbatimScientificName",
-  "verbatimDeterminer",
-  "verbatimDate",
-  "typeStatus",
-  "typeStatusEvidence",
-  "determiner",
-  "determinedOn",
-  "verbatimRemarks",
-  "scientificNameSource",
   "scientificName",
-  "transcriberRemarks",
-  "isPrimary",
-  "scientificNameDetails",
-  "isFiledAs",
-  "determinationRemarks",
-  "managedAttributes"
+  "scientificNameSource",
+  "scientificNameDetails"
 ];
 
 export function ScientificNameField({
@@ -45,7 +30,6 @@ export function ScientificNameField({
   isManualInput
 }: ScientificNameFieldProps) {
   const { readOnly } = useDinaFormContext();
-  const { bulkGet } = useApiClient();
 
   // Scientific Field Input Reference (Used for triggering the blur() event after a selection is made.)
   const inputRef = useRef<HTMLInputElement>(null);
@@ -201,24 +185,6 @@ export function ScientificNameField({
                   selectedDetermination[fieldName]
                 );
               });
-
-              // Determiner needs to be handled differently if provided.
-              if (Array.isArray(selectedDetermination?.["determiner"])) {
-                form.setFieldValue(
-                  fieldProps("determiner").name,
-                  compact(
-                    await bulkGet<Person, true>(
-                      selectedDetermination["determiner"].map(
-                        (personId: string) => `/person/${personId}`
-                      ) ?? [],
-                      {
-                        apiBaseUrl: "/agent-api",
-                        returnNullForMissingResource: true
-                      }
-                    )
-                  )
-                );
-              }
 
               // Remove focus - timeout is needed to trick the browser into performing this last.
               setTimeout(
