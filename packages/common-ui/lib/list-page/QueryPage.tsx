@@ -2,7 +2,7 @@ import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
 import { ColumnSort, Row, SortingState } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { isEqualWith, toPairs, uniqBy } from "lodash";
+import { toPairs, uniqBy } from "lodash";
 import React, {
   useCallback,
   useEffect,
@@ -871,17 +871,12 @@ export function QueryPage<TData extends KitsuResource>({
    */
   const onDisplayedColumnsChange = useCallback(
     (newDisplayedColumns: TableColumn<TData>[]) => {
-      // Check if the order has changed
-      const orderChanged = !isEqualWith(
-        newDisplayedColumns,
-        displayedColumns,
-        (a, b) => {
-          return a.id === b.id;
-        }
-      );
+      // Check if order has changed (ignoring different items)
+      const orderChanged =
+        displayedColumns.length === newDisplayedColumns.length;
 
       // Update the flag based on order change
-      isActionTriggeredQuery.current = orderChanged;
+      isActionTriggeredQuery.current = !orderChanged;
 
       // Update displayedColumns regardless of order change
       setDisplayedColumns(newDisplayedColumns);
