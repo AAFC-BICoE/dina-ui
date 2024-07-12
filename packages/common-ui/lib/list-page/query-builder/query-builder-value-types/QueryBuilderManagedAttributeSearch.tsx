@@ -352,7 +352,11 @@ export default function QueryRowManagedAttributeSearch({
           controlShouldRenderValue: true,
           isClearable: false,
           className: isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0",
-          onKeyDown
+          onKeyDown,
+          captureMenuScroll: true,
+          menuPlacement: isInColumnSelector ? "bottom" : "auto",
+          menuShouldScrollIntoView: false,
+          minMenuHeight: 600
         }}
         omitNullOption={true}
       />
@@ -369,6 +373,10 @@ export default function QueryRowManagedAttributeSearch({
               selectedOperator: selected?.value ?? ""
             })
           }
+          captureMenuScroll={true}
+          menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+          menuShouldScrollIntoView={false}
+          minMenuHeight={600}
         />
       ) : (
         <></>

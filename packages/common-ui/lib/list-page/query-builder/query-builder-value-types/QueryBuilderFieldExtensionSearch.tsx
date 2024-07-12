@@ -191,6 +191,10 @@ export default function QueryRowFieldExtensionSearch({
         }
         onInputChange={(inputValue) => setExtensionSearchValue(inputValue)}
         inputValue={extensionSearchValue}
+        captureMenuScroll={true}
+        menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+        menuShouldScrollIntoView={false}
+        minMenuHeight={600}
       />
 
       {/* Field Selector */}
@@ -211,6 +215,10 @@ export default function QueryRowFieldExtensionSearch({
             }
             onInputChange={(inputValue) => setFieldSearchValue(inputValue)}
             inputValue={fieldSearchValue}
+            captureMenuScroll={true}
+            menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+            menuShouldScrollIntoView={false}
+            minMenuHeight={600}
           />
         </>
       ) : (
@@ -230,6 +238,10 @@ export default function QueryRowFieldExtensionSearch({
                 selectedOperator: selected?.value ?? ""
               })
             }
+            captureMenuScroll={true}
+            menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+            menuShouldScrollIntoView={false}
+            minMenuHeight={600}
           />
 
           {/* Search Value */}
