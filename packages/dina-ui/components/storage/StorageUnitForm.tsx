@@ -1,4 +1,5 @@
 import {
+  AreYouSureModal,
   BackButton,
   ButtonBar,
   DateField,
@@ -13,7 +14,8 @@ import {
   TextField,
   ToggleField,
   useApiClient,
-  useDinaFormContext
+  useDinaFormContext,
+  useModal
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { isArray } from "lodash";
@@ -24,9 +26,8 @@ import {
   StorageUnitBreadCrumb,
   StorageUnitChildrenViewer
 } from "..";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { StorageUnit, StorageUnitType } from "../../types/collection-api";
-import { Modal, Button } from "react-bootstrap";
 import { useState } from "react";
 import { ResourceNameIdentifier } from "../../types/common/resources/ResourceNameIdentifier";
 
@@ -70,17 +71,12 @@ export function StorageUnitForm({
   )
 }: StorageUnitFormProps) {
   const { apiClient } = useApiClient();
+  const { openModal } = useModal();
 
   const initialValues = storageUnit || {
     type: "storage-unit",
     parentStorageUnit: initialParent
   };
-
-  // State used to hold the name that was duplicated, if it exists the warning will appear.
-  const [duplicatedName, setDuplicatedName] = useState<string>();
-
-  const [proceedWithDuplicate, setProceedWithDuplicate] =
-    useState<boolean>(false);
 
   async function onSubmit({
     submittedValues,
@@ -88,41 +84,56 @@ export function StorageUnitForm({
   }: DinaFormSubmitParams<StorageUnit>) {
     const savedArgs: SaveArgs<StorageUnit>[] = [];
 
+    const proceedWithSave = async () => {
+      if (submittedValues.isMultiple) {
+        const names = isArray(submittedValues.name)
+          ? submittedValues.name
+          : [submittedValues.name];
+        delete submittedValues.isMultiple;
+        names.map((unitName) =>
+          savedArgs.push({
+            resource: { ...submittedValues, name: unitName },
+            type: "storage-unit"
+          })
+        );
+      } else {
+        delete submittedValues.isMultiple;
+        savedArgs.push({
+          resource: isArray(submittedValues.name)
+            ? { ...submittedValues, name: submittedValues.name.join() }
+            : submittedValues,
+          type: "storage-unit"
+        });
+      }
+
+      const savedStorage = await save<StorageUnit>(savedArgs, {
+        apiBaseUrl: "/collection-api"
+      });
+      await onSaved(savedStorage);
+    };
+
     // Check for any duplicates...
     const duplicatesFound = await checkForDuplicates(
       submittedValues.name,
       submittedValues.group
     );
-    if (duplicatesFound && !proceedWithDuplicate) {
-      setDuplicatedName(submittedValues.name);
-      return;
-    }
 
-    if (submittedValues.isMultiple) {
-      const names = isArray(submittedValues.name)
-        ? submittedValues.name
-        : [submittedValues.name];
-      delete submittedValues.isMultiple;
-      names.map((unitName) =>
-        savedArgs.push({
-          resource: { ...submittedValues, name: unitName },
-          type: "storage-unit"
-        })
+    if (duplicatesFound) {
+      openModal(
+        <AreYouSureModal
+          actionMessage={<DinaMessage id="storageUnit_duplicate_title" />}
+          messageBody={
+            <DinaMessage
+              id="storageUnit_duplicate_body"
+              values={{ duplicatedName: submittedValues.name }}
+            />
+          }
+          onYesButtonClicked={proceedWithSave}
+        />
       );
     } else {
-      delete submittedValues.isMultiple;
-      savedArgs.push({
-        resource: isArray(submittedValues.name)
-          ? { ...submittedValues, name: submittedValues.name.join() }
-          : submittedValues,
-        type: "storage-unit"
-      });
+      await proceedWithSave();
     }
-
-    const savedStorage = await save<StorageUnit>(savedArgs, {
-      apiBaseUrl: "/collection-api"
-    });
-    await onSaved(savedStorage);
   }
 
   async function checkForDuplicates(name: string, group: string) {
@@ -134,17 +145,14 @@ export function StorageUnitForm({
     );
 
     if (response && response.data.length > 0) {
+      // If the returned result is the current record, do not consider it a duplicate.
+      if (response.data.at(0)?.id === storageUnit?.id) {
+        return false;
+      }
+
       return true;
     }
     return false;
-  }
-
-  function hideDuplicateWarning() {
-    setDuplicatedName(undefined);
-  }
-
-  function proceedAnyway() {
-    setProceedWithDuplicate(true);
   }
 
   return (
@@ -154,26 +162,6 @@ export function StorageUnitForm({
       onSubmit={onSubmit}
     >
       {buttonBar}
-      <Modal
-        show={duplicatedName !== undefined && !proceedWithDuplicate}
-        centered={true}
-      >
-        <Modal.Header closeButton={true} onHide={hideDuplicateWarning}>
-          <Modal.Title>Storage Unit Name already exists</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          The name "{duplicatedName}" is already in use for another storage unit
-          in this group. Would you still like to proceed?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={hideDuplicateWarning}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={proceedAnyway}>
-            Proceed anyway
-          </Button>
-        </Modal.Footer>
-      </Modal>
       <StorageUnitFormFields parentIdInURL={parentIdInURL} />
     </DinaForm>
   );
