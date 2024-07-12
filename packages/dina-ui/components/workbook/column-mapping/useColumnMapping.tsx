@@ -1,4 +1,4 @@
-import { KitsuResource, PersistedResource } from "kitsu";
+import { PersistedResource } from "kitsu";
 import { chain, pick, startCase } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -6,7 +6,6 @@ import {
   Tooltip,
   filterBy,
   useApiClient,
-  useDinaFormContext,
   useQuery
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -29,9 +28,7 @@ import {
 import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { FaExclamationTriangle } from "react-icons/fa";
-import { get } from "lodash";
-
-type RelationshipResource = { name?: string } & KitsuResource;
+import { ResourceNameIdentifier } from "../../../types/common/resources/ResourceNameIdentifier";
 
 export function useColumnMapping() {
   const { formatMessage } = useDinaIntl();
@@ -95,7 +92,7 @@ export function useColumnMapping() {
     });
 
   const { loading: assemblageLoading, response: assemblageResp } = useQuery<
-    RelationshipResource[]
+    ResourceNameIdentifier[]
   >(
     {
       path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=assemblage`,
@@ -107,7 +104,7 @@ export function useColumnMapping() {
   );
 
   const { loading: collectionLoading, response: collectionResp } = useQuery<
-    RelationshipResource[]
+    ResourceNameIdentifier[]
   >(
     {
       path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=collection`,
@@ -118,7 +115,7 @@ export function useColumnMapping() {
     }
   );
   const { loading: preparationTypeLoading, response: preparationTypeResp } =
-    useQuery<RelationshipResource[]>(
+    useQuery<ResourceNameIdentifier[]>(
       {
         path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-type`,
         page: { limit: 1000 }
@@ -128,7 +125,7 @@ export function useColumnMapping() {
       }
     );
   const { loading: preparationMethodLoading, response: preparationMethodResp } =
-    useQuery<RelationshipResource[]>(
+    useQuery<ResourceNameIdentifier[]>(
       {
         path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=preparation-method`,
         page: { limit: 1000 }
@@ -138,7 +135,7 @@ export function useColumnMapping() {
       }
     );
   const { loading: protocolLoading, response: protocolResp } = useQuery<
-    RelationshipResource[]
+    ResourceNameIdentifier[]
   >(
     {
       path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=protocol`,
@@ -149,7 +146,7 @@ export function useColumnMapping() {
     }
   );
   const { loading: storageUnitLoading, response: storageUnitResp } = useQuery<
-    RelationshipResource[]
+    ResourceNameIdentifier[]
   >(
     {
       path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=storage-unit`,
@@ -160,7 +157,7 @@ export function useColumnMapping() {
     }
   );
   const { loading: projectLoading, response: projectResp } = useQuery<
-    RelationshipResource[]
+    ResourceNameIdentifier[]
   >(
     {
       path: `collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=project`,
@@ -175,7 +172,7 @@ export function useColumnMapping() {
     page: { limit: 1000 }
   });
   const { loading: metadataLoading, response: metadataResp } = useQuery<
-    RelationshipResource[]
+    ResourceNameIdentifier[]
   >(
     {
       path: `objectstore-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=metadata`,
@@ -573,7 +570,7 @@ export function useColumnMapping() {
         for (let i = 1; i < spreadsheetData[sheet].length; i++) {
           const parentValue = spreadsheetData[sheet][i].content[colIndex];
           if (parentValue) {
-            const response = await apiClient.get<RelationshipResource[]>(
+            const response = await apiClient.get<ResourceNameIdentifier[]>(
               `/collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=material-sample&filter[name][EQ]=${parentValue}`,
               {
                 page: { limit: 1 }

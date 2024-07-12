@@ -110,6 +110,14 @@ input[id^="react-select"] {
   justify-content: center;
 }
 
+.modal-backdrop {
+  z-index: 5000 !important;
+}
+
+.modal {
+  z-index: 5050 !important;
+}
+
 /* Give the "Multiple Values" placeholders an italic font. */
 .has-multiple-values {
   :placeholder-shown,
