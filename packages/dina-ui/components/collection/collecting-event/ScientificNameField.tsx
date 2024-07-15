@@ -8,9 +8,9 @@ import {
   GlobalNamesReadOnly,
   SelectedScientificNameView
 } from "../global-names/GlobalNamesField";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
-import { noop } from "lodash";
+import { noop, uniqWith, isEqual } from "lodash";
 import { Determination } from "packages/dina-ui/types/collection-api/resources/Determination";
 import { includedTypeQuery } from "common-ui/lib/list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 
@@ -30,9 +30,6 @@ export function ScientificNameField({
   isManualInput
 }: ScientificNameFieldProps) {
   const { readOnly } = useDinaFormContext();
-
-  // Scientific Field Input Reference (Used for triggering the blur() event after a selection is made.)
-  const inputRef = useRef<HTMLInputElement>(null);
 
   /** Current search value. */
   const [inputValue, setInputValue] = useState<string>("");
@@ -101,7 +98,8 @@ export function ScientificNameField({
           });
       });
 
-      setSuggestions(suggestionsFound);
+      // Remove suggestions that are exact duplicates...
+      setSuggestions(uniqWith(suggestionsFound, isEqual));
     }
   });
 
@@ -165,8 +163,7 @@ export function ScientificNameField({
               autoComplete: "none",
               className: "form-control",
               onFocus: () => setFocus(true),
-              onBlur: () => setFocus(false),
-              ref: inputRef
+              onBlur: () => setFocus(false)
             };
 
             /**
@@ -185,12 +182,6 @@ export function ScientificNameField({
                   selectedDetermination[fieldName]
                 );
               });
-
-              // Remove focus - timeout is needed to trick the browser into performing this last.
-              setTimeout(
-                () => (inputRef.current && inputRef.current.blur(), 0)
-              );
-              setFocus(false);
             };
 
             return (
