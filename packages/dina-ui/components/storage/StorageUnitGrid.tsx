@@ -55,8 +55,8 @@ export function useMaterialSampleSelectCoordinatesControls({
     if (isArray(materialSamples)) {
       materialSamples.forEach((item) => {
         newCellGrid[
-          `${item.storageUnitCoordinates?.wellRow?.toUpperCase()}_${
-            item.storageUnitCoordinates?.wellColumn
+          `${item.storageUnitUsage?.wellRow?.toUpperCase()}_${
+            item.storageUnitUsage?.wellColumn
           }`
         ] = { sampleName: item.materialSampleName, ...item };
       });

@@ -56,7 +56,7 @@ import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
-import { StorageUnitCoordinates } from "../../../types/collection-api/resources/StorageUnitCoordinates";
+import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -79,7 +79,7 @@ export function useMaterialSampleQuery(id?: string | null) {
         "parentMaterialSample",
         "projects",
         "assemblages",
-        "storageUnitCoordinates"
+        "storageUnitUsage"
       ].join(",")
     },
     {
@@ -530,14 +530,14 @@ export function useMaterialSampleSave({
         organismsQuantity: undefined,
         organism: []
       }),
-      // Remove storageUnit and storageUnitCoordinates if toggle is disabled
+      // Remove storageUnit and storageUnitUsage if toggle is disabled
       ...(!enableStorage && {
         storageUnit: { id: null, type: "storage-unit" },
-        storageUnitCoordinates: { id: null, type: "storage-unit-coordinates" }
+        storageUnitUsage: { id: null, type: "storage-unit-usage" }
       }),
-      // Remove storageUnitCoordinates if toggle is enabled but no storageUnit edge case
+      // Remove storageUnitUsage if toggle is enabled but no storageUnit edge case
       ...(!submittedValues.storageUnit?.id && {
-        storageUnitCoordinates: { id: null, type: "storage-unit-coordinates" }
+        storageUnitUsage: { id: null, type: "storage-unit-usage" }
       }),
       ...(!enableCollectingEvent && {
         collectingEvent: { id: null, type: "collecting-event" }
@@ -672,30 +672,29 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
-    // Take user input storageUnitCoordinates to create storageUnitCoordinates resource
-    if (msDiff.storageUnitCoordinates && msPreprocessed.storageUnit?.id) {
-      // Create new storageUnitCoordinates
-      const storageUnitCoordinatesSaveArgs: SaveArgs<StorageUnitCoordinates>[] =
-        [
-          {
-            type: "storage-unit-coordinates",
-            resource: {
-              ...(msDiff.storageUnitCoordinates as StorageUnitCoordinates),
-              storageUnit: submittedValues.storageUnit,
-              type: "storage-unit-coordinates"
-            }
+    // Take user input storageUnitUsage to create storageUnitUsage resource
+    if (msDiff.storageUnitUsage && msPreprocessed.storageUnit?.id) {
+      // Create new storageUnitUsage
+      const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] = [
+        {
+          type: "storage-unit-usage",
+          resource: {
+            ...(msDiff.storageUnitUsage as StorageUnitUsage),
+            storageUnit: submittedValues.storageUnit,
+            type: "storage-unit-usage"
           }
-        ];
+        }
+      ];
 
-      const savedStorageUnitCoordinates = await save<StorageUnitCoordinates>(
-        storageUnitCoordinatesSaveArgs,
+      const savedStorageUnitUsage = await save<StorageUnitUsage>(
+        storageUnitUsageSaveArgs,
         {
           apiBaseUrl: "/collection-api"
         }
       );
 
-      // Create link between material sample and created StorageUnitCoordinates resource
-      msDiff.storageUnitCoordinates = savedStorageUnitCoordinates[0];
+      // Create link between material sample and created storageUnitUsage resource
+      msDiff.storageUnitUsage = savedStorageUnitUsage[0];
     }
 
     const organismsWereChanged =
@@ -765,7 +764,7 @@ export function useMaterialSampleSave({
             data: pick(msDiffWithOrganisms.collection, "id", "type")
           }
         }),
-        ...getStorageUnitCoordinatesRelationship()
+        ...getStorageUnitUsageRelationship()
       },
 
       // Set the attributes to undefined after they've been moved to "relationships":
@@ -774,7 +773,7 @@ export function useMaterialSampleSave({
       organism: undefined,
       assemblages: undefined,
       preparedBy: undefined,
-      storageUnitCoordinates: undefined
+      storageUnitUsage: undefined
     };
     // delete the association if associated sample is left unfilled
     if (
@@ -790,21 +789,17 @@ export function useMaterialSampleSave({
 
     return saveOperation;
 
-    function getStorageUnitCoordinatesRelationship() {
-      if (msDiffWithOrganisms.storageUnitCoordinates) {
-        if (!!msDiffWithOrganisms?.storageUnitCoordinates.id) {
+    function getStorageUnitUsageRelationship() {
+      if (msDiffWithOrganisms.storageUnitUsage) {
+        if (!!msDiffWithOrganisms?.storageUnitUsage.id) {
           return {
-            storageUnitCoordinates: {
-              data: pick(
-                msDiffWithOrganisms.storageUnitCoordinates,
-                "id",
-                "type"
-              )
+            storageUnitUsage: {
+              data: pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
             }
           };
         } else {
           return {
-            storageUnitCoordinates: {
+            storageUnitUsage: {
               data: null
             }
           };
@@ -911,17 +906,17 @@ export function useMaterialSampleSave({
         formik
       );
 
-      // Delete StorageUnitCoordinates if there is one when no StorageUnit linked
+      // Delete storageUnitUsage if there is one when no StorageUnit linked
       if (
         (!enableStorage || !submittedValues.storageUnit?.id) &&
-        submittedValues.storageUnitCoordinates?.id
+        submittedValues.storageUnitUsage?.id
       ) {
-        await save<StorageUnitCoordinates>(
+        await save<StorageUnitUsage>(
           [
             {
               delete: {
-                id: submittedValues.storageUnitCoordinates?.id ?? null,
-                type: "storage-unit-coordinates"
+                id: submittedValues.storageUnitUsage?.id ?? null,
+                type: "storage-unit-usage"
               }
             }
           ],

@@ -219,7 +219,7 @@ describe("Material Sample Edit Page", () => {
               publiclyReleasable: true, // Default value
               relationships: {
                 organism: { data: [] },
-                storageUnitCoordinates: { data: null }
+                storageUnitUsage: { data: null }
               },
               type: "material-sample",
               attachment: undefined,
@@ -234,7 +234,7 @@ describe("Material Sample Edit Page", () => {
               preparedBy: undefined,
               collection: undefined,
               assemblages: undefined,
-              storageUnitCoordinates: undefined
+              storageUnitUsage: undefined
             },
             type: "material-sample"
           }
@@ -298,7 +298,7 @@ describe("Material Sample Edit Page", () => {
               publiclyReleasable: true, // Default value
               relationships: {
                 organism: { data: [] },
-                storageUnitCoordinates: { data: null }
+                storageUnitUsage: { data: null }
               },
               type: "material-sample",
               attachment: undefined,
@@ -313,7 +313,7 @@ describe("Material Sample Edit Page", () => {
               preparedBy: undefined,
               collection: undefined,
               assemblages: undefined,
-              storageUnitCoordinates: undefined
+              storageUnitUsage: undefined
             },
             type: "material-sample"
           }

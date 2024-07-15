@@ -221,12 +221,12 @@ const FieldMappingConfig: FieldMappingConfigType = {
         name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
-    storageUnitCoordinates: {
+    storageUnitUsage: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
         hasGroup: false,
         linkOrCreateSetting: LinkOrCreateSetting.CREATE,
-        type: "storage-unit-coordinates",
+        type: "storage-unit-usage",
         baseApiPath: "/collection-api"
       },
       attributes: {

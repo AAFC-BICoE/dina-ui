@@ -9,8 +9,8 @@ import { CommonMessage } from "../intl/common-ui-intl";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
 import { useModal } from "../modal/modal";
 import { MaterialSample } from "../../../dina-ui/types/collection-api";
-import { StorageUnitCoordinates } from "../../../dina-ui/types/collection-api/resources/StorageUnitCoordinates";
 import { KitsuResponse } from "kitsu";
+import { StorageUnitUsage } from "../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 interface DeleteButtonProps {
   /** Additional button classes. */
@@ -72,7 +72,7 @@ export function DeleteButton({
       materialSample = await apiClient.get<MaterialSample>(
         `collection-api/material-sample/${id}`,
         {
-          include: "storageUnitCoordinates"
+          include: "storageUnitUsage"
         }
       );
     }
@@ -86,14 +86,14 @@ export function DeleteButton({
       options
     );
 
-    // Delete StorageUnitCoordinates if there is one linked
-    if (materialSample.data.storageUnitCoordinates?.id && deleteRelationships) {
-      await save<StorageUnitCoordinates>(
+    // Delete StorageUnitUsage if there is one linked
+    if (materialSample.data.storageUnitUsage?.id && deleteRelationships) {
+      await save<StorageUnitUsage>(
         [
           {
             delete: {
-              id: materialSample.data.storageUnitCoordinates?.id ?? null,
-              type: "storage-unit-coordinates"
+              id: materialSample.data.storageUnitUsage?.id ?? null,
+              type: "storage-unit-usage"
             }
           }
         ],

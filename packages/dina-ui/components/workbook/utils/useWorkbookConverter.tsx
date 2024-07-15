@@ -524,14 +524,14 @@ export function useWorkbookConverter(
             );
           }
 
-          // Link storageUnit to storageUnitCoordinates before creating storageUnitCoordinates
+          // Link storageUnit to storageUnitUsage before creating storageUnitUsage
           if (
             resource.type === "material-sample" &&
-            attributeName === "storageUnitCoordinates"
+            attributeName === "storageUnitUsage"
           ) {
             // Check that storage unit is given if row has well column and well row
             if (!!(resource as any)?.relationships?.storageUnit?.data?.id) {
-              // Link storageUnit to storageUnitCoordinates
+              // Link storageUnit to storageUnitUsage
               value.relationships["storageUnit"] = {
                 data: (resource as any)?.relationships?.storageUnit?.data
               };

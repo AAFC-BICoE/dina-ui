@@ -12,7 +12,7 @@ import { PreparationType } from "./PreparationType";
 import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Person } from "../../objectstore-api";
-import { StorageUnitCoordinates } from "./StorageUnitCoordinates";
+import { StorageUnitUsage } from "./StorageUnitUsage";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -113,7 +113,7 @@ export interface MaterialSampleRelationships {
   storageUnit?: StorageUnit;
   projects?: Project[];
   assemblages?: Assemblage[];
-  storageUnitCoordinates?: StorageUnitCoordinates;
+  storageUnitUsage?: StorageUnitUsage;
 }
 
 interface MaterialSampleChildren extends MaterialSample {

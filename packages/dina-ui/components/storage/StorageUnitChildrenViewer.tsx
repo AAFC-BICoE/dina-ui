@@ -36,7 +36,7 @@ export function StorageUnitChildrenViewer({
     {
       path: "collection-api/material-sample",
       filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` },
-      include: "storageUnitCoordinates",
+      include: "storageUnitUsage",
       page: { limit: 1000 }
     },
     {

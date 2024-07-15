@@ -40,7 +40,7 @@ export function AssignedStorage({
   return value?.id ? (
     <div>
       {withResponse(storageQuery, ({ data: storageUnit }) => {
-        // Create storageUnitCoordinates Row options
+        // Create storageUnitUsage Row options
         const options: SelectOption<string>[] = [];
         if (storageUnit.storageUnitType?.gridLayoutDefinition?.numberOfRows) {
           for (
@@ -84,14 +84,14 @@ export function AssignedStorage({
                 <div className="list-inline mb-3">
                   <SelectField
                     options={options}
-                    name={"storageUnitCoordinates.wellRow"}
+                    name={"storageUnitUsage.wellRow"}
                     customName={"row"}
                     className="list-inline-item"
                     disableTemplateCheckbox={true}
                     disabled={isTemplate}
                   />
                   <TextField
-                    name={"storageUnitCoordinates.wellColumn"}
+                    name={"storageUnitUsage.wellColumn"}
                     customName="column"
                     className="list-inline-item"
                     disableTemplateCheckbox={true}

@@ -1700,12 +1700,12 @@ describe("Form template edit page", () => {
                 },
                 {
                   defaultValue: undefined,
-                  name: "storageUnitCoordinates.wellRow",
+                  name: "storageUnitUsage.wellRow",
                   visible: true
                 },
                 {
                   defaultValue: undefined,
-                  name: "storageUnitCoordinates.wellColumn",
+                  name: "storageUnitUsage.wellColumn",
                   visible: true
                 }
               ]
