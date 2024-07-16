@@ -59,7 +59,7 @@ import { useGenerateSequence } from "./useGenerateSequence";
 import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export function useMaterialSampleQuery(id?: string | null) {
-  const { bulkGet } = useApiClient();
+  const { bulkGet, apiClient } = useApiClient();
 
   const materialSampleQuery = useQuery<MaterialSample>(
     {
@@ -72,7 +72,6 @@ export function useMaterialSampleQuery(id?: string | null) {
         "preparationType",
         "preparationMethod",
         "preparedBy",
-        "storageUnit",
         "hierarchy",
         "organism",
         "materialSampleChildren",
@@ -103,6 +102,20 @@ export function useMaterialSampleQuery(id?: string | null) {
                 );
               }
             }
+          }
+        }
+
+        // Setup the storage unit if it's stored on the storage unit usage.
+        if (data?.storageUnitUsage?.id) {
+          const storageUnit = await apiClient.get<StorageUnitUsage>(
+            `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
+            {
+              include: "storageUnit"
+            }
+          );
+
+          if (storageUnit?.data?.storageUnit) {
+            data.storageUnit = storageUnit.data.storageUnit;
           }
         }
 
@@ -675,7 +688,7 @@ export function useMaterialSampleSave({
     // Take user input storageUnitUsage to create storageUnitUsage resource
     // TODO need to review this...
     if (msDiff.storageUnit && msPreprocessed.storageUnit?.id) {
-      // Create new storageUnitUsage
+      // Create new storageUnitUsage, the storageUnit is saved here.
       const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] = [
         {
           type: "storage-unit-usage",
@@ -766,9 +779,11 @@ export function useMaterialSampleSave({
             data: pick(msDiffWithOrganisms.collection, "id", "type")
           }
         }),
-        ...(msDiffWithOrganisms.storageUnitUsage?.id && {
+        ...(msDiffWithOrganisms.storageUnitUsage && {
           storageUnitUsage: {
-            data: pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
+            data: msDiffWithOrganisms.storageUnitUsage?.id
+              ? pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
+              : null
           }
         })
       },

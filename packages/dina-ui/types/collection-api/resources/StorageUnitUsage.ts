@@ -5,6 +5,8 @@ export interface StorageUnitUsageAttributes {
   type: "storage-unit-usage";
   wellColumn?: number;
   wellRow?: string;
+  cellNumber?: number;
+  storageUnitName?: string;
   usageType?: string;
   createdOn?: string;
   createdBy?: string;
