@@ -680,21 +680,15 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
-    // console.log("msDiff");
-    // console.log(msDiff);
-    // console.log("msPreprocessed");
-    // console.log(msPreprocessed);
-
-    // Take user input storageUnitUsage to create storageUnitUsage resource
-    // TODO need to review this...
-    if (msDiff.storageUnit && msPreprocessed.storageUnit?.id) {
+    // Check if there is any changes to the storage unit or storage unit usage.
+    if (msDiff?.storageUnit?.id || msDiff?.storageUnitUsage?.id) {
       // Create new storageUnitUsage, the storageUnit is saved here.
       const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] = [
         {
           type: "storage-unit-usage",
           resource: {
             ...(msDiff.storageUnitUsage as StorageUnitUsage),
-            storageUnit: submittedValues.storageUnit,
+            storageUnit: pick(submittedValues.storageUnit, "id", "type"),
             usageType: "material-sample",
             type: "storage-unit-usage"
           }
