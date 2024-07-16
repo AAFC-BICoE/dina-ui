@@ -360,7 +360,7 @@ export function useMaterialSampleSave({
           ? find(formTemplate?.components, {
               name: STORAGE_COMPONENT_NAME
             })?.visible ?? false
-          : materialSample?.storageUnit?.id
+          : materialSample?.storageUnitUsage?.id
       )
     );
 
@@ -532,11 +532,6 @@ export function useMaterialSampleSave({
       }),
       // Remove storageUnit and storageUnitUsage if toggle is disabled
       ...(!enableStorage && {
-        storageUnit: { id: null, type: "storage-unit" },
-        storageUnitUsage: { id: null, type: "storage-unit-usage" }
-      }),
-      // Remove storageUnitUsage if toggle is enabled but no storageUnit edge case
-      ...(!submittedValues.storageUnit?.id && {
         storageUnitUsage: { id: null, type: "storage-unit-usage" }
       }),
       ...(!enableCollectingEvent && {
@@ -672,8 +667,14 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
+    // console.log("msDiff");
+    // console.log(msDiff);
+    // console.log("msPreprocessed");
+    // console.log(msPreprocessed);
+
     // Take user input storageUnitUsage to create storageUnitUsage resource
-    if (msDiff.storageUnitUsage && msPreprocessed.storageUnit?.id) {
+    // TODO need to review this...
+    if (msDiff.storageUnit && msPreprocessed.storageUnit?.id) {
       // Create new storageUnitUsage
       const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] = [
         {
@@ -681,6 +682,7 @@ export function useMaterialSampleSave({
           resource: {
             ...(msDiff.storageUnitUsage as StorageUnitUsage),
             storageUnit: submittedValues.storageUnit,
+            usageType: "material-sample",
             type: "storage-unit-usage"
           }
         }
@@ -764,7 +766,11 @@ export function useMaterialSampleSave({
             data: pick(msDiffWithOrganisms.collection, "id", "type")
           }
         }),
-        ...getStorageUnitUsageRelationship()
+        ...(msDiffWithOrganisms.storageUnitUsage?.id && {
+          storageUnitUsage: {
+            data: pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
+          }
+        })
       },
 
       // Set the attributes to undefined after they've been moved to "relationships":
@@ -773,8 +779,10 @@ export function useMaterialSampleSave({
       organism: undefined,
       assemblages: undefined,
       preparedBy: undefined,
-      storageUnitUsage: undefined
+      storageUnitUsage: undefined,
+      storageUnit: undefined
     };
+
     // delete the association if associated sample is left unfilled
     if (
       msInputWithRelationships.associations?.length === 1 &&
@@ -788,24 +796,6 @@ export function useMaterialSampleSave({
     };
 
     return saveOperation;
-
-    function getStorageUnitUsageRelationship() {
-      if (msDiffWithOrganisms.storageUnitUsage) {
-        if (!!msDiffWithOrganisms?.storageUnitUsage.id) {
-          return {
-            storageUnitUsage: {
-              data: pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
-            }
-          };
-        } else {
-          return {
-            storageUnitUsage: {
-              data: null
-            }
-          };
-        }
-      }
-    }
   }
 
   /**

@@ -212,7 +212,6 @@ describe("Material Sample Edit Page", () => {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
-              storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
@@ -291,7 +290,6 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
@@ -493,10 +491,9 @@ describe("Material Sample Edit Page", () => {
           type: "material-sample",
           id: "333",
           materialSampleName: "test-ms",
-          storageUnit: {
+          storageUnitUsage: {
             id: "76575",
-            type: "storage-unit",
-            name: "test-storage-unit"
+            type: "storage-unit-usage"
           } as KitsuResourceLink
         }}
         onSaved={mockOnSaved}
