@@ -87,7 +87,7 @@ export function ContainerGrid<
           const coords = `${rowLabel}_${column}`;
 
           return (
-            <div className={`well-${coords}`} style={{ height: "40px" }}>
+            <div className={`well-${coords}`} style={{ height: "auto" }}>
               <GridCell<ItemType>
                 movedItems={movedItems}
                 onDrop={({ batchItemSample: newItem }) =>
