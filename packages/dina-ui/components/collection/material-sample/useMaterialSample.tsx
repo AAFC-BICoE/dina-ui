@@ -713,6 +713,14 @@ export function useMaterialSampleSave({
       msDiff.storageUnitUsage = savedStorageUnitUsage[0];
     }
 
+    // If the storage unit is set to null in the diff then the storage unit usage should also be removed.
+    if (msDiff?.storageUnit?.id === null) {
+      msDiff.storageUnitUsage = {
+        id: null,
+        type: "storage-unit-usage"
+      };
+    }
+
     const organismsWereChanged =
       !!msDiff.organism ||
       msDiff.organismsQuantity !== undefined ||
