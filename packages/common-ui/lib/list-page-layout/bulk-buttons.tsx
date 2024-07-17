@@ -62,8 +62,7 @@ export function BulkDeleteButton({
               if (typeName === "material-sample") {
                 materialSamples = await bulkGet<MaterialSample>(
                   resourceIds.map(
-                    (id) =>
-                      `/material-sample/${id}?include=storageUnitCoordinates`
+                    (id) => `/material-sample/${id}?include=storageUnitUsage`
                   ),
                   { apiBaseUrl: "/collection-api" }
                 );
@@ -88,12 +87,11 @@ export function BulkDeleteButton({
               ) {
                 const deleteOperations: Operation[] = materialSamples
                   .filter(
-                    (materialSample) =>
-                      !!materialSample.storageUnitCoordinates?.id
+                    (materialSample) => !!materialSample.storageUnitUsage?.id
                   )
                   .map((materialSample) => ({
                     op: "DELETE",
-                    path: `storage-unit-coordinates/${materialSample.storageUnitCoordinates?.id}`
+                    path: `storage-unit-usage/${materialSample.storageUnitUsage?.id}`
                   }));
 
                 await doOperations(deleteOperations, {

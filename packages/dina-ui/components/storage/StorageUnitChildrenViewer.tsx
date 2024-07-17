@@ -35,8 +35,8 @@ export function StorageUnitChildrenViewer({
   const materialSamplesQuery = useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
-      filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` },
-      include: "storageUnitCoordinates",
+      filter: { rsql: `storageUnitUsage.storageUnit.uuid==${storageUnit?.id}` },
+      include: "storageUnitUsage",
       page: { limit: 1000 }
     },
     {
@@ -60,13 +60,14 @@ export function StorageUnitChildrenViewer({
     );
     const samplesQueryParams = {
       path: "collection-api/material-sample",
-      filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` }
+      filter: { rsql: `storageUnitUsage.storageUnit.uuid==${storageUnit?.id}` }
     };
     const { data: childSamples } = await apiClient.get<MaterialSample[]>(
       samplesQueryParams.path,
       {
         filter: samplesQueryParams.filter,
-        page: { limit: 1000 }
+        page: { limit: 1000 },
+        include: "storageUnitUsage"
       }
     );
 

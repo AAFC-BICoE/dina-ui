@@ -2577,40 +2577,94 @@ describe("MaterialSampleBulkEditor", () => {
         [
           {
             resource: {
-              id: "1",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              relationships: {},
+              id: undefined,
               storageUnit: {
                 id: "C",
                 type: "storage-unit"
               },
+              type: "storage-unit-usage",
+              usageType: "material-sample"
+            },
+            type: "storage-unit-usage"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ],
+      [
+        [
+          {
+            resource: {
+              id: undefined,
+              storageUnit: {
+                id: "C",
+                type: "storage-unit"
+              },
+              type: "storage-unit-usage",
+              usageType: "material-sample"
+            },
+            type: "storage-unit-usage"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ],
+      [
+        [
+          {
+            resource: {
+              assemblages: undefined,
+              attachment: undefined,
+              id: "1",
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparedBy: undefined,
+              projects: undefined,
+              relationships: {
+                storageUnitUsage: {
+                  data: {
+                    id: "11111",
+                    type: "storage-unit-usage"
+                  }
+                }
+              },
+              storageUnit: undefined,
+              storageUnitUsage: undefined,
               type: "material-sample"
             },
             type: "material-sample"
           },
           {
             resource: {
-              id: "2",
+              assemblages: undefined,
               attachment: undefined,
+              id: "2",
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
+              preparedBy: undefined,
               projects: undefined,
-              relationships: {},
-              storageUnit: {
-                id: "C",
-                type: "storage-unit"
+              relationships: {
+                storageUnitUsage: {
+                  data: {
+                    id: "11111",
+                    type: "storage-unit-usage"
+                  }
+                }
               },
+              storageUnit: undefined,
+              storageUnitUsage: undefined,
               type: "material-sample"
             },
             type: "material-sample"
           }
         ],
-        { apiBaseUrl: "/collection-api" }
+        {
+          apiBaseUrl: "/collection-api"
+        }
       ]
     ]);
   });

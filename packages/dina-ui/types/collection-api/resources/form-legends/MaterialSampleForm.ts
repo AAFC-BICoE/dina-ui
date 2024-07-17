@@ -564,8 +564,8 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           {
             id: "storageUnit"
           },
-          { id: "storageUnitCoordinates.wellRow", visible: true },
-          { id: "storageUnitCoordinates.wellColumn", visible: true }
+          { id: "storageUnitUsage.wellRow", visible: true },
+          { id: "storageUnitUsage.wellColumn", visible: true }
         ]
       }
     ]

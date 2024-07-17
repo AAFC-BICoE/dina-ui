@@ -627,7 +627,7 @@ export function useColumnMapping() {
               protocols.find((item) => item.name === value) ??
               protocols.find((item) => compareAlphanumeric(item.name, value));
             break;
-          case "storageUnit.name":
+          case "storageUnitUsage.storageUnit.name":
             found =
               storageUnits.find((item) => item.name === value) ??
               storageUnits.find((item) =>
@@ -689,7 +689,7 @@ export function useColumnMapping() {
     let options: any[] = [];
     let targetType: string = "";
     switch (fieldPath) {
-      case "storageUnit.name":
+      case "storageUnitUsage.storageUnit.name":
         options = storageUnits.map((resource) => ({
           label: resource.name,
           value: resource.id,
