@@ -130,6 +130,24 @@ export interface QueryPageProps<TData extends KitsuResource> {
   excludedRelationshipTypes?: string[];
 
   /**
+   * IDs of the columns that should always be displayed and cannot be deleted.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  mandatoryDisplayedColumns?: string[];
+
+  /**
+   * IDs of the columns that should always be displayed and cannot be deleted.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  nonExportableColumns?: string[];
+
+  /**
    * By default, the QueryPage will try sorting using `createdOn` attribute. You can override this
    * setting by providing your own default sort.
    */
@@ -273,6 +291,8 @@ export function QueryPage<TData extends KitsuResource>({
   dynamicFieldMapping,
   enableRelationshipPresence = false,
   excludedRelationshipTypes,
+  mandatoryDisplayedColumns,
+  nonExportableColumns,
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
@@ -560,6 +580,7 @@ export function QueryPage<TData extends KitsuResource>({
         .finally(() => {
           // No matter the end result, loading should stop.
           setLoading(false);
+          isActionTriggeredQuery.current = false;
         });
     }
   }, [
@@ -579,7 +600,7 @@ export function QueryPage<TData extends KitsuResource>({
         setSubmittedQueryBuilderTree(newTree);
         setQueryBuilderTree(newTree);
         isActionTriggeredQuery.current = true;
-      } else if (customViewElasticSearchQuery) {
+      } else if (customViewElasticSearchQuery && !enableColumnSelector) {
         setSubmittedQueryBuilderTree(emptyQueryTree());
         setQueryBuilderTree(emptyQueryTree());
         isActionTriggeredQuery.current = true;
@@ -844,13 +865,23 @@ export function QueryPage<TData extends KitsuResource>({
   /**
    * When the displayed columns are changed from the column selector, we need to trigger
    * a new elastic search query since the _source changes.
+   *
+   * Elasticsearch query is not regenerated if the order only changed since we still have all
+   * the fields required.
    */
   const onDisplayedColumnsChange = useCallback(
     (newDisplayedColumns: TableColumn<TData>[]) => {
-      isActionTriggeredQuery.current = true;
+      // Check if order has changed (ignoring different items)
+      const orderChanged =
+        displayedColumns.length === newDisplayedColumns.length;
+
+      // Update the flag based on order change
+      isActionTriggeredQuery.current = !orderChanged;
+
+      // Update displayedColumns regardless of order change
       setDisplayedColumns(newDisplayedColumns);
     },
-    []
+    [displayedColumns] // Only re-render if displayedColumns changes
   );
 
   /**
@@ -994,6 +1025,8 @@ export function QueryPage<TData extends KitsuResource>({
                       defaultColumns={columns as any}
                       setColumnSelectorLoading={setColumnSelectorLoading}
                       excludedRelationshipTypes={excludedRelationshipTypes}
+                      mandatoryDisplayedColumns={mandatoryDisplayedColumns}
+                      nonExportableColumns={nonExportableColumns}
                     />
                   )}
                   {bulkEditPath && (
@@ -1041,6 +1074,8 @@ export function QueryPage<TData extends KitsuResource>({
                       setColumnSelectorLoading={setColumnSelectorLoading}
                       dynamicFieldsMappingConfig={dynamicFieldMapping}
                       excludedRelationshipTypes={excludedRelationshipTypes}
+                      mandatoryDisplayedColumns={mandatoryDisplayedColumns}
+                      nonExportableColumns={nonExportableColumns}
                     />
                   )}
                 </div>

@@ -352,7 +352,11 @@ export default function QueryRowManagedAttributeSearch({
           controlShouldRenderValue: true,
           isClearable: false,
           className: isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0",
-          onKeyDown
+          onKeyDown,
+          captureMenuScroll: true,
+          menuPlacement: isInColumnSelector ? "bottom" : "auto",
+          menuShouldScrollIntoView: false,
+          minMenuHeight: 600
         }}
         omitNullOption={true}
       />
@@ -369,6 +373,10 @@ export default function QueryRowManagedAttributeSearch({
               selectedOperator: selected?.value ?? ""
             })
           }
+          captureMenuScroll={true}
+          menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+          menuShouldScrollIntoView={false}
+          minMenuHeight={600}
         />
       ) : (
         <></>
@@ -394,8 +402,13 @@ export function transformManagedAttributeToDSL({
   indexMap
 }: TransformToDSLProps): any {
   // Parse the managed attribute search options. Trim the search value.
-  const managedAttributeSearchValue: ManagedAttributeSearchStates =
-    JSON.parse(value);
+  let managedAttributeSearchValue: ManagedAttributeSearchStates;
+  try {
+    managedAttributeSearchValue = JSON.parse(value);
+  } catch (e) {
+    console.error(e);
+    return;
+  }
   managedAttributeSearchValue.searchValue =
     managedAttributeSearchValue.searchValue.trim();
 

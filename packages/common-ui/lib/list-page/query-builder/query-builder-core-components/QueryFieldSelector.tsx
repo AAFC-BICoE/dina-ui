@@ -218,6 +218,10 @@ export function QueryFieldSelector({
         }
         isValidNewOption={(_inputValue) => !isInColumnSelector}
         onCreateOption={performGlobalSearch}
+        captureMenuScroll={true}
+        menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+        menuShouldScrollIntoView={false}
+        minMenuHeight={600}
       />
     </div>
   );

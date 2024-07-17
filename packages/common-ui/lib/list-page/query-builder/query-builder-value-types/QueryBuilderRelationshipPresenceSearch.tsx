@@ -119,6 +119,10 @@ export default function QueryRowRelationshipPresenceSearch({
         }
         onInputChange={(inputValue) => setRelationshipSearchValue(inputValue)}
         inputValue={relationshipSearchValue}
+        captureMenuScroll={true}
+        menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+        menuShouldScrollIntoView={false}
+        minMenuHeight={600}
       />
 
       {/* Operator Selector */}
@@ -161,6 +165,10 @@ function retrieveRelationshipsFromIndexMapping(
         value: mapping.parentName
       } as SelectOption<string>);
     }
+
+    // Sort the accumulator at this point.
+    acc.sort((a, b) => a.label.localeCompare(b.label));
+
     return acc;
   }, []);
 }

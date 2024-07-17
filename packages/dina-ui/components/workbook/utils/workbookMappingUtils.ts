@@ -48,9 +48,9 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["type", "materialSampleType"],
   ["collection", "collection.name"],
   ["collections", "collection.name"],
-  ["storage unit", "storageUnit.name"],
-  ["storage", "storageUnit.name"],
-  ["storageunit", "storageUnit.name"],
+  ["storage unit", "storageUnitUsage.storageUnit.name"],
+  ["storage", "storageUnitUsage.storageUnit.name"],
+  ["storageunit", "storageUnitUsage.storageUnit.name"],
   ["project", "projects.name"],
   ["projects", "projects.name"],
   ["preparation type", "preparationType.name"],
@@ -71,8 +71,8 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["host remarks", "hostOrganism.remarks"],
   ["collector's number", "collectingEvent.dwcRecordNumber"],
   ["collector number", "collectingEvent.dwcRecordNumber"],
-  ["well column", "storageUnitCoordinates.wellColumn"],
-  ["well row", "storageUnitCoordinates.wellRow"]
+  ["well column", "storageUnitUsage.wellColumn"],
+  ["well row", "storageUnitUsage.wellRow"]
 ]);
 
 export type FieldOptionType = {

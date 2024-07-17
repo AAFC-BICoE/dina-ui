@@ -264,6 +264,17 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "organism",
         referencedType: "organism",
         apiEndpoint: "collection-api/managed-attribute"
+      },
+
+      // Attachment
+      {
+        type: "managedAttribute",
+        label: "managedAttributes",
+        path: "included.attributes.managedAttributes",
+        apiEndpoint: "objectstore-api/managed-attribute",
+        component: "ENTITY",
+        referencedBy: "attachment",
+        referencedType: "metadata"
       }
     ]
   };
@@ -393,6 +404,13 @@ export default function MaterialSampleListPage() {
           enableRelationshipPresence={true}
           dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
           columns={columns}
+          mandatoryDisplayedColumns={["selectColumn", "materialSampleName"]}
+          nonExportableColumns={[
+            "selectColumn",
+            "assemblages.",
+            "projects.",
+            "organism."
+          ]}
           bulkDeleteButtonProps={{
             typeName: "material-sample",
             apiBaseUrl: "/collection-api"

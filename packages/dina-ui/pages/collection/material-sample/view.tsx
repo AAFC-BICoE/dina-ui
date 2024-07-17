@@ -57,8 +57,8 @@ import {
 } from "../../../types/collection-api";
 import { Row } from "@tanstack/react-table";
 import { CSSProperties } from "react";
-import { StorageUnitCoordinates } from "packages/dina-ui/types/collection-api/resources/StorageUnitCoordinates";
 import { dynamicFieldMappingForMaterialSample } from "./list";
+import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -194,16 +194,14 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 type="material-sample"
                 className="ms-auto"
                 onDeleted={async () => {
-                  // Delete StorageUnitCoordinates if there is one linked
-                  if (materialSampleData.storageUnitCoordinates?.id) {
-                    await save<StorageUnitCoordinates>(
+                  // Delete storageUnitUsage if there is one linked
+                  if (materialSampleData.storageUnitUsage?.id) {
+                    await save<StorageUnitUsage>(
                       [
                         {
                           delete: {
-                            id:
-                              materialSampleData.storageUnitCoordinates?.id ??
-                              null,
-                            type: "storage-unit-coordinates"
+                            id: materialSampleData.storageUnitUsage?.id ?? null,
+                            type: "storage-unit-usage"
                           }
                         }
                       ],
@@ -327,6 +325,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   ]}
                   dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
                   enableColumnSelector={true}
+                  mandatoryDisplayedColumns={["materialSampleName"]}
                   excludedRelationshipTypes={["collecting-event"]}
                 />
 

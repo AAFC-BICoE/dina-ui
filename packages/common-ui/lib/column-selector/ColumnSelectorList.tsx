@@ -26,27 +26,6 @@ import QueryRowRelationshipPresenceSearch, {
   RelationshipPresenceSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
 
-// IDs of columns not supported for exporting
-export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
-  "selectColumn",
-  "thumbnail",
-  "objectStorePreview",
-  "assemblages.",
-  "projects.",
-  "organism."
-];
-
-// IDs of columns that the user cannot configure, they are mandatory.
-export const MANDATORY_DISPLAYED_COLUMNS: string[] = [
-  "selectColumn",
-  "thumbnail",
-  "originalFilename",
-  "materialSampleName",
-  "assemblages.",
-  "projects.",
-  "organism."
-];
-
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
   loading: boolean;
@@ -60,7 +39,9 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   loading,
   defaultColumns,
   indexMapping,
-  dynamicFieldsMappingConfig
+  dynamicFieldsMappingConfig,
+  mandatoryDisplayedColumns,
+  nonExportableColumns
 }: ColumnSelectorListProps<TData>) {
   const { apiClient } = useApiClient();
 
@@ -145,6 +126,45 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     }
   };
 
+  const onColumnItemChangeOrder = (
+    direction: "up" | "down",
+    columnId: string
+  ) => {
+    // Create a copy of the displayedColumns array
+    const newDisplayedColumns = [...displayedColumns];
+
+    // Find the index of the column to be moved
+    const columnIndex = newDisplayedColumns.findIndex(
+      (column) => column.id === columnId
+    );
+
+    // Check if the column exists and the direction is valid
+    if (columnIndex !== -1 && (direction === "up" || direction === "down")) {
+      // Swap the column with its neighbor based on direction
+      const targetIndex =
+        direction === "up" ? columnIndex - 1 : columnIndex + 1;
+
+      // Check if the target index is within bounds
+      if (targetIndex >= 0 && targetIndex < newDisplayedColumns.length) {
+        // Swap elements:
+        [newDisplayedColumns[columnIndex], newDisplayedColumns[targetIndex]] = [
+          newDisplayedColumns[targetIndex],
+          newDisplayedColumns[columnIndex]
+        ];
+      }
+    }
+
+    // Update the displayedColumns state with the modified array
+    setDisplayedColumns(newDisplayedColumns);
+
+    // Update local storage if not in export mode
+    if (!exportMode) {
+      setLocalStorageDisplayedColumns(
+        newDisplayedColumns.map((column) => column?.columnSelectorString ?? "")
+      );
+    }
+  };
+
   const onColumnItemInsert = async () => {
     if (isValidField && selectedField && indexMapping) {
       const generatedColumnPath = generateColumnPath({
@@ -209,7 +229,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   const displayedColumnsFiltered = useMemo(() => {
     return displayedColumns.filter((column) => {
       if (exportMode) {
-        return !NOT_EXPORTABLE_COLUMN_IDS.some((id) =>
+        return !(nonExportableColumns ?? []).some((id) =>
           (column?.id ?? "").startsWith(id)
         );
       }
@@ -221,23 +241,26 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     if (indexMapping) {
       return indexMapping.filter((mapping) => {
         // Check if it's already been used, does not need to shown again since they are already displaying it.
-        const alreadyUsed = displayedColumns?.find(
-          (column) =>
-            mapping?.value === column?.columnSelectorString ||
-            mapping?.label === column?.columnSelectorString
-        );
+        const alreadyUsed = displayedColumns?.find((column) => {
+          // Check if it's a nested field or normal field:
+          if (mapping.parentType) {
+            return mapping?.value === column?.columnSelectorString;
+          } else {
+            return mapping?.label === column?.columnSelectorString;
+          }
+        });
         if (alreadyUsed) {
           return false;
         }
 
         if (exportMode) {
-          return !NOT_EXPORTABLE_COLUMN_IDS.some(
+          return !(nonExportableColumns ?? []).some(
             (id) =>
               (mapping?.value ?? "").startsWith(id) ||
               (mapping?.label ?? "").startsWith(id)
           );
         } else {
-          return !MANDATORY_DISPLAYED_COLUMNS.some(
+          return !(mandatoryDisplayedColumns ?? []).some(
             (id) =>
               (mapping?.value ?? "").startsWith(id) ||
               (mapping?.label ?? "").startsWith(id)
@@ -310,19 +333,22 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                   }
                 />
               </strong>
-              {displayedColumnsFiltered.map((column) => {
+              {displayedColumnsFiltered.map((column, index) => {
                 return (
                   <ColumnItem
                     key={column.id}
                     column={column}
+                    isTop={index === 0}
+                    isBottom={index === displayedColumnsFiltered.length - 1}
                     isMandatoryField={
                       exportMode
                         ? false
-                        : MANDATORY_DISPLAYED_COLUMNS.some((id) =>
+                        : (mandatoryDisplayedColumns ?? []).some((id) =>
                             (column?.id ?? "").startsWith(id)
                           )
                     }
                     onColumnItemDelete={onColumnItemDelete}
+                    onColumnItemChangeOrder={onColumnItemChangeOrder}
                   />
                 );
               })}

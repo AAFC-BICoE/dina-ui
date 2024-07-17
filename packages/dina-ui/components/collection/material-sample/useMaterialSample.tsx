@@ -56,10 +56,10 @@ import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
-import { StorageUnitCoordinates } from "../../../types/collection-api/resources/StorageUnitCoordinates";
+import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export function useMaterialSampleQuery(id?: string | null) {
-  const { bulkGet } = useApiClient();
+  const { bulkGet, apiClient } = useApiClient();
 
   const materialSampleQuery = useQuery<MaterialSample>(
     {
@@ -72,14 +72,13 @@ export function useMaterialSampleQuery(id?: string | null) {
         "preparationType",
         "preparationMethod",
         "preparedBy",
-        "storageUnit",
         "hierarchy",
         "organism",
         "materialSampleChildren",
         "parentMaterialSample",
         "projects",
         "assemblages",
-        "storageUnitCoordinates"
+        "storageUnitUsage"
       ].join(",")
     },
     {
@@ -103,6 +102,20 @@ export function useMaterialSampleQuery(id?: string | null) {
                 );
               }
             }
+          }
+        }
+
+        // Setup the storage unit if it's stored on the storage unit usage.
+        if (data?.storageUnitUsage?.id) {
+          const storageUnit = await apiClient.get<StorageUnitUsage>(
+            `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
+            {
+              include: "storageUnit"
+            }
+          );
+
+          if (storageUnit?.data?.storageUnit) {
+            data.storageUnit = storageUnit.data.storageUnit;
           }
         }
 
@@ -360,7 +373,7 @@ export function useMaterialSampleSave({
           ? find(formTemplate?.components, {
               name: STORAGE_COMPONENT_NAME
             })?.visible ?? false
-          : materialSample?.storageUnit?.id
+          : materialSample?.storageUnitUsage?.id
       )
     );
 
@@ -530,14 +543,9 @@ export function useMaterialSampleSave({
         organismsQuantity: undefined,
         organism: []
       }),
-      // Remove storageUnit and storageUnitCoordinates if toggle is disabled
+      // Remove storageUnit and storageUnitUsage if toggle is disabled
       ...(!enableStorage && {
-        storageUnit: { id: null, type: "storage-unit" },
-        storageUnitCoordinates: { id: null, type: "storage-unit-coordinates" }
-      }),
-      // Remove storageUnitCoordinates if toggle is enabled but no storageUnit edge case
-      ...(!submittedValues.storageUnit?.id && {
-        storageUnitCoordinates: { id: null, type: "storage-unit-coordinates" }
+        storageUnitUsage: { id: null, type: "storage-unit-usage" }
       }),
       ...(!enableCollectingEvent && {
         collectingEvent: { id: null, type: "collecting-event" }
@@ -672,30 +680,45 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
-    // Take user input storageUnitCoordinates to create storageUnitCoordinates resource
-    if (msDiff.storageUnitCoordinates && msPreprocessed.storageUnit?.id) {
-      // Create new storageUnitCoordinates
-      const storageUnitCoordinatesSaveArgs: SaveArgs<StorageUnitCoordinates>[] =
-        [
-          {
-            type: "storage-unit-coordinates",
-            resource: {
-              ...(msDiff.storageUnitCoordinates as StorageUnitCoordinates),
-              storageUnit: submittedValues.storageUnit,
-              type: "storage-unit-coordinates"
-            }
+    // Check if there is any changes to the storage unit or storage unit usage.
+    if (msDiff?.storageUnit?.id || msDiff?.storageUnitUsage?.id) {
+      // Create new storageUnitUsage, the storageUnit is saved here.
+      const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] = [
+        {
+          type: "storage-unit-usage",
+          resource: {
+            ...(pick(
+              msDiff.storageUnitUsage,
+              "wellRow",
+              "wellColumn"
+            ) as StorageUnitUsage),
+            storageUnit: msPreprocessed?.storageUnit?.id
+              ? pick(msPreprocessed.storageUnit, "id", "type")
+              : undefined,
+            type: "storage-unit-usage",
+            id: msPreprocessed.storageUnitUsage?.id ?? undefined,
+            usageType: "material-sample"
           }
-        ];
+        }
+      ];
 
-      const savedStorageUnitCoordinates = await save<StorageUnitCoordinates>(
-        storageUnitCoordinatesSaveArgs,
+      const savedStorageUnitUsage = await save<StorageUnitUsage>(
+        storageUnitUsageSaveArgs,
         {
           apiBaseUrl: "/collection-api"
         }
       );
 
-      // Create link between material sample and created StorageUnitCoordinates resource
-      msDiff.storageUnitCoordinates = savedStorageUnitCoordinates[0];
+      // Create link between material sample and created storageUnitUsage resource
+      msDiff.storageUnitUsage = savedStorageUnitUsage[0];
+    }
+
+    // If the storage unit is set to null in the diff then the storage unit usage should also be removed.
+    if (msDiff?.storageUnit?.id === null) {
+      msDiff.storageUnitUsage = {
+        id: null,
+        type: "storage-unit-usage"
+      };
     }
 
     const organismsWereChanged =
@@ -765,7 +788,13 @@ export function useMaterialSampleSave({
             data: pick(msDiffWithOrganisms.collection, "id", "type")
           }
         }),
-        ...getStorageUnitCoordinatesRelationship()
+        ...(msDiffWithOrganisms.storageUnitUsage && {
+          storageUnitUsage: {
+            data: msDiffWithOrganisms.storageUnitUsage?.id
+              ? pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
+              : null
+          }
+        })
       },
 
       // Set the attributes to undefined after they've been moved to "relationships":
@@ -774,8 +803,10 @@ export function useMaterialSampleSave({
       organism: undefined,
       assemblages: undefined,
       preparedBy: undefined,
-      storageUnitCoordinates: undefined
+      storageUnitUsage: undefined,
+      storageUnit: undefined
     };
+
     // delete the association if associated sample is left unfilled
     if (
       msInputWithRelationships.associations?.length === 1 &&
@@ -789,28 +820,6 @@ export function useMaterialSampleSave({
     };
 
     return saveOperation;
-
-    function getStorageUnitCoordinatesRelationship() {
-      if (msDiffWithOrganisms.storageUnitCoordinates) {
-        if (!!msDiffWithOrganisms?.storageUnitCoordinates.id) {
-          return {
-            storageUnitCoordinates: {
-              data: pick(
-                msDiffWithOrganisms.storageUnitCoordinates,
-                "id",
-                "type"
-              )
-            }
-          };
-        } else {
-          return {
-            storageUnitCoordinates: {
-              data: null
-            }
-          };
-        }
-      }
-    }
   }
 
   /**
@@ -911,17 +920,17 @@ export function useMaterialSampleSave({
         formik
       );
 
-      // Delete StorageUnitCoordinates if there is one when no StorageUnit linked
+      // Delete storageUnitUsage if there is one when no StorageUnit linked
       if (
         (!enableStorage || !submittedValues.storageUnit?.id) &&
-        submittedValues.storageUnitCoordinates?.id
+        submittedValues.storageUnitUsage?.id
       ) {
-        await save<StorageUnitCoordinates>(
+        await save<StorageUnitUsage>(
           [
             {
               delete: {
-                id: submittedValues.storageUnitCoordinates?.id ?? null,
-                type: "storage-unit-coordinates"
+                id: submittedValues.storageUnitUsage?.id ?? null,
+                type: "storage-unit-usage"
               }
             }
           ],
