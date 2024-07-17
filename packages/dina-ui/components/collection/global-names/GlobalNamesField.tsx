@@ -2,7 +2,7 @@ import { FieldWrapper, FieldWrapperProps, useDinaFormContext } from "common-ui";
 import { FormikProps } from "formik";
 
 import DOMPurify from "dompurify";
-import { isArray } from "lodash";
+import { isArray, startCase } from "lodash";
 import { Dispatch, SetStateAction, useState } from "react";
 import Switch from "react-switch";
 import {
@@ -126,13 +126,15 @@ export function GlobalNamesField({
 interface GlobalNamesReadOnlyProps {
   value: string;
   scientificNameDetails: ScientificNameSourceDetails;
+  displayFull?: boolean;
 }
 
 export function GlobalNamesReadOnly({
   value,
-  scientificNameDetails
+  scientificNameDetails,
+  displayFull
 }: GlobalNamesReadOnlyProps) {
-  const [showMore, setShowMore] = useState(false);
+  const [showMore, setShowMore] = useState(displayFull ?? false);
   const { formatMessage } = useDinaIntl();
 
   let safeHtmlLink: string = "";
@@ -160,12 +162,15 @@ export function GlobalNamesReadOnly({
   const initTaxonTree = (
     <>
       {pathsInit?.map((path, idx) => {
-        let boldText = ranksInit?.[idx] && (
+        let boldText = (
           <>
             <b>
               {" "}
-              {ranksInit[idx].charAt(0)?.toUpperCase() +
-                ranksInit[idx].substring(1)}{" "}
+              {startCase(
+                ranksInit?.[idx] === ""
+                  ? "unranked"
+                  : ranksInit?.[idx] ?? "unranked"
+              )}{" "}
               :
             </b>{" "}
             <>{path}</>{" "}
@@ -183,11 +188,14 @@ export function GlobalNamesReadOnly({
   const fullTaxonTree = (
     <>
       {paths?.map((path, idx) => {
-        let boldText = ranks?.[idx] && (
+        let boldText = (
           <>
             <b>
               {" "}
-              {ranks[idx].charAt(0)?.toUpperCase() + ranks[idx].substring(1)} :
+              {startCase(
+                ranks?.[idx] === "" ? "unranked" : ranks?.[idx] ?? "unranked"
+              )}{" "}
+              :
             </b>{" "}
             <>{path}</>{" "}
           </>
@@ -218,19 +226,21 @@ export function GlobalNamesReadOnly({
       ) : (
         <div className="mt-1">
           {showMore ? fullTaxonTree : initTaxonTree}
-          <a
-            role="button"
-            className="btn-link"
-            onClick={() => setShowMore(!showMore)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                setShowMore(!showMore);
-              }
-            }}
-            tabIndex={0}
-          >
-            {showMore ? formatMessage("showLess") : formatMessage("showMore")}{" "}
-          </a>
+          {!displayFull && (
+            <a
+              role="button"
+              className="btn-link"
+              onClick={() => setShowMore(!showMore)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  setShowMore(!showMore);
+                }
+              }}
+              tabIndex={0}
+            >
+              {showMore ? formatMessage("showLess") : formatMessage("showMore")}{" "}
+            </a>
+          )}
         </div>
       )}
     </div>
