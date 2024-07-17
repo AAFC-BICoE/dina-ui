@@ -692,9 +692,10 @@ export function useMaterialSampleSave({
               "wellRow",
               "wellColumn"
             ) as StorageUnitUsage),
+            type: "storage-unit-usage",
+            id: msPreprocessed.storageUnitUsage?.id ?? undefined,
             storageUnit: pick(submittedValues.storageUnit, "id", "type"),
-            usageType: "material-sample",
-            type: "storage-unit-usage"
+            usageType: "material-sample"
           }
         }
       ];
