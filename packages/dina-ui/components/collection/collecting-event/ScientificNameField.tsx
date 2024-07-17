@@ -8,7 +8,7 @@ import {
   GlobalNamesReadOnly,
   SelectedScientificNameView
 } from "../global-names/GlobalNamesField";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
 import { noop, uniqWith, isEqual } from "lodash";
 import { Determination } from "packages/dina-ui/types/collection-api/resources/Determination";
@@ -41,6 +41,8 @@ export function ScientificNameField({
 
   /** When an option is selected, this is used to temporarly hide the suggestions. */
   const [optionSelected, setOptionSelected] = useState<boolean>(false);
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useElasticSearchQuery({
     indexName: "dina_material_sample_index",
@@ -173,7 +175,8 @@ export function ScientificNameField({
               onBlur: () => {
                 setFocus(false);
                 setOptionSelected(false);
-              }
+              },
+              ref: inputRef
             };
 
             /**
@@ -194,6 +197,7 @@ export function ScientificNameField({
               });
 
               setOptionSelected(true);
+              inputRef.current?.blur?.();
             };
 
             return (
@@ -203,9 +207,6 @@ export function ScientificNameField({
                 suggestions={optionSelected === false ? suggestions : []}
                 getSuggestionValue={(s) => s.scientificName ?? ""}
                 onSuggestionsFetchRequested={({ value: fetchValue }) => {
-                  if (fetchValue !== inputValue) {
-                    setOptionSelected(false);
-                  }
                   setInputValue?.(fetchValue);
                 }}
                 onSuggestionSelected={(_event, data) =>
