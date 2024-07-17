@@ -41,8 +41,14 @@ export function AssignedStorage({
     <div>
       {withResponse(storageQuery, ({ data: storageUnit }) => {
         // Create storageUnitUsage Row options
-        const options: SelectOption<string>[] = [];
+        const options: SelectOption<string | null>[] = [];
         if (storageUnit.storageUnitType?.gridLayoutDefinition?.numberOfRows) {
+          // Empty option
+          options.push({
+            label: "<None>",
+            value: null
+          });
+
           for (
             let i = 1;
             i <=

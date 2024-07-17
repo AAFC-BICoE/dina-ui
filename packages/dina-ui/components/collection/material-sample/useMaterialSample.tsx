@@ -687,7 +687,11 @@ export function useMaterialSampleSave({
         {
           type: "storage-unit-usage",
           resource: {
-            ...(msDiff.storageUnitUsage as StorageUnitUsage),
+            ...(pick(
+              msDiff.storageUnitUsage,
+              "wellRow",
+              "wellColumn"
+            ) as StorageUnitUsage),
             storageUnit: pick(submittedValues.storageUnit, "id", "type"),
             usageType: "material-sample",
             type: "storage-unit-usage"

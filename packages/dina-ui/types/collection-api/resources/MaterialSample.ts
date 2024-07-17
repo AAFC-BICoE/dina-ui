@@ -44,7 +44,7 @@ export interface MaterialSampleAttributes {
   materialSampleRemarks?: string;
   materialSampleType?: MaterialSampleType;
   organism?: (Organism | null | undefined)[] | null;
-  storageUnit?: StorageUnit | null;
+  storageUnit?: StorageUnit;
 
   // Client-side only fields for the organism section:
   organismsQuantity?: number;
