@@ -530,14 +530,15 @@ export function useWorkbookConverter(
             attributeName === "storageUnitUsage"
           ) {
             // Check that storage unit is given if row has well column and well row
-            if (!!(resource as any)?.relationships?.storageUnit?.data?.id) {
-              // Link storageUnit to storageUnitUsage
-              value.relationships["storageUnit"] = {
-                data: (resource as any)?.relationships?.storageUnit?.data
-              };
-            } else {
+            if (
+              !(resource as any)?.storageUnitUsage?.relationships?.storageUnit
+                ?.data?.id
+            ) {
               throw new Error(formatMessage("workBookStorageUnitIsRequired"));
             }
+
+            // Supply the mandatory usage type.
+            value["usageType"] = "material-sample";
           }
 
           const newCreatedValue = await save(
