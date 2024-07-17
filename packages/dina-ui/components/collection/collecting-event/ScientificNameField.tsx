@@ -39,6 +39,9 @@ export function ScientificNameField({
   /** Is the textbox selected, this is used to determine if the suggestions should appear. */
   const [focus, setFocus] = useState<boolean>(false);
 
+  /** When an option is selected, this is used to temporarly hide the suggestions. */
+  const [optionSelected, setOptionSelected] = useState<boolean>(false);
+
   useElasticSearchQuery({
     indexName: "dina_material_sample_index",
     queryDSL: {
@@ -89,7 +92,11 @@ export function ScientificNameField({
             const determinations =
               organismRelationship?.attributes?.determination ?? [];
             determinations?.forEach((determination) => {
-              if (determination?.scientificName?.startsWith(inputValue)) {
+              if (
+                determination?.scientificName
+                  ?.toLowerCase()
+                  .startsWith(inputValue.toLowerCase())
+              ) {
                 suggestionsFound.push({
                   ...determination
                 });
@@ -163,7 +170,10 @@ export function ScientificNameField({
               autoComplete: "none",
               className: "form-control",
               onFocus: () => setFocus(true),
-              onBlur: () => setFocus(false)
+              onBlur: () => {
+                setFocus(false);
+                setOptionSelected(false);
+              }
             };
 
             /**
@@ -182,17 +192,22 @@ export function ScientificNameField({
                   selectedDetermination[fieldName]
                 );
               });
+
+              setOptionSelected(true);
             };
 
             return (
               <AutoSuggest<Determination>
                 {...props}
                 multiSection={false}
-                suggestions={suggestions}
+                suggestions={optionSelected === false ? suggestions : []}
                 getSuggestionValue={(s) => s.scientificName ?? ""}
-                onSuggestionsFetchRequested={({ value: fetchValue }) =>
-                  setInputValue?.(fetchValue)
-                }
+                onSuggestionsFetchRequested={({ value: fetchValue }) => {
+                  if (fetchValue !== inputValue) {
+                    setOptionSelected(false);
+                  }
+                  setInputValue?.(fetchValue);
+                }}
                 onSuggestionSelected={(_event, data) =>
                   suggestionSelected(data.suggestion)
                 }
