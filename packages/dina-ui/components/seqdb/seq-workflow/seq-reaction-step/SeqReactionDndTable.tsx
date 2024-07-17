@@ -76,19 +76,19 @@ export function SeqReactionDndTable({
     {
       id: "wellCoordinates",
       cell: ({ row }) =>
-        row.original?.pcrBatchItem?.storageUnitCoordinates?.wellRow === null ||
-        row.original?.pcrBatchItem?.storageUnitCoordinates?.wellColumn === null
+        row.original?.pcrBatchItem?.storageUnitUsage?.wellRow === null ||
+        row.original?.pcrBatchItem?.storageUnitUsage?.wellColumn === null
           ? ""
-          : row.original.pcrBatchItem?.storageUnitCoordinates?.wellRow +
+          : row.original.pcrBatchItem?.storageUnitUsage?.wellRow +
             "" +
-            row.original.pcrBatchItem?.storageUnitCoordinates?.wellColumn,
+            row.original.pcrBatchItem?.storageUnitUsage?.wellColumn,
       header: () => <FieldHeader name={"wellCoordinates"} />,
       enableSorting: false
     },
     {
       id: "tubeNumber",
       cell: ({ row }) =>
-        row.original?.pcrBatchItem?.storageUnitCoordinates?.cellNumber || "",
+        row.original?.pcrBatchItem?.storageUnitUsage?.cellNumber || "",
       header: () => <FieldHeader name={"tubeNumber"} />,
       enableSorting: false
     },

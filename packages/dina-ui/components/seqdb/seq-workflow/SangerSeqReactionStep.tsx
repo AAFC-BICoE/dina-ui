@@ -38,7 +38,7 @@ import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { SeqReactionDndTable } from "./seq-reaction-step/SeqReactionDndTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { useSeqReactionState } from "./seq-reaction-step/useSeqReactionState";
-import { StorageUnitCoordinates } from "packages/dina-ui/types/collection-api/resources/StorageUnitCoordinates";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export interface SangerSeqReactionStepProps {
   seqBatch?: SeqBatch;
@@ -179,9 +179,7 @@ export function SangerSeqReactionStep({
   const pcrBatchItemQuery = useQuery<PcrBatchItem[]>(
     {
       path: `seqdb-api/pcr-batch-item`,
-      include: ["pcrBatch", "materialSample", "storageUnitCoordinates"].join(
-        ","
-      ),
+      include: ["pcrBatch", "materialSample", "storageUnitUsage"].join(","),
       filter: {
         "pcrBatch.uuid": selectedPcrBatch?.id as string
       },
@@ -191,23 +189,20 @@ export function SangerSeqReactionStep({
       disabled: !selectedPcrBatch,
       onSuccess: async ({ data }) => {
         let processedPcrBatchItems: PcrBatchItem[] = [];
-        const fetchedStorageUnitCoordinates =
-          await bulkGet<StorageUnitCoordinates>(
-            data.map(
-              (item) =>
-                "/storage-unit-coordinates/" + item?.storageUnitCoordinates?.id
-            ),
-            {
-              apiBaseUrl: "/collection-api",
-              returnNullForMissingResource: true
-            }
-          );
+        const fetchedStorageUnitUsages = await bulkGet<StorageUnitUsage>(
+          data.map(
+            (item) => "/storage-unit-usage/" + item?.storageUnitUsage?.id
+          ),
+          {
+            apiBaseUrl: "/collection-api",
+            returnNullForMissingResource: true
+          }
+        );
         processedPcrBatchItems = data.map((batchItem) => ({
           ...batchItem,
-          storageUnitCoordinates: fetchedStorageUnitCoordinates.find(
-            (fetchedStorageUnitCoordinate) =>
-              fetchedStorageUnitCoordinate.id ===
-              batchItem.storageUnitCoordinates?.id
+          storageUnitUsage: fetchedStorageUnitUsages.find(
+            (fetchedStorageUnitUsage) =>
+              fetchedStorageUnitUsage.id === batchItem.storageUnitUsage?.id
           )
         }));
 
@@ -284,18 +279,18 @@ export function SangerSeqReactionStep({
     {
       id: "welColumn",
       cell: ({ row }) =>
-        row.original?.storageUnitCoordinates?.wellRow === null ||
-        row.original?.storageUnitCoordinates?.wellColumn === null
+        row.original?.storageUnitUsage?.wellRow === null ||
+        row.original?.storageUnitUsage?.wellColumn === null
           ? ""
-          : row.original?.storageUnitCoordinates?.wellRow +
+          : row.original?.storageUnitUsage?.wellRow +
             "" +
-            row.original?.storageUnitCoordinates?.wellColumn,
+            row.original?.storageUnitUsage?.wellColumn,
       header: () => <FieldHeader name={"wellCoordinates"} />,
       enableSorting: false
     },
     {
       id: "tubeNumber",
-      cell: ({ row }) => row.original?.storageUnitCoordinates?.cellNumber || "",
+      cell: ({ row }) => row.original?.storageUnitUsage?.cellNumber || "",
       header: () => <FieldHeader name={"tubeNumber"} />,
       enableSorting: false
     }

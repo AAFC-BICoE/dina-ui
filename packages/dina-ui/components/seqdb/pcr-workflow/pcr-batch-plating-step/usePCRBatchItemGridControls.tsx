@@ -12,7 +12,7 @@ import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { CellGrid } from "../../container-grid/ContainerGrid";
-import { StorageUnitCoordinates } from "packages/dina-ui/types/collection-api/resources/StorageUnitCoordinates";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 interface ContainerGridProps {
   pcrBatchId: string;
@@ -82,47 +82,42 @@ export function usePCRBatchItemGridControls({
       })(""),
       page: { limit: 1000 },
       path: `/seqdb-api/pcr-batch-item`,
-      include: "materialSample,storageUnitCoordinates"
+      include: "materialSample,storageUnitUsage"
     },
     {
       onSuccess: async ({ data: pcrBatchItems }) => {
         if (!pcrBatchItems) return;
 
         /**
-         * Fetch StorageUnitCoordinates linked to each PcrBatchItem
+         * Fetch StorageUnitUsage linked to each PcrBatchItem
          * @returns
          */
-        async function fetchStorageUnitCoordinates() {
+        async function fetchStorageUnitUsage() {
           if (!pcrBatchItems) return;
 
-          const storageUnitCoordinatesQuery =
-            await bulkGet<StorageUnitCoordinates>(
-              pcrBatchItems
-                .filter((item) => item.storageUnitCoordinates?.id)
-                .map(
-                  (item) =>
-                    "/storage-unit-coordinates/" +
-                    item.storageUnitCoordinates?.id
-                ),
-              { apiBaseUrl: "/collection-api" }
-            );
-          const pcrBatchItemsWithStorageUnitCoordinates = pcrBatchItems.map(
+          const storageUnitUsageQuery = await bulkGet<StorageUnitUsage>(
+            pcrBatchItems
+              .filter((item) => item.storageUnitUsage?.id)
+              .map(
+                (item) => "/storage-unit-usage/" + item.storageUnitUsage?.id
+              ),
+            { apiBaseUrl: "/collection-api" }
+          );
+          const pcrBatchItemsWithStorageUnitUsage = pcrBatchItems.map(
             (pcrBatchItem) => {
-              const queryStorageUnitCoordinates =
-                storageUnitCoordinatesQuery.find(
-                  (storageUnitCoordinate) =>
-                    storageUnitCoordinate?.id ===
-                    pcrBatchItem.storageUnitCoordinates?.id
-                );
+              const queryStorageUnitUsage = storageUnitUsageQuery.find(
+                (storageUnitUsage) =>
+                  storageUnitUsage?.id === pcrBatchItem.storageUnitUsage?.id
+              );
               return {
                 ...pcrBatchItem,
-                wellColumn: queryStorageUnitCoordinates?.wellColumn,
-                wellRow: queryStorageUnitCoordinates?.wellRow,
-                storageUnitCoordinates: queryStorageUnitCoordinates
+                wellColumn: queryStorageUnitUsage?.wellColumn,
+                wellRow: queryStorageUnitUsage?.wellRow,
+                storageUnitUsage: queryStorageUnitUsage
               };
             }
           );
-          pcrBatchItems = pcrBatchItemsWithStorageUnitCoordinates;
+          pcrBatchItems = pcrBatchItemsWithStorageUnitUsage;
         }
 
         /**
@@ -153,7 +148,7 @@ export function usePCRBatchItemGridControls({
         }
 
         setLoadingRelationships(true);
-        fetchStorageUnitCoordinates();
+        fetchStorageUnitUsage();
         fetchSamples((materialSamples) => {
           const pcrBatchItemsWithSampleNames =
             materialSamples.map<PcrBatchItemSample>((sample) => {
@@ -170,20 +165,20 @@ export function usePCRBatchItemGridControls({
 
           const pcrBatchItemsWithCoords = pcrBatchItemsWithSampleNames.filter(
             (item) =>
-              item.storageUnitCoordinates?.wellRow &&
-              item.storageUnitCoordinates?.wellColumn
+              item.storageUnitUsage?.wellRow &&
+              item.storageUnitUsage?.wellColumn
           );
 
           const pcrBatchItemsNoCoords = pcrBatchItemsWithSampleNames.filter(
             (item) =>
-              !item.storageUnitCoordinates?.wellRow &&
-              !item.storageUnitCoordinates?.wellColumn
+              !item.storageUnitUsage?.wellRow &&
+              !item.storageUnitUsage?.wellColumn
           );
 
           const newCellGrid: CellGrid<PcrBatchItemSample> = {};
           pcrBatchItemsWithCoords.forEach((item) => {
             newCellGrid[
-              `${item.storageUnitCoordinates?.wellRow}_${item.storageUnitCoordinates?.wellColumn}`
+              `${item.storageUnitUsage?.wellRow}_${item.storageUnitUsage?.wellColumn}`
             ] = item;
           });
 
@@ -368,61 +363,60 @@ export function usePCRBatchItemGridControls({
           newWellColumn = Number(col);
           newWellRow = row;
         }
-        if (movedItem.storageUnitCoordinates) {
-          movedItem.storageUnitCoordinates.wellColumn = newWellColumn;
-          movedItem.storageUnitCoordinates.wellRow = newWellRow;
+        if (movedItem.storageUnitUsage) {
+          movedItem.storageUnitUsage.wellColumn = newWellColumn;
+          movedItem.storageUnitUsage.wellRow = newWellRow;
         } else {
-          movedItem.storageUnitCoordinates = {
+          movedItem.storageUnitUsage = {
             wellColumn: newWellColumn,
             wellRow: newWellRow,
-            type: "storage-unit-coordinates"
+            type: "storage-unit-usage"
           };
         }
 
         return movedItem;
       });
-      // Save storageUnitCoordinates resources with valid wellColumn and wellRow
-      const storageUnitCoordinatesSaveArgs: SaveArgs<StorageUnitCoordinates>[] =
+      // Save storageUnitUsage resources with valid wellColumn and wellRow
+      const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] =
         materialSampleItemsToSave
           .filter(
             (item) =>
-              item.storageUnitCoordinates?.wellColumn &&
-              item.storageUnitCoordinates?.wellRow
+              item.storageUnitUsage?.wellColumn &&
+              item.storageUnitUsage?.wellRow
           )
           .map((item) => ({
-            type: "storage-unit-coordinates",
+            type: "storage-unit-usage",
             resource: {
-              wellColumn: item.storageUnitCoordinates?.wellColumn,
-              wellRow: item.storageUnitCoordinates?.wellRow,
+              wellColumn: item.storageUnitUsage?.wellColumn,
+              wellRow: item.storageUnitUsage?.wellRow,
               storageUnit: pcrBatch.storageUnit,
-              type: "storage-unit-coordinates",
-              id: item.storageUnitCoordinates?.id
+              type: "storage-unit-usage",
+              id: item.storageUnitUsage?.id,
+              usageType: "pcr-batch-item"
             }
           }));
-      const savedStorageUnitCoordinates = storageUnitCoordinatesSaveArgs.length
-        ? await save<StorageUnitCoordinates>(storageUnitCoordinatesSaveArgs, {
+      const savedStorageUnitUsage = storageUnitUsageSaveArgs.length
+        ? await save<StorageUnitUsage>(storageUnitUsageSaveArgs, {
             apiBaseUrl: "/collection-api"
           })
         : [];
 
       const saveArgs: SaveArgs<PcrBatchItem>[] = materialSampleItemsToSave.map(
         (item) => {
-          const matchedStorageunitCoordinates =
-            savedStorageUnitCoordinates.find(
-              (storageUnitCoordinate) =>
-                storageUnitCoordinate.wellColumn ===
-                  item.storageUnitCoordinates?.wellColumn &&
-                storageUnitCoordinate.wellRow ===
-                  item.storageUnitCoordinates?.wellRow
-            );
+          const matchedStorageUnitUsage = savedStorageUnitUsage.find(
+            (storageUnitUsage) =>
+              storageUnitUsage.wellColumn ===
+                item.storageUnitUsage?.wellColumn &&
+              storageUnitUsage.wellRow === item.storageUnitUsage?.wellRow
+          );
           return {
             resource: {
               type: "pcr-batch-item",
               id: item.id,
               relationships: {
-                storageUnitCoordinates: {
-                  data: matchedStorageunitCoordinates
-                    ? pick(matchedStorageunitCoordinates, "id", "type")
+                storageUnitUsage: {
+                  data: matchedStorageUnitUsage
+                    ? pick(matchedStorageUnitUsage, "id", "type")
                     : null
                 }
               }
@@ -434,23 +428,22 @@ export function usePCRBatchItemGridControls({
 
       await save<PcrBatchItem>(saveArgs, { apiBaseUrl: "/seqdb-api" });
 
-      // Delete storageUnitCoordinates resources without wellColumn or wellRow (presumably removed from grid)
-      const deleteStorageUnitCoordinatesArgs: DeleteArgs[] =
-        materialSampleItemsToSave
-          .filter(
-            (item) =>
-              (!item.storageUnitCoordinates?.wellColumn ||
-                !item.storageUnitCoordinates?.wellRow) &&
-              item.storageUnitCoordinates?.id
-          )
-          .map((item) => ({
-            delete: {
-              id: item.storageUnitCoordinates?.id ?? "",
-              type: "storage-unit-coordinates"
-            }
-          }));
-      if (deleteStorageUnitCoordinatesArgs.length) {
-        await save<StorageUnitCoordinates>(deleteStorageUnitCoordinatesArgs, {
+      // Delete storageUnitUsage resources without wellColumn or wellRow (presumably removed from grid)
+      const deleteStorageUnitUsageArgs: DeleteArgs[] = materialSampleItemsToSave
+        .filter(
+          (item) =>
+            (!item.storageUnitUsage?.wellColumn ||
+              !item.storageUnitUsage?.wellRow) &&
+            item.storageUnitUsage?.id
+        )
+        .map((item) => ({
+          delete: {
+            id: item.storageUnitUsage?.id ?? "",
+            type: "storage-unit-usage"
+          }
+        }));
+      if (deleteStorageUnitUsageArgs.length) {
+        await save<StorageUnitUsage>(deleteStorageUnitUsageArgs, {
           apiBaseUrl: "/collection-api"
         });
       }

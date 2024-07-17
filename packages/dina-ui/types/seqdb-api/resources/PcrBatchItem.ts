@@ -1,8 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { PcrBatch } from "./PcrBatch";
-import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { MaterialSample } from "../../collection-api";
-import { StorageUnitCoordinates } from "../../collection-api/resources/StorageUnitCoordinates";
+import { StorageUnitUsage } from "../../collection-api/resources/StorageUnitUsage";
 
 /**
  * The result for the PcrBatch item can be any string provided by the user. The enums below is
@@ -52,7 +51,7 @@ export interface PcrBatchItemAttributes {
 export interface PcrBatchItemRelationships {
   pcrBatch?: PcrBatch;
   materialSample?: MaterialSample;
-  storageUnitCoordinates?: StorageUnitCoordinates;
+  storageUnitUsage?: StorageUnitUsage;
 }
 
 export type PcrBatchItem = KitsuResource &

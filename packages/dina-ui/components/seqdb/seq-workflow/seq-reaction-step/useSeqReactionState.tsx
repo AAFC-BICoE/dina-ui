@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { compact } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { StorageUnitCoordinates } from "packages/dina-ui/types/collection-api/resources/StorageUnitCoordinates";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export function useSeqReactionState(seqBatchId?: string) {
   const [selectedResources, setSelectedResources] = useState<SeqReaction[]>([]);
@@ -68,7 +68,7 @@ export function useSeqReactionState(seqBatchId?: string) {
       await bulkGet<PcrBatchItem, true>(
         seqReactions?.map(
           (item) =>
-            `/pcr-batch-item/${item.pcrBatchItem?.id}?include=materialSample,pcrBatch,storageUnitCoordinates`
+            `/pcr-batch-item/${item.pcrBatchItem?.id}?include=materialSample,pcrBatch,storageUnitUsage`
         ),
         {
           apiBaseUrl: "/seqdb-api",
@@ -76,11 +76,10 @@ export function useSeqReactionState(seqBatchId?: string) {
         }
       )
     );
-    const storageUnitCoordinates = compact(
-      await bulkGet<StorageUnitCoordinates>(
+    const storageUnitUsage = compact(
+      await bulkGet<StorageUnitUsage>(
         pcrBatchItems?.map(
-          (item) =>
-            `/storage-unit-coordinates/${item.storageUnitCoordinates?.id}`
+          (item) => `/storage-unit-usage/${item.storageUnitUsage?.id}`
         ),
         {
           apiBaseUrl: "/collection-api",
@@ -90,8 +89,8 @@ export function useSeqReactionState(seqBatchId?: string) {
     );
     pcrBatchItems = pcrBatchItems.map((pcrBatchItem) => ({
       ...pcrBatchItem,
-      storageUnitCoordinates: storageUnitCoordinates.find(
-        (suc) => suc.id === pcrBatchItem.storageUnitCoordinates?.id
+      storageUnitUsage: storageUnitUsage.find(
+        (suc) => suc.id === pcrBatchItem.storageUnitUsage?.id
       )
     }));
 

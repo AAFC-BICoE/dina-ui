@@ -18,7 +18,7 @@ import {
   pcrBatchItemResultColor
 } from "../../../types/seqdb-api";
 import { getDeterminations } from "../../collection/material-sample/organismUtils";
-import { StorageUnitCoordinates } from "packages/dina-ui/types/collection-api/resources/StorageUnitCoordinates";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export function usePcrReactionData(pcrBatchId?: string) {
   const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>([]);
@@ -51,7 +51,7 @@ export function usePcrReactionData(pcrBatchId?: string) {
               }
             ]
           })(""),
-          include: "materialSample,storageUnitCoordinates",
+          include: "materialSample,storageUnitUsage",
           page: {
             limit: 1000 // Maximum page limit
           }
@@ -74,10 +74,9 @@ export function usePcrReactionData(pcrBatchId?: string) {
       return;
     }
     let processedPcrBatchItems: PcrBatchItem[] = [];
-    const fetchedStorageUnitCoordinates = await bulkGet<StorageUnitCoordinates>(
+    const fetchedStorageUnitUsages = await bulkGet<StorageUnitUsage>(
       batchItems.map(
-        (item) =>
-          "/storage-unit-coordinates/" + item?.storageUnitCoordinates?.id
+        (item) => "/storage-unit-usage/" + item?.storageUnitUsage?.id
       ),
       {
         apiBaseUrl: "/collection-api",
@@ -86,10 +85,9 @@ export function usePcrReactionData(pcrBatchId?: string) {
     );
     processedPcrBatchItems = batchItems.map((batchItem) => ({
       ...batchItem,
-      storageUnitCoordinates: fetchedStorageUnitCoordinates.find(
-        (fetchedStorageUnitCoordinate) =>
-          fetchedStorageUnitCoordinate.id ===
-          batchItem.storageUnitCoordinates?.id
+      storageUnitUsage: fetchedStorageUnitUsages.find(
+        (fetchedStorageUnitUsage) =>
+          fetchedStorageUnitUsage.id === batchItem.storageUnitUsage?.id
       )
     }));
 
@@ -160,10 +158,10 @@ export function PcrReactionTable({
       id: "wellCoordinates",
       cell: ({ row }) => (
         <>
-          {row.original?.storageUnitCoordinates?.wellRow === null ||
-          row.original?.storageUnitCoordinates?.wellColumn === null
+          {row.original?.storageUnitUsage?.wellRow === null ||
+          row.original?.storageUnitUsage?.wellColumn === null
             ? ""
-            : `${row.original.storageUnitCoordinates?.wellRow}${row.original.storageUnitCoordinates?.wellColumn}`}
+            : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
         </>
       ),
       header: () => <FieldHeader name={"wellCoordinates"} />
@@ -171,10 +169,10 @@ export function PcrReactionTable({
     {
       id: "tubeNumber",
       cell: ({ row: { original } }) =>
-        original?.storageUnitCoordinates?.cellNumber === undefined ? (
+        original?.storageUnitUsage?.cellNumber === undefined ? (
           <></>
         ) : (
-          <>{original.storageUnitCoordinates?.cellNumber}</>
+          <>{original.storageUnitUsage?.cellNumber}</>
         ),
       header: () => <FieldHeader name={"tubeNumber"} />
     },

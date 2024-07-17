@@ -23,8 +23,8 @@ const MATERIAL_SAMPLE_NAME_3 = "Name 3";
 const MATERIAL_SAMPLE_NAME_4 = "Name 4";
 const MATERIAL_SAMPLE_NAME_5 = "Name 5";
 
-const STORAGE_UNIT_COORDINATES_ID_4 = "storage-unit-coordinates-4";
-const STORAGE_UNIT_COORDINATES_ID_5 = "storage-unit-coordinates-5";
+const STORAGE_UNIT_USAGE_ID_4 = "storage-unit-usage-4";
+const STORAGE_UNIT_USAGE_ID_5 = "storage-unit-usage-5";
 
 const GRID_ROW_SIZE = 5;
 const GRID_COL_SIZE = 8;
@@ -46,15 +46,15 @@ let STORAGE_UNIT_1: StorageUnit = {
   }
 };
 
-let STORAGE_UNIT_COORDINATES_4 = {
-  id: STORAGE_UNIT_COORDINATES_ID_4,
-  type: "storage-unit-coordinates",
+let STORAGE_UNIT_USAGE_4 = {
+  id: STORAGE_UNIT_USAGE_ID_4,
+  type: "storage-unit-usage",
   wellColumn: 1,
   wellRow: "A"
 };
-let STORAGE_UNIT_COORDINATES_5 = {
-  id: STORAGE_UNIT_COORDINATES_ID_5,
-  type: "storage-unit-coordinates",
+let STORAGE_UNIT_USAGE_5 = {
+  id: STORAGE_UNIT_USAGE_ID_5,
+  type: "storage-unit-usage",
   wellColumn: 2,
   wellRow: "A"
 };
@@ -117,9 +117,9 @@ let PCR_BATCH_ITEMS: PcrBatchItem[] = [
     type: "pcr-batch-item",
     createdBy: "dina-admin",
     group: "aafc",
-    storageUnitCoordinates: {
-      id: STORAGE_UNIT_COORDINATES_ID_4,
-      type: "storage-unit-coordinates"
+    storageUnitUsage: {
+      id: STORAGE_UNIT_USAGE_ID_4,
+      type: "storage-unit-usage"
     },
     materialSample: {
       id: MATERIAL_SAMPLE_ID_4,
@@ -131,9 +131,9 @@ let PCR_BATCH_ITEMS: PcrBatchItem[] = [
     type: "pcr-batch-item",
     createdBy: "dina-admin",
     group: "aafc",
-    storageUnitCoordinates: {
-      id: STORAGE_UNIT_COORDINATES_ID_5,
-      type: "storage-unit-coordinates"
+    storageUnitUsage: {
+      id: STORAGE_UNIT_USAGE_ID_5,
+      type: "storage-unit-usage"
     },
     materialSample: {
       id: MATERIAL_SAMPLE_ID_5,
@@ -183,10 +183,10 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_5
         };
-      case "/storage-unit-coordinates/" + STORAGE_UNIT_COORDINATES_ID_4:
-        return STORAGE_UNIT_COORDINATES_4;
-      case "/storage-unit-coordinates/" + STORAGE_UNIT_COORDINATES_ID_5:
-        return STORAGE_UNIT_COORDINATES_5;
+      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_ID_4:
+        return STORAGE_UNIT_USAGE_4;
+      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_ID_5:
+        return STORAGE_UNIT_USAGE_5;
     }
   });
 });
@@ -225,15 +225,15 @@ describe("SangerPcrBatchItemGridStep component", () => {
       }
     };
 
-    STORAGE_UNIT_COORDINATES_4 = {
-      id: STORAGE_UNIT_COORDINATES_ID_4,
-      type: "storage-unit-coordinates",
+    STORAGE_UNIT_USAGE_4 = {
+      id: STORAGE_UNIT_USAGE_ID_4,
+      type: "storage-unit-usage",
       wellColumn: 1,
       wellRow: "A"
     };
-    STORAGE_UNIT_COORDINATES_5 = {
-      id: STORAGE_UNIT_COORDINATES_ID_5,
-      type: "storage-unit-coordinates",
+    STORAGE_UNIT_USAGE_5 = {
+      id: STORAGE_UNIT_USAGE_ID_5,
+      type: "storage-unit-usage",
       wellColumn: 2,
       wellRow: "A"
     };
@@ -296,9 +296,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
         type: "pcr-batch-item",
         createdBy: "dina-admin",
         group: "aafc",
-        storageUnitCoordinates: {
-          id: STORAGE_UNIT_COORDINATES_ID_4,
-          type: "storage-unit-coordinates"
+        storageUnitUsage: {
+          id: STORAGE_UNIT_USAGE_ID_4,
+          type: "storage-unit-usage"
         },
         materialSample: {
           id: MATERIAL_SAMPLE_ID_4,
@@ -310,9 +310,9 @@ describe("SangerPcrBatchItemGridStep component", () => {
         type: "pcr-batch-item",
         createdBy: "dina-admin",
         group: "aafc",
-        storageUnitCoordinates: {
-          id: STORAGE_UNIT_COORDINATES_ID_5,
-          type: "storage-unit-coordinates"
+        storageUnitUsage: {
+          id: STORAGE_UNIT_USAGE_ID_5,
+          type: "storage-unit-usage"
         },
         materialSample: {
           id: MATERIAL_SAMPLE_ID_5,
@@ -559,53 +559,58 @@ describe("SangerPcrBatchItemGridStep component", () => {
       [
         {
           resource: {
-            id: STORAGE_UNIT_COORDINATES_ID_4,
-            type: "storage-unit-coordinates",
+            id: STORAGE_UNIT_USAGE_ID_4,
+            type: "storage-unit-usage",
             wellColumn: 4,
             wellRow: "A",
-            storageUnit: STORAGE_UNIT_1
+            storageUnit: STORAGE_UNIT_1,
+            usageType: "pcr-batch-item"
           },
-          type: "storage-unit-coordinates"
+          type: "storage-unit-usage"
         },
         {
           resource: {
-            id: "storage-unit-coordinates-5",
-            type: "storage-unit-coordinates",
+            id: "storage-unit-usage-5",
+            type: "storage-unit-usage",
             wellColumn: 5,
             wellRow: "A",
-            storageUnit: STORAGE_UNIT_1
+            storageUnit: STORAGE_UNIT_1,
+            usageType: "pcr-batch-item"
           },
-          type: "storage-unit-coordinates"
+          type: "storage-unit-usage"
         },
         {
           resource: {
             id: undefined,
-            type: "storage-unit-coordinates",
+            type: "storage-unit-usage",
             wellColumn: 1,
             wellRow: "A",
-            storageUnit: STORAGE_UNIT_1
+            storageUnit: STORAGE_UNIT_1,
+            usageType: "pcr-batch-item"
           },
-          type: "storage-unit-coordinates"
+          type: "storage-unit-usage"
         },
         {
           resource: {
             id: undefined,
-            type: "storage-unit-coordinates",
+            type: "storage-unit-usage",
             wellColumn: 2,
             wellRow: "A",
-            storageUnit: STORAGE_UNIT_1
+            storageUnit: STORAGE_UNIT_1,
+            usageType: "pcr-batch-item"
           },
-          type: "storage-unit-coordinates"
+          type: "storage-unit-usage"
         },
         {
           resource: {
             id: undefined,
-            type: "storage-unit-coordinates",
+            type: "storage-unit-usage",
             wellColumn: 3,
             wellRow: "A",
-            storageUnit: STORAGE_UNIT_1
+            storageUnit: STORAGE_UNIT_1,
+            usageType: "pcr-batch-item"
           },
-          type: "storage-unit-coordinates"
+          type: "storage-unit-usage"
         }
       ],
       { apiBaseUrl: "/collection-api" }
@@ -684,14 +689,14 @@ describe("SangerPcrBatchItemGridStep component", () => {
       [
         {
           delete: {
-            id: "storage-unit-coordinates-4",
-            type: "storage-unit-coordinates"
+            id: "storage-unit-usage-4",
+            type: "storage-unit-usage"
           }
         },
         {
           delete: {
-            id: "storage-unit-coordinates-5",
-            type: "storage-unit-coordinates"
+            id: "storage-unit-usage-5",
+            type: "storage-unit-usage"
           }
         }
       ],

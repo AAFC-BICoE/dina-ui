@@ -30,9 +30,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Good Band",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-1",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-1",
+      type: "storage-unit-usage",
       wellRow: "A",
       wellColumn: 1,
       cellNumber: 1
@@ -49,9 +49,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Good Band",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-2",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-2",
+      type: "storage-unit-usage",
       wellRow: "A",
       wellColumn: 2,
       cellNumber: 2
@@ -68,9 +68,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Good Band",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-3",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-3",
+      type: "storage-unit-usage",
       wellRow: "A",
       wellColumn: 3,
       cellNumber: 3
@@ -87,9 +87,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Good Band",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-4",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-4",
+      type: "storage-unit-usage",
       wellRow: "A",
       wellColumn: 4,
       cellNumber: 4
@@ -106,9 +106,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Good Band",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-5",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-5",
+      type: "storage-unit-usage",
       wellRow: "A",
       wellColumn: 5,
       cellNumber: 5
@@ -125,9 +125,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Weak Band",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-6",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-6",
+      type: "storage-unit-usage",
       wellRow: "B",
       wellColumn: 1,
       cellNumber: 6
@@ -144,9 +144,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Weak Band",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-7",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-7",
+      type: "storage-unit-usage",
       wellRow: "B",
       wellColumn: 2,
       cellNumber: 7
@@ -163,9 +163,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Weak Band",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-8",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-8",
+      type: "storage-unit-usage",
       wellRow: "B",
       wellColumn: 3,
       cellNumber: 8
@@ -182,9 +182,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Weak Band",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-9",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-9",
+      type: "storage-unit-usage",
       wellRow: "B",
       wellColumn: 4,
       cellNumber: 9
@@ -201,9 +201,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Weak Band",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-10",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-10",
+      type: "storage-unit-usage",
       wellRow: "B",
       wellColumn: 5,
       cellNumber: 10
@@ -220,9 +220,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Multiple Bands",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-11",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-11",
+      type: "storage-unit-usage",
       wellRow: "C",
       wellColumn: 1,
       cellNumber: 11
@@ -239,9 +239,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Multiple Bands",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-12",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-12",
+      type: "storage-unit-usage",
       wellRow: "C",
       wellColumn: 2,
       cellNumber: 12
@@ -258,9 +258,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Multiple Bands",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-13",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-13",
+      type: "storage-unit-usage",
       wellRow: "C",
       wellColumn: 3,
       cellNumber: 13
@@ -277,9 +277,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Multiple Bands",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-14",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-14",
+      type: "storage-unit-usage",
       wellRow: "C",
       wellColumn: 4,
       cellNumber: 14
@@ -296,9 +296,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Multiple Bands",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-15",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-15",
+      type: "storage-unit-usage",
       wellRow: "C",
       wellColumn: 5,
       cellNumber: 15
@@ -315,9 +315,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Contaminated",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-16",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-16",
+      type: "storage-unit-usage",
       wellRow: "D",
       wellColumn: 1,
       cellNumber: 16
@@ -334,9 +334,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Contaminated",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-17",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-17",
+      type: "storage-unit-usage",
       wellRow: "D",
       wellColumn: 2,
       cellNumber: 17
@@ -353,9 +353,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Contaminated",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-18",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-18",
+      type: "storage-unit-usage",
       wellRow: "D",
       wellColumn: 3,
       cellNumber: 18
@@ -372,9 +372,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Contaminated",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-19",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-19",
+      type: "storage-unit-usage",
       wellRow: "D",
       wellColumn: 4,
       cellNumber: 19
@@ -391,9 +391,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Contaminated",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-20",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-20",
+      type: "storage-unit-usage",
       wellRow: "D",
       wellColumn: 5,
       cellNumber: 20
@@ -410,9 +410,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Smear",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-21",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-21",
+      type: "storage-unit-usage",
       wellRow: "E",
       wellColumn: 1,
       cellNumber: 21
@@ -429,9 +429,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Smear",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-22",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-22",
+      type: "storage-unit-usage",
       wellRow: "E",
       wellColumn: 2,
       cellNumber: 22
@@ -448,9 +448,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Smear",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-23",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-23",
+      type: "storage-unit-usage",
       wellRow: "E",
       wellColumn: 3,
       cellNumber: 23
@@ -467,9 +467,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Smear",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-24",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-24",
+      type: "storage-unit-usage",
       wellRow: "E",
       wellColumn: 4,
       cellNumber: 24
@@ -486,9 +486,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Smear",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-25",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-25",
+      type: "storage-unit-usage",
       wellRow: "E",
       wellColumn: 5,
       cellNumber: 25
@@ -505,9 +505,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "Custom Result",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-26",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-26",
+      type: "storage-unit-usage",
       wellRow: "F",
       wellColumn: 1,
       cellNumber: 26
@@ -524,9 +524,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-27",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-27",
+      type: "storage-unit-usage",
       wellRow: "F",
       wellColumn: 2,
       cellNumber: 27
@@ -543,9 +543,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-28",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-28",
+      type: "storage-unit-usage",
       wellRow: "F",
       wellColumn: 3,
       cellNumber: 28
@@ -562,9 +562,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-29",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-29",
+      type: "storage-unit-usage",
       wellRow: "F",
       wellColumn: 4,
       cellNumber: 29
@@ -581,9 +581,9 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
     result: "",
-    storageUnitCoordinates: {
-      id: "storage-unit-coordinates-30",
-      type: "storage-unit-coordinates",
+    storageUnitUsage: {
+      id: "storage-unit-usage-30",
+      type: "storage-unit-usage",
       wellRow: "F",
       wellColumn: 5,
       cellNumber: 30
