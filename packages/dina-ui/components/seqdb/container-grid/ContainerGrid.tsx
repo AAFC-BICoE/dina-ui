@@ -70,8 +70,11 @@ export function ContainerGrid<
       size: 40,
       meta: {
         style: {
+          position: "sticky",
+          left: 0,
           background: "white",
-          boxShadow: "11px 0px 9px 0px rgba(0,0,0,0.1)"
+          boxShadow: "7px 0px 9px 0px rgba(0,0,0,0.1)",
+          zIndex: 500
         }
       }
     });
@@ -117,6 +120,10 @@ export function ContainerGrid<
       <style>{`
         .rt-td {
           padding: 0 !important;
+        }
+
+        .ReactTable {
+          overflow-x: auto;
         }
       `}</style>
       <ReactTable<any>
