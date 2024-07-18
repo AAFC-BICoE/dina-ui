@@ -74,20 +74,23 @@ export function usePcrReactionData(pcrBatchId?: string) {
       return;
     }
     let processedPcrBatchItems: PcrBatchItem[] = [];
+    const batchItemPaths = batchItems
+      .filter((batchItem) => !!batchItem.storageUnitUsage)
+      .map((item) => "/storage-unit-usage/" + item?.storageUnitUsage?.id);
     const fetchedStorageUnitUsages = await bulkGet<StorageUnitUsage>(
-      batchItems.map(
-        (item) => "/storage-unit-usage/" + item?.storageUnitUsage?.id
-      ),
+      batchItemPaths,
       {
         apiBaseUrl: "/collection-api",
         returnNullForMissingResource: true
       }
     );
+
     processedPcrBatchItems = batchItems.map((batchItem) => ({
       ...batchItem,
       storageUnitUsage: fetchedStorageUnitUsages.find(
-        (fetchedStorageUnitUsage) =>
-          fetchedStorageUnitUsage.id === batchItem.storageUnitUsage?.id
+        (fetchedStorageUnitUsage) => {
+          return fetchedStorageUnitUsage?.id === batchItem.storageUnitUsage?.id;
+        }
       )
     }));
 
@@ -156,14 +159,17 @@ export function PcrReactionTable({
   const PCR_REACTION_COLUMN: ColumnDef<PcrBatchItem>[] = [
     {
       id: "wellCoordinates",
-      cell: ({ row }) => (
-        <>
-          {row.original?.storageUnitUsage?.wellRow === null ||
-          row.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
-        </>
-      ),
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
       header: () => <FieldHeader name={"wellCoordinates"} />
     },
     {
