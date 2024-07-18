@@ -30,7 +30,7 @@ export function SeqReactionTable({
     {
       id: "pcrTubeNumber",
       cell: ({ row: { original } }) => (
-        <div>{original?.pcrBatchItem?.cellNumber || ""}</div>
+        <div>{original?.pcrBatchItem?.storageUnitUsage?.cellNumber || ""}</div>
       ),
       header: () => (
         <b>
@@ -53,9 +53,9 @@ export function SeqReactionTable({
       id: "pcrWellCoordinates",
       cell: ({ row }) => (
         <div>
-          {(row.original.pcrBatchItem?.wellRow ?? "") +
+          {(row.original.pcrBatchItem?.storageUnitUsage?.wellRow ?? "") +
             "" +
-            (row.original.pcrBatchItem?.wellColumn ?? "")}
+            (row.original.pcrBatchItem?.storageUnitUsage?.wellColumn ?? "")}
         </div>
       ),
       header: () => (

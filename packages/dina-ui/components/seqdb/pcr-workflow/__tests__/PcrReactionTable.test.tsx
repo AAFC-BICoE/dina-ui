@@ -27,14 +27,14 @@ describe("PcrReactionTable component", () => {
     wrapper.find("table tbody tr").forEach((row) => {
       // Well coordinates
       expect(row.find("td").at(0).text()).toEqual(
-        PCR_BATCH_ITEMS?.[rowNumber]?.wellRow +
+        PCR_BATCH_ITEMS?.[rowNumber]?.storageUnitUsage?.wellRow +
           "" +
-          PCR_BATCH_ITEMS?.[rowNumber]?.wellColumn
+          PCR_BATCH_ITEMS?.[rowNumber]?.storageUnitUsage?.wellColumn
       );
 
       // Tube Number
       expect(row.find("td").at(1).text()).toEqual(
-        "" + PCR_BATCH_ITEMS?.[rowNumber]?.cellNumber
+        "" + PCR_BATCH_ITEMS?.[rowNumber]?.storageUnitUsage?.cellNumber
       );
 
       // Primary ID

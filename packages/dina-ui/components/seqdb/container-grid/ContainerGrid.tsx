@@ -131,6 +131,7 @@ export function ContainerGrid<
         columns={tableColumns}
         data={tableData}
         showPagination={false}
+        enableSorting={false}
       />
     </div>
   );

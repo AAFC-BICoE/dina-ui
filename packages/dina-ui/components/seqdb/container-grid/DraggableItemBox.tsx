@@ -13,9 +13,7 @@ interface DraggableItemBoxProps<ItemType extends { sampleName?: string }> {
 
 export const ITEM_BOX_DRAG_KEY = "materialSampleItem";
 
-export function DraggableItemBox<
-  ItemType extends { sampleId?: string; sampleName?: string }
->({
+export function DraggableItemBox<ItemType extends { sampleName?: string }>({
   onClick = noop,
   batchItemSample,
   coordinates,

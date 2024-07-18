@@ -18,6 +18,7 @@ import {
   pcrBatchItemResultColor
 } from "../../../types/seqdb-api";
 import { getDeterminations } from "../../collection/material-sample/organismUtils";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export function usePcrReactionData(pcrBatchId?: string) {
   const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>([]);
@@ -50,27 +51,50 @@ export function usePcrReactionData(pcrBatchId?: string) {
               }
             ]
           })(""),
-          include: "materialSample",
+          include: "materialSample,storageUnitUsage",
           page: {
             limit: 1000 // Maximum page limit
           }
         })
-        .then((response) => {
+        .then(async (response) => {
           const batchItems: PersistedResource<PcrBatchItem>[] =
             response.data?.filter(
               (item) => item?.materialSample?.id !== undefined
             );
-          fetchMaterialSamples(batchItems);
+          await fetchMaterialSamples(batchItems);
         });
     }
   }
 
-  function fetchMaterialSamples(batchItems: PersistedResource<PcrBatchItem>[]) {
+  async function fetchMaterialSamples(
+    batchItems: PersistedResource<PcrBatchItem>[]
+  ) {
     if (!batchItems || batchItems.length === 0) {
       setLoading(false);
       return;
     }
-    bulkGet<MaterialSampleSummary>(
+    let processedPcrBatchItems: PcrBatchItem[] = [];
+    const batchItemPaths = batchItems
+      .filter((batchItem) => !!batchItem.storageUnitUsage)
+      .map((item) => "/storage-unit-usage/" + item?.storageUnitUsage?.id);
+    const fetchedStorageUnitUsages = await bulkGet<StorageUnitUsage>(
+      batchItemPaths,
+      {
+        apiBaseUrl: "/collection-api",
+        returnNullForMissingResource: true
+      }
+    );
+
+    processedPcrBatchItems = batchItems.map((batchItem) => ({
+      ...batchItem,
+      storageUnitUsage: fetchedStorageUnitUsages.find(
+        (fetchedStorageUnitUsage) => {
+          return fetchedStorageUnitUsage?.id === batchItem.storageUnitUsage?.id;
+        }
+      )
+    }));
+
+    const fetchedMaterialSampleSummary = await bulkGet<MaterialSampleSummary>(
       batchItems.map(
         (item) => "/material-sample-summary/" + item?.materialSample?.id
       ),
@@ -78,20 +102,20 @@ export function usePcrReactionData(pcrBatchId?: string) {
         apiBaseUrl: "/collection-api",
         returnNullForMissingResource: true
       }
-    ).then((response) => {
-      const sampleSummaries = compact(response ?? []);
-      batchItems = batchItems.filter(
-        (item) =>
-          !!sampleSummaries.find(
-            (sample) =>
-              item.materialSample?.id && sample.id === item.materialSample?.id
-          )
-      );
-      sortPcrBatchItems(batchItems, sampleSummaries);
-      setPcrBatchItems(batchItems);
-      setMaterialSampleSummaries(sampleSummaries);
-      setLoading(false);
-    });
+    );
+    const sampleSummaries = compact(fetchedMaterialSampleSummary ?? []);
+    processedPcrBatchItems = processedPcrBatchItems.filter(
+      (item) =>
+        !!sampleSummaries.find(
+          (sample) =>
+            item.materialSample?.id && sample.id === item.materialSample?.id
+        )
+    );
+
+    sortPcrBatchItems(processedPcrBatchItems, sampleSummaries);
+    setPcrBatchItems(processedPcrBatchItems);
+    setMaterialSampleSummaries(sampleSummaries);
+    setLoading(false);
   }
 
   function sortPcrBatchItems(
@@ -135,19 +159,27 @@ export function PcrReactionTable({
   const PCR_REACTION_COLUMN: ColumnDef<PcrBatchItem>[] = [
     {
       id: "wellCoordinates",
-      cell: ({ row }) => (
-        <>
-          {row.original?.wellRow === null || row.original?.wellColumn === null
-            ? ""
-            : `${row.original.wellRow}${row.original.wellColumn}`}
-        </>
-      ),
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
       header: () => <FieldHeader name={"wellCoordinates"} />
     },
     {
       id: "tubeNumber",
       cell: ({ row: { original } }) =>
-        original?.cellNumber === undefined ? <></> : <>{original.cellNumber}</>,
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
       header: () => <FieldHeader name={"tubeNumber"} />
     },
     {
@@ -222,6 +254,7 @@ export function PcrReactionTable({
       data={sortBy(pcrBatchItems, "cellNumber")}
       showPagination={false}
       manualPagination={true}
+      enableSorting={false}
     />
   );
 }
