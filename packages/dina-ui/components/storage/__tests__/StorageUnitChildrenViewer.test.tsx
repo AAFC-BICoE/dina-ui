@@ -90,7 +90,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       };
     case "collection-api/material-sample":
       // Stored material samples:
-      if (params?.filter?.rsql === "storageUnit.uuid==A") {
+      if (params?.filter?.rsql === "storageUnitUsage.storageUnit.uuid==A") {
         return { data: [{ id: "ms-1", type: "material-sample" }] };
       } else {
         return { data: [{ id: "ms-1", type: "material-sample" }] };

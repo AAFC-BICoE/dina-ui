@@ -1,6 +1,5 @@
 import React from "react";
 import { CellGrid, ContainerGrid } from "../seqdb/container-grid/ContainerGrid";
-import { LoadingSpinner, useQuery } from "../../../common-ui/lib";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { useState, useEffect } from "react";
 import { isArray, noop } from "lodash";
@@ -53,12 +52,20 @@ export function useMaterialSampleSelectCoordinatesControls({
   useEffect(() => {
     const newCellGrid: CellGrid<MaterialSample & { sampleName?: string }> = {};
     if (isArray(materialSamples)) {
+      const storageUnitUsages = materialSamples?.map(
+        (sample) => sample.storageUnitUsage
+      );
       materialSamples.forEach((item) => {
-        newCellGrid[
-          `${item.storageUnitCoordinates?.wellRow?.toUpperCase()}_${
-            item.storageUnitCoordinates?.wellColumn
-          }`
-        ] = { sampleName: item.materialSampleName, ...item };
+        const storageUnitUsage = storageUnitUsages?.find(
+          (usage) => usage?.id === item?.storageUnitUsage?.id
+        );
+        if (storageUnitUsage) {
+          newCellGrid[
+            `${storageUnitUsage?.wellRow?.toUpperCase()}_${
+              storageUnitUsage?.wellColumn
+            }`
+          ] = { sampleName: item.materialSampleName, ...item };
+        }
       });
     }
 

@@ -22,10 +22,8 @@ import {
 } from "../../../types/collection-api";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { TabbedArrayField } from "../TabbedArrayField";
-import {
-  GlobalNamesField,
-  SelectedScientificNameView
-} from "../global-names/GlobalNamesField";
+import { GlobalNamesField } from "../global-names/GlobalNamesField";
+import { ScientificNameField } from "./ScientificNameField";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -246,46 +244,10 @@ export function DeterminationField({
                   className="non-strip"
                   sectionName="organism-determination-section"
                 >
-                  <TextField
-                    {...fieldProps("scientificName")}
-                    readOnlyRender={(value, _form) => {
-                      const scientificNameSrcDetailUrlVal = _form.getFieldMeta(
-                        fieldProps("scientificNameDetails.sourceUrl").name
-                      ).value as string;
-                      return (
-                        <SelectedScientificNameView
-                          value={value}
-                          formik={_form}
-                          scientificNameDetailsField={
-                            fieldProps("scientificNameDetails").name
-                          }
-                          scientificNameSrcDetailUrlVal={
-                            scientificNameSrcDetailUrlVal
-                          }
-                        />
-                      );
-                    }}
-                    onChangeExternal={(_form, _, newVal) => {
-                      if (newVal && newVal?.trim().length > 0) {
-                        _form.setFieldValue(
-                          fieldProps("scientificNameSource").name,
-                          isManualInput ? "CUSTOM" : null
-                        );
-                      } else {
-                        if (!isManualInput) {
-                          _form.setFieldValue(
-                            fieldProps("scientificNameSource").name,
-                            null
-                          );
-                          _form.setFieldValue(
-                            fieldProps("scientificNameDetails").name,
-                            null
-                          );
-                        }
-                      }
-                    }}
+                  <ScientificNameField
+                    fieldProps={fieldProps}
+                    isManualInput={isManualInput}
                   />
-                  {!readOnly && <hr />}
 
                   {/* determination scientific name search is used for search scientific name and display search result entry in edit mode */}
                   {!readOnly && (
