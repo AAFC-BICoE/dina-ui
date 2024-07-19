@@ -100,19 +100,16 @@ export default function MetadataListPage() {
         (original as any)?.data?.attributes?.resourceExternalURL ? (
           <Link
             href={`/object-store/object/external-resource-view?id=${original?.id}`}
+            className="m-auto"
           >
-            <a className="m-auto">
-              <DinaMessage id="detailsPageLink" />
-            </a>
+            <DinaMessage id="detailsPageLink" />
           </Link>
         ) : (original as any).data?.attributes?.originalFilename ? (
           <Link
             href={`/object-store/object/view?id=${original.id}`}
-            passHref={true}
+            id={`file-name-${original.id}`}
           >
-            <a id={`file-name-${original.id}`}>
-              {(original as any).data?.attributes?.originalFilename}
-            </a>
+            {(original as any).data?.attributes?.originalFilename}
           </Link>
         ) : null,
       header: () => <FieldHeader name="originalFilename" />,
@@ -200,9 +197,7 @@ export default function MetadataListPage() {
           </div>
           <div className="list-inline-item float-end">
             <Link href="/object-store/upload">
-              <a>
-                <DinaMessage id="uploadPageTitle" />
-              </a>
+              <DinaMessage id="uploadPageTitle" />
             </Link>
           </div>
         </div>

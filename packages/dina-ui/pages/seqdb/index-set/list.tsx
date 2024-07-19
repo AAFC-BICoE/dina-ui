@@ -22,11 +22,7 @@ const INDEX_SET_TABLE_COLUMNS: ColumnDefinition<IndexSet>[] = [
       row: {
         original: { id, name }
       }
-    }) => (
-      <Link href={`/seqdb/index-set/view?id=${id}`}>
-        <a>{name}</a>
-      </Link>
-    ),
+    }) => <Link href={`/seqdb/index-set/view?id=${id}`}>{name}</Link>,
     header: "Name",
     accessorKey: "name"
   },

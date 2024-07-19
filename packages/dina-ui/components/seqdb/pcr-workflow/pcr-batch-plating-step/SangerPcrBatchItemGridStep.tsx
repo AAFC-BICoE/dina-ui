@@ -78,10 +78,12 @@ export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
       <div className="mt-3">
         <div className="row mb-2">
           <div className="col-12 text-end">
-            <Link href={`/seqdb/pcr-workflow/worksheet?id=${pcrBatchId}`}>
-              <a target="_blank" className="btn btn-primary">
-                Worksheet
-              </a>
+            <Link
+              href={`/seqdb/pcr-workflow/worksheet?id=${pcrBatchId}`}
+              target="_blank"
+              className="btn btn-primary"
+            >
+              Worksheet
             </Link>
           </div>
         </div>
@@ -101,10 +103,12 @@ export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
       {!editMode && (
         <div className="row">
           <div className="col-12 text-end">
-            <Link href={`/seqdb/pcr-workflow/worksheet?id=${pcrBatchId}`}>
-              <a target="_blank" className="btn btn-primary">
-                Worksheet
-              </a>
+            <Link
+              href={`/seqdb/pcr-workflow/worksheet?id=${pcrBatchId}`}
+              target="_blank"
+              className="btn btn-primary"
+            >
+              Worksheet
             </Link>
           </div>
         </div>

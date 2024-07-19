@@ -21,8 +21,8 @@ export function GroupFieldView(props: GroupFieldViewProps) {
 export function GroupLabel({ groupName }) {
   const { label, id } = useGroupLabel(groupName);
   return id ? (
-    <Link href={`/group/view?id=${id}`}>
-      {<a style={{ color: "#525252" }}>{label}</a>}
+    <Link href={`/group/view?id=${id}`} style={{ color: "#525252" }}>
+      {label}
     </Link>
   ) : (
     <>{label}</>

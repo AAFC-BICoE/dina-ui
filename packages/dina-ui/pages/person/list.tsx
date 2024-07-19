@@ -15,11 +15,7 @@ const AGENT_TABLE_COLUMNS: ColumnDefinition<Person>[] = [
       row: {
         original: { id, displayName }
       }
-    }) => (
-      <Link href={`/person/view?id=${id}`}>
-        <a>{displayName}</a>
-      </Link>
-    ),
+    }) => <Link href={`/person/view?id=${id}`}>{displayName}</Link>,
     accessorKey: "displayName"
   },
   "email",

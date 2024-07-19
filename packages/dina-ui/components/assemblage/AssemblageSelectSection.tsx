@@ -74,7 +74,7 @@ export function AssemblageSelectField({
                     <div className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined">
                       <FaFolderOpen />
                       <Link href={"/collection/assemblage/view?id=" + val.id}>
-                        <a>{val.name}</a>
+                        {val.name}
                       </Link>
                     </div>
                   }

@@ -7,9 +7,7 @@ import { RevisionRowConfig } from "../revision-row-config";
 
 export const PROJECT_REVISION_ROW_CONFIG: RevisionRowConfig<Project> = {
   name: ({ id, name }) => (
-    <Link href={`/collection/project/view?id=${id}`}>
-      <a>{name || id}</a>
-    </Link>
+    <Link href={`/collection/project/view?id=${id}`}>{name || id}</Link>
   ),
   customValueCells: {
     attachment: ({
@@ -34,7 +32,10 @@ export const PROJECT_REVISION_ROW_CONFIG: RevisionRowConfig<Project> = {
         )}
       </div>
     ),
-    multilingualDescription: descriptionCell(true, false, "multilingualDescription")
-      .cell
+    multilingualDescription: descriptionCell(
+      true,
+      false,
+      "multilingualDescription"
+    ).cell
   }
 };

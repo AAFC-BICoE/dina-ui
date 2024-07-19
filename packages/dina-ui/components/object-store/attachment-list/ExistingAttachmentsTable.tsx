@@ -76,8 +76,8 @@ export function ExistingAttachmentsTable({
         }
 
         return metadata?.originalFilename ? (
-          <Link href={`/object-store/object/view?id=${id}`} passHref={true}>
-            <a>{metadata?.originalFilename}</a>
+          <Link href={`/object-store/object/view?id=${id}`}>
+            {metadata?.originalFilename}
           </Link>
         ) : null;
       },

@@ -27,9 +27,7 @@ export default function CollectingEventListPage() {
         }
       }) => (
         <Link href={`/collection/collecting-event/view?id=${id}`}>
-          <a>
-            <DinaMessage id="viewDetails" />
-          </a>
+          <DinaMessage id="viewDetails" />
         </Link>
       ),
       accessorKey: "id",

@@ -22,9 +22,7 @@ export function ReadOnlyValue({ value, link, bold }: ReadOnlyValueProps) {
       style={{ whiteSpace: "pre-wrap", fontWeight: bold ? "bold" : undefined }}
     >
       {link ? (
-        <Link href={link}>
-          <a>{value}</a>
-        </Link>
+        <Link href={link}>{value}</Link>
       ) : Array.isArray(value) ? (
         value.map((val, idx) => {
           const displayString = val.name

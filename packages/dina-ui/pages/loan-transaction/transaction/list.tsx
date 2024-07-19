@@ -17,9 +17,7 @@ export const TRANSACTION_TABLE_COLUMNS: TableColumn<Transaction>[] = [
   {
     cell: ({ row: { original } }) => (
       <Link href={`/loan-transaction/transaction/view?id=${original.id}`}>
-        <a>
-          {(original as any).data?.attributes?.transactionNumber || original.id}
-        </a>
+        {(original as any).data?.attributes?.transactionNumber || original.id}
       </Link>
     ),
     header: () => <FieldHeader name="transactionNumber" />,

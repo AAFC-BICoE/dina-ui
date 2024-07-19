@@ -45,13 +45,8 @@ export const getColumnDefinition: () => ColumnDefinition<MaterialSample>[] =
             original: { id, materialSampleName, dwcOtherCatalogNumbers }
           }
         }) => (
-          <Link
-            href={`/collection/material-sample/view?id=${id}`}
-            passHref={true}
-          >
-            <a>
-              {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-            </a>
+          <Link href={`/collection/material-sample/view?id=${id}`}>
+            {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
           </Link>
         ),
         accessorKey: "materialSampleName"
@@ -124,15 +119,17 @@ export function SampleListLayout({
           {
             cell: ({ row: { original: sample } }) => (
               <div className="d-flex">
-                <Link href={`/collection/material-sample/view?id=${sample.id}`}>
-                  <a className="btn btn-link">
-                    <DinaMessage id="view" />
-                  </a>
+                <Link
+                  href={`/collection/material-sample/view?id=${sample.id}`}
+                  className="btn btn-link"
+                >
+                  <DinaMessage id="view" />
                 </Link>
-                <Link href={`/collection/material-sample/edit?id=${sample.id}`}>
-                  <a className="btn btn-link">
-                    <DinaMessage id="editButtonText" />
-                  </a>
+                <Link
+                  href={`/collection/material-sample/edit?id=${sample.id}`}
+                  className="btn btn-link"
+                >
+                  <DinaMessage id="editButtonText" />
                 </Link>
                 <DeleteButton
                   replaceClassName="btn btn-link"
@@ -292,15 +289,10 @@ export default function MaterialSampleListPage() {
           original: { id, data }
         }
       }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-        >
-          <a>
-            {data?.attributes?.materialSampleName ||
-              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-              id}
-          </a>
+        <Link href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
         </Link>
       ),
       header: () => <FieldHeader name="materialSampleName" />,
@@ -320,7 +312,7 @@ export default function MaterialSampleListPage() {
           <Link
             href={`/collection/collection/view?id=${included?.collection?.id}`}
           >
-            <a>{included?.collection?.attributes?.name}</a>
+            {included?.collection?.attributes?.name}
           </Link>
         ) : null,
       header: () => <FieldHeader name="collection.name" />,
@@ -382,10 +374,11 @@ export default function MaterialSampleListPage() {
         <div className="col-md-12 d-flex gap-2">
           <div className="ms-auto" />
           <CreateButton entityLink="/collection/material-sample" />
-          <Link href={`/collection/material-sample/bulk-create`}>
-            <a className="btn btn-primary">
-              <DinaMessage id="bulkCreate" />
-            </a>
+          <Link
+            href={`/collection/material-sample/bulk-create`}
+            className="btn btn-primary"
+          >
+            <DinaMessage id="bulkCreate" />
           </Link>
         </div>
       </ButtonBar>

@@ -52,10 +52,11 @@ export default function NgsWorkflowListPage() {
       <Nav marginBottom={false} />
       <ButtonBar>
         <div className="flex d-flex">
-          <Link href={`/seqdb/ngs-workflow/run`}>
-            <a className="btn btn-primary ms-auto">
-              <SeqdbMessage id="startNewWorkflow" />
-            </a>
+          <Link
+            href={`/seqdb/ngs-workflow/run`}
+            className="btn btn-primary ms-auto"
+          >
+            <SeqdbMessage id="startNewWorkflow" />
           </Link>
         </div>
       </ButtonBar>

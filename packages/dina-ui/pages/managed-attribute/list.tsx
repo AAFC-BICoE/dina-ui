@@ -129,9 +129,7 @@ function CollectionAttributeListView() {
           original: { id, name }
         }
       }) => (
-        <Link href={`/collection/managed-attribute/view?id=${id}`}>
-          <a>{name}</a>
-        </Link>
+        <Link href={`/collection/managed-attribute/view?id=${id}`}>{name}</Link>
       ),
       header: "Name",
       accessorKey: "name"
@@ -243,7 +241,7 @@ function ObjectStoreAttributeListView() {
           }
         }) => (
           <Link href={`/object-store/managed-attribute/view?id=${id}`}>
-            <a>{name}</a>
+            {name}
           </Link>
         ),
         header: "Name",
@@ -322,7 +320,7 @@ function TransactionAttributeListView() {
           }
         }) => (
           <Link href={`/loan-transaction/managed-attribute/view?id=${id}`}>
-            <a>{name}</a>
+            {name}
           </Link>
         ),
         header: "Name",

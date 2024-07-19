@@ -8,9 +8,7 @@ import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttribu
 
 export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
   name: ({ id, name }) => (
-    <Link href={`/collection/assemblage/view?id=${id}`}>
-      <a>{name || id}</a>
-    </Link>
+    <Link href={`/collection/assemblage/view?id=${id}`}>{name || id}</Link>
   ),
   customValueCells: {
     attachment: ({
@@ -36,8 +34,11 @@ export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
       </div>
     ),
     multilingualTitle: titleCell(true, false, "multilingualTitle").cell,
-    multilingualDescription: descriptionCell(true, false, "multilingualDescription")
-      .cell,
+    multilingualDescription: descriptionCell(
+      true,
+      false,
+      "multilingualDescription"
+    ).cell,
 
     // Show the entire value of the metadata map in a key-value table:
     managedAttributes: ({

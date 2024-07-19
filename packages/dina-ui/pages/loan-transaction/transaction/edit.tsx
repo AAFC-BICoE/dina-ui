@@ -435,9 +435,7 @@ export function TransactionFormLayout({
                   typeof row.original?.agent === "object" &&
                   row.original?.agent?.id ? (
                     <Link href={`/person/view?id=${row.original?.agent?.id}`}>
-                      <a>
-                        <PersonName id={row.original?.agent?.id} />
-                      </a>
+                      <PersonName id={row.original?.agent?.id} />
                     </Link>
                   ) : (
                     row.original?.agent

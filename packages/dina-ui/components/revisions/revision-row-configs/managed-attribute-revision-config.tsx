@@ -7,7 +7,7 @@ export const MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG: RevisionRowConfig<Manag
   {
     name: ({ id, name, key }) => (
       <Link href={`/collection/managed-attribute/edit?id=${id}`}>
-        <a>{name || key || id}</a>
+        {name || key || id}
       </Link>
     ),
     customValueCells: {

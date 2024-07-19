@@ -46,9 +46,7 @@ export function IdentifierRow({
             if (url.protocol === "http:" || url.protocol === "https:") {
               return (
                 <Fragment key={value}>
-                  <Link href={value} passHref={true}>
-                    <a>{value}</a>
-                  </Link>
+                  <Link href={value}>{value}</Link>
                 </Fragment>
               );
             }
