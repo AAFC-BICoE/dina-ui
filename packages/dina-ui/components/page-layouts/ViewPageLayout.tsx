@@ -174,10 +174,11 @@ export function ViewPageLayout<T extends KitsuResource>({
                   (backButton ? (
                     backButton
                   ) : specialListUrl ? (
-                    <Link href={specialListUrl}>
-                      <a className="back-button my-auto me-auto">
-                        <DinaMessage id="backToList" />
-                      </a>
+                    <Link
+                      href={specialListUrl}
+                      className="back-button my-auto me-auto"
+                    >
+                      <DinaMessage id="backToList" />
                     </Link>
                   ) : (
                     <BackButton
@@ -199,10 +200,11 @@ export function ViewPageLayout<T extends KitsuResource>({
                     <EditButton entityId={id} entityLink={entityLink} />
                   ))}
                 {showRevisionsLink && (
-                  <Link href={`${entityLink}/revisions?id=${id}`}>
-                    <a className="btn btn-info">
-                      <DinaMessage id="revisionsButtonText" />
-                    </a>
+                  <Link
+                    href={`${entityLink}/revisions?id=${id}`}
+                    className="btn btn-info"
+                  >
+                    <DinaMessage id="revisionsButtonText" />
                   </Link>
                 )}
                 {showDeleteButton &&
@@ -238,9 +240,7 @@ export function ViewPageLayout<T extends KitsuResource>({
               {form(formProps)}
               {showRevisionsLinkAtBottom && (
                 <Link href={`${entityLink}/revisions?id=${id}`}>
-                  <a>
-                    <DinaMessage id="revisionsButtonText" />
-                  </a>
+                  <DinaMessage id="revisionsButtonText" />
                 </Link>
               )}
             </main>

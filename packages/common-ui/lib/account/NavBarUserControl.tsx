@@ -30,7 +30,7 @@ export function NavbarUserControl() {
                     }
                   }}
                 >
-                  <a>{username}</a>
+                  {username}
                 </Link>
               </span>
             </>

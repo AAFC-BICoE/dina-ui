@@ -176,10 +176,9 @@ export function StorageUnitChildrenViewer({
                 </button>
                 <Link
                   href={`/collection/storage-unit/edit?parentId=${storageUnit.id}`}
+                  className="btn btn-primary add-child-storage-unit"
                 >
-                  <a className="btn btn-primary add-child-storage-unit">
-                    <DinaMessage id="addNewChildStorageUnit" />
-                  </a>
+                  <DinaMessage id="addNewChildStorageUnit" />
                 </Link>
                 <button
                   className="btn btn-primary add-existing-as-child"

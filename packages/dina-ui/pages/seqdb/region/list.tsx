@@ -16,11 +16,7 @@ const REGION_TABLE_COLUMNS: ColumnDefinition<Region>[] = [
       row: {
         original: { id, name }
       }
-    }) => (
-      <Link href={`/seqdb/region/view?id=${id}`}>
-        <a>{name}</a>
-      </Link>
-    ),
+    }) => <Link href={`/seqdb/region/view?id=${id}`}>{name}</Link>,
     accessorKey: "name"
   },
   "description",

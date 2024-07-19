@@ -34,10 +34,13 @@ export function ThumbnailCell<TData extends KitsuResource>({
           {hasExternalResourceDerivative ? (
             <FaExternalLinkAlt className="m-auto me-2 h5" />
           ) : (
-            <Link href={resourceExternalURL} passHref={true}>
-              <a target="_blank" className="m-auto h5">
-                <FaExternalLinkAlt />
-              </a>
+            <Link
+              href={resourceExternalURL}
+              passHref={true}
+              target="_blank"
+              className="m-auto h5"
+            >
+              <FaExternalLinkAlt />
             </Link>
           )}
           {hasExternalResourceDerivative && (
@@ -45,10 +48,9 @@ export function ThumbnailCell<TData extends KitsuResource>({
           )}
           <Link
             href={`/object-store/object/external-resource-view?id=${original?.id}`}
+            className="m-auto"
           >
-            <a className="m-auto">
-              <DinaMessage id="detailsPageLink" />
-            </a>
+            <DinaMessage id="detailsPageLink" />
           </Link>
         </div>
       ) : (

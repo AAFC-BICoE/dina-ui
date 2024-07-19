@@ -19,9 +19,7 @@ const THEROMOCYCLERPROFILE_TABLE_COLUMNS: ColumnDefinition<ThermocyclerProfile>[
         }
       }) =>
         region ? (
-          <Link href={`/seqdb/region/view?id=${region.id}`}>
-            <a>{region.name}</a>
-          </Link>
+          <Link href={`/seqdb/region/view?id=${region.id}`}>{region.name}</Link>
         ) : null,
       accessorKey: "region.name"
     },
@@ -31,9 +29,7 @@ const THEROMOCYCLERPROFILE_TABLE_COLUMNS: ColumnDefinition<ThermocyclerProfile>[
           original: { id, name }
         }
       }) => (
-        <Link href={`/seqdb/thermocycler-profile/view?id=${id}`}>
-          <a>{name}</a>
-        </Link>
+        <Link href={`/seqdb/thermocycler-profile/view?id=${id}`}>{name}</Link>
       ),
       accessorKey: "name"
     },

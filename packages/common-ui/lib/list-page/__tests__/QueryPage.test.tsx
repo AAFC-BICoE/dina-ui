@@ -290,15 +290,10 @@ describe("QueryPage test", () => {
             original: { id, data }
           }
         }) => (
-          <Link
-            href={`/collection/material-sample/view?id=${id}`}
-            passHref={true}
-          >
-            <a>
-              {data?.attributes?.materialSampleName ||
-                data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-                id}
-            </a>
+          <Link href={`/collection/material-sample/view?id=${id}`}>
+            {data?.attributes?.materialSampleName ||
+              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+              id}
           </Link>
         ),
         header: () => <FieldHeader name="materialSampleName" />,
@@ -318,7 +313,7 @@ describe("QueryPage test", () => {
             <Link
               href={`/collection/collection/view?id=${included?.collection?.id}`}
             >
-              <a>{included?.collection?.attributes?.name}</a>
+              {included?.collection?.attributes?.name}
             </Link>
           ) : null,
         header: () => <FieldHeader name="collection.name" />,

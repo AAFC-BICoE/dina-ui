@@ -5,9 +5,7 @@ import { RevisionRowConfig } from "../revision-row-config";
 
 export const INSTITUTION_REVISION_ROW_CONFIG: RevisionRowConfig<Institution> = {
   name: ({ name, id }) => (
-    <Link href={`/collection/institution/view?id=${id}`}>
-      <a>{name || id}</a>
-    </Link>
+    <Link href={`/collection/institution/view?id=${id}`}>{name || id}</Link>
   ),
   customValueCells: {
     identifiers: ({
@@ -21,7 +19,10 @@ export const INSTITUTION_REVISION_ROW_CONFIG: RevisionRowConfig<Institution> = {
           <KeyValueTable data={identifier} />
         </div>
       )),
-    multilingualDescription: descriptionCell(true, false, "multilingualDescription")
-      .cell
+    multilingualDescription: descriptionCell(
+      true,
+      false,
+      "multilingualDescription"
+    ).cell
   }
 };

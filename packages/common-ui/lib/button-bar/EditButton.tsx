@@ -42,18 +42,17 @@ export function EditButton({
   const baseUrl = entityLink.replace(/^\/?/, "/");
 
   return (
-    <Link href={`${baseUrl}/edit?id=${entityId}`}>
-      <a
-        className={classNames("btn btn-primary", { disabled }, className)}
-        style={{ paddingLeft: "15px", paddingRight: "15px", ...style }}
-        onMouseOver={onMouseOver}
-        onMouseOut={onMouseOut}
-        onBlur={onBlur}
-        onKeyUp={onKeyUp}
-        aria-describedby={ariaDescribedBy}
-      >
-        <CommonMessage id="editButtonText" />
-      </a>
+    <Link
+      href={`${baseUrl}/edit?id=${entityId}`}
+      className={classNames("btn btn-primary", { disabled }, className)}
+      style={{ paddingLeft: "15px", paddingRight: "15px", ...style }}
+      onMouseOver={onMouseOver}
+      onMouseOut={onMouseOut}
+      onBlur={onBlur}
+      onKeyUp={onKeyUp}
+      aria-describedby={ariaDescribedBy}
+    >
+      <CommonMessage id="editButtonText" />
     </Link>
   );
 }

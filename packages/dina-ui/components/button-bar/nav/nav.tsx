@@ -561,33 +561,18 @@ export function Footer({ centered = true }: FooterProps) {
             <nav className="col-md-10 ftr-urlt-lnk py-3">
               <ul>
                 <li>
-                  <Link
-                    href="https://www.canada.ca/en/contact.html"
-                    passHref={true}
-                  >
-                    <a>
-                      <DinaMessage id="footerContactInfo" />
-                    </a>
+                  <Link href="https://www.canada.ca/en/contact.html">
+                    <DinaMessage id="footerContactInfo" />
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="https://www.canada.ca/en/transparency/terms.html"
-                    passHref={true}
-                  >
-                    <a>
-                      <DinaMessage id="footerTermsAndConditions" />
-                    </a>
+                  <Link href="https://www.canada.ca/en/transparency/terms.html">
+                    <DinaMessage id="footerTermsAndConditions" />
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="https://www.canada.ca/en/transparency/privacy.html"
-                    passHref={true}
-                  >
-                    <a>
-                      <DinaMessage id="footerPrivacy" />
-                    </a>
+                  <Link href="https://www.canada.ca/en/transparency/privacy.html">
+                    <DinaMessage id="footerPrivacy" />
                   </Link>
                 </li>
               </ul>

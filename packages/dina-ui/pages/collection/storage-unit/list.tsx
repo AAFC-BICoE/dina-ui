@@ -14,8 +14,8 @@ const columns: TableColumn<any>[] = [
         original: { id, data }
       }
     }) => (
-      <Link href={`/collection/storage-unit/view?id=${id}`} passHref={true}>
-        <a>{data?.attributes?.name}</a>
+      <Link href={`/collection/storage-unit/view?id=${id}`}>
+        {data?.attributes?.name}
       </Link>
     ),
     header: () => <FieldHeader name="name" />,
@@ -38,9 +38,8 @@ const columns: TableColumn<any>[] = [
       return (
         <Link
           href={`/collection/storage-unit-type/view?id=${included?.["storage-unit-type"]?.id}`}
-          passHref={true}
         >
-          <a>{included?.["storage-unit-type"]?.attributes?.name}</a>
+          {included?.["storage-unit-type"]?.attributes?.name}
         </Link>
       );
     },

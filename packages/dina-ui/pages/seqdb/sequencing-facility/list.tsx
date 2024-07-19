@@ -19,7 +19,7 @@ const SUBMISSION_FACILITY_TABLE_COLUMNS: ColumnDefinition<SequencingFacility>[] 
         }
       }) => (
         <Link href={`/seqdb/sequencing-facility/view?id=${id}`}>
-          <a>{name || id}</a>
+          {name || id}
         </Link>
       ),
       accessorKey: "name"

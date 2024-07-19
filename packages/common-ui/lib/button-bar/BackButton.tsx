@@ -41,10 +41,11 @@ export function BackButton({
         };
 
   return (
-    <Link href={href}>
-      <a className={`back-button my-auto ${className ? className : ""}`}>
-        <CommonMessage id={(buttonMsg as any) ?? message} />
-      </a>
+    <Link
+      href={href}
+      className={`back-button my-auto ${className ? className : ""}`}
+    >
+      <CommonMessage id={(buttonMsg as any) ?? message} />
     </Link>
   );
 }

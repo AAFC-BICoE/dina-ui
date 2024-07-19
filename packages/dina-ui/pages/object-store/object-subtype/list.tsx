@@ -20,7 +20,7 @@ const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
       }
     }) => (
       <Link href={`/object-store/object-subtype/edit?id=${id}`}>
-        <a>{acSubtype}</a>
+        {acSubtype}
       </Link>
     ),
     accessorKey: "acSubtype",

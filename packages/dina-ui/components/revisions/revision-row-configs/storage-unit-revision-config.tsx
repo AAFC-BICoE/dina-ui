@@ -6,9 +6,7 @@ import { RevisionRowConfig } from "../revision-row-config";
 export const STORAGE_UNIT_REVISION_ROW_CONFIG: RevisionRowConfig<StorageUnit> =
   {
     name: ({ id, name }) => (
-      <Link href={`/collection/storage-unit/view?id=${id}`}>
-        <a>{name || id}</a>
-      </Link>
+      <Link href={`/collection/storage-unit/view?id=${id}`}>{name || id}</Link>
     ),
     customValueCells: {
       storageUnitType: ({

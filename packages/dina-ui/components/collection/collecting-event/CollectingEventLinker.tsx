@@ -54,10 +54,9 @@ export function CollectingEventLinker({
         <div className="d-flex">
           <Link
             href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
+            className="flex-grow-1 my-auto"
           >
-            <a className="flex-grow-1 my-auto">
-              <DinaMessage id="viewDetails" />
-            </a>
+            <DinaMessage id="viewDetails" />
           </Link>
           <FormikButton
             className="flex-grow-1 btn btn-link collecting-event-link-button"

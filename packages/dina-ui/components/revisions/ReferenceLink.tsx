@@ -41,9 +41,7 @@ export function ReferenceLink<TResource extends KitsuResource>({
       name(res.data as PersistedResource<TResource>) || res.data.id;
 
     return href ? (
-      <Link href={`${href}${res.data.id}`}>
-        <a>{content}</a>
-      </Link>
+      <Link href={`${href}${res.data.id}`}>{content}</Link>
     ) : (
       <>{content}</>
     );

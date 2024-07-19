@@ -220,10 +220,9 @@ export function RevisionsPage({
           href={`${detailsPageLink}/${
             isExternalResourceMetadata ? "external-resource-view" : "view"
           }?id=${resource?.id}`}
+          className="back-button my-auto me-auto mt-2"
         >
-          <a className="back-button my-auto me-auto mt-2">
-            <DinaMessage id="detailsPageLink" />
-          </a>
+          <DinaMessage id="detailsPageLink" />
         </Link>
       </ButtonBar>
 

@@ -102,7 +102,7 @@ export function useMaterialSampleRelationshipColumns() {
             : original?.materialSampleName;
         return (
           <Link href={`/collection/material-sample/view?id=${original?.id}`}>
-            <a>{materialSampleName || original?.id}</a>
+            {materialSampleName || original?.id}
           </Link>
         );
       },
@@ -158,13 +158,11 @@ export function useMaterialSampleRelationshipColumns() {
       id: "materialSampleName",
       cell: ({ row: { original } }) => (
         <Link href={`/collection/material-sample/view?id=${original.id}`}>
-          <a>
-            {(original as any).data.attributes.materialSampleName ||
-              (original as any).data.attributes.dwcOtherCatalogNumbers?.join?.(
-                ", "
-              ) ||
-              original.id}
-          </a>
+          {(original as any).data.attributes.materialSampleName ||
+            (original as any).data.attributes.dwcOtherCatalogNumbers?.join?.(
+              ", "
+            ) ||
+            original.id}
         </Link>
       ),
       header: () => <FieldHeader name="materialSampleName" />,
@@ -195,13 +193,11 @@ export function useMaterialSampleRelationshipColumns() {
       id: "materialSampleName",
       cell: ({ row: { original } }) => (
         <Link href={`/collection/material-sample/view?id=${original.id}`}>
-          <a>
-            {(original as any).data?.attributes?.materialSampleName ||
-              (
-                original as any
-              ).data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-              original.id}
-          </a>
+          {(original as any).data?.attributes?.materialSampleName ||
+            (original as any).data?.attributes?.dwcOtherCatalogNumbers?.join?.(
+              ", "
+            ) ||
+            original.id}
         </Link>
       ),
       header: () => <FieldHeader name="materialSampleName" />,

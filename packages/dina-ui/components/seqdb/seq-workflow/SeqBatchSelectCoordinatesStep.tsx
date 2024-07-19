@@ -81,10 +81,12 @@ export function SeqBatchSelectCoordinatesStep(
       {!editMode && (
         <div className="row">
           <div className="col-12 text-end">
-            <Link href={`/seqdb/seq-workflow/worksheet?id=${seqBatchId}`}>
-              <a target="_blank" className="btn btn-primary">
-                Worksheet
-              </a>
+            <Link
+              href={`/seqdb/seq-workflow/worksheet?id=${seqBatchId}`}
+              target="_blank"
+              className="btn btn-primary"
+            >
+              Worksheet
             </Link>
           </div>
         </div>

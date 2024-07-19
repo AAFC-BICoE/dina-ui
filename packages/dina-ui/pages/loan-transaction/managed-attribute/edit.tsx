@@ -24,16 +24,18 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
 
   const backButton =
     id === undefined ? (
-      <Link href="/managed-attribute/list?step=2">
-        <a className="back-button my-auto me-auto">
-          <DinaMessage id="backToList" />
-        </a>
+      <Link
+        href="/managed-attribute/list?step=2"
+        className="back-button my-auto me-auto"
+      >
+        <DinaMessage id="backToList" />
       </Link>
     ) : (
-      <Link href={`/loan-transaction/managed-attribute/view?id=${id}`}>
-        <a className="back-button my-auto me-auto">
-          <DinaMessage id="backToReadOnlyPage" />
-        </a>
+      <Link
+        href={`/loan-transaction/managed-attribute/view?id=${id}`}
+        className="back-button my-auto me-auto"
+      >
+        <DinaMessage id="backToReadOnlyPage" />
       </Link>
     );
 

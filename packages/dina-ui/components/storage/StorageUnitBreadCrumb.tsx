@@ -25,17 +25,23 @@ export function StorageUnitBreadCrumb({
 
   // Add parents to hierarchy array
   const hierarchy = parentPath.map((node, index) => (
-    <Link href={`/collection/storage-unit/view?id=${node.uuid}`} key={index}>
-      <a style={{ color: "#fff" }}>{`${node.name} (${node.typeName})`}</a>
+    <Link
+      href={`/collection/storage-unit/view?id=${node.uuid}`}
+      key={index}
+      style={{ color: "#fff" }}
+    >
+      {`${node.name} (${node.typeName})`}
     </Link>
   ));
 
   // Add selected storage unit to array
   hierarchy.push(
-    <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-      <a style={{ color: "#fff" }} target={newTab ? "_blank" : undefined}>
-        {unitDisplayName}
-      </a>
+    <Link
+      href={`/collection/storage-unit/view?id=${storageUnit.id}`}
+      style={{ color: "#fff" }}
+      target={newTab ? "_blank" : undefined}
+    >
+      {unitDisplayName}
     </Link>
   );
 
@@ -45,8 +51,11 @@ export function StorageUnitBreadCrumb({
         <li className="breadcrumb-item">
           <strong>
             {storageUnit.id && !disableLastLink ? (
-              <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-                <a target={newTab ? "_blank" : undefined}>{unitDisplayName}</a>
+              <Link
+                href={`/collection/storage-unit/view?id=${storageUnit.id}`}
+                target={newTab ? "_blank" : undefined}
+              >
+                {unitDisplayName}
               </Link>
             ) : (
               unitDisplayName

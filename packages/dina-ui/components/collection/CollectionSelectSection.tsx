@@ -22,9 +22,7 @@ export function CollectionSelectSection({
 }: CollectionSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
-    <CollectionSelectField 
-      resourcePath={resourcePath}
-    />
+    <CollectionSelectField resourcePath={resourcePath} />
   ) : (
     <div className={`${classNames} row`}>
       <DinaFormSection horizontal="flex">
@@ -90,28 +88,28 @@ export function CollectionSelectField({
           </span>
         }
         readOnlyRender={(value, _) => (
-            <>
-              {value?.id && (
-                <div className="d-flex flex-row mb-3 me-2">
-                  <Tooltip 
-                    visibleElement={(
-                      <div
-                        className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
+          <>
+            {value?.id && (
+              <div className="d-flex flex-row mb-3 me-2">
+                <Tooltip
+                  visibleElement={
+                    <div className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined">
+                      <FaInbox />
+                      <Link
+                        href={"/collection/collection/view?id=" + value?.id}
                       >
-                        <FaInbox/>
-                        <Link href={"/collection/collection/view?id=" + value?.id}>
-                          <a>{value?.name || value?.id}{value?.code ? ` (${value.code})` : ""}</a>
-                        </Link>
-                      </div>                    
-                    )} 
-                    id="collection"
-                    disableSpanMargin={true}
-                  />
-                </div>                 
-              )}
-            </>
-          )
-        }
+                        {value?.name || value?.id}
+                        {value?.code ? ` (${value.code})` : ""}
+                      </Link>
+                    </div>
+                  }
+                  id="collection"
+                  disableSpanMargin={true}
+                />
+              </div>
+            )}
+          </>
+        )}
       />
     </DinaFormSection>
   );
