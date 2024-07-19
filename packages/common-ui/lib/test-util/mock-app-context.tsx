@@ -137,9 +137,22 @@ export function mountWithAppContext2(
   element: React.ReactNode,
   mockAppContextProviderProps?: MockAppContextProviderProps
 ) {
-  return render(
+  const reactLibraryComponent = render(
     <MockAppContextProvider {...mockAppContextProviderProps}>
       {element}
     </MockAppContextProvider>
   );
+
+  const rerenderWithContext = (elementRerender: React.ReactNode) => {
+    reactLibraryComponent.rerender(
+      <MockAppContextProvider {...mockAppContextProviderProps}>
+        {elementRerender}
+      </MockAppContextProvider>
+    );
+  };
+
+  return {
+    ...reactLibraryComponent,
+    rerender: rerenderWithContext
+  };
 }
