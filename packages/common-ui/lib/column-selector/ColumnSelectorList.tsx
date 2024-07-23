@@ -369,7 +369,8 @@ export async function downloadDataExport(
     const getFileResponse = await apiClient.get(
       `dina-export-api/file/${id}?type=DATA_EXPORT`,
       {
-        responseType: "blob"
+        responseType: "blob",
+        timeout: 0
       }
     );
 
