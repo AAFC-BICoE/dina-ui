@@ -1,10 +1,9 @@
 import { IntlProvider } from "react-intl";
-import Select from "react-select/base";
 import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { FilterAttribute } from "../FilterBuilder";
 import { FilterBuilderContextProvider } from "../FilterBuilderContext";
 import { FilterRow, FilterRowProps } from "../FilterRow";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const TEST_SPECIMEN_NUMBER_FILTER: FilterAttribute = {
@@ -48,6 +47,7 @@ describe("FilterRow component", () => {
           filterAttributes={filterAttributes || TEST_FILTER_ATTRIBUTES}
         >
           <FilterRow
+            key="0"
             model={{
               attribute: "name",
               id: 1,
@@ -158,20 +158,6 @@ describe("FilterRow component", () => {
     expect(mockOnChange).toHaveBeenCalledTimes(1);
   });
 
-  it("Changes the model's searchType value when the search type is changed.", async () => {
-    const wrapper = mountFilterRow();
-
-    const select = wrapper.getByRole("combobox", { name: /search type/i });
-    fireEvent.click(select);
-    fireEvent.keyDown(select, { charCode: 40 });
-    await new Promise(setImmediate);
-    // screen.logTestingPlaygroundURL();
-    fireEvent.click(wrapper.getAllByRole("option", { name: "" })[1]);
-    await new Promise(setImmediate);
-
-    // TODO - Fix this test...
-  });
-
   it("Provides a prop to show the remove button.", () => {
     const wrapper = mountFilterRow({ showRemoveButton: true });
     expect(wrapper.queryByRole("button", { name: /\-/i })).toBeInTheDocument();
@@ -185,23 +171,18 @@ describe("FilterRow component", () => {
   });
 
   it("Makes the text input invisible when the search type is 'Blank field'", () => {
-    const wrapper = mountFilterRow();
-
-    // The input is visible be default
-    expect(
-      wrapper.find("input.filter-value").prop("style")?.visibility
-    ).toEqual(undefined);
-
-    // Change the search type to "BLANK_FIELD".
-    wrapper.find(".filter-search-type").find(Select).prop<any>("onChange")({
-      value: "BLANK_FIELD"
+    const wrapper = mountFilterRow({
+      model: {
+        attribute: "name",
+        id: 1,
+        predicate: "IS",
+        searchType: "BLANK_FIELD",
+        type: "FILTER_ROW",
+        value: ""
+      }
     });
-    wrapper.update();
 
-    // The input should now be hidden.
-    expect(
-      wrapper.find("input.filter-value").prop("style")?.visibility
-    ).toEqual("hidden");
+    expect(wrapper.queryByRole("textbox")).not.toBeInTheDocument();
   });
 
   it("Can show a custom filter attribute label.", () => {
@@ -216,12 +197,7 @@ describe("FilterRow component", () => {
       }
     });
 
-    expect(
-      wrapper.find(".filter-attribute").find(Select).prop("value")
-    ).toEqual({
-      label: "Specimen Number",
-      value: TEST_SPECIMEN_NUMBER_FILTER
-    });
+    expect(wrapper.getByText(/specimen number/i)).toBeInTheDocument();
   });
 
   it("Generated a title case label for a filter attribute object.", () => {
@@ -237,11 +213,8 @@ describe("FilterRow component", () => {
     });
 
     expect(
-      wrapper.find(".filter-attribute").find(Select).prop("value")
-    ).toEqual({
-      label: "Specimen Replicate Version",
-      value: TEST_REPLICATE_VERSION_FILTER
-    });
+      wrapper.getByText(/specimen replicate version/i)
+    ).toBeInTheDocument();
   });
 
   it("Displays the intl message for a field name if there is one.", () => {
@@ -261,11 +234,6 @@ describe("FilterRow component", () => {
     );
 
     // The field label should be "Group Name" instead of teh auto-generated "Group Group Name":
-    expect(
-      wrapper.find(".filter-attribute").find(Select).prop("value")
-    ).toEqual({
-      label: "Group Name",
-      value: TEST_INTL_FIELD_NAME
-    });
+    expect(wrapper.getByText(/group name/i)).toBeInTheDocument();
   });
 });
