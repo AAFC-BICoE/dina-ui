@@ -1,5 +1,6 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { KeyValueTable } from "../KeyValueTable";
+import "@testing-library/jest-dom";
 
 describe("KeyValueTable component", () => {
   it("Renders the object's keys and values", () => {
@@ -8,13 +9,13 @@ describe("KeyValueTable component", () => {
       keyB: "value B"
     };
 
-    const wrapper = mountWithAppContext(<KeyValueTable data={object} />);
+    const wrapper = mountWithAppContext2(<KeyValueTable data={object} />);
 
-    expect(wrapper.find(".key-cell").at(0).text()).toEqual("Key A");
-    expect(wrapper.find(".key-cell").at(1).text()).toEqual("Key B");
+    expect(wrapper.queryByText("Key A")).toBeInTheDocument();
+    expect(wrapper.queryByText("Key B")).toBeInTheDocument();
 
-    expect(wrapper.find(".value-cell").at(0).text()).toEqual("value A");
-    expect(wrapper.find(".value-cell").at(1).text()).toEqual("value B");
+    expect(wrapper.queryByText("value A")).toBeInTheDocument();
+    expect(wrapper.queryByText("value B")).toBeInTheDocument();
   });
 
   it("Renders custom value cells", () => {
@@ -23,7 +24,7 @@ describe("KeyValueTable component", () => {
       keyB: "value B"
     };
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <KeyValueTable
         customValueCells={{
           keyB: ({ getValue }) => getValue().toUpperCase()
@@ -33,9 +34,9 @@ describe("KeyValueTable component", () => {
     );
 
     // keyA unaffected:
-    expect(wrapper.find(".value-cell").at(0).text()).toEqual("value A");
+    expect(wrapper.queryByText("value A")).toBeInTheDocument();
 
     // keyB uppercased:
-    expect(wrapper.find(".value-cell").at(1).text()).toEqual("VALUE B");
+    expect(wrapper.queryByText("VALUE B")).toBeInTheDocument();
   });
 });

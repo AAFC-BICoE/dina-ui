@@ -1,7 +1,8 @@
-import Select from "react-select";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { SelectField } from "../SelectField";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const PRIMER_TYPE_OPTIONS = [
   {
@@ -36,7 +37,7 @@ const PRIMER_TYPE_OPTIONS = [
 ];
 
 function getWrapper(propsOverride = {}) {
-  return mountWithAppContext(
+  return mountWithAppContext2(
     <DinaForm
       initialValues={{
         testField: "ITRU_PRIMER"
@@ -60,40 +61,38 @@ describe("SelectField component", () => {
   it("Displays the Formik field's value.", () => {
     const wrapper = getWrapper();
 
-    const { value } = wrapper.find<any>(Select).props();
-
-    // The selected option object should be passed into the Select component.
-    expect(value).toEqual({
-      label: "iTru Primer",
-      value: "ITRU_PRIMER"
-    });
+    // Selected value should be displayed.
+    expect(wrapper.queryByText(/itru_primer/i)).toBeInTheDocument();
   });
 
   it("Changes the Formik field's value.", () => {
     const wrapper = getWrapper();
 
-    const { onChange } = wrapper.find<any>(Select).props();
-
-    // Simulate changing the selected option.
-    onChange({
-      label: "Fusion Primer",
-      value: "FUSION_PRIMER"
-    });
+    // Change the value that is selected...
+    fireEvent.change(
+      wrapper.getByRole("combobox", { name: /test field itru primer/i }),
+      { target: { value: "FUSION_PRIMER" } }
+    );
+    fireEvent.click(wrapper.getByRole("option", { name: /fusion primer/i }));
 
     // The new value should be re-rendered into the value-display div.
-    expect(wrapper.find("#value-display").text()).toEqual("FUSION_PRIMER");
+    expect(wrapper.queryByText(/fusion_primer/i)).toBeInTheDocument();
   });
 
   it("Provides an onChange callback.", () => {
     const mockOnChange = jest.fn();
     const wrapper = getWrapper({ onChange: mockOnChange });
 
-    // Change the value.
-    wrapper.find(Select).prop<any>("onChange")({ value: "newTestValue" });
+    // Change the value that is selected...
+    fireEvent.change(
+      wrapper.getByRole("combobox", { name: /test field itru primer/i }),
+      { target: { value: "FUSION_PRIMER" } }
+    );
+    fireEvent.click(wrapper.getByRole("option", { name: /fusion primer/i }));
 
     // The mock function should have been called with the new value.
     expect(mockOnChange).lastCalledWith(
-      "newTestValue",
+      "FUSION_PRIMER", // New selected value
       expect.anything(),
       "ITRU_PRIMER"
     );
@@ -101,24 +100,24 @@ describe("SelectField component", () => {
 
   it("Allows multi-select.", async () => {
     const mockOnChange = jest.fn();
-    const wrapper = getWrapper({ onChange: mockOnChange });
+    const wrapper = getWrapper({ onChange: mockOnChange, isMulti: true });
 
-    // Change the value to the first two options:
-    wrapper.find(Select).prop<any>("onChange")([
-      PRIMER_TYPE_OPTIONS[0],
-      PRIMER_TYPE_OPTIONS[1]
-    ]);
+    // Click the combo box to display options.
+    fireEvent.click(wrapper.getByRole("combobox"));
+    fireEvent.keyPress(wrapper.getByRole("combobox"), { charCode: 40 });
+    fireEvent.click(
+      wrapper.getByRole("button", { name: /remove itru primer/i })
+    );
 
     // The mock function should have been called with the new value.
     expect(mockOnChange).lastCalledWith(
-      ["PRIMER", "MID"],
+      ["PRIMER"],
       expect.anything(),
       "ITRU_PRIMER"
     );
   });
-
   it("Renders the read-only view.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{
           singleValue: "ITRU_PRIMER",
@@ -130,14 +129,11 @@ describe("SelectField component", () => {
         <SelectField name="multipleValues" options={PRIMER_TYPE_OPTIONS} />
       </DinaForm>
     );
-
-    expect(wrapper.find(".singleValue-field .read-only-view").text()).toEqual(
-      "iTru Primer"
-    );
+    expect(wrapper.getByText(/itru primer/i)).toBeInTheDocument();
 
     // Joins the names with commas:
     expect(
-      wrapper.find(".multipleValues-field .read-only-view").text()
-    ).toEqual("PCR Primer, 454 Multiplex Identifier");
+      wrapper.getByText(/pcr primer, 454 multiplex identifier/i)
+    ).toBeInTheDocument();
   });
 });
