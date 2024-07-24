@@ -626,6 +626,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   multiple: "Multiple",
   multipleMaterialSamples: "Multiple Material Samples",
   multipleUnits: "Multiple Units",
+  isGeneric: "Generic",
   mustBeValidDecimalValue: "Must be a valid decimal value.",
   mustBeValidIntegerValue: "Must be a valid integer value.",
   noChildren: "No Children",

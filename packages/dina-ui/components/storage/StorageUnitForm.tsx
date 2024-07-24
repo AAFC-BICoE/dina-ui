@@ -184,7 +184,7 @@ export function StorageUnitFormFields({
   return (
     <div>
       <div className="row">
-        <div className="col-md-6">
+        <div className="col-md-6 d-flex">
           {!readOnly && !initialValues.id && (
             <ToggleField
               className="me-4"
@@ -193,6 +193,11 @@ export function StorageUnitFormFields({
               label={formatMessage("multipleUnits")}
             />
           )}
+          <ToggleField
+            className="me-4"
+            name="isGeneric"
+            label={formatMessage("isGeneric")}
+          />
         </div>
       </div>
       <div className="row">
