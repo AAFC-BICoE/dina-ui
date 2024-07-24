@@ -10,6 +10,7 @@ const PARENT_STORAGE_UNIT: PersistedResource<StorageUnit> = {
   group: "test-group",
   type: "storage-unit",
   name: "A",
+  isGeneric: false,
   storageUnitType: {
     id: STORAGE_UNIT_TYPE_NAME,
     type: "storage-unit-type",

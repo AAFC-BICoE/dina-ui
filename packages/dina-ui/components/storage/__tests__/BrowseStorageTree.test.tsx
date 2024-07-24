@@ -12,6 +12,7 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
   group: "aafc",
   name: "A",
   type: "storage-unit",
+  isGeneric: false,
   storageUnitType: {
     id: STORAGE_UNIT_TYPE_NAME,
     type: "storage-unit-type",
@@ -26,6 +27,7 @@ const STORAGE_B: PersistedResource<StorageUnit> = {
   group: "aafc",
   name: "B",
   type: "storage-unit",
+  isGeneric: false,
   storageUnitType: {
     id: STORAGE_UNIT_TYPE_NAME,
     type: "storage-unit-type",
@@ -42,6 +44,7 @@ const STORAGE_C: PersistedResource<StorageUnit> = {
   group: "aafc",
   name: "C",
   type: "storage-unit",
+  isGeneric: false,
   storageUnitType: {
     id: STORAGE_UNIT_TYPE_NAME,
     type: "storage-unit-type",
@@ -60,6 +63,7 @@ const STORAGE_D: PersistedResource<StorageUnit> = {
   group: "aafc",
   name: "D",
   type: "storage-unit",
+  isGeneric: false,
   storageUnitType: {
     id: STORAGE_UNIT_TYPE_NAME,
     type: "storage-unit-type",

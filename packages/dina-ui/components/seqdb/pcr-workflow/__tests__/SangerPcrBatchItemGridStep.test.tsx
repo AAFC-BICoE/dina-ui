@@ -34,6 +34,7 @@ let STORAGE_UNIT_1: StorageUnit = {
   type: "storage-unit",
   name: "storage unit 1",
   group: "aafc",
+  isGeneric: false,
   storageUnitType: {
     type: "storage-unit-type",
     name: "storage unit type 1",
@@ -213,6 +214,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
       type: "storage-unit",
       name: "storage unit 1",
       group: "aafc",
+      isGeneric: false,
       storageUnitType: {
         type: "storage-unit-type",
         name: "storage unit type 1",
