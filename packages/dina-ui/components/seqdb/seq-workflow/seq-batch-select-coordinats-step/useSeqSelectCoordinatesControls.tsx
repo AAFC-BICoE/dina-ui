@@ -9,6 +9,7 @@ import {
   SeqReaction
 } from "../../../../types/seqdb-api";
 import { CellGrid } from "../../container-grid/ContainerGrid";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 interface SeqSelectCoordinatesControlsProps {
   seqBatchId: string;
@@ -195,12 +196,46 @@ export function useSeqSelectCoordinatesControls({
       })(""),
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
-      include: "pcrBatchItem,seqBatch,seqPrimer"
+      include: "pcrBatchItem,seqBatch,seqPrimer,storageUnitUsage"
     },
     {
       deps: [lastSave],
       onSuccess: async ({ data: seqReactions }) => {
         setItemsLoading(true);
+
+        /**
+         * Fetch StorageUnitUsage linked to each SeqReactions
+         * @returns
+         */
+        async function fetchStorageUnitUsage() {
+          if (!seqReactions) return;
+
+          const storageUnitUsageQuery = await bulkGet<StorageUnitUsage>(
+            seqReactions
+              .filter((item) => item.storageUnitUsage?.id)
+              .map(
+                (item) => "/storage-unit-usage/" + item.storageUnitUsage?.id
+              ),
+            { apiBaseUrl: "/collection-api" }
+          );
+
+          const seqReactionWithStorageUnitUsage = seqReactions.map(
+            (seqReaction) => {
+              const queryStorageUnitUsage = storageUnitUsageQuery.find(
+                (storageUnitUsage) =>
+                  storageUnitUsage?.id === seqReaction.storageUnitUsage?.id
+              );
+              return {
+                ...seqReaction,
+                wellColumn: queryStorageUnitUsage?.wellColumn,
+                wellRow: queryStorageUnitUsage?.wellRow,
+                storageUnitUsage: queryStorageUnitUsage
+              };
+            }
+          );
+          seqReactions = seqReactionWithStorageUnitUsage;
+        }
+
         const seqReactionAndPcrBatchItem = compact(
           seqReactions.map(
             (item) =>
@@ -230,6 +265,7 @@ export function useSeqSelectCoordinatesControls({
           )
         );
 
+        fetchStorageUnitUsage();
         setSeqReactionSamples(
           seqReactionAndPcrBatchItem.map((rec) => {
             const pcrBatchItem = pcrBatchItems.find(
