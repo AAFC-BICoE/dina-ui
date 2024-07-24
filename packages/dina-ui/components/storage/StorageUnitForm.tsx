@@ -193,11 +193,13 @@ export function StorageUnitFormFields({
               label={formatMessage("multipleUnits")}
             />
           )}
-          <ToggleField
-            className="me-4"
-            name="isGeneric"
-            label={formatMessage("isGeneric")}
-          />
+          {(!readOnly || initialValues.isGeneric) && (
+            <ToggleField
+              className="me-4"
+              name="isGeneric"
+              label={formatMessage("isGeneric")}
+            />
+          )}
         </div>
       </div>
       <div className="row">
