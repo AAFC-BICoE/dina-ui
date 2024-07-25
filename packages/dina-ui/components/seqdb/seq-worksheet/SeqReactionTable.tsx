@@ -69,7 +69,9 @@ export function SeqReactionTable({
       id: "seqWellCoordinates",
       cell: ({ row }) => (
         <div>
-          {(row.original.wellRow ?? "") + "" + (row.original.wellColumn ?? "")}
+          {(row.original?.storageUnitUsage?.wellRow ?? "") +
+            "" +
+            (row.original?.storageUnitUsage?.wellColumn ?? "")}
         </div>
       ),
       header: () => (
@@ -81,7 +83,9 @@ export function SeqReactionTable({
     },
     {
       id: "seqTubeNumber",
-      cell: ({ row }) => <div>{row.original?.cellNumber ?? ""}</div>,
+      cell: ({ row }) => (
+        <div>{row.original?.storageUnitUsage?.cellNumber ?? ""}</div>
+      ),
       header: () => (
         <b>
           <DinaMessage id={"seqTubeNumber"} />

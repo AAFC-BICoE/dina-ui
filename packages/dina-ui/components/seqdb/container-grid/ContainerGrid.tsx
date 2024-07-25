@@ -90,7 +90,7 @@ export function ContainerGrid<
           const coords = `${rowLabel}_${column}`;
 
           return (
-            <div className={`well-${coords}`} style={{ height: "auto" }}>
+            <div className={`well-${coords}`} style={{ minHeight: "40px" }}>
               <GridCell<ItemType>
                 movedItems={movedItems}
                 onDrop={({ batchItemSample: newItem }) =>
@@ -165,10 +165,10 @@ function GridCell<ItemType extends { sampleName?: string }>({
     >
       <div
         ref={drop}
-        className="h-100 w-100"
         style={{
           border: dragHover ? "3px dashed #1C6EA4" : undefined,
-          background: dragHover ? "#f7fbff" : undefined
+          background: dragHover ? "#f7fbff" : undefined,
+          minHeight: "40px"
         }}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
