@@ -1,12 +1,9 @@
 import { DinaForm } from "../DinaForm";
-import { KitsuResource } from "kitsu";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DataEntryField } from "../data-entry/DataEntryField";
-import { DataBlock } from "../data-entry/DataBlock";
-import { SelectField, TextField } from "../../../../common-ui/lib";
-import { FaPlus, FaMinus } from "react-icons/fa";
-import Select from "react-select";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const blockOptions = {
   id: "blockOptions",
@@ -22,9 +19,9 @@ const unitsOptions = {
   id: "unitsOptions",
   type: "vocabulary",
   vocabularyElements: [
-    { name: "BLOCK_OPTION_2", key: "UNIT_OPTION_1" },
-    { name: "BLOCK_OPTION_2", key: "UNIT_OPTION_2" },
-    { name: "BLOCK_OPTION_2", key: "UNIT_OPTION_3" }
+    { name: "UNIT OPTION 1", key: "UNIT_OPTION_1" },
+    { name: "UNIT OPTION 2", key: "UNIT_OPTION_2" },
+    { name: "UNIT OPTION 3", key: "UNIT_OPTION_3" }
   ]
 };
 const typeOptions = [
@@ -81,7 +78,7 @@ describe("DataEntry", () => {
 
   it("Tests correct number of data blocks and data block fields entered", async () => {
     const name = "extensionValues";
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         onSubmit={async ({ submittedValues }) => mockSubmit(submittedValues)}
@@ -99,77 +96,41 @@ describe("DataEntry", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
-    expect(wrapper.find(DataBlock).exists()).toEqual(false);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
-    wrapper.find("button.add-datablock").simulate("click");
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Click the "+" icon to add a new field.
+    const addSection = wrapper.getByRole("button");
+    fireEvent.click(addSection);
 
-    expect(wrapper.find(DataBlock).exists()).toEqual(true);
+    // Expect block option 1 to be created:
+    expect(wrapper.getByText(/block_option_1/i)).toBeInTheDocument();
 
-    // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
-    let dataBlock = wrapper
-      .findWhere(
-        (datablock) =>
-          datablock.props().name ===
-          `${name}.${blockOptions.vocabularyElements[0].name}`
-      )
-      .find(SelectField);
+    const typeSelect = wrapper.getAllByRole("combobox", {
+      name: /select\.\.\./i
+    })[0];
+    fireEvent.change(typeSelect, { target: { value: "TYPE_OPTION_1" } });
+    fireEvent.click(wrapper.getByRole("option", { name: /type_option_1/i }));
 
-    // block select option
-    dataBlock
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[0].name}.select`
-      )
-      .find<any>(Select)
-      .props()
-      .onChange({ label: "Block Option 1", value: "BLOCK_OPTION_1" });
-
-    // type select option
-    dataBlock
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.type`
-      )
-      .find<any>(Select)
-      .props()
-      .onChange({ label: "Type Option 1", value: "TYPE_OPTION_1" });
+    // Expect type option 1 to be selected.
+    expect(wrapper.getByText(/type_option_1/i)).toBeInTheDocument();
 
     // unit select option
-    dataBlock
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.unit`
-      )
-      .find<any>(Select)
-      .props()
-      .onChange({ label: "Unit Option 1", value: "UNIT_OPTION_1" });
+    const unitSelect = wrapper.getByRole("combobox", { name: /select\.\.\./i });
+    fireEvent.change(unitSelect, { target: { value: "UNIT_OPTION_1" } });
+    fireEvent.click(wrapper.getByRole("option", { name: /unit option 1/i }));
 
-    wrapper
-      .find<any>(TextField)
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.value`
-      )
-      .find("input")
-      .simulate("change", {
-        target: {
-          name: `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.value`,
-          value: "VALUE_1"
-        }
-      });
+    // Expect unit option 1 to be selected.
+    expect(wrapper.getByText(/unit option 1/i)).toBeInTheDocument();
 
-    // form submission
-    wrapper.find("form").simulate("submit");
+    // Change the value
+    fireEvent.change(wrapper.getByRole("textbox"), {
+      target: { value: "VALUE_1" }
+    });
+
+    // Submit the form.
+    fireEvent.submit(wrapper.getByRole("group"));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
@@ -187,69 +148,37 @@ describe("DataEntry", () => {
       }
     });
 
-    // Add new row to data block
-    wrapper
-      .findWhere(
-        (datablock) =>
-          datablock.props().name ===
-          `${name}.${blockOptions.vocabularyElements[0].name}`
-      )
-      .find(FaPlus)
-      .simulate("click");
+    // Add another row:
+    fireEvent.click(wrapper.getByTestId("add row button"));
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Change the type for this new row.
+    const typeSelect2 = wrapper.getAllByRole("combobox", {
+      name: /select\.\.\./i
+    })[0];
+    fireEvent.change(typeSelect2, { target: { value: "TYPE_OPTION_2" } });
+    fireEvent.click(wrapper.getByRole("option", { name: /type_option_2/i }));
 
-    // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
-    dataBlock = wrapper
-      .findWhere(
-        (datablock) =>
-          datablock.props().name ===
-          `${name}.${blockOptions.vocabularyElements[0].name}`
-      )
-      .find(SelectField);
-
-    // type select option
-    dataBlock
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.type`
-      )
-      .find<any>(Select)
-      .props()
-      .onChange({ label: "Type Option 2", value: "TYPE_OPTION_2" });
+    // Expect type option 1 to be selected.
+    expect(wrapper.getByText(/type_option_2/i)).toBeInTheDocument();
 
     // unit select option
-    dataBlock
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.unit`
-      )
-      .find<any>(Select)
-      .props()
-      .onChange({ label: "Unit Option 2", value: "UNIT_OPTION_2" });
+    const unitSelect2 = wrapper.getByRole("combobox", {
+      name: /select\.\.\./i
+    });
+    fireEvent.change(unitSelect2, { target: { value: "UNIT_OPTION_2" } });
+    fireEvent.click(wrapper.getByRole("option", { name: /unit option 2/i }));
 
-    wrapper
-      .find<any>(TextField)
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.value`
-      )
-      .find("input")
-      .simulate("change", {
-        target: {
-          name: `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.value`,
-          value: "VALUE_2"
-        }
-      });
+    // Expect unit option 1 to be selected.
+    expect(wrapper.getByText(/unit option 2/i)).toBeInTheDocument();
 
-    // form submission
-    wrapper.find("form").simulate("submit");
+    // Change the value
+    fireEvent.change(wrapper.getAllByRole("textbox")[1], {
+      target: { value: "VALUE_2" }
+    });
+
+    // Submit the form.
+    fireEvent.submit(wrapper.getByRole("group"));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
@@ -273,70 +202,37 @@ describe("DataEntry", () => {
       }
     });
 
-    wrapper.find("button.add-datablock").simulate("click");
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
-    const selectFieldsSecondBlock = wrapper
-      .findWhere(
-        (datablock) =>
-          datablock.props().name ===
-          `${name}.${blockOptions.vocabularyElements[1].name}`
-      )
-      .find(SelectField);
-    // block select option
-    selectFieldsSecondBlock
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[1].name}.select`
-      )
-      .find<any>(Select)
-      .props()
-      .onChange({ label: "Block Option 2", value: "BLOCK_OPTION_2" });
+    fireEvent.click(addSection);
+    expect(wrapper.getByText(/block_option_2/i)).toBeInTheDocument();
 
     // type select option
-    selectFieldsSecondBlock
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.type`
-      )
-      .find<any>(Select)
-      .props()
-      .onChange({ label: "Type Option 3", value: "TYPE_OPTION_3" });
+    const typeSelect3 = wrapper.getAllByRole("combobox", {
+      name: /select\.\.\./i
+    })[0];
+    fireEvent.change(typeSelect3, { target: { value: "TYPE_OPTION_3" } });
+    fireEvent.click(wrapper.getByRole("option", { name: /type_option_3/i }));
+
+    // Expect type option 1 to be selected.
+    expect(wrapper.getByText(/type_option_3/i)).toBeInTheDocument();
 
     // unit select option
-    selectFieldsSecondBlock
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.unit`
-      )
-      .find<any>(Select)
-      .props()
-      .onChange({ label: "Unit Option 3", value: "UNIT_OPTION_3" });
+    const unitSelect3 = wrapper.getByRole("combobox", {
+      name: /select\.\.\./i
+    });
+    fireEvent.change(unitSelect3, { target: { value: "UNIT_OPTION_3" } });
+    fireEvent.click(wrapper.getByRole("option", { name: /unit option 3/i }));
 
-    wrapper
-      .find<any>(TextField)
-      .filterWhere(
-        (n: any) =>
-          n.props().name ===
-          `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.value`
-      )
-      .find("input")
-      .simulate("change", {
-        target: {
-          name: `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.value`,
-          value: "VALUE_3"
-        }
-      });
+    // Expect unit option 1 to be selected.
+    expect(wrapper.getByText(/unit option 3/i)).toBeInTheDocument();
+
+    // Change the value
+    fireEvent.change(wrapper.getAllByRole("textbox")[2], {
+      target: { value: "VALUE_3" }
+    });
 
     // form submission
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.getByRole("group"));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({

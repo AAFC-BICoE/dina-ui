@@ -40,6 +40,7 @@ export interface FilterRowProps {
   onChange: () => void;
   onRemoveClick: () => void;
   onOrClick: () => void;
+  onModelChange?: (FilterRowModel) => void;
 }
 
 export interface FilterAttributeOption {
@@ -224,6 +225,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
       this.props.model.predicate = "IS";
     }
 
+    this.props?.onModelChange?.(this.props.model);
     this.props.onChange();
     this.forceUpdate();
   };
@@ -233,6 +235,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     value: string;
   }) => {
     this.props.model.predicate = value.value as FilterRowPredicate;
+    this.props?.onModelChange?.(this.props.model);
     this.props.onChange();
     this.forceUpdate();
   };
@@ -242,24 +245,28 @@ export class FilterRow extends React.Component<FilterRowProps> {
     value: FilterRowSearchType;
   }) => {
     this.props.model.searchType = value.value;
+    this.props?.onModelChange?.(this.props.model);
     this.props.onChange();
     this.forceUpdate();
   };
 
   private onValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.props.model.value = e.target.value;
+    this.props?.onModelChange?.(this.props.model);
     this.props.onChange();
     this.forceUpdate();
   };
 
   private onSelectValueChanged = (e) => {
     this.props.model.value = e;
+    this.props?.onModelChange?.(this.props.model);
     this.props.onChange();
     this.forceUpdate();
   };
 
   private onDateValueChanged = (date: string | DateRange) => {
     this.props.model.value = date;
+    this.props?.onModelChange?.(this.props.model);
     this.props.onChange();
     this.forceUpdate();
   };

@@ -1,5 +1,7 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DeleteButton } from "../DeleteButton";
+import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockDoOperations = jest.fn();
 
@@ -17,7 +19,7 @@ describe("DeleteButton", () => {
   });
 
   it("Deletes the resource and then redirects to another page.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DeleteButton
         id="100"
         type="metadata"
@@ -26,14 +28,18 @@ describe("DeleteButton", () => {
       { apiContext }
     );
 
-    // Open modal:
-    wrapper.find("button.delete-button").simulate("click");
-    wrapper.update();
+    // Find the delete button using a query method
+    const deleteButton = wrapper.getByRole("button", { name: /delete/i });
+
+    // Click the button.
+    fireEvent.click(deleteButton);
 
     // Click Yes:
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
-    wrapper.update();
+    const yesButton = wrapper.getByRole("button", { name: /yes/i });
+    fireEvent.click(yesButton);
+
+    // Wait for the loading to be removed.
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i));
 
     expect(mockDoOperations).lastCalledWith(
       [
@@ -48,11 +54,12 @@ describe("DeleteButton", () => {
   });
 
   it("Renders blank if the passed ID is undefined.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DeleteButton type="metadata" postDeleteRedirect="/metadata/list" />,
       { apiContext }
     );
 
-    expect(wrapper.find(DeleteButton).html()).toEqual(null);
+    // Expect the button not to be rendered...
+    expect(wrapper.queryByRole("button", { name: /delete/i })).toBeNull();
   });
 });
