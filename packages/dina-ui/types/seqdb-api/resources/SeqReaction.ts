@@ -7,9 +7,6 @@ import { StorageUnitUsage } from "../../collection-api/resources/StorageUnitUsag
 export interface SeqReactionAttributes {
   type: "seq-reaction";
   group?: string;
-  wellColumn?: number;
-  wellRow?: string;
-  cellNumber?: number;
   createdBy?: string;
   createdOn?: string;
 }
