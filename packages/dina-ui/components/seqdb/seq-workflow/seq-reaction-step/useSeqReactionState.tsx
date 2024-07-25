@@ -58,7 +58,7 @@ export function useSeqReactionState(seqBatchId?: string) {
         filter: {
           "seqBatch.uuid": seqBatchId as string
         },
-        include: ["pcrBatchItem", "seqPrimer"].join(","),
+        include: ["pcrBatchItem", "seqPrimer", "storageUnitUsage"].join(","),
         sort: "pcrBatchItem",
         page: { limit: 1000 }
       }
@@ -76,7 +76,7 @@ export function useSeqReactionState(seqBatchId?: string) {
         }
       )
     );
-    const storageUnitUsage = compact(
+    const pcrBatchStorageUnitUsages = compact(
       await bulkGet<StorageUnitUsage>(
         pcrBatchItems?.map(
           (item) => `/storage-unit-usage/${item.storageUnitUsage?.id}`
@@ -89,7 +89,7 @@ export function useSeqReactionState(seqBatchId?: string) {
     );
     pcrBatchItems = pcrBatchItems.map((pcrBatchItem) => ({
       ...pcrBatchItem,
-      storageUnitUsage: storageUnitUsage.find(
+      storageUnitUsage: pcrBatchStorageUnitUsages.find(
         (suc) => suc.id === pcrBatchItem.storageUnitUsage?.id
       )
     }));
@@ -98,6 +98,18 @@ export function useSeqReactionState(seqBatchId?: string) {
       await bulkGet<MaterialSample, true>(
         pcrBatchItems?.map(
           (item) => `/material-sample/${item.materialSample?.id}`
+        ),
+        {
+          apiBaseUrl: "/collection-api",
+          returnNullForMissingResource: true
+        }
+      )
+    );
+
+    const seqReactionStorageUnitUsages = compact(
+      await bulkGet<StorageUnitUsage>(
+        seqReactions?.map(
+          (item) => `/storage-unit-usage/${item.storageUnitUsage?.id}`
         ),
         {
           apiBaseUrl: "/collection-api",
@@ -121,6 +133,14 @@ export function useSeqReactionState(seqBatchId?: string) {
           item.pcrBatchItem.materialSample = foundSample;
         }
       }
+
+      // Link the seqReaction storage unit.
+      if (item.storageUnitUsage?.id) {
+        item.storageUnitUsage = seqReactionStorageUnitUsages.find(
+          (storageUsage) => storageUsage.id === item.storageUnitUsage?.id
+        );
+      }
+
       return item;
     });
 
