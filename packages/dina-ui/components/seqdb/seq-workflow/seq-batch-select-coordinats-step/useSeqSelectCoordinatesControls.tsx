@@ -1,6 +1,12 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import { ApiClientContext, filterBy, useQuery } from "common-ui";
-import { compact, isEmpty, omitBy } from "lodash";
+import {
+  ApiClientContext,
+  DeleteArgs,
+  filterBy,
+  SaveArgs,
+  useQuery
+} from "common-ui";
+import { compact, isEmpty, omitBy, pick } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -20,6 +26,7 @@ export interface SeqReactionSample {
   seqReactionId?: string;
   seqBatchId?: string;
   pcrBatchItemId?: string;
+  storageUnitUsageId?: string;
   primerId?: string;
   primerName?: string;
   primerDirection?: string;
@@ -246,9 +253,7 @@ export function useSeqSelectCoordinatesControls({
                 primerName: item.seqPrimer?.name,
                 seqReactionId: item.id,
                 pcrBatchItemId: item.pcrBatchItem?.id,
-                wellColumn: item.wellColumn,
-                wellRow: item.wellRow,
-                cellNumber: item.cellNumber
+                storageUnitUsageId: item.storageUnitUsage?.id
               } as SeqReactionSample)
           )
         );
@@ -402,33 +407,59 @@ export function useSeqSelectCoordinatesControls({
     try {
       const { cellGrid, movedItems } = gridState;
 
+      const storageUnitUsageToSave: SaveArgs<StorageUnitUsage>[] = [];
+      const storageUnitUsageToDelete: DeleteArgs[] = [];
+
       const materialSampleItemsToSave = movedItems.map((movedItem) => {
         // Get the coords from the cell grid.
         const coords = Object.keys(cellGrid).find(
           (key) => cellGrid[key] === movedItem
         );
 
-        let newWellColumn: number | undefined;
-        let newWellRow: string | undefined;
+        // Check if the coords exist when moved, if they do, update/create new storage unit usage.
+        // If it moved and it has no more coords, it needs to be deleted if it had a storage unit usage.
         if (coords) {
           const [row, col] = coords.split("_");
-          newWellColumn = Number(col);
-          newWellRow = row;
+          storageUnitUsageToSave.push({
+            resource: {
+              id: movedItem.storageUnitUsageId,
+              type: "storage-unit-usage",
+              storageUnit: seqBatch.storageUnit,
+              wellColumn: Number(col),
+              wellRow: row,
+              usageType: "seq-reaction"
+            } as StorageUnitUsage,
+            type: "storage-unit-usage"
+          });
+        } else {
+          if (movedItem.storageUnitUsageId) {
+            storageUnitUsageToDelete.push({
+              delete: {
+                id: movedItem.storageUnitUsageId,
+                type: "storage-unit-usage"
+              }
+            });
+          }
         }
-
-        movedItem.wellColumn = newWellColumn;
-        movedItem.wellRow = newWellRow;
 
         return movedItem;
       });
+
+      // Perform create/update for storage unit usages if required.
+      if (storageUnitUsageToSave.length > 0) {
+        await save(storageUnitUsageToSave, { apiBaseUrl: "/collection-api" });
+      }
+
+      // Perform delete for storage unit usages that were removed.
+      if (storageUnitUsageToDelete.length > 0) {
+        await save(storageUnitUsageToDelete, { apiBaseUrl: "/collection-api" });
+      }
 
       const saveArgs = materialSampleItemsToSave.map((item) => {
         return {
           resource: {
             type: "seq-reaction",
             id: item.seqReactionId,
-            wellColumn: item.wellColumn ?? null,
-            wellRow: item.wellRow ?? null,
             relationships: {
               seqBatch: {
                 data: {
@@ -447,6 +478,11 @@ export function useSeqSelectCoordinatesControls({
                   id: item.primerId,
                   type: "pcr-primer"
                 }
+              },
+              storageUnitUsage: {
+                data: item.storageUnitUsageId
+                  ? pick(item.storageUnitUsageId, "id", "type")
+                  : null
               }
             }
           } as SeqReaction,
