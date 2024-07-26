@@ -17,6 +17,7 @@ import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import StorageUnitGrid from "./StorageUnitGrid";
+import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
 
 export interface StorageTreeFieldProps {
   storageUnit: StorageUnit;
@@ -47,6 +48,11 @@ export function StorageUnitChildrenViewer({
       }
     }
   );
+  const storageUnitUsageQuery = useQuery<PcrBatchItem[]>({
+    path: "collection-api/storage-unit-usage/",
+    filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` },
+    include: "storageUnit"
+  });
 
   async function moveAllContent(targetUnit: PersistedResource<StorageUnit>) {
     const childStoragePath = `collection-api/storage-unit/${storageUnit?.id}?include=storageUnitChildren`;
