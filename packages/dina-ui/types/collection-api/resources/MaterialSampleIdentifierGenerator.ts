@@ -19,7 +19,7 @@ export interface MaterialSampleIdentifierGeneratorAttributes {
   characterType: CharacterTypes;
 
   /** Amount of identifiers to be generated */
-  amount: number;
+  quantity: number;
 
   // Result returned, not postable.
   nextIdentifiers?: string[];

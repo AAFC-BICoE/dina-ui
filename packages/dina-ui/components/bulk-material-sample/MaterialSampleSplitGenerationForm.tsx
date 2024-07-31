@@ -24,6 +24,7 @@ import { startCase } from "lodash";
 import { SplitConfigurationOption } from "../collection/material-sample/SplitMaterialSampleDropdownButton";
 import Select from "react-select";
 import { getSplitConfigurationFormTemplates } from "../form-template/formTemplateUtils";
+import { flattenDeep } from "lodash";
 
 const ENTITY_LINK = "/collection/material-sample";
 
@@ -39,7 +40,7 @@ interface MaterialSampleSplitGenerationFormProps {
 
 export function MaterialSampleSplitGenerationForm({
   ids,
-  splitConfiguration,
+  splitConfiguration: splitConfigurationExternal,
   onGenerate
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
@@ -50,10 +51,15 @@ export function MaterialSampleSplitGenerationForm({
     SplitConfigurationOption[]
   >([]);
 
-  // Selected split configuration to use.
+  // Selected split configuration option in drop down
   const [splitConfigurationOption, setSplitConfigurationOption] = useState<
     SplitConfigurationOption | undefined
   >();
+
+  // Split configuration to be used
+  const [splitConfiguration, setSplitConfiguration] = useState<
+    SplitConfiguration | undefined
+  >(splitConfigurationExternal);
 
   const [generatedIdentifiers, setGeneratedIdentifiers] = useState<string[]>(
     []
@@ -197,20 +203,24 @@ export function MaterialSampleSplitGenerationForm({
             <h4 className="mt-2">
               <DinaMessage id="settingLabel" />
             </h4>
-            <strong>
-              <DinaMessage id="selectSplitConfiguration" />
-            </strong>
-            <Select<SplitConfigurationOption>
-              className="mt-1 mb-3"
-              name="splitConfiguration"
-              options={splitConfigurationOptions}
-              onChange={(selection) =>
-                selection && setSplitConfigurationOption(selection)
-              }
-              autoFocus={true}
-              value={splitConfigurationOption}
-              isClearable={true}
-            />
+            {isMultiple && (
+              <>
+                <strong>
+                  <DinaMessage id="selectSplitConfiguration" />
+                </strong>
+                <Select<SplitConfigurationOption>
+                  className="mt-1 mb-3"
+                  name="splitConfiguration"
+                  options={splitConfigurationOptions}
+                  onChange={(selection) =>
+                    selection && setSplitConfigurationOption(selection)
+                  }
+                  autoFocus={true}
+                  value={splitConfigurationOption}
+                  isClearable={true}
+                />
+              </>
+            )}
             <Card>
               <Card.Body>
                 <DinaMessage id="splitFrom" />:
@@ -272,7 +282,7 @@ function PreviewGeneratedNames({
   function getIdentifierRequest(index): MaterialSampleIdentifierGenerator {
     return {
       type: "material-sample-identifier-generator",
-      amount: numberToCreate,
+      quantity: numberToCreate,
       currentParentUUID: splitFromMaterialSamples?.[index]?.id ?? "",
       strategy:
         splitConfiguration?.materialSampleNameGeneration?.strategy ??
@@ -298,10 +308,11 @@ function PreviewGeneratedNames({
         { apiBaseUrl: "/collection-api", overridePatchOperation: true }
       );
 
-      const generatedIdentifiersResults = response.flatMap(
-        (resp) => resp?.nextIdentifiers ?? []
+      const generatedIdentifiersResults = flattenDeep(
+        response.flatMap((resp) =>
+          resp?.nextIdentifiers ? Object.values(resp?.nextIdentifiers) : []
+        )
       );
-
       setGeneratedIdentifiers(generatedIdentifiersResults);
     }
 
