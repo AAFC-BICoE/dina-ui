@@ -8,17 +8,22 @@ import {
   SubmitButton,
   useApiClient,
   LoadingSpinner,
-  DinaFormOnSubmit
+  DinaFormOnSubmit,
+  useQuery,
+  useAccount
 } from "common-ui";
 import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useFormikContext } from "formik";
 import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/resources/MaterialSampleIdentifierGenerator";
-import { useBulkGet, useStringArrayConverter } from "common-ui";
-import { MaterialSample } from "../../types/collection-api";
+import { useBulkGet } from "common-ui";
+import { FormTemplate, MaterialSample } from "../../types/collection-api";
 import { InputResource } from "kitsu";
 import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
 import { startCase } from "lodash";
+import { SplitConfigurationOption } from "../collection/material-sample/SplitMaterialSampleDropdownButton";
+import Select from "react-select";
+import { getSplitConfigurationFormTemplates } from "../form-template/formTemplateUtils";
 
 const ENTITY_LINK = "/collection/material-sample";
 
@@ -38,21 +43,85 @@ export function MaterialSampleSplitGenerationForm({
   onGenerate
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
-  const [convertArrayToString] = useStringArrayConverter();
+  const { groupNames, username } = useAccount();
 
-  const isMultiple = useMemo(() => ids.length > 1, [ids]);
+  // List of all the split configurations available.
+  const [splitConfigurationOptions, setSplitConfigurationOptions] = useState<
+    SplitConfigurationOption[]
+  >([]);
+
+  // Selected split configuration to use.
+  const [splitConfigurationOption, setSplitConfigurationOption] = useState<
+    SplitConfigurationOption | undefined
+  >();
 
   const [generatedIdentifiers, setGeneratedIdentifiers] = useState<string[]>(
     []
   );
 
-  const splitFromMaterialSamples = useBulkGet<MaterialSample>({
+  const [splitFromMaterialSamples, setSplitFromMaterialSamples] = useState<
+    MaterialSample[]
+  >([]);
+
+  const isMultiple = useMemo(() => ids.length > 1, [ids]);
+
+  const materialSamplesQuery = useBulkGet<MaterialSample>({
     ids,
     listPath:
       "collection-api/material-sample?include=materialSampleChildren,collection,parentMaterialSample",
-    disabled: ids.length === 0
+    disabled: ids.length === 0,
+    onSuccess(response) {
+      setSplitFromMaterialSamples(response);
+    }
   });
+  const materialSampleType = (splitFromMaterialSamples?.at(0) as any)
+    ?.materialSampleType;
+  const filteredMaterialSamples = splitFromMaterialSamples?.filter(
+    (materialSample: any) =>
+      materialSample.materialSampleType === materialSampleType
+  );
 
+  const hasMismatchMaterialSampleType = splitFromMaterialSamples?.some(
+    (materialSample: any) =>
+      materialSample.materialSampleType !== materialSampleType
+  );
+
+  if (hasMismatchMaterialSampleType) {
+    throw new Error(formatMessage("mismatchMaterialSampleTypeError"));
+  }
+
+  // Retrieve all of the form templates, then filter for the correct one.
+  const formTemplatesQuery = useQuery<FormTemplate[]>(
+    {
+      path: "collection-api/form-template",
+
+      // Display all user form templates and public to the group templates.
+      filter: {
+        rsql: `group=in=(${groupNames});(createdBy==${username},restrictToCreatedBy==false)`
+      }
+    },
+    {
+      disabled: filteredMaterialSamples?.length === 0,
+      onSuccess: async ({ data }) => {
+        const formTemplatesWithSplitConfig = getSplitConfigurationFormTemplates(
+          data as FormTemplate[],
+          materialSampleType
+        );
+        const generatedOptions = formTemplatesWithSplitConfig.map(
+          (formTemplate) => ({
+            label: formTemplate?.name ?? "",
+            value: formTemplate?.id ?? ""
+          })
+        );
+        setSplitConfigurationOptions(generatedOptions);
+
+        // If options are available, just set the first one automatically.
+        if (generatedOptions.length > 0) {
+          setSplitConfigurationOption(generatedOptions[0]);
+        }
+      }
+    }
+  );
   const buttonBar = (
     <>
       {/* Back Button (Changes depending on the number of records) */}
@@ -73,7 +142,7 @@ export function MaterialSampleSplitGenerationForm({
     </>
   );
 
-  if (splitFromMaterialSamples.loading) {
+  if (materialSamplesQuery.loading || formTemplatesQuery.loading) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -91,7 +160,7 @@ export function MaterialSampleSplitGenerationForm({
       return;
     }
 
-    const splitFromMaterialSample: any = splitFromMaterialSamples?.data?.[0];
+    const splitFromMaterialSample: any = filteredMaterialSamples?.[0];
 
     const samples: InputResource<MaterialSample>[] = [];
     generatedIdentifiers.forEach((identifier) => {
@@ -128,32 +197,48 @@ export function MaterialSampleSplitGenerationForm({
             <h4 className="mt-2">
               <DinaMessage id="settingLabel" />
             </h4>
+            <strong>
+              <DinaMessage id="selectSplitConfiguration" />
+            </strong>
+            <Select<SplitConfigurationOption>
+              className="mt-1 mb-3"
+              name="splitConfiguration"
+              options={splitConfigurationOptions}
+              onChange={(selection) =>
+                selection && setSplitConfigurationOption(selection)
+              }
+              autoFocus={true}
+              value={splitConfigurationOption}
+              isClearable={true}
+            />
             <Card>
               <Card.Body>
                 <DinaMessage id="splitFrom" />:
-                <span className="ms-2">
-                  {convertArrayToString(
-                    (splitFromMaterialSamples?.data as any)?.map(
-                      (materialSample) => materialSample?.materialSampleName
+                <ul>
+                  {(filteredMaterialSamples as any)?.map(
+                    (materialSample, index) => (
+                      <li key={index}>{materialSample?.materialSampleName}</li>
                     )
                   )}
-                </span>
+                </ul>
               </Card.Body>
             </Card>
 
-            <NumberSpinnerField
-              name="numberToCreate"
-              min={1}
-              max={500}
-              label={formatMessage("materialSamplesToCreate")}
-              disabled={isMultiple}
-              className="mt-3"
-            />
+            {!isMultiple && (
+              <NumberSpinnerField
+                name="numberToCreate"
+                min={1}
+                max={500}
+                label={formatMessage("materialSamplesToCreate")}
+                disabled={isMultiple}
+                className="mt-3"
+              />
+            )}
           </div>
           <div className="col-md-7">
             <PreviewGeneratedNames
               splitFromMaterialSamples={
-                splitFromMaterialSamples.data as MaterialSample[]
+                filteredMaterialSamples as MaterialSample[]
               }
               generatedIdentifiers={generatedIdentifiers}
               setGeneratedIdentifiers={setGeneratedIdentifiers}
