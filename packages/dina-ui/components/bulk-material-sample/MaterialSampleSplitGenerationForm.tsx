@@ -23,7 +23,10 @@ import { SplitConfiguration } from "../../types/collection-api/resources/SplitCo
 import { startCase } from "lodash";
 import { SplitConfigurationOption } from "../collection/material-sample/SplitMaterialSampleDropdownButton";
 import Select from "react-select";
-import { getSplitConfigurationFormTemplates } from "../form-template/formTemplateUtils";
+import {
+  getSplitConfigurationComponentValues,
+  getSplitConfigurationFormTemplates
+} from "../form-template/formTemplateUtils";
 import { flattenDeep } from "lodash";
 
 const ENTITY_LINK = "/collection/material-sample";
@@ -61,9 +64,12 @@ export function MaterialSampleSplitGenerationForm({
     SplitConfiguration | undefined
   >(splitConfigurationExternal);
 
-  const [generatedIdentifiers, setGeneratedIdentifiers] = useState<string[]>(
-    []
-  );
+  // Available form templates that can be transformed to split config
+  const [formTemplates, setFormTemplates] = useState<FormTemplate[]>([]);
+
+  const [generatedIdentifiers, setGeneratedIdentifiers] = useState<
+    Record<string, string[]>
+  >({});
 
   const [splitFromMaterialSamples, setSplitFromMaterialSamples] = useState<
     MaterialSample[]
@@ -120,7 +126,10 @@ export function MaterialSampleSplitGenerationForm({
           })
         );
         setSplitConfigurationOptions(generatedOptions);
-
+        setFormTemplates(data);
+        setSplitConfiguration(
+          getSplitConfigurationComponentValues(data[0])?.splitConfiguration
+        );
         // If options are available, just set the first one automatically.
         if (generatedOptions.length > 0) {
           setSplitConfigurationOption(generatedOptions[0]);
@@ -159,33 +168,45 @@ export function MaterialSampleSplitGenerationForm({
   const onSubmit: DinaFormOnSubmit<MaterialSampleBulkSplitFields> = ({
     submittedValues
   }) => {
-    if (
-      Number(generatedIdentifiers.length) !==
-      Number(submittedValues?.numberToCreate)
-    ) {
-      return;
+    if (filteredMaterialSamples.length === 1) {
+      if (
+        Number(flattenDeep(Object.values(generatedIdentifiers)).length) !==
+        Number(submittedValues?.numberToCreate)
+      ) {
+        return;
+      }
+    } else if (filteredMaterialSamples.length > 1) {
+      if (
+        Number(Object.keys(generatedIdentifiers).length) !==
+        Number(filteredMaterialSamples.length)
+      ) {
+        return;
+      }
     }
 
-    const splitFromMaterialSample: any = filteredMaterialSamples?.[0];
-
     const samples: InputResource<MaterialSample>[] = [];
-    generatedIdentifiers.forEach((identifier) => {
-      samples.push({
-        type: "material-sample",
-        parentMaterialSample: {
-          id: splitFromMaterialSample?.id ?? "",
-          type: "material-sample"
-        },
-        group: splitFromMaterialSample?.group ?? "",
-        collection: splitFromMaterialSample?.collection?.id
-          ? {
-              id: splitFromMaterialSample?.collection?.id ?? "",
-              type: "collection"
-            }
-          : undefined,
-        publiclyReleasable: true,
-        allowDuplicateName: false,
-        materialSampleName: identifier
+    Object.keys(generatedIdentifiers).forEach((parentId) => {
+      generatedIdentifiers[parentId].forEach((childMaterialSampleName) => {
+        const parentMaterialSample = filteredMaterialSamples.find(
+          (filteredMaterialSample) => filteredMaterialSample.id === parentId
+        );
+        samples.push({
+          type: "material-sample",
+          parentMaterialSample: {
+            id: parentId ?? "",
+            type: "material-sample"
+          },
+          group: parentMaterialSample?.group ?? "",
+          collection: parentMaterialSample?.collection?.id
+            ? {
+                id: parentMaterialSample?.collection?.id ?? "",
+                type: "collection"
+              }
+            : undefined,
+          publiclyReleasable: true,
+          allowDuplicateName: false,
+          materialSampleName: childMaterialSampleName
+        });
       });
     });
 
@@ -212,9 +233,19 @@ export function MaterialSampleSplitGenerationForm({
                   className="mt-1 mb-3"
                   name="splitConfiguration"
                   options={splitConfigurationOptions}
-                  onChange={(selection) =>
-                    selection && setSplitConfigurationOption(selection)
-                  }
+                  onChange={(selection) => {
+                    if (selection) {
+                      setSplitConfigurationOption(selection);
+                      setSplitConfiguration(
+                        getSplitConfigurationComponentValues(
+                          formTemplates.find(
+                            (formTemplate) =>
+                              formTemplate.id === selection.value
+                          )
+                        )?.splitConfiguration
+                      );
+                    }
+                  }}
                   autoFocus={true}
                   value={splitConfigurationOption}
                   isClearable={true}
@@ -263,8 +294,8 @@ export function MaterialSampleSplitGenerationForm({
 
 interface PreviewGeneratedNamesProps {
   splitFromMaterialSamples: MaterialSample[];
-  generatedIdentifiers: string[];
-  setGeneratedIdentifiers: (identifiers: string[]) => void;
+  generatedIdentifiers: Record<string, string[]>;
+  setGeneratedIdentifiers: (identifiers: Record<string, string[]>) => void;
   splitConfiguration?: SplitConfiguration;
 }
 
@@ -276,10 +307,14 @@ function PreviewGeneratedNames({
 }: PreviewGeneratedNamesProps) {
   const { save } = useApiClient();
   const formik = useFormikContext<MaterialSampleBulkSplitFields>();
+  const numberToCreate =
+    splitFromMaterialSamples.length > 1
+      ? splitFromMaterialSamples.length
+      : formik.values.numberToCreate;
 
-  const numberToCreate = formik.values.numberToCreate;
-
-  function getIdentifierRequest(index): MaterialSampleIdentifierGenerator {
+  function getSingleParentIdentifierRequest(
+    index
+  ): MaterialSampleIdentifierGenerator {
     return {
       type: "material-sample-identifier-generator",
       quantity: numberToCreate,
@@ -295,25 +330,53 @@ function PreviewGeneratedNames({
     };
   }
 
+  function getMultiParentIdentifierRequest(
+    parentIds
+  ): MaterialSampleIdentifierGenerator {
+    return {
+      type: "material-sample-identifier-generator",
+      currentParentsUUID: parentIds,
+      strategy:
+        splitConfiguration?.materialSampleNameGeneration?.strategy ??
+        "DIRECT_PARENT",
+      characterType:
+        splitConfiguration?.materialSampleNameGeneration?.characterType ??
+        "LOWER_LETTER",
+      materialSampleType:
+        splitConfiguration?.materialSampleNameGeneration?.materialSampleType
+    };
+  }
+
   // To prevent spamming the network calls, this useEffect has a debounce.
   useEffect(() => {
     async function callGenerateIdentifierAPI() {
-      const response = await save<MaterialSampleIdentifierGenerator>(
-        [
-          {
-            resource: getIdentifierRequest(0),
-            type: "material-sample-identifier-generator"
-          }
-        ],
-        { apiBaseUrl: "/collection-api", overridePatchOperation: true }
-      );
+      if (splitFromMaterialSamples.length === 1) {
+        const response = await save<MaterialSampleIdentifierGenerator>(
+          [
+            {
+              resource: getSingleParentIdentifierRequest(0),
+              type: "material-sample-identifier-generator"
+            }
+          ],
+          { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+        );
 
-      const generatedIdentifiersResults = flattenDeep(
-        response.flatMap((resp) =>
-          resp?.nextIdentifiers ? Object.values(resp?.nextIdentifiers) : []
-        )
-      );
-      setGeneratedIdentifiers(generatedIdentifiersResults);
+        setGeneratedIdentifiers(response[0].nextIdentifiers ?? {});
+      } else if (splitFromMaterialSamples.length > 1) {
+        const parentIds = splitFromMaterialSamples.map(
+          (parentMaterialSample) => parentMaterialSample.id
+        );
+        const response = await save<MaterialSampleIdentifierGenerator>(
+          [
+            {
+              resource: getMultiParentIdentifierRequest(parentIds),
+              type: "material-sample-identifier-generator"
+            }
+          ],
+          { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+        );
+        setGeneratedIdentifiers(response[0].nextIdentifiers ?? {});
+      }
     }
 
     let timeoutId;
@@ -335,6 +398,38 @@ function PreviewGeneratedNames({
   const formattedMaterialSampleType = startCase(
     materialSampleType.toLowerCase().replace(/_/g, " ")
   );
+
+  const numOfRows =
+    splitFromMaterialSamples.length === 0
+      ? numberToCreate
+      : flattenDeep(Object.values(generatedIdentifiers)).length;
+
+  const childrenRows: JSX.Element[] = [];
+  let numberOfChildren = 0;
+  Object.keys(generatedIdentifiers).forEach((parentId) => {
+    const childMaterialSampleNames = generatedIdentifiers[parentId];
+    const parentMaterialSampleName = splitFromMaterialSamples.find(
+      (materialSample) => materialSample.id === parentId
+    )?.materialSampleName;
+    childMaterialSampleNames.forEach((childMaterialSampleName) => {
+      numberOfChildren++;
+      const childRowComponent = (
+        <tr key={numberOfChildren}>
+          <td>#{numberOfChildren}</td>
+          <td>
+            {childMaterialSampleName ? (
+              childMaterialSampleName
+            ) : (
+              <LoadingSpinner loading={true} />
+            )}
+          </td>
+          <td>{parentMaterialSampleName}</td>
+          <td>{formattedMaterialSampleType}</td>
+        </tr>
+      );
+      childrenRows.push(childRowComponent);
+    });
+  });
 
   return (
     <div className="mt-2">
@@ -358,27 +453,7 @@ function PreviewGeneratedNames({
             </th>
           </tr>
         </thead>
-        <tbody>
-          {Array.from(
-            {
-              length: numberToCreate
-            },
-            (_, i) => i
-          ).map((_, index) => (
-            <tr key={index + 1}>
-              <td>#{index + 1}</td>
-              <td>
-                {generatedIdentifiers[index] ? (
-                  generatedIdentifiers[index]
-                ) : (
-                  <LoadingSpinner loading={true} />
-                )}
-              </td>
-              <td>{splitFromMaterialSamples?.[0]?.materialSampleName ?? ""}</td>
-              <td>{formattedMaterialSampleType}</td>
-            </tr>
-          ))}
-        </tbody>
+        <tbody>{childrenRows}</tbody>
       </table>
     </div>
   );
