@@ -28,6 +28,7 @@ import {
   getSplitConfigurationFormTemplates
 } from "../form-template/formTemplateUtils";
 import { flattenDeep } from "lodash";
+import { ErrorBanner } from "../error/ErrorBanner";
 
 const ENTITY_LINK = "/collection/material-sample";
 
@@ -97,10 +98,6 @@ export function MaterialSampleSplitGenerationForm({
     (materialSample: any) =>
       materialSample.materialSampleType !== materialSampleType
   );
-
-  if (hasMismatchMaterialSampleType) {
-    throw new Error(formatMessage("mismatchMaterialSampleTypeError"));
-  }
 
   // Retrieve all of the form templates, then filter for the correct one.
   const formTemplatesQuery = useQuery<FormTemplate[]>(
@@ -219,6 +216,11 @@ export function MaterialSampleSplitGenerationForm({
       onSubmit={onSubmit}
     >
       <PageLayout titleId="splitSubsampleTitle" buttonBarContent={buttonBar}>
+        {hasMismatchMaterialSampleType && (
+          <ErrorBanner
+            errorMessage={formatMessage("mismatchMaterialSampleTypeError")}
+          />
+        )}
         <div className="row">
           <div className="col-md-5">
             <h4 className="mt-2">
