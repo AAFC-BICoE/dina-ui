@@ -29,6 +29,7 @@ import {
 } from "../form-template/formTemplateUtils";
 import { flattenDeep } from "lodash";
 import { ErrorBanner } from "../error/ErrorBanner";
+import { useRouter } from "next/router";
 
 const ENTITY_LINK = "/collection/material-sample";
 
@@ -49,6 +50,8 @@ export function MaterialSampleSplitGenerationForm({
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
   const { groupNames, username } = useAccount();
+  const router = useRouter();
+  const formTemplateId = router.query.splitConfiguration;
 
   // List of all the split configurations available.
   const [splitConfigurationOptions, setSplitConfigurationOptions] = useState<
@@ -124,9 +127,6 @@ export function MaterialSampleSplitGenerationForm({
         );
         setSplitConfigurationOptions(generatedOptions);
         setFormTemplates(data);
-        setSplitConfiguration(
-          getSplitConfigurationComponentValues(data[0])?.splitConfiguration
-        );
         // If options are available, just set the first one automatically.
         if (generatedOptions.length > 0) {
           setSplitConfigurationOption(generatedOptions[0]);
@@ -226,7 +226,7 @@ export function MaterialSampleSplitGenerationForm({
             <h4 className="mt-2">
               <DinaMessage id="settingLabel" />
             </h4>
-            {isMultiple && (
+            {!formTemplateId && (
               <>
                 <strong>
                   <DinaMessage id="selectSplitConfiguration" />
@@ -258,11 +258,15 @@ export function MaterialSampleSplitGenerationForm({
               <Card.Body>
                 <DinaMessage id="splitFrom" />:
                 <ul>
-                  {(filteredMaterialSamples as any)?.map(
-                    (materialSample, index) => (
-                      <li key={index}>{materialSample?.materialSampleName}</li>
-                    )
-                  )}
+                  {Object.keys(generatedIdentifiers).map((parentId, index) => (
+                    <li key={index}>
+                      {
+                        filteredMaterialSamples.find(
+                          (materialSample) => materialSample.id === parentId
+                        )?.materialSampleName
+                      }
+                    </li>
+                  ))}
                 </ul>
               </Card.Body>
             </Card>
@@ -280,9 +284,7 @@ export function MaterialSampleSplitGenerationForm({
           </div>
           <div className="col-md-7">
             <PreviewGeneratedNames
-              splitFromMaterialSamples={
-                filteredMaterialSamples as MaterialSample[]
-              }
+              splitFromMaterialSamples={filteredMaterialSamples}
               generatedIdentifiers={generatedIdentifiers}
               setGeneratedIdentifiers={setGeneratedIdentifiers}
               splitConfiguration={splitConfiguration}
@@ -400,11 +402,6 @@ function PreviewGeneratedNames({
   const formattedMaterialSampleType = startCase(
     materialSampleType.toLowerCase().replace(/_/g, " ")
   );
-
-  const numOfRows =
-    splitFromMaterialSamples.length === 0
-      ? numberToCreate
-      : flattenDeep(Object.values(generatedIdentifiers)).length;
 
   const childrenRows: JSX.Element[] = [];
   let numberOfChildren = 0;
