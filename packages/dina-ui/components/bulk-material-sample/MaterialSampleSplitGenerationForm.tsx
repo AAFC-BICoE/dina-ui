@@ -41,12 +41,14 @@ interface MaterialSampleSplitGenerationFormProps {
   ids: string[];
   splitConfiguration?: SplitConfiguration;
   onGenerate: (samples: InputResource<MaterialSample>[]) => void;
+  setFormTemplateId?: (formTemplateId: string) => void;
 }
 
 export function MaterialSampleSplitGenerationForm({
   ids,
   splitConfiguration: splitConfigurationExternal,
-  onGenerate
+  onGenerate,
+  setFormTemplateId
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
   const { groupNames, username } = useAccount();
@@ -238,6 +240,7 @@ export function MaterialSampleSplitGenerationForm({
                   onChange={(selection) => {
                     if (selection) {
                       setSplitConfigurationOption(selection);
+                      setFormTemplateId?.(selection.value);
                       setSplitConfiguration(
                         getSplitConfigurationComponentValues(
                           formTemplates.find(
