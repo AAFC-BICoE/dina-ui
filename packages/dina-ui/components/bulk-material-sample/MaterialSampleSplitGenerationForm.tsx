@@ -51,7 +51,7 @@ export function MaterialSampleSplitGenerationForm({
   const { formatMessage } = useDinaIntl();
   const { groupNames, username } = useAccount();
   const router = useRouter();
-  const formTemplateId = router.query.splitConfiguration;
+  const formTemplateId = router?.query?.splitConfiguration;
 
   // List of all the split configurations available.
   const [splitConfigurationOptions, setSplitConfigurationOptions] = useState<
