@@ -125,7 +125,8 @@ export function PersonSelectField(
           querySpec,
           indexName: "dina_agent_index",
           searchField: "data.attributes.displayName",
-          additionalField: "data.attributes.aliases"
+          additionalField: "data.attributes.aliases",
+          type: "person"
         })
       }
       readOnlyLink="/person/view?id="
@@ -175,7 +176,8 @@ export function StorageUnitSelectField({
           indexName: "dina_storage_index",
           searchField: "data.attributes.name",
           restrictedField,
-          restrictedFieldValue
+          restrictedFieldValue,
+          type: "storage-unit"
         })
       }
       readOnlyLink="/collection/storage-unit/view?id="
