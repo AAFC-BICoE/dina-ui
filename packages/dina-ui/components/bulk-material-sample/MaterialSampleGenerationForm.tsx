@@ -219,7 +219,9 @@ function GeneratorFields({
   const { formatMessage } = useDinaIntl();
   const formikForm = useFormikContext<any>();
   useEffect(() => {
-    formikForm.setFieldValue("baseName", baseName);
+    if (!formikForm.values.baseName) {
+      formikForm.setFieldValue("baseName", baseName);
+    }
   }, []);
 
   const SUFFIX_TYPE_OPTIONS = INCREMENT_MODES.map((mode) => ({
