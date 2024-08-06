@@ -23,19 +23,27 @@ export function isBlankResourceAttribute(value: any) {
   }
 }
 
-export function withoutBlankFields<T>(original: T): { [P in keyof T]: T[P] } {
+export function withoutBlankFields<T>(
+  preprocessed: T,
+  original?: T
+): { [P in keyof T]: T[P] } {
   const overriddenObject = omitBy(
-    original as any,
+    preprocessed as any,
     isBlankResourceAttribute
   ) as {
     [P in keyof T]: T[P];
   };
-
   if (
-    (original as any)?.dcCreator &&
-    (original as any)?.dcCreator?.id === null
+    (preprocessed as any)?.dcCreator &&
+    (preprocessed as any)?.dcCreator?.id === null
   ) {
-    (overriddenObject as any).dcCreator = (original as any)?.dcCreator;
+    (overriddenObject as any).dcCreator = (preprocessed as any)?.dcCreator;
+  }
+  if (
+    (original as any)?.preparedBy &&
+    (original as any)?.preparedBy.length === 0
+  ) {
+    (overriddenObject as any).preparedBy = (preprocessed as any)?.preparedBy;
   }
   return overriddenObject;
 }

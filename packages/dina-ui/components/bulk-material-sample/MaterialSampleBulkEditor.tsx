@@ -289,7 +289,7 @@ export function getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook) {
     }
 
     /** Sample override object with only the non-empty fields. */
-    const overrides = withoutBlankFields(bulkEditSample);
+    const overrides = withoutBlankFields(bulkEditSample, formik.values);
 
     // Combine the managed attributes dictionaries:
     const newManagedAttributes = {

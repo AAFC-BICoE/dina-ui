@@ -7,7 +7,9 @@ export interface MaterialSampleIdentifierGeneratorAttributes {
   type: "material-sample-identifier-generator";
 
   /** The "split from" UUID. */
-  currentParentUUID: string;
+  currentParentUUID?: string;
+
+  currentParentsUUID?: string[];
 
   /** The strategy to perform on the current parent UUID. */
   strategy: Strategies;
@@ -19,10 +21,10 @@ export interface MaterialSampleIdentifierGeneratorAttributes {
   characterType: CharacterTypes;
 
   /** Amount of identifiers to be generated */
-  amount: number;
+  quantity?: number;
 
   // Result returned, not postable.
-  nextIdentifiers?: string[];
+  nextIdentifiers?: Record<string, string[]>;
 }
 
 export type MaterialSampleIdentifierGenerator = KitsuResource &

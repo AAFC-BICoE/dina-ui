@@ -420,7 +420,7 @@ export default function MaterialSampleListPage() {
             dataExportPath: "/export/data-export/export",
             entityLink: "/collection/material-sample"
           }}
-          // bulkSplitPath="/collection/material-sample/bulk-split"
+          bulkSplitPath="/collection/material-sample/bulk-split"
         />
       </main>
       <Footer />
