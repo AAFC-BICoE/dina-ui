@@ -49,12 +49,6 @@ describe("MaterialSampleGenerationForm", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Use series mode:
-    wrapper.find("li.series-tab").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
     // Fill out the form:
     wrapper
       .find(".collection-field")
@@ -99,7 +93,7 @@ describe("MaterialSampleGenerationForm", () => {
     expect(mockOnGenerate).lastCalledWith({
       generationMode: "SERIES",
       samples: expectedNames.map((name) => ({
-        allowDuplicateName: false,
+        parentMaterialSample: undefined,
         collection: { id: "100", name: "test-collection", type: "collection" },
         group: "aafc",
         materialSampleName: name,
@@ -120,90 +114,6 @@ describe("MaterialSampleGenerationForm", () => {
         separator: "-",
         start: "00001",
         suffix: ""
-      }
-    });
-  });
-
-  it("Generates the initial values for the new samples in batch mode.", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleGenerationForm onGenerate={mockOnGenerate} />,
-      testCtx
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Use batch mode:
-    wrapper.find("li.batch-tab").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Fill out the form:
-    wrapper
-      .find(".collection-field")
-      .find(ResourceSelect)
-      .prop<any>("onChange")({
-      id: "100",
-      name: "test-collection",
-      type: "collection"
-    });
-    wrapper
-      .find(".numberToCreate-field input")
-      .simulate("change", { target: { value: "5" } });
-    wrapper
-      .find(".baseName-field input")
-      .simulate("change", { target: { value: "my-sample" } });
-    wrapper
-      .find(".separator-field input")
-      .simulate("change", { target: { value: "-" } });
-    wrapper
-      .find(".suffix-field input")
-      .simulate("change", { target: { value: "my-suffix" } });
-
-    const expectedNames = [
-      "my-sample-my-suffix",
-      "my-sample-my-suffix",
-      "my-sample-my-suffix",
-      "my-sample-my-suffix",
-      "my-sample-my-suffix"
-    ];
-
-    // The default names should be in the placeholders:
-    expect(
-      wrapper.find(".sample-name input").map((node) => node.prop("placeholder"))
-    ).toEqual(expectedNames);
-
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Sample initialValues are created with the expected names and the linked collection:
-    expect(mockOnGenerate).lastCalledWith({
-      generationMode: "BATCH",
-      samples: expectedNames.map((name) => ({
-        allowDuplicateName: true,
-        collection: { id: "100", name: "test-collection", type: "collection" },
-        group: "aafc",
-        materialSampleName: name,
-        publiclyReleasable: true,
-        type: "material-sample"
-      })),
-      submittedValues: {
-        baseName: "my-sample",
-        collection: {
-          id: "100",
-          name: "test-collection",
-          type: "collection"
-        },
-        group: "aafc",
-        increment: "NUMERICAL",
-        numberToCreate: "5",
-        samples: [],
-        separator: "-",
-        start: "001",
-        suffix: "my-suffix"
       }
     });
   });
