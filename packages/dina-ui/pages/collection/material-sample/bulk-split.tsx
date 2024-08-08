@@ -99,6 +99,7 @@ export default function MaterialSampleBulkSplitPage() {
           ids={ids}
           splitConfiguration={splitConfiguration}
           setFormTemplateId={setFormTemplateId}
+          formTemplateId={formTemplateId}
         />
       )}
     </>

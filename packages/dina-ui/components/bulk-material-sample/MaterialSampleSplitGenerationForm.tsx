@@ -42,28 +42,25 @@ interface MaterialSampleSplitGenerationFormProps {
   splitConfiguration?: SplitConfiguration;
   onGenerate: (samples: InputResource<MaterialSample>[]) => void;
   setFormTemplateId?: (formTemplateId: string) => void;
+  formTemplateId?: string;
 }
 
 export function MaterialSampleSplitGenerationForm({
   ids,
   splitConfiguration: splitConfigurationExternal,
   onGenerate,
-  setFormTemplateId
+  setFormTemplateId,
+  formTemplateId
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
   const { groupNames, username } = useAccount();
   const router = useRouter();
-  const formTemplateId = router?.query?.splitConfiguration;
+  const splitConfigQuery = router?.query?.splitConfiguration;
 
   // List of all the split configurations available.
   const [splitConfigurationOptions, setSplitConfigurationOptions] = useState<
     SplitConfigurationOption[]
   >([]);
-
-  // Selected split configuration option in drop down
-  const [splitConfigurationOption, setSplitConfigurationOption] = useState<
-    SplitConfigurationOption | undefined
-  >();
 
   // Split configuration to be used
   const [splitConfiguration, setSplitConfiguration] = useState<
@@ -131,7 +128,7 @@ export function MaterialSampleSplitGenerationForm({
         setFormTemplates(data);
         // If options are available, just set the first one automatically.
         if (generatedOptions.length > 0) {
-          setSplitConfigurationOption(generatedOptions[0]);
+          setFormTemplateId?.(generatedOptions?.[0]?.value ?? "");
         }
       }
     }
@@ -212,6 +209,10 @@ export function MaterialSampleSplitGenerationForm({
     onGenerate(samples);
   };
 
+  const splitConfigurationOption = splitConfigurationOptions.find(
+    (splitOption) => splitOption.value === formTemplateId
+  );
+
   return (
     <DinaForm<MaterialSampleBulkSplitFields>
       initialValues={initialValues}
@@ -228,7 +229,7 @@ export function MaterialSampleSplitGenerationForm({
             <h4 className="mt-2">
               <DinaMessage id="settingLabel" />
             </h4>
-            {!formTemplateId && (
+            {!splitConfigQuery && (
               <>
                 <strong>
                   <DinaMessage id="selectSplitConfiguration" />
@@ -239,7 +240,6 @@ export function MaterialSampleSplitGenerationForm({
                   options={splitConfigurationOptions}
                   onChange={(selection) => {
                     if (selection) {
-                      setSplitConfigurationOption(selection);
                       setFormTemplateId?.(selection.value);
                       setSplitConfiguration(
                         getSplitConfigurationComponentValues(
@@ -253,7 +253,6 @@ export function MaterialSampleSplitGenerationForm({
                   }}
                   autoFocus={true}
                   value={splitConfigurationOption}
-                  isClearable={true}
                 />
               </>
             )}
@@ -397,7 +396,7 @@ function PreviewGeneratedNames({
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [formik.values]);
+  }, [formik.values, splitConfiguration]);
 
   // Columns to be displayed
   const materialSampleType =
