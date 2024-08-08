@@ -15,10 +15,8 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "../../../common-ui/lib/list-page/types";
 import StorageUnitGrid from "./StorageUnitGrid";
-import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export interface StorageTreeFieldProps {
   storageUnit: StorageUnit;

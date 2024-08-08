@@ -4,9 +4,9 @@ import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { useState, useEffect } from "react";
 import { isArray, noop } from "lodash";
 import { PersistedResource } from "kitsu";
-import { LoadingSpinner, useApiClient } from "packages/common-ui/lib";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { PcrBatchItem, SeqReaction } from "packages/dina-ui/types/seqdb-api";
+import { LoadingSpinner, useApiClient } from "../../../common-ui/lib";
+import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
+import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
 
 export interface StorageUnitGridProps {
   storageUnit: StorageUnit;
