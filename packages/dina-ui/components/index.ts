@@ -59,7 +59,6 @@ export * from "./project/ProjectSelectSection";
 export * from "./transaction/TransactionMaterialDirectionSection";
 export * from "./resource-select-fields/resource-select-fields";
 export * from "./revision-by-user/CommonRevisionsByUserPage";
-export * from "./storage-unit-type/KeepContentsTogetherToggleForm";
 export * from "./storage/BrowseStorageTree";
 export * from "./storage/StorageLinker";
 export * from "./storage/StorageUnitBreadCrumb";
