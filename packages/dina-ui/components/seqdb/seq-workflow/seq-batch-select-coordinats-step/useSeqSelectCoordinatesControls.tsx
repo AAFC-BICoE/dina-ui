@@ -450,7 +450,7 @@ export function useSeqSelectCoordinatesControls({
               storageUnit: seqBatch.storageUnit,
               type: "storage-unit-usage",
               id: item.storageUnitUsage?.id,
-              usageType: "pcr-batch-item"
+              usageType: "seq-reaction"
             }
           }));
 
