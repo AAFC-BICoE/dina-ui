@@ -85,6 +85,7 @@ describe("Storage Unit edit page.", () => {
           {
             resource: {
               name: "test-storage-unit",
+              isGeneric: false,
               parentStorageUnit: expect.objectContaining({
                 id: "A",
                 type: "storage-unit"
