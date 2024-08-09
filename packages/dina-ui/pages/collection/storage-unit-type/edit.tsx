@@ -163,7 +163,6 @@ export function StorageUnitTypeFormFields() {
             className="col-md-6"
           />
         )}
-        <ToggleField className="col-md-3" name="isInseperable" />
         <ToggleField className="col-md-3" name="enableGrid" />
       </div>
       {formik.values.enableGrid && (
