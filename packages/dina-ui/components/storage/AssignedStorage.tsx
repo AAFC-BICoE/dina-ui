@@ -71,11 +71,6 @@ export function AssignedStorage({
                   newTab={!readOnly}
                 />
               </div>
-              {storageUnit.storageUnitType?.isInseperable && (
-                <div className="list-inline-item">
-                  (<DinaMessage id="keepContentsTogether" />)
-                </div>
-              )}
               {!readOnly && !parentIdInURL && (
                 <FormikButton
                   className="remove-storage btn mb-3 list-inline-item"
