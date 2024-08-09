@@ -84,7 +84,10 @@ export function useGridCoordinatesControls({
               }
             );
             const pcrBatchItem = pcrBatchItemQuery.data[0];
-            await getCellGrid(pcrBatchItem, storageUnitUsage);
+
+            if (pcrBatchItem) {
+              await getCellGrid(pcrBatchItem, storageUnitUsage);
+            }
           } else if (storageUnitUsage.usageType === "seq-reaction") {
             const seqReactionQuery = await apiClient.get<SeqReaction[]>(
               `seqdb-api/seq-reaction`,
@@ -94,8 +97,9 @@ export function useGridCoordinatesControls({
               }
             );
             const seqReaction = seqReactionQuery.data[0];
-            const pcrBatchItem = seqReaction.pcrBatchItem;
-            await getCellGrid(pcrBatchItem, storageUnitUsage);
+            if (seqReaction && seqReaction.pcrBatchItem) {
+              await getCellGrid(seqReaction.pcrBatchItem, storageUnitUsage);
+            }
           } else {
             console.error("Unexpected usage type.");
           }
