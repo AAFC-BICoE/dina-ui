@@ -86,6 +86,9 @@ export default function ExportPage<TData extends KitsuResource>() {
   async function exportData(formik) {
     setLoading(true);
 
+    // Clear error message.
+    setDataExportError(undefined);
+
     // Prepare the query to be used for exporting purposes.
     if (queryObject) {
       delete (queryObject as any)._source;
@@ -175,6 +178,10 @@ export default function ExportPage<TData extends KitsuResource>() {
   async function exportObjects(formik) {
     {
       setLoading(true);
+
+      // Clear error message.
+      setDataExportError(undefined);
+
       const paths = localStorageExportObjectIds.map(
         (id) => `metadata/${id}?include=derivatives`
       );
@@ -210,13 +217,21 @@ export default function ExportPage<TData extends KitsuResource>() {
         },
         type: "object-export"
       };
-      const objectExportResponse = await save<ObjectExport>(
-        [objectExportSaveArg],
-        {
-          apiBaseUrl: "/objectstore-api"
-        }
-      );
-      await getExport(objectExportResponse, formik);
+
+      try {
+        const objectExportResponse = await save<ObjectExport>(
+          [objectExportSaveArg],
+          {
+            apiBaseUrl: "/objectstore-api"
+          }
+        );
+        await getExport(objectExportResponse, formik);
+      } catch (e) {
+        setDataExportError(
+          <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
+        );
+      }
+
       setLoading(false);
     }
   }
