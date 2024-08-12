@@ -40,7 +40,7 @@ export function IdentifierFields({
           <FieldArray name="identifiers">
             {({ form, push, remove }) => {
               const identifiers = otherIdentifiersMode
-                ? Object.keys(form.values?.identifiers)
+                ? Object.keys(form.values?.identifiers ?? {})
                 : form.values?.identifiers ?? [];
 
               function addIdentifier() {
