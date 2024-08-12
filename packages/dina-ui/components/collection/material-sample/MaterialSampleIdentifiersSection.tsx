@@ -12,6 +12,7 @@ import {
   IDENTIFIER_COMPONENT_NAME,
   MaterialSample
 } from "../../../types/collection-api";
+import { OtherIdentifiersSection } from "./OtherIdentifiersSection";
 
 export interface MaterialSampleIdentifiersSectionProps {
   disableSampleNameField?: boolean;
@@ -90,6 +91,9 @@ export function MaterialSampleIdentifiersSection({
             customName="dwcOtherCatalogNumbers"
           />
         </div>
+      </div>
+      <div className="row">
+        <OtherIdentifiersSection name="identifiers" />
       </div>
     </FieldSet>
   );

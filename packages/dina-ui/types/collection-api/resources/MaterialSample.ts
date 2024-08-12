@@ -24,6 +24,7 @@ export interface MaterialSampleAttributes {
   createdBy?: string;
   sourceSet?: string;
   dwcOtherCatalogNumbers?: string[];
+  identifiers?: { [identifierType: string]: string };
   preservationType?: string | null;
   preparationFixative?: string | null;
   preparationMaterials?: string | null;

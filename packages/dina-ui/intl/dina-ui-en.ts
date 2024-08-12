@@ -528,6 +528,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   identifierType: "Identifier Type",
   identifierURI: "Identifier",
   identifiers: "Identifiers",
+  otherIdentifiers: "Other Identifiers",
   includeAll: "Include All",
   insertHybridSymbol: "Insert Hybrid Symbol",
   institution: "Institution",
