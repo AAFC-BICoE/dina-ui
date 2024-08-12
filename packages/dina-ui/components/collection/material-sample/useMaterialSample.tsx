@@ -531,6 +531,17 @@ export function useMaterialSampleSave({
       );
     }
 
+    // Other identifiers saving
+    if (submittedValues.identifiers) {
+      submittedValues.identifiers = (submittedValues.identifiers as any).reduce(
+        (acc, identifier) => {
+          acc[identifier.type] = identifier.uri;
+          return acc;
+        },
+        {}
+      );
+    }
+
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,

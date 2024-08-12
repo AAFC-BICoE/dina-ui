@@ -16,13 +16,17 @@ export interface IdentifierFieldsProps {
   divClassName?: string;
   fieldClassName?: string;
   width?: string;
+  legendId?: string;
+  otherIdentifiersMode?: boolean;
 }
 
 export function IdentifierFields({
   typeOptions,
   width,
   divClassName,
-  fieldClassName
+  fieldClassName,
+  legendId = "identifierLegend",
+  otherIdentifiersMode = false
 }: IdentifierFieldsProps) {
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const { readOnly } = useDinaFormContext();
@@ -30,12 +34,14 @@ export function IdentifierFields({
     <div className={divClassName} style={{ width: `${width}` }}>
       <div className={`${fieldClassName}`}>
         <FieldSet
-          legend={<DinaMessage id="identifierLegend" />}
+          legend={<DinaMessage id={legendId as any} />}
           id="identifierLegend"
         >
           <FieldArray name="identifiers">
             {({ form, push, remove }) => {
-              const identifiers = form.values?.identifiers ?? [];
+              const identifiers = otherIdentifiersMode
+                ? Object.keys(form.values?.identifiers)
+                : form.values?.identifiers ?? [];
 
               function addIdentifier() {
                 push({});

@@ -93,7 +93,7 @@ export function MaterialSampleIdentifiersSection({
         </div>
       </div>
       <div className="row">
-        <OtherIdentifiersSection name="identifiers" />
+        <OtherIdentifiersSection />
       </div>
     </FieldSet>
   );

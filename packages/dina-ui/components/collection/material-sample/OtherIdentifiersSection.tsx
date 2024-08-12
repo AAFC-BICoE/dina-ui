@@ -1,29 +1,19 @@
-import { FieldSet } from "common-ui/lib";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { useFormikContext } from "formik";
-import { OtherIdentifiersRow } from "./OtherIdentifiersRow";
+import { IdentifierFields } from "../../identifier/IdentifierFields";
+import useVocabularyOptions from "../useVocabularyOptions";
 
-export interface OtherIdentifiersSectionProps {
-  name: string;
-}
-
-export function OtherIdentifiersSection({
-  name
-}: OtherIdentifiersSectionProps) {
-  const formik = useFormikContext<any>();
-  const otherIdentifierValues = formik?.values?.[name] ?? { [""]: "" };
+export function OtherIdentifiersSection() {
+  const { vocabOptions } = useVocabularyOptions({
+    path: "collection-api/vocabulary2/materialSampleIdentifierType"
+  });
 
   return (
-    <FieldSet legend={<DinaMessage id="otherIdentifiers" />}>
-      {Object.keys(otherIdentifierValues).map((identifierType, rowIndex) => {
-        return (
-          <OtherIdentifiersRow
-            key={rowIndex}
-            rootName={name}
-            typeOptions={[]}
-          />
-        );
-      })}
-    </FieldSet>
+    <IdentifierFields
+      typeOptions={vocabOptions.map((vocab) => ({
+        label: vocab.label,
+        value: vocab.value
+      }))}
+      legendId={"otherIdentifiers"}
+      otherIdentifiersMode={true}
+    />
   );
 }
