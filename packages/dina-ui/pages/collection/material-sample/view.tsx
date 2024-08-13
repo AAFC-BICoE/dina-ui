@@ -254,7 +254,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           <>
             <Head
               title={formatMessage("materialSampleViewTitle", {
-                primaryID: materialSample?.materialSampleName
+                primaryID:
+                  materialSample?.materialSampleName ?? materialSample.id
               })}
             />
             <Nav marginBottom={false} />

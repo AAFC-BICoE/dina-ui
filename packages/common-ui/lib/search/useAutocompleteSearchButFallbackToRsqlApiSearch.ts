@@ -7,7 +7,6 @@ export interface UseAutocompleteSearchButFallbackToRsqlApiSearchProps
   extends AutocompleteSearchParams {
   searchQuery: string;
   querySpec: JsonApiQuerySpec;
-  type?: string;
 }
 
 /**
@@ -30,8 +29,7 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
   additionalField,
   searchField,
   restrictedField,
-  restrictedFieldValue,
-  type
+  restrictedFieldValue
 }: UseAutocompleteSearchButFallbackToRsqlApiSearchProps) {
   // The mode indicates which API is being used. Either RSQL or Elastic Search.
   const [apiMode, setApiMode] = useState<ApiModeType>("elasticsearch");
@@ -64,9 +62,6 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
   // Put the ResourceSelect's input into the Search hook's state:
   useEffect(() => setInputValue(searchQuery), [searchQuery]);
 
-  elasticSearchResult?.forEach((resource) => {
-    resource.type = type as any;
-  });
   return {
     loading: elasticSearchLoading || rsqlSearchLoading,
     response: {
