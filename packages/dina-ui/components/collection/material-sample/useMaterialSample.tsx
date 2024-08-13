@@ -455,6 +455,11 @@ export function useMaterialSampleSave({
 
   const msInitialValues: InputResource<MaterialSample> =
     withOrganismEditorValues(materialSample ?? defaultValues);
+  if (msInitialValues.identifiers) {
+    (msInitialValues as any).identifiers = Object.entries(
+      msInitialValues.identifiers
+    ).map(([type, uri]) => ({ type, uri }));
+  }
 
   /** Used to get the values of the nested CollectingEvent form. */
   const colEventFormRef = colEventFormRefProp ?? useRef<FormikProps<any>>(null);
@@ -528,6 +533,17 @@ export function useMaterialSampleSave({
     if (submittedValues.extensionValues) {
       submittedValues.extensionValues = processExtensionValuesSaving(
         submittedValues.extensionValues
+      );
+    }
+
+    // Other identifiers saving
+    if (submittedValues.identifiers) {
+      submittedValues.identifiers = (submittedValues.identifiers as any).reduce(
+        (acc, identifier) => {
+          acc[identifier.type] = identifier.uri;
+          return acc;
+        },
+        {}
       );
     }
 

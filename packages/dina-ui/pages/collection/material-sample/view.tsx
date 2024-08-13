@@ -154,6 +154,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     <div>
       {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
         const materialSample = withOrganismEditorValues(materialSampleData);
+        if (materialSample.identifiers) {
+          (materialSample as any).identifiers = Object.entries(
+            materialSample.identifiers
+          ).map(([type, uri]) => ({ type, uri }));
+        }
         const buttonBar = id && (
           <ButtonBar>
             <div className="col-md-2 col-sm-12 mt-2">
