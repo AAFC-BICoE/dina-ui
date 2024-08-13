@@ -146,7 +146,12 @@ export function MaterialSampleSplitGenerationForm({
 
       {/* Submit Button */}
       <div className="col-md-6 col-sm-12 d-flex">
-        <SubmitButton className={"ms-auto"}>
+        <SubmitButton
+          className={"ms-auto"}
+          buttonProps={() => ({
+            disabled: !splitConfiguration
+          })}
+        >
           <DinaMessage id="splitButton" />
         </SubmitButton>
       </div>

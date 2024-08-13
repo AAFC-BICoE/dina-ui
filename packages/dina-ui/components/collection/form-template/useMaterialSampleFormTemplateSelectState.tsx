@@ -40,7 +40,8 @@ export function useMaterialSampleFormTemplateSelectState({
   const { username } = useAccount();
   const { apiClient } = useApiClient();
   const router = useRouter();
-  const formTemplateId = router?.query?.formTemplateId?.toString();
+  const formTemplateId =
+    router?.query?.formTemplateId?.toString() ?? temporaryFormTemplateUUID;
   // Store the nav order in the Page components state:
   const [navOrder, setNavOrder] = useState<string[] | null>(null);
 
@@ -54,13 +55,13 @@ export function useMaterialSampleFormTemplateSelectState({
     useState<PersistedResource<FormTemplate>>();
 
   useEffect(() => {
-    if (temporaryFormTemplateUUID || sampleFormTemplateUUID) {
+    if (sampleFormTemplateUUID) {
       getFormTemplate();
     } else {
       setSampleFormTemplate(undefined);
       setNavOrder(null);
     }
-  }, [sampleFormTemplateUUID, temporaryFormTemplateUUID]);
+  }, [sampleFormTemplateUUID]);
 
   useEffect(() => {
     if (formTemplateId) {
@@ -71,9 +72,7 @@ export function useMaterialSampleFormTemplateSelectState({
   async function getFormTemplate() {
     await apiClient
       .get<FormTemplate>(
-        `collection-api/form-template/${
-          temporaryFormTemplateUUID ?? sampleFormTemplateUUID
-        }`,
+        `collection-api/form-template/${sampleFormTemplateUUID}`,
         {}
       )
       .then((response) => {
