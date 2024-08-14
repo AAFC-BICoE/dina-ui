@@ -54,7 +54,7 @@ export function MaterialSampleIdentifiersSection({
       sectionName="identifiers-section"
     >
       <div className="row">
-        <div className="col-md-6">
+        <div className="col-md-7">
           <div className="d-flex">
             <TextField
               disableTemplateCheckbox={true}
@@ -83,13 +83,9 @@ export function MaterialSampleIdentifiersSection({
               />
             )}
           </div>
-          <TextField name={`${namePrefix}barcode`} customName="barcode" />
         </div>
-        <div className="col-md-6">
-          <StringArrayField
-            name={`${namePrefix}dwcOtherCatalogNumbers`}
-            customName="dwcOtherCatalogNumbers"
-          />
+        <div className="col-md-5">
+          <TextField name={`${namePrefix}barcode`} customName="barcode" />
         </div>
       </div>
       <div className="row">

@@ -18,40 +18,161 @@ export function OtherIdentifiersSection() {
   });
 
   return (
-    <FieldArray name="identifiers">
-      {({ form, push, remove }) => {
-        const identifiers = form.values?.identifiers ?? [];
-        const selectedTypes = identifiers.map((obj) => obj.type);
+    <FieldSet
+      legend={<DinaMessage id={"otherIdentifiers"} />}
+      wrapLegend={() => <></>}
+      id="identifierLegend"
+    >
+      <FieldArray name="identifiers">
+        {({ form, push, remove }) => {
+          const identifiers = form.values?.identifiers ?? [];
+          const selectedTypes = identifiers.map((obj) => obj.type);
 
-        // If empty, just display one.
-        if (identifiers.length === 0) {
-          push({});
-        }
+          // If empty, just display one.
+          if (identifiers.length === 0) {
+            push({});
+          }
 
-        function addIdentifier() {
-          push({});
-        }
+          function addIdentifier() {
+            push({});
+          }
 
-        function removeIdentifier(index: number) {
-          remove(index);
-        }
+          function removeIdentifier(index: number) {
+            remove(index);
+          }
 
-        function containsEmptyObject() {
-          return identifiers.some((obj) => Object.keys(obj).length === 0);
-        }
+          function containsEmptyObject() {
+            return identifiers.some((obj) => Object.keys(obj).length === 0);
+          }
 
-        // Add button should be disabled if there is already an empty option being displayed or out of types to use.
-        const disableAddButton =
-          selectedTypes.length === vocabOptions.length || containsEmptyObject();
+          // Add button should be disabled if there is already an empty option being displayed or out of types to use.
+          const disableAddButton =
+            selectedTypes.length === vocabOptions.length ||
+            containsEmptyObject();
 
-        function legendWrapper():
-          | ((legendElement: JSX.Element) => JSX.Element)
-          | undefined {
-          return (legendElement) => {
+          return (
+            <div className={`identifier-section`}>
+              {/* Top header, where the plus icon is displayed */}
+              <div className="row">
+                <div className="col-md-8">
+                  <h2 className="fieldset-h2-adjustment">
+                    <DinaMessage id="otherIdentifiers" />
+                  </h2>
+                </div>
+                <div className="col-md-4 d-flex align-items-center justify-content-between">
+                  {!readOnly && (
+                    <FaPlus
+                      className="ms-auto"
+                      style={{
+                        cursor: disableAddButton ? "not-allowed" : "pointer",
+                        color: disableAddButton ? "gray" : "black"
+                      }}
+                      onClick={() => {
+                        if (!disableAddButton) {
+                          addIdentifier();
+                        }
+                      }}
+                      size="2em"
+                      onMouseOver={(event) => {
+                        if (!disableAddButton) {
+                          event.currentTarget.style.color = "blue";
+                        }
+                      }}
+                      onMouseOut={(event) => {
+                        if (disableAddButton) {
+                          event.currentTarget.style.color = "gray";
+                        } else {
+                          event.currentTarget.style.color = "black";
+                        }
+                      }}
+                      data-testid="add row button"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Each of other identifier rows to be displayed */}
+              {identifiers.map((_, index) => (
+                <div className="row" key={index}>
+                  <div className="col-md-5">
+                    <SelectField
+                      name={"identifiers[" + index + "].type"}
+                      options={(vocabOptions as any).filter(
+                        (option) => !selectedTypes.includes(option.value)
+                      )}
+                      hideLabel={true}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <TextField
+                      name={"identifiers[" + index + "].value"}
+                      hideLabel={true}
+                    />
+                  </div>
+                  <div className="col-md-1 d-flex align-items-center justify-content-between">
+                    {!readOnly && (
+                      <FaMinus
+                        className="ms-auto"
+                        style={{ marginTop: "-10px", cursor: "pointer" }}
+                        onClick={() => removeIdentifier(index)}
+                        size="2em"
+                        onMouseOver={(event) =>
+                          (event.currentTarget.style.color = "blue")
+                        }
+                        onMouseOut={(event) =>
+                          (event.currentTarget.style.color = "")
+                        }
+                        data-testid="add row button"
+                      />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        }}
+      </FieldArray>
+
+      <FieldArray name="dwcOtherCatalogNumbers">
+        {({ form, push, remove }) => {
+          const otherCatalogNumbers = form.values?.dwcOtherCatalogNumbers ?? [];
+
+          // If empty, just display one.
+          if (otherCatalogNumbers.length === 0) {
+            push({});
+          }
+
+          function addCatalogNumber() {
+            push({});
+          }
+
+          function removeCatalogNumber(index: number) {
+            remove(index);
+          }
+
+          function containsEmptyObject() {
             return (
-              <div className="d-flex align-items-center justify-content-between">
-                {legendElement}
-                {!readOnly && (
+              otherCatalogNumbers.some(
+                (obj) => Object.keys(obj).length === 0
+              ) || otherCatalogNumbers.find((obj) => obj.value === "")
+            );
+          }
+
+          const disableAddButton = containsEmptyObject();
+
+          return (
+            <div className="other-catalogue-numbers-section">
+              {/* Top header, where the plus icon is displayed */}
+              <div
+                className="row"
+                style={{ borderTop: "1px solid lightgray", paddingTop: "15px" }}
+              >
+                <div className="col-md-8">
+                  <strong>
+                    <DinaMessage id={"field_dwcOtherCatalogNumbers"} />
+                  </strong>
+                </div>
+                <div className="col-md-4 d-flex align-items-center justify-content-between">
                   <FaPlus
                     className="ms-auto"
                     style={{
@@ -60,7 +181,7 @@ export function OtherIdentifiersSection() {
                     }}
                     onClick={() => {
                       if (!disableAddButton) {
-                        addIdentifier();
+                        addCatalogNumber();
                       }
                     }}
                     size="2em"
@@ -78,57 +199,41 @@ export function OtherIdentifiersSection() {
                     }}
                     data-testid="add row button"
                   />
-                )}
+                </div>
               </div>
-            );
-          };
-        }
 
-        return (
-          <FieldSet
-            legend={<DinaMessage id={"otherIdentifiers"} />}
-            id="identifierLegend"
-            wrapLegend={legendWrapper()}
-          >
-            <div className={`identifier-section`}>
-              {identifiers.map((_, index) => (
+              {/* Each of other catalog numbers rows to be displayed */}
+              {otherCatalogNumbers.map((_, index) => (
                 <div className="row" key={index}>
-                  <div className="col-md-5">
-                    <SelectField
-                      name={"identifiers[" + index + "].type"}
-                      options={(vocabOptions as any).filter(
-                        (option) => !selectedTypes.includes(option.value)
-                      )}
-                      label={formatMessage("identifierType")}
-                    />
-                  </div>
-                  <div className="col-md-6">
+                  <div className="col-md-11">
                     <TextField
-                      name={"identifiers[" + index + "].value"}
-                      label={formatMessage("identifierURI")}
+                      name={"dwcOtherCatalogNumbers[" + index + "].value"}
+                      hideLabel={true}
                     />
                   </div>
-                  <div className="col-md-1">
-                    <FaMinus
-                      className="ms-1"
-                      style={{ marginTop: "33px", cursor: "pointer" }}
-                      onClick={() => removeIdentifier(index)}
-                      size="2em"
-                      onMouseOver={(event) =>
-                        (event.currentTarget.style.color = "blue")
-                      }
-                      onMouseOut={(event) =>
-                        (event.currentTarget.style.color = "")
-                      }
-                      data-testid="add row button"
-                    />
+                  <div className="col-md-1 d-flex align-items-center justify-content-between">
+                    {!readOnly && (
+                      <FaMinus
+                        className="ms-auto"
+                        style={{ marginTop: "-10px", cursor: "pointer" }}
+                        onClick={() => removeCatalogNumber(index)}
+                        size="2em"
+                        onMouseOver={(event) =>
+                          (event.currentTarget.style.color = "blue")
+                        }
+                        onMouseOut={(event) =>
+                          (event.currentTarget.style.color = "")
+                        }
+                        data-testid="add row button"
+                      />
+                    )}
                   </div>
                 </div>
               ))}
             </div>
-          </FieldSet>
-        );
-      }}
-    </FieldArray>
+          );
+        }}
+      </FieldArray>
+    </FieldSet>
   );
 }
