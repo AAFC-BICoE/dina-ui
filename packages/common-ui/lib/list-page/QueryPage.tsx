@@ -599,16 +599,17 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Once the configuration is setup, we can display change the tree.
   useEffect(() => {
-    if (queryBuilderConfig && viewMode) {
-      if (customViewQuery) {
-        isActionTriggeredQuery.current = true;
-        const newTree = Utils.loadTree(customViewQuery);
-        setSubmittedQueryBuilderTree(newTree);
-        setQueryBuilderTree(newTree);
-      } else if (customViewElasticSearchQuery && !enableColumnSelector) {
-        isActionTriggeredQuery.current = true;
-        setSubmittedQueryBuilderTree(emptyQueryTree());
-        setQueryBuilderTree(emptyQueryTree());
+    if (queryBuilderConfig) {
+      isActionTriggeredQuery.current = true;
+      if (viewMode) {
+        if (customViewQuery) {
+          const newTree = Utils.loadTree(customViewQuery);
+          setSubmittedQueryBuilderTree(newTree);
+          setQueryBuilderTree(newTree);
+        } else if (customViewElasticSearchQuery && !enableColumnSelector) {
+          setSubmittedQueryBuilderTree(emptyQueryTree());
+          setQueryBuilderTree(emptyQueryTree());
+        }
       }
     }
   }, [
@@ -872,7 +873,9 @@ export function QueryPage<TData extends KitsuResource>({
         displayedColumns.length === newDisplayedColumns.length;
 
       // Update the flag based on order change
-      isActionTriggeredQuery.current = !orderChanged;
+      if (displayedColumns.length !== 0) {
+        isActionTriggeredQuery.current = !orderChanged;
+      }
 
       // Update displayedColumns regardless of order change
       setDisplayedColumns(newDisplayedColumns);
