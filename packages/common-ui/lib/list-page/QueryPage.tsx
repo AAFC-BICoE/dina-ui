@@ -323,7 +323,6 @@ export function QueryPage<TData extends KitsuResource>({
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
-  const isInitialQueryFinished = useRef(false);
   const isActionTriggeredQuery = useRef(false);
 
   // Search results returned by Elastic Search
@@ -403,6 +402,15 @@ export function QueryPage<TData extends KitsuResource>({
     return { group: groups };
   }, [groups]);
 
+  const sessionStorageLastUsedKeyTreeKey = uniqueName + "-last-used-tree";
+  const localStorageLastUsedSavedSearchChangedKey =
+    uniqueName + "-saved-search-changed";
+  const [sessionStorageQueryTree, setSessionStorageQueryTree] =
+    useSessionStorage<JsonTree>(
+      sessionStorageLastUsedKeyTreeKey,
+      defaultJsonTree
+    );
+
   /** If column selector is not being used, just load the default columns in. */
   useEffect(() => {
     if (!enableColumnSelector) {
@@ -475,6 +483,7 @@ export function QueryPage<TData extends KitsuResource>({
     // Elastic search query with pagination settings.
     let queryDSL;
     if (customViewElasticSearchQuery) {
+      isActionTriggeredQuery.current = true;
       queryDSL = customViewElasticSearchQuery;
     } else {
       queryDSL = elasticSearchFormatExport(
@@ -504,14 +513,10 @@ export function QueryPage<TData extends KitsuResource>({
     // Save elastic search query for export page
     setElasticSearchQuery({ ...queryDSL });
 
-    if (
-      isInitialQueryFinished.current === false ||
-      isActionTriggeredQuery.current
-    ) {
+    if (isActionTriggeredQuery.current === true) {
+      isActionTriggeredQuery.current = false;
       setLoading(true);
-      if (isInitialQueryFinished.current === false) {
-        isInitialQueryFinished.current = true;
-      }
+
       // Fetch data using elastic search.
       // The included section will be transformed from an array to an object with the type name for each relationship.
       elasticSearchRequest(queryDSL)
@@ -580,7 +585,6 @@ export function QueryPage<TData extends KitsuResource>({
         .finally(() => {
           // No matter the end result, loading should stop.
           setLoading(false);
-          isActionTriggeredQuery.current = false;
         });
     }
   }, [
@@ -589,21 +593,22 @@ export function QueryPage<TData extends KitsuResource>({
     sortingRules,
     submittedQueryBuilderTree,
     groups,
-    displayedColumns
+    displayedColumns,
+    customViewElasticSearchQuery
   ]);
 
   // Once the configuration is setup, we can display change the tree.
   useEffect(() => {
     if (queryBuilderConfig && viewMode) {
       if (customViewQuery) {
+        isActionTriggeredQuery.current = true;
         const newTree = Utils.loadTree(customViewQuery);
         setSubmittedQueryBuilderTree(newTree);
         setQueryBuilderTree(newTree);
-        isActionTriggeredQuery.current = true;
       } else if (customViewElasticSearchQuery && !enableColumnSelector) {
+        isActionTriggeredQuery.current = true;
         setSubmittedQueryBuilderTree(emptyQueryTree());
         setQueryBuilderTree(emptyQueryTree());
-        isActionTriggeredQuery.current = true;
       }
     }
   }, [
@@ -819,15 +824,6 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
-  const sessionStorageLastUsedKeyTreeKey = uniqueName + "-last-used-tree";
-  const localStorageLastUsedSavedSearchChangedKey =
-    uniqueName + "-saved-search-changed";
-  const [sessionStorageQueryTree, setSessionStorageQueryTree] =
-    useSessionStorage<JsonTree>(
-      sessionStorageLastUsedKeyTreeKey,
-      defaultJsonTree
-    );
-
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
    * performed.
@@ -995,6 +991,7 @@ export function QueryPage<TData extends KitsuResource>({
             groups={groups}
             uniqueName={uniqueName}
             validationErrors={validationErrors}
+            triggerSearch={isActionTriggeredQuery}
           />
         </>
       )}
