@@ -75,7 +75,8 @@ export function StorageUnitForm({
 
   const initialValues = storageUnit || {
     type: "storage-unit",
-    parentStorageUnit: initialParent
+    parentStorageUnit: initialParent,
+    isGeneric: false
   };
 
   async function onSubmit({
