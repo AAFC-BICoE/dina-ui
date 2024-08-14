@@ -538,7 +538,7 @@ export function useMaterialSampleSave({
 
     // Other identifiers saving
     if (submittedValues.identifiers) {
-      submittedValues.identifiers = (submittedValues.identifiers as any).reduce(
+      const otherIdentifiers = (submittedValues.identifiers as any).reduce(
         (acc, identifier) => {
           if (identifier.type && identifier.value) {
             acc[identifier.type] = identifier.value;
@@ -547,13 +547,25 @@ export function useMaterialSampleSave({
         },
         {}
       );
+
+      if (otherIdentifiers && Object.keys(otherIdentifiers).length > 0) {
+        submittedValues.identifiers = otherIdentifiers;
+      } else {
+        submittedValues.identifiers = undefined;
+      }
     }
 
     // Remove empty items from dwcOtherCatalogNumbers
     if (submittedValues.dwcOtherCatalogNumbers) {
-      submittedValues.dwcOtherCatalogNumbers = (
+      const otherCatalogNumbers = (
         submittedValues.dwcOtherCatalogNumbers as any
       ).filter((catNum) => catNum !== "");
+
+      if (otherCatalogNumbers.length !== 0) {
+        submittedValues.dwcOtherCatalogNumbers = otherCatalogNumbers;
+      } else {
+        submittedValues.dwcOtherCatalogNumbers = undefined;
+      }
     }
 
     /** Input to submit to the back-end API. */
