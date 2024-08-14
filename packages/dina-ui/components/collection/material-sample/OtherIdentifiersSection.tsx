@@ -6,15 +6,14 @@ import {
 } from "common-ui/lib";
 import useVocabularyOptions from "../useVocabularyOptions";
 import { FieldArray } from "formik";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
 
 export function OtherIdentifiersSection() {
-  const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
 
   const { vocabOptions } = useVocabularyOptions({
-    path: "collection-api/vocabulary2/materialSampleType"
+    path: "collection-api/vocabulary2/materialSampleIdentifierType"
   });
 
   return (
@@ -139,11 +138,11 @@ export function OtherIdentifiersSection() {
 
           // If empty, just display one.
           if (otherCatalogNumbers.length === 0) {
-            push({});
+            push("");
           }
 
           function addCatalogNumber() {
-            push({});
+            push("");
           }
 
           function removeCatalogNumber(index: number) {
@@ -173,63 +172,71 @@ export function OtherIdentifiersSection() {
                   </strong>
                 </div>
                 <div className="col-md-4 d-flex align-items-center justify-content-between">
-                  <FaPlus
-                    className="ms-auto"
-                    style={{
-                      cursor: disableAddButton ? "not-allowed" : "pointer",
-                      color: disableAddButton ? "gray" : "black"
-                    }}
-                    onClick={() => {
-                      if (!disableAddButton) {
-                        addCatalogNumber();
-                      }
-                    }}
-                    size="2em"
-                    onMouseOver={(event) => {
-                      if (!disableAddButton) {
-                        event.currentTarget.style.color = "blue";
-                      }
-                    }}
-                    onMouseOut={(event) => {
-                      if (disableAddButton) {
-                        event.currentTarget.style.color = "gray";
-                      } else {
-                        event.currentTarget.style.color = "black";
-                      }
-                    }}
-                    data-testid="add row button"
-                  />
+                  {!readOnly && (
+                    <FaPlus
+                      className="ms-auto"
+                      style={{
+                        cursor: disableAddButton ? "not-allowed" : "pointer",
+                        color: disableAddButton ? "gray" : "black"
+                      }}
+                      onClick={() => {
+                        if (!disableAddButton) {
+                          addCatalogNumber();
+                        }
+                      }}
+                      size="2em"
+                      onMouseOver={(event) => {
+                        if (!disableAddButton) {
+                          event.currentTarget.style.color = "blue";
+                        }
+                      }}
+                      onMouseOut={(event) => {
+                        if (disableAddButton) {
+                          event.currentTarget.style.color = "gray";
+                        } else {
+                          event.currentTarget.style.color = "black";
+                        }
+                      }}
+                      data-testid="add row button"
+                    />
+                  )}
                 </div>
               </div>
 
               {/* Each of other catalog numbers rows to be displayed */}
-              {otherCatalogNumbers.map((_, index) => (
-                <div className="row" key={index}>
-                  <div className="col-md-11">
-                    <TextField
-                      name={"dwcOtherCatalogNumbers[" + index + "].value"}
-                      hideLabel={true}
-                    />
-                  </div>
-                  <div className="col-md-1 d-flex align-items-center justify-content-between">
-                    {!readOnly && (
-                      <FaMinus
-                        className="ms-auto"
-                        style={{ marginTop: "-10px", cursor: "pointer" }}
-                        onClick={() => removeCatalogNumber(index)}
-                        size="2em"
-                        onMouseOver={(event) =>
-                          (event.currentTarget.style.color = "blue")
-                        }
-                        onMouseOut={(event) =>
-                          (event.currentTarget.style.color = "")
-                        }
-                        data-testid="add row button"
+              {!readOnly &&
+                otherCatalogNumbers.map((_, index) => (
+                  <div className="row" key={index}>
+                    <div className="col-md-11">
+                      <TextField
+                        name={"dwcOtherCatalogNumbers[" + index + "]"}
+                        hideLabel={true}
                       />
-                    )}
+                    </div>
+                    <div className="col-md-1 d-flex align-items-center justify-content-between">
+                      {!readOnly && (
+                        <FaMinus
+                          className="ms-auto"
+                          style={{ marginTop: "-10px", cursor: "pointer" }}
+                          onClick={() => removeCatalogNumber(index)}
+                          size="2em"
+                          onMouseOver={(event) =>
+                            (event.currentTarget.style.color = "blue")
+                          }
+                          onMouseOut={(event) =>
+                            (event.currentTarget.style.color = "")
+                          }
+                          data-testid="add row button"
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+
+              {/* Read-only mode, display it like an array. */}
+              {readOnly && (
+                <p className="mt-2">{otherCatalogNumbers.join(", ")}</p>
+              )}
             </div>
           );
         }}

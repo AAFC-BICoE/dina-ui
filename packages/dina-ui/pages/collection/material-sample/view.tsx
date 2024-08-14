@@ -157,7 +157,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         if (materialSample.identifiers) {
           (materialSample as any).identifiers = Object.entries(
             materialSample.identifiers
-          ).map(([type, uri]) => ({ type, uri }));
+          ).map(([type, value]) => ({ type, value }));
         }
         const buttonBar = id && (
           <ButtonBar>

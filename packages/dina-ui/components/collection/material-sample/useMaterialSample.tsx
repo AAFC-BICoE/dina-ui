@@ -458,7 +458,7 @@ export function useMaterialSampleSave({
   if (msInitialValues.identifiers) {
     (msInitialValues as any).identifiers = Object.entries(
       msInitialValues.identifiers
-    ).map(([type, uri]) => ({ type, uri }));
+    ).map(([type, value]) => ({ type, value }));
   }
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -540,7 +540,7 @@ export function useMaterialSampleSave({
     if (submittedValues.identifiers) {
       submittedValues.identifiers = (submittedValues.identifiers as any).reduce(
         (acc, identifier) => {
-          acc[identifier.type] = identifier.uri;
+          acc[identifier.type] = identifier.value;
           return acc;
         },
         {}
