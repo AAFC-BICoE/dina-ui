@@ -540,11 +540,20 @@ export function useMaterialSampleSave({
     if (submittedValues.identifiers) {
       submittedValues.identifiers = (submittedValues.identifiers as any).reduce(
         (acc, identifier) => {
-          acc[identifier.type] = identifier.value;
+          if (identifier.type && identifier.value) {
+            acc[identifier.type] = identifier.value;
+          }
           return acc;
         },
         {}
       );
+    }
+
+    // Remove empty items from dwcOtherCatalogNumbers
+    if (submittedValues.dwcOtherCatalogNumbers) {
+      submittedValues.dwcOtherCatalogNumbers = (
+        submittedValues.dwcOtherCatalogNumbers as any
+      ).filter((catNum) => catNum !== "");
     }
 
     /** Input to submit to the back-end API. */

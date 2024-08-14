@@ -29,7 +29,8 @@ export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
   "collection",
   "materialSampleName",
   "dwcOtherCatalogNumbers",
-  "barcode"
+  "barcode",
+  "identifiers"
 ];
 
 /** Fields layout re-useable between view and edit pages. */
