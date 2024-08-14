@@ -1,6 +1,7 @@
 import {
   FieldSet,
   SelectField,
+  SelectOption,
   TextField,
   useDinaFormContext
 } from "common-ui/lib";
@@ -12,9 +13,14 @@ import { FaMinus, FaPlus } from "react-icons/fa";
 export function OtherIdentifiersSection() {
   const { readOnly } = useDinaFormContext();
 
-  const { vocabOptions } = useVocabularyOptions({
+  const { vocabOptions: vocab } = useVocabularyOptions({
     path: "collection-api/vocabulary2/materialSampleIdentifierType"
   });
+
+  const vocabOptions: SelectOption<string>[] = vocab.map((v) => ({
+    label: v.label,
+    value: v.value
+  }));
 
   return (
     <FieldSet
@@ -93,11 +99,19 @@ export function OtherIdentifiersSection() {
               {/* Each of other identifier rows to be displayed */}
               {identifiers.map((_, index) => (
                 <div className="row" key={index}>
-                  <div className="col-md-5">
-                    <SelectField
+                  <div className={readOnly ? "col-md-2" : "col-md-5"}>
+                    <SelectField<string>
                       name={"identifiers[" + index + "].type"}
-                      options={(vocabOptions as any).filter(
+                      options={vocabOptions.filter(
                         (option) => !selectedTypes.includes(option.value)
+                      )}
+                      readOnlyRender={(optionValue) => (
+                        <strong>
+                          {vocabOptions.find(
+                            (item) => item.value === optionValue
+                          )?.label ?? ""}
+                          :
+                        </strong>
                       )}
                       hideLabel={true}
                     />
