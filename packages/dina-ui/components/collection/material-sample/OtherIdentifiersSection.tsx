@@ -6,7 +6,7 @@ import {
 } from "common-ui/lib";
 import useVocabularyOptions from "../useVocabularyOptions";
 import { FieldArray } from "formik";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
 
 export function OtherIdentifiersSection() {
