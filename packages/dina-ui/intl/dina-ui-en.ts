@@ -182,6 +182,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   determiningDate: "Determining Date",
   dinaHomeH1: "Dina Home",
   dinaManagementSectionTitle: "Management",
+  dinaConfigurationSectionTitle: "Configuration",
+  userProfile: "User Profile",
   disabledForChildMaterialSamples: "Disabled for child Material Samples",
   dragDropInstructionsHeader: "To rearrange the attribute order:",
   dragDropKeyboardInstructions:
