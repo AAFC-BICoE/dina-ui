@@ -1,7 +1,7 @@
 import {
   FieldSet,
+  FieldWrapper,
   SelectField,
-  SelectOption,
   TextField,
   useDinaFormContext
 } from "common-ui/lib";
@@ -13,14 +13,9 @@ import { FaMinus, FaPlus } from "react-icons/fa";
 export function OtherIdentifiersSection() {
   const { readOnly } = useDinaFormContext();
 
-  const { vocabOptions: vocab } = useVocabularyOptions({
+  const { vocabOptions } = useVocabularyOptions({
     path: "collection-api/vocabulary2/materialSampleIdentifierType"
   });
-
-  const vocabOptions: SelectOption<string>[] = vocab.map((v) => ({
-    label: v.label,
-    value: v.value
-  }));
 
   return (
     <FieldSet
@@ -60,9 +55,15 @@ export function OtherIdentifiersSection() {
               {/* Top header, where the plus icon is displayed */}
               <div className="row">
                 <div className="col-md-8">
-                  <h2 className="fieldset-h2-adjustment">
-                    <DinaMessage id="otherIdentifiers" />
-                  </h2>
+                  <FieldWrapper
+                    disableLabelClick={true}
+                    name={"visibleOtherIdentifiers"}
+                    hideLabel={true}
+                  >
+                    <h2 className="fieldset-h2-adjustment">
+                      <DinaMessage id="otherIdentifiers" />
+                    </h2>
+                  </FieldWrapper>
                 </div>
                 <div className="col-md-4 d-flex align-items-center justify-content-between">
                   {!readOnly && (
@@ -100,7 +101,7 @@ export function OtherIdentifiersSection() {
               {identifiers.map((_, index) => (
                 <div className="row" key={index}>
                   <div className={readOnly ? "col-md-2" : "col-md-5"}>
-                    <SelectField<string>
+                    <SelectField
                       name={"identifiers[" + index + "].type"}
                       options={vocabOptions.filter(
                         (option) => !selectedTypes.includes(option.value)
@@ -113,6 +114,13 @@ export function OtherIdentifiersSection() {
                           :
                         </strong>
                       )}
+                      selectProps={{
+                        getOptionLabel: (optionValue) =>
+                          (optionValue as any)?.label ?? "",
+                        getOptionValue: (optionValue) =>
+                          (optionValue as any)?.value ?? ""
+                      }}
+                      disableTemplateCheckbox={true}
                       hideLabel={true}
                     />
                   </div>
@@ -120,6 +128,7 @@ export function OtherIdentifiersSection() {
                     <TextField
                       name={"identifiers[" + index + "].value"}
                       hideLabel={true}
+                      disableTemplateCheckbox={true}
                     />
                   </div>
                   <div className="col-md-1 d-flex align-items-center justify-content-between">
@@ -181,9 +190,15 @@ export function OtherIdentifiersSection() {
                 style={{ borderTop: "1px solid lightgray", paddingTop: "15px" }}
               >
                 <div className="col-md-8">
-                  <strong>
-                    <DinaMessage id={"field_dwcOtherCatalogNumbers"} />
-                  </strong>
+                  <FieldWrapper
+                    disableLabelClick={true}
+                    name={"visibleOtherCatalogNumbers"}
+                    hideLabel={true}
+                  >
+                    <strong>
+                      <DinaMessage id={"field_dwcOtherCatalogNumbers"} />
+                    </strong>
+                  </FieldWrapper>
                 </div>
                 <div className="col-md-4 d-flex align-items-center justify-content-between">
                   {!readOnly && (
@@ -225,6 +240,7 @@ export function OtherIdentifiersSection() {
                       <TextField
                         name={"dwcOtherCatalogNumbers[" + index + "]"}
                         hideLabel={true}
+                        disableTemplateCheckbox={true}
                       />
                     </div>
                     <div className="col-md-1 d-flex align-items-center justify-content-between">
