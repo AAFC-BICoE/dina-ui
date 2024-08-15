@@ -228,6 +228,14 @@ export function FormTemplateEditPageLoaded({
                     `collectingEvent.${field.id}`
                   );
                   break;
+                case IDENTIFIER_COMPONENT_NAME:
+                  if (
+                    field.id === "identifiers" ||
+                    field.id === "dwcOtherCatalogNumbers"
+                  ) {
+                    item.defaultValue = undefined;
+                  }
+                  break;
                 case SPLIT_CONFIGURATION_COMPONENT_NAME:
                   // Displayed by default. Visibility cannot be configured.
                   item.visible = true;

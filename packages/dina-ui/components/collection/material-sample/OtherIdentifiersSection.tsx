@@ -22,7 +22,7 @@ export function OtherIdentifiersSection() {
   const visibility = getFormTemplateCheckboxes(formTemplate);
   const otherIdentifiersVisible = formTemplate
     ? visibility?.templateCheckboxes?.[
-        "identifiers-component.identifiers-section.identifers"
+        "identifiers-component.identifiers-section.identifiers"
       ] ?? false
     : true;
   const otherCatalogNumbersVisble = formTemplate
@@ -146,6 +146,7 @@ export function OtherIdentifiersSection() {
                             (optionValue as any)?.value ?? ""
                         }}
                         disableTemplateCheckbox={true}
+                        disabled={isTemplate}
                         hideLabel={true}
                       />
                     </div>
@@ -154,6 +155,7 @@ export function OtherIdentifiersSection() {
                         name={"identifiers[" + index + "].value"}
                         hideLabel={true}
                         disableTemplateCheckbox={true}
+                        disabled={isTemplate}
                       />
                     </div>
                     <div className="col-md-1 d-flex align-items-center justify-content-between">
@@ -274,6 +276,7 @@ export function OtherIdentifiersSection() {
                           name={"dwcOtherCatalogNumbers[" + index + "]"}
                           hideLabel={true}
                           disableTemplateCheckbox={true}
+                          disabled={isTemplate}
                         />
                       </div>
                       <div className="col-md-1 d-flex align-items-center justify-content-between">
