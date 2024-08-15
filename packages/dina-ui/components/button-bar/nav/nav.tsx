@@ -573,6 +573,7 @@ function NavDinaConfigurationDropdown({ formatMessage }) {
             hideBackButton: true
           }
         }}
+        onKeyDown={onKeyDownLastItem}
         passHref={true}
       >
         <NavDropdown.Item role="menuitem">
