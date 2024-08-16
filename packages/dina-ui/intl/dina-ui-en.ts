@@ -361,7 +361,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_gridLayoutDefinition_column_label: "By Column",
   field_gridLayoutDefinition_row_label: "By Row",
   field_host: "Host",
-  field_id: "ID",
+  field_id: "UUID",
   field_isFiledAs_tooltip:
     "Make this determination the filed as. Only one determination can be filed as",
   field_isInseperable: "Keep Contents Together",
