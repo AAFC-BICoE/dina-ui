@@ -1,11 +1,22 @@
 import { TagSelectReadOnly } from "../../tag-editor/TagSelectField";
 
-export default function MetadataBadges() {
+interface MetadataBadgesProps {
+  tagsFieldName?: string;
+  groupSelectorName?: string;
+}
+
+export default function MetadataBadges({
+  tagsFieldName,
+  groupSelectorName
+}: MetadataBadgesProps) {
   return (
     <div>
       {" "}
       <div className="row">
-        <TagSelectReadOnly />
+        <TagSelectReadOnly
+          tagsFieldName={tagsFieldName}
+          groupSelectorName={groupSelectorName}
+        />
       </div>
     </div>
   );
