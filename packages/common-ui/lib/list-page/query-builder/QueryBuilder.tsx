@@ -99,6 +99,9 @@ interface QueryBuilderProps {
    * submitting a broken query.
    */
   validationErrors: ValidationError[];
+
+  // Reference for triggering the search. This helps prevent more searches than necessary.
+  triggerSearch: React.MutableRefObject<boolean>;
 }
 
 function QueryBuilder({
@@ -113,7 +116,8 @@ function QueryBuilder({
   groups,
   setGroups,
   uniqueName,
-  validationErrors
+  validationErrors,
+  triggerSearch
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -159,6 +163,7 @@ function QueryBuilder({
           groups={groups}
           setGroups={setGroups}
           uniqueName={uniqueName}
+          triggerSearch={triggerSearch}
         />
         <Query
           {...queryBuilderConfig}
