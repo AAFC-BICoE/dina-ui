@@ -1,6 +1,5 @@
 import { writeStorage } from "@rehooks/local-storage";
 import { ResourceSelect } from "common-ui";
-import Select from "react-select";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../group-select/useStoredDefaultGroup";
 import { MaterialSampleGenerationForm } from "../MaterialSampleGenerationForm";
@@ -70,6 +69,9 @@ describe("MaterialSampleGenerationForm", () => {
     wrapper
       .find(".separator-field input")
       .simulate("change", { target: { value: "-" } });
+    wrapper
+      .find(".sourceSet-field input")
+      .simulate("change", { target: { value: "sourceSet1" } });
 
     const expectedNames = [
       "my-sample-00001",
@@ -96,6 +98,7 @@ describe("MaterialSampleGenerationForm", () => {
         parentMaterialSample: undefined,
         collection: { id: "100", name: "test-collection", type: "collection" },
         group: "aafc",
+        sourceSet: "sourceSet1",
         materialSampleName: name,
         publiclyReleasable: true,
         type: "material-sample"
@@ -110,6 +113,7 @@ describe("MaterialSampleGenerationForm", () => {
         group: "aafc",
         increment: "NUMERICAL",
         numberToCreate: "5",
+        sourceSet: "sourceSet1",
         samples: [],
         separator: "-",
         start: "00001",
