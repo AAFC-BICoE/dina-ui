@@ -2156,6 +2156,8 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               projects: undefined,
               barcode: "edited-barcode",
               relationships: {},
