@@ -9,14 +9,12 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  useApiClient,
-  useDinaFormContext
+  useApiClient
 } from "common-ui";
 import { Field, FormikContextType, useFormikContext } from "formik";
 import { InputResource } from "kitsu";
 import { padStart, range } from "lodash";
 import { useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import * as yup from "yup";
 import {
@@ -83,12 +81,18 @@ export function MaterialSampleGenerationForm({
       >((_, index) => {
         const sample = submittedValues.samples[index];
         const materialSampleName = sample?.materialSampleName?.trim?.();
+        const sourceSet =
+          submittedValues.sourceSet !== undefined &&
+          submittedValues.sourceSet !== ""
+            ? submittedValues.sourceSet
+            : undefined;
         return {
           type: "material-sample",
           parentMaterialSample: undefined,
           group: submittedValues.group,
           collection: submittedValues.collection,
           publiclyReleasable: true,
+          sourceSet,
           ...sample,
           materialSampleName: materialSampleName
             ? materialSampleName
@@ -129,6 +133,7 @@ export function MaterialSampleGenerationForm({
           start: "001",
           baseName: "",
           separator: "",
+          sourceSet: "",
           collection: collectionQuery.lastUsedCollection
         }
       }
@@ -172,13 +177,23 @@ export function MaterialSampleGenerationForm({
         />
       </div>
       {!useNextSequence && (
-        <>
-          <GeneratorFields
-            generationMode={generationMode}
-            baseName={baseNameFromCollection}
-          />
-          <PreviewAndCustomizeFields generationMode={generationMode} />
-        </>
+        <GeneratorFields
+          generationMode={generationMode}
+          baseName={baseNameFromCollection}
+        />
+      )}
+
+      {/* Source Set */}
+      <div className="row">
+        <TextField
+          className="col-sm-6"
+          name="sourceSet"
+          tooltipOverride={formatMessage("sourceSet_tooltip")}
+        />
+      </div>
+
+      {!useNextSequence && (
+        <PreviewAndCustomizeFields generationMode={generationMode} />
       )}
       <ButtonBar centered={false}>
         <BackToListButton
@@ -402,6 +417,7 @@ const generatorFormSchema = yup.object({
     .required(),
   baseName: yup.string(),
   separator: yup.string(),
+  sourceSet: yup.string(),
   // Batch mode:
   suffix: yup.string(),
   // Series mode:
