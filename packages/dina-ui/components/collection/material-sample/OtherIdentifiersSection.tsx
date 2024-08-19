@@ -6,7 +6,7 @@ import {
   useDinaFormContext
 } from "common-ui/lib";
 import useVocabularyOptions from "../useVocabularyOptions";
-import { FieldArray } from "formik";
+import { FieldArray, useFormikContext } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { getFormTemplateCheckboxes } from "../../form-template/formTemplateUtils";
@@ -14,21 +14,26 @@ import { getFormTemplateCheckboxes } from "../../form-template/formTemplateUtils
 export function OtherIdentifiersSection() {
   const { readOnly, isTemplate, formTemplate, isBulkEditAllTab } =
     useDinaFormContext();
+  const { values } = useFormikContext();
 
   const { vocabOptions } = useVocabularyOptions({
-    path: "collection-api/vocabulary2/materialSampleType"
+    path: "collection-api/vocabulary2/materialSampleIdentifierType"
   });
 
   // Determine if the form template sections should be visible. (Bulk edit is disabled for now)
   const visibility = getFormTemplateCheckboxes(formTemplate);
-  const otherIdentifiersVisible = isBulkEditAllTab
+  const otherIdentifiersVisible = readOnly
+    ? Object.keys((values as any)?.identifiers)?.length !== 0
+    : isBulkEditAllTab
     ? false
     : formTemplate
     ? visibility?.templateCheckboxes?.[
         "identifiers-component.identifiers-section.identifiers"
       ] ?? false
     : true;
-  const otherCatalogNumbersVisible = isBulkEditAllTab
+  const otherCatalogNumbersVisible = readOnly
+    ? !!(values as any)?.dwcOtherCatalogNumbers
+    : isBulkEditAllTab
     ? false
     : formTemplate
     ? visibility?.templateCheckboxes?.[
@@ -57,7 +62,7 @@ export function OtherIdentifiersSection() {
             const selectedTypes = identifiers?.map?.((obj) => obj.type) ?? [];
 
             // If empty, just display one.
-            if (identifiers?.length === 0) {
+            if (identifiers?.length === 0 && !readOnly) {
               push({});
             }
 
@@ -226,7 +231,9 @@ export function OtherIdentifiersSection() {
                 <div
                   className="row"
                   style={{
-                    borderTop: "1px solid lightgray",
+                    borderTop: !otherIdentifiersVisible
+                      ? "0px solid white"
+                      : "1px solid lightgray",
                     paddingTop: "15px"
                   }}
                 >
