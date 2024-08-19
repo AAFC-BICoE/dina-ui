@@ -23,7 +23,7 @@ export function OtherIdentifiersSection() {
   // Determine if the form template sections should be visible. (Bulk edit is disabled for now)
   const visibility = getFormTemplateCheckboxes(formTemplate);
   const otherIdentifiersVisible = readOnly
-    ? Object.keys((values as any)?.identifiers)?.length !== 0
+    ? Object.keys((values as any)?.identifiers ?? {})?.length !== 0
     : isBulkEditAllTab
     ? false
     : formTemplate
