@@ -148,13 +148,16 @@ export function OtherIdentifiersSection() {
                           <strong>
                             {vocabOptions.find(
                               (item) => item.value === optionValue
-                            )?.label ?? ""}
+                            )?.label ??
+                              optionValue ??
+                              ""}
                             :
                           </strong>
                         )}
                         selectProps={{
                           getOptionLabel: (optionValue) =>
-                            (optionValue as any)?.label ?? "",
+                            (optionValue as any)?.label ??
+                            (optionValue as any)?.value,
                           getOptionValue: (optionValue) =>
                             (optionValue as any)?.value ?? ""
                         }}

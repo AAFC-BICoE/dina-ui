@@ -551,7 +551,7 @@ export function useMaterialSampleSave({
       if (otherIdentifiers && Object.keys(otherIdentifiers).length > 0) {
         submittedValues.identifiers = otherIdentifiers;
       } else {
-        submittedValues.identifiers = undefined;
+        submittedValues.identifiers = {};
       }
     }
 
@@ -564,7 +564,7 @@ export function useMaterialSampleSave({
       if (otherCatalogNumbers.length !== 0) {
         submittedValues.dwcOtherCatalogNumbers = otherCatalogNumbers;
       } else {
-        submittedValues.dwcOtherCatalogNumbers = undefined;
+        (submittedValues.dwcOtherCatalogNumbers as any) = null;
       }
     }
 
