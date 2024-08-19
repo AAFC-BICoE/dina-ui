@@ -229,10 +229,9 @@ export function TagSelectReadOnly({
   groupSelectorName = "group"
 }: TagSelectReadOnlyProps) {
   const { values } = useFormikContext<any>();
-
   return (
     <>
-      {values?.tags && values.tags.length !== 0 && (
+      {values?.[tagsFieldName] && values?.[tagsFieldName].length !== 0 && (
         <div className="ms-auto">
           <TagSelectField
             resourcePath={resourcePath}

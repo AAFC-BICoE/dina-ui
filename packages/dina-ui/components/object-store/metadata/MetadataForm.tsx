@@ -28,6 +28,7 @@ import {
 import { ReactNode, Ref } from "react";
 import { InputResource } from "kitsu";
 import { FormikProps } from "formik";
+import MetadataBadges from "./MetadataBadges";
 
 export interface MetadataFormProps {
   metadata?: InputResource<Metadata>;
@@ -86,6 +87,7 @@ export function MetadataForm({
           <MetadataFileView metadata={metadata as Metadata} imgHeight="15rem" />
         )}
       </div>
+      <MetadataBadges />
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"
