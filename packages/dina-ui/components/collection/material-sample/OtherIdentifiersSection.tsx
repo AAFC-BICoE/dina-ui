@@ -12,20 +12,25 @@ import { FaMinus, FaPlus } from "react-icons/fa";
 import { getFormTemplateCheckboxes } from "../../form-template/formTemplateUtils";
 
 export function OtherIdentifiersSection() {
-  const { readOnly, isTemplate, formTemplate } = useDinaFormContext();
+  const { readOnly, isTemplate, formTemplate, isBulkEditAllTab } =
+    useDinaFormContext();
 
   const { vocabOptions } = useVocabularyOptions({
-    path: "collection-api/vocabulary2/materialSampleIdentifierType"
+    path: "collection-api/vocabulary2/materialSampleType"
   });
 
-  // Determine if the form template sections should be visible.
+  // Determine if the form template sections should be visible. (Bulk edit is disabled for now)
   const visibility = getFormTemplateCheckboxes(formTemplate);
-  const otherIdentifiersVisible = formTemplate
+  const otherIdentifiersVisible = isBulkEditAllTab
+    ? false
+    : formTemplate
     ? visibility?.templateCheckboxes?.[
         "identifiers-component.identifiers-section.identifiers"
       ] ?? false
     : true;
-  const otherCatalogNumbersVisble = formTemplate
+  const otherCatalogNumbersVisible = isBulkEditAllTab
+    ? false
+    : formTemplate
     ? visibility?.templateCheckboxes?.[
         "identifiers-component.identifiers-section.dwcOtherCatalogNumbers"
       ] ?? false
@@ -34,7 +39,7 @@ export function OtherIdentifiersSection() {
   // If both are not visible, do not display the section.
   if (
     otherIdentifiersVisible === false &&
-    otherCatalogNumbersVisble === false
+    otherCatalogNumbersVisible === false
   ) {
     return <></>;
   }
@@ -48,11 +53,11 @@ export function OtherIdentifiersSection() {
       {otherIdentifiersVisible && (
         <FieldArray name="identifiers">
           {({ form, push, remove }) => {
-            const identifiers = form.values?.identifiers ?? [];
-            const selectedTypes = identifiers.map((obj) => obj.type);
+            const identifiers = form?.values?.identifiers ?? [];
+            const selectedTypes = identifiers?.map?.((obj) => obj.type) ?? [];
 
             // If empty, just display one.
-            if (identifiers.length === 0) {
+            if (identifiers?.length === 0) {
               push({});
             }
 
@@ -65,7 +70,10 @@ export function OtherIdentifiersSection() {
             }
 
             function containsEmptyObject() {
-              return identifiers.some((obj) => Object.keys(obj).length === 0);
+              return (
+                identifiers?.some?.((obj) => Object.keys(obj).length === 0) ??
+                false
+              );
             }
 
             // Add button should be disabled if there is already an empty option being displayed or out of types to use.
@@ -123,7 +131,7 @@ export function OtherIdentifiersSection() {
                 </div>
 
                 {/* Each of other identifier rows to be displayed */}
-                {identifiers.map((_, index) => (
+                {identifiers?.map?.((_, index) => (
                   <div className="row" key={index}>
                     <div className={readOnly ? "col-md-2" : "col-md-5"}>
                       <SelectField
@@ -183,11 +191,11 @@ export function OtherIdentifiersSection() {
         </FieldArray>
       )}
 
-      {otherCatalogNumbersVisble && (
+      {otherCatalogNumbersVisible && (
         <FieldArray name="dwcOtherCatalogNumbers">
           {({ form, push, remove }) => {
             const otherCatalogNumbers =
-              form.values?.dwcOtherCatalogNumbers ?? [];
+              form?.values?.dwcOtherCatalogNumbers ?? [];
 
             // If empty, just display one.
             if (otherCatalogNumbers.length === 0) {
@@ -269,7 +277,7 @@ export function OtherIdentifiersSection() {
 
                 {/* Each of other catalog numbers rows to be displayed */}
                 {!readOnly &&
-                  otherCatalogNumbers.map((_, index) => (
+                  otherCatalogNumbers?.map((_, index) => (
                     <div className="row" key={index}>
                       <div className="col-md-11">
                         <TextField
