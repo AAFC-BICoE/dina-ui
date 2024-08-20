@@ -118,20 +118,13 @@ export function useIndexMapping({
       resp.data?.relationships?.map((relationship) => {
         relationship?.attributes?.map((relationshipAttribute) => {
           // This is the user-friendly label to display on the search dropdown.
-          let attributeLabel = relationshipAttribute.path?.includes(".")
+          const attributeLabel = relationshipAttribute.path?.includes(".")
             ? relationshipAttribute.path.substring(
                 relationshipAttribute.path.indexOf(".") + 1
               ) +
               "." +
               relationshipAttribute.name
             : relationshipAttribute.name;
-
-          if (
-            relationship.referencedBy === "acMetadataCreator" ||
-            relationship.referencedBy === "dcCreator"
-          ) {
-            attributeLabel = `${relationship.referencedBy}.${relationshipAttribute.name}`;
-          }
 
           const fullPath =
             relationship.path +

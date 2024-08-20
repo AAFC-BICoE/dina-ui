@@ -531,37 +531,32 @@ export function QueryPage<TData extends KitsuResource>({
               },
               included: rslt._source?.included?.reduce(
                 (includedAccumulator, currentIncluded) => {
-                  if (
-                    currentIncluded?.type === "organism" ||
-                    currentIncluded?.type === "derivative"
-                  ) {
-                    if (!includedAccumulator[currentIncluded?.type]) {
-                      return (
-                        (includedAccumulator[currentIncluded?.type] = [
-                          currentIncluded
-                        ]),
-                        includedAccumulator
-                      );
-                    } else {
-                      return (
-                        includedAccumulator[currentIncluded?.type].push(
-                          currentIncluded
-                        ),
-                        includedAccumulator
-                      );
+                  const relationships = rslt._source?.data?.relationships ?? {};
+                  const currentID = currentIncluded?.id;
+                  const relationshipKeys = Object.keys(relationships).filter(
+                    (key) => {
+                      const relationshipData = relationships[key].data;
+                      return Array.isArray(relationshipData)
+                        ? relationshipData.some((item) => item.id === currentID)
+                        : relationshipData?.id === currentID;
                     }
-                  } else {
-                    return (
-                      (includedAccumulator[currentIncluded?.type] =
-                        currentIncluded),
-                      includedAccumulator
-                    );
-                  }
+                  );
+
+                  relationshipKeys.forEach((key) => {
+                    if (!includedAccumulator[key]) {
+                      includedAccumulator[key] = currentIncluded;
+                    } else {
+                      includedAccumulator[key].push(currentIncluded);
+                    }
+                  });
+
+                  return includedAccumulator;
                 },
                 {}
               )
             };
           });
+
           // If we have reached the count limit, we will need to perform another request for the true
           // query size.
           if (result?.total.value === MAX_COUNT_SIZE) {

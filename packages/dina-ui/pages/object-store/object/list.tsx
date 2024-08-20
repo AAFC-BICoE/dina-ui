@@ -91,7 +91,7 @@ export default function MetadataListPage() {
     ? getTableSectionWidth(screenWidth)
     : 12;
 
-  const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
+  const METADATA_TABLE_COLUMNS: TableColumn<any>[] = [
     ThumbnailCell({
       bucketField: "data.attributes.bucket"
     }),
@@ -129,14 +129,16 @@ export default function MetadataListPage() {
     dateCell("acDigitizationDate", "data.attributes.acDigitizationDate"),
     dateCell("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
     {
-      cell: ({ row: { original } }) => (
-        <>
-          {
-            (original as any).included?.acMetadataCreator?.attributes
-              ?.displayName
-          }
-        </>
-      ),
+      cell: ({
+        row: {
+          original: { included }
+        }
+      }) =>
+        included?.acMetadataCreator?.id ? (
+          <Link href={`/person/view?id=${included?.acMetadataCreator?.id}`}>
+            <a>{included?.acMetadataCreator?.attributes?.displayName}</a>
+          </Link>
+        ) : null,
       header: () => <FieldHeader name="acMetadataCreator.displayName" />,
       relationshipType: "person",
       accessorKey: "included.attributes.displayName",
