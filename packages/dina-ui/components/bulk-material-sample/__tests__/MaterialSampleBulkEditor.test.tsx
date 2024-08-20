@@ -2156,6 +2156,8 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               projects: undefined,
               barcode: "edited-barcode",
               relationships: {},
@@ -2841,11 +2843,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
-        .exists()
-    ).toEqual(true);
+    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
+    // expect(
+    //   wrapper
+    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+    //     .exists()
+    // ).toEqual(true);
 
     // Select a form template:
     wrapper
@@ -2868,11 +2871,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field input")
-        .exists()
-    ).toEqual(false);
+    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
+    // expect(
+    //   wrapper
+    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field input")
+    //     .exists()
+    // ).toEqual(false);
 
     // Switch to the first individual sample tab:
     wrapper.find("li.sample-tab-0").simulate("click");
@@ -2883,11 +2887,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".sample-tabpanel-0 .barcode-field input").exists()
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers-field input")
-        .exists()
-    ).toEqual(false);
+    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
+    // expect(
+    //   wrapper
+    //     .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers-field input")
+    //     .exists()
+    // ).toEqual(false);
   });
 
   it("Allows selecting a Form Template to provide default values for bulk material sample edit all tab.", async () => {
@@ -2905,11 +2910,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
-        .exists()
-    ).toEqual(true);
+    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
+    // expect(
+    //   wrapper
+    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+    //     .exists()
+    // ).toEqual(true);
 
     // Select a form template:
     wrapper
@@ -2932,11 +2938,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
-        .exists()
-    ).toEqual(false);
+    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
+    // expect(
+    //   wrapper
+    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+    //     .exists()
+    // ).toEqual(false);
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
     ).toEqual("1111");

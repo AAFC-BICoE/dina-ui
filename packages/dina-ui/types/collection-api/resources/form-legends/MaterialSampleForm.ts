@@ -131,6 +131,9 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "barcode"
+          },
+          {
+            id: "identifiers"
           }
         ]
       }

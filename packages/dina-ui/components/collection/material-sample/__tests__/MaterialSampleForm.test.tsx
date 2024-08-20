@@ -212,6 +212,8 @@ describe("Material Sample Edit Page", () => {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
@@ -290,6 +292,8 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
@@ -357,6 +361,8 @@ describe("Material Sample Edit Page", () => {
               id: "1",
               type: "material-sample",
               materialSampleName: "test-material-sample-id",
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               relationships: {}
             },
             type: "material-sample"
@@ -446,6 +452,8 @@ describe("Material Sample Edit Page", () => {
                 type: "collecting-event"
               },
               id: "1",
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               type: "material-sample",
               relationships: {}
             },
@@ -610,6 +618,8 @@ describe("Material Sample Edit Page", () => {
               relationships: {},
               attachment: undefined,
               projects: undefined,
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               type: "material-sample"
             },
             type: "material-sample"
@@ -692,6 +702,8 @@ describe("Material Sample Edit Page", () => {
             resource: {
               id: "333",
               relationships: {},
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               type: "material-sample"
             },
             type: "material-sample"

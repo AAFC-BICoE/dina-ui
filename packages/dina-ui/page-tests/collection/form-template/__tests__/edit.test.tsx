@@ -1128,7 +1128,12 @@ describe("Form template edit page", () => {
                   name: "dwcOtherCatalogNumbers",
                   visible: false
                 },
-                { defaultValue: undefined, name: "barcode", visible: false }
+                { defaultValue: undefined, name: "barcode", visible: false },
+                {
+                  defaultValue: undefined,
+                  name: "identifiers",
+                  visible: false
+                }
               ]
             }
           ]

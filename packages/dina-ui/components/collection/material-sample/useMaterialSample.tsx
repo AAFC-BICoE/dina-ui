@@ -458,7 +458,7 @@ export function useMaterialSampleSave({
   if (msInitialValues.identifiers) {
     (msInitialValues as any).identifiers = Object.entries(
       msInitialValues.identifiers
-    ).map(([type, uri]) => ({ type, uri }));
+    ).map(([type, value]) => ({ type, value }));
   }
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -538,13 +538,34 @@ export function useMaterialSampleSave({
 
     // Other identifiers saving
     if (submittedValues.identifiers) {
-      submittedValues.identifiers = (submittedValues.identifiers as any).reduce(
+      const otherIdentifiers = (submittedValues.identifiers as any).reduce(
         (acc, identifier) => {
-          acc[identifier.type] = identifier.uri;
+          if (identifier.type && identifier.value) {
+            acc[identifier.type] = identifier.value;
+          }
           return acc;
         },
         {}
       );
+
+      if (otherIdentifiers && Object.keys(otherIdentifiers).length > 0) {
+        submittedValues.identifiers = otherIdentifiers;
+      } else {
+        submittedValues.identifiers = {};
+      }
+    }
+
+    // Remove empty items from dwcOtherCatalogNumbers
+    if (submittedValues.dwcOtherCatalogNumbers) {
+      const otherCatalogNumbers = (
+        submittedValues.dwcOtherCatalogNumbers as any
+      ).filter((catNum) => catNum !== "");
+
+      if (otherCatalogNumbers.length !== 0) {
+        submittedValues.dwcOtherCatalogNumbers = otherCatalogNumbers;
+      } else {
+        (submittedValues.dwcOtherCatalogNumbers as any) = null;
+      }
     }
 
     /** Input to submit to the back-end API. */
