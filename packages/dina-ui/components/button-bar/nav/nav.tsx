@@ -564,7 +564,11 @@ function NavDinaConfigurationDropdown({ formatMessage }) {
           <DinaMessage id="formTemplates" />
         </NavDropdown.Item>
       </Link>
-
+      <Link href="/collection/split-configuration/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="splitConfigurationTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link
         href={{
           pathname: `/dina-user/view`,
