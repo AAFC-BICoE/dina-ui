@@ -7,7 +7,7 @@ import { createSessionStorageLastUsedTreeKey } from "common-ui/lib/list-page/sav
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
 import { useEffect } from "react";
-import { Tooltip } from "packages/common-ui/lib";
+import { Tooltip } from "common-ui/lib";
 
 interface WorkbookConfirmationProps {
   /** To display the number of records created to the user. */
