@@ -7,6 +7,7 @@ import { createSessionStorageLastUsedTreeKey } from "common-ui/lib/list-page/sav
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
 import { useEffect } from "react";
+import { Tooltip } from "packages/common-ui/lib";
 
 interface WorkbookConfirmationProps {
   /** To display the number of records created to the user. */
@@ -113,6 +114,18 @@ export function WorkbookConfirmation({
           <DinaMessage
             id="workbook_confirmation_total"
             values={{ total: totalRecordsCreated }}
+          />
+        </span>
+        <span className="mt-2">
+          <strong>
+            <DinaMessage id="field_sourceSet" />
+            {": "}
+          </strong>
+          <span>{sourceSetValue}</span>
+          <Tooltip
+            id="sourceSet_workbook_tooltip"
+            placement="right"
+            className="no-select ms-1"
           />
         </span>
       </div>
