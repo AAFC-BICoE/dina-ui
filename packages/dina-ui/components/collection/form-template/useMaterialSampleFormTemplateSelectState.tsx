@@ -108,6 +108,8 @@ export function useMaterialSampleFormTemplateSelectState({
       materialSampleComponent.managedAttributesOrder ?? [],
     determinationManagedAttributesOrder:
       materialSampleComponent.determinationManagedAttributesOrder ?? [],
+    preparationManagedAttributesOrder:
+      materialSampleComponent.preparationManagedAttributesOrder ?? [],
     collectingEventManagedAttributesOrder:
       collectingEventComponent.managedAttributesOrder ?? [],
     formTemplate: {
@@ -143,6 +145,7 @@ export function useMaterialSampleFormTemplateSelectState({
   delete materialSampleInitialValues?.templateCheckboxes;
   delete materialSampleInitialValues?.templateFields;
   delete materialSampleInitialValues?.managedAttributesOrder;
+  delete materialSampleInitialValues?.preparationManagedAttributesOrder;
   delete collectingEventInitialValues?.templateCheckboxes;
   delete collectingEventInitialValues?.templateFields;
   delete collectingEventInitialValues?.managedAttributesOrder;
