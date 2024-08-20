@@ -875,6 +875,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storagesCreatedByMe: "Storages Created By Me",
   sourceSet_tooltip:
     "User-defined name that can be used to retrieve all material samples that were created in the same batch.",
+  sourceSet_workbook_tooltip:
+    "Automatically generated name by the workbook generator that can be used to retrieve all the material samples imported by this workbook upload.",
   tags: "Tags",
   tag: "Tag",
   target: "Target",
