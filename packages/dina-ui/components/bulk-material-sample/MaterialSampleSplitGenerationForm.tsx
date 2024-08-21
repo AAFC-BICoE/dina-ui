@@ -85,14 +85,16 @@ export function MaterialSampleSplitGenerationForm({
 
   const filteredMaterialSamples = splitFromMaterialSamples?.filter(
     (materialSample: any) =>
-      materialSample.materialSampleType ===
-      splitConfiguration?.conditionalOnMaterialSampleTypes
+      splitConfiguration?.conditionalOnMaterialSampleTypes?.includes(
+        materialSample.materialSampleType
+      )
   );
 
   const hasMismatchMaterialSampleType = splitFromMaterialSamples?.some(
     (materialSample: any) =>
-      materialSample.materialSampleType !==
-      splitConfiguration?.conditionalOnMaterialSampleTypes
+      !splitConfiguration?.conditionalOnMaterialSampleTypes?.includes(
+        materialSample.materialSampleType
+      )
   );
 
   // Retrieve all of the form templates, then filter for the correct one.

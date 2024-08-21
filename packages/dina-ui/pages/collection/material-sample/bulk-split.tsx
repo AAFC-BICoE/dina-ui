@@ -82,6 +82,9 @@ export default function MaterialSampleBulkSplitPage() {
             samples={lastSubmission}
             onSaved={moveToResultPage}
             onPreviousClick={() => setMode("GENERATE")}
+            overrideMaterialSampleType={
+              splitConfiguration?.materialSampleTypeCreatedBySplit
+            }
             // initialFormTemplateUUID={formTemplateId}
           />
         </PageLayout>

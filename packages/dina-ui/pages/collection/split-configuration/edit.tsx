@@ -132,8 +132,10 @@ export function SplitConfigurationForm({
       newErrors.characterType = formatMessage("requiredField");
     }
 
-    // Seperator can only be one character.
-    if (!isUndefined(values?.separator) && values.separator.length !== 1) {
+    // Seperator is required and it can only be one character.
+    if (isUndefined(values?.separator)) {
+      newErrors.separator = formatMessage("requiredField");
+    } else if (values.separator.length !== 1) {
       newErrors.separator = formatMessage(
         "materialSampleSplitConfigurationSeperatorError"
       );
@@ -270,6 +272,13 @@ export function SplitConfigurationFormLayout() {
               name="separator"
               inputProps={{
                 maxLength: 1
+              }}
+              readOnlyRender={(value) => {
+                // Display space characters to make it more clear a space was used as the separator.
+                if (value === " ") {
+                  return <i>(Space character)</i>;
+                }
+                return value;
               }}
               label={formatMessage("materialSampleSplitConfigurationSeperator")}
             />

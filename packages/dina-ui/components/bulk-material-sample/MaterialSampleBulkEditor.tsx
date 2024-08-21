@@ -38,6 +38,7 @@ export interface MaterialSampleBulkEditorProps {
   onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
   disableSampleNameField?: boolean;
   onPreviousClick?: () => void;
+  overrideMaterialSampleType?: string;
   initialFormTemplateUUID?: string;
 }
 
@@ -46,7 +47,8 @@ export function MaterialSampleBulkEditor({
   disableSampleNameField,
   onSaved,
   onPreviousClick,
-  initialFormTemplateUUID
+  initialFormTemplateUUID,
+  overrideMaterialSampleType
 }: MaterialSampleBulkEditorProps) {
   // Allow selecting a custom view for the form:
   const {
@@ -56,7 +58,8 @@ export function MaterialSampleBulkEditor({
     materialSampleInitialValues,
     collectingEventInitialValues
   } = useMaterialSampleFormTemplateSelectState({
-    temporaryFormTemplateUUID: initialFormTemplateUUID
+    temporaryFormTemplateUUID: initialFormTemplateUUID,
+    overrideMaterialSampleType
   });
 
   const [selectedTab, setSelectedTab] = useState<
