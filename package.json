@@ -41,7 +41,8 @@
     "tslint-plugin-prettier": "^2.3.0",
     "tslint-react": "^5.0.0",
     "typescript": "^4.5.5",
-    "xlsx": "npm:@e965/xlsx@0.20.0"
+    "xlsx": "npm:@e965/xlsx@0.20.0",
+    "canvas": "^2.11.2"
   },
   "resolutions": {
     "kitsu/axios": "^0.21.1",
@@ -73,7 +74,5 @@
     ]
   },
   "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72",
-  "dependencies": {
-    "canvas": "^2.11.2"
-  }
+  "dependencies": {}
 }
