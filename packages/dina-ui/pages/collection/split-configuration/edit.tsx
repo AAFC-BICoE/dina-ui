@@ -50,6 +50,7 @@ export default function SplitConfigurationEditPage() {
           splitConfiguration={response ? response.data : undefined}
           titleId={titleId}
           router={router}
+          readOnlyMode={false}
         />
       ))}
     </PageLayout>
@@ -58,11 +59,13 @@ export default function SplitConfigurationEditPage() {
 
 interface SplitConfigurationFormProps {
   splitConfiguration?: SplitConfiguration;
+  readOnlyMode: boolean;
   titleId: string;
   router: NextRouter;
 }
 
 export function SplitConfigurationForm({
+  readOnlyMode,
   splitConfiguration: splitConfigurationData,
   titleId,
   router
@@ -80,11 +83,12 @@ export function SplitConfigurationForm({
     submittedValues
   }) => {
     const updatedSplitConfiguration = {
+      ...submittedValues,
       id: submittedValues.id,
       type: submittedValues.type
     } as SplitConfiguration;
 
-    await save(
+    const [savedSplitConfiguration] = await save(
       [
         {
           resource: updatedSplitConfiguration,
@@ -95,7 +99,7 @@ export function SplitConfigurationForm({
     );
 
     await router.push(
-      `/collection/split-configuration/view?id=${submittedValues.id}`
+      `/collection/split-configuration/view?id=${savedSplitConfiguration.id}`
     );
   };
 
@@ -141,17 +145,13 @@ export function SplitConfigurationForm({
     return newErrors;
   };
 
-  return (
-    <DinaForm<SplitConfiguration>
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-      validate={onValidate}
-    >
+  const buttonBarContent = readOnlyMode ? null : (
+    <>
       <ButtonBar className="mb-4">
         <div className="col-md-6 col-sm-12 mt-2">
           <BackButton
             entityId={initialValues.id as string}
-            entityLink="/split-configuration"
+            entityLink="/collection/split-configuration"
           />
         </div>
         <div className="col-md-6 col-sm-12 d-flex">
@@ -161,6 +161,17 @@ export function SplitConfigurationForm({
       <h1 id="wb-cont">
         <DinaMessage id={titleId as any} />
       </h1>
+    </>
+  );
+
+  return (
+    <DinaForm<SplitConfiguration>
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      validate={onValidate}
+      readOnly={readOnlyMode}
+    >
+      {buttonBarContent}
       <SplitConfigurationFormLayout />
     </DinaForm>
   );
@@ -195,16 +206,14 @@ export function SplitConfigurationFormLayout() {
         className="non-strip"
       >
         <div className="row">
-          <div className="col-md-6">
-            <ControlledVocabularySelectField
-              name="conditionalOnMaterialSampleTypes"
-              label={formatMessage("field_materialSampleType")}
-              query={() => ({
-                path: "collection-api/vocabulary2/materialSampleType"
-              })}
-              isMulti={true}
-            />
-          </div>
+          <ControlledVocabularySelectField
+            name="conditionalOnMaterialSampleTypes"
+            label={formatMessage("field_materialSampleType")}
+            query={() => ({
+              path: "collection-api/vocabulary2/materialSampleType"
+            })}
+            isMulti={true}
+          />
         </div>
       </FieldSet>
 
@@ -283,7 +292,9 @@ export function SplitConfigurationFormLayout() {
         <div className="row">
           <ControlledVocabularySelectField
             name="materialSampleTypeCreatedBySplit"
-            label={formatMessage("field_materialSampleType")}
+            label={formatMessage(
+              "materialSampleSplitConfigurationTypeCreatedBySplit"
+            )}
             query={() => ({
               path: "collection-api/vocabulary2/materialSampleType"
             })}

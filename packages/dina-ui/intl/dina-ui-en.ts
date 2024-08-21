@@ -600,6 +600,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleSplitConfigurationSeperator: "Seperator",
   materialSampleSplitConfigurationSeperatorError:
     "Separator must be a single character.",
+  materialSampleSplitConfigurationTypeCreatedBySplit:
+    "Material Sample Type Created",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleViewTitle: "{primaryID} - Material Sample",
   materialSamples: "Material Samples",
