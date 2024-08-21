@@ -212,6 +212,7 @@ export interface PrepareSampleSaveOperationParams {
   preProcessSample?: (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
+  collectingEventRefExternal?: React.RefObject<FormikProps<any>>;
 }
 
 export function useMaterialSampleSave({
@@ -572,55 +573,6 @@ export function useMaterialSampleSave({
       ...{ scheduledAction: undefined }
     };
 
-    // Save and link the Collecting Event if enabled:
-    if (enableCollectingEvent && colEventFormRef.current) {
-      // Save the linked CollectingEvent if included:
-      const submittedCollectingEvent = cloneDeep(
-        colEventFormRef.current.values
-      );
-
-      const collectingEventWasEdited =
-        !submittedCollectingEvent.id ||
-        !isEqual(submittedCollectingEvent, collectingEventInitialValues);
-
-      try {
-        // Throw if the Collecting Event sub-form has errors:
-        const colEventErrors = await colEventFormRef.current.validateForm();
-        if (!isEmpty(colEventErrors)) {
-          throw new DoOperationsError("", colEventErrors);
-        }
-
-        // Only send the save request if the Collecting Event was edited:
-        const savedCollectingEvent = collectingEventWasEdited
-          ? // Use the same save method as the Collecting Event page:
-            await saveCollectingEvent(
-              submittedCollectingEvent,
-              colEventFormRef.current
-            )
-          : submittedCollectingEvent;
-
-        // Set the ColEventId here in case the next operation fails:
-        setColEventId(savedCollectingEvent.id);
-
-        // Link the MaterialSample to the CollectingEvent:
-        materialSampleInput.collectingEvent = {
-          id: savedCollectingEvent.id,
-          type: savedCollectingEvent.type
-        };
-      } catch (error: unknown) {
-        if (error instanceof DoOperationsError) {
-          // Put the error messages into both form states:
-          colEventFormRef.current.setStatus(error.message);
-          colEventFormRef.current.setErrors(error.fieldErrors);
-          throw new DoOperationsError(
-            error.message,
-            mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)
-          );
-        }
-        throw error;
-      }
-    }
-
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (
       materialSampleInput.useTargetOrganism &&
@@ -681,7 +633,8 @@ export function useMaterialSampleSave({
    */
   async function prepareSampleSaveOperation({
     submittedValues,
-    preProcessSample
+    preProcessSample,
+    collectingEventRefExternal
   }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample>> {
     const materialSampleInput = await prepareSampleInput(submittedValues);
 
@@ -695,6 +648,61 @@ export function useMaterialSampleSave({
           updated: msPreprocessed
         })
       : msPreprocessed;
+
+    // Save and link the Collecting Event if enabled:
+    const colEventFormRefToUse = colEventFormRef?.current?.values
+      ? colEventFormRef
+      : collectingEventRefExternal;
+    if (
+      (enableCollectingEvent || collectingEventRefExternal) &&
+      colEventFormRefToUse?.current
+    ) {
+      // Save the linked CollectingEvent if included:
+      const submittedCollectingEvent = cloneDeep(
+        colEventFormRefToUse.current.values
+      );
+
+      const collectingEventWasEdited =
+        !submittedCollectingEvent.id ||
+        !isEqual(submittedCollectingEvent, collectingEventInitialValues);
+
+      try {
+        // Throw if the Collecting Event sub-form has errors:
+        const colEventErrors =
+          await colEventFormRefToUse?.current?.validateForm();
+        if (!isEmpty(colEventErrors)) {
+          throw new DoOperationsError("", colEventErrors);
+        }
+        // Only send the save request if the Collecting Event was edited:
+        const savedCollectingEvent = collectingEventWasEdited
+          ? // Use the same save method as the Collecting Event page:
+            await saveCollectingEvent(
+              submittedCollectingEvent,
+              colEventFormRefToUse.current
+            )
+          : submittedCollectingEvent;
+
+        // Set the ColEventId here in case the next operation fails:
+        setColEventId(savedCollectingEvent.id);
+
+        // Link the MaterialSample to the CollectingEvent:
+        msDiff.collectingEvent = {
+          id: savedCollectingEvent.id,
+          type: savedCollectingEvent.type
+        };
+      } catch (error: unknown) {
+        if (error instanceof DoOperationsError) {
+          // Put the error messages into both form states:
+          colEventFormRefToUse.current.setStatus(error.message);
+          colEventFormRefToUse.current.setErrors(error.fieldErrors);
+          throw new DoOperationsError(
+            error.message,
+            mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)
+          );
+        }
+        throw error;
+      }
+    }
 
     // Check if there is any changes to the storage unit or storage unit usage.
     if (msDiff?.storageUnit?.id || msDiff?.storageUnitUsage?.id) {
@@ -1030,7 +1038,8 @@ export function useMaterialSampleSave({
     onSubmit,
     prepareSampleInput,
     prepareSampleSaveOperation,
-    loading
+    loading,
+    colEventFormRef
   };
 }
 
