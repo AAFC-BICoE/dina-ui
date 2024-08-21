@@ -78,17 +78,6 @@ export function TabbedResourceLinker<T extends KitsuResource>({
           </div>
         </div>
       )}
-      {isInBulkEditTab && (
-        <div className="alert alert-warning">
-          <DinaMessage
-            id="bulkEditResourceLinkerWarningSingle"
-            values={{
-              targetType: getFieldLabel({ name: targetType }).fieldLabel,
-              fieldName: getFieldLabel({ name: fieldName }).fieldLabel
-            }}
-          />
-        </div>
-      )}
       <Tabs
         // Re-initialize the form when the linked resource changes:
         key={resourceId}

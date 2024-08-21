@@ -9,7 +9,8 @@ import {
   resourceDifference,
   SaveArgs,
   useApiClient,
-  useQuery
+  useQuery,
+  withoutBlankFields
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -674,6 +675,14 @@ export function useMaterialSampleSave({
     const colEventFormRefToUse = colEventFormRef?.current?.values
       ? colEventFormRef
       : collectingEventRefExternal;
+    if (colEventFormRefToUse?.current) {
+      const collectingEventValues = {
+        ...withoutBlankFields(colEventFormRef?.current?.values),
+        ...withoutBlankFields(collectingEventRefExternal?.current?.values)
+      };
+      colEventFormRefToUse.current.values = collectingEventValues;
+    }
+
     if (
       (enableCollectingEvent || collectingEventRefExternal) &&
       colEventFormRefToUse?.current
@@ -716,10 +725,11 @@ export function useMaterialSampleSave({
           // Put the error messages into both form states:
           colEventFormRefToUse.current.setStatus(error.message);
           colEventFormRefToUse.current.setErrors(error.fieldErrors);
-          throw new DoOperationsError(
+          const newOpError = new DoOperationsError(
             error.message,
             mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)
           );
+          throw newOpError;
         }
         throw error;
       }
