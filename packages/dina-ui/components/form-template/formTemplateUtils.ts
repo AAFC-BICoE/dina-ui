@@ -7,7 +7,6 @@ import {
   FormTemplateSectionItem
 } from "../../types/collection-api";
 import { sortBy, get, isEmpty, compact } from "lodash";
-import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
 
 export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined

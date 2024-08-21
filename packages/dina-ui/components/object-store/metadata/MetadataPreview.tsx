@@ -9,6 +9,7 @@ import { MetadataFileView } from "./MetadataFileView";
 import { useMetadataViewQuery } from "./useMetadata";
 import Link from "next/link";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import MetadataBadges from "./MetadataBadges";
 
 interface MetadataPreviewProps {
   metadataId: string;
@@ -90,6 +91,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
               </div>
             </>
           )}
+          <MetadataBadges tagsFieldName="acTags" />
           <MetadataDetails metadata={metadata} />
           {metadata.fileIdentifier && (
             <ExifView objectUpload={metadata.objectUpload} />
