@@ -42,7 +42,6 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   linkerTabContent,
   briefDetails,
   fieldName,
-  targetType,
   fieldSetId,
   legend,
   hideLinkerTab
