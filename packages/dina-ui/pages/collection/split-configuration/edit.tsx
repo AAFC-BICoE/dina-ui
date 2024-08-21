@@ -5,7 +5,6 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   FieldSet,
-  FieldSpy,
   SelectField,
   SubmitButton,
   TextField,
@@ -14,7 +13,7 @@ import {
   withResponseOrDisabled
 } from "common-ui";
 import { NextRouter, useRouter } from "next/router";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import { GroupSelectField } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   DIRECT_PARENT_STRATEGY,
@@ -23,7 +22,7 @@ import {
   SplitConfiguration,
   TYPE_BASED_STRATEGY,
   UPPER_CHARACTER_TYPE
-} from "packages/dina-ui/types/collection-api/resources/SplitConfiguration2";
+} from "../../../types/collection-api/resources/SplitConfiguration";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { isUndefined, isEmpty } from "lodash";
 
@@ -32,8 +31,6 @@ export default function SplitConfigurationEditPage() {
   const {
     query: { id }
   } = router;
-
-  const { formatMessage } = useDinaIntl();
 
   const splitConfigurationQuery = useQuery<SplitConfiguration>(
     { path: `collection-api/split-configuration/${id}` },

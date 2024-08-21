@@ -9,9 +9,7 @@ import PageLayout from "../../../components/page/PageLayout";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { BULK_SPLIT_IDS, LoadingSpinner, useQuery } from "common-ui/lib";
-import { FormTemplate } from "../../../types/collection-api";
 import { SplitConfiguration } from "../../../types/collection-api/resources/SplitConfiguration";
-import { getSplitConfigurationComponentValues } from "../../../components/form-template/formTemplateUtils";
 
 export default function MaterialSampleBulkSplitPage() {
   const router = useRouter();
@@ -24,21 +22,18 @@ export default function MaterialSampleBulkSplitPage() {
 
   const [ids] = useLocalStorage<string[]>(BULK_SPLIT_IDS, []);
 
-  const [formTemplateId, setFormTemplateId] = useState<string>(
+  const [splitConfigurationID, setSplitConfigurationID] = useState<string>(
     router.query.splitConfiguration as string
   );
 
-  const formTemplateQuery = useQuery<FormTemplate>(
+  const splitConfigurationQuery = useQuery<SplitConfiguration>(
     {
-      path: `collection-api/form-template/${formTemplateId}`
+      path: `collection-api/split-configuration/${splitConfigurationID}`
     },
     {
-      disabled: !formTemplateId,
+      disabled: !splitConfigurationID,
       onSuccess: (response) => {
-        setSplitConfiguration(
-          getSplitConfigurationComponentValues(response.data)
-            ?.splitConfiguration
-        );
+        setSplitConfiguration(response.data);
       }
     }
   );
@@ -70,8 +65,8 @@ export default function MaterialSampleBulkSplitPage() {
   }
 
   if (
-    !formTemplateQuery.isDisabled &&
-    formTemplateQuery.loading &&
+    !splitConfigurationQuery.isDisabled &&
+    splitConfigurationQuery.loading &&
     !splitConfiguration
   ) {
     return <LoadingSpinner loading={true} />;
@@ -87,7 +82,7 @@ export default function MaterialSampleBulkSplitPage() {
             samples={lastSubmission}
             onSaved={moveToResultPage}
             onPreviousClick={() => setMode("GENERATE")}
-            initialFormTemplateUUID={formTemplateId}
+            // initialFormTemplateUUID={formTemplateId}
           />
         </PageLayout>
       )}
@@ -98,8 +93,8 @@ export default function MaterialSampleBulkSplitPage() {
           onGenerate={onGenerate}
           ids={ids}
           splitConfiguration={splitConfiguration}
-          setFormTemplateId={setFormTemplateId}
-          formTemplateId={formTemplateId}
+          setSplitConfigurationID={setSplitConfigurationID}
+          splitConfigurationID={splitConfigurationID}
         />
       )}
     </>

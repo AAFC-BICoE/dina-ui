@@ -1,7 +1,7 @@
 import { BackButton, EditButton, useQuery, withResponse } from "common-ui";
 import { useRouter } from "next/router";
-import { SplitConfiguration } from "packages/dina-ui/types/collection-api/resources/SplitConfiguration2";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { SplitConfiguration } from "../../../types/collection-api/resources/SplitConfiguration";
+import PageLayout from "../../../components/page/PageLayout";
 import { SplitConfigurationForm } from "./edit";
 
 export default function DinaUserDetailsPage() {
