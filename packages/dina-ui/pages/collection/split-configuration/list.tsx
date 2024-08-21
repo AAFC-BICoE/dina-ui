@@ -14,7 +14,7 @@ const SPLIT_CONFIG_TABLE_COLUMNS: ColumnDefinition<any>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/collection/split-configuration/edit?id=${id}`}>{name}</Link>
+      <Link href={`/collection/split-configuration/view?id=${id}`}>{name}</Link>
     ),
     accessorKey: "name",
     header: () => <FieldHeader name="name" />
@@ -25,7 +25,7 @@ const SPLIT_CONFIG_TABLE_COLUMNS: ColumnDefinition<any>[] = [
 export default function AgentListPage() {
   const buttonBarContent = (
     <div className="flex d-flex ms-auto">
-      <CreateButton entityLink="/split-configuration" />
+      <CreateButton entityLink="/collection/split-configuration" />
     </div>
   );
 

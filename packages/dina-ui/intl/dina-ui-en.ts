@@ -582,6 +582,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleShowParentAttributes: "Parent Attributes",
   showParentAttributes: "Parent Material Sample",
   splitConfigurationTitle: "Split Configurations",
+  splitConfigurationEdit: "Edit Split Configuration",
+  splitConfigurationAdd: "Add Split Configuration",
   materialSampleSplitConfiguration: "Split Configuration",
   materialSampleSplitConfigurationCondition: "Condition",
   materialSampleSplitConfigurationConditionType: "Condition Type",
