@@ -19,7 +19,6 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
 
@@ -229,11 +228,6 @@ const formTemplate: PersistedResource<FormTemplate> = {
   restrictToCreatedBy: true,
   viewConfiguration: {},
   components: [
-    {
-      name: SPLIT_CONFIGURATION_COMPONENT_NAME,
-      visible: true,
-      order: 0
-    },
     {
       name: IDENTIFIER_COMPONENT_NAME,
       visible: true,
@@ -949,7 +943,6 @@ describe("Form template edit page", () => {
     );
     expect(navOrder).toEqual([
       "show-parent-attributes-component",
-      "split-configuration-component",
       "identifiers-component",
       "material-sample-info-component",
       "collecting-event-component",
@@ -1027,45 +1020,6 @@ describe("Form template edit page", () => {
             }
           ],
           visible: false
-        },
-        {
-          name: "split-configuration-component",
-          visible: false,
-          order: 1,
-          sections: [
-            {
-              items: [
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.condition.conditionType",
-                  visible: true
-                },
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.condition.materialSampleType",
-                  visible: true
-                }
-              ],
-              name: "split-configuration-condition-section",
-              visible: true
-            },
-            {
-              items: [
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.materialSampleNameGeneration.strategy",
-                  visible: true
-                },
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.materialSampleNameGeneration.characterType",
-                  visible: true
-                }
-              ],
-              name: "split-configuration-material-sample-name-generation-section",
-              visible: true
-            }
-          ]
         },
         {
           name: "identifiers-component",

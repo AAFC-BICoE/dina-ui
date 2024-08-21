@@ -188,9 +188,6 @@ export interface UseMaterialSampleSaveParams {
     parentAttributes?: string[];
   };
 
-  /** Split Configuration (Form Template Only) */
-  splitConfigurationInitialState?: boolean;
-
   /** Optionally restrict the form to these enabled fields. */
   formTemplate?: FormTemplate;
 
@@ -224,7 +221,6 @@ export function useMaterialSampleSave({
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
-  splitConfigurationInitialState,
   reduceRendering,
   disableNestedFormEdits,
   showChangedIndicatorsInNestedForms,
@@ -300,8 +296,6 @@ export function useMaterialSampleSave({
   // Enable Switch States:
   const [enableShowParentAttributes, setEnableShowParentAttributes] =
     useState<boolean>(false);
-  const [enableSplitConfiguration, setEnableSplitConfiguration] =
-    useState<boolean>(false);
   const [enableCollectingEvent, setEnableCollectingEvent] =
     useState<boolean>(false);
   const [enablePreparations, setEnablePreparations] = useState<boolean>(false);
@@ -314,7 +308,6 @@ export function useMaterialSampleSave({
 
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
-    setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
     setEnableShowParentAttributes(
       Boolean(
         hasShowParentAttributes
@@ -437,8 +430,6 @@ export function useMaterialSampleSave({
     setEnableAssociations,
     enableRestrictions,
     setEnableRestrictions,
-    enableSplitConfiguration,
-    setEnableSplitConfiguration,
     enableShowParentAttributes,
     setEnableShowParentAttributes
   };

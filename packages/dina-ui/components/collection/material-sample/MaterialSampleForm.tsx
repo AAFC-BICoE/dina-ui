@@ -43,7 +43,6 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
@@ -59,7 +58,6 @@ import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
-import { SplitConfigurationSection } from "./SplitConfigurationSection";
 import { CollectionSelectSection } from "../CollectionSelectSection";
 import { NotPubliclyReleasableSection } from "../../tag-editor/NotPubliclyReleasableSection";
 import { ShowParentAttributesField } from "./ShowParentAttributesField";
@@ -237,12 +235,6 @@ export function MaterialSampleForm({
           }
           materialSample={materialSample}
         />
-      ),
-    [SPLIT_CONFIGURATION_COMPONENT_NAME]: (id) =>
-      !reduceRendering &&
-      isTemplate &&
-      dataComponentState.enableSplitConfiguration && (
-        <SplitConfigurationSection id={id} />
       ),
     [IDENTIFIER_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
