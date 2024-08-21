@@ -590,11 +590,16 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleSplitConfigurationDirectParent: "Direct Parent",
   materialSampleSplitConfigurationMaterialSampleNameGeneration:
     "Material Sample Name Generation",
+  materialSampleSplitConfigurationMaterialSampleGeneration:
+    "Material Sample Generation",
   materialSampleSplitConfigurationRequiredMaterialSampleType:
     "Material Sample Type is required when the Split Configuration is using the Material Sample Type strategy.",
   materialSampleSplitConfigurationStrategy: "Strategy",
   materialSampleSplitConfigurationVisibleMaterialSampleType:
     "Material Sample Type must be visible when Split Configuration is using the Material Sample Type strategy.",
+  materialSampleSplitConfigurationSeperator: "Seperator",
+  materialSampleSplitConfigurationSeperatorError:
+    "Separator must be a single character.",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleViewTitle: "{primaryID} - Material Sample",
   materialSamples: "Material Samples",
@@ -700,6 +705,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   protocolData: "Protocol Data",
   protocolListTitle: "Protocols",
   protocolNameLabel: "Protocol Name",
+  splitConfigurationNameLabel: "Split Configuration Name",
   protocolViewTitle: "Protocol",
   queryBuilder_addSearchGroup: "Add sub-query",
   queryBuilder_addSearchRule: "Add query",

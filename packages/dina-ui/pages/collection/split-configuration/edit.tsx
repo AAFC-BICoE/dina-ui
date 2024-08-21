@@ -1,16 +1,31 @@
 import {
   BackButton,
   ButtonBar,
+  ControlledVocabularySelectField,
   DinaForm,
   DinaFormOnSubmit,
+  FieldSet,
+  FieldSpy,
+  SelectField,
   SubmitButton,
+  TextField,
+  useDinaFormContext,
   useQuery,
   withResponseOrDisabled
 } from "common-ui";
 import { NextRouter, useRouter } from "next/router";
-import { Footer, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { SplitConfiguration } from "packages/dina-ui/types/collection-api/resources/SplitConfiguration2";
+import {
+  DIRECT_PARENT_STRATEGY,
+  LOWER_CHARACTER_TYPE,
+  NUMBER_CHARACTER_TYPE,
+  SplitConfiguration,
+  TYPE_BASED_STRATEGY,
+  UPPER_CHARACTER_TYPE
+} from "packages/dina-ui/types/collection-api/resources/SplitConfiguration2";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { isUndefined, isEmpty } from "lodash";
 
 export default function SplitConfigurationEditPage() {
   const router = useRouter();
@@ -29,34 +44,31 @@ export default function SplitConfigurationEditPage() {
     id === undefined ? "splitConfigurationAdd" : "splitConfigurationEdit";
 
   return (
-    <div>
-      <Head title={formatMessage(titleId)} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id={titleId} />
-        </h1>
-        {withResponseOrDisabled(splitConfigurationQuery, (response) => (
-          <SplitConfigurationForm
-            splitConfiguration={response ? response.data : undefined}
-            router={router}
-          />
-        ))}
-      </main>
-      <Footer />
-    </div>
+    <PageLayout titleId={titleId} displayHeading={false}>
+      {withResponseOrDisabled(splitConfigurationQuery, (response) => (
+        <SplitConfigurationForm
+          splitConfiguration={response ? response.data : undefined}
+          titleId={titleId}
+          router={router}
+        />
+      ))}
+    </PageLayout>
   );
 }
 
 interface SplitConfigurationFormProps {
   splitConfiguration?: SplitConfiguration;
+  titleId: string;
   router: NextRouter;
 }
 
 export function SplitConfigurationForm({
   splitConfiguration: splitConfigurationData,
+  titleId,
   router
 }: SplitConfigurationFormProps) {
+  const { formatMessage } = useDinaIntl();
+
   const initialValues: SplitConfiguration = splitConfigurationData
     ? splitConfigurationData
     : {
@@ -87,10 +99,53 @@ export function SplitConfigurationForm({
     );
   };
 
+  const onValidate = (values: SplitConfiguration) => {
+    // Create a new object to hold any new errors we find
+    const newErrors: any = {};
+
+    // Name is a required field
+    if (isUndefined(values?.name)) {
+      newErrors.name = formatMessage("requiredField");
+    }
+
+    // Condition Material Sample Type is a required field
+    if (isEmpty(values?.conditionalOnMaterialSampleTypes)) {
+      newErrors.conditionalOnMaterialSampleTypes =
+        formatMessage("requiredField");
+    }
+
+    // Strategy is a required field
+    if (isUndefined(values?.strategy)) {
+      newErrors.strategy = formatMessage("requiredField");
+    } else if (
+      values.strategy === "TYPE_BASED" &&
+      isUndefined(values.materialSampleTypeCreatedBySplit)
+    ) {
+      newErrors.materialSampleTypeCreatedBySplit = formatMessage(
+        "materialSampleSplitConfigurationRequiredMaterialSampleType"
+      );
+    }
+
+    // Character Type is a required field
+    if (isUndefined(values?.characterType)) {
+      newErrors.characterType = formatMessage("requiredField");
+    }
+
+    // Seperator can only be one character.
+    if (!isUndefined(values?.separator) && values.separator.length !== 1) {
+      newErrors.separator = formatMessage(
+        "materialSampleSplitConfigurationSeperatorError"
+      );
+    }
+
+    return newErrors;
+  };
+
   return (
     <DinaForm<SplitConfiguration>
       initialValues={initialValues}
       onSubmit={onSubmit}
+      validate={onValidate}
     >
       <ButtonBar className="mb-4">
         <div className="col-md-6 col-sm-12 mt-2">
@@ -103,6 +158,139 @@ export function SplitConfigurationForm({
           <SubmitButton className="ms-auto" />
         </div>
       </ButtonBar>
+      <h1 id="wb-cont">
+        <DinaMessage id={titleId as any} />
+      </h1>
+      <SplitConfigurationFormLayout />
     </DinaForm>
+  );
+}
+
+export function SplitConfigurationFormLayout() {
+  const { readOnly } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
+
+  return (
+    <>
+      <div className="row">
+        <TextField
+          className="col-md-6 splitConfigurationName"
+          name="name"
+          label={formatMessage("splitConfigurationNameLabel")}
+        />
+        {!readOnly && (
+          <GroupSelectField
+            name="group"
+            enableStoredDefaultGroup={true}
+            className="col-md-6"
+          />
+        )}
+      </div>
+
+      {/* Condition Fields */}
+      <FieldSet
+        id="split-configuration-condition-section"
+        legend={<DinaMessage id="materialSampleSplitConfigurationCondition" />}
+        sectionName="split-configuration-condition-section"
+        className="non-strip"
+      >
+        <div className="row">
+          <div className="col-md-6">
+            <ControlledVocabularySelectField
+              name="conditionalOnMaterialSampleTypes"
+              label={formatMessage("field_materialSampleType")}
+              query={() => ({
+                path: "collection-api/vocabulary2/materialSampleType"
+              })}
+              isMulti={true}
+            />
+          </div>
+        </div>
+      </FieldSet>
+
+      {/* Sequence Generation Fields */}
+      <FieldSet
+        id="split-configuration-material-sample-name-generation-section"
+        legend={
+          <DinaMessage id="materialSampleSplitConfigurationMaterialSampleNameGeneration" />
+        }
+        sectionName="split-configuration-material-sample-name-generation-section"
+        className="non-strip"
+      >
+        <div className="row">
+          <div className="col-md-6">
+            <SelectField
+              name="strategy"
+              label={formatMessage("materialSampleSplitConfigurationStrategy")}
+              options={[
+                {
+                  value: DIRECT_PARENT_STRATEGY,
+                  label: formatMessage(
+                    "materialSampleSplitConfigurationDirectParent"
+                  )
+                },
+                {
+                  value: TYPE_BASED_STRATEGY,
+                  label: formatMessage("field_materialSampleType")
+                }
+              ]}
+            />
+          </div>
+          <div className="col-md-6">
+            <SelectField
+              name="characterType"
+              label={formatMessage("splitGenerationOptionLabel")}
+              options={[
+                {
+                  value: LOWER_CHARACTER_TYPE,
+                  label: formatMessage("splitGenerationOptionLowercase")
+                },
+                {
+                  value: UPPER_CHARACTER_TYPE,
+                  label: formatMessage("splitGenerationOptionUppercase")
+                },
+                {
+                  value: NUMBER_CHARACTER_TYPE,
+                  label: formatMessage("splitGenerationOptionNumerical")
+                }
+              ]}
+            />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-6">
+            <TextField
+              className="separator"
+              name="separator"
+              inputProps={{
+                maxLength: 1
+              }}
+              label={formatMessage("materialSampleSplitConfigurationSeperator")}
+            />
+          </div>
+        </div>
+      </FieldSet>
+
+      {/* Material Sample Generation */}
+      <FieldSet
+        id="split-configuration-material-sample-generation-section"
+        legend={
+          <DinaMessage id="materialSampleSplitConfigurationMaterialSampleGeneration" />
+        }
+        sectionName="split-configuration-material-sample-generation-section"
+        className="non-strip"
+      >
+        <div className="row">
+          <ControlledVocabularySelectField
+            name="materialSampleTypeCreatedBySplit"
+            label={formatMessage("field_materialSampleType")}
+            query={() => ({
+              path: "collection-api/vocabulary2/materialSampleType"
+            })}
+            isMulti={false}
+          />
+        </div>
+      </FieldSet>
+    </>
   );
 }
