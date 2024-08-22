@@ -24,7 +24,6 @@ import { SplitConfigurationOption } from "../collection/material-sample/SplitMat
 import Select from "react-select";
 import { flattenDeep } from "lodash";
 import { ErrorBanner } from "../error/ErrorBanner";
-import { useRouter } from "next/router";
 import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
 
 const ENTITY_LINK = "/collection/material-sample";
@@ -50,8 +49,6 @@ export function MaterialSampleSplitGenerationForm({
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
   const { groupNames, username } = useAccount();
-  const router = useRouter();
-  const splitConfigQuery = router?.query?.splitConfiguration;
 
   // List of all the split configurations available.
   const [splitConfigurationOptions, setSplitConfigurationOptions] = useState<
@@ -97,7 +94,8 @@ export function MaterialSampleSplitGenerationForm({
       )
   );
 
-  // Retrieve all of the form templates, then filter for the correct one.
+  // Retrieve all the split configuration options if a mismatch type is found, to allow the user
+  // to fix the issue. Normally this is query is not ran if no type mismatches are found.
   const splitConfigurationQuery = useQuery<SplitConfiguration[]>(
     {
       path: "collection-api/split-configuration",
@@ -110,20 +108,15 @@ export function MaterialSampleSplitGenerationForm({
       }
     },
     {
-      disabled: filteredMaterialSamples?.length === 0,
+      disabled: !hasMismatchMaterialSampleType,
       onSuccess: async ({ data }) => {
         const generatedOptions = data.map((splitConfig) => ({
-          label: splitConfiguration?.name ?? "",
-          value: splitConfiguration?.id ?? "",
+          label: splitConfig?.name ?? "",
+          value: splitConfig?.id ?? "",
           resource: splitConfig
         }));
 
         setSplitConfigurationOptions(generatedOptions);
-
-        // If options are available, just set the first one automatically.
-        if (generatedOptions.length > 0 && generatedOptions?.[0]?.resource) {
-          setSplitConfiguration?.(generatedOptions?.[0]?.resource);
-        }
       }
     }
   );
@@ -131,11 +124,13 @@ export function MaterialSampleSplitGenerationForm({
   const buttonBar = (
     <>
       {/* Back Button (Changes depending on the number of records) */}
-      <div className="col-md-6 col-sm-12 mt-2">
+      <div className="col-md-6 col-sm-12">
         {isMultiple ? (
           <BackToListButton entityLink={ENTITY_LINK} />
         ) : (
-          <BackButton entityLink={ENTITY_LINK} entityId={ids[0]} />
+          <div className="mt-2">
+            <BackButton entityLink={ENTITY_LINK} entityId={ids[0]} />
+          </div>
         )}
       </div>
 
@@ -229,7 +224,7 @@ export function MaterialSampleSplitGenerationForm({
             <h4 className="mt-2">
               <DinaMessage id="settingLabel" />
             </h4>
-            {!splitConfigQuery && (
+            {splitConfigurationOptions.length !== 0 && (
               <>
                 <strong>
                   <DinaMessage id="selectSplitConfiguration" />
@@ -320,7 +315,8 @@ function PreviewGeneratedNames({
       currentParentUUID: splitFromMaterialSamples?.[index]?.id ?? "",
       strategy: splitConfiguration?.strategy ?? "DIRECT_PARENT",
       characterType: splitConfiguration?.characterType ?? "LOWER_LETTER",
-      materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit
+      materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit,
+      seperator: splitConfiguration?.separator ?? "-"
     };
   }
 
@@ -332,7 +328,8 @@ function PreviewGeneratedNames({
       currentParentsUUID: parentIds,
       strategy: splitConfiguration?.strategy ?? "DIRECT_PARENT",
       characterType: splitConfiguration?.characterType ?? "LOWER_LETTER",
-      materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit
+      materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit,
+      seperator: splitConfiguration?.separator ?? "-"
     };
   }
 

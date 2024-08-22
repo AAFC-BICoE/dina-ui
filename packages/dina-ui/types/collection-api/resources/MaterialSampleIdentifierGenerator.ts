@@ -2,6 +2,7 @@ import { KitsuResource } from "kitsu";
 
 export type Strategies = "TYPE_BASED" | "DIRECT_PARENT";
 export type CharacterTypes = "NUMBER" | "LOWER_LETTER" | "UPPER_LETTER";
+export type Seperators = "-" | "_" | " ";
 
 export interface MaterialSampleIdentifierGeneratorAttributes {
   type: "material-sample-identifier-generator";
@@ -19,6 +20,9 @@ export interface MaterialSampleIdentifierGeneratorAttributes {
 
   /** Character type strategy (-1, -a, -A) */
   characterType: CharacterTypes;
+
+  /** Seperators to use in name generation (dash, underscore, space) */
+  seperator: Seperators;
 
   /** Amount of identifiers to be generated */
   quantity?: number;

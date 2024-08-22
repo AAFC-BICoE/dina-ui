@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { Seperators } from "./MaterialSampleIdentifierGenerator";
 
 export const TYPE_BASED_STRATEGY = "TYPE_BASED";
 export const DIRECT_PARENT_STRATEGY = "DIRECT_PARENT";
@@ -25,7 +26,7 @@ export interface SplitConfigurationAttributes {
   strategy?: SplitStrategies;
   conditionalOnMaterialSampleTypes?: string[];
   characterType?: SplitCharacterTypes;
-  separator?: string;
+  separator?: Seperators;
   materialSampleTypeCreatedBySplit?: string;
 }
 

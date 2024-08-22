@@ -72,7 +72,8 @@ export function SplitConfigurationForm({
   const initialValues: SplitConfiguration = splitConfigurationData
     ? splitConfigurationData
     : {
-        type: "split-configuration"
+        type: "split-configuration",
+        separator: "-"
       };
 
   const onSubmit: DinaFormOnSubmit<SplitConfiguration> = async ({
@@ -133,9 +134,7 @@ export function SplitConfigurationForm({
     }
 
     // Seperator is required and it can only be one character.
-    if (isUndefined(values?.separator)) {
-      newErrors.separator = formatMessage("requiredField");
-    } else if (values.separator.length !== 1) {
+    if (!isUndefined(values?.separator) && values.separator.length > 1) {
       newErrors.separator = formatMessage(
         "materialSampleSplitConfigurationSeperatorError"
       );
@@ -267,20 +266,29 @@ export function SplitConfigurationFormLayout() {
         </div>
         <div className="row">
           <div className="col-md-6">
-            <TextField
-              className="separator"
+            {/*
+              Adding an option? 
+              Make sure to add it to the enum called Seperators in MaterialSampleIdentifierGenerator.ts 
+            */}
+            <SelectField
               name="separator"
-              inputProps={{
-                maxLength: 1
-              }}
-              readOnlyRender={(value) => {
-                // Display space characters to make it more clear a space was used as the separator.
-                if (value === " ") {
-                  return <i>(Space character)</i>;
-                }
-                return value;
-              }}
               label={formatMessage("materialSampleSplitConfigurationSeperator")}
+              options={[
+                {
+                  value: "-",
+                  label: formatMessage("splitConfiguration_separator_dash")
+                },
+                {
+                  value: "_",
+                  label: formatMessage(
+                    "splitConfiguration_separator_underscore"
+                  )
+                },
+                {
+                  value: " ",
+                  label: formatMessage("splitConfiguration_separator_space")
+                }
+              ]}
             />
           </div>
         </div>
