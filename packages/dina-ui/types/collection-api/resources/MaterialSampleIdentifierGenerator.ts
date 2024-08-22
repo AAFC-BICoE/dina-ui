@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import {
-  Seperators,
+  Separators,
   SplitStrategies,
   SplitCharacterTypes
 } from "./SplitConfiguration";
@@ -22,8 +22,8 @@ export interface MaterialSampleIdentifierGeneratorAttributes {
   /** Character type strategy (-1, -a, -A) */
   characterType: SplitCharacterTypes;
 
-  /** Seperators to use in name generation (dash, underscore, space) */
-  seperator: Seperators;
+  /** Separators to use in name generation (dash, underscore, space) */
+  separator: Separators;
 
   /** Amount of identifiers to be generated */
   quantity?: number;

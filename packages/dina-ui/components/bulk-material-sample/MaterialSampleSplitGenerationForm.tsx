@@ -25,7 +25,7 @@ import Select from "react-select";
 import { flattenDeep } from "lodash";
 import { ErrorBanner } from "../error/ErrorBanner";
 import {
-  SEPERATOR_DASH,
+  SEPARATOR_DASH,
   SplitConfiguration
 } from "../../types/collection-api/resources/SplitConfiguration";
 
@@ -111,15 +111,43 @@ export function MaterialSampleSplitGenerationForm({
       }
     },
     {
-      disabled: !hasMismatchMaterialSampleType,
+      disabled:
+        !hasMismatchMaterialSampleType || splitFromMaterialSamples.length === 0,
       onSuccess: async ({ data }) => {
-        const generatedOptions = data.map((splitConfig) => ({
-          label: splitConfig?.name ?? "",
-          value: splitConfig?.id ?? "",
-          resource: splitConfig
-        }));
+        // Determine the material sample types of all the selected material samples.
+        const uniqueMaterialSampleTypes = splitFromMaterialSamples?.reduce(
+          (acc: string[], materialSample: any) => {
+            const materialSampleType = materialSample.materialSampleType;
+            if (!acc.includes(materialSampleType)) {
+              acc.push(materialSampleType);
+            }
+            return acc;
+          },
+          []
+        );
+
+        // Filter out options not supported by the multiple material samples.
+        const generatedOptions = data
+          .filter((splitConfig) => {
+            // Check if all required material sample types are present in uniqueMaterialSampleTypes
+            return (splitConfig.conditionalOnMaterialSampleTypes || [])?.some(
+              (supportedType) =>
+                uniqueMaterialSampleTypes.includes(supportedType)
+            );
+          })
+          .map((splitConfig) => ({
+            label: splitConfig?.name ?? "",
+            value: splitConfig?.id ?? "",
+            resource: splitConfig
+          }));
 
         setSplitConfigurationOptions(generatedOptions);
+
+        // If options are available, automatically select the first option.
+        if (generatedOptions.length > 0 && generatedOptions?.[0]?.resource) {
+          setSplitConfigurationID?.(generatedOptions[0].value);
+          setSplitConfiguration(generatedOptions[0].resource);
+        }
       }
     }
   );
@@ -319,7 +347,7 @@ function PreviewGeneratedNames({
       strategy: splitConfiguration?.strategy ?? "DIRECT_PARENT",
       characterType: splitConfiguration?.characterType ?? "LOWER_LETTER",
       materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit,
-      seperator: splitConfiguration?.separator ?? SEPERATOR_DASH
+      separator: splitConfiguration?.separator ?? SEPARATOR_DASH
     };
   }
 
@@ -332,7 +360,7 @@ function PreviewGeneratedNames({
       strategy: splitConfiguration?.strategy ?? "DIRECT_PARENT",
       characterType: splitConfiguration?.characterType ?? "LOWER_LETTER",
       materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit,
-      seperator: splitConfiguration?.separator ?? "-"
+      separator: splitConfiguration?.separator ?? SEPARATOR_DASH
     };
   }
 

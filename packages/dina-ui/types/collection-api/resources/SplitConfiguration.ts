@@ -16,14 +16,14 @@ export type SplitCharacterTypes =
   | typeof UPPER_CHARACTER_TYPE
   | typeof NUMBER_CHARACTER_TYPE;
 
-export const SEPERATOR_DASH = "-";
-export const SEPERATOR_UNDERSCORE = "_";
-export const SEPERATOR_SPACE = " ";
+export const SEPARATOR_DASH = "-";
+export const SEPARATOR_UNDERSCORE = "_";
+export const SEPARATOR_SPACE = " ";
 
-export type Seperators =
-  | typeof SEPERATOR_DASH
-  | typeof SEPERATOR_UNDERSCORE
-  | typeof SEPERATOR_SPACE;
+export type Separators =
+  | typeof SEPARATOR_DASH
+  | typeof SEPARATOR_UNDERSCORE
+  | typeof SEPARATOR_SPACE;
 
 export interface SplitConfigurationAttributes {
   type: "split-configuration";
@@ -34,7 +34,7 @@ export interface SplitConfigurationAttributes {
   strategy?: SplitStrategies;
   conditionalOnMaterialSampleTypes?: string[];
   characterType?: SplitCharacterTypes;
-  separator?: Seperators;
+  separator?: Separators;
   materialSampleTypeCreatedBySplit?: string;
 }
 

@@ -19,9 +19,9 @@ import {
   DIRECT_PARENT_STRATEGY,
   LOWER_CHARACTER_TYPE,
   NUMBER_CHARACTER_TYPE,
-  SEPERATOR_DASH,
-  SEPERATOR_SPACE,
-  SEPERATOR_UNDERSCORE,
+  SEPARATOR_DASH,
+  SEPARATOR_SPACE,
+  SEPARATOR_UNDERSCORE,
   SplitConfiguration,
   TYPE_BASED_STRATEGY,
   UPPER_CHARACTER_TYPE
@@ -76,7 +76,7 @@ export function SplitConfigurationForm({
     ? splitConfigurationData
     : {
         type: "split-configuration",
-        separator: SEPERATOR_DASH
+        separator: SEPARATOR_DASH
       };
 
   const onSubmit: DinaFormOnSubmit<SplitConfiguration> = async ({
@@ -136,10 +136,10 @@ export function SplitConfigurationForm({
       newErrors.characterType = formatMessage("requiredField");
     }
 
-    // Seperator is required and it can only be one character.
+    // Separator is required and it can only be one character.
     if (!isUndefined(values?.separator) && values.separator.length > 1) {
       newErrors.separator = formatMessage(
-        "materialSampleSplitConfigurationSeperatorError"
+        "materialSampleSplitConfigurationSeparatorError"
       );
     }
 
@@ -179,7 +179,7 @@ export function SplitConfigurationForm({
 }
 
 export function SplitConfigurationFormLayout() {
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   return (
@@ -271,20 +271,20 @@ export function SplitConfigurationFormLayout() {
           <div className="col-md-6">
             <SelectField
               name="separator"
-              label={formatMessage("materialSampleSplitConfigurationSeperator")}
+              label={formatMessage("materialSampleSplitConfigurationSeparator")}
               options={[
                 {
-                  value: SEPERATOR_DASH,
+                  value: SEPARATOR_DASH,
                   label: formatMessage("splitConfiguration_separator_dash")
                 },
                 {
-                  value: SEPERATOR_UNDERSCORE,
+                  value: SEPARATOR_UNDERSCORE,
                   label: formatMessage(
                     "splitConfiguration_separator_underscore"
                   )
                 },
                 {
-                  value: SEPERATOR_SPACE,
+                  value: SEPARATOR_SPACE,
                   label: formatMessage("splitConfiguration_separator_space")
                 }
               ]}
@@ -294,27 +294,30 @@ export function SplitConfigurationFormLayout() {
       </FieldSet>
 
       {/* Material Sample Generation */}
-      <FieldSet
-        id="split-configuration-material-sample-generation-section"
-        legend={
-          <DinaMessage id="materialSampleSplitConfigurationMaterialSampleGeneration" />
-        }
-        sectionName="split-configuration-material-sample-generation-section"
-        className="non-strip"
-      >
-        <div className="row">
-          <ControlledVocabularySelectField
-            name="materialSampleTypeCreatedBySplit"
-            label={formatMessage(
-              "materialSampleSplitConfigurationTypeCreatedBySplit"
-            )}
-            query={() => ({
-              path: "collection-api/vocabulary2/materialSampleType"
-            })}
-            isMulti={false}
-          />
-        </div>
-      </FieldSet>
+      {(!readOnly || initialValues.materialSampleTypeCreatedBySplit) && (
+        <FieldSet
+          id="split-configuration-material-sample-generation-section"
+          legend={
+            <DinaMessage id="materialSampleSplitConfigurationMaterialSampleGeneration" />
+          }
+          sectionName="split-configuration-material-sample-generation-section"
+          className="non-strip"
+        >
+          <div className="row">
+            <ControlledVocabularySelectField
+              name="materialSampleTypeCreatedBySplit"
+              label={formatMessage(
+                "materialSampleSplitConfigurationTypeCreatedBySplit"
+              )}
+              query={() => ({
+                path: "collection-api/vocabulary2/materialSampleType"
+              })}
+              isMulti={false}
+              isClearable={true}
+            />
+          </div>
+        </FieldSet>
+      )}
     </>
   );
 }

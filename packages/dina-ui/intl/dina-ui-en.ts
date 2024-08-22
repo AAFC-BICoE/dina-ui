@@ -597,11 +597,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleSplitConfigurationStrategy: "Strategy",
   materialSampleSplitConfigurationVisibleMaterialSampleType:
     "Material Sample Type must be visible when Split Configuration is using the Material Sample Type strategy.",
-  materialSampleSplitConfigurationSeperator: "Seperator",
+  materialSampleSplitConfigurationSeparator: "Separator",
   splitConfiguration_separator_dash: "Dash",
   splitConfiguration_separator_underscore: "Underscore",
   splitConfiguration_separator_space: "Space",
-  materialSampleSplitConfigurationSeperatorError:
+  materialSampleSplitConfigurationSeparatorError:
     "Separator must be a single character.",
   materialSampleSplitConfigurationTypeCreatedBySplit:
     "Material Sample Type Created",
