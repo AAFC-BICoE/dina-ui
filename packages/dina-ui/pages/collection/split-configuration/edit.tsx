@@ -19,6 +19,9 @@ import {
   DIRECT_PARENT_STRATEGY,
   LOWER_CHARACTER_TYPE,
   NUMBER_CHARACTER_TYPE,
+  SEPERATOR_DASH,
+  SEPERATOR_SPACE,
+  SEPERATOR_UNDERSCORE,
   SplitConfiguration,
   TYPE_BASED_STRATEGY,
   UPPER_CHARACTER_TYPE
@@ -73,7 +76,7 @@ export function SplitConfigurationForm({
     ? splitConfigurationData
     : {
         type: "split-configuration",
-        separator: "-"
+        separator: SEPERATOR_DASH
       };
 
   const onSubmit: DinaFormOnSubmit<SplitConfiguration> = async ({
@@ -266,26 +269,22 @@ export function SplitConfigurationFormLayout() {
         </div>
         <div className="row">
           <div className="col-md-6">
-            {/*
-              Adding an option? 
-              Make sure to add it to the enum called Seperators in MaterialSampleIdentifierGenerator.ts 
-            */}
             <SelectField
               name="separator"
               label={formatMessage("materialSampleSplitConfigurationSeperator")}
               options={[
                 {
-                  value: "-",
+                  value: SEPERATOR_DASH,
                   label: formatMessage("splitConfiguration_separator_dash")
                 },
                 {
-                  value: "_",
+                  value: SEPERATOR_UNDERSCORE,
                   label: formatMessage(
                     "splitConfiguration_separator_underscore"
                   )
                 },
                 {
-                  value: " ",
+                  value: SEPERATOR_SPACE,
                   label: formatMessage("splitConfiguration_separator_space")
                 }
               ]}

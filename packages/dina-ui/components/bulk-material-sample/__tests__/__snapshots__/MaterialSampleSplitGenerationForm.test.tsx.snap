@@ -1,17 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
+exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching material sample types. 1`] = `
 "<main className=\\"container-fluid\\" role=\\"main\\">
   <h1 id=\\"wb-cont\\">
     Split Material Sample
   </h1>
-  <ErrorBanner errorMessage=\\"Some Material Samples do not match the Split Configuration and were removed.\\">
-    <div className=\\"error-viewer\\">
-      <div className=\\"alert alert-danger\\" role=\\"status\\">
-        Some Material Samples do not match the Split Configuration and were removed.
-      </div>
-    </div>
-  </ErrorBanner>
   <div className=\\"row\\">
     <div className=\\"col-md-5\\">
       <h4 className=\\"mt-2\\">
@@ -21,99 +14,6 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
           </FormattedMessage>
         </FormattedMessage>
       </h4>
-      <strong>
-        <FormattedMessage id=\\"selectSplitConfiguration\\">
-          <FormattedMessage defaultMessage=\\" \\" id=\\"selectSplitConfiguration\\">
-            Select Split Configuration
-          </FormattedMessage>
-        </FormattedMessage>
-      </strong>
-      <ForwardRef className=\\"mt-1 mb-3\\" name=\\"splitConfiguration\\" options={{...}} onChange={[Function: onChange]} autoFocus={true} value={[undefined]}>
-        <Select className=\\"mt-1 mb-3\\" name=\\"splitConfiguration\\" options={{...}} autoFocus={true} inputValue=\\"\\" menuIsOpen={false} onChange={[Function (anonymous)]} onInputChange={[Function (anonymous)]} onMenuClose={[Function (anonymous)]} onMenuOpen={[Function (anonymous)]} value={{...}} aria-live=\\"polite\\" backspaceRemovesValue={true} blurInputOnSelect={true} captureMenuScroll={false} classNames={{...}} closeMenuOnSelect={true} closeMenuOnScroll={false} components={{...}} controlShouldRenderValue={true} escapeClearsValue={false} filterOption={[Function (anonymous)]} formatGroupLabel={[Function: formatGroupLabel]} getOptionLabel={[Function: getOptionLabel]} getOptionValue={[Function: getOptionValue]} isDisabled={false} isLoading={false} isMulti={false} isRtl={false} isSearchable={true} isOptionDisabled={[Function: isOptionDisabled]} loadingMessage={[Function: loadingMessage]} maxMenuHeight={300} minMenuHeight={140} menuPlacement=\\"bottom\\" menuPosition=\\"absolute\\" menuShouldBlockScroll={false} menuShouldScrollIntoView={true} noOptionsMessage={[Function: noOptionsMessage]} openMenuOnFocus={false} openMenuOnClick={true} pageSize={5} placeholder=\\"Select...\\" screenReaderStatus={[Function: screenReaderStatus]} styles={{...}} tabIndex={0} tabSelectsValue={true} unstyled={false}>
-          <SelectContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} className=\\"mt-1 mb-3\\" innerProps={{...}} isDisabled={false} isFocused={false}>
-            <EmotionCssPropInternal css={{...}} className=\\"mt-1 mb-3\\" id={[undefined]} onKeyDown={[Function (anonymous)]} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"SelectContainer\\">
-              <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-              <div className=\\"mt-1 mb-3 css-b62m3t-container\\" id={[undefined]} onKeyDown={[Function (anonymous)]}>
-                <LiveRegion clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} id=\\"react-select-2-live-region\\" ariaSelection={{...}} focusedOption={{...}} focusedValue={{...}} isFocused={false} selectValue={{...}} focusableOptions={{...}} isAppleDevice={false}>
-                  <A11yText id=\\"react-select-2-live-region\\">
-                    <EmotionCssPropInternal css={{...}} id=\\"react-select-2-live-region\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\">
-                      <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-                      <span id=\\"react-select-2-live-region\\" className=\\"css-1f43avz-a11yText-A11yText\\" />
-                    </EmotionCssPropInternal>
-                  </A11yText>
-                  <A11yText aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" role=\\"log\\">
-                    <EmotionCssPropInternal css={{...}} aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" role=\\"log\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\">
-                      <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-                      <span aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" role=\\"log\\" className=\\"css-1f43avz-a11yText-A11yText\\" />
-                    </EmotionCssPropInternal>
-                  </A11yText>
-                </LiveRegion>
-                <Control clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerRef={[Function (anonymous)]} innerProps={{...}} isDisabled={false} isFocused={false} menuIsOpen={false}>
-                  <EmotionCssPropInternal css={{...}} className=\\"\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-disabled={[undefined]} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Control\\">
-                    <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-                    <div className=\\" css-13cymwt-control\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-disabled={[undefined]}>
-                      <ValueContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false}>
-                        <EmotionCssPropInternal css={{...}} className=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"ValueContainer\\">
-                          <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-                          <div className=\\" css-1fdsijx-ValueContainer\\">
-                            <Placeholder clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false} isFocused={false} innerProps={{...}}>
-                              <EmotionCssPropInternal css={{...}} className=\\"\\" id=\\"react-select-2-placeholder\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Placeholder\\">
-                                <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-                                <div className=\\" css-1jqq78o-placeholder\\" id=\\"react-select-2-placeholder\\">
-                                  Select...
-                                </div>
-                              </EmotionCssPropInternal>
-                            </Placeholder>
-                            <Input clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} autoCapitalize=\\"none\\" autoComplete=\\"off\\" autoCorrect=\\"off\\" id=\\"react-select-2-input\\" innerRef={[Function (anonymous)]} isDisabled={false} isHidden={false} onBlur={[Function (anonymous)]} onChange={[Function (anonymous)]} onFocus={[Function (anonymous)]} spellCheck=\\"false\\" tabIndex={0} form={[undefined]} type=\\"text\\" value=\\"\\" aria-autocomplete=\\"list\\" aria-expanded={false} aria-haspopup={true} aria-errormessage={[undefined]} aria-invalid={[undefined]} aria-label={[undefined]} aria-labelledby={[undefined]} aria-required={[undefined]} role=\\"combobox\\" aria-activedescendant=\\"\\" aria-describedby=\\"react-select-2-placeholder\\">
-                              <EmotionCssPropInternal css={{...}} className=\\"\\" data-value=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Input\\">
-                                <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-                                <div className=\\" css-qbdosj-Input\\" data-value=\\"\\">
-                                  <input className=\\"\\" style={{...}} disabled={false} autoCapitalize=\\"none\\" autoComplete=\\"off\\" autoCorrect=\\"off\\" id=\\"react-select-2-input\\" onBlur={[Function (anonymous)]} onChange={[Function (anonymous)]} onFocus={[Function (anonymous)]} spellCheck=\\"false\\" tabIndex={0} form={[undefined]} type=\\"text\\" value=\\"\\" aria-autocomplete=\\"list\\" aria-expanded={false} aria-haspopup={true} aria-errormessage={[undefined]} aria-invalid={[undefined]} aria-label={[undefined]} aria-labelledby={[undefined]} aria-required={[undefined]} role=\\"combobox\\" aria-activedescendant=\\"\\" aria-describedby=\\"react-select-2-placeholder\\" />
-                                </div>
-                              </EmotionCssPropInternal>
-                            </Input>
-                          </div>
-                        </EmotionCssPropInternal>
-                      </ValueContainer>
-                      <IndicatorsContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false}>
-                        <EmotionCssPropInternal css={{...}} className=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"IndicatorsContainer\\">
-                          <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-                          <div className=\\" css-1hb7zxy-IndicatorsContainer\\">
-                            <IndicatorSeparator clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false} isFocused={false}>
-                              <EmotionCssPropInternal css={{...}} className=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"IndicatorSeparator\\">
-                                <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-                                <span className=\\" css-1u9des2-indicatorSeparator\\" />
-                              </EmotionCssPropInternal>
-                            </IndicatorSeparator>
-                            <DropdownIndicator clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerProps={{...}} isDisabled={false} isFocused={false}>
-                              <EmotionCssPropInternal css={{...}} className=\\"\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-hidden=\\"true\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"DropdownIndicator\\">
-                                <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-                                <div className=\\" css-1xc3v61-indicatorContainer\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-hidden=\\"true\\">
-                                  <DownChevron>
-                                    <Svg size={20}>
-                                      <EmotionCssPropInternal height={20} width={20} viewBox=\\"0 0 20 20\\" aria-hidden=\\"true\\" focusable=\\"false\\" css={{...}} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"svg\\">
-                                        <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
-                                        <svg height={20} width={20} viewBox=\\"0 0 20 20\\" aria-hidden=\\"true\\" focusable=\\"false\\" className=\\"css-tj5bde-Svg\\">
-                                          <path d=\\"M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z\\" />
-                                        </svg>
-                                      </EmotionCssPropInternal>
-                                    </Svg>
-                                  </DownChevron>
-                                </div>
-                              </EmotionCssPropInternal>
-                            </DropdownIndicator>
-                          </div>
-                        </EmotionCssPropInternal>
-                      </IndicatorsContainer>
-                    </div>
-                  </EmotionCssPropInternal>
-                </Control>
-                <input name=\\"splitConfiguration\\" type=\\"hidden\\" value=\\"\\" />
-              </div>
-            </EmotionCssPropInternal>
-          </SelectContainer>
-        </Select>
-      </ForwardRef>
       <Card body={false}>
         <div className=\\"card\\">
           <CardBody>
@@ -161,7 +61,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
       </NumberSpinnerField>
     </div>
     <div className=\\"col-md-7\\">
-      <PreviewGeneratedNames splitFromMaterialSamples={{...}} generatedIdentifiers={{...}} setGeneratedIdentifiers={[Function: bound dispatchAction]} splitConfiguration={[undefined]}>
+      <PreviewGeneratedNames splitFromMaterialSamples={{...}} generatedIdentifiers={{...}} setGeneratedIdentifiers={[Function: bound dispatchAction]} splitConfiguration={{...}}>
         <div className=\\"mt-2\\">
           <h4>
             <FormattedMessage id=\\"previewLabel\\">
@@ -210,4 +110,37 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
     </div>
   </div>
 </main>"
+`;
+
+exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching material sample types. 1`] = `
+"<MockAppContextProvider apiContext={{...}}>
+  <SWRConfig$1 value={{...}}>
+    <IntlProvider>
+      <IntlProvider locale=\\"en\\" messages={{...}} formats={{...}} timeZone={[undefined]} defaultLocale=\\"en\\" defaultFormats={{...}} fallbackOnEmptyString={true} onError={[Function: defaultErrorHandler]} onWarn={[Function: defaultWarnHandler]} textComponent={[symbol]}>
+        <FileUploadProviderImpl>
+          <Memo(DndProvider) backend={[Function: createBackend]}>
+            <div>
+              <ModalProvider appElement={{...}}>
+                <MaterialSampleSplitGenerationForm onGenerate={[Function: mockConstructor] { _isMockFunction: true, getMockImplementation: [Function (anonymous)], mock: Object [Object: null prototype] { calls: [], instances: [], invocationCallOrder: [], results: [] }, mockClear: [Function (anonymous)], mockReset: [Function (anonymous)], mockRestore: [Function (anonymous)], mockReturnValueOnce: [Function (anonymous)], mockResolvedValueOnce: [Function (anonymous)], mockRejectedValueOnce: [Function (anonymous)], mockReturnValue: [Function (anonymous)], mockResolvedValue: [Function (anonymous)], mockRejectedValue: [Function (anonymous)], mockImplementationOnce: [Function (anonymous)], mockImplementation: [Function (anonymous)], mockReturnThis: [Function (anonymous)], mockName: [Function (anonymous)], getMockName: [Function (anonymous)] }} ids={{...}} splitConfiguration={{...}} splitConfigurationID=\\"706eece4-3105-4e96-bc2f-7530a80a6163\\">
+                  <LoadingSpinner loading={true}>
+                    <div className=\\"spinner-border\\" role=\\"status\\">
+                      <span className=\\"visually-hidden mb-3\\">
+                        Loading...
+                      </span>
+                    </div>
+                  </LoadingSpinner>
+                </MaterialSampleSplitGenerationForm>
+                <Modal appElement={[undefined]} ariaHideApp={false} isOpen={false} className=\\"Modal__Bootstrap modal-dialog\\" style={{...}} contentLabel=\\"Popup dialog window\\" portalClassName=\\"ReactModalPortal\\" bodyOpenClassName=\\"ReactModal__Body--open\\" role=\\"dialog\\" closeTimeoutMS={0} shouldFocusAfterRender={true} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true} shouldReturnFocusAfterClose={true} preventScroll={false} parentSelector={[Function: parentSelector]} overlayElement={[Function: overlayElement]} contentElement={[Function: contentElement]}>
+                  <Portal containerInfo={{...}}>
+                    <ModalPortal defaultStyles={{...}} appElement={[undefined]} ariaHideApp={false} isOpen={false} className=\\"Modal__Bootstrap modal-dialog\\" style={{...}} contentLabel=\\"Popup dialog window\\" portalClassName=\\"ReactModalPortal\\" bodyOpenClassName=\\"ReactModal__Body--open\\" role=\\"dialog\\" closeTimeoutMS={0} shouldFocusAfterRender={true} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true} shouldReturnFocusAfterClose={true} preventScroll={false} parentSelector={[Function: parentSelector]} overlayElement={[Function: overlayElement]} contentElement={[Function: contentElement]} />
+                  </Portal>
+                </Modal>
+              </ModalProvider>
+            </div>
+          </Memo(DndProvider)>
+        </FileUploadProviderImpl>
+      </IntlProvider>
+    </IntlProvider>
+  </SWRConfig$1>
+</MockAppContextProvider>"
 `;

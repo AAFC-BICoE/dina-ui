@@ -24,7 +24,10 @@ import { SplitConfigurationOption } from "../collection/material-sample/SplitMat
 import Select from "react-select";
 import { flattenDeep } from "lodash";
 import { ErrorBanner } from "../error/ErrorBanner";
-import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
+import {
+  SEPERATOR_DASH,
+  SplitConfiguration
+} from "../../types/collection-api/resources/SplitConfiguration";
 
 const ENTITY_LINK = "/collection/material-sample";
 
@@ -316,7 +319,7 @@ function PreviewGeneratedNames({
       strategy: splitConfiguration?.strategy ?? "DIRECT_PARENT",
       characterType: splitConfiguration?.characterType ?? "LOWER_LETTER",
       materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit,
-      seperator: splitConfiguration?.separator ?? "-"
+      seperator: splitConfiguration?.separator ?? SEPERATOR_DASH
     };
   }
 

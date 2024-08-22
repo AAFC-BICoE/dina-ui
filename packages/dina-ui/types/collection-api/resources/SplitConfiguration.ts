@@ -1,5 +1,4 @@
 import { KitsuResource } from "kitsu";
-import { Seperators } from "./MaterialSampleIdentifierGenerator";
 
 export const TYPE_BASED_STRATEGY = "TYPE_BASED";
 export const DIRECT_PARENT_STRATEGY = "DIRECT_PARENT";
@@ -16,6 +15,15 @@ export type SplitCharacterTypes =
   | typeof LOWER_CHARACTER_TYPE
   | typeof UPPER_CHARACTER_TYPE
   | typeof NUMBER_CHARACTER_TYPE;
+
+export const SEPERATOR_DASH = "-";
+export const SEPERATOR_UNDERSCORE = "_";
+export const SEPERATOR_SPACE = " ";
+
+export type Seperators =
+  | typeof SEPERATOR_DASH
+  | typeof SEPERATOR_UNDERSCORE
+  | typeof SEPERATOR_SPACE;
 
 export interface SplitConfigurationAttributes {
   type: "split-configuration";
