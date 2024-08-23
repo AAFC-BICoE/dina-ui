@@ -189,28 +189,8 @@ export function PcrBatchForm({
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
-    // Storage Unit or Storage Unit Type can be set but not both.
-    if (submittedValues.storageUnit?.id) {
-      (submittedValues as any).storageUnitType = {
-        id: null,
-        type: "storage-unit-type"
-      };
-    } else if (submittedValues.storageUnitType?.id) {
-      (submittedValues as any).storageUnit = {
-        id: null,
-        type: "storage-unit"
-      };
-    } else {
-      // Clear both in this case.
-      (submittedValues as any).storageUnit = {
-        id: null,
-        type: "storage-unit"
-      };
-      (submittedValues as any).storageUnitType = {
-        id: null,
-        type: "storage-unit-type"
-      };
-    }
+    // Delete storage unit type
+    delete submittedValues.storageUnitType;
 
     const inputResource = {
       ...submittedValues,
@@ -344,19 +324,8 @@ function PcrBatchFormFields({
           model="collection-api/storage-unit-type"
           optionLabel={(storageUnitType) => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
-          onChange={(storageUnitType) => {
+          onChange={() => {
             setFieldValue("storageUnit.id", null);
-            if (
-              !Array.isArray(storageUnitType) &&
-              storageUnitType?.gridLayoutDefinition != null
-            ) {
-              setFieldValue(
-                "storageRestriction.layout",
-                storageUnitType.gridLayoutDefinition
-              );
-            } else {
-              setFieldValue("storageRestriction", null);
-            }
           }}
         />
       );
