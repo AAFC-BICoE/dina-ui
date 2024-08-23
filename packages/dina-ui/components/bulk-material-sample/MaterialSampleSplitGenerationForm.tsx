@@ -25,7 +25,7 @@ import Select from "react-select";
 import { flattenDeep } from "lodash";
 import { ErrorBanner } from "../error/ErrorBanner";
 import {
-  SEPARATOR_DASH,
+  Separators,
   SplitConfiguration
 } from "../../types/collection-api/resources/SplitConfiguration";
 
@@ -347,7 +347,7 @@ function PreviewGeneratedNames({
       strategy: splitConfiguration?.strategy ?? "DIRECT_PARENT",
       characterType: splitConfiguration?.characterType ?? "LOWER_LETTER",
       materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit,
-      separator: splitConfiguration?.separator ?? SEPARATOR_DASH
+      separator: splitConfiguration?.separator ?? Separators.DASH
     };
   }
 
@@ -360,7 +360,7 @@ function PreviewGeneratedNames({
       strategy: splitConfiguration?.strategy ?? "DIRECT_PARENT",
       characterType: splitConfiguration?.characterType ?? "LOWER_LETTER",
       materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit,
-      separator: splitConfiguration?.separator ?? SEPARATOR_DASH
+      separator: splitConfiguration?.separator ?? Separators.DASH
     };
   }
 

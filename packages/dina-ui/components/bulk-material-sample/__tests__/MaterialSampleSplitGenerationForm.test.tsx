@@ -1,4 +1,4 @@
-import { SEPARATOR_DASH } from "../../../types/collection-api/resources/SplitConfiguration";
+import { Separators } from "../../../types/collection-api/resources/SplitConfiguration";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { MaterialSampleSplitGenerationForm } from "../MaterialSampleSplitGenerationForm";
 
@@ -45,7 +45,7 @@ describe("MaterialSampleSplitGenerationForm", () => {
           characterType: "LOWER_LETTER",
           conditionalOnMaterialSampleTypes: ["WHOLE_ORGANISM"],
           id: SPLIT_CONFIGURATION_UUID,
-          separator: SEPARATOR_DASH,
+          separator: Separators[Separators.DASH],
           name: "test-splitconfig",
           materialSampleTypeCreatedBySplit: "CULTURE_STRAIN",
           strategy: "DIRECT_PARENT"
@@ -74,7 +74,7 @@ describe("MaterialSampleSplitGenerationForm", () => {
           characterType: "LOWER_LETTER",
           conditionalOnMaterialSampleTypes: ["CULTURE_STRAIN"],
           id: SPLIT_CONFIGURATION_UUID,
-          separator: SEPARATOR_DASH,
+          separator: Separators[Separators.DASH],
           name: "test-splitconfig",
           materialSampleTypeCreatedBySplit: "CULTURE_STRAIN",
           strategy: "DIRECT_PARENT"
