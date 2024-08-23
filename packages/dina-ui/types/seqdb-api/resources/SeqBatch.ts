@@ -12,7 +12,6 @@ export interface SeqBatchAttributes {
   isCompleted: boolean;
   sequencingType?: string;
   reactionDate?: string;
-  storageRestriction?: any;
   createdBy?: string;
   createdOn?: string;
 }
@@ -23,7 +22,6 @@ export interface SeqBatchRelationships {
   region?: Region;
   thermocyclerProfile?: ThermocyclerProfile;
   protocol?: Protocol;
-  storageUnitType?: ResourceIdentifierObject;
   storageUnit?: ResourceIdentifierObject;
 }
 

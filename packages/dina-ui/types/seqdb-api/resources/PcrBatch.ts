@@ -17,7 +17,6 @@ export interface PcrBatchAttributes {
   /** UUID array (from the back-end JSON) or Person array (in the form state). */
   experimenters?: Person[];
 
-  storageRestriction?: any;
   positiveControl?: string;
   reactionVolume?: string;
   reactionDate?: string;
@@ -30,7 +29,6 @@ export interface PcrBatchRelationships {
   primerReverse?: PcrPrimer;
   region?: Region;
   attachment?: ResourceIdentifierObject[];
-  storageUnitType?: ResourceIdentifierObject;
   storageUnit?: ResourceIdentifierObject;
   protocol?: Protocol;
 }

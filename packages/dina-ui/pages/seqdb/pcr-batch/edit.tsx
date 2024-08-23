@@ -266,17 +266,6 @@ export function LoadExternalDataForPcrBatchForm({
     }
   );
 
-  // Add the storage unit type to the initial values.
-  if (storageUnitQuery?.response?.data) {
-    initialValues.storageUnitType = storageUnitQuery?.response?.data
-      ?.storageUnitType?.id
-      ? {
-          id: storageUnitQuery?.response.data.storageUnitType.id,
-          type: "storage-unit-type"
-        }
-      : undefined;
-  }
-
   // Display loading indicator if not ready.
   if (storageUnitQuery.loading || loadingReactionData) {
     return <LoadingSpinner loading={true} />;

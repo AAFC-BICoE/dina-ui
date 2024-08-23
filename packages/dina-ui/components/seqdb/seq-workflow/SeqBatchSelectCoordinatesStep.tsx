@@ -158,7 +158,10 @@ export function SeqBatchSelectCoordinatesStep(
         </div>
         <div className="col-9">
           <strong>Container wells</strong>
-          <ContainerGrid<SeqBatch, SeqReactionSample>
+          <ContainerGrid<
+            SeqBatch & { gridLayoutDefinition?: any },
+            SeqReactionSample
+          >
             batch={seqBatch}
             cellGrid={cellGrid}
             movedItems={movedItems}
