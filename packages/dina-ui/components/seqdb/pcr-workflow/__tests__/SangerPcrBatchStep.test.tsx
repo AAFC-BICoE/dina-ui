@@ -80,6 +80,10 @@ describe("SangerPcrBatchStep component", () => {
     wrapper.update();
 
     expect(mockOnSaved).lastCalledWith(1, {
+      storageUnit: {
+        id: null,
+        type: "storage-unit"
+      },
       createdBy: "test-user",
       id: "11111111-1111-1111-1111-111111111111",
       name: PCR_BATCH_NAME,
@@ -145,6 +149,10 @@ describe("SangerPcrBatchStep component", () => {
     wrapper.update();
 
     expect(mockOnSaved).lastCalledWith(1, {
+      storageUnit: {
+        id: null,
+        type: "storage-unit"
+      },
       createdBy: "test-user",
       id: "11111111-1111-1111-1111-111111111111",
       name: PCR_BATCH_NAME,
