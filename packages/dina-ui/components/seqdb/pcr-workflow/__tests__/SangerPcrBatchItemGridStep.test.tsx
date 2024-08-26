@@ -60,18 +60,11 @@ let STORAGE_UNIT_USAGE_5 = {
   wellRow: "A"
 };
 
-let PCR_BATCH: PcrBatch = {
+let PCR_BATCH: PcrBatch & { gridLayoutDefinition?: any } = {
   name: "pcr-batch-name",
   type: "pcr-batch",
   isCompleted: false,
   id: PCR_BATCH_ID,
-  storageRestriction: {
-    layout: {
-      numberOfColumns: GRID_COL_SIZE,
-      numberOfRows: GRID_ROW_SIZE,
-      fillDirection: "BY_COLUMN"
-    }
-  },
   storageUnit: STORAGE_UNIT_1 as any
 };
 
@@ -147,6 +140,10 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "/seqdb-api/pcr-batch-item":
       return {
         data: PCR_BATCH_ITEMS
+      };
+    case "/collection-api/storage-unit/storage-unit-1":
+      return {
+        data: STORAGE_UNIT_1
       };
   }
 });
@@ -245,12 +242,10 @@ describe("SangerPcrBatchItemGridStep component", () => {
       type: "pcr-batch",
       isCompleted: false,
       id: PCR_BATCH_ID,
-      storageRestriction: {
-        layout: {
-          numberOfColumns: GRID_COL_SIZE,
-          numberOfRows: GRID_ROW_SIZE,
-          fillDirection: "BY_COLUMN"
-        }
+      gridLayoutDefinition: {
+        numberOfColumns: GRID_COL_SIZE,
+        numberOfRows: GRID_ROW_SIZE,
+        fillDirection: "BY_COLUMN"
       },
       storageUnit: STORAGE_UNIT_1 as any
     };
