@@ -601,8 +601,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitConfiguration_separator_dash: "Dash",
   splitConfiguration_separator_underscore: "Underscore",
   splitConfiguration_separator_space: "Space",
-  materialSampleSplitConfigurationSeparatorError:
-    "Separator must be a single character.",
   materialSampleSplitConfigurationTypeCreatedBySplit:
     "Material Sample Type Created",
   materialSampleTypeListTitle: "Material Sample Types",

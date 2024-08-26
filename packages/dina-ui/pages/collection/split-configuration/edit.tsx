@@ -136,11 +136,9 @@ export function SplitConfigurationForm({
       newErrors.characterType = formatMessage("requiredField");
     }
 
-    // Separator is required and it can only be one character.
-    if (!isUndefined(values?.separator) && values.separator.length > 1) {
-      newErrors.separator = formatMessage(
-        "materialSampleSplitConfigurationSeparatorError"
-      );
+    // Separator is required.
+    if (isUndefined(values?.separator)) {
+      newErrors.separator = formatMessage("requiredField");
     }
 
     return newErrors;
