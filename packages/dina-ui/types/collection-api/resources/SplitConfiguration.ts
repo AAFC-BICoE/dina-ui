@@ -16,11 +16,14 @@ export type SplitCharacterTypes =
   | typeof UPPER_CHARACTER_TYPE
   | typeof NUMBER_CHARACTER_TYPE;
 
-export enum Separators {
-  DASH = "-",
-  UNDERSCORE = "_",
-  SPACE = " "
-}
+export const SEPARATORS_DASH = "DASH";
+export const SEPARATORS_UNDERSCORE = "UNDERSCORE";
+export const SEPARATORS_SPACE = "SPACE";
+
+export type Separators =
+  | typeof SEPARATORS_DASH
+  | typeof SEPARATORS_UNDERSCORE
+  | typeof SEPARATORS_SPACE;
 
 export interface SplitConfigurationAttributes {
   type: "split-configuration";

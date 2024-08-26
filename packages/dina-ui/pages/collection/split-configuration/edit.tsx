@@ -19,7 +19,9 @@ import {
   DIRECT_PARENT_STRATEGY,
   LOWER_CHARACTER_TYPE,
   NUMBER_CHARACTER_TYPE,
-  Separators,
+  SEPARATORS_DASH,
+  SEPARATORS_SPACE,
+  SEPARATORS_UNDERSCORE,
   SplitConfiguration,
   TYPE_BASED_STRATEGY,
   UPPER_CHARACTER_TYPE
@@ -74,7 +76,7 @@ export function SplitConfigurationForm({
     ? splitConfigurationData
     : {
         type: "split-configuration",
-        separator: Separators[Separators.DASH]
+        separator: SEPARATORS_DASH
       };
 
   const onSubmit: DinaFormOnSubmit<SplitConfiguration> = async ({
@@ -272,17 +274,17 @@ export function SplitConfigurationFormLayout() {
               label={formatMessage("materialSampleSplitConfigurationSeparator")}
               options={[
                 {
-                  value: Separators[Separators.DASH],
+                  value: SEPARATORS_DASH,
                   label: formatMessage("splitConfiguration_separator_dash")
                 },
                 {
-                  value: Separators[Separators.UNDERSCORE],
+                  value: SEPARATORS_UNDERSCORE,
                   label: formatMessage(
                     "splitConfiguration_separator_underscore"
                   )
                 },
                 {
-                  value: Separators[Separators.SPACE],
+                  value: SEPARATORS_SPACE,
                   label: formatMessage("splitConfiguration_separator_space")
                 }
               ]}
