@@ -255,24 +255,7 @@ export function LoadExternalDataForPcrBatchForm({
     )
   });
 
-  // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
-  const storageUnitQuery = useQuery<StorageUnit>(
-    {
-      path: `collection-api/storage-unit/${initialValues?.storageUnit?.id}`,
-      include: "storageUnitType"
-    },
-    {
-      disabled: !initialValues?.storageUnit?.id
-    }
-  );
-
-  // Display loading indicator if not ready.
-  if (storageUnitQuery.loading || loadingReactionData) {
-    return <LoadingSpinner loading={true} />;
-  }
-
-  // Wait for response or if disabled, just continue with rendering.
-  return withResponseOrDisabled(storageUnitQuery, () => (
+  return (
     <DinaForm<Partial<PcrBatch>>
       {...dinaFormProps}
       initialValues={initialValues}
@@ -283,7 +266,7 @@ export function LoadExternalDataForPcrBatchForm({
         materialSamples={materialSamples}
       />
     </DinaForm>
-  ));
+  );
 }
 
 interface PcrBatchFormFieldsProps {

@@ -144,28 +144,8 @@ export function SeqBatchForm({
       experimenters: undefined
     };
 
-    // Storage Unit or Storage Unit Type can be set but not both.
-    if (inputResourceWithRelationships.storageUnit?.id) {
-      (inputResourceWithRelationships as any).storageUnitType = {
-        id: null,
-        type: "storage-unit-type"
-      };
-    } else if (inputResourceWithRelationships.storageUnitType?.id) {
-      (inputResourceWithRelationships as any).storageUnit = {
-        id: null,
-        type: "storage-unit"
-      };
-    } else {
-      // Clear both in this case.
-      (inputResourceWithRelationships as any).storageUnit = {
-        id: null,
-        type: "storage-unit"
-      };
-      (inputResourceWithRelationships as any).storageUnitType = {
-        id: null,
-        type: "storage-unit-type"
-      };
-    }
+    // Delete storage unit type
+    delete (inputResourceWithRelationships as any).storageUnitType;
 
     const [savedResource] = await save<SeqBatch>(
       [
@@ -206,35 +186,7 @@ export function LoadExternalDataForSeqBatchForm({
     initialValues.id
   );
 
-  // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
-  const storageUnitQuery = useQuery<StorageUnit>(
-    {
-      path: `collection-api/storage-unit/${initialValues?.storageUnit?.id}`,
-      include: "storageUnitType"
-    },
-    {
-      disabled: !initialValues?.storageUnit?.id
-    }
-  );
-
-  // Add the storage unit type to the initial values.
-  if (storageUnitQuery?.response?.data) {
-    initialValues.storageUnitType = storageUnitQuery?.response?.data
-      ?.storageUnitType?.id
-      ? {
-          id: storageUnitQuery?.response.data.storageUnitType.id,
-          type: "storage-unit-type"
-        }
-      : undefined;
-  }
-
-  // Display loading indicator if not ready.
-  if (storageUnitQuery.loading) {
-    return <LoadingSpinner loading={true} />;
-  }
-
-  // Wait for response or if disabled, just continue with rendering.
-  return withResponseOrDisabled(storageUnitQuery, () => (
+  return (
     <>
       <DinaForm<Partial<SeqBatch>>
         {...dinaFormProps}
@@ -255,7 +207,7 @@ export function LoadExternalDataForSeqBatchForm({
         </FieldSet>
       )}
     </>
-  ));
+  );
 }
 
 /** Re-usable field layout between edit and view pages. */
