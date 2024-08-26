@@ -307,9 +307,11 @@ export function SeqBatchFormFields() {
           model="collection-api/protocol"
           optionLabel={(protocol) => protocol.name}
         />
-        <div className="col-md-6">
-          <StorageUnitTypeSelectorComponent />
-        </div>
+        {!readOnly && (
+          <div className="col-md-6">
+            <StorageUnitTypeSelectorComponent />
+          </div>
+        )}
         <div className="col-md-6">
           <StorageUnitSelectField
             resourceProps={{

@@ -419,7 +419,7 @@ function PcrBatchFormFields({
         <TextField className="col-md-6" name="positiveControl" />
         <TextField className="col-md-6" name="reactionVolume" />
         <DateField className="col-md-6" name="reactionDate" />
-        <StorageUnitTypeSelectorComponent />
+        {!readOnly && <StorageUnitTypeSelectorComponent />}
         <StorageUnitSelectField
           resourceProps={{
             name: "storageUnit",
