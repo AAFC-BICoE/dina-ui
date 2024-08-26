@@ -9,7 +9,7 @@ import {
   useStringComparator
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { compact, orderBy } from "lodash";
+import { compact, sortBy } from "lodash";
 import { useEffect, useState } from "react";
 import { MaterialSampleSummary } from "../../../types/collection-api";
 import {
@@ -306,13 +306,13 @@ export function PcrReactionTable({
       }
     }
   ];
-
   return (
     <ReactTable<PcrBatchItem>
       className="-striped react-table-overflow"
       columns={PCR_REACTION_COLUMN}
-      data={orderBy(pcrBatchItems, "storageUnitUsage.cellNumber")}
+      data={pcrBatchItems}
       showPagination={false}
+      pageSize={1000}
       enableSorting={true}
       sort={[
         {
