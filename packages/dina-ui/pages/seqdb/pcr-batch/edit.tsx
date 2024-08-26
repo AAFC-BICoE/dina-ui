@@ -255,6 +255,11 @@ export function LoadExternalDataForPcrBatchForm({
     )
   });
 
+  // Display loading indicator if not ready.
+  if (loadingReactionData) {
+    return <LoadingSpinner loading={true} />;
+  }
+
   return (
     <DinaForm<Partial<PcrBatch>>
       {...dinaFormProps}
@@ -438,11 +443,11 @@ function PcrBatchFormFields({
           />
         </FieldSet>
       )}
-      <AttachmentsField
+      {/* <AttachmentsField
         name="attachment"
         attachmentPath={`seqdb-api/pcr-batch/${initialValues.id}/attachment`}
         title={<DinaMessage id="attachments" />}
-      />
+      /> */}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />
