@@ -146,6 +146,12 @@ export function SeqBatchForm({
 
     // Delete storage unit type
     delete (inputResourceWithRelationships as any).storageUnitType;
+    if (!inputResourceWithRelationships.storageUnit?.id) {
+      (inputResourceWithRelationships as any).storageUnit = {
+        id: null,
+        type: "storage-unit"
+      };
+    }
 
     const [savedResource] = await save<SeqBatch>(
       [

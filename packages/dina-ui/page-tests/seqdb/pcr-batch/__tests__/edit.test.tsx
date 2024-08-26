@@ -166,10 +166,6 @@ describe("PcrBatch edit page", () => {
               id: null,
               type: "storage-unit"
             },
-            storageUnitType: {
-              id: null,
-              type: "storage-unit-type"
-            },
             relationships: {
               experimenters: {
                 data: [
@@ -224,10 +220,6 @@ describe("PcrBatch edit page", () => {
               id: null,
               type: "storage-unit"
             },
-            storageUnitType: {
-              id: null,
-              type: "storage-unit-type"
-            },
             type: "pcr-batch",
             relationships: {
               experimenters: {
@@ -279,15 +271,9 @@ describe("PcrBatch edit page", () => {
             createdBy: "test-user",
             name: "test new batch",
             type: "pcr-batch",
-            // Storage Unit / Storage Unit type are always set for each request.
-            storageRestriction: null,
             storageUnit: {
               id: null,
               type: "storage-unit"
-            },
-            storageUnitType: {
-              id: STORAGE_UNIT_TYPE_UUID,
-              type: "storage-unit-type"
             },
             relationships: {
               attachment: {
@@ -345,14 +331,9 @@ describe("PcrBatch edit page", () => {
             name: "test new batch",
             type: "pcr-batch",
             // Storage Unit / Storage Unit type are always set for each request.
-            storageRestriction: null,
             storageUnit: {
               id: STORAGE_UNIT_UUID,
               type: "storage-unit"
-            },
-            storageUnitType: {
-              id: null,
-              type: "storage-unit-type"
             },
             relationships: {
               attachment: {

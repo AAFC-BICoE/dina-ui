@@ -191,6 +191,12 @@ export function PcrBatchForm({
 
     // Delete storage unit type
     delete submittedValues.storageUnitType;
+    if (!submittedValues.storageUnit?.id) {
+      (submittedValues as any).storageUnit = {
+        id: null,
+        type: "storage-unit"
+      };
+    }
 
     const inputResource = {
       ...submittedValues,
