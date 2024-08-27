@@ -423,6 +423,17 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
             id: "preparationProtocol"
           }
         ]
+      },
+      {
+        id: "preparations-managed-attributes-section",
+        maxGridSizeX: 2,
+        items: [
+          {
+            id: "preparationManagedAttributes",
+            visible: true
+          },
+          { id: "preparationManagedAttributesOrder", visible: true }
+        ]
       }
     ]
   },

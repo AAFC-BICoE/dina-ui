@@ -1526,6 +1526,22 @@ describe("Form template edit page", () => {
                   visible: false
                 }
               ]
+            },
+            {
+              name: "preparations-managed-attributes-section",
+              visible: true,
+              items: [
+                {
+                  defaultValue: undefined,
+                  name: "preparationManagedAttributes",
+                  visible: true
+                },
+                {
+                  defaultValue: undefined,
+                  name: "preparationManagedAttributesOrder",
+                  visible: true
+                }
+              ]
             }
           ]
         },

@@ -116,7 +116,8 @@ export function useMaterialSampleFormTemplateProps<
       visibleManagedAttributeKeys: {
         materialSample: actionDefinition.managedAttributesOrder,
         collectingEvent: actionDefinition.collectingEventManagedAttributesOrder,
-        determination: actionDefinition.determinationManagedAttributesOrder
+        determination: actionDefinition.determinationManagedAttributesOrder,
+        preparations: actionDefinition.preparationManagedAttributesOrder
       }
     };
 
