@@ -27,6 +27,11 @@ export interface UseMaterialSampleFormTemplateSelectStateProps {
    * This value will not be saved into local storage so it doesn't override their usual choice.
    */
   temporaryFormTemplateUUID?: string;
+
+  /**
+   * Used with split configurations to override the material sample type.
+   */
+  overrideMaterialSampleType?: string;
 }
 
 /**
@@ -35,7 +40,8 @@ export interface UseMaterialSampleFormTemplateSelectStateProps {
  * Only handles Form Templates (e.g. show/hide fields), not default values.
  */
 export function useMaterialSampleFormTemplateSelectState({
-  temporaryFormTemplateUUID
+  temporaryFormTemplateUUID,
+  overrideMaterialSampleType
 }: UseMaterialSampleFormTemplateSelectStateProps) {
   const { username } = useAccount();
   const { apiClient } = useApiClient();
@@ -156,7 +162,12 @@ export function useMaterialSampleFormTemplateSelectState({
     navOrder,
     setNavOrder,
     visibleManagedAttributeKeys,
-    materialSampleInitialValues,
+    materialSampleInitialValues: {
+      ...materialSampleInitialValues,
+      ...(overrideMaterialSampleType
+        ? { materialSampleType: overrideMaterialSampleType }
+        : {})
+    },
     collectingEventInitialValues
   };
 }

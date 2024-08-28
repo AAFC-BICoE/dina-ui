@@ -1,3 +1,146 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `""`;
+exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching material sample types. 1`] = `
+"<main className=\\"container-fluid\\" role=\\"main\\">
+  <h1 id=\\"wb-cont\\">
+    Split Material Sample
+  </h1>
+  <div className=\\"row\\">
+    <div className=\\"col-md-5\\">
+      <h4 className=\\"mt-2\\">
+        <FormattedMessage id=\\"settingLabel\\">
+          <FormattedMessage defaultMessage=\\" \\" id=\\"settingLabel\\">
+            Settings
+          </FormattedMessage>
+        </FormattedMessage>
+      </h4>
+      <Card body={false}>
+        <div className=\\"card\\">
+          <CardBody>
+            <div className=\\"card-body\\">
+              <FormattedMessage id=\\"splitFrom\\">
+                <FormattedMessage defaultMessage=\\" \\" id=\\"splitFrom\\">
+                  Split from
+                </FormattedMessage>
+              </FormattedMessage>
+              :
+              <ul />
+            </div>
+          </CardBody>
+        </div>
+      </Card>
+      <NumberSpinnerField name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false} className=\\"mt-3\\">
+        <FieldWrapper name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false} className=\\"mt-3\\">
+          <FieldSpy fieldName=\\"numberToCreate\\" validate={[undefined]}>
+            <FormikConnect(FastFieldInner) name=\\"numberToCreate\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
+              <FastFieldInner name=\\"numberToCreate\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
+                <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"numberToCreate\\">
+                  <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
+                    <div className=\\"mt-3\\">
+                      <label className=\\"numberToCreate-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
+                        <div className=\\"field-label label-col mb-2\\" style={[undefined]}>
+                          <strong>
+                            Material Samples to Create
+                          </strong>
+                        </div>
+                        <div className=\\"field-col\\" style={{...}}>
+                          <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
+                            <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
+                              <input className=\\"form-control\\" type=\\"number\\" min={1} max={500} size={4} step={1} onKeyDown={[Function: onKeyDown]} onChange={[Function: onChange]} onClick={[Function: onClick]} disabled={false} value={1} />
+                            </ErrorBoundary>
+                          </FormikConnectedField>
+                        </div>
+                      </label>
+                    </div>
+                  </LabelWrapper>
+                </FieldSpyInternal>
+              </FastFieldInner>
+            </FormikConnect(FastFieldInner)>
+          </FieldSpy>
+        </FieldWrapper>
+      </NumberSpinnerField>
+    </div>
+    <div className=\\"col-md-7\\">
+      <PreviewGeneratedNames splitFromMaterialSamples={{...}} generatedIdentifiers={{...}} setGeneratedIdentifiers={[Function: bound dispatchAction]} splitConfiguration={{...}}>
+        <div className=\\"mt-2\\">
+          <h4>
+            <FormattedMessage id=\\"previewLabel\\">
+              <FormattedMessage defaultMessage=\\" \\" id=\\"previewLabel\\">
+                Preview
+              </FormattedMessage>
+            </FormattedMessage>
+          </h4>
+          <table className=\\"table\\">
+            <thead>
+              <tr>
+                <th>
+                  <FormattedMessage id=\\"splitPreviewNumberColumn\\">
+                    <FormattedMessage defaultMessage=\\" \\" id=\\"splitPreviewNumberColumn\\">
+                      Number
+                    </FormattedMessage>
+                  </FormattedMessage>
+                </th>
+                <th>
+                  <FormattedMessage id=\\"splitPreviewGeneratedIdentifierColumn\\">
+                    <FormattedMessage defaultMessage=\\" \\" id=\\"splitPreviewGeneratedIdentifierColumn\\">
+                      Generated Identifier
+                    </FormattedMessage>
+                  </FormattedMessage>
+                </th>
+                <th>
+                  <FormattedMessage id=\\"parentMaterialSample\\">
+                    <FormattedMessage defaultMessage=\\" \\" id=\\"parentMaterialSample\\">
+                      Parent Material Sample
+                    </FormattedMessage>
+                  </FormattedMessage>
+                </th>
+                <th>
+                  <FormattedMessage id=\\"field_materialSampleType\\">
+                    <FormattedMessage defaultMessage=\\" \\" id=\\"field_materialSampleType\\">
+                      Material Sample Type
+                    </FormattedMessage>
+                  </FormattedMessage>
+                </th>
+              </tr>
+            </thead>
+            <tbody />
+          </table>
+        </div>
+      </PreviewGeneratedNames>
+    </div>
+  </div>
+</main>"
+`;
+
+exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching material sample types. 1`] = `
+"<MockAppContextProvider apiContext={{...}}>
+  <SWRConfig$1 value={{...}}>
+    <IntlProvider>
+      <IntlProvider locale=\\"en\\" messages={{...}} formats={{...}} timeZone={[undefined]} defaultLocale=\\"en\\" defaultFormats={{...}} fallbackOnEmptyString={true} onError={[Function: defaultErrorHandler]} onWarn={[Function: defaultWarnHandler]} textComponent={[symbol]}>
+        <FileUploadProviderImpl>
+          <Memo(DndProvider) backend={[Function: createBackend]}>
+            <div>
+              <ModalProvider appElement={{...}}>
+                <MaterialSampleSplitGenerationForm onGenerate={[Function: mockConstructor] { _isMockFunction: true, getMockImplementation: [Function (anonymous)], mock: Object [Object: null prototype] { calls: [], instances: [], invocationCallOrder: [], results: [] }, mockClear: [Function (anonymous)], mockReset: [Function (anonymous)], mockRestore: [Function (anonymous)], mockReturnValueOnce: [Function (anonymous)], mockResolvedValueOnce: [Function (anonymous)], mockRejectedValueOnce: [Function (anonymous)], mockReturnValue: [Function (anonymous)], mockResolvedValue: [Function (anonymous)], mockRejectedValue: [Function (anonymous)], mockImplementationOnce: [Function (anonymous)], mockImplementation: [Function (anonymous)], mockReturnThis: [Function (anonymous)], mockName: [Function (anonymous)], getMockName: [Function (anonymous)] }} ids={{...}} splitConfiguration={{...}} splitConfigurationID=\\"706eece4-3105-4e96-bc2f-7530a80a6163\\">
+                  <LoadingSpinner loading={true}>
+                    <div className=\\"spinner-border\\" role=\\"status\\">
+                      <span className=\\"visually-hidden mb-3\\">
+                        Loading...
+                      </span>
+                    </div>
+                  </LoadingSpinner>
+                </MaterialSampleSplitGenerationForm>
+                <Modal appElement={[undefined]} ariaHideApp={false} isOpen={false} className=\\"Modal__Bootstrap modal-dialog\\" style={{...}} contentLabel=\\"Popup dialog window\\" portalClassName=\\"ReactModalPortal\\" bodyOpenClassName=\\"ReactModal__Body--open\\" role=\\"dialog\\" closeTimeoutMS={0} shouldFocusAfterRender={true} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true} shouldReturnFocusAfterClose={true} preventScroll={false} parentSelector={[Function: parentSelector]} overlayElement={[Function: overlayElement]} contentElement={[Function: contentElement]}>
+                  <Portal containerInfo={{...}}>
+                    <ModalPortal defaultStyles={{...}} appElement={[undefined]} ariaHideApp={false} isOpen={false} className=\\"Modal__Bootstrap modal-dialog\\" style={{...}} contentLabel=\\"Popup dialog window\\" portalClassName=\\"ReactModalPortal\\" bodyOpenClassName=\\"ReactModal__Body--open\\" role=\\"dialog\\" closeTimeoutMS={0} shouldFocusAfterRender={true} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true} shouldReturnFocusAfterClose={true} preventScroll={false} parentSelector={[Function: parentSelector]} overlayElement={[Function: overlayElement]} contentElement={[Function: contentElement]} />
+                  </Portal>
+                </Modal>
+              </ModalProvider>
+            </div>
+          </Memo(DndProvider)>
+        </FileUploadProviderImpl>
+      </IntlProvider>
+    </IntlProvider>
+  </SWRConfig$1>
+</MockAppContextProvider>"
+`;

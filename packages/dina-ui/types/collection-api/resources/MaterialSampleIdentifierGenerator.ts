@@ -1,7 +1,9 @@
 import { KitsuResource } from "kitsu";
-
-export type Strategies = "TYPE_BASED" | "DIRECT_PARENT";
-export type CharacterTypes = "NUMBER" | "LOWER_LETTER" | "UPPER_LETTER";
+import {
+  Separators,
+  SplitStrategies,
+  SplitCharacterTypes
+} from "./SplitConfiguration";
 
 export interface MaterialSampleIdentifierGeneratorAttributes {
   type: "material-sample-identifier-generator";
@@ -12,13 +14,16 @@ export interface MaterialSampleIdentifierGeneratorAttributes {
   currentParentsUUID?: string[];
 
   /** The strategy to perform on the current parent UUID. */
-  strategy: Strategies;
+  strategy: SplitStrategies;
 
   /** Material Sample Type */
   materialSampleType?: string;
 
   /** Character type strategy (-1, -a, -A) */
-  characterType: CharacterTypes;
+  characterType: SplitCharacterTypes;
+
+  /** Separators to use in name generation (dash, underscore, space) */
+  separator: Separators;
 
   /** Amount of identifiers to be generated */
   quantity?: number;
