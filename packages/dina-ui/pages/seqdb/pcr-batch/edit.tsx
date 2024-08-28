@@ -189,26 +189,12 @@ export function PcrBatchForm({
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
-    // Storage Unit or Storage Unit Type can be set but not both.
-    if (submittedValues.storageUnit?.id) {
-      (submittedValues as any).storageUnitType = {
-        id: null,
-        type: "storage-unit-type"
-      };
-    } else if (submittedValues.storageUnitType?.id) {
+    // Delete storage unit type
+    delete submittedValues.storageUnitType;
+    if (!submittedValues.storageUnit?.id) {
       (submittedValues as any).storageUnit = {
         id: null,
         type: "storage-unit"
-      };
-    } else {
-      // Clear both in this case.
-      (submittedValues as any).storageUnit = {
-        id: null,
-        type: "storage-unit"
-      };
-      (submittedValues as any).storageUnitType = {
-        id: null,
-        type: "storage-unit-type"
       };
     }
 
@@ -275,35 +261,12 @@ export function LoadExternalDataForPcrBatchForm({
     )
   });
 
-  // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
-  const storageUnitQuery = useQuery<StorageUnit>(
-    {
-      path: `collection-api/storage-unit/${initialValues?.storageUnit?.id}`,
-      include: "storageUnitType"
-    },
-    {
-      disabled: !initialValues?.storageUnit?.id
-    }
-  );
-
-  // Add the storage unit type to the initial values.
-  if (storageUnitQuery?.response?.data) {
-    initialValues.storageUnitType = storageUnitQuery?.response?.data
-      ?.storageUnitType?.id
-      ? {
-          id: storageUnitQuery?.response.data.storageUnitType.id,
-          type: "storage-unit-type"
-        }
-      : undefined;
-  }
-
   // Display loading indicator if not ready.
-  if (storageUnitQuery.loading || loadingReactionData) {
+  if (loadingReactionData) {
     return <LoadingSpinner loading={true} />;
   }
 
-  // Wait for response or if disabled, just continue with rendering.
-  return withResponseOrDisabled(storageUnitQuery, () => (
+  return (
     <DinaForm<Partial<PcrBatch>>
       {...dinaFormProps}
       initialValues={initialValues}
@@ -314,7 +277,7 @@ export function LoadExternalDataForPcrBatchForm({
         materialSamples={materialSamples}
       />
     </DinaForm>
-  ));
+  );
 }
 
 interface PcrBatchFormFieldsProps {
@@ -344,19 +307,8 @@ function PcrBatchFormFields({
           model="collection-api/storage-unit-type"
           optionLabel={(storageUnitType) => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
-          onChange={(storageUnitType) => {
+          onChange={() => {
             setFieldValue("storageUnit.id", null);
-            if (
-              !Array.isArray(storageUnitType) &&
-              storageUnitType?.gridLayoutDefinition != null
-            ) {
-              setFieldValue(
-                "storageRestriction.layout",
-                storageUnitType.gridLayoutDefinition
-              );
-            } else {
-              setFieldValue("storageRestriction", null);
-            }
           }}
         />
       );
@@ -467,7 +419,7 @@ function PcrBatchFormFields({
         <TextField className="col-md-6" name="positiveControl" />
         <TextField className="col-md-6" name="reactionVolume" />
         <DateField className="col-md-6" name="reactionDate" />
-        <StorageUnitTypeSelectorComponent />
+        {!readOnly && <StorageUnitTypeSelectorComponent />}
         <StorageUnitSelectField
           resourceProps={{
             name: "storageUnit",
@@ -497,11 +449,11 @@ function PcrBatchFormFields({
           />
         </FieldSet>
       )}
-      <AttachmentsField
+      {/* <AttachmentsField
         name="attachment"
         attachmentPath={`seqdb-api/pcr-batch/${initialValues.id}/attachment`}
         title={<DinaMessage id="attachments" />}
-      />
+      /> */}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />

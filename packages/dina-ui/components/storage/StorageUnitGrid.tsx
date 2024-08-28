@@ -31,9 +31,8 @@ export default function StorageUnitGrid({
       <ContainerGrid
         className="mb-3"
         batch={{
-          storageRestriction: {
-            layout: storageUnit?.storageUnitType?.gridLayoutDefinition
-          }
+          gridLayoutDefinition:
+            storageUnit?.storageUnitType?.gridLayoutDefinition
         }}
         cellGrid={cellGrid}
         editMode={false}
