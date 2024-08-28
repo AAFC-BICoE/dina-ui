@@ -185,11 +185,7 @@ export function MaterialSampleGenerationForm({
 
       {/* Source Set */}
       <div className="row">
-        <TextField
-          className="col-sm-6"
-          name="sourceSet"
-          tooltipOverride={formatMessage("sourceSet_tooltip")}
-        />
+        <TextField className="col-sm-6" name="sourceSet" />
       </div>
 
       {!useNextSequence && (

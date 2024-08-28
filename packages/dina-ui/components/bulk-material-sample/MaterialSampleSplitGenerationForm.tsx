@@ -10,7 +10,8 @@ import {
   LoadingSpinner,
   DinaFormOnSubmit,
   useQuery,
-  useAccount
+  useAccount,
+  TextField
 } from "common-ui";
 import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -35,6 +36,7 @@ const ENTITY_LINK = "/collection/material-sample";
 
 interface MaterialSampleBulkSplitFields {
   numberToCreate: number;
+  sourceSet?: string;
 }
 
 interface MaterialSampleSplitGenerationFormProps {
@@ -206,7 +208,8 @@ export function MaterialSampleSplitGenerationForm({
             : undefined,
           publiclyReleasable: true,
           allowDuplicateName: false,
-          materialSampleName: childMaterialSampleName
+          materialSampleName: childMaterialSampleName,
+          sourceSet: submittedValues.sourceSet
         });
       });
     });
@@ -288,6 +291,7 @@ export function MaterialSampleSplitGenerationForm({
                 className="mt-3"
               />
             )}
+            <TextField name={"sourceSet"} />
           </div>
           <div className="col-md-7">
             <PreviewGeneratedNames
