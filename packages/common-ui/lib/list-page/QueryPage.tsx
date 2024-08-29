@@ -50,7 +50,8 @@ import {
   applyRootQuery,
   applySortingRules,
   applySourceFiltering,
-  elasticSearchFormatExport
+  elasticSearchFormatExport,
+  processResults
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import {
   CustomViewField,
@@ -521,41 +522,8 @@ export function QueryPage<TData extends KitsuResource>({
       // The included section will be transformed from an array to an object with the type name for each relationship.
       elasticSearchRequest(queryDSL)
         .then((result) => {
-          const processedResult = result?.hits.map((rslt) => {
-            return {
-              id: rslt._source?.data?.id,
-              type: rslt._source?.data?.type,
-              data: {
-                attributes: rslt._source?.data?.attributes,
-                relationships: rslt._source?.data?.relationships
-              },
-              included: rslt._source?.included?.reduce(
-                (includedAccumulator, currentIncluded) => {
-                  const relationships = rslt._source?.data?.relationships ?? {};
-                  const currentID = currentIncluded?.id;
-                  const relationshipKeys = Object.keys(relationships).filter(
-                    (key) => {
-                      const relationshipData = relationships[key].data;
-                      return Array.isArray(relationshipData)
-                        ? relationshipData.some((item) => item.id === currentID)
-                        : relationshipData?.id === currentID;
-                    }
-                  );
-
-                  relationshipKeys.forEach((key) => {
-                    if (!includedAccumulator[key]) {
-                      includedAccumulator[key] = currentIncluded;
-                    } else {
-                      includedAccumulator[key].push(currentIncluded);
-                    }
-                  });
-
-                  return includedAccumulator;
-                },
-                {}
-              )
-            };
-          });
+          // console.log(result);
+          const processedResult = processResults(result);
 
           // If we have reached the count limit, we will need to perform another request for the true
           // query size.

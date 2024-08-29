@@ -409,6 +409,65 @@ export function applyRootQuery(elasticSearchQuery: any) {
   };
 }
 
+/**
+ * This function is responsible for taking the elastic search results can converting it to something
+ * the display table can read.
+ *
+ * The included section will be added as an object unless it's a to-many relationship, then it's
+ * transfered to an array.
+ *
+ * @param results Elasticsearch JSON result
+ */
+export function processResults(result: any) {
+  return result?.hits.map((rslt) => {
+    return {
+      id: rslt._source?.data?.id,
+      type: rslt._source?.data?.type,
+      data: {
+        attributes: rslt._source?.data?.attributes,
+        relationships: rslt._source?.data?.relationships
+      },
+      included: rslt._source?.included?.reduce(
+        (includedAccumulator, currentIncluded) => {
+          const relationships = rslt._source?.data?.relationships ?? {};
+          const currentID = currentIncluded?.id;
+          const relationshipKeys = Object.keys(relationships).filter((key) => {
+            const relationshipData = relationships[key].data;
+            return Array.isArray(relationshipData)
+              ? relationshipData.some((item) => item.id === currentID)
+              : relationshipData?.id === currentID;
+          });
+
+          relationshipKeys.forEach((key) => {
+            if (!includedAccumulator[key]) {
+              // No found before, treat it as an object.
+              includedAccumulator[key] = currentIncluded;
+            } else {
+              // Found again, treat it as an array.
+              if (
+                typeof includedAccumulator[key] !== "object" ||
+                !Array.isArray(includedAccumulator[key])
+              ) {
+                // Convert it to an array from an object.
+                includedAccumulator[key] = [
+                  includedAccumulator[key],
+                  currentIncluded
+                ];
+              } else {
+                // Already an array, push the new one into it.
+                includedAccumulator[key].push(currentIncluded);
+              }
+            }
+          });
+
+          return includedAccumulator;
+        },
+        {}
+      )
+    };
+  });
+}
+
 // If it's a relationship search, ensure that the included type is being filtered out.
 export function includedTypeQuery(parentType: string): any {
   return {

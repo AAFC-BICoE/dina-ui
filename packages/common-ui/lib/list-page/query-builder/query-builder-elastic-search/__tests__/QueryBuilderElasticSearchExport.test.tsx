@@ -18,7 +18,8 @@ import {
   inTextQuery,
   inRangeQuery,
   betweenQuery,
-  inDateQuery
+  inDateQuery,
+  processResults
 } from "../QueryBuilderElasticSearchExport";
 
 const ELASTIC_SEARCH_QUERY: any = {
@@ -284,6 +285,119 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
     });
   });
 
+  describe("processResults", () => {
+    test("Entity attributes only", async () => {
+      const result = {
+        total: { relation: "eq", value: 25 },
+        hits: [
+          {
+            _source: {
+              data: {
+                relationships: {
+                  parentMaterialSample: {},
+                  collectingEvent: { data: null },
+                  preparationMethod: { data: null },
+                  storageUnitUsage: {},
+                  projects: { data: [] },
+                  preparedBy: { data: [] },
+                  organism: { data: [] },
+                  attachment: { data: [] },
+                  collection: { data: null },
+                  preparationProtocol: {},
+                  preparationType: { data: null },
+                  assemblages: { data: [] }
+                },
+                attributes: {
+                  materialSampleType: "CULTURE_STRAIN",
+                  dwcOtherCatalogNumbers: null,
+                  createdBy: "dina-admin",
+                  materialSampleName: "sample10-B",
+                  createdOn: "2024-08-29T14:25:55.864404Z",
+                  materialSampleState: null,
+                  group: "aafc"
+                },
+                id: "01919e87-58ef-7712-b32f-4ae08321e7e3",
+                type: "material-sample"
+              }
+            }
+          },
+          {
+            _source: {
+              data: {
+                relationships: {
+                  parentMaterialSample: {},
+                  collectingEvent: { data: null },
+                  preparationMethod: { data: null },
+                  storageUnitUsage: {},
+                  projects: { data: [] },
+                  preparedBy: { data: [] },
+                  organism: { data: [] },
+                  attachment: { data: [] },
+                  collection: { data: null },
+                  preparationProtocol: {},
+                  preparationType: { data: null },
+                  assemblages: { data: [] }
+                },
+                attributes: {
+                  materialSampleType: "CULTURE_STRAIN",
+                  dwcOtherCatalogNumbers: null,
+                  createdBy: "dina-admin",
+                  materialSampleName: "sample10-C",
+                  createdOn: "2024-08-29T14:25:55.864404Z",
+                  materialSampleState: null,
+                  group: "aafc"
+                },
+                id: "01919e87-59a3-7c07-a4b9-a10f4ddd4a80",
+                type: "material-sample"
+              }
+            }
+          },
+          {
+            _source: {
+              data: {
+                relationships: {
+                  parentMaterialSample: {},
+                  collectingEvent: { data: null },
+                  preparationMethod: { data: null },
+                  storageUnitUsage: {},
+                  projects: { data: [] },
+                  preparedBy: { data: [] },
+                  organism: { data: [] },
+                  attachment: { data: [] },
+                  collection: { data: null },
+                  preparationProtocol: {},
+                  preparationType: { data: null },
+                  assemblages: { data: [] }
+                },
+                attributes: {
+                  materialSampleType: "CULTURE_STRAIN",
+                  dwcOtherCatalogNumbers: null,
+                  createdBy: "dina-admin",
+                  materialSampleName: "sample10-D",
+                  createdOn: "2024-08-29T14:25:55.864404Z",
+                  materialSampleState: null,
+                  group: "aafc"
+                },
+                id: "01919e87-5a16-7653-83db-530af5cb4b7d",
+                type: "material-sample"
+              }
+            }
+          }
+        ]
+      };
+
+      expect(processResults(result)).toMatchSnapshot();
+    });
+
+    // test("Relationships", async () => {
+    //   const result =
+    // });
+
+    // test("To-many relationships", async () => {
+
+    // });
+  });
+
   describe("Query helper functions", () => {
     test("includedTypeQuery", async () => {
       expect(includedTypeQuery("parentTest")).toMatchSnapshot();
@@ -305,60 +419,152 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
 
     test("inQuery", async () => {
       // Test keyword support
-      expect(inQuery("fieldTest", "test1, test2, TEST3", undefined, true, false)).toMatchSnapshot();
-      expect(inQuery("fieldTest", "test1, test2, TEST3", undefined, false, false)).toMatchSnapshot();
+      expect(
+        inQuery("fieldTest", "test1, test2, TEST3", undefined, true, false)
+      ).toMatchSnapshot();
+      expect(
+        inQuery("fieldTest", "test1, test2, TEST3", undefined, false, false)
+      ).toMatchSnapshot();
 
       // Not version
-      expect(inQuery("fieldTest", "test1, test2", undefined, true, true)).toMatchSnapshot();
+      expect(
+        inQuery("fieldTest", "test1, test2", undefined, true, true)
+      ).toMatchSnapshot();
 
-      // Comma-separator tests. 
-      expect(inQuery("fieldTest", "test1,test2,test3", undefined, true, false)).toMatchSnapshot();
-      expect(inQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)).toMatchSnapshot();
-      expect(inQuery("fieldTest", " TEST1 ", undefined, true, false)).toMatchSnapshot();
-      expect(inQuery("fieldTest", "", undefined, true, false)).toMatchSnapshot();
+      // Comma-separator tests.
+      expect(
+        inQuery("fieldTest", "test1,test2,test3", undefined, true, false)
+      ).toMatchSnapshot();
+      expect(
+        inQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)
+      ).toMatchSnapshot();
+      expect(
+        inQuery("fieldTest", " TEST1 ", undefined, true, false)
+      ).toMatchSnapshot();
+      expect(
+        inQuery("fieldTest", "", undefined, true, false)
+      ).toMatchSnapshot();
 
       // Empty last comma should be ignored.
-      expect(inQuery("fieldTest", "test1, test2, ", undefined, true, false)).toMatchSnapshot();
+      expect(
+        inQuery("fieldTest", "test1, test2, ", undefined, true, false)
+      ).toMatchSnapshot();
     });
 
     test("inTextQuery", async () => {
       // Test keyword support
-      expect(inTextQuery("fieldTest", "test1, test2, TEST3", undefined, true, false)).toMatchSnapshot();
-      expect(inTextQuery("fieldTest", "test1, test2, TEST3", undefined, false, false)).toMatchSnapshot();
+      expect(
+        inTextQuery("fieldTest", "test1, test2, TEST3", undefined, true, false)
+      ).toMatchSnapshot();
+      expect(
+        inTextQuery("fieldTest", "test1, test2, TEST3", undefined, false, false)
+      ).toMatchSnapshot();
 
       // Not version
-      expect(inTextQuery("fieldTest", "test1, test2", undefined, true, true)).toMatchSnapshot();
+      expect(
+        inTextQuery("fieldTest", "test1, test2", undefined, true, true)
+      ).toMatchSnapshot();
 
-      // Comma-separator tests. 
-      expect(inTextQuery("fieldTest", "test1,test2,test3", undefined, true, false)).toMatchSnapshot();
-      expect(inTextQuery("fieldTest", "  test1, test2, test3  ", undefined, true, false)).toMatchSnapshot();
-      expect(inTextQuery("fieldTest", " TEST1 ", undefined, true, false)).toMatchSnapshot();
-      expect(inTextQuery("fieldTest", "", undefined, true, false)).toMatchSnapshot();
+      // Comma-separator tests.
+      expect(
+        inTextQuery("fieldTest", "test1,test2,test3", undefined, true, false)
+      ).toMatchSnapshot();
+      expect(
+        inTextQuery(
+          "fieldTest",
+          "  test1, test2, test3  ",
+          undefined,
+          true,
+          false
+        )
+      ).toMatchSnapshot();
+      expect(
+        inTextQuery("fieldTest", " TEST1 ", undefined, true, false)
+      ).toMatchSnapshot();
+      expect(
+        inTextQuery("fieldTest", "", undefined, true, false)
+      ).toMatchSnapshot();
 
       // Empty last comma should be ignored.
-      expect(inTextQuery("fieldTest", "test1, test2, ", undefined, true, false)).toMatchSnapshot();
+      expect(
+        inTextQuery("fieldTest", "test1, test2, ", undefined, true, false)
+      ).toMatchSnapshot();
     });
 
     test("inDateQuery", async () => {
       // In version
-      expect(inDateQuery("fieldTest", "1998-05-19, 2005-09-23, 2023-01-01", undefined, "date_time", false)).toMatchSnapshot();
-      expect(inDateQuery("fieldTest", "1998-05-19, 2005-09-23, 2023-01-01", undefined, "date_time", false)).toMatchSnapshot();
+      expect(
+        inDateQuery(
+          "fieldTest",
+          "1998-05-19, 2005-09-23, 2023-01-01",
+          undefined,
+          "date_time",
+          false
+        )
+      ).toMatchSnapshot();
+      expect(
+        inDateQuery(
+          "fieldTest",
+          "1998-05-19, 2005-09-23, 2023-01-01",
+          undefined,
+          "date_time",
+          false
+        )
+      ).toMatchSnapshot();
 
       // Not in version
-      expect(inDateQuery("fieldTest", "1998-05-19, 2005-09-23", undefined, "date_time", true)).toMatchSnapshot();
+      expect(
+        inDateQuery(
+          "fieldTest",
+          "1998-05-19, 2005-09-23",
+          undefined,
+          "date_time",
+          true
+        )
+      ).toMatchSnapshot();
 
-      // Comma-separator tests. 
-      expect(inDateQuery("fieldTest", "1998-05-19,2005-09-23,2023-01-01", undefined, "date_time", false)).toMatchSnapshot();
-      expect(inDateQuery("fieldTest", "  1998-05-19, 2005-09-23, 2023-01-01  ", undefined, "date_time", false)).toMatchSnapshot();
-      expect(inDateQuery("fieldTest", " 1998-05-19 ", undefined, "date_time", false)).toMatchSnapshot();
-      expect(inDateQuery("fieldTest", "", undefined, "date_time", false)).toMatchSnapshot();
+      // Comma-separator tests.
+      expect(
+        inDateQuery(
+          "fieldTest",
+          "1998-05-19,2005-09-23,2023-01-01",
+          undefined,
+          "date_time",
+          false
+        )
+      ).toMatchSnapshot();
+      expect(
+        inDateQuery(
+          "fieldTest",
+          "  1998-05-19, 2005-09-23, 2023-01-01  ",
+          undefined,
+          "date_time",
+          false
+        )
+      ).toMatchSnapshot();
+      expect(
+        inDateQuery("fieldTest", " 1998-05-19 ", undefined, "date_time", false)
+      ).toMatchSnapshot();
+      expect(
+        inDateQuery("fieldTest", "", undefined, "date_time", false)
+      ).toMatchSnapshot();
 
       // Empty last comma should be ignored.
-      expect(inDateQuery("fieldTest", "1998-05-19, 2005-09-23, ", undefined, "date_time", false)).toMatchSnapshot();
+      expect(
+        inDateQuery(
+          "fieldTest",
+          "1998-05-19, 2005-09-23, ",
+          undefined,
+          "date_time",
+          false
+        )
+      ).toMatchSnapshot();
     });
 
     test("inRangeQuery", async () => {
-      expect(inRangeQuery("fieldTest", "1998-05-19, 2023-03-02", undefined, false)).toMatchSnapshot();
+      expect(
+        inRangeQuery("fieldTest", "1998-05-19, 2023-03-02", undefined, false)
+      ).toMatchSnapshot();
     });
 
     test("existsQuery", async () => {
@@ -370,9 +576,30 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
     });
 
     test("betweenQuery tests", async () => {
-      expect(betweenQuery("data.attribute.numberExample", JSON.stringify({ low: 2, high: 5 }), undefined, "number")).toMatchSnapshot();
-      expect(betweenQuery("data.attribute.materialSampleName", JSON.stringify({ low: "Test100", high: "Test200" }), undefined, "text")).toMatchSnapshot();
-      expect(betweenQuery("included.attributes.dwcRecordNumber", JSON.stringify({ low: "10.5", high: "293" }), "collecting-event", "number")).toMatchSnapshot();
+      expect(
+        betweenQuery(
+          "data.attribute.numberExample",
+          JSON.stringify({ low: 2, high: 5 }),
+          undefined,
+          "number"
+        )
+      ).toMatchSnapshot();
+      expect(
+        betweenQuery(
+          "data.attribute.materialSampleName",
+          JSON.stringify({ low: "Test100", high: "Test200" }),
+          undefined,
+          "text"
+        )
+      ).toMatchSnapshot();
+      expect(
+        betweenQuery(
+          "included.attributes.dwcRecordNumber",
+          JSON.stringify({ low: "10.5", high: "293" }),
+          "collecting-event",
+          "number"
+        )
+      ).toMatchSnapshot();
     });
   });
 

@@ -350,11 +350,14 @@ export default function MaterialSampleListPage() {
       accessorKey: "data.attributes.materialSampleState",
       isKeyword: true
     },
+
+    // Group
     {
       id: "group",
       header: () => <FieldHeader name="group" />,
       accessorKey: "data.attributes.group"
     },
+
     // Created By
     {
       id: "createdBy",

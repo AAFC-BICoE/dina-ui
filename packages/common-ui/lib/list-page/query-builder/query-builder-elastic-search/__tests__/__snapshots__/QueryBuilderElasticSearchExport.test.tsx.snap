@@ -1496,3 +1496,152 @@ Object {
   },
 }
 `;
+
+exports[`QueryBuilderElasticSearchExport functionality processResults Entity attributes only 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "attributes": Object {
+        "createdBy": "dina-admin",
+        "createdOn": "2024-08-29T14:25:55.864404Z",
+        "dwcOtherCatalogNumbers": null,
+        "group": "aafc",
+        "materialSampleName": "sample10-B",
+        "materialSampleState": null,
+        "materialSampleType": "CULTURE_STRAIN",
+      },
+      "relationships": Object {
+        "assemblages": Object {
+          "data": Array [],
+        },
+        "attachment": Object {
+          "data": Array [],
+        },
+        "collectingEvent": Object {
+          "data": null,
+        },
+        "collection": Object {
+          "data": null,
+        },
+        "organism": Object {
+          "data": Array [],
+        },
+        "parentMaterialSample": Object {},
+        "preparationMethod": Object {
+          "data": null,
+        },
+        "preparationProtocol": Object {},
+        "preparationType": Object {
+          "data": null,
+        },
+        "preparedBy": Object {
+          "data": Array [],
+        },
+        "projects": Object {
+          "data": Array [],
+        },
+        "storageUnitUsage": Object {},
+      },
+    },
+    "id": "01919e87-58ef-7712-b32f-4ae08321e7e3",
+    "included": undefined,
+    "type": "material-sample",
+  },
+  Object {
+    "data": Object {
+      "attributes": Object {
+        "createdBy": "dina-admin",
+        "createdOn": "2024-08-29T14:25:55.864404Z",
+        "dwcOtherCatalogNumbers": null,
+        "group": "aafc",
+        "materialSampleName": "sample10-C",
+        "materialSampleState": null,
+        "materialSampleType": "CULTURE_STRAIN",
+      },
+      "relationships": Object {
+        "assemblages": Object {
+          "data": Array [],
+        },
+        "attachment": Object {
+          "data": Array [],
+        },
+        "collectingEvent": Object {
+          "data": null,
+        },
+        "collection": Object {
+          "data": null,
+        },
+        "organism": Object {
+          "data": Array [],
+        },
+        "parentMaterialSample": Object {},
+        "preparationMethod": Object {
+          "data": null,
+        },
+        "preparationProtocol": Object {},
+        "preparationType": Object {
+          "data": null,
+        },
+        "preparedBy": Object {
+          "data": Array [],
+        },
+        "projects": Object {
+          "data": Array [],
+        },
+        "storageUnitUsage": Object {},
+      },
+    },
+    "id": "01919e87-59a3-7c07-a4b9-a10f4ddd4a80",
+    "included": undefined,
+    "type": "material-sample",
+  },
+  Object {
+    "data": Object {
+      "attributes": Object {
+        "createdBy": "dina-admin",
+        "createdOn": "2024-08-29T14:25:55.864404Z",
+        "dwcOtherCatalogNumbers": null,
+        "group": "aafc",
+        "materialSampleName": "sample10-D",
+        "materialSampleState": null,
+        "materialSampleType": "CULTURE_STRAIN",
+      },
+      "relationships": Object {
+        "assemblages": Object {
+          "data": Array [],
+        },
+        "attachment": Object {
+          "data": Array [],
+        },
+        "collectingEvent": Object {
+          "data": null,
+        },
+        "collection": Object {
+          "data": null,
+        },
+        "organism": Object {
+          "data": Array [],
+        },
+        "parentMaterialSample": Object {},
+        "preparationMethod": Object {
+          "data": null,
+        },
+        "preparationProtocol": Object {},
+        "preparationType": Object {
+          "data": null,
+        },
+        "preparedBy": Object {
+          "data": Array [],
+        },
+        "projects": Object {
+          "data": Array [],
+        },
+        "storageUnitUsage": Object {},
+      },
+    },
+    "id": "01919e87-5a16-7653-83db-530af5cb4b7d",
+    "included": undefined,
+    "type": "material-sample",
+  },
+]
+`;
