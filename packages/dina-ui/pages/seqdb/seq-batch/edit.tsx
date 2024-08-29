@@ -231,19 +231,8 @@ export function SeqBatchFormFields() {
           model="collection-api/storage-unit-type"
           optionLabel={(storageUnitType) => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
-          onChange={(storageUnitType) => {
+          onChange={() => {
             setFieldValue("storageUnit.id", null);
-            if (
-              !Array.isArray(storageUnitType) &&
-              storageUnitType?.gridLayoutDefinition != null
-            ) {
-              setFieldValue(
-                "storageRestriction.layout",
-                storageUnitType.gridLayoutDefinition
-              );
-            } else {
-              setFieldValue("storageRestriction", null);
-            }
           }}
         />
       );
