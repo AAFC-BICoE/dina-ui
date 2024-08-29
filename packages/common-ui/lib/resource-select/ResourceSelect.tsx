@@ -200,7 +200,8 @@ export function ResourceSelect<TData extends KitsuResource>({
         if (optionA.label && optionB.label) {
           return optionA.label
             .toString()
-            .localeCompare(optionB.label.toString());
+            .toLowerCase()
+            .localeCompare(optionB.label.toString().toLowerCase());
         }
 
         // Unable to perform sort.
