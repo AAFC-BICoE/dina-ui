@@ -190,11 +190,22 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // Build the list of options from the returned resources.
   const resourceOptions =
-    response?.data.map((resource) => ({
-      label: optionLabel(resource),
-      resource,
-      value: resource.id
-    })) ?? [];
+    response?.data
+      .map((resource) => ({
+        label: optionLabel(resource),
+        resource,
+        value: resource.id
+      }))
+      .sort((optionA, optionB) => {
+        if (optionA.label && optionB.label) {
+          return optionA.label
+            .toString()
+            .localeCompare(optionB.label.toString());
+        }
+
+        // Unable to perform search.
+        return 0;
+      }) ?? [];
 
   const groupedResourceOptions = showGroupCategary
     ? chain(resourceOptions)
