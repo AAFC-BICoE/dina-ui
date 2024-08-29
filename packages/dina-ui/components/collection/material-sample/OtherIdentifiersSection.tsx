@@ -141,9 +141,8 @@ export function OtherIdentifiersSection() {
                     <div className={readOnly ? "col-md-2" : "col-md-5"}>
                       <SelectField
                         name={"identifiers[" + index + "].type"}
-                        options={vocabOptions.filter(
-                          (option) => !selectedTypes.includes(option.value)
-                        )}
+                        options={vocabOptions}
+                        filterValues={selectedTypes}
                         readOnlyRender={(optionValue) => (
                           <strong>
                             {vocabOptions.find(
@@ -154,13 +153,6 @@ export function OtherIdentifiersSection() {
                             :
                           </strong>
                         )}
-                        selectProps={{
-                          getOptionLabel: (optionValue) =>
-                            (optionValue as any)?.label ??
-                            (optionValue as any)?.value,
-                          getOptionValue: (optionValue) =>
-                            (optionValue as any)?.value ?? ""
-                        }}
                         disableTemplateCheckbox={true}
                         disabled={isTemplate}
                         hideLabel={true}
