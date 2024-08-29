@@ -42,7 +42,6 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   linkerTabContent,
   briefDetails,
   fieldName,
-  targetType,
   fieldSetId,
   legend,
   hideLinkerTab
@@ -76,17 +75,6 @@ export function TabbedResourceLinker<T extends KitsuResource>({
           <div className="alert alert-secondary placeholder-text">
             {bulkCtx?.placeholder}
           </div>
-        </div>
-      )}
-      {isInBulkEditTab && (
-        <div className="alert alert-warning">
-          <DinaMessage
-            id="bulkEditResourceLinkerWarningSingle"
-            values={{
-              targetType: getFieldLabel({ name: targetType }).fieldLabel,
-              fieldName: getFieldLabel({ name: fieldName }).fieldLabel
-            }}
-          />
         </div>
       )}
       <Tabs

@@ -16,44 +16,29 @@ export interface IdentifierFieldsProps {
   divClassName?: string;
   fieldClassName?: string;
   width?: string;
-  legendId?: string;
-  otherIdentifiersMode?: boolean;
 }
 
 export function IdentifierFields({
   typeOptions,
   width,
   divClassName,
-  fieldClassName,
-  legendId = "identifierLegend",
-  otherIdentifiersMode = false
+  fieldClassName
 }: IdentifierFieldsProps) {
   const [activeTabIdx, setActiveTabIdx] = useState(0);
-  const { readOnly, isBulkEditAllTab } = useDinaFormContext();
-
-  // Disable temporarly for bulk editing since it's not working correctly.
-  if (otherIdentifiersMode && isBulkEditAllTab) {
-    return <></>;
-  }
+  const { readOnly } = useDinaFormContext();
 
   return (
     <div className={divClassName} style={{ width: `${width}` }}>
       <div className={`${fieldClassName}`}>
         <FieldSet
-          legend={<DinaMessage id={legendId as any} />}
+          legend={<DinaMessage id={"identifierLegend"} />}
           id="identifierLegend"
         >
           <FieldArray name="identifiers">
             {({ form, push, remove }) => {
-              const identifiers = otherIdentifiersMode
-                ? Object.keys(form.values?.identifiers ?? {})
-                : form.values?.identifiers ?? [];
+              const identifiers = form.values?.identifiers ?? [];
 
               function addIdentifier() {
-                if (otherIdentifiersMode && identifiers.length === 1) {
-                  return;
-                }
-
                 push({});
                 setActiveTabIdx(identifiers.length);
               }
@@ -90,15 +75,14 @@ export function IdentifierFields({
                         />
                         {!readOnly && (
                           <div className="list-inline mb-3">
-                            {otherIdentifiersMode &&
-                              identifiers.length !== 1 && (
-                                <FormikButton
-                                  className="list-inline-item btn btn-primary add-identifier-button"
-                                  onClick={addIdentifier}
-                                >
-                                  <DinaMessage id="addAnotherIdentifier" />
-                                </FormikButton>
-                              )}
+                            {identifiers.length !== 1 && (
+                              <FormikButton
+                                className="list-inline-item btn btn-primary add-identifier-button"
+                                onClick={addIdentifier}
+                              >
+                                <DinaMessage id="addAnotherIdentifier" />
+                              </FormikButton>
+                            )}
                             <FormikButton
                               className="list-inline-item btn btn-dark"
                               onClick={() => removeIdentifier(index)}

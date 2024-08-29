@@ -32,7 +32,7 @@ export interface CellGrid<ItemType> {
 }
 
 export function ContainerGrid<
-  BatchType extends { storageRestriction?: any },
+  BatchType extends { gridLayoutDefinition?: any },
   ItemType extends { sampleName?: string }
 >({
   batch,
@@ -47,10 +47,9 @@ export function ContainerGrid<
 
   useEffect(() => {
     if (!batch) return;
-
-    if (batch?.storageRestriction) {
-      setNumberOfRows(batch.storageRestriction.layout.numberOfRows);
-      setNumberOfColumns(batch.storageRestriction.layout.numberOfColumns);
+    if (batch?.gridLayoutDefinition) {
+      setNumberOfRows(batch.gridLayoutDefinition.numberOfRows);
+      setNumberOfColumns(batch.gridLayoutDefinition.numberOfColumns);
     }
   }, [batch]);
 

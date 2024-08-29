@@ -56,19 +56,13 @@ export function useLastSavedSearch({
   );
 
   const loadLastSavedSearch = () => {
-    if (sessionStorageQueryTree) {
-      setQueryBuilderTree(Utils.loadTree(sessionStorageQueryTree as JsonTree));
-      setSubmittedQueryBuilderTree(
-        Utils.loadTree(sessionStorageQueryTree as JsonTree)
-      );
-    }
-
     setQueryLoaded(true);
   };
 
   // Once the query builder tree has been loaded in, perform a submit.
   useEffect(() => {
     if (sessionStorageQueryTree) {
+      setQueryBuilderTree(Utils.loadTree(sessionStorageQueryTree as JsonTree));
       setSubmittedQueryBuilderTree(
         Utils.loadTree(sessionStorageQueryTree as JsonTree)
       );

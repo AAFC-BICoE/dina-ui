@@ -10,52 +10,50 @@ import {
   LoadingSpinner,
   DinaFormOnSubmit,
   useQuery,
-  useAccount
+  useAccount,
+  TextField
 } from "common-ui";
 import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useFormikContext } from "formik";
 import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/resources/MaterialSampleIdentifierGenerator";
 import { useBulkGet } from "common-ui";
-import { FormTemplate, MaterialSample } from "../../types/collection-api";
+import { MaterialSample } from "../../types/collection-api";
 import { InputResource } from "kitsu";
-import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
 import { startCase } from "lodash";
 import { SplitConfigurationOption } from "../collection/material-sample/SplitMaterialSampleDropdownButton";
 import Select from "react-select";
-import {
-  getSplitConfigurationComponentValues,
-  getSplitConfigurationFormTemplates
-} from "../form-template/formTemplateUtils";
 import { flattenDeep } from "lodash";
 import { ErrorBanner } from "../error/ErrorBanner";
-import { useRouter } from "next/router";
+import {
+  SEPARATORS_DASH,
+  SplitConfiguration
+} from "../../types/collection-api/resources/SplitConfiguration";
 
 const ENTITY_LINK = "/collection/material-sample";
 
 interface MaterialSampleBulkSplitFields {
   numberToCreate: number;
+  sourceSet?: string;
 }
 
 interface MaterialSampleSplitGenerationFormProps {
   ids: string[];
   splitConfiguration?: SplitConfiguration;
   onGenerate: (samples: InputResource<MaterialSample>[]) => void;
-  setFormTemplateId?: (formTemplateId: string) => void;
-  formTemplateId?: string;
+  setSplitConfigurationID?: (splitConfigurationID: string) => void;
+  splitConfigurationID?: string;
 }
 
 export function MaterialSampleSplitGenerationForm({
   ids,
   splitConfiguration: splitConfigurationExternal,
   onGenerate,
-  setFormTemplateId,
-  formTemplateId
+  setSplitConfigurationID,
+  splitConfigurationID
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
   const { groupNames, username } = useAccount();
-  const router = useRouter();
-  const splitConfigQuery = router?.query?.splitConfiguration;
 
   // List of all the split configurations available.
   const [splitConfigurationOptions, setSplitConfigurationOptions] = useState<
@@ -66,9 +64,6 @@ export function MaterialSampleSplitGenerationForm({
   const [splitConfiguration, setSplitConfiguration] = useState<
     SplitConfiguration | undefined
   >(splitConfigurationExternal);
-
-  // Available form templates that can be transformed to split config
-  const [formTemplates, setFormTemplates] = useState<FormTemplate[]>([]);
 
   const [generatedIdentifiers, setGeneratedIdentifiers] = useState<
     Record<string, string[]>
@@ -89,58 +84,86 @@ export function MaterialSampleSplitGenerationForm({
       setSplitFromMaterialSamples(response);
     }
   });
-  const materialSampleType = (splitFromMaterialSamples?.at(0) as any)
-    ?.materialSampleType;
+
   const filteredMaterialSamples = splitFromMaterialSamples?.filter(
     (materialSample: any) =>
-      materialSample.materialSampleType === materialSampleType
+      splitConfiguration?.conditionalOnMaterialSampleTypes?.includes(
+        materialSample.materialSampleType
+      )
   );
 
   const hasMismatchMaterialSampleType = splitFromMaterialSamples?.some(
     (materialSample: any) =>
-      materialSample.materialSampleType !== materialSampleType
+      !splitConfiguration?.conditionalOnMaterialSampleTypes?.includes(
+        materialSample.materialSampleType
+      )
   );
 
-  // Retrieve all of the form templates, then filter for the correct one.
-  const formTemplatesQuery = useQuery<FormTemplate[]>(
+  // Retrieve all the split configuration options if a mismatch type is found, to allow the user
+  // to fix the issue. Normally this is query is not ran if no type mismatches are found.
+  const splitConfigurationQuery = useQuery<SplitConfiguration[]>(
     {
-      path: "collection-api/form-template",
-
-      // Display all user form templates and public to the group templates.
+      path: "collection-api/split-configuration",
+      page: {
+        limit: 1000
+      },
+      // Display all user split configurations.
       filter: {
-        rsql: `group=in=(${groupNames});(createdBy==${username},restrictToCreatedBy==false)`
+        rsql: `group=in=(${groupNames});(createdBy==${username})`
       }
     },
     {
-      disabled: filteredMaterialSamples?.length === 0,
+      disabled:
+        !hasMismatchMaterialSampleType || splitFromMaterialSamples.length === 0,
       onSuccess: async ({ data }) => {
-        const formTemplatesWithSplitConfig = getSplitConfigurationFormTemplates(
-          data as FormTemplate[],
-          materialSampleType
+        // Determine the material sample types of all the selected material samples.
+        const uniqueMaterialSampleTypes = splitFromMaterialSamples?.reduce(
+          (acc: string[], materialSample: any) => {
+            const materialSampleType = materialSample.materialSampleType;
+            if (!acc.includes(materialSampleType)) {
+              acc.push(materialSampleType);
+            }
+            return acc;
+          },
+          []
         );
-        const generatedOptions = formTemplatesWithSplitConfig.map(
-          (formTemplate) => ({
-            label: formTemplate?.name ?? "",
-            value: formTemplate?.id ?? ""
+
+        // Filter out options not supported by the multiple material samples.
+        const generatedOptions = data
+          .filter((splitConfig) => {
+            // Check if all required material sample types are present in uniqueMaterialSampleTypes
+            return (splitConfig.conditionalOnMaterialSampleTypes || [])?.some(
+              (supportedType) =>
+                uniqueMaterialSampleTypes.includes(supportedType)
+            );
           })
-        );
+          .map((splitConfig) => ({
+            label: splitConfig?.name ?? "",
+            value: splitConfig?.id ?? "",
+            resource: splitConfig
+          }));
+
         setSplitConfigurationOptions(generatedOptions);
-        setFormTemplates(data);
-        // If options are available, just set the first one automatically.
-        if (generatedOptions.length > 0) {
-          setFormTemplateId?.(generatedOptions?.[0]?.value ?? "");
+
+        // If options are available, automatically select the first option.
+        if (generatedOptions.length > 0 && generatedOptions?.[0]?.resource) {
+          setSplitConfigurationID?.(generatedOptions[0].value);
+          setSplitConfiguration(generatedOptions[0].resource);
         }
       }
     }
   );
+
   const buttonBar = (
     <>
       {/* Back Button (Changes depending on the number of records) */}
-      <div className="col-md-6 col-sm-12 mt-2">
+      <div className="col-md-6 col-sm-12">
         {isMultiple ? (
           <BackToListButton entityLink={ENTITY_LINK} />
         ) : (
-          <BackButton entityLink={ENTITY_LINK} entityId={ids[0]} />
+          <div className="mt-2">
+            <BackButton entityLink={ENTITY_LINK} entityId={ids[0]} />
+          </div>
         )}
       </div>
 
@@ -158,7 +181,7 @@ export function MaterialSampleSplitGenerationForm({
     </>
   );
 
-  if (materialSamplesQuery.loading || formTemplatesQuery.loading) {
+  if (materialSamplesQuery.loading || splitConfigurationQuery.loading) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -206,7 +229,8 @@ export function MaterialSampleSplitGenerationForm({
             : undefined,
           publiclyReleasable: true,
           allowDuplicateName: false,
-          materialSampleName: childMaterialSampleName
+          materialSampleName: childMaterialSampleName,
+          sourceSet: submittedValues.sourceSet
         });
       });
     });
@@ -215,7 +239,7 @@ export function MaterialSampleSplitGenerationForm({
   };
 
   const splitConfigurationOption = splitConfigurationOptions.find(
-    (splitOption) => splitOption.value === formTemplateId
+    (splitOption) => splitOption.value === splitConfigurationID
   );
 
   return (
@@ -234,7 +258,7 @@ export function MaterialSampleSplitGenerationForm({
             <h4 className="mt-2">
               <DinaMessage id="settingLabel" />
             </h4>
-            {!splitConfigQuery && (
+            {splitConfigurationOptions.length !== 0 && (
               <>
                 <strong>
                   <DinaMessage id="selectSplitConfiguration" />
@@ -244,16 +268,9 @@ export function MaterialSampleSplitGenerationForm({
                   name="splitConfiguration"
                   options={splitConfigurationOptions}
                   onChange={(selection) => {
-                    if (selection) {
-                      setFormTemplateId?.(selection.value);
-                      setSplitConfiguration(
-                        getSplitConfigurationComponentValues(
-                          formTemplates.find(
-                            (formTemplate) =>
-                              formTemplate.id === selection.value
-                          )
-                        )?.splitConfiguration
-                      );
+                    if (selection && selection.resource) {
+                      setSplitConfigurationID?.(selection.value);
+                      setSplitConfiguration(selection.resource);
                     }
                   }}
                   autoFocus={true}
@@ -288,6 +305,7 @@ export function MaterialSampleSplitGenerationForm({
                 className="mt-3"
               />
             )}
+            <TextField name={"sourceSet"} />
           </div>
           <div className="col-md-7">
             <PreviewGeneratedNames
@@ -330,14 +348,10 @@ function PreviewGeneratedNames({
       type: "material-sample-identifier-generator",
       quantity: numberToCreate,
       currentParentUUID: splitFromMaterialSamples?.[index]?.id ?? "",
-      strategy:
-        splitConfiguration?.materialSampleNameGeneration?.strategy ??
-        "DIRECT_PARENT",
-      characterType:
-        splitConfiguration?.materialSampleNameGeneration?.characterType ??
-        "LOWER_LETTER",
-      materialSampleType:
-        splitConfiguration?.materialSampleNameGeneration?.materialSampleType
+      strategy: splitConfiguration?.strategy ?? "DIRECT_PARENT",
+      characterType: splitConfiguration?.characterType ?? "LOWER_LETTER",
+      materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit,
+      separator: splitConfiguration?.separator ?? SEPARATORS_DASH
     };
   }
 
@@ -347,14 +361,10 @@ function PreviewGeneratedNames({
     return {
       type: "material-sample-identifier-generator",
       currentParentsUUID: parentIds,
-      strategy:
-        splitConfiguration?.materialSampleNameGeneration?.strategy ??
-        "DIRECT_PARENT",
-      characterType:
-        splitConfiguration?.materialSampleNameGeneration?.characterType ??
-        "LOWER_LETTER",
-      materialSampleType:
-        splitConfiguration?.materialSampleNameGeneration?.materialSampleType
+      strategy: splitConfiguration?.strategy ?? "DIRECT_PARENT",
+      characterType: splitConfiguration?.characterType ?? "LOWER_LETTER",
+      materialSampleType: splitConfiguration?.materialSampleTypeCreatedBySplit,
+      separator: splitConfiguration?.separator ?? SEPARATORS_DASH
     };
   }
 
@@ -405,7 +415,7 @@ function PreviewGeneratedNames({
 
   // Columns to be displayed
   const materialSampleType =
-    splitConfiguration?.materialSampleNameGeneration?.materialSampleType ?? "";
+    splitConfiguration?.materialSampleTypeCreatedBySplit ?? "";
   const formattedMaterialSampleType = startCase(
     materialSampleType.toLowerCase().replace(/_/g, " ")
   );

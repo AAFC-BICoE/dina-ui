@@ -41,6 +41,7 @@ const TEST_COLLECTION_1 = {
 
 const TEST_STORAGE_UNIT: PersistedResource<StorageUnit> = {
   id: "su-1",
+  isGeneric: false,
   type: "storage-unit",
   name: "storage unit 1",
   group: "test-group",
@@ -56,6 +57,7 @@ const TEST_STORAGE_UNITS = ["A", "B", "C"].map<PersistedResource<StorageUnit>>(
   (id) => ({
     id,
     type: "storage-unit",
+    isGeneric: false,
     group: "test-group",
     name: `storage unit ${id}`,
     storageUnitType: {
@@ -1219,10 +1221,10 @@ describe("MaterialSampleBulkEditor", () => {
     // The tab with the error is given the red text, and the other 3 tabs are unaffected:
     expect(
       wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
-    ).toEqual(true);
+    ).toEqual(false);
     expect(
       wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+    ).toEqual(true);
     expect(
       wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
     ).toEqual(false);
@@ -1232,13 +1234,11 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Shows the error message:
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .error-viewer").first().text()
+      wrapper.find(".sample-tabpanel-0 .error-viewer").first().text()
     ).toContain("Start Event Date Time");
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .startEventDateTime-field .invalid-feedback")
-        .exists()
-    ).toEqual(true);
+    expect(wrapper.find(".sample-tabpanel-0 .error-message").exists()).toEqual(
+      true
+    );
   });
 
   it("Shows an error indicator on the individual sample tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
@@ -1397,10 +1397,10 @@ describe("MaterialSampleBulkEditor", () => {
     // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
       wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
-    ).toEqual(true);
+    ).toEqual(false);
     expect(
       wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+    ).toEqual(true);
     expect(
       wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
     ).toEqual(false);
@@ -1410,13 +1410,11 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Shows the error message:
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .error-viewer").first().text()
+      wrapper.find(".sample-tabpanel-0 .error-viewer").first().text()
     ).toContain("Start Event Date Time");
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .startEventDateTime-field .invalid-feedback")
-        .exists()
-    ).toEqual(true);
+    expect(wrapper.find(".sample-tabpanel-0 .error-message").exists()).toEqual(
+      true
+    );
   });
 
   it("Shows an error indicator on the Edit All tab when a bulk-edited causes a server-side field error.", async () => {
@@ -2156,6 +2154,8 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               projects: undefined,
               barcode: "edited-barcode",
               relationships: {},
@@ -2324,7 +2324,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toEqual(true);
   });
 
-  it("Creates and links a common Collecting Event to all samples", async () => {
+  it("Creates and links a unique Collecting Event to all samples", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -2373,10 +2373,16 @@ describe("MaterialSampleBulkEditor", () => {
       [
         [
           {
-            resource: expect.objectContaining({
+            resource: {
+              type: "collecting-event",
+              geoReferenceAssertions: [{ isPrimary: true }],
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              publiclyReleasable: true,
               dwcVerbatimLocality: "test locality",
-              type: "collecting-event"
-            }),
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
             type: "collecting-event"
           }
         ],
@@ -2385,33 +2391,132 @@ describe("MaterialSampleBulkEditor", () => {
       [
         [
           {
-            resource: expect.objectContaining({
-              collectingEvent: {
-                id: "11111",
-                type: "collecting-event"
-              },
-              type: "material-sample"
-            }),
+            resource: {
+              type: "collecting-event",
+              geoReferenceAssertions: [{ isPrimary: true }],
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              publiclyReleasable: true,
+              dwcVerbatimLocality: "test locality",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
+              type: "collecting-event",
+              geoReferenceAssertions: [{ isPrimary: true }],
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              publiclyReleasable: true,
+              dwcVerbatimLocality: "test locality",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
+              type: "material-sample",
+              materialSampleName: "MS1",
+              collection: { id: "1", type: "collection" },
+              restrictionFieldsExtension: null,
+              preparationType: { id: null, type: "preparation-type" },
+              preparationDate: null,
+              preparationRemarks: null,
+              dwcDegreeOfEstablishment: null,
+              preparationMethod: { id: null, type: "preparation-method" },
+              preservationType: null,
+              preparationFixative: null,
+              preparationMaterials: null,
+              preparationSubstrate: null,
+              preparationProtocol: { id: null, type: "protocol" },
+              preparationManagedAttributes: {},
+              isRestricted: false,
+              restrictionRemarks: null,
+              collectingEvent: { id: "11111", type: "collecting-event" },
+              associations: [],
+              hostOrganism: null,
+              relationships: {
+                organism: { data: [] },
+                preparedBy: { data: [] },
+                collection: { data: { id: "1", type: "collection" } },
+                storageUnitUsage: { data: null }
+              }
+            },
             type: "material-sample"
           },
           {
-            resource: expect.objectContaining({
-              collectingEvent: {
-                id: "11111",
-                type: "collecting-event"
-              },
-              type: "material-sample"
-            }),
+            resource: {
+              type: "material-sample",
+              materialSampleName: "MS2",
+              collection: { id: "1", type: "collection" },
+              restrictionFieldsExtension: null,
+              preparationType: { id: null, type: "preparation-type" },
+              preparationDate: null,
+              preparationRemarks: null,
+              dwcDegreeOfEstablishment: null,
+              preparationMethod: { id: null, type: "preparation-method" },
+              preservationType: null,
+              preparationFixative: null,
+              preparationMaterials: null,
+              preparationSubstrate: null,
+              preparationProtocol: { id: null, type: "protocol" },
+              preparationManagedAttributes: {},
+              isRestricted: false,
+              restrictionRemarks: null,
+              collectingEvent: { id: "11111", type: "collecting-event" },
+              associations: [],
+              hostOrganism: null,
+              relationships: {
+                organism: { data: [] },
+                preparedBy: { data: [] },
+                collection: { data: { id: "1", type: "collection" } },
+                storageUnitUsage: { data: null }
+              }
+            },
             type: "material-sample"
           },
           {
-            resource: expect.objectContaining({
-              collectingEvent: {
-                id: "11111",
-                type: "collecting-event"
-              },
-              type: "material-sample"
-            }),
+            resource: {
+              type: "material-sample",
+              materialSampleName: "MS3",
+              collection: { id: "1", type: "collection" },
+              restrictionFieldsExtension: null,
+              preparationType: { id: null, type: "preparation-type" },
+              preparationDate: null,
+              preparationRemarks: null,
+              dwcDegreeOfEstablishment: null,
+              preparationMethod: { id: null, type: "preparation-method" },
+              preservationType: null,
+              preparationFixative: null,
+              preparationMaterials: null,
+              preparationSubstrate: null,
+              preparationProtocol: { id: null, type: "protocol" },
+              preparationManagedAttributes: {},
+              isRestricted: false,
+              restrictionRemarks: null,
+              collectingEvent: { id: "11111", type: "collecting-event" },
+              associations: [],
+              hostOrganism: null,
+              relationships: {
+                organism: { data: [] },
+                preparedBy: { data: [] },
+                collection: { data: { id: "1", type: "collection" } },
+                storageUnitUsage: { data: null }
+              }
+            },
             type: "material-sample"
           }
         ],
@@ -2475,10 +2580,13 @@ describe("MaterialSampleBulkEditor", () => {
       [
         [
           {
-            resource: expect.objectContaining({
+            resource: {
+              id: "col-event-1",
+              type: "collecting-event",
               dwcVerbatimLocality: "bulk edited locality",
-              type: "collecting-event"
-            }),
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
             type: "collecting-event"
           }
         ],
@@ -2488,35 +2596,34 @@ describe("MaterialSampleBulkEditor", () => {
         [
           {
             resource: {
-              collectingEvent: {
-                id: "col-event-1",
-                type: "collecting-event"
-              },
-              relationships: {},
+              id: "col-event-1",
+              type: "collecting-event",
+              dwcVerbatimLocality: "bulk edited locality",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
               id: "1",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              type: "material-sample"
+              type: "material-sample",
+              collectingEvent: { id: "col-event-1", type: "collecting-event" },
+              relationships: {}
             },
             type: "material-sample"
           },
           {
             resource: {
-              collectingEvent: {
-                id: "col-event-1",
-                type: "collecting-event"
-              },
-              relationships: {},
               id: "2",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              type: "material-sample"
+              type: "material-sample",
+              collectingEvent: { id: "col-event-1", type: "collecting-event" },
+              relationships: {}
             },
             type: "material-sample"
           }
@@ -2841,11 +2948,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
-        .exists()
-    ).toEqual(true);
+    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
+    // expect(
+    //   wrapper
+    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+    //     .exists()
+    // ).toEqual(true);
 
     // Select a form template:
     wrapper
@@ -2868,11 +2976,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field input")
-        .exists()
-    ).toEqual(false);
+    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
+    // expect(
+    //   wrapper
+    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field input")
+    //     .exists()
+    // ).toEqual(false);
 
     // Switch to the first individual sample tab:
     wrapper.find("li.sample-tab-0").simulate("click");
@@ -2883,11 +2992,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".sample-tabpanel-0 .barcode-field input").exists()
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers-field input")
-        .exists()
-    ).toEqual(false);
+    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
+    // expect(
+    //   wrapper
+    //     .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers-field input")
+    //     .exists()
+    // ).toEqual(false);
   });
 
   it("Allows selecting a Form Template to provide default values for bulk material sample edit all tab.", async () => {
@@ -2905,11 +3015,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
-        .exists()
-    ).toEqual(true);
+    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
+    // expect(
+    //   wrapper
+    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+    //     .exists()
+    // ).toEqual(true);
 
     // Select a form template:
     wrapper
@@ -2932,11 +3043,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
-        .exists()
-    ).toEqual(false);
+    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
+    // expect(
+    //   wrapper
+    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+    //     .exists()
+    // ).toEqual(false);
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
     ).toEqual("1111");

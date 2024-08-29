@@ -19,7 +19,6 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
 
@@ -229,11 +228,6 @@ const formTemplate: PersistedResource<FormTemplate> = {
   restrictToCreatedBy: true,
   viewConfiguration: {},
   components: [
-    {
-      name: SPLIT_CONFIGURATION_COMPONENT_NAME,
-      visible: true,
-      order: 0
-    },
     {
       name: IDENTIFIER_COMPONENT_NAME,
       visible: true,
@@ -949,7 +943,6 @@ describe("Form template edit page", () => {
     );
     expect(navOrder).toEqual([
       "show-parent-attributes-component",
-      "split-configuration-component",
       "identifiers-component",
       "material-sample-info-component",
       "collecting-event-component",
@@ -1029,48 +1022,9 @@ describe("Form template edit page", () => {
           visible: false
         },
         {
-          name: "split-configuration-component",
-          visible: false,
-          order: 1,
-          sections: [
-            {
-              items: [
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.condition.conditionType",
-                  visible: true
-                },
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.condition.materialSampleType",
-                  visible: true
-                }
-              ],
-              name: "split-configuration-condition-section",
-              visible: true
-            },
-            {
-              items: [
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.materialSampleNameGeneration.strategy",
-                  visible: true
-                },
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.materialSampleNameGeneration.characterType",
-                  visible: true
-                }
-              ],
-              name: "split-configuration-material-sample-name-generation-section",
-              visible: true
-            }
-          ]
-        },
-        {
           name: "identifiers-component",
           visible: true,
-          order: 2,
+          order: 1,
           sections: [
             {
               name: "general-section",
@@ -1128,7 +1082,12 @@ describe("Form template edit page", () => {
                   name: "dwcOtherCatalogNumbers",
                   visible: false
                 },
-                { defaultValue: undefined, name: "barcode", visible: false }
+                { defaultValue: undefined, name: "barcode", visible: false },
+                {
+                  defaultValue: undefined,
+                  name: "identifiers",
+                  visible: false
+                }
               ]
             }
           ]
@@ -1136,7 +1095,7 @@ describe("Form template edit page", () => {
         {
           name: "material-sample-info-component",
           visible: true,
-          order: 3,
+          order: 2,
           sections: [
             {
               name: "material-sample-info-section",
@@ -1174,7 +1133,7 @@ describe("Form template edit page", () => {
         {
           name: "collecting-event-component",
           visible: true,
-          order: 4,
+          order: 3,
           sections: [
             {
               name: "general-section",
@@ -1463,7 +1422,7 @@ describe("Form template edit page", () => {
         {
           name: "preparations-component",
           visible: false,
-          order: 5,
+          order: 4,
           sections: [
             {
               name: "general-section",
@@ -1521,13 +1480,29 @@ describe("Form template edit page", () => {
                   visible: false
                 }
               ]
+            },
+            {
+              name: "preparations-managed-attributes-section",
+              visible: true,
+              items: [
+                {
+                  defaultValue: undefined,
+                  name: "preparationManagedAttributes",
+                  visible: true
+                },
+                {
+                  defaultValue: undefined,
+                  name: "preparationManagedAttributesOrder",
+                  visible: true
+                }
+              ]
             }
           ]
         },
         {
           name: "organisms-component",
           visible: false,
-          order: 6,
+          order: 5,
           sections: [
             {
               name: "organisms-general-section",
@@ -1643,7 +1618,7 @@ describe("Form template edit page", () => {
         {
           name: "associations-component",
           visible: false,
-          order: 7,
+          order: 6,
           sections: [
             {
               name: "associations-host-organism-section",
@@ -1687,7 +1662,7 @@ describe("Form template edit page", () => {
         {
           name: "storage-component",
           visible: false,
-          order: 8,
+          order: 7,
           sections: [
             {
               name: "storage-selection-section",
@@ -1715,7 +1690,7 @@ describe("Form template edit page", () => {
         {
           name: "restriction-component",
           visible: false,
-          order: 9,
+          order: 8,
           sections: [
             {
               name: "restriction-general-section",
@@ -1750,7 +1725,7 @@ describe("Form template edit page", () => {
         {
           name: "scheduled-actions-component",
           visible: false,
-          order: 10,
+          order: 9,
           sections: [
             {
               name: "scheduled-actions-add-section",
@@ -1788,7 +1763,7 @@ describe("Form template edit page", () => {
         {
           name: "field-extensions-component",
           visible: true,
-          order: 11,
+          order: 10,
           sections: [
             {
               items: [
@@ -1806,7 +1781,7 @@ describe("Form template edit page", () => {
         {
           name: "managed-attributes-component",
           visible: true,
-          order: 12,
+          order: 11,
           sections: [
             {
               name: "managed-attributes-section",
@@ -1829,7 +1804,7 @@ describe("Form template edit page", () => {
         {
           name: "material-sample-attachments-component",
           visible: true,
-          order: 13,
+          order: 12,
           sections: [
             {
               name: "material-sample-attachments-sections",

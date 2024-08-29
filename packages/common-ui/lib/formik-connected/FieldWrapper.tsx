@@ -123,6 +123,14 @@ export function FieldWrapper(props: FieldWrapperProps) {
             templateCheckboxFieldName ?? name
           );
         }
+        if (name.includes("preparationManagedAttributes")) {
+          const visibleManagedAttributes = find(sectionFound.items, {
+            name: "preparationManagedAttributesOrder"
+          })?.defaultValue;
+          return visibleManagedAttributes?.includes(
+            templateCheckboxFieldName ?? name
+          );
+        }
 
         return (
           !find(sectionFound.items, {

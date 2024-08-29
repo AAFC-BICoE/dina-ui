@@ -6,8 +6,11 @@ import {
   SaveArgs,
   useQuery
 } from "common-ui";
-import { compact, isEmpty, omitBy, pick } from "lodash";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { compact, isEmpty, omitBy, pick, set } from "lodash";
+import {
+  MaterialSample,
+  StorageUnit
+} from "packages/dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   PcrBatchItem,
@@ -38,7 +41,7 @@ export function useSeqSelectCoordinatesControls({
   seqBatchId,
   seqBatch
 }: SeqSelectCoordinatesControlsProps) {
-  const { save, bulkGet } = useContext(ApiClientContext);
+  const { save, bulkGet, apiClient } = useContext(ApiClientContext);
 
   const [itemsLoading, setItemsLoading] = useState<boolean>(true);
 
@@ -83,18 +86,35 @@ export function useSeqSelectCoordinatesControls({
   );
 
   useEffect(() => {
-    if (!seqBatch) return;
+    if (!seqBatch || !seqBatch.storageUnit) return;
 
-    if (seqBatch?.storageRestriction) {
-      setNumberOfColumns(seqBatch.storageRestriction.layout.numberOfColumns);
-      setNumberOfRows(seqBatch.storageRestriction.layout.numberOfRows);
-      setFillMode(
-        seqBatch.storageRestriction.layout.fillDirection === "BY_ROW"
-          ? "ROW"
-          : "COLUMN"
+    async function fetchStorageUnitTypeLayout() {
+      const storageUnitReponse = await apiClient.get<StorageUnit>(
+        `/collection-api/storage-unit/${seqBatch?.storageUnit?.id}`,
+        { include: "storageUnitType" }
       );
-      setIsStorage(true);
+      if (storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition) {
+        const gridLayoutDefinition =
+          storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition;
+        set(
+          seqBatch,
+          "gridLayoutDefinition.numberOfColumns",
+          gridLayoutDefinition.numberOfColumns
+        );
+        set(
+          seqBatch,
+          "gridLayoutDefinition.numberOfRows",
+          gridLayoutDefinition.numberOfRows
+        );
+        setNumberOfColumns(gridLayoutDefinition.numberOfColumns);
+        setNumberOfRows(gridLayoutDefinition.numberOfRows);
+        setFillMode(
+          gridLayoutDefinition.fillDirection === "BY_ROW" ? "ROW" : "COLUMN"
+        );
+        setIsStorage(true);
+      }
     }
+    fetchStorageUnitTypeLayout();
   }, [seqBatch]);
 
   useEffect(() => {
