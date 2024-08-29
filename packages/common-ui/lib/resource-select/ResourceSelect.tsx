@@ -203,7 +203,7 @@ export function ResourceSelect<TData extends KitsuResource>({
             .localeCompare(optionB.label.toString());
         }
 
-        // Unable to perform search.
+        // Unable to perform sort.
         return 0;
       }) ?? [];
 
