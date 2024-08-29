@@ -176,15 +176,15 @@ function getNestedColumn<TData extends KitsuResource>(
   path: string,
   indexColumn: ESIndexMapping
 ): TableColumn<TData> {
-  const accessorKey = `${indexColumn.parentPath}.${
-    indexColumn.path.split(".")[0]
-  }.${indexColumn.label}`;
+  const accessorKeyRelationship = `${indexColumn.parentPath}.${indexColumn.parentName}`;
+  const accessorKeyRelationshipAttribute = `${indexColumn.path}.${indexColumn.label}`;
+  const accessorKeyFull = `${accessorKeyRelationship}.${accessorKeyRelationshipAttribute}`;
 
   if (indexColumn.type === "date") {
     return {
       ...dateCell(
         indexColumn.value,
-        accessorKey,
+        accessorKeyFull,
         indexColumn.parentType,
         true,
         indexColumn
@@ -200,19 +200,20 @@ function getNestedColumn<TData extends KitsuResource>(
           prefixName={startCase(indexColumn.parentName)}
         />
       ),
-      accessorKey,
+      accessorKey: accessorKeyFull,
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
       cell: ({ row: { original } }) => {
-        const relationshipAccessor = accessorKey?.split(".");
-        relationshipAccessor?.splice(
-          1,
-          0,
-          indexColumn.parentType ? indexColumn.parentType : ""
-        );
-        const valuePath = relationshipAccessor?.join(".");
-        const value = get(original, valuePath);
-        return <>{value}</>;
+        const value = get(original, accessorKeyRelationship);
+        if (value && Array.isArray(value)) {
+          const values = value
+            .map((val) => get(val, accessorKeyRelationshipAttribute))
+            .join(", ");
+          return <>{values}</>;
+        } else {
+          const singleValue = get(original, accessorKeyFull);
+          return <>{singleValue}</>;
+        }
       },
       relationshipType: indexColumn.parentType,
       columnSelectorString: path
