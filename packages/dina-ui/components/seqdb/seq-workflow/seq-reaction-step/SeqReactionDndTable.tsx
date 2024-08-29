@@ -174,6 +174,7 @@ export function SeqReactionDndTable({
           desc: false
         }
       ]}
+      enableMultiSort={true}
     />
   );
 }

@@ -320,6 +320,7 @@ export function PcrReactionTable({
           desc: false
         }
       ]}
+      enableMultiSort={true}
     />
   );
 }
