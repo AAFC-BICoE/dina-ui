@@ -59,6 +59,51 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
           </FieldSpy>
         </FieldWrapper>
       </NumberSpinnerField>
+      <TextField name=\\"sourceSet\\">
+        <FieldWrapper name=\\"sourceSet\\">
+          <FieldSpy fieldName=\\"sourceSet\\" validate={[undefined]}>
+            <FormikConnect(FastFieldInner) name=\\"sourceSet\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
+              <FastFieldInner name=\\"sourceSet\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
+                <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"sourceSet\\">
+                  <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
+                    <div className=\\"\\">
+                      <label className=\\"sourceSet-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
+                        <div className=\\"field-label label-col mb-2\\" style={[undefined]}>
+                          <strong>
+                            <FieldHeader name=\\"sourceSet\\" customName={[undefined]} tooltipOverride={[undefined]} tooltipImage={[undefined]} tooltipImageAlt={[undefined]} tooltipLink={[undefined]} tooltipLinkText={[undefined]} startCaseLabel={[undefined]}>
+                              <div className=\\"sourceSet-field-header\\">
+                                Source Set
+                                <Tooltip id=\\"field_sourceSet_tooltip\\" directText={[undefined]} image={[undefined]} altImage={[undefined]} link={[undefined]} linkText={[undefined]}>
+                                  <span className=\\"m-2\\">
+                                    <ForwardRef(Tooltip) id=\\"field_sourceSet_tooltip\\" overlay={{...}} placement=\\"top\\" trigger={{...}} zIndex={9001}>
+                                      <Trigger popupClassName=\\"\\" prefixCls=\\"rc-tooltip\\" popup={[Function: getPopupElement]} action={{...}} builtinPlacements={{...}} popupPlacement=\\"top\\" popupAlign={{...}} getPopupContainer={[undefined]} onPopupVisibleChange={[Function: noop]} afterPopupVisibleChange={[Function: noop]} popupTransitionName={[undefined]} popupAnimation={[undefined]} popupMotion={[undefined]} defaultPopupVisible={false} destroyPopupOnHide={false} autoDestroy={false} mouseLeaveDelay={0.1} popupStyle={{...}} mouseEnterDelay={0} zIndex={9001} getPopupClassNameFromAlign={[Function: returnEmptyString]} getDocument={[Function: returnDocument]} onPopupAlign={[Function: noop]} focusDelay={0} blurDelay={0.15} mask={false} maskClosable={true} showAction={{...}} hideAction={{...}}>
+                                        <span onContextMenu={[undefined]} onClick={[undefined]} onMouseDown={[undefined]} onTouchStart={[undefined]} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onFocus={[Function (anonymous)]} onBlur={[Function (anonymous)]}>
+                                          <img src=\\"/static/images/iconInformation.gif\\" alt=\\"User-defined name that can be used to retrieve all material samples that were created in the same batch.\\" aria-describedby=\\"field_sourceSet_tooltip\\" tabIndex={0} />
+                                        </span>
+                                      </Trigger>
+                                    </ForwardRef(Tooltip)>
+                                  </span>
+                                </Tooltip>
+                              </div>
+                            </FieldHeader>
+                          </strong>
+                        </div>
+                        <div className=\\"field-col\\" style={{...}}>
+                          <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
+                            <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
+                              <input type=\\"text\\" placeholder={[undefined]} className=\\"form-control\\" onChange={[Function: onChange]} value=\\"\\" readOnly={[undefined]} disabled={[undefined]} onKeyDown={[Function: onKeyDown]} />
+                            </ErrorBoundary>
+                          </FormikConnectedField>
+                        </div>
+                      </label>
+                    </div>
+                  </LabelWrapper>
+                </FieldSpyInternal>
+              </FastFieldInner>
+            </FormikConnect(FastFieldInner)>
+          </FieldSpy>
+        </FieldWrapper>
+      </TextField>
     </div>
     <div className=\\"col-md-7\\">
       <PreviewGeneratedNames splitFromMaterialSamples={{...}} generatedIdentifiers={{...}} setGeneratedIdentifiers={[Function: bound dispatchAction]} splitConfiguration={{...}}>
