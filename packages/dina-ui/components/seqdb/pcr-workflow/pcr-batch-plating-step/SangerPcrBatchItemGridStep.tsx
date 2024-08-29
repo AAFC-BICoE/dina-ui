@@ -25,16 +25,14 @@ export interface PCRBatchItemGridProps {
   setPerformSave: (newValue: boolean) => void;
 }
 
-export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
-  const {
-    pcrBatchId,
-    pcrBatch,
-    onSaved,
-    editMode,
-    setEditMode,
-    performSave,
-    setPerformSave
-  } = props;
+export function SangerPcrBatchItemGridStep({
+  pcrBatchId,
+  pcrBatch,
+  onSaved,
+  editMode,
+  performSave,
+  setPerformSave
+}: PCRBatchItemGridProps) {
   const {
     availableItems,
     cellGrid,
@@ -178,7 +176,10 @@ export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
         </div>
         <div className="col-9">
           <strong>Container wells</strong>
-          <ContainerGrid<PcrBatch, PcrBatchItemSample>
+          <ContainerGrid<
+            PcrBatch & { gridLayoutDefinition?: any },
+            PcrBatchItemSample
+          >
             batch={pcrBatch}
             cellGrid={cellGrid}
             movedItems={movedItems}

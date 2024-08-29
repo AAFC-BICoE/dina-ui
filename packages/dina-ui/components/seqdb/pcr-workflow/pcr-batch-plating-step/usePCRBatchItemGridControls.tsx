@@ -7,8 +7,11 @@ import {
   useQuery,
   useStringComparator
 } from "common-ui";
-import { compact, isEmpty, omitBy, pick } from "lodash";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { compact, isEmpty, omitBy, pick, set } from "lodash";
+import {
+  MaterialSample,
+  StorageUnit
+} from "packages/dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { CellGrid } from "../../container-grid/ContainerGrid";
@@ -27,7 +30,7 @@ export function usePCRBatchItemGridControls({
   pcrBatchId,
   pcrBatch
 }: ContainerGridProps) {
-  const { save, bulkGet } = useContext(ApiClientContext);
+  const { save, bulkGet, apiClient } = useContext(ApiClientContext);
 
   const { compareByStringAndNumber } = useStringComparator();
 
@@ -194,18 +197,35 @@ export function usePCRBatchItemGridControls({
   );
 
   useEffect(() => {
-    if (!pcrBatch) return;
+    if (!pcrBatch || !pcrBatch.storageUnit) return;
 
-    if (pcrBatch?.storageRestriction) {
-      setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
-      setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
-      setFillMode(
-        pcrBatch.storageRestriction.layout.fillDirection === "BY_ROW"
-          ? "ROW"
-          : "COLUMN"
+    async function fetchStorageUnitTypeLayout() {
+      const storageUnitReponse = await apiClient.get<StorageUnit>(
+        `/collection-api/storage-unit/${pcrBatch?.storageUnit?.id}`,
+        { include: "storageUnitType" }
       );
-      setIsStorage(true);
+      if (storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition) {
+        const gridLayoutDefinition =
+          storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition;
+        set(
+          pcrBatch,
+          "gridLayoutDefinition.numberOfColumns",
+          gridLayoutDefinition.numberOfColumns
+        );
+        set(
+          pcrBatch,
+          "gridLayoutDefinition.numberOfRows",
+          gridLayoutDefinition.numberOfRows
+        );
+        setNumberOfColumns(gridLayoutDefinition.numberOfColumns);
+        setNumberOfRows(gridLayoutDefinition.numberOfRows);
+        setFillMode(
+          gridLayoutDefinition.fillDirection === "BY_ROW" ? "ROW" : "COLUMN"
+        );
+        setIsStorage(true);
+      }
     }
+    fetchStorageUnitTypeLayout();
   }, [pcrBatch]);
 
   function sortAvailableItems(batchItemSamples: PcrBatchItemSample[]) {

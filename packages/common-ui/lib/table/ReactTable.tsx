@@ -183,7 +183,7 @@ export function ReactTable<TData>({
     ...(enableSorting && { getSortedRowModel: getSortedRowModel() }),
     ...(enableFilters && { getFilteredRowModel: getFilteredRowModel() }),
     initialState: {
-      sorting: sort ?? sorting,
+      sorting,
       pagination: { pageIndex, pageSize },
       ...(defaultExpanded && {
         expanded: defaultExpanded
@@ -199,7 +199,7 @@ export function ReactTable<TData>({
         getExpandedRowModel: getExpandedRowModel()
       }),
     state: {
-      sorting: sort ?? sorting,
+      sorting,
       ...(columnVisibility && { columnVisibility }),
       ...(enableFilters && columnFilters && { columnFilters }),
       ...(manualPagination && {
@@ -256,7 +256,7 @@ export function ReactTable<TData>({
             pageSizeOptions={pageSizeOptions}
             isTop={true}
             displayFirstAndLastOptions={
-              enableSorting && !!sort && sort?.length > 0
+              enableSorting && !!sorting && sorting?.length > 0
             }
             smallPaginationButtons={smallPaginationButtons}
           />
@@ -267,7 +267,7 @@ export function ReactTable<TData>({
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
-                const defaultSortRule = sort?.find(
+                const defaultSortRule = sorting?.find(
                   (sortRule) => sortRule.id === header.id
                 );
 
@@ -400,7 +400,7 @@ export function ReactTable<TData>({
             pageSizeOptions={pageSizeOptions}
             isTop={false}
             displayFirstAndLastOptions={
-              enableSorting && !!sort && sort?.length > 0
+              enableSorting && !!sorting && sorting?.length > 0
             }
             smallPaginationButtons={smallPaginationButtons}
           />

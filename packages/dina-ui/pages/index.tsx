@@ -341,6 +341,11 @@ export function Home() {
                     <DinaMessage id="formTemplates" />
                   </a>
                 </Link>
+                <Link href="/collection/split-configuration/list">
+                  <a>
+                    <DinaMessage id="splitConfigurationTitle" />
+                  </a>
+                </Link>
                 <Link
                   href={{
                     pathname: `/dina-user/view`,

@@ -581,17 +581,28 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleName: "Material Sample Name",
   materialSampleShowParentAttributes: "Parent Attributes",
   showParentAttributes: "Parent Material Sample",
+  splitConfigurationTitle: "Split Configurations",
+  splitConfigurationEdit: "Edit Split Configuration",
+  splitConfigurationAdd: "Add Split Configuration",
   materialSampleSplitConfiguration: "Split Configuration",
   materialSampleSplitConfigurationCondition: "Condition",
   materialSampleSplitConfigurationConditionType: "Condition Type",
   materialSampleSplitConfigurationDirectParent: "Direct Parent",
   materialSampleSplitConfigurationMaterialSampleNameGeneration:
     "Material Sample Name Generation",
+  materialSampleSplitConfigurationMaterialSampleGeneration:
+    "Material Sample Generation",
   materialSampleSplitConfigurationRequiredMaterialSampleType:
     "Material Sample Type is required when the Split Configuration is using the Material Sample Type strategy.",
   materialSampleSplitConfigurationStrategy: "Strategy",
   materialSampleSplitConfigurationVisibleMaterialSampleType:
     "Material Sample Type must be visible when Split Configuration is using the Material Sample Type strategy.",
+  materialSampleSplitConfigurationSeparator: "Separator",
+  splitConfiguration_separator_dash: "Dash",
+  splitConfiguration_separator_underscore: "Underscore",
+  splitConfiguration_separator_space: "Space",
+  materialSampleSplitConfigurationTypeCreatedBySplit:
+    "Material Sample Type Created",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleViewTitle: "{primaryID} - Material Sample",
   materialSamples: "Material Samples",
@@ -697,6 +708,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   protocolData: "Protocol Data",
   protocolListTitle: "Protocols",
   protocolNameLabel: "Protocol Name",
+  splitConfigurationNameLabel: "Split Configuration Name",
   protocolViewTitle: "Protocol",
   queryBuilder_addSearchGroup: "Add sub-query",
   queryBuilder_addSearchRule: "Add query",

@@ -21,7 +21,6 @@ describe("PcrReactionTable component", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
-
     // Ensure well coordinates are displayed correctly
     let rowNumber = 0;
     wrapper.find("table tbody tr").forEach((row) => {
