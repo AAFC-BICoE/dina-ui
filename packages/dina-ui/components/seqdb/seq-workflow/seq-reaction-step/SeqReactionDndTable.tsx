@@ -94,17 +94,19 @@ export function SeqReactionDndTable({
       accessorKey: "wellCoordinates",
       sortingFn: (a: any, b: any): number => {
         const aString =
-          !a.original?.storageUnitUsage ||
-          a.original?.storageUnitUsage?.wellRow === null ||
-          a.original?.storageUnitUsage?.wellColumn === null
+          a.original?.pcrBatchItem?.storageUnitUsage?.wellRow === null ||
+          a.original?.pcrBatchItem?.storageUnitUsage?.wellColumn === null
             ? ""
-            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+            : a.original.pcrBatchItem?.storageUnitUsage?.wellRow +
+              "" +
+              a.original.pcrBatchItem?.storageUnitUsage?.wellColumn;
         const bString =
-          !b.original?.storageUnitUsage ||
-          b.original?.storageUnitUsage?.wellRow === null ||
-          b.original?.storageUnitUsage?.wellColumn === null
+          b.original?.pcrBatchItem?.storageUnitUsage?.wellRow === null ||
+          b.original?.pcrBatchItem?.storageUnitUsage?.wellColumn === null
             ? ""
-            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+            : b.original.pcrBatchItem?.storageUnitUsage?.wellRow +
+              "" +
+              b.original.pcrBatchItem?.storageUnitUsage?.wellColumn;
         return compareByStringAndNumber(aString, bString);
       }
     },
@@ -116,8 +118,8 @@ export function SeqReactionDndTable({
       accessorKey: "tubeNumber",
       sortingFn: (a: any, b: any): number =>
         compareByStringAndNumber(
-          a.original.storageUnitUsage.cellNumber.toString(),
-          b.original.storageUnitUsage.cellNumber.toString()
+          a.original?.pcrBatchItem?.storageUnitUsage?.cellNumber.toString(),
+          b.original?.pcrBatchItem?.storageUnitUsage?.cellNumber.toString()
         )
     },
     {
