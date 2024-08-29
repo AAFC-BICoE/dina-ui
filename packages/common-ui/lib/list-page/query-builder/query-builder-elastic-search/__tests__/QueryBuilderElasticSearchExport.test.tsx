@@ -389,13 +389,273 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
       expect(processResults(result)).toMatchSnapshot();
     });
 
-    // test("Relationships", async () => {
-    //   const result =
-    // });
+    test("Relationships", async () => {
+      const result = {
+        total: { relation: "eq", value: 25 },
+        hits: [
+          {
+            _source: {
+              data: {
+                relationships: {
+                  parentMaterialSample: {},
+                  collectingEvent: { data: null },
+                  preparationMethod: { data: null },
+                  storageUnitUsage: {},
+                  projects: { data: [] },
+                  preparedBy: { data: [] },
+                  organism: { data: [] },
+                  attachment: { data: [] },
+                  collection: { data: null },
+                  preparationProtocol: {},
+                  preparationType: { data: null },
+                  assemblages: { data: [] }
+                },
+                attributes: {
+                  materialSampleType: "CULTURE_STRAIN",
+                  dwcOtherCatalogNumbers: null,
+                  createdBy: "dina-admin",
+                  materialSampleName: "sample10-J",
+                  createdOn: "2024-08-29T14:25:55.864404Z",
+                  materialSampleState: null,
+                  group: "aafc"
+                },
+                id: "01919e87-5b71-7dff-921b-16c1ed4f011a",
+                type: "material-sample"
+              }
+            }
+          },
+          {
+            _source: {
+              data: {
+                relationships: {
+                  parentMaterialSample: {},
+                  collectingEvent: { data: null },
+                  preparationMethod: { data: null },
+                  storageUnitUsage: {},
+                  projects: { data: [] },
+                  preparedBy: { data: [] },
+                  organism: { data: [] },
+                  attachment: { data: [] },
+                  collection: {
+                    data: {
+                      id: "2b349356-3ffb-46be-81f5-cb0d6ae9b4ef",
+                      type: "collection"
+                    },
+                    links: {
+                      related:
+                        "/api/v1/material-sample/01919e87-58a0-70bd-8846-453100ccecb9/collection",
+                      self: "/api/v1/material-sample/01919e87-58a0-70bd-8846-453100ccecb9/relationships/collection"
+                    }
+                  },
+                  preparationProtocol: {},
+                  preparationType: { data: null },
+                  assemblages: { data: [] }
+                },
+                attributes: {
+                  materialSampleType: "CULTURE_STRAIN",
+                  dwcOtherCatalogNumbers: null,
+                  createdBy: "dina-admin",
+                  materialSampleName: "sample10-A",
+                  createdOn: "2024-08-29T14:25:55.864404Z",
+                  materialSampleState: null,
+                  group: "aafc"
+                },
+                id: "01919e87-58a0-70bd-8846-453100ccecb9",
+                type: "material-sample"
+              },
+              included: [
+                {
+                  attributes: {
+                    code: "SeqDB",
+                    name: "Sequence Database"
+                  },
+                  id: "2b349356-3ffb-46be-81f5-cb0d6ae9b4ef",
+                  type: "collection"
+                }
+              ]
+            }
+          },
+          {
+            _source: {
+              data: {
+                relationships: {
+                  parentMaterialSample: {},
+                  collectingEvent: { data: null },
+                  preparationMethod: { data: null },
+                  storageUnitUsage: {},
+                  projects: { data: [] },
+                  preparedBy: { data: [] },
+                  organism: { data: [] },
+                  attachment: { data: [] },
+                  collection: {
+                    data: {
+                      id: "01919f58-a9ea-7838-9737-7a0e54cdc41b",
+                      type: "collection"
+                    },
+                    links: {
+                      related:
+                        "/api/v1/material-sample/01919e87-59a3-7c07-a4b9-a10f4ddd4a80/collection",
+                      self: "/api/v1/material-sample/01919e87-59a3-7c07-a4b9-a10f4ddd4a80/relationships/collection"
+                    }
+                  },
+                  preparationProtocol: {},
+                  preparationType: { data: null },
+                  assemblages: { data: [] }
+                },
+                attributes: {
+                  materialSampleType: "CULTURE_STRAIN",
+                  dwcOtherCatalogNumbers: null,
+                  createdBy: "dina-admin",
+                  materialSampleName: "sample10-C",
+                  createdOn: "2024-08-29T14:25:55.864404Z",
+                  materialSampleState: null,
+                  group: "aafc"
+                },
+                id: "01919e87-59a3-7c07-a4b9-a10f4ddd4a80",
+                type: "material-sample"
+              },
+              included: [
+                {
+                  attributes: {
+                    code: "CNC",
+                    name: "Canadian National Collection"
+                  },
+                  id: "01919f58-a9ea-7838-9737-7a0e54cdc41b",
+                  type: "collection"
+                }
+              ]
+            }
+          }
+        ]
+      };
 
-    // test("To-many relationships", async () => {
+      expect(processResults(result)).toMatchSnapshot();
+    });
 
-    // });
+    test("To-many relationships", async () => {
+      const result = {
+        total: { relation: "eq", value: 2 },
+        hits: [
+          {
+            _source: {
+              data: {
+                relationships: {
+                  parentMaterialSample: {},
+                  collectingEvent: { data: null },
+                  preparationMethod: { data: null },
+                  storageUnitUsage: { data: null },
+                  projects: {
+                    data: [
+                      {
+                        id: "01919485-ed65-7a79-9080-91445b897ef4",
+                        type: "project"
+                      }
+                    ],
+                    links: {
+                      related:
+                        "/api/v1/material-sample/01918f22-13a4-7f6d-894e-974bc1e14d23/projects",
+                      self: "/api/v1/material-sample/01918f22-13a4-7f6d-894e-974bc1e14d23/relationships/projects"
+                    }
+                  },
+                  preparedBy: { data: [] },
+                  organism: { data: [] },
+                  attachment: { data: [] },
+                  collection: { data: null },
+                  preparationProtocol: {},
+                  preparationType: { data: null },
+                  assemblages: { data: [] }
+                },
+                attributes: {
+                  materialSampleType: "WHOLE_ORGANISM",
+                  dwcOtherCatalogNumbers: null,
+                  createdBy: "dina-admin",
+                  materialSampleName: "SAMPLE_a",
+                  createdOn: "2024-08-26T14:41:00.656734Z",
+                  materialSampleState: null,
+                  group: "aafc"
+                },
+                id: "01918f22-13a4-7f6d-894e-974bc1e14d23",
+                type: "material-sample"
+              },
+              included: [
+                {
+                  attributes: {
+                    name: "Project A"
+                  },
+                  id: "01919485-ed65-7a79-9080-91445b897ef4",
+                  type: "project"
+                }
+              ]
+            }
+          },
+          {
+            _source: {
+              data: {
+                relationships: {
+                  parentMaterialSample: {},
+                  collectingEvent: { data: null },
+                  preparationMethod: { data: null },
+                  storageUnitUsage: { data: null },
+                  projects: {
+                    data: [
+                      {
+                        id: "01919485-ed65-7a79-9080-91445b897ef4",
+                        type: "project"
+                      },
+                      {
+                        id: "01919486-2f9a-7d1c-92f3-05a2542e2eea",
+                        type: "project"
+                      }
+                    ],
+                    links: {
+                      related:
+                        "/api/v1/material-sample/01918f22-1687-7634-bcd3-cd56d493bf27/projects",
+                      self: "/api/v1/material-sample/01918f22-1687-7634-bcd3-cd56d493bf27/relationships/projects"
+                    }
+                  },
+                  preparedBy: { data: [] },
+                  organism: { data: [] },
+                  attachment: { data: [] },
+                  collection: { data: null },
+                  preparationProtocol: {},
+                  preparationType: { data: null },
+                  assemblages: { data: [] }
+                },
+                attributes: {
+                  materialSampleType: "WHOLE_ORGANISM",
+                  dwcOtherCatalogNumbers: null,
+                  createdBy: "dina-admin",
+                  materialSampleName: "SAMPLE_c",
+                  createdOn: "2024-08-26T14:41:00.656734Z",
+                  materialSampleState: null,
+                  group: "aafc"
+                },
+                id: "01918f22-1687-7634-bcd3-cd56d493bf27",
+                type: "material-sample"
+              },
+              included: [
+                {
+                  attributes: {
+                    name: "Project A"
+                  },
+                  id: "01919485-ed65-7a79-9080-91445b897ef4",
+                  type: "project"
+                },
+                {
+                  attributes: {
+                    name: "Project B"
+                  },
+                  id: "01919486-2f9a-7d1c-92f3-05a2542e2eea",
+                  type: "project"
+                }
+              ]
+            }
+          }
+        ]
+      };
+
+      expect(processResults(result)).toMatchSnapshot();
+    });
   });
 
   describe("Query helper functions", () => {

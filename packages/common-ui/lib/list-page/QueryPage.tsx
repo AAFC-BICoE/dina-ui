@@ -522,7 +522,6 @@ export function QueryPage<TData extends KitsuResource>({
       // The included section will be transformed from an array to an object with the type name for each relationship.
       elasticSearchRequest(queryDSL)
         .then((result) => {
-          // console.log(result);
           const processedResult = processResults(result);
 
           // If we have reached the count limit, we will need to perform another request for the true

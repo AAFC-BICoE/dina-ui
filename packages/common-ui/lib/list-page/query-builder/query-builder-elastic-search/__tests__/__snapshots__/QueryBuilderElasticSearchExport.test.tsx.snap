@@ -1645,3 +1645,336 @@ Array [
   },
 ]
 `;
+
+exports[`QueryBuilderElasticSearchExport functionality processResults Relationships 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "attributes": Object {
+        "createdBy": "dina-admin",
+        "createdOn": "2024-08-29T14:25:55.864404Z",
+        "dwcOtherCatalogNumbers": null,
+        "group": "aafc",
+        "materialSampleName": "sample10-J",
+        "materialSampleState": null,
+        "materialSampleType": "CULTURE_STRAIN",
+      },
+      "relationships": Object {
+        "assemblages": Object {
+          "data": Array [],
+        },
+        "attachment": Object {
+          "data": Array [],
+        },
+        "collectingEvent": Object {
+          "data": null,
+        },
+        "collection": Object {
+          "data": null,
+        },
+        "organism": Object {
+          "data": Array [],
+        },
+        "parentMaterialSample": Object {},
+        "preparationMethod": Object {
+          "data": null,
+        },
+        "preparationProtocol": Object {},
+        "preparationType": Object {
+          "data": null,
+        },
+        "preparedBy": Object {
+          "data": Array [],
+        },
+        "projects": Object {
+          "data": Array [],
+        },
+        "storageUnitUsage": Object {},
+      },
+    },
+    "id": "01919e87-5b71-7dff-921b-16c1ed4f011a",
+    "included": undefined,
+    "type": "material-sample",
+  },
+  Object {
+    "data": Object {
+      "attributes": Object {
+        "createdBy": "dina-admin",
+        "createdOn": "2024-08-29T14:25:55.864404Z",
+        "dwcOtherCatalogNumbers": null,
+        "group": "aafc",
+        "materialSampleName": "sample10-A",
+        "materialSampleState": null,
+        "materialSampleType": "CULTURE_STRAIN",
+      },
+      "relationships": Object {
+        "assemblages": Object {
+          "data": Array [],
+        },
+        "attachment": Object {
+          "data": Array [],
+        },
+        "collectingEvent": Object {
+          "data": null,
+        },
+        "collection": Object {
+          "data": Object {
+            "id": "2b349356-3ffb-46be-81f5-cb0d6ae9b4ef",
+            "type": "collection",
+          },
+          "links": Object {
+            "related": "/api/v1/material-sample/01919e87-58a0-70bd-8846-453100ccecb9/collection",
+            "self": "/api/v1/material-sample/01919e87-58a0-70bd-8846-453100ccecb9/relationships/collection",
+          },
+        },
+        "organism": Object {
+          "data": Array [],
+        },
+        "parentMaterialSample": Object {},
+        "preparationMethod": Object {
+          "data": null,
+        },
+        "preparationProtocol": Object {},
+        "preparationType": Object {
+          "data": null,
+        },
+        "preparedBy": Object {
+          "data": Array [],
+        },
+        "projects": Object {
+          "data": Array [],
+        },
+        "storageUnitUsage": Object {},
+      },
+    },
+    "id": "01919e87-58a0-70bd-8846-453100ccecb9",
+    "included": Object {
+      "collection": Object {
+        "attributes": Object {
+          "code": "SeqDB",
+          "name": "Sequence Database",
+        },
+        "id": "2b349356-3ffb-46be-81f5-cb0d6ae9b4ef",
+        "type": "collection",
+      },
+    },
+    "type": "material-sample",
+  },
+  Object {
+    "data": Object {
+      "attributes": Object {
+        "createdBy": "dina-admin",
+        "createdOn": "2024-08-29T14:25:55.864404Z",
+        "dwcOtherCatalogNumbers": null,
+        "group": "aafc",
+        "materialSampleName": "sample10-C",
+        "materialSampleState": null,
+        "materialSampleType": "CULTURE_STRAIN",
+      },
+      "relationships": Object {
+        "assemblages": Object {
+          "data": Array [],
+        },
+        "attachment": Object {
+          "data": Array [],
+        },
+        "collectingEvent": Object {
+          "data": null,
+        },
+        "collection": Object {
+          "data": Object {
+            "id": "01919f58-a9ea-7838-9737-7a0e54cdc41b",
+            "type": "collection",
+          },
+          "links": Object {
+            "related": "/api/v1/material-sample/01919e87-59a3-7c07-a4b9-a10f4ddd4a80/collection",
+            "self": "/api/v1/material-sample/01919e87-59a3-7c07-a4b9-a10f4ddd4a80/relationships/collection",
+          },
+        },
+        "organism": Object {
+          "data": Array [],
+        },
+        "parentMaterialSample": Object {},
+        "preparationMethod": Object {
+          "data": null,
+        },
+        "preparationProtocol": Object {},
+        "preparationType": Object {
+          "data": null,
+        },
+        "preparedBy": Object {
+          "data": Array [],
+        },
+        "projects": Object {
+          "data": Array [],
+        },
+        "storageUnitUsage": Object {},
+      },
+    },
+    "id": "01919e87-59a3-7c07-a4b9-a10f4ddd4a80",
+    "included": Object {
+      "collection": Object {
+        "attributes": Object {
+          "code": "CNC",
+          "name": "Canadian National Collection",
+        },
+        "id": "01919f58-a9ea-7838-9737-7a0e54cdc41b",
+        "type": "collection",
+      },
+    },
+    "type": "material-sample",
+  },
+]
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality processResults To-many relationships 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "attributes": Object {
+        "createdBy": "dina-admin",
+        "createdOn": "2024-08-26T14:41:00.656734Z",
+        "dwcOtherCatalogNumbers": null,
+        "group": "aafc",
+        "materialSampleName": "SAMPLE_a",
+        "materialSampleState": null,
+        "materialSampleType": "WHOLE_ORGANISM",
+      },
+      "relationships": Object {
+        "assemblages": Object {
+          "data": Array [],
+        },
+        "attachment": Object {
+          "data": Array [],
+        },
+        "collectingEvent": Object {
+          "data": null,
+        },
+        "collection": Object {
+          "data": null,
+        },
+        "organism": Object {
+          "data": Array [],
+        },
+        "parentMaterialSample": Object {},
+        "preparationMethod": Object {
+          "data": null,
+        },
+        "preparationProtocol": Object {},
+        "preparationType": Object {
+          "data": null,
+        },
+        "preparedBy": Object {
+          "data": Array [],
+        },
+        "projects": Object {
+          "data": Array [
+            Object {
+              "id": "01919485-ed65-7a79-9080-91445b897ef4",
+              "type": "project",
+            },
+          ],
+          "links": Object {
+            "related": "/api/v1/material-sample/01918f22-13a4-7f6d-894e-974bc1e14d23/projects",
+            "self": "/api/v1/material-sample/01918f22-13a4-7f6d-894e-974bc1e14d23/relationships/projects",
+          },
+        },
+        "storageUnitUsage": Object {
+          "data": null,
+        },
+      },
+    },
+    "id": "01918f22-13a4-7f6d-894e-974bc1e14d23",
+    "included": Object {
+      "projects": Object {
+        "attributes": Object {
+          "name": "Project A",
+        },
+        "id": "01919485-ed65-7a79-9080-91445b897ef4",
+        "type": "project",
+      },
+    },
+    "type": "material-sample",
+  },
+  Object {
+    "data": Object {
+      "attributes": Object {
+        "createdBy": "dina-admin",
+        "createdOn": "2024-08-26T14:41:00.656734Z",
+        "dwcOtherCatalogNumbers": null,
+        "group": "aafc",
+        "materialSampleName": "SAMPLE_c",
+        "materialSampleState": null,
+        "materialSampleType": "WHOLE_ORGANISM",
+      },
+      "relationships": Object {
+        "assemblages": Object {
+          "data": Array [],
+        },
+        "attachment": Object {
+          "data": Array [],
+        },
+        "collectingEvent": Object {
+          "data": null,
+        },
+        "collection": Object {
+          "data": null,
+        },
+        "organism": Object {
+          "data": Array [],
+        },
+        "parentMaterialSample": Object {},
+        "preparationMethod": Object {
+          "data": null,
+        },
+        "preparationProtocol": Object {},
+        "preparationType": Object {
+          "data": null,
+        },
+        "preparedBy": Object {
+          "data": Array [],
+        },
+        "projects": Object {
+          "data": Array [
+            Object {
+              "id": "01919485-ed65-7a79-9080-91445b897ef4",
+              "type": "project",
+            },
+            Object {
+              "id": "01919486-2f9a-7d1c-92f3-05a2542e2eea",
+              "type": "project",
+            },
+          ],
+          "links": Object {
+            "related": "/api/v1/material-sample/01918f22-1687-7634-bcd3-cd56d493bf27/projects",
+            "self": "/api/v1/material-sample/01918f22-1687-7634-bcd3-cd56d493bf27/relationships/projects",
+          },
+        },
+        "storageUnitUsage": Object {
+          "data": null,
+        },
+      },
+    },
+    "id": "01918f22-1687-7634-bcd3-cd56d493bf27",
+    "included": Object {
+      "projects": Array [
+        Object {
+          "attributes": Object {
+            "name": "Project A",
+          },
+          "id": "01919485-ed65-7a79-9080-91445b897ef4",
+          "type": "project",
+        },
+        Object {
+          "attributes": Object {
+            "name": "Project B",
+          },
+          "id": "01919486-2f9a-7d1c-92f3-05a2542e2eea",
+          "type": "project",
+        },
+      ],
+    },
+    "type": "material-sample",
+  },
+]
+`;
