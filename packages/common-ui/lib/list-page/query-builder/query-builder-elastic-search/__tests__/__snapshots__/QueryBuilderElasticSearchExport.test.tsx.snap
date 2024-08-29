@@ -1465,6 +1465,7 @@ Object {
     "includes": Array [
       "data.id",
       "data.type",
+      "data.relationships",
       "data.attributes.testColumn1",
       "data.attributes.includeThis1",
       "data.attributes.includeThis2",
