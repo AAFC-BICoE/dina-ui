@@ -78,7 +78,8 @@ export function DraggableItemBox<ItemType extends { sampleName?: string }>({
           }}
         >
           <span className="sample-box-text">
-            {batchItemSample.sampleName} {primerName && <>({primerName})</>}
+            {batchItemSample.sampleName}
+            {primerName && <> ({primerName})</>}
           </span>
         </div>
       </RcTooltip>
