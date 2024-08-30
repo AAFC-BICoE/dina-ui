@@ -212,6 +212,9 @@ export default function NgsWorkFlowRunPage() {
           <Tab disabled={isDisabled(2, true)}>
             {formatMessage("preLibraryPrep")}
           </Tab>
+          <Tab disabled={isDisabled(3, true)}>
+            {formatMessage("selectCoordinates")}
+          </Tab>
         </TabList>
         <TabPanel>
           <LibraryPrepBatchStep
@@ -249,6 +252,7 @@ export default function NgsWorkFlowRunPage() {
             />
           )}
         </TabPanel>
+        <TabPanel />
       </Tabs>
     </PageLayout>
   );

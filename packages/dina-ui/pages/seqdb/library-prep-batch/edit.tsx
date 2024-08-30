@@ -16,14 +16,20 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { useFormikContext } from "formik";
+import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
 import { cloneDeep } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import {
+  Footer,
+  GroupSelectField,
+  Head,
+  Nav,
+  StorageUnitSelectField
+} from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { Protocol } from "../../../types/collection-api";
+import { Protocol, StorageUnitType } from "../../../types/collection-api";
 import {
   ContainerType,
   IndexSet,
@@ -213,6 +219,25 @@ function LibraryPrepBatchFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
   const { values } = useFormikContext<any>();
 
+  // When the storage unit type is changed, the storage unit needs to be cleared.
+  const StorageUnitTypeSelectorComponent = connect(
+    ({ formik: { setFieldValue } }) => {
+      return (
+        <ResourceSelectField<StorageUnitType>
+          className="col-md-6"
+          name="storageUnitType"
+          filter={filterBy(["name"])}
+          model="collection-api/storage-unit-type"
+          optionLabel={(storageUnitType) => `${storageUnitType.name}`}
+          readOnlyLink="/collection/storage-unit-type/view?id="
+          onChange={() => {
+            setFieldValue("storageUnit.id", null);
+          }}
+        />
+      );
+    }
+  );
+
   return (
     <div>
       <div className="row">
@@ -249,12 +274,24 @@ function LibraryPrepBatchFormFields() {
           model="collection-api/protocol"
           optionLabel={(protocol) => protocol.name}
         />
-        <ResourceSelectField<ContainerType>
-          className="col-md-6"
-          name="containerType"
-          filter={filterBy(["name"])}
-          model="seqdb-api/container-type"
-          optionLabel={(ct) => ct.name}
+        {!readOnly && <StorageUnitTypeSelectorComponent />}
+        <StorageUnitSelectField
+          resourceProps={{
+            name: "storageUnit",
+            filter: filterBy(["name"], {
+              extraFilters: values?.storageUnitType?.id
+                ? [
+                    {
+                      selector: "storageUnitType.uuid",
+                      comparison: "==",
+                      arguments: values?.storageUnitType?.id ?? ""
+                    }
+                  ]
+                : undefined
+            }),
+            isDisabled: !values?.storageUnitType?.id,
+            className: "col-md-6"
+          }}
         />
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
