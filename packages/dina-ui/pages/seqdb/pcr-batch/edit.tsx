@@ -385,6 +385,7 @@ function PcrBatchFormFields({
           className="col-md-6"
           name="protocol"
           filter={filterBy(["name"])}
+          filterList={(resource) => resource.protocolType === "pcr_reaction"}
           model="collection-api/protocol"
           optionLabel={(protocol) => protocol.name}
         />
