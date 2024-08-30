@@ -31,7 +31,6 @@ import {
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Protocol, StorageUnitType } from "../../../types/collection-api";
 import {
-  ContainerType,
   IndexSet,
   LibraryPrepBatch,
   Product,
@@ -42,7 +41,8 @@ export function useLibraryPrepBatchQuery(id?: string, deps?: any[]) {
   return useQuery<LibraryPrepBatch>(
     {
       path: `seqdb-api/library-prep-batch/${id}`,
-      include: "containerType,product,protocol,thermocyclerProfile"
+      include:
+        "product,protocol,thermocyclerProfile,storageUnit,storageUnitType"
     },
     { disabled: !id, deps }
   );
@@ -127,16 +127,6 @@ export function LibraryPrepBatchForm({
   }: DinaFormSubmitParams<LibraryPrepBatch & { [key: string]: string }>) {
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
-
-    if (submittedValues.containerType) {
-      (submittedValues as any).relationships.containerType = {
-        data: {
-          id: submittedValues.containerType.id,
-          type: "container-type"
-        }
-      };
-      delete submittedValues.containerType;
-    }
 
     if (submittedValues.product) {
       (submittedValues as any).relationships.product = {

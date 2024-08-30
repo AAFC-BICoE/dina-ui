@@ -1,6 +1,5 @@
 import { KitsuResource } from "kitsu";
 import { Protocol } from "packages/dina-ui/types/collection-api";
-import { ContainerType } from "../ContainerType";
 import { Product } from "../Product";
 import { ThermocyclerProfile } from "../ThermocyclerProfile";
 import { IndexSet } from "./IndexSet";

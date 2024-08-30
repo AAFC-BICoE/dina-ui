@@ -29,9 +29,6 @@ export interface NsgSample {
   batchId?: string;
   pcrBatchItemId?: string;
   storageUnitUsage?: StorageUnitUsage;
-  primerId?: string;
-  primerName?: string;
-  primerDirection?: string;
   sampleId?: string;
   sampleName?: string;
 }
@@ -60,21 +57,14 @@ export function useNsgSelectCoordinatesControls({
 
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
 
-  // const [seqReactionSamples, setSeqReactionSamples] =
-  //   useState<NsgSample[]>();
-
   const [isStorage, setIsStorage] = useState<boolean>(false);
 
-  // const [seqReactionSortOrder, setSeqReactionSortOrder] = useLocalStorage<
-  //   string[]
-  // >(`seqReactionSortOrder-${seqBatch?.id}`);
-
   const [gridState, setGridState] = useState({
-    // Available SeqBatchItems with no well coordinates.
+    // Available NsgSample with no well coordinates.
     availableItems: [] as NsgSample[],
-    // The grid of SeqBatchItems that have well coordinates.
+    // The grid of NsgSample that have well coordinates.
     cellGrid: {} as CellGrid<NsgSample>,
-    // SeqBatchItems that have been moved since data initialization.
+    // NsgSample that have been moved since data initialization.
     movedItems: [] as NsgSample[]
   });
 
@@ -270,7 +260,7 @@ export function useNsgSelectCoordinatesControls({
                 seqReactionId: item.id,
                 pcrBatchItemId: item.pcrBatchItem?.id,
                 storageUnitUsage: item.storageUnitUsage
-              } as SeqReactionSample)
+              } as NsgSample)
           )
         );
         const seqReactionCompleted = await fetchStorageUnitUsage(
@@ -306,15 +296,14 @@ export function useNsgSelectCoordinatesControls({
     }
   );
 
-  function moveItems(items: SeqReactionSample[], coords?: string) {
+  function moveItems(items: NsgSample[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
-      // Remove the SeqBatchItem from the grid.
-      const newCellGrid: CellGrid<SeqReactionSample> = omitBy(
-        cellGrid,
-        (item) => items.includes(item)
+      // Remove the NsgSample from the grid.
+      const newCellGrid: CellGrid<NsgSample> = omitBy(cellGrid, (item) =>
+        items.includes(item)
       );
 
-      // Remove the SeqBatchItem from the available SeqBatchItems.
+      // Remove the NsgSample from the available NsgSample.
       let newAvailableItems = availableItems.filter((s) => !items.includes(s));
       const newMovedItems = [...movedItems];
 
@@ -346,7 +335,7 @@ export function useNsgSelectCoordinatesControls({
             thisItemRowNumber + 64
           )}_${thisItemColumnNumber}`;
 
-          // If there is already a SeqBatchItem in this cell, move the existing SeqBatchItem back to the list.
+          // If there is already a NsgSample in this cell, move the existing NsgSample back to the list.
           const itemAlreadyInThisCell = newCellGrid[thisItemCoords];
           if (itemAlreadyInThisCell) {
             newAvailableItems.push(itemAlreadyInThisCell);
@@ -355,9 +344,9 @@ export function useNsgSelectCoordinatesControls({
             }
           }
 
-          // Only move the SeqBatchItem into the grid if the well is valid for this container type.
+          // Only move the NsgSample into the grid if the well is valid for this container type.
           if (newCellNumber <= numberOfColumns * numberOfRows) {
-            // Move the SeqBatchItem into the grid.
+            // Move the NsgSample into the grid.
             newCellGrid[thisItemCoords] = item;
           } else {
             newAvailableItems.push(item);
@@ -366,11 +355,11 @@ export function useNsgSelectCoordinatesControls({
           newCellNumber++;
         }
       } else {
-        // Add the SeqBatchItem to the list.
+        // Add the NsgSample to the list.
         newAvailableItems = [...newAvailableItems, ...items];
       }
 
-      // Set every SeqBatchItem passed into this function as moved.
+      // Set every NsgSample passed into this function as moved.
       for (const item of items) {
         if (!movedItems.includes(item)) {
           newMovedItems.push(item);
@@ -388,7 +377,7 @@ export function useNsgSelectCoordinatesControls({
     setSelectedItems([]);
   }
 
-  function onGridDrop(item: SeqReactionSample, coords: string) {
+  function onGridDrop(item: NsgSample, coords: string) {
     if (selectedItems.includes(item)) {
       moveItems(selectedItems, coords);
     } else {
@@ -396,7 +385,7 @@ export function useNsgSelectCoordinatesControls({
     }
   }
 
-  function onListDrop(item: { batchItemSample: SeqReactionSample }) {
+  function onListDrop(item: { batchItemSample: NsgSample }) {
     moveItems([item.batchItemSample]);
   }
 
@@ -426,7 +415,7 @@ export function useNsgSelectCoordinatesControls({
     try {
       const { cellGrid, movedItems } = gridState;
 
-      const materialSampleItemsToSave = movedItems.map((movedItem) => {
+      const libraryPrepsToSave = movedItems.map((movedItem) => {
         // Get the coords from the cell grid.
         const coords = Object.keys(cellGrid).find(
           (key) => cellGrid[key] === movedItem
@@ -455,7 +444,7 @@ export function useNsgSelectCoordinatesControls({
 
       // Save storageUnitUsage resources with valid wellColumn and wellRow
       const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] =
-        materialSampleItemsToSave
+        libraryPrepsToSave
           .filter(
             (item) =>
               item.storageUnitUsage?.wellColumn &&
@@ -480,7 +469,7 @@ export function useNsgSelectCoordinatesControls({
           })
         : [];
 
-      const saveArgs = materialSampleItemsToSave.map((item) => {
+      const saveArgs = libraryPrepsToSave.map((item) => {
         const matchedStorageUnitUsage = savedStorageUnitUsages.find(
           (storageUsage) =>
             storageUsage.wellColumn === item.storageUnitUsage?.wellColumn &&
@@ -489,27 +478,27 @@ export function useNsgSelectCoordinatesControls({
 
         return {
           resource: {
-            type: "seq-reaction",
+            type: "library-prep",
             id: item.seqReactionId,
             relationships: {
-              seqBatch: {
-                data: {
-                  id: item.seqBatchId,
-                  type: "seq-batch"
-                }
-              },
-              pcrBatchItem: {
-                data: {
-                  id: item.pcrBatchItemId,
-                  type: "pcr-batch-item"
-                }
-              },
-              seqPrimer: {
-                data: {
-                  id: item.primerId,
-                  type: "pcr-primer"
-                }
-              },
+              // seqBatch: {
+              //   data: {
+              //     id: item.seqBatchId,
+              //     type: "seq-batch"
+              //   }
+              // },
+              // pcrBatchItem: {
+              //   data: {
+              //     id: item.pcrBatchItemId,
+              //     type: "pcr-batch-item"
+              //   }
+              // },
+              // seqPrimer: {
+              //   data: {
+              //     id: item.primerId,
+              //     type: "pcr-primer"
+              //   }
+              // },
               storageUnitUsage: {
                 data: matchedStorageUnitUsage
                   ? pick(matchedStorageUnitUsage, "id", "type")
@@ -524,7 +513,7 @@ export function useNsgSelectCoordinatesControls({
       await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
 
       // Delete storageUnitUsage resources without wellColumn or wellRow (presumably removed from grid)
-      const deleteStorageUnitUsageArgs: DeleteArgs[] = materialSampleItemsToSave
+      const deleteStorageUnitUsageArgs: DeleteArgs[] = libraryPrepsToSave
         .filter(
           (item) =>
             (!item.storageUnitUsage?.wellColumn ||

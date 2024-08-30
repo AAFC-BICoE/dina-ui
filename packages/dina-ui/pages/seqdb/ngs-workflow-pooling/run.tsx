@@ -17,7 +17,8 @@ export function useLibraryPoolQuery(id?: string, deps?: any[]) {
   return useQuery<LibraryPool>(
     {
       path: `seqdb-api/library-pool/${id}`,
-      include: "containerType,product,protocol,thermocyclerProfile"
+      include:
+        "product,protocol,thermocyclerProfile,storageUnit,storageUnitType"
     },
     { disabled: !id, deps }
   );
