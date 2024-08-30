@@ -20,7 +20,6 @@ interface LibraryPrepBatchAttributes {
 }
 
 interface LibraryPrepBatchRelationships {
-  containerType?: ContainerType;
   product?: Product;
   protocol?: Protocol;
   indexSet?: IndexSet;
