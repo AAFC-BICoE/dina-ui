@@ -8,7 +8,7 @@ import { LoadingSpinner, useApiClient } from "../../../common-ui/lib";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
 import { ErrorBanner } from "../error/ErrorBanner";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface StorageUnitGridProps {
   storageUnit: StorageUnit;
