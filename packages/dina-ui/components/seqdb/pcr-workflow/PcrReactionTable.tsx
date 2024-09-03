@@ -201,8 +201,8 @@ export function PcrReactionTable({
       accessorKey: "tubeNumber",
       sortingFn: (a: any, b: any): number =>
         compareByStringAndNumber(
-          a.original.storageUnitUsage.cellNumber.toString(),
-          b.original.storageUnitUsage.cellNumber.toString()
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
         )
     },
     {
