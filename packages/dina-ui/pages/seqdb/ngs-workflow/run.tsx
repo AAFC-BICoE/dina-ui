@@ -253,17 +253,18 @@ export default function NgsWorkFlowRunPage() {
             />
           )}
         </TabPanel>
-        {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
-          <NgsSampleSelectCoordinatesStep
-            libraryPrepBatchId={libraryPrepBatchId}
-            libraryPrepBatch={libraryPrepBatch.response?.data}
-            editMode={editMode}
-            setEditMode={setEditMode}
-            performSave={performSave}
-            setPerformSave={setPerformSave}
-          />
-        )}
-        <TabPanel />
+        <TabPanel>
+          {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
+            <NgsSampleSelectCoordinatesStep
+              libraryPrepBatchId={libraryPrepBatchId}
+              libraryPrepBatch={libraryPrepBatch.response?.data}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
+        </TabPanel>
       </Tabs>
     </PageLayout>
   );

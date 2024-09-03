@@ -128,6 +128,21 @@ export function LibraryPrepBatchForm({
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
+    // Storage unit type is not stored, used to help filter the storage unit dropdown.
+    delete submittedValues.storageUnitType;
+    if (submittedValues.storageUnit) {
+      (submittedValues as any).relationships.storageUnit = {
+        data:
+          submittedValues.storageUnit.id !== null
+            ? {
+                id: submittedValues.storageUnit.id,
+                type: "storage-unit"
+              }
+            : null
+      };
+      delete submittedValues.storageUnit;
+    }
+
     if (submittedValues.product) {
       (submittedValues as any).relationships.product = {
         data:

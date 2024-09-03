@@ -23,7 +23,9 @@ interface NsgSelectCoordinatesControlsProps {
 
 export interface NsgSample {
   libraryPrepId?: string;
+  libraryPrep?: LibraryPrep;
   libraryPrepBatchId?: string;
+  libraryPrepBatch?: LibraryPrepBatch;
   storageUnitUsage?: StorageUnitUsage;
   sampleId?: string;
   sampleName?: string;
@@ -250,16 +252,20 @@ export function useNsgSelectCoordinatesControls({
           });
         }
 
-        const seqReactionAndPcrBatchItem = compact(
+        const libraryPrepsAndLibraryPrepBatch = compact(
           libraryPreps.map(
             (item) =>
               ({
-                storageUnitUsage: item.storageUnitUsage
+                storageUnitUsage: item.storageUnitUsage,
+                libraryPrep: item,
+                libraryPrepBatch,
+                libraryPrepBatchId,
+                libraryPrepId: item.id
               } as NsgSample)
           )
         );
         const ngsSamplesCompleted = await fetchStorageUnitUsage(
-          seqReactionAndPcrBatchItem
+          libraryPrepsAndLibraryPrepBatch
         );
 
         const libraryPrepItems = compact(
