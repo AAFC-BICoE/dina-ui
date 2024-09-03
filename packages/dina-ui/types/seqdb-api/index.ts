@@ -1,4 +1,3 @@
-export * from "./resources/ContainerType";
 export * from "./resources/PcrBatch";
 export * from "./resources/PcrBatchItem";
 export * from "./resources/PcrPrimer";

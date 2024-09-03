@@ -67,7 +67,7 @@ export function NgsSampleSelectionStep({
 
   const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
     string[]
-  >(`pcrWorkflowMaterialSampleSortOrder-${batchId}`);
+  >(`ngsMaterialSampleSortOrder-${batchId}`);
 
   /**
    * When the page is first loaded, check if saved samples has already been chosen and reload them.
