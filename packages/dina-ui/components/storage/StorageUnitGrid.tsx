@@ -37,7 +37,7 @@ export default function StorageUnitGrid({
           <ErrorBanner
             key={coordinate}
             errorMessage={formatMessage("multipleSamplesWellCoordinates", {
-              wellCoordinate: coordinate,
+              wellCoordinate: coordinate.replace("_", ""),
               samples: samples.join(", ")
             })}
           />
