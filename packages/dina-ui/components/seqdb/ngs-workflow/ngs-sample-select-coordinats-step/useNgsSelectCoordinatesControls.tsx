@@ -42,11 +42,11 @@ export function useNsgSelectCoordinatesControls({
   // Whether the grid is submitting.
   const [submitting, setSubmitting] = useState(false);
 
-  // Highlighted/selected SeqBatchItems.
+  // Highlighted/selected library prep items.
   const [selectedItems, setSelectedItems] = useState<NsgSample[]>([]);
   const lastSelectedItemRef = useRef<NsgSample>();
 
-  // Grid fill direction when you move multiple SeqBatchItems into the grid.
+  // Grid fill direction when you move multiple library prep items into the grid.
   const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");
 
   const [lastSave, setLastSave] = useState<number>();
@@ -114,7 +114,7 @@ export function useNsgSelectCoordinatesControls({
     if (!ngsSamples) return;
 
     fetchSamples((materialSamples) => {
-      const seqBatchItemsWithSampleNames = ngsSamples.map<NsgSample>(
+      const libraryPrepItemsWithSampleNames = ngsSamples.map<NsgSample>(
         (ngsSample) => {
           const foundSample = materialSamples.find(
             (sample) => sample.id === ngsSample.sampleId
@@ -127,26 +127,26 @@ export function useNsgSelectCoordinatesControls({
         }
       );
 
-      const seqBatchItemsWithCoords = seqBatchItemsWithSampleNames.filter(
+      const libraryPrepItemsWithCoords = libraryPrepItemsWithSampleNames.filter(
         (item) =>
           item?.storageUnitUsage?.wellRow && item?.storageUnitUsage?.wellColumn
       );
 
-      const seqBatchItemsNoCoords = seqBatchItemsWithSampleNames.filter(
+      const libraryPrepItemsNoCoords = libraryPrepItemsWithSampleNames.filter(
         (item) =>
           !item?.storageUnitUsage?.wellRow &&
           !item?.storageUnitUsage?.wellColumn
       );
 
       const newCellGrid: CellGrid<NsgSample> = {};
-      seqBatchItemsWithCoords.forEach((item) => {
+      libraryPrepItemsWithCoords.forEach((item) => {
         newCellGrid[
           `${item?.storageUnitUsage?.wellRow}_${item.storageUnitUsage?.wellColumn}`
         ] = item;
       });
 
       setGridState({
-        availableItems: sortAvailableItems(seqBatchItemsNoCoords), // seqBatchItemsNoCoords?.sort(itemSort),
+        availableItems: sortAvailableItems(libraryPrepItemsNoCoords),
         cellGrid: newCellGrid,
         movedItems: []
       });
@@ -283,13 +283,12 @@ export function useNsgSelectCoordinatesControls({
 
         setNgsSamples(
           ngsSamplesCompleted.map((rec) => {
-            const pcrBatchItem = libraryPrepItems.find(
+            const libraryPrep = libraryPrepItems.find(
               (item) => item.id === rec.libraryPrepId
             );
             return {
               ...rec,
-              pcrBatchItemId: pcrBatchItem?.id,
-              sampleId: pcrBatchItem?.materialSample?.id
+              sampleId: libraryPrep?.materialSample?.id
             };
           })
         );
