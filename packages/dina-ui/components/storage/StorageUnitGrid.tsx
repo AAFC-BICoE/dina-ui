@@ -1,12 +1,14 @@
 import React from "react";
 import { CellGrid, ContainerGrid } from "../seqdb/container-grid/ContainerGrid";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { isArray, noop } from "lodash";
 import { PersistedResource } from "kitsu";
 import { LoadingSpinner, useApiClient } from "../../../common-ui/lib";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
+import { ErrorBanner } from "../error/ErrorBanner";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface StorageUnitGridProps {
   storageUnit: StorageUnit;
@@ -18,16 +20,29 @@ export default function StorageUnitGrid({
   materialSamples
 }: StorageUnitGridProps) {
   const [loading, setLoading] = useState<boolean>(false);
-  const { cellGrid } = useGridCoordinatesControls({
-    materialSamples,
-    storageUnit,
-    setLoading
-  });
+  const { formatMessage } = useDinaIntl();
+  const { cellGrid, multipleSamplesWellCoordinates } =
+    useGridCoordinatesControls({
+      materialSamples,
+      storageUnit,
+      setLoading
+    });
 
   return loading ? (
     <LoadingSpinner loading={true} />
   ) : (
     <div>
+      {multipleSamplesWellCoordinates.current.map(({ coordinate, samples }) => {
+        return (
+          <ErrorBanner
+            key={coordinate}
+            errorMessage={formatMessage("multipleSamplesWellCoordinates", {
+              wellCoordinate: coordinate.replace("_", ""),
+              samples: samples.join(", ")
+            })}
+          />
+        );
+      })}
       <ContainerGrid
         className="mb-3"
         batch={{
@@ -43,7 +58,7 @@ export default function StorageUnitGrid({
   );
 }
 
-export interface MaterialSampleSelectCoordinatesControls {
+export interface GridCoordinatesControls {
   materialSamples?: PersistedResource<MaterialSample>[] | undefined;
   storageUnit: StorageUnit;
   setLoading?: (isLoading: boolean) => void;
@@ -52,19 +67,64 @@ export function useGridCoordinatesControls({
   materialSamples,
   storageUnit,
   setLoading
-}: MaterialSampleSelectCoordinatesControls) {
+}: GridCoordinatesControls) {
   const [gridState, setGridState] = useState({
-    // The grid of SeqBatchItems that have well coordinates.
     cellGrid: {} as CellGrid<MaterialSample & { sampleName?: string }>,
-    // SeqBatchItems that have been moved since data initialization.
     movedItems: [] as (MaterialSample & { sampleName?: string })[]
   });
+
+  // Change to track an array of objects with well coordinate and associated samples.
+  const multipleSamplesWellCoordinates = useRef<
+    { coordinate: string; samples: string[] }[]
+  >([]);
+
   const { apiClient } = useApiClient();
 
-  async function fetchStorageUnitUsages() {
+  async function getGridState() {
+    setLoading?.(true);
     const newCellGrid: CellGrid<any> = {};
+    if (isArray(materialSamples) && materialSamples.length > 0) {
+      const storageUnitUsages = materialSamples.map(
+        (sample) => sample.storageUnitUsage
+      );
+      materialSamples.forEach((materialSample) => {
+        const storageUnitUsage = storageUnitUsages.find(
+          (usage) => usage?.id === materialSample?.storageUnitUsage?.id
+        );
+        if (storageUnitUsage) {
+          const key = `${storageUnitUsage?.wellRow?.toUpperCase()}_${
+            storageUnitUsage?.wellColumn
+          }`;
+
+          if (newCellGrid[key]) {
+            // Update the existing entry for multiple samples
+            const existingEntry = multipleSamplesWellCoordinates.current.find(
+              (entry) => entry.coordinate === key
+            );
+
+            if (existingEntry) {
+              existingEntry.samples.push(
+                materialSample.materialSampleName ?? ""
+              );
+            } else {
+              multipleSamplesWellCoordinates.current.push({
+                coordinate: key,
+                samples: [
+                  newCellGrid[key].sampleName,
+                  materialSample.materialSampleName
+                ]
+              });
+            }
+          } else {
+            newCellGrid[key] = {
+              sampleName: materialSample.materialSampleName
+            };
+          }
+        }
+      });
+    }
+
     try {
-      setLoading?.(true);
       const storageUnitUsagesQuery = await apiClient.get<StorageUnitUsage[]>(
         "collection-api/storage-unit-usage/",
         {
@@ -72,41 +132,55 @@ export function useGridCoordinatesControls({
           filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` }
         }
       );
-      if (storageUnitUsagesQuery.data.length > 0) {
-        storageUnitUsagesQuery.data.forEach(async (storageUnitUsage) => {
-          if (storageUnitUsage.usageType === "pcr-batch-item") {
-            const pcrBatchItemQuery = await apiClient.get<PcrBatchItem[]>(
-              `seqdb-api/pcr-batch-item`,
-              {
-                include: "materialSample",
-                filter: { "storageUnitUsage.uuid": storageUnitUsage?.id }
-              }
-            );
-            const pcrBatchItem = pcrBatchItemQuery.data[0];
 
-            if (pcrBatchItem) {
-              await getCellGrid(pcrBatchItem, storageUnitUsage);
-            }
-          } else if (storageUnitUsage.usageType === "seq-reaction") {
-            const seqReactionQuery = await apiClient.get<SeqReaction[]>(
-              `seqdb-api/seq-reaction`,
-              {
-                include: "pcrBatchItem",
-                filter: { "storageUnitUsage.uuid": storageUnitUsage?.id }
+      if (storageUnitUsagesQuery.data.length > 0) {
+        // Use map to return an array of promises
+        const gridPromises = storageUnitUsagesQuery.data.map(
+          async (storageUnitUsage) => {
+            if (storageUnitUsage.usageType === "pcr-batch-item") {
+              const pcrBatchItemQuery = await apiClient.get<PcrBatchItem[]>(
+                `seqdb-api/pcr-batch-item`,
+                {
+                  include: "materialSample",
+                  filter: { "storageUnitUsage.uuid": storageUnitUsage?.id }
+                }
+              );
+              const pcrBatchItem = pcrBatchItemQuery.data[0];
+              if (pcrBatchItem) {
+                await getCellGrid(pcrBatchItem, storageUnitUsage);
               }
-            );
-            const seqReaction = seqReactionQuery.data[0];
-            if (seqReaction && seqReaction.pcrBatchItem) {
-              await getCellGrid(seqReaction.pcrBatchItem, storageUnitUsage);
+            } else if (storageUnitUsage.usageType === "seq-reaction") {
+              const seqReactionQuery = await apiClient.get<SeqReaction[]>(
+                `seqdb-api/seq-reaction`,
+                {
+                  include: "pcrBatchItem",
+                  filter: { "storageUnitUsage.uuid": storageUnitUsage?.id }
+                }
+              );
+              const seqReaction = seqReactionQuery.data[0];
+              if (seqReaction && seqReaction.pcrBatchItem) {
+                await getCellGrid(seqReaction.pcrBatchItem, storageUnitUsage);
+              }
+            } else {
+              console.error("Unexpected usage type.");
             }
-          } else {
-            console.error("Unexpected usage type.");
           }
-        });
+        );
+
+        // Await all the promises
+        await Promise.all(gridPromises);
       }
-      setLoading?.(false);
+
+      // Initialize grid state
+      setGridState({
+        cellGrid: newCellGrid,
+        movedItems: []
+      });
     } catch (error) {
-      throw error;
+      console.error("Error fetching grid state:", error);
+    } finally {
+      // Ensure setLoading is called after all async operations complete
+      setLoading?.(false);
     }
 
     async function getCellGrid(
@@ -127,46 +201,36 @@ export function useGridCoordinatesControls({
         {}
       );
       const materialSample = materialSampleQuery.data;
-      newCellGrid[
-        `${storageUnitUsage?.wellRow?.toUpperCase()}_${
-          storageUnitUsage?.wellColumn
-        }`
-      ] = { sampleName: materialSample.materialSampleName };
-      // Initialize grid state
-      setGridState({
-        cellGrid: newCellGrid,
-        movedItems: []
-      });
+      const key = `${storageUnitUsage?.wellRow?.toUpperCase()}_${
+        storageUnitUsage?.wellColumn
+      }`;
+
+      if (newCellGrid[key]) {
+        // Update the existing entry for multiple samples
+        const existingEntry = multipleSamplesWellCoordinates.current.find(
+          (entry) => entry.coordinate === key
+        );
+
+        if (existingEntry) {
+          existingEntry.samples.push(materialSample.materialSampleName ?? "");
+        } else {
+          multipleSamplesWellCoordinates.current.push({
+            coordinate: key,
+            samples: [
+              newCellGrid[key].sampleName,
+              materialSample.materialSampleName
+            ]
+          });
+        }
+      } else {
+        newCellGrid[key] = { sampleName: materialSample.materialSampleName };
+      }
     }
   }
 
   useEffect(() => {
-    if (isArray(materialSamples) && materialSamples.length > 0) {
-      const newCellGrid: CellGrid<any> = {};
-      const storageUnitUsages = materialSamples?.map(
-        (sample) => sample.storageUnitUsage
-      );
-      materialSamples.forEach((item) => {
-        const storageUnitUsage = storageUnitUsages?.find(
-          (usage) => usage?.id === item?.storageUnitUsage?.id
-        );
-        if (storageUnitUsage) {
-          newCellGrid[
-            `${storageUnitUsage?.wellRow?.toUpperCase()}_${
-              storageUnitUsage?.wellColumn
-            }`
-          ] = { sampleName: item.materialSampleName };
-        }
-      });
-      // Initialize grid state
-      setGridState({
-        cellGrid: newCellGrid,
-        movedItems: []
-      });
-    } else {
-      fetchStorageUnitUsages();
-    }
+    getGridState();
   }, []);
 
-  return { ...gridState };
+  return { ...gridState, multipleSamplesWellCoordinates };
 }

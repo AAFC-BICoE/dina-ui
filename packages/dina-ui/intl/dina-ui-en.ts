@@ -1040,5 +1040,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbook_confirmation_view: "View Imported Material Samples",
   storageUnit_duplicate_title: "Storage Unit Name already exists",
   storageUnit_duplicate_body:
-    'The name "{duplicatedName}" is already in use for another storage unit in this group. Would you still like to proceed?'
+    'The name "{duplicatedName}" is already in use for another storage unit in this group. Would you still like to proceed?',
+  multipleSamplesWellCoordinates:
+    "Well coordinate {wellCoordinate} has multiple material samples: {samples}."
 };
