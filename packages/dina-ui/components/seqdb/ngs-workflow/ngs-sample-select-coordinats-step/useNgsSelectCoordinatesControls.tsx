@@ -61,7 +61,7 @@ export function useNsgSelectCoordinatesControls({
 
   const [ngsSamplesSortOrder, setNgsSamplesSortOrder] = useLocalStorage<
     string[]
-  >(`ngsSamplesSortOrder-${libraryPrepBatch?.id}`);
+  >(`ngsMaterialSampleSortOrder-${libraryPrepBatch?.id}`);
 
   const [gridState, setGridState] = useState({
     // Available NsgSample with no well coordinates.
@@ -159,14 +159,14 @@ export function useNsgSelectCoordinatesControls({
       const sorted = ngsSamplesSortOrder.map((reactionId) =>
         ngsSampleArray.find((item) => {
           const tempId: (string | undefined)[] = [];
-          tempId.push(item.libraryPrepId);
+          tempId.push(item.sampleId);
           const id = compact(tempId).join("_");
           return id === reactionId;
         })
       );
       ngsSampleArray.forEach((item) => {
         const tempId: (string | undefined)[] = [];
-        tempId.push(item.libraryPrepId);
+        tempId.push(item.sampleId);
         const id = compact(tempId).join("_");
         if (ngsSamplesSortOrder.indexOf(id) === -1) {
           sorted.push(item);
@@ -486,6 +486,12 @@ export function useNsgSelectCoordinatesControls({
                 data: {
                   id: item.libraryPrepBatchId,
                   type: "library-prep-batch"
+                }
+              },
+              materialSample: {
+                data: {
+                  id: item.sampleId,
+                  type: "material-sample"
                 }
               },
               storageUnitUsage: {
