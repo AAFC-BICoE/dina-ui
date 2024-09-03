@@ -4,6 +4,7 @@ import { Product } from "../Product";
 import { ThermocyclerProfile } from "../ThermocyclerProfile";
 import { IndexSet } from "./IndexSet";
 import { LibraryPrep } from "./LibraryPrep";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 interface LibraryPrepBatchAttributes {
   type: "library-prep-batch";
@@ -24,6 +25,7 @@ interface LibraryPrepBatchRelationships {
   indexSet?: IndexSet;
   thermocyclerProfile?: ThermocyclerProfile;
   libraryPreps?: LibraryPrep[];
+  storageUnit?: ResourceIdentifierObject;
 }
 
 export type LibraryPrepBatch = KitsuResource &

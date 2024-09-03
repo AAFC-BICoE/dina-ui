@@ -229,7 +229,7 @@ export function LoadExternalDataForLibraryPrepBatchForm({
 /** Re-usable field layout between edit and view pages. */
 function LibraryPrepBatchFormFields() {
   const { readOnly } = useDinaFormContext();
-  const { values } = useFormikContext<Partial<LibraryPrepBatch>>();
+  const { values } = useFormikContext<any>();
 
   // When the storage unit type is changed, the storage unit needs to be cleared.
   const StorageUnitTypeSelectorComponent = connect(

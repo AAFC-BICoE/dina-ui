@@ -10,8 +10,8 @@ import { DraggableItemList } from "../container-grid/DraggableItemList";
 import { ContainerGrid } from "../container-grid/ContainerGrid";
 
 export interface NgsSampleSelectCoordinatesStepProps {
-  batchId: string;
-  batch: LibraryPrepBatch;
+  libraryPrepBatchId: string;
+  libraryPrepBatch: LibraryPrepBatch;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
@@ -21,8 +21,14 @@ export interface NgsSampleSelectCoordinatesStepProps {
 export function NgsSampleSelectCoordinatesStep(
   props: NgsSampleSelectCoordinatesStepProps
 ) {
-  const { batchId, batch, editMode, setEditMode, performSave, setPerformSave } =
-    props;
+  const {
+    libraryPrepBatchId,
+    libraryPrepBatch,
+    editMode,
+    setEditMode,
+    performSave,
+    setPerformSave
+  } = props;
 
   const {
     availableItems,
@@ -41,8 +47,8 @@ export function NgsSampleSelectCoordinatesStep(
     isStorage,
     gridIsPopulated
   } = useNsgSelectCoordinatesControls({
-    batchId,
-    batch
+    libraryPrepBatchId,
+    libraryPrepBatch
   });
 
   // Check if a save was requested from the top level button bar.
@@ -145,7 +151,7 @@ export function NgsSampleSelectCoordinatesStep(
             LibraryPrepBatch & { gridLayoutDefinition?: any },
             NsgSample
           >
-            batch={batch}
+            batch={libraryPrepBatch}
             cellGrid={cellGrid}
             movedItems={movedItems}
             onDrop={onGridDrop}

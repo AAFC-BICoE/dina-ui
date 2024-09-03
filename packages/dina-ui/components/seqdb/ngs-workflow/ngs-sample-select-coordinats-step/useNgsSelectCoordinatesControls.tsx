@@ -12,30 +12,26 @@ import {
   StorageUnit
 } from "packages/dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import {
-  LibraryPrepBatch,
-  PcrBatchItem,
-  SeqReaction
-} from "../../../../types/seqdb-api";
+import { LibraryPrep, LibraryPrepBatch } from "../../../../types/seqdb-api";
 import { CellGrid } from "../../container-grid/ContainerGrid";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 interface NsgSelectCoordinatesControlsProps {
-  batchId: string;
-  batch: LibraryPrepBatch;
+  libraryPrepBatchId: string;
+  libraryPrepBatch: LibraryPrepBatch;
 }
 
 export interface NsgSample {
-  batchId?: string;
-  pcrBatchItemId?: string;
+  libraryPrepId?: string;
+  libraryPrepBatchId?: string;
   storageUnitUsage?: StorageUnitUsage;
   sampleId?: string;
   sampleName?: string;
 }
 
 export function useNsgSelectCoordinatesControls({
-  batchId,
-  batch
+  libraryPrepBatchId,
+  libraryPrepBatch
 }: NsgSelectCoordinatesControlsProps) {
   const { save, bulkGet, apiClient } = useContext(ApiClientContext);
 
@@ -57,7 +53,13 @@ export function useNsgSelectCoordinatesControls({
 
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
 
+  const [ngsSamples, setNgsSamples] = useState<NsgSample[]>();
+
   const [isStorage, setIsStorage] = useState<boolean>(false);
+
+  const [ngsSamplesSortOrder, setNgsSamplesSortOrder] = useLocalStorage<
+    string[]
+  >(`ngsSamplesSortOrder-${libraryPrepBatch?.id}`);
 
   const [gridState, setGridState] = useState({
     // Available NsgSample with no well coordinates.
@@ -75,23 +77,23 @@ export function useNsgSelectCoordinatesControls({
   );
 
   useEffect(() => {
-    if (!batch || !batch.storageUnit) return;
+    if (!libraryPrepBatch || !libraryPrepBatch.storageUnit) return;
 
     async function fetchStorageUnitTypeLayout() {
       const storageUnitReponse = await apiClient.get<StorageUnit>(
-        `/collection-api/storage-unit/${seqBatch?.storageUnit?.id}`,
+        `/collection-api/storage-unit/${libraryPrepBatch?.storageUnit?.id}`,
         { include: "storageUnitType" }
       );
       if (storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition) {
         const gridLayoutDefinition =
           storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition;
         set(
-          seqBatch,
+          libraryPrepBatch,
           "gridLayoutDefinition.numberOfColumns",
           gridLayoutDefinition.numberOfColumns
         );
         set(
-          seqBatch,
+          libraryPrepBatch,
           "gridLayoutDefinition.numberOfRows",
           gridLayoutDefinition.numberOfRows
         );
@@ -104,23 +106,24 @@ export function useNsgSelectCoordinatesControls({
       }
     }
     fetchStorageUnitTypeLayout();
-  }, [seqBatch]);
+  }, [libraryPrepBatch]);
 
   useEffect(() => {
-    if (!seqReactionSamples) return;
+    if (!ngsSamples) return;
 
     fetchSamples((materialSamples) => {
-      const seqBatchItemsWithSampleNames =
-        seqReactionSamples.map<SeqReactionSample>((reaction) => {
+      const seqBatchItemsWithSampleNames = ngsSamples.map<NsgSample>(
+        (ngsSample) => {
           const foundSample = materialSamples.find(
-            (sample) => sample.id === reaction.sampleId
+            (sample) => sample.id === ngsSample.sampleId
           );
           return {
-            ...reaction,
+            ...ngsSample,
             sampleId: foundSample?.id,
             sampleName: foundSample?.materialSampleName ?? foundSample?.id
           };
-        });
+        }
+      );
 
       const seqBatchItemsWithCoords = seqBatchItemsWithSampleNames.filter(
         (item) =>
@@ -133,7 +136,7 @@ export function useNsgSelectCoordinatesControls({
           !item?.storageUnitUsage?.wellColumn
       );
 
-      const newCellGrid: CellGrid<SeqReactionSample> = {};
+      const newCellGrid: CellGrid<NsgSample> = {};
       seqBatchItemsWithCoords.forEach((item) => {
         newCellGrid[
           `${item?.storageUnitUsage?.wellRow}_${item.storageUnitUsage?.wellColumn}`
@@ -147,31 +150,29 @@ export function useNsgSelectCoordinatesControls({
       });
       setItemsLoading(false);
     });
-  }, [seqReactionSamples]);
+  }, [ngsSamples]);
 
-  function sortAvailableItems(reactionSamples: SeqReactionSample[]) {
-    if (seqReactionSortOrder) {
-      const sorted = seqReactionSortOrder.map((reactionId) =>
-        reactionSamples.find((item) => {
+  function sortAvailableItems(ngsSampleArray: NsgSample[]) {
+    if (ngsSamplesSortOrder) {
+      const sorted = ngsSamplesSortOrder.map((reactionId) =>
+        ngsSampleArray.find((item) => {
           const tempId: (string | undefined)[] = [];
-          tempId.push(item.pcrBatchItemId);
-          tempId.push(item.primerId);
+          tempId.push(item.libraryPrepId);
           const id = compact(tempId).join("_");
           return id === reactionId;
         })
       );
-      reactionSamples.forEach((item) => {
+      ngsSampleArray.forEach((item) => {
         const tempId: (string | undefined)[] = [];
-        tempId.push(item.pcrBatchItemId);
-        tempId.push(item.primerId);
+        tempId.push(item.libraryPrepId);
         const id = compact(tempId).join("_");
-        if (seqReactionSortOrder.indexOf(id) === -1) {
+        if (ngsSamplesSortOrder.indexOf(id) === -1) {
           sorted.push(item);
         }
       });
       return compact(sorted);
     } else {
-      return compact(reactionSamples);
+      return compact(ngsSampleArray);
     }
   }
 
@@ -180,10 +181,10 @@ export function useNsgSelectCoordinatesControls({
    * operation.
    */
   async function fetchSamples(callback: (response: MaterialSample[]) => void) {
-    if (!seqReactionSamples) return;
+    if (!ngsSamples) return;
 
     await bulkGet<MaterialSample>(
-      seqReactionSamples
+      ngsSamples
         .filter((item) => item.sampleId)
         .map((item) => "/material-sample/" + item.sampleId),
       { apiBaseUrl: "/collection-api" }
@@ -200,36 +201,36 @@ export function useNsgSelectCoordinatesControls({
     });
   }
 
-  // SeqBatchItem queries.
-  const { loading: materialSampleItemsLoading } = useQuery<SeqReaction[]>(
+  // LibraryPrep queries.
+  const { loading: materialSampleItemsLoading } = useQuery<LibraryPrep[]>(
     {
       filter: filterBy([], {
         extraFilters: [
           {
-            selector: "seqBatch.uuid",
+            selector: "libraryPrepBatch.uuid",
             comparison: "==",
-            arguments: seqBatchId
+            arguments: libraryPrepBatchId
           }
         ]
       })(""),
       page: { limit: 1000 },
-      path: `/seqdb-api/seq-reaction`,
-      include: "pcrBatchItem,seqBatch,seqPrimer,storageUnitUsage"
+      path: `/seqdb-api/library-prep`,
+      include: "storageUnitUsage"
     },
     {
       deps: [lastSave],
-      onSuccess: async ({ data: seqReactions }) => {
+      onSuccess: async ({ data: libraryPreps }) => {
         setItemsLoading(true);
 
         /**
-         * Fetch StorageUnitUsage linked to each SeqReactions
+         * Fetch Storage Unit Usage linked to each Library Prep
          * @returns
          */
         async function fetchStorageUnitUsage(
-          seqReactionSamp: SeqReactionSample[]
-        ): Promise<SeqReactionSample[]> {
+          ngsSamplesArray: NsgSample[]
+        ): Promise<NsgSample[]> {
           const storageUnitUsageQuery = await bulkGet<StorageUnitUsage>(
-            seqReactionSamp
+            ngsSamplesArray
               .filter((item) => item.storageUnitUsage?.id)
               .map(
                 (item) => "/storage-unit-usage/" + item.storageUnitUsage?.id
@@ -237,41 +238,35 @@ export function useNsgSelectCoordinatesControls({
             { apiBaseUrl: "/collection-api" }
           );
 
-          return seqReactionSamp.map((seqReaction) => {
+          return ngsSamplesArray.map((ngsSample) => {
             const queryStorageUnitUsage = storageUnitUsageQuery.find(
               (storageUnitUsage) =>
-                storageUnitUsage?.id === seqReaction.storageUnitUsage?.id
+                storageUnitUsage?.id === ngsSample.storageUnitUsage?.id
             );
             return {
-              ...seqReaction,
+              ...ngsSample,
               storageUnitUsage: queryStorageUnitUsage as StorageUnitUsage
             };
           });
         }
 
         const seqReactionAndPcrBatchItem = compact(
-          seqReactions.map(
+          libraryPreps.map(
             (item) =>
               ({
-                seqBatchId: item.seqBatch?.id,
-                primerId: item.seqPrimer?.id,
-                primerDirection: item.seqPrimer?.direction,
-                primerName: item.seqPrimer?.name,
-                seqReactionId: item.id,
-                pcrBatchItemId: item.pcrBatchItem?.id,
                 storageUnitUsage: item.storageUnitUsage
               } as NsgSample)
           )
         );
-        const seqReactionCompleted = await fetchStorageUnitUsage(
+        const ngsSamplesCompleted = await fetchStorageUnitUsage(
           seqReactionAndPcrBatchItem
         );
 
-        const pcrBatchItems = compact(
-          await bulkGet<PcrBatchItem, true>(
-            seqReactionCompleted?.map(
+        const libraryPrepItems = compact(
+          await bulkGet<LibraryPrep, true>(
+            ngsSamplesCompleted?.map(
               (item) =>
-                `/pcr-batch-item/${item.pcrBatchItemId}?include=materialSample`
+                `/library-prep/${item.libraryPrepId}?include=materialSample`
             ),
             {
               apiBaseUrl: "/seqdb-api",
@@ -280,10 +275,10 @@ export function useNsgSelectCoordinatesControls({
           )
         );
 
-        setSeqReactionSamples(
-          seqReactionCompleted.map((rec) => {
-            const pcrBatchItem = pcrBatchItems.find(
-              (item) => item.id === rec.pcrBatchItemId
+        setNgsSamples(
+          ngsSamplesCompleted.map((rec) => {
+            const pcrBatchItem = libraryPrepItems.find(
+              (item) => item.id === rec.libraryPrepId
             );
             return {
               ...rec,
@@ -455,7 +450,7 @@ export function useNsgSelectCoordinatesControls({
             resource: {
               wellColumn: item.storageUnitUsage?.wellColumn,
               wellRow: item.storageUnitUsage?.wellRow,
-              storageUnit: seqBatch.storageUnit,
+              storageUnit: libraryPrepBatch.storageUnit,
               type: "storage-unit-usage",
               id: item.storageUnitUsage?.id,
               usageType: "seq-reaction"
@@ -479,26 +474,14 @@ export function useNsgSelectCoordinatesControls({
         return {
           resource: {
             type: "library-prep",
-            id: item.seqReactionId,
+            id: item.libraryPrepId,
             relationships: {
-              // seqBatch: {
-              //   data: {
-              //     id: item.seqBatchId,
-              //     type: "seq-batch"
-              //   }
-              // },
-              // pcrBatchItem: {
-              //   data: {
-              //     id: item.pcrBatchItemId,
-              //     type: "pcr-batch-item"
-              //   }
-              // },
-              // seqPrimer: {
-              //   data: {
-              //     id: item.primerId,
-              //     type: "pcr-primer"
-              //   }
-              // },
+              libraryPrepBatch: {
+                data: {
+                  id: item.libraryPrepBatchId,
+                  type: "library-prep-batch"
+                }
+              },
               storageUnitUsage: {
                 data: matchedStorageUnitUsage
                   ? pick(matchedStorageUnitUsage, "id", "type")
@@ -506,7 +489,7 @@ export function useNsgSelectCoordinatesControls({
               }
             }
           },
-          type: "seq-reaction"
+          type: "library-prep"
         };
       });
 

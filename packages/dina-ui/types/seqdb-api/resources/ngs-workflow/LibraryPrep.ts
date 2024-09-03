@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { NgsIndex } from "./NgsIndex";
 import { LibraryPrepBatch } from "./LibraryPrepBatch";
-import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 interface LibraryPrepAttributes {
   type: "library-prep";
@@ -19,7 +19,7 @@ interface LibraryPrepRelationships {
   materialSample?: MaterialSample;
   indexI5?: NgsIndex | null;
   indexI7?: NgsIndex | null;
-  storageUnit?: ResourceIdentifierObject;
+  storageUnitUsage?: StorageUnitUsage;
 }
 
 export type LibraryPrep = KitsuResource &
