@@ -130,32 +130,54 @@ export function LibraryPrepBatchForm({
 
     if (submittedValues.product) {
       (submittedValues as any).relationships.product = {
-        data: {
-          id: submittedValues.product.id,
-          type: "product"
-        }
+        data:
+          submittedValues.product.id !== null
+            ? {
+                id: submittedValues.product.id,
+                type: "product"
+              }
+            : null
       };
       delete submittedValues.product;
     }
 
     if (submittedValues.protocol) {
       (submittedValues as any).relationships.protocol = {
-        data: {
-          id: submittedValues.protocol.id,
-          type: "protocol"
-        }
+        data:
+          submittedValues.protocol.id !== null
+            ? {
+                id: submittedValues.protocol.id,
+                type: "protocol"
+              }
+            : null
       };
       delete submittedValues.protocol;
     }
 
     if (submittedValues.thermocyclerProfile) {
       (submittedValues as any).relationships.thermocyclerProfile = {
-        data: {
-          id: submittedValues.thermocyclerProfile.id,
-          type: "thermocycler-profile"
-        }
+        data:
+          submittedValues.thermocyclerProfile.id !== null
+            ? {
+                id: submittedValues.thermocyclerProfile.id,
+                type: "thermocycler-profile"
+              }
+            : null
       };
       delete submittedValues.thermocyclerProfile;
+    }
+
+    if (submittedValues.indexSet) {
+      (submittedValues as any).relationships.indexSet = {
+        data:
+          submittedValues.indexSet.id !== null
+            ? {
+                id: submittedValues.indexSet.id,
+                type: "index-set"
+              }
+            : null
+      };
+      delete submittedValues.indexSet;
     }
 
     const [savedResource] = await save<LibraryPrepBatch>(
@@ -206,8 +228,8 @@ export function LoadExternalDataForLibraryPrepBatchForm({
 
 /** Re-usable field layout between edit and view pages. */
 function LibraryPrepBatchFormFields() {
-  const { readOnly, initialValues } = useDinaFormContext();
-  const { values } = useFormikContext<any>();
+  const { readOnly } = useDinaFormContext();
+  const { values } = useFormikContext<Partial<LibraryPrepBatch>>();
 
   // When the storage unit type is changed, the storage unit needs to be cleared.
   const StorageUnitTypeSelectorComponent = connect(
@@ -297,6 +319,7 @@ function LibraryPrepBatchFormFields() {
           filter={filterBy(["name"])}
           model="seqdb-api/index-set"
           optionLabel={(set) => set.name}
+          readOnlyLink="/seqdb/index-set/view?id="
         />
         <NumberField className="col-md-6" name="totalLibraryYieldNm" />
         <TextField className="col-md-6" name="yieldNotes" multiLines={true} />
