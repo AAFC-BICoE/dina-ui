@@ -1,6 +1,7 @@
 import { noop } from "lodash";
 import { useDrag } from "react-dnd";
 import RcTooltip from "rc-tooltip";
+import Link from "next/link";
 
 interface DraggableItemBoxProps<ItemType extends { sampleName?: string }> {
   onClick?: (e: any) => void;
@@ -13,7 +14,9 @@ interface DraggableItemBoxProps<ItemType extends { sampleName?: string }> {
 
 export const ITEM_BOX_DRAG_KEY = "materialSampleItem";
 
-export function DraggableItemBox<ItemType extends { sampleName?: string }>({
+export function DraggableItemBox<
+  ItemType extends { sampleId?: string; sampleName?: string }
+>({
   onClick = noop,
   batchItemSample,
   coordinates,
@@ -78,7 +81,15 @@ export function DraggableItemBox<ItemType extends { sampleName?: string }>({
           }}
         >
           <span className="sample-box-text">
-            {batchItemSample.sampleName}
+            {batchItemSample.sampleId && !editMode ? (
+              <Link
+                href={`/collection/material-sample/view?id=${batchItemSample.sampleId}`}
+              >
+                {batchItemSample.sampleName}
+              </Link>
+            ) : (
+              batchItemSample.sampleName
+            )}
             {primerName && <> ({primerName})</>}
           </span>
         </div>

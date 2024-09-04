@@ -33,7 +33,7 @@ export interface CellGrid<ItemType> {
 
 export function ContainerGrid<
   BatchType extends { gridLayoutDefinition?: any },
-  ItemType extends { sampleName?: string }
+  ItemType extends { sampleId?: string; sampleName?: string }
 >({
   batch,
   cellGrid,
