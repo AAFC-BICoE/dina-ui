@@ -1,7 +1,8 @@
 import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import { useState } from "react";
 import { QueryConjunctionSwitch } from "../QueryConjunctionSwitch";
-import { screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 describe("QueryConjunctionSwitch component", () => {
   test("Snapshot Test", async () => {
@@ -48,20 +49,21 @@ describe("QueryConjunctionSwitch component", () => {
     const orButton = buttons[1];
 
     // Expect the initial state.
-    expect(
-      toggle.find(QueryConjunctionSwitch).prop("currentConjunction")
-    ).toEqual("AND");
+    expect(andButton).toHaveClass("activeToggle");
+    expect(orButton).not.toHaveClass("activeToggle");
 
     // Click the toggle to "OR".
-    toggle.find("button").at(1).simulate("click");
-    expect(
-      toggle.find(QueryConjunctionSwitch).prop("currentConjunction")
-    ).toEqual("OR");
+    fireEvent.click(orButton);
+
+    // OR should now be switched.
+    expect(andButton).not.toHaveClass("activeToggle");
+    expect(orButton).toHaveClass("activeToggle");
 
     // Switch back to "AND"
-    toggle.find("button").at(0).simulate("click");
-    expect(
-      toggle.find(QueryConjunctionSwitch).prop("currentConjunction")
-    ).toEqual("AND");
+    fireEvent.click(andButton);
+
+    // AND should now be switched again.
+    expect(andButton).toHaveClass("activeToggle");
+    expect(orButton).not.toHaveClass("activeToggle");
   });
 });
