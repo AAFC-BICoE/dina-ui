@@ -14,6 +14,7 @@ const storageUnitWithHierarchy: PersistedResource<StorageUnit> = {
   group: "group",
   name: "A",
   type: "storage-unit",
+  isGeneric: false,
   storageUnitType: {
     name: "Box",
     id: "BOX",
@@ -31,6 +32,7 @@ const storageUnitWithParentHierarchy: PersistedResource<StorageUnit> = {
   group: "group",
   name: "A",
   type: "storage-unit",
+  isGeneric: false,
   storageUnitType: {
     name: "Box",
     id: "BOX",
@@ -42,6 +44,7 @@ const storageUnitWithParentHierarchy: PersistedResource<StorageUnit> = {
     group: "group",
     name: "B",
     type: "storage-unit",
+    isGeneric: false,
     hierarchy: [
       { uuid: "B", name: "B", typeName: "Cabinet", typeUuid: "CABINET" },
       { uuid: "C", name: "C", typeName: "Room", typeUuid: "ROOM" }

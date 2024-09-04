@@ -13,7 +13,7 @@ import { SeqdbMessage } from "../intl/seqdb-intl";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 
 export function Home() {
-  const { isAdmin, rolesPerGroup } = useAccount();
+  const { isAdmin, rolesPerGroup, subject } = useAccount();
 
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
@@ -296,11 +296,6 @@ export function Home() {
                     <DinaMessage id="fieldExtensions" />
                   </a>
                 </Link>
-                <Link href="/collection/form-template/list">
-                  <a>
-                    <DinaMessage id="formTemplates" />
-                  </a>
-                </Link>
                 <Link href="/collection/institution/list">
                   <a>
                     <DinaMessage id="institutionListTitle" />
@@ -329,6 +324,39 @@ export function Home() {
                 <Link href="/collection/storage-unit-type/list">
                   <a>
                     <DinaMessage id="storageUnitTypeListTitle" />
+                  </a>
+                </Link>
+              </Stack>
+            </Col>
+
+            {/* Configuration Links */}
+            <Col className="mb-4">
+              <h2>
+                <DinaMessage id="dinaConfigurationSectionTitle" />
+              </h2>
+
+              <Stack style={{ display: "inline-flex" }}>
+                <Link href="/collection/form-template/list">
+                  <a>
+                    <DinaMessage id="formTemplates" />
+                  </a>
+                </Link>
+                <Link href="/collection/split-configuration/list">
+                  <a>
+                    <DinaMessage id="splitConfigurationTitle" />
+                  </a>
+                </Link>
+                <Link
+                  href={{
+                    pathname: `/dina-user/view`,
+                    query: {
+                      id: subject,
+                      hideBackButton: true
+                    }
+                  }}
+                >
+                  <a>
+                    <DinaMessage id="userProfile" />
                   </a>
                 </Link>
               </Stack>

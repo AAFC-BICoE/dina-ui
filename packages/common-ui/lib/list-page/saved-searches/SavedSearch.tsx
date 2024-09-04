@@ -6,7 +6,7 @@ import { useAccount } from "../../account/AccountProvider";
 import { useModal } from "../../modal/modal";
 import { SaveArgs, useApiClient } from "../../api-client/ApiClientContext";
 import { AreYouSureModal } from "../../modal/AreYouSureModal";
-import { FilterParam, KitsuResource } from "kitsu";
+import { FilterParam } from "kitsu";
 import { Alert, Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
 import {
@@ -94,6 +94,9 @@ export interface SavedSearchProps {
    * to remain the same across tables, it can share the same name.
    */
   uniqueName: string;
+
+  // Reference for triggering the search. This helps prevent more searches than necessary.
+  triggerSearch: React.MutableRefObject<boolean>;
 }
 
 export function createSessionStorageLastUsedTreeKey(uniqueName: string) {
@@ -123,7 +126,8 @@ export function SavedSearch({
   groups,
   setGroups,
   performSubmit,
-  uniqueName
+  uniqueName,
+  triggerSearch
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -221,6 +225,7 @@ export function SavedSearch({
     if (!selectedSavedSearch || !userPreferences) return;
     setQueryError(undefined);
     loadSavedSearch(selectedSavedSearch);
+    triggerSearch.current = true;
   }, [selectedSavedSearch, lastSelected]);
 
   // User Preferences has been loaded in and apply default loaded search:

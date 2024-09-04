@@ -31,7 +31,8 @@ import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { useSessionStorage } from "usehooks-ts";
 
-const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
+const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
+const BASE_DELAY_EXPORT_FETCH_MS = 2000;
 
 export default function ExportPage<TData extends KitsuResource>() {
   const { formatNumber } = useIntl();
@@ -86,6 +87,9 @@ export default function ExportPage<TData extends KitsuResource>() {
   async function exportData(formik) {
     setLoading(true);
 
+    // Clear error message.
+    setDataExportError(undefined);
+
     // Prepare the query to be used for exporting purposes.
     if (queryObject) {
       delete (queryObject as any)._source;
@@ -123,7 +127,6 @@ export default function ExportPage<TData extends KitsuResource>() {
     let dataExportGetResponse;
     while (isFetchingDataExport) {
       if (fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES) {
-        fetchDataExportRetries += 1;
         if (dataExportGetResponse?.data?.status === "COMPLETED") {
           // Get the exported data
           await downloadDataExport(
@@ -154,8 +157,14 @@ export default function ExportPage<TData extends KitsuResource>() {
             }
           }
 
-          // Wait 1 second before retrying
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          // Exponential Backoff
+          await new Promise((resolve) =>
+            setTimeout(
+              resolve,
+              BASE_DELAY_EXPORT_FETCH_MS * 2 ** fetchDataExportRetries
+            )
+          );
+          fetchDataExportRetries += 1;
         }
       } else {
         // Max retries reached
@@ -175,6 +184,10 @@ export default function ExportPage<TData extends KitsuResource>() {
   async function exportObjects(formik) {
     {
       setLoading(true);
+
+      // Clear error message.
+      setDataExportError(undefined);
+
       const paths = localStorageExportObjectIds.map(
         (id) => `metadata/${id}?include=derivatives`
       );
@@ -210,13 +223,21 @@ export default function ExportPage<TData extends KitsuResource>() {
         },
         type: "object-export"
       };
-      const objectExportResponse = await save<ObjectExport>(
-        [objectExportSaveArg],
-        {
-          apiBaseUrl: "/objectstore-api"
-        }
-      );
-      await getExport(objectExportResponse, formik);
+
+      try {
+        const objectExportResponse = await save<ObjectExport>(
+          [objectExportSaveArg],
+          {
+            apiBaseUrl: "/objectstore-api"
+          }
+        );
+        await getExport(objectExportResponse, formik);
+      } catch (e) {
+        setDataExportError(
+          <div className="alert alert-danger">{e?.message ?? e.toString()}</div>
+        );
+      }
+
       setLoading(false);
     }
   }

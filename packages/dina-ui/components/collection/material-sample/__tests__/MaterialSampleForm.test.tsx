@@ -212,6 +212,8 @@ describe("Material Sample Edit Page", () => {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
@@ -276,42 +278,45 @@ describe("Material Sample Edit Page", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
-
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
-        // Doesn't save the existing Collecting Event because it wasn't edited:
         [
-          // New material-sample:
           {
             resource: {
-              associations: [],
-              collectingEvent: {
-                id: "1",
-                type: "collecting-event"
-              },
-              materialSampleName: "test-material-sample-id",
-              hostOrganism: null,
+              startEventDateTime: "2021-04-13",
+              verbatimEventDateTime: "2021-04-13",
+              id: "1",
+              type: "collecting-event",
+              group: "test group",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
+              type: "material-sample",
               managedAttributes: {},
-              publiclyReleasable: true, // Default value
+              publiclyReleasable: true,
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
+              materialSampleName: "test-material-sample-id",
+              restrictionFieldsExtension: null,
+              isRestricted: false,
+              restrictionRemarks: null,
+              associations: [],
+              hostOrganism: null,
+              collectingEvent: { id: "1", type: "collecting-event" },
               relationships: {
                 organism: { data: [] },
                 storageUnitUsage: { data: null }
-              },
-              type: "material-sample",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              isRestricted: false,
-              restrictionFieldsExtension: null,
-              restrictionRemarks: null,
-              scheduledAction: undefined,
-              preparedBy: undefined,
-              collection: undefined,
-              assemblages: undefined,
-              storageUnitUsage: undefined
+              }
             },
             type: "material-sample"
           }
@@ -349,14 +354,32 @@ describe("Material Sample Edit Page", () => {
 
     expect(mockSave.mock.calls).toEqual([
       [
-        // Edits existing material-sample
-        // And only includes the updated field:
+        [
+          {
+            resource: {
+              startEventDateTime: "2021-04-13",
+              verbatimEventDateTime: "2021-04-13",
+              id: "1",
+              type: "collecting-event",
+              group: "test group",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
         [
           {
             resource: {
               id: "1",
               type: "material-sample",
               materialSampleName: "test-material-sample-id",
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
+              collectingEvent: { id: "1", type: "collecting-event" },
               relationships: {}
             },
             type: "material-sample"
@@ -446,6 +469,8 @@ describe("Material Sample Edit Page", () => {
                 type: "collecting-event"
               },
               id: "1",
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               type: "material-sample",
               relationships: {}
             },
@@ -606,18 +631,34 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              startEventDateTime: "2021-04-13",
+              verbatimEventDateTime: "2021-04-13",
+              id: "1",
+              type: "collecting-event",
+              group: "test group",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
               id: "333",
-              relationships: {},
-              attachment: undefined,
-              projects: undefined,
-              type: "material-sample"
+              type: "material-sample",
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
+              collectingEvent: { id: "1", type: "collecting-event" },
+              relationships: {}
             },
             type: "material-sample"
           }
         ],
-        {
-          apiBaseUrl: "/collection-api"
-        }
+        { apiBaseUrl: "/collection-api" }
       ]
     ]);
   });
@@ -690,16 +731,34 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              startEventDateTime: "2021-04-13",
+              verbatimEventDateTime: "2021-04-13",
+              id: "1",
+              type: "collecting-event",
+              group: "test group",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
               id: "333",
-              relationships: {},
-              type: "material-sample"
+              type: "material-sample",
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
+              collectingEvent: { id: "1", type: "collecting-event" },
+              relationships: {}
             },
             type: "material-sample"
           }
         ],
-        {
-          apiBaseUrl: "/collection-api"
-        }
+        { apiBaseUrl: "/collection-api" }
       ]
     ]);
   });

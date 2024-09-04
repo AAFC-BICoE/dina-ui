@@ -26,11 +26,12 @@ export function IdentifierFields({
 }: IdentifierFieldsProps) {
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const { readOnly } = useDinaFormContext();
+
   return (
     <div className={divClassName} style={{ width: `${width}` }}>
       <div className={`${fieldClassName}`}>
         <FieldSet
-          legend={<DinaMessage id="identifierLegend" />}
+          legend={<DinaMessage id={"identifierLegend"} />}
           id="identifierLegend"
         >
           <FieldArray name="identifiers">
@@ -74,12 +75,14 @@ export function IdentifierFields({
                         />
                         {!readOnly && (
                           <div className="list-inline mb-3">
-                            <FormikButton
-                              className="list-inline-item btn btn-primary add-identifier-button"
-                              onClick={addIdentifier}
-                            >
-                              <DinaMessage id="addAnotherIdentifier" />
-                            </FormikButton>
+                            {identifiers.length !== 1 && (
+                              <FormikButton
+                                className="list-inline-item btn btn-primary add-identifier-button"
+                                onClick={addIdentifier}
+                              >
+                                <DinaMessage id="addAnotherIdentifier" />
+                              </FormikButton>
+                            )}
                             <FormikButton
                               className="list-inline-item btn btn-dark"
                               onClick={() => removeIdentifier(index)}

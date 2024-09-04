@@ -42,6 +42,9 @@ export function DraggableItemBox<ItemType extends { sampleName?: string }>({
     return undefined;
   };
 
+  // Primer name can be supplied, only displayed if provided.
+  const primerName = (batchItemSample as any)?.primerName ?? undefined;
+
   return (
     <li className="list-group-item p-0" onClick={onClick} ref={drag}>
       <RcTooltip
@@ -55,6 +58,12 @@ export function DraggableItemBox<ItemType extends { sampleName?: string }>({
                   {coordinates}
                   <br />
                   {batchItemSample.sampleName}
+                  {primerName && (
+                    <>
+                      <br />
+                      {primerName}
+                    </>
+                  )}
                 </>
               </div>
             )}
@@ -68,7 +77,10 @@ export function DraggableItemBox<ItemType extends { sampleName?: string }>({
             cursor: editMode ? "move" : "default"
           }}
         >
-          <span className="sample-box-text">{batchItemSample.sampleName}</span>
+          <span className="sample-box-text">
+            {batchItemSample.sampleName}
+            {primerName && <> ({primerName})</>}
+          </span>
         </div>
       </RcTooltip>
     </li>

@@ -11,6 +11,7 @@ const STORAGE_UNIT_CHILDREN = ["B", "C", "D"].map<
   group: "group",
   name: letter,
   type: "storage-unit",
+  isGeneric: false,
   storageUnitType: {
     id: "BOX",
     name: "Box",
@@ -26,6 +27,7 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
   group: "group",
   name: "A",
   type: "storage-unit",
+  isGeneric: false,
   storageUnitChildren: STORAGE_UNIT_CHILDREN
 };
 
@@ -34,6 +36,7 @@ const STORAGE_B: PersistedResource<StorageUnit> = {
   id: "B",
   group: "group",
   name: "B",
+  isGeneric: false,
   type: "storage-unit"
 };
 
@@ -130,6 +133,7 @@ const storageUnitA: StorageUnit = {
   id: "A",
   name: "testNameA",
   group: "aafc",
+  isGeneric: false,
   storageUnitChildren: STORAGE_UNIT_CHILDREN
 };
 
@@ -137,7 +141,8 @@ const storageUnitX: StorageUnit = {
   type: "storage-unit",
   id: "X",
   name: "testNameX",
-  group: "aafc"
+  group: "aafc",
+  isGeneric: false
 };
 
 describe("StorageUnitChildrenViewer component", () => {

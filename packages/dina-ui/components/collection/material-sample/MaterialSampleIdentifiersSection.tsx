@@ -12,6 +12,7 @@ import {
   IDENTIFIER_COMPONENT_NAME,
   MaterialSample
 } from "../../../types/collection-api";
+import { OtherIdentifiersSection } from "./OtherIdentifiersSection";
 
 export interface MaterialSampleIdentifiersSectionProps {
   disableSampleNameField?: boolean;
@@ -28,7 +29,8 @@ export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
   "collection",
   "materialSampleName",
   "dwcOtherCatalogNumbers",
-  "barcode"
+  "barcode",
+  "identifiers"
 ];
 
 /** Fields layout re-useable between view and edit pages. */
@@ -53,7 +55,7 @@ export function MaterialSampleIdentifiersSection({
       sectionName="identifiers-section"
     >
       <div className="row">
-        <div className="col-md-6">
+        <div className="col-md-7">
           <div className="d-flex">
             <TextField
               disableTemplateCheckbox={true}
@@ -82,14 +84,13 @@ export function MaterialSampleIdentifiersSection({
               />
             )}
           </div>
+        </div>
+        <div className="col-md-5">
           <TextField name={`${namePrefix}barcode`} customName="barcode" />
         </div>
-        <div className="col-md-6">
-          <StringArrayField
-            name={`${namePrefix}dwcOtherCatalogNumbers`}
-            customName="dwcOtherCatalogNumbers"
-          />
-        </div>
+      </div>
+      <div className="row">
+        <OtherIdentifiersSection />
       </div>
     </FieldSet>
   );

@@ -178,6 +178,7 @@ export function FileView({
           >
             {isImage ? (
               <img
+                loading="lazy"
                 alt={imgAlt ?? `File path : ${filePath}`}
                 src={objectURL}
                 style={{ height: imgHeight }}

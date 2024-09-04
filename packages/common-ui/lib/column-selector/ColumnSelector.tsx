@@ -160,6 +160,22 @@ export function ColumnSelector<TData extends KitsuResource>(
         });
       }
 
+      // Add UUID field as an additional field.
+      injectedMappings = injectedMappings.concat({
+        label: "id",
+        value: "id",
+        path: "id",
+        hideField: false,
+        type: "text",
+        containsSupport: false,
+        distinctTerm: false,
+        endsWithSupport: false,
+        keywordMultiFieldSupport: false,
+        keywordNumericSupport: false,
+        optimizedPrefix: false,
+        dynamicField: undefined
+      });
+
       // Finally, set it as the state.
       setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
     }

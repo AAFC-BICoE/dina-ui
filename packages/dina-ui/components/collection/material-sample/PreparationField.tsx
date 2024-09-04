@@ -209,7 +209,9 @@ export function PreparationField({
             managedAttributeComponent="PREPARATION"
             fieldSetProps={{
               id,
-              legend: <DinaMessage id="preparationManagedAttributes" />
+              legend: <DinaMessage id="preparationManagedAttributes" />,
+              componentName: PREPARATIONS_COMPONENT_NAME,
+              sectionName: "preparations-managed-attributes-section"
             }}
             managedAttributeOrderFieldName="preparationManagedAttributesOrder"
             visibleAttributeKeys={visibleManagedAttributeKeys}

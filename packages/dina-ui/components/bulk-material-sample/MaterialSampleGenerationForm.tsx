@@ -11,11 +11,10 @@ import {
   TextField,
   useApiClient
 } from "common-ui";
-import { Field, FormikContextType } from "formik";
+import { Field, FormikContextType, useFormikContext } from "formik";
 import { InputResource } from "kitsu";
 import { padStart, range } from "lodash";
 import { useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import * as yup from "yup";
 import {
@@ -26,6 +25,8 @@ import {
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useGenerateSequence } from "../collection/material-sample/useGenerateSequence";
+import { useEffect } from "react";
+import { Collection } from "packages/dina-ui/types/collection-api";
 
 export interface MaterialSampleGenerationFormProps {
   onGenerate: (samples: MaterialSampleGenerationFormSubmission) => void;
@@ -45,7 +46,7 @@ export function MaterialSampleGenerationForm({
   initialMode
 }: MaterialSampleGenerationFormProps) {
   const [generationMode, setGenerationMode] = useState<GenerationMode>(
-    initialMode || "BATCH"
+    initialMode || "SERIES"
   );
   const [useNextSequence, setUseNextSequence] = useState<boolean>(
     initialValues?.useNextSequence || false
@@ -79,25 +80,31 @@ export function MaterialSampleGenerationForm({
         InputResource<MaterialSample>
       >((_, index) => {
         const sample = submittedValues.samples[index];
+        const materialSampleName = sample?.materialSampleName?.trim?.();
+        const sourceSet =
+          submittedValues.sourceSet !== undefined &&
+          submittedValues.sourceSet !== ""
+            ? submittedValues.sourceSet
+            : undefined;
         return {
           type: "material-sample",
           parentMaterialSample: undefined,
           group: submittedValues.group,
           collection: submittedValues.collection,
           publiclyReleasable: true,
-          // Batch mode generates samples with the same name, so allow duplicate names in batch mode:
-          allowDuplicateName: generationMode === "BATCH",
+          sourceSet,
           ...sample,
-          materialSampleName:
-            sample?.materialSampleName?.trim?.() || useNextSequence
-              ? submittedValues.baseName
-                ? submittedValues.baseName + (generatedLowId + index)
-                : `${generatedLowId + index}`
-              : generateName({
-                  generationMode,
-                  index,
-                  formState: submittedValues
-                })
+          materialSampleName: materialSampleName
+            ? materialSampleName
+            : useNextSequence
+            ? submittedValues.baseName
+              ? submittedValues.baseName + (generatedLowId + index)
+              : `${generatedLowId + index}`
+            : generateName({
+                generationMode,
+                index,
+                formState: submittedValues
+              })
         };
       });
       onGenerate({ samples, submittedValues, generationMode });
@@ -126,6 +133,7 @@ export function MaterialSampleGenerationForm({
           start: "001",
           baseName: "",
           separator: "",
+          sourceSet: "",
           collection: collectionQuery.lastUsedCollection
         }
       }
@@ -168,36 +176,21 @@ export function MaterialSampleGenerationForm({
           }}
         />
       </div>
-      <Tabs
-        selectedIndex={GENERATION_MODES.indexOf(generationMode)}
-        onSelect={(index) => setGenerationMode(GENERATION_MODES[index])}
-      >
-        <TabList>
-          <Tab className="react-tabs__tab batch-tab">
-            <DinaMessage id="generateBatch" />
-          </Tab>
-          {!useNextSequence && (
-            <Tab className="react-tabs__tab series-tab">
-              <DinaMessage id="generateSeries" />
-            </Tab>
-          )}
-        </TabList>
-        <TabPanel>
-          <GeneratorFields
-            generationMode={generationMode}
-            useNextSequence={useNextSequence}
-          />
-          {!useNextSequence && (
-            <PreviewAndCustomizeFields generationMode={generationMode} />
-          )}
-        </TabPanel>
-        {!useNextSequence && (
-          <TabPanel>
-            <GeneratorFields generationMode={generationMode} />
-            <PreviewAndCustomizeFields generationMode={generationMode} />
-          </TabPanel>
-        )}
-      </Tabs>
+      {!useNextSequence && (
+        <GeneratorFields
+          generationMode={generationMode}
+          baseName={baseNameFromCollection}
+        />
+      )}
+
+      {/* Source Set */}
+      <div className="row">
+        <TextField className="col-sm-6" name="sourceSet" />
+      </div>
+
+      {!useNextSequence && (
+        <PreviewAndCustomizeFields generationMode={generationMode} />
+      )}
       <ButtonBar centered={false}>
         <BackToListButton
           className="ms-auto"
@@ -217,22 +210,30 @@ export function MaterialSampleGenerationForm({
   );
 }
 
-export const GENERATION_MODES = ["BATCH", "SERIES"] as const;
-export type GenerationMode = typeof GENERATION_MODES[number];
+export const GENERATION_MODES = ["SERIES"] as const;
+export type GenerationMode = (typeof GENERATION_MODES)[number];
 
 export const INCREMENT_MODES = ["NUMERICAL", "LETTER"] as const;
-export type IncrementMode = typeof INCREMENT_MODES[number];
+export type IncrementMode = (typeof INCREMENT_MODES)[number];
 
 interface GeneratorFieldsProps {
   generationMode: GenerationMode;
   useNextSequence?: boolean;
+  baseName?: string;
 }
 
 function GeneratorFields({
   generationMode,
-  useNextSequence
+  useNextSequence,
+  baseName
 }: GeneratorFieldsProps) {
   const { formatMessage } = useDinaIntl();
+  const formikForm = useFormikContext<any>();
+  useEffect(() => {
+    if (!formikForm.values.baseName) {
+      formikForm.setFieldValue("baseName", baseName);
+    }
+  }, []);
 
   const SUFFIX_TYPE_OPTIONS = INCREMENT_MODES.map((mode) => ({
     label: formatMessage(mode),
@@ -244,25 +245,13 @@ function GeneratorFields({
         <DinaMessage id="primaryId" />
       </h4>
       <div className="row">
-        <CollectionSelectField className="col-sm-6" name="collection" />
-        {generationMode === "BATCH" && (
-          <>
-            <TextField
-              name="suffix"
-              className="col-md-3"
-              inputProps={{
-                disabled: useNextSequence
-              }}
-            />
-            <TextField
-              name="separator"
-              className="col-md-3"
-              inputProps={{
-                disabled: useNextSequence
-              }}
-            />
-          </>
-        )}
+        <CollectionSelectField
+          className="col-sm-6"
+          name="collection"
+          onChange={(value) => {
+            formikForm.setFieldValue("baseName", (value as Collection)?.code);
+          }}
+        />
         {generationMode === "SERIES" && (
           <>
             <SelectField
@@ -322,11 +311,6 @@ function PreviewAndCustomizeFields({ generationMode }: GeneratorFieldsProps) {
       <h4>
         <DinaMessage id="previewAndCustomizeLabel" />
       </h4>
-      {generationMode === "BATCH" && (
-        <p>
-          <DinaMessage id="batchModeInfo" />
-        </p>
-      )}
       {generationMode === "SERIES" && (
         <p>
           <DinaMessage id="seriesModeInfo" />
@@ -363,6 +347,9 @@ function PreviewAndCustomizeFields({ generationMode }: GeneratorFieldsProps) {
                       removeLabel={true}
                       removeBottomMargin={true}
                       placeholder={placeholder}
+                      onChangeExternal={(form, name, value) => {
+                        form.setFieldValue(name, value);
+                      }}
                     />
                   </div>
                 </li>
@@ -386,11 +373,7 @@ function generateName(params: GenerateNameParams) {
 
   const generatedName = `${formState.baseName || ""}${
     formState.separator || ""
-  }${
-    generationMode === "BATCH"
-      ? formState.suffix || ""
-      : generateSeriesSuffix(params)
-  }`;
+  }${generateSeriesSuffix(params)}`;
   return generatedName;
 }
 function generateSeriesSuffix({ index, formState }: GenerateNameParams) {
@@ -430,6 +413,7 @@ const generatorFormSchema = yup.object({
     .required(),
   baseName: yup.string(),
   separator: yup.string(),
+  sourceSet: yup.string(),
   // Batch mode:
   suffix: yup.string(),
   // Series mode:

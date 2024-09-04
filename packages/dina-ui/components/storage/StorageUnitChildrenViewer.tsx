@@ -15,7 +15,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "../../../common-ui/lib/list-page/types";
 import StorageUnitGrid from "./StorageUnitGrid";
 
 export interface StorageTreeFieldProps {
@@ -119,13 +119,14 @@ export function StorageUnitChildrenViewer({
     <LoadingSpinner loading={true} />
   ) : (
     <div className="mb-3">
-      {storageUnit?.storageUnitType?.gridLayoutDefinition && (
-        <StorageUnitGrid
-          storageUnit={storageUnit}
-          materialSamples={materialSamplesQuery.response?.data}
-        />
-      )}
-      {actionMode !== "VIEW" && (
+      {storageUnit?.storageUnitType?.gridLayoutDefinition &&
+        !storageUnit.isGeneric && (
+          <StorageUnitGrid
+            storageUnit={storageUnit}
+            materialSamples={materialSamplesQuery.response?.data}
+          />
+        )}
+      {actionMode !== "VIEW" && !storageUnit.isGeneric && (
         <FieldSet
           legend={
             <div className="d-flex align-items-center gap-2 mb-2">
@@ -161,35 +162,37 @@ export function StorageUnitChildrenViewer({
       )}
       {actionMode === "VIEW" && (
         <div>
-          <div className="d-flex align-items-center gap-2 mb-3">
-            <strong>
-              <DinaMessage id="browseContents" />
-            </strong>
-            {readOnly && (
-              <>
-                <button
-                  className="btn btn-primary enable-move-content"
-                  onClick={() => setActionMode("MOVE_ALL")}
-                  disabled={hideMoveContents}
-                >
-                  <DinaMessage id="moveAllContent" />
-                </button>
-                <Link
-                  href={`/collection/storage-unit/edit?parentId=${storageUnit.id}`}
-                >
-                  <a className="btn btn-primary add-child-storage-unit">
-                    <DinaMessage id="addNewChildStorageUnit" />
-                  </a>
-                </Link>
-                <button
-                  className="btn btn-primary add-existing-as-child"
-                  onClick={() => setActionMode("ADD_EXISTING_AS_CHILD")}
-                >
-                  <DinaMessage id="addExistingStorageUnitAsChild" />
-                </button>
-              </>
-            )}
-          </div>
+          {!storageUnit.isGeneric && (
+            <div className="d-flex align-items-center gap-2 mb-3">
+              <strong>
+                <DinaMessage id="browseContents" />
+              </strong>
+              {readOnly && (
+                <>
+                  <button
+                    className="btn btn-primary enable-move-content"
+                    onClick={() => setActionMode("MOVE_ALL")}
+                    disabled={hideMoveContents}
+                  >
+                    <DinaMessage id="moveAllContent" />
+                  </button>
+                  <Link
+                    href={`/collection/storage-unit/edit?parentId=${storageUnit.id}`}
+                  >
+                    <a className="btn btn-primary add-child-storage-unit">
+                      <DinaMessage id="addNewChildStorageUnit" />
+                    </a>
+                  </Link>
+                  <button
+                    className="btn btn-primary add-existing-as-child"
+                    onClick={() => setActionMode("ADD_EXISTING_AS_CHILD")}
+                  >
+                    <DinaMessage id="addExistingStorageUnitAsChild" />
+                  </button>
+                </>
+              )}
+            </div>
+          )}
           <StorageUnitContents
             storageUnit={storageUnit}
             materialSamples={materialSamplesQuery.response?.data}
@@ -260,19 +263,21 @@ export function StorageUnitContents({
           disabled={true}
         />
       </div>
-      <div
-        className="p-2 mb-3"
-        style={{ border: "1px solid #d3d7cf", backgroundColor: "#f3f3f3" }}
-      >
-        <strong>
-          <DinaMessage id="materialSamples" />
-        </strong>
-        <ReactTable<MaterialSample>
-          columns={materialSampleColumns}
-          data={materialSamples ?? []}
-          showPagination={true}
-        />
-      </div>
+      {!storageUnit.isGeneric && (
+        <div
+          className="p-2 mb-3"
+          style={{ border: "1px solid #d3d7cf", backgroundColor: "#f3f3f3" }}
+        >
+          <strong>
+            <DinaMessage id="materialSamples" />
+          </strong>
+          <ReactTable<MaterialSample>
+            columns={materialSampleColumns}
+            data={materialSamples ?? []}
+            showPagination={true}
+          />
+        </div>
+      )}
     </>
   );
 }

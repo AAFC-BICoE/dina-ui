@@ -223,6 +223,7 @@ export function DataRow({
                     (event.currentTarget.style.color = "blue")
                   }
                   onMouseOut={(event) => (event.currentTarget.style.color = "")}
+                  data-testid="add row button"
                 />
               }
             </>

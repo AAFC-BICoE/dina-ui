@@ -97,6 +97,7 @@ export function Nav({ marginBottom = true, centered = true }: NavProps) {
               <NavAgentDropdown formatMessage={formatMessage} />
               <NavSequenceDropdown formatMessage={formatMessage} />
               <NavControlledVocabularyDropdown formatMessage={formatMessage} />
+              <NavDinaConfigurationDropdown formatMessage={formatMessage} />
 
               {/* Navigation menu right */}
               {showManagementNavigation && (
@@ -465,11 +466,6 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
           <DinaMessage id="fieldExtensions" />
         </NavDropdown.Item>
       </Link>
-      <Link href="/collection/form-template/list" passHref={true}>
-        <NavDropdown.Item role="menuitem">
-          <DinaMessage id="formTemplates" />
-        </NavDropdown.Item>
-      </Link>
       <Link href="/collection/institution/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="institutionListTitle" />
@@ -543,6 +539,51 @@ function NavDinaManagementDropdown({ formatMessage }) {
           </Link>
         </>
       )}
+    </NavDropdown>
+  );
+}
+
+function NavDinaConfigurationDropdown({ formatMessage }) {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
+
+  const { subject } = useAccount();
+
+  return (
+    <NavDropdown
+      title={formatMessage("dinaConfigurationSectionTitle")}
+      onMouseOver={showDropdown}
+      onKeyDown={onKeyDown}
+      onMouseLeave={hideDropdown}
+      show={show}
+      role="menuitem"
+      menuRole="menu"
+    >
+      <Link href="/collection/form-template/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="formTemplates" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/collection/split-configuration/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="splitConfigurationTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link
+        href={{
+          pathname: `/dina-user/view`,
+          query: {
+            id: subject,
+            hideBackButton: true
+          }
+        }}
+        onKeyDown={onKeyDownLastItem}
+        passHref={true}
+      >
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="userProfile" />
+        </NavDropdown.Item>
+      </Link>
     </NavDropdown>
   );
 }

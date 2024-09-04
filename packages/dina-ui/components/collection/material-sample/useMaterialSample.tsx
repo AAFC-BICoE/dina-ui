@@ -9,7 +9,8 @@ import {
   resourceDifference,
   SaveArgs,
   useApiClient,
-  useQuery
+  useQuery,
+  withoutBlankFields
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -188,9 +189,6 @@ export interface UseMaterialSampleSaveParams {
     parentAttributes?: string[];
   };
 
-  /** Split Configuration (Form Template Only) */
-  splitConfigurationInitialState?: boolean;
-
   /** Optionally restrict the form to these enabled fields. */
   formTemplate?: FormTemplate;
 
@@ -212,6 +210,7 @@ export interface PrepareSampleSaveOperationParams {
   preProcessSample?: (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
+  collectingEventRefExternal?: React.RefObject<FormikProps<any>>;
 }
 
 export function useMaterialSampleSave({
@@ -224,7 +223,6 @@ export function useMaterialSampleSave({
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
-  splitConfigurationInitialState,
   reduceRendering,
   disableNestedFormEdits,
   showChangedIndicatorsInNestedForms,
@@ -300,8 +298,6 @@ export function useMaterialSampleSave({
   // Enable Switch States:
   const [enableShowParentAttributes, setEnableShowParentAttributes] =
     useState<boolean>(false);
-  const [enableSplitConfiguration, setEnableSplitConfiguration] =
-    useState<boolean>(false);
   const [enableCollectingEvent, setEnableCollectingEvent] =
     useState<boolean>(false);
   const [enablePreparations, setEnablePreparations] = useState<boolean>(false);
@@ -314,7 +310,6 @@ export function useMaterialSampleSave({
 
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
-    setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
     setEnableShowParentAttributes(
       Boolean(
         hasShowParentAttributes
@@ -437,8 +432,6 @@ export function useMaterialSampleSave({
     setEnableAssociations,
     enableRestrictions,
     setEnableRestrictions,
-    enableSplitConfiguration,
-    setEnableSplitConfiguration,
     enableShowParentAttributes,
     setEnableShowParentAttributes
   };
@@ -455,6 +448,11 @@ export function useMaterialSampleSave({
 
   const msInitialValues: InputResource<MaterialSample> =
     withOrganismEditorValues(materialSample ?? defaultValues);
+  if (msInitialValues.identifiers) {
+    (msInitialValues as any).identifiers = Object.entries(
+      msInitialValues.identifiers
+    ).map(([type, value]) => ({ type, value }));
+  }
 
   /** Used to get the values of the nested CollectingEvent form. */
   const colEventFormRef = colEventFormRefProp ?? useRef<FormikProps<any>>(null);
@@ -531,6 +529,38 @@ export function useMaterialSampleSave({
       );
     }
 
+    // Other identifiers saving
+    if (submittedValues.identifiers) {
+      const otherIdentifiers = (submittedValues.identifiers as any).reduce(
+        (acc, identifier) => {
+          if (identifier.type && identifier.value) {
+            acc[identifier.type] = identifier.value;
+          }
+          return acc;
+        },
+        {}
+      );
+
+      if (otherIdentifiers && Object.keys(otherIdentifiers).length > 0) {
+        submittedValues.identifiers = otherIdentifiers;
+      } else {
+        submittedValues.identifiers = {};
+      }
+    }
+
+    // Remove empty items from dwcOtherCatalogNumbers
+    if (submittedValues.dwcOtherCatalogNumbers) {
+      const otherCatalogNumbers = (
+        submittedValues.dwcOtherCatalogNumbers as any
+      ).filter((catNum) => catNum !== "");
+
+      if (otherCatalogNumbers.length !== 0) {
+        submittedValues.dwcOtherCatalogNumbers = otherCatalogNumbers;
+      } else {
+        (submittedValues.dwcOtherCatalogNumbers as any) = null;
+      }
+    }
+
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,
@@ -555,55 +585,6 @@ export function useMaterialSampleSave({
       // Remove the scheduledAction field from the Form Template:
       ...{ scheduledAction: undefined }
     };
-
-    // Save and link the Collecting Event if enabled:
-    if (enableCollectingEvent && colEventFormRef.current) {
-      // Save the linked CollectingEvent if included:
-      const submittedCollectingEvent = cloneDeep(
-        colEventFormRef.current.values
-      );
-
-      const collectingEventWasEdited =
-        !submittedCollectingEvent.id ||
-        !isEqual(submittedCollectingEvent, collectingEventInitialValues);
-
-      try {
-        // Throw if the Collecting Event sub-form has errors:
-        const colEventErrors = await colEventFormRef.current.validateForm();
-        if (!isEmpty(colEventErrors)) {
-          throw new DoOperationsError("", colEventErrors);
-        }
-
-        // Only send the save request if the Collecting Event was edited:
-        const savedCollectingEvent = collectingEventWasEdited
-          ? // Use the same save method as the Collecting Event page:
-            await saveCollectingEvent(
-              submittedCollectingEvent,
-              colEventFormRef.current
-            )
-          : submittedCollectingEvent;
-
-        // Set the ColEventId here in case the next operation fails:
-        setColEventId(savedCollectingEvent.id);
-
-        // Link the MaterialSample to the CollectingEvent:
-        materialSampleInput.collectingEvent = {
-          id: savedCollectingEvent.id,
-          type: savedCollectingEvent.type
-        };
-      } catch (error: unknown) {
-        if (error instanceof DoOperationsError) {
-          // Put the error messages into both form states:
-          colEventFormRef.current.setStatus(error.message);
-          colEventFormRef.current.setErrors(error.fieldErrors);
-          throw new DoOperationsError(
-            error.message,
-            mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)
-          );
-        }
-        throw error;
-      }
-    }
 
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (
@@ -665,7 +646,8 @@ export function useMaterialSampleSave({
    */
   async function prepareSampleSaveOperation({
     submittedValues,
-    preProcessSample
+    preProcessSample,
+    collectingEventRefExternal
   }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample>> {
     const materialSampleInput = await prepareSampleInput(submittedValues);
 
@@ -679,6 +661,70 @@ export function useMaterialSampleSave({
           updated: msPreprocessed
         })
       : msPreprocessed;
+
+    // Save and link the Collecting Event if enabled:
+    const colEventFormRefToUse = colEventFormRef?.current?.values
+      ? colEventFormRef
+      : collectingEventRefExternal;
+    if (colEventFormRefToUse?.current) {
+      const collectingEventValues = {
+        ...withoutBlankFields(colEventFormRef?.current?.values),
+        ...withoutBlankFields(collectingEventRefExternal?.current?.values)
+      };
+      colEventFormRefToUse.current.values = collectingEventValues;
+    }
+
+    if (
+      (enableCollectingEvent || collectingEventRefExternal) &&
+      colEventFormRefToUse?.current
+    ) {
+      // Save the linked CollectingEvent if included:
+      const submittedCollectingEvent = cloneDeep(
+        colEventFormRefToUse.current.values
+      );
+
+      const collectingEventWasEdited =
+        !submittedCollectingEvent.id ||
+        !isEqual(submittedCollectingEvent, collectingEventInitialValues);
+
+      try {
+        // Throw if the Collecting Event sub-form has errors:
+        const colEventErrors =
+          await colEventFormRefToUse?.current?.validateForm();
+        if (!isEmpty(colEventErrors)) {
+          throw new DoOperationsError("", colEventErrors);
+        }
+        // Only send the save request if the Collecting Event was edited:
+        const savedCollectingEvent = collectingEventWasEdited
+          ? // Use the same save method as the Collecting Event page:
+            await saveCollectingEvent(
+              submittedCollectingEvent,
+              colEventFormRefToUse.current
+            )
+          : submittedCollectingEvent;
+
+        // Set the ColEventId here in case the next operation fails:
+        setColEventId(savedCollectingEvent.id);
+
+        // Link the MaterialSample to the CollectingEvent:
+        msDiff.collectingEvent = {
+          id: savedCollectingEvent.id,
+          type: savedCollectingEvent.type
+        };
+      } catch (error: unknown) {
+        if (error instanceof DoOperationsError) {
+          // Put the error messages into both form states:
+          colEventFormRefToUse.current.setStatus(error.message);
+          colEventFormRefToUse.current.setErrors(error.fieldErrors);
+          const newOpError = new DoOperationsError(
+            error.message,
+            mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)
+          );
+          throw newOpError;
+        }
+        throw error;
+      }
+    }
 
     // Check if there is any changes to the storage unit or storage unit usage.
     if (msDiff?.storageUnit?.id || msDiff?.storageUnitUsage?.id) {
@@ -1014,7 +1060,8 @@ export function useMaterialSampleSave({
     onSubmit,
     prepareSampleInput,
     prepareSampleSaveOperation,
-    loading
+    loading,
+    colEventFormRef
   };
 }
 

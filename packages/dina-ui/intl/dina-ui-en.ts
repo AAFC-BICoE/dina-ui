@@ -182,6 +182,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   determiningDate: "Determining Date",
   dinaHomeH1: "Dina Home",
   dinaManagementSectionTitle: "Management",
+  dinaConfigurationSectionTitle: "Configuration",
+  userProfile: "User Profile",
   disabledForChildMaterialSamples: "Disabled for child Material Samples",
   dragDropInstructionsHeader: "To rearrange the attribute order:",
   dragDropKeyboardInstructions:
@@ -359,7 +361,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_gridLayoutDefinition_column_label: "By Column",
   field_gridLayoutDefinition_row_label: "By Row",
   field_host: "Host",
-  field_id: "ID",
+  field_id: "UUID",
   field_isFiledAs_tooltip:
     "Make this determination the filed as. Only one determination can be filed as",
   field_isInseperable: "Keep Contents Together",
@@ -443,6 +445,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_scientificName: "Scientific Name",
   field_scientificNameInput: "Scientific Name",
   field_sex: "Sex",
+  field_sourceSet: "Source Set",
   field_startDate: "Start Date",
   field_startEventDateTime: "Start Event Date Time",
   field_startEventDateTime_tooltip:
@@ -528,6 +531,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   identifierType: "Identifier Type",
   identifierURI: "Identifier",
   identifiers: "Identifiers",
+  otherIdentifiers: "Other Identifiers",
   includeAll: "Include All",
   insertHybridSymbol: "Insert Hybrid Symbol",
   institution: "Institution",
@@ -577,17 +581,28 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleName: "Material Sample Name",
   materialSampleShowParentAttributes: "Parent Attributes",
   showParentAttributes: "Parent Material Sample",
+  splitConfigurationTitle: "Split Configurations",
+  splitConfigurationEdit: "Edit Split Configuration",
+  splitConfigurationAdd: "Add Split Configuration",
   materialSampleSplitConfiguration: "Split Configuration",
   materialSampleSplitConfigurationCondition: "Condition",
   materialSampleSplitConfigurationConditionType: "Condition Type",
   materialSampleSplitConfigurationDirectParent: "Direct Parent",
   materialSampleSplitConfigurationMaterialSampleNameGeneration:
     "Material Sample Name Generation",
+  materialSampleSplitConfigurationMaterialSampleGeneration:
+    "Material Sample Generation",
   materialSampleSplitConfigurationRequiredMaterialSampleType:
     "Material Sample Type is required when the Split Configuration is using the Material Sample Type strategy.",
   materialSampleSplitConfigurationStrategy: "Strategy",
   materialSampleSplitConfigurationVisibleMaterialSampleType:
     "Material Sample Type must be visible when Split Configuration is using the Material Sample Type strategy.",
+  materialSampleSplitConfigurationSeparator: "Separator",
+  splitConfiguration_separator_dash: "Dash",
+  splitConfiguration_separator_underscore: "Underscore",
+  splitConfiguration_separator_space: "Space",
+  materialSampleSplitConfigurationTypeCreatedBySplit:
+    "Material Sample Type Created",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleViewTitle: "{primaryID} - Material Sample",
   materialSamples: "Material Samples",
@@ -626,6 +641,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   multiple: "Multiple",
   multipleMaterialSamples: "Multiple Material Samples",
   multipleUnits: "Multiple Units",
+  isGeneric: "Generic",
   mustBeValidDecimalValue: "Must be a valid decimal value.",
   mustBeValidIntegerValue: "Must be a valid integer value.",
   noChildren: "No Children",
@@ -692,6 +708,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   protocolData: "Protocol Data",
   protocolListTitle: "Protocols",
   protocolNameLabel: "Protocol Name",
+  splitConfigurationNameLabel: "Split Configuration Name",
   protocolViewTitle: "Protocol",
   queryBuilder_addSearchGroup: "Add sub-query",
   queryBuilder_addSearchRule: "Add query",
@@ -868,6 +885,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnitType: "Storage Unit Type",
   storageUnitTypeListTitle: "Storage Unit Types",
   storagesCreatedByMe: "Storages Created By Me",
+  field_sourceSet_tooltip:
+    "User-defined name that can be used to retrieve all material samples that were created in the same batch.",
+  sourceSet_workbook_tooltip:
+    "Automatically generated name by the workbook generator that can be used to retrieve all the material samples imported by this workbook upload.",
   tags: "Tags",
   tag: "Tag",
   target: "Target",
@@ -1019,5 +1040,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbook_confirmation_view: "View Imported Material Samples",
   storageUnit_duplicate_title: "Storage Unit Name already exists",
   storageUnit_duplicate_body:
-    'The name "{duplicatedName}" is already in use for another storage unit in this group. Would you still like to proceed?'
+    'The name "{duplicatedName}" is already in use for another storage unit in this group. Would you still like to proceed?',
+  multipleSamplesWellCoordinates:
+    "Well coordinate {wellCoordinate} has multiple material samples: {samples}."
 };

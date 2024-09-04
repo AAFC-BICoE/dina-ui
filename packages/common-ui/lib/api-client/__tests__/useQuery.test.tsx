@@ -1,7 +1,7 @@
 import { DocWithErrors } from "jsonapi-typescript";
 import { KitsuResource, KitsuResponse, KitsuResponseData } from "kitsu";
 import { last } from "lodash";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { ClientSideJoinSpec } from "../client-side-join";
 import { MetaWithTotal } from "../operations-types";
 import {
@@ -147,7 +147,7 @@ describe("useQuery hook", () => {
 
   it("Provides an onSuccess callback arg", async () => {
     mockGet.mockImplementationOnce(async () => MOCK_TODO_RESPONSE);
-    mountWithAppContext(<TestComponent />, testCtx);
+    mountWithAppContext2(<TestComponent />, testCtx);
 
     await new Promise(setImmediate);
 
@@ -159,12 +159,14 @@ describe("useQuery hook", () => {
     mockGet.mockImplementation(async () => MOCK_TODO_RESPONSE);
 
     // Render with an initial 'deps' prop.
-    const wrapper = mountWithAppContext(<TestComponent deps={[1]} />, testCtx);
+    const { rerender } = mountWithAppContext2(
+      <TestComponent deps={[1]} />,
+      testCtx
+    );
     await new Promise(setImmediate);
+
     // Update with a different 'deps' prop.
-    wrapper.setProps({
-      children: <TestComponent deps={[2]} />
-    });
+    rerender(<TestComponent deps={[2]} />);
     await new Promise(setImmediate);
 
     // The request should have been sent twice.
@@ -176,12 +178,14 @@ describe("useQuery hook", () => {
     mockGet.mockImplementation(async () => MOCK_TODO_RESPONSE);
 
     // Render with an initial 'deps' prop.
-    const wrapper = mountWithAppContext(<TestComponent deps={[1]} />, testCtx);
+    const { rerender } = mountWithAppContext2(
+      <TestComponent deps={[1]} />,
+      testCtx
+    );
     await new Promise(setImmediate);
+
     // Update with the same 'deps' prop.
-    wrapper.setProps({
-      children: <TestComponent deps={[1]} />
-    });
+    rerender(<TestComponent deps={[1]} />);
     await new Promise(setImmediate);
 
     // The request should only have been sent once.
@@ -196,7 +200,7 @@ describe("useQuery hook", () => {
     ]);
 
     // Render with a joinSpec to a "people-api".
-    mountWithAppContext(
+    mountWithAppContext2(
       <TestComponent
         joinSpecs={[
           {
@@ -238,7 +242,7 @@ describe("useQuery hook", () => {
 
   it("Lets you disable the query.", async () => {
     // Render with an initial 'deps' prop.
-    mountWithAppContext(<TestComponent disabled={true} />, testCtx);
+    mountWithAppContext2(<TestComponent disabled={true} />, testCtx);
     await new Promise(setImmediate);
 
     expect(mockGet).toHaveBeenCalledTimes(0);
@@ -246,7 +250,7 @@ describe("useQuery hook", () => {
 
   it("Renders with loading as true before sending a request", (done) => {
     let renderCount = 0;
-    mountWithAppContext(
+    mountWithAppContext2(
       <Query<Todo[]> query={{ path: "todo" }}>
         {({ loading }) => {
           // Query should be rendered once with loading as true.
@@ -263,7 +267,7 @@ describe("useQuery hook", () => {
   });
 
   it("Passes single-resource data from the mocked API to child components", (done) => {
-    mountWithAppContext(
+    mountWithAppContext2(
       <Query<Todo> query={{ path: "todo/25" }}>
         {({ loading, response }) => {
           if (response) {
@@ -281,7 +285,7 @@ describe("useQuery hook", () => {
   });
 
   it("Passes list data from the mocked API to child components", (done) => {
-    mountWithAppContext(
+    mountWithAppContext2(
       <Query<Todo[], MetaWithTotal> query={{ path: "todo" }}>
         {({ loading, response }) => {
           if (response) {
@@ -314,7 +318,7 @@ describe("useQuery hook", () => {
   });
 
   it("Supports JSONAPI GET params", () => {
-    mountWithAppContext(
+    mountWithAppContext2(
       <Query<Todo[]>
         query={{
           fields: { todo: "name,description" },
@@ -348,7 +352,7 @@ describe("useQuery hook", () => {
 
   it("Renders an error to child components", (done) => {
     // Get an error by requesting an attribute that the resource doesn't have.
-    mountWithAppContext(
+    mountWithAppContext2(
       <Query<Todo[]>
         query={{ path: "todo", fields: { todo: "unknownAttribute" } }}
       >
@@ -369,7 +373,7 @@ describe("useQuery hook", () => {
     const mockChild = jest.fn(() => null);
 
     // The first render will fetch the data once.
-    const wrapper = mountWithAppContext(
+    const { rerender } = mountWithAppContext2(
       pagedQuery({ offset: 0, limit: 3 }, mockChild),
       testCtx
     );
@@ -388,9 +392,7 @@ describe("useQuery hook", () => {
     );
 
     // The second render with different props will fetch the data again.
-    wrapper.setProps({
-      children: pagedQuery({ offset: 3, limit: 3 }, mockChild)
-    });
+    rerender(pagedQuery({ offset: 3, limit: 3 }, mockChild));
 
     // Wait for the second request to start:
     await Promise.resolve();
@@ -415,7 +417,7 @@ describe("useQuery hook", () => {
     const mockChild = jest.fn(() => null);
 
     // Initial render.
-    const wrapper = mountWithAppContext(
+    const { rerender } = mountWithAppContext2(
       pagedQuery({ offset: 0, limit: 3 }, mockChild),
       testCtx
     );
@@ -435,9 +437,7 @@ describe("useQuery hook", () => {
     );
 
     // Render the component again with new props.
-    wrapper.setProps({
-      children: pagedQuery({ offset: 3, limit: 3 }, mockChild)
-    });
+    rerender(pagedQuery({ offset: 3, limit: 3 }, mockChild));
 
     // Query component renders with loading as true when re-fetching data.
     expect(mockChild).lastCalledWith(
@@ -457,13 +457,11 @@ describe("useQuery hook", () => {
     const pageSpec = { offset: 0, limit: 3 };
 
     // The first render will fetch the data once.
-    const wrapper = mountWithAppContext(pagedQuery(pageSpec), testCtx);
+    const { rerender } = mountWithAppContext2(pagedQuery(pageSpec), testCtx);
     expect(mockGet).toHaveBeenCalledTimes(1);
 
     // The second render with the same props will not fetch again.
-    wrapper.setProps({
-      children: pagedQuery(pageSpec)
-    });
+    rerender(pagedQuery(pageSpec));
     expect(mockGet).toHaveBeenCalledTimes(1);
   });
 });

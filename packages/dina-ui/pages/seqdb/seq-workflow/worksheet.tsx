@@ -40,7 +40,7 @@ export default function SeqWorksheetPage() {
       `seqdb-api/seq-batch/${id}`,
       {
         include:
-          "region,thermocyclerProfile,experimenters,protocol,,storageUnit,storageUnitType"
+          "region,thermocyclerProfile,experimenters,protocol,storageUnit,storageUnitType"
       }
     );
     const seqBatch = response.data;

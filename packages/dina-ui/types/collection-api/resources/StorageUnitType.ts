@@ -6,7 +6,6 @@ export interface StorageUnitTypeAttributes {
   group: string;
   createdBy?: string;
   createdOn?: string;
-  isInseperable?: boolean | null;
   gridLayoutDefinition?: GridLayoutDefinition;
 
   // client side attribute

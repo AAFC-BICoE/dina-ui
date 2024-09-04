@@ -1,14 +1,14 @@
 import { IntlProvider } from "react-intl";
-import Select from "react-select";
 import { DinaForm } from "../../formik-connected/DinaForm";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { FilterBuilderField } from "../FilterBuilderField";
+import { fireEvent } from "@testing-library/react";
 
 describe("FilterBuilderField component", () => {
   const mockSubmit = jest.fn();
 
   function mountForm() {
-    return mountWithAppContext(
+    return mountWithAppContext2(
       <IntlProvider
         locale="en"
         messages={{ "field_group.groupName": "Group Name" }}
@@ -30,20 +30,26 @@ describe("FilterBuilderField component", () => {
   it("Exposes the passed filter attributes as filter options.", () => {
     const wrapper = mountForm();
 
-    expect(wrapper.find<any>(Select).first().props().options).toEqual([
-      { label: "Name", value: "name" },
-      { label: "Group Name", value: "group.groupName" }
-    ]);
+    fireEvent.focus(
+      wrapper.getByRole("combobox", { name: /filter attribute/i })
+    );
+    fireEvent.keyDown(
+      wrapper.getByRole("combobox", { name: /filter attribute/i }),
+      { key: "ArrowDown", code: "ArrowDown", charCode: 40 }
+    );
+
+    const options = wrapper.getAllByRole("option") as HTMLOptionElement[];
+    expect(options.length).toBe(2);
+    expect(options[0].textContent).toEqual("Name");
+    expect(options[1].textContent).toEqual("Group Name");
   });
 
   it("Passes the filter model up to Formik.", async () => {
     const wrapper = mountForm();
-    await new Promise(setImmediate);
 
-    wrapper.find("form").simulate("submit");
-
+    // Submit the search...
+    fireEvent.click(wrapper.getByRole("button", { name: /search/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Formik should have the initial value.
     expect(mockSubmit).lastCalledWith(
@@ -53,14 +59,11 @@ describe("FilterBuilderField component", () => {
     );
 
     // Change an input value.
-    wrapper
-      .find(".filter-value")
-      .simulate("change", { target: { value: "test value" } });
-
-    wrapper.find("form").simulate("submit");
-
+    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
+      target: { value: "test value" }
+    });
+    fireEvent.click(wrapper.getByRole("button", { name: /search/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith(

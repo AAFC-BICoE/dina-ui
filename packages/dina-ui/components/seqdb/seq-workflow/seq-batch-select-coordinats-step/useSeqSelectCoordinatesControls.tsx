@@ -1,7 +1,16 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import { ApiClientContext, filterBy, useQuery } from "common-ui";
-import { compact, isEmpty, omitBy } from "lodash";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import {
+  ApiClientContext,
+  DeleteArgs,
+  filterBy,
+  SaveArgs,
+  useQuery
+} from "common-ui";
+import { compact, isEmpty, omitBy, pick, set } from "lodash";
+import {
+  MaterialSample,
+  StorageUnit
+} from "packages/dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   PcrBatchItem,
@@ -9,6 +18,7 @@ import {
   SeqReaction
 } from "../../../../types/seqdb-api";
 import { CellGrid } from "../../container-grid/ContainerGrid";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 interface SeqSelectCoordinatesControlsProps {
   seqBatchId: string;
@@ -19,12 +29,10 @@ export interface SeqReactionSample {
   seqReactionId?: string;
   seqBatchId?: string;
   pcrBatchItemId?: string;
+  storageUnitUsage?: StorageUnitUsage;
   primerId?: string;
   primerName?: string;
   primerDirection?: string;
-  wellRow?: string;
-  wellColumn?: number;
-  cellNumber?: number;
   sampleId?: string;
   sampleName?: string;
 }
@@ -33,7 +41,7 @@ export function useSeqSelectCoordinatesControls({
   seqBatchId,
   seqBatch
 }: SeqSelectCoordinatesControlsProps) {
-  const { save, bulkGet } = useContext(ApiClientContext);
+  const { save, bulkGet, apiClient } = useContext(ApiClientContext);
 
   const [itemsLoading, setItemsLoading] = useState<boolean>(true);
 
@@ -78,18 +86,35 @@ export function useSeqSelectCoordinatesControls({
   );
 
   useEffect(() => {
-    if (!seqBatch) return;
+    if (!seqBatch || !seqBatch.storageUnit) return;
 
-    if (seqBatch?.storageRestriction) {
-      setNumberOfColumns(seqBatch.storageRestriction.layout.numberOfColumns);
-      setNumberOfRows(seqBatch.storageRestriction.layout.numberOfRows);
-      setFillMode(
-        seqBatch.storageRestriction.layout.fillDirection === "BY_ROW"
-          ? "ROW"
-          : "COLUMN"
+    async function fetchStorageUnitTypeLayout() {
+      const storageUnitReponse = await apiClient.get<StorageUnit>(
+        `/collection-api/storage-unit/${seqBatch?.storageUnit?.id}`,
+        { include: "storageUnitType" }
       );
-      setIsStorage(true);
+      if (storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition) {
+        const gridLayoutDefinition =
+          storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition;
+        set(
+          seqBatch,
+          "gridLayoutDefinition.numberOfColumns",
+          gridLayoutDefinition.numberOfColumns
+        );
+        set(
+          seqBatch,
+          "gridLayoutDefinition.numberOfRows",
+          gridLayoutDefinition.numberOfRows
+        );
+        setNumberOfColumns(gridLayoutDefinition.numberOfColumns);
+        setNumberOfRows(gridLayoutDefinition.numberOfRows);
+        setFillMode(
+          gridLayoutDefinition.fillDirection === "BY_ROW" ? "ROW" : "COLUMN"
+        );
+        setIsStorage(true);
+      }
     }
+    fetchStorageUnitTypeLayout();
   }, [seqBatch]);
 
   useEffect(() => {
@@ -109,16 +134,21 @@ export function useSeqSelectCoordinatesControls({
         });
 
       const seqBatchItemsWithCoords = seqBatchItemsWithSampleNames.filter(
-        (item) => item.wellRow && item.wellColumn
+        (item) =>
+          item?.storageUnitUsage?.wellRow && item?.storageUnitUsage?.wellColumn
       );
 
       const seqBatchItemsNoCoords = seqBatchItemsWithSampleNames.filter(
-        (item) => !item.wellRow && !item.wellColumn
+        (item) =>
+          !item?.storageUnitUsage?.wellRow &&
+          !item?.storageUnitUsage?.wellColumn
       );
 
       const newCellGrid: CellGrid<SeqReactionSample> = {};
       seqBatchItemsWithCoords.forEach((item) => {
-        newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item;
+        newCellGrid[
+          `${item?.storageUnitUsage?.wellRow}_${item.storageUnitUsage?.wellColumn}`
+        ] = item;
       });
 
       setGridState({
@@ -195,12 +225,41 @@ export function useSeqSelectCoordinatesControls({
       })(""),
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
-      include: "pcrBatchItem,seqBatch,seqPrimer"
+      include: "pcrBatchItem,seqBatch,seqPrimer,storageUnitUsage"
     },
     {
       deps: [lastSave],
       onSuccess: async ({ data: seqReactions }) => {
         setItemsLoading(true);
+
+        /**
+         * Fetch StorageUnitUsage linked to each SeqReactions
+         * @returns
+         */
+        async function fetchStorageUnitUsage(
+          seqReactionSamp: SeqReactionSample[]
+        ): Promise<SeqReactionSample[]> {
+          const storageUnitUsageQuery = await bulkGet<StorageUnitUsage>(
+            seqReactionSamp
+              .filter((item) => item.storageUnitUsage?.id)
+              .map(
+                (item) => "/storage-unit-usage/" + item.storageUnitUsage?.id
+              ),
+            { apiBaseUrl: "/collection-api" }
+          );
+
+          return seqReactionSamp.map((seqReaction) => {
+            const queryStorageUnitUsage = storageUnitUsageQuery.find(
+              (storageUnitUsage) =>
+                storageUnitUsage?.id === seqReaction.storageUnitUsage?.id
+            );
+            return {
+              ...seqReaction,
+              storageUnitUsage: queryStorageUnitUsage as StorageUnitUsage
+            };
+          });
+        }
+
         const seqReactionAndPcrBatchItem = compact(
           seqReactions.map(
             (item) =>
@@ -211,15 +270,17 @@ export function useSeqSelectCoordinatesControls({
                 primerName: item.seqPrimer?.name,
                 seqReactionId: item.id,
                 pcrBatchItemId: item.pcrBatchItem?.id,
-                wellColumn: item.wellColumn,
-                wellRow: item.wellRow,
-                cellNumber: item.cellNumber
+                storageUnitUsage: item.storageUnitUsage
               } as SeqReactionSample)
           )
         );
+        const seqReactionCompleted = await fetchStorageUnitUsage(
+          seqReactionAndPcrBatchItem
+        );
+
         const pcrBatchItems = compact(
           await bulkGet<PcrBatchItem, true>(
-            seqReactionAndPcrBatchItem?.map(
+            seqReactionCompleted?.map(
               (item) =>
                 `/pcr-batch-item/${item.pcrBatchItemId}?include=materialSample`
             ),
@@ -231,7 +292,7 @@ export function useSeqSelectCoordinatesControls({
         );
 
         setSeqReactionSamples(
-          seqReactionAndPcrBatchItem.map((rec) => {
+          seqReactionCompleted.map((rec) => {
             const pcrBatchItem = pcrBatchItems.find(
               (item) => item.id === rec.pcrBatchItemId
             );
@@ -379,20 +440,58 @@ export function useSeqSelectCoordinatesControls({
           newWellColumn = Number(col);
           newWellRow = row;
         }
-
-        movedItem.wellColumn = newWellColumn;
-        movedItem.wellRow = newWellRow;
+        if (movedItem.storageUnitUsage) {
+          movedItem.storageUnitUsage.wellColumn = newWellColumn;
+          movedItem.storageUnitUsage.wellRow = newWellRow;
+        } else {
+          movedItem.storageUnitUsage = {
+            wellColumn: newWellColumn,
+            wellRow: newWellRow,
+            type: "storage-unit-usage"
+          };
+        }
 
         return movedItem;
       });
 
+      // Save storageUnitUsage resources with valid wellColumn and wellRow
+      const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] =
+        materialSampleItemsToSave
+          .filter(
+            (item) =>
+              item.storageUnitUsage?.wellColumn &&
+              item.storageUnitUsage?.wellRow
+          )
+          .map((item) => ({
+            type: "storage-unit-usage",
+            resource: {
+              wellColumn: item.storageUnitUsage?.wellColumn,
+              wellRow: item.storageUnitUsage?.wellRow,
+              storageUnit: seqBatch.storageUnit,
+              type: "storage-unit-usage",
+              id: item.storageUnitUsage?.id,
+              usageType: "seq-reaction"
+            }
+          }));
+
+      // Perform create/update for storage unit usages if required.
+      const savedStorageUnitUsages = storageUnitUsageSaveArgs.length
+        ? await save<StorageUnitUsage>(storageUnitUsageSaveArgs, {
+            apiBaseUrl: "/collection-api"
+          })
+        : [];
+
       const saveArgs = materialSampleItemsToSave.map((item) => {
+        const matchedStorageUnitUsage = savedStorageUnitUsages.find(
+          (storageUsage) =>
+            storageUsage.wellColumn === item.storageUnitUsage?.wellColumn &&
+            storageUsage.wellRow === item.storageUnitUsage?.wellRow
+        );
+
         return {
           resource: {
             type: "seq-reaction",
             id: item.seqReactionId,
-            wellColumn: item.wellColumn ?? null,
-            wellRow: item.wellRow ?? null,
             relationships: {
               seqBatch: {
                 data: {
@@ -411,14 +510,39 @@ export function useSeqSelectCoordinatesControls({
                   id: item.primerId,
                   type: "pcr-primer"
                 }
+              },
+              storageUnitUsage: {
+                data: matchedStorageUnitUsage
+                  ? pick(matchedStorageUnitUsage, "id", "type")
+                  : null
               }
             }
-          } as SeqReaction,
+          },
           type: "seq-reaction"
         };
       });
 
       await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
+
+      // Delete storageUnitUsage resources without wellColumn or wellRow (presumably removed from grid)
+      const deleteStorageUnitUsageArgs: DeleteArgs[] = materialSampleItemsToSave
+        .filter(
+          (item) =>
+            (!item.storageUnitUsage?.wellColumn ||
+              !item.storageUnitUsage?.wellRow) &&
+            item.storageUnitUsage?.id
+        )
+        .map((item) => ({
+          delete: {
+            id: item.storageUnitUsage?.id ?? "",
+            type: "storage-unit-usage"
+          }
+        }));
+      if (deleteStorageUnitUsageArgs.length) {
+        await save<StorageUnitUsage>(deleteStorageUnitUsageArgs, {
+          apiBaseUrl: "/collection-api"
+        });
+      }
 
       setLastSave(Date.now());
     } catch (err) {

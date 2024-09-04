@@ -75,7 +75,8 @@ export function StorageUnitForm({
 
   const initialValues = storageUnit || {
     type: "storage-unit",
-    parentStorageUnit: initialParent
+    parentStorageUnit: initialParent,
+    isGeneric: false
   };
 
   async function onSubmit({
@@ -184,13 +185,20 @@ export function StorageUnitFormFields({
   return (
     <div>
       <div className="row">
-        <div className="col-md-6">
+        <div className="col-md-6 d-flex">
           {!readOnly && !initialValues.id && (
             <ToggleField
               className="me-4"
               onChangeExternal={onStorageUnitMultipleToggled}
               name="isMultiple"
               label={formatMessage("multipleUnits")}
+            />
+          )}
+          {(!readOnly || initialValues.isGeneric) && (
+            <ToggleField
+              className="me-4"
+              name="isGeneric"
+              label={formatMessage("isGeneric")}
             />
           )}
         </div>

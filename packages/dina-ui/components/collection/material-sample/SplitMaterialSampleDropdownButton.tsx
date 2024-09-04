@@ -6,12 +6,12 @@ import Dropdown from "react-bootstrap/Dropdown";
 import Select from "react-select";
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
-import { FormTemplate } from "../../../types/collection-api";
-import { getSplitConfigurationFormTemplates } from "../../form-template/formTemplateUtils";
+import { SplitConfiguration } from "../../../types/collection-api/resources/SplitConfiguration";
 
-interface SplitConfigurationOption {
+export interface SplitConfigurationOption {
   label: string;
   value: string;
+  resource: SplitConfiguration;
 }
 
 type CustomMenuProps = {
@@ -43,38 +43,44 @@ export function SplitMaterialSampleDropdownButton({
   >([]);
 
   // Selected split configuration to use.
-  const [splitConfiguration, setSplitConfiguration] = useState<
+  const [splitConfigurationOption, setSplitConfigurationOption] = useState<
     SplitConfigurationOption | undefined
   >();
 
   // Retrieve all of the form templates, then filter for the correct one.
-  useQuery<FormTemplate[]>(
+  useQuery<SplitConfiguration[]>(
     {
-      path: "collection-api/form-template",
+      path: "collection-api/split-configuration",
+      page: {
+        limit: 1000
+      },
 
       // Display all user form templates and public to the group templates.
       filter: {
-        rsql: `group=in=(${groupNames});(createdBy==${username},restrictToCreatedBy==false)`
+        rsql: `group=in=(${groupNames});(createdBy==${username})`
       }
     },
     {
       disabled,
       onSuccess: async ({ data }) => {
-        const formTemplatesWithSplitConfig = getSplitConfigurationFormTemplates(
-          data as FormTemplate[],
-          materialSampleType
-        );
-        const generatedOptions = formTemplatesWithSplitConfig.map(
-          (formTemplate) => ({
-            label: formTemplate?.name ?? "",
-            value: formTemplate?.id ?? ""
-          })
-        );
+        // Generate the list of options, filter the ones for this specific material sample type condition.
+        const generatedOptions = data
+          .filter((splitConfig) =>
+            splitConfig.conditionalOnMaterialSampleTypes?.includes(
+              materialSampleType ?? ""
+            )
+          )
+          .map((splitConfig) => ({
+            label: splitConfig?.name ?? "",
+            value: splitConfig?.id ?? "",
+            resource: splitConfig
+          }));
+
         setSplitConfigurationOptions(generatedOptions);
 
         // If options are available, just set the first one automatically.
         if (generatedOptions.length > 0) {
-          setSplitConfiguration(generatedOptions[0]);
+          setSplitConfigurationOption(generatedOptions[0]);
         }
       }
     }
@@ -85,7 +91,7 @@ export function SplitMaterialSampleDropdownButton({
    */
   async function onClick() {
     // Ensure a split configuration option has been selected.
-    if (!splitConfiguration || splitConfiguration.value === "") {
+    if (!splitConfigurationOption || splitConfigurationOption.value === "") {
       return;
     }
 
@@ -93,7 +99,7 @@ export function SplitMaterialSampleDropdownButton({
     writeStorage<string[]>(BULK_SPLIT_IDS, ids);
 
     await router.push(
-      `/collection/material-sample/bulk-split?splitConfiguration=${splitConfiguration.value}`
+      `/collection/material-sample/bulk-split?splitConfiguration=${splitConfigurationOption.value}`
     );
   }
 
@@ -118,16 +124,16 @@ export function SplitMaterialSampleDropdownButton({
             name="splitConfiguration"
             options={splitConfigurationOptions}
             onChange={(selection) =>
-              selection && setSplitConfiguration(selection)
+              selection && setSplitConfigurationOption(selection)
             }
             autoFocus={true}
-            value={splitConfiguration}
+            value={splitConfigurationOption}
             isClearable={true}
           />
           <Button
             onClick={onClick}
             className="mt-3"
-            disabled={splitConfiguration === undefined}
+            disabled={splitConfigurationOption === undefined}
           >
             <DinaMessage id="splitButton" />
           </Button>
@@ -141,7 +147,10 @@ export function SplitMaterialSampleDropdownButton({
       id="splitMaterialSampleNameRequiredTooltip"
       disableSpanMargin={true}
       visibleElement={
-        <button className={"btn btn-primary " + (className ? className : "me-2")} disabled={true}>
+        <button
+          className={"btn btn-primary " + (className ? className : "me-2")}
+          disabled={true}
+        >
           <DinaMessage id="splitButton" />
         </button>
       }

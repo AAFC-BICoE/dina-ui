@@ -166,7 +166,8 @@ function getEntityColumn<TData extends KitsuResource>(
       header: () => <FieldHeader name={indexColumn?.label} />,
       accessorKey: indexColumn?.value,
       isKeyword: indexColumn?.keywordMultiFieldSupport,
-      columnSelectorString: path
+      columnSelectorString: path,
+      enableSorting: indexColumn?.value === "id" ? false : true
     };
   }
 }

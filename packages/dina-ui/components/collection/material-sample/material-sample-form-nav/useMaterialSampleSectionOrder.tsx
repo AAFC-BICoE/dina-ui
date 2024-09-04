@@ -9,7 +9,6 @@ import {
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
-  SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
 import { ScrollTarget } from "./MaterialSampleFormNav";
@@ -47,10 +46,6 @@ export function useMaterialSampleSectionOrder({
       disabled: !dataComponentState.enableShowParentAttributes,
       setEnabled: dataComponentState.setEnableShowParentAttributes,
       customSwitch: ShowParentAttributesSwitch
-    },
-    [SPLIT_CONFIGURATION_COMPONENT_NAME]: {
-      disabled: !dataComponentState.enableSplitConfiguration,
-      setEnabled: dataComponentState.setEnableSplitConfiguration
     },
     [COLLECTING_EVENT_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableCollectingEvent,

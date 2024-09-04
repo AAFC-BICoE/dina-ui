@@ -27,7 +27,7 @@ export function MaterialSampleBreadCrumb({
   const { readOnly } = useDinaFormContext();
   const parentPath = [...(materialSample.hierarchy?.slice(1) ?? [])];
 
-  const displayName = materialSample.materialSampleName;
+  const displayName = materialSample.materialSampleName ?? materialSample.id;
   const customStyle = {
     option: (base) => {
       return {

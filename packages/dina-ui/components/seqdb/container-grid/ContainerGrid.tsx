@@ -32,7 +32,7 @@ export interface CellGrid<ItemType> {
 }
 
 export function ContainerGrid<
-  BatchType extends { storageRestriction?: any },
+  BatchType extends { gridLayoutDefinition?: any },
   ItemType extends { sampleName?: string }
 >({
   batch,
@@ -47,10 +47,9 @@ export function ContainerGrid<
 
   useEffect(() => {
     if (!batch) return;
-
-    if (batch?.storageRestriction) {
-      setNumberOfRows(batch.storageRestriction.layout.numberOfRows);
-      setNumberOfColumns(batch.storageRestriction.layout.numberOfColumns);
+    if (batch?.gridLayoutDefinition) {
+      setNumberOfRows(batch.gridLayoutDefinition.numberOfRows);
+      setNumberOfColumns(batch.gridLayoutDefinition.numberOfColumns);
     }
   }, [batch]);
 
@@ -90,7 +89,7 @@ export function ContainerGrid<
           const coords = `${rowLabel}_${column}`;
 
           return (
-            <div className={`well-${coords}`} style={{ height: "auto" }}>
+            <div className={`well-${coords}`} style={{ minHeight: "40px" }}>
               <GridCell<ItemType>
                 movedItems={movedItems}
                 onDrop={({ batchItemSample: newItem }) =>
@@ -165,10 +164,10 @@ function GridCell<ItemType extends { sampleName?: string }>({
     >
       <div
         ref={drop}
-        className="h-100 w-100"
         style={{
           border: dragHover ? "3px dashed #1C6EA4" : undefined,
-          background: dragHover ? "#f7fbff" : undefined
+          background: dragHover ? "#f7fbff" : undefined,
+          minHeight: "40px"
         }}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}

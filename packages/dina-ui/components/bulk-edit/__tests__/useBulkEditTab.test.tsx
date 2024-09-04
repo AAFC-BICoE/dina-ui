@@ -240,11 +240,6 @@ describe("Material sample bulk edit tab", () => {
       // Keeps the name and type:
       type: "material-sample",
       materialSampleName: "test-sample",
-      // Adds the Col event:
-      collectingEvent: {
-        id: "11111111-1111-1111-1111-111111111111",
-        type: "collecting-event"
-      },
       // Sets the default association because it's enabled and there are no values set in the other tabs:
       associations: [{}],
       // Sets the default organism because it's enabled and there are no values set in the other tabs:

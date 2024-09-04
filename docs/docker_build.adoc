@@ -6,7 +6,7 @@ From the top-level directory, run the yarn build and then the docker build:
 ----
 yarn
 yarn workspace dina-ui build
-docker build -f Dockerfile -t dina-ui:tag .
+docker build -t dina-ui:dev .
 ----
 
 Docker environment variables required to run:
