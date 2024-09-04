@@ -1,8 +1,10 @@
 import { KitsuResource } from "kitsu";
 import Select from "react-select/base";
 import { ResourceSelect, ResourceSelectProps } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { AsyncOption } from "../ResourceSelect";
+import "@testing-library/jest-dom";
+import { fireEvent, screen } from "@testing-library/react";
 
 /** Example */
 interface Todo extends KitsuResource {
@@ -58,19 +60,28 @@ describe("ResourceSelect component", () => {
   };
 
   function mountWithContext(element: JSX.Element) {
-    return mountWithAppContext(element, { apiContext });
+    return mountWithAppContext2(element, { apiContext });
   }
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("Renders initially with a loading indicator and placeholder message.", () => {
-    const wrapper = mountWithContext(
+  it("Renders initially with a loading indicator and placeholder message.", async () => {
+    const { container } = mountWithContext(
       <ResourceSelect {...DEFAULT_SELECT_PROPS} />
     );
 
-    expect((wrapper.find(Select).props() as any).isLoading).toEqual(true);
+    expect(
+      container.querySelector(".react-select__loading-indicator")
+    ).toBeInTheDocument();
+
+    // Wait for the options to load.
+    await new Promise(setImmediate);
+
+    expect(
+      container.querySelector(".react-select__loading-indicator")
+    ).not.toBeInTheDocument();
   });
 
   it("Fetches a list of options from the back-end API.", async () => {
@@ -80,13 +91,15 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    const options = (wrapper.find(Select).props() as any).options;
+    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
+    await new Promise(setImmediate);
 
     // There should be 4 options including the <None> option.
-    expect(options[0].options.length).toEqual(4);
-    expect(options[0].options.map((option) => option.label)).toEqual([
+    const options = wrapper.getAllByRole("option");
+    expect(options.length).toEqual(4);
+    expect(options.map((option) => option.textContent)).toEqual([
       "<None>",
       "todo 1",
       "todo 2",
@@ -103,13 +116,16 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    const options = wrapper.find(Select).prop<any>("options")[0].options;
-    const onChange = wrapper.find(Select).prop("onChange");
+    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
+    await new Promise(setImmediate);
 
-    // Select the third option (excluding the <none option>).
-    onChange(options[3], null as any);
+    const options = wrapper.getAllByRole("option");
+
+    // Select the third option.
+    fireEvent.click(options[3]);
+    await new Promise(setImmediate);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith(
@@ -118,33 +134,37 @@ describe("ResourceSelect component", () => {
         name: "todo 3",
         type: "todo"
       },
-      null
+      { action: "select-option", name: undefined, option: undefined }
     );
   });
 
-  it("Allows the 'onChange' prop to be undefined.", () => {
+  it("Allows the 'onChange' prop to be undefined.", async () => {
     const wrapper = mountWithContext(
       <ResourceSelect {...DEFAULT_SELECT_PROPS} onChange={undefined} />
     );
 
-    // Select an option.
-    (wrapper.find(Select).props() as any).onChange({
-      label: "a todo",
-      resource: {},
-      value: "1"
-    });
+    // Wait for the options to load.
+    await new Promise(setImmediate);
+
+    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
+    await new Promise(setImmediate);
+
+    const options = wrapper.getAllByRole("option");
+
+    // Select the third option.
+    fireEvent.click(options[3]);
 
     // Nothing should happen because no onChange prop was provided.
   });
 
   it("Passes optional 'include' prop for the JSONAPI GET request.", async () => {
-    const wrapper = mountWithContext(
+    mountWithContext(
       <ResourceSelect {...DEFAULT_SELECT_PROPS} include="group" />
     );
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockGet).lastCalledWith("todo-api/todo", {
@@ -155,13 +175,10 @@ describe("ResourceSelect component", () => {
   });
 
   it("Omits optional 'sort' and 'include' props from the GET request when they are not passed as props.", async () => {
-    const wrapper = mountWithContext(
-      <ResourceSelect {...DEFAULT_SELECT_PROPS} />
-    );
+    mountWithContext(<ResourceSelect {...DEFAULT_SELECT_PROPS} />);
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
 
@@ -182,14 +199,14 @@ describe("ResourceSelect component", () => {
       <ResourceSelect {...DEFAULT_SELECT_PROPS} filter={filter} />
     );
 
-    const { onInputChange } = wrapper.find(Select).props();
-
-    // Simulate the select component's input change.
-    onInputChange("test filter value", null as any);
-
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
+
+    // Simulate changing the value and filtering it.
+    fireEvent.change(wrapper.getByRole("combobox"), {
+      target: { value: "test filter value" }
+    });
+    await new Promise(setImmediate);
 
     // The GET function shsould have been called twice: for the initial query and again for the
     // filtered query.
@@ -202,30 +219,13 @@ describe("ResourceSelect component", () => {
       page: { limit: 6 }
     });
 
-    const { options } = wrapper.find(Select).props();
+    const options = wrapper.getAllByRole("option");
 
     // The <None> option should be hidden when a search value is specified.
-    expect(options).toEqual([
-      {
-        label: "Search results",
-        options: [
-          {
-            label: "todo 1",
-            resource: { id: "1", name: "todo 1", type: "todo" },
-            value: "1"
-          },
-          {
-            label: "todo 2",
-            resource: { id: "2", name: "todo 2", type: "todo" },
-            value: "2"
-          },
-          {
-            label: "todo 3",
-            resource: { id: "3", name: "todo 3", type: "todo" },
-            value: "3"
-          }
-        ]
-      }
+    expect(options.map((option) => option.textContent)).toEqual([
+      "todo 1",
+      "todo 2",
+      "todo 3"
     ]);
   });
 
@@ -240,17 +240,7 @@ describe("ResourceSelect component", () => {
       <ResourceSelect {...DEFAULT_SELECT_PROPS} value={value} />
     );
 
-    const currentValue = (wrapper.find(Select).props() as any).value;
-
-    expect(currentValue).toEqual({
-      label: "DEFAULT TODO",
-      resource: {
-        id: "300",
-        name: "DEFAULT TODO",
-        type: "todo"
-      },
-      value: "300"
-    });
+    expect(wrapper.getByText(/default todo/i)).toBeInTheDocument();
   });
 
   it("Provides a <None> option to set the relationship as null.", async () => {
@@ -262,27 +252,24 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    const options = wrapper.find(Select).prop<any>("options")[0].options;
-    const onChange = wrapper.find(Select).prop("onChange");
+    // Display the options...
+    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
+    await new Promise(setImmediate);
 
-    const nullOption = options[0];
-
-    expect(nullOption).toEqual({
-      label: "<None>",
-      resource: {
-        id: null
-      },
-      value: null
-    });
+    const options = wrapper.getAllByRole("option");
+    expect(options[0].textContent).toEqual("<None>");
 
     // Select the null option.
-    onChange(nullOption, null as any);
+    fireEvent.click(options[0]);
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith({ id: null }, null);
+    expect(mockOnChange).lastCalledWith(
+      { id: null },
+      { action: "select-option", name: undefined, option: undefined }
+    );
   });
 
   it("Shows a <None> label when the <None> option is selected.", () => {
