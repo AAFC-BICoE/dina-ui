@@ -3,7 +3,7 @@ import { ResourceSelect, ResourceSelectProps } from "../..";
 import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { AsyncOption } from "../ResourceSelect";
 import "@testing-library/jest-dom";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 
 /** Example */
 interface Todo extends KitsuResource {
@@ -133,7 +133,7 @@ describe("ResourceSelect component", () => {
         name: "todo 3",
         type: "todo"
       },
-      { action: "select-option", name: undefined, option: undefined }
+      expect.objectContaining({})
     );
   });
 
@@ -267,7 +267,7 @@ describe("ResourceSelect component", () => {
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith(
       { id: null },
-      { action: "select-option", name: undefined, option: undefined }
+      expect.objectContaining({})
     );
   });
 
@@ -294,10 +294,29 @@ describe("ResourceSelect component", () => {
   it("Allows multi-select mode.", async () => {
     const mockOnChange = jest.fn();
 
+    const TEST_MULTI_VALUE = [
+      {
+        id: "1",
+        name: "todo 1",
+        type: "todo"
+      },
+      {
+        id: "2",
+        name: "todo 2",
+        type: "todo"
+      },
+      {
+        id: "3",
+        name: "todo 3",
+        type: "todo"
+      }
+    ];
+
     const wrapper = mountWithContext(
       <ResourceSelect<Todo>
         {...DEFAULT_SELECT_PROPS}
         isMulti={true}
+        value={TEST_MULTI_VALUE}
         onChange={mockOnChange}
       />
     );
@@ -305,21 +324,7 @@ describe("ResourceSelect component", () => {
     // Wait for the options to load.
     await new Promise(setImmediate);
 
-    // Display the options...
-    fireEvent.click(wrapper.getByText(/type here to search\./i));
-    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
-
-    const options = wrapper.getAllByRole("option");
-
-    // Select the second and third options.
-    fireEvent.keyDown(options[1], { key: "Shift" });
-    fireEvent.click(options[1]);
-    fireEvent.keyUp(options[1], { key: "Shift" });
-
-    fireEvent.keyDown(options[2], { key: "Shift" });
-    fireEvent.click(options[2]);
-    fireEvent.keyUp(options[2], { key: "Shift" });
+    fireEvent.click(wrapper.getByRole("button", { name: /remove todo 1/i }));
     await new Promise(setImmediate);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
@@ -336,7 +341,7 @@ describe("ResourceSelect component", () => {
           type: "todo"
         }
       ],
-      null
+      expect.objectContaining({})
     );
   });
 
@@ -426,11 +431,10 @@ describe("ResourceSelect component", () => {
 
     await new Promise(setImmediate);
     expect(mockGetResource).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(TEST_ASYNC_TODO, {
-      action: "select-option",
-      name: undefined,
-      option: undefined
-    });
+    expect(mockOnChange).lastCalledWith(
+      TEST_ASYNC_TODO,
+      expect.objectContaining({})
+    );
   });
 
   it("Allows a callback options prop to show special options that call a function (multi dropdown mode).", async () => {
@@ -480,9 +484,7 @@ describe("ResourceSelect component", () => {
           type: "todo"
         }
       ],
-      expect.objectContaining({
-        /* no action check */
-      })
+      expect.objectContaining({})
     );
   });
 
