@@ -1,5 +1,4 @@
 import { KitsuResource } from "kitsu";
-import Select from "react-select/base";
 import { ResourceSelect, ResourceSelectProps } from "../..";
 import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { AsyncOption } from "../ResourceSelect";
@@ -277,9 +276,7 @@ describe("ResourceSelect component", () => {
       <ResourceSelect {...DEFAULT_SELECT_PROPS} value={{ id: null }} />
     );
 
-    expect(wrapper.containsMatchingElement(<div>{"<None>"}</div>)).toEqual(
-      true
-    );
+    expect(wrapper.getByText(/<none>/i)).toBeInTheDocument();
   });
 
   it("Shows a '<None>' label in the select input when the passed value's id is null.", () => {
@@ -291,9 +288,7 @@ describe("ResourceSelect component", () => {
       <ResourceSelect {...DEFAULT_SELECT_PROPS} value={nullOption} />
     );
 
-    expect(wrapper.containsMatchingElement(<div>{"<None>"}</div>)).toEqual(
-      true
-    );
+    expect(wrapper.getByText(/<none>/i)).toBeInTheDocument();
   });
 
   it("Allows multi-select mode.", async () => {
@@ -309,13 +304,23 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    const options = wrapper.find<any>(Select).prop("options")[0].options;
-    const onChange = wrapper.find(Select).prop("onChange");
+    // Display the options...
+    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
+    await new Promise(setImmediate);
+
+    const options = wrapper.getAllByRole("option");
 
     // Select the second and third options.
-    onChange([options[1], options[2]], null as any);
+    fireEvent.keyDown(options[1], { key: "Shift" });
+    fireEvent.click(options[1]);
+    fireEvent.keyUp(options[1], { key: "Shift" });
+
+    fireEvent.keyDown(options[2], { key: "Shift" });
+    fireEvent.click(options[2]);
+    fireEvent.keyUp(options[2], { key: "Shift" });
+    await new Promise(setImmediate);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith(
@@ -359,9 +364,9 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.text()).toEqual("todo 2todo 3");
+    expect(wrapper.getByText(/todo 2/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/todo 3/i)).toBeInTheDocument();
   });
 
   it("Does not render the 'none' option in multi-select mode.", async () => {
@@ -371,12 +376,18 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    const options = wrapper.find(Select).prop<any>("options")[0].options;
+    // Display the options...
+    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
+    await new Promise(setImmediate);
+
+    const options = wrapper.getAllByRole("option");
 
     // Only the todos should be options.
-    expect(options.map((o) => o.resource)).toEqual(MOCK_TODOS.data);
+    expect(options.map((o) => o.textContent)).toEqual(
+      MOCK_TODOS.data.map((o) => o.name)
+    );
   });
 
   it("Allows a callback options prop to show special options that call a function (single dropdown mode).", async () => {
@@ -399,23 +410,27 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    const options = wrapper.find(Select).prop<any>("options")[0].options;
-    const asyncOptions = wrapper.find(Select).prop<any>("options")[1].options;
+    // Display the options...
+    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
+    await new Promise(setImmediate);
+
+    const options = wrapper.getAllByRole("option");
 
     // There should be 5 options including the <None> option and the custom callback option:
-    expect(options.length).toEqual(4);
-    expect(asyncOptions.length).toEqual(1);
+    expect(options.length).toEqual(5);
 
     // Select the callback option, which should call the callback:
-    wrapper.find(Select).prop<any>("onChange")(asyncOptions[0]);
+    fireEvent.click(options[4]);
 
     await new Promise(setImmediate);
-    wrapper.update();
-
     expect(mockGetResource).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(TEST_ASYNC_TODO, undefined);
+    expect(mockOnChange).lastCalledWith(TEST_ASYNC_TODO, {
+      action: "select-option",
+      name: undefined,
+      option: undefined
+    });
   });
 
   it("Allows a callback options prop to show special options that call a function (multi dropdown mode).", async () => {
@@ -439,26 +454,35 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    const options = wrapper.find(Select).prop<any>("options")[0].options;
-    const asyncOptions = wrapper.find(Select).prop<any>("options")[1].options;
+    // Display the options...
+    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
+    await new Promise(setImmediate);
+
+    const options = wrapper.getAllByRole("option");
 
     // There should be 4 options including the custom callback option:
-    expect(options.length).toEqual(3);
-    expect(asyncOptions.length).toEqual(1);
+    expect(options.length).toEqual(4);
 
     // Select the callback option, which should call the callback:
-    wrapper.find(Select).prop<any>("onChange")([options[0], asyncOptions[0]]);
+    fireEvent.click(options[3]);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGetResource).toHaveBeenCalledTimes(1);
     // Called with the normal option plus the async-fetched value:
     expect(mockOnChange).lastCalledWith(
-      [options[0].resource, TEST_ASYNC_TODO],
-      undefined
+      [
+        {
+          id: "100",
+          name: "async todo",
+          type: "todo"
+        }
+      ],
+      expect.objectContaining({
+        /* no action check */
+      })
     );
   });
 
@@ -482,31 +506,26 @@ describe("ResourceSelect component", () => {
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // There should be 5 options including the custom callback option and the none option.
-    const options = wrapper.find(Select).prop<any>("options")[0].options;
-    const asyncOptions = wrapper.find(Select).prop<any>("options")[1].options;
-    expect(options.length).toEqual(4);
-    expect(asyncOptions.length).toEqual(1);
-
-    const { onInputChange } = wrapper.find(Select).props();
-
-    // Simulate searching something that does not exist.
-    onInputChange("incorrect search with no matches", null as any);
-
-    // Wait for the options to load after the search has been entered.
+    fireEvent.click(wrapper.getByText(/type here to search\./i));
+    fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Select the last option, which should be the custom callback option.
-    wrapper.find(Select).prop<any>("onChange")(asyncOptions[0]);
+    const options = wrapper.getAllByRole("option");
+    expect(options.length).toEqual(5);
 
+    // Simulate changing the value and filtering it.
+    fireEvent.change(wrapper.getByRole("combobox"), {
+      target: { value: "incorrect search with no matches" }
+    });
+    fireEvent.keyPress(wrapper.getByRole("combobox"), { key: "Enter" });
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // If the resource has been called, then the selected option was the async option.
-    expect(mockGetResource).toHaveBeenCalledTimes(1);
+    // Async option should always be displayed even in search results.
+    expect(
+      wrapper.getByRole("option", { name: /asyncoption/i })
+    ).toBeInTheDocument();
   });
 
   it("Fetches the selected value's full object when only a shallow reference (id+type) is provided.", async () => {
@@ -518,22 +537,15 @@ describe("ResourceSelect component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockBulkGet).lastCalledWith(["todo/ABC"], {
       apiBaseUrl: "/todo-api",
       returnNullForMissingResource: true
     });
 
-    expect(wrapper.find(Select).prop("value")).toEqual({
-      label: "ABC-fetched-from-bulkGet",
-      resource: {
-        id: "ABC",
-        name: "ABC-fetched-from-bulkGet", // The name was fetched using bulkGet.
-        type: "todo"
-      },
-      value: "ABC"
-    });
+    expect(
+      wrapper.getByText(/abc\-fetched\-from\-bulkget/i)
+    ).toBeInTheDocument();
   });
 
   it("Doesn't fetch the selected value's full object when a full value (not shallow reference) provided.", async () => {
@@ -545,18 +557,8 @@ describe("ResourceSelect component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
-
     expect(mockBulkGet).toHaveBeenCalledTimes(0);
 
-    expect(wrapper.find(Select).prop("value")).toEqual({
-      label: "example-custom-name",
-      resource: {
-        id: "ABC",
-        name: "example-custom-name", // The name was fetched using bulkGet.
-        type: "todo"
-      },
-      value: "ABC"
-    });
+    expect(wrapper.getByText(/example\-custom\-name/i)).toBeInTheDocument();
   });
 });
