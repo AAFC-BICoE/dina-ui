@@ -3,29 +3,76 @@ import {
   FieldSet,
   SelectField,
   TextField,
-  useDinaFormContext
+  useDinaFormContext,
+  useBulkEditTabContext
 } from "common-ui/lib";
 import useVocabularyOptions from "../useVocabularyOptions";
 import { FieldArray, useFormikContext } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { getFormTemplateCheckboxes } from "../../form-template/formTemplateUtils";
+import { isEqual, uniq } from "lodash";
+import { useEffect } from "react";
 
 export function OtherIdentifiersSection() {
   const { readOnly, isTemplate, formTemplate, isBulkEditAllTab } =
     useDinaFormContext();
+  const bulkEditCtx = useBulkEditTabContext();
   const { values } = useFormikContext();
 
   const { vocabOptions } = useVocabularyOptions({
     path: "collection-api/vocabulary2/materialSampleIdentifierType"
   });
 
-  // Determine if the form template sections should be visible. (Bulk edit is disabled for now)
+  useEffect(() => {
+    if (
+      isBulkEditAllTab &&
+      bulkEditCtx &&
+      bulkEditCtx.bulkEditFormRef.current
+    ) {
+      const identifiers = bulkEditCtx.resourceHooks.map(
+        (sample) => (sample.formRef.current?.values as any)?.identifiers
+      );
+      const dwcOtherCatalogNumbers = bulkEditCtx.resourceHooks.map(
+        (sample) =>
+          (sample.formRef.current?.values as any)?.dwcOtherCatalogNumbers
+      );
+      const allIdentifiersSame = isEqual(identifiers, uniq(identifiers));
+      const allDwcNumbersSame = isEqual(
+        dwcOtherCatalogNumbers,
+        uniq(dwcOtherCatalogNumbers)
+      );
+
+      // Special cases where the bulk edit tab should display the values since they match exactly.
+      if (allIdentifiersSame) {
+        bulkEditCtx.bulkEditFormRef.current?.setFieldValue(
+          "identifiers",
+          (bulkEditCtx.resourceHooks?.at(0)?.formRef.current?.values as any)
+            ?.identifiers
+        );
+        bulkEditCtx.bulkEditFormRef.current?.setFieldTouched(
+          "identifiers",
+          false
+        );
+      }
+      if (allDwcNumbersSame) {
+        bulkEditCtx.bulkEditFormRef.current?.setFieldValue(
+          "dwcOtherCatalogNumbers",
+          (bulkEditCtx.resourceHooks?.at(0)?.formRef.current?.values as any)
+            ?.dwcOtherCatalogNumbers
+        );
+        bulkEditCtx.bulkEditFormRef.current?.setFieldTouched(
+          "dwcOtherCatalogNumbers",
+          false
+        );
+      }
+    }
+  }, [isBulkEditAllTab, bulkEditCtx]);
+
+  // Determine if the form template sections should be visible.
   const visibility = getFormTemplateCheckboxes(formTemplate);
   const otherIdentifiersVisible = readOnly
     ? Object.keys((values as any)?.identifiers ?? {})?.length !== 0
-    : isBulkEditAllTab
-    ? false
     : formTemplate
     ? visibility?.templateCheckboxes?.[
         "identifiers-component.identifiers-section.identifiers"
@@ -33,8 +80,6 @@ export function OtherIdentifiersSection() {
     : true;
   const otherCatalogNumbersVisible = readOnly
     ? !!(values as any)?.dwcOtherCatalogNumbers
-    : isBulkEditAllTab
-    ? false
     : formTemplate
     ? visibility?.templateCheckboxes?.[
         "identifiers-component.identifiers-section.dwcOtherCatalogNumbers"
