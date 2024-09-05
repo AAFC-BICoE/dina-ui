@@ -4,6 +4,8 @@ import {
   ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
+  processExtensionValuesLoading,
+  processExtensionValuesSaving,
   SubmitButton,
   useQuery,
   withResponse
@@ -56,7 +58,12 @@ export interface ProjectFormValues extends InputResource<Project> {}
 
 export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
   const { save } = useContext(ApiClientContext);
-
+  // Process loaded back-end data into data structure that Forkmiks can use
+  if (fetchedProject?.extensionValues) {
+    fetchedProject.extensionValues = processExtensionValuesLoading(
+      fetchedProject.extensionValues
+    );
+  }
   const initialValues: ProjectFormValues = fetchedProject
     ? {
         ...fetchedProject,
@@ -73,7 +80,11 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
     submittedValues
   }) => {
     (submittedValues as any).relationships = {};
-
+    if (submittedValues.extensionValues) {
+      submittedValues.extensionValues = processExtensionValuesSaving(
+        submittedValues.extensionValues
+      );
+    }
     const input: InputResource<Project> = {
       ...submittedValues,
       // Convert the editable format to the stored format:

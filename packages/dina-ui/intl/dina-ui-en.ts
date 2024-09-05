@@ -229,6 +229,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   fieldExtensions: "Field Extensions",
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
+  projectFieldExtensions: "Project Field Extensions",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
   field_acDigitizationDate: "Date Original Version Created",
