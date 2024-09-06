@@ -1042,5 +1042,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnit_duplicate_body:
     'The name "{duplicatedName}" is already in use for another storage unit in this group. Would you still like to proceed?',
   multipleSamplesWellCoordinates:
-    "Well coordinate {wellCoordinate} has multiple material samples: {samples}."
+    "Well coordinate {wellCoordinate} has multiple material samples: {samples}.",
+  unitMismatchComponents:
+    "Some components' units are not ul/rxn and will not show up in the reaction table: {components}."
 };
