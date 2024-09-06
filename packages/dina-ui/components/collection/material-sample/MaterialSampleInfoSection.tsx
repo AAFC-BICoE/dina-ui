@@ -5,6 +5,7 @@ import {
   FieldSet,
   FieldSpy,
   TextField,
+  ToggleField,
   useDinaFormContext
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../..//intl/dina-ui-intl";
@@ -85,6 +86,10 @@ export function MaterialSampleInfoSection({
           )}
         </div>
         <div className="col-md-6">
+          <ToggleField
+            name="isBaseForSplitByType"
+            disableTemplateCheckbox={true}
+          />
           <TextField name="materialSampleRemarks" multiLines={true} />
         </div>
       </div>

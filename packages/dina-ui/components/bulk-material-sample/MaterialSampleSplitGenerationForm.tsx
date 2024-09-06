@@ -312,7 +312,7 @@ export function MaterialSampleSplitGenerationForm({
 
             <TextField
               name={"sourceSet"}
-              className="mt-3"
+              className={isMultiple ? "" : "mt-3"}
               disabled={baseNameError}
             />
           </div>

@@ -369,6 +369,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_isPrimary_tooltip:
     "Make this determination the primary data point when exported. Only one determination can be primary",
   field_isRestricted: "Is Restricted",
+  field_isBaseForSplitByType: "Use As Base Name For Split",
+  field_isBaseForSplitByType_tooltip:
+    "When enabled and using type based Split Configurations, if no parents contain a different Material Sample Type then this Material Sample will be used to derive the identifier from.",
   field_isolatedBy: "Isolated By",
   field_isolatedOn: "Isolated On",
   field_isolationRemarks: "Isolation Remarks",
