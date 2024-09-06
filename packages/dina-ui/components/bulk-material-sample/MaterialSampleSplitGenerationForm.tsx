@@ -73,6 +73,8 @@ export function MaterialSampleSplitGenerationForm({
     MaterialSample[]
   >([]);
 
+  const [baseNameError, setBaseNameError] = useState<boolean>(false);
+
   const isMultiple = useMemo(() => ids.length > 1, [ids]);
 
   const materialSamplesQuery = useBulkGet<MaterialSample>({
@@ -114,7 +116,9 @@ export function MaterialSampleSplitGenerationForm({
     },
     {
       disabled:
-        !hasMismatchMaterialSampleType || splitFromMaterialSamples.length === 0,
+        !hasMismatchMaterialSampleType ||
+        !baseNameError ||
+        splitFromMaterialSamples.length === 0,
       onSuccess: async ({ data }) => {
         // Determine the material sample types of all the selected material samples.
         const uniqueMaterialSampleTypes = splitFromMaterialSamples?.reduce(
@@ -172,7 +176,7 @@ export function MaterialSampleSplitGenerationForm({
         <SubmitButton
           className={"ms-auto"}
           buttonProps={() => ({
-            disabled: !splitConfiguration
+            disabled: !splitConfiguration || baseNameError
           })}
         >
           <DinaMessage id="splitButton" />
@@ -253,12 +257,17 @@ export function MaterialSampleSplitGenerationForm({
             errorMessage={formatMessage("mismatchMaterialSampleTypeError")}
           />
         )}
+        {baseNameError && (
+          <ErrorBanner
+            errorMessage={formatMessage("baseNameGenerationErrorMessage")}
+          />
+        )}
         <div className="row">
           <div className="col-md-5">
             <h4 className="mt-2">
               <DinaMessage id="settingLabel" />
             </h4>
-            {splitConfigurationOptions.length !== 0 && (
+            {(splitConfigurationOptions.length !== 0 || baseNameError) && (
               <>
                 <strong>
                   <DinaMessage id="selectSplitConfiguration" />
@@ -282,14 +291,8 @@ export function MaterialSampleSplitGenerationForm({
               <Card.Body>
                 <DinaMessage id="splitFrom" />:
                 <ul>
-                  {Object.keys(generatedIdentifiers).map((parentId, index) => (
-                    <li key={index}>
-                      {
-                        filteredMaterialSamples.find(
-                          (materialSample) => materialSample.id === parentId
-                        )?.materialSampleName
-                      }
-                    </li>
+                  {filteredMaterialSamples.map((materialSample, index) => (
+                    <li key={index}>{materialSample.materialSampleName}</li>
                   ))}
                 </ul>
               </Card.Body>
@@ -312,6 +315,7 @@ export function MaterialSampleSplitGenerationForm({
               splitFromMaterialSamples={filteredMaterialSamples}
               generatedIdentifiers={generatedIdentifiers}
               setGeneratedIdentifiers={setGeneratedIdentifiers}
+              setBaseNameError={setBaseNameError}
               splitConfiguration={splitConfiguration}
             />
           </div>
@@ -325,6 +329,7 @@ interface PreviewGeneratedNamesProps {
   splitFromMaterialSamples: MaterialSample[];
   generatedIdentifiers: Record<string, string[]>;
   setGeneratedIdentifiers: (identifiers: Record<string, string[]>) => void;
+  setBaseNameError: (value: boolean) => void;
   splitConfiguration?: SplitConfiguration;
 }
 
@@ -332,6 +337,7 @@ function PreviewGeneratedNames({
   splitFromMaterialSamples,
   generatedIdentifiers,
   setGeneratedIdentifiers,
+  setBaseNameError,
   splitConfiguration
 }: PreviewGeneratedNamesProps) {
   const { save } = useApiClient();
@@ -372,31 +378,45 @@ function PreviewGeneratedNames({
   useEffect(() => {
     async function callGenerateIdentifierAPI() {
       if (splitFromMaterialSamples.length === 1) {
-        const response = await save<MaterialSampleIdentifierGenerator>(
-          [
-            {
-              resource: getSingleParentIdentifierRequest(0),
-              type: "material-sample-identifier-generator"
-            }
-          ],
-          { apiBaseUrl: "/collection-api", overridePatchOperation: true }
-        );
-
-        setGeneratedIdentifiers(response[0].nextIdentifiers ?? {});
+        try {
+          const response = await save<MaterialSampleIdentifierGenerator>(
+            [
+              {
+                resource: getSingleParentIdentifierRequest(0),
+                type: "material-sample-identifier-generator"
+              }
+            ],
+            { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+          );
+          setGeneratedIdentifiers(response[0].nextIdentifiers ?? {});
+        } catch (ex) {
+          if (ex.message.includes("Could not find a basename")) {
+            setGeneratedIdentifiers({});
+            setBaseNameError(true);
+          }
+        }
       } else if (splitFromMaterialSamples.length > 1) {
         const parentIds = splitFromMaterialSamples.map(
           (parentMaterialSample) => parentMaterialSample.id
         );
-        const response = await save<MaterialSampleIdentifierGenerator>(
-          [
-            {
-              resource: getMultiParentIdentifierRequest(parentIds),
-              type: "material-sample-identifier-generator"
-            }
-          ],
-          { apiBaseUrl: "/collection-api", overridePatchOperation: true }
-        );
-        setGeneratedIdentifiers(response[0].nextIdentifiers ?? {});
+
+        try {
+          const response = await save<MaterialSampleIdentifierGenerator>(
+            [
+              {
+                resource: getMultiParentIdentifierRequest(parentIds),
+                type: "material-sample-identifier-generator"
+              }
+            ],
+            { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+          );
+          setGeneratedIdentifiers(response[0].nextIdentifiers ?? {});
+        } catch (ex) {
+          if (ex.message.includes("Could not find a basename")) {
+            setGeneratedIdentifiers({});
+            setBaseNameError(true);
+          }
+        }
       }
     }
 
