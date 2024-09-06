@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { useElasticSearchDistinctTerm } from "../useElasticSearchDistinctTerm";
 import { isEmpty } from "lodash";
 
@@ -94,7 +94,7 @@ const mockSuggestionRequestRelationship = jest.fn<any, any>(async (path) => {
         aggregations: {
           "nested#included_aggregation": {
             doc_count: 4,
-            "included_type_filter": {
+            included_type_filter: {
               doc_count: 3,
               "sterms#term_aggregation": {
                 doc_count_error_upper_bound: 0,
@@ -115,7 +115,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
   });
 
   it("Non-relationship suggestions retrieved (keyword multiField)", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext2(
       <UseElasticSearchDistinctTermWrapper
         fieldName={FIELD_NAME}
         searchResultsRetrieved={(results: any) => {
@@ -131,9 +131,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
         }
       }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSuggestionRequest).toBeCalledWith(
       "search-api/search-ws/search",
@@ -153,7 +151,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
   });
 
   it("Non-relationship suggestions retrieved (keyword type)", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext2(
       <UseElasticSearchDistinctTermWrapper
         fieldName={FIELD_NAME}
         searchResultsRetrieved={(results: any) => {
@@ -171,7 +169,6 @@ describe("Use Elastic Search Distinct Term Hook", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSuggestionRequest).toBeCalledWith(
       "search-api/search-ws/search",
@@ -191,7 +188,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
   });
 
   it("Relationship suggestions retrieved", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext2(
       <UseElasticSearchDistinctTermWrapper
         fieldName={RELATIONSHIP_FIELD_NAME}
         relationshipType={RELATIONSHIP_TYPE}
@@ -210,7 +207,6 @@ describe("Use Elastic Search Distinct Term Hook", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSuggestionRequestRelationship).toBeCalledWith(
       "search-api/search-ws/search",
@@ -248,7 +244,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
 
   describe("Error handling / Props not provided cases", () => {
     it("Unable to retrieve results, empty suggestion list returned", async () => {
-      const wrapper = mountWithAppContext(
+      mountWithAppContext2(
         <UseElasticSearchDistinctTermWrapper
           fieldName={FIELD_NAME}
           searchResultsRetrieved={(results: any) => {
@@ -271,7 +267,6 @@ describe("Use Elastic Search Distinct Term Hook", () => {
       );
 
       await new Promise(setImmediate);
-      wrapper.update();
 
       // No search results should be provided.
       expect(mockSearchResults).toBeCalledTimes(0);
@@ -281,7 +276,7 @@ describe("Use Elastic Search Distinct Term Hook", () => {
     });
 
     it("No field name provided, no results should be returned.", async () => {
-      const wrapper = mountWithAppContext(
+      const wrapper = mountWithAppContext2(
         <UseElasticSearchDistinctTermWrapper
           searchResultsRetrieved={(results: any) => {
             mockSearchResults(results);
@@ -301,14 +296,13 @@ describe("Use Elastic Search Distinct Term Hook", () => {
       );
 
       await new Promise(setImmediate);
-      wrapper.update();
 
       expect(mockSuggestionRequest).toBeCalledTimes(0);
       expect(mockEmptyResults).toBeCalledTimes(1);
     });
 
     it("No group provided, the query should not include group", async () => {
-      const wrapper = mountWithAppContext(
+      const wrapper = mountWithAppContext2(
         <UseElasticSearchDistinctTermWrapper
           fieldName={FIELD_NAME}
           searchResultsRetrieved={(results: any) => {
@@ -327,7 +321,6 @@ describe("Use Elastic Search Distinct Term Hook", () => {
       );
 
       await new Promise(setImmediate);
-      wrapper.update();
 
       expect(mockSuggestionRequest).toBeCalledWith(
         "search-api/search-ws/search",
