@@ -115,10 +115,7 @@ export function MaterialSampleSplitGenerationForm({
       }
     },
     {
-      disabled:
-        !hasMismatchMaterialSampleType ||
-        !baseNameError ||
-        splitFromMaterialSamples.length === 0,
+      disabled: splitFromMaterialSamples.length === 0,
       onSuccess: async ({ data }) => {
         // Determine the material sample types of all the selected material samples.
         const uniqueMaterialSampleTypes = splitFromMaterialSamples?.reduce(
@@ -150,7 +147,11 @@ export function MaterialSampleSplitGenerationForm({
         setSplitConfigurationOptions(generatedOptions);
 
         // If options are available, automatically select the first option.
-        if (generatedOptions.length > 0 && generatedOptions?.[0]?.resource) {
+        if (
+          !splitConfiguration &&
+          generatedOptions.length > 0 &&
+          generatedOptions?.[0]?.resource
+        ) {
           setSplitConfigurationID?.(generatedOptions[0].value);
           setSplitConfiguration(generatedOptions[0].resource);
         }
@@ -267,30 +268,30 @@ export function MaterialSampleSplitGenerationForm({
             <h4 className="mt-2">
               <DinaMessage id="settingLabel" />
             </h4>
-            {(splitConfigurationOptions.length !== 0 || baseNameError) && (
-              <>
-                <strong>
-                  <DinaMessage id="selectSplitConfiguration" />
-                </strong>
-                <Select<SplitConfigurationOption>
-                  className="mt-1 mb-3"
-                  name="splitConfiguration"
-                  options={splitConfigurationOptions}
-                  onChange={(selection) => {
-                    if (selection && selection.resource) {
-                      setSplitConfigurationID?.(selection.value);
-                      setSplitConfiguration(selection.resource);
-                    }
-                  }}
-                  autoFocus={true}
-                  value={splitConfigurationOption}
-                />
-              </>
-            )}
+
+            <strong>
+              <DinaMessage id="selectSplitConfiguration" />
+            </strong>
+            <Select<SplitConfigurationOption>
+              className="mt-1 mb-3"
+              name="splitConfiguration"
+              options={splitConfigurationOptions}
+              onChange={(selection) => {
+                if (selection && selection.resource) {
+                  setSplitConfigurationID?.(selection.value);
+                  setSplitConfiguration(selection.resource);
+                }
+              }}
+              autoFocus={true}
+              value={splitConfigurationOption}
+            />
+
             <Card>
               <Card.Body>
-                <DinaMessage id="splitFrom" />:
-                <ul>
+                <strong>
+                  <DinaMessage id="splitFrom" />:
+                </strong>
+                <ul className="mb-0">
                   {filteredMaterialSamples.map((materialSample, index) => (
                     <li key={index}>{materialSample.materialSampleName}</li>
                   ))}
@@ -304,11 +305,16 @@ export function MaterialSampleSplitGenerationForm({
                 min={1}
                 max={500}
                 label={formatMessage("materialSamplesToCreate")}
-                disabled={isMultiple}
+                disabled={isMultiple || baseNameError}
                 className="mt-3"
               />
             )}
-            <TextField name={"sourceSet"} />
+
+            <TextField
+              name={"sourceSet"}
+              className="mt-3"
+              disabled={baseNameError}
+            />
           </div>
           <div className="col-md-7">
             <PreviewGeneratedNames
@@ -377,6 +383,9 @@ function PreviewGeneratedNames({
   // To prevent spamming the network calls, this useEffect has a debounce.
   useEffect(() => {
     async function callGenerateIdentifierAPI() {
+      // Reset errors
+      setBaseNameError(false);
+
       if (splitFromMaterialSamples.length === 1) {
         try {
           const response = await save<MaterialSampleIdentifierGenerator>(
