@@ -1044,5 +1044,5 @@ export const DINAUI_MESSAGES_ENGLISH = {
   multipleSamplesWellCoordinates:
     "Well coordinate {wellCoordinate} has multiple material samples: {samples}.",
   unitMismatchComponents:
-    "Some components' units are not ul/rxn and will not show up in the reaction table: {components}."
+    "Some components units are not ul/rxn and will not show up in the reaction table: {components}."
 };
