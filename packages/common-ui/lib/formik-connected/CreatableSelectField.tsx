@@ -52,7 +52,6 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
     readOnlyBold,
     ...labelWrapperProps
   } = props;
-  // console.log(options)
 
   const defaultReadOnlyRender = (value?: SingleOrArray<T | null>) => {
     const values = compact(castArray(value));
