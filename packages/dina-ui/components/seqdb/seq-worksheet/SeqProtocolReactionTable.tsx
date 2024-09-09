@@ -114,6 +114,7 @@ export function SeqProtocolReactionTable({
             return true;
           } else {
             unitMismatches.push(findProtocolLabel(pd.key));
+            return false;
           }
         })?.value ?? ""
       );
