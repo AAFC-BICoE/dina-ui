@@ -1,6 +1,7 @@
 import {
   CheckBoxField,
   CreatableSelectField,
+  DateField,
   FieldSpy,
   SelectField,
   TextField,
@@ -52,7 +53,13 @@ export function DataRow({
   const unitSelectFieldName = `${name}.unit`;
   const vocabularyBasedFieldName = `${name}.vocabularyBased`;
   const formik = useFormikContext<any>();
-  const [selectedType, setSelectedType] = useState<any>();
+
+  // Find the row's initial selected value
+  const selectedTypeValue = name.split(".").at(-1);
+  const selected = typeOptions?.find(
+    (typeOption) => typeOption.value === selectedTypeValue
+  );
+  const [selectedType, setSelectedType] = useState<any>(selected);
 
   function onCreatableSelectFieldChange(value, formikCtx) {
     if (isVocabularyBasedEnabledForType) {
@@ -154,13 +161,23 @@ export function DataRow({
         )}
       </div>
       <div style={{ width: "15rem", marginLeft: "3rem" }}>
-        <TextField
-          name={valueTextFieldName}
-          removeBottomMargin={true}
-          label={<DinaMessage id="dataValue" />}
-          disableTemplateCheckbox={true}
-          hideLabel={rowIndex !== 0}
-        />
+        {selectedType?.vocabularyElementType === "DATE" ? (
+          <DateField
+            name={valueTextFieldName}
+            removeBottomMargin={true}
+            label={<DinaMessage id="dataValue" />}
+            disableTemplateCheckbox={true}
+            hideLabel={rowIndex !== 0}
+          />
+        ) : (
+          <TextField
+            name={valueTextFieldName}
+            removeBottomMargin={true}
+            label={<DinaMessage id="dataValue" />}
+            disableTemplateCheckbox={true}
+            hideLabel={rowIndex !== 0}
+          />
+        )}
       </div>
       {unitsOptions ? (
         <div style={{ width: "15rem", marginLeft: "3rem" }}>
