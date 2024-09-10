@@ -107,6 +107,26 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete input.attachment;
 
+    // Make a separte request to handle the Resource's extensionValues due to Crnk bug in backend where extensionValues are not correctly
+    // Changed when the Resource has multilingualDescription
+    if (input.extensionValues && input.id) {
+      await save<Project>(
+        [
+          {
+            resource: {
+              id: input.id,
+              type: input.type,
+              extensionValues: input.extensionValues
+            } as any,
+            type: "project"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      );
+      delete input.extensionValues;
+    }
     const [savedProject] = await save<Project>(
       [
         {
