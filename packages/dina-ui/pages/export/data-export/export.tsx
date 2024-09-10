@@ -30,6 +30,7 @@ import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { useSessionStorage } from "usehooks-ts";
+import { Card, ButtonGroup, ToggleButton, Spinner } from "react-bootstrap";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
 const BASE_DELAY_EXPORT_FETCH_MS = 2000;
@@ -244,9 +245,7 @@ export default function ExportPage<TData extends KitsuResource>() {
   const disableObjectExportButton =
     localStorageExportObjectIds.length < 1 || totalRecords > 100;
 
-  return loading ? (
-    <LoadingSpinner loading={loading} />
-  ) : (
+  return (
     <PageLayout
       titleId="exportButtonText"
       buttonBarContent={
@@ -270,84 +269,119 @@ export default function ExportPage<TData extends KitsuResource>() {
     >
       <DinaForm initialValues={{}}>
         {dataExportError}
-        <div className="ms-2">
-          <CommonMessage
-            id="tableTotalCount"
-            values={{ totalCount: formatNumber(totalRecords ?? 0) }}
-          />
-          <TextField
-            name={"name"}
-            customName="exportName"
-            className="col-md-2"
-          />
-          <div className="mb-2">
-            <span style={{ padding: "0 1.25rem 0 1.25rem" }}>
-              <label>
-                <input
-                  type="radio"
-                  name="export"
-                  id="data"
-                  checked={exportType === "TABULAR_DATA"}
-                  onClick={() => {
-                    setExportType("TABULAR_DATA");
-                  }}
-                  className="me-1"
+
+        <CommonMessage
+          id="tableTotalCount"
+          values={{ totalCount: formatNumber(totalRecords ?? 0) }}
+        />
+        <div className="col-md-12">
+          <h4 className="mt-3">
+            <DinaMessage id="settingLabel" />
+          </h4>
+          <Card>
+            <Card.Body>
+              <div className="col-md-4">
+                <TextField
+                  name={"name"}
+                  customName="exportName"
+                  disabled={loading}
                 />
-                <DinaMessage id="dataLabel" />
-              </label>
-            </span>
-            {uniqueName === "object-store-list" && (
-              <span style={{ paddingRight: "1.25rem" }}>
-                <label
-                  style={{
-                    color: disableObjectExportButton ? "grey" : undefined
-                  }}
-                >
-                  {" "}
-                  <input
-                    type="radio"
-                    name="export"
-                    id="objects"
-                    checked={exportType === "OBJECT_ARCHIVE"}
-                    onClick={() => {
-                      setExportType("OBJECT_ARCHIVE");
-                    }}
-                    disabled={disableObjectExportButton}
-                    className="me-1"
-                  />
-                  <DinaMessage id="objectsLabel" />
-                </label>
-              </span>
-            )}
-            <SubmitButton
-              buttonProps={(formik) => ({
-                style: { width: "8rem" },
-                disabled: loading,
-                onClick: () => {
-                  if (exportType === "TABULAR_DATA") {
-                    exportData(formik);
-                  } else {
-                    exportObjects(formik);
+                {uniqueName === "object-store-list" && (
+                  <>
+                    <strong>Export Type</strong>
+                    <br />
+                    <ButtonGroup className="mt-1">
+                      <ToggleButton
+                        id="export-data"
+                        value={"data"}
+                        type={"radio"}
+                        checked={exportType === "TABULAR_DATA"}
+                        onClick={() => {
+                          setExportType("TABULAR_DATA");
+                        }}
+                        variant={
+                          exportType === "TABULAR_DATA"
+                            ? "primary"
+                            : "outline-primary"
+                        }
+                        disabled={loading}
+                      >
+                        <DinaMessage id="dataLabel" />
+                      </ToggleButton>
+                      <ToggleButton
+                        id="export-object"
+                        value={"object"}
+                        type={"radio"}
+                        checked={exportType === "OBJECT_ARCHIVE"}
+                        onClick={() => {
+                          setExportType("OBJECT_ARCHIVE");
+                        }}
+                        variant={
+                          exportType === "OBJECT_ARCHIVE"
+                            ? "primary"
+                            : "outline-primary"
+                        }
+                        disabled={loading}
+                      >
+                        <DinaMessage id="objectsLabel" />
+                      </ToggleButton>
+                    </ButtonGroup>
+                  </>
+                )}
+              </div>
+            </Card.Body>
+            <Card.Footer>
+              <SubmitButton
+                buttonProps={(formik) => ({
+                  style: { width: "8rem" },
+                  disabled: loading,
+                  onClick: () => {
+                    if (exportType === "TABULAR_DATA") {
+                      exportData(formik);
+                    } else {
+                      exportObjects(formik);
+                    }
                   }
-                }
-              })}
-            >
-              <DinaMessage id="exportButtonText" />
-            </SubmitButton>
-            {uniqueName === "object-store-list" &&
-              disableObjectExportButton && (
-                <Tooltip id="exportObjectsMaxLimitTooltip" />
-              )}
-          </div>
+                })}
+              >
+                {loading ? (
+                  <>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                    <span className="visually-hidden">Loading...</span>
+                  </>
+                ) : (
+                  <DinaMessage id="exportButtonText" />
+                )}
+              </SubmitButton>
+              {uniqueName === "object-store-list" &&
+                disableObjectExportButton && (
+                  <Tooltip id="exportObjectsMaxLimitTooltip" />
+                )}
+            </Card.Footer>
+          </Card>
+
           {exportType === "TABULAR_DATA" && (
-            <ColumnSelectorMemo
-              exportMode={true}
-              displayedColumns={columnsToExport as any}
-              setDisplayedColumns={setColumnsToExport as any}
-              indexMapping={indexMap}
-              uniqueName={uniqueName}
-              dynamicFieldsMappingConfig={dynamicFieldMapping}
-            />
+            <>
+              <h4 className="mt-4">Columns to export</h4>
+              <Card>
+                <Card.Body>
+                  <ColumnSelectorMemo
+                    exportMode={true}
+                    displayedColumns={columnsToExport as any}
+                    setDisplayedColumns={setColumnsToExport as any}
+                    indexMapping={indexMap}
+                    uniqueName={uniqueName}
+                    dynamicFieldsMappingConfig={dynamicFieldMapping}
+                  />
+                </Card.Body>
+              </Card>
+            </>
           )}
         </div>
       </DinaForm>
