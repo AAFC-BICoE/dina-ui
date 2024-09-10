@@ -67,6 +67,7 @@ export function ProjectFormLayout() {
         blockOptionsFilter={{
           "extension.fields.dinaComponent": "PROJECT"
         }}
+        width={"100%"}
       />
       <AttachmentsField
         name="attachment"
