@@ -3,7 +3,9 @@ import {
   CreatableSelectField,
   DateField,
   FieldSpy,
+  NumberField,
   SelectField,
+  StringToggleField,
   TextField,
   Tooltip
 } from "common-ui";
@@ -102,6 +104,32 @@ export function DataRow({
     }
   }
 
+  const valueInputProps = {
+    name: valueTextFieldName,
+    removeBottomMargin: true,
+    label: <DinaMessage id="dataValue" />,
+    disableTemplateCheckbox: true,
+    hideLabel: rowIndex !== 0
+  };
+  const valueInputField =
+    selectedType?.vocabularyElementType === "INTEGER" ? (
+      <NumberField {...valueInputProps} />
+    ) : selectedType?.vocabularyElementType === "DATE" ? (
+      <DateField {...valueInputProps} />
+    ) : selectedType?.vocabularyElementType === "BOOL" ? (
+      <StringToggleField {...valueInputProps} />
+    ) : selectedType?.vocabularyElementType === "DECIMAL" ? (
+      <NumberField {...valueInputProps} isInteger={false} />
+    ) : (
+      <TextField
+        name={valueTextFieldName}
+        removeBottomMargin={true}
+        label={<DinaMessage id="dataValue" />}
+        disableTemplateCheckbox={true}
+        hideLabel={rowIndex !== 0}
+      />
+    );
+
   return (
     <div className="d-flex">
       <div style={{ width: "15rem" }}>
@@ -161,23 +189,7 @@ export function DataRow({
         )}
       </div>
       <div style={{ width: "15rem", marginLeft: "3rem" }}>
-        {selectedType?.vocabularyElementType === "DATE" ? (
-          <DateField
-            name={valueTextFieldName}
-            removeBottomMargin={true}
-            label={<DinaMessage id="dataValue" />}
-            disableTemplateCheckbox={true}
-            hideLabel={rowIndex !== 0}
-          />
-        ) : (
-          <TextField
-            name={valueTextFieldName}
-            removeBottomMargin={true}
-            label={<DinaMessage id="dataValue" />}
-            disableTemplateCheckbox={true}
-            hideLabel={rowIndex !== 0}
-          />
-        )}
+        {valueInputField}
       </div>
       {unitsOptions ? (
         <div style={{ width: "15rem", marginLeft: "3rem" }}>
