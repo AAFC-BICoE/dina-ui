@@ -1,6 +1,682 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching material sample types. 1`] = `""`;
+exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching material sample types. 1`] = `
+"<MockAppContextProvider apiContext={{...}}>
+  <SWRConfig$1 value={{...}}>
+    <IntlProvider>
+      <IntlProvider locale=\\"en\\" messages={{...}} formats={{...}} timeZone={[undefined]} defaultLocale=\\"en\\" defaultFormats={{...}} fallbackOnEmptyString={true} onError={[Function: defaultErrorHandler]} onWarn={[Function: defaultWarnHandler]} textComponent={[symbol]}>
+        <FileUploadProviderImpl>
+          <Memo(DndProvider) backend={[Function: createBackend]}>
+            <div>
+              <ModalProvider appElement={{...}}>
+                <MaterialSampleSplitGenerationForm onGenerate={[Function: mockConstructor] { _isMockFunction: true, getMockImplementation: [Function (anonymous)], mock: Object [Object: null prototype] { calls: [], instances: [], invocationCallOrder: [], results: [] }, mockClear: [Function (anonymous)], mockReset: [Function (anonymous)], mockRestore: [Function (anonymous)], mockReturnValueOnce: [Function (anonymous)], mockResolvedValueOnce: [Function (anonymous)], mockRejectedValueOnce: [Function (anonymous)], mockReturnValue: [Function (anonymous)], mockResolvedValue: [Function (anonymous)], mockRejectedValue: [Function (anonymous)], mockImplementationOnce: [Function (anonymous)], mockImplementation: [Function (anonymous)], mockReturnThis: [Function (anonymous)], mockName: [Function (anonymous)], getMockName: [Function (anonymous)] }} ids={{...}} splitConfiguration={{...}} splitConfigurationID=\\"706eece4-3105-4e96-bc2f-7530a80a6163\\">
+                  <DinaForm initialValues={{...}} onSubmit={[Function: onSubmit]}>
+                    <Formik validateOnChange={false} validateOnBlur={false} initialValues={{...}} onSubmit={[Function (anonymous)]}>
+                      <FormWrapper customErrorViewerMessage={[undefined]}>
+                        <Form onKeyDown={[undefined]}>
+                          <form onSubmit={[Function (anonymous)]} onReset={[Function (anonymous)]} action=\\"#\\" onKeyDown={[undefined]}>
+                            <ErrorViewer customErrorViewerMessage={[undefined]}>
+                              <div className=\\"error-viewer\\" />
+                            </ErrorViewer>
+                            <PromptIfDirty formik={{...}} />
+                            <PageLayout titleId=\\"splitSubsampleTitle\\" buttonBarContent={{...}}>
+                              <Head title=\\"Split Material Sample\\">
+                                <Head>
+                                  <SideEffect reduceComponentsToState={[Function: reduceComponents]} headManager={{...}} inAmpMode={false} />
+                                </Head>
+                              </Head>
+                              <Nav marginBottom={false}>
+                                <SkipLinks>
+                                  <nav id=\\"wb-tphp\\" className=\\"d-flex flex-column align-items-center\\">
+                                    <a className=\\"wb-link-inv wb-sl\\" href=\\"#wb-cont\\">
+                                      <FormattedMessage id=\\"skipToMainContent\\">
+                                        <FormattedMessage defaultMessage=\\" \\" id=\\"skipToMainContent\\">
+                                          Skip to Main Content
+                                        </FormattedMessage>
+                                      </FormattedMessage>
+                                    </a>
+                                    <a className=\\"wb-link-inv wb-sl\\" href=\\"#wb-info\\">
+                                      <FormattedMessage id=\\"skipToAboutThisApplication\\">
+                                        <FormattedMessage defaultMessage=\\" \\" id=\\"skipToAboutThisApplication\\">
+                                          Skip to &quot;About this site&quot;
+                                        </FormattedMessage>
+                                      </FormattedMessage>
+                                    </a>
+                                    <a className=\\"wb-link-inv wb-sl\\" rel=\\"alternate\\" href=\\"?wbdisable=true\\">
+                                      <FormattedMessage id=\\"skipToBasicHtmlVersion\\">
+                                        <FormattedMessage defaultMessage=\\" \\" id=\\"skipToBasicHtmlVersion\\">
+                                          Switch to basic HTML version
+                                        </FormattedMessage>
+                                      </FormattedMessage>
+                                    </a>
+                                  </nav>
+                                </SkipLinks>
+                                <header className={[undefined]}>
+                                  <Container fluid={true} className=\\"centered\\">
+                                    <div className=\\"centered container-fluid\\">
+                                      <Row xs={1} md={2} className=\\"header-container row d-flex \\">
+                                        <div className=\\"header-container row d-flex  row row-cols-md-2 row-cols-1\\">
+                                          <Col className=\\"\\">
+                                            <div className=\\"col\\">
+                                              <GovernmentLogo>
+                                                <img src=\\"/static/images/canadaLogo_en.svg\\" property=\\"logo\\" alt=\\"\\" className=\\"logo\\" />
+                                                <span className=\\"wb-inv\\" property=\\"name\\">
+                                                  Government of Canada / 
+                                                  <span lang=\\"fr\\">
+                                                    Gouvernement du Canada
+                                                  </span>
+                                                </span>
+                                                <meta property=\\"areaServed\\" typeof=\\"Country\\" content=\\"Canada\\" />
+                                              </GovernmentLogo>
+                                            </div>
+                                          </Col>
+                                          <Col className=\\"text-end \\">
+                                            <div className=\\"text-end  col\\">
+                                              <ul className=\\"list-inline mt-1 mb-1\\">
+                                                <li className=\\"list-inline-item mr-1 my-auto\\">
+                                                  <FeedbackButton>
+                                                    <ForwardRef(LinkComponent) href=\\"https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback\\" passHref={true}>
+                                                      <Button variant=\\"link\\" className=\\"px-0\\" active={false} disabled={false} onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback\\">
+                                                        <a disabled={[undefined]} onClick={[Function: handleClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback\\" role=\\"button\\" tabIndex={0} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function: handleKeyDown]} className=\\"px-0 btn btn-link\\">
+                                                          <FormattedMessage id=\\"feedbackButtonText\\">
+                                                            <FormattedMessage defaultMessage=\\" \\" id=\\"feedbackButtonText\\">
+                                                              Feedback
+                                                            </FormattedMessage>
+                                                          </FormattedMessage>
+                                                        </a>
+                                                      </Button>
+                                                    </ForwardRef(LinkComponent)>
+                                                  </FeedbackButton>
+                                                </li>
+                                                <li className=\\"list-inline-item px-2\\">
+                                                  –
+                                                </li>
+                                                <li className=\\"list-inline-item mr-0\\">
+                                                  <LanguageSelector>
+                                                    <div data-testid=\\"languageSelector\\">
+                                                      <Button variant=\\"link\\" onClick={[Function: onClick]} lang=\\"fr\\" className=\\"px-0\\" active={false} disabled={false}>
+                                                        <button onClick={[Function: onClick]} lang=\\"fr\\" disabled={false} type=\\"button\\" className=\\"px-0 btn btn-link\\">
+                                                          Français
+                                                        </button>
+                                                      </Button>
+                                                    </div>
+                                                  </LanguageSelector>
+                                                </li>
+                                              </ul>
+                                              <ul className=\\"list-inline\\">
+                                                <li className=\\"list-inline-item my-auto\\">
+                                                  <NavbarUserControl>
+                                                    <div className=\\"d-flex align-items-center text-end\\">
+                                                      <span className=\\"me-2 my-auto h4\\">
+                                                        <FaUserCircle>
+                                                          <IconBase attr={{...}}>
+                                                            <svg stroke=\\"currentColor\\" fill=\\"currentColor\\" strokeWidth=\\"0\\" viewBox=\\"0 0 496 512\\" className={[undefined]} style={{...}} height=\\"1em\\" width=\\"1em\\" xmlns=\\"http://www.w3.org/2000/svg\\">
+                                                              <path d=\\"M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z\\" />
+                                                            </svg>
+                                                          </IconBase>
+                                                        </FaUserCircle>
+                                                      </span>
+                                                      <span className=\\"me-4 my-auto h5\\">
+                                                        <ForwardRef(LinkComponent) href={{...}}>
+                                                          <a onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"/dina-user/view?id=&hideBackButton=true\\">
+                                                            test-user
+                                                          </a>
+                                                        </ForwardRef(LinkComponent)>
+                                                      </span>
+                                                      <button type=\\"button\\" className=\\"btn btn-info logout-button my-auto\\" onClick={[Function: onClick]}>
+                                                        <FormattedMessage id=\\"logoutBtn\\">
+                                                          <FormattedMessage defaultMessage=\\" \\" id=\\"logoutBtn\\">
+                                                            Logout
+                                                          </FormattedMessage>
+                                                        </FormattedMessage>
+                                                      </button>
+                                                    </div>
+                                                  </NavbarUserControl>
+                                                </li>
+                                              </ul>
+                                            </div>
+                                          </Col>
+                                        </div>
+                                      </Row>
+                                    </div>
+                                  </Container>
+                                  <Navbar className=\\"app-bar\\" expand=\\"lg\\" variant=\\"light\\" collapseOnSelect={false}>
+                                    <nav className=\\"app-bar navbar navbar-expand-lg navbar-light\\">
+                                      <Container fluid={true} className=\\"centered\\">
+                                        <div className=\\"centered container-fluid\\">
+                                          <ForwardRef(LinkComponent) href=\\"/\\" passHref={true}>
+                                            <NavbarBrand href=\\"/\\" className=\\"app-name\\" onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]}>
+                                              <a href=\\"/\\" onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} className=\\"app-name navbar-brand\\">
+                                                <FormattedMessage id=\\"appTitleInstanceMode\\" values={{...}}>
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"appTitleInstanceMode\\" values={{...}}>
+                                                    DINA (developer)
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </a>
+                                            </NavbarBrand>
+                                          </ForwardRef(LinkComponent)>
+                                          <NavbarToggle aria-controls=\\"basic-navbar-nav\\" label=\\"Toggle navigation\\">
+                                            <button aria-controls=\\"basic-navbar-nav\\" type=\\"button\\" onClick={[Function (anonymous)]} aria-label=\\"Toggle navigation\\" className=\\"navbar-toggler collapsed\\">
+                                              <span className=\\"navbar-toggler-icon\\" />
+                                            </button>
+                                          </NavbarToggle>
+                                          <NavbarCollapse id=\\"basic-navbar-nav\\" role=\\"menubar\\">
+                                            <ForwardRef in={false} id=\\"basic-navbar-nav\\" role=\\"menubar\\" timeout={300} mountOnEnter={false} unmountOnExit={false} appear={false} getDimensionValue={[Function: getDefaultDimensionValue]}>
+                                              <ForwardRef addEndListener={[Function: transitionEndListener]} in={false} id=\\"basic-navbar-nav\\" role=\\"menubar\\" timeout={300} mountOnEnter={false} unmountOnExit={false} appear={false} aria-expanded={false} onEnter={[Function (anonymous)]} onEntering={[Function (anonymous)]} onEntered={[Function (anonymous)]} onExit={[Function (anonymous)]} onExiting={[Function (anonymous)]} childRef={{...}}>
+                                                <Transition in={false} id=\\"basic-navbar-nav\\" role=\\"menubar\\" timeout={300} mountOnEnter={false} unmountOnExit={false} appear={false} aria-expanded={false} onEnter={[Function (anonymous)]} onEntered={[Function (anonymous)]} onEntering={[Function (anonymous)]} onExit={[Function (anonymous)]} onExited={[Function (anonymous)]} onExiting={[Function (anonymous)]} addEndListener={[Function (anonymous)]} nodeRef={{...}} enter={true} exit={true}>
+                                                  <div className=\\"navbar-collapse collapse\\" id=\\"basic-navbar-nav\\" role=\\"menubar\\" aria-expanded={false}>
+                                                    <NavCollectionDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Collection\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Collection
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavCollectionDropdown>
+                                                    <NavTransactionsDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Transactions\\" show={false} onMouseOver={[Function: showDropdown]} onMouseLeave={[Function: hideDropdown]} onKeyDown={[Function: onKeyDown]} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown show={false} onMouseOver={[Function: showDropdown]} onMouseLeave={[Function: hideDropdown]} onKeyDown={[Function: onKeyDown]} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onMouseLeave={[Function: hideDropdown]} onKeyDown={[Function: onKeyDown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Transactions
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavTransactionsDropdown>
+                                                    <NavObjectStoreDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Object Store\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Object Store
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavObjectStoreDropdown>
+                                                    <NavAgentDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Agents\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Agents
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavAgentDropdown>
+                                                    <NavSequenceDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Sequencing\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Sequencing
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavSequenceDropdown>
+                                                    <NavControlledVocabularyDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Controlled Vocabulary\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Controlled Vocabulary
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavControlledVocabularyDropdown>
+                                                    <NavDinaConfigurationDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Configuration\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Configuration
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavDinaConfigurationDropdown>
+                                                  </div>
+                                                </Transition>
+                                              </ForwardRef>
+                                            </ForwardRef>
+                                          </NavbarCollapse>
+                                        </div>
+                                      </Container>
+                                    </nav>
+                                  </Navbar>
+                                </header>
+                              </Nav>
+                              <ButtonBar>
+                                <div className=\\"button-bar button-bar-sticky undefined\\">
+                                  <div className=\\"container-fluid centered\\">
+                                    <div className=\\"d-flex row\\">
+                                      <div className=\\"col-md-6 col-sm-12\\">
+                                        <div className=\\"mt-2\\">
+                                          <BackButton entityLink=\\"/collection/material-sample\\" entityId=\\"a503d31d-8203-4766-af85-db271e087853\\">
+                                            <ForwardRef(LinkComponent) href=\\"/collection/material-sample/view?id=a503d31d-8203-4766-af85-db271e087853\\">
+                                              <a className=\\"back-button my-auto \\" onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"/collection/material-sample/view?id=a503d31d-8203-4766-af85-db271e087853\\">
+                                                <FormattedMessage id=\\"backToReadOnlyPage\\">
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"backToReadOnlyPage\\">
+                                                    Back to read-only page
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </a>
+                                            </ForwardRef(LinkComponent)>
+                                          </BackButton>
+                                        </div>
+                                      </div>
+                                      <div className=\\"col-md-6 col-sm-12 d-flex\\">
+                                        <FormikConnect(SubmitButtonInternal) className=\\"ms-auto\\" buttonProps={[Function: buttonProps]}>
+                                          <SubmitButtonInternal className=\\"ms-auto\\" buttonProps={[Function: buttonProps]} formik={{...}}>
+                                            <button disabled={false} className=\\"btn ms-auto btn-primary\\" style={{...}} onClick={[Function: onClick]} type=\\"submit\\">
+                                              <FormattedMessage id=\\"splitButton\\">
+                                                <FormattedMessage defaultMessage=\\" \\" id=\\"splitButton\\">
+                                                  Split
+                                                </FormattedMessage>
+                                              </FormattedMessage>
+                                            </button>
+                                          </SubmitButtonInternal>
+                                        </FormikConnect(SubmitButtonInternal)>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </ButtonBar>
+                              <main className=\\"container-fluid\\" role=\\"main\\">
+                                <h1 id=\\"wb-cont\\">
+                                  Split Material Sample
+                                </h1>
+                                <div className=\\"row\\">
+                                  <div className=\\"col-md-5\\">
+                                    <h4 className=\\"mt-2\\">
+                                      <FormattedMessage id=\\"settingLabel\\">
+                                        <FormattedMessage defaultMessage=\\" \\" id=\\"settingLabel\\">
+                                          Settings
+                                        </FormattedMessage>
+                                      </FormattedMessage>
+                                    </h4>
+                                    <strong>
+                                      <FormattedMessage id=\\"selectSplitConfiguration\\">
+                                        <FormattedMessage defaultMessage=\\" \\" id=\\"selectSplitConfiguration\\">
+                                          Select Split Configuration
+                                        </FormattedMessage>
+                                      </FormattedMessage>
+                                    </strong>
+                                    <ForwardRef className=\\"mt-1 mb-3\\" name=\\"splitConfiguration\\" options={{...}} onChange={[Function: onChange]} autoFocus={true} value={[undefined]}>
+                                      <Select className=\\"mt-1 mb-3\\" name=\\"splitConfiguration\\" options={{...}} autoFocus={true} inputValue=\\"\\" menuIsOpen={false} onChange={[Function (anonymous)]} onInputChange={[Function (anonymous)]} onMenuClose={[Function (anonymous)]} onMenuOpen={[Function (anonymous)]} value={{...}} aria-live=\\"polite\\" backspaceRemovesValue={true} blurInputOnSelect={true} captureMenuScroll={false} classNames={{...}} closeMenuOnSelect={true} closeMenuOnScroll={false} components={{...}} controlShouldRenderValue={true} escapeClearsValue={false} filterOption={[Function (anonymous)]} formatGroupLabel={[Function: formatGroupLabel]} getOptionLabel={[Function: getOptionLabel]} getOptionValue={[Function: getOptionValue]} isDisabled={false} isLoading={false} isMulti={false} isRtl={false} isSearchable={true} isOptionDisabled={[Function: isOptionDisabled]} loadingMessage={[Function: loadingMessage]} maxMenuHeight={300} minMenuHeight={140} menuPlacement=\\"bottom\\" menuPosition=\\"absolute\\" menuShouldBlockScroll={false} menuShouldScrollIntoView={true} noOptionsMessage={[Function: noOptionsMessage]} openMenuOnFocus={false} openMenuOnClick={true} pageSize={5} placeholder=\\"Select...\\" screenReaderStatus={[Function: screenReaderStatus]} styles={{...}} tabIndex={0} tabSelectsValue={true} unstyled={false}>
+                                        <SelectContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} className=\\"mt-1 mb-3\\" innerProps={{...}} isDisabled={false} isFocused={false}>
+                                          <EmotionCssPropInternal css={{...}} className=\\"mt-1 mb-3\\" id={[undefined]} onKeyDown={[Function (anonymous)]} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"SelectContainer\\">
+                                            <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                            <div className=\\"mt-1 mb-3 css-b62m3t-container\\" id={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                              <LiveRegion clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} id=\\"react-select-2-live-region\\" ariaSelection={{...}} focusedOption={{...}} focusedValue={{...}} isFocused={false} selectValue={{...}} focusableOptions={{...}} isAppleDevice={false}>
+                                                <A11yText id=\\"react-select-2-live-region\\">
+                                                  <EmotionCssPropInternal css={{...}} id=\\"react-select-2-live-region\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\">
+                                                    <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                    <span id=\\"react-select-2-live-region\\" className=\\"css-1f43avz-a11yText-A11yText\\" />
+                                                  </EmotionCssPropInternal>
+                                                </A11yText>
+                                                <A11yText aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" role=\\"log\\">
+                                                  <EmotionCssPropInternal css={{...}} aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" role=\\"log\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\">
+                                                    <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                    <span aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" role=\\"log\\" className=\\"css-1f43avz-a11yText-A11yText\\" />
+                                                  </EmotionCssPropInternal>
+                                                </A11yText>
+                                              </LiveRegion>
+                                              <Control clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerRef={[Function (anonymous)]} innerProps={{...}} isDisabled={false} isFocused={false} menuIsOpen={false}>
+                                                <EmotionCssPropInternal css={{...}} className=\\"\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-disabled={[undefined]} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Control\\">
+                                                  <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                  <div className=\\" css-13cymwt-control\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-disabled={[undefined]}>
+                                                    <ValueContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false}>
+                                                      <EmotionCssPropInternal css={{...}} className=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"ValueContainer\\">
+                                                        <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                        <div className=\\" css-1fdsijx-ValueContainer\\">
+                                                          <Placeholder clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false} isFocused={false} innerProps={{...}}>
+                                                            <EmotionCssPropInternal css={{...}} className=\\"\\" id=\\"react-select-2-placeholder\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Placeholder\\">
+                                                              <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                              <div className=\\" css-1jqq78o-placeholder\\" id=\\"react-select-2-placeholder\\">
+                                                                Select...
+                                                              </div>
+                                                            </EmotionCssPropInternal>
+                                                          </Placeholder>
+                                                          <Input clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} autoCapitalize=\\"none\\" autoComplete=\\"off\\" autoCorrect=\\"off\\" id=\\"react-select-2-input\\" innerRef={[Function (anonymous)]} isDisabled={false} isHidden={false} onBlur={[Function (anonymous)]} onChange={[Function (anonymous)]} onFocus={[Function (anonymous)]} spellCheck=\\"false\\" tabIndex={0} form={[undefined]} type=\\"text\\" value=\\"\\" aria-autocomplete=\\"list\\" aria-expanded={false} aria-haspopup={true} aria-errormessage={[undefined]} aria-invalid={[undefined]} aria-label={[undefined]} aria-labelledby={[undefined]} aria-required={[undefined]} role=\\"combobox\\" aria-activedescendant=\\"\\" aria-describedby=\\"react-select-2-placeholder\\">
+                                                            <EmotionCssPropInternal css={{...}} className=\\"\\" data-value=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Input\\">
+                                                              <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                              <div className=\\" css-qbdosj-Input\\" data-value=\\"\\">
+                                                                <input className=\\"\\" style={{...}} disabled={false} autoCapitalize=\\"none\\" autoComplete=\\"off\\" autoCorrect=\\"off\\" id=\\"react-select-2-input\\" onBlur={[Function (anonymous)]} onChange={[Function (anonymous)]} onFocus={[Function (anonymous)]} spellCheck=\\"false\\" tabIndex={0} form={[undefined]} type=\\"text\\" value=\\"\\" aria-autocomplete=\\"list\\" aria-expanded={false} aria-haspopup={true} aria-errormessage={[undefined]} aria-invalid={[undefined]} aria-label={[undefined]} aria-labelledby={[undefined]} aria-required={[undefined]} role=\\"combobox\\" aria-activedescendant=\\"\\" aria-describedby=\\"react-select-2-placeholder\\" />
+                                                              </div>
+                                                            </EmotionCssPropInternal>
+                                                          </Input>
+                                                        </div>
+                                                      </EmotionCssPropInternal>
+                                                    </ValueContainer>
+                                                    <IndicatorsContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false}>
+                                                      <EmotionCssPropInternal css={{...}} className=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"IndicatorsContainer\\">
+                                                        <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                        <div className=\\" css-1hb7zxy-IndicatorsContainer\\">
+                                                          <IndicatorSeparator clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false} isFocused={false}>
+                                                            <EmotionCssPropInternal css={{...}} className=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"IndicatorSeparator\\">
+                                                              <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                              <span className=\\" css-1u9des2-indicatorSeparator\\" />
+                                                            </EmotionCssPropInternal>
+                                                          </IndicatorSeparator>
+                                                          <DropdownIndicator clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerProps={{...}} isDisabled={false} isFocused={false}>
+                                                            <EmotionCssPropInternal css={{...}} className=\\"\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-hidden=\\"true\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"DropdownIndicator\\">
+                                                              <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                              <div className=\\" css-1xc3v61-indicatorContainer\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-hidden=\\"true\\">
+                                                                <DownChevron>
+                                                                  <Svg size={20}>
+                                                                    <EmotionCssPropInternal height={20} width={20} viewBox=\\"0 0 20 20\\" aria-hidden=\\"true\\" focusable=\\"false\\" css={{...}} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"svg\\">
+                                                                      <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                                      <svg height={20} width={20} viewBox=\\"0 0 20 20\\" aria-hidden=\\"true\\" focusable=\\"false\\" className=\\"css-tj5bde-Svg\\">
+                                                                        <path d=\\"M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z\\" />
+                                                                      </svg>
+                                                                    </EmotionCssPropInternal>
+                                                                  </Svg>
+                                                                </DownChevron>
+                                                              </div>
+                                                            </EmotionCssPropInternal>
+                                                          </DropdownIndicator>
+                                                        </div>
+                                                      </EmotionCssPropInternal>
+                                                    </IndicatorsContainer>
+                                                  </div>
+                                                </EmotionCssPropInternal>
+                                              </Control>
+                                              <input name=\\"splitConfiguration\\" type=\\"hidden\\" value=\\"\\" />
+                                            </div>
+                                          </EmotionCssPropInternal>
+                                        </SelectContainer>
+                                      </Select>
+                                    </ForwardRef>
+                                    <Card body={false}>
+                                      <div className=\\"card\\">
+                                        <CardBody>
+                                          <div className=\\"card-body\\">
+                                            <strong>
+                                              <FormattedMessage id=\\"splitFrom\\">
+                                                <FormattedMessage defaultMessage=\\" \\" id=\\"splitFrom\\">
+                                                  Split from
+                                                </FormattedMessage>
+                                              </FormattedMessage>
+                                              :
+                                            </strong>
+                                            <ul className=\\"mb-0\\">
+                                              <li>
+                                                CNC-1
+                                              </li>
+                                            </ul>
+                                          </div>
+                                        </CardBody>
+                                      </div>
+                                    </Card>
+                                    <NumberSpinnerField name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false} className=\\"mt-3\\">
+                                      <FieldWrapper name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false} className=\\"mt-3\\">
+                                        <FieldSpy fieldName=\\"numberToCreate\\" validate={[undefined]}>
+                                          <FormikConnect(FastFieldInner) name=\\"numberToCreate\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
+                                            <FastFieldInner name=\\"numberToCreate\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
+                                              <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"numberToCreate\\">
+                                                <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
+                                                  <div className=\\"mt-3\\">
+                                                    <label className=\\"numberToCreate-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
+                                                      <div className=\\"field-label label-col mb-2\\" style={[undefined]}>
+                                                        <strong>
+                                                          Material Samples to Create
+                                                        </strong>
+                                                      </div>
+                                                      <div className=\\"field-col\\" style={{...}}>
+                                                        <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
+                                                          <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
+                                                            <input className=\\"form-control\\" type=\\"number\\" min={1} max={500} size={4} step={1} onKeyDown={[Function: onKeyDown]} onChange={[Function: onChange]} onClick={[Function: onClick]} disabled={false} value={1} />
+                                                          </ErrorBoundary>
+                                                        </FormikConnectedField>
+                                                      </div>
+                                                    </label>
+                                                  </div>
+                                                </LabelWrapper>
+                                              </FieldSpyInternal>
+                                            </FastFieldInner>
+                                          </FormikConnect(FastFieldInner)>
+                                        </FieldSpy>
+                                      </FieldWrapper>
+                                    </NumberSpinnerField>
+                                    <TextField name=\\"sourceSet\\" className=\\"mt-3\\" disabled={false}>
+                                      <FieldWrapper name=\\"sourceSet\\" className=\\"mt-3\\">
+                                        <FieldSpy fieldName=\\"sourceSet\\" validate={[undefined]}>
+                                          <FormikConnect(FastFieldInner) name=\\"sourceSet\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
+                                            <FastFieldInner name=\\"sourceSet\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
+                                              <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"sourceSet\\">
+                                                <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
+                                                  <div className=\\"mt-3\\">
+                                                    <label className=\\"sourceSet-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
+                                                      <div className=\\"field-label label-col mb-2\\" style={[undefined]}>
+                                                        <strong>
+                                                          <FieldHeader name=\\"sourceSet\\" customName={[undefined]} tooltipOverride={[undefined]} tooltipImage={[undefined]} tooltipImageAlt={[undefined]} tooltipLink={[undefined]} tooltipLinkText={[undefined]} startCaseLabel={[undefined]}>
+                                                            <div className=\\"sourceSet-field-header\\">
+                                                              Source Set
+                                                              <Tooltip id=\\"field_sourceSet_tooltip\\" directText={[undefined]} image={[undefined]} altImage={[undefined]} link={[undefined]} linkText={[undefined]}>
+                                                                <span className=\\"m-2\\">
+                                                                  <ForwardRef(Tooltip) id=\\"field_sourceSet_tooltip\\" overlay={{...}} placement=\\"top\\" trigger={{...}} zIndex={9001}>
+                                                                    <Trigger popupClassName=\\"\\" prefixCls=\\"rc-tooltip\\" popup={[Function: getPopupElement]} action={{...}} builtinPlacements={{...}} popupPlacement=\\"top\\" popupAlign={{...}} getPopupContainer={[undefined]} onPopupVisibleChange={[Function: noop]} afterPopupVisibleChange={[Function: noop]} popupTransitionName={[undefined]} popupAnimation={[undefined]} popupMotion={[undefined]} defaultPopupVisible={false} destroyPopupOnHide={false} autoDestroy={false} mouseLeaveDelay={0.1} popupStyle={{...}} mouseEnterDelay={0} zIndex={9001} getPopupClassNameFromAlign={[Function: returnEmptyString]} getDocument={[Function: returnDocument]} onPopupAlign={[Function: noop]} focusDelay={0} blurDelay={0.15} mask={false} maskClosable={true} showAction={{...}} hideAction={{...}}>
+                                                                      <span onContextMenu={[undefined]} onClick={[undefined]} onMouseDown={[undefined]} onTouchStart={[undefined]} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onFocus={[Function (anonymous)]} onBlur={[Function (anonymous)]}>
+                                                                        <img src=\\"/static/images/iconInformation.gif\\" alt=\\"User-defined name that can be used to retrieve all material samples that were created in the same batch.\\" aria-describedby=\\"field_sourceSet_tooltip\\" tabIndex={0} />
+                                                                      </span>
+                                                                    </Trigger>
+                                                                  </ForwardRef(Tooltip)>
+                                                                </span>
+                                                              </Tooltip>
+                                                            </div>
+                                                          </FieldHeader>
+                                                        </strong>
+                                                      </div>
+                                                      <div className=\\"field-col\\" style={{...}}>
+                                                        <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
+                                                          <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
+                                                            <input type=\\"text\\" placeholder={[undefined]} className=\\"form-control\\" onChange={[Function: onChange]} value=\\"\\" readOnly={[undefined]} disabled={false} onKeyDown={[Function: onKeyDown]} />
+                                                          </ErrorBoundary>
+                                                        </FormikConnectedField>
+                                                      </div>
+                                                    </label>
+                                                  </div>
+                                                </LabelWrapper>
+                                              </FieldSpyInternal>
+                                            </FastFieldInner>
+                                          </FormikConnect(FastFieldInner)>
+                                        </FieldSpy>
+                                      </FieldWrapper>
+                                    </TextField>
+                                  </div>
+                                  <div className=\\"col-md-7\\">
+                                    <PreviewGeneratedNames splitFromMaterialSamples={{...}} generatedIdentifiers={{...}} setGeneratedIdentifiers={[Function: bound dispatchAction]} setBaseNameError={[Function: bound dispatchAction]} splitConfiguration={{...}}>
+                                      <div className=\\"mt-2\\">
+                                        <h4>
+                                          <FormattedMessage id=\\"previewLabel\\">
+                                            <FormattedMessage defaultMessage=\\" \\" id=\\"previewLabel\\">
+                                              Preview
+                                            </FormattedMessage>
+                                          </FormattedMessage>
+                                        </h4>
+                                        <table className=\\"table\\">
+                                          <thead>
+                                            <tr>
+                                              <th>
+                                                <FormattedMessage id=\\"splitPreviewNumberColumn\\">
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"splitPreviewNumberColumn\\">
+                                                    Number
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </th>
+                                              <th>
+                                                <FormattedMessage id=\\"splitPreviewGeneratedIdentifierColumn\\">
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"splitPreviewGeneratedIdentifierColumn\\">
+                                                    Generated Identifier
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </th>
+                                              <th>
+                                                <FormattedMessage id=\\"parentMaterialSample\\">
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"parentMaterialSample\\">
+                                                    Parent Material Sample
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </th>
+                                              <th>
+                                                <FormattedMessage id=\\"field_materialSampleType\\">
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"field_materialSampleType\\">
+                                                    Material Sample Type
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </th>
+                                            </tr>
+                                          </thead>
+                                          <tbody />
+                                        </table>
+                                      </div>
+                                    </PreviewGeneratedNames>
+                                  </div>
+                                </div>
+                              </main>
+                              <Footer>
+                                <footer id=\\"wb-info\\" className=\\"mt-3\\" style={{...}}>
+                                  <div className=\\"brand\\">
+                                    <div className=\\"container-fluid centered\\">
+                                      <div className=\\"row \\">
+                                        <nav className=\\"col-md-10 ftr-urlt-lnk py-3\\">
+                                          <ul>
+                                            <li>
+                                              <ForwardRef(LinkComponent) href=\\"https://www.canada.ca/en/contact.html\\" passHref={true}>
+                                                <a onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"https://www.canada.ca/en/contact.html\\">
+                                                  <FormattedMessage id=\\"footerContactInfo\\">
+                                                    <FormattedMessage defaultMessage=\\" \\" id=\\"footerContactInfo\\">
+                                                      Contact information
+                                                    </FormattedMessage>
+                                                  </FormattedMessage>
+                                                </a>
+                                              </ForwardRef(LinkComponent)>
+                                            </li>
+                                            <li>
+                                              <ForwardRef(LinkComponent) href=\\"https://www.canada.ca/en/transparency/terms.html\\" passHref={true}>
+                                                <a onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"https://www.canada.ca/en/transparency/terms.html\\">
+                                                  <FormattedMessage id=\\"footerTermsAndConditions\\">
+                                                    <FormattedMessage defaultMessage=\\" \\" id=\\"footerTermsAndConditions\\">
+                                                      Terms and conditions
+                                                    </FormattedMessage>
+                                                  </FormattedMessage>
+                                                </a>
+                                              </ForwardRef(LinkComponent)>
+                                            </li>
+                                            <li>
+                                              <ForwardRef(LinkComponent) href=\\"https://www.canada.ca/en/transparency/privacy.html\\" passHref={true}>
+                                                <a onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"https://www.canada.ca/en/transparency/privacy.html\\">
+                                                  <FormattedMessage id=\\"footerPrivacy\\">
+                                                    <FormattedMessage defaultMessage=\\" \\" id=\\"footerPrivacy\\">
+                                                      Privacy
+                                                    </FormattedMessage>
+                                                  </FormattedMessage>
+                                                </a>
+                                              </ForwardRef(LinkComponent)>
+                                            </li>
+                                          </ul>
+                                          <div />
+                                        </nav>
+                                        <div className=\\"col-6 col-md-3 col-lg-2 text-end pt-2\\">
+                                          <img src=\\"https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/wmms-blk.svg\\" alt=\\"Symbol of the Government of Canada\\" className=\\"mt-4\\" />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </footer>
+                              </Footer>
+                            </PageLayout>
+                          </form>
+                        </Form>
+                      </FormWrapper>
+                    </Formik>
+                  </DinaForm>
+                </MaterialSampleSplitGenerationForm>
+                <Modal appElement={[undefined]} ariaHideApp={false} isOpen={false} className=\\"Modal__Bootstrap modal-dialog\\" style={{...}} contentLabel=\\"Popup dialog window\\" portalClassName=\\"ReactModalPortal\\" bodyOpenClassName=\\"ReactModal__Body--open\\" role=\\"dialog\\" closeTimeoutMS={0} shouldFocusAfterRender={true} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true} shouldReturnFocusAfterClose={true} preventScroll={false} parentSelector={[Function: parentSelector]} overlayElement={[Function: overlayElement]} contentElement={[Function: contentElement]}>
+                  <Portal containerInfo={{...}}>
+                    <ModalPortal defaultStyles={{...}} appElement={[undefined]} ariaHideApp={false} isOpen={false} className=\\"Modal__Bootstrap modal-dialog\\" style={{...}} contentLabel=\\"Popup dialog window\\" portalClassName=\\"ReactModalPortal\\" bodyOpenClassName=\\"ReactModal__Body--open\\" role=\\"dialog\\" closeTimeoutMS={0} shouldFocusAfterRender={true} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true} shouldReturnFocusAfterClose={true} preventScroll={false} parentSelector={[Function: parentSelector]} overlayElement={[Function: overlayElement]} contentElement={[Function: contentElement]} />
+                  </Portal>
+                </Modal>
+              </ModalProvider>
+            </div>
+          </Memo(DndProvider)>
+        </FileUploadProviderImpl>
+      </IntlProvider>
+    </IntlProvider>
+  </SWRConfig$1>
+</MockAppContextProvider>"
+`;
 
 exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching material sample types. 1`] = `
 "<MockAppContextProvider apiContext={{...}}>
@@ -12,13 +688,661 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
             <div>
               <ModalProvider appElement={{...}}>
                 <MaterialSampleSplitGenerationForm onGenerate={[Function: mockConstructor] { _isMockFunction: true, getMockImplementation: [Function (anonymous)], mock: Object [Object: null prototype] { calls: [], instances: [], invocationCallOrder: [], results: [] }, mockClear: [Function (anonymous)], mockReset: [Function (anonymous)], mockRestore: [Function (anonymous)], mockReturnValueOnce: [Function (anonymous)], mockResolvedValueOnce: [Function (anonymous)], mockRejectedValueOnce: [Function (anonymous)], mockReturnValue: [Function (anonymous)], mockResolvedValue: [Function (anonymous)], mockRejectedValue: [Function (anonymous)], mockImplementationOnce: [Function (anonymous)], mockImplementation: [Function (anonymous)], mockReturnThis: [Function (anonymous)], mockName: [Function (anonymous)], getMockName: [Function (anonymous)] }} ids={{...}} splitConfiguration={{...}} splitConfigurationID=\\"706eece4-3105-4e96-bc2f-7530a80a6163\\">
-                  <LoadingSpinner loading={true}>
-                    <div className=\\"spinner-border\\" role=\\"status\\">
-                      <span className=\\"visually-hidden mb-3\\">
-                        Loading...
-                      </span>
-                    </div>
-                  </LoadingSpinner>
+                  <DinaForm initialValues={{...}} onSubmit={[Function: onSubmit]}>
+                    <Formik validateOnChange={false} validateOnBlur={false} initialValues={{...}} onSubmit={[Function (anonymous)]}>
+                      <FormWrapper customErrorViewerMessage={[undefined]}>
+                        <Form onKeyDown={[undefined]}>
+                          <form onSubmit={[Function (anonymous)]} onReset={[Function (anonymous)]} action=\\"#\\" onKeyDown={[undefined]}>
+                            <ErrorViewer customErrorViewerMessage={[undefined]}>
+                              <div className=\\"error-viewer\\" />
+                            </ErrorViewer>
+                            <PromptIfDirty formik={{...}} />
+                            <PageLayout titleId=\\"splitSubsampleTitle\\" buttonBarContent={{...}}>
+                              <Head title=\\"Split Material Sample\\">
+                                <Head>
+                                  <SideEffect reduceComponentsToState={[Function: reduceComponents]} headManager={{...}} inAmpMode={false} />
+                                </Head>
+                              </Head>
+                              <Nav marginBottom={false}>
+                                <SkipLinks>
+                                  <nav id=\\"wb-tphp\\" className=\\"d-flex flex-column align-items-center\\">
+                                    <a className=\\"wb-link-inv wb-sl\\" href=\\"#wb-cont\\">
+                                      <FormattedMessage id=\\"skipToMainContent\\">
+                                        <FormattedMessage defaultMessage=\\" \\" id=\\"skipToMainContent\\">
+                                          Skip to Main Content
+                                        </FormattedMessage>
+                                      </FormattedMessage>
+                                    </a>
+                                    <a className=\\"wb-link-inv wb-sl\\" href=\\"#wb-info\\">
+                                      <FormattedMessage id=\\"skipToAboutThisApplication\\">
+                                        <FormattedMessage defaultMessage=\\" \\" id=\\"skipToAboutThisApplication\\">
+                                          Skip to &quot;About this site&quot;
+                                        </FormattedMessage>
+                                      </FormattedMessage>
+                                    </a>
+                                    <a className=\\"wb-link-inv wb-sl\\" rel=\\"alternate\\" href=\\"?wbdisable=true\\">
+                                      <FormattedMessage id=\\"skipToBasicHtmlVersion\\">
+                                        <FormattedMessage defaultMessage=\\" \\" id=\\"skipToBasicHtmlVersion\\">
+                                          Switch to basic HTML version
+                                        </FormattedMessage>
+                                      </FormattedMessage>
+                                    </a>
+                                  </nav>
+                                </SkipLinks>
+                                <header className={[undefined]}>
+                                  <Container fluid={true} className=\\"centered\\">
+                                    <div className=\\"centered container-fluid\\">
+                                      <Row xs={1} md={2} className=\\"header-container row d-flex \\">
+                                        <div className=\\"header-container row d-flex  row row-cols-md-2 row-cols-1\\">
+                                          <Col className=\\"\\">
+                                            <div className=\\"col\\">
+                                              <GovernmentLogo>
+                                                <img src=\\"/static/images/canadaLogo_en.svg\\" property=\\"logo\\" alt=\\"\\" className=\\"logo\\" />
+                                                <span className=\\"wb-inv\\" property=\\"name\\">
+                                                  Government of Canada / 
+                                                  <span lang=\\"fr\\">
+                                                    Gouvernement du Canada
+                                                  </span>
+                                                </span>
+                                                <meta property=\\"areaServed\\" typeof=\\"Country\\" content=\\"Canada\\" />
+                                              </GovernmentLogo>
+                                            </div>
+                                          </Col>
+                                          <Col className=\\"text-end \\">
+                                            <div className=\\"text-end  col\\">
+                                              <ul className=\\"list-inline mt-1 mb-1\\">
+                                                <li className=\\"list-inline-item mr-1 my-auto\\">
+                                                  <FeedbackButton>
+                                                    <ForwardRef(LinkComponent) href=\\"https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback\\" passHref={true}>
+                                                      <Button variant=\\"link\\" className=\\"px-0\\" active={false} disabled={false} onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback\\">
+                                                        <a disabled={[undefined]} onClick={[Function: handleClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback\\" role=\\"button\\" tabIndex={0} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function: handleKeyDown]} className=\\"px-0 btn btn-link\\">
+                                                          <FormattedMessage id=\\"feedbackButtonText\\">
+                                                            <FormattedMessage defaultMessage=\\" \\" id=\\"feedbackButtonText\\">
+                                                              Feedback
+                                                            </FormattedMessage>
+                                                          </FormattedMessage>
+                                                        </a>
+                                                      </Button>
+                                                    </ForwardRef(LinkComponent)>
+                                                  </FeedbackButton>
+                                                </li>
+                                                <li className=\\"list-inline-item px-2\\">
+                                                  –
+                                                </li>
+                                                <li className=\\"list-inline-item mr-0\\">
+                                                  <LanguageSelector>
+                                                    <div data-testid=\\"languageSelector\\">
+                                                      <Button variant=\\"link\\" onClick={[Function: onClick]} lang=\\"fr\\" className=\\"px-0\\" active={false} disabled={false}>
+                                                        <button onClick={[Function: onClick]} lang=\\"fr\\" disabled={false} type=\\"button\\" className=\\"px-0 btn btn-link\\">
+                                                          Français
+                                                        </button>
+                                                      </Button>
+                                                    </div>
+                                                  </LanguageSelector>
+                                                </li>
+                                              </ul>
+                                              <ul className=\\"list-inline\\">
+                                                <li className=\\"list-inline-item my-auto\\">
+                                                  <NavbarUserControl>
+                                                    <div className=\\"d-flex align-items-center text-end\\">
+                                                      <span className=\\"me-2 my-auto h4\\">
+                                                        <FaUserCircle>
+                                                          <IconBase attr={{...}}>
+                                                            <svg stroke=\\"currentColor\\" fill=\\"currentColor\\" strokeWidth=\\"0\\" viewBox=\\"0 0 496 512\\" className={[undefined]} style={{...}} height=\\"1em\\" width=\\"1em\\" xmlns=\\"http://www.w3.org/2000/svg\\">
+                                                              <path d=\\"M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z\\" />
+                                                            </svg>
+                                                          </IconBase>
+                                                        </FaUserCircle>
+                                                      </span>
+                                                      <span className=\\"me-4 my-auto h5\\">
+                                                        <ForwardRef(LinkComponent) href={{...}}>
+                                                          <a onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"/dina-user/view?id=&hideBackButton=true\\">
+                                                            test-user
+                                                          </a>
+                                                        </ForwardRef(LinkComponent)>
+                                                      </span>
+                                                      <button type=\\"button\\" className=\\"btn btn-info logout-button my-auto\\" onClick={[Function: onClick]}>
+                                                        <FormattedMessage id=\\"logoutBtn\\">
+                                                          <FormattedMessage defaultMessage=\\" \\" id=\\"logoutBtn\\">
+                                                            Logout
+                                                          </FormattedMessage>
+                                                        </FormattedMessage>
+                                                      </button>
+                                                    </div>
+                                                  </NavbarUserControl>
+                                                </li>
+                                              </ul>
+                                            </div>
+                                          </Col>
+                                        </div>
+                                      </Row>
+                                    </div>
+                                  </Container>
+                                  <Navbar className=\\"app-bar\\" expand=\\"lg\\" variant=\\"light\\" collapseOnSelect={false}>
+                                    <nav className=\\"app-bar navbar navbar-expand-lg navbar-light\\">
+                                      <Container fluid={true} className=\\"centered\\">
+                                        <div className=\\"centered container-fluid\\">
+                                          <ForwardRef(LinkComponent) href=\\"/\\" passHref={true}>
+                                            <NavbarBrand href=\\"/\\" className=\\"app-name\\" onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]}>
+                                              <a href=\\"/\\" onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} className=\\"app-name navbar-brand\\">
+                                                <FormattedMessage id=\\"appTitleInstanceMode\\" values={{...}}>
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"appTitleInstanceMode\\" values={{...}}>
+                                                    DINA (developer)
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </a>
+                                            </NavbarBrand>
+                                          </ForwardRef(LinkComponent)>
+                                          <NavbarToggle aria-controls=\\"basic-navbar-nav\\" label=\\"Toggle navigation\\">
+                                            <button aria-controls=\\"basic-navbar-nav\\" type=\\"button\\" onClick={[Function (anonymous)]} aria-label=\\"Toggle navigation\\" className=\\"navbar-toggler collapsed\\">
+                                              <span className=\\"navbar-toggler-icon\\" />
+                                            </button>
+                                          </NavbarToggle>
+                                          <NavbarCollapse id=\\"basic-navbar-nav\\" role=\\"menubar\\">
+                                            <ForwardRef in={false} id=\\"basic-navbar-nav\\" role=\\"menubar\\" timeout={300} mountOnEnter={false} unmountOnExit={false} appear={false} getDimensionValue={[Function: getDefaultDimensionValue]}>
+                                              <ForwardRef addEndListener={[Function: transitionEndListener]} in={false} id=\\"basic-navbar-nav\\" role=\\"menubar\\" timeout={300} mountOnEnter={false} unmountOnExit={false} appear={false} aria-expanded={false} onEnter={[Function (anonymous)]} onEntering={[Function (anonymous)]} onEntered={[Function (anonymous)]} onExit={[Function (anonymous)]} onExiting={[Function (anonymous)]} childRef={{...}}>
+                                                <Transition in={false} id=\\"basic-navbar-nav\\" role=\\"menubar\\" timeout={300} mountOnEnter={false} unmountOnExit={false} appear={false} aria-expanded={false} onEnter={[Function (anonymous)]} onEntered={[Function (anonymous)]} onEntering={[Function (anonymous)]} onExit={[Function (anonymous)]} onExited={[Function (anonymous)]} onExiting={[Function (anonymous)]} addEndListener={[Function (anonymous)]} nodeRef={{...}} enter={true} exit={true}>
+                                                  <div className=\\"navbar-collapse collapse\\" id=\\"basic-navbar-nav\\" role=\\"menubar\\" aria-expanded={false}>
+                                                    <NavCollectionDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Collection\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Collection
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavCollectionDropdown>
+                                                    <NavTransactionsDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Transactions\\" show={false} onMouseOver={[Function: showDropdown]} onMouseLeave={[Function: hideDropdown]} onKeyDown={[Function: onKeyDown]} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown show={false} onMouseOver={[Function: showDropdown]} onMouseLeave={[Function: hideDropdown]} onKeyDown={[Function: onKeyDown]} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onMouseLeave={[Function: hideDropdown]} onKeyDown={[Function: onKeyDown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Transactions
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavTransactionsDropdown>
+                                                    <NavObjectStoreDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Object Store\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Object Store
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavObjectStoreDropdown>
+                                                    <NavAgentDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Agents\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Agents
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavAgentDropdown>
+                                                    <NavSequenceDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Sequencing\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Sequencing
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavSequenceDropdown>
+                                                    <NavControlledVocabularyDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Controlled Vocabulary\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Controlled Vocabulary
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavControlledVocabularyDropdown>
+                                                    <NavDinaConfigurationDropdown formatMessage={[Function: formatMessage]}>
+                                                      <NavDropdown title=\\"Configuration\\" onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" menuRole=\\"menu\\">
+                                                        <Dropdown onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} show={false} role=\\"menuitem\\" className=\\"nav-item\\" navbar={false} align=\\"start\\" autoClose={true}>
+                                                          <Dropdown placement=\\"bottom-start\\" show={false} onSelect={[undefined]} onToggle={[Function (anonymous)]} focusFirstItemOnShow={[undefined]} itemSelector=\\".dropdown-item:not(.disabled):not(:disabled)\\">
+                                                            <div onMouseOver={[Function: showDropdown]} onKeyDown={[Function: onKeyDown]} onMouseLeave={[Function: hideDropdown]} role=\\"menuitem\\" className=\\"nav-item dropdown\\">
+                                                              <DropdownToggle id={[undefined]} eventKey={{...}} active={[undefined]} disabled={[undefined]} childBsPrefix={[undefined]} as={{...}}>
+                                                                <NavLink className=\\"dropdown-toggle\\" id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} eventKey={{...}} active={[undefined]} disabled={false}>
+                                                                  <Anchor id={[undefined]} onClick={[Function (anonymous)]} aria-expanded={false} disabled={false} role={[undefined]} className=\\"dropdown-toggle nav-link\\">
+                                                                    <a id={[undefined]} onClick={[Function: handleClick]} aria-expanded={false} disabled={[undefined]} role=\\"button\\" className=\\"dropdown-toggle nav-link\\" tabIndex={0} href={[undefined]} target={[undefined]} aria-disabled={[undefined]} rel={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                                                      Configuration
+                                                                    </a>
+                                                                  </Anchor>
+                                                                </NavLink>
+                                                              </DropdownToggle>
+                                                              <DropdownMenu role=\\"menu\\" renderOnMount={[undefined]} rootCloseEvent={[undefined]} variant={[undefined]} flip={true} />
+                                                            </div>
+                                                          </Dropdown>
+                                                        </Dropdown>
+                                                      </NavDropdown>
+                                                    </NavDinaConfigurationDropdown>
+                                                  </div>
+                                                </Transition>
+                                              </ForwardRef>
+                                            </ForwardRef>
+                                          </NavbarCollapse>
+                                        </div>
+                                      </Container>
+                                    </nav>
+                                  </Navbar>
+                                </header>
+                              </Nav>
+                              <ButtonBar>
+                                <div className=\\"button-bar button-bar-sticky undefined\\">
+                                  <div className=\\"container-fluid centered\\">
+                                    <div className=\\"d-flex row\\">
+                                      <div className=\\"col-md-6 col-sm-12\\">
+                                        <div className=\\"mt-2\\">
+                                          <BackButton entityLink=\\"/collection/material-sample\\" entityId=\\"a503d31d-8203-4766-af85-db271e087853\\">
+                                            <ForwardRef(LinkComponent) href=\\"/collection/material-sample/view?id=a503d31d-8203-4766-af85-db271e087853\\">
+                                              <a className=\\"back-button my-auto \\" onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"/collection/material-sample/view?id=a503d31d-8203-4766-af85-db271e087853\\">
+                                                <FormattedMessage id=\\"backToReadOnlyPage\\">
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"backToReadOnlyPage\\">
+                                                    Back to read-only page
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </a>
+                                            </ForwardRef(LinkComponent)>
+                                          </BackButton>
+                                        </div>
+                                      </div>
+                                      <div className=\\"col-md-6 col-sm-12 d-flex\\">
+                                        <FormikConnect(SubmitButtonInternal) className=\\"ms-auto\\" buttonProps={[Function: buttonProps]}>
+                                          <SubmitButtonInternal className=\\"ms-auto\\" buttonProps={[Function: buttonProps]} formik={{...}}>
+                                            <button disabled={false} className=\\"btn ms-auto btn-primary\\" style={{...}} onClick={[Function: onClick]} type=\\"submit\\">
+                                              <FormattedMessage id=\\"splitButton\\">
+                                                <FormattedMessage defaultMessage=\\" \\" id=\\"splitButton\\">
+                                                  Split
+                                                </FormattedMessage>
+                                              </FormattedMessage>
+                                            </button>
+                                          </SubmitButtonInternal>
+                                        </FormikConnect(SubmitButtonInternal)>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </ButtonBar>
+                              <main className=\\"container-fluid\\" role=\\"main\\">
+                                <h1 id=\\"wb-cont\\">
+                                  Split Material Sample
+                                </h1>
+                                <ErrorBanner errorMessage=\\"Some Material Samples do not match the Split Configuration and were removed.\\">
+                                  <div className=\\"error-viewer\\">
+                                    <div className=\\"alert alert-danger\\" role=\\"status\\">
+                                      Some Material Samples do not match the Split Configuration and were removed.
+                                    </div>
+                                  </div>
+                                </ErrorBanner>
+                                <div className=\\"row\\">
+                                  <div className=\\"col-md-5\\">
+                                    <h4 className=\\"mt-2\\">
+                                      <FormattedMessage id=\\"settingLabel\\">
+                                        <FormattedMessage defaultMessage=\\" \\" id=\\"settingLabel\\">
+                                          Settings
+                                        </FormattedMessage>
+                                      </FormattedMessage>
+                                    </h4>
+                                    <strong>
+                                      <FormattedMessage id=\\"selectSplitConfiguration\\">
+                                        <FormattedMessage defaultMessage=\\" \\" id=\\"selectSplitConfiguration\\">
+                                          Select Split Configuration
+                                        </FormattedMessage>
+                                      </FormattedMessage>
+                                    </strong>
+                                    <ForwardRef className=\\"mt-1 mb-3\\" name=\\"splitConfiguration\\" options={{...}} onChange={[Function: onChange]} autoFocus={true} value={[undefined]}>
+                                      <Select className=\\"mt-1 mb-3\\" name=\\"splitConfiguration\\" options={{...}} autoFocus={true} inputValue=\\"\\" menuIsOpen={false} onChange={[Function (anonymous)]} onInputChange={[Function (anonymous)]} onMenuClose={[Function (anonymous)]} onMenuOpen={[Function (anonymous)]} value={{...}} aria-live=\\"polite\\" backspaceRemovesValue={true} blurInputOnSelect={true} captureMenuScroll={false} classNames={{...}} closeMenuOnSelect={true} closeMenuOnScroll={false} components={{...}} controlShouldRenderValue={true} escapeClearsValue={false} filterOption={[Function (anonymous)]} formatGroupLabel={[Function: formatGroupLabel]} getOptionLabel={[Function: getOptionLabel]} getOptionValue={[Function: getOptionValue]} isDisabled={false} isLoading={false} isMulti={false} isRtl={false} isSearchable={true} isOptionDisabled={[Function: isOptionDisabled]} loadingMessage={[Function: loadingMessage]} maxMenuHeight={300} minMenuHeight={140} menuPlacement=\\"bottom\\" menuPosition=\\"absolute\\" menuShouldBlockScroll={false} menuShouldScrollIntoView={true} noOptionsMessage={[Function: noOptionsMessage]} openMenuOnFocus={false} openMenuOnClick={true} pageSize={5} placeholder=\\"Select...\\" screenReaderStatus={[Function: screenReaderStatus]} styles={{...}} tabIndex={0} tabSelectsValue={true} unstyled={false}>
+                                        <SelectContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} className=\\"mt-1 mb-3\\" innerProps={{...}} isDisabled={false} isFocused={false}>
+                                          <EmotionCssPropInternal css={{...}} className=\\"mt-1 mb-3\\" id={[undefined]} onKeyDown={[Function (anonymous)]} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"SelectContainer\\">
+                                            <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                            <div className=\\"mt-1 mb-3 css-b62m3t-container\\" id={[undefined]} onKeyDown={[Function (anonymous)]}>
+                                              <LiveRegion clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} id=\\"react-select-3-live-region\\" ariaSelection={{...}} focusedOption={{...}} focusedValue={{...}} isFocused={false} selectValue={{...}} focusableOptions={{...}} isAppleDevice={false}>
+                                                <A11yText id=\\"react-select-3-live-region\\">
+                                                  <EmotionCssPropInternal css={{...}} id=\\"react-select-3-live-region\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\">
+                                                    <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                    <span id=\\"react-select-3-live-region\\" className=\\"css-1f43avz-a11yText-A11yText\\" />
+                                                  </EmotionCssPropInternal>
+                                                </A11yText>
+                                                <A11yText aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" role=\\"log\\">
+                                                  <EmotionCssPropInternal css={{...}} aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" role=\\"log\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\">
+                                                    <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                    <span aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" role=\\"log\\" className=\\"css-1f43avz-a11yText-A11yText\\" />
+                                                  </EmotionCssPropInternal>
+                                                </A11yText>
+                                              </LiveRegion>
+                                              <Control clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerRef={[Function (anonymous)]} innerProps={{...}} isDisabled={false} isFocused={false} menuIsOpen={false}>
+                                                <EmotionCssPropInternal css={{...}} className=\\"\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-disabled={[undefined]} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Control\\">
+                                                  <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                  <div className=\\" css-13cymwt-control\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-disabled={[undefined]}>
+                                                    <ValueContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false}>
+                                                      <EmotionCssPropInternal css={{...}} className=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"ValueContainer\\">
+                                                        <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                        <div className=\\" css-1fdsijx-ValueContainer\\">
+                                                          <Placeholder clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false} isFocused={false} innerProps={{...}}>
+                                                            <EmotionCssPropInternal css={{...}} className=\\"\\" id=\\"react-select-3-placeholder\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Placeholder\\">
+                                                              <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                              <div className=\\" css-1jqq78o-placeholder\\" id=\\"react-select-3-placeholder\\">
+                                                                Select...
+                                                              </div>
+                                                            </EmotionCssPropInternal>
+                                                          </Placeholder>
+                                                          <Input clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} autoCapitalize=\\"none\\" autoComplete=\\"off\\" autoCorrect=\\"off\\" id=\\"react-select-3-input\\" innerRef={[Function (anonymous)]} isDisabled={false} isHidden={false} onBlur={[Function (anonymous)]} onChange={[Function (anonymous)]} onFocus={[Function (anonymous)]} spellCheck=\\"false\\" tabIndex={0} form={[undefined]} type=\\"text\\" value=\\"\\" aria-autocomplete=\\"list\\" aria-expanded={false} aria-haspopup={true} aria-errormessage={[undefined]} aria-invalid={[undefined]} aria-label={[undefined]} aria-labelledby={[undefined]} aria-required={[undefined]} role=\\"combobox\\" aria-activedescendant=\\"\\" aria-describedby=\\"react-select-3-placeholder\\">
+                                                            <EmotionCssPropInternal css={{...}} className=\\"\\" data-value=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Input\\">
+                                                              <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                              <div className=\\" css-qbdosj-Input\\" data-value=\\"\\">
+                                                                <input className=\\"\\" style={{...}} disabled={false} autoCapitalize=\\"none\\" autoComplete=\\"off\\" autoCorrect=\\"off\\" id=\\"react-select-3-input\\" onBlur={[Function (anonymous)]} onChange={[Function (anonymous)]} onFocus={[Function (anonymous)]} spellCheck=\\"false\\" tabIndex={0} form={[undefined]} type=\\"text\\" value=\\"\\" aria-autocomplete=\\"list\\" aria-expanded={false} aria-haspopup={true} aria-errormessage={[undefined]} aria-invalid={[undefined]} aria-label={[undefined]} aria-labelledby={[undefined]} aria-required={[undefined]} role=\\"combobox\\" aria-activedescendant=\\"\\" aria-describedby=\\"react-select-3-placeholder\\" />
+                                                              </div>
+                                                            </EmotionCssPropInternal>
+                                                          </Input>
+                                                        </div>
+                                                      </EmotionCssPropInternal>
+                                                    </ValueContainer>
+                                                    <IndicatorsContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false}>
+                                                      <EmotionCssPropInternal css={{...}} className=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"IndicatorsContainer\\">
+                                                        <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                        <div className=\\" css-1hb7zxy-IndicatorsContainer\\">
+                                                          <IndicatorSeparator clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={false} isFocused={false}>
+                                                            <EmotionCssPropInternal css={{...}} className=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"IndicatorSeparator\\">
+                                                              <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                              <span className=\\" css-1u9des2-indicatorSeparator\\" />
+                                                            </EmotionCssPropInternal>
+                                                          </IndicatorSeparator>
+                                                          <DropdownIndicator clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getClassNames={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={false} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerProps={{...}} isDisabled={false} isFocused={false}>
+                                                            <EmotionCssPropInternal css={{...}} className=\\"\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-hidden=\\"true\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"DropdownIndicator\\">
+                                                              <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                              <div className=\\" css-1xc3v61-indicatorContainer\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-hidden=\\"true\\">
+                                                                <DownChevron>
+                                                                  <Svg size={20}>
+                                                                    <EmotionCssPropInternal height={20} width={20} viewBox=\\"0 0 20 20\\" aria-hidden=\\"true\\" focusable=\\"false\\" css={{...}} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"svg\\">
+                                                                      <Insertion cache={{...}} serialized={{...}} isStringTag={true} />
+                                                                      <svg height={20} width={20} viewBox=\\"0 0 20 20\\" aria-hidden=\\"true\\" focusable=\\"false\\" className=\\"css-tj5bde-Svg\\">
+                                                                        <path d=\\"M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z\\" />
+                                                                      </svg>
+                                                                    </EmotionCssPropInternal>
+                                                                  </Svg>
+                                                                </DownChevron>
+                                                              </div>
+                                                            </EmotionCssPropInternal>
+                                                          </DropdownIndicator>
+                                                        </div>
+                                                      </EmotionCssPropInternal>
+                                                    </IndicatorsContainer>
+                                                  </div>
+                                                </EmotionCssPropInternal>
+                                              </Control>
+                                              <input name=\\"splitConfiguration\\" type=\\"hidden\\" value=\\"\\" />
+                                            </div>
+                                          </EmotionCssPropInternal>
+                                        </SelectContainer>
+                                      </Select>
+                                    </ForwardRef>
+                                    <Card body={false}>
+                                      <div className=\\"card\\">
+                                        <CardBody>
+                                          <div className=\\"card-body\\">
+                                            <strong>
+                                              <FormattedMessage id=\\"splitFrom\\">
+                                                <FormattedMessage defaultMessage=\\" \\" id=\\"splitFrom\\">
+                                                  Split from
+                                                </FormattedMessage>
+                                              </FormattedMessage>
+                                              :
+                                            </strong>
+                                            <ul className=\\"mb-0\\" />
+                                          </div>
+                                        </CardBody>
+                                      </div>
+                                    </Card>
+                                    <NumberSpinnerField name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false} className=\\"mt-3\\">
+                                      <FieldWrapper name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false} className=\\"mt-3\\">
+                                        <FieldSpy fieldName=\\"numberToCreate\\" validate={[undefined]}>
+                                          <FormikConnect(FastFieldInner) name=\\"numberToCreate\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
+                                            <FastFieldInner name=\\"numberToCreate\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
+                                              <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"numberToCreate\\">
+                                                <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
+                                                  <div className=\\"mt-3\\">
+                                                    <label className=\\"numberToCreate-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
+                                                      <div className=\\"field-label label-col mb-2\\" style={[undefined]}>
+                                                        <strong>
+                                                          Material Samples to Create
+                                                        </strong>
+                                                      </div>
+                                                      <div className=\\"field-col\\" style={{...}}>
+                                                        <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
+                                                          <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
+                                                            <input className=\\"form-control\\" type=\\"number\\" min={1} max={500} size={4} step={1} onKeyDown={[Function: onKeyDown]} onChange={[Function: onChange]} onClick={[Function: onClick]} disabled={false} value={1} />
+                                                          </ErrorBoundary>
+                                                        </FormikConnectedField>
+                                                      </div>
+                                                    </label>
+                                                  </div>
+                                                </LabelWrapper>
+                                              </FieldSpyInternal>
+                                            </FastFieldInner>
+                                          </FormikConnect(FastFieldInner)>
+                                        </FieldSpy>
+                                      </FieldWrapper>
+                                    </NumberSpinnerField>
+                                    <TextField name=\\"sourceSet\\" className=\\"mt-3\\" disabled={false}>
+                                      <FieldWrapper name=\\"sourceSet\\" className=\\"mt-3\\">
+                                        <FieldSpy fieldName=\\"sourceSet\\" validate={[undefined]}>
+                                          <FormikConnect(FastFieldInner) name=\\"sourceSet\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
+                                            <FastFieldInner name=\\"sourceSet\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
+                                              <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"sourceSet\\">
+                                                <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
+                                                  <div className=\\"mt-3\\">
+                                                    <label className=\\"sourceSet-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
+                                                      <div className=\\"field-label label-col mb-2\\" style={[undefined]}>
+                                                        <strong>
+                                                          <FieldHeader name=\\"sourceSet\\" customName={[undefined]} tooltipOverride={[undefined]} tooltipImage={[undefined]} tooltipImageAlt={[undefined]} tooltipLink={[undefined]} tooltipLinkText={[undefined]} startCaseLabel={[undefined]}>
+                                                            <div className=\\"sourceSet-field-header\\">
+                                                              Source Set
+                                                              <Tooltip id=\\"field_sourceSet_tooltip\\" directText={[undefined]} image={[undefined]} altImage={[undefined]} link={[undefined]} linkText={[undefined]}>
+                                                                <span className=\\"m-2\\">
+                                                                  <ForwardRef(Tooltip) id=\\"field_sourceSet_tooltip\\" overlay={{...}} placement=\\"top\\" trigger={{...}} zIndex={9001}>
+                                                                    <Trigger popupClassName=\\"\\" prefixCls=\\"rc-tooltip\\" popup={[Function: getPopupElement]} action={{...}} builtinPlacements={{...}} popupPlacement=\\"top\\" popupAlign={{...}} getPopupContainer={[undefined]} onPopupVisibleChange={[Function: noop]} afterPopupVisibleChange={[Function: noop]} popupTransitionName={[undefined]} popupAnimation={[undefined]} popupMotion={[undefined]} defaultPopupVisible={false} destroyPopupOnHide={false} autoDestroy={false} mouseLeaveDelay={0.1} popupStyle={{...}} mouseEnterDelay={0} zIndex={9001} getPopupClassNameFromAlign={[Function: returnEmptyString]} getDocument={[Function: returnDocument]} onPopupAlign={[Function: noop]} focusDelay={0} blurDelay={0.15} mask={false} maskClosable={true} showAction={{...}} hideAction={{...}}>
+                                                                      <span onContextMenu={[undefined]} onClick={[undefined]} onMouseDown={[undefined]} onTouchStart={[undefined]} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onFocus={[Function (anonymous)]} onBlur={[Function (anonymous)]}>
+                                                                        <img src=\\"/static/images/iconInformation.gif\\" alt=\\"User-defined name that can be used to retrieve all material samples that were created in the same batch.\\" aria-describedby=\\"field_sourceSet_tooltip\\" tabIndex={0} />
+                                                                      </span>
+                                                                    </Trigger>
+                                                                  </ForwardRef(Tooltip)>
+                                                                </span>
+                                                              </Tooltip>
+                                                            </div>
+                                                          </FieldHeader>
+                                                        </strong>
+                                                      </div>
+                                                      <div className=\\"field-col\\" style={{...}}>
+                                                        <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
+                                                          <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
+                                                            <input type=\\"text\\" placeholder={[undefined]} className=\\"form-control\\" onChange={[Function: onChange]} value=\\"\\" readOnly={[undefined]} disabled={false} onKeyDown={[Function: onKeyDown]} />
+                                                          </ErrorBoundary>
+                                                        </FormikConnectedField>
+                                                      </div>
+                                                    </label>
+                                                  </div>
+                                                </LabelWrapper>
+                                              </FieldSpyInternal>
+                                            </FastFieldInner>
+                                          </FormikConnect(FastFieldInner)>
+                                        </FieldSpy>
+                                      </FieldWrapper>
+                                    </TextField>
+                                  </div>
+                                  <div className=\\"col-md-7\\">
+                                    <PreviewGeneratedNames splitFromMaterialSamples={{...}} generatedIdentifiers={{...}} setGeneratedIdentifiers={[Function: bound dispatchAction]} setBaseNameError={[Function: bound dispatchAction]} splitConfiguration={{...}}>
+                                      <div className=\\"mt-2\\">
+                                        <h4>
+                                          <FormattedMessage id=\\"previewLabel\\">
+                                            <FormattedMessage defaultMessage=\\" \\" id=\\"previewLabel\\">
+                                              Preview
+                                            </FormattedMessage>
+                                          </FormattedMessage>
+                                        </h4>
+                                        <table className=\\"table\\">
+                                          <thead>
+                                            <tr>
+                                              <th>
+                                                <FormattedMessage id=\\"splitPreviewNumberColumn\\">
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"splitPreviewNumberColumn\\">
+                                                    Number
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </th>
+                                              <th>
+                                                <FormattedMessage id=\\"splitPreviewGeneratedIdentifierColumn\\">
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"splitPreviewGeneratedIdentifierColumn\\">
+                                                    Generated Identifier
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </th>
+                                              <th>
+                                                <FormattedMessage id=\\"parentMaterialSample\\">
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"parentMaterialSample\\">
+                                                    Parent Material Sample
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </th>
+                                              <th>
+                                                <FormattedMessage id=\\"field_materialSampleType\\">
+                                                  <FormattedMessage defaultMessage=\\" \\" id=\\"field_materialSampleType\\">
+                                                    Material Sample Type
+                                                  </FormattedMessage>
+                                                </FormattedMessage>
+                                              </th>
+                                            </tr>
+                                          </thead>
+                                          <tbody />
+                                        </table>
+                                      </div>
+                                    </PreviewGeneratedNames>
+                                  </div>
+                                </div>
+                              </main>
+                              <Footer>
+                                <footer id=\\"wb-info\\" className=\\"mt-3\\" style={{...}}>
+                                  <div className=\\"brand\\">
+                                    <div className=\\"container-fluid centered\\">
+                                      <div className=\\"row \\">
+                                        <nav className=\\"col-md-10 ftr-urlt-lnk py-3\\">
+                                          <ul>
+                                            <li>
+                                              <ForwardRef(LinkComponent) href=\\"https://www.canada.ca/en/contact.html\\" passHref={true}>
+                                                <a onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"https://www.canada.ca/en/contact.html\\">
+                                                  <FormattedMessage id=\\"footerContactInfo\\">
+                                                    <FormattedMessage defaultMessage=\\" \\" id=\\"footerContactInfo\\">
+                                                      Contact information
+                                                    </FormattedMessage>
+                                                  </FormattedMessage>
+                                                </a>
+                                              </ForwardRef(LinkComponent)>
+                                            </li>
+                                            <li>
+                                              <ForwardRef(LinkComponent) href=\\"https://www.canada.ca/en/transparency/terms.html\\" passHref={true}>
+                                                <a onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"https://www.canada.ca/en/transparency/terms.html\\">
+                                                  <FormattedMessage id=\\"footerTermsAndConditions\\">
+                                                    <FormattedMessage defaultMessage=\\" \\" id=\\"footerTermsAndConditions\\">
+                                                      Terms and conditions
+                                                    </FormattedMessage>
+                                                  </FormattedMessage>
+                                                </a>
+                                              </ForwardRef(LinkComponent)>
+                                            </li>
+                                            <li>
+                                              <ForwardRef(LinkComponent) href=\\"https://www.canada.ca/en/transparency/privacy.html\\" passHref={true}>
+                                                <a onClick={[Function: onClick]} onMouseEnter={[Function: onMouseEnter]} onTouchStart={[Function: onTouchStart]} href=\\"https://www.canada.ca/en/transparency/privacy.html\\">
+                                                  <FormattedMessage id=\\"footerPrivacy\\">
+                                                    <FormattedMessage defaultMessage=\\" \\" id=\\"footerPrivacy\\">
+                                                      Privacy
+                                                    </FormattedMessage>
+                                                  </FormattedMessage>
+                                                </a>
+                                              </ForwardRef(LinkComponent)>
+                                            </li>
+                                          </ul>
+                                          <div />
+                                        </nav>
+                                        <div className=\\"col-6 col-md-3 col-lg-2 text-end pt-2\\">
+                                          <img src=\\"https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/wmms-blk.svg\\" alt=\\"Symbol of the Government of Canada\\" className=\\"mt-4\\" />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </footer>
+                              </Footer>
+                            </PageLayout>
+                          </form>
+                        </Form>
+                      </FormWrapper>
+                    </Formik>
+                  </DinaForm>
                 </MaterialSampleSplitGenerationForm>
                 <Modal appElement={[undefined]} ariaHideApp={false} isOpen={false} className=\\"Modal__Bootstrap modal-dialog\\" style={{...}} contentLabel=\\"Popup dialog window\\" portalClassName=\\"ReactModalPortal\\" bodyOpenClassName=\\"ReactModal__Body--open\\" role=\\"dialog\\" closeTimeoutMS={0} shouldFocusAfterRender={true} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true} shouldReturnFocusAfterClose={true} preventScroll={false} parentSelector={[Function: parentSelector]} overlayElement={[Function: overlayElement]} contentElement={[Function: contentElement]}>
                   <Portal containerInfo={{...}}>

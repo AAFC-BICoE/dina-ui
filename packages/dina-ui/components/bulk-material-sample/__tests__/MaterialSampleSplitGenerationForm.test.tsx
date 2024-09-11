@@ -1,6 +1,7 @@
 import { SEPARATORS_DASH } from "../../../types/collection-api/resources/SplitConfiguration";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { MaterialSampleSplitGenerationForm } from "../MaterialSampleSplitGenerationForm";
+import { LoadingSpinner } from "common-ui/lib";
 
 const NO_CHILDREN_MATERIAL_SAMPLE_UUID = "a503d31d-8203-4766-af85-db271e087853";
 const SPLIT_CONFIGURATION_UUID = "706eece4-3105-4e96-bc2f-7530a80a6163";
@@ -55,13 +56,15 @@ describe("MaterialSampleSplitGenerationForm", () => {
       { apiContext }
     );
 
-    // Wait for the material sample request.
-    await new Promise(setImmediate);
-    wrapper.update();
+    while (wrapper.find(LoadingSpinner).exists()) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      wrapper.update();
+    }
 
     // This test is designed to simply ensure the design doesn't change when it's not expected.
     // If it's expected, the snapshot will need to be updated.
-    expect(wrapper.find("main").debug()).toMatchSnapshot();
+    expect(wrapper.debug()).toMatchSnapshot();
+    wrapper.unmount();
   });
 
   it("Layout snapshot without matching material sample types.", async () => {
@@ -85,11 +88,14 @@ describe("MaterialSampleSplitGenerationForm", () => {
     );
 
     // Wait for the material sample request.
-    await new Promise(setImmediate);
-    wrapper.update();
+    while (wrapper.find(LoadingSpinner).exists()) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      wrapper.update();
+    }
 
     // This test is designed to simply ensure the design doesn't change when it's not expected.
     // If it's expected, the snapshot will need to be updated.
     expect(wrapper.debug()).toMatchSnapshot();
+    wrapper.unmount();
   });
 });
