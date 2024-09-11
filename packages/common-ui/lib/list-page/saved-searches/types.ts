@@ -1,4 +1,3 @@
-import { VisibilityState } from "@tanstack/react-table";
 import { JsonTree } from "react-awesome-query-builder";
 
 /**
