@@ -89,13 +89,14 @@ export default function useSavedExports<TData extends KitsuResource>({
       await performSaveRequest([
         ...everySavedExport.filter(
           (savedExport) =>
-            savedExport.name !== savedExportName.trim() &&
-            savedExport.component !== indexName
+            !(
+              savedExport.name === savedExportName.trim() &&
+              savedExport.component === indexName
+            )
         ),
         savedExportObject
       ]);
     } catch (e) {
-      // TODO: Add better error handling...
       console.error(e);
       setLoadingCreateSavedExport(false);
       return;
@@ -130,13 +131,14 @@ export default function useSavedExports<TData extends KitsuResource>({
       await performSaveRequest([
         ...everySavedExport.filter(
           (savedExport) =>
-            savedExport.name !== selectedSavedExport.name &&
-            savedExport.component !== indexName
+            !(
+              savedExport.name === selectedSavedExport.name &&
+              savedExport.component === indexName
+            )
         ),
         savedExportObject
       ]);
     } catch (e) {
-      // TODO: Add better error handling...
       console.error(e);
       setLoadingUpdate(false);
       return;
@@ -163,12 +165,13 @@ export default function useSavedExports<TData extends KitsuResource>({
       await performSaveRequest([
         ...everySavedExport.filter(
           (savedExport) =>
-            savedExport.name !== selectedSavedExport.name &&
-            savedExport.component === indexName
+            !(
+              savedExport.name === selectedSavedExport.name &&
+              savedExport.component === indexName
+            )
         )
       ]);
     } catch (e) {
-      // TODO: Add better error handling...
       console.error(e);
       setLoadingDelete(false);
       return;
@@ -263,8 +266,7 @@ export default function useSavedExports<TData extends KitsuResource>({
 
   const displayOverrideWarning =
     allSavedExports.find(
-      (savedExport) =>
-        savedExport.name.toLowerCase() === savedExportName.trim().toLowerCase()
+      (savedExport) => savedExport.name === savedExportName.trim()
     ) !== undefined;
 
   const disableCreateButton =

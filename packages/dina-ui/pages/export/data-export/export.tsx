@@ -401,6 +401,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                             }
                           }}
                           isLoading={loadingSavedExports}
+                          isDisabled={loading}
                           value={
                             allSavedExports
                               ?.map((option) => ({
@@ -421,7 +422,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                             style={{ marginTop: "30px" }}
                             variant="danger"
                             onClick={deleteSavedExport}
-                            disabled={loadingDelete}
+                            disabled={loadingDelete || loading}
                           >
                             {loadingDelete ? LoadingSpinner : <FaTrash />}
                           </Button>
@@ -430,7 +431,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                               style={{ marginTop: "30px", marginLeft: "10px" }}
                               variant="primary"
                               onClick={updateSavedExport}
-                              disabled={loadingUpdate}
+                              disabled={loadingUpdate || loading}
                             >
                               {loadingUpdate ? (
                                 LoadingSpinner
@@ -476,7 +477,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                     className="btn btn-primary"
                     type="button"
                     onClick={handleShowCreateSavedExportModal}
-                    disabled={loadingSavedExports}
+                    disabled={loadingSavedExports || loading}
                   >
                     <DinaMessage id="savedExport_createTitle" />
                   </button>
