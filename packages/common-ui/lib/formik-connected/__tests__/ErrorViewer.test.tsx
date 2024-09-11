@@ -1,25 +1,30 @@
 import { Formik } from "formik";
 import { noop } from "lodash";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { ErrorViewer } from "../ErrorViewer";
 import { SubmitButton } from "../SubmitButton";
+import { fireEvent, screen } from "@testing-library/react";
+import { IntlProvider } from "react-intl";
 
 describe("ErrorViewer component", () => {
-  it("Renders nothing when formik has no status.", () => {
-    const wrapper = mountWithAppContext(
+  it("Renders nothing when Formik has no status.", () => {
+    // Render the component with React Testing Library
+    const wrapper = mountWithAppContext2(
       <Formik initialValues={{}} onSubmit={noop}>
         <ErrorViewer />
       </Formik>
     );
 
-    expect(wrapper.find(ErrorViewer).html()).toEqual(
-      `<div class="error-viewer"></div>`
-    );
+    // Assert that the element exists and then check the innerHTML
+    const errorViewer = wrapper.container.querySelector(".error-viewer");
+    expect(errorViewer).not.toBeNull();
+    expect(errorViewer!.innerHTML).toEqual("");
   });
 
-  it("Renders the formik status as an error message.", async () => {
-    const wrapper = mountWithAppContext(
+  it("Renders the Formik status as an error message.", async () => {
+    // Render the component using React Testing Library
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         onSubmit={({ formik }) => formik.setStatus("Test error")}
@@ -28,16 +33,15 @@ describe("ErrorViewer component", () => {
       </DinaForm>
     );
 
-    wrapper.find("form").simulate("submit");
-
+    // Submit the form.
+    fireEvent.click(wrapper.getByRole("button"));
     await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual("Test error");
+    screen.logTestingPlaygroundURL();
+    expect(wrapper.getByText(/test error/i)).toBeInTheDocument();
   });
 
   it("Renders field-level errors.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         initialErrors={{
@@ -53,7 +57,6 @@ describe("ErrorViewer component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(
       wrapper
