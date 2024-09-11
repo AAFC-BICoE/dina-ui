@@ -548,6 +548,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   literalGeoreferencedByLabel: "Georeferenced By",
   load: "Load",
   loading: "Loading",
+  loadingSpinner: "Loading...",
   loanTransaction: "Transaction",
   loanTransactionManagedAttributeListTitle:
     "Loans and Transactions Managed Attributes",
@@ -795,7 +796,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAndGoToViewPageButton: "Save & Go To View Page",
   saveAndMarkAsComplete: "Save and Mark as Complete",
   saveAsDefault: "Save as Default",
-  saveChanges: "Save changes",
+  saveChanges: "Save Changes...",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   saveSearch: "Save Search",
   saveSearchInstruction:
@@ -1044,5 +1045,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   multipleSamplesWellCoordinates:
     "Well coordinate {wellCoordinate} has multiple material samples: {samples}.",
   unitMismatchComponents:
-    "Some components units are not ul/rxn and will not show up in the reaction table: {components}."
+    "Some components units are not ul/rxn and will not show up in the reaction table: {components}.",
+  savedExport_exportType: "Export Type",
+  savedExport_exportDropdown: "Load saved columns to export",
+  savedExport_createTitle: "Create Saved Export Columns",
+  savedExport_overrideWarning:
+    'A saved export exists with the name "{savedExportName}". Creating this saved export will replace the existing one.',
+  savedExport_createName: "Saved Export Name",
+  savedExport_columnsToBeSaved: "Columns to be saved",
+  export_columnsToExport: "Columns To Export"
 };

@@ -1,4 +1,4 @@
-export interface SavedExportColumnStructure {
+export default interface SavedExportColumnStructure {
   name: string;
   component: string;
   columns: string[];

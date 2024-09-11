@@ -37,9 +37,9 @@ import {
   Button
 } from "react-bootstrap";
 import Select from "react-select";
-import { useSavedExports } from "./useSavedExports";
-import { SavedExportColumnStructure } from "./types";
 import { FaTrash } from "react-icons/fa";
+import SavedExportColumnStructure from "./types";
+import useSavedExports from "./useSavedExports";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
 const BASE_DELAY_EXPORT_FETCH_MS = 2000;
@@ -107,6 +107,8 @@ export default function ExportPage<TData extends KitsuResource>() {
     handleShowCreateSavedExportModal,
     columnsToExport,
     setColumnsToExport,
+    columnPathsToExport,
+    setColumnPathsToExport,
     deleteSavedExport,
     updateSavedExport
   } = useSavedExports<TData>({
@@ -280,7 +282,9 @@ export default function ExportPage<TData extends KitsuResource>() {
         role="status"
         aria-hidden="true"
       />
-      <span className="visually-hidden">Loading...</span>
+      <span className="visually-hidden">
+        <DinaMessage id="loadingSpinner" />
+      </span>
     </>
   );
 
@@ -333,7 +337,9 @@ export default function ExportPage<TData extends KitsuResource>() {
                     />
                     {uniqueName === "object-store-list" && (
                       <>
-                        <strong>Export Type</strong>
+                        <strong>
+                          <DinaMessage id="savedExport_exportType" />
+                        </strong>
                         <br />
                         <ButtonGroup className="mt-1">
                           <ToggleButton
@@ -378,7 +384,9 @@ export default function ExportPage<TData extends KitsuResource>() {
                   {exportType === "TABULAR_DATA" && (
                     <>
                       <div className="col-md-4">
-                        <strong>Load saved columns to export</strong>
+                        <strong>
+                          <DinaMessage id="savedExport_exportDropdown" />
+                        </strong>
                         <Select<SavedExportOption>
                           className="mt-2 mb-3"
                           name="savedExportOption"
@@ -427,7 +435,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                               {loadingUpdate ? (
                                 LoadingSpinner
                               ) : (
-                                <>Save Changes...</>
+                                <DinaMessage id="saveChanges" />
                               )}
                             </Button>
                           )}
@@ -463,26 +471,32 @@ export default function ExportPage<TData extends KitsuResource>() {
                       <Tooltip id="exportObjectsMaxLimitTooltip" />
                     )}
                 </div>
-                <button
-                  className="btn btn-primary"
-                  type="button"
-                  onClick={handleShowCreateSavedExportModal}
-                  disabled={loadingSavedExports}
-                >
-                  Create Saved Export Columns
-                </button>
+                {exportType === "TABULAR_DATA" && (
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={handleShowCreateSavedExportModal}
+                    disabled={loadingSavedExports}
+                  >
+                    <DinaMessage id="savedExport_createTitle" />
+                  </button>
+                )}
               </Card.Footer>
             </Card>
 
             {exportType === "TABULAR_DATA" && (
               <>
-                <h4 className="mt-4">Columns to export</h4>
+                <h4 className="mt-4">
+                  <DinaMessage id="export_columnsToExport" />
+                </h4>
                 <Card>
                   <Card.Body>
                     <ColumnSelectorMemo
                       exportMode={true}
                       displayedColumns={columnsToExport as any}
                       setDisplayedColumns={setColumnsToExport as any}
+                      overrideDisplayedColumns={columnPathsToExport}
+                      setOverrideDisplayedColumns={setColumnPathsToExport}
                       indexMapping={indexMap}
                       uniqueName={uniqueName}
                       dynamicFieldsMappingConfig={dynamicFieldMapping}

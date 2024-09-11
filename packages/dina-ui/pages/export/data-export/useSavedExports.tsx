@@ -2,19 +2,20 @@ import { SaveArgs, useAccount, useApiClient } from "common-ui/lib";
 import { UserPreference } from "../../../types/user-api";
 import { FilterParam, KitsuResource } from "kitsu";
 import { useEffect, useState, useMemo } from "react";
-import { SavedExportColumnStructure } from "./types";
+import SavedExportColumnStructure from "./types";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { isEqual } from "lodash";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 
 export interface UseSavedExportsProp {
   indexName: string;
 }
 
-export function useSavedExports<TData extends KitsuResource>({
+export default function useSavedExports<TData extends KitsuResource>({
   indexName
 }: UseSavedExportsProp) {
   const { save, apiClient } = useApiClient();
@@ -28,11 +29,16 @@ export function useSavedExports<TData extends KitsuResource>({
     SavedExportColumnStructure[]
   >([]);
   const [loadingSavedExports, setLoadingSavedExports] = useState<boolean>(true);
+
+  // Currently selected states...
   const [selectedSavedExport, setSelectedSavedExport] =
     useState<SavedExportColumnStructure>();
   const [columnsToExport, setColumnsToExport] = useState<TableColumn<TData>[]>(
     []
   );
+
+  // Selected paths to be loaded in as columnToExport.
+  const [columnPathsToExport, setColumnPathsToExport] = useState<string[]>();
 
   // All states related to creating a saved export.
   const [savedExportName, setSavedExportName] = useState<string>("");
@@ -82,7 +88,7 @@ export function useSavedExports<TData extends KitsuResource>({
         ...everySavedExport.filter(
           (savedExport) =>
             savedExport.name !== savedExportName.trim() &&
-            savedExport.component === indexName
+            savedExport.component !== indexName
         ),
         savedExportObject
       ]);
@@ -123,7 +129,7 @@ export function useSavedExports<TData extends KitsuResource>({
         ...everySavedExport.filter(
           (savedExport) =>
             savedExport.name !== selectedSavedExport.name &&
-            savedExport.component === indexName
+            savedExport.component !== indexName
         ),
         savedExportObject
       ]);
@@ -133,6 +139,9 @@ export function useSavedExports<TData extends KitsuResource>({
       setLoadingUpdate(false);
       return;
     }
+
+    // Select the newly upddated saved export...
+    setSelectedSavedExport(savedExportObject);
 
     setLoadingUpdate(false);
   }
@@ -220,7 +229,10 @@ export function useSavedExports<TData extends KitsuResource>({
       });
   }
 
-  function convertColumnsToPaths(columns) {
+  function convertColumnsToPaths(columns): string[] {
+    if (!columns) {
+      return [];
+    }
     return columns.map((column) => column?.id ?? "");
   }
 
@@ -231,14 +243,26 @@ export function useSavedExports<TData extends KitsuResource>({
     retrieveSavedExports();
   }, []);
 
+  /**
+   * When the user selects a saved export, load the columns in...
+   */
+  useEffect(() => {
+    if (selectedSavedExport) {
+      setColumnPathsToExport(selectedSavedExport.columns);
+    }
+  }, [selectedSavedExport]);
+
+  const columnsToExportPaths = convertColumnsToPaths(columnsToExport);
+
   const changesMade = !isEqual(
-    convertColumnsToPaths(columnsToExport),
+    columnsToExportPaths,
     selectedSavedExport?.columns ?? []
   );
 
   const displayOverrideWarning =
     allSavedExports.find(
-      (savedExport) => savedExport.name === savedExportName.trim()
+      (savedExport) =>
+        savedExport.name.toLowerCase() === savedExportName.trim().toLowerCase()
     ) !== undefined;
 
   const disableCreateButton =
@@ -254,17 +278,23 @@ export function useSavedExports<TData extends KitsuResource>({
         scrollable={true}
       >
         <Modal.Header closeButton={!loadingCreateSavedExport}>
-          <Modal.Title>Create Saved Export Columns</Modal.Title>
+          <Modal.Title>
+            <DinaMessage id="savedExport_createTitle" />
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {displayOverrideWarning && (
             <Alert variant={"warning"}>
-              A saved export exists with the name "{savedExportName}". Creating
-              this saved export will replace the existing one.
+              <DinaMessage
+                id="savedExport_overrideWarning"
+                values={{ savedExportName }}
+              />
             </Alert>
           )}
 
-          <strong>Saved Export Name:</strong>
+          <strong>
+            <DinaMessage id="savedExport_createName" />
+          </strong>
           <input
             className="form-control"
             value={savedExportName}
@@ -273,7 +303,9 @@ export function useSavedExports<TData extends KitsuResource>({
           />
           <br />
 
-          <strong>Columns to be saved:</strong>
+          <strong>
+            <DinaMessage id="savedExport_columnsToBeSaved" />
+          </strong>
           {columnsToExport.map((column) => (column as any)?.header())}
         </Modal.Body>
         <Modal.Footer>
@@ -282,7 +314,7 @@ export function useSavedExports<TData extends KitsuResource>({
             onClick={handleCloseCreateSavedExportModal}
             disabled={loadingCreateSavedExport}
           >
-            Cancel
+            <DinaMessage id="cancelButtonText" />
           </Button>
           <Button
             variant="primary"
@@ -298,10 +330,12 @@ export function useSavedExports<TData extends KitsuResource>({
                   role="status"
                   aria-hidden="true"
                 />
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">
+                  <DinaMessage id="loadingSpinner" />
+                </span>
               </>
             ) : (
-              <>Create</>
+              <DinaMessage id="create" />
             )}
           </Button>
         </Modal.Footer>
@@ -328,6 +362,8 @@ export function useSavedExports<TData extends KitsuResource>({
     ModalElement,
     handleShowCreateSavedExportModal,
     columnsToExport,
-    setColumnsToExport
+    setColumnsToExport,
+    columnPathsToExport,
+    setColumnPathsToExport
   };
 }
