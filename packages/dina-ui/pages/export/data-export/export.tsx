@@ -5,7 +5,6 @@ import {
   DATA_EXPORT_TOTAL_RECORDS_KEY,
   DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY,
   useApiClient,
-  LoadingSpinner,
   OBJECT_EXPORT_IDS_KEY,
   downloadDataExport,
   Tooltip,
@@ -31,9 +30,17 @@ import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { useSessionStorage } from "usehooks-ts";
 import { Card, ButtonGroup, ToggleButton, Spinner } from "react-bootstrap";
+import Select from "react-select";
+import { useSavedExports } from "./useSavedExports";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
 const BASE_DELAY_EXPORT_FETCH_MS = 2000;
+
+export interface SavedExportOption {
+  label: string;
+  value: string;
+  // resource: SplitConfiguration;
+}
 
 export default function ExportPage<TData extends KitsuResource>() {
   const { formatNumber } = useIntl();
@@ -83,6 +90,10 @@ export default function ExportPage<TData extends KitsuResource>() {
   const { indexMap } = useIndexMapping({
     indexName,
     dynamicFieldMapping
+  });
+
+  const { allSavedExports, loadingSavedExports } = useSavedExports({
+    indexName
   });
 
   async function exportData(formik) {
@@ -242,6 +253,7 @@ export default function ExportPage<TData extends KitsuResource>() {
       setLoading(false);
     }
   }
+
   const disableObjectExportButton =
     localStorageExportObjectIds.length < 1 || totalRecords > 100;
 
@@ -280,53 +292,75 @@ export default function ExportPage<TData extends KitsuResource>() {
           </h4>
           <Card>
             <Card.Body>
-              <div className="col-md-4">
-                <TextField
-                  name={"name"}
-                  customName="exportName"
-                  disabled={loading}
-                />
-                {uniqueName === "object-store-list" && (
-                  <>
-                    <strong>Export Type</strong>
-                    <br />
-                    <ButtonGroup className="mt-1">
-                      <ToggleButton
-                        id="export-data"
-                        value={"data"}
-                        type={"radio"}
-                        checked={exportType === "TABULAR_DATA"}
-                        onClick={() => {
-                          setExportType("TABULAR_DATA");
-                        }}
-                        variant={
-                          exportType === "TABULAR_DATA"
-                            ? "primary"
-                            : "outline-primary"
+              <div className="row">
+                <div className="col-md-4">
+                  <TextField
+                    name={"name"}
+                    customName="exportName"
+                    disabled={loading}
+                  />
+                  {uniqueName === "object-store-list" && (
+                    <>
+                      <strong>Export Type</strong>
+                      <br />
+                      <ButtonGroup className="mt-1">
+                        <ToggleButton
+                          id="export-data"
+                          value={"data"}
+                          type={"radio"}
+                          checked={exportType === "TABULAR_DATA"}
+                          onClick={() => {
+                            setExportType("TABULAR_DATA");
+                          }}
+                          variant={
+                            exportType === "TABULAR_DATA"
+                              ? "primary"
+                              : "outline-primary"
+                          }
+                          disabled={loading}
+                        >
+                          <DinaMessage id="dataLabel" />
+                        </ToggleButton>
+                        <ToggleButton
+                          id="export-object"
+                          value={"object"}
+                          type={"radio"}
+                          checked={exportType === "OBJECT_ARCHIVE"}
+                          onClick={() => {
+                            setExportType("OBJECT_ARCHIVE");
+                          }}
+                          variant={
+                            exportType === "OBJECT_ARCHIVE"
+                              ? "primary"
+                              : "outline-primary"
+                          }
+                          disabled={loading}
+                        >
+                          <DinaMessage id="objectsLabel" />
+                        </ToggleButton>
+                      </ButtonGroup>
+                    </>
+                  )}
+                </div>
+
+                {exportType === "TABULAR_DATA" && (
+                  <div className="col-md-4">
+                    <strong>Load saved columns to export</strong>
+                    <Select<SavedExportOption>
+                      className="mt-1 mb-3"
+                      name="splitConfiguration"
+                      options={[]}
+                      onChange={(selection) => {
+                        if (selection) {
+                          // setSplitConfigurationID?.(selection.value);
+                          // setSplitConfiguration(selection.resource);
                         }
-                        disabled={loading}
-                      >
-                        <DinaMessage id="dataLabel" />
-                      </ToggleButton>
-                      <ToggleButton
-                        id="export-object"
-                        value={"object"}
-                        type={"radio"}
-                        checked={exportType === "OBJECT_ARCHIVE"}
-                        onClick={() => {
-                          setExportType("OBJECT_ARCHIVE");
-                        }}
-                        variant={
-                          exportType === "OBJECT_ARCHIVE"
-                            ? "primary"
-                            : "outline-primary"
-                        }
-                        disabled={loading}
-                      >
-                        <DinaMessage id="objectsLabel" />
-                      </ToggleButton>
-                    </ButtonGroup>
-                  </>
+                      }}
+                      isLoading={loadingSavedExports}
+                      autoFocus={true}
+                      value={undefined}
+                    />
+                  </div>
                 )}
               </div>
             </Card.Body>
