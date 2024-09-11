@@ -1,8 +1,10 @@
 import { SaveArgs, useAccount, useApiClient } from "common-ui/lib";
-import { UserPreference } from "../../../types/user-api";
+import {
+  SavedExportColumnStructure,
+  UserPreference
+} from "../../../types/user-api";
 import { FilterParam, KitsuResource } from "kitsu";
 import { useEffect, useState, useMemo } from "react";
-import SavedExportColumnStructure from "./types";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";

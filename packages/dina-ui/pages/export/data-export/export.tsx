@@ -38,8 +38,8 @@ import {
 } from "react-bootstrap";
 import Select from "react-select";
 import { FaTrash } from "react-icons/fa";
-import SavedExportColumnStructure from "./types";
 import useSavedExports from "./useSavedExports";
+import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
 const BASE_DELAY_EXPORT_FETCH_MS = 2000;
