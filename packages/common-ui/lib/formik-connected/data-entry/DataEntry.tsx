@@ -54,6 +54,11 @@ export function DataEntry({
 
   function queryBlockOptions() {
     if (readOnly) {
+      if (isVocabularyBasedEnabledForBlock) {
+        return useVocabularyOptions({
+          path: blockOptionsEndpoint
+        });
+      }
       const ids: string[] = [];
       forOwn(extensionValues, (extensionValue, extensionKey) => {
         forOwn(extensionValue.rows, (_fieldValue, fieldKey) => {
@@ -78,13 +83,19 @@ export function DataEntry({
     }
   }
   const blockOptionsQuery: any = queryBlockOptions();
+
   function getBlockOptions() {
     if (readOnly) {
+      if (isVocabularyBasedEnabledForBlock) {
+        return blockOptionsQuery?.vocabOptions;
+      }
+
       const nestedExtensionFieldValue = groupBy(
         blockOptionsQuery.data,
         (extensionFieldValue: FieldExtensionValue) =>
           extensionFieldValue.extensionKey
       );
+
       const options: any = [];
       forOwn(nestedExtensionFieldValue, (fieldExtensionValue) => {
         const blockOption = fieldExtensionValue.reduce(

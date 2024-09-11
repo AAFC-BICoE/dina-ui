@@ -1047,5 +1047,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   multipleSamplesWellCoordinates:
     "Well coordinate {wellCoordinate} has multiple material samples: {samples}.",
   baseNameGenerationErrorMessage:
-    'Unable to generate identifiers using this split configuration: The parent material samples do not have a different Material Sample Type to derive the identifier base name. Either edit the parent material sample type to be different from the Split Configuration type or enable the "use as base name for split" toggle.'
+    'Unable to generate identifiers using this split configuration: The parent material samples do not have a different Material Sample Type to derive the identifier base name. Either edit the parent material sample type to be different from the Split Configuration type or enable the "use as base name for split" toggle.',
+  unitMismatchComponents:
+    "Some components units are not ul/rxn and will not show up in the reaction table: {components}."
 };

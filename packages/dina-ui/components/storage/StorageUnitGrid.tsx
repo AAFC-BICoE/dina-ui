@@ -69,8 +69,8 @@ export function useGridCoordinatesControls({
   setLoading
 }: GridCoordinatesControls) {
   const [gridState, setGridState] = useState({
-    cellGrid: {} as CellGrid<MaterialSample & { sampleName?: string }>,
-    movedItems: [] as (MaterialSample & { sampleName?: string })[]
+    cellGrid: {} as CellGrid<any>,
+    movedItems: [] as any[]
   });
 
   // Change to track an array of objects with well coordinate and associated samples.
@@ -117,7 +117,8 @@ export function useGridCoordinatesControls({
             }
           } else {
             newCellGrid[key] = {
-              sampleName: materialSample.materialSampleName
+              sampleName: materialSample.materialSampleName,
+              sampleId: materialSample.id
             };
           }
         }
@@ -223,7 +224,10 @@ export function useGridCoordinatesControls({
           });
         }
       } else {
-        newCellGrid[key] = { sampleName: materialSample.materialSampleName };
+        newCellGrid[key] = {
+          sampleName: materialSample.materialSampleName,
+          sampleId: materialSample.id
+        };
       }
     }
   }
