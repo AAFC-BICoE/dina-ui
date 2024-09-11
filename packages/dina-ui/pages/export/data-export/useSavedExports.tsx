@@ -1,14 +1,20 @@
 import { useAccount, useApiClient } from "common-ui/lib";
 import { UserPreference } from "../../../types/user-api";
-import { FilterParam } from "kitsu";
-import { useEffect, useState } from "react";
+import { FilterParam, KitsuResource } from "kitsu";
+import { useEffect, useState, useMemo } from "react";
 import { SavedExportColumnStructure } from "./types";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
 
 export interface UseSavedExportsProp {
   indexName: string;
 }
 
-export function useSavedExports({ indexName }: UseSavedExportsProp) {
+export function useSavedExports<TData extends KitsuResource>({
+  indexName
+}: UseSavedExportsProp) {
   const { save, apiClient } = useApiClient();
   const { subject } = useAccount();
 
@@ -19,9 +25,28 @@ export function useSavedExports({ indexName }: UseSavedExportsProp) {
   const [loadingSavedExports, setLoadingSavedExports] = useState<boolean>(true);
   const [selectedSavedExport, setSelectedSavedExport] =
     useState<SavedExportColumnStructure>();
+  const [columnsToExport, setColumnsToExport] = useState<TableColumn<TData>[]>(
+    []
+  );
 
-  function createSavedExport(name: string, columns: string[]) {
-    return;
+  // All states related to creating a saved export.
+  const [savedExportName, setSavedExportName] = useState<string>("");
+  const [showCreateSavedExportModal, setShowCreateSavedExportModal] =
+    useState(false);
+  const [loadingCreateSavedExport, setLoadingCreateSavedExport] =
+    useState<boolean>(false);
+  const handleCloseCreateSavedExportModal = () => {
+    if (loadingCreateSavedExport) {
+      return;
+    }
+
+    setShowCreateSavedExportModal(false);
+  };
+  const handleShowCreateSavedExportModal = () =>
+    setShowCreateSavedExportModal(true);
+
+  function createSavedExport() {
+    setLoadingCreateSavedExport(true);
   }
 
   function updateSavedExport() {
@@ -68,13 +93,83 @@ export function useSavedExports({ indexName }: UseSavedExportsProp) {
     retrieveSavedExports();
   }, []);
 
+  const disableCreateButton =
+    loadingCreateSavedExport || savedExportName.trim() === "";
+
+  const ModalElement = useMemo(
+    () => (
+      <Modal
+        show={showCreateSavedExportModal}
+        onHide={handleCloseCreateSavedExportModal}
+        centered={true}
+        size="lg"
+        scrollable={true}
+      >
+        <Modal.Header closeButton={!loadingCreateSavedExport}>
+          <Modal.Title>Create Saved Export Columns</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <strong>Saved Export Name:</strong>
+          <input
+            className="form-control"
+            value={savedExportName}
+            onChange={(e) => setSavedExportName(e.target.value)}
+            disabled={loadingCreateSavedExport}
+          />
+          <br />
+
+          <strong>Columns to be saved:</strong>
+          {columnsToExport.map((column) => (column as any)?.header())}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={handleCloseCreateSavedExportModal}
+            disabled={loadingCreateSavedExport}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={createSavedExport}
+            disabled={disableCreateButton}
+          >
+            {loadingCreateSavedExport ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                <span className="visually-hidden">Loading...</span>
+              </>
+            ) : (
+              <>Create</>
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    ),
+    [
+      showCreateSavedExportModal,
+      savedExportName,
+      columnsToExport,
+      loadingCreateSavedExport
+    ]
+  );
+
   return {
-    createSavedExport,
     updateSavedExport,
     deleteSavedExport,
     allSavedExports,
     loadingSavedExports,
     setSelectedSavedExport,
-    selectedSavedExport
+    selectedSavedExport,
+    ModalElement,
+    handleShowCreateSavedExportModal,
+    columnsToExport,
+    setColumnsToExport
   };
 }
