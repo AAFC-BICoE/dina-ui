@@ -8,6 +8,7 @@ import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { isEqual } from "lodash";
 
 export interface UseSavedExportsProp {
   indexName: string;
@@ -39,53 +40,58 @@ export function useSavedExports<TData extends KitsuResource>({
     useState(false);
   const [loadingCreateSavedExport, setLoadingCreateSavedExport] =
     useState<boolean>(false);
+
+  // States for deleting a saved export
+  const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
+
+  // States for updating a saved export
+  const [loadingUpdate, setLoadingUpdate] = useState<boolean>(false);
+
+  /**
+   * Close the create new saved export modal.
+   *
+   * Will not close if the create operation is loading.
+   */
   const handleCloseCreateSavedExportModal = () => {
     if (loadingCreateSavedExport) {
       return;
     }
-
     setShowCreateSavedExportModal(false);
   };
+
+  /**
+   * Display the create new saved export modal.
+   */
   const handleShowCreateSavedExportModal = () =>
     setShowCreateSavedExportModal(true);
 
+  /**
+   * Create a new saved export.
+   */
   async function createSavedExport() {
     setLoadingCreateSavedExport(true);
 
     const savedExportObject: SavedExportColumnStructure = {
-      columns: columnsToExport.map((column) => column?.id ?? ""),
+      columns: convertColumnsToPaths(columnsToExport),
       component: indexName,
       name: savedExportName.trim()
     };
 
-    // Perform saving request.
-    const saveArgs: SaveArgs<UserPreference> = {
-      resource: {
-        id: userPreferenceID ?? null,
-        userId: subject,
-        savedExportColumnSelection: [
-          ...everySavedExport.filter(
-            (savedExport) =>
-              savedExport.name !== savedExportName.trim() &&
-              savedExport.component === indexName
-          ),
-          savedExportObject
-        ]
-      } as any,
-      type: "user-preference"
-    };
-
     try {
-      await save([saveArgs], { apiBaseUrl: "/user-api" });
+      await performSaveRequest([
+        ...everySavedExport.filter(
+          (savedExport) =>
+            savedExport.name !== savedExportName.trim() &&
+            savedExport.component === indexName
+        ),
+        savedExportObject
+      ]);
     } catch (e) {
       // TODO: Add better error handling...
       console.error(e);
       setLoadingCreateSavedExport(false);
       return;
     }
-
-    // Reload all the saved exports again...
-    await retrieveSavedExports();
 
     // Select the newly created saved export...
     setSelectedSavedExport(savedExportObject);
@@ -95,20 +101,98 @@ export function useSavedExports<TData extends KitsuResource>({
     setSavedExportName("");
   }
 
+  /**
+   * Update the currently selected saved export.
+   */
   async function updateSavedExport() {
     // Cannot update a saved export if no saved export is selected.
     if (!selectedSavedExport) {
       return;
     }
+
+    setLoadingUpdate(true);
+
+    const savedExportObject: SavedExportColumnStructure = {
+      columns: convertColumnsToPaths(columnsToExport),
+      component: indexName,
+      name: selectedSavedExport.name
+    };
+
+    try {
+      await performSaveRequest([
+        ...everySavedExport.filter(
+          (savedExport) =>
+            savedExport.name !== selectedSavedExport.name &&
+            savedExport.component === indexName
+        ),
+        savedExportObject
+      ]);
+    } catch (e) {
+      // TODO: Add better error handling...
+      console.error(e);
+      setLoadingUpdate(false);
+      return;
+    }
+
+    setLoadingUpdate(false);
   }
 
+  /**
+   * Delete the currently selected saved export.
+   */
   async function deleteSavedExport() {
     // Cannot delete a saved export if no saved export is selected.
     if (!selectedSavedExport) {
       return;
     }
+
+    setLoadingDelete(true);
+
+    try {
+      await performSaveRequest([
+        ...everySavedExport.filter(
+          (savedExport) =>
+            savedExport.name !== selectedSavedExport.name &&
+            savedExport.component === indexName
+        )
+      ]);
+    } catch (e) {
+      // TODO: Add better error handling...
+      console.error(e);
+      setLoadingDelete(false);
+      return;
+    }
+
+    setLoadingDelete(false);
+    setSelectedSavedExport(undefined);
   }
 
+  /**
+   * Performs the update/create (depends on the id being null). Also preforms a retrieve to
+   * update the list.
+   *
+   * @param toBeSavedExports The savedExportColumnSelection to be added to the user preferences.
+   */
+  async function performSaveRequest(toBeSavedExports) {
+    // Perform saving request.
+    const saveArgs: SaveArgs<UserPreference> = {
+      resource: {
+        id: userPreferenceID ?? null,
+        userId: subject,
+        savedExportColumnSelection: toBeSavedExports
+      } as any,
+      type: "user-preference"
+    };
+    await save([saveArgs], { apiBaseUrl: "/user-api" });
+
+    // After changes are made perform a reload.
+    await retrieveSavedExports();
+  }
+
+  /**
+   * Retrieve the users user-preferences and find the savedExportColumnSelection
+   * filtered for this specific indexName.
+   */
   async function retrieveSavedExports() {
     setLoadingSavedExports(true);
     await apiClient
@@ -136,9 +220,21 @@ export function useSavedExports<TData extends KitsuResource>({
       });
   }
 
+  function convertColumnsToPaths(columns) {
+    return columns.map((column) => column?.id ?? "");
+  }
+
+  /**
+   * First-load setup
+   */
   useEffect(() => {
     retrieveSavedExports();
   }, []);
+
+  const changesMade = !isEqual(
+    convertColumnsToPaths(columnsToExport),
+    selectedSavedExport?.columns ?? []
+  );
 
   const displayOverrideWarning =
     allSavedExports.find(
@@ -223,7 +319,10 @@ export function useSavedExports<TData extends KitsuResource>({
     updateSavedExport,
     deleteSavedExport,
     allSavedExports,
+    changesMade,
     loadingSavedExports,
+    loadingDelete,
+    loadingUpdate,
     setSelectedSavedExport,
     selectedSavedExport,
     ModalElement,

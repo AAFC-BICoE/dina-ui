@@ -98,13 +98,17 @@ export default function ExportPage<TData extends KitsuResource>() {
   const {
     allSavedExports,
     loadingSavedExports,
+    loadingDelete,
+    loadingUpdate,
+    changesMade,
     setSelectedSavedExport,
     selectedSavedExport,
     ModalElement,
     handleShowCreateSavedExportModal,
     columnsToExport,
     setColumnsToExport,
-    deleteSavedExport
+    deleteSavedExport,
+    updateSavedExport
   } = useSavedExports<TData>({
     indexName
   });
@@ -267,6 +271,19 @@ export default function ExportPage<TData extends KitsuResource>() {
     }
   }
 
+  const LoadingSpinner = (
+    <>
+      <Spinner
+        as="span"
+        animation="border"
+        size="sm"
+        role="status"
+        aria-hidden="true"
+      />
+      <span className="visually-hidden">Loading...</span>
+    </>
+  );
+
   const disableObjectExportButton =
     localStorageExportObjectIds.length < 1 || totalRecords > 100;
 
@@ -396,9 +413,24 @@ export default function ExportPage<TData extends KitsuResource>() {
                             style={{ marginTop: "30px" }}
                             variant="danger"
                             onClick={deleteSavedExport}
+                            disabled={loadingDelete}
                           >
-                            <FaTrash />
+                            {loadingDelete ? LoadingSpinner : <FaTrash />}
                           </Button>
+                          {changesMade && (
+                            <Button
+                              style={{ marginTop: "30px", marginLeft: "10px" }}
+                              variant="primary"
+                              onClick={updateSavedExport}
+                              disabled={loadingUpdate}
+                            >
+                              {loadingUpdate ? (
+                                LoadingSpinner
+                              ) : (
+                                <>Save Changes...</>
+                              )}
+                            </Button>
+                          )}
                         </div>
                       )}
                     </>
@@ -421,16 +453,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                     })}
                   >
                     {loading ? (
-                      <>
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                        />
-                        <span className="visually-hidden">Loading...</span>
-                      </>
+                      LoadingSpinner
                     ) : (
                       <DinaMessage id="exportButtonText" />
                     )}
@@ -441,7 +464,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                     )}
                 </div>
                 <button
-                  className="btn btn-primary ms-auto"
+                  className="btn btn-primary"
                   type="button"
                   onClick={handleShowCreateSavedExportModal}
                   disabled={loadingSavedExports}
