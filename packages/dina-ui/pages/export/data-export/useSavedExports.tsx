@@ -1,4 +1,4 @@
-import { useAccount, useApiClient } from "common-ui/lib";
+import { SaveArgs, useAccount, useApiClient } from "common-ui/lib";
 import { UserPreference } from "../../../types/user-api";
 import { FilterParam, KitsuResource } from "kitsu";
 import { useEffect, useState, useMemo } from "react";
@@ -6,6 +6,7 @@ import { SavedExportColumnStructure } from "./types";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 
 export interface UseSavedExportsProp {
@@ -19,6 +20,9 @@ export function useSavedExports<TData extends KitsuResource>({
   const { subject } = useAccount();
 
   const [userPreferenceID, setUserPreferenceID] = useState<string>();
+  const [everySavedExport, setEverySavedExport] = useState<
+    SavedExportColumnStructure[]
+  >([]);
   const [allSavedExports, setAllSavedExports] = useState<
     SavedExportColumnStructure[]
   >([]);
@@ -45,18 +49,60 @@ export function useSavedExports<TData extends KitsuResource>({
   const handleShowCreateSavedExportModal = () =>
     setShowCreateSavedExportModal(true);
 
-  function createSavedExport() {
+  async function createSavedExport() {
     setLoadingCreateSavedExport(true);
+
+    const savedExportObject: SavedExportColumnStructure = {
+      columns: columnsToExport.map((column) => column?.id ?? ""),
+      component: indexName,
+      name: savedExportName.trim()
+    };
+
+    // Perform saving request.
+    const saveArgs: SaveArgs<UserPreference> = {
+      resource: {
+        id: userPreferenceID ?? null,
+        userId: subject,
+        savedExportColumnSelection: [
+          ...everySavedExport.filter(
+            (savedExport) =>
+              savedExport.name !== savedExportName.trim() &&
+              savedExport.component === indexName
+          ),
+          savedExportObject
+        ]
+      } as any,
+      type: "user-preference"
+    };
+
+    try {
+      await save([saveArgs], { apiBaseUrl: "/user-api" });
+    } catch (e) {
+      // TODO: Add better error handling...
+      console.error(e);
+      setLoadingCreateSavedExport(false);
+      return;
+    }
+
+    // Reload all the saved exports again...
+    await retrieveSavedExports();
+
+    // Select the newly created saved export...
+    setSelectedSavedExport(savedExportObject);
+
+    setLoadingCreateSavedExport(false);
+    handleCloseCreateSavedExportModal();
+    setSavedExportName("");
   }
 
-  function updateSavedExport() {
+  async function updateSavedExport() {
     // Cannot update a saved export if no saved export is selected.
     if (!selectedSavedExport) {
       return;
     }
   }
 
-  function deleteSavedExport() {
+  async function deleteSavedExport() {
     // Cannot delete a saved export if no saved export is selected.
     if (!selectedSavedExport) {
       return;
@@ -76,6 +122,7 @@ export function useSavedExports<TData extends KitsuResource>({
         setUserPreferenceID(response?.data?.[0]?.id ?? undefined);
 
         if (response?.data?.[0]?.savedExportColumnSelection) {
+          setEverySavedExport(response.data[0].savedExportColumnSelection);
           setAllSavedExports(
             response.data[0].savedExportColumnSelection.filter(
               (savedExport) => savedExport.component === indexName
@@ -93,6 +140,11 @@ export function useSavedExports<TData extends KitsuResource>({
     retrieveSavedExports();
   }, []);
 
+  const displayOverrideWarning =
+    allSavedExports.find(
+      (savedExport) => savedExport.name === savedExportName.trim()
+    ) !== undefined;
+
   const disableCreateButton =
     loadingCreateSavedExport || savedExportName.trim() === "";
 
@@ -109,6 +161,13 @@ export function useSavedExports<TData extends KitsuResource>({
           <Modal.Title>Create Saved Export Columns</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {displayOverrideWarning && (
+            <Alert variant={"warning"}>
+              A saved export exists with the name "{savedExportName}". Creating
+              this saved export will replace the existing one.
+            </Alert>
+          )}
+
           <strong>Saved Export Name:</strong>
           <input
             className="form-control"

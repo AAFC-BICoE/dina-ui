@@ -29,10 +29,17 @@ import { Metadata, ObjectExport } from "packages/dina-ui/types/objectstore-api";
 import { DataExport, ExportType } from "packages/dina-ui/types/dina-export-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { useSessionStorage } from "usehooks-ts";
-import { Card, ButtonGroup, ToggleButton, Spinner } from "react-bootstrap";
+import {
+  Card,
+  ButtonGroup,
+  ToggleButton,
+  Spinner,
+  Button
+} from "react-bootstrap";
 import Select from "react-select";
 import { useSavedExports } from "./useSavedExports";
 import { SavedExportColumnStructure } from "./types";
+import { FaTrash } from "react-icons/fa";
 
 const MAX_DATA_EXPORT_FETCH_RETRIES = 6;
 const BASE_DELAY_EXPORT_FETCH_MS = 2000;
@@ -96,7 +103,8 @@ export default function ExportPage<TData extends KitsuResource>() {
     ModalElement,
     handleShowCreateSavedExportModal,
     columnsToExport,
-    setColumnsToExport
+    setColumnsToExport,
+    deleteSavedExport
   } = useSavedExports<TData>({
     indexName
   });
@@ -351,36 +359,49 @@ export default function ExportPage<TData extends KitsuResource>() {
                   </div>
 
                   {exportType === "TABULAR_DATA" && (
-                    <div className="col-md-4">
-                      <strong>Load saved columns to export</strong>
-                      <Select<SavedExportOption>
-                        className="mt-1 mb-3"
-                        name="savedExportOption"
-                        options={allSavedExports.map((option) => ({
-                          value: option.name,
-                          label: option.name,
-                          resource: option
-                        }))}
-                        onChange={(selection) => {
-                          if (selection && selection.resource) {
-                            setSelectedSavedExport(selection.resource);
+                    <>
+                      <div className="col-md-4">
+                        <strong>Load saved columns to export</strong>
+                        <Select<SavedExportOption>
+                          className="mt-2 mb-3"
+                          name="savedExportOption"
+                          options={allSavedExports.map((option) => ({
+                            value: option.name,
+                            label: option.name,
+                            resource: option
+                          }))}
+                          onChange={(selection) => {
+                            if (selection && selection.resource) {
+                              setSelectedSavedExport(selection.resource);
+                            }
+                          }}
+                          isLoading={loadingSavedExports}
+                          value={
+                            allSavedExports
+                              ?.map((option) => ({
+                                value: option.name,
+                                label: option.name,
+                                resource: option
+                              }))
+                              ?.find(
+                                (option) =>
+                                  option.value === selectedSavedExport?.name
+                              ) ?? undefined
                           }
-                        }}
-                        isLoading={loadingSavedExports}
-                        value={
-                          allSavedExports
-                            ?.map((option) => ({
-                              value: option.name,
-                              label: option.name,
-                              resource: option
-                            }))
-                            ?.find(
-                              (option) =>
-                                option.value === selectedSavedExport?.name
-                            ) ?? undefined
-                        }
-                      />
-                    </div>
+                        />
+                      </div>
+                      {selectedSavedExport && (
+                        <div className="col-md-4">
+                          <Button
+                            style={{ marginTop: "30px" }}
+                            variant="danger"
+                            onClick={deleteSavedExport}
+                          >
+                            <FaTrash />
+                          </Button>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </Card.Body>
