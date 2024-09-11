@@ -44,10 +44,9 @@ describe("QueryOperatorSelector component", () => {
     // Simulate opening up the menu.
     fireEvent.click(wrapper.getByText(/contains/i));
     fireEvent.keyDown(wrapper.getByRole("combobox"), { key: "ArrowDown" });
-    await new Promise(setImmediate);
 
     // 5 options should be rendered.
-    const options = wrapper.getAllByRole("option");
+    const options = await wrapper.findAllByRole("option");
     expect(options.length).toEqual(5);
     options.forEach((option, index) => {
       expect(option.textContent).toEqual(OPERATOR_OPTIONS[index].label);
