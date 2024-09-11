@@ -4,8 +4,8 @@ import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { ErrorViewer } from "../ErrorViewer";
 import { SubmitButton } from "../SubmitButton";
-import { fireEvent, screen } from "@testing-library/react";
-import { IntlProvider } from "react-intl";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 describe("ErrorViewer component", () => {
   it("Renders nothing when Formik has no status.", () => {
@@ -41,7 +41,7 @@ describe("ErrorViewer component", () => {
   });
 
   it("Renders field-level errors.", async () => {
-    const wrapper = mountWithAppContext2(
+    mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         initialErrors={{
@@ -56,17 +56,21 @@ describe("ErrorViewer component", () => {
       </DinaForm>
     );
 
-    await new Promise(setImmediate);
+    // Wait for the error messages to render
+    await waitFor(() => {
+      // Select all error messages within elements with class .alert.alert-danger .error-message
+      const errorMessages = screen
+        .getAllByText((_, element) =>
+          element!.classList.contains("error-message")
+        )
+        .map((node) => node.textContent);
 
-    expect(
-      wrapper
-        .find(".alert.alert-danger .error-message")
-        .map((node) => node.text())
-    ).toEqual([
-      "1 : Top Level Field - Error",
-      "2 : Nested Object Nested Field - Nested Error",
-      // The first array element should be shown as "1" instead of "0":
-      "3 : Nested Array Object 1 Nested Array Element Field - Nested Array Element Error"
-    ]);
+      expect(errorMessages).toEqual([
+        "1 : Top Level Field - Error",
+        "2 : Nested Object Nested Field - Nested Error",
+        // The first array element should be shown as "1" instead of "0":
+        "3 : Nested Array Object 1 Nested Array Element Field - Nested Array Element Error"
+      ]);
+    });
   });
 });
