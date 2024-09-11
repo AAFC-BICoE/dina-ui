@@ -5,6 +5,7 @@ import {
   FieldSet,
   FieldSpy,
   TextField,
+  ToggleField,
   useDinaFormContext
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../..//intl/dina-ui-intl";
@@ -33,7 +34,7 @@ export function MaterialSampleInfoSection({
 }) {
   const { locale, formatMessage } = useDinaIntl();
 
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, isTemplate } = useDinaFormContext();
 
   const onMaterialSampleStateChanged = (form, _name, value) => {
     if (value === "") {
@@ -85,6 +86,12 @@ export function MaterialSampleInfoSection({
           )}
         </div>
         <div className="col-md-6">
+          {!isTemplate && (
+            <ToggleField
+              name="isBaseForSplitByType"
+              disableTemplateCheckbox={true}
+            />
+          )}
           <TextField name="materialSampleRemarks" multiLines={true} />
         </div>
       </div>
