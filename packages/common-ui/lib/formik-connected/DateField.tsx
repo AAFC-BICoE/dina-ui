@@ -18,6 +18,7 @@ export interface DateFieldProps extends FieldWrapperProps {
   showTime?: boolean;
   disabled?: boolean;
   showPlaceholder?: boolean;
+  skipValidation?: boolean;
 }
 
 export const DATE_REGEX_NO_TIME = /^\d{4}-\d{2}-\d{2}$/;
@@ -25,11 +26,21 @@ export const DATE_REGEX_PARTIAL = /^\d{4}(-\d{2}){0,2}$/;
 
 /** Formik-connected date input. */
 export function DateField(props: DateFieldProps) {
-  const { showTime, disabled, partialDate, showPlaceholder = true } = props;
+  const {
+    showTime,
+    disabled,
+    partialDate,
+    showPlaceholder = true,
+    skipValidation = false
+  } = props;
 
   const { formatMessage } = useIntl();
 
   function validate(value: unknown) {
+    if (skipValidation) {
+      return;
+    }
+
     if (value && typeof value === "string") {
       if (!showTime) {
         if (partialDate) {

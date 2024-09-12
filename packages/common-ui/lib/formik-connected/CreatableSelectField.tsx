@@ -61,6 +61,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
           find(options, (option) => option.value === item)?.label || item
       )
     );
+
     return (
       <div className="read-only-view">
         <ReadOnlyValue

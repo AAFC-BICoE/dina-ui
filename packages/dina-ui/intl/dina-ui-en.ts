@@ -229,6 +229,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   fieldExtensions: "Field Extensions",
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
+  projectFieldExtensions: "Project Field Extensions",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
   field_acDigitizationDate: "Date Original Version Created",
@@ -369,6 +370,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_isPrimary_tooltip:
     "Make this determination the primary data point when exported. Only one determination can be primary",
   field_isRestricted: "Is Restricted",
+  field_isBaseForSplitByType: "Use As Base Name For Split",
+  field_isBaseForSplitByType_tooltip:
+    "When enabled and using type based Split Configurations, if no parents contain a different Material Sample Type then this Material Sample will be used to derive the identifier from.",
   field_isolatedBy: "Isolated By",
   field_isolatedOn: "Isolated On",
   field_isolationRemarks: "Isolation Remarks",
@@ -548,6 +552,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   literalGeoreferencedByLabel: "Georeferenced By",
   load: "Load",
   loading: "Loading",
+  loadingSpinner: "Loading...",
   loanTransaction: "Transaction",
   loanTransactionManagedAttributeListTitle:
     "Loans and Transactions Managed Attributes",
@@ -759,6 +764,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_value_text_placeholder: "Enter text search value...",
   queryBuilder_value_in_placeholder: "Enter comma-separated values...",
   queryBuilder_value_true: "True",
+  placeholder_decimal: "Enter decimal value",
+  placeholder_integer: "Enter integer value",
   queryBuilder_invalid_query:
     "Some parts of your query were removed as they are no longer supported. Please review and update your query to use supported options:",
   reception: "Reception",
@@ -795,7 +802,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAndGoToViewPageButton: "Save & Go To View Page",
   saveAndMarkAsComplete: "Save and Mark as Complete",
   saveAsDefault: "Save as Default",
-  saveChanges: "Save changes",
+  saveChanges: "Save Changes...",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   saveSearch: "Save Search",
   saveSearchInstruction:
@@ -1042,5 +1049,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnit_duplicate_body:
     'The name "{duplicatedName}" is already in use for another storage unit in this group. Would you still like to proceed?',
   multipleSamplesWellCoordinates:
-    "Well coordinate {wellCoordinate} has multiple material samples: {samples}."
+    "Well coordinate {wellCoordinate} has multiple material samples: {samples}.",
+  baseNameGenerationErrorMessage:
+    'Unable to generate identifiers using this split configuration: The parent material samples do not have a different Material Sample Type to derive the identifier base name. Either edit the parent material sample type to be different from the Split Configuration type or enable the "use as base name for split" toggle.',
+  unitMismatchComponents:
+    "Some components units are not ul/rxn and will not show up in the reaction table: {components}.",
+  savedExport_exportType: "Export Type",
+  savedExport_exportDropdown: "Load saved columns to export",
+  savedExport_createTitle: "Create Saved Export Columns",
+  savedExport_overrideWarning:
+    'A saved export exists with the name "{savedExportName}". Creating this saved export will replace the existing one.',
+  savedExport_createName: "Saved Export Name",
+  savedExport_columnsToBeSaved: "Columns to be saved",
+  export_columnsToExport: "Columns To Export"
 };

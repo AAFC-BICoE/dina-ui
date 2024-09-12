@@ -1,8 +1,11 @@
 import {
   CheckBoxField,
   CreatableSelectField,
+  DateField,
   FieldSpy,
+  NumberField,
   SelectField,
+  StringToggleField,
   TextField,
   Tooltip
 } from "common-ui";
@@ -46,13 +49,19 @@ export function DataRow({
   unitsAddable = false,
   isVocabularyBasedEnabledForType = false
 }: DataRowProps) {
-  const { locale } = useDinaIntl();
+  const { locale, messages } = useDinaIntl();
   const valueTextFieldName = `${name}.value`;
   const typeSelectFieldName = `${name}.type`;
   const unitSelectFieldName = `${name}.unit`;
   const vocabularyBasedFieldName = `${name}.vocabularyBased`;
   const formik = useFormikContext<any>();
-  const [selectedType, setSelectedType] = useState<any>();
+
+  // Find the row's initial selected value
+  const selectedTypeValue = name.split(".").at(-1);
+  const selected = typeOptions?.find(
+    (typeOption) => typeOption.value === selectedTypeValue
+  );
+  const [selectedType, setSelectedType] = useState<any>(selected);
 
   function onCreatableSelectFieldChange(value, formikCtx) {
     if (isVocabularyBasedEnabledForType) {
@@ -94,6 +103,33 @@ export function DataRow({
       formik.setFieldValue(rowsPath, newRows);
     }
   }
+
+  const valueInputProps = {
+    name: valueTextFieldName,
+    removeBottomMargin: true,
+    label: <DinaMessage id="dataValue" />,
+    disableTemplateCheckbox: true,
+    hideLabel: rowIndex !== 0
+  };
+
+  const valueInputField =
+    selectedType?.vocabularyElementType === "INTEGER" ? (
+      <TextField
+        {...valueInputProps}
+        placeholder={messages["placeholder_integer"]}
+      />
+    ) : selectedType?.vocabularyElementType === "DATE" ? (
+      <DateField {...valueInputProps} skipValidation={true} />
+    ) : selectedType?.vocabularyElementType === "BOOL" ? (
+      <StringToggleField {...valueInputProps} />
+    ) : selectedType?.vocabularyElementType === "DECIMAL" ? (
+      <TextField
+        {...valueInputProps}
+        placeholder={messages["placeholder_decimal"]}
+      />
+    ) : (
+      <TextField {...valueInputProps} />
+    );
 
   return (
     <div className="d-flex">
@@ -154,13 +190,7 @@ export function DataRow({
         )}
       </div>
       <div style={{ width: "15rem", marginLeft: "3rem" }}>
-        <TextField
-          name={valueTextFieldName}
-          removeBottomMargin={true}
-          label={<DinaMessage id="dataValue" />}
-          disableTemplateCheckbox={true}
-          hideLabel={rowIndex !== 0}
-        />
+        {valueInputField}
       </div>
       {unitsOptions ? (
         <div style={{ width: "15rem", marginLeft: "3rem" }}>

@@ -50,6 +50,19 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
   >;
 
   /**
+   * When provided, it will be set as the setDisplayedColumns. This is populated from the
+   * saved export hook.
+   */
+  overrideDisplayedColumns?: string[];
+
+  /**
+   * Should only be set to empty, indicating it has been processed.
+   */
+  setOverrideDisplayedColumns?: React.Dispatch<
+    React.SetStateAction<string[] | undefined>
+  >;
+
+  /**
    * IDs of the columns that should always be displayed and cannot be deleted.
    *
    * Uses the startsWith match so you can define the full path or partial paths.
@@ -92,6 +105,8 @@ export function ColumnSelector<TData extends KitsuResource>(
     defaultColumns,
     setColumnSelectorLoading,
     setDisplayedColumns,
+    overrideDisplayedColumns,
+    setOverrideDisplayedColumns,
     excludedRelationshipTypes
   } = props;
 
@@ -209,6 +224,32 @@ export function ColumnSelector<TData extends KitsuResource>(
       }
     }
 
+    async function loadColumnsFromSavedExport() {
+      if (injectedIndexMapping && overrideDisplayedColumns) {
+        const promises = overrideDisplayedColumns.map(async (localColumn) => {
+          const newColumnDefinition = await generateColumnDefinition({
+            indexMappings: injectedIndexMapping,
+            dynamicFieldsMappingConfig,
+            apiClient,
+            defaultColumns,
+            path: localColumn
+          });
+          return newColumnDefinition;
+        });
+
+        const columns = (await Promise.all(promises)).filter(isDefinedColumn);
+        setDisplayedColumns(columns);
+      }
+    }
+
+    // Check if overrides are provided from the saved exports.
+    if (overrideDisplayedColumns) {
+      loadColumnsFromSavedExport();
+      setLoading(false);
+      setColumnSelectorLoading?.(false);
+      return;
+    }
+
     if (
       !localStorageDisplayedColumns ||
       localStorageDisplayedColumns?.length === 0
@@ -227,7 +268,11 @@ export function ColumnSelector<TData extends KitsuResource>(
       setLoading(false);
       setColumnSelectorLoading?.(false);
     }
-  }, [localStorageDisplayedColumns, injectedIndexMapping]);
+  }, [
+    localStorageDisplayedColumns,
+    injectedIndexMapping,
+    overrideDisplayedColumns
+  ]);
 
   const {
     show: showMenu,
