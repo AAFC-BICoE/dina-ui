@@ -49,7 +49,7 @@ export function DataRow({
   unitsAddable = false,
   isVocabularyBasedEnabledForType = false
 }: DataRowProps) {
-  const { locale } = useDinaIntl();
+  const { locale, messages } = useDinaIntl();
   const valueTextFieldName = `${name}.value`;
   const typeSelectFieldName = `${name}.type`;
   const unitSelectFieldName = `${name}.unit`;
@@ -111,23 +111,24 @@ export function DataRow({
     disableTemplateCheckbox: true,
     hideLabel: rowIndex !== 0
   };
+
   const valueInputField =
     selectedType?.vocabularyElementType === "INTEGER" ? (
-      <NumberField {...valueInputProps} />
+      <TextField
+        {...valueInputProps}
+        placeholder={messages["placeholder_integer"]}
+      />
     ) : selectedType?.vocabularyElementType === "DATE" ? (
-      <DateField {...valueInputProps} />
+      <DateField {...valueInputProps} skipValidation={true} />
     ) : selectedType?.vocabularyElementType === "BOOL" ? (
       <StringToggleField {...valueInputProps} />
     ) : selectedType?.vocabularyElementType === "DECIMAL" ? (
-      <NumberField {...valueInputProps} isInteger={false} />
-    ) : (
       <TextField
-        name={valueTextFieldName}
-        removeBottomMargin={true}
-        label={<DinaMessage id="dataValue" />}
-        disableTemplateCheckbox={true}
-        hideLabel={rowIndex !== 0}
+        {...valueInputProps}
+        placeholder={messages["placeholder_decimal"]}
       />
+    ) : (
+      <TextField {...valueInputProps} />
     );
 
   return (
