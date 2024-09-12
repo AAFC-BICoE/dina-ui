@@ -53,15 +53,11 @@ export function DataRow({
   const valueTextFieldName = `${name}.value`;
   const typeSelectFieldName = `${name}.type`;
   const unitSelectFieldName = `${name}.unit`;
+
   const vocabularyBasedFieldName = `${name}.vocabularyBased`;
   const formik = useFormikContext<any>();
 
-  // Find the row's initial selected value
-  const selectedTypeValue = name.split(".").at(-1);
-  const selected = typeOptions?.find(
-    (typeOption) => typeOption.value === selectedTypeValue
-  );
-  const [selectedType, setSelectedType] = useState<any>(selected);
+  const [selectedType, setSelectedType] = useState<any>();
 
   function onCreatableSelectFieldChange(value, formikCtx) {
     if (isVocabularyBasedEnabledForType) {
@@ -71,6 +67,15 @@ export function DataRow({
       );
     }
   }
+
+  // Change currentSelectedType and unit if the name (formik path) changes
+  useEffect(() => {
+    const selectedTypeValue = name.split(".").at(-1);
+    const selected = typeOptions?.find(
+      (typeOption) => typeOption.value === selectedTypeValue
+    );
+    setSelectedType(selected);
+  }, [name]);
 
   function onTypeSelectFieldChange(value) {
     setSelectedType(find(typeOptions, (item) => item.value === value));
@@ -114,19 +119,16 @@ export function DataRow({
 
   const valueInputField =
     selectedType?.vocabularyElementType === "INTEGER" ? (
-      <TextField
+      <NumberField
         {...valueInputProps}
         placeholder={messages["placeholder_integer"]}
       />
     ) : selectedType?.vocabularyElementType === "DATE" ? (
-      <DateField {...valueInputProps} skipValidation={true} />
+      <DateField {...valueInputProps} />
     ) : selectedType?.vocabularyElementType === "BOOL" ? (
       <StringToggleField {...valueInputProps} />
     ) : selectedType?.vocabularyElementType === "DECIMAL" ? (
-      <TextField
-        {...valueInputProps}
-        placeholder={messages["placeholder_decimal"]}
-      />
+      <NumberField {...valueInputProps} isInteger={false} />
     ) : (
       <TextField {...valueInputProps} />
     );
