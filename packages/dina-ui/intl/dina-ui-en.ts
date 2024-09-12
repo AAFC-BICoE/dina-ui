@@ -229,6 +229,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   fieldExtensions: "Field Extensions",
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
+  projectFieldExtensions: "Project Field Extensions",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
   field_acDigitizationDate: "Date Original Version Created",
@@ -763,6 +764,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_value_text_placeholder: "Enter text search value...",
   queryBuilder_value_in_placeholder: "Enter comma-separated values...",
   queryBuilder_value_true: "True",
+  placeholder_decimal: "Enter decimal value",
+  placeholder_integer: "Enter integer value",
   queryBuilder_invalid_query:
     "Some parts of your query were removed as they are no longer supported. Please review and update your query to use supported options:",
   reception: "Reception",
