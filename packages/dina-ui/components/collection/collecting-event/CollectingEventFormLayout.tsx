@@ -1015,6 +1015,7 @@ export function CollectingEventFormLayout({
             blockOptionsFilter={{
               "extension.fields.dinaComponent": "COLLECTING_EVENT"
             }}
+            width={"100%"}
           />
         </DinaFormSection>
       </div>
