@@ -235,7 +235,7 @@ export function OtherIdentifiersSection() {
           </h2>
           <div className="d-flex mb-2">
             <button
-              className="btn btn-primary override-all-button"
+              className="btn btn-primary override-all-button-identifiers"
               onClick={() =>
                 openModal(
                   <AreYouSureModal
@@ -414,7 +414,7 @@ export function OtherIdentifiersSection() {
           </strong>
           <div className="d-flex mt-2">
             <button
-              className="btn btn-primary override-all-button"
+              className="btn btn-primary override-all-button-catalog-numbers"
               onClick={() =>
                 openModal(
                   <AreYouSureModal

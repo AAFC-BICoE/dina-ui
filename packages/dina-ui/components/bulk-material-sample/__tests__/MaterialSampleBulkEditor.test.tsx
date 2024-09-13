@@ -3137,7 +3137,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers_0_-field input")
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
         .exists()
     ).toEqual(true);
 
@@ -3165,7 +3165,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers_0_-field input")
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
         .exists()
     ).toEqual(false);
 
@@ -3204,7 +3204,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers_0_-field input")
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
         .exists()
     ).toEqual(true);
 
@@ -3232,7 +3232,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers_0_-field input")
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers input")
         .exists()
     ).toEqual(false);
 
