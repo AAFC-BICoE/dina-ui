@@ -28,7 +28,7 @@ import {
   blankMaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
-import { fireEvent, screen, within } from "@testing-library/react";
+import { fireEvent, within } from "@testing-library/react";
 
 const TEST_COLLECTING_EVENT = {
   id: "col-event-1",
@@ -815,6 +815,35 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_STORAGE_UNITS[2] };
     case "collection-api/form-template/cd6d8297-43a0-45c6-b44e-983db917eb11":
       return { data: formTemplate };
+    case "collection-api/vocabulary2/materialSampleIdentifierType":
+      return {
+        data: {
+          id: "materialSampleIdentifierType",
+          type: "vocabulary",
+          attributes: {
+            vocabularyElements: [
+              {
+                key: "seqdb_id",
+                name: "SeqDB ID",
+                term: null,
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "SeqDB ID"
+                    },
+                    {
+                      lang: "fr",
+                      title: "ID SeqDB"
+                    }
+                  ]
+                },
+                inverseOf: null
+              }
+            ]
+          }
+        }
+      };
     case "collection-api/storage-unit-type":
     case "collection-api/collection":
     case "collection-api/collection-method":
@@ -1200,37 +1229,29 @@ describe("MaterialSampleBulkEditor", () => {
     // Edit the first sample:
     fireEvent.click(wrapper.getByRole("tab", { name: /ms1/i }));
     fireEvent.change(
-      within(
-        within(wrapper.getByRole("tabpanel", { name: /ms1/i })).getByTestId(
-          "dwcOtherCatalogNumbers_0_-field"
-        )
-      ).getByRole("textbox"),
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
       { target: { value: "otherCatalog1" } }
     );
 
     // Edit the second sample:
     fireEvent.click(wrapper.getByRole("tab", { name: /ms2/i }));
     fireEvent.change(
-      within(
-        within(wrapper.getByRole("tabpanel", { name: /ms2/i })).getByTestId(
-          "dwcOtherCatalogNumbers_0_-field"
-        )
-      ).getByRole("textbox"),
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
       { target: { value: "otherCatalog2" } }
     );
 
     // Edit the third sample:
     fireEvent.click(wrapper.getByRole("tab", { name: /ms3/i }));
     fireEvent.change(
-      within(
-        within(wrapper.getByRole("tabpanel", { name: /ms3/i })).getByTestId(
-          "dwcOtherCatalogNumbers_0_-field"
-        )
-      ).getByRole("textbox"),
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
       { target: { value: "otherCatalog3" } }
     );
-
-    screen.logTestingPlaygroundURL();
 
     // Submit the form.
     fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
@@ -1287,6 +1308,64 @@ describe("MaterialSampleBulkEditor", () => {
       "11111",
       "11111",
       "11111"
+    ]);
+  });
+
+  it("Bulk edit all material samples using other catalogue and other identifiers", async () => {
+    const wrapper = mountWithAppContext2(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={
+          [
+            {
+              id: "1",
+              type: "material-sample",
+              dwcOtherCatalogNumbers: ["otherCatalog1"]
+            },
+            {
+              id: "2",
+              type: "material-sample",
+              dwcOtherCatalogNumbers: ["otherCatalog2"]
+            },
+            {
+              id: "3",
+              type: "material-sample",
+              dwcOtherCatalogNumbers: ["otherCatalog3"]
+            }
+          ] as InputResource<MaterialSample>[]
+        }
+      />,
+      testCtx
+    );
+    await new Promise(setImmediate);
+
+    fireEvent.click(
+      wrapper.getAllByRole("button", { name: /override all/i })[1]
+    );
+    fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+    await new Promise(setImmediate);
+
+    // Update the other cataloge value:
+    fireEvent.change(
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
+      { target: { value: "otherCatalogAll" } }
+    );
+
+    // Submit the form.
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await new Promise(setImmediate);
+
+    // Saves the new material samples:
+    expect(mockSave.mock.calls).toMatchSnapshot();
+
+    // The saved samples are mocked by mockSave and are passed into the onSaved callback.
+    // Check the IDs to make sure they were saved:
+    expect(mockOnSaved.mock.calls[0][0].map((sample) => sample.id)).toEqual([
+      "1",
+      "2",
+      "3"
     ]);
   });
 

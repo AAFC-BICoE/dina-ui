@@ -1,10 +1,12 @@
 import {
+  AreYouSureModal,
   CheckBoxWithoutWrapper,
   FieldSet,
   SelectField,
   TextField,
   useDinaFormContext,
-  useFieldLabels
+  useFieldLabels,
+  useModal
 } from "common-ui/lib";
 import useVocabularyOptions from "../useVocabularyOptions";
 import { FieldArray, useFormikContext } from "formik";
@@ -18,6 +20,7 @@ export function OtherIdentifiersSection() {
     useDinaFormContext();
   const { values } = useFormikContext();
   const { getFieldLabel } = useFieldLabels();
+  const { openModal } = useModal();
 
   const { vocabOptions } = useVocabularyOptions({
     path: "collection-api/vocabulary2/materialSampleIdentifierType"
@@ -54,6 +57,16 @@ export function OtherIdentifiersSection() {
   ) {
     return <></>;
   }
+
+  const materialSampleLabel = getFieldLabel({
+    name: "material-sample"
+  }).fieldLabel;
+  const otherIdentifierLabel = getFieldLabel({
+    name: "otherIdentifiers"
+  }).fieldLabel.replace(/s$/, "");
+  const otherCatalogNumberLabel = getFieldLabel({
+    name: "dwcOtherCatalogNumbers"
+  }).fieldLabel.replace(/s$/, "");
 
   return (
     <FieldSet
@@ -147,11 +160,8 @@ export function OtherIdentifiersSection() {
                     <DinaMessage
                       id="bulkEditResourceSetWarningMulti"
                       values={{
-                        targetType: getFieldLabel({ name: "material-sample" })
-                          .fieldLabel,
-                        fieldName: getFieldLabel({
-                          name: "otherIdentifiers"
-                        }).fieldLabel.replace(/s$/, "")
+                        targetType: materialSampleLabel,
+                        fieldName: otherIdentifierLabel
                       }}
                     />
                   </div>
@@ -160,7 +170,10 @@ export function OtherIdentifiersSection() {
                 {/* Each of other identifier rows to be displayed */}
                 {identifiers?.map?.((_, index) => (
                   <div className="row" key={index}>
-                    <div className={readOnly ? "col-md-2" : "col-md-5"}>
+                    <div
+                      className={readOnly ? "col-md-2" : "col-md-5"}
+                      data-testid={"identifiers[" + index + "].type"}
+                    >
                       <SelectField
                         name={"identifiers[" + index + "].type"}
                         options={vocabOptions}
@@ -180,7 +193,10 @@ export function OtherIdentifiersSection() {
                         hideLabel={true}
                       />
                     </div>
-                    <div className="col-md-6">
+                    <div
+                      className="col-md-6"
+                      data-testid={"identifiers[" + index + "].value"}
+                    >
                       <TextField
                         name={"identifiers[" + index + "].value"}
                         hideLabel={true}
@@ -220,7 +236,27 @@ export function OtherIdentifiersSection() {
           <div className="d-flex mb-2">
             <button
               className="btn btn-primary override-all-button"
-              onClick={() => setBulkEditOtherIdentifiersOverride(true)}
+              onClick={() =>
+                openModal(
+                  <AreYouSureModal
+                    actionMessage={
+                      <DinaMessage
+                        id="overrideAllConfirmationTitle"
+                        values={{ fieldName: otherIdentifierLabel }}
+                      />
+                    }
+                    messageBody={
+                      <DinaMessage
+                        id="overrideAllConfirmation"
+                        values={{ fieldName: otherIdentifierLabel }}
+                      />
+                    }
+                    onYesButtonClicked={() =>
+                      setBulkEditOtherIdentifiersOverride(true)
+                    }
+                  />
+                )
+              }
             >
               <DinaMessage id="overrideAll" />
             </button>
@@ -320,11 +356,8 @@ export function OtherIdentifiersSection() {
                     <DinaMessage
                       id="bulkEditResourceSetWarningMulti"
                       values={{
-                        targetType: getFieldLabel({ name: "material-sample" })
-                          .fieldLabel,
-                        fieldName: getFieldLabel({
-                          name: "dwcOtherCatalogNumbers"
-                        }).fieldLabel.replace(/s$/, "")
+                        targetType: materialSampleLabel,
+                        fieldName: otherCatalogNumberLabel
                       }}
                     />
                   </div>
@@ -334,7 +367,10 @@ export function OtherIdentifiersSection() {
                 {!readOnly &&
                   otherCatalogNumbers?.map((_, index) => (
                     <div className="row" key={index}>
-                      <div className="col-md-11">
+                      <div
+                        className="col-md-11"
+                        data-testid={"dwcOtherCatalogNumbers[" + index + "]"}
+                      >
                         <TextField
                           name={"dwcOtherCatalogNumbers[" + index + "]"}
                           hideLabel={true}
@@ -379,7 +415,27 @@ export function OtherIdentifiersSection() {
           <div className="d-flex mt-2">
             <button
               className="btn btn-primary override-all-button"
-              onClick={() => setBulkEditCatalogNumbersOverride(true)}
+              onClick={() =>
+                openModal(
+                  <AreYouSureModal
+                    actionMessage={
+                      <DinaMessage
+                        id="overrideAllConfirmationTitle"
+                        values={{ fieldName: otherCatalogNumberLabel }}
+                      />
+                    }
+                    messageBody={
+                      <DinaMessage
+                        id="overrideAllConfirmation"
+                        values={{ fieldName: otherCatalogNumberLabel }}
+                      />
+                    }
+                    onYesButtonClicked={() =>
+                      setBulkEditCatalogNumbersOverride(true)
+                    }
+                  />
+                )
+              }
             >
               <DinaMessage id="overrideAll" />
             </button>
