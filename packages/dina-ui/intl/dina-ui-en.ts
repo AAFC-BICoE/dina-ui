@@ -1055,11 +1055,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   unitMismatchComponents:
     "Some components units are not ul/rxn and will not show up in the reaction table: {components}.",
   savedExport_exportType: "Export Type",
-  savedExport_exportDropdown: "Load saved columns to export",
-  savedExport_createTitle: "Create Saved Export Columns",
+  savedExport_exportDropdown: "Select Export Template",
+  savedExport_createTitle: "Save Export Template",
   savedExport_overrideWarning:
-    'A saved export exists with the name "{savedExportName}". Creating this saved export will replace the existing one.',
-  savedExport_createName: "Saved Export Name",
+    'A export template exists with the name "{savedExportName}". Creating this export template will replace the existing one.',
+  savedExport_createName: "Saved Export Template Name",
   savedExport_columnsToBeSaved: "Columns to be saved",
   export_columnsToExport: "Columns To Export"
 };
