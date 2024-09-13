@@ -4,70 +4,24 @@ import {
   SelectField,
   TextField,
   useDinaFormContext,
-  useBulkEditTabContext
+  useFieldLabels
 } from "common-ui/lib";
 import useVocabularyOptions from "../useVocabularyOptions";
 import { FieldArray, useFormikContext } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { getFormTemplateCheckboxes } from "../../form-template/formTemplateUtils";
-import { isEqual, uniq } from "lodash";
-import { useEffect } from "react";
+import { useState } from "react";
 
 export function OtherIdentifiersSection() {
   const { readOnly, isTemplate, formTemplate, isBulkEditAllTab } =
     useDinaFormContext();
-  const bulkEditCtx = useBulkEditTabContext();
   const { values } = useFormikContext();
+  const { getFieldLabel } = useFieldLabels();
 
   const { vocabOptions } = useVocabularyOptions({
     path: "collection-api/vocabulary2/materialSampleIdentifierType"
   });
-
-  useEffect(() => {
-    if (
-      isBulkEditAllTab &&
-      bulkEditCtx &&
-      bulkEditCtx.bulkEditFormRef.current
-    ) {
-      const identifiers = bulkEditCtx.resourceHooks.map(
-        (sample) => (sample.formRef.current?.values as any)?.identifiers
-      );
-      const dwcOtherCatalogNumbers = bulkEditCtx.resourceHooks.map(
-        (sample) =>
-          (sample.formRef.current?.values as any)?.dwcOtherCatalogNumbers
-      );
-      const allIdentifiersSame = isEqual(identifiers, uniq(identifiers));
-      const allDwcNumbersSame = isEqual(
-        dwcOtherCatalogNumbers,
-        uniq(dwcOtherCatalogNumbers)
-      );
-
-      // Special cases where the bulk edit tab should display the values since they match exactly.
-      if (allIdentifiersSame) {
-        bulkEditCtx.bulkEditFormRef.current?.setFieldValue(
-          "identifiers",
-          (bulkEditCtx.resourceHooks?.at(0)?.formRef.current?.values as any)
-            ?.identifiers
-        );
-        bulkEditCtx.bulkEditFormRef.current?.setFieldTouched(
-          "identifiers",
-          false
-        );
-      }
-      if (allDwcNumbersSame) {
-        bulkEditCtx.bulkEditFormRef.current?.setFieldValue(
-          "dwcOtherCatalogNumbers",
-          (bulkEditCtx.resourceHooks?.at(0)?.formRef.current?.values as any)
-            ?.dwcOtherCatalogNumbers
-        );
-        bulkEditCtx.bulkEditFormRef.current?.setFieldTouched(
-          "dwcOtherCatalogNumbers",
-          false
-        );
-      }
-    }
-  }, [isBulkEditAllTab, bulkEditCtx]);
 
   // Determine if the form template sections should be visible.
   const visibility = getFormTemplateCheckboxes(formTemplate);
@@ -86,6 +40,13 @@ export function OtherIdentifiersSection() {
       ] ?? false
     : true;
 
+  const [
+    bulkEditOtherIdentifiersOverride,
+    setBulkEditOtherIdentifiersOverride
+  ] = useState<boolean>(isBulkEditAllTab === undefined);
+  const [bulkEditCatalogNumbersOverride, setBulkEditCatalogNumbersOverride] =
+    useState<boolean>(isBulkEditAllTab === undefined);
+
   // If both are not visible, do not display the section.
   if (
     otherIdentifiersVisible === false &&
@@ -100,7 +61,7 @@ export function OtherIdentifiersSection() {
       wrapLegend={() => <></>}
       id="identifierLegend"
     >
-      {otherIdentifiersVisible && (
+      {otherIdentifiersVisible && bulkEditOtherIdentifiersOverride && (
         <FieldArray name="identifiers">
           {({ form, push, remove }) => {
             const identifiers = form?.values?.identifiers ?? [];
@@ -180,6 +141,22 @@ export function OtherIdentifiersSection() {
                   </div>
                 </div>
 
+                {/* Warning message if overriding all */}
+                {bulkEditOtherIdentifiersOverride && isBulkEditAllTab && (
+                  <div className="alert alert-warning">
+                    <DinaMessage
+                      id="bulkEditResourceSetWarningMulti"
+                      values={{
+                        targetType: getFieldLabel({ name: "material-sample" })
+                          .fieldLabel,
+                        fieldName: getFieldLabel({
+                          name: "otherIdentifiers"
+                        }).fieldLabel.replace(/s$/, "")
+                      }}
+                    />
+                  </div>
+                )}
+
                 {/* Each of other identifier rows to be displayed */}
                 {identifiers?.map?.((_, index) => (
                   <div className="row" key={index}>
@@ -235,8 +212,23 @@ export function OtherIdentifiersSection() {
           }}
         </FieldArray>
       )}
+      {!bulkEditOtherIdentifiersOverride && (
+        <>
+          <h2 className="fieldset-h2-adjustment">
+            <DinaMessage id="otherIdentifiers" />
+          </h2>
+          <div className="d-flex mb-2">
+            <button
+              className="btn btn-primary override-all-button"
+              onClick={() => setBulkEditOtherIdentifiersOverride(true)}
+            >
+              <DinaMessage id="overrideAll" />
+            </button>
+          </div>
+        </>
+      )}
 
-      {otherCatalogNumbersVisible && (
+      {otherCatalogNumbersVisible && bulkEditCatalogNumbersOverride && (
         <FieldArray name="dwcOtherCatalogNumbers">
           {({ form, push, remove }) => {
             const otherCatalogNumbers =
@@ -322,6 +314,22 @@ export function OtherIdentifiersSection() {
                   </div>
                 </div>
 
+                {/* Warning message if overriding all */}
+                {bulkEditCatalogNumbersOverride && isBulkEditAllTab && (
+                  <div className="alert alert-warning">
+                    <DinaMessage
+                      id="bulkEditResourceSetWarningMulti"
+                      values={{
+                        targetType: getFieldLabel({ name: "material-sample" })
+                          .fieldLabel,
+                        fieldName: getFieldLabel({
+                          name: "dwcOtherCatalogNumbers"
+                        }).fieldLabel.replace(/s$/, "")
+                      }}
+                    />
+                  </div>
+                )}
+
                 {/* Each of other catalog numbers rows to be displayed */}
                 {!readOnly &&
                   otherCatalogNumbers?.map((_, index) => (
@@ -362,6 +370,21 @@ export function OtherIdentifiersSection() {
             );
           }}
         </FieldArray>
+      )}
+      {!bulkEditCatalogNumbersOverride && (
+        <>
+          <strong>
+            <DinaMessage id={"field_dwcOtherCatalogNumbers"} />
+          </strong>
+          <div className="d-flex mt-2">
+            <button
+              className="btn btn-primary override-all-button"
+              onClick={() => setBulkEditCatalogNumbersOverride(true)}
+            >
+              <DinaMessage id="overrideAll" />
+            </button>
+          </div>
+        </>
       )}
     </FieldSet>
   );
