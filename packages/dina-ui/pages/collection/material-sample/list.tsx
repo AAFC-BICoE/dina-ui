@@ -275,6 +275,26 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         component: "ENTITY",
         referencedBy: "attachment",
         referencedType: "metadata"
+      },
+
+      // Parent Material Sample
+      {
+        type: "managedAttribute",
+        label: "managedAttributes",
+        path: "included.attributes.managedAttributes",
+        apiEndpoint: "collection-api/managed-attribute",
+        component: "ENTITY",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
+      },
+      {
+        type: "fieldExtension",
+        label: "restrictions",
+        component: "RESTRICTION",
+        path: "data.attributes.restrictionFieldsExtension",
+        apiEndpoint: "collection-api/extension",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
       }
     ]
   };
