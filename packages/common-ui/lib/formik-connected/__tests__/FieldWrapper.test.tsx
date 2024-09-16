@@ -1,7 +1,12 @@
 import { IntlProvider } from "react-intl";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import {
+  mountWithAppContext,
+  mountWithAppContext2
+} from "../../test-util/mock-app-context";
 import { DinaForm, DinaFormSection } from "../DinaForm";
 import { FieldWrapper } from "../FieldWrapper";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockSubmit = jest.fn();
 
@@ -9,17 +14,19 @@ describe("FieldWrapper component.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Adds a generated title-case label to the wrapped component.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <FieldWrapper name="fieldName">{() => <div />}</FieldWrapper>
       </DinaForm>
     );
 
-    expect(wrapper.find("label").text()).toEqual("Field Name");
+    const labelElement = wrapper.container.querySelector("label");
+    expect(labelElement).not.toBeNull();
+    expect(labelElement?.textContent).toEqual("Field Name");
   });
 
   it("Accepts a className which is applied to a surrounding div.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <FieldWrapper className="col-6" name="fieldName">
           {() => <div />}
@@ -27,11 +34,11 @@ describe("FieldWrapper component.", () => {
       </DinaForm>
     );
 
-    expect(wrapper.find(".col-6").exists()).toEqual(true);
+    expect(wrapper.container.querySelector(".col-6")).toBeInTheDocument();
   });
 
   it("Displays the intl message (if there is one) in the label.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <IntlProvider
         locale="en"
         messages={{ field_testField: "My Field Label" }}
@@ -42,11 +49,13 @@ describe("FieldWrapper component.", () => {
       </IntlProvider>
     );
 
-    expect(wrapper.find("label").text()).toEqual("My Field Label");
+    const labelElement = wrapper.container.querySelector("label");
+    expect(labelElement).not.toBeNull();
+    expect(labelElement?.textContent).toEqual("My Field Label");
   });
 
   it("Displays a custom label.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <FieldWrapper label="The Group's Name" name="group.groupName">
           {() => <div />}
@@ -54,21 +63,26 @@ describe("FieldWrapper component.", () => {
       </DinaForm>
     );
 
-    expect(wrapper.find("label").text()).toEqual("The Group's Name");
+    const labelElement = wrapper.container.querySelector("label");
+    expect(labelElement).not.toBeNull();
+    expect(labelElement?.textContent).toEqual("The Group's Name");
   });
 
   it("Displays the readOnly value when the form is read-only.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ myField: "my value" }} readOnly={true}>
         <FieldWrapper name="myField" />
       </DinaForm>
     );
 
-    expect(wrapper.find(".field-view").text()).toEqual("my value");
+    // Verify the field value is rendered correctly
+    const fieldValueElement = wrapper.container.querySelector(".field-view");
+    expect(fieldValueElement).not.toBeNull(); // Ensure the field value is found
+    expect(fieldValueElement?.textContent).toEqual("my value");
   });
 
   it("Can display a custom read-only view.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ myField: "my value" }} readOnly={true}>
         <FieldWrapper
           name="myField"
@@ -77,11 +91,14 @@ describe("FieldWrapper component.", () => {
       </DinaForm>
     );
 
-    expect(wrapper.find(".custom-div").text()).toEqual("my value");
+    expect(wrapper.container.querySelector(".custom-div")?.textContent).toEqual(
+      "my value"
+    );
   });
 
   it("Accepts a custom field name for the template checkbox.", async () => {
-    const wrapper = mountWithAppContext(
+    // Render the component with the context wrapper
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ myField: "my value", templateCheckboxes: {} }}
         isTemplate={true}
@@ -101,17 +118,28 @@ describe("FieldWrapper component.", () => {
       </DinaForm>
     );
 
-    wrapper
-      .find("input[type='checkbox']")
-      .simulate("change", { target: { checked: true } });
-    wrapper.update();
+    // Simulate checking the checkbox
+    const checkbox = screen.getByRole("checkbox", {
+      name: /select/i
+    });
+    // Initially, the checkbox should not be checked
+    expect(checkbox).not.toBeChecked();
 
-    wrapper.find("form").simulate("submit");
+    // Simulate checking the checkbox (toggle to true)
+    fireEvent.click(checkbox);
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Assert that the checkbox is checked
+    expect(checkbox).toBeChecked();
 
-    expect(mockSubmit).lastCalledWith({
+    // Simulate form submission
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
+
+    // Wait for the form submission to complete
+    await waitFor(() => expect(mockSubmit).toHaveBeenCalled());
+
+    // Verify the submitted values
+    expect(mockSubmit).toHaveBeenCalledWith({
       myField: "my value",
       templateCheckboxes: {
         "componentName.sectionName.customTemplateFieldName": true
@@ -120,7 +148,7 @@ describe("FieldWrapper component.", () => {
   });
 
   it("Properly hides the field when the form template has disabled it.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ myField1: "my value", templateCheckboxes: {} }}
         formTemplate={{
@@ -195,9 +223,9 @@ describe("FieldWrapper component.", () => {
       </DinaForm>
     );
 
-    expect(wrapper.find(".enabledField1").exists()).toEqual(true);
-    expect(wrapper.find(".enabledField2").exists()).toEqual(true);
-    expect(wrapper.find(".disabledField1").exists()).toEqual(false);
-    expect(wrapper.find(".disabledField2").exists()).toEqual(false);
+    expect(wrapper.container.querySelector(".enabledField1")).not.toBeNull();
+    expect(wrapper.container.querySelector(".enabledField2")).not.toBeNull();
+    expect(wrapper.container.querySelector(".disabledField1")).toBeNull();
+    expect(wrapper.container.querySelector(".disabledField2")).toBeNull();
   });
 });
