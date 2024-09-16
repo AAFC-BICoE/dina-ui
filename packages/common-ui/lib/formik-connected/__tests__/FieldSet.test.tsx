@@ -2,7 +2,6 @@ import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FieldSet } from "../FieldSet";
 import { FieldWrapper } from "../FieldWrapper";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockSubmit = jest.fn();
