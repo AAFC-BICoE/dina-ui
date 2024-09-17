@@ -429,17 +429,7 @@ export function useWorkbookConverter(
     >,
     workbookColumnMap: WorkbookColumnMap,
     fieldPath: string,
-    group: string,
-    _existingResource?: InputResource<
-      KitsuResource & {
-        group?: string;
-        relationships: {
-          [key: string]: {
-            data: { id: string; type: string } | { id: string; type: string }[];
-          };
-        };
-      }
-    >
+    group: string
   ) {
     const attributeName = fieldPath.substring(fieldPath.lastIndexOf(".") + 1);
     const value = resource[attributeName];

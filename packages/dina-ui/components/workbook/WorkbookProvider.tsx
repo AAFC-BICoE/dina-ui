@@ -86,6 +86,7 @@ type State = {
   apiBaseUrl?: string;
   error?: Error;
   sourceSet?: string;
+  appendData?: boolean;
 };
 
 interface WorkbookMetaData {
@@ -95,6 +96,7 @@ interface WorkbookMetaData {
   group?: string;
   apiBaseUrl?: string;
   error?: Error;
+  appendData?: boolean;
 }
 
 const reducer = (state, action: { type: actionType; payload?: any }): State => {
@@ -134,7 +136,8 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         workbookResources: action.payload.workbookResources,
         group: action.payload.group,
         type: action.payload.type,
-        apiBaseUrl: action.payload.apiBaseUrl
+        apiBaseUrl: action.payload.apiBaseUrl,
+        appendData: action.payload.appendData
       };
     case "FAIL_SAVING":
       return {
@@ -234,6 +237,7 @@ export interface WorkbookUploadContextI {
   sheet: number;
   error?: Error;
   sourceSet?: string;
+  appendData?: boolean;
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
   setColumnMap: (newColumnMap: WorkbookColumnMap) => void;
@@ -247,7 +251,8 @@ export interface WorkbookUploadContextI {
     relationshipMapping: RelationshipMapping,
     group: string,
     type: string,
-    apiBaseUrl: string
+    apiBaseUrl: string,
+    appendData: boolean
   ) => Promise<void>;
   pauseSavingWorkbook: () => void;
   resumeSavingWorkbook: () => void;
@@ -289,7 +294,8 @@ export function WorkbookUploadContextProvider({
     progress: 0,
     sheet: 0,
     type: "material-sample",
-    group: groupNames?.[0]
+    group: groupNames?.[0],
+    appendData: false
   };
   const [state, dispatch] = useReducer(reducer, initState);
 
@@ -336,7 +342,8 @@ export function WorkbookUploadContextProvider({
     relationshipMapping: RelationshipMapping,
     newGroup: string,
     newType: string,
-    newApiBaseUrl: string
+    newApiBaseUrl: string,
+    appendData: boolean
   ) => {
     for (const columnHeader of Object.keys(relationshipMapping)) {
       const relationshipColumn = relationshipMapping[columnHeader];
@@ -353,7 +360,8 @@ export function WorkbookUploadContextProvider({
       group: newGroup,
       type: newType,
       apiBaseUrl: newApiBaseUrl,
-      progress: 0
+      progress: 0,
+      appendData
     });
     await saveWorkbookResourcesInIndexDB(
       newType,
@@ -366,7 +374,8 @@ export function WorkbookUploadContextProvider({
         workbookResources: newWorkbookResources,
         group: newGroup,
         type: newType,
-        apiBaseUrl: newApiBaseUrl
+        apiBaseUrl: newApiBaseUrl,
+        appendData
       }
     });
   };
@@ -510,6 +519,7 @@ export function WorkbookUploadContextProvider({
         status: state.status,
         error: state.error,
         sourceSet: state.sourceSet,
+        appendData: state.appendData,
 
         uploadWorkbook,
         setColumnMap,

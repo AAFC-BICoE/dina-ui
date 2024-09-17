@@ -1,5 +1,6 @@
 import {
   AreYouSureModal,
+  CheckBoxField,
   FieldWrapper,
   LoadingSpinner,
   SubmitButton,
@@ -203,7 +204,8 @@ export function WorkbookColumnMapping({
         relationshipMapping as RelationshipMapping,
         submittedValues.group,
         type,
-        baseApiPath
+        baseApiPath,
+        submittedValues.appendData
       );
     }
   }
@@ -620,6 +622,7 @@ export function WorkbookColumnMapping({
                         }
                       }}
                     />
+                    <CheckBoxField name="appendData" />
                   </div>
                 </Card.Body>
               </Card>

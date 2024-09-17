@@ -2,21 +2,14 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
-import { useIntl } from "react-intl";
-import {
-  AreYouSureModal,
-  rsql,
-  useApiClient,
-  useModal,
-  useQuery
-} from "../../../common-ui/lib";
+import { AreYouSureModal, useApiClient } from "../../../common-ui/lib";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
 import { delay } from "./utils/workbookMappingUtils";
 import { PersistedResource, KitsuResource } from "kitsu";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { MaterialSample } from "../../types/collection-api";
 
 export interface SaveWorkbookProgressProps {
   onWorkbookCanceled: () => void;
@@ -41,7 +34,8 @@ export function SaveWorkbookProgress({
     finishSavingWorkbook,
     cancelSavingWorkbook,
     failSavingWorkbook,
-    workbookColumnMap
+    workbookColumnMap,
+    appendData
   } = useWorkbookContext();
 
   const { save, apiClient, doOperations } = useApiClient();
@@ -50,8 +44,8 @@ export function SaveWorkbookProgress({
   const { formatMessage } = useDinaIntl();
   const warningText = formatMessage("leaveSaveWorkbookWarning");
 
-  const appendDataForAllExistingResources = useRef(false);
-  const { openModal } = useModal();
+  // const appendDataForAllExistingResources = useRef(false);
+  // const { openModal } = useModal();
 
   const [now, setNow] = useState<number>(progress);
   const [sourceSet, setSourceSet] = useState<string>();
@@ -142,25 +136,16 @@ export function SaveWorkbookProgress({
           existingResource = resp.data[0];
         }
 
-        if (existingResource) {
-          const appendDataForExisting = await openModalWithPromise(
-            existingResource
-          );
-
-          // Depending on the user's response, set the `appendDataForAllExistingResources` flag
-          appendDataForAllExistingResources.current = appendDataForExisting;
-        }
-
         for (const key of Object.keys(resource)) {
           await linkRelationshipAttribute(
             resource,
             workbookColumnMap,
             key,
-            group ?? "",
-            appendDataForAllExistingResources.current && existingResource
-              ? existingResource
-              : undefined
+            group ?? ""
           );
+          if (appendData) {
+            resource.id = existingResource.id;
+          }
         }
       }
 
@@ -175,33 +160,6 @@ export function SaveWorkbookProgress({
         { apiBaseUrl }
       );
       setSavedResources([...savedResources, ...savedArgs]);
-    }
-
-    // Utility function to show the modal and stop code execution and return a Promise that resolves based on user's choice
-    function openModalWithPromise(existingResource): Promise<boolean> {
-      return new Promise((resolve) => {
-        openModal(
-          <AreYouSureModal
-            actionMessage={<DinaMessage id="existingResourceFoundTitle" />}
-            messageBody={
-              <DinaMessage
-                id="existingResourceFoundBody"
-                values={{
-                  existingResourceName: existingResource.materialSampleName
-                }}
-              />
-            }
-            onYesButtonClicked={() => {
-              resolve(true);
-            }}
-            onNoButtonClicked={() => {
-              resolve(false);
-            }}
-            yesButtonText={formatMessage("workBookAppendData")}
-            noButtonText={formatMessage("workBookCreateNew")}
-          />
-        );
-      });
     }
 
     // Split big array into small chunks, which chunk size is 5.
