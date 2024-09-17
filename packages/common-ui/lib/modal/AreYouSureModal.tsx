@@ -13,6 +13,8 @@ export interface AreYouSureModalProps {
 
   onYesButtonClicked: OnFormikSubmit;
 
+  onNoButtonClicked?: () => void;
+
   /** Describes the message displaying to the user in order to make action decision. */
   messageBody?: ReactNode;
 
@@ -31,6 +33,7 @@ export function AreYouSureModal({
   actionMessage,
   messageBody,
   onYesButtonClicked,
+  onNoButtonClicked,
   yesButtonText,
   noButtonText
 }: AreYouSureModalProps) {
@@ -61,7 +64,10 @@ export function AreYouSureModal({
           <div className="d-flex gap-3">
             <FormikButton
               className="btn btn-dark no-button"
-              onClick={closeModal}
+              onClick={async () => {
+                await onNoButtonClicked?.();
+                closeModal();
+              }}
               buttonProps={() => ({ style: { width: "10rem" } })}
             >
               {noButtonText ?? <CommonMessage id="no" />}

@@ -1061,5 +1061,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
     'A export template exists with the name "{savedExportName}". Creating this export template will replace the existing one.',
   savedExport_createName: "Saved Export Template Name",
   savedExport_columnsToBeSaved: "Columns to be saved",
-  export_columnsToExport: "Columns To Export"
+  export_columnsToExport: "Columns To Export",
+  existingResourceFoundTitle: "Resource with Name already exists.",
+  existingResourceFoundBody: `Append new data to existing record: {existingResourceName}?`,
+  workBookAppendData: "Append Data",
+  workBookCreateNew: "Create New"
 };

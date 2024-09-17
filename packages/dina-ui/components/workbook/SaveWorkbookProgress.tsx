@@ -3,8 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { useIntl } from "react-intl";
-import { rsql, useApiClient } from "../../../common-ui/lib";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import {
+  AreYouSureModal,
+  rsql,
+  useApiClient,
+  useModal,
+  useQuery
+} from "../../../common-ui/lib";
+import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
@@ -41,8 +47,11 @@ export function SaveWorkbookProgress({
   const { save, apiClient, doOperations } = useApiClient();
   const statusRef = useRef<WorkBookSavingStatus>(status ?? "CANCELED");
   const router = useRouter();
-  const { formatMessage } = useIntl();
-  const warningText = formatMessage({ id: "leaveSaveWorkbookWarning" });
+  const { formatMessage } = useDinaIntl();
+  const warningText = formatMessage("leaveSaveWorkbookWarning");
+
+  const appendDataForAllExistingResources = useRef(false);
+  const { openModal } = useModal();
 
   const [now, setNow] = useState<number>(progress);
   const [sourceSet, setSourceSet] = useState<string>();
@@ -118,16 +127,43 @@ export function SaveWorkbookProgress({
     setSourceSet(sourceSetInternal);
     async function saveChunkOfWorkbook(chunkedResources) {
       for (const resource of chunkedResources) {
+        resource.sourceSet = sourceSetInternal;
+        let existingResource: any;
+
+        if (resource.type === "material-sample") {
+          const resp = await apiClient.get<MaterialSample[]>(
+            "collection-api/material-sample",
+            {
+              filter: {
+                rsql: `materialSampleName=="${resource?.materialSampleName}"`
+              }
+            }
+          );
+          existingResource = resp.data[0];
+        }
+
+        if (existingResource) {
+          const appendDataForExisting = await openModalWithPromise(
+            existingResource
+          );
+
+          // Depending on the user's response, set the `appendDataForAllExistingResources` flag
+          appendDataForAllExistingResources.current = appendDataForExisting;
+        }
+
         for (const key of Object.keys(resource)) {
-          resource.sourceSet = sourceSetInternal;
           await linkRelationshipAttribute(
             resource,
             workbookColumnMap,
             key,
-            group ?? ""
+            group ?? "",
+            appendDataForAllExistingResources.current && existingResource
+              ? existingResource
+              : undefined
           );
         }
       }
+
       const savedArgs = await save(
         chunkedResources.map(
           (item) =>
@@ -139,6 +175,33 @@ export function SaveWorkbookProgress({
         { apiBaseUrl }
       );
       setSavedResources([...savedResources, ...savedArgs]);
+    }
+
+    // Utility function to show the modal and stop code execution and return a Promise that resolves based on user's choice
+    function openModalWithPromise(existingResource): Promise<boolean> {
+      return new Promise((resolve) => {
+        openModal(
+          <AreYouSureModal
+            actionMessage={<DinaMessage id="existingResourceFoundTitle" />}
+            messageBody={
+              <DinaMessage
+                id="existingResourceFoundBody"
+                values={{
+                  existingResourceName: existingResource.materialSampleName
+                }}
+              />
+            }
+            onYesButtonClicked={() => {
+              resolve(true);
+            }}
+            onNoButtonClicked={() => {
+              resolve(false);
+            }}
+            yesButtonText={formatMessage("workBookAppendData")}
+            noButtonText={formatMessage("workBookCreateNew")}
+          />
+        );
+      });
     }
 
     // Split big array into small chunks, which chunk size is 5.
