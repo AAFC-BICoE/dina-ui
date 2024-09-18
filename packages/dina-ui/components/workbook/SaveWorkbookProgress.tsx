@@ -44,9 +44,6 @@ export function SaveWorkbookProgress({
   const { formatMessage } = useDinaIntl();
   const warningText = formatMessage("leaveSaveWorkbookWarning");
 
-  // const appendDataForAllExistingResources = useRef(false);
-  // const { openModal } = useModal();
-
   const [now, setNow] = useState<number>(progress);
   const [sourceSet, setSourceSet] = useState<string>();
   const [savedResources, setSavedResources] = useState<
@@ -124,7 +121,7 @@ export function SaveWorkbookProgress({
         resource.sourceSet = sourceSetInternal;
         let existingResource: any;
 
-        if (resource.type === "material-sample") {
+        if (appendData && resource.type === "material-sample") {
           const resp = await apiClient.get<MaterialSample[]>(
             "collection-api/material-sample",
             {
@@ -143,7 +140,7 @@ export function SaveWorkbookProgress({
             key,
             group ?? ""
           );
-          if (appendData) {
+          if (existingResource) {
             resource.id = existingResource.id;
           }
         }
