@@ -1,7 +1,7 @@
-import { FormikButton, LoadingSpinner } from "../..";
+import { FormikButton } from "../..";
 import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockOnClick = jest.fn();

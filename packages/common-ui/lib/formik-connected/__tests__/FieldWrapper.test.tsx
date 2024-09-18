@@ -1,8 +1,5 @@
 import { IntlProvider } from "react-intl";
-import {
-  mountWithAppContext,
-  mountWithAppContext2
-} from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm, DinaFormSection } from "../DinaForm";
 import { FieldWrapper } from "../FieldWrapper";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
