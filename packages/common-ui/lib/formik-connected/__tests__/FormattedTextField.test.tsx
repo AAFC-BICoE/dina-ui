@@ -1,10 +1,7 @@
-import {
-  mountWithAppContext,
-  mountWithAppContext2
-} from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FormattedTextField } from "../FormattedTextField";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 describe("FormattedTextField component", () => {
