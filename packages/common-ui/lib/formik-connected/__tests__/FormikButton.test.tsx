@@ -1,12 +1,14 @@
 import { FormikButton, LoadingSpinner } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockOnClick = jest.fn();
 const mockOnSubmit = jest.fn();
 
 function getWrapper() {
-  return mountWithAppContext(
+  return mountWithAppContext2(
     <DinaForm
       initialValues={{ testProperty: "testValue" }}
       onSubmit={async ({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -23,9 +25,11 @@ describe("FormikButton component", () => {
 
   it("Renders the button.", () => {
     const wrapper = getWrapper();
-    expect(wrapper.find("button[children='Test Button']").exists()).toEqual(
-      true
-    );
+    expect(
+      wrapper.getByRole("button", {
+        name: /test button/i
+      })
+    ).toBeInTheDocument();
   });
 
   it("Renders a loading spinner while the form is loading.", async () => {
@@ -34,15 +38,29 @@ describe("FormikButton component", () => {
     mockOnSubmit.mockImplementation(async () => {
       await new Promise(setImmediate);
     });
-    wrapper.find("form").simulate("submit");
-    wrapper.update();
 
-    expect(wrapper.find(LoadingSpinner).exists()).toEqual(true);
+    // Submit the form
+    fireEvent.click(
+      wrapper.getByRole("button", {
+        name: /test button/i
+      })
+    );
+    // Wait for the spinner to appear
+    await waitFor(() => {
+      expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
+      expect(
+        wrapper.container.querySelector(".spinner-border")
+      ).toBeInTheDocument();
+    });
   });
 
   it("Provides an onClick method that provides access to the formik context.", () => {
     const wrapper = getWrapper();
-    wrapper.find("button").simulate("click");
+    fireEvent.click(
+      wrapper.getByRole("button", {
+        name: /test button/i
+      })
+    );
     expect(mockOnClick.mock.calls).toEqual([
       [
         { testProperty: "testValue" },
