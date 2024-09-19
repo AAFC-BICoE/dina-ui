@@ -38,7 +38,6 @@ import { useState } from "react";
 import { ResourceNameIdentifier } from "../../types/common/resources/ResourceNameIdentifier";
 import StorageUnitGrid from "./StorageUnitGrid";
 import { useFormikContext } from "formik";
-import FieldLabel from "packages/common-ui/lib/label/FieldLabel";
 
 export const storageUnitFormSchema = yup.object({
   storageUnitType: yup.object().required()
