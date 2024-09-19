@@ -32,7 +32,8 @@ export default function StorageUnitGrid({
     cellGrid,
     multipleSamplesWellCoordinates,
     usageTypeRef,
-    pcrBatchRef
+    pcrBatchRef,
+    seqBatchRef
   } = useGridCoordinatesControls({
     materialSamples,
     storageUnit,
@@ -71,11 +72,11 @@ export default function StorageUnitGrid({
               href={{
                 pathname: `/seqdb/seq-batch/view`,
                 query: {
-                  id: pcrBatchRef?.current?.id
+                  id: seqBatchRef?.current?.id
                 }
               }}
             >
-              <a>{pcrBatchRef?.current?.name}</a>
+              <a>{seqBatchRef?.current?.name}</a>
             </Link>
           )}
           {usageTypeRef.current === "pcr-batch-item" && (
@@ -231,11 +232,11 @@ export function useGridCoordinatesControls({
               const seqReaction = seqReactionQuery.data[0];
               if (seqReaction.seqBatch) {
                 try {
-                  const pcrBatchQuery = await apiClient.get<PcrBatch>(
+                  const seqBatchQuery = await apiClient.get<SeqBatch>(
                     `seqdb-api/seq-batch/${seqReaction.seqBatch.id}`,
                     {}
                   );
-                  pcrBatchRef.current = pcrBatchQuery.data;
+                  seqBatchRef.current = seqBatchQuery.data;
                 } catch (e) {
                   console.error(e);
                 }
@@ -321,6 +322,7 @@ export function useGridCoordinatesControls({
     ...gridState,
     multipleSamplesWellCoordinates,
     usageTypeRef,
-    pcrBatchRef
+    pcrBatchRef,
+    seqBatchRef
   };
 }
