@@ -6,9 +6,16 @@ import { isArray, noop } from "lodash";
 import { PersistedResource } from "kitsu";
 import { LoadingSpinner, useApiClient } from "../../../common-ui/lib";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
-import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
+import {
+  PcrBatch,
+  PcrBatchItem,
+  SeqBatch,
+  SeqReaction
+} from "../../types/seqdb-api";
 import { ErrorBanner } from "../error/ErrorBanner";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
+import FieldLabel from "packages/common-ui/lib/label/FieldLabel";
+import Link from "next/link";
 
 export interface StorageUnitGridProps {
   storageUnit: StorageUnit;
@@ -21,12 +28,24 @@ export default function StorageUnitGrid({
 }: StorageUnitGridProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const { formatMessage } = useDinaIntl();
-  const { cellGrid, multipleSamplesWellCoordinates } =
-    useGridCoordinatesControls({
-      materialSamples,
-      storageUnit,
-      setLoading
-    });
+  const {
+    cellGrid,
+    multipleSamplesWellCoordinates,
+    usageTypeRef,
+    pcrBatchRef
+  } = useGridCoordinatesControls({
+    materialSamples,
+    storageUnit,
+    setLoading
+  });
+  function parseUsageType(usageType) {
+    const usageTypeMap = {
+      "material-sample": "Material Sample",
+      "pcr-batch-item": "PCR Batch",
+      "seq-reaction": "Seq Batch"
+    };
+    return usageTypeMap[usageType];
+  }
 
   return loading ? (
     <LoadingSpinner loading={true} />
@@ -43,17 +62,50 @@ export default function StorageUnitGrid({
           />
         );
       })}
-      <ContainerGrid
-        className="mb-3"
-        batch={{
-          gridLayoutDefinition:
-            storageUnit?.storageUnitType?.gridLayoutDefinition
-        }}
-        cellGrid={cellGrid}
-        editMode={false}
-        movedItems={[]}
-        onDrop={noop}
-      />
+      <div>
+        <FieldLabel name={formatMessage("usage")} />
+        <div className={"field-col mb-3"}>
+          {parseUsageType(usageTypeRef.current)}{" "}
+          {usageTypeRef.current === "seq-reaction" && (
+            <Link
+              href={{
+                pathname: `/seqdb/seq-batch/view`,
+                query: {
+                  id: pcrBatchRef?.current?.id
+                }
+              }}
+            >
+              <a>{pcrBatchRef?.current?.name}</a>
+            </Link>
+          )}
+          {usageTypeRef.current === "pcr-batch-item" && (
+            <Link
+              href={{
+                pathname: `/seqdb/pcr-batch/view`,
+                query: {
+                  id: pcrBatchRef?.current?.id
+                }
+              }}
+            >
+              <a>{pcrBatchRef?.current?.name}</a>
+            </Link>
+          )}
+        </div>
+      </div>
+      <div>
+        <FieldLabel name={formatMessage("contents")} />
+        <ContainerGrid
+          className="mb-3"
+          batch={{
+            gridLayoutDefinition:
+              storageUnit?.storageUnitType?.gridLayoutDefinition
+          }}
+          cellGrid={cellGrid}
+          editMode={false}
+          movedItems={[]}
+          onDrop={noop}
+        />
+      </div>
     </div>
   );
 }
@@ -73,6 +125,10 @@ export function useGridCoordinatesControls({
     movedItems: [] as any[]
   });
 
+  const usageTypeRef = useRef<string | undefined>(undefined);
+  const pcrBatchRef = useRef<PersistedResource<PcrBatch>>();
+  const seqBatchRef = useRef<PersistedResource<SeqBatch>>();
+
   // Change to track an array of objects with well coordinate and associated samples.
   const multipleSamplesWellCoordinates = useRef<
     { coordinate: string; samples: string[] }[]
@@ -87,6 +143,7 @@ export function useGridCoordinatesControls({
       const storageUnitUsages = materialSamples.map(
         (sample) => sample.storageUnitUsage
       );
+      usageTypeRef.current = storageUnitUsages[0]?.usageType;
       materialSamples.forEach((materialSample) => {
         const storageUnitUsage = storageUnitUsages.find(
           (usage) => usage?.id === materialSample?.storageUnitUsage?.id
@@ -135,18 +192,31 @@ export function useGridCoordinatesControls({
       );
 
       if (storageUnitUsagesQuery.data.length > 0) {
+        usageTypeRef.current = storageUnitUsagesQuery?.data?.[0]?.usageType;
         // Use map to return an array of promises
         const gridPromises = storageUnitUsagesQuery.data.map(
-          async (storageUnitUsage) => {
+          async (storageUnitUsage, index) => {
             if (storageUnitUsage.usageType === "pcr-batch-item") {
               const pcrBatchItemQuery = await apiClient.get<PcrBatchItem[]>(
                 `seqdb-api/pcr-batch-item`,
                 {
-                  include: "materialSample",
+                  include: `materialSample,${index === 0 ? "pcrBatch" : ""}`,
                   filter: { "storageUnitUsage.uuid": storageUnitUsage?.id }
                 }
               );
               const pcrBatchItem = pcrBatchItemQuery.data[0];
+              if (pcrBatchItem.pcrBatch) {
+                try {
+                  const pcrBatchQuery = await apiClient.get<PcrBatch>(
+                    `seqdb-api/pcr-batch/${pcrBatchItem.pcrBatch.id}`,
+                    {}
+                  );
+                  pcrBatchRef.current = pcrBatchQuery.data;
+                } catch (e) {
+                  console.error(e);
+                }
+              }
+
               if (pcrBatchItem) {
                 await getCellGrid(pcrBatchItem, storageUnitUsage);
               }
@@ -154,11 +224,22 @@ export function useGridCoordinatesControls({
               const seqReactionQuery = await apiClient.get<SeqReaction[]>(
                 `seqdb-api/seq-reaction`,
                 {
-                  include: "pcrBatchItem",
+                  include: `pcrBatchItem,${index === 0 ? "seqBatch" : ""}`,
                   filter: { "storageUnitUsage.uuid": storageUnitUsage?.id }
                 }
               );
               const seqReaction = seqReactionQuery.data[0];
+              if (seqReaction.seqBatch) {
+                try {
+                  const pcrBatchQuery = await apiClient.get<PcrBatch>(
+                    `seqdb-api/seq-batch/${seqReaction.seqBatch.id}`,
+                    {}
+                  );
+                  pcrBatchRef.current = pcrBatchQuery.data;
+                } catch (e) {
+                  console.error(e);
+                }
+              }
               if (seqReaction && seqReaction.pcrBatchItem) {
                 await getCellGrid(seqReaction.pcrBatchItem, storageUnitUsage);
               }
@@ -236,5 +317,10 @@ export function useGridCoordinatesControls({
     getGridState();
   }, []);
 
-  return { ...gridState, multipleSamplesWellCoordinates };
+  return {
+    ...gridState,
+    multipleSamplesWellCoordinates,
+    usageTypeRef,
+    pcrBatchRef
+  };
 }

@@ -5,10 +5,8 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
-  FieldHeader,
   FieldWrapper,
   filterBy,
-  LabelView,
   LoadingSpinner,
   ResourceSelectField,
   SaveArgs,
@@ -40,6 +38,7 @@ import { useState } from "react";
 import { ResourceNameIdentifier } from "../../types/common/resources/ResourceNameIdentifier";
 import StorageUnitGrid from "./StorageUnitGrid";
 import { useFormikContext } from "formik";
+import FieldLabel from "packages/common-ui/lib/label/FieldLabel";
 
 export const storageUnitFormSchema = yup.object({
   storageUnitType: yup.object().required()
@@ -266,20 +265,10 @@ export function StorageUnitFormFields({
       </div>
       {initialValues?.storageUnitType?.gridLayoutDefinition &&
         !formik?.values?.isGeneric && (
-          <div>
-            <div className={"field-label"}>
-              {
-                <strong>
-                  {" "}
-                  <FieldHeader name={formatMessage("contents")} />
-                </strong>
-              }
-            </div>
-            <StorageUnitGrid
-              storageUnit={initialValues}
-              materialSamples={materialSamplesQuery.response?.data}
-            />
-          </div>
+          <StorageUnitGrid
+            storageUnit={initialValues}
+            materialSamples={materialSamplesQuery.response?.data}
+          />
         )}
       {readOnly ? (
         <FieldWrapper
