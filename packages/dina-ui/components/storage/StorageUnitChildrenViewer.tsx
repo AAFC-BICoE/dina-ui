@@ -10,43 +10,34 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
 import { TableColumn } from "../../../common-ui/lib/list-page/types";
-import StorageUnitGrid from "./StorageUnitGrid";
-
 export interface StorageTreeFieldProps {
   storageUnit: StorageUnit;
+  materialSamples: PersistedResource<MaterialSample>[] | undefined;
 }
 
 export type StorageActionMode = "VIEW" | "MOVE_ALL" | "ADD_EXISTING_AS_CHILD";
 
 export function StorageUnitChildrenViewer({
-  storageUnit
+  storageUnit,
+  materialSamples
 }: StorageTreeFieldProps) {
   const { readOnly } = useDinaFormContext();
   const router = useRouter();
   const { apiClient, save } = useApiClient();
   const [actionMode, setActionMode] = useState<StorageActionMode>("VIEW");
   const [hideMoveContents, setHideMoveContents] = useState<boolean>(false);
-  const materialSamplesQuery = useQuery<MaterialSample[]>(
-    {
-      path: "collection-api/material-sample",
-      filter: { rsql: `storageUnitUsage.storageUnit.uuid==${storageUnit?.id}` },
-      include: "storageUnitUsage",
-      page: { limit: 1000 }
-    },
-    {
-      onSuccess(response) {
-        if (response?.data?.length === 0) {
-          setHideMoveContents(true);
-        }
-      }
+
+  useEffect(() => {
+    if (materialSamples?.length === 0) {
+      setHideMoveContents(true);
     }
-  );
+  }, []);
 
   async function moveAllContent(targetUnit: PersistedResource<StorageUnit>) {
     const childStoragePath = `collection-api/storage-unit/${storageUnit?.id}?include=storageUnitChildren`;
@@ -115,17 +106,8 @@ export function StorageUnitChildrenViewer({
     await router.reload();
   }
 
-  return materialSamplesQuery.loading ? (
-    <LoadingSpinner loading={true} />
-  ) : (
+  return (
     <div className="mb-3">
-      {storageUnit?.storageUnitType?.gridLayoutDefinition &&
-        !storageUnit.isGeneric && (
-          <StorageUnitGrid
-            storageUnit={storageUnit}
-            materialSamples={materialSamplesQuery.response?.data}
-          />
-        )}
       {actionMode !== "VIEW" && !storageUnit.isGeneric && (
         <FieldSet
           legend={
@@ -195,7 +177,7 @@ export function StorageUnitChildrenViewer({
           )}
           <StorageUnitContents
             storageUnit={storageUnit}
-            materialSamples={materialSamplesQuery.response?.data}
+            materialSamples={materialSamples}
           />
         </div>
       )}

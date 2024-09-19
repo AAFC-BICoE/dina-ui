@@ -5,8 +5,11 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
+  FieldHeader,
   FieldWrapper,
   filterBy,
+  LabelView,
+  LoadingSpinner,
   ResourceSelectField,
   SaveArgs,
   StringArrayField,
@@ -15,7 +18,8 @@ import {
   ToggleField,
   useApiClient,
   useDinaFormContext,
-  useModal
+  useModal,
+  useQuery
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { isArray } from "lodash";
@@ -27,9 +31,15 @@ import {
   StorageUnitChildrenViewer
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { StorageUnit, StorageUnitType } from "../../types/collection-api";
+import {
+  MaterialSample,
+  StorageUnit,
+  StorageUnitType
+} from "../../types/collection-api";
 import { useState } from "react";
 import { ResourceNameIdentifier } from "../../types/common/resources/ResourceNameIdentifier";
+import StorageUnitGrid from "./StorageUnitGrid";
+import { useFormikContext } from "formik";
 
 export const storageUnitFormSchema = yup.object({
   storageUnitType: yup.object().required()
@@ -178,11 +188,21 @@ export function StorageUnitFormFields({
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const [showTextAreaInput, setShowTextAreaInput] = useState(false);
+  const formik = useFormikContext<StorageUnit>();
   const onStorageUnitMultipleToggled = (checked) => {
     setShowTextAreaInput(checked);
   };
 
-  return (
+  const materialSamplesQuery = useQuery<MaterialSample[]>({
+    path: "collection-api/material-sample",
+    filter: { rsql: `storageUnitUsage.storageUnit.uuid==${initialValues?.id}` },
+    include: "storageUnitUsage",
+    page: { limit: 1000 }
+  });
+
+  return materialSamplesQuery.loading ? (
+    <LoadingSpinner loading={true} />
+  ) : (
     <div>
       <div className="row">
         <div className="col-md-6 d-flex">
@@ -244,6 +264,23 @@ export function StorageUnitFormFields({
           readOnlyLink="/collection/storage-unit-type/view?id="
         />
       </div>
+      {initialValues?.storageUnitType?.gridLayoutDefinition &&
+        !formik?.values?.isGeneric && (
+          <div>
+            <div className={"field-label"}>
+              {
+                <strong>
+                  {" "}
+                  <FieldHeader name={formatMessage("contents")} />
+                </strong>
+              }
+            </div>
+            <StorageUnitGrid
+              storageUnit={initialValues}
+              materialSamples={materialSamplesQuery.response?.data}
+            />
+          </div>
+        )}
       {readOnly ? (
         <FieldWrapper
           name="location"
@@ -263,7 +300,12 @@ export function StorageUnitFormFields({
           parentStorageUnitUUID={initialValues.id}
         />
       )}
-      {readOnly && <StorageUnitChildrenViewer storageUnit={initialValues} />}
+      {readOnly && (
+        <StorageUnitChildrenViewer
+          storageUnit={initialValues}
+          materialSamples={materialSamplesQuery?.response?.data}
+        />
+      )}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" showTime={true} />
