@@ -14,7 +14,7 @@ import {
 } from "../../types/seqdb-api";
 import { ErrorBanner } from "../error/ErrorBanner";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import FieldLabel from "packages/common-ui/lib/label/FieldLabel";
+import FieldLabel from "../../../common-ui/lib/label/FieldLabel";
 import Link from "next/link";
 
 export interface StorageUnitGridProps {
