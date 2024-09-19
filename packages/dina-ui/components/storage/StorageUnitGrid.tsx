@@ -13,7 +13,7 @@ import {
   SeqReaction
 } from "../../types/seqdb-api";
 import { ErrorBanner } from "../error/ErrorBanner";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import FieldLabel from "packages/common-ui/lib/label/FieldLabel";
 import Link from "next/link";
 
@@ -47,6 +47,23 @@ export default function StorageUnitGrid({
     };
     return usageTypeMap[usageType];
   }
+  function getEditContentsPath(): string {
+    let editContentsPath = "";
+    if (usageTypeRef.current === "seq-reaction") {
+      if (seqBatchRef.current?.isCompleted) {
+        editContentsPath = `/seqdb/seq-batch/view?id=${seqBatchRef?.current?.id}`;
+      } else {
+        editContentsPath = `/seqdb/seq-workflow/run?seqBatchId=${seqBatchRef?.current?.id}`;
+      }
+    } else if (usageTypeRef.current === "pcr-batch-item") {
+      if (pcrBatchRef.current?.isCompleted) {
+        editContentsPath = `/seqdb/pcr-batch/view?id=${pcrBatchRef?.current?.id}`;
+      } else {
+        editContentsPath = `/seqdb/pcr-workflow/run?pcrBatchId=${pcrBatchRef?.current?.id}`;
+      }
+    }
+    return editContentsPath;
+  }
 
   return loading ? (
     <LoadingSpinner loading={true} />
@@ -64,7 +81,7 @@ export default function StorageUnitGrid({
         );
       })}
       <div>
-        <FieldLabel name={formatMessage("usage")} />
+        <FieldLabel name={formatMessage("usage")} className={"mb-2"} />
         <div className={"field-col mb-3"}>
           {parseUsageType(usageTypeRef.current)}{" "}
           {usageTypeRef.current === "seq-reaction" && (
@@ -94,7 +111,14 @@ export default function StorageUnitGrid({
         </div>
       </div>
       <div>
-        <FieldLabel name={formatMessage("contents")} />
+        <div className="d-flex justify-content-between align-items-end mb-3">
+          <FieldLabel name={formatMessage("contents")} />
+          <Link href={getEditContentsPath()}>
+            <a className={"btn btn-primary"}>
+              <DinaMessage id="editContents" />
+            </a>
+          </Link>
+        </div>
         <ContainerGrid
           className="mb-3"
           batch={{

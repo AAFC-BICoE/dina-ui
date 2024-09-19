@@ -1062,5 +1062,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedExport_createName: "Saved Export Template Name",
   savedExport_columnsToBeSaved: "Columns to be saved",
   export_columnsToExport: "Columns To Export",
-  usage: "Usage"
+  usage: "Usage",
+  editContents: "Edit Contents"
 };
