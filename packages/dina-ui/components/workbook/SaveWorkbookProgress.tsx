@@ -50,6 +50,8 @@ export function SaveWorkbookProgress({
     PersistedResource<KitsuResource>[]
   >([]);
 
+  const resourcesUpdatedCount = useRef<number>(0);
+
   const isSafeToLeave = () => {
     return (
       !statusRef.current ||
@@ -61,7 +63,7 @@ export function SaveWorkbookProgress({
   };
 
   const finishUpload = (sourceSetValue?: string) => {
-    finishSavingWorkbook(sourceSetValue ?? "");
+    finishSavingWorkbook(sourceSetValue ?? "", resourcesUpdatedCount.current);
   };
 
   const { linkRelationshipAttribute } = useWorkbookConverter(
@@ -119,7 +121,6 @@ export function SaveWorkbookProgress({
     async function saveChunkOfWorkbook(chunkedResources) {
       for (const resource of chunkedResources) {
         resource.sourceSet = sourceSetInternal;
-        let existingResource: any;
 
         if (appendData && resource.type === "material-sample") {
           const resp = await apiClient.get<MaterialSample[]>(
@@ -130,7 +131,11 @@ export function SaveWorkbookProgress({
               }
             }
           );
-          existingResource = resp.data[0];
+          const existingResource = resp.data[0];
+          if (existingResource) {
+            resource.id = existingResource.id;
+            resourcesUpdatedCount.current = resourcesUpdatedCount.current + 1;
+          }
         }
 
         for (const key of Object.keys(resource)) {
@@ -140,9 +145,6 @@ export function SaveWorkbookProgress({
             key,
             group ?? ""
           );
-          if (existingResource) {
-            resource.id = existingResource.id;
-          }
         }
       }
 

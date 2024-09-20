@@ -87,6 +87,7 @@ type State = {
   error?: Error;
   sourceSet?: string;
   appendData?: boolean;
+  resourcesUpdatedCount?: number;
 };
 
 interface WorkbookMetaData {
@@ -159,7 +160,8 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
       return {
         ...state,
         status: "FINISHED",
-        sourceSet: action.payload
+        sourceSet: action.payload.sourceSet,
+        resourcesUpdatedCount: action.payload.resourcesUpdatedCount
       };
     case "RESET":
       return {
@@ -238,6 +240,7 @@ export interface WorkbookUploadContextI {
   error?: Error;
   sourceSet?: string;
   appendData?: boolean;
+  resourcesUpdatedCount?: number;
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
   setColumnMap: (newColumnMap: WorkbookColumnMap) => void;
@@ -256,7 +259,10 @@ export interface WorkbookUploadContextI {
   ) => Promise<void>;
   pauseSavingWorkbook: () => void;
   resumeSavingWorkbook: () => void;
-  finishSavingWorkbook: (sourceSet: string) => Promise<void>;
+  finishSavingWorkbook: (
+    sourceSet: string,
+    resourcesUpdatedCount: number
+  ) => Promise<void>;
   cancelSavingWorkbook: (type?: string) => Promise<void>;
   failSavingWorkbook: (error: Error) => Promise<void>;
   setGroup: (group: string) => void;
@@ -413,7 +419,10 @@ export function WorkbookUploadContextProvider({
     });
   };
 
-  const finishSavingWorkbook = async (sourceSet: string) => {
+  const finishSavingWorkbook = async (
+    sourceSet: string,
+    resourcesUpdatedCount: number
+  ) => {
     writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
       status: "FINISHED",
       group: state.group,
@@ -424,7 +433,10 @@ export function WorkbookUploadContextProvider({
     await clearWorkbookResources();
     dispatch({
       type: "FINISH_SAVING",
-      payload: sourceSet
+      payload: {
+        sourceSet,
+        resourcesUpdatedCount
+      }
     });
   };
 
@@ -520,6 +532,7 @@ export function WorkbookUploadContextProvider({
         error: state.error,
         sourceSet: state.sourceSet,
         appendData: state.appendData,
+        resourcesUpdatedCount: state.resourcesUpdatedCount,
 
         uploadWorkbook,
         setColumnMap,
