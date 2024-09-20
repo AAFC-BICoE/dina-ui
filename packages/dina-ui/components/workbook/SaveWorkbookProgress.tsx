@@ -126,7 +126,7 @@ export function SaveWorkbookProgress({
             "collection-api/material-sample",
             {
               filter: {
-                rsql: `materialSampleName=="${resource?.materialSampleName}"`
+                rsql: `materialSampleName=="${resource?.materialSampleName}";group==${group}`
               }
             }
           );
