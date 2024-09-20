@@ -288,10 +288,19 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
       // Parent Material Sample
       {
         type: "managedAttribute",
-        label: "managedAttributes",
+        label: "materialSampleManagedAttributes",
         path: "included.attributes.managedAttributes",
         apiEndpoint: "collection-api/managed-attribute",
-        component: "ENTITY",
+        component: "MATERIAL_SAMPLE",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
+      },
+      {
+        type: "managedAttribute",
+        label: "preparationManagedAttributes",
+        path: "included.attributes.preparationManagedAttributes",
+        apiEndpoint: "collection-api/managed-attribute",
+        component: "PREPARATION",
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
