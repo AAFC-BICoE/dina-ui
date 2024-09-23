@@ -1,12 +1,13 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FieldSet } from "../FieldSet";
 import { FieldWrapper } from "../FieldWrapper";
+import "@testing-library/jest-dom";
 
 const mockSubmit = jest.fn();
 
 it("Properly hide a section when all fields are hidden inside of it.", async () => {
-  const wrapper = mountWithAppContext(
+  const wrapper = mountWithAppContext2(
     <DinaForm
       initialValues={{ myField1: "my value", templateCheckboxes: {} }}
       formTemplate={{
@@ -105,9 +106,11 @@ it("Properly hide a section when all fields are hidden inside of it.", async () 
   );
 
   // Ensure the sections are being displayed if even only one field is visible.
-  expect(wrapper.find(".displayAll").exists()).toEqual(true);
-  expect(wrapper.find(".displaySome").exists()).toEqual(true);
+  expect(wrapper.container.querySelector(".displayAll")).toBeInTheDocument();
+  expect(wrapper.container.querySelector(".displaySome")).toBeInTheDocument();
 
   // Sections with no fields being visible should just not be displayed at all.
-  expect(wrapper.find(".displayNone").exists()).toEqual(false);
+  expect(
+    wrapper.container.querySelector(".displayNone")
+  ).not.toBeInTheDocument();
 });

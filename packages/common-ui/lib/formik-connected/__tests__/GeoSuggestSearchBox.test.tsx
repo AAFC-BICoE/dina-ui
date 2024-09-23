@@ -1,10 +1,11 @@
-import Autosuggest from "react-autosuggest";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import {
   GeoSuggestSearchBox,
   NominatumApiSearchResult
 } from "../GeoSuggestSearchBox";
+import { fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 // Mock out the KeyboardEventHandler which should only be rendered in the browser.
 jest.mock("next/dynamic", () => () => {
@@ -45,38 +46,48 @@ describe("GeoSuggestTextField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Fetches the suggestions from the Nominatim API.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <GeoSuggestSearchBox fetchJson={mockFetchJson} />
       </DinaForm>
     );
 
-    wrapper.find("input").prop<any>("onChange")({
-      target: { value: "ottawa" }
-    } as any);
+    // Simulate typing in the input
+    const input = wrapper.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "ottawa" } });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Press the button:
-    wrapper.find("button.geo-suggest-button").simulate("click");
+    // Simulate clicking the search button
+    const geosuggestButton = wrapper.getByRole("button", {
+      name: /geo\-suggest/i
+    });
+    fireEvent.click(geosuggestButton);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // THe button should be disabled after searching due to API request throttling:
-    expect(wrapper.find("button.geo-suggest-button").prop("disabled")).toEqual(
-      true
-    );
-
-    // Suggestions are shown in a list of buttons:
+    // The button should become disabled after the API request
     expect(
-      wrapper.find(".suggestion-list button").map((node) => node.text())
-    ).toEqual(["result 1", "result 2"]);
+      wrapper.container.querySelector(".geo-suggest-button")
+    ).toBeDisabled();
 
-    // The correct API url shouls have been used:
-    expect(mockFetchJson).lastCalledWith(
-      "https://nominatim.openstreetmap.org/search.php?q=ottawa&addressdetails=1&format=jsonv2"
-    );
+    // Verify that suggestions are rendered correctly
+    const result1Button = wrapper.getByRole("button", {
+      name: /result 1/i
+    });
+    const result2Button = wrapper.getByRole("button", {
+      name: /result 2/i
+    });
+
+    // Assert that both buttons are present
+    expect(result1Button).toBeInTheDocument();
+    expect(result2Button).toBeInTheDocument();
+
+    // Wait for any asynchronous behavior
+    await waitFor(() => {
+      expect(mockFetchJson).toHaveBeenCalledWith(
+        "https://nominatim.openstreetmap.org/search.php?q=ottawa&addressdetails=1&format=jsonv2"
+      );
+    });
   });
 });
