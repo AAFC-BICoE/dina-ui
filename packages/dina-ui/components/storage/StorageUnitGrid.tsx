@@ -4,7 +4,11 @@ import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { useState, useEffect, useRef } from "react";
 import { isArray, noop } from "lodash";
 import { PersistedResource } from "kitsu";
-import { LoadingSpinner, useApiClient } from "../../../common-ui/lib";
+import {
+  LoadingSpinner,
+  useApiClient,
+  useDinaFormContext
+} from "../../../common-ui/lib";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
 import {
   PcrBatch,
@@ -16,6 +20,7 @@ import { ErrorBanner } from "../error/ErrorBanner";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import FieldLabel from "../../../common-ui/lib/label/FieldLabel";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export interface StorageUnitGridProps {
   storageUnit: StorageUnit;
@@ -27,7 +32,9 @@ export default function StorageUnitGrid({
   materialSamples
 }: StorageUnitGridProps) {
   const [loading, setLoading] = useState<boolean>(false);
+  const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
+  const router = useRouter();
   const {
     cellGrid,
     multipleSamplesWellCoordinates,
@@ -48,7 +55,7 @@ export default function StorageUnitGrid({
     return usageTypeMap[usageType];
   }
   function getEditContentsPath(): string {
-    let editContentsPath = "";
+    let editContentsPath: string = "";
     if (usageTypeRef.current === "seq-reaction") {
       if (seqBatchRef.current?.isCompleted) {
         editContentsPath = `/seqdb/seq-batch/view?id=${seqBatchRef?.current?.id}`;
@@ -61,9 +68,13 @@ export default function StorageUnitGrid({
       } else {
         editContentsPath = `/seqdb/pcr-workflow/run?pcrBatchId=${pcrBatchRef?.current?.id}`;
       }
+    } else if (usageTypeRef.current === "material-sample") {
+      editContentsPath = `/collection/storage-unit/grid?id=${storageUnit.id}`;
     }
+
     return editContentsPath;
   }
+  const editContentsRef = getEditContentsPath();
 
   return loading ? (
     <LoadingSpinner loading={true} />
@@ -111,14 +122,20 @@ export default function StorageUnitGrid({
         </div>
       </div>
       <div>
-        <div className="d-flex justify-content-between align-items-end mb-3">
-          <FieldLabel name={formatMessage("contents")} />
-          <Link href={getEditContentsPath()}>
-            <a className={"btn btn-primary"}>
+        {!readOnly && (
+          <div className="d-flex justify-content-between align-items-end mb-3">
+            <FieldLabel name={formatMessage("contents")} />
+            <button
+              onClick={async () => {
+                await router.push(editContentsRef);
+              }}
+              className={"btn btn-primary"}
+              disabled={!!!editContentsRef}
+            >
               <DinaMessage id="editContents" />
-            </a>
-          </Link>
-        </div>
+            </button>
+          </div>
+        )}
         <ContainerGrid
           className="mb-3"
           batch={{

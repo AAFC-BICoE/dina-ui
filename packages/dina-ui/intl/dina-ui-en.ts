@@ -1063,5 +1063,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedExport_columnsToBeSaved: "Columns to be saved",
   export_columnsToExport: "Columns To Export",
   usage: "Usage",
-  editContents: "Edit Contents"
+  editContents: "Edit Contents",
+  storageUnitGridTitle: "Storage Unit Grid"
 };
