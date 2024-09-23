@@ -1043,6 +1043,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteFailedImport: "Delete Failed Import",
   workbook_confirmation_title: "Import Complete!",
   workbook_confirmation_total: "{total} new material samples were created.",
+  workbook_updated_total: "{total} existing material samples were updated.",
   workbook_confirmation_new: "Upload New Workbook",
   workbook_confirmation_view: "View Imported Material Samples",
   storageUnit_duplicate_title: "Storage Unit Name already exists",
@@ -1061,5 +1062,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     'A export template exists with the name "{savedExportName}". Creating this export template will replace the existing one.',
   savedExport_createName: "Saved Export Template Name",
   savedExport_columnsToBeSaved: "Columns to be saved",
-  export_columnsToExport: "Columns To Export"
+  export_columnsToExport: "Columns To Export",
+  field_appendData_tooltip:
+    "If enabled, append data to existing record with matching name. Otherwise, create new record."
 };

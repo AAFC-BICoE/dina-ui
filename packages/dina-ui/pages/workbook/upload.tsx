@@ -23,7 +23,8 @@ export function UploadWorkbookPage() {
     spreadsheetData,
     uploadWorkbook,
     sourceSet,
-    group
+    group,
+    resourcesUpdatedCount
   } = useWorkbookContext();
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -152,11 +153,12 @@ export function UploadWorkbookPage() {
             />
           ) : isThereACompletedUpload() ? (
             <WorkbookConfirmation
-              totalRecordsCreated={workbookResources.length}
+              totalWorkbookResourcesCount={workbookResources.length}
               sourceSetValue={sourceSet ?? ""}
               groupUsed={group ?? ""}
               onWorkbookReset={backToUpload}
               preventRendering={preventRendering}
+              resourcesUpdatedCount={resourcesUpdatedCount}
             />
           ) : spreadsheetData ? (
             <WorkbookColumnMapping
