@@ -130,6 +130,8 @@ function StorageUnitGridForm() {
               <StorageUnitSampleSelectionStep
                 onSaved={onSaved}
                 performSave={performSave}
+                editMode={editMode}
+                storageUnit={data}
               />
             </TabPanel>
             <TabPanel>
