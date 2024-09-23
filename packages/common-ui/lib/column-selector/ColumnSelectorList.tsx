@@ -254,16 +254,16 @@ export function ColumnSelectorList<TData extends KitsuResource>({
         }
 
         if (exportMode) {
-          return !(nonExportableColumns ?? []).some(
-            (id) =>
-              (mapping?.value ?? "").startsWith(id) ||
-              (mapping?.label ?? "").startsWith(id)
+          return !(nonExportableColumns ?? []).some((id) =>
+            mapping?.parentType
+              ? (mapping?.value ?? "").startsWith(id)
+              : (mapping?.label ?? "").startsWith(id)
           );
         } else {
-          return !(mandatoryDisplayedColumns ?? []).some(
-            (id) =>
-              (mapping?.value ?? "").startsWith(id) ||
-              (mapping?.label ?? "").startsWith(id)
+          return !(mandatoryDisplayedColumns ?? []).some((id) =>
+            mapping?.parentType
+              ? (mapping?.value ?? "").startsWith(id)
+              : (mapping?.label ?? "").startsWith(id)
           );
         }
       });
