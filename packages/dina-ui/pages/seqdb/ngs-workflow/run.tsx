@@ -13,6 +13,7 @@ import { useLibraryPrepBatchQuery } from "../library-prep-batch/edit";
 import { NgsSampleSelectionStep } from "packages/dina-ui/components/seqdb";
 import { PreLibraryPrepStep } from "packages/dina-ui/components/seqdb/ngs-workflow/PreLibraryPrepStep";
 import { NgsSampleSelectCoordinatesStep } from "packages/dina-ui/components/seqdb/ngs-workflow/NgsSampleSelectCoordinatesStep";
+import { IndexAssignmentStep } from "packages/dina-ui/components/seqdb/ngs-workflow/IndexAssignmentStep";
 
 export default function NgsWorkFlowRunPage() {
   const router = useRouter();
@@ -88,7 +89,7 @@ export default function NgsWorkFlowRunPage() {
             Cancel
           </Button>
 
-          {currentStep !== 3 ? (
+          {currentStep !== 4 ? (
             <Button
               variant={"primary"}
               className="ms-2"
@@ -216,6 +217,9 @@ export default function NgsWorkFlowRunPage() {
           <Tab disabled={isDisabled(3, true)}>
             {formatMessage("preLibraryPrep")}
           </Tab>
+          <Tab disabled={isDisabled(4, true)}>
+            {formatMessage("indexAssignmentStep")}
+          </Tab>
         </TabList>
         <TabPanel>
           <LibraryPrepBatchStep
@@ -263,6 +267,11 @@ export default function NgsWorkFlowRunPage() {
               performSave={performSave}
               setPerformSave={setPerformSave}
             />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
+            <IndexAssignmentStep />
           )}
         </TabPanel>
       </Tabs>
