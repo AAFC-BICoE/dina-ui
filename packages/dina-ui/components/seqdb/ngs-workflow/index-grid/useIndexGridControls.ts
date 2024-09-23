@@ -1,13 +1,19 @@
 import { ApiClientContext, safeSubmit, SaveArgs, useQuery } from "common-ui";
 import { Dictionary, toPairs } from "lodash";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { LibraryPrep, NgsIndex } from "../../../../types/seqdb-api";
 import { IndexGridProps } from "./IndexGrid";
+import {
+  StorageUnit,
+  StorageUnitType
+} from "packages/dina-ui/types/collection-api";
 
 export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
-  const { save } = useContext(ApiClientContext);
+  const { save, apiClient } = useContext(ApiClientContext);
 
   const [lastSave, setLastSave] = useState<number>();
+
+  const [storageUnitType, setStorageUnitType] = useState<StorageUnitType>();
 
   const { loading: libraryPrepsLoading, response: libraryPrepsResponse } =
     useQuery<LibraryPrep[]>(
@@ -20,6 +26,21 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
         deps: [lastSave]
       }
     );
+
+  useEffect(() => {
+    if (!libraryPrepBatch || !libraryPrepBatch.storageUnit) return;
+
+    async function fetchStorageUnitTypeLayout() {
+      const storageUnitReponse = await apiClient.get<StorageUnit>(
+        `/collection-api/storage-unit/${libraryPrepBatch?.storageUnit?.id}`,
+        { include: "storageUnitType" }
+      );
+      if (storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition) {
+        setStorageUnitType(storageUnitReponse?.data.storageUnitType);
+      }
+    }
+    fetchStorageUnitTypeLayout();
+  }, [libraryPrepBatch]);
 
   const onSubmit = safeSubmit(async (values) => {
     const libraryPreps = libraryPrepsResponse ? libraryPrepsResponse.data : [];
@@ -67,5 +88,10 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
     setLastSave(Date.now());
   });
 
-  return { libraryPrepsLoading, libraryPrepsResponse, onSubmit };
+  return {
+    libraryPrepsLoading,
+    libraryPrepsResponse,
+    storageUnitType,
+    onSubmit
+  };
 }

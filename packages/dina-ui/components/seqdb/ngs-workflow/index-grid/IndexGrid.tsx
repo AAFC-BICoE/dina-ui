@@ -3,16 +3,17 @@ import {
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
-  SubmitButton
+  SubmitButton,
+  ReactTable
 } from "common-ui";
 import { Form, Formik } from "formik";
-import ReactTable, { Column } from "react-table";
 import {
   LibraryPrep,
   LibraryPrepBatch,
   NgsIndex
 } from "../../../../types/seqdb-api";
 import { useIndexGridControls } from "./useIndexGridControls";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
 
 export interface IndexGridProps {
   libraryPrepBatch: LibraryPrepBatch;
@@ -21,19 +22,20 @@ export interface IndexGridProps {
 export function IndexGrid(props: IndexGridProps) {
   const { libraryPrepBatch } = props;
 
-  const { storageUnit, indexSet } = libraryPrepBatch;
+  const { indexSet } = libraryPrepBatch;
 
-  const { libraryPrepsLoading, libraryPrepsResponse, onSubmit } =
-    useIndexGridControls(props);
+  const {
+    libraryPrepsLoading,
+    libraryPrepsResponse,
+    storageUnitType,
+    onSubmit
+  } = useIndexGridControls(props);
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
   }
 
-  if (
-    !libraryPrepsResponse?.data?.storageUnitUsage?.storageUnitType ||
-    !indexSet
-  ) {
+  if (!storageUnitType && !indexSet) {
     return (
       <span className="alert alert-warning">
         Container Type and Index Set must be set to use the index grid.
@@ -56,39 +58,52 @@ export function IndexGrid(props: IndexGridProps) {
       ] = prep;
     }
 
-    const columns: Column[] = [];
+    const columns: TableColumn<any>[] = [];
 
     // Add the primer column:
     columns.push({
-      Cell: ({ index }) => {
-        const rowLetter = String.fromCharCode(index + 65);
+      cell: ({
+        row: {
+          original: { data }
+        }
+      }) => {
+        const rowLetter = String.fromCharCode(data + 65);
 
         return (
-          libraryPrepBatch.indexSet && (
+          indexSet && (
             <div style={{ padding: "7px 5px" }}>
-              <span>{String.fromCharCode(index + 65)}</span>
+              <span>{String.fromCharCode(data + 65)}</span>
               <ResourceSelectField<NgsIndex>
                 hideLabel={true}
                 filter={filterBy(["name"])}
                 name={`indexI5s[${rowLetter}]`}
                 optionLabel={(primer) => primer.name}
-                model={`seqdb-api/indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </div>
           )
         );
       },
-      resizable: false,
-      sortable: false
+      accessorKey: "",
+      enableResizing: false,
+      enableSorting: false
     });
 
-    for (let col = 0; col < containerType.numberOfColumns; col++) {
+    for (
+      let col = 0;
+      col < (storageUnitType?.gridLayoutDefinition?.numberOfColumns ?? 0);
+      col++
+    ) {
       const columnLabel = String(col + 1);
 
       columns.push({
-        Cell: ({ index: row }) => {
-          const rowLabel = String.fromCharCode(row + 65);
+        cell: ({
+          row: {
+            original: { data }
+          }
+        }) => {
+          const rowLabel = String.fromCharCode(data.row + 65);
           const coords = `${rowLabel}_${columnLabel}`;
           const prep = cellGrid[coords];
 
@@ -112,8 +127,8 @@ export function IndexGrid(props: IndexGridProps) {
             </div>
           ) : null;
         },
-        Header: () =>
-          libraryPrepBatch.indexSet && (
+        header: () =>
+          indexSet && (
             <>
               {columnLabel}
               <ResourceSelectField<NgsIndex>
@@ -121,17 +136,20 @@ export function IndexGrid(props: IndexGridProps) {
                 filter={filterBy(["name"])}
                 name={`indexI7s[${columnLabel}]`}
                 optionLabel={(primer) => primer.name}
-                model={`seqdb-api/indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </>
           ),
-        resizable: false,
-        sortable: false
+        accessorKey: "",
+        enableResizing: false,
+        enableSorting: false
       });
     }
 
-    const tableData = new Array(storageUnit.numberOfRows).fill({});
+    const tableData = new Array(
+      storageUnitType?.gridLayoutDefinition?.numberOfRows ?? 0
+    ).fill({});
 
     return (
       <Formik
@@ -153,7 +171,6 @@ export function IndexGrid(props: IndexGridProps) {
           <ReactTable
             columns={columns}
             data={tableData}
-            minRows={0}
             showPagination={false}
           />
         </Form>

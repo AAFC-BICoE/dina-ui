@@ -271,7 +271,15 @@ export default function NgsWorkFlowRunPage() {
         </TabPanel>
         <TabPanel>
           {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
-            <IndexAssignmentStep />
+            <IndexAssignmentStep
+              batchId={libraryPrepBatchId}
+              batch={libraryPrepBatch.response?.data}
+              onSaved={onSaved}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
           )}
         </TabPanel>
       </Tabs>
