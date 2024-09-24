@@ -1,12 +1,11 @@
 import {
-  ErrorViewer,
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
   SubmitButton,
-  ReactTable
+  ReactTable,
+  DinaForm
 } from "common-ui";
-import { Form, Formik } from "formik";
 import {
   LibraryPrep,
   LibraryPrepBatch,
@@ -85,6 +84,7 @@ export function IndexGrid(props: IndexGridProps) {
           )
         );
       },
+      header: () => "test2",
       accessorKey: "",
       enableResizing: false,
       enableSorting: false
@@ -127,21 +127,23 @@ export function IndexGrid(props: IndexGridProps) {
             </div>
           ) : null;
         },
-        header: () =>
-          indexSet && (
-            <>
-              {columnLabel}
-              <ResourceSelectField<NgsIndex>
-                hideLabel={true}
-                filter={filterBy(["name"])}
-                name={`indexI7s[${columnLabel}]`}
-                optionLabel={(primer) => primer.name}
-                model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
-                styles={{ menu: () => ({ zIndex: 5 }) }}
-              />
-            </>
-          ),
-        accessorKey: "",
+        header: () => "test1",
+        // header: () =>
+        //   indexSet && (
+        //     <>
+        //       {columnLabel}
+        //       <ResourceSelectField<NgsIndex>
+        //         hideLabel={true}
+        //         filter={filterBy(["name"])}
+        //         name={`indexI7s[${columnLabel}]`}
+        //         optionLabel={(primer) => primer.name}
+        //         model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
+        //         styles={{ menu: () => ({ zIndex: 5 }) }}
+        //       />
+        //     </>
+        //   ),
+        id: `${columnLabel}`,
+        accessorKey: `${columnLabel}`,
         enableResizing: false,
         enableSorting: false
       });
@@ -152,29 +154,17 @@ export function IndexGrid(props: IndexGridProps) {
     ).fill({});
 
     return (
-      <Formik
+      <DinaForm
         initialValues={{ indexI5s: {}, indexI7s: {} }}
         onSubmit={onSubmit}
       >
-        <Form translate={undefined}>
-          <style>{`
-            .rt-td {
-              padding: 0 !important;
-            }
-          `}</style>
-          <ErrorViewer />
-          <div style={{ height: "50px" }}>
-            <div className="float-right">
-              <SubmitButton />
-            </div>
+        <div style={{ height: "50px" }}>
+          <div className="float-right">
+            <SubmitButton />
           </div>
-          <ReactTable
-            columns={columns}
-            data={tableData}
-            showPagination={false}
-          />
-        </Form>
-      </Formik>
+        </div>
+        <ReactTable columns={columns} data={tableData} showPagination={false} />
+      </DinaForm>
     );
   }
 

@@ -1,4 +1,11 @@
-import { ApiClientContext, safeSubmit, SaveArgs, useQuery } from "common-ui";
+import {
+  ApiClientContext,
+  DinaFormSubmitParams,
+  filterBy,
+  safeSubmit,
+  SaveArgs,
+  useQuery
+} from "common-ui";
 import { Dictionary, toPairs } from "lodash";
 import { useContext, useState, useEffect } from "react";
 import { LibraryPrep, NgsIndex } from "../../../../types/seqdb-api";
@@ -20,7 +27,16 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
       {
         include: "indexI5,indexI7",
         page: { limit: 1000 },
-        path: `seqdb-api/libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
+        filter: filterBy([], {
+          extraFilters: [
+            {
+              selector: "libraryPrepBatch.uuid",
+              comparison: "==",
+              arguments: libraryPrepBatch.id ?? ""
+            }
+          ]
+        })(""),
+        path: `seqdb-api/library-prep`
       },
       {
         deps: [lastSave]
@@ -42,9 +58,9 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
     fetchStorageUnitTypeLayout();
   }, [libraryPrepBatch]);
 
-  const onSubmit = safeSubmit(async (values) => {
+  async function onSubmit({ submittedValues }: DinaFormSubmitParams<any>) {
     const libraryPreps = libraryPrepsResponse ? libraryPrepsResponse.data : [];
-    const { indexI5s, indexI7s } = values;
+    const { indexI5s, indexI7s } = submittedValues;
 
     const edits: Dictionary<Partial<LibraryPrep>> = {};
 
@@ -86,7 +102,7 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
     await save(saveOps, { apiBaseUrl: "/seqdb-api" });
 
     setLastSave(Date.now());
-  });
+  }
 
   return {
     libraryPrepsLoading,

@@ -211,11 +211,11 @@ export default function NgsWorkFlowRunPage() {
           <Tab disabled={isDisabled(1, true)}>
             {formatMessage("selectMaterialSamples")}
           </Tab>
-          <Tab disabled={isDisabled(2, true)}>
-            {formatMessage("selectCoordinates")}
-          </Tab>
           <Tab disabled={isDisabled(3, true)}>
             {formatMessage("preLibraryPrep")}
+          </Tab>
+          <Tab disabled={isDisabled(2, true)}>
+            {formatMessage("selectCoordinates")}
           </Tab>
           <Tab disabled={isDisabled(4, true)}>
             {formatMessage("indexAssignmentStep")}
@@ -246,9 +246,10 @@ export default function NgsWorkFlowRunPage() {
         </TabPanel>
         <TabPanel>
           {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
-            <NgsSampleSelectCoordinatesStep
-              libraryPrepBatchId={libraryPrepBatchId}
-              libraryPrepBatch={libraryPrepBatch.response?.data}
+            <PreLibraryPrepStep
+              batchId={libraryPrepBatchId}
+              batch={libraryPrepBatch.response?.data}
+              onSaved={onSaved}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}
@@ -258,10 +259,9 @@ export default function NgsWorkFlowRunPage() {
         </TabPanel>
         <TabPanel>
           {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
-            <PreLibraryPrepStep
-              batchId={libraryPrepBatchId}
-              batch={libraryPrepBatch.response?.data}
-              onSaved={onSaved}
+            <NgsSampleSelectCoordinatesStep
+              libraryPrepBatchId={libraryPrepBatchId}
+              libraryPrepBatch={libraryPrepBatch.response?.data}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}
