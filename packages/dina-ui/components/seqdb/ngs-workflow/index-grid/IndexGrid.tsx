@@ -3,13 +3,13 @@ import {
   ReactTable,
   DinaForm,
   SelectField,
-  SelectOption
+  SelectOption,
+  SubmitButton
 } from "common-ui";
 import { LibraryPrep, NgsIndex } from "../../../../types/seqdb-api";
 import { useIndexGridControls } from "./useIndexGridControls";
 import { ColumnDef } from "@tanstack/react-table";
 import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
-import { useEffect } from "react";
 
 export interface CellData {
   row: number;
@@ -20,8 +20,7 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
     batch: libraryPrepBatch,
     editMode,
     performSave,
-    setPerformSave,
-    setEditMode
+    setPerformSave
   } = props;
 
   const { indexSet } = libraryPrepBatch;
@@ -35,17 +34,14 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
     onSubmit
   } = useIndexGridControls(props);
 
-  // Check if a save was requested from the top level button bar.
-  useEffect(() => {
-    async function performSaveInternal() {
-      setPerformSave(false);
-      setEditMode(false);
-    }
-
-    if (performSave) {
-      performSaveInternal();
-    }
-  }, [performSave]);
+  // Hidden button bar is used to submit the page from the button bar in a parent component.
+  const hiddenButtonBar = (
+    <SubmitButton
+      className="hidden"
+      performSave={performSave}
+      setPerformSave={setPerformSave}
+    />
+  );
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
@@ -82,13 +78,15 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
         return (
           indexSet && (
             <div style={{ padding: "7px 5px" }}>
-              <SelectField<NgsIndex>
+              <SelectField
                 label={rowLetter}
                 name={`indexI5s[${rowLetter}]`}
-                options={ngsIndexes?.map<SelectOption<NgsIndex>>((index) => ({
-                  label: index.name,
-                  value: index
-                }))}
+                options={ngsIndexes
+                  ?.filter((index) => index.direction === "I5")
+                  ?.map<SelectOption<string>>((index) => ({
+                    label: index.name,
+                    value: index.id
+                  }))}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </div>
@@ -152,13 +150,16 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
         header: () =>
           indexSet && (
             <>
-              <SelectField<NgsIndex>
+              <SelectField
                 label={columnLabel}
                 name={`indexI7s[${columnLabel}]`}
-                options={ngsIndexes?.map<SelectOption<NgsIndex>>((index) => ({
-                  label: index.name,
-                  value: index
-                }))}
+                options={ngsIndexes
+                  ?.filter((index) => index.direction === "I7")
+                  ?.map<SelectOption<string>>((index) => ({
+                    label: index.name,
+                    value: index.id
+                  }))}
+                className="w-100"
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </>
@@ -186,6 +187,7 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
         onSubmit={onSubmit}
         readOnly={editMode === false}
       >
+        {hiddenButtonBar}
         <style>{`
           .rt-td {
             padding: 0 !important;

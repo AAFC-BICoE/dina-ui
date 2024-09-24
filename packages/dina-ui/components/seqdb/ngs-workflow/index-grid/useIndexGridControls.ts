@@ -18,7 +18,9 @@ import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
 
 export function useIndexGridControls({
   batch: libraryPrepBatch,
-  editMode
+  editMode,
+  setEditMode,
+  setPerformSave
 }: IndexAssignmentStepProps) {
   const { save, apiClient, bulkGet } = useContext(ApiClientContext);
 
@@ -156,7 +158,7 @@ export function useIndexGridControls({
     const edits: Dictionary<Partial<LibraryPrep>> = {};
 
     // Get the new i7 values:
-    const colIndexes = toPairs<NgsIndex>(indexI7s);
+    const colIndexes = toPairs<string>(indexI7s);
     for (const [col, index] of colIndexes) {
       const colPreps = libraryPrepsToSave.filter(
         (it) => String(it?.storageUnitUsage?.wellColumn) === col
@@ -164,14 +166,14 @@ export function useIndexGridControls({
       for (const prep of colPreps) {
         if (prep.id) {
           const edit = edits[prep.id] || {};
-          edit.indexI7 = { id: index.id, type: "ngsIndex" } as NgsIndex;
+          edit.indexI7 = { id: index, type: "ngs-index" } as NgsIndex;
           edits[prep.id] = edit;
         }
       }
     }
 
     // Get the new i5 values:
-    const rowIndexes = toPairs<NgsIndex>(indexI5s);
+    const rowIndexes = toPairs<string>(indexI5s);
     for (const [row, index] of rowIndexes) {
       const rowPreps = libraryPrepsToSave.filter(
         (it) => it?.storageUnitUsage?.wellRow === row
@@ -179,20 +181,21 @@ export function useIndexGridControls({
       for (const prep of rowPreps) {
         if (prep.id) {
           const edit = edits[prep.id] || {};
-          edit.indexI5 = { id: index.id, type: "ngsIndex" } as NgsIndex;
+          edit.indexI5 = { id: index, type: "ngs-index" } as NgsIndex;
           edits[prep.id] = edit;
         }
       }
     }
 
     const saveOps: SaveArgs[] = toPairs(edits).map(([id, prepEdit]) => ({
-      resource: { id, type: "libraryPrep", ...prepEdit },
-      type: "libraryPrep"
+      resource: { id, type: "library-prep", ...prepEdit },
+      type: "library-prep"
     }));
 
     await save(saveOps, { apiBaseUrl: "/seqdb-api" });
-
     setLastSave(Date.now());
+    setPerformSave(false);
+    setEditMode(false);
   }
 
   return {
