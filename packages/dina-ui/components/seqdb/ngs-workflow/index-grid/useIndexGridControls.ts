@@ -29,6 +29,7 @@ export function useIndexGridControls({
   const [libraryPrepsLoading, setLibraryPrepsLoading] = useState<boolean>(true);
   const [libraryPreps, setLibraryPreps] = useState<LibraryPrep[]>();
   const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>();
+  const [ngsIndexes, setNgsIndexes] = useState<NgsIndex[]>();
 
   useQuery<LibraryPrep[]>(
     {
@@ -105,6 +106,29 @@ export function useIndexGridControls({
     }
   );
 
+  useQuery<NgsIndex[]>(
+    {
+      page: { limit: 1000 },
+      filter: filterBy([], {
+        extraFilters: [
+          {
+            selector: "indexSet.uuid",
+            comparison: "==",
+            arguments: libraryPrepBatch?.indexSet?.id ?? ""
+          }
+        ]
+      })(""),
+      path: `seqdb-api/ngs-index`
+    },
+    {
+      deps: [lastSave],
+      async onSuccess(response) {
+        setNgsIndexes(response.data as NgsIndex[]);
+      },
+      disabled: !libraryPrepBatch?.indexSet?.id
+    }
+  );
+
   useEffect(() => {
     if (!libraryPrepBatch || !libraryPrepBatch.storageUnit) return;
 
@@ -175,6 +199,7 @@ export function useIndexGridControls({
     libraryPrepsLoading,
     libraryPreps,
     materialSamples,
+    ngsIndexes,
     storageUnitType,
     onSubmit
   };

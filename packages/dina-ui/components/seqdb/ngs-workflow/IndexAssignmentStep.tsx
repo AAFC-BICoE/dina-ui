@@ -30,12 +30,12 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
         <Col sm={2}>
           <Nav variant="pills" className="flex-column">
             <Nav.Item>
-              <Nav.Link eventKey="assignByGrid">
+              <Nav.Link eventKey="assignByGrid" style={{ cursor: "pointer" }}>
                 {formatMessage("assignByGrid")}
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link eventKey="assignByTable">
+              <Nav.Link eventKey="assignByTable" style={{ cursor: "pointer" }}>
                 {formatMessage("assignByTable")}
               </Nav.Link>
             </Nav.Item>

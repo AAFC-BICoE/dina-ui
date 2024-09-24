@@ -1,22 +1,28 @@
 import {
-  filterBy,
   LoadingSpinner,
-  ResourceSelectField,
-  SubmitButton,
   ReactTable,
-  DinaForm
+  DinaForm,
+  SelectField,
+  SelectOption
 } from "common-ui";
 import { LibraryPrep, NgsIndex } from "../../../../types/seqdb-api";
 import { useIndexGridControls } from "./useIndexGridControls";
 import { ColumnDef } from "@tanstack/react-table";
 import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
+import { useEffect } from "react";
 
 export interface CellData {
   row: number;
 }
 
 export function IndexGrid(props: IndexAssignmentStepProps) {
-  const { batch: libraryPrepBatch, editMode } = props;
+  const {
+    batch: libraryPrepBatch,
+    editMode,
+    performSave,
+    setPerformSave,
+    setEditMode
+  } = props;
 
   const { indexSet } = libraryPrepBatch;
 
@@ -24,9 +30,22 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
     libraryPrepsLoading,
     libraryPreps,
     materialSamples,
+    ngsIndexes,
     storageUnitType,
     onSubmit
   } = useIndexGridControls(props);
+
+  // Check if a save was requested from the top level button bar.
+  useEffect(() => {
+    async function performSaveInternal() {
+      setPerformSave(false);
+      setEditMode(false);
+    }
+
+    if (performSave) {
+      performSaveInternal();
+    }
+  }, [performSave]);
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
@@ -63,14 +82,14 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
         return (
           indexSet && (
             <div style={{ padding: "7px 5px" }}>
-              <span>{rowLetter}</span>
-              <ResourceSelectField<NgsIndex>
-                hideLabel={true}
-                filter={filterBy(["name"])}
+              <SelectField<NgsIndex>
+                label={rowLetter}
                 name={`indexI5s[${rowLetter}]`}
-                optionLabel={(primer) => primer.name}
-                model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
-                styles={{ menu: () => ({ zIndex: 100 }) }}
+                options={ngsIndexes?.map<SelectOption<NgsIndex>>((index) => ({
+                  label: index.name,
+                  value: index
+                }))}
+                styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </div>
           )
@@ -133,13 +152,13 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
         header: () =>
           indexSet && (
             <>
-              <span>{columnLabel}</span>
-              <ResourceSelectField<NgsIndex>
-                hideLabel={true}
-                filter={filterBy(["name"])}
+              <SelectField<NgsIndex>
+                label={columnLabel}
                 name={`indexI7s[${columnLabel}]`}
-                optionLabel={(primer) => primer.name}
-                model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
+                options={ngsIndexes?.map<SelectOption<NgsIndex>>((index) => ({
+                  label: index.name,
+                  value: index
+                }))}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </>
@@ -167,13 +186,6 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
         onSubmit={onSubmit}
         readOnly={editMode === false}
       >
-        {editMode && (
-          <div style={{ height: "50px" }}>
-            <div className="float-right">
-              <SubmitButton />
-            </div>
-          </div>
-        )}
         <style>{`
           .rt-td {
             padding: 0 !important;
