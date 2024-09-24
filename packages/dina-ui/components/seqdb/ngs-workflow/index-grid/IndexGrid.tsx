@@ -6,27 +6,27 @@ import {
   ReactTable,
   DinaForm
 } from "common-ui";
-import {
-  LibraryPrep,
-  LibraryPrepBatch,
-  NgsIndex
-} from "../../../../types/seqdb-api";
+import { LibraryPrep, NgsIndex } from "../../../../types/seqdb-api";
 import { useIndexGridControls } from "./useIndexGridControls";
 import { ColumnDef } from "@tanstack/react-table";
 import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
 
 export interface CellData {
-  libraryPrep?: LibraryPrep;
   row: number;
 }
 
 export function IndexGrid(props: IndexAssignmentStepProps) {
-  const { batch: libraryPrepBatch } = props;
+  const { batch: libraryPrepBatch, editMode } = props;
 
   const { indexSet } = libraryPrepBatch;
 
-  const { libraryPrepsLoading, libraryPreps, storageUnitType, onSubmit } =
-    useIndexGridControls(props);
+  const {
+    libraryPrepsLoading,
+    libraryPreps,
+    materialSamples,
+    storageUnitType,
+    onSubmit
+  } = useIndexGridControls(props);
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
@@ -63,23 +63,33 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
         return (
           indexSet && (
             <div style={{ padding: "7px 5px" }}>
-              <strong>{rowLetter}</strong>
-              {/* <ResourceSelectField<NgsIndex>
+              <span>{rowLetter}</span>
+              <ResourceSelectField<NgsIndex>
                 hideLabel={true}
                 filter={filterBy(["name"])}
                 name={`indexI5s[${rowLetter}]`}
                 optionLabel={(primer) => primer.name}
                 model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
-                styles={{ menu: () => ({ zIndex: 5 }) }}
-              /> */}
+                styles={{ menu: () => ({ zIndex: 100 }) }}
+              />
             </div>
           )
         );
       },
+      meta: {
+        style: {
+          position: "sticky",
+          left: 0,
+          background: "white",
+          boxShadow: "7px 0px 9px 0px rgba(0,0,0,0.1)",
+          zIndex: 500
+        }
+      },
       id: "rowNumber",
       accessorKey: "",
       enableResizing: false,
-      enableSorting: false
+      enableSorting: false,
+      size: 300
     });
 
     // Generate the columns
@@ -98,7 +108,11 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
 
           return prep ? (
             <div className="h-100 w-100 list-group-item">
-              <div>{prep.materialSample?.materialSampleName}</div>
+              <div>
+                {materialSamples?.find(
+                  (sample) => sample.id === prep?.materialSample?.id
+                )?.materialSampleName ?? ""}
+              </div>
               <div>
                 {prep.indexI5 && (
                   <div>
@@ -119,21 +133,22 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
         header: () =>
           indexSet && (
             <>
-              <strong>{columnLabel}</strong>
-              {/* <ResourceSelectField<NgsIndex>
+              <span>{columnLabel}</span>
+              <ResourceSelectField<NgsIndex>
                 hideLabel={true}
                 filter={filterBy(["name"])}
                 name={`indexI7s[${columnLabel}]`}
                 optionLabel={(primer) => primer.name}
                 model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
-              /> */}
+              />
             </>
           ),
         id: `${columnLabel}`,
         accessorKey: `${columnLabel}`,
         enableResizing: false,
-        enableSorting: false
+        enableSorting: false,
+        size: 300
       });
     }
 
@@ -150,12 +165,24 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
       <DinaForm
         initialValues={{ indexI5s: {}, indexI7s: {} }}
         onSubmit={onSubmit}
+        readOnly={editMode === false}
       >
-        <div style={{ height: "50px" }}>
-          <div className="float-right">
-            <SubmitButton />
+        {editMode && (
+          <div style={{ height: "50px" }}>
+            <div className="float-right">
+              <SubmitButton />
+            </div>
           </div>
-        </div>
+        )}
+        <style>{`
+          .rt-td {
+            padding: 0 !important;
+          }
+
+          .ReactTable {
+            overflow-x: auto;
+          }
+        `}</style>
         <ReactTable<CellData>
           columns={columns}
           data={tableData}

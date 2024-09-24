@@ -9,6 +9,7 @@ import { Dictionary, toPairs } from "lodash";
 import { useContext, useState, useEffect } from "react";
 import { LibraryPrep, NgsIndex } from "../../../../types/seqdb-api";
 import {
+  MaterialSample,
   StorageUnit,
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
@@ -16,7 +17,8 @@ import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resource
 import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
 
 export function useIndexGridControls({
-  batch: libraryPrepBatch
+  batch: libraryPrepBatch,
+  editMode
 }: IndexAssignmentStepProps) {
   const { save, apiClient, bulkGet } = useContext(ApiClientContext);
 
@@ -26,10 +28,11 @@ export function useIndexGridControls({
 
   const [libraryPrepsLoading, setLibraryPrepsLoading] = useState<boolean>(true);
   const [libraryPreps, setLibraryPreps] = useState<LibraryPrep[]>();
+  const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>();
 
   useQuery<LibraryPrep[]>(
     {
-      include: "indexI5,indexI7,storageUnitUsage",
+      include: "indexI5,indexI7,storageUnitUsage,materialSample",
       page: { limit: 1000 },
       filter: filterBy([], {
         extraFilters: [
@@ -46,7 +49,7 @@ export function useIndexGridControls({
       deps: [lastSave],
       async onSuccess(response) {
         /**
-         * Fetch Storage Unit Usage linked to each Library Prep
+         * Fetch Storage Unit Usage linked to each Library Prep along with the material sample.
          * @returns
          */
         async function fetchStorageUnitUsage(
@@ -58,7 +61,9 @@ export function useIndexGridControls({
               .map(
                 (item) => "/storage-unit-usage/" + item.storageUnitUsage?.id
               ),
-            { apiBaseUrl: "/collection-api" }
+            {
+              apiBaseUrl: "/collection-api"
+            }
           );
 
           return libraryPrepsArray.map((ngsSample) => {
@@ -73,7 +78,28 @@ export function useIndexGridControls({
           });
         }
 
-        setLibraryPreps(await fetchStorageUnitUsage(response.data));
+        async function fetchMaterialSamples(
+          libraryPrepsArray: LibraryPrep[]
+        ): Promise<MaterialSample[]> {
+          const materialSampleQuery = await bulkGet<MaterialSample>(
+            libraryPrepsArray
+              .filter((item) => item?.materialSample?.id)
+              .map((item) => "/material-sample/" + item?.materialSample?.id),
+            {
+              apiBaseUrl: "/collection-api"
+            }
+          );
+
+          return materialSampleQuery as MaterialSample[];
+        }
+
+        const libraryPrepItems = await fetchStorageUnitUsage(response.data);
+        const materialSampleItems = await fetchMaterialSamples(
+          libraryPrepItems
+        );
+
+        setLibraryPreps(libraryPrepItems);
+        setMaterialSamples(materialSampleItems);
         setLibraryPrepsLoading(false);
       }
     }
@@ -95,6 +121,11 @@ export function useIndexGridControls({
   }, [libraryPrepBatch]);
 
   async function onSubmit({ submittedValues }: DinaFormSubmitParams<any>) {
+    // Do not perform a submit if not in edit mode.
+    if (!editMode) {
+      return;
+    }
+
     const libraryPrepsToSave = libraryPreps ? libraryPreps : [];
     const { indexI5s, indexI7s } = submittedValues;
 
@@ -143,6 +174,7 @@ export function useIndexGridControls({
   return {
     libraryPrepsLoading,
     libraryPreps,
+    materialSamples,
     storageUnitType,
     onSubmit
   };

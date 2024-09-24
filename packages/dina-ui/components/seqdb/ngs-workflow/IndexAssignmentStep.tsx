@@ -21,15 +21,7 @@ export interface IndexAssignmentStepProps {
   setPerformSave: (newValue: boolean) => void;
 }
 
-export function IndexAssignmentStep({
-  batchId,
-  batch,
-  editMode,
-  setEditMode,
-  onSaved,
-  performSave,
-  setPerformSave
-}: IndexAssignmentStepProps) {
+export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
   const { formatMessage } = useSeqdbIntl();
 
   return (
@@ -52,7 +44,7 @@ export function IndexAssignmentStep({
         <Col sm={10}>
           <Tab.Content>
             <Tab.Pane eventKey="assignByGrid">
-              <IndexGrid batch={batch} />
+              <IndexGrid {...props} />
             </Tab.Pane>
             <Tab.Pane eventKey="assignByTable" />
           </Tab.Content>
