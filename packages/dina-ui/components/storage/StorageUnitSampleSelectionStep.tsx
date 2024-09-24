@@ -167,7 +167,7 @@ export function StorageUnitSampleSelectionStep({
             }
           );
 
-          // Create link between material sample and created storageUnitUsage resource
+          // Create link between resource and created storageUnitUsage resource
           resource.storageUnitUsage = savedStorageUnitUsage[0];
           const saveArg = [
             {
@@ -184,17 +184,55 @@ export function StorageUnitSampleSelectionStep({
             }
           ];
 
-          const savedMaterialSample = await save(saveArg, {
+          await save(saveArg, {
             apiBaseUrl: "/collection-api"
           });
         });
       }
 
       // Filter for resources that were previously linked but now unselected, these need to be unlinked
-      const resourcedToUnlink = prevSelectedResources?.filter(
+      const resourcesToUnlink = prevSelectedResources?.filter(
         (prevSelectedResource) =>
           !currentSelectedResourceIdsSet.has(prevSelectedResource.id)
       );
+
+      if (resourcesToUnlink) {
+        resourcesToUnlink.forEach(async (resource) => {
+          // Unlink storageUnitUsage from resource
+          const saveArg = [
+            {
+              resource: {
+                id: resource.id,
+                type: resource.type,
+                relationships: {
+                  storageUnitUsage: {
+                    data: null
+                  }
+                }
+              },
+              type: resource.type
+            }
+          ];
+          await save(saveArg, {
+            apiBaseUrl: "/collection-api"
+          });
+
+          // Delete storageUnitUsage
+          await save<StorageUnitUsage>(
+            [
+              {
+                delete: {
+                  id: resource.storageUnitUsage?.id ?? null,
+                  type: "storage-unit-usage"
+                }
+              }
+            ],
+            {
+              apiBaseUrl: "/collection-api"
+            }
+          );
+        });
+      }
     } catch (e) {
       if (e.toString() === "Error: Access is denied") {
         throw new DoOperationsError("Access is denied");
