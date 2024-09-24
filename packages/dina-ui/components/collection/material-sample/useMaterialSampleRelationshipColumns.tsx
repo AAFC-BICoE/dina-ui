@@ -107,7 +107,11 @@ export function useMaterialSampleRelationshipColumns() {
       },
       header: () => <FieldHeader name="materialSampleName" />,
       accessorKey: "data.attributes.materialSampleName",
-      sortingFn: "alphanumeric",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleName,
+          b?.original?.materialSampleName
+        ),
       isKeyword: true,
       enableSorting: true
     },
@@ -176,7 +180,11 @@ export function useMaterialSampleRelationshipColumns() {
       },
       header: () => <FieldHeader name="materialSampleName" />,
       accessorKey: "data.attributes.materialSampleName",
-      sortingFn: "alphanumeric",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleName,
+          b?.original?.materialSampleName
+        ),
       isKeyword: true,
       enableSorting: true
     },
