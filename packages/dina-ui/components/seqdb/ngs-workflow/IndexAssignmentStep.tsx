@@ -7,6 +7,7 @@ import Row from "react-bootstrap/Row";
 import Tab from "react-bootstrap/Tab";
 import { Dispatch, SetStateAction } from "react";
 import { IndexGrid } from "./index-grid/IndexGrid";
+import { IndexAssignmentTable } from "./IndexAssignmentTable";
 
 export interface IndexAssignmentStepProps {
   batchId: string;
@@ -46,7 +47,9 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
             <Tab.Pane eventKey="assignByGrid">
               <IndexGrid {...props} />
             </Tab.Pane>
-            <Tab.Pane eventKey="assignByTable" />
+            <Tab.Pane eventKey="assignByTable">
+              <IndexAssignmentTable {...props} />
+            </Tab.Pane>
           </Tab.Content>
         </Col>
       </Row>
