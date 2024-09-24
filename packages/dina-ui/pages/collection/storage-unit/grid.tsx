@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useStorageUnit } from "./edit";
 import { useState } from "react";
 import { Tabs, TabList, Tab, TabPanel } from "react-tabs";
-import { Button, Spinner, Dropdown, ButtonGroup } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
 import { StorageUnitSampleSelectionStep } from "packages/dina-ui/components/storage/StorageUnitSampleSelectionStep";
 import { StorageUnitSelectCoordinatesStep } from "packages/dina-ui/components/storage/StorageUnitSelectCoordinatesStep";
@@ -18,7 +18,7 @@ export default function StorageUnitGridPage() {
 function StorageUnitGridForm() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
-  const id = router.query.id?.toString();
+  const id = router.query.storageUnitId?.toString();
   const storageUnitQuery = useStorageUnit(id);
   // Current step being used.
   const [currentStep, setCurrentStep] = useState<number>(0);

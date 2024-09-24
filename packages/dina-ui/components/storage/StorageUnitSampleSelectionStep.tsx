@@ -1,21 +1,23 @@
-import { PersistedResource } from "kitsu";
 import {
+  DoOperationsError,
   filterBy,
   LoadingSpinner,
   QueryPage,
+  SaveArgs,
   useApiClient,
   useQuery
 } from "packages/common-ui/lib";
 import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
 import {
-  MaterialSampleSummary,
   MaterialSample,
   StorageUnit
 } from "packages/dina-ui/types/collection-api";
 import { useEffect, useState } from "react";
 import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { compact, pick, uniq, difference, concat } from "lodash";
+import { compact, uniq, difference, concat } from "lodash";
+import { useRouter } from "next/router";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 interface StorageUnitSampleSelectionStepProps {
   onSaved: (nextStep?: number) => Promise<void>;
@@ -36,10 +38,14 @@ export function StorageUnitSampleSelectionStep({
   const [selectedResources, setSelectedResources] = useState<
     MaterialSample[] | undefined
   >(undefined);
+  const router = useRouter();
+  const storageUnitId = router.query.storageUnitId?.toString();
 
   // Resources that were previously linked to the Storage Unit
-  const [previouslySelectedResources, setPreviouslySelectedResources] =
-    useState<MaterialSample[] | undefined>(undefined);
+  const [prevSelectedResources, setPreviouslySelectedResources] = useState<
+    MaterialSample[] | undefined
+  >(undefined);
+
   const materialSamplesQuery = useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
@@ -51,7 +57,6 @@ export function StorageUnitSampleSelectionStep({
       onSuccess: (response) => {
         const sorted = sortMaterialSamples(response.data ?? []);
 
-        // On load up, the current selectedResources and previouslySelectedResources will both be the resources that were already linked to the storage unit
         setSelectedResources(sorted);
         setPreviouslySelectedResources(sorted);
       }
@@ -122,85 +127,84 @@ export function StorageUnitSampleSelectionStep({
   }
 
   async function saveMaterialSamples() {
-    // try {
-    //   const { data: pcrBatch } = await apiClient.get<PcrBatch>(
-    //     `seqdb-api/pcr-batch/${pcrBatchId}`,
-    //     {}
-    //   );
-    //   // Convert to UUID arrays to compare the two arrays.
-    //   const selectedResourceUUIDs = compact(
-    //     selectedResources?.map((material) => material.id)
-    //   );
-    //   const previouslySelectedResourcesUUIDs = compact(
-    //     previouslySelectedResources?.map((item) => ({
-    //       materialSampleUUID: item?.materialSample?.id,
-    //       pcrBatchItemUUID: item?.id
-    //     }))
-    //   );
-    //   const temp = previouslySelectedResources?.map((item) => ({
-    //     materialSampleUUID: item?.materialSample?.id,
-    //     pcrBatchItemUUID: item?.id
-    //   }));
-    //   // UUIDs of PCR Batch Items that need to be created.
-    //   const itemsToCreate = uniq(
-    //     selectedResourceUUIDs.filter(
-    //       (uuid) =>
-    //         !previouslySelectedResourcesUUIDs.some(
-    //           (item) => item.materialSampleUUID === uuid
-    //         )
-    //     )
-    //   );
-    //   // UUIDs of PCR Batch Items that need to be deleted.
-    //   const itemsToDelete = uniq(
-    //     previouslySelectedResourcesUUIDs.filter(
-    //       (uuid) =>
-    //         !selectedResourceUUIDs.includes(uuid.materialSampleUUID as string)
-    //     )
-    //   );
-    //   // Perform create
-    //   if (itemsToCreate.length !== 0) {
-    //     await save(
-    //       itemsToCreate.map((materialUUID) => ({
-    //         resource: {
-    //           type: "pcr-batch-item",
-    //           group: pcrBatch.group ?? "",
-    //           createdBy: username ?? "",
-    //           pcrBatch: pick(pcrBatch, "id", "type"),
-    //           relationships: {
-    //             materialSample: {
-    //               data: {
-    //                 id: materialUUID,
-    //                 type: "material-sample"
-    //               }
-    //             }
-    //           }
-    //         },
-    //         type: "pcr-batch-item"
-    //       })),
-    //       { apiBaseUrl: "/seqdb-api" }
-    //     );
-    //   }
-    //   // Perform deletes
-    //   if (itemsToDelete.length !== 0) {
-    //     await save(
-    //       itemsToDelete.map((item) => ({
-    //         delete: {
-    //           id: item.pcrBatchItemUUID ?? "",
-    //           type: "pcr-batch-item"
-    //         }
-    //       })),
-    //       { apiBaseUrl: "/seqdb-api" }
-    //     );
-    //   }
-    // } catch (e) {
-    //   if (e.toString() === "Error: Access is denied") {
-    //     throw new DoOperationsError("Access is denied");
-    //   }
-    // } finally {
-    //   // Clear the previously selected resources.
-    //   setPreviouslySelectedResources([]);
-    //   // setEditMode(false);
-    // }
+    try {
+      const prevSelectedResourceIdsSet = new Set(
+        prevSelectedResources?.map((prevSelected) => prevSelected.id)
+      );
+
+      const currentSelectedResourceIdsSet = new Set(
+        selectedResources?.map((selectedResource) => selectedResource.id)
+      );
+
+      // Filter for resources that weren't already previously linked to storage unit
+      // These resources need to be linked to the storage unit
+      const resourcesToLink = selectedResources?.filter(
+        (selectedResource) =>
+          !prevSelectedResourceIdsSet.has(selectedResource.id)
+      );
+      if (resourcesToLink) {
+        resourcesToLink.forEach(async (resource) => {
+          // Create new storageUnitUsage, the storageUnit is saved here.
+          const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] = [
+            {
+              type: "storage-unit-usage",
+              resource: {
+                storageUnit: {
+                  type: "storage-unit",
+                  id: storageUnitId!
+                },
+                type: "storage-unit-usage",
+                id: undefined,
+                usageType: "material-sample"
+              }
+            }
+          ];
+
+          const savedStorageUnitUsage = await save<StorageUnitUsage>(
+            storageUnitUsageSaveArgs,
+            {
+              apiBaseUrl: "/collection-api"
+            }
+          );
+
+          // Create link between material sample and created storageUnitUsage resource
+          resource.storageUnitUsage = savedStorageUnitUsage[0];
+          const saveArg = [
+            {
+              resource: {
+                id: resource.id,
+                type: resource.type,
+                relationships: {
+                  storageUnitUsage: {
+                    data: savedStorageUnitUsage[0]
+                  }
+                }
+              },
+              type: resource.type
+            }
+          ];
+
+          const savedMaterialSample = await save(saveArg, {
+            apiBaseUrl: "/collection-api"
+          });
+        });
+      }
+
+      // Filter for resources that were previously linked but now unselected, these need to be unlinked
+      const resourcedToUnlink = prevSelectedResources?.filter(
+        (prevSelectedResource) =>
+          !currentSelectedResourceIdsSet.has(prevSelectedResource.id)
+      );
+    } catch (e) {
+      if (e.toString() === "Error: Access is denied") {
+        throw new DoOperationsError("Access is denied");
+      } else {
+        console.error(e);
+      }
+    } finally {
+      // Clear the previously selected resources.
+      setPreviouslySelectedResources([]);
+    }
   }
   return selectedResources === undefined ? (
     <LoadingSpinner loading={true} />

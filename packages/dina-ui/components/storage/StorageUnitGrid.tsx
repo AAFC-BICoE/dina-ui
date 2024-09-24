@@ -149,7 +149,7 @@ export function useGridCoordinatesControls({
         (sample) => sample.storageUnitUsage
       );
       usageTypeRef.current = storageUnitUsages[0]?.usageType;
-      editContentsPathRef.current = `/collection/storage-unit/grid?id=${storageUnit.id}`;
+      editContentsPathRef.current = `/collection/storage-unit/grid?storageUnitId=${storageUnit.id}`;
       materialSamples.forEach((materialSample) => {
         const storageUnitUsage = storageUnitUsages.find(
           (usage) => usage?.id === materialSample?.storageUnitUsage?.id
