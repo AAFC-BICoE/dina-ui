@@ -12,23 +12,21 @@ import {
   NgsIndex
 } from "../../../../types/seqdb-api";
 import { useIndexGridControls } from "./useIndexGridControls";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { ColumnDef } from "@tanstack/react-table";
+import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
 
-export interface IndexGridProps {
-  libraryPrepBatch: LibraryPrepBatch;
+export interface CellData {
+  libraryPrep?: LibraryPrep;
+  row: number;
 }
 
-export function IndexGrid(props: IndexGridProps) {
-  const { libraryPrepBatch } = props;
+export function IndexGrid(props: IndexAssignmentStepProps) {
+  const { batch: libraryPrepBatch } = props;
 
   const { indexSet } = libraryPrepBatch;
 
-  const {
-    libraryPrepsLoading,
-    libraryPrepsResponse,
-    storageUnitType,
-    onSubmit
-  } = useIndexGridControls(props);
+  const { libraryPrepsLoading, libraryPreps, storageUnitType, onSubmit } =
+    useIndexGridControls(props);
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
@@ -42,9 +40,7 @@ export function IndexGrid(props: IndexGridProps) {
     );
   }
 
-  if (libraryPrepsResponse) {
-    const libraryPreps = libraryPrepsResponse.data;
-
+  if (libraryPreps) {
     const libraryPrepsWithCoords = libraryPreps.filter(
       (prep) =>
         prep.storageUnitUsage?.wellRow && prep.storageUnitUsage?.wellColumn
@@ -57,39 +53,36 @@ export function IndexGrid(props: IndexGridProps) {
       ] = prep;
     }
 
-    const columns: TableColumn<any>[] = [];
+    const columns: ColumnDef<CellData>[] = [];
 
     // Add the primer column:
     columns.push({
-      cell: ({
-        row: {
-          original: { data }
-        }
-      }) => {
-        const rowLetter = String.fromCharCode(data + 65);
+      cell: ({ row: { original } }) => {
+        const rowLetter = String.fromCharCode(original.row + 65);
 
         return (
           indexSet && (
             <div style={{ padding: "7px 5px" }}>
-              <span>{String.fromCharCode(data + 65)}</span>
-              <ResourceSelectField<NgsIndex>
+              <strong>{rowLetter}</strong>
+              {/* <ResourceSelectField<NgsIndex>
                 hideLabel={true}
                 filter={filterBy(["name"])}
                 name={`indexI5s[${rowLetter}]`}
                 optionLabel={(primer) => primer.name}
                 model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
-              />
+              /> */}
             </div>
           )
         );
       },
-      header: () => "test2",
+      id: "rowNumber",
       accessorKey: "",
       enableResizing: false,
       enableSorting: false
     });
 
+    // Generate the columns
     for (
       let col = 0;
       col < (storageUnitType?.gridLayoutDefinition?.numberOfColumns ?? 0);
@@ -98,12 +91,8 @@ export function IndexGrid(props: IndexGridProps) {
       const columnLabel = String(col + 1);
 
       columns.push({
-        cell: ({
-          row: {
-            original: { data }
-          }
-        }) => {
-          const rowLabel = String.fromCharCode(data.row + 65);
+        cell: ({ row: { original } }) => {
+          const rowLabel = String.fromCharCode(original.row + 65);
           const coords = `${rowLabel}_${columnLabel}`;
           const prep = cellGrid[coords];
 
@@ -127,21 +116,20 @@ export function IndexGrid(props: IndexGridProps) {
             </div>
           ) : null;
         },
-        header: () => "test1",
-        // header: () =>
-        //   indexSet && (
-        //     <>
-        //       {columnLabel}
-        //       <ResourceSelectField<NgsIndex>
-        //         hideLabel={true}
-        //         filter={filterBy(["name"])}
-        //         name={`indexI7s[${columnLabel}]`}
-        //         optionLabel={(primer) => primer.name}
-        //         model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
-        //         styles={{ menu: () => ({ zIndex: 5 }) }}
-        //       />
-        //     </>
-        //   ),
+        header: () =>
+          indexSet && (
+            <>
+              <strong>{columnLabel}</strong>
+              {/* <ResourceSelectField<NgsIndex>
+                hideLabel={true}
+                filter={filterBy(["name"])}
+                name={`indexI7s[${columnLabel}]`}
+                optionLabel={(primer) => primer.name}
+                model={`seqdb-api/indexSet/${indexSet.id}/ngsIndexes`}
+                styles={{ menu: () => ({ zIndex: 5 }) }}
+              /> */}
+            </>
+          ),
         id: `${columnLabel}`,
         accessorKey: `${columnLabel}`,
         enableResizing: false,
@@ -149,9 +137,14 @@ export function IndexGrid(props: IndexGridProps) {
       });
     }
 
-    const tableData = new Array(
-      storageUnitType?.gridLayoutDefinition?.numberOfRows ?? 0
-    ).fill({});
+    // Populate the table's rows using the number of rows.
+    const tableData: CellData[] = [];
+    const numberOfRows =
+      storageUnitType?.gridLayoutDefinition?.numberOfRows ?? 0;
+
+    for (let i = 0; i < numberOfRows; i++) {
+      tableData.push({ row: i });
+    }
 
     return (
       <DinaForm
@@ -163,7 +156,11 @@ export function IndexGrid(props: IndexGridProps) {
             <SubmitButton />
           </div>
         </div>
-        <ReactTable columns={columns} data={tableData} showPagination={false} />
+        <ReactTable<CellData>
+          columns={columns}
+          data={tableData}
+          showPagination={false}
+        />
       </DinaForm>
     );
   }

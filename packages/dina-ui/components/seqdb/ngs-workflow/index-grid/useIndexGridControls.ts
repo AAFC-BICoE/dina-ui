@@ -2,46 +2,82 @@ import {
   ApiClientContext,
   DinaFormSubmitParams,
   filterBy,
-  safeSubmit,
   SaveArgs,
   useQuery
 } from "common-ui";
 import { Dictionary, toPairs } from "lodash";
 import { useContext, useState, useEffect } from "react";
 import { LibraryPrep, NgsIndex } from "../../../../types/seqdb-api";
-import { IndexGridProps } from "./IndexGrid";
 import {
   StorageUnit,
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
 
-export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
-  const { save, apiClient } = useContext(ApiClientContext);
+export function useIndexGridControls({
+  batch: libraryPrepBatch
+}: IndexAssignmentStepProps) {
+  const { save, apiClient, bulkGet } = useContext(ApiClientContext);
 
   const [lastSave, setLastSave] = useState<number>();
 
   const [storageUnitType, setStorageUnitType] = useState<StorageUnitType>();
 
-  const { loading: libraryPrepsLoading, response: libraryPrepsResponse } =
-    useQuery<LibraryPrep[]>(
-      {
-        include: "indexI5,indexI7",
-        page: { limit: 1000 },
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "libraryPrepBatch.uuid",
-              comparison: "==",
-              arguments: libraryPrepBatch.id ?? ""
-            }
-          ]
-        })(""),
-        path: `seqdb-api/library-prep`
-      },
-      {
-        deps: [lastSave]
+  const [libraryPrepsLoading, setLibraryPrepsLoading] = useState<boolean>(true);
+  const [libraryPreps, setLibraryPreps] = useState<LibraryPrep[]>();
+
+  useQuery<LibraryPrep[]>(
+    {
+      include: "indexI5,indexI7,storageUnitUsage",
+      page: { limit: 1000 },
+      filter: filterBy([], {
+        extraFilters: [
+          {
+            selector: "libraryPrepBatch.uuid",
+            comparison: "==",
+            arguments: libraryPrepBatch.id ?? ""
+          }
+        ]
+      })(""),
+      path: `seqdb-api/library-prep`
+    },
+    {
+      deps: [lastSave],
+      async onSuccess(response) {
+        /**
+         * Fetch Storage Unit Usage linked to each Library Prep
+         * @returns
+         */
+        async function fetchStorageUnitUsage(
+          libraryPrepsArray: LibraryPrep[]
+        ): Promise<LibraryPrep[]> {
+          const storageUnitUsageQuery = await bulkGet<StorageUnitUsage>(
+            libraryPrepsArray
+              .filter((item) => item.storageUnitUsage?.id)
+              .map(
+                (item) => "/storage-unit-usage/" + item.storageUnitUsage?.id
+              ),
+            { apiBaseUrl: "/collection-api" }
+          );
+
+          return libraryPrepsArray.map((ngsSample) => {
+            const queryStorageUnitUsage = storageUnitUsageQuery.find(
+              (storageUnitUsage) =>
+                storageUnitUsage?.id === ngsSample.storageUnitUsage?.id
+            );
+            return {
+              ...ngsSample,
+              storageUnitUsage: queryStorageUnitUsage as StorageUnitUsage
+            };
+          });
+        }
+
+        setLibraryPreps(await fetchStorageUnitUsage(response.data));
+        setLibraryPrepsLoading(false);
       }
-    );
+    }
+  );
 
   useEffect(() => {
     if (!libraryPrepBatch || !libraryPrepBatch.storageUnit) return;
@@ -59,7 +95,7 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
   }, [libraryPrepBatch]);
 
   async function onSubmit({ submittedValues }: DinaFormSubmitParams<any>) {
-    const libraryPreps = libraryPrepsResponse ? libraryPrepsResponse.data : [];
+    const libraryPrepsToSave = libraryPreps ? libraryPreps : [];
     const { indexI5s, indexI7s } = submittedValues;
 
     const edits: Dictionary<Partial<LibraryPrep>> = {};
@@ -67,7 +103,7 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
     // Get the new i7 values:
     const colIndexes = toPairs<NgsIndex>(indexI7s);
     for (const [col, index] of colIndexes) {
-      const colPreps = libraryPreps.filter(
+      const colPreps = libraryPrepsToSave.filter(
         (it) => String(it?.storageUnitUsage?.wellColumn) === col
       );
       for (const prep of colPreps) {
@@ -82,7 +118,7 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
     // Get the new i5 values:
     const rowIndexes = toPairs<NgsIndex>(indexI5s);
     for (const [row, index] of rowIndexes) {
-      const rowPreps = libraryPreps.filter(
+      const rowPreps = libraryPrepsToSave.filter(
         (it) => it?.storageUnitUsage?.wellRow === row
       );
       for (const prep of rowPreps) {
@@ -106,7 +142,7 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
 
   return {
     libraryPrepsLoading,
-    libraryPrepsResponse,
+    libraryPreps,
     storageUnitType,
     onSubmit
   };

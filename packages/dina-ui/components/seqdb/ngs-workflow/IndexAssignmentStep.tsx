@@ -35,7 +35,7 @@ export function IndexAssignmentStep({
   return (
     <Tab.Container id="left-tabs-example" defaultActiveKey="assignByGrid">
       <Row>
-        <Col sm={3}>
+        <Col sm={2}>
           <Nav variant="pills" className="flex-column">
             <Nav.Item>
               <Nav.Link eventKey="assignByGrid">
@@ -49,10 +49,10 @@ export function IndexAssignmentStep({
             </Nav.Item>
           </Nav>
         </Col>
-        <Col sm={9}>
+        <Col sm={10}>
           <Tab.Content>
             <Tab.Pane eventKey="assignByGrid">
-              <IndexGrid libraryPrepBatch={batch} />
+              <IndexGrid batch={batch} />
             </Tab.Pane>
             <Tab.Pane eventKey="assignByTable" />
           </Tab.Content>
