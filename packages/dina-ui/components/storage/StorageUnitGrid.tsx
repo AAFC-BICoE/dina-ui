@@ -343,6 +343,13 @@ export function useGridCoordinatesControls({
     }
   }
 
+  // Filter out samples without coordinates from multipleSamplesWellCoordinates
+  // They simply don't have a coordinate yet not necessarily occupying the same well
+  multipleSamplesWellCoordinates.current =
+    multipleSamplesWellCoordinates.current.filter(
+      (sample) => !sample.coordinate.includes("undefined")
+    );
+
   return {
     ...gridState,
     multipleSamplesWellCoordinates,
