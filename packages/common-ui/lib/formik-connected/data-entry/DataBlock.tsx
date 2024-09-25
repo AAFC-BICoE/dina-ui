@@ -67,9 +67,10 @@ export function DataBlock({
       if (formikCtx?.values?.[rootName]) {
         Object.keys(formikCtx?.values?.[rootName]).forEach((extensionKey) => {
           if (formikCtx?.values?.[rootName][extensionKey].select === oldValue) {
-            formikCtx.values[rootName][extensionKey].rows = {
+            // Use setFieldValue to cause a rerender
+            formikCtx.setFieldValue(`${rootName}.${extensionKey}.rows`, {
               "extensionField-0": ""
-            };
+            });
           }
         });
       }

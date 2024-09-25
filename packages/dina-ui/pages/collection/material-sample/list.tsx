@@ -196,22 +196,30 @@ export function SampleListLayout({
 export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
   {
     fields: [
-      // Managed Attributes
+      // Material Sample - Managed Attributes
       {
         type: "managedAttribute",
-        label: "managedAttributes",
+        label: "materialSampleManagedAttributes",
         component: "MATERIAL_SAMPLE",
         path: "data.attributes.managedAttributes",
         apiEndpoint: "collection-api/managed-attribute"
       },
-
-      // Field Extensions
+      // Material Sample - Field Extensions
       {
         type: "fieldExtension",
         label: "fieldExtensions",
         component: "MATERIAL_SAMPLE",
         path: "data.attributes.extensionValues",
         apiEndpoint: "collection-api/extension"
+      },
+
+      // Preparation - Managed Attributes
+      {
+        type: "managedAttribute",
+        label: "preparationManagedAttributes",
+        component: "PREPARATION",
+        path: "data.attributes.preparationManagedAttributes",
+        apiEndpoint: "collection-api/managed-attribute"
       },
 
       // Restrictions
@@ -275,6 +283,54 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         component: "ENTITY",
         referencedBy: "attachment",
         referencedType: "metadata"
+      },
+
+      // Parent Material Sample
+      {
+        type: "managedAttribute",
+        label: "materialSampleManagedAttributes",
+        path: "included.attributes.managedAttributes",
+        apiEndpoint: "collection-api/managed-attribute",
+        component: "MATERIAL_SAMPLE",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
+      },
+      {
+        type: "managedAttribute",
+        label: "preparationManagedAttributes",
+        path: "included.attributes.preparationManagedAttributes",
+        apiEndpoint: "collection-api/managed-attribute",
+        component: "PREPARATION",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
+      },
+      {
+        type: "fieldExtension",
+        label: "fieldExtensions",
+        component: "MATERIAL_SAMPLE",
+        path: "included.attributes.extensionValues",
+        apiEndpoint: "collection-api/extension",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
+      },
+      {
+        type: "fieldExtension",
+        label: "restrictions",
+        component: "RESTRICTION",
+        path: "included.attributes.restrictionFieldsExtension",
+        apiEndpoint: "collection-api/extension",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
+      },
+      // Hide the "Indentifiers" until it's supported like managed attributes/field extensions.
+      {
+        type: "unsupported",
+        label: "identifiers",
+        component: "MATERIAL_SAMPLE",
+        path: "included.attributes.identifiers",
+        apiEndpoint: "collection-api/vocabulary2/materialSampleIdentifierType",
+        referencedBy: "parentMaterialSample",
+        referencedType: "material-sample"
       }
     ]
   };
