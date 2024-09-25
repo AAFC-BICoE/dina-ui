@@ -229,7 +229,6 @@ export function useIndexGridControls({
     }
 
     const libraryPrepUpdates = (submittedValues?.libraryPrep as any[])
-      ?.filter((submittedValue: any) => submittedValue)
       ?.map<LibraryPrep>((submittedValue: any, index: number) => ({
         type: "library-prep",
         id: libraryPreps[index].id,
@@ -239,7 +238,8 @@ export function useIndexGridControls({
         ...(submittedValue.indexI7 && {
           indexI7: { type: "ngs-index", id: submittedValue.indexI7 }
         })
-      }));
+      }))
+      ?.filter((update: any) => update.indexI5 || update.indexI7);
 
     const saveArgs = libraryPrepUpdates.map((resource) => ({
       resource,

@@ -106,6 +106,19 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
     [libraryPreps, materialSamples]
   );
 
+  const initialValues = useMemo(() => {
+    if (!libraryPreps || libraryPreps.length === 0) {
+      return {};
+    }
+
+    return {
+      libraryPrep: libraryPreps.map((prep) => ({
+        ...(prep.indexI5 ? { indexI5: prep?.indexI5?.id } : {}),
+        ...(prep.indexI7 ? { indexI7: prep?.indexI7?.id } : {})
+      }))
+    };
+  }, [libraryPreps]);
+
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
   }
@@ -120,7 +133,7 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
 
   return (
     <DinaForm
-      initialValues={{}}
+      initialValues={initialValues}
       onSubmit={onSubmitTable}
       readOnly={editMode === false}
       enableReinitialize={true}
