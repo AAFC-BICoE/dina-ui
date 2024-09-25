@@ -162,9 +162,9 @@ export function IndexAssignmentTable(props: IndexAssignmentTableProps) {
 
   if (!batch?.indexSet?.id) {
     return (
-      <span className="alert alert-warning">
+      <div className="alert alert-warning mt-2">
         {formatMessage("missingIndexForAssignment")}
-      </span>
+      </div>
     );
   }
 

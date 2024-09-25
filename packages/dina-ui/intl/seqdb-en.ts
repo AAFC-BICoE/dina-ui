@@ -144,6 +144,8 @@ export const SEQDB_MESSAGES_ENGLISH = {
     "Index Set must be set on the Library Prep Batch to assign indexes.",
   missingContainerAndIndexForAssignment:
     "Container Type and Index Set must be set to use the index grid.",
+  missingSelectedCoordinatesForAssignment:
+    "Coordinates needed to be selected in order to assign indexes using the grid.",
   selectPcrBatch: "Select PCR Batch",
   selectPcrBatchTitle: "Select PCR Batch",
   selectSamples: "Select Material Samples",

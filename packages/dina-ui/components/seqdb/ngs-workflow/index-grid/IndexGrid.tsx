@@ -50,11 +50,11 @@ export function IndexGrid(props: IndexGridProps) {
     return <LoadingSpinner loading={true} />;
   }
 
-  if (!storageUnitType && !indexSet) {
+  if (!storageUnitType || !indexSet) {
     return (
-      <span className="alert alert-warning">
+      <div className="alert alert-warning mt-2">
         {formatMessage("missingContainerAndIndexForAssignment")}
-      </span>
+      </div>
     );
   }
 
@@ -63,6 +63,15 @@ export function IndexGrid(props: IndexGridProps) {
       (prep) =>
         prep.storageUnitUsage?.wellRow && prep.storageUnitUsage?.wellColumn
     );
+
+    // Display an error if no coordinates have been selected yet, nothing to edit.
+    if (libraryPrepsWithCoords.length === 0) {
+      return (
+        <div className="alert alert-warning mt-2">
+          {formatMessage("missingSelectedCoordinatesForAssignment")}
+        </div>
+      );
+    }
 
     const cellGrid: { [key: string]: LibraryPrep } = {};
     for (const prep of libraryPrepsWithCoords) {
