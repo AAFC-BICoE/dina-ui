@@ -88,6 +88,9 @@ export function IndexGrid(props: IndexGridProps) {
                     label: index.name,
                     value: index.id
                   }))}
+                selectProps={{
+                  isClearable: true
+                }}
               />
             </div>
           )
@@ -159,6 +162,9 @@ export function IndexGrid(props: IndexGridProps) {
                     label: index.name,
                     value: index.id
                   }))}
+                selectProps={{
+                  isClearable: true
+                }}
                 className="w-100"
               />
             </>

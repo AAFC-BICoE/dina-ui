@@ -15,7 +15,7 @@ interface LibraryPrepAttributes {
 }
 
 interface LibraryPrepRelationships {
-  libraryPrepBatch: LibraryPrepBatch;
+  libraryPrepBatch?: LibraryPrepBatch;
   materialSample?: MaterialSample;
   indexI5?: NgsIndex | null;
   indexI7?: NgsIndex | null;

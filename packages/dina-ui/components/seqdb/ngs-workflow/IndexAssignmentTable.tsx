@@ -78,6 +78,9 @@ export function IndexAssignmentTable(props: IndexAssignmentTableProps) {
                 label: ngsIndex.name,
                 value: ngsIndex.id
               }))}
+            selectProps={{
+              isClearable: true
+            }}
           />
         )
     },
@@ -94,6 +97,9 @@ export function IndexAssignmentTable(props: IndexAssignmentTableProps) {
                 label: ngsIndex.name,
                 value: ngsIndex.id
               }))}
+            selectProps={{
+              isClearable: true
+            }}
           />
         )
     }

@@ -15,6 +15,7 @@ import {
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
 import { LibraryPrep, NgsIndex } from "packages/dina-ui/types/seqdb-api";
+import { isEqual } from "lodash";
 
 export interface UseIndexAssignmentReturn {
   libraryPrepsLoading: boolean;
@@ -245,25 +246,46 @@ export function useIndexAssignmentAPI({
     }
 
     const libraryPrepUpdates = (submittedValues?.libraryPrep as any[])
-      ?.map<LibraryPrep>((submittedValue: any, index: number) => ({
-        type: "library-prep",
-        id: libraryPreps[index].id,
-        ...(submittedValue.indexI5 && {
-          indexI5: { type: "ngs-index", id: submittedValue.indexI5 }
-        }),
-        ...(submittedValue.indexI7 && {
-          indexI7: { type: "ngs-index", id: submittedValue.indexI7 }
-        })
-      }))
-      ?.filter((update: any) => update.indexI5 || update.indexI7);
+      ?.map<LibraryPrep>(
+        (submittedValue: any, index: number) =>
+          ({
+            type: "library-prep",
+            id: libraryPreps[index].id,
+            ...(!isEqual(
+              libraryPreps[index]?.indexI5?.id,
+              submittedValue.indexI5
+            ) && {
+              indexI5: {
+                type: "ngs-index",
+                id: submittedValue.indexI5 ? submittedValue.indexI5 : null
+              }
+            }),
+            ...(!isEqual(
+              libraryPreps[index]?.indexI7?.id,
+              submittedValue.indexI7
+            ) && {
+              indexI7: {
+                type: "ngs-index",
+                id: submittedValue.indexI7 ? submittedValue.indexI7 : null
+              }
+            })
+          } as LibraryPrep)
+      )
+      ?.filter(
+        (update: any) =>
+          update.indexI5 !== undefined || update.indexI7 !== undefined
+      );
 
-    const saveArgs = libraryPrepUpdates.map((resource) => ({
-      resource,
-      type: "library-prep"
-    }));
+    if (libraryPrepUpdates.length !== 0) {
+      const saveArgs = libraryPrepUpdates.map((resource) => ({
+        resource,
+        type: "library-prep"
+      }));
 
-    await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
-    setLastSave(Date.now());
+      await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
+      setLastSave(Date.now());
+    }
+
     setPerformSave(false);
     setEditMode(false);
   }
