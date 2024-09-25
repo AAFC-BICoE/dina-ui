@@ -10,24 +10,30 @@ import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
 import { useMemo } from "react";
 import { LibraryPrep } from "packages/dina-ui/types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useIndexGridControls } from "./index-grid/useIndexGridControls";
+import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
+import { UseIndexAssignmentReturn } from "./useIndexAssignmentAPI";
 
 interface IndexAssignmentRow {
-  materialSample?: MaterialSample;
+  materialSample?: MaterialSampleSummary;
   libraryPrep?: LibraryPrep;
 }
 
-export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
+interface IndexAssignmentTableProps
+  extends IndexAssignmentStepProps,
+    UseIndexAssignmentReturn {}
+
+export function IndexAssignmentTable(props: IndexAssignmentTableProps) {
   const {
+    editMode,
+    batch,
+    performSave,
+    setPerformSave,
     libraryPrepsLoading,
     libraryPreps,
     materialSamples,
     ngsIndexes,
     onSubmitTable
-  } = useIndexGridControls(props);
-
-  const { editMode, batch, performSave, setPerformSave } = props;
+  } = props;
 
   // Hidden button bar is used to submit the page from the button bar in a parent component.
   const hiddenButtonBar = (

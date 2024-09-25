@@ -9,6 +9,7 @@ import { Dispatch, SetStateAction } from "react";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { IndexGrid } from "./index-grid/IndexGrid";
 import { IndexAssignmentTable } from "./IndexAssignmentTable";
+import { useIndexAssignmentAPI } from "./useIndexAssignmentAPI";
 
 export interface IndexAssignmentStepProps {
   batchId: string;
@@ -25,6 +26,9 @@ export interface IndexAssignmentStepProps {
 
 export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
   const { formatMessage } = useSeqdbIntl();
+
+  // Data required for both options is pretty much the same so share the data between both.
+  const indexAssignmentApiProps = useIndexAssignmentAPI(props);
 
   // Get the last active tab from local storage (defaults to "assignByGrid")
   const [activeKey, setActiveKey] = useLocalStorage(
@@ -60,10 +64,10 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
         <Col sm={10}>
           <Tab.Content>
             <Tab.Pane eventKey="assignByGrid">
-              <IndexGrid {...props} />
+              <IndexGrid {...props} {...indexAssignmentApiProps} />
             </Tab.Pane>
             <Tab.Pane eventKey="assignByTable">
-              <IndexAssignmentTable {...props} />
+              <IndexAssignmentTable {...props} {...indexAssignmentApiProps} />
             </Tab.Pane>
           </Tab.Content>
         </Col>

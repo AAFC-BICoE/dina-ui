@@ -7,32 +7,33 @@ import {
   SubmitButton
 } from "common-ui";
 import { LibraryPrep } from "../../../../types/seqdb-api";
-import { useIndexGridControls } from "./useIndexGridControls";
 import { ColumnDef } from "@tanstack/react-table";
 import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
+import { UseIndexAssignmentReturn } from "../useIndexAssignmentAPI";
 
-export interface CellData {
+interface CellData {
   row: number;
 }
 
-export function IndexGrid(props: IndexAssignmentStepProps) {
+interface IndexGridProps
+  extends IndexAssignmentStepProps,
+    UseIndexAssignmentReturn {}
+
+export function IndexGrid(props: IndexGridProps) {
   const {
     batch: libraryPrepBatch,
     editMode,
     performSave,
-    setPerformSave
-  } = props;
-
-  const { indexSet } = libraryPrepBatch;
-
-  const {
+    setPerformSave,
     libraryPrepsLoading,
     libraryPreps,
     materialSamples,
     ngsIndexes,
     storageUnitType,
     onSubmitGrid
-  } = useIndexGridControls(props);
+  } = props;
+
+  const { indexSet } = libraryPrepBatch;
 
   // Hidden button bar is used to submit the page from the button bar in a parent component.
   const hiddenButtonBar = (

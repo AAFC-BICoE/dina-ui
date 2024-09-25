@@ -7,30 +7,44 @@ import {
 } from "common-ui";
 import { Dictionary, toPairs } from "lodash";
 import { useContext, useState, useEffect } from "react";
-import { LibraryPrep, NgsIndex } from "../../../../types/seqdb-api";
 import {
-  MaterialSample,
+  MaterialSampleSummary,
   StorageUnit,
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
+import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
+import { LibraryPrep, NgsIndex } from "packages/dina-ui/types/seqdb-api";
 
-export function useIndexGridControls({
+export interface UseIndexAssignmentReturn {
+  libraryPrepsLoading: boolean;
+  libraryPreps?: LibraryPrep[];
+  materialSamples?: MaterialSampleSummary[];
+  ngsIndexes?: NgsIndex[];
+  storageUnitType?: StorageUnitType;
+  onSubmitGrid: ({
+    submittedValues
+  }: DinaFormSubmitParams<any>) => Promise<void>;
+  onSubmitTable: ({
+    submittedValues
+  }: DinaFormSubmitParams<any>) => Promise<void>;
+}
+
+export function useIndexAssignmentAPI({
   batch: libraryPrepBatch,
   editMode,
   setEditMode,
   setPerformSave
-}: IndexAssignmentStepProps) {
+}: IndexAssignmentStepProps): UseIndexAssignmentReturn {
   const { save, apiClient, bulkGet } = useContext(ApiClientContext);
 
   const [lastSave, setLastSave] = useState<number>();
 
   const [storageUnitType, setStorageUnitType] = useState<StorageUnitType>();
-
   const [libraryPrepsLoading, setLibraryPrepsLoading] = useState<boolean>(true);
   const [libraryPreps, setLibraryPreps] = useState<LibraryPrep[]>();
-  const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>();
+  const [materialSamples, setMaterialSamples] =
+    useState<MaterialSampleSummary[]>();
   const [ngsIndexes, setNgsIndexes] = useState<NgsIndex[]>();
 
   useQuery<LibraryPrep[]>(
@@ -83,17 +97,19 @@ export function useIndexGridControls({
 
         async function fetchMaterialSamples(
           libraryPrepsArray: LibraryPrep[]
-        ): Promise<MaterialSample[]> {
-          const materialSampleQuery = await bulkGet<MaterialSample>(
+        ): Promise<MaterialSampleSummary[]> {
+          const materialSampleQuery = await bulkGet<MaterialSampleSummary>(
             libraryPrepsArray
               .filter((item) => item?.materialSample?.id)
-              .map((item) => "/material-sample/" + item?.materialSample?.id),
+              .map(
+                (item) => "/material-sample-summary/" + item?.materialSample?.id
+              ),
             {
               apiBaseUrl: "/collection-api"
             }
           );
 
-          return materialSampleQuery as MaterialSample[];
+          return materialSampleQuery as MaterialSampleSummary[];
         }
 
         const libraryPrepItems = await fetchStorageUnitUsage(response.data);
