@@ -3,9 +3,11 @@ import {
   DinaForm,
   DinaFormSubmitParams,
   filterBy,
+  LoadingSpinner,
   ReactTable,
   SelectField,
-  SelectOption
+  SelectOption,
+  SubmitButton
 } from "packages/common-ui/lib";
 import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
 import { useContext, useState, useMemo } from "react";
@@ -29,7 +31,16 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
   const { libraryPrepsLoading, libraryPreps, materialSamples, ngsIndexes } =
     useIndexGridControls(props);
 
-  const { editMode, batch } = props;
+  const { editMode, batch, performSave, setPerformSave } = props;
+
+  // Hidden button bar is used to submit the page from the button bar in a parent component.
+  const hiddenButtonBar = (
+    <SubmitButton
+      className="hidden"
+      performSave={performSave}
+      setPerformSave={setPerformSave}
+    />
+  );
 
   async function onSubmit({ submittedValues }: DinaFormSubmitParams<any>) {
     const submittedSampleSrs: IndexAssignmentRow[] = submittedValues.sampleSrs;
@@ -75,7 +86,7 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
         return wellCoordinates;
       },
       header: "Well Coordinates",
-      size: 100
+      size: 150
     },
     {
       header: "Material Sample Name",
@@ -130,6 +141,18 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
     [libraryPreps, materialSamples]
   );
 
+  if (libraryPrepsLoading) {
+    return <LoadingSpinner loading={true} />;
+  }
+
+  if (!batch?.indexSet?.id) {
+    return (
+      <span className="alert alert-warning">
+        Index Set must be set on the Library Prep Batch to assign indexes.
+      </span>
+    );
+  }
+
   return (
     <DinaForm
       initialValues={{}}
@@ -137,6 +160,7 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
       readOnly={editMode === false}
       enableReinitialize={true}
     >
+      {hiddenButtonBar}
       <ReactTable<IndexAssignmentRow>
         columns={COLUMNS}
         data={tableData}

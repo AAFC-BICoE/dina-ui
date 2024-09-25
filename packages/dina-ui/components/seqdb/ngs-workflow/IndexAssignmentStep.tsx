@@ -6,6 +6,7 @@ import Nav from "react-bootstrap/Nav";
 import Row from "react-bootstrap/Row";
 import Tab from "react-bootstrap/Tab";
 import { Dispatch, SetStateAction } from "react";
+import { useLocalStorage } from "@rehooks/local-storage";
 import { IndexGrid } from "./index-grid/IndexGrid";
 import { IndexAssignmentTable } from "./IndexAssignmentTable";
 
@@ -25,8 +26,22 @@ export interface IndexAssignmentStepProps {
 export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
   const { formatMessage } = useSeqdbIntl();
 
+  // Get the last active tab from local storage (defaults to "assignByGrid")
+  const [activeKey, setActiveKey] = useLocalStorage(
+    "indexAssignmentStep_activeTab",
+    "assignByGrid"
+  );
+
+  const handleSelect = (eventKey) => {
+    setActiveKey(eventKey);
+  };
+
   return (
-    <Tab.Container id="left-tabs-example" defaultActiveKey="assignByGrid">
+    <Tab.Container
+      id="left-tabs-example"
+      activeKey={activeKey}
+      onSelect={handleSelect}
+    >
       <Row>
         <Col sm={2}>
           <Nav variant="pills" className="flex-column">
