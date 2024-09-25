@@ -1,8 +1,5 @@
 import {
-  ApiClientContext,
   DinaForm,
-  DinaFormSubmitParams,
-  filterBy,
   LoadingSpinner,
   ReactTable,
   SelectField,
@@ -10,8 +7,7 @@ import {
   SubmitButton
 } from "packages/common-ui/lib";
 import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
-import { useContext, useState, useMemo } from "react";
-import { isEqual } from "lodash";
+import { useMemo } from "react";
 import { LibraryPrep } from "packages/dina-ui/types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
@@ -23,13 +19,13 @@ interface IndexAssignmentRow {
 }
 
 export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
-  const { save } = useContext(ApiClientContext);
-
-  // Timestamp of the last table save.
-  const [lastPrepTableSave, setLastPrepTableSave] = useState<number>();
-
-  const { libraryPrepsLoading, libraryPreps, materialSamples, ngsIndexes } =
-    useIndexGridControls(props);
+  const {
+    libraryPrepsLoading,
+    libraryPreps,
+    materialSamples,
+    ngsIndexes,
+    onSubmitTable
+  } = useIndexGridControls(props);
 
   const { editMode, batch, performSave, setPerformSave } = props;
 
@@ -41,35 +37,6 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
       setPerformSave={setPerformSave}
     />
   );
-
-  async function onSubmit({ submittedValues }: DinaFormSubmitParams<any>) {
-    const submittedSampleSrs: IndexAssignmentRow[] = submittedValues.sampleSrs;
-
-    // const touchedSampleSrs: IndexAssignmentRow[] = [];
-    // for (const i in submittedSampleSrs) {
-    //   if (!isEqual(submittedSampleSrs[i], libraryPreps[i])) {
-    //     touchedSampleSrs.push(submittedSampleSrs[i]);
-    //   }
-    // }
-
-    // const libraryPreps: LibraryPrep[] = [];
-    // for (const submittedSr of touchedSampleSrs) {
-    //   if (submittedSr.libraryPrep) {
-    //     submittedSr.libraryPrep.sample = submittedSr.sample;
-    //     submittedSr.libraryPrep.libraryPrepBatch = libraryPrepBatch;
-    //     libraryPreps.push(submittedSr.libraryPrep);
-    //   }
-    // }
-
-    // const saveArgs = libraryPreps.map(resource => ({
-    //   resource,
-    //   type: "libraryPrep"
-    // }));
-
-    // await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
-
-    setLastPrepTableSave(Date.now());
-  }
 
   const COLUMNS: ColumnDef<IndexAssignmentRow>[] = [
     {
@@ -94,35 +61,33 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
     },
     {
       header: "Index i5",
-      cell: ({ row: { index, original } }) =>
+      cell: ({ row: { index } }) =>
         batch.indexSet && (
           <SelectField
             hideLabel={true}
-            name={`indexI5s[${index}]`}
+            name={`libraryPrep[${index}].indexI5`}
             options={ngsIndexes
               ?.filter((ngsIndex) => ngsIndex.direction === "I5")
               ?.map<SelectOption<string>>((ngsIndex) => ({
                 label: ngsIndex.name,
                 value: ngsIndex.id
               }))}
-            styles={{ menu: () => ({ zIndex: 5 }) }}
           />
         )
     },
     {
       header: "Index i7",
-      cell: ({ row: { index, original } }) =>
+      cell: ({ row: { index } }) =>
         batch.indexSet && (
           <SelectField
             hideLabel={true}
-            name={`indexI7s[${index}]`}
+            name={`libraryPrep[${index}].indexI7`}
             options={ngsIndexes
               ?.filter((ngsIndex) => ngsIndex.direction === "I7")
               ?.map<SelectOption<string>>((ngsIndex) => ({
                 label: ngsIndex.name,
                 value: ngsIndex.id
               }))}
-            styles={{ menu: () => ({ zIndex: 5 }) }}
           />
         )
     }
@@ -156,12 +121,13 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
   return (
     <DinaForm
       initialValues={{}}
-      onSubmit={onSubmit}
+      onSubmit={onSubmitTable}
       readOnly={editMode === false}
       enableReinitialize={true}
     >
       {hiddenButtonBar}
       <ReactTable<IndexAssignmentRow>
+        className="-striped react-table-overflow"
         columns={COLUMNS}
         data={tableData}
         loading={libraryPrepsLoading}

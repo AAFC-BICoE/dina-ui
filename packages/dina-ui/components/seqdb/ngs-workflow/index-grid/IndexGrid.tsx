@@ -6,7 +6,7 @@ import {
   SelectOption,
   SubmitButton
 } from "common-ui";
-import { LibraryPrep, NgsIndex } from "../../../../types/seqdb-api";
+import { LibraryPrep } from "../../../../types/seqdb-api";
 import { useIndexGridControls } from "./useIndexGridControls";
 import { ColumnDef } from "@tanstack/react-table";
 import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
@@ -31,7 +31,7 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
     materialSamples,
     ngsIndexes,
     storageUnitType,
-    onSubmit
+    onSubmitGrid
   } = useIndexGridControls(props);
 
   // Hidden button bar is used to submit the page from the button bar in a parent component.
@@ -87,7 +87,6 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
                     label: index.name,
                     value: index.id
                   }))}
-                styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </div>
           )
@@ -160,7 +159,6 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
                     value: index.id
                   }))}
                 className="w-100"
-                styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </>
           ),
@@ -184,20 +182,12 @@ export function IndexGrid(props: IndexAssignmentStepProps) {
     return (
       <DinaForm
         initialValues={{ indexI5s: {}, indexI7s: {} }}
-        onSubmit={onSubmit}
+        onSubmit={onSubmitGrid}
         readOnly={editMode === false}
       >
         {hiddenButtonBar}
-        <style>{`
-          .rt-td {
-            padding: 0 !important;
-          }
-
-          .ReactTable {
-            overflow-x: auto;
-          }
-        `}</style>
         <ReactTable<CellData>
+          className="-striped react-table-overflow"
           columns={columns}
           data={tableData}
           showPagination={false}

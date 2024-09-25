@@ -146,7 +146,15 @@ export function useIndexGridControls({
     fetchStorageUnitTypeLayout();
   }, [libraryPrepBatch]);
 
-  async function onSubmit({ submittedValues }: DinaFormSubmitParams<any>) {
+  /**
+   * Index Grid Form Submit
+   *
+   * Columns can set the i7 for each cell in that column and rows can set the i5 index for each
+   * cell in that row.
+   *
+   * @param submittedValues Formik form data - Indicates the row/column and the index to set.
+   */
+  async function onSubmitGrid({ submittedValues }: DinaFormSubmitParams<any>) {
     // Do not perform a submit if not in edit mode.
     if (!editMode) {
       return;
@@ -198,12 +206,59 @@ export function useIndexGridControls({
     setEditMode(false);
   }
 
+  /**
+   * Table index assignment submit. This form lets you set the i5/i7 indexes for each library
+   * prep individually.
+   *
+   * @param submittedValues Formik form data
+   */
+  async function onSubmitTable({ submittedValues }: DinaFormSubmitParams<any>) {
+    // Do not perform a submit if not in edit mode.
+    if (!editMode) {
+      return;
+    }
+
+    // Library preps must be loaded in.
+    if (
+      !libraryPreps ||
+      libraryPreps.length === 0 ||
+      !submittedValues.libraryPrep ||
+      submittedValues.libraryPrep.length === 0
+    ) {
+      return;
+    }
+
+    const libraryPrepUpdates = (submittedValues?.libraryPrep as any[])
+      ?.filter((submittedValue: any) => submittedValue)
+      ?.map<LibraryPrep>((submittedValue: any, index: number) => ({
+        type: "library-prep",
+        id: libraryPreps[index].id,
+        ...(submittedValue.indexI5 && {
+          indexI5: { type: "ngs-index", id: submittedValue.indexI5 }
+        }),
+        ...(submittedValue.indexI7 && {
+          indexI7: { type: "ngs-index", id: submittedValue.indexI7 }
+        })
+      }));
+
+    const saveArgs = libraryPrepUpdates.map((resource) => ({
+      resource,
+      type: "library-prep"
+    }));
+
+    await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
+    setLastSave(Date.now());
+    setPerformSave(false);
+    setEditMode(false);
+  }
+
   return {
     libraryPrepsLoading,
     libraryPreps,
     materialSamples,
     ngsIndexes,
     storageUnitType,
-    onSubmit
+    onSubmitGrid,
+    onSubmitTable
   };
 }
