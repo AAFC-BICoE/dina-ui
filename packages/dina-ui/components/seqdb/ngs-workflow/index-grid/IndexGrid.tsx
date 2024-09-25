@@ -10,6 +10,7 @@ import { LibraryPrep } from "../../../../types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
 import { IndexAssignmentStepProps } from "../IndexAssignmentStep";
 import { UseIndexAssignmentReturn } from "../useIndexAssignmentAPI";
+import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
 
 interface CellData {
   row: number;
@@ -33,6 +34,7 @@ export function IndexGrid(props: IndexGridProps) {
     onSubmitGrid
   } = props;
 
+  const { formatMessage } = useSeqdbIntl();
   const { indexSet } = libraryPrepBatch;
 
   // Hidden button bar is used to submit the page from the button bar in a parent component.
@@ -51,7 +53,7 @@ export function IndexGrid(props: IndexGridProps) {
   if (!storageUnitType && !indexSet) {
     return (
       <span className="alert alert-warning">
-        Container Type and Index Set must be set to use the index grid.
+        {formatMessage("missingContainerAndIndexForAssignment")}
       </span>
     );
   }
@@ -89,8 +91,10 @@ export function IndexGrid(props: IndexGridProps) {
                     value: index.id
                   }))}
                 selectProps={{
-                  isClearable: true
+                  isClearable: true,
+                  placeholder: formatMessage("selectI5")
                 }}
+                removeBottomMargin={true}
               />
             </div>
           )
@@ -98,11 +102,8 @@ export function IndexGrid(props: IndexGridProps) {
       },
       meta: {
         style: {
-          position: "sticky",
-          left: 0,
           background: "white",
-          boxShadow: "7px 0px 9px 0px rgba(0,0,0,0.1)",
-          zIndex: 500
+          boxShadow: "7px 0px 9px 0px rgba(0,0,0,0.1)"
         }
       },
       id: "rowNumber",
@@ -152,22 +153,22 @@ export function IndexGrid(props: IndexGridProps) {
         },
         header: () =>
           indexSet && (
-            <>
-              <SelectField
-                label={columnLabel}
-                name={`indexI7s[${columnLabel}]`}
-                options={ngsIndexes
-                  ?.filter((index) => index.direction === "I7")
-                  ?.map<SelectOption<string>>((index) => ({
-                    label: index.name,
-                    value: index.id
-                  }))}
-                selectProps={{
-                  isClearable: true
-                }}
-                className="w-100"
-              />
-            </>
+            <SelectField
+              label={columnLabel}
+              name={`indexI7s[${columnLabel}]`}
+              options={ngsIndexes
+                ?.filter((index) => index.direction === "I7")
+                ?.map<SelectOption<string>>((index) => ({
+                  label: index.name,
+                  value: index.id
+                }))}
+              selectProps={{
+                isClearable: true,
+                placeholder: formatMessage("selectI7")
+              }}
+              removeBottomMargin={true}
+              className={"w-100"}
+            />
           ),
         id: `${columnLabel}`,
         accessorKey: `${columnLabel}`,
@@ -181,7 +182,6 @@ export function IndexGrid(props: IndexGridProps) {
     const tableData: CellData[] = [];
     const numberOfRows =
       storageUnitType?.gridLayoutDefinition?.numberOfRows ?? 0;
-
     for (let i = 0; i < numberOfRows; i++) {
       tableData.push({ row: i });
     }
@@ -198,6 +198,7 @@ export function IndexGrid(props: IndexGridProps) {
           columns={columns}
           data={tableData}
           showPagination={false}
+          manualPagination={true}
         />
       </DinaForm>
     );

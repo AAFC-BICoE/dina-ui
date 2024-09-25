@@ -300,7 +300,10 @@ input[type="number"]::-webkit-outer-spin-button {
 /*
  * React Table Styles
  */
-.react-table-overflow .rt-td, .react-table-overflow .rt-tbody, .react-table-overflow .rt-table {
+.react-table-overflow .rt-td, 
+.react-table-overflow .rt-tbody, 
+.react-table-overflow .rt-table,
+.react-table-overflow th {
   overflow: visible !important;
 }
 

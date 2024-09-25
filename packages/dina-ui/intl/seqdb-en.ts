@@ -138,6 +138,12 @@ export const SEQDB_MESSAGES_ENGLISH = {
   indexAssignmentStep: "Index Assignment",
   assignByGrid: "Assign by grid",
   assignByTable: "Assign by table",
+  selectI5: "Select i5",
+  selectI7: "Select i7",
+  missingIndexForAssignment:
+    "Index Set must be set on the Library Prep Batch to assign indexes.",
+  missingContainerAndIndexForAssignment:
+    "Container Type and Index Set must be set to use the index grid.",
   selectPcrBatch: "Select PCR Batch",
   selectPcrBatchTitle: "Select PCR Batch",
   selectSamples: "Select Material Samples",

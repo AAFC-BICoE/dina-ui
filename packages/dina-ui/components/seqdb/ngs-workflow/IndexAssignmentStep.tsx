@@ -37,6 +37,11 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
   );
 
   const handleSelect = (eventKey) => {
+    // Do not switch modes if in edit mode. This is used to prevent data from being mixed up.
+    if (props.editMode) {
+      return;
+    }
+
     setActiveKey(eventKey);
   };
 
@@ -50,12 +55,20 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
         <Col sm={2}>
           <Nav variant="pills" className="flex-column">
             <Nav.Item>
-              <Nav.Link eventKey="assignByGrid" style={{ cursor: "pointer" }}>
+              <Nav.Link
+                eventKey="assignByGrid"
+                style={{ cursor: props.editMode ? "default" : "pointer" }}
+                disabled={props.editMode}
+              >
                 {formatMessage("assignByGrid")}
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link eventKey="assignByTable" style={{ cursor: "pointer" }}>
+              <Nav.Link
+                eventKey="assignByTable"
+                style={{ cursor: props.editMode ? "default" : "pointer" }}
+                disabled={props.editMode}
+              >
                 {formatMessage("assignByTable")}
               </Nav.Link>
             </Nav.Item>

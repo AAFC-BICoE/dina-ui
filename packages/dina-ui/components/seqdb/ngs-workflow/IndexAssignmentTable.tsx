@@ -4,7 +4,8 @@ import {
   ReactTable,
   SelectField,
   SelectOption,
-  SubmitButton
+  SubmitButton,
+  useStringComparator
 } from "packages/common-ui/lib";
 import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
 import { useMemo } from "react";
@@ -12,6 +13,7 @@ import { LibraryPrep } from "packages/dina-ui/types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
 import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
 import { UseIndexAssignmentReturn } from "./useIndexAssignmentAPI";
+import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
 
 interface IndexAssignmentRow {
   materialSample?: MaterialSampleSummary;
@@ -35,6 +37,9 @@ export function IndexAssignmentTable(props: IndexAssignmentTableProps) {
     onSubmitTable
   } = props;
 
+  const { compareByStringAndNumber } = useStringComparator();
+  const { formatMessage } = useSeqdbIntl();
+
   // Hidden button bar is used to submit the page from the button bar in a parent component.
   const hiddenButtonBar = (
     <SubmitButton
@@ -49,16 +54,36 @@ export function IndexAssignmentTable(props: IndexAssignmentTableProps) {
       cell: ({ row: { original: sr } }) => {
         const { libraryPrep } = sr as IndexAssignmentRow;
         if (!libraryPrep || !libraryPrep.storageUnitUsage) {
-          return null;
+          return "";
         }
 
         const { wellRow, wellColumn } = libraryPrep.storageUnitUsage;
         const wellCoordinates =
-          wellColumn === null || !wellRow ? null : `${wellRow}${wellColumn}`;
+          wellColumn === null || !wellRow ? "" : `${wellRow}${wellColumn}`;
 
         return wellCoordinates;
       },
       header: "Well Coordinates",
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aStorageUnit = a.original?.libraryPrep?.storageUnitUsage;
+        const bStorageUnit = b.original?.libraryPrep?.storageUnitUsage;
+
+        const aString =
+          !aStorageUnit ||
+          aStorageUnit?.wellRow === null ||
+          aStorageUnit?.wellColumn === null
+            ? ""
+            : `${aStorageUnit?.wellRow}${aStorageUnit?.wellColumn}`;
+        const bString =
+          !bStorageUnit ||
+          bStorageUnit?.wellRow === null ||
+          bStorageUnit?.wellColumn === null
+            ? ""
+            : `${bStorageUnit?.wellRow}${bStorageUnit?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      },
+      enableSorting: true,
       size: 150
     },
     {
@@ -138,7 +163,7 @@ export function IndexAssignmentTable(props: IndexAssignmentTableProps) {
   if (!batch?.indexSet?.id) {
     return (
       <span className="alert alert-warning">
-        Index Set must be set on the Library Prep Batch to assign indexes.
+        {formatMessage("missingIndexForAssignment")}
       </span>
     );
   }
@@ -159,6 +184,7 @@ export function IndexAssignmentTable(props: IndexAssignmentTableProps) {
         manualPagination={true}
         showPagination={false}
         pageSize={tableData.length}
+        sort={[{ id: "wellCoordinates", desc: false }]}
       />
     </DinaForm>
   );
