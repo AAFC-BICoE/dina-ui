@@ -4,32 +4,24 @@ import {
   DinaFormSubmitParams,
   filterBy,
   ReactTable,
-  ResourceSelectField,
-  SelectField
+  SelectField,
+  SelectOption
 } from "packages/common-ui/lib";
 import { IndexAssignmentStepProps } from "./IndexAssignmentStep";
-import { useContext, useState } from "react";
-import { isEqual, startCase } from "lodash";
+import { useContext, useState, useMemo } from "react";
+import { isEqual } from "lodash";
 import { LibraryPrep } from "packages/dina-ui/types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useIndexGridControls } from "./index-grid/useIndexGridControls";
 
 interface IndexAssignmentRow {
-  materialSample: MaterialSample;
-  libraryPrep: LibraryPrep;
+  materialSample?: MaterialSample;
+  libraryPrep?: LibraryPrep;
 }
 
 export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
   const { save } = useContext(ApiClientContext);
-
-  // Current sample StepResources in the "sample selection" table.
-  const [sampleSrs, setSampleSrs] = useState<IndexAssignmentRow[]>([]);
-
-  // The values to initialize the Formik form.
-  const [formikValues, setFormikValues] = useState({
-    sampleSrs: [] as IndexAssignmentRow[]
-  });
 
   // Timestamp of the last table save.
   const [lastPrepTableSave, setLastPrepTableSave] = useState<number>();
@@ -42,12 +34,12 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
   async function onSubmit({ submittedValues }: DinaFormSubmitParams<any>) {
     const submittedSampleSrs: IndexAssignmentRow[] = submittedValues.sampleSrs;
 
-    const touchedSampleSrs: IndexAssignmentRow[] = [];
-    for (const i in submittedSampleSrs) {
-      if (!isEqual(submittedSampleSrs[i], sampleSrs[i])) {
-        touchedSampleSrs.push(submittedSampleSrs[i]);
-      }
-    }
+    // const touchedSampleSrs: IndexAssignmentRow[] = [];
+    // for (const i in submittedSampleSrs) {
+    //   if (!isEqual(submittedSampleSrs[i], libraryPreps[i])) {
+    //     touchedSampleSrs.push(submittedSampleSrs[i]);
+    //   }
+    // }
 
     // const libraryPreps: LibraryPrep[] = [];
     // for (const submittedSr of touchedSampleSrs) {
@@ -69,63 +61,90 @@ export function IndexAssignmentTable(props: IndexAssignmentStepProps) {
   }
 
   const COLUMNS: ColumnDef<IndexAssignmentRow>[] = [
-    // {
-    //   cell: ({ row: { original: sr } }) => {
-    //     const { libraryPrep } = sr as IndexAssignmentRow;
-    //     if (!libraryPrep) {
-    //       return null;
-    //     }
+    {
+      cell: ({ row: { original: sr } }) => {
+        const { libraryPrep } = sr as IndexAssignmentRow;
+        if (!libraryPrep || !libraryPrep.storageUnitUsage) {
+          return null;
+        }
 
-    //     const { wellColumn, wellRow } = libraryPrep;
-    //     const wellCoordinates =
-    //       wellColumn === null || !wellRow
-    //         ? null
-    //         : `${wellRow}${String(wellColumn).padStart(2, "0")}`;
+        const { wellRow, wellColumn } = libraryPrep.storageUnitUsage;
+        const wellCoordinates =
+          wellColumn === null || !wellRow ? null : `${wellRow}${wellColumn}`;
 
-    //     return wellCoordinates;
-    //   },
-    //   header: "Well Coordinates",
-    //   enableSorting: false
-    // },
+        return wellCoordinates;
+      },
+      header: "Well Coordinates",
+      size: 100
+    },
     {
       header: "Material Sample Name",
-      accessorKey: "sample.name"
+      accessorKey: "materialSample.materialSampleName"
+    },
+    {
+      header: "Index i5",
+      cell: ({ row: { index, original } }) =>
+        batch.indexSet && (
+          <SelectField
+            hideLabel={true}
+            name={`indexI5s[${index}]`}
+            options={ngsIndexes
+              ?.filter((ngsIndex) => ngsIndex.direction === "I5")
+              ?.map<SelectOption<string>>((ngsIndex) => ({
+                label: ngsIndex.name,
+                value: ngsIndex.id
+              }))}
+            styles={{ menu: () => ({ zIndex: 5 }) }}
+          />
+        )
+    },
+    {
+      header: "Index i7",
+      cell: ({ row: { index, original } }) =>
+        batch.indexSet && (
+          <SelectField
+            hideLabel={true}
+            name={`indexI7s[${index}]`}
+            options={ngsIndexes
+              ?.filter((ngsIndex) => ngsIndex.direction === "I7")
+              ?.map<SelectOption<string>>((ngsIndex) => ({
+                label: ngsIndex.name,
+                value: ngsIndex.id
+              }))}
+            styles={{ menu: () => ({ zIndex: 5 }) }}
+          />
+        )
     }
-    // ...["indexI5", "indexI7"].map(fieldName => ({
-    //   cell: ({row: { index, original }}) =>
-    //     batch.indexSet && (
-    //       <SelectField
-    //         label={rowLetter}
-    //         name={`indexI5s[${rowLetter}]`}
-    //         options={ngsIndexes
-    //           ?.filter((index) => index.direction === "I5")
-    //           ?.map<SelectOption<string>>((index) => ({
-    //             label: index.name,
-    //             value: index.id
-    //           }))}
-    //         styles={{ menu: () => ({ zIndex: 5 }) }}
-    //       />
-    //     ),
-    //   header: startCase(fieldName),
-    //   enableSorting: false
-    // }))
   ];
 
+  const tableData = useMemo(
+    () =>
+      libraryPreps && libraryPreps.length !== 0
+        ? libraryPreps.map<IndexAssignmentRow>((prep) => ({
+            libraryPrep: prep,
+            materialSample: materialSamples?.find(
+              (samp) => samp.id === prep?.materialSample?.id
+            )
+          }))
+        : [],
+    [libraryPreps, materialSamples]
+  );
+
   return (
-    <>
-      <DinaForm
-        initialValues={{ indexI5s: {}, indexI7s: {} }}
-        onSubmit={onSubmit}
-        readOnly={editMode === false}
-      >
-        <ReactTable
-          columns={COLUMNS}
-          data={formikValues.sampleSrs}
-          loading={libraryPrepsLoading}
-          showPagination={false}
-          pageSize={sampleSrs.length}
-        />
-      </DinaForm>
-    </>
+    <DinaForm
+      initialValues={{}}
+      onSubmit={onSubmit}
+      readOnly={editMode === false}
+      enableReinitialize={true}
+    >
+      <ReactTable<IndexAssignmentRow>
+        columns={COLUMNS}
+        data={tableData}
+        loading={libraryPrepsLoading}
+        manualPagination={true}
+        showPagination={false}
+        pageSize={tableData.length}
+      />
+    </DinaForm>
   );
 }
