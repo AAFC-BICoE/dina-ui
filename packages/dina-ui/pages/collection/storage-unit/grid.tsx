@@ -8,8 +8,8 @@ import { useState } from "react";
 import { Tabs, TabList, Tab, TabPanel } from "react-tabs";
 import { Button, Spinner } from "react-bootstrap";
 import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
-import { StorageUnitSampleSelectionStep } from "packages/dina-ui/components/storage/StorageUnitSampleSelectionStep";
-import { StorageUnitSelectCoordinatesStep } from "packages/dina-ui/components/storage/StorageUnitSelectCoordinatesStep";
+import { StorageUnitSampleSelectionStep } from "packages/dina-ui/components/storage/grid/StorageUnitSampleSelectionStep";
+import { StorageUnitSelectCoordinatesStep } from "packages/dina-ui/components/storage/grid/StorageUnitSelectCoordinatesStep";
 
 export default function StorageUnitGridPage() {
   return <StorageUnitGridForm />;
@@ -138,6 +138,8 @@ function StorageUnitGridForm() {
               <StorageUnitSelectCoordinatesStep
                 onSaved={onSaved}
                 performSave={performSave}
+                editMode={editMode}
+                storageUnit={data}
               />
             </TabPanel>
           </Tabs>

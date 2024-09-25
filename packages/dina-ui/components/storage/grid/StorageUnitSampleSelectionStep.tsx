@@ -13,7 +13,7 @@ import {
   StorageUnit
 } from "packages/dina-ui/types/collection-api";
 import { useEffect, useState } from "react";
-import { useMaterialSampleRelationshipColumns } from "../collection/material-sample/useMaterialSampleRelationshipColumns";
+import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { compact, uniq, difference, concat } from "lodash";
 import { useRouter } from "next/router";

@@ -36,7 +36,7 @@ import {
 } from "../../types/collection-api";
 import { useState } from "react";
 import { ResourceNameIdentifier } from "../../types/common/resources/ResourceNameIdentifier";
-import StorageUnitGrid from "./StorageUnitGrid";
+import StorageUnitGrid from "./grid/StorageUnitGrid";
 import { useFormikContext } from "formik";
 
 export const storageUnitFormSchema = yup.object({
