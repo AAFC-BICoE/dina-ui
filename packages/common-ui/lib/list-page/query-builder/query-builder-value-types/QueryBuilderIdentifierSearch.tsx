@@ -10,11 +10,8 @@ import QueryBuilderTextSearch, {
 import { noop } from "lodash";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
-import {
-  VocabularyOption,
-  VocabularySelectField
-} from "packages/dina-ui/components/collection/VocabularySelectField";
-import useVocabularyOptions from "packages/dina-ui/components/collection/useVocabularyOptions";
+import { VocabularyOption } from "packages/dina-ui/components/collection/VocabularySelectField";
+import useVocabularyOptions from "../../../../../dina-ui/components/collection/useVocabularyOptions";
 
 interface QueryBuilderIdentifierSearchProps {
   /**
