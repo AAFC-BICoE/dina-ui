@@ -118,6 +118,65 @@ describe("ColumnSelectorUtils", () => {
       ).toEqual("fieldExtension/COLLECTING_EVENT/mixs_water_v4/alkalinity");
     });
 
+    it("Generate identifier path", () => {
+      expect(
+        generateColumnPath({
+          indexMapping: {
+            dynamicField: {
+              type: "identifier",
+              label: "identifiers",
+              component: "MATERIAL_SAMPLE",
+              path: "data.attributes.identifiers",
+              apiEndpoint:
+                "collection-api/vocabulary2/materialSampleIdentifierType"
+            },
+            value: "data.attributes.identifiers",
+            distinctTerm: false,
+            label: "identifiers",
+            path: "data.attributes.identifiers",
+            type: "identifier",
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            containsSupport: false,
+            endsWithSupport: false,
+            hideField: false
+          },
+          dynamicFieldValue: `{"searchValue":"","selectedOperator":"exactMatch","selectedIdentifier":"seqdb_id"}`
+        })
+      ).toEqual("identifier/seqdb_id");
+
+      expect(
+        generateColumnPath({
+          indexMapping: {
+            dynamicField: {
+              type: "identifier",
+              label: "identifiers",
+              component: "MATERIAL_SAMPLE",
+              path: "included.attributes.identifiers",
+              apiEndpoint:
+                "collection-api/vocabulary2/materialSampleIdentifierType"
+            },
+            parentName: "parentMaterialSample",
+            parentPath: "included",
+            parentType: "collecting-event",
+            value: "included.attributes.identifiers_parentMaterialSample",
+            distinctTerm: false,
+            label: "identifiers",
+            path: "included.attributes.identifiers",
+            type: "identifier",
+            keywordMultiFieldSupport: false,
+            keywordNumericSupport: false,
+            optimizedPrefix: false,
+            containsSupport: false,
+            endsWithSupport: false,
+            hideField: false
+          },
+          dynamicFieldValue: `{"searchValue":"","selectedOperator":"exactMatch","selectedIdentifier":"seqdb_id"}`
+        })
+      ).toEqual("identifier/seqdb_id");
+    });
+
     it("Generate relationship presence path", () => {
       expect(
         generateColumnPath({

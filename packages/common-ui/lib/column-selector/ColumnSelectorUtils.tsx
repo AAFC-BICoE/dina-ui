@@ -14,6 +14,7 @@ import { FieldExtensionSearchStates } from "../list-page/query-builder/query-bui
 import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
@@ -54,6 +55,16 @@ export function generateColumnPath({
           fieldExtensionValues?.selectedExtension +
           "/" +
           fieldExtensionValues?.selectedField
+        );
+
+      // Identifier (identifier/[IDENTIFIER_KEY])
+      case "identifier":
+        const identifierValues: IdentifierSearchStates =
+          JSON.parse(dynamicFieldValue);
+        return (
+          indexMapping.dynamicField.type +
+          "/" +
+          identifierValues.selectedIdentifier
         );
 
       // Relationship Presence (relationshipPresence/[RELATIONSHIP]/[OPERATOR])
@@ -259,6 +270,21 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
         component,
         extension,
         field,
+        apiClient,
+        dynamicFieldsMappingConfig
+      );
+    }
+
+    // Handle identifier paths
+    if (
+      dynamicFieldsMappingConfig &&
+      pathParts.length === 2 &&
+      pathParts[0] === "identifier"
+    ) {
+      const identifierKey = pathParts[1];
+      return getIdentifierColumn(
+        path,
+        identifierKey,
         apiClient,
         dynamicFieldsMappingConfig
       );
@@ -559,6 +585,130 @@ export function getIncludedExtensionFieldColumn(
   };
 
   return extensionValuesColumn;
+}
+
+async function getIdentifierColumn<TData extends KitsuResource>(
+  path: string,
+  identifierKey: string,
+  apiClient: Kitsu,
+  dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
+): Promise<TableColumn<TData> | undefined> {
+  // API request params:
+  const params = {
+    filter: {},
+    page: { limit: 1 }
+  };
+
+  // Figure out API endpoint using the dynamicFieldsMappingConfig.
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find(
+    (config) => config.type === "identifier"
+  );
+  const relationshipConfigMatch =
+    dynamicFieldsMappingConfig.relationshipFields.find(
+      (config) => config.type === "identifier"
+    );
+
+  if (!fieldConfigMatch && !relationshipConfigMatch) {
+    console.error(
+      "Identifier Config could not be found in the dynamic fields mapping."
+    );
+    return;
+  }
+
+  try {
+    if (fieldConfigMatch) {
+      // API request for the identifiers
+      const identifierRequest = await fetchDynamicField(
+        apiClient,
+        fieldConfigMatch.apiEndpoint,
+        params
+      );
+      const fieldDefinition = "";
+
+      if (fieldDefinition) {
+        return getAttributeIdentifierColumn(
+          path,
+          fieldConfigMatch,
+          fieldDefinition
+        );
+      }
+    }
+
+    if (relationshipConfigMatch) {
+      // API request for the identifiers
+      const identifierRequest = await fetchDynamicField(
+        apiClient,
+        relationshipConfigMatch.apiEndpoint,
+        params
+      );
+      const fieldDefinition = "";
+
+      if (fieldDefinition) {
+        return getIncludedIdentifierColumn(
+          path,
+          identifierKey,
+          relationshipConfigMatch
+        );
+      }
+    }
+  } catch (error) {
+    // Handle the error here, e.g., log it or display an error message.
+    throw error;
+  }
+}
+
+export function getAttributeIdentifierColumn<TData extends KitsuResource>(
+  path: string,
+  identifierKey: any,
+  config: DynamicField
+): TableColumn<TData> {
+  const accessorKey = `${config.path}.${identifierKey}`;
+  const identifierColumn = {
+    header: () => "TODO",
+    accessorKey,
+    id: `${config.label}.${identifierKey}`,
+    isKeyword: true,
+    isColumnVisible: true,
+    config,
+    // managedAttribute,
+    sortDescFirst: true,
+    columnSelectorString: path
+  };
+
+  return identifierColumn;
+}
+
+export function getIncludedIdentifierColumn<TData extends KitsuResource>(
+  path: string,
+  identifierKey: string,
+  config: RelationshipDynamicField
+): TableColumn<TData> {
+  const accessorKey = `${config.path}.${identifierKey}`;
+
+  const identifierColumn = {
+    cell: ({ row: { original } }) => {
+      const relationshipAccessor = accessorKey?.split(".");
+      relationshipAccessor?.splice(
+        1,
+        0,
+        config.referencedType ? config.referencedType : ""
+      );
+      const valuePath = relationshipAccessor?.join(".");
+      const value = get(original, valuePath);
+      return <>{value}</>;
+    },
+    header: () => "TODO",
+    accessorKey,
+    id: `${config.referencedBy}.${config.label}.${identifierKey}`,
+    isKeyword: true,
+    isColumnVisible: true,
+    relationshipType: config.referencedType,
+    // managedAttribute,
+    config,
+    columnSelectorString: path
+  };
+
+  return identifierColumn;
 }
 
 export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
