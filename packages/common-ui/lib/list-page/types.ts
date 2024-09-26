@@ -253,6 +253,7 @@ export type DynamicFieldType =
   | "unsupported"
   | "managedAttribute"
   | "fieldExtension"
+  | "identifier"
   | "relationshipPresence";
 
 export interface DynamicFieldsMappingConfig {

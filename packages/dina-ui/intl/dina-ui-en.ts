@@ -734,6 +734,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "See user documentation for all supported syntax.",
   queryBuilder_managedAttribute_placeholder:
     "Select managed attribute to search against...",
+  queryBuilder_identifier_placeholder:
+    "Select identifier type to search against...",
   queryBuilder_operator_presence: "Presence",
   queryBuilder_operator_absence: "Absence",
   queryBuilder_operator_containsDate: "Contains",
