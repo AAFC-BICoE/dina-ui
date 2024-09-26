@@ -4,6 +4,7 @@ import { GroupBase } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import useVocabularyOptions from "./useVocabularyOptions";
+import { VocabularyElement } from "packages/dina-ui/types/collection-api";
 
 export interface VocabularySelectFieldProps extends FieldWrapperProps {
   path: string;
@@ -96,4 +97,19 @@ export function VocabularyReadOnlyView({ path, value }) {
         .join(", ")}
     </div>
   ) : null;
+}
+
+export interface VocabularyFieldHeaderProps {
+  vocabulary: VocabularyElement;
+}
+
+export function VocabularyFieldHeader({
+  vocabulary
+}: VocabularyFieldHeaderProps) {
+  const { locale } = useDinaIntl();
+  const label =
+    vocabulary?.multilingualTitle?.titles?.find(
+      (title) => title.lang === locale
+    )?.title ?? vocabulary.key;
+  return <>{label}</>;
 }

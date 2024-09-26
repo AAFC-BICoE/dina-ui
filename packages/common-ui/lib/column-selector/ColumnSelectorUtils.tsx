@@ -15,6 +15,8 @@ import { RelationshipPresenceSearchStates } from "../list-page/query-builder/que
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
+import { VocabularyElement } from "packages/dina-ui/types/collection-api";
+import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
 
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
@@ -595,7 +597,6 @@ async function getIdentifierColumn<TData extends KitsuResource>(
 ): Promise<TableColumn<TData> | undefined> {
   // API request params:
   const params = {
-    filter: {},
     page: { limit: 1 }
   };
 
@@ -623,13 +624,19 @@ async function getIdentifierColumn<TData extends KitsuResource>(
         fieldConfigMatch.apiEndpoint,
         params
       );
-      const fieldDefinition = "";
 
-      if (fieldDefinition) {
+      // Find the Vocabulary Element based on the identifier key.
+      const vocabularyElements = (identifierRequest as any)
+        ?.vocabularyElements as VocabularyElement[];
+      const vocabularyElement = vocabularyElements.find(
+        (vocab) => vocab.key === identifierKey
+      );
+
+      if (vocabularyElement) {
         return getAttributeIdentifierColumn(
           path,
-          fieldConfigMatch,
-          fieldDefinition
+          vocabularyElement,
+          fieldConfigMatch
         );
       }
     }
@@ -641,12 +648,18 @@ async function getIdentifierColumn<TData extends KitsuResource>(
         relationshipConfigMatch.apiEndpoint,
         params
       );
-      const fieldDefinition = "";
 
-      if (fieldDefinition) {
+      // Find the Vocabulary Element based on the identifier key.
+      const vocabularyElements = (identifierRequest as any)
+        ?.vocabularyElements as VocabularyElement[];
+      const vocabularyElement = vocabularyElements.find(
+        (vocab) => vocab.key === identifierKey
+      );
+
+      if (vocabularyElement) {
         return getIncludedIdentifierColumn(
           path,
-          identifierKey,
+          vocabularyElement,
           relationshipConfigMatch
         );
       }
@@ -659,18 +672,18 @@ async function getIdentifierColumn<TData extends KitsuResource>(
 
 export function getAttributeIdentifierColumn<TData extends KitsuResource>(
   path: string,
-  identifierKey: any,
+  identifier: VocabularyElement,
   config: DynamicField
 ): TableColumn<TData> {
-  const accessorKey = `${config.path}.${identifierKey}`;
+  const accessorKey = `${config.path}.${identifier.key}`;
   const identifierColumn = {
-    header: () => "TODO",
+    header: () => <VocabularyFieldHeader vocabulary={identifier} />,
     accessorKey,
-    id: `${config.label}.${identifierKey}`,
+    id: `${config.label}.${identifier.key}`,
     isKeyword: true,
     isColumnVisible: true,
     config,
-    // managedAttribute,
+    identifier,
     sortDescFirst: true,
     columnSelectorString: path
   };
@@ -680,10 +693,10 @@ export function getAttributeIdentifierColumn<TData extends KitsuResource>(
 
 export function getIncludedIdentifierColumn<TData extends KitsuResource>(
   path: string,
-  identifierKey: string,
+  identifier: VocabularyElement,
   config: RelationshipDynamicField
 ): TableColumn<TData> {
-  const accessorKey = `${config.path}.${identifierKey}`;
+  const accessorKey = `${config.path}.${identifier.key}`;
 
   const identifierColumn = {
     cell: ({ row: { original } }) => {
@@ -697,13 +710,13 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
       const value = get(original, valuePath);
       return <>{value}</>;
     },
-    header: () => "TODO",
+    header: () => <VocabularyFieldHeader vocabulary={identifier} />,
     accessorKey,
-    id: `${config.referencedBy}.${config.label}.${identifierKey}`,
+    id: `${config.referencedBy}.${config.label}.${identifier.key}`,
     isKeyword: true,
     isColumnVisible: true,
     relationshipType: config.referencedType,
-    // managedAttribute,
+    identifier,
     config,
     columnSelectorString: path
   };
