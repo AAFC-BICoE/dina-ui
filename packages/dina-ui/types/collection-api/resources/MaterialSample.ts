@@ -45,12 +45,12 @@ export interface MaterialSampleAttributes {
   materialSampleRemarks?: string;
   materialSampleType?: MaterialSampleType;
   organism?: (Organism | null | undefined)[] | null;
-  storageUnit?: StorageUnit;
 
   // Client-side only fields for the organism section:
   organismsQuantity?: number;
   organismsIndividualEntry?: boolean;
   useTargetOrganism?: boolean;
+  storageUnit?: StorageUnit;
 
   publiclyReleasable?: boolean | null;
   notPubliclyReleasableReason?: string;

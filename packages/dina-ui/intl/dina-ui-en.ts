@@ -1063,6 +1063,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedExport_createName: "Saved Export Template Name",
   savedExport_columnsToBeSaved: "Columns to be saved",
   export_columnsToExport: "Columns To Export",
+  usage: "Usage",
+  editContents: "Edit Contents",
+  storageUnitGridTitle: "Storage Unit Grid",
   field_appendData_tooltip:
     "If enabled, append data to existing record with matching name. Otherwise, create new record."
 };

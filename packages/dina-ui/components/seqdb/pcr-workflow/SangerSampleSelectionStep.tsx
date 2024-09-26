@@ -259,7 +259,6 @@ export function SangerSampleSelectionStep({
     } finally {
       // Clear the previously selected resources.
       setPreviouslySelectedResources([]);
-      // setEditMode(false);
     }
   }
 
