@@ -11,13 +11,15 @@ interface StorageUnitSelectCoordinatesStepProps {
   performSave: boolean;
   editMode: boolean;
   storageUnit: StorageUnit;
+  currentStep: number;
 }
 
 export function StorageUnitSelectCoordinatesStep({
   onSaved,
   performSave,
   editMode,
-  storageUnit
+  storageUnit,
+  currentStep
 }: StorageUnitSelectCoordinatesStepProps) {
   const {
     availableItems,
@@ -36,7 +38,8 @@ export function StorageUnitSelectCoordinatesStep({
     isStorage,
     gridIsPopulated
   } = useMaterialSampleGridControls({
-    storageUnit
+    storageUnit,
+    currentStep
   });
 
   // Check if a save was requested from the top level button bar.

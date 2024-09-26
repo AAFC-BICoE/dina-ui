@@ -11,13 +11,16 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { StorageUnitUsage } from "../../../../types/collection-api/resources/StorageUnitUsage";
 import { CellGrid } from "../../../../components/seqdb/container-grid/ContainerGrid";
 import { SAMPLE_SELECTION_MATERIAL_SAMPLE_SORT_ORDER } from "../StorageUnitSampleSelectionStep";
+import { SELECT_COORDINATES_TAB_INDEX } from "../../../../pages/collection/storage-unit/grid";
 
 interface MaterialSampleGridControlsProps {
   storageUnit: StorageUnit;
+  currentStep: number;
 }
 
 export function useMaterialSampleGridControls({
-  storageUnit
+  storageUnit,
+  currentStep
 }: MaterialSampleGridControlsProps) {
   const { save } = useContext(ApiClientContext);
 
@@ -65,10 +68,7 @@ export function useMaterialSampleGridControls({
     () => !isEmpty(gridState.cellGrid),
     [gridState]
   );
-
-  const { loading: materialSamplesQueryLoading, response } = useQuery<
-    MaterialSample[]
-  >(
+  const { loading: materialSamplesQueryLoading } = useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
       filter: {
@@ -78,6 +78,7 @@ export function useMaterialSampleGridControls({
       page: { limit: 1000 }
     },
     {
+      disabled: currentStep !== SELECT_COORDINATES_TAB_INDEX,
       onSuccess: async ({ data: materialSamples }) => {
         if (!materialSamples) return;
 
@@ -97,11 +98,12 @@ export function useMaterialSampleGridControls({
               item.storageUnitUsage?.wellColumn
           );
 
-        const pcrBatchItemsNoCoords = gridStateMaterialSamples.filter(
-          (item) =>
-            !item.storageUnitUsage?.wellRow &&
-            !item.storageUnitUsage?.wellColumn
-        );
+        const gridStateMaterialSamplesNoCoords =
+          gridStateMaterialSamples.filter(
+            (item) =>
+              !item.storageUnitUsage?.wellRow &&
+              !item.storageUnitUsage?.wellColumn
+          );
 
         const newCellGrid: CellGrid<
           MaterialSample & { sampleName?: string; sampleId?: string }
@@ -113,7 +115,7 @@ export function useMaterialSampleGridControls({
         });
 
         setGridState({
-          availableItems: sortAvailableItems(pcrBatchItemsNoCoords),
+          availableItems: sortAvailableItems(gridStateMaterialSamplesNoCoords),
           cellGrid: newCellGrid,
           movedItems: []
         });

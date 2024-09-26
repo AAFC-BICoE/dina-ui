@@ -1,4 +1,4 @@
-import { BackToListButton, withResponse } from "packages/common-ui/lib";
+import { BackButton, withResponse } from "packages/common-ui/lib";
 import { Head, storageUnitDisplayName } from "packages/dina-ui/components";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
@@ -10,6 +10,9 @@ import { Button, Spinner } from "react-bootstrap";
 import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
 import { StorageUnitSampleSelectionStep } from "packages/dina-ui/components/storage/grid/StorageUnitSampleSelectionStep";
 import { StorageUnitSelectCoordinatesStep } from "packages/dina-ui/components/storage/grid/StorageUnitSelectCoordinatesStep";
+
+export const SELECT_MATERIAL_SAMPLES_TAB_INDEX = 0;
+export const SELECT_COORDINATES_TAB_INDEX = 1;
 
 export default function StorageUnitGridPage() {
   return <StorageUnitGridForm />;
@@ -34,13 +37,6 @@ function StorageUnitGridForm() {
     // If a next step is provided, we follow the chain to the next tab
     if (nextStep) {
       setCurrentStep(nextStep);
-      await router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          step: "" + nextStep
-        }
-      });
     } else {
       // No nextStep provided, set editMode to false
       setEditMode(false);
@@ -50,7 +46,11 @@ function StorageUnitGridForm() {
   const buttonBarContent = (
     <>
       <div className="col-md-4">
-        <BackToListButton entityLink="/collection/storage-unit" />
+        <BackButton
+          entityLink="/collection/storage-unit"
+          entityId={id}
+          className="btn btn-primary"
+        />
       </div>
       {editMode ? (
         <>
@@ -109,6 +109,7 @@ function StorageUnitGridForm() {
     // Not disabled.
     return false;
   };
+
   return (
     <PageLayout
       titleId={formatMessage("storageUnitGridTitle")}
@@ -119,10 +120,10 @@ function StorageUnitGridForm() {
           <Head title={storageUnitDisplayName(data)} />
           <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>
             <TabList>
-              <Tab disabled={isDisabled(0)}>
+              <Tab disabled={isDisabled(SELECT_MATERIAL_SAMPLES_TAB_INDEX)}>
                 {formatMessage("selectMaterialSamples")}
               </Tab>
-              <Tab disabled={isDisabled(1)}>
+              <Tab disabled={isDisabled(SELECT_COORDINATES_TAB_INDEX)}>
                 {formatMessage("selectCoordinates")}
               </Tab>
             </TabList>
@@ -132,6 +133,7 @@ function StorageUnitGridForm() {
                 performSave={performSave}
                 editMode={editMode}
                 storageUnit={data}
+                currentStep={currentStep}
               />
             </TabPanel>
             <TabPanel>
@@ -140,6 +142,7 @@ function StorageUnitGridForm() {
                 performSave={performSave}
                 editMode={editMode}
                 storageUnit={data}
+                currentStep={currentStep}
               />
             </TabPanel>
           </Tabs>

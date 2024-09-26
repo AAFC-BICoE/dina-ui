@@ -6,24 +6,23 @@ import {
   SaveArgs,
   useApiClient,
   useQuery
-} from "packages/common-ui/lib";
-import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
-import {
-  MaterialSample,
-  StorageUnit
-} from "packages/dina-ui/types/collection-api";
+} from "../../../../common-ui/lib";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
+import { MaterialSample, StorageUnit } from "../../../types/collection-api";
 import { useEffect, useState } from "react";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { compact, uniq, difference, concat } from "lodash";
 import { useRouter } from "next/router";
-import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
+import { SELECT_MATERIAL_SAMPLES_TAB_INDEX } from "../../../pages/collection/storage-unit/grid";
 
 interface StorageUnitSampleSelectionStepProps {
   onSaved: (nextStep?: number) => Promise<void>;
   performSave: boolean;
   editMode: boolean;
   storageUnit: StorageUnit;
+  currentStep: number;
 }
 
 export const SAMPLE_SELECTION_MATERIAL_SAMPLE_SORT_ORDER = `sampleSelectionMaterialSampleSortOrder`;
@@ -32,7 +31,8 @@ export function StorageUnitSampleSelectionStep({
   onSaved,
   performSave,
   editMode,
-  storageUnit
+  storageUnit,
+  currentStep
 }: StorageUnitSampleSelectionStepProps) {
   // The selected resources to be used for the QueryPage.
   const [selectedResources, setSelectedResources] = useState<
@@ -46,7 +46,7 @@ export function StorageUnitSampleSelectionStep({
     MaterialSample[] | undefined
   >(undefined);
 
-  const materialSamplesQuery = useQuery<MaterialSample[]>(
+  useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
       filter: { rsql: `storageUnitUsage.storageUnit.uuid==${storageUnit?.id}` },
@@ -54,6 +54,7 @@ export function StorageUnitSampleSelectionStep({
       include: "storageUnitUsage"
     },
     {
+      disabled: currentStep !== SELECT_MATERIAL_SAMPLES_TAB_INDEX,
       onSuccess: (response) => {
         const sorted = sortMaterialSamples(response.data ?? []);
 
@@ -62,7 +63,7 @@ export function StorageUnitSampleSelectionStep({
       }
     }
   );
-  const { apiClient, bulkGet, save } = useApiClient();
+  const { save } = useApiClient();
   const { STORAGE_UNIT_GRID_ELASTIC_SEARCH_COLUMN } =
     useMaterialSampleRelationshipColumns();
 
@@ -136,15 +137,15 @@ export function StorageUnitSampleSelectionStep({
         selectedResources?.map((selectedResource) => selectedResource.id)
       );
 
-      // Filter for resources that weren't already previously linked to storage unit
-      // These resources need to be linked to the storage unit
+      // Filter for resources that need to be linked to the storage unit
       const resourcesToLink = selectedResources?.filter(
         (selectedResource) =>
           !prevSelectedResourceIdsSet.has(selectedResource.id)
       );
+
+      // Use for...of to properly handle async operations
       if (resourcesToLink) {
-        resourcesToLink.forEach(async (resource) => {
-          // Create new storageUnitUsage, the storageUnit is saved here.
+        for (const resource of resourcesToLink) {
           const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] = [
             {
               type: "storage-unit-usage",
@@ -167,7 +168,6 @@ export function StorageUnitSampleSelectionStep({
             }
           );
 
-          // Create link between resource and created storageUnitUsage resource
           resource.storageUnitUsage = savedStorageUnitUsage[0];
           const saveArg = [
             {
@@ -187,18 +187,17 @@ export function StorageUnitSampleSelectionStep({
           await save(saveArg, {
             apiBaseUrl: "/collection-api"
           });
-        });
+        }
       }
 
-      // Filter for resources that were previously linked but now unselected, these need to be unlinked
+      // Filter for resources that need to be unlinked
       const resourcesToUnlink = prevSelectedResources?.filter(
         (prevSelectedResource) =>
           !currentSelectedResourceIdsSet.has(prevSelectedResource.id)
       );
 
       if (resourcesToUnlink) {
-        resourcesToUnlink.forEach(async (resource) => {
-          // Unlink storageUnitUsage from resource
+        for (const resource of resourcesToUnlink) {
           const saveArg = [
             {
               resource: {
@@ -217,7 +216,6 @@ export function StorageUnitSampleSelectionStep({
             apiBaseUrl: "/collection-api"
           });
 
-          // Delete storageUnitUsage
           await save<StorageUnitUsage>(
             [
               {
@@ -231,7 +229,7 @@ export function StorageUnitSampleSelectionStep({
               apiBaseUrl: "/collection-api"
             }
           );
-        });
+        }
       }
     } catch (e) {
       if (e.toString() === "Error: Access is denied") {
@@ -240,10 +238,10 @@ export function StorageUnitSampleSelectionStep({
         console.error(e);
       }
     } finally {
-      // Clear the previously selected resources.
       setPreviouslySelectedResources([]);
     }
   }
+
   return selectedResources === undefined ? (
     <LoadingSpinner loading={true} />
   ) : (
