@@ -13,6 +13,7 @@ import { useLibraryPrepBatchQuery } from "../library-prep-batch/edit";
 import { NgsSampleSelectionStep } from "packages/dina-ui/components/seqdb";
 import { PreLibraryPrepStep } from "packages/dina-ui/components/seqdb/ngs-workflow/PreLibraryPrepStep";
 import { NgsSampleSelectCoordinatesStep } from "packages/dina-ui/components/seqdb/ngs-workflow/NgsSampleSelectCoordinatesStep";
+import { IndexAssignmentStep } from "packages/dina-ui/components/seqdb/ngs-workflow/IndexAssignmentStep";
 
 export default function NgsWorkFlowRunPage() {
   const router = useRouter();
@@ -88,7 +89,7 @@ export default function NgsWorkFlowRunPage() {
             Cancel
           </Button>
 
-          {currentStep !== 3 ? (
+          {currentStep !== 4 ? (
             <Button
               variant={"primary"}
               className="ms-2"
@@ -211,10 +212,13 @@ export default function NgsWorkFlowRunPage() {
             {formatMessage("selectMaterialSamples")}
           </Tab>
           <Tab disabled={isDisabled(2, true)}>
-            {formatMessage("selectCoordinates")}
+            {formatMessage("preLibraryPrep")}
           </Tab>
           <Tab disabled={isDisabled(3, true)}>
-            {formatMessage("preLibraryPrep")}
+            {formatMessage("selectCoordinates")}
+          </Tab>
+          <Tab disabled={isDisabled(4, true)}>
+            {formatMessage("indexAssignmentStep")}
           </Tab>
         </TabList>
         <TabPanel>
@@ -242,6 +246,19 @@ export default function NgsWorkFlowRunPage() {
         </TabPanel>
         <TabPanel>
           {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
+            <PreLibraryPrepStep
+              batchId={libraryPrepBatchId}
+              batch={libraryPrepBatch.response?.data}
+              onSaved={onSaved}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
             <NgsSampleSelectCoordinatesStep
               libraryPrepBatchId={libraryPrepBatchId}
               libraryPrepBatch={libraryPrepBatch.response?.data}
@@ -254,7 +271,7 @@ export default function NgsWorkFlowRunPage() {
         </TabPanel>
         <TabPanel>
           {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
-            <PreLibraryPrepStep
+            <IndexAssignmentStep
               batchId={libraryPrepBatchId}
               batch={libraryPrepBatch.response?.data}
               onSaved={onSaved}

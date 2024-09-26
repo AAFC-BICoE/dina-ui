@@ -42,7 +42,7 @@ export function useLibraryPrepBatchQuery(id?: string, deps?: any[]) {
     {
       path: `seqdb-api/library-prep-batch/${id}`,
       include:
-        "product,protocol,thermocyclerProfile,storageUnit,storageUnitType"
+        "product,protocol,thermocyclerProfile,storageUnit,storageUnitType,indexSet"
     },
     { disabled: !id, deps }
   );
