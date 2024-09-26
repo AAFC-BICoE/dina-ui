@@ -3,28 +3,18 @@ import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
-import { filterBy, ResourceSelect, SelectOption, useQuery } from "common-ui";
-import {
-  ManagedAttribute,
-  VocabularyElement
-} from "../../../../../dina-ui/types/collection-api";
-import QueryBuilderNumberSearch, {
-  transformNumberSearchToDSL,
-  validateNumber
-} from "./QueryBuilderNumberSearch";
-import QueryBuilderDateSearch, {
-  transformDateSearchToDSL,
-  validateDate
-} from "./QueryBuilderDateSearch";
-import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
+import { SelectOption } from "common-ui";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./QueryBuilderTextSearch";
-import { get, noop } from "lodash";
-import { PersistedResource } from "kitsu";
+import { noop } from "lodash";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
-import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
+import {
+  VocabularyOption,
+  VocabularySelectField
+} from "packages/dina-ui/components/collection/VocabularySelectField";
+import useVocabularyOptions from "packages/dina-ui/components/collection/useVocabularyOptions";
 
 interface QueryBuilderIdentifierSearchProps {
   /**
@@ -174,66 +164,52 @@ export default function QueryRowIdentifierSearch({
     });
   }
 
+  // Retrieve the vocabulary options
+  const { vocabOptions, loading } = useVocabularyOptions({
+    path: identifierConfig?.dynamicField?.apiEndpoint ?? ""
+  });
+
   return (
     <div className={isInColumnSelector ? "" : "row"}>
       {/* Identifier Selection */}
-      {/* <ResourceSelect<VocabularyElement>
-        filter={(input) => ({
-          ...filterBy(["name"])(input),
-          ...(identifierConfig?.dynamicField?.component
-            ? {
-                managedAttributeComponent:
-                  identifierConfig?.dynamicField?.component
-              }
-            : {})
-        })}
-        model={identifierConfig?.dynamicField?.apiEndpoint ?? ""}
-        optionLabel={(attribute) =>
-          get(attribute, "name") ||
-          get(attribute, "key") ||
-          get(attribute, "id") ||
-          ""
-        }
-        isMulti={false}
+      <Select<VocabularyOption>
+        options={vocabOptions}
+        value={vocabOptions.find(
+          (option) => option.value === identifierSelected
+        )}
+        isLoading={loading}
         placeholder={formatMessage({
           id: "queryBuilder_identifier_placeholder"
         })}
-        pageSize={15}
         onChange={(newValue) => {
           const fieldPath =
             (identifierConfig?.path ?? "") +
             "." +
-            ((newValue as PersistedResource<VocabularyElement>).key ?? "");
+            ((newValue as VocabularyOption).value ?? "");
 
           setIdentifierState({
             ...identifierState,
-            selectedIdentifier:
-              newValue,
+            selectedIdentifier: newValue?.value,
             selectedIdentifierConfig: fieldValueToIndexSettings(
               fieldPath,
               indexMap ?? []
             ),
             selectedOperator: "",
-            selectedType: "",
             searchValue: ""
           });
         }}
-        value={identifierSelected}
-        selectProps={{
-          controlShouldRenderValue: true,
-          isClearable: false,
-          className: isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0",
-          onKeyDown,
-          captureMenuScroll: true,
-          menuPlacement: isInColumnSelector ? "bottom" : "auto",
-          menuShouldScrollIntoView: false,
-          minMenuHeight: 600
-        }}
-        omitNullOption={true}
-      /> */}
+        controlShouldRenderValue={true}
+        isClearable={false}
+        className={isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"}
+        onKeyDown={onKeyDown}
+        captureMenuScroll={true}
+        menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+        menuShouldScrollIntoView={false}
+        minMenuHeight={600}
+      />
 
       {/* Operator */}
-      {!isInColumnSelector && operatorOptions.length !== 0 ? (
+      {!isInColumnSelector && identifierSelected ? (
         <Select<SelectOption<string>>
           options={operatorOptions}
           className={`col me-1 ps-0`}
@@ -253,8 +229,8 @@ export default function QueryRowIdentifierSearch({
         <></>
       )}
 
-      {/* Value Searching (changes based ont he type selected) */}
-      {!isInColumnSelector && (
+      {/* Value Searching (changes based on the type selected) */}
+      {!isInColumnSelector && identifierSelected && (
         <div className="col ps-0">{supportedValueForType()}</div>
       )}
     </div>

@@ -212,6 +212,14 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         path: "data.attributes.extensionValues",
         apiEndpoint: "collection-api/extension"
       },
+      // Material Sample - Identifiers
+      {
+        type: "identifier",
+        label: "identifiers",
+        component: "MATERIAL_SAMPLE",
+        path: "data.attributes.identifiers",
+        apiEndpoint: "collection-api/vocabulary2/materialSampleIdentifierType"
+      },
 
       // Preparation - Managed Attributes
       {
@@ -285,7 +293,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedType: "metadata"
       },
 
-      // Parent Material Sample
+      // Parent Material Sample - Material Sample - Managed Attributes
       {
         type: "managedAttribute",
         label: "materialSampleManagedAttributes",
@@ -295,6 +303,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+      // Parent Material Sample - Preparation - Managed Attributes
       {
         type: "managedAttribute",
         label: "preparationManagedAttributes",
@@ -304,6 +313,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+      // Parent Material Sample - Material Sample - Field Extensions
       {
         type: "fieldExtension",
         label: "fieldExtensions",
@@ -313,6 +323,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+      // Parent Material Sample - Material Sample - Restrictions
       {
         type: "fieldExtension",
         label: "restrictions",
@@ -322,9 +333,9 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
-      // Hide the "Indentifiers" until it's supported like managed attributes/field extensions.
+      // Parent Material Sample - Material Sample - Identifiers
       {
-        type: "unsupported",
+        type: "identifier",
         label: "identifiers",
         component: "MATERIAL_SAMPLE",
         path: "included.attributes.identifiers",
