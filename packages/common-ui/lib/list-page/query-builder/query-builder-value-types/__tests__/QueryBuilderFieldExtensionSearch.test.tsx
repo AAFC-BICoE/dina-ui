@@ -1,6 +1,6 @@
 import { transformFieldExtensionToDSL } from "../QueryBuilderFieldExtensionSearch";
 
-describe("QueryBuilderManagedAttributeSearch", () => {
+describe("QueryBuilderFieldExtensionSearch", () => {
   describe("transformFieldExtensionToDSL function", () => {
     const operators = [
       "exactMatch",
@@ -15,7 +15,10 @@ describe("QueryBuilderManagedAttributeSearch", () => {
 
     describe("Attribute level tests", () => {
       test.each(operators)("Using the %s operator.", async (operator) => {
-        const testValue = operator === "in" || operator === "notIn" ? "test1, test2,test3" : "test123";
+        const testValue =
+          operator === "in" || operator === "notIn"
+            ? "test1, test2,test3"
+            : "test123";
 
         expect(
           transformFieldExtensionToDSL({
@@ -39,7 +42,9 @@ describe("QueryBuilderManagedAttributeSearch", () => {
               keywordMultiFieldSupport: true,
               optimizedPrefix: false,
               containsSupport: false,
-              endsWithSupport: false
+              endsWithSupport: false,
+              hideField: false,
+              keywordNumericSupport: false
             }
           })
         ).toMatchSnapshot();
@@ -48,7 +53,10 @@ describe("QueryBuilderManagedAttributeSearch", () => {
 
     describe("Relationship level tests", () => {
       test.each(operators)("Using the %s operator.", async (operator) => {
-        const testValue = operator === "in" || operator === "notIn" ? "test1, test2,test3" : "test123";
+        const testValue =
+          operator === "in" || operator === "notIn"
+            ? "test1, test2,test3"
+            : "test123";
 
         expect(
           transformFieldExtensionToDSL({
@@ -77,7 +85,9 @@ describe("QueryBuilderManagedAttributeSearch", () => {
               keywordMultiFieldSupport: false,
               optimizedPrefix: false,
               containsSupport: false,
-              endsWithSupport: false
+              endsWithSupport: false,
+              hideField: false,
+              keywordNumericSupport: false
             }
           })
         ).toMatchSnapshot();
