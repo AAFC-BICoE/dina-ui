@@ -7,7 +7,9 @@ import {
   PcrBatchItem,
   PcrBatch,
   SeqReaction,
-  SeqBatch
+  SeqBatch,
+  LibraryPrep,
+  LibraryPrepBatch
 } from "../../../../types/seqdb-api";
 import { useState, useRef, useEffect } from "react";
 import { UrlObject } from "url";
@@ -135,7 +137,50 @@ export function useGridCoordinatesControls({
               }
 
               if (pcrBatchItem) {
-                await getCellGrid(pcrBatchItem, storageUnitUsage);
+                await getCellGrid(
+                  pcrBatchItem,
+                  storageUnitUsage,
+                  "pcr-batch-item"
+                );
+              }
+            } else if (storageUnitUsage.usageType === "library-prep") {
+              const libraryPrepQuery = await apiClient.get<LibraryPrep[]>(
+                `seqdb-api/library-prep`,
+                {
+                  include: `materialSample,${
+                    index === 0 ? "libraryPrepBatch" : ""
+                  }`,
+                  filter: { "storageUnitUsage.uuid": storageUnitUsage?.id }
+                }
+              );
+              const libraryPrep = libraryPrepQuery.data[0];
+              if (libraryPrep.libraryPrepBatch) {
+                try {
+                  const libraryPrepBatchQuery =
+                    await apiClient.get<LibraryPrepBatch>(
+                      `seqdb-api/library-prep-batch/${libraryPrep.libraryPrepBatch.id}`,
+                      {}
+                    );
+                  const libraryPrepBatch = libraryPrepBatchQuery.data;
+                  usageTypeResourceNameRef.current = libraryPrepBatch.name;
+                  usageTypeLinkRef.current = {
+                    pathname: `/seqdb/ngs-workflow/view`,
+                    query: {
+                      id: libraryPrepBatch?.id
+                    }
+                  };
+                  editContentsPathRef.current = `/seqdb/ngs-workflow/run?id=${libraryPrepBatch?.id}`;
+                } catch (e) {
+                  console.error(e);
+                }
+              }
+
+              if (libraryPrep) {
+                await getCellGrid(
+                  libraryPrep,
+                  storageUnitUsage,
+                  "library-prep"
+                );
               }
             } else if (storageUnitUsage.usageType === "seq-reaction") {
               const seqReactionQuery = await apiClient.get<SeqReaction[]>(
@@ -170,7 +215,11 @@ export function useGridCoordinatesControls({
                 }
               }
               if (seqReaction && seqReaction.pcrBatchItem) {
-                await getCellGrid(seqReaction.pcrBatchItem, storageUnitUsage);
+                await getCellGrid(
+                  seqReaction.pcrBatchItem,
+                  storageUnitUsage,
+                  "pcr-batch-item"
+                );
               }
             } else {
               console.error("Unexpected usage type.");
@@ -195,16 +244,14 @@ export function useGridCoordinatesControls({
     }
 
     async function getCellGrid(
-      pcrBatchItem,
-      storageUnitUsage: PersistedResource<StorageUnitUsage>
+      resource,
+      storageUnitUsage: PersistedResource<StorageUnitUsage>,
+      type
     ) {
       const pcrBatchItemWithMaterialSampleIdQuery =
-        await apiClient.get<PcrBatchItem>(
-          `seqdb-api/pcr-batch-item/${pcrBatchItem?.id}`,
-          {
-            include: "materialSample"
-          }
-        );
+        await apiClient.get<PcrBatchItem>(`seqdb-api/${type}/${resource?.id}`, {
+          include: "materialSample"
+        });
       const pcrBatchItemWithMaterialSampleId =
         pcrBatchItemWithMaterialSampleIdQuery.data;
       const materialSampleQuery = await apiClient.get<MaterialSample>(
@@ -255,6 +302,17 @@ export function useGridCoordinatesControls({
     usageTypeRef,
     editContentsPathRef,
     usageTypeLinkRef,
-    usageTypeResourceNameRef
+    usageTypeResourceNameRef,
+    usageType: parseUsageType(usageTypeRef.current)
   };
+}
+
+function parseUsageType(usageType) {
+  const usageTypeMap = {
+    "material-sample": "Material Sample",
+    "pcr-batch-item": "PCR Batch",
+    "seq-reaction": "Seq Batch",
+    "library-prep": "Library Prep Batch"
+  };
+  return usageTypeMap[usageType];
 }
