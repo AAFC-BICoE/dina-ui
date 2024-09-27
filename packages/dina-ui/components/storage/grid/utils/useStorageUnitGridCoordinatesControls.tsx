@@ -169,7 +169,7 @@ export function useGridCoordinatesControls({
                       id: libraryPrepBatch?.id
                     }
                   };
-                  editContentsPathRef.current = `/seqdb/ngs-workflow/view?id=${libraryPrepBatch?.id}`;
+                  editContentsPathRef.current = `/seqdb/ngs-workflow/run?id=${libraryPrepBatch?.id}`;
                 } catch (e) {
                   console.error(e);
                 }
