@@ -9,6 +9,7 @@ import { Dictionary, toPairs } from "lodash";
 import { useContext, useState, useEffect } from "react";
 import {
   MaterialSampleSummary,
+  Protocol,
   StorageUnit,
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
@@ -23,6 +24,7 @@ export interface UseIndexAssignmentReturn {
   materialSamples?: MaterialSampleSummary[];
   ngsIndexes?: NgsIndex[];
   storageUnitType?: StorageUnitType;
+  protocol?: Protocol;
   onSubmitGrid: ({
     submittedValues
   }: DinaFormSubmitParams<any>) => Promise<void>;
@@ -47,6 +49,7 @@ export function useIndexAssignmentAPI({
   const [materialSamples, setMaterialSamples] =
     useState<MaterialSampleSummary[]>();
   const [ngsIndexes, setNgsIndexes] = useState<NgsIndex[]>();
+  const [protocol, setProtocol] = useState<Protocol>();
 
   useQuery<LibraryPrep[]>(
     {
@@ -145,6 +148,19 @@ export function useIndexAssignmentAPI({
         setNgsIndexes(response.data as NgsIndex[]);
       },
       disabled: !libraryPrepBatch?.indexSet?.id
+    }
+  );
+
+  useQuery<Protocol>(
+    {
+      page: { limit: 1 },
+      path: `collection-api/protocol/${libraryPrepBatch?.protocol?.id}`
+    },
+    {
+      async onSuccess(response) {
+        setProtocol(response.data as Protocol);
+      },
+      disabled: !libraryPrepBatch?.protocol?.id
     }
   );
 
@@ -296,6 +312,7 @@ export function useIndexAssignmentAPI({
     materialSamples,
     ngsIndexes,
     storageUnitType,
+    protocol,
     onSubmitGrid,
     onSubmitTable
   };

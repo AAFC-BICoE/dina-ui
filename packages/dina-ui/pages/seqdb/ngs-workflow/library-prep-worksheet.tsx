@@ -1,6 +1,5 @@
 import { LoadingSpinner, useQuery } from "common-ui";
 import { useRouter } from "next/router";
-import { Head } from "packages/dina-ui/components";
 import { useIndexAssignmentAPI } from "packages/dina-ui/components/seqdb/ngs-workflow/useIndexAssignmentAPI";
 import {
   LibraryPrep,
@@ -34,7 +33,7 @@ export default function LibraryPrepWorksheetPage() {
     return <LoadingSpinner loading={true} />;
   }
   if (!batch) {
-    return "wack";
+    return "Library Prep Batch ID could not be found.";
   }
 
   return (
@@ -54,7 +53,7 @@ function LibraryPrepWorksheetLoaded({
   batch,
   sampleLayout
 }: LibraryPrepWorksheetLoadedProps) {
-  const { libraryPrepsLoading, libraryPreps, storageUnitType } =
+  const { libraryPrepsLoading, libraryPreps, storageUnitType, protocol } =
     useIndexAssignmentAPI({
       batch,
       batchId: batch.id ?? "",
@@ -70,7 +69,7 @@ function LibraryPrepWorksheetLoaded({
   }
 
   const buttonBarContent = (
-    <>
+    <div className="flex d-flex">
       <Button
         variant="secondary"
         className="btn btn-primary "
@@ -79,7 +78,7 @@ function LibraryPrepWorksheetLoaded({
       >
         <DinaMessage id="print" />
       </Button>
-    </>
+    </div>
   );
 
   return (
@@ -92,7 +91,7 @@ function LibraryPrepWorksheetLoaded({
           <HorizontalField label="Workflow" defaultValue={batch.name} />
           <HorizontalField
             label="Protocol"
-            defaultValue={batch.protocol ? batch.protocol.name : ""}
+            defaultValue={protocol ? protocol.name : ""}
           />
         </div>
         <div className="col-6">
@@ -100,7 +99,7 @@ function LibraryPrepWorksheetLoaded({
           <HorizontalField label="Date" />
         </div>
       </div>
-      <div style={{ height: "50px" }} />
+      <div style={{ height: "30px" }} />
       <div className="row">
         <div className="col-6">
           <BigField label="Notes" />
@@ -113,12 +112,15 @@ function LibraryPrepWorksheetLoaded({
               <HorizontalField label="Neg Control" />
               <div className="row form-group">
                 <div className="col-3">
-                  <input className="form-control" />
+                  <input className="form-control" disabled={true} />
                 </div>
                 <div className="col-9">
-                  <strong>ul reaction mix pipetted into each tube</strong>
+                  <strong style={{ marginTop: "10px" }}>
+                    ul reaction mix pipetted into each tube
+                  </strong>
                 </div>
               </div>
+              <div style={{ height: "10px" }} />
               <HorizontalField
                 label="Thermocycler Profile"
                 defaultValue={
@@ -168,6 +170,7 @@ function LibraryPrepWorksheetLoaded({
       <div className="row">
         <div className="col-12">
           <BigField label="Results and next steps" />
+          <div style={{ height: "20px" }} />
           {libraryPreps && libraryPreps?.length !== 0 && (
             <>
               {sampleLayout === "table" ? (
@@ -192,7 +195,7 @@ function LibraryPrepWorksheetLoaded({
 
 function HorizontalField({ label, defaultValue = "", disabled = true }) {
   return (
-    <div className="row form-group mb-2">
+    <div className="row form-group mb-3">
       <strong className="col-3">{label}</strong>
       <div className="col-9">
         <input
@@ -207,7 +210,7 @@ function HorizontalField({ label, defaultValue = "", disabled = true }) {
 
 function BigField({ label, defaultValue = "", disabled = true }) {
   return (
-    <div className="row form-group mb-2">
+    <div className="row form-group mb-3">
       <div className="col-12">
         <strong>{label}</strong>
         <textarea
@@ -244,7 +247,7 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
           const wellRow = prep?.storageUnitUsage?.wellRow;
           const wellCoordinates =
             wellColumn === null || !wellRow
-              ? null
+              ? ""
               : `${wellRow}${String(wellColumn)}`;
 
           return (
