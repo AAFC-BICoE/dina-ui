@@ -5,8 +5,10 @@ import {
   LibraryPrep,
   LibraryPrepBatch
 } from "packages/dina-ui/types/seqdb-api";
-import { noop } from "lodash";
-import { StorageUnitType } from "packages/dina-ui/types/collection-api";
+import {
+  MaterialSampleSummary,
+  StorageUnitType
+} from "packages/dina-ui/types/collection-api";
 import { Button } from "react-bootstrap";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
@@ -22,7 +24,7 @@ export default function LibraryPrepWorksheetPage() {
         "protocol",
         "thermocyclerProfile",
         "indexSet",
-        "containerType"
+        "storageUnit"
       ].join(","),
       path: `seqdb-api/library-prep-batch/${batchId}`
     });
@@ -53,16 +55,16 @@ function LibraryPrepWorksheetLoaded({
   batch,
   sampleLayout
 }: LibraryPrepWorksheetLoadedProps) {
-  const { libraryPrepsLoading, libraryPreps, storageUnitType, protocol } =
-    useIndexAssignmentAPI({
-      batch,
-      batchId: batch.id ?? "",
-      editMode: true,
-      onSaved: (_x, _y) => Promise.resolve(),
-      performSave: false,
-      setEditMode: noop,
-      setPerformSave: noop
-    });
+  const {
+    libraryPrepsLoading,
+    libraryPreps,
+    storageUnitType,
+    protocol,
+    materialSamples
+  } = useIndexAssignmentAPI({
+    batch,
+    batchId: batch.id ?? ""
+  });
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
@@ -176,12 +178,14 @@ function LibraryPrepWorksheetLoaded({
               {sampleLayout === "table" ? (
                 <LibraryPrepTable
                   libraryPrepBatch={batch}
+                  materialSamples={materialSamples}
                   preps={libraryPreps}
                 />
               ) : sampleLayout === "grid" ? (
                 <LibraryPrepGrid
                   libraryPrepBatch={batch}
                   preps={libraryPreps}
+                  materialSamples={materialSamples}
                   storageUnitType={storageUnitType}
                 />
               ) : null}
@@ -227,16 +231,16 @@ interface LibraryPrepTableProps {
   libraryPrepBatch: LibraryPrepBatch;
   preps: LibraryPrep[];
   storageUnitType?: StorageUnitType;
+  materialSamples?: MaterialSampleSummary[];
 }
 
-function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
+function LibraryPrepTable({ preps, materialSamples }: LibraryPrepTableProps) {
   return (
     <table className="table table-bordered table-sm library-prep-table">
       <thead>
         <tr>
           <th>Well Coordinates</th>
           <th>Primary ID</th>
-          <th>Material Sample Version</th>
           <th>Index i5</th>
           <th>Index i7</th>
         </tr>
@@ -250,11 +254,14 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
               ? ""
               : `${wellRow}${String(wellColumn)}`;
 
+          const materialSample = materialSamples?.find(
+            (sample) => sample.id === prep?.materialSample?.id
+          );
+
           return (
             <tr key={String(prep.id)}>
               <td>{wellCoordinates}</td>
-              <td>{prep?.materialSample?.materialSampleName}</td>
-              <td>{prep?.materialSample?.version}</td>
+              <td>{materialSample?.materialSampleName ?? ""}</td>
               <td>{prep.indexI5 && prep.indexI5.name}</td>
               <td>{prep.indexI7 && prep.indexI7.name}</td>
             </tr>
@@ -265,7 +272,11 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
   );
 }
 
-function LibraryPrepGrid({ preps, storageUnitType }: LibraryPrepTableProps) {
+function LibraryPrepGrid({
+  preps,
+  materialSamples,
+  storageUnitType
+}: LibraryPrepTableProps) {
   if (!storageUnitType) {
     return null;
   }
@@ -276,7 +287,7 @@ function LibraryPrepGrid({ preps, storageUnitType }: LibraryPrepTableProps) {
   );
   for (const prep of libraryPrepsWithCoords) {
     cellGrid[
-      `${prep?.storageUnitUsage?.wellRow}_${prep?.storageUnitUsage?.wellRow}`
+      `${prep?.storageUnitUsage?.wellRow}_${prep?.storageUnitUsage?.wellColumn}`
     ] = prep;
   }
 
@@ -297,20 +308,28 @@ function LibraryPrepGrid({ preps, storageUnitType }: LibraryPrepTableProps) {
         <tr>
           <td />
           {columnNumbers.map((num) => (
-            <td key={num}>{num}</td>
+            <td key={num} style={{ paddingLeft: "10px" }}>
+              <strong>{num}</strong>
+            </td>
           ))}
         </tr>
         {rowLetters.map((rowLetter) => (
           <tr key={rowLetter}>
-            <td>{rowLetter}</td>
+            <td style={{ width: "50px", paddingLeft: "10px" }}>
+              <strong>{rowLetter}</strong>
+            </td>
             {columnNumbers.map((columnNumber) => {
               const prep = cellGrid[`${rowLetter}_${columnNumber}`];
 
               return (
-                <td key={columnNumber}>
+                <td key={columnNumber} style={{ paddingLeft: "10px" }}>
                   {prep && (
                     <div className="h-100 w-100">
-                      <div>{prep?.materialSample?.materialSampleName}</div>
+                      <div>
+                        {materialSamples?.find(
+                          (sample) => sample.id === prep?.materialSample?.id
+                        )?.materialSampleName ?? ""}
+                      </div>
                       <div>
                         {prep.indexI5 && (
                           <div>

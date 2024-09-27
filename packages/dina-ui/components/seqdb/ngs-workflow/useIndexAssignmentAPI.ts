@@ -38,7 +38,7 @@ export function useIndexAssignmentAPI({
   editMode,
   setEditMode,
   setPerformSave
-}: IndexAssignmentStepProps): UseIndexAssignmentReturn {
+}: Partial<IndexAssignmentStepProps>): UseIndexAssignmentReturn {
   const { save, apiClient, bulkGet } = useContext(ApiClientContext);
 
   const [lastSave, setLastSave] = useState<number>();
@@ -60,7 +60,7 @@ export function useIndexAssignmentAPI({
           {
             selector: "libraryPrepBatch.uuid",
             comparison: "==",
-            arguments: libraryPrepBatch.id ?? ""
+            arguments: libraryPrepBatch?.id ?? ""
           }
         ]
       })(""),
@@ -235,8 +235,8 @@ export function useIndexAssignmentAPI({
 
     await save(saveOps, { apiBaseUrl: "/seqdb-api" });
     setLastSave(Date.now());
-    setPerformSave(false);
-    setEditMode(false);
+    setPerformSave?.(false);
+    setEditMode?.(false);
   }
 
   /**
@@ -302,8 +302,8 @@ export function useIndexAssignmentAPI({
       setLastSave(Date.now());
     }
 
-    setPerformSave(false);
-    setEditMode(false);
+    setPerformSave?.(false);
+    setEditMode?.(false);
   }
 
   return {

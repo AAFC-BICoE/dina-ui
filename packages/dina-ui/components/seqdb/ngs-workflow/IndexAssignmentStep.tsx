@@ -79,7 +79,7 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
         <Col sm={10}>
           <Tab.Content>
             <div className="row mb-2">
-              <div className="form-group list-inline">
+              <div className="form-group list-inline d-flex justify-content-end">
                 <Link
                   href={`/seqdb/ngs-workflow/library-prep-worksheet?batchId=${props.batchId}&sampleLayout=table`}
                 >
@@ -87,7 +87,7 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
                     className="list-inline-item btn btn-primary"
                     target="_blank"
                   >
-                    Library Prep Worksheet With Table{" "}
+                    Library Prep Worksheet With Table
                     <FaExternalLinkAlt className="ms-2" />
                   </a>
                 </Link>
@@ -98,7 +98,7 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
                     className="list-inline-item btn btn-primary"
                     target="_blank"
                   >
-                    Library Prep Worksheet With Grid{" "}
+                    Library Prep Worksheet With Grid
                     <FaExternalLinkAlt className="ms-2" />
                   </a>
                 </Link>
