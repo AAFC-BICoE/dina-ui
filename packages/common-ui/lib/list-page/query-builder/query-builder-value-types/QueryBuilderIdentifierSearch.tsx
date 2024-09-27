@@ -12,6 +12,7 @@ import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import { VocabularyOption } from "packages/dina-ui/components/collection/VocabularySelectField";
 import useVocabularyOptions from "../../../../../dina-ui/components/collection/useVocabularyOptions";
+import QueryBuilderNumberSearch from "./QueryBuilderNumberSearch";
 
 interface QueryBuilderIdentifierSearchProps {
   /**
@@ -103,16 +104,15 @@ export default function QueryRowIdentifierSearch({
 
   const supportedOperatorsForType: () => string[] = () => {
     return [
-      "exactMatch",
-      "wildcard",
+      "equals",
+      "notEquals",
       "in",
       "notIn",
-      // Check if the identifier contains keyword numeric support.
-      identifierState?.selectedIdentifierConfig?.keywordNumericSupport
-        ? "between"
-        : undefined,
-      "startsWith",
-      "notEquals",
+      "between",
+      "greaterThan",
+      "greaterThanOrEqualTo",
+      "lessThan",
+      "lessThanOrEqualTo",
       "empty",
       "notEmpty"
     ].filter((option) => option !== undefined) as string[];
@@ -150,7 +150,7 @@ export default function QueryRowIdentifierSearch({
         })
     };
 
-    return <QueryBuilderTextSearch {...commonProps} />;
+    return <QueryBuilderNumberSearch {...commonProps} />;
   };
 
   // Set the the operator if the identifier selected has changed.
@@ -280,10 +280,7 @@ export function transformIdentifierToDSL({
       ? identifierFieldInfo
       : ({
           ...fieldInfo,
-          distinctTerm: false,
-
-          // All identifiers have keyword support.
-          keywordMultiFieldSupport: true
+          distinctTerm: false
         } as ESIndexMapping)
   };
 

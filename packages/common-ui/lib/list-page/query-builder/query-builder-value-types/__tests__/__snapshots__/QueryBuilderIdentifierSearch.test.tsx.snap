@@ -1,17 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the between operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the between operator 1`] = `
 Object {
   "range": Object {
     "data.attributes.identifiers.seqdb_id.keyword_numeric": Object {
-      "gte": "stringValue1",
-      "lte": "stringValue3",
+      "gte": 1,
+      "lte": 5,
     },
   },
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the empty operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the empty operator 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -38,15 +38,31 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the exactMatch operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the equals operator 1`] = `
 Object {
   "term": Object {
-    "data.attributes.identifiers.seqdb_id.keyword": "stringValue",
+    "data.attributes.identifiers.seqdb_id.keyword": "42",
   },
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the in operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the greaterThan operator 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.identifiers.seqdb_id.keyword": "42",
+  },
+}
+`;
+
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the greaterThanOrEqualTo operator 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.identifiers.seqdb_id.keyword": "42",
+  },
+}
+`;
+
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the in operator 1`] = `
 Object {
   "bool": Object {
     "must": Object {
@@ -57,7 +73,7 @@ Object {
             "term": Object {
               "data.attributes.identifiers.seqdb_id.keyword": Object {
                 "case_insensitive": true,
-                "value": "stringValue1",
+                "value": "1",
               },
             },
           },
@@ -65,7 +81,7 @@ Object {
             "term": Object {
               "data.attributes.identifiers.seqdb_id.keyword": Object {
                 "case_insensitive": true,
-                "value": "stringValue2",
+                "value": "2",
               },
             },
           },
@@ -73,7 +89,7 @@ Object {
             "term": Object {
               "data.attributes.identifiers.seqdb_id.keyword": Object {
                 "case_insensitive": true,
-                "value": "stringValue3",
+                "value": "4",
               },
             },
           },
@@ -84,7 +100,23 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the notEmpty operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the lessThan operator 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.identifiers.seqdb_id.keyword": "42",
+  },
+}
+`;
+
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the lessThanOrEqualTo operator 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.identifiers.seqdb_id.keyword": "42",
+  },
+}
+`;
+
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the notEmpty operator 1`] = `
 Object {
   "bool": Object {
     "must": Object {
@@ -101,7 +133,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the notEquals operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the notEquals operator 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -109,7 +141,7 @@ Object {
         "bool": Object {
           "must_not": Object {
             "term": Object {
-              "data.attributes.identifiers.seqdb_id.keyword": "stringValue",
+              "data.attributes.identifiers.seqdb_id.keyword": "42",
             },
           },
         },
@@ -128,7 +160,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the notIn operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Attribute level tests Using the notIn operator 1`] = `
 Object {
   "bool": Object {
     "must_not": Object {
@@ -139,7 +171,7 @@ Object {
             "term": Object {
               "data.attributes.identifiers.seqdb_id.keyword": Object {
                 "case_insensitive": true,
-                "value": "stringValue1",
+                "value": "1",
               },
             },
           },
@@ -147,7 +179,7 @@ Object {
             "term": Object {
               "data.attributes.identifiers.seqdb_id.keyword": Object {
                 "case_insensitive": true,
-                "value": "stringValue2",
+                "value": "2",
               },
             },
           },
@@ -155,7 +187,7 @@ Object {
             "term": Object {
               "data.attributes.identifiers.seqdb_id.keyword": Object {
                 "case_insensitive": true,
-                "value": "stringValue3",
+                "value": "4",
               },
             },
           },
@@ -166,29 +198,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the startsWith operator 1`] = `
-Object {
-  "prefix": Object {
-    "data.attributes.identifiers.seqdb_id.keyword": Object {
-      "case_insensitive": true,
-      "value": "stringValue",
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Attribute level tests Using the wildcard operator 1`] = `
-Object {
-  "wildcard": Object {
-    "data.attributes.identifiers.seqdb_id.keyword": Object {
-      "case_insensitive": true,
-      "value": "*stringValue*",
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the between operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the between operator 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -198,8 +208,8 @@ Object {
           Object {
             "range": Object {
               "included.attributes.identifiers.seqdb_id.keyword_numeric": Object {
-                "gte": "stringValue1",
-                "lte": "stringValue3",
+                "gte": 1,
+                "lte": 5,
               },
             },
           },
@@ -215,7 +225,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the empty operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the empty operator 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -285,7 +295,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the exactMatch operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the equals operator 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -294,7 +304,7 @@ Object {
         "must": Array [
           Object {
             "term": Object {
-              "included.attributes.identifiers.seqdb_id.keyword": "stringValue",
+              "included.attributes.identifiers.seqdb_id.keyword": "42",
             },
           },
           Object {
@@ -309,7 +319,55 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the in operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the greaterThan operator 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.identifiers.seqdb_id.keyword": "42",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the greaterThanOrEqualTo operator 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.identifiers.seqdb_id.keyword": "42",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the in operator 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -326,7 +384,7 @@ Object {
                       "term": Object {
                         "included.attributes.identifiers.seqdb_id.keyword": Object {
                           "case_insensitive": true,
-                          "value": "stringValue1",
+                          "value": "1",
                         },
                       },
                     },
@@ -334,7 +392,7 @@ Object {
                       "term": Object {
                         "included.attributes.identifiers.seqdb_id.keyword": Object {
                           "case_insensitive": true,
-                          "value": "stringValue2",
+                          "value": "2",
                         },
                       },
                     },
@@ -342,7 +400,7 @@ Object {
                       "term": Object {
                         "included.attributes.identifiers.seqdb_id.keyword": Object {
                           "case_insensitive": true,
-                          "value": "stringValue3",
+                          "value": "4",
                         },
                       },
                     },
@@ -363,7 +421,55 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the notEmpty operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the lessThan operator 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.identifiers.seqdb_id.keyword": "42",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the lessThanOrEqualTo operator 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.identifiers.seqdb_id.keyword": "42",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "material-sample",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the notEmpty operator 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -392,7 +498,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the notEquals operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the notEquals operator 1`] = `
 Object {
   "bool": Object {
     "should": Array [
@@ -408,7 +514,7 @@ Object {
               },
               "must_not": Object {
                 "term": Object {
-                  "included.attributes.identifiers.seqdb_id.keyword": "stringValue",
+                  "included.attributes.identifiers.seqdb_id.keyword": "42",
                 },
               },
             },
@@ -448,7 +554,7 @@ Object {
 }
 `;
 
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the notIn operator 1`] = `
+exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function INTEGER based identifier tests Relationship level tests Using the notIn operator 1`] = `
 Object {
   "nested": Object {
     "path": "included",
@@ -465,7 +571,7 @@ Object {
                       "term": Object {
                         "included.attributes.identifiers.seqdb_id.keyword": Object {
                           "case_insensitive": true,
-                          "value": "stringValue1",
+                          "value": "1",
                         },
                       },
                     },
@@ -473,7 +579,7 @@ Object {
                       "term": Object {
                         "included.attributes.identifiers.seqdb_id.keyword": Object {
                           "case_insensitive": true,
-                          "value": "stringValue2",
+                          "value": "2",
                         },
                       },
                     },
@@ -481,66 +587,12 @@ Object {
                       "term": Object {
                         "included.attributes.identifiers.seqdb_id.keyword": Object {
                           "case_insensitive": true,
-                          "value": "stringValue3",
+                          "value": "4",
                         },
                       },
                     },
                   ],
                 },
-              },
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "material-sample",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the startsWith operator 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "prefix": Object {
-              "included.attributes.identifiers.seqdb_id.keyword": Object {
-                "case_insensitive": true,
-                "value": "stringValue",
-              },
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "material-sample",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderIdentifierSearch transformIdentiferToDSL function STRING based identifier tests Relationship level tests Using the wildcard operator 1`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "wildcard": Object {
-              "included.attributes.identifiers.seqdb_id.keyword": Object {
-                "case_insensitive": true,
-                "value": "*stringValue*",
               },
             },
           },

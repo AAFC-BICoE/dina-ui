@@ -19,26 +19,28 @@ describe("QueryBuilderIdentifierSearch", () => {
   describe("transformIdentiferToDSL function", () => {
     const testValues: TestValueStructure[] = [
       {
-        type: "STRING",
+        type: "INTEGER",
         testValue: (operator) => {
           switch (operator) {
             case "in":
             case "notIn":
-              return "stringValue1, stringValue2,stringValue3";
+              return "1, 2,4";
             case "between":
-              return '{\\"low\\":\\"stringValue1\\",\\"high\\":\\"stringValue3\\"}';
+              return '{\\"low\\":1,\\"high\\":5}';
             default:
-              return "stringValue";
+              return "42";
           }
         },
         operators: [
-          "exactMatch",
-          "wildcard",
+          "equals",
+          "notEquals",
           "in",
           "notIn",
           "between",
-          "startsWith",
-          "notEquals",
+          "greaterThan",
+          "greaterThanOrEqualTo",
+          "lessThan",
+          "lessThanOrEqualTo",
           "empty",
           "notEmpty"
         ],
