@@ -10,6 +10,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { IndexGrid } from "./index-grid/IndexGrid";
 import { IndexAssignmentTable } from "./IndexAssignmentTable";
 import { useIndexAssignmentAPI } from "./useIndexAssignmentAPI";
+import Link from "next/link";
 
 export interface IndexAssignmentStepProps {
   batchId: string;
@@ -76,6 +77,30 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
         </Col>
         <Col sm={10}>
           <Tab.Content>
+            <div className="row">
+              <div className="form-group list-inline">
+                <Link
+                  href={`/seqdb/ngs-workflow/library-prep-worksheet?batchId=${props.batchId}&sampleLayout=table`}
+                >
+                  <a
+                    className="list-inline-item btn btn-primary"
+                    target="_blank"
+                  >
+                    Library Prep Worksheet With Table
+                  </a>
+                </Link>
+                <Link
+                  href={`/seqdb/ngs-workflow/library-prep-worksheet?batchId=${props.batchId}&sampleLayout=grid`}
+                >
+                  <a
+                    className="list-inline-item btn btn-primary"
+                    target="_blank"
+                  >
+                    Library Prep Worksheet With Grid
+                  </a>
+                </Link>
+              </div>
+            </div>
             <Tab.Pane eventKey="assignByGrid">
               <IndexGrid {...props} {...indexAssignmentApiProps} />
             </Tab.Pane>
