@@ -26,7 +26,7 @@ export default function StorageUnitGrid({
   const {
     cellGrid,
     multipleSamplesWellCoordinates,
-    usageTypeRef,
+    usageType,
     editContentsPathRef,
     usageTypeLinkRef,
     usageTypeResourceNameRef
@@ -35,14 +35,6 @@ export default function StorageUnitGrid({
     storageUnit,
     setLoading
   });
-  function parseUsageType(usageType) {
-    const usageTypeMap = {
-      "material-sample": "Material Sample",
-      "pcr-batch-item": "PCR Batch",
-      "seq-reaction": "Seq Batch"
-    };
-    return usageTypeMap[usageType];
-  }
 
   return loading ? (
     <LoadingSpinner loading={true} />
@@ -62,7 +54,7 @@ export default function StorageUnitGrid({
       <div>
         <FieldLabel name={formatMessage("usage")} className={"mb-2"} />
         <div className={"field-col mb-3"}>
-          {parseUsageType(usageTypeRef.current)}{" "}
+          {usageType}{" "}
           {usageTypeLinkRef.current && (
             <Link href={usageTypeLinkRef.current}>
               <a>{usageTypeResourceNameRef?.current}</a>

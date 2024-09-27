@@ -458,7 +458,7 @@ export function useNsgSelectCoordinatesControls({
               storageUnit: libraryPrepBatch.storageUnit,
               type: "storage-unit-usage",
               id: item.storageUnitUsage?.id,
-              usageType: "seq-reaction"
+              usageType: "library-prep"
             }
           }));
 
