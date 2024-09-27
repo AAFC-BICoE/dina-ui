@@ -11,6 +11,7 @@ import { IndexGrid } from "./index-grid/IndexGrid";
 import { IndexAssignmentTable } from "./IndexAssignmentTable";
 import { useIndexAssignmentAPI } from "./useIndexAssignmentAPI";
 import Link from "next/link";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 export interface IndexAssignmentStepProps {
   batchId: string;
@@ -86,7 +87,8 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
                     className="list-inline-item btn btn-primary"
                     target="_blank"
                   >
-                    Library Prep Worksheet With Table
+                    Library Prep Worksheet With Table{" "}
+                    <FaExternalLinkAlt className="ms-2" />
                   </a>
                 </Link>
                 <Link
@@ -96,7 +98,8 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
                     className="list-inline-item btn btn-primary"
                     target="_blank"
                   >
-                    Library Prep Worksheet With Grid
+                    Library Prep Worksheet With Grid{" "}
+                    <FaExternalLinkAlt className="ms-2" />
                   </a>
                 </Link>
               </div>

@@ -1,10 +1,16 @@
 import { LoadingSpinner, useQuery } from "common-ui";
 import { useRouter } from "next/router";
 import { Head } from "packages/dina-ui/components";
+import { useIndexAssignmentAPI } from "packages/dina-ui/components/seqdb/ngs-workflow/useIndexAssignmentAPI";
 import {
   LibraryPrep,
   LibraryPrepBatch
 } from "packages/dina-ui/types/seqdb-api";
+import { noop } from "lodash";
+import { StorageUnitType } from "packages/dina-ui/types/collection-api";
+import { Button } from "react-bootstrap";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 export default function LibraryPrepWorksheetPage() {
   const {
@@ -24,156 +30,164 @@ export default function LibraryPrepWorksheetPage() {
 
   const batch = batchResponse && batchResponse.data;
 
-  const { loading: prepsLoading, response: prepsResponse } = useQuery<
-    LibraryPrep[]
-  >({
-    include: "indexI5,indexI7,materialSample,storageUnitUsage",
-    page: { limit: 1000 },
-    path: `seqdb-api/library-prep`
-  });
+  if (batchLoading) {
+    return <LoadingSpinner loading={true} />;
+  }
+  if (!batch) {
+    return "wack";
+  }
 
-  if (batchLoading || prepsLoading) {
+  return (
+    <LibraryPrepWorksheetLoaded
+      batch={batch}
+      sampleLayout={(sampleLayout as string) ?? "table"}
+    />
+  );
+}
+
+interface LibraryPrepWorksheetLoadedProps {
+  batch: LibraryPrepBatch;
+  sampleLayout: string;
+}
+
+function LibraryPrepWorksheetLoaded({
+  batch,
+  sampleLayout
+}: LibraryPrepWorksheetLoadedProps) {
+  const { libraryPrepsLoading, libraryPreps, storageUnitType } =
+    useIndexAssignmentAPI({
+      batch,
+      batchId: batch.id ?? "",
+      editMode: true,
+      onSaved: (_x, _y) => Promise.resolve(),
+      performSave: false,
+      setEditMode: noop,
+      setPerformSave: noop
+    });
+
+  if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
   }
 
-  if (batchResponse && batch) {
-    return (
-      <div style={{ width: "1100px" }}>
-        <Head title="Library Prep Worksheet" />
-        <style>{`
-          @media print {
-            body {
-              padding: 0;
-            }
-            a[href]:after {
-              content: none !important;
-            }
-          }
-          
-          @media print and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) {
-            body {
-              padding-left: 1.5cm;
-            }
-            a[href]:after {
-              content: none !important;
-            }
-          }
-        `}</style>
-        <div className="container-fluid">
-          <div className="form-group">
-            <h2 className="d-inline">Library Prep Worksheet</h2>
-            <button
-              className="btn btn-primary d-print-none d-inline float-right"
-              onClick={() => window.print()}
-            >
-              Print
-            </button>
-          </div>
-          <div className="row">
-            <div className="col-6">
-              <HorizontalField label="Workflow" defaultValue={batch.name} />
-              <HorizontalField
-                label="Protocol"
-                defaultValue={batch.protocol ? batch.protocol.name : ""}
-              />
-            </div>
-            <div className="col-6">
-              <HorizontalField label="Experimenter" />
-              <HorizontalField label="Date" />
-            </div>
-          </div>
-          <div style={{ height: "50px" }} />
-          <div className="row">
-            <div className="col-6">
-              <BigField label="Notes" />
-              <HorizontalField label="Thermocycler" />
-            </div>
-            <div className="col-6">
-              <div className="row">
-                <div className="col-12">
-                  <HorizontalField label="Pos Control" />
-                  <HorizontalField label="Neg Control" />
-                  <div className="row form-group">
-                    <div className="col-3">
-                      <input className="form-control" />
-                    </div>
-                    <div className="col-9">
-                      <strong>ul reaction mix pipetted into each tube</strong>
-                    </div>
-                  </div>
-                  <HorizontalField
-                    label="Thermocycler Profile"
-                    defaultValue={
-                      batch.thermocyclerProfile
-                        ? batch.thermocyclerProfile.name
-                        : ""
-                    }
-                  />
-                  <div className="row">
-                    <div className="col-6">
-                      {[...Array(6).keys()].map((i) => (
-                        <HorizontalField
-                          key={i}
-                          label={`Step ${i + 1}`}
-                          defaultValue={
-                            batch.thermocyclerProfile &&
-                            batch.thermocyclerProfile[`step${i + 1}`]
-                          }
-                        />
-                      ))}
-                    </div>
-                    <div className="col-6">
-                      {[...Array(6).keys()].map((i) => (
-                        <HorizontalField
-                          key={i}
-                          label={`Step ${i + 7}`}
-                          defaultValue={
-                            batch.thermocyclerProfile &&
-                            batch.thermocyclerProfile[`step${i + 7}`]
-                          }
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <HorizontalField
-                    label="Cycles"
-                    defaultValue={
-                      batch.thermocyclerProfile &&
-                      batch.thermocyclerProfile.cycles
-                        ? batch.thermocyclerProfile.cycles
-                        : ""
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+  const buttonBarContent = (
+    <>
+      <Button
+        variant="secondary"
+        className="btn btn-primary "
+        onClick={() => window.print()}
+        style={{ width: "10rem" }}
+      >
+        <DinaMessage id="print" />
+      </Button>
+    </>
+  );
+
+  return (
+    <PageLayout
+      titleId="libraryPrepWorksheetTitle"
+      buttonBarContent={buttonBarContent}
+    >
+      <div className="row">
+        <div className="col-6">
+          <HorizontalField label="Workflow" defaultValue={batch.name} />
+          <HorizontalField
+            label="Protocol"
+            defaultValue={batch.protocol ? batch.protocol.name : ""}
+          />
+        </div>
+        <div className="col-6">
+          <HorizontalField label="Experimenter" />
+          <HorizontalField label="Date" />
+        </div>
+      </div>
+      <div style={{ height: "50px" }} />
+      <div className="row">
+        <div className="col-6">
+          <BigField label="Notes" />
+          <HorizontalField label="Thermocycler" />
+        </div>
+        <div className="col-6">
           <div className="row">
             <div className="col-12">
-              <BigField label="Results and next steps" />
-              {prepsResponse && (
-                <>
-                  {sampleLayout === "table" ? (
-                    <LibraryPrepTable
-                      libraryPrepBatch={batch}
-                      preps={prepsResponse.data}
+              <HorizontalField label="Pos Control" />
+              <HorizontalField label="Neg Control" />
+              <div className="row form-group">
+                <div className="col-3">
+                  <input className="form-control" />
+                </div>
+                <div className="col-9">
+                  <strong>ul reaction mix pipetted into each tube</strong>
+                </div>
+              </div>
+              <HorizontalField
+                label="Thermocycler Profile"
+                defaultValue={
+                  batch.thermocyclerProfile
+                    ? batch.thermocyclerProfile.name
+                    : ""
+                }
+              />
+              <div className="row">
+                <div className="col-6">
+                  {[...Array(6).keys()].map((i) => (
+                    <HorizontalField
+                      key={i}
+                      label={`Step ${i + 1}`}
+                      defaultValue={
+                        batch.thermocyclerProfile &&
+                        batch.thermocyclerProfile[`step${i + 1}`]
+                      }
                     />
-                  ) : sampleLayout === "grid" ? (
-                    <LibraryPrepGrid
-                      libraryPrepBatch={batch}
-                      preps={prepsResponse.data}
+                  ))}
+                </div>
+                <div className="col-6">
+                  {[...Array(6).keys()].map((i) => (
+                    <HorizontalField
+                      key={i}
+                      label={`Step ${i + 7}`}
+                      defaultValue={
+                        batch.thermocyclerProfile &&
+                        batch.thermocyclerProfile[`step${i + 7}`]
+                      }
                     />
-                  ) : null}
-                </>
-              )}
+                  ))}
+                </div>
+              </div>
+              <HorizontalField
+                label="Cycles"
+                defaultValue={
+                  batch.thermocyclerProfile && batch.thermocyclerProfile.cycles
+                    ? batch.thermocyclerProfile.cycles
+                    : ""
+                }
+              />
             </div>
           </div>
         </div>
       </div>
-    );
-  }
-
-  return null;
+      <div className="row">
+        <div className="col-12">
+          <BigField label="Results and next steps" />
+          {libraryPreps && libraryPreps?.length !== 0 && (
+            <>
+              {sampleLayout === "table" ? (
+                <LibraryPrepTable
+                  libraryPrepBatch={batch}
+                  preps={libraryPreps}
+                />
+              ) : sampleLayout === "grid" ? (
+                <LibraryPrepGrid
+                  libraryPrepBatch={batch}
+                  preps={libraryPreps}
+                  storageUnitType={storageUnitType}
+                />
+              ) : null}
+            </>
+          )}
+        </div>
+      </div>
+    </PageLayout>
+  );
 }
 
 function HorizontalField({ label, defaultValue = "" }) {
@@ -201,6 +215,7 @@ function BigField({ label, defaultValue = "" }) {
 interface LibraryPrepTableProps {
   libraryPrepBatch: LibraryPrepBatch;
   preps: LibraryPrep[];
+  storageUnitType?: StorageUnitType;
 }
 
 function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
@@ -208,7 +223,7 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
     <table className="table table-bordered table-sm library-prep-table">
       <thead>
         <tr>
-          <th>Well Location</th>
+          <th>Well Coordinates</th>
           <th>Sample Name</th>
           <th>Sample Version</th>
           <th>Index i5</th>
@@ -217,15 +232,16 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
       </thead>
       <tbody>
         {preps.map((prep) => {
-          const { wellColumn, wellRow } = prep;
-          const wellLocation =
+          const wellColumn = prep?.storageUnitUsage?.wellColumn;
+          const wellRow = prep?.storageUnitUsage?.wellRow;
+          const wellCoordinates =
             wellColumn === null || !wellRow
               ? null
               : `${wellRow}${String(wellColumn).padStart(2, "0")}`;
 
           return (
             <tr key={String(prep.id)}>
-              <td>{wellLocation}</td>
+              <td>{wellCoordinates}</td>
               <td>{prep?.materialSample?.materialSampleName}</td>
               <td>{prep?.materialSample?.version}</td>
               <td>{prep.indexI5 && prep.indexI5.name}</td>
@@ -238,23 +254,24 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
   );
 }
 
-function LibraryPrepGrid({ libraryPrepBatch, preps }: LibraryPrepTableProps) {
-  const { containerType } = libraryPrepBatch;
-
-  if (!containerType) {
+function LibraryPrepGrid({ preps, storageUnitType }: LibraryPrepTableProps) {
+  if (!storageUnitType) {
     return null;
   }
 
   const cellGrid: { [key: string]: LibraryPrep } = {};
-
   const libraryPrepsWithCoords = preps.filter(
-    (prep) => prep.wellRow && prep.wellColumn
+    (prep) => prep?.storageUnitUsage?.wellRow && prep?.storageUnitUsage?.wellRow
   );
   for (const prep of libraryPrepsWithCoords) {
-    cellGrid[`${prep.wellRow}_${prep.wellColumn}`] = prep;
+    cellGrid[
+      `${prep?.storageUnitUsage?.wellRow}_${prep?.storageUnitUsage?.wellRow}`
+    ] = prep;
   }
 
-  const { numberOfColumns, numberOfRows } = containerType;
+  const numberOfColumns =
+    storageUnitType?.gridLayoutDefinition?.numberOfColumns;
+  const numberOfRows = storageUnitType?.gridLayoutDefinition?.numberOfRows;
 
   const rowLetters = [...Array(numberOfRows).keys()].map((num) =>
     String.fromCharCode(num + 65)
