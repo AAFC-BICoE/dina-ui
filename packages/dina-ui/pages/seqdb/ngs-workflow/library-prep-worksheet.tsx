@@ -134,8 +134,8 @@ function LibraryPrepWorksheetLoaded({
                       key={i}
                       label={`Step ${i + 1}`}
                       defaultValue={
-                        batch.thermocyclerProfile &&
-                        batch.thermocyclerProfile[`step${i + 1}`]
+                        batch?.thermocyclerProfile?.steps &&
+                        batch.thermocyclerProfile.steps[`${i}`]
                       }
                     />
                   ))}
@@ -146,8 +146,8 @@ function LibraryPrepWorksheetLoaded({
                       key={i}
                       label={`Step ${i + 7}`}
                       defaultValue={
-                        batch.thermocyclerProfile &&
-                        batch.thermocyclerProfile[`step${i + 7}`]
+                        batch?.thermocyclerProfile?.steps &&
+                        batch.thermocyclerProfile.steps[`${i + 6}`]
                       }
                     />
                   ))}
@@ -190,23 +190,31 @@ function LibraryPrepWorksheetLoaded({
   );
 }
 
-function HorizontalField({ label, defaultValue = "" }) {
+function HorizontalField({ label, defaultValue = "", disabled = true }) {
   return (
-    <div className="row form-group">
+    <div className="row form-group mb-2">
       <strong className="col-3">{label}</strong>
       <div className="col-9">
-        <input className="form-control" defaultValue={defaultValue} />
+        <input
+          className="form-control"
+          defaultValue={defaultValue}
+          disabled={disabled}
+        />
       </div>
     </div>
   );
 }
 
-function BigField({ label, defaultValue = "" }) {
+function BigField({ label, defaultValue = "", disabled = true }) {
   return (
-    <div className="row form-group">
+    <div className="row form-group mb-2">
       <div className="col-12">
         <strong>{label}</strong>
-        <textarea className="form-control" defaultValue={defaultValue} />
+        <textarea
+          className="form-control"
+          defaultValue={defaultValue}
+          disabled={disabled}
+        />
       </div>
     </div>
   );
@@ -224,8 +232,8 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
       <thead>
         <tr>
           <th>Well Coordinates</th>
-          <th>Sample Name</th>
-          <th>Sample Version</th>
+          <th>Primary ID</th>
+          <th>Material Sample Version</th>
           <th>Index i5</th>
           <th>Index i7</th>
         </tr>
@@ -237,7 +245,7 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
           const wellCoordinates =
             wellColumn === null || !wellRow
               ? null
-              : `${wellRow}${String(wellColumn).padStart(2, "0")}`;
+              : `${wellRow}${String(wellColumn)}`;
 
           return (
             <tr key={String(prep.id)}>

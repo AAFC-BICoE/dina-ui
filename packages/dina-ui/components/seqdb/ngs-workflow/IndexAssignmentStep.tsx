@@ -78,7 +78,7 @@ export function IndexAssignmentStep(props: IndexAssignmentStepProps) {
         </Col>
         <Col sm={10}>
           <Tab.Content>
-            <div className="row">
+            <div className="row mb-2">
               <div className="form-group list-inline">
                 <Link
                   href={`/seqdb/ngs-workflow/library-prep-worksheet?batchId=${props.batchId}&sampleLayout=table`}
