@@ -172,7 +172,9 @@ describe("QueryBuilderIdentifierSearch", () => {
                       testValue as TestValueStructure
                     ).testValue(
                       operator
-                    )}","selectedOperator":"${operator}","selectedIdentifier": "seqdb_id","selectedType":"${
+                    )}","selectedOperator":"${operator}","selectedIdentifier": {"id":"seqdb_id","type":"identifier-type","vocabularyElementType":"${
+                      (testValue as TestValueStructure).type
+                    }","multilingualTitle":{"titles":[{"lang":"en","title":"SeqDB ID"},{"lang":"fr","title":"ID SeqDB"}]}},"selectedType":"${
                       (testValue as TestValueStructure).type
                     }"}`,
                     fieldInfo: {
@@ -221,7 +223,9 @@ describe("QueryBuilderIdentifierSearch", () => {
                       testValue as TestValueStructure
                     ).testValue(
                       operator
-                    )}","selectedOperator":"${operator}","selectedIdentifier": "seqdb_id","selectedType":"${
+                    )}","selectedOperator":"${operator}","selectedIdentifier": {"id":"seqdb_id","type":"identifier-type","vocabularyElementType":"${
+                      (testValue as TestValueStructure).type
+                    }","multilingualTitle":{"titles":[{"lang":"en","title":"SeqDB ID"},{"lang":"fr","title":"ID SeqDB"}]}},"selectedType":"${
                       (testValue as TestValueStructure).type
                     }"}`,
                     fieldInfo: {

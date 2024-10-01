@@ -15,7 +15,7 @@ export default function useTypedVocabularyOptions<T extends TypedVocabulary>({
   const { locale } = useDinaIntl();
 
   const vocabOptions =
-    response?.data?.map((vocab) => toOption(vocab as T)) ?? [];
+    response?.data?.map?.((vocab) => toOption(vocab as T)) ?? [];
 
   const directVocabs = response?.data;
 

@@ -112,7 +112,7 @@ export default function QueryRowIdentifierSearch({
 
   const identifierSelected = identifierState.selectedIdentifier;
 
-  // Determine the type of the selected managed attribute.
+  // Determine the type of the selected identifier.
   const identifierType = identifierSelected?.vocabularyElementType ?? "";
 
   const supportedOperatorsForType: (type: string) => string[] = (type) => {
@@ -155,7 +155,7 @@ export default function QueryRowIdentifierSearch({
           "wildcard",
           "in",
           "notIn",
-          // Check if the managed attribute contains keyword numeric support.
+          // Check if the identifier selected contains keyword numeric support.
           identifierState?.selectedIdentifierConfig?.keywordNumericSupport
             ? "between"
             : undefined,
@@ -226,7 +226,7 @@ export default function QueryRowIdentifierSearch({
     }
   };
 
-  // Set the type and the operator if the managed attribute selected has changed.
+  // Set the type and the operator if the identifier selected has changed.
   if (identifierState.selectedType === "" && identifierType !== "") {
     setIdentifierState({
       ...identifierState,
@@ -346,7 +346,7 @@ export function transformIdentifierToDSL({
   }
 
   const fieldPath: string =
-    fieldInfo?.path + "." + identifierSearchValue.selectedIdentifier;
+    fieldInfo?.path + "." + identifierSearchValue?.selectedIdentifier?.id ?? "";
 
   // Check if identifier can be found within the index map.
   const identifierFieldInfo = fieldValueToIndexSettings(
