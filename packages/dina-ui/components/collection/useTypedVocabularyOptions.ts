@@ -17,6 +17,8 @@ export default function useTypedVocabularyOptions<T extends TypedVocabulary>({
   const vocabOptions =
     response?.data?.map((vocab) => toOption(vocab as T)) ?? [];
 
+  const directVocabs = response?.data;
+
   function toOption(value: T): VocabularyOption {
     const label =
       find(
@@ -28,5 +30,10 @@ export default function useTypedVocabularyOptions<T extends TypedVocabulary>({
     return { label, value: value.id };
   }
 
-  return { toOption, loading, vocabOptions };
+  return {
+    toOption,
+    loading,
+    vocabOptions,
+    typedVocabularies: directVocabs as T[]
+  };
 }

@@ -11,9 +11,15 @@ import { noop } from "lodash";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import { VocabularyOption } from "packages/dina-ui/components/collection/VocabularySelectField";
-import QueryBuilderNumberSearch from "./QueryBuilderNumberSearch";
-import useTypedVocabularyOptions from "packages/dina-ui/components/collection/useTypedVocabularyOptions";
+import QueryBuilderNumberSearch, {
+  transformNumberSearchToDSL
+} from "./QueryBuilderNumberSearch";
+import useTypedVocabularyOptions from "../../../../../dina-ui/components/collection/useTypedVocabularyOptions";
 import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
+import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
+import QueryBuilderDateSearch, {
+  transformDateSearchToDSL
+} from "./QueryBuilderDateSearch";
 
 interface QueryBuilderIdentifierSearchProps {
   /**
@@ -49,10 +55,13 @@ export interface IdentifierOption extends SelectOption<string> {
 
 export interface IdentifierSearchStates {
   /** The key of the selected identifier to search against. */
-  selectedIdentifier?: string;
+  selectedIdentifier?: IdentifierType;
 
   /** If possible, the identifier config from the index map */
   selectedIdentifierConfig?: ESIndexMapping;
+
+  /** The vocabulary type of the selected identifier. */
+  selectedType: string;
 
   /** Operator to be used on the identifier search. */
   selectedOperator: string;
@@ -103,29 +112,70 @@ export default function QueryRowIdentifierSearch({
 
   const identifierSelected = identifierState.selectedIdentifier;
 
-  const supportedOperatorsForType: () => string[] = () => {
-    return [
-      "equals",
-      "notEquals",
-      "in",
-      "notIn",
-      "between",
-      "greaterThan",
-      "greaterThanOrEqualTo",
-      "lessThan",
-      "lessThanOrEqualTo",
-      "empty",
-      "notEmpty"
-    ].filter((option) => option !== undefined) as string[];
+  // Determine the type of the selected managed attribute.
+  const identifierType = identifierSelected?.vocabularyElementType ?? "";
+
+  const supportedOperatorsForType: (type: string) => string[] = (type) => {
+    switch (type) {
+      case "INTEGER":
+      case "DECIMAL":
+        return [
+          "equals",
+          "notEquals",
+          "in",
+          "notIn",
+          "between",
+          "greaterThan",
+          "greaterThanOrEqualTo",
+          "lessThan",
+          "lessThanOrEqualTo",
+          "empty",
+          "notEmpty"
+        ];
+      case "DATE":
+        return [
+          "equals",
+          "notEquals",
+          "containsDate",
+          "between",
+          "in",
+          "notIn",
+          "greaterThan",
+          "greaterThanOrEqualTo",
+          "lessThan",
+          "lessThanOrEqualTo",
+          "empty",
+          "notEmpty"
+        ];
+      case "BOOL":
+        return ["equals", "empty", "notEmpty"];
+      case "STRING":
+        return [
+          "exactMatch",
+          "wildcard",
+          "in",
+          "notIn",
+          // Check if the managed attribute contains keyword numeric support.
+          identifierState?.selectedIdentifierConfig?.keywordNumericSupport
+            ? "between"
+            : undefined,
+          "startsWith",
+          "notEquals",
+          "empty",
+          "notEmpty"
+        ].filter((option) => option !== undefined) as string[];
+      default:
+        return [];
+    }
   };
 
   // Generate the operator options
-  const operatorOptions = supportedOperatorsForType().map<SelectOption<string>>(
-    (option) => ({
-      label: formatMessage({ id: "queryBuilder_operator_" + option }),
-      value: option
-    })
-  );
+  const operatorOptions = supportedOperatorsForType(identifierType).map<
+    SelectOption<string>
+  >((option) => ({
+    label: formatMessage({ id: "queryBuilder_operator_" + option }),
+    value: option
+  }));
 
   // Currently selected option, if no option can be found just select the first one.
   const selectedOperator = operatorOptions?.find(
@@ -133,7 +183,7 @@ export default function QueryRowIdentifierSearch({
   );
 
   // Determine the value input to display based on the type. Currently only string is supported.
-  const supportedValueForType = () => {
+  const supportedValueForType = (type: string) => {
     const operator = identifierState.selectedOperator;
 
     // If the operator is "empty" or "not empty", do not display anything.
@@ -151,10 +201,38 @@ export default function QueryRowIdentifierSearch({
         })
     };
 
-    return <QueryBuilderNumberSearch {...commonProps} />;
+    switch (type) {
+      case "INTEGER":
+      case "DECIMAL":
+        return <QueryBuilderNumberSearch {...commonProps} />;
+      case "DATE":
+        return <QueryBuilderDateSearch {...commonProps} />;
+      case "BOOL":
+        // Automatically set the boolean value to true if it's not preset.
+        if (
+          identifierState.searchValue !== "true" &&
+          identifierState.searchValue !== "false"
+        ) {
+          setIdentifierState({
+            ...identifierState,
+            searchValue: "true"
+          });
+        }
+        return <QueryBuilderBooleanSearch {...commonProps} />;
+      case "STRING":
+        return <QueryBuilderTextSearch {...commonProps} />;
+      default:
+        return <></>;
+    }
   };
 
-  // Set the the operator if the identifier selected has changed.
+  // Set the type and the operator if the managed attribute selected has changed.
+  if (identifierState.selectedType === "" && identifierType !== "") {
+    setIdentifierState({
+      ...identifierState,
+      selectedType: identifierType
+    });
+  }
   if (!selectedOperator && operatorOptions?.[0]) {
     setIdentifierState({
       ...identifierState,
@@ -163,9 +241,10 @@ export default function QueryRowIdentifierSearch({
   }
 
   // Retrieve the vocabulary options
-  const { vocabOptions, loading } = useTypedVocabularyOptions<IdentifierType>({
-    path: identifierConfig?.dynamicField?.apiEndpoint ?? ""
-  });
+  const { vocabOptions, loading, typedVocabularies } =
+    useTypedVocabularyOptions<IdentifierType>({
+      path: identifierConfig?.dynamicField?.apiEndpoint ?? ""
+    });
 
   return (
     <div className={isInColumnSelector ? "" : "row"}>
@@ -173,7 +252,7 @@ export default function QueryRowIdentifierSearch({
       <Select<VocabularyOption>
         options={vocabOptions}
         value={vocabOptions.find(
-          (option) => option.value === identifierSelected
+          (option) => option.value === identifierSelected?.id
         )}
         isLoading={loading}
         placeholder={formatMessage({
@@ -187,12 +266,15 @@ export default function QueryRowIdentifierSearch({
 
           setIdentifierState({
             ...identifierState,
-            selectedIdentifier: newValue?.value,
+            selectedIdentifier: typedVocabularies.find(
+              (vocab) => vocab.id === newValue?.value
+            ),
             selectedIdentifierConfig: fieldValueToIndexSettings(
               fieldPath,
               indexMap ?? []
             ),
             selectedOperator: "",
+            selectedType: "",
             searchValue: ""
           });
         }}
@@ -229,7 +311,7 @@ export default function QueryRowIdentifierSearch({
 
       {/* Value Searching (changes based on the type selected) */}
       {!isInColumnSelector && identifierSelected && (
-        <div className="col ps-0">{supportedValueForType()}</div>
+        <div className="col ps-0">{supportedValueForType(identifierType)}</div>
       )}
     </div>
   );
@@ -285,5 +367,14 @@ export function transformIdentifierToDSL({
         } as ESIndexMapping)
   };
 
-  return transformTextSearchToDSL({ ...commonProps });
+  switch (identifierSearchValue.selectedType) {
+    case "INTEGER":
+    case "DECIMAL":
+      return transformNumberSearchToDSL({ ...commonProps });
+    case "DATE":
+      return transformDateSearchToDSL({ ...commonProps });
+    case "STRING":
+    case "BOOL":
+      return transformTextSearchToDSL({ ...commonProps });
+  }
 }
