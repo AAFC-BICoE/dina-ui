@@ -255,7 +255,7 @@ export function useGridCoordinatesControls({
       const pcrBatchItemWithMaterialSampleId =
         pcrBatchItemWithMaterialSampleIdQuery.data;
       const materialSampleQuery = await apiClient.get<MaterialSample>(
-        `collection-api/material-sample/${pcrBatchItemWithMaterialSampleId.materialSample?.id}`,
+        `collection-api/material-sample-summary/${pcrBatchItemWithMaterialSampleId.materialSample?.id}`,
         {}
       );
       const materialSample = materialSampleQuery.data;

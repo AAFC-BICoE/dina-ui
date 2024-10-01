@@ -196,7 +196,7 @@ export function useSeqSelectCoordinatesControls({
     await bulkGet<MaterialSample>(
       seqReactionSamples
         .filter((item) => item.sampleId)
-        .map((item) => "/material-sample/" + item.sampleId),
+        .map((item) => "/material-sample-summary/" + item.sampleId),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
       const materialSamplesTransformed = compact(response).map<MaterialSample>(
