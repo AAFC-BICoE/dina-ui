@@ -1,8 +1,11 @@
 import {
   AreYouSureModal,
   CheckBoxWithoutWrapper,
+  DateField,
   FieldSet,
+  NumberField,
   SelectField,
+  StringToggleField,
   TextField,
   useDinaFormContext,
   useFieldLabels,
@@ -23,9 +26,10 @@ export function OtherIdentifiersSection() {
   const { getFieldLabel } = useFieldLabels();
   const { openModal } = useModal();
 
-  const { vocabOptions } = useTypedVocabularyOptions<IdentifierType>({
-    path: "collection-api/identifier-type"
-  });
+  const { vocabOptions, typedVocabularies } =
+    useTypedVocabularyOptions<IdentifierType>({
+      path: "collection-api/identifier-type"
+    });
 
   // Determine if the form template sections should be visible.
   const visibility = getFormTemplateCheckboxes(formTemplate);
@@ -169,61 +173,84 @@ export function OtherIdentifiersSection() {
                 )}
 
                 {/* Each of other identifier rows to be displayed */}
-                {identifiers?.map?.((_, index) => (
-                  <div className="row" key={index}>
-                    <div
-                      className={readOnly ? "col-md-2" : "col-md-5"}
-                      data-testid={"identifiers[" + index + "].type"}
-                    >
-                      <SelectField
-                        name={"identifiers[" + index + "].type"}
-                        options={vocabOptions}
-                        filterValues={selectedTypes}
-                        readOnlyRender={(optionValue) => (
-                          <strong>
-                            {vocabOptions.find(
-                              (item) => item.value === optionValue
-                            )?.label ??
-                              optionValue ??
-                              ""}
-                            :
-                          </strong>
-                        )}
-                        disableTemplateCheckbox={true}
-                        disabled={isTemplate}
-                        hideLabel={true}
-                      />
-                    </div>
-                    <div
-                      className="col-md-6"
-                      data-testid={"identifiers[" + index + "].value"}
-                    >
-                      <TextField
-                        name={"identifiers[" + index + "].value"}
-                        hideLabel={true}
-                        disableTemplateCheckbox={true}
-                        disabled={isTemplate}
-                      />
-                    </div>
-                    <div className="col-md-1 d-flex align-items-center justify-content-between">
-                      {!readOnly && (
-                        <FaMinus
-                          className="ms-auto"
-                          style={{ marginTop: "-10px", cursor: "pointer" }}
-                          onClick={() => removeIdentifier(index)}
-                          size="2em"
-                          onMouseOver={(event) =>
-                            (event.currentTarget.style.color = "blue")
-                          }
-                          onMouseOut={(event) =>
-                            (event.currentTarget.style.color = "")
-                          }
-                          data-testid="add row button"
+                {identifiers?.map?.((identifier, index) => {
+                  // Retrieve the identifier type based on the ID selected. By default, string is used.
+                  const identifierType =
+                    typedVocabularies?.find?.(
+                      (vocab) => vocab?.id === identifier?.type
+                    )?.vocabularyElementType ?? "STRING";
+                  const commonProps = {
+                    name: "identifiers[" + index + "].value",
+                    hideLabel: true,
+                    disableTemplateCheckbox: true,
+                    disabled: isTemplate
+                  };
+
+                  return (
+                    <div className="row" key={index}>
+                      <div
+                        className={readOnly ? "col-md-2" : "col-md-5"}
+                        data-testid={"identifiers[" + index + "].type"}
+                      >
+                        <SelectField
+                          name={"identifiers[" + index + "].type"}
+                          options={vocabOptions}
+                          filterValues={selectedTypes}
+                          readOnlyRender={(optionValue) => (
+                            <strong>
+                              {vocabOptions.find(
+                                (item) => item.value === optionValue
+                              )?.label ??
+                                optionValue ??
+                                ""}
+                              :
+                            </strong>
+                          )}
+                          disableTemplateCheckbox={true}
+                          disabled={isTemplate}
+                          hideLabel={true}
                         />
-                      )}
+                      </div>
+                      <div
+                        className="col-md-6"
+                        data-testid={"identifiers[" + index + "].value"}
+                      >
+                        {identifierType === "STRING" && (
+                          <TextField {...commonProps} />
+                        )}
+                        {identifierType === "DATE" && (
+                          <DateField {...commonProps} />
+                        )}
+                        {identifierType === "INTEGER" && (
+                          <NumberField {...commonProps} isInteger={true} />
+                        )}
+                        {identifierType === "DECIMAL" && (
+                          <NumberField {...commonProps} isInteger={false} />
+                        )}
+                        {identifierType === "BOOL" && (
+                          <StringToggleField {...commonProps} />
+                        )}
+                      </div>
+                      <div className="col-md-1 d-flex align-items-center justify-content-between">
+                        {!readOnly && (
+                          <FaMinus
+                            className="ms-auto"
+                            style={{ marginTop: "-10px", cursor: "pointer" }}
+                            onClick={() => removeIdentifier(index)}
+                            size="2em"
+                            onMouseOver={(event) =>
+                              (event.currentTarget.style.color = "blue")
+                            }
+                            onMouseOut={(event) =>
+                              (event.currentTarget.style.color = "")
+                            }
+                            data-testid="add row button"
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             );
           }}
