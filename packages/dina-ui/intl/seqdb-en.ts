@@ -158,6 +158,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   seqSubmissionListTitle: "SEQ Submission",
   seqTubeNumber: "SEQ Tube Number",
   seqWellCoordinates: "SEQ Well Coordinates",
+  libraryPrepWorksheetTitle: "Library Prep Worksheet",
   seqWorkSheetErrors: " errors)",
   seqWorkSheetPleaseAdd: "(please add ",
   seqWorksheetComponents: "Components",

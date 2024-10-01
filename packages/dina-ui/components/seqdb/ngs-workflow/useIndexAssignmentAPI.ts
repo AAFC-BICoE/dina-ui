@@ -9,6 +9,7 @@ import { Dictionary, toPairs } from "lodash";
 import { useContext, useState, useEffect } from "react";
 import {
   MaterialSampleSummary,
+  Protocol,
   StorageUnit,
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
@@ -23,6 +24,7 @@ export interface UseIndexAssignmentReturn {
   materialSamples?: MaterialSampleSummary[];
   ngsIndexes?: NgsIndex[];
   storageUnitType?: StorageUnitType;
+  protocol?: Protocol;
   onSubmitGrid: ({
     submittedValues
   }: DinaFormSubmitParams<any>) => Promise<void>;
@@ -36,7 +38,7 @@ export function useIndexAssignmentAPI({
   editMode,
   setEditMode,
   setPerformSave
-}: IndexAssignmentStepProps): UseIndexAssignmentReturn {
+}: Partial<IndexAssignmentStepProps>): UseIndexAssignmentReturn {
   const { save, apiClient, bulkGet } = useContext(ApiClientContext);
 
   const [lastSave, setLastSave] = useState<number>();
@@ -47,6 +49,7 @@ export function useIndexAssignmentAPI({
   const [materialSamples, setMaterialSamples] =
     useState<MaterialSampleSummary[]>();
   const [ngsIndexes, setNgsIndexes] = useState<NgsIndex[]>();
+  const [protocol, setProtocol] = useState<Protocol>();
 
   useQuery<LibraryPrep[]>(
     {
@@ -57,7 +60,7 @@ export function useIndexAssignmentAPI({
           {
             selector: "libraryPrepBatch.uuid",
             comparison: "==",
-            arguments: libraryPrepBatch.id ?? ""
+            arguments: libraryPrepBatch?.id ?? ""
           }
         ]
       })(""),
@@ -148,6 +151,19 @@ export function useIndexAssignmentAPI({
     }
   );
 
+  useQuery<Protocol>(
+    {
+      page: { limit: 1 },
+      path: `collection-api/protocol/${libraryPrepBatch?.protocol?.id}`
+    },
+    {
+      async onSuccess(response) {
+        setProtocol(response.data as Protocol);
+      },
+      disabled: !libraryPrepBatch?.protocol?.id
+    }
+  );
+
   useEffect(() => {
     if (!libraryPrepBatch || !libraryPrepBatch.storageUnit) return;
 
@@ -219,8 +235,8 @@ export function useIndexAssignmentAPI({
 
     await save(saveOps, { apiBaseUrl: "/seqdb-api" });
     setLastSave(Date.now());
-    setPerformSave(false);
-    setEditMode(false);
+    setPerformSave?.(false);
+    setEditMode?.(false);
   }
 
   /**
@@ -286,8 +302,8 @@ export function useIndexAssignmentAPI({
       setLastSave(Date.now());
     }
 
-    setPerformSave(false);
-    setEditMode(false);
+    setPerformSave?.(false);
+    setEditMode?.(false);
   }
 
   return {
@@ -296,6 +312,7 @@ export function useIndexAssignmentAPI({
     materialSamples,
     ngsIndexes,
     storageUnitType,
+    protocol,
     onSubmitGrid,
     onSubmitTable
   };
