@@ -45,6 +45,9 @@ import QueryRowGlobalSearchSearch, {
 import QueryRowRelationshipPresenceSearch, {
   transformRelationshipPresenceToDSL
 } from "./query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
+import QueryRowIdentifierSearch, {
+  transformIdentifierToDSL
+} from "./query-builder-value-types/QueryBuilderIdentifierSearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -94,6 +97,7 @@ function getQueryBuilderTypeFromIndexType(
     case "boolean":
     case "managedAttribute":
     case "fieldExtension":
+    case "identifier":
     case "relationshipPresence":
       return type;
 
@@ -502,6 +506,34 @@ export function generateBuilderConfig(
         });
       }
     },
+    identifier: {
+      ...BasicConfig.widgets.text,
+      type: "identifier",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowIdentifierSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          identifierConfig={
+            (factoryProps?.fieldDefinition?.fieldSettings as any)
+              ?.mapping as ESIndexMapping
+          }
+          indexMap={indexMap}
+          isInColumnSelector={false}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformIdentifierToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings,
+          indexMap
+        });
+      }
+    },
     relationshipPresence: {
       ...BasicConfig.widgets.text,
       type: "relationshipPresence",
@@ -649,6 +681,15 @@ export function generateBuilderConfig(
       defaultOperator: "noOperator",
       widgets: {
         fieldExtension: {
+          operators: ["noOperator"]
+        }
+      }
+    },
+    identifier: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        identifier: {
           operators: ["noOperator"]
         }
       }

@@ -815,7 +815,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_STORAGE_UNITS[2] };
     case "collection-api/form-template/cd6d8297-43a0-45c6-b44e-983db917eb11":
       return { data: formTemplate };
-    case "collection-api/vocabulary2/materialSampleIdentifierType":
+    case "collection-api/identifier-type":
       return {
         data: {
           id: "materialSampleIdentifierType",
