@@ -14,6 +14,10 @@ import { FieldExtensionSearchStates } from "../list-page/query-builder/query-bui
 import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
+import { VocabularyElement } from "packages/dina-ui/types/collection-api";
+import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
+import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
@@ -54,6 +58,16 @@ export function generateColumnPath({
           fieldExtensionValues?.selectedExtension +
           "/" +
           fieldExtensionValues?.selectedField
+        );
+
+      // Identifier (identifier/[IDENTIFIER_KEY])
+      case "identifier":
+        const identifierValues: IdentifierSearchStates =
+          JSON.parse(dynamicFieldValue);
+        return (
+          indexMapping.dynamicField.type +
+          "/" +
+          identifierValues.selectedIdentifier
         );
 
       // Relationship Presence (relationshipPresence/[RELATIONSHIP]/[OPERATOR])
@@ -259,6 +273,21 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
         component,
         extension,
         field,
+        apiClient,
+        dynamicFieldsMappingConfig
+      );
+    }
+
+    // Handle identifier paths
+    if (
+      dynamicFieldsMappingConfig &&
+      pathParts.length === 2 &&
+      pathParts[0] === "identifier"
+    ) {
+      const identifierKey = pathParts[1];
+      return getIdentifierColumn(
+        path,
+        identifierKey,
         apiClient,
         dynamicFieldsMappingConfig
       );
@@ -559,6 +588,139 @@ export function getIncludedExtensionFieldColumn(
   };
 
   return extensionValuesColumn;
+}
+
+async function getIdentifierColumn<TData extends KitsuResource>(
+  path: string,
+  identifierKey: string,
+  apiClient: Kitsu,
+  dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
+): Promise<TableColumn<TData> | undefined> {
+  // API request params:
+  const params = {
+    page: { limit: 1 }
+  };
+
+  // Figure out API endpoint using the dynamicFieldsMappingConfig.
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find(
+    (config) => config.type === "identifier"
+  );
+  const relationshipConfigMatch =
+    dynamicFieldsMappingConfig.relationshipFields.find(
+      (config) => config.type === "identifier"
+    );
+
+  if (!fieldConfigMatch && !relationshipConfigMatch) {
+    console.error(
+      "Identifier Config could not be found in the dynamic fields mapping."
+    );
+    return;
+  }
+
+  try {
+    if (fieldConfigMatch) {
+      // API request for the identifiers
+      const identifierRequest = await fetchDynamicField(
+        apiClient,
+        fieldConfigMatch.apiEndpoint,
+        params
+      );
+
+      // Find the Vocabulary Element based on the identifier key.
+      const vocabularyElements = identifierRequest as any as IdentifierType[];
+      const vocabularyElement = vocabularyElements.find(
+        (vocab) => vocab.id === identifierKey
+      );
+
+      if (vocabularyElement) {
+        return getAttributeIdentifierColumn(
+          path,
+          vocabularyElement,
+          fieldConfigMatch
+        );
+      }
+    }
+
+    if (relationshipConfigMatch) {
+      // API request for the identifiers
+      const identifierRequest = await fetchDynamicField(
+        apiClient,
+        relationshipConfigMatch.apiEndpoint,
+        params
+      );
+
+      // Find the Vocabulary Element based on the identifier key.
+      const vocabularyElements = identifierRequest as any as IdentifierType[];
+      const vocabularyElement = vocabularyElements.find(
+        (vocab) => vocab.id === identifierKey
+      );
+
+      if (vocabularyElement) {
+        return getIncludedIdentifierColumn(
+          path,
+          vocabularyElement,
+          relationshipConfigMatch
+        );
+      }
+    }
+  } catch (error) {
+    // Handle the error here, e.g., log it or display an error message.
+    throw error;
+  }
+}
+
+export function getAttributeIdentifierColumn<TData extends KitsuResource>(
+  path: string,
+  identifier: IdentifierType,
+  config: DynamicField
+): TableColumn<TData> {
+  const accessorKey = `${config.path}.${identifier.id}`;
+  const identifierColumn = {
+    header: () => <VocabularyFieldHeader vocabulary={identifier} />,
+    accessorKey,
+    id: `${config.label}.${identifier.id}`,
+    isKeyword: true,
+    isColumnVisible: true,
+    config,
+    identifier,
+    sortDescFirst: true,
+    columnSelectorString: path
+  };
+
+  return identifierColumn;
+}
+
+export function getIncludedIdentifierColumn<TData extends KitsuResource>(
+  path: string,
+  identifier: IdentifierType,
+  config: RelationshipDynamicField
+): TableColumn<TData> {
+  const accessorKey = `${config.path}.${identifier.id}`;
+
+  const identifierColumn = {
+    cell: ({ row: { original } }) => {
+      const relationshipAccessor = accessorKey?.split(".");
+      relationshipAccessor?.splice(
+        1,
+        0,
+        config.referencedType ? config.referencedType : ""
+      );
+      const valuePath = relationshipAccessor?.join(".");
+      const value = get(original, valuePath);
+      return <>{value}</>;
+    },
+    header: () => <VocabularyFieldHeader vocabulary={identifier} />,
+    accessorKey,
+    id: `${config.referencedBy}.${config.label}.${identifier.id}`,
+    isKeyword: true,
+    isColumnVisible: true,
+    relationshipType: config.referencedType,
+    identifier,
+    config,
+    columnSelectorString: path
+  };
+
+  return identifierColumn;
 }
 
 export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(

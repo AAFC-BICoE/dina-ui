@@ -480,6 +480,11 @@ export function QueryPage<TData extends KitsuResource>({
       }
     }
 
+    // Ensure displayedColumns has been loaded in.
+    if (displayedColumns.length === 0) {
+      return;
+    }
+
     // Elastic search query with pagination settings.
     let queryDSL;
     if (customViewElasticSearchQuery) {

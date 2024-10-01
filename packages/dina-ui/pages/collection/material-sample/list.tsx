@@ -212,6 +212,14 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         path: "data.attributes.extensionValues",
         apiEndpoint: "collection-api/extension"
       },
+      // Material Sample - Identifiers
+      {
+        type: "identifier",
+        label: "identifiers",
+        component: "MATERIAL_SAMPLE",
+        path: "data.attributes.identifiers",
+        apiEndpoint: "collection-api/identifier-type"
+      },
 
       // Preparation - Managed Attributes
       {
@@ -285,9 +293,9 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedType: "metadata"
       },
 
-      // Parent Material Sample
+      // Parent Material Sample - Material Sample - Managed Attributes
       {
-        type: "managedAttribute",
+        type: "unsupported",
         label: "materialSampleManagedAttributes",
         path: "included.attributes.managedAttributes",
         apiEndpoint: "collection-api/managed-attribute",
@@ -295,8 +303,9 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+      // Parent Material Sample - Preparation - Managed Attributes
       {
-        type: "managedAttribute",
+        type: "unsupported",
         label: "preparationManagedAttributes",
         path: "included.attributes.preparationManagedAttributes",
         apiEndpoint: "collection-api/managed-attribute",
@@ -304,8 +313,9 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+      // Parent Material Sample - Material Sample - Field Extensions
       {
-        type: "fieldExtension",
+        type: "unsupported",
         label: "fieldExtensions",
         component: "MATERIAL_SAMPLE",
         path: "included.attributes.extensionValues",
@@ -313,8 +323,9 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
+      // Parent Material Sample - Material Sample - Restrictions
       {
-        type: "fieldExtension",
+        type: "unsupported",
         label: "restrictions",
         component: "RESTRICTION",
         path: "included.attributes.restrictionFieldsExtension",
@@ -322,13 +333,13 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       },
-      // Hide the "Indentifiers" until it's supported like managed attributes/field extensions.
+      // Parent Material Sample - Material Sample - Identifiers
       {
         type: "unsupported",
         label: "identifiers",
         component: "MATERIAL_SAMPLE",
         path: "included.attributes.identifiers",
-        apiEndpoint: "collection-api/vocabulary2/materialSampleIdentifierType",
+        apiEndpoint: "collection-api/identifier-type",
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       }
