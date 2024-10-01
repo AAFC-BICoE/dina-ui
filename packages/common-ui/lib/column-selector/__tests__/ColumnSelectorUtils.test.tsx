@@ -127,8 +127,7 @@ describe("ColumnSelectorUtils", () => {
               label: "identifiers",
               component: "MATERIAL_SAMPLE",
               path: "data.attributes.identifiers",
-              apiEndpoint:
-                "collection-api/vocabulary2/materialSampleIdentifierType"
+              apiEndpoint: "collection-api/identifier-type"
             },
             value: "data.attributes.identifiers",
             distinctTerm: false,
@@ -154,8 +153,7 @@ describe("ColumnSelectorUtils", () => {
               label: "identifiers",
               component: "MATERIAL_SAMPLE",
               path: "included.attributes.identifiers",
-              apiEndpoint:
-                "collection-api/vocabulary2/materialSampleIdentifierType"
+              apiEndpoint: "collection-api/identifier-type"
             },
             parentName: "parentMaterialSample",
             parentPath: "included",

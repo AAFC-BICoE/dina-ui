@@ -17,6 +17,7 @@ import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 import { VocabularyElement } from "packages/dina-ui/types/collection-api";
 import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
+import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 
 export interface GenerateColumnPathProps {
   /** Index mapping for the column to generate the column path. */
@@ -626,10 +627,9 @@ async function getIdentifierColumn<TData extends KitsuResource>(
       );
 
       // Find the Vocabulary Element based on the identifier key.
-      const vocabularyElements = (identifierRequest as any)
-        ?.vocabularyElements as VocabularyElement[];
+      const vocabularyElements = identifierRequest as any as IdentifierType[];
       const vocabularyElement = vocabularyElements.find(
-        (vocab) => vocab.key === identifierKey
+        (vocab) => vocab.id === identifierKey
       );
 
       if (vocabularyElement) {
@@ -650,10 +650,9 @@ async function getIdentifierColumn<TData extends KitsuResource>(
       );
 
       // Find the Vocabulary Element based on the identifier key.
-      const vocabularyElements = (identifierRequest as any)
-        ?.vocabularyElements as VocabularyElement[];
+      const vocabularyElements = identifierRequest as any as IdentifierType[];
       const vocabularyElement = vocabularyElements.find(
-        (vocab) => vocab.key === identifierKey
+        (vocab) => vocab.id === identifierKey
       );
 
       if (vocabularyElement) {
@@ -672,14 +671,14 @@ async function getIdentifierColumn<TData extends KitsuResource>(
 
 export function getAttributeIdentifierColumn<TData extends KitsuResource>(
   path: string,
-  identifier: VocabularyElement,
+  identifier: IdentifierType,
   config: DynamicField
 ): TableColumn<TData> {
-  const accessorKey = `${config.path}.${identifier.key}`;
+  const accessorKey = `${config.path}.${identifier.id}`;
   const identifierColumn = {
     header: () => <VocabularyFieldHeader vocabulary={identifier} />,
     accessorKey,
-    id: `${config.label}.${identifier.key}`,
+    id: `${config.label}.${identifier.id}`,
     isKeyword: true,
     isColumnVisible: true,
     config,
@@ -693,10 +692,10 @@ export function getAttributeIdentifierColumn<TData extends KitsuResource>(
 
 export function getIncludedIdentifierColumn<TData extends KitsuResource>(
   path: string,
-  identifier: VocabularyElement,
+  identifier: IdentifierType,
   config: RelationshipDynamicField
 ): TableColumn<TData> {
-  const accessorKey = `${config.path}.${identifier.key}`;
+  const accessorKey = `${config.path}.${identifier.id}`;
 
   const identifierColumn = {
     cell: ({ row: { original } }) => {
@@ -712,7 +711,7 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
     },
     header: () => <VocabularyFieldHeader vocabulary={identifier} />,
     accessorKey,
-    id: `${config.referencedBy}.${config.label}.${identifier.key}`,
+    id: `${config.referencedBy}.${config.label}.${identifier.id}`,
     isKeyword: true,
     isColumnVisible: true,
     relationshipType: config.referencedType,

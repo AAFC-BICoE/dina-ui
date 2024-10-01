@@ -5,6 +5,7 @@ import CreatableSelect, { CreatableProps } from "react-select/creatable";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import useVocabularyOptions from "./useVocabularyOptions";
 import { VocabularyElement } from "packages/dina-ui/types/collection-api";
+import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 
 export interface VocabularySelectFieldProps extends FieldWrapperProps {
   path: string;
@@ -100,7 +101,7 @@ export function VocabularyReadOnlyView({ path, value }) {
 }
 
 export interface VocabularyFieldHeaderProps {
-  vocabulary: VocabularyElement;
+  vocabulary: IdentifierType;
 }
 
 export function VocabularyFieldHeader({
@@ -110,6 +111,6 @@ export function VocabularyFieldHeader({
   const label =
     vocabulary?.multilingualTitle?.titles?.find(
       (title) => title.lang === locale
-    )?.title ?? vocabulary.key;
+    )?.title ?? vocabulary.id;
   return <>{label}</>;
 }

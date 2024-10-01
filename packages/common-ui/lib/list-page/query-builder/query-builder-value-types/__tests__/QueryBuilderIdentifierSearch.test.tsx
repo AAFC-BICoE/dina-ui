@@ -73,8 +73,7 @@ describe("QueryBuilderIdentifierSearch", () => {
                       label: "identifiers",
                       component: "MATERIAL_SAMPLE",
                       path: "data.attributes.identifiers",
-                      apiEndpoint:
-                        "collection-api/vocabulary2/materialSampleIdentifierType"
+                      apiEndpoint: "collection-api/identifier-type"
                     },
                     hideField: true,
                     value: "data.attributes.identifiers",
@@ -119,8 +118,7 @@ describe("QueryBuilderIdentifierSearch", () => {
                       path: "included.attributes.identifiers",
                       referencedBy: "parentMaterialSample",
                       referencedType: "material-sample",
-                      apiEndpoint:
-                        "collection-api/vocabulary2/materialSampleIdentifierType"
+                      apiEndpoint: "collection-api/identifier-type"
                     } as any,
                     hideField: true,
                     parentName: "parentMaterialSample",

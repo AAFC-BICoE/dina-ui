@@ -8,12 +8,13 @@ import {
   useFieldLabels,
   useModal
 } from "common-ui/lib";
-import useVocabularyOptions from "../useVocabularyOptions";
 import { FieldArray, useFormikContext } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { getFormTemplateCheckboxes } from "../../form-template/formTemplateUtils";
 import { useState } from "react";
+import useTypedVocabularyOptions from "../useTypedVocabularyOptions";
+import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 
 export function OtherIdentifiersSection() {
   const { readOnly, isTemplate, formTemplate, isBulkEditAllTab } =
@@ -22,8 +23,8 @@ export function OtherIdentifiersSection() {
   const { getFieldLabel } = useFieldLabels();
   const { openModal } = useModal();
 
-  const { vocabOptions } = useVocabularyOptions({
-    path: "collection-api/vocabulary2/materialSampleIdentifierType"
+  const { vocabOptions } = useTypedVocabularyOptions<IdentifierType>({
+    path: "collection-api/identifier-type"
   });
 
   // Determine if the form template sections should be visible.

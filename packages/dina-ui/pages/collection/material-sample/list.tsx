@@ -218,7 +218,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         label: "identifiers",
         component: "MATERIAL_SAMPLE",
         path: "data.attributes.identifiers",
-        apiEndpoint: "collection-api/vocabulary2/materialSampleIdentifierType"
+        apiEndpoint: "collection-api/identifier-type"
       },
 
       // Preparation - Managed Attributes
@@ -339,7 +339,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
         label: "identifiers",
         component: "MATERIAL_SAMPLE",
         path: "included.attributes.identifiers",
-        apiEndpoint: "collection-api/vocabulary2/materialSampleIdentifierType",
+        apiEndpoint: "collection-api/identifier-type",
         referencedBy: "parentMaterialSample",
         referencedType: "material-sample"
       }

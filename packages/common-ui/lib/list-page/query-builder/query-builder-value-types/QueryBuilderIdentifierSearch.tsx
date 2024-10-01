@@ -11,8 +11,9 @@ import { noop } from "lodash";
 import { fieldValueToIndexSettings } from "../useQueryBuilderConfig";
 import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 import { VocabularyOption } from "packages/dina-ui/components/collection/VocabularySelectField";
-import useVocabularyOptions from "../../../../../dina-ui/components/collection/useVocabularyOptions";
 import QueryBuilderNumberSearch from "./QueryBuilderNumberSearch";
+import useTypedVocabularyOptions from "packages/dina-ui/components/collection/useTypedVocabularyOptions";
+import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 
 interface QueryBuilderIdentifierSearchProps {
   /**
@@ -162,7 +163,7 @@ export default function QueryRowIdentifierSearch({
   }
 
   // Retrieve the vocabulary options
-  const { vocabOptions, loading } = useVocabularyOptions({
+  const { vocabOptions, loading } = useTypedVocabularyOptions<IdentifierType>({
     path: identifierConfig?.dynamicField?.apiEndpoint ?? ""
   });
 
