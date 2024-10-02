@@ -135,7 +135,9 @@ export function usePCRBatchItemGridControls({
           await bulkGet<MaterialSample>(
             pcrBatchItems
               .filter((item) => item.materialSample?.id)
-              .map((item) => "/material-sample/" + item.materialSample?.id),
+              .map(
+                (item) => "/material-sample-summary/" + item.materialSample?.id
+              ),
             { apiBaseUrl: "/collection-api" }
           ).then((response) => {
             const materialSamplesTransformed = compact(
@@ -151,8 +153,8 @@ export function usePCRBatchItemGridControls({
         }
 
         setLoadingRelationships(true);
-        fetchStorageUnitUsage();
-        fetchSamples((materialSamples) => {
+        await fetchStorageUnitUsage();
+        await fetchSamples((materialSamples) => {
           const pcrBatchItemsWithSampleNames =
             materialSamples.map<PcrBatchItemSample>((sample) => {
               const batchItem = pcrBatchItems.find(

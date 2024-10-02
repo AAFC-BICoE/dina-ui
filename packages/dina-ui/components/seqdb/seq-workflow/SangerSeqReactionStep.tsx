@@ -208,7 +208,9 @@ export function SangerSeqReactionStep({
 
         const materialSamples = compact(
           await bulkGet<MaterialSample, true>(
-            data?.map((item) => `/material-sample/${item.materialSample?.id}`),
+            data?.map(
+              (item) => `/material-sample-summary/${item.materialSample?.id}`
+            ),
             {
               apiBaseUrl: "/collection-api",
               returnNullForMissingResource: true

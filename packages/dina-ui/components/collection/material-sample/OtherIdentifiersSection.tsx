@@ -26,7 +26,7 @@ export function OtherIdentifiersSection() {
   const { getFieldLabel } = useFieldLabels();
   const { openModal } = useModal();
 
-  const { vocabOptions, typedVocabularies } =
+const { vocabOptions, typedVocabularies } =
     useTypedVocabularyOptions<IdentifierType>({
       path: "collection-api/identifier-type"
     });
