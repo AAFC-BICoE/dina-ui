@@ -97,7 +97,7 @@ export function useSeqReactionState(seqBatchId?: string) {
     const materialSamples = compact(
       await bulkGet<MaterialSample, true>(
         pcrBatchItems?.map(
-          (item) => `/material-sample/${item.materialSample?.id}`
+          (item) => `/material-sample-summary/${item.materialSample?.id}`
         ),
         {
           apiBaseUrl: "/collection-api",
