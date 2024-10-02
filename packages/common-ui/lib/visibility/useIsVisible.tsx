@@ -34,6 +34,12 @@ export function useIsVisible({
   const [isIntersecting, setIntersecting] = useState(false);
 
   useEffect(() => {
+    // For unit testing, always consider it in view.
+    if (!window.IntersectionObserver) {
+      setIntersecting(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         const inView = entry.isIntersecting;
