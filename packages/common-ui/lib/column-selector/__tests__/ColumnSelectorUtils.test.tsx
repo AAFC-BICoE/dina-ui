@@ -1,4 +1,7 @@
-import { generateColumnPath } from "../ColumnSelectorUtils";
+import {
+  generateColumnPath,
+  parseRelationshipNameFromType
+} from "../ColumnSelectorUtils";
 
 describe("ColumnSelectorUtils", () => {
   describe("generateColumnPath", () => {
@@ -57,7 +60,7 @@ describe("ColumnSelectorUtils", () => {
           dynamicFieldValue: `{"searchValue":"","selectedOperator":"exactMatch","selectedManagedAttribute":{"id":"01905a46-17bb-74ef-a2f5-3e801d52433d","type":"managed-attribute","name":"CollectingEvent","key":"collecting_event_managed_attribute_key","vocabularyElementType":"STRING","unit":null,"managedAttributeComponent":"COLLECTING_EVENT","acceptedValues":null,"createdOn":"2024-06-27T15:17:41.436807Z","createdBy":"dina-admin","group":"aafc","multilingualDescription":{"descriptions":[]}},"selectedType":"STRING"}`
         })
       ).toEqual(
-        "managedAttribute/COLLECTING_EVENT/collecting_event_managed_attribute_key"
+        "managedAttribute~collectingEvent/COLLECTING_EVENT/collecting_event_managed_attribute_key"
       );
     });
 
@@ -115,7 +118,9 @@ describe("ColumnSelectorUtils", () => {
           },
           dynamicFieldValue: `{"selectedExtension":"mixs_water_v4","selectedField":"alkalinity","searchValue":"","selectedOperator":"exactMatch"}`
         })
-      ).toEqual("fieldExtension/COLLECTING_EVENT/mixs_water_v4/alkalinity");
+      ).toEqual(
+        "fieldExtension~collectingEvent/COLLECTING_EVENT/mixs_water_v4/alkalinity"
+      );
     });
 
     it("Generate identifier path", () => {
@@ -172,7 +177,7 @@ describe("ColumnSelectorUtils", () => {
           },
           dynamicFieldValue: `{"searchValue":"","selectedOperator":"exactMatch","selectedIdentifier":"seqdb_id"}`
         })
-      ).toEqual("identifier/seqdb_id");
+      ).toEqual("identifier~parentMaterialSample/seqdb_id");
     });
 
     it("Generate relationship presence path", () => {
@@ -243,6 +248,18 @@ describe("ColumnSelectorUtils", () => {
           }
         })
       ).toEqual("assemblages.name");
+    });
+  });
+
+  describe("parseRelationshipNameFromType", () => {
+    it("Successfully parse the relationship name from the type", () => {
+      expect(
+        parseRelationshipNameFromType("identifier~parentMaterialSample")
+      ).toEqual("parentMaterialSample");
+    });
+
+    it("Returns undefined if no relationshipName is provided", () => {
+      expect(parseRelationshipNameFromType("identifier")).toBeUndefined();
     });
   });
 });
