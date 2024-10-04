@@ -445,6 +445,9 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
   const managedAttributeKey = managedAttribute.key;
   const accessorKey = `${config.path}.${managedAttributeKey}`;
 
+  const pathParts = config.path.split(".");
+  const fieldName = pathParts[pathParts.length - 1];
+
   const managedAttributesColumn = {
     cell: ({ row: { original } }) => {
       const relationshipAccessor = accessorKey?.split(".");
@@ -457,9 +460,14 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
       const value = get(original, valuePath);
       return <>{value}</>;
     },
-    header: () => <FieldHeader name={managedAttribute.name} />,
+    header: () => (
+      <>
+        {config.referencedBy ? startCase(config.referencedBy) + " - " : ""}
+        {startCase(managedAttribute.name)}
+      </>
+    ),
     accessorKey,
-    id: `${config.referencedBy}.${config.label}.${managedAttributeKey}`,
+    id: `${config.referencedBy}.${fieldName}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: true,
     relationshipType: config.referencedType,
@@ -480,10 +488,14 @@ export function getAttributesManagedAttributeColumn<
 ): TableColumn<TData> {
   const managedAttributeKey = managedAttribute.key;
   const accessorKey = `${config.path}.${managedAttributeKey}`;
+
+  const pathParts = config.path.split(".");
+  const fieldName = pathParts[pathParts.length - 1];
+
   const managedAttributesColumn = {
     header: () => <FieldHeader name={managedAttribute.name} />,
     accessorKey,
-    id: `${config.label}.${managedAttributeKey}`,
+    id: `${fieldName}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: true,
     config,
@@ -656,9 +668,9 @@ export function getIncludedExtensionFieldColumn(
     accessorKey,
     id: `${config.referencedBy}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
     header: () =>
-      `${startCase(config.referencedBy)} - ${extensionValue.extension.name} - ${
-        extensionField.name
-      }`,
+      `${config.referencedBy ? startCase(config.referencedBy) + " - " : ""}${
+        extensionValue.extension.name
+      } - ${extensionField.name}`,
     label: `${startCase(config.referencedBy)} - ${
       extensionValue.extension.name
     } - ${extensionField.name}`,
@@ -784,10 +796,13 @@ export function getAttributeIdentifierColumn<TData extends KitsuResource>(
   config: DynamicField
 ): TableColumn<TData> {
   const accessorKey = `${config.path}.${identifier.id}`;
+  const pathParts = config.path.split(".");
+  const fieldName = pathParts[pathParts.length - 1];
+
   const identifierColumn = {
     header: () => <VocabularyFieldHeader vocabulary={identifier} />,
     accessorKey,
-    id: `${config.label}.${identifier.id}`,
+    id: `${fieldName}.${identifier.id}`,
     isKeyword: true,
     isColumnVisible: true,
     config,
@@ -806,6 +821,9 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
 ): TableColumn<TData> {
   const accessorKey = `${config.path}.${identifier.id}`;
 
+  const pathParts = config.path.split(".");
+  const fieldName = pathParts[pathParts.length - 1];
+
   const identifierColumn = {
     cell: ({ row: { original } }) => {
       const relationshipAccessor = accessorKey?.split(".");
@@ -820,7 +838,7 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
     },
     header: () => <VocabularyFieldHeader vocabulary={identifier} />,
     accessorKey,
-    id: `${config.referencedBy}.${config.label}.${identifier.id}`,
+    id: `${config.referencedBy}.${fieldName}.${identifier.id}`,
     isKeyword: true,
     isColumnVisible: true,
     relationshipType: config.referencedType,
