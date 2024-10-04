@@ -190,5 +190,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   workflowDetails: "Workflow Details",
   workflowDetailsTab: "Details",
   workflowStepTab: "Step {number}: {name}",
-  workflowViewTitle: "NGS Workflow"
+  workflowViewTitle: "NGS Workflow",
+  sequencingFacility: "Sequencing Facility"
 };
