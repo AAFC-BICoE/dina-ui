@@ -272,12 +272,13 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
     ) {
       const component = pathParts[1];
       const key = pathParts[2];
+      const relationshipName = parseRelationshipNameFromType(pathParts[0]);
 
       return getManagedAttributesColumn(
         path,
         component,
         key,
-
+        relationshipName,
         apiClient,
         dynamicFieldsMappingConfig
       );
@@ -292,11 +293,14 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
       const component = pathParts[1];
       const extension = pathParts[2];
       const field = pathParts[3];
+      const relationshipName = parseRelationshipNameFromType(pathParts[0]);
+
       return getFieldExtensionColumn(
         path,
         component,
         extension,
         field,
+        relationshipName,
         apiClient,
         dynamicFieldsMappingConfig
       );
@@ -309,9 +313,12 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
       pathParts[0].startsWith("identifier")
     ) {
       const identifierKey = pathParts[1];
+      const relationshipName = parseRelationshipNameFromType(pathParts[0]);
+
       return getIdentifierColumn(
         path,
         identifierKey,
+        relationshipName,
         apiClient,
         dynamicFieldsMappingConfig
       );
@@ -379,6 +386,12 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
       "Managed Attribute Config for the following component: " +
         component +
         " could not be determined."
+    );
+    return;
+  }
+  if (fieldConfigMatch && relationshipConfigMatch) {
+    console.error(
+      "Identifier Config found for both field and relationship side. Ensure dynamic configuration is correct."
     );
     return;
   }
@@ -488,6 +501,7 @@ async function getFieldExtensionColumn<TData extends KitsuResource>(
   component: string,
   extension: string,
   field: string,
+  relationshipName: string | undefined,
   apiClient: Kitsu,
   dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
 ): Promise<TableColumn<TData> | undefined> {
@@ -502,21 +516,44 @@ async function getFieldExtensionColumn<TData extends KitsuResource>(
   };
 
   // Figure out API endpoint using the dynamicFieldsMappingConfig.
-  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find(
-    (config) =>
-      config.type === "fieldExtension" && config.component === component
-  );
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find((config) => {
+    // Can't be a field config if a relationship name is provided.
+    if (relationshipName !== undefined) {
+      return false;
+    }
+
+    if (config.type === "fieldExtension" && config.component === component) {
+      return true;
+    }
+  });
   const relationshipConfigMatch =
-    dynamicFieldsMappingConfig.relationshipFields.find(
-      (config) =>
-        config.type === "fieldExtension" && config.component === component
-    );
+    dynamicFieldsMappingConfig.relationshipFields.find((config) => {
+      // Can't be a relationship config if a relationship is not provided.
+      if (relationshipName === undefined) {
+        return false;
+      }
+
+      // Dynamic field type, component and the relationship need to match.
+      if (
+        config.type === "fieldExtension" &&
+        config.component === component &&
+        config.referencedBy === relationshipName
+      ) {
+        return true;
+      }
+    });
 
   if (!fieldConfigMatch && !relationshipConfigMatch) {
     console.error(
       "Field Extension Config for the following component: " +
         component +
         " could not be determined."
+    );
+    return;
+  }
+  if (fieldConfigMatch && relationshipConfigMatch) {
+    console.error(
+      "Identifier Config found for both field and relationship side. Ensure dynamic configuration is correct."
     );
     return;
   }
@@ -618,8 +655,13 @@ export function getIncludedExtensionFieldColumn(
     },
     accessorKey,
     id: `${config.referencedBy}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
-    header: () => `${extensionValue.extension.name} - ${extensionField.name}`,
-    label: `${extensionValue.extension.name} - ${extensionField.name}`,
+    header: () =>
+      `${startCase(config.referencedBy)} - ${extensionValue.extension.name} - ${
+        extensionField.name
+      }`,
+    label: `${startCase(config.referencedBy)} - ${
+      extensionValue.extension.name
+    } - ${extensionField.name}`,
     isKeyword: true,
     isColumnVisible: true,
     relationshipType: config.referencedType,
@@ -635,6 +677,7 @@ export function getIncludedExtensionFieldColumn(
 async function getIdentifierColumn<TData extends KitsuResource>(
   path: string,
   identifierKey: string,
+  relationshipName: string | undefined,
   apiClient: Kitsu,
   dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
 ): Promise<TableColumn<TData> | undefined> {
@@ -644,17 +687,41 @@ async function getIdentifierColumn<TData extends KitsuResource>(
   };
 
   // Figure out API endpoint using the dynamicFieldsMappingConfig.
-  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find(
-    (config) => config.type === "identifier"
-  );
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find((config) => {
+    // Can't be a field config if a relationship name is provided.
+    if (relationshipName !== undefined) {
+      return false;
+    }
+
+    if (config.type === "identifier") {
+      return true;
+    }
+  });
   const relationshipConfigMatch =
-    dynamicFieldsMappingConfig.relationshipFields.find(
-      (config) => config.type === "identifier"
-    );
+    dynamicFieldsMappingConfig.relationshipFields.find((config) => {
+      // Can't be a relationship config if a relationship is not provided.
+      if (relationshipName === undefined) {
+        return false;
+      }
+
+      // Dynamic field type, component and the relationship need to match.
+      if (
+        config.type === "identifier" &&
+        config.referencedBy === relationshipName
+      ) {
+        return true;
+      }
+    });
 
   if (!fieldConfigMatch && !relationshipConfigMatch) {
     console.error(
       "Identifier Config could not be found in the dynamic fields mapping."
+    );
+    return;
+  }
+  if (fieldConfigMatch && relationshipConfigMatch) {
+    console.error(
+      "Identifier Config found for both field and relationship side. Ensure dynamic configuration is correct."
     );
     return;
   }

@@ -295,7 +295,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
 
       // Parent Material Sample - Material Sample - Managed Attributes
       {
-        type: "unsupported",
+        type: "managedAttribute",
         label: "materialSampleManagedAttributes",
         path: "included.attributes.managedAttributes",
         apiEndpoint: "collection-api/managed-attribute",
@@ -305,7 +305,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
       },
       // Parent Material Sample - Preparation - Managed Attributes
       {
-        type: "unsupported",
+        type: "managedAttribute",
         label: "preparationManagedAttributes",
         path: "included.attributes.preparationManagedAttributes",
         apiEndpoint: "collection-api/managed-attribute",
@@ -315,7 +315,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
       },
       // Parent Material Sample - Material Sample - Field Extensions
       {
-        type: "unsupported",
+        type: "fieldExtension",
         label: "fieldExtensions",
         component: "MATERIAL_SAMPLE",
         path: "included.attributes.extensionValues",
@@ -325,7 +325,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
       },
       // Parent Material Sample - Material Sample - Restrictions
       {
-        type: "unsupported",
+        type: "fieldExtension",
         label: "restrictions",
         component: "RESTRICTION",
         path: "included.attributes.restrictionFieldsExtension",
@@ -335,7 +335,7 @@ export const dynamicFieldMappingForMaterialSample: DynamicFieldsMappingConfig =
       },
       // Parent Material Sample - Material Sample - Identifiers
       {
-        type: "unsupported",
+        type: "identifier",
         label: "identifiers",
         component: "MATERIAL_SAMPLE",
         path: "included.attributes.identifiers",
