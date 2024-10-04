@@ -146,7 +146,7 @@ describe("ColumnSelectorUtils", () => {
             endsWithSupport: false,
             hideField: false
           },
-          dynamicFieldValue: `{"searchValue":"","selectedOperator":"exactMatch","selectedIdentifier":"seqdb_id"}`
+          dynamicFieldValue: `{"searchValue":"","selectedOperator":"exactMatch","selectedIdentifier":{"id": "seqdb_id"}}`
         })
       ).toEqual("identifier/seqdb_id");
 
@@ -175,7 +175,7 @@ describe("ColumnSelectorUtils", () => {
             endsWithSupport: false,
             hideField: false
           },
-          dynamicFieldValue: `{"searchValue":"","selectedOperator":"exactMatch","selectedIdentifier":"seqdb_id"}`
+          dynamicFieldValue: `{"searchValue":"","selectedOperator":"exactMatch","selectedIdentifier":{"id": "seqdb_id"}}`
         })
       ).toEqual("identifier~parentMaterialSample/seqdb_id");
     });
