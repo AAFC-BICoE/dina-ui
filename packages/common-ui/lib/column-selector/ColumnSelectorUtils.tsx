@@ -73,7 +73,7 @@ export function generateColumnPath({
         return (
           dynamicFieldTypeWithRelationship +
           "/" +
-          identifierValues.selectedIdentifier
+          identifierValues.selectedIdentifier?.id
         );
 
       // Relationship Presence (relationshipPresence/[RELATIONSHIP]/[OPERATOR])
@@ -836,7 +836,12 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
       const value = get(original, valuePath);
       return <>{value}</>;
     },
-    header: () => <VocabularyFieldHeader vocabulary={identifier} />,
+    header: () => (
+      <VocabularyFieldHeader
+        vocabulary={identifier}
+        referencedBy={config.referencedBy}
+      />
+    ),
     accessorKey,
     id: `${config.referencedBy}.${fieldName}.${identifier.id}`,
     isKeyword: true,
