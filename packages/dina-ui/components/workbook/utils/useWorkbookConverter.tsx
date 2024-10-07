@@ -323,6 +323,10 @@ export function useWorkbookConverter(
             if (fieldPath === "organism.determination.scientificNameDetails") {
               parent["scientificNameSource"] = ScientificNameSource.CUSTOM;
             }
+            if (fieldPath.includes("geoReferenceAssertions")) {
+              resource["collectingEvent"]["geoReferenceAssertions"].isPrimary =
+                true;
+            }
           }
         }
       }

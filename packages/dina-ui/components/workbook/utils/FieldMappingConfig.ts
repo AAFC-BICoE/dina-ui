@@ -102,8 +102,6 @@ const FieldMappingConfig: FieldMappingConfigType = {
         verbatimEventDateTime: { dataType: WorkbookDataTypeEnum.STRING },
         dwcVerbatimLocality: { dataType: WorkbookDataTypeEnum.STRING },
         host: { dataType: WorkbookDataTypeEnum.STRING },
-        dwcVerbatimLatitude: { dataType: WorkbookDataTypeEnum.STRING },
-        dwcVerbatimLongitude: { dataType: WorkbookDataTypeEnum.STRING },
         dwcVerbatimCoordinateSystem: { dataType: WorkbookDataTypeEnum.STRING },
         dwcVerbatimSRS: { dataType: WorkbookDataTypeEnum.STRING },
         dwcVerbatimElevation: { dataType: WorkbookDataTypeEnum.STRING },
