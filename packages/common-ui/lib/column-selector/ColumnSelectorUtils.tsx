@@ -15,7 +15,6 @@ import { RelationshipPresenceSearchStates } from "../list-page/query-builder/que
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
-import { VocabularyElement } from "packages/dina-ui/types/collection-api";
 import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
 import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 
@@ -33,13 +32,20 @@ export function generateColumnPath({
 }: GenerateColumnPathProps) {
   // Handle the path for dynamic fields.
   if (indexMapping.dynamicField && dynamicFieldValue) {
+    // Relationship name will be included with the type of the dynamic field, if it's entity
+    // level then it's just not included. This helps to determine exactly what relationship
+    // this needs to connect to.
+    const dynamicFieldTypeWithRelationship =
+      indexMapping.dynamicField.type +
+      (indexMapping.parentName ? "~" + indexMapping.parentName : "");
+
     switch (indexMapping.dynamicField.type) {
       // Managed Attribute (managedAttribute/[COMPONENT]/[MANAGED_ATTRIBUTE_KEY])
       case "managedAttribute":
         const managedAttributeValues: ManagedAttributeSearchStates =
           JSON.parse(dynamicFieldValue);
         return (
-          indexMapping.dynamicField.type +
+          dynamicFieldTypeWithRelationship +
           "/" +
           (indexMapping.dynamicField?.component ?? "ENTITY") +
           "/" +
@@ -51,7 +57,7 @@ export function generateColumnPath({
         const fieldExtensionValues: FieldExtensionSearchStates =
           JSON.parse(dynamicFieldValue);
         return (
-          indexMapping.dynamicField.type +
+          dynamicFieldTypeWithRelationship +
           "/" +
           (indexMapping.dynamicField?.component ?? "ENTITY") +
           "/" +
@@ -65,9 +71,9 @@ export function generateColumnPath({
         const identifierValues: IdentifierSearchStates =
           JSON.parse(dynamicFieldValue);
         return (
-          indexMapping.dynamicField.type +
+          dynamicFieldTypeWithRelationship +
           "/" +
-          identifierValues.selectedIdentifier
+          identifierValues.selectedIdentifier?.id
         );
 
       // Relationship Presence (relationshipPresence/[RELATIONSHIP]/[OPERATOR])
@@ -89,6 +95,22 @@ export function generateColumnPath({
   } else {
     return indexMapping.label;
   }
+}
+
+/**
+ * Parses the relationship name from a dynamic field type string. Relationships are defined using
+ * the '~' symbol.
+ *
+ * @param {string} dynamicFieldType - The dynamic field type string to parse.
+ * @returns {string|undefined} The relationship name if found, otherwise undefined.
+ */
+export function parseRelationshipNameFromType(dynamicFieldType) {
+  const tildeIndex = dynamicFieldType.indexOf("~");
+  if (tildeIndex !== -1) {
+    return dynamicFieldType.substring(tildeIndex + 1);
+  }
+
+  return undefined;
 }
 
 export interface GenerateColumnDefinitionProps<TData extends KitsuResource> {
@@ -246,14 +268,17 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
     if (
       dynamicFieldsMappingConfig &&
       pathParts.length === 3 &&
-      pathParts[0] === "managedAttribute"
+      pathParts[0].startsWith("managedAttribute")
     ) {
       const component = pathParts[1];
       const key = pathParts[2];
+      const relationshipName = parseRelationshipNameFromType(pathParts[0]);
+
       return getManagedAttributesColumn(
         path,
         component,
         key,
+        relationshipName,
         apiClient,
         dynamicFieldsMappingConfig
       );
@@ -263,16 +288,19 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
     if (
       dynamicFieldsMappingConfig &&
       pathParts.length === 4 &&
-      pathParts[0] === "fieldExtension"
+      pathParts[0].startsWith("fieldExtension")
     ) {
       const component = pathParts[1];
       const extension = pathParts[2];
       const field = pathParts[3];
+      const relationshipName = parseRelationshipNameFromType(pathParts[0]);
+
       return getFieldExtensionColumn(
         path,
         component,
         extension,
         field,
+        relationshipName,
         apiClient,
         dynamicFieldsMappingConfig
       );
@@ -282,12 +310,15 @@ async function getDynamicFieldColumn<TData extends KitsuResource>(
     if (
       dynamicFieldsMappingConfig &&
       pathParts.length === 2 &&
-      pathParts[0] === "identifier"
+      pathParts[0].startsWith("identifier")
     ) {
       const identifierKey = pathParts[1];
+      const relationshipName = parseRelationshipNameFromType(pathParts[0]);
+
       return getIdentifierColumn(
         path,
         identifierKey,
+        relationshipName,
         apiClient,
         dynamicFieldsMappingConfig
       );
@@ -309,6 +340,7 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
   path: string,
   component: string,
   key: string,
+  relationshipName: string | undefined,
   apiClient: Kitsu,
   dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
 ): Promise<TableColumn<TData> | undefined> {
@@ -322,21 +354,44 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
   };
 
   // Figure out API endpoint using the dynamicFieldsMappingConfig.
-  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find(
-    (config) =>
-      config.type === "managedAttribute" && config.component === component
-  );
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find((config) => {
+    // Can't be a field config if a relationship name is provided.
+    if (relationshipName !== undefined) {
+      return false;
+    }
+
+    if (config.type === "managedAttribute" && config.component === component) {
+      return true;
+    }
+  });
   const relationshipConfigMatch =
-    dynamicFieldsMappingConfig.relationshipFields.find(
-      (config) =>
-        config.type === "managedAttribute" && config.component === component
-    );
+    dynamicFieldsMappingConfig.relationshipFields.find((config) => {
+      // Can't be a relationship config if a relationship is not provided.
+      if (relationshipName === undefined) {
+        return false;
+      }
+
+      // Dynamic field type, component and the relationship need to match.
+      if (
+        config.type === "managedAttribute" &&
+        config.component === component &&
+        config.referencedBy === relationshipName
+      ) {
+        return true;
+      }
+    });
 
   if (!fieldConfigMatch && !relationshipConfigMatch) {
     console.error(
       "Managed Attribute Config for the following component: " +
         component +
         " could not be determined."
+    );
+    return;
+  }
+  if (fieldConfigMatch && relationshipConfigMatch) {
+    console.error(
+      "Identifier Config found for both field and relationship side. Ensure dynamic configuration is correct."
     );
     return;
   }
@@ -390,6 +445,9 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
   const managedAttributeKey = managedAttribute.key;
   const accessorKey = `${config.path}.${managedAttributeKey}`;
 
+  const pathParts = config.path.split(".");
+  const fieldName = pathParts[pathParts.length - 1];
+
   const managedAttributesColumn = {
     cell: ({ row: { original } }) => {
       const relationshipAccessor = accessorKey?.split(".");
@@ -402,9 +460,14 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
       const value = get(original, valuePath);
       return <>{value}</>;
     },
-    header: () => <FieldHeader name={managedAttribute.name} />,
+    header: () => (
+      <>
+        {config.referencedBy ? startCase(config.referencedBy) + " - " : ""}
+        {startCase(managedAttribute.name)}
+      </>
+    ),
     accessorKey,
-    id: `${config.referencedBy}.${config.label}.${managedAttributeKey}`,
+    id: `${config.referencedBy}.${fieldName}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: true,
     relationshipType: config.referencedType,
@@ -425,10 +488,14 @@ export function getAttributesManagedAttributeColumn<
 ): TableColumn<TData> {
   const managedAttributeKey = managedAttribute.key;
   const accessorKey = `${config.path}.${managedAttributeKey}`;
+
+  const pathParts = config.path.split(".");
+  const fieldName = pathParts[pathParts.length - 1];
+
   const managedAttributesColumn = {
     header: () => <FieldHeader name={managedAttribute.name} />,
     accessorKey,
-    id: `${config.label}.${managedAttributeKey}`,
+    id: `${fieldName}.${managedAttributeKey}`,
     isKeyword: managedAttribute.vocabularyElementType === "STRING",
     isColumnVisible: true,
     config,
@@ -446,6 +513,7 @@ async function getFieldExtensionColumn<TData extends KitsuResource>(
   component: string,
   extension: string,
   field: string,
+  relationshipName: string | undefined,
   apiClient: Kitsu,
   dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
 ): Promise<TableColumn<TData> | undefined> {
@@ -460,21 +528,44 @@ async function getFieldExtensionColumn<TData extends KitsuResource>(
   };
 
   // Figure out API endpoint using the dynamicFieldsMappingConfig.
-  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find(
-    (config) =>
-      config.type === "fieldExtension" && config.component === component
-  );
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find((config) => {
+    // Can't be a field config if a relationship name is provided.
+    if (relationshipName !== undefined) {
+      return false;
+    }
+
+    if (config.type === "fieldExtension" && config.component === component) {
+      return true;
+    }
+  });
   const relationshipConfigMatch =
-    dynamicFieldsMappingConfig.relationshipFields.find(
-      (config) =>
-        config.type === "fieldExtension" && config.component === component
-    );
+    dynamicFieldsMappingConfig.relationshipFields.find((config) => {
+      // Can't be a relationship config if a relationship is not provided.
+      if (relationshipName === undefined) {
+        return false;
+      }
+
+      // Dynamic field type, component and the relationship need to match.
+      if (
+        config.type === "fieldExtension" &&
+        config.component === component &&
+        config.referencedBy === relationshipName
+      ) {
+        return true;
+      }
+    });
 
   if (!fieldConfigMatch && !relationshipConfigMatch) {
     console.error(
       "Field Extension Config for the following component: " +
         component +
         " could not be determined."
+    );
+    return;
+  }
+  if (fieldConfigMatch && relationshipConfigMatch) {
+    console.error(
+      "Identifier Config found for both field and relationship side. Ensure dynamic configuration is correct."
     );
     return;
   }
@@ -576,8 +667,13 @@ export function getIncludedExtensionFieldColumn(
     },
     accessorKey,
     id: `${config.referencedBy}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
-    header: () => `${extensionValue.extension.name} - ${extensionField.name}`,
-    label: `${extensionValue.extension.name} - ${extensionField.name}`,
+    header: () =>
+      `${config.referencedBy ? startCase(config.referencedBy) + " - " : ""}${
+        extensionValue.extension.name
+      } - ${extensionField.name}`,
+    label: `${startCase(config.referencedBy)} - ${
+      extensionValue.extension.name
+    } - ${extensionField.name}`,
     isKeyword: true,
     isColumnVisible: true,
     relationshipType: config.referencedType,
@@ -593,6 +689,7 @@ export function getIncludedExtensionFieldColumn(
 async function getIdentifierColumn<TData extends KitsuResource>(
   path: string,
   identifierKey: string,
+  relationshipName: string | undefined,
   apiClient: Kitsu,
   dynamicFieldsMappingConfig: DynamicFieldsMappingConfig
 ): Promise<TableColumn<TData> | undefined> {
@@ -602,17 +699,41 @@ async function getIdentifierColumn<TData extends KitsuResource>(
   };
 
   // Figure out API endpoint using the dynamicFieldsMappingConfig.
-  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find(
-    (config) => config.type === "identifier"
-  );
+  const fieldConfigMatch = dynamicFieldsMappingConfig.fields.find((config) => {
+    // Can't be a field config if a relationship name is provided.
+    if (relationshipName !== undefined) {
+      return false;
+    }
+
+    if (config.type === "identifier") {
+      return true;
+    }
+  });
   const relationshipConfigMatch =
-    dynamicFieldsMappingConfig.relationshipFields.find(
-      (config) => config.type === "identifier"
-    );
+    dynamicFieldsMappingConfig.relationshipFields.find((config) => {
+      // Can't be a relationship config if a relationship is not provided.
+      if (relationshipName === undefined) {
+        return false;
+      }
+
+      // Dynamic field type, component and the relationship need to match.
+      if (
+        config.type === "identifier" &&
+        config.referencedBy === relationshipName
+      ) {
+        return true;
+      }
+    });
 
   if (!fieldConfigMatch && !relationshipConfigMatch) {
     console.error(
       "Identifier Config could not be found in the dynamic fields mapping."
+    );
+    return;
+  }
+  if (fieldConfigMatch && relationshipConfigMatch) {
+    console.error(
+      "Identifier Config found for both field and relationship side. Ensure dynamic configuration is correct."
     );
     return;
   }
@@ -675,10 +796,13 @@ export function getAttributeIdentifierColumn<TData extends KitsuResource>(
   config: DynamicField
 ): TableColumn<TData> {
   const accessorKey = `${config.path}.${identifier.id}`;
+  const pathParts = config.path.split(".");
+  const fieldName = pathParts[pathParts.length - 1];
+
   const identifierColumn = {
     header: () => <VocabularyFieldHeader vocabulary={identifier} />,
     accessorKey,
-    id: `${config.label}.${identifier.id}`,
+    id: `${fieldName}.${identifier.id}`,
     isKeyword: true,
     isColumnVisible: true,
     config,
@@ -697,6 +821,9 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
 ): TableColumn<TData> {
   const accessorKey = `${config.path}.${identifier.id}`;
 
+  const pathParts = config.path.split(".");
+  const fieldName = pathParts[pathParts.length - 1];
+
   const identifierColumn = {
     cell: ({ row: { original } }) => {
       const relationshipAccessor = accessorKey?.split(".");
@@ -709,9 +836,14 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
       const value = get(original, valuePath);
       return <>{value}</>;
     },
-    header: () => <VocabularyFieldHeader vocabulary={identifier} />,
+    header: () => (
+      <VocabularyFieldHeader
+        vocabulary={identifier}
+        referencedBy={config.referencedBy}
+      />
+    ),
     accessorKey,
-    id: `${config.referencedBy}.${config.label}.${identifier.id}`,
+    id: `${config.referencedBy}.${fieldName}.${identifier.id}`,
     isKeyword: true,
     isColumnVisible: true,
     relationshipType: config.referencedType,
