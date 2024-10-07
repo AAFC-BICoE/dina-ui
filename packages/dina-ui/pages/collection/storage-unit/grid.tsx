@@ -27,7 +27,9 @@ function StorageUnitGridForm() {
   const [currentStep, setCurrentStep] = useState<number>(0);
 
   // Global edit mode state.
-  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editMode, setEditMode] = useState<boolean>(
+    router.query.editMode === "true"
+  );
 
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);

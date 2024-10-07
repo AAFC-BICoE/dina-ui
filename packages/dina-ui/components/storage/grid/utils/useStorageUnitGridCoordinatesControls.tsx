@@ -50,7 +50,7 @@ export function useGridCoordinatesControls({
         (sample) => sample.storageUnitUsage
       );
       usageTypeRef.current = storageUnitUsages[0]?.usageType;
-      editContentsPathRef.current = `/collection/storage-unit/grid?storageUnitId=${storageUnit.id}`;
+      editContentsPathRef.current = `/collection/storage-unit/grid?storageUnitId=${storageUnit.id}&editMode=true`;
       materialSamples.forEach((materialSample) => {
         const storageUnitUsage = storageUnitUsages.find(
           (usage) => usage?.id === materialSample?.storageUnitUsage?.id
@@ -129,7 +129,7 @@ export function useGridCoordinatesControls({
                   if (pcrBatch?.isCompleted) {
                     editContentsPathRef.current = `/seqdb/pcr-batch/view?id=${pcrBatch?.id}`;
                   } else {
-                    editContentsPathRef.current = `/seqdb/pcr-workflow/run?pcrBatchId=${pcrBatch?.id}`;
+                    editContentsPathRef.current = `/seqdb/pcr-workflow/run?pcrBatchId=${pcrBatch?.id}&editMode=true`;
                   }
                 } catch (e) {
                   console.error(e);
@@ -169,7 +169,7 @@ export function useGridCoordinatesControls({
                       id: libraryPrepBatch?.id
                     }
                   };
-                  editContentsPathRef.current = `/seqdb/ngs-workflow/run?id=${libraryPrepBatch?.id}`;
+                  editContentsPathRef.current = `/seqdb/ngs-workflow/run?id=${libraryPrepBatch?.id}&editMode=true`;
                 } catch (e) {
                   console.error(e);
                 }
@@ -208,7 +208,7 @@ export function useGridCoordinatesControls({
                   if (seqBatch?.isCompleted) {
                     editContentsPathRef.current = `/seqdb/seq-batch/view?id=${seqBatch?.id}`;
                   } else {
-                    editContentsPathRef.current = `/seqdb/seq-workflow/run?seqBatchId=${seqBatch?.id}`;
+                    editContentsPathRef.current = `/seqdb/seq-workflow/run?seqBatchId=${seqBatch?.id}&editMode=true`;
                   }
                 } catch (e) {
                   console.error(e);
