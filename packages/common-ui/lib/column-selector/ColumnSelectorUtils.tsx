@@ -480,10 +480,10 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
       return <>{value}</>;
     },
     header: () => (
-      <>
-        {config.referencedBy ? startCase(config.referencedBy) + " - " : ""}
-        {startCase(managedAttribute.name)}
-      </>
+      <IncludedManagedAttributeLabel
+        name={managedAttribute.name}
+        relationship={config.referencedBy}
+      />
     ),
     accessorKey,
     id: `${config.referencedBy}.${fieldName}.${managedAttributeKey}`,
@@ -496,6 +496,30 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
   };
 
   return managedAttributesColumn;
+}
+
+export interface IncludedManagedAttributeLabelProps {
+  name: string;
+  relationship: string;
+}
+
+export function IncludedManagedAttributeLabel({
+  name,
+  relationship
+}: IncludedManagedAttributeLabelProps) {
+  const { messages, formatMessage } = useDinaIntl();
+
+  const relationshipLabel = messages["title_" + relationship]
+    ? formatMessage(("title_" + relationship) as any)
+    : startCase(relationship);
+
+  return (
+    <>
+      {relationshipLabel}
+      {" - "}
+      {startCase(name)}
+    </>
+  );
 }
 
 export function getAttributesManagedAttributeColumn<
@@ -686,10 +710,13 @@ export function getIncludedExtensionFieldColumn(
     },
     accessorKey,
     id: `${config.referencedBy}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
-    header: () =>
-      `${config.referencedBy ? startCase(config.referencedBy) + " - " : ""}${
-        extensionValue.extension.name
-      } - ${extensionField.name}`,
+    header: () => (
+      <IncludedExtensionFieldLabel
+        extensionPackage={extensionField.extension.name}
+        name={extensionValue.name}
+        relationship={config.referencedBy}
+      />
+    ),
     label: `${startCase(config.referencedBy)} - ${
       extensionValue.extension.name
     } - ${extensionField.name}`,
@@ -703,6 +730,34 @@ export function getIncludedExtensionFieldColumn(
   };
 
   return extensionValuesColumn;
+}
+
+export interface IncludedExtensionFieldLabelProps {
+  extensionPackage: string;
+  name: string;
+  relationship: string;
+}
+
+export function IncludedExtensionFieldLabel({
+  name,
+  extensionPackage,
+  relationship
+}: IncludedExtensionFieldLabelProps) {
+  const { messages, formatMessage } = useDinaIntl();
+
+  const relationshipLabel = messages["title_" + relationship]
+    ? formatMessage(("title_" + relationship) as any)
+    : startCase(relationship);
+
+  return (
+    <>
+      {relationshipLabel}
+      {" - "}
+      {extensionPackage}
+      {" - "}
+      {name}
+    </>
+  );
 }
 
 async function getIdentifierColumn<TData extends KitsuResource>(
@@ -856,9 +911,9 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
       return <>{value}</>;
     },
     header: () => (
-      <VocabularyFieldHeader
-        vocabulary={identifier}
-        referencedBy={config.referencedBy}
+      <IncludedIdentifierLabel
+        identifierVocabulary={identifier}
+        relationship={config.referencedBy}
       />
     ),
     accessorKey,
@@ -872,6 +927,35 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
   };
 
   return identifierColumn;
+}
+
+export interface IncludedIdentifierLabelProps {
+  identifierVocabulary: IdentifierType;
+  relationship: string;
+}
+
+export function IncludedIdentifierLabel({
+  identifierVocabulary,
+  relationship
+}: IncludedIdentifierLabelProps) {
+  const { messages, formatMessage, locale } = useDinaIntl();
+
+  const relationshipLabel = messages["title_" + relationship]
+    ? formatMessage(("title_" + relationship) as any)
+    : startCase(relationship);
+
+  const label =
+    identifierVocabulary?.multilingualTitle?.titles?.find(
+      (title) => title.lang === locale
+    )?.title ?? identifierVocabulary.id;
+
+  return (
+    <>
+      {relationshipLabel}
+      {" - "}
+      {label}
+    </>
+  );
 }
 
 export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
