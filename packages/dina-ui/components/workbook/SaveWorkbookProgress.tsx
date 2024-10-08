@@ -2,15 +2,14 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
-import { useIntl } from "react-intl";
-import { rsql, useApiClient } from "../../../common-ui/lib";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { AreYouSureModal, useApiClient } from "../../../common-ui/lib";
+import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
 import { delay } from "./utils/workbookMappingUtils";
 import { PersistedResource, KitsuResource } from "kitsu";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { MaterialSample } from "../../types/collection-api";
 
 export interface SaveWorkbookProgressProps {
   onWorkbookCanceled: () => void;
@@ -35,20 +34,23 @@ export function SaveWorkbookProgress({
     finishSavingWorkbook,
     cancelSavingWorkbook,
     failSavingWorkbook,
-    workbookColumnMap
+    workbookColumnMap,
+    appendData
   } = useWorkbookContext();
 
   const { save, apiClient, doOperations } = useApiClient();
   const statusRef = useRef<WorkBookSavingStatus>(status ?? "CANCELED");
   const router = useRouter();
-  const { formatMessage } = useIntl();
-  const warningText = formatMessage({ id: "leaveSaveWorkbookWarning" });
+  const { formatMessage } = useDinaIntl();
+  const warningText = formatMessage("leaveSaveWorkbookWarning");
 
   const [now, setNow] = useState<number>(progress);
   const [sourceSet, setSourceSet] = useState<string>();
   const [savedResources, setSavedResources] = useState<
     PersistedResource<KitsuResource>[]
   >([]);
+
+  const resourcesUpdatedCount = useRef<number>(0);
 
   const isSafeToLeave = () => {
     return (
@@ -61,7 +63,7 @@ export function SaveWorkbookProgress({
   };
 
   const finishUpload = (sourceSetValue?: string) => {
-    finishSavingWorkbook(sourceSetValue ?? "");
+    finishSavingWorkbook(sourceSetValue ?? "", resourcesUpdatedCount.current);
   };
 
   const { linkRelationshipAttribute } = useWorkbookConverter(
@@ -118,8 +120,25 @@ export function SaveWorkbookProgress({
     setSourceSet(sourceSetInternal);
     async function saveChunkOfWorkbook(chunkedResources) {
       for (const resource of chunkedResources) {
+        resource.sourceSet = sourceSetInternal;
+
+        if (appendData && resource.type === "material-sample") {
+          const resp = await apiClient.get<MaterialSample[]>(
+            "collection-api/material-sample",
+            {
+              filter: {
+                rsql: `materialSampleName=="${resource?.materialSampleName}";group==${group}`
+              }
+            }
+          );
+          const existingResource = resp.data[0];
+          if (existingResource) {
+            resource.id = existingResource.id;
+            resourcesUpdatedCount.current = resourcesUpdatedCount.current + 1;
+          }
+        }
+
         for (const key of Object.keys(resource)) {
-          resource.sourceSet = sourceSetInternal;
           await linkRelationshipAttribute(
             resource,
             workbookColumnMap,
@@ -128,6 +147,7 @@ export function SaveWorkbookProgress({
           );
         }
       }
+
       const savedArgs = await save(
         chunkedResources.map(
           (item) =>

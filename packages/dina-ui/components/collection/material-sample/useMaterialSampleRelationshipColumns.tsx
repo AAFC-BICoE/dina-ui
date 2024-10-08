@@ -92,6 +92,78 @@ export function useMaterialSampleRelationshipColumns() {
   const { compareByStringAndNumber } = useStringComparator();
   const { formatMessage } = useIntl();
 
+  const STORAGE_UNIT_GRID_ELASTIC_SEARCH_COLUMN: TableColumn<any>[] = [
+    {
+      id: "materialSampleName",
+      cell: ({ row: { original } }) => {
+        const materialSampleName =
+          original?.data?.attributes?.materialSampleName ??
+          original?.materialSampleName;
+        return (
+          <Link href={`/collection/material-sample/view?id=${original?.id}`}>
+            <a>{materialSampleName || original?.id}</a>
+          </Link>
+        );
+      },
+      header: () => <FieldHeader name="materialSampleName" />,
+      accessorKey: "data.attributes.materialSampleName",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleName,
+          b?.original?.materialSampleName
+        ),
+      isKeyword: true,
+      enableSorting: true
+    },
+    {
+      id: "wellCoordinates",
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          !a.original?.storageUnitUsage ||
+          a.original?.storageUnitUsage?.wellRow === null ||
+          a.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+        const bString =
+          !b.original?.storageUnitUsage ||
+          b.original?.storageUnitUsage?.wellRow === null ||
+          b.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      }
+    },
+    {
+      id: "tubeNumber",
+      cell: ({ row: { original } }) =>
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
+    }
+  ];
+
   const PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN: TableColumn<any>[] = [
     {
       id: "materialSampleName",
@@ -108,7 +180,11 @@ export function useMaterialSampleRelationshipColumns() {
       },
       header: () => <FieldHeader name="materialSampleName" />,
       accessorKey: "data.attributes.materialSampleName",
-      sortingFn: "alphanumeric",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleName,
+          b?.original?.materialSampleName
+        ),
       isKeyword: true,
       enableSorting: true
     },
@@ -232,6 +308,7 @@ export function useMaterialSampleRelationshipColumns() {
   return {
     ELASTIC_SEARCH_COLUMN,
     PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN,
-    ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW
+    ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW,
+    STORAGE_UNIT_GRID_ELASTIC_SEARCH_COLUMN
   };
 }

@@ -244,9 +244,16 @@ export interface TransformToDSLProps {
   indexMap?: ESIndexMapping[];
 }
 
+/**
+ * Dynamic field types supported by the Query Builder.
+ *
+ * "unsupported" will just hide the options without generating the single option.
+ */
 export type DynamicFieldType =
+  | "unsupported"
   | "managedAttribute"
   | "fieldExtension"
+  | "identifier"
   | "relationshipPresence";
 
 export interface DynamicFieldsMappingConfig {

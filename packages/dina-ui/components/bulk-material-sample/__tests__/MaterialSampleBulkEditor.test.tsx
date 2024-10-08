@@ -10,7 +10,10 @@ import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { default as ReactSwitch, default as Switch } from "react-switch";
 import { AttachmentsEditor, SAMPLE_FORM_TEMPLATE_KEY } from "../..";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import {
+  mountWithAppContext,
+  mountWithAppContext2
+} from "../../../test-util/mock-app-context";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
@@ -25,6 +28,7 @@ import {
   blankMaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
+import { fireEvent, within } from "@testing-library/react";
 
 const TEST_COLLECTING_EVENT = {
   id: "col-event-1",
@@ -811,6 +815,35 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_STORAGE_UNITS[2] };
     case "collection-api/form-template/cd6d8297-43a0-45c6-b44e-983db917eb11":
       return { data: formTemplate };
+    case "collection-api/identifier-type":
+      return {
+        data: {
+          id: "materialSampleIdentifierType",
+          type: "vocabulary",
+          attributes: {
+            vocabularyElements: [
+              {
+                key: "seqdb_id",
+                name: "SeqDB ID",
+                term: null,
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "SeqDB ID"
+                    },
+                    {
+                      lang: "fr",
+                      title: "ID SeqDB"
+                    }
+                  ]
+                },
+                inverseOf: null
+              }
+            ]
+          }
+        }
+      };
     case "collection-api/storage-unit-type":
     case "collection-api/collection":
     case "collection-api/collection-method":
@@ -1180,6 +1213,159 @@ describe("MaterialSampleBulkEditor", () => {
       "11111",
       "11111",
       "11111"
+    ]);
+  });
+
+  it("Bulk creates material samples using other catalogue and other identifiers", async () => {
+    const wrapper = mountWithAppContext2(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx
+    );
+    await new Promise(setImmediate);
+
+    // Edit the first sample:
+    fireEvent.click(wrapper.getByRole("tab", { name: /ms1/i }));
+    fireEvent.change(
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
+      { target: { value: "otherCatalog1" } }
+    );
+
+    // Edit the second sample:
+    fireEvent.click(wrapper.getByRole("tab", { name: /ms2/i }));
+    fireEvent.change(
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
+      { target: { value: "otherCatalog2" } }
+    );
+
+    // Edit the third sample:
+    fireEvent.click(wrapper.getByRole("tab", { name: /ms3/i }));
+    fireEvent.change(
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
+      { target: { value: "otherCatalog3" } }
+    );
+
+    // Submit the form.
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await new Promise(setImmediate);
+
+    // Saves the new material samples:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              dwcOtherCatalogNumbers: ["otherCatalog1"],
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS1",
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          {
+            resource: expect.objectContaining({
+              dwcOtherCatalogNumbers: ["otherCatalog2"],
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS2",
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          {
+            resource: expect.objectContaining({
+              dwcOtherCatalogNumbers: ["otherCatalog3"],
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS3",
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+
+    // The saved samples are mocked by mockSave and are passed into the onSaved callback.
+    // Check the IDs to make sure they were saved:
+    expect(mockOnSaved.mock.calls[0][0].map((sample) => sample.id)).toEqual([
+      "11111",
+      "11111",
+      "11111"
+    ]);
+  });
+
+  it("Bulk edit all material samples using other catalogue and other identifiers", async () => {
+    const wrapper = mountWithAppContext2(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={
+          [
+            {
+              id: "1",
+              type: "material-sample",
+              dwcOtherCatalogNumbers: ["otherCatalog1"]
+            },
+            {
+              id: "2",
+              type: "material-sample",
+              dwcOtherCatalogNumbers: ["otherCatalog2"]
+            },
+            {
+              id: "3",
+              type: "material-sample",
+              dwcOtherCatalogNumbers: ["otherCatalog3"]
+            }
+          ] as InputResource<MaterialSample>[]
+        }
+      />,
+      testCtx
+    );
+    await new Promise(setImmediate);
+
+    fireEvent.click(
+      wrapper.getAllByRole("button", { name: /override all/i })[1]
+    );
+    fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+    await new Promise(setImmediate);
+
+    // Update the other cataloge value:
+    fireEvent.change(
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
+      { target: { value: "otherCatalogAll" } }
+    );
+
+    // Submit the form.
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await new Promise(setImmediate);
+
+    // Saves the new material samples:
+    expect(mockSave.mock.calls).toMatchSnapshot();
+
+    // The saved samples are mocked by mockSave and are passed into the onSaved callback.
+    // Check the IDs to make sure they were saved:
+    expect(mockOnSaved.mock.calls[0][0].map((sample) => sample.id)).toEqual([
+      "1",
+      "2",
+      "3"
     ]);
   });
 
@@ -2948,12 +3134,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
-    // expect(
-    //   wrapper
-    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
-    //     .exists()
-    // ).toEqual(true);
+
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
+        .exists()
+    ).toEqual(true);
 
     // Select a form template:
     wrapper
@@ -2976,12 +3162,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
-    // expect(
-    //   wrapper
-    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field input")
-    //     .exists()
-    // ).toEqual(false);
+
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
+        .exists()
+    ).toEqual(false);
 
     // Switch to the first individual sample tab:
     wrapper.find("li.sample-tab-0").simulate("click");
@@ -2992,12 +3178,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".sample-tabpanel-0 .barcode-field input").exists()
     ).toEqual(true);
-    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
-    // expect(
-    //   wrapper
-    //     .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers-field input")
-    //     .exists()
-    // ).toEqual(false);
+
+    expect(
+      wrapper
+        .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers_0_-field input")
+        .exists()
+    ).toEqual(false);
   });
 
   it("Allows selecting a Form Template to provide default values for bulk material sample edit all tab.", async () => {
@@ -3015,12 +3201,12 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
-    // expect(
-    //   wrapper
-    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
-    //     .exists()
-    // ).toEqual(true);
+
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
+        .exists()
+    ).toEqual(true);
 
     // Select a form template:
     wrapper
@@ -3043,12 +3229,13 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
-    // Currently disabled for bulk edit tab, will be re-enabled in a future ticket.
-    // expect(
-    //   wrapper
-    //     .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
-    //     .exists()
-    // ).toEqual(false);
+
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers input")
+        .exists()
+    ).toEqual(false);
+
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
     ).toEqual("1111");

@@ -3,8 +3,8 @@ import { StorageUnit } from "./StorageUnit";
 
 export interface StorageUnitUsageAttributes {
   type: "storage-unit-usage";
-  wellColumn?: number;
-  wellRow?: string;
+  wellColumn?: number | null;
+  wellRow?: string | null;
   cellNumber?: number;
   storageUnitName?: string;
   usageType?: string;

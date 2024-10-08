@@ -355,6 +355,7 @@ export function MaterialSampleForm({
             blockOptionsFilter={{
               "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
             }}
+            width={"100%"}
           />
         </DinaFormSection>
       ),

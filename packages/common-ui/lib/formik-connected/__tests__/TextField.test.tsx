@@ -1,25 +1,31 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { fireEvent } from "@testing-library/react";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { SubmitButton } from "../SubmitButton";
 import { TextField } from "../TextField";
 import { object, string } from "yup";
+import "@testing-library/jest-dom";
 
 describe("TextField component", () => {
   it("Displays the field's label and value.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ testObject: { testField: "initial value" } }}>
         <TextField name="testObject.testField" />
       </DinaForm>
     );
 
-    expect(wrapper.find("label").text()).toEqual("Test Object Test Field");
-    expect((wrapper.find("input").instance() as any).value).toEqual(
-      "initial value"
-    );
+    expect(wrapper.getByText(/test object test field/i)).toBeInTheDocument();
+    expect(
+      (
+        wrapper.getByRole("textbox", {
+          name: /test object test field/i
+        }) as HTMLInputElement
+      ).value
+    ).toEqual("initial value");
   });
 
   it("Changes the field's value.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ testObject: { testField: "initial value" } }}>
         {({
           values: {
@@ -34,15 +40,20 @@ describe("TextField component", () => {
       </DinaForm>
     );
 
-    wrapper.find("input").simulate("change", {
+    fireEvent.change(wrapper.getByRole("textbox"), {
       target: { name: "testObject.testField", value: "new value" }
     });
-
-    expect(wrapper.find("#value-display").text()).toEqual("new value");
+    expect(
+      (
+        wrapper.getByRole("textbox", {
+          name: /test object test field/i
+        }) as HTMLInputElement
+      ).value
+    ).toEqual("new value");
   });
 
   it("Shows a field-level error message.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ testField: "initial value" }}
         validationSchema={object({
@@ -57,12 +68,10 @@ describe("TextField component", () => {
       </DinaForm>
     );
 
-    wrapper.find("form").simulate("submit");
-
+    fireEvent.click(wrapper.getByRole("button"));
     await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find("input").hasClass("is-invalid")).toEqual(true);
-    expect(wrapper.find(".invalid-feedback").text()).toEqual("Test Error");
+    expect(
+      wrapper.getByText(/1 : test field \- test error/i)
+    ).toBeInTheDocument();
   });
 });

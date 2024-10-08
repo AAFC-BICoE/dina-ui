@@ -1,6 +1,8 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { AreYouSureModal } from "../AreYouSureModal";
 import { useModal } from "../modal";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockYesClick = jest.fn();
 
@@ -19,8 +21,12 @@ function TestComponent() {
             />
           )
         }
-      />
-      <button className="close-modal" onClick={closeModal} />
+      >
+        Open
+      </button>
+      <button className="close-modal" onClick={closeModal}>
+        Close
+      </button>
     </>
   );
 }
@@ -31,37 +37,41 @@ describe("AreYouSureModal", () => {
   });
 
   it("Closes when you click 'No'", async () => {
-    const wrapper = mountWithAppContext(<TestComponent />);
+    const wrapper = mountWithAppContext2(<TestComponent />);
+
+    // Should not be open by default on initial load.
+    expect(wrapper.queryByText(/test message/i)).not.toBeInTheDocument();
 
     // Open modal:
-    wrapper.find("button.open-modal").simulate("click");
-    wrapper.update();
+    fireEvent.click(wrapper.getByRole("button", { name: /open/i }));
+
+    // Ensure the test message is displayed.
+    expect(wrapper.getByText(/test message/i)).toBeInTheDocument();
 
     // Click 'no':
-    wrapper.find("button.no-button").simulate("click");
-    wrapper.update();
+    fireEvent.click(wrapper.getByRole("button", { name: /no/i }));
 
     // Should be closed now:
-    expect(wrapper.find(AreYouSureModal).exists()).toEqual(false);
+    expect(wrapper.queryByText(/test message/i)).not.toBeInTheDocument();
   });
 
   it("Runs the passed function and closes when you click 'Yes'", async () => {
-    const wrapper = mountWithAppContext(<TestComponent />);
+    const wrapper = mountWithAppContext2(<TestComponent />);
 
     // Open modal:
-    wrapper.find("button.open-modal").simulate("click");
-    wrapper.update();
+    fireEvent.click(wrapper.getByRole("button", { name: /open/i }));
 
-    // Click Yes:
-    wrapper.find("form").simulate("submit");
+    // Ensure the test message is displayed.
+    expect(wrapper.getByText(/test message/i)).toBeInTheDocument();
+
+    // Click 'yes':
+    fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
     await new Promise(setImmediate);
-    await new Promise(setImmediate);
-    wrapper.update();
 
     // Should have run the function:
     expect(mockYesClick).toHaveBeenCalledTimes(1);
 
     // Should be closed now:
-    expect(wrapper.find(AreYouSureModal).exists()).toEqual(false);
+    expect(wrapper.queryByText(/test message/i)).not.toBeInTheDocument();
   });
 });

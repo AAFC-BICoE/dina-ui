@@ -3,6 +3,7 @@ import { FormikProps } from "formik";
 import { Ref, useEffect, useRef } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { PcrReactionTable, usePcrReactionData } from "./PcrReactionTable";
+import Link from "next/link";
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
@@ -121,6 +122,17 @@ export function SangerPcrReactionStep({
       innerRef={formRef}
       readOnly={!editMode}
     >
+      {!editMode && (
+        <div className="row mb-3">
+          <div className="col-12 text-end">
+            <Link href={`/seqdb/pcr-workflow/worksheet?id=${pcrBatchId}`}>
+              <a target="_blank" className="btn btn-primary">
+                Worksheet
+              </a>
+            </Link>
+          </div>
+        </div>
+      )}
       <PcrReactionTable
         pcrBatchItems={pcrBatchItems}
         materialSamples={materialSamples}

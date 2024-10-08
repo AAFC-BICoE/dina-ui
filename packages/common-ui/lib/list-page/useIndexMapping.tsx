@@ -168,36 +168,14 @@ export function useIndexMapping({
       // Inject dynamic field mapping config into these.
       if (dynamicFieldMapping) {
         dynamicFieldMapping.fields.forEach((fieldMapping) => {
-          result.push({
-            dynamicField: fieldMapping,
-            value: fieldMapping.path,
-            distinctTerm: false,
-            label: fieldMapping.label,
-            path: fieldMapping.path,
-            type: fieldMapping.type,
-            keywordMultiFieldSupport: false,
-            keywordNumericSupport: false,
-            optimizedPrefix: false,
-            containsSupport: false,
-            endsWithSupport: false,
-            hideField: false
-          });
-        });
-        dynamicFieldMapping.relationshipFields.forEach(
-          (relationshipFieldMapping) => {
+          if (fieldMapping.type !== "unsupported") {
             result.push({
-              dynamicField: relationshipFieldMapping,
-              parentName: relationshipFieldMapping.referencedBy,
-              parentPath: "included",
-              parentType: relationshipFieldMapping.referencedType,
-              value:
-                relationshipFieldMapping.path +
-                "_" +
-                relationshipFieldMapping.referencedBy,
+              dynamicField: fieldMapping,
+              value: fieldMapping.path,
               distinctTerm: false,
-              label: relationshipFieldMapping.label,
-              path: relationshipFieldMapping.path,
-              type: relationshipFieldMapping.type,
+              label: fieldMapping.label,
+              path: fieldMapping.path,
+              type: fieldMapping.type,
               keywordMultiFieldSupport: false,
               keywordNumericSupport: false,
               optimizedPrefix: false,
@@ -205,6 +183,32 @@ export function useIndexMapping({
               endsWithSupport: false,
               hideField: false
             });
+          }
+        });
+        dynamicFieldMapping.relationshipFields.forEach(
+          (relationshipFieldMapping) => {
+            if (relationshipFieldMapping.type !== "unsupported") {
+              result.push({
+                dynamicField: relationshipFieldMapping,
+                parentName: relationshipFieldMapping.referencedBy,
+                parentPath: "included",
+                parentType: relationshipFieldMapping.referencedType,
+                value:
+                  relationshipFieldMapping.path +
+                  "_" +
+                  relationshipFieldMapping.referencedBy,
+                distinctTerm: false,
+                label: relationshipFieldMapping.label,
+                path: relationshipFieldMapping.path,
+                type: relationshipFieldMapping.type,
+                keywordMultiFieldSupport: false,
+                keywordNumericSupport: false,
+                optimizedPrefix: false,
+                containsSupport: false,
+                endsWithSupport: false,
+                hideField: false
+              });
+            }
           }
         );
       }

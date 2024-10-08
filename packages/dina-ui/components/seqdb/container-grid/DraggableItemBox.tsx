@@ -1,6 +1,7 @@
 import { noop } from "lodash";
 import { useDrag } from "react-dnd";
 import RcTooltip from "rc-tooltip";
+import Link from "next/link";
 
 interface DraggableItemBoxProps<ItemType extends { sampleName?: string }> {
   onClick?: (e: any) => void;
@@ -13,7 +14,9 @@ interface DraggableItemBoxProps<ItemType extends { sampleName?: string }> {
 
 export const ITEM_BOX_DRAG_KEY = "materialSampleItem";
 
-export function DraggableItemBox<ItemType extends { sampleName?: string }>({
+export function DraggableItemBox<
+  ItemType extends { sampleId?: string; sampleName?: string }
+>({
   onClick = noop,
   batchItemSample,
   coordinates,
@@ -42,6 +45,9 @@ export function DraggableItemBox<ItemType extends { sampleName?: string }>({
     return undefined;
   };
 
+  // Primer name can be supplied, only displayed if provided.
+  const primerName = (batchItemSample as any)?.primerName ?? undefined;
+
   return (
     <li className="list-group-item p-0" onClick={onClick} ref={drag}>
       <RcTooltip
@@ -55,6 +61,12 @@ export function DraggableItemBox<ItemType extends { sampleName?: string }>({
                   {coordinates}
                   <br />
                   {batchItemSample.sampleName}
+                  {primerName && (
+                    <>
+                      <br />
+                      {primerName}
+                    </>
+                  )}
                 </>
               </div>
             )}
@@ -68,7 +80,18 @@ export function DraggableItemBox<ItemType extends { sampleName?: string }>({
             cursor: editMode ? "move" : "default"
           }}
         >
-          <span className="sample-box-text">{batchItemSample.sampleName}</span>
+          <span className="sample-box-text">
+            {batchItemSample.sampleId && !editMode ? (
+              <Link
+                href={`/collection/material-sample/view?id=${batchItemSample.sampleId}`}
+              >
+                {batchItemSample.sampleName}
+              </Link>
+            ) : (
+              batchItemSample.sampleName
+            )}
+            {primerName && <> ({primerName})</>}
+          </span>
         </div>
       </RcTooltip>
     </li>

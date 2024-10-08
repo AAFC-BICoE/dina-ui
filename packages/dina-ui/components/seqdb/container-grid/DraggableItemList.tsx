@@ -10,7 +10,9 @@ interface DraggableItemListProps<ItemType> {
   editMode: boolean;
 }
 
-export function DraggableItemList<ItemType extends { sampleName?: string }>({
+export function DraggableItemList<
+  ItemType extends { sampleName?: string; sampleId?: string }
+>({
   availableItems,
   movedItems,
   selectedItems,

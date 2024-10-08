@@ -49,7 +49,7 @@ export function PreLibraryPrepStep({
     async function performSaveInternal() {
       await savePreLibraryPreps();
       setPerformSave(false);
-      await onSaved(2);
+      await onSaved(4);
     }
 
     if (performSave) {

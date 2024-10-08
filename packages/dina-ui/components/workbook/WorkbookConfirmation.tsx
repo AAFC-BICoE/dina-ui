@@ -10,8 +10,8 @@ import { useEffect } from "react";
 import { Tooltip } from "common-ui/lib";
 
 interface WorkbookConfirmationProps {
-  /** To display the number of records created to the user. */
-  totalRecordsCreated: number;
+  /** The total number of resources in the workbook. */
+  totalWorkbookResourcesCount: number;
 
   /** Used for generating the search query on the material sample list page. */
   sourceSetValue: string;
@@ -24,14 +24,18 @@ interface WorkbookConfirmationProps {
 
   /** When this callback is triggered, it will prevent the workbook uploader from updating the state. */
   preventRendering: () => void;
+
+  /** The number of resources updated due to already existing and user chose appendData. */
+  resourcesUpdatedCount?: number;
 }
 
 export function WorkbookConfirmation({
-  totalRecordsCreated,
+  totalWorkbookResourcesCount,
   sourceSetValue,
   groupUsed,
   onWorkbookReset,
-  preventRendering
+  preventRendering,
+  resourcesUpdatedCount
 }: WorkbookConfirmationProps) {
   const router = useRouter();
   const uniqueName = "material-sample-list";
@@ -113,7 +117,17 @@ export function WorkbookConfirmation({
         <span>
           <DinaMessage
             id="workbook_confirmation_total"
-            values={{ total: totalRecordsCreated }}
+            values={{
+              total: totalWorkbookResourcesCount - (resourcesUpdatedCount ?? 0)
+            }}
+          />
+        </span>
+        <span>
+          <DinaMessage
+            id="workbook_updated_total"
+            values={{
+              total: resourcesUpdatedCount
+            }}
           />
         </span>
         <span className="mt-2">

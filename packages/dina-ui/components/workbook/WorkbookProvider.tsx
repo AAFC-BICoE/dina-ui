@@ -86,6 +86,8 @@ type State = {
   apiBaseUrl?: string;
   error?: Error;
   sourceSet?: string;
+  appendData?: boolean;
+  resourcesUpdatedCount?: number;
 };
 
 interface WorkbookMetaData {
@@ -95,6 +97,7 @@ interface WorkbookMetaData {
   group?: string;
   apiBaseUrl?: string;
   error?: Error;
+  appendData?: boolean;
 }
 
 const reducer = (state, action: { type: actionType; payload?: any }): State => {
@@ -134,7 +137,8 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
         workbookResources: action.payload.workbookResources,
         group: action.payload.group,
         type: action.payload.type,
-        apiBaseUrl: action.payload.apiBaseUrl
+        apiBaseUrl: action.payload.apiBaseUrl,
+        appendData: action.payload.appendData
       };
     case "FAIL_SAVING":
       return {
@@ -156,7 +160,8 @@ const reducer = (state, action: { type: actionType; payload?: any }): State => {
       return {
         ...state,
         status: "FINISHED",
-        sourceSet: action.payload
+        sourceSet: action.payload.sourceSet,
+        resourcesUpdatedCount: action.payload.resourcesUpdatedCount
       };
     case "RESET":
       return {
@@ -234,6 +239,8 @@ export interface WorkbookUploadContextI {
   sheet: number;
   error?: Error;
   sourceSet?: string;
+  appendData?: boolean;
+  resourcesUpdatedCount?: number;
 
   uploadWorkbook: (newSpreadsheetData: WorkbookJSON) => Promise<void>;
   setColumnMap: (newColumnMap: WorkbookColumnMap) => void;
@@ -247,11 +254,15 @@ export interface WorkbookUploadContextI {
     relationshipMapping: RelationshipMapping,
     group: string,
     type: string,
-    apiBaseUrl: string
+    apiBaseUrl: string,
+    appendData: boolean
   ) => Promise<void>;
   pauseSavingWorkbook: () => void;
   resumeSavingWorkbook: () => void;
-  finishSavingWorkbook: (sourceSet: string) => Promise<void>;
+  finishSavingWorkbook: (
+    sourceSet: string,
+    resourcesUpdatedCount: number
+  ) => Promise<void>;
   cancelSavingWorkbook: (type?: string) => Promise<void>;
   failSavingWorkbook: (error: Error) => Promise<void>;
   setGroup: (group: string) => void;
@@ -289,7 +300,8 @@ export function WorkbookUploadContextProvider({
     progress: 0,
     sheet: 0,
     type: "material-sample",
-    group: groupNames?.[0]
+    group: groupNames?.[0],
+    appendData: false
   };
   const [state, dispatch] = useReducer(reducer, initState);
 
@@ -336,7 +348,8 @@ export function WorkbookUploadContextProvider({
     relationshipMapping: RelationshipMapping,
     newGroup: string,
     newType: string,
-    newApiBaseUrl: string
+    newApiBaseUrl: string,
+    appendData: boolean
   ) => {
     for (const columnHeader of Object.keys(relationshipMapping)) {
       const relationshipColumn = relationshipMapping[columnHeader];
@@ -353,7 +366,8 @@ export function WorkbookUploadContextProvider({
       group: newGroup,
       type: newType,
       apiBaseUrl: newApiBaseUrl,
-      progress: 0
+      progress: 0,
+      appendData
     });
     await saveWorkbookResourcesInIndexDB(
       newType,
@@ -366,7 +380,8 @@ export function WorkbookUploadContextProvider({
         workbookResources: newWorkbookResources,
         group: newGroup,
         type: newType,
-        apiBaseUrl: newApiBaseUrl
+        apiBaseUrl: newApiBaseUrl,
+        appendData
       }
     });
   };
@@ -404,7 +419,10 @@ export function WorkbookUploadContextProvider({
     });
   };
 
-  const finishSavingWorkbook = async (sourceSet: string) => {
+  const finishSavingWorkbook = async (
+    sourceSet: string,
+    resourcesUpdatedCount: number
+  ) => {
     writeStorage<WorkbookMetaData>("workbookResourceMetaData", {
       status: "FINISHED",
       group: state.group,
@@ -415,7 +433,10 @@ export function WorkbookUploadContextProvider({
     await clearWorkbookResources();
     dispatch({
       type: "FINISH_SAVING",
-      payload: sourceSet
+      payload: {
+        sourceSet,
+        resourcesUpdatedCount
+      }
     });
   };
 
@@ -510,6 +531,8 @@ export function WorkbookUploadContextProvider({
         status: state.status,
         error: state.error,
         sourceSet: state.sourceSet,
+        appendData: state.appendData,
+        resourcesUpdatedCount: state.resourcesUpdatedCount,
 
         uploadWorkbook,
         setColumnMap,

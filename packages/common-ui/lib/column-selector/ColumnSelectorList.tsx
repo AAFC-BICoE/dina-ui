@@ -25,6 +25,9 @@ import {
 import QueryRowRelationshipPresenceSearch, {
   RelationshipPresenceSearchStates
 } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
+import QueryRowIdentifierSearch, {
+  IdentifierSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 
 export interface ColumnSelectorListProps<TData extends KitsuResource>
   extends ColumnSelectorProps<TData> {
@@ -95,6 +98,15 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                 setIsValidField(true);
                 return;
               }
+              break;
+            case "identifier":
+              const identifierValues: IdentifierSearchStates =
+                JSON.parse(dynamicFieldValue);
+              if (identifierValues?.selectedIdentifier) {
+                setIsValidField(true);
+                return;
+              }
+              break;
           }
         }
       } else {
@@ -254,16 +266,16 @@ export function ColumnSelectorList<TData extends KitsuResource>({
         }
 
         if (exportMode) {
-          return !(nonExportableColumns ?? []).some(
-            (id) =>
-              (mapping?.value ?? "").startsWith(id) ||
-              (mapping?.label ?? "").startsWith(id)
+          return !(nonExportableColumns ?? []).some((id) =>
+            mapping?.parentType
+              ? (mapping?.value ?? "").startsWith(id)
+              : (mapping?.label ?? "").startsWith(id)
           );
         } else {
-          return !(mandatoryDisplayedColumns ?? []).some(
-            (id) =>
-              (mapping?.value ?? "").startsWith(id) ||
-              (mapping?.label ?? "").startsWith(id)
+          return !(mandatoryDisplayedColumns ?? []).some((id) =>
+            mapping?.parentType
+              ? (mapping?.value ?? "").startsWith(id)
+              : (mapping?.label ?? "").startsWith(id)
           );
         }
       });
@@ -301,6 +313,15 @@ export function ColumnSelectorList<TData extends KitsuResource>({
               setValue={setDynamicFieldValue}
               value={dynamicFieldValue}
               isInColumnSelector={true}
+            />
+          )}
+          {selectedField?.dynamicField?.type === "identifier" && (
+            <QueryRowIdentifierSearch
+              indexMap={indexMapping}
+              identifierConfig={selectedField}
+              isInColumnSelector={true}
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
             />
           )}
           {selectedField?.dynamicField?.type === "relationshipPresence" && (

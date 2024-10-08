@@ -151,31 +151,31 @@ const mockGet = jest.fn<any, any>(async (path) => {
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
   return paths.map((path) => {
     switch (path) {
-      case "/material-sample/" + MATERIAL_SAMPLE_ID_1:
+      case "/material-sample-summary/" + MATERIAL_SAMPLE_ID_1:
         return {
           id: MATERIAL_SAMPLE_ID_1,
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_1
         };
-      case "/material-sample/" + MATERIAL_SAMPLE_ID_2:
+      case "/material-sample-summary/" + MATERIAL_SAMPLE_ID_2:
         return {
           id: MATERIAL_SAMPLE_ID_2,
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_2
         };
-      case "/material-sample/" + MATERIAL_SAMPLE_ID_3:
+      case "/material-sample-summary/" + MATERIAL_SAMPLE_ID_3:
         return {
           id: MATERIAL_SAMPLE_ID_3,
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_3
         };
-      case "/material-sample/" + MATERIAL_SAMPLE_ID_4:
+      case "/material-sample-summary/" + MATERIAL_SAMPLE_ID_4:
         return {
           id: MATERIAL_SAMPLE_ID_4,
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_4
         };
-      case "/material-sample/" + MATERIAL_SAMPLE_ID_5:
+      case "/material-sample-summary/" + MATERIAL_SAMPLE_ID_5:
         return {
           id: MATERIAL_SAMPLE_ID_5,
           type: "material-sample",

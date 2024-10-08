@@ -2,7 +2,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   FieldHeader,
   ReactTable,
-  useGroupedCheckBoxes
+  useGroupedCheckBoxes,
+  useStringComparator
 } from "../../../../../common-ui/lib";
 import {
   SeqReaction,
@@ -31,6 +32,8 @@ export function SeqReactionDndTable({
     defaultAvailableItems: selectedSeqReactions
   });
 
+  const { compareByStringAndNumber } = useStringComparator();
+
   const SELECTED_RESOURCE_SELECT_ALL_HEADER: ColumnDef<SeqReaction>[] = editMode
     ? [
         {
@@ -54,7 +57,7 @@ export function SeqReactionDndTable({
       accessorFn: (row) =>
         row.pcrBatchItem?.materialSample?.materialSampleName ?? "",
       header: () => <FieldHeader name={"sampleName"} />,
-      enableSorting: false
+      accessorKey: "materialSampleName"
     },
     {
       id: "result",
@@ -71,7 +74,12 @@ export function SeqReactionDndTable({
         </div>
       ),
       header: () => <FieldHeader name={"result"} />,
-      enableSorting: false
+      accessorKey: "result",
+      sortingFn: (a: any, b: any): number => {
+        const aString = a.original?.pcrBatchItem?.result;
+        const bString = b.original?.pcrBatchItem?.result;
+        return compareByStringAndNumber(aString, bString);
+      }
     },
     {
       id: "wellCoordinates",
@@ -83,26 +91,58 @@ export function SeqReactionDndTable({
             "" +
             row.original.pcrBatchItem?.storageUnitUsage?.wellColumn,
       header: () => <FieldHeader name={"wellCoordinates"} />,
-      enableSorting: false
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          a.original?.pcrBatchItem?.storageUnitUsage?.wellRow === null ||
+          a.original?.pcrBatchItem?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : a.original.pcrBatchItem?.storageUnitUsage?.wellRow +
+              "" +
+              a.original.pcrBatchItem?.storageUnitUsage?.wellColumn;
+        const bString =
+          b.original?.pcrBatchItem?.storageUnitUsage?.wellRow === null ||
+          b.original?.pcrBatchItem?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : b.original.pcrBatchItem?.storageUnitUsage?.wellRow +
+              "" +
+              b.original.pcrBatchItem?.storageUnitUsage?.wellColumn;
+        return compareByStringAndNumber(aString, bString);
+      }
     },
     {
       id: "tubeNumber",
       cell: ({ row }) =>
         row.original?.pcrBatchItem?.storageUnitUsage?.cellNumber || "",
       header: () => <FieldHeader name={"tubeNumber"} />,
-      enableSorting: false
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a.original?.pcrBatchItem?.storageUnitUsage?.cellNumber.toString(),
+          b.original?.pcrBatchItem?.storageUnitUsage?.cellNumber.toString()
+        )
     },
     {
       id: "primer",
       cell: ({ row }) => row.original?.seqPrimer?.name || "",
       header: () => <FieldHeader name={"primer"} />,
-      enableSorting: false
+      accessorKey: "primer",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a.original?.seqPrimer?.name || "",
+          b.original?.seqPrimer?.name || ""
+        )
     },
     {
       id: "direction",
       cell: ({ row }) => row.original?.seqPrimer?.direction || "",
       header: () => <FieldHeader name={"direction"} />,
-      enableSorting: false
+      accessorKey: "direction",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a.original?.seqPrimer?.direction || "",
+          b.original?.seqPrimer?.direction || ""
+        )
     }
   ];
 
@@ -126,7 +166,15 @@ export function SeqReactionDndTable({
       data={selectedSeqReactions}
       onRowMove={onRowMove}
       enableDnd={editMode}
-      enableSorting={false}
+      pageSize={1000}
+      enableSorting={true}
+      sort={[
+        {
+          id: "tubeNumber",
+          desc: false
+        }
+      ]}
+      enableMultiSort={true}
     />
   );
 }

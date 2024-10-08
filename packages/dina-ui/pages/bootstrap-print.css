@@ -74,4 +74,7 @@
   .react-select__indicators {
     display: none !important;
   }
+  .button-bar {
+    display: none !important;
+  }
 }

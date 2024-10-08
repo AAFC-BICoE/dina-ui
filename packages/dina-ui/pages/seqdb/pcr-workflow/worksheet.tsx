@@ -37,7 +37,7 @@ export default function PcrWorksheetPage() {
       `seqdb-api/pcr-batch/${id}`,
       {
         include:
-          "primerForward,primerReverse,region,thermocyclerProfile,protocol"
+          "primerForward,primerReverse,region,thermocyclerProfile,protocol,experimenters"
       }
     );
     const pcrBatch = response.data;
