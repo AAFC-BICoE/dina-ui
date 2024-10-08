@@ -24,7 +24,9 @@ function StorageUnitGridForm() {
   const id = router.query.storageUnitId?.toString();
   const storageUnitQuery = useStorageUnit(id);
   // Current step being used.
-  const [currentStep, setCurrentStep] = useState<number>(0);
+  const [currentStep, setCurrentStep] = useState<number>(
+    router.query.step ? Number(router.query.step) : 0
+  );
 
   // Global edit mode state.
   const [editMode, setEditMode] = useState<boolean>(
