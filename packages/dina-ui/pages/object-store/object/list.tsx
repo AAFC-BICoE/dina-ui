@@ -146,6 +146,24 @@ export default function MetadataListPage() {
       enableSorting: false,
       id: "acMetadataCreator.displayName"
     },
+    {
+      cell: ({
+        row: {
+          original: { included }
+        }
+      }) =>
+        included?.dcCreator?.id ? (
+          <Link href={`/person/view?id=${included?.dcCreator?.id}`}>
+            <a>{included?.dcCreator?.attributes?.displayName}</a>
+          </Link>
+        ) : null,
+      header: () => <FieldHeader name="dcCreator.displayName" />,
+      relationshipType: "person",
+      accessorKey: "included.attributes.displayName",
+      isKeyword: true,
+      enableSorting: false,
+      id: "dcCreator.displayName"
+    },
     stringArrayCell("acTags", "data.attributes.acTags"),
     {
       id: "objectStorePreview",

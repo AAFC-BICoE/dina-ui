@@ -906,6 +906,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   title_preparationType: "Preparation Type",
   title_storageUnit: "Storage Unit",
   title_storageUnitType: "Storage Unit Type",
+  title_acMetadataCreator: "Uploaded By",
+  title_dcCreator: "Digitized By",
   to: "To",
   toBeReturned: "To Be Returned",
   tooltipDefaultLinkMessage: "Click here to learn more.",
