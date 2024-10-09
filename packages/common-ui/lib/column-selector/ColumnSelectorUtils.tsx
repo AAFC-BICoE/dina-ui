@@ -712,9 +712,9 @@ export function getIncludedExtensionFieldColumn(
     id: `${config.referencedBy}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
     header: () => (
       <IncludedExtensionFieldLabel
-        extensionPackage={extensionField.extension.name}
-        name={extensionValue.name}
-        relationship={config.referencedBy}
+        extensionPackage={extensionValue?.extension?.name ?? ""}
+        name={extensionField?.name ?? ""}
+        relationship={config?.referencedBy ?? ""}
       />
     ),
     label: `${startCase(config.referencedBy)} - ${

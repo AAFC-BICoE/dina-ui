@@ -30,13 +30,23 @@ interface QueryFieldSelectorProps {
    * displays different options not available for the search.
    */
   isInColumnSelector: boolean;
+
+  /**
+   * IDs of the columns that should not be displayed in the Query Builder field selector.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  nonSearchableColumns?: string[];
 }
 
 export function QueryFieldSelector({
   indexMap,
   currentField,
   setField,
-  isInColumnSelector = false
+  isInColumnSelector = false,
+  nonSearchableColumns
 }: QueryFieldSelectorProps) {
   const { formatMessage, messages, locale } = useIntl();
 
@@ -64,6 +74,12 @@ export function QueryFieldSelector({
     const simpleRowOptions = indexMap
       ?.filter((prop) => !prop.parentPath)
       ?.filter((prop) => prop.hideField === false)
+      ?.filter(
+        (prop) =>
+          !(nonSearchableColumns ?? []).some((id) =>
+            (prop?.label ?? "").startsWith(id)
+          )
+      )
       ?.map((prop) => ({
         label: messages["field_" + prop.label]
           ? formatMessage({ id: "field_" + prop.label })
@@ -76,6 +92,12 @@ export function QueryFieldSelector({
     const nestedRowOptions = indexMap
       ?.filter((prop) => !!prop.parentPath)
       ?.filter((prop) => prop.hideField === false)
+      ?.filter(
+        (prop) =>
+          !(nonSearchableColumns ?? []).some((id) =>
+            (prop?.value ?? "").startsWith(id)
+          )
+      )
       ?.map((prop) => {
         return {
           parentName: prop.parentName,
@@ -105,7 +127,7 @@ export function QueryFieldSelector({
     return simpleRowOptions
       ? [...simpleRowOptions, ...groupedNestRowOptions]
       : [];
-  }, [indexMap, locale]);
+  }, [indexMap, locale, nonSearchableColumns]);
 
   // Custom styling to indent the group option menus.
   const customStyles = useMemo(

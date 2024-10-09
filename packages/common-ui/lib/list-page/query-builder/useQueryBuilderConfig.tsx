@@ -158,6 +158,15 @@ export interface UseQueryBuilderConfigProps {
   enableRelationshipPresence?: boolean;
 
   customViewFields?: CustomViewField[];
+
+  /**
+   * IDs of the columns that should not be displayed in the Query Builder field selector.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  nonSearchableColumns?: string[];
 }
 
 /**
@@ -167,7 +176,8 @@ export function useQueryBuilderConfig({
   indexName,
   dynamicFieldMapping,
   enableRelationshipPresence,
-  customViewFields
+  customViewFields,
+  nonSearchableColumns
 }: UseQueryBuilderConfigProps) {
   // Load index map using the index name.
   const { indexMap } = useIndexMapping({
@@ -189,7 +199,8 @@ export function useQueryBuilderConfig({
         indexName,
         formatMessage,
         customViewFields,
-        enableRelationshipPresence
+        enableRelationshipPresence,
+        nonSearchableColumns
       )
     );
   }, [indexMap, customViewFields, locale]);
@@ -209,7 +220,8 @@ export function generateBuilderConfig(
   indexName: string,
   formatMessage: any,
   customViewFields?: CustomViewField[],
-  enableRelationshipPresence?: boolean
+  enableRelationshipPresence?: boolean,
+  nonSearchableColumns?: string[]
 ): Config {
   // If the index map doesn't exist, then there is no point of loading the config yet.
   if (!indexMap) {
@@ -743,6 +755,7 @@ export function generateBuilderConfig(
         currentField={fieldDropdownProps?.selectedPath?.join(".") ?? ""}
         setField={fieldDropdownProps?.setField}
         isInColumnSelector={false}
+        nonSearchableColumns={nonSearchableColumns}
       />
     ),
     renderOperator: (operatorDropdownProps) => {

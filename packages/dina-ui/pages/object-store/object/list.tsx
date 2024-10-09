@@ -254,6 +254,10 @@ export default function MetadataListPage() {
                   "thumbnail",
                   "objectStorePreview"
                 ]}
+                nonSearchableColumns={[
+                  "acMetadataCreator.displayName",
+                  "dcCreator.displayName"
+                ]}
                 enableRelationshipPresence={true}
                 columns={METADATA_TABLE_COLUMNS}
                 bulkDeleteButtonProps={{

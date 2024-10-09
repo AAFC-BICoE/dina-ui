@@ -140,13 +140,22 @@ export interface QueryPageProps<TData extends KitsuResource> {
   mandatoryDisplayedColumns?: string[];
 
   /**
-   * IDs of the columns that should always be displayed and cannot be deleted.
+   * IDs of the columns that will not be shown in the export field list.
    *
    * Uses the startsWith match so you can define the full path or partial paths.
    *
    * Used for the column selector.
    */
   nonExportableColumns?: string[];
+
+  /**
+   * IDs of the columns that should not be displayed in the Query Builder field selector.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  nonSearchableColumns?: string[];
 
   /**
    * By default, the QueryPage will try sorting using `createdOn` attribute. You can override this
@@ -294,6 +303,7 @@ export function QueryPage<TData extends KitsuResource>({
   excludedRelationshipTypes,
   mandatoryDisplayedColumns,
   nonExportableColumns,
+  nonSearchableColumns,
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
@@ -376,7 +386,8 @@ export function QueryPage<TData extends KitsuResource>({
     indexName,
     dynamicFieldMapping,
     enableRelationshipPresence,
-    customViewFields
+    customViewFields,
+    nonSearchableColumns
   });
 
   // Groups selected for the search.
