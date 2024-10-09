@@ -25,7 +25,9 @@ export default function NgsWorkFlowRunPage() {
   );
 
   // Global edit mode state.
-  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editMode, setEditMode] = useState<boolean>(
+    router.query.editMode === "true"
+  );
 
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
