@@ -90,6 +90,12 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    * Array of relationshipType columns to be excluded from the dropdown menu
    */
   excludedRelationshipTypes?: string[];
+
+  /**
+   * Should all the input/buttons be disabled, Helpful if loading and do not want user to
+   * interact with fields.
+   */
+  disabled?: boolean;
 }
 
 export function ColumnSelector<TData extends KitsuResource>(
@@ -106,7 +112,6 @@ export function ColumnSelector<TData extends KitsuResource>(
     setColumnSelectorLoading,
     setDisplayedColumns,
     overrideDisplayedColumns,
-    setOverrideDisplayedColumns,
     excludedRelationshipTypes
   } = props;
 

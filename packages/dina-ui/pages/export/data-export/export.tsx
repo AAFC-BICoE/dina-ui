@@ -134,6 +134,7 @@ export default function ExportPage<TData extends KitsuResource>() {
         source: indexName,
         query: queryString,
         columns: columnsToExport.map((item) => item.id),
+        columnAliases: columnsToExport.map((item) => item?.exportHeader ?? ""),
         name: formik?.values?.name
       },
       type: "data-export"
@@ -501,6 +502,7 @@ export default function ExportPage<TData extends KitsuResource>() {
                       indexMapping={indexMap}
                       uniqueName={uniqueName}
                       dynamicFieldsMappingConfig={dynamicFieldMapping}
+                      disabled={loading}
                     />
                   </Card.Body>
                 </Card>

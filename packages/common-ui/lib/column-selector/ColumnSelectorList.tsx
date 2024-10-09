@@ -44,7 +44,8 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   indexMapping,
   dynamicFieldsMappingConfig,
   mandatoryDisplayedColumns,
-  nonExportableColumns
+  nonExportableColumns,
+  disabled
 }: ColumnSelectorListProps<TData>) {
   const { apiClient } = useApiClient();
 
@@ -391,6 +392,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                           )
                     }
                     isExportMode={exportMode ?? false}
+                    isDisabled={disabled ?? false}
                     onColumnItemDelete={onColumnItemDelete}
                     onColumnItemChangeOrder={onColumnItemChangeOrder}
                     onColumnItemChangeHeader={onColumnItemChangeHeader}

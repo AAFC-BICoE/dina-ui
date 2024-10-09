@@ -20,6 +20,9 @@ export interface ColumnItemProps<TData extends KitsuResource> {
 
   /** Is the column item being displayed in export mode? (Displays the column header) */
   isExportMode: boolean;
+
+  /** Should all the options on the column item be disabled. (Useful when exporting to prevent edits) */
+  isDisabled: boolean;
 }
 
 export function ColumnItem<TData extends KitsuResource>({
@@ -30,7 +33,8 @@ export function ColumnItem<TData extends KitsuResource>({
   isTop,
   isBottom,
   isMandatoryField,
-  isExportMode
+  isExportMode,
+  isDisabled
 }: ColumnItemProps<TData>) {
   return (
     <>
@@ -58,6 +62,7 @@ export function ColumnItem<TData extends KitsuResource>({
                   style={{ width: "500px" }}
                   value={column?.exportHeader}
                   placeholder={column.id}
+                  disabled={isDisabled}
                   onChange={(e) =>
                     column.id &&
                     onColumnItemChangeHeader(e.target.value, column.id)
@@ -68,7 +73,7 @@ export function ColumnItem<TData extends KitsuResource>({
               {/* Order Up Button */}
               <Button
                 variant="light"
-                disabled={isTop}
+                disabled={isTop || isDisabled}
                 className={isExportMode ? "" : "ms-auto"}
                 onClick={() =>
                   column.id && onColumnItemChangeOrder("up", column.id)
@@ -81,7 +86,7 @@ export function ColumnItem<TData extends KitsuResource>({
               <Button
                 className="ms-1"
                 variant="light"
-                disabled={isBottom}
+                disabled={isBottom || isDisabled}
                 onClick={() =>
                   column.id && onColumnItemChangeOrder("down", column.id)
                 }
@@ -93,7 +98,7 @@ export function ColumnItem<TData extends KitsuResource>({
               <Button
                 className="ms-1"
                 variant="danger"
-                disabled={isMandatoryField}
+                disabled={isMandatoryField || isDisabled}
                 onClick={() => column.id && onColumnItemDelete(column.id)}
               >
                 <FaTrash />
