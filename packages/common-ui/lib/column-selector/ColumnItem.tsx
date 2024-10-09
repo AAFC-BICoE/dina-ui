@@ -16,6 +16,9 @@ export interface ColumnItemProps<TData extends KitsuResource> {
 
   /** Used to determine if the delete button should be disbaled. */
   isMandatoryField: boolean;
+
+  /** Is the column item being displayed in export mode? (Displays the column header) */
+  isExportMode: boolean;
 }
 
 export function ColumnItem<TData extends KitsuResource>({
@@ -24,7 +27,8 @@ export function ColumnItem<TData extends KitsuResource>({
   onColumnItemChangeOrder,
   isTop,
   isBottom,
-  isMandatoryField
+  isMandatoryField,
+  isExportMode
 }: ColumnItemProps<TData>) {
   return (
     <>
@@ -44,11 +48,20 @@ export function ColumnItem<TData extends KitsuResource>({
                 {(column as any)?.header()}
               </p>
 
+              {/* Header */}
+              {isExportMode && (
+                <input
+                  type="text"
+                  className="ms-auto form-control w-25 me-2"
+                  value={""}
+                />
+              )}
+
               {/* Order Up Button */}
               <Button
-                className="ms-auto"
                 variant="light"
                 disabled={isTop}
+                className={isExportMode ? "" : "ms-auto"}
                 onClick={() =>
                   column.id && onColumnItemChangeOrder("up", column.id)
                 }

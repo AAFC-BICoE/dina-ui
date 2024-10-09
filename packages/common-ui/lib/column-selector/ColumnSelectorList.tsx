@@ -368,6 +368,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                             (column?.id ?? "").startsWith(id)
                           )
                     }
+                    isExportMode={exportMode ?? false}
                     onColumnItemDelete={onColumnItemDelete}
                     onColumnItemChangeOrder={onColumnItemChangeOrder}
                   />
