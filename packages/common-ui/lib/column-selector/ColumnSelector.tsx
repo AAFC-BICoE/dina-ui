@@ -12,6 +12,7 @@ import {
 import { generateColumnDefinition } from "./ColumnSelectorUtils";
 import { useApiClient } from "../api-client/ApiClientContext";
 import useLocalStorage from "@rehooks/local-storage";
+import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
 
@@ -53,13 +54,13 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    * When provided, it will be set as the setDisplayedColumns. This is populated from the
    * saved export hook.
    */
-  overrideDisplayedColumns?: string[];
+  overrideDisplayedColumns?: SavedExportColumnStructure;
 
   /**
    * Should only be set to empty, indicating it has been processed.
    */
   setOverrideDisplayedColumns?: React.Dispatch<
-    React.SetStateAction<string[] | undefined>
+    React.SetStateAction<SavedExportColumnStructure | undefined>
   >;
 
   /**
@@ -231,16 +232,25 @@ export function ColumnSelector<TData extends KitsuResource>(
 
     async function loadColumnsFromSavedExport() {
       if (injectedIndexMapping && overrideDisplayedColumns) {
-        const promises = overrideDisplayedColumns.map(async (localColumn) => {
-          const newColumnDefinition = await generateColumnDefinition({
-            indexMappings: injectedIndexMapping,
-            dynamicFieldsMappingConfig,
-            apiClient,
-            defaultColumns,
-            path: localColumn
-          });
-          return newColumnDefinition;
-        });
+        const promises = overrideDisplayedColumns?.columns?.map?.(
+          async (localColumn, index) => {
+            const newColumnDefinition = await generateColumnDefinition({
+              indexMappings: injectedIndexMapping,
+              dynamicFieldsMappingConfig,
+              apiClient,
+              defaultColumns,
+              path: localColumn
+            });
+
+            // Set the column header if saved.
+            if (newColumnDefinition) {
+              newColumnDefinition.exportHeader =
+                overrideDisplayedColumns?.columnAliases?.[index] ?? "";
+            }
+
+            return newColumnDefinition;
+          }
+        );
 
         const columns = (await Promise.all(promises)).filter(isDefinedColumn);
         setDisplayedColumns(columns);

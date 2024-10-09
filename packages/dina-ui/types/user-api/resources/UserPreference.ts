@@ -15,6 +15,7 @@ export interface SavedExportColumnStructure {
   name: string;
   component: string;
   columns: string[];
+  columnAliases: string[];
 }
 
 export type UserPreference = KitsuResource & UserPreferenceAttributes;
