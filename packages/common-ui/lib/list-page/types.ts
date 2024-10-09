@@ -49,6 +49,11 @@ export type TableColumn<TData extends KitsuResource> = ColumnDef<TData> & {
    * Used for storing the column selector string, for local storage purposes.
    */
   columnSelectorString?: string;
+
+  /**
+   * Used for the column exporter to allow the user to
+   */
+  exportHeader?: string;
 };
 
 /**

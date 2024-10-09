@@ -7,6 +7,7 @@ export interface ColumnItemProps<TData extends KitsuResource> {
   column: TableColumn<TData>;
   onColumnItemDelete: (columnId: string) => void;
   onColumnItemChangeOrder: (direction: "up" | "down", columnId: string) => void;
+  onColumnItemChangeHeader: (headerValue: string, columnId: string) => void;
 
   /** Used to determine if the sort up arrow should be disabled. */
   isTop: boolean;
@@ -25,6 +26,7 @@ export function ColumnItem<TData extends KitsuResource>({
   column,
   onColumnItemDelete,
   onColumnItemChangeOrder,
+  onColumnItemChangeHeader,
   isTop,
   isBottom,
   isMandatoryField,
@@ -52,8 +54,14 @@ export function ColumnItem<TData extends KitsuResource>({
               {isExportMode && (
                 <input
                   type="text"
-                  className="ms-auto form-control w-25 me-2"
-                  value={""}
+                  className="ms-auto form-control me-2"
+                  style={{ width: "500px" }}
+                  value={column?.exportHeader}
+                  placeholder={column.id}
+                  onChange={(e) =>
+                    column.id &&
+                    onColumnItemChangeHeader(e.target.value, column.id)
+                  }
                 />
               )}
 

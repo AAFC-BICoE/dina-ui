@@ -177,6 +177,28 @@ export function ColumnSelectorList<TData extends KitsuResource>({
     }
   };
 
+  const onColumnItemChangeHeader = (headerValue: string, columnId: string) => {
+    // This operation should not be possible if not in export mode.
+    if (!exportMode) {
+      return;
+    }
+
+    // Create a copy of the displayedColumns array
+    const newDisplayedColumns = [...displayedColumns];
+
+    // Find the index of the column to be moved
+    const columnIndex = newDisplayedColumns.findIndex(
+      (column) => column.id === columnId
+    );
+
+    if (columnIndex !== -1) {
+      newDisplayedColumns[columnIndex].exportHeader = headerValue;
+    }
+
+    // Update the displayedColumns state with the modified array
+    setDisplayedColumns(newDisplayedColumns);
+  };
+
   const onColumnItemInsert = async () => {
     if (isValidField && selectedField && indexMapping) {
       const generatedColumnPath = generateColumnPath({
@@ -371,6 +393,7 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                     isExportMode={exportMode ?? false}
                     onColumnItemDelete={onColumnItemDelete}
                     onColumnItemChangeOrder={onColumnItemChangeOrder}
+                    onColumnItemChangeHeader={onColumnItemChangeHeader}
                   />
                 );
               })}
