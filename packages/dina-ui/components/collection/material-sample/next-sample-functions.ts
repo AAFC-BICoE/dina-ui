@@ -47,6 +47,11 @@ export function nextSampleInitialValues(
   // Calculate the next suffix:
   const newMaterialSampleName = nextSampleName(materialSampleName);
 
+  // Some data-components should not automatically be copied over to the material sample.
+  // An alert will appear for the user to copy these data components over if the user wishes to
+  // duplicate these over.
+  // console.log(copiedValues);
+
   const initialValues = {
     ...copiedValues,
     materialSampleName: newMaterialSampleName,
