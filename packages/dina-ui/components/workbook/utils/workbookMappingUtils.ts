@@ -72,7 +72,23 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
   ["collector's number", "collectingEvent.dwcRecordNumber"],
   ["collector number", "collectingEvent.dwcRecordNumber"],
   ["well column", "storageUnitUsage.wellColumn"],
-  ["well row", "storageUnitUsage.wellRow"]
+  ["well row", "storageUnitUsage.wellRow"],
+  [
+    "decimal latitude",
+    "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"
+  ],
+  [
+    "decimal longitude",
+    "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
+  ],
+  [
+    "latitude",
+    "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"
+  ],
+  [
+    "longitude",
+    "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
+  ]
 ]);
 
 export type FieldOptionType = {

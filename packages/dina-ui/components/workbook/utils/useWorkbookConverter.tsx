@@ -275,6 +275,7 @@ export function useWorkbookConverter(
         const fieldPath = getPathOfField(fieldNameInWorkbook);
         if (fieldPath) {
           let parent = resource;
+
           // Handle nested attributes
           const fieldNameArray = fieldPath.split(".");
           let childPath = "";
@@ -320,6 +321,12 @@ export function useWorkbookConverter(
               workbookRow[fieldNameInWorkbook],
               fieldNameInWorkbook
             );
+            if (
+              fieldPath.includes("dwcDecimalLongitude") ||
+              fieldPath.includes("dwcDecimalLatitude")
+            ) {
+              parent["isPrimary"] = true;
+            }
             if (fieldPath === "organism.determination.scientificNameDetails") {
               parent["scientificNameSource"] = ScientificNameSource.CUSTOM;
             }
