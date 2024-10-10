@@ -50,7 +50,8 @@ import {
   applyRootQuery,
   applySortingRules,
   applySourceFiltering,
-  elasticSearchFormatExport
+  elasticSearchFormatExport,
+  processResults
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import {
   CustomViewField,
@@ -139,13 +140,22 @@ export interface QueryPageProps<TData extends KitsuResource> {
   mandatoryDisplayedColumns?: string[];
 
   /**
-   * IDs of the columns that should always be displayed and cannot be deleted.
+   * IDs of the columns that will not be shown in the export field list.
    *
    * Uses the startsWith match so you can define the full path or partial paths.
    *
    * Used for the column selector.
    */
   nonExportableColumns?: string[];
+
+  /**
+   * IDs of the columns that should not be displayed in the Query Builder field selector.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  nonSearchableColumns?: string[];
 
   /**
    * By default, the QueryPage will try sorting using `createdOn` attribute. You can override this
@@ -293,6 +303,7 @@ export function QueryPage<TData extends KitsuResource>({
   excludedRelationshipTypes,
   mandatoryDisplayedColumns,
   nonExportableColumns,
+  nonSearchableColumns,
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
@@ -375,7 +386,8 @@ export function QueryPage<TData extends KitsuResource>({
     indexName,
     dynamicFieldMapping,
     enableRelationshipPresence,
-    customViewFields
+    customViewFields,
+    nonSearchableColumns
   });
 
   // Groups selected for the search.
@@ -526,47 +538,8 @@ export function QueryPage<TData extends KitsuResource>({
       // The included section will be transformed from an array to an object with the type name for each relationship.
       elasticSearchRequest(queryDSL)
         .then((result) => {
-          const processedResult = result?.hits.map((rslt) => {
-            return {
-              id: rslt._source?.data?.id,
-              type: rslt._source?.data?.type,
-              data: {
-                attributes: rslt._source?.data?.attributes,
-                relationships: rslt._source?.data?.relationships
-              },
-              included: rslt._source?.included?.reduce(
-                (includedAccumulator, currentIncluded) => {
-                  if (
-                    currentIncluded?.type === "organism" ||
-                    currentIncluded?.type === "derivative"
-                  ) {
-                    if (!includedAccumulator[currentIncluded?.type]) {
-                      return (
-                        (includedAccumulator[currentIncluded?.type] = [
-                          currentIncluded
-                        ]),
-                        includedAccumulator
-                      );
-                    } else {
-                      return (
-                        includedAccumulator[currentIncluded?.type].push(
-                          currentIncluded
-                        ),
-                        includedAccumulator
-                      );
-                    }
-                  } else {
-                    return (
-                      (includedAccumulator[currentIncluded?.type] =
-                        currentIncluded),
-                      includedAccumulator
-                    );
-                  }
-                },
-                {}
-              )
-            };
-          });
+          const processedResult = processResults(result);
+
           // If we have reached the count limit, we will need to perform another request for the true
           // query size.
           if (result?.total.value === MAX_COUNT_SIZE) {

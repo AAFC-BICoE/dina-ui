@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useIntl } from "react-intl";
+import { MessageFormatElement, useIntl } from "react-intl";
 import { SelectOption } from "common-ui";
 import { ESIndexMapping, TransformToDSLProps } from "../../types";
 import Select from "react-select";
@@ -45,7 +45,7 @@ export default function QueryRowRelationshipPresenceSearch({
   indexMapping,
   isInColumnSelector
 }: QueryRowRelationshipPresenceSearchProps) {
-  const { formatMessage } = useIntl();
+  const { formatMessage, messages } = useIntl();
 
   const [relationshipPresenceState, setRelationshipPresenceState] =
     useState<RelationshipPresenceSearchStates>(() =>
@@ -66,7 +66,7 @@ export default function QueryRowRelationshipPresenceSearch({
   }, [relationshipPresenceState, setValue]);
 
   const relationshipOptions: SelectOption<string>[] =
-    retrieveRelationshipsFromIndexMapping(indexMapping);
+    retrieveRelationshipsFromIndexMapping(indexMapping, messages);
   const [relationshipSearchValue, setRelationshipSearchValue] =
     useState<string>("");
 
@@ -152,7 +152,8 @@ export default function QueryRowRelationshipPresenceSearch({
  * @returns {SelectOption<string>[]} An array of SelectOption objects containing unique labels and values representing relationships.
  */
 function retrieveRelationshipsFromIndexMapping(
-  indexMapping: ESIndexMapping[]
+  indexMapping: ESIndexMapping[],
+  messages: Record<string, string> | Record<string, MessageFormatElement[]>
 ): SelectOption<string>[] {
   return indexMapping.reduce<SelectOption<string>[]>((acc, mapping) => {
     // Check if the mapping has a parentName and if it already exists in the accumulator
@@ -161,7 +162,9 @@ function retrieveRelationshipsFromIndexMapping(
       !acc.find((item) => item.value === mapping.parentName)
     ) {
       acc.push({
-        label: startCase(mapping.parentName),
+        label: messages["title_" + mapping.parentName]
+          ? messages["title_" + mapping.parentName]
+          : startCase(mapping.parentName),
         value: mapping.parentName
       } as SelectOption<string>);
     }

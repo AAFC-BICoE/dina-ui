@@ -13,7 +13,7 @@ import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-b
 import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
 import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
 import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 import { VocabularyFieldHeader } from "../../../../packages/dina-ui/components";
 import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
@@ -212,15 +212,15 @@ function getNestedColumn<TData extends KitsuResource>(
   path: string,
   indexColumn: ESIndexMapping
 ): TableColumn<TData> {
-  const accessorKey = `${indexColumn.parentPath}.${
-    indexColumn.path.split(".")[0]
-  }.${indexColumn.label}`;
+  const accessorKeyRelationship = `${indexColumn.parentPath}.${indexColumn.parentName}`;
+  const accessorKeyRelationshipAttribute = `${indexColumn.path}.${indexColumn.label}`;
+  const accessorKeyFull = `${accessorKeyRelationship}.${accessorKeyRelationshipAttribute}`;
 
   if (indexColumn.type === "date") {
     return {
       ...dateCell(
         indexColumn.value,
-        accessorKey,
+        accessorKeyFull,
         indexColumn.parentType,
         true,
         indexColumn
@@ -231,29 +231,48 @@ function getNestedColumn<TData extends KitsuResource>(
     return {
       id: indexColumn.value,
       header: () => (
-        <FieldHeader
-          name={indexColumn.label}
-          prefixName={startCase(indexColumn.parentName)}
+        <NestedColumnLabel
+          label={indexColumn.label}
+          relationship={indexColumn.parentName ?? ""}
         />
       ),
-      accessorKey,
+      accessorKey: accessorKeyFull,
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
       cell: ({ row: { original } }) => {
-        const relationshipAccessor = accessorKey?.split(".");
-        relationshipAccessor?.splice(
-          1,
-          0,
-          indexColumn.parentType ? indexColumn.parentType : ""
-        );
-        const valuePath = relationshipAccessor?.join(".");
-        const value = get(original, valuePath);
-        return <>{value}</>;
+        const value = get(original, accessorKeyRelationship);
+        if (value && Array.isArray(value)) {
+          const values = value
+            .map((val) => get(val, accessorKeyRelationshipAttribute))
+            .join(", ");
+          return <>{values}</>;
+        } else {
+          const singleValue = get(original, accessorKeyFull);
+          return <>{singleValue}</>;
+        }
       },
       relationshipType: indexColumn.parentType,
       columnSelectorString: path
     };
   }
+}
+
+export interface NestedColumnLabelProps {
+  label: string;
+  relationship: string;
+}
+
+export function NestedColumnLabel({
+  label,
+  relationship
+}: NestedColumnLabelProps) {
+  const { formatMessage, messages } = useDinaIntl();
+
+  const relationshipLabel = messages["title_" + relationship]
+    ? formatMessage(("title_" + relationship) as any)
+    : startCase(relationship);
+
+  return <FieldHeader name={label} prefixName={relationshipLabel} />;
 }
 
 // Handle getting columns from query options that contain dynamicField
@@ -461,10 +480,10 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
       return <>{value}</>;
     },
     header: () => (
-      <>
-        {config.referencedBy ? startCase(config.referencedBy) + " - " : ""}
-        {startCase(managedAttribute.name)}
-      </>
+      <IncludedManagedAttributeLabel
+        name={managedAttribute.name}
+        relationship={config.referencedBy}
+      />
     ),
     accessorKey,
     id: `${config.referencedBy}.${fieldName}.${managedAttributeKey}`,
@@ -477,6 +496,30 @@ export function getIncludedManagedAttributeColumn<TData extends KitsuResource>(
   };
 
   return managedAttributesColumn;
+}
+
+export interface IncludedManagedAttributeLabelProps {
+  name: string;
+  relationship: string;
+}
+
+export function IncludedManagedAttributeLabel({
+  name,
+  relationship
+}: IncludedManagedAttributeLabelProps) {
+  const { messages, formatMessage } = useDinaIntl();
+
+  const relationshipLabel = messages["title_" + relationship]
+    ? formatMessage(("title_" + relationship) as any)
+    : startCase(relationship);
+
+  return (
+    <>
+      {relationshipLabel}
+      {" - "}
+      {startCase(name)}
+    </>
+  );
 }
 
 export function getAttributesManagedAttributeColumn<
@@ -667,10 +710,13 @@ export function getIncludedExtensionFieldColumn(
     },
     accessorKey,
     id: `${config.referencedBy}.${fieldExtensionResourceType}.${extensionValue.id}.${extensionField.key}`,
-    header: () =>
-      `${config.referencedBy ? startCase(config.referencedBy) + " - " : ""}${
-        extensionValue.extension.name
-      } - ${extensionField.name}`,
+    header: () => (
+      <IncludedExtensionFieldLabel
+        extensionPackage={extensionValue?.extension?.name ?? ""}
+        name={extensionField?.name ?? ""}
+        relationship={config?.referencedBy ?? ""}
+      />
+    ),
     label: `${startCase(config.referencedBy)} - ${
       extensionValue.extension.name
     } - ${extensionField.name}`,
@@ -684,6 +730,34 @@ export function getIncludedExtensionFieldColumn(
   };
 
   return extensionValuesColumn;
+}
+
+export interface IncludedExtensionFieldLabelProps {
+  extensionPackage: string;
+  name: string;
+  relationship: string;
+}
+
+export function IncludedExtensionFieldLabel({
+  name,
+  extensionPackage,
+  relationship
+}: IncludedExtensionFieldLabelProps) {
+  const { messages, formatMessage } = useDinaIntl();
+
+  const relationshipLabel = messages["title_" + relationship]
+    ? formatMessage(("title_" + relationship) as any)
+    : startCase(relationship);
+
+  return (
+    <>
+      {relationshipLabel}
+      {" - "}
+      {extensionPackage}
+      {" - "}
+      {name}
+    </>
+  );
 }
 
 async function getIdentifierColumn<TData extends KitsuResource>(
@@ -837,9 +911,9 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
       return <>{value}</>;
     },
     header: () => (
-      <VocabularyFieldHeader
-        vocabulary={identifier}
-        referencedBy={config.referencedBy}
+      <IncludedIdentifierLabel
+        identifierVocabulary={identifier}
+        relationship={config.referencedBy}
       />
     ),
     accessorKey,
@@ -855,6 +929,35 @@ export function getIncludedIdentifierColumn<TData extends KitsuResource>(
   return identifierColumn;
 }
 
+export interface IncludedIdentifierLabelProps {
+  identifierVocabulary: IdentifierType;
+  relationship: string;
+}
+
+export function IncludedIdentifierLabel({
+  identifierVocabulary,
+  relationship
+}: IncludedIdentifierLabelProps) {
+  const { messages, formatMessage, locale } = useDinaIntl();
+
+  const relationshipLabel = messages["title_" + relationship]
+    ? formatMessage(("title_" + relationship) as any)
+    : startCase(relationship);
+
+  const label =
+    identifierVocabulary?.multilingualTitle?.titles?.find(
+      (title) => title.lang === locale
+    )?.title ?? identifierVocabulary.id;
+
+  return (
+    <>
+      {relationshipLabel}
+      {" - "}
+      {label}
+    </>
+  );
+}
+
 export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
   path: string,
   relationship: string,
@@ -863,12 +966,7 @@ export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
   return {
     accessorKey: `data.relationships`,
     id: `relationshipPresence.${relationship}.${operator}`,
-    header: () => (
-      <DinaMessage
-        id="field__relationshipPresence_column"
-        values={{ relationshipName: startCase(relationship) }}
-      />
-    ),
+    header: () => <RelationshipPresenceLabel relationship={relationship} />,
     cell: ({ row: { original } }) => {
       const relationshipExists = get(
         original,
@@ -892,6 +990,33 @@ export function getRelationshipPresenceFieldColumn<TData extends KitsuResource>(
     enableSorting: false,
     columnSelectorString: path
   };
+}
+
+export interface RelationshipPresenceLabelProps {
+  relationship: string;
+}
+
+/**
+ * Component used for generating the relationship presence label with locale support.
+ * @param relationship Relationship being displayed
+ * @returns String with the label
+ */
+export function RelationshipPresenceLabel({
+  relationship
+}: RelationshipPresenceLabelProps) {
+  const { formatMessage, messages } = useDinaIntl();
+
+  const relationshipLabel = messages["title_" + relationship]
+    ? formatMessage(("title_" + relationship) as any)
+    : startCase(relationship);
+
+  return (
+    <>
+      {formatMessage("field__relationshipPresence_column", {
+        relationshipName: relationshipLabel
+      })}
+    </>
+  );
 }
 
 // Fetch filtered dynamic field from back end
