@@ -7,6 +7,7 @@ export interface ColumnItemProps<TData extends KitsuResource> {
   column: TableColumn<TData>;
   onColumnItemDelete: (columnId: string) => void;
   onColumnItemChangeOrder: (direction: "up" | "down", columnId: string) => void;
+  onColumnItemChangeHeader: (headerValue: string, columnId: string) => void;
 
   /** Used to determine if the sort up arrow should be disabled. */
   isTop: boolean;
@@ -16,15 +17,24 @@ export interface ColumnItemProps<TData extends KitsuResource> {
 
   /** Used to determine if the delete button should be disbaled. */
   isMandatoryField: boolean;
+
+  /** Is the column item being displayed in export mode? (Displays the column header) */
+  isExportMode: boolean;
+
+  /** Should all the options on the column item be disabled. (Useful when exporting to prevent edits) */
+  isDisabled: boolean;
 }
 
 export function ColumnItem<TData extends KitsuResource>({
   column,
   onColumnItemDelete,
   onColumnItemChangeOrder,
+  onColumnItemChangeHeader,
   isTop,
   isBottom,
-  isMandatoryField
+  isMandatoryField,
+  isExportMode,
+  isDisabled
 }: ColumnItemProps<TData>) {
   return (
     <>
@@ -44,11 +54,27 @@ export function ColumnItem<TData extends KitsuResource>({
                 {(column as any)?.header()}
               </p>
 
+              {/* Header */}
+              {isExportMode && (
+                <input
+                  type="text"
+                  className="ms-auto form-control me-2"
+                  style={{ width: "500px" }}
+                  value={column?.exportHeader}
+                  placeholder={column.id}
+                  disabled={isDisabled}
+                  onChange={(e) =>
+                    column.id &&
+                    onColumnItemChangeHeader(e.target.value, column.id)
+                  }
+                />
+              )}
+
               {/* Order Up Button */}
               <Button
-                className="ms-auto"
                 variant="light"
-                disabled={isTop}
+                disabled={isTop || isDisabled}
+                className={isExportMode ? "" : "ms-auto"}
                 onClick={() =>
                   column.id && onColumnItemChangeOrder("up", column.id)
                 }
@@ -60,7 +86,7 @@ export function ColumnItem<TData extends KitsuResource>({
               <Button
                 className="ms-1"
                 variant="light"
-                disabled={isBottom}
+                disabled={isBottom || isDisabled}
                 onClick={() =>
                   column.id && onColumnItemChangeOrder("down", column.id)
                 }
@@ -72,7 +98,7 @@ export function ColumnItem<TData extends KitsuResource>({
               <Button
                 className="ms-1"
                 variant="danger"
-                disabled={isMandatoryField}
+                disabled={isMandatoryField || isDisabled}
                 onClick={() => column.id && onColumnItemDelete(column.id)}
               >
                 <FaTrash />

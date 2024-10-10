@@ -44,7 +44,8 @@ export function ColumnSelectorList<TData extends KitsuResource>({
   indexMapping,
   dynamicFieldsMappingConfig,
   mandatoryDisplayedColumns,
-  nonExportableColumns
+  nonExportableColumns,
+  disabled
 }: ColumnSelectorListProps<TData>) {
   const { apiClient } = useApiClient();
 
@@ -175,6 +176,28 @@ export function ColumnSelectorList<TData extends KitsuResource>({
         newDisplayedColumns.map((column) => column?.columnSelectorString ?? "")
       );
     }
+  };
+
+  const onColumnItemChangeHeader = (headerValue: string, columnId: string) => {
+    // This operation should not be possible if not in export mode.
+    if (!exportMode) {
+      return;
+    }
+
+    // Create a copy of the displayedColumns array
+    const newDisplayedColumns = [...displayedColumns];
+
+    // Find the index of the column to be moved
+    const columnIndex = newDisplayedColumns.findIndex(
+      (column) => column.id === columnId
+    );
+
+    if (columnIndex !== -1) {
+      newDisplayedColumns[columnIndex].exportHeader = headerValue;
+    }
+
+    // Update the displayedColumns state with the modified array
+    setDisplayedColumns(newDisplayedColumns);
   };
 
   const onColumnItemInsert = async () => {
@@ -368,8 +391,11 @@ export function ColumnSelectorList<TData extends KitsuResource>({
                             (column?.id ?? "").startsWith(id)
                           )
                     }
+                    isExportMode={exportMode ?? false}
+                    isDisabled={disabled ?? false}
                     onColumnItemDelete={onColumnItemDelete}
                     onColumnItemChangeOrder={onColumnItemChangeOrder}
+                    onColumnItemChangeHeader={onColumnItemChangeHeader}
                   />
                 );
               })}

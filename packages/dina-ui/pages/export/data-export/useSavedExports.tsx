@@ -40,7 +40,8 @@ export default function useSavedExports<TData extends KitsuResource>({
   );
 
   // Selected paths to be loaded in as columnToExport.
-  const [columnPathsToExport, setColumnPathsToExport] = useState<string[]>();
+  const [columnPathsToExport, setColumnPathsToExport] =
+    useState<SavedExportColumnStructure>();
 
   // All states related to creating a saved export.
   const [savedExportName, setSavedExportName] = useState<string>("");
@@ -81,6 +82,7 @@ export default function useSavedExports<TData extends KitsuResource>({
 
     const savedExportObject: SavedExportColumnStructure = {
       columns: convertColumnsToPaths(columnsToExport),
+      columnAliases: convertColumnsToAliases(columnsToExport),
       component: indexName,
       name: savedExportName.trim()
     };
@@ -123,6 +125,7 @@ export default function useSavedExports<TData extends KitsuResource>({
 
     const savedExportObject: SavedExportColumnStructure = {
       columns: convertColumnsToPaths(columnsToExport),
+      columnAliases: convertColumnsToAliases(columnsToExport),
       component: indexName,
       name: selectedSavedExport.name
     };
@@ -241,6 +244,13 @@ export default function useSavedExports<TData extends KitsuResource>({
     return columns.map((column) => column?.id ?? "");
   }
 
+  function convertColumnsToAliases(columns): string[] {
+    if (!columns) {
+      return [];
+    }
+    return columns.map((column) => column?.exportHeader ?? "");
+  }
+
   /**
    * First-load setup
    */
@@ -253,16 +263,16 @@ export default function useSavedExports<TData extends KitsuResource>({
    */
   useEffect(() => {
     if (selectedSavedExport) {
-      setColumnPathsToExport(selectedSavedExport.columns);
+      setColumnPathsToExport(selectedSavedExport);
     }
   }, [selectedSavedExport]);
 
   const columnsToExportPaths = convertColumnsToPaths(columnsToExport);
+  const columnsToExportAliases = convertColumnsToAliases(columnsToExport);
 
-  const changesMade = !isEqual(
-    columnsToExportPaths,
-    selectedSavedExport?.columns ?? []
-  );
+  const changesMade =
+    !isEqual(columnsToExportPaths, selectedSavedExport?.columns ?? []) ||
+    !isEqual(columnsToExportAliases, selectedSavedExport?.columnAliases ?? []);
 
   const displayOverrideWarning =
     allSavedExports.find(
@@ -310,7 +320,9 @@ export default function useSavedExports<TData extends KitsuResource>({
           <strong>
             <DinaMessage id="savedExport_columnsToBeSaved" />
           </strong>
-          {columnsToExport.map((column) => (column as any)?.header())}
+          {columnsToExport.map((column) => (
+            <div key={column?.id ?? ""}>{(column as any)?.header()}</div>
+          ))}
         </Modal.Body>
         <Modal.Footer>
           <Button
