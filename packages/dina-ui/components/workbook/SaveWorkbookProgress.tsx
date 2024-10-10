@@ -2,7 +2,11 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
-import { AreYouSureModal, useApiClient } from "../../../common-ui/lib";
+import {
+  AreYouSureModal,
+  QueryTable,
+  useApiClient
+} from "../../../common-ui/lib";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
@@ -10,6 +14,7 @@ import { useWorkbookConverter } from "./utils/useWorkbookConverter";
 import { delay } from "./utils/workbookMappingUtils";
 import { PersistedResource, KitsuResource } from "kitsu";
 import { MaterialSample } from "../../types/collection-api";
+import Link from "next/link";
 
 export interface SaveWorkbookProgressProps {
   onWorkbookCanceled: () => void;
@@ -49,6 +54,7 @@ export function SaveWorkbookProgress({
   const [savedResources, setSavedResources] = useState<
     PersistedResource<KitsuResource>[]
   >([]);
+  const [existingResources, setExistingResources] = useState<any[]>([]);
 
   const resourcesUpdatedCount = useRef<number>(0);
 
@@ -131,6 +137,10 @@ export function SaveWorkbookProgress({
               }
             }
           );
+          if (resp.data.length > 1) {
+            setExistingResources(resp.data);
+            pause();
+          }
           const existingResource = resp.data[0];
           if (existingResource) {
             resource.id = existingResource.id;
@@ -264,6 +274,37 @@ export function SaveWorkbookProgress({
       )}
       {statusRef.current === "PAUSED" && now < workbookResources.length && (
         <div className="mt-3 text-center">
+          {existingResources.length > 0 && (
+            <QueryTable<any>
+              filter={{ id: existingResources.join(",") }}
+              path={"collection-api/material-sample"}
+              columns={[
+                {
+                  cell: ({
+                    row: {
+                      original: {
+                        id,
+                        materialSampleName,
+                        dwcOtherCatalogNumbers
+                      }
+                    }
+                  }) => (
+                    <Link
+                      href={`/collection/material-sample/view?id=${id}`}
+                      passHref={true}
+                    >
+                      <a>
+                        {materialSampleName ||
+                          dwcOtherCatalogNumbers?.join?.(", ") ||
+                          id}
+                      </a>
+                    </Link>
+                  ),
+                  accessorKey: "materialSampleName"
+                }
+              ]}
+            />
+          )}
           <p>
             <DinaMessage id="confirmToResumeSavingWorkbook" />
           </p>
