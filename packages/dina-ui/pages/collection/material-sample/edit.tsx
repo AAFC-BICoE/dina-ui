@@ -10,7 +10,8 @@ import {
   Nav,
   nextSampleInitialValues,
   useMaterialSampleFormTemplateSelectState,
-  useMaterialSampleQuery
+  useMaterialSampleQuery,
+  CopyToNextSampleProvider
 } from "../../../components";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -100,22 +101,6 @@ export default function MaterialSampleEditPage() {
       <Head title={formatMessage(title)} />
       <Nav />
       <main className="container-fluid">
-        {!id &&
-          !!lastCreatedId &&
-          withResponse(copyFromQuery, ({ data: originalSample }) => (
-            <SaveAndCopyToNextSuccessAlert
-              id={lastCreatedId}
-              displayName={
-                !!originalSample.materialSampleName?.length
-                  ? originalSample.materialSampleName
-                  : lastCreatedId
-              }
-              entityPath={"collection/material-sample"}
-            />
-          ))}
-        <h1 id="wb-cont">
-          <DinaMessage id={title} />
-        </h1>
         {id ? (
           withResponse(materialSampleQuery, ({ data: sample }) => {
             if (sampleFormTemplate?.id) {
@@ -126,31 +111,70 @@ export default function MaterialSampleEditPage() {
               });
             }
             return (
-              <MaterialSampleForm
-                enableReinitialize={true}
-                navOrder={navOrder}
-                {...sampleFormProps}
-                materialSample={sample}
-              />
+              <>
+                <h1 id="wb-cont">
+                  <DinaMessage id={title} />
+                </h1>
+                <MaterialSampleForm
+                  enableReinitialize={true}
+                  navOrder={navOrder}
+                  {...sampleFormProps}
+                  materialSample={sample}
+                />
+              </>
             );
           })
         ) : copyFromId ? (
           withResponse(copyFromQuery, ({ data: originalSample }) => {
             const initialValues = nextSampleInitialValues(originalSample);
             return (
-              <MaterialSampleForm
-                {...sampleFormProps}
-                materialSample={initialValues}
-                disableAutoNamePrefix={true}
-              />
+              <CopyToNextSampleProvider
+                value={{
+                  originalSample,
+                  notCopiedOverWarnings: [
+                    {
+                      componentName: "storage",
+                      duplicateAnyway(materialSample) {
+                        if (materialSample) {
+                          return;
+                        }
+                        return;
+                      }
+                    }
+                  ]
+                }}
+              >
+                <SaveAndCopyToNextSuccessAlert
+                  id={lastCreatedId ?? ""}
+                  displayName={
+                    !!originalSample.materialSampleName?.length
+                      ? originalSample.materialSampleName
+                      : lastCreatedId ?? ""
+                  }
+                  entityPath={"collection/material-sample"}
+                />
+                <h1 id="wb-cont">
+                  <DinaMessage id={title} />
+                </h1>
+                <MaterialSampleForm
+                  {...sampleFormProps}
+                  materialSample={initialValues}
+                  disableAutoNamePrefix={true}
+                />
+              </CopyToNextSampleProvider>
             );
           })
         ) : (
-          <MaterialSampleForm
-            enableReinitialize={true}
-            navOrder={navOrder}
-            {...sampleFormProps}
-          />
+          <>
+            <h1 id="wb-cont">
+              <DinaMessage id={title} />
+            </h1>
+            <MaterialSampleForm
+              enableReinitialize={true}
+              navOrder={navOrder}
+              {...sampleFormProps}
+            />
+          </>
         )}
       </main>
       <Footer />

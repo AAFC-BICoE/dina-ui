@@ -1,6 +1,7 @@
 import { PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import { MaterialSample } from "../../../types/collection-api";
+import { createContext, useContext } from "react";
 
 /** Calculates the next sample name based on the previous name's suffix. */
 export function nextSampleName(previousName?: string | null): string {
@@ -47,10 +48,7 @@ export function nextSampleInitialValues(
   // Calculate the next suffix:
   const newMaterialSampleName = nextSampleName(materialSampleName);
 
-  // Some data-components should not automatically be copied over to the material sample.
-  // An alert will appear for the user to copy these data components over if the user wishes to
-  // duplicate these over.
-  // console.log(copiedValues);
+  // Remove storage if coordinates are provided since that's specific to
 
   const initialValues = {
     ...copiedValues,
@@ -59,4 +57,36 @@ export function nextSampleInitialValues(
   };
 
   return initialValues;
+}
+
+export interface NotCopiedOverWarning {
+  componentName: string;
+
+  /**
+   * Triggered if the user wants to duplicate the information over.
+   * @param materialSample Original material sample to alter.
+   * @returns
+   */
+  duplicateAnyway: (materialSample: MaterialSample) => void;
+}
+
+export interface CopyToNextSampleContextI {
+  /**
+   * The original initial values before changes are made.
+   */
+  originalSample: MaterialSample;
+
+  /** Warnings to display to the user and logic for adding it back if the user wants to. */
+  notCopiedOverWarnings: NotCopiedOverWarning[];
+}
+
+const CopyToNextSampleContext = createContext<CopyToNextSampleContextI | null>(
+  null
+);
+export const CopyToNextSampleProvider = CopyToNextSampleContext.Provider;
+
+/** If it's a copied next sample, this hook will return all of the CopyToNextSampleContext props */
+export function useCopyToNextSample(): CopyToNextSampleContextI | null {
+  const ctx = useContext(CopyToNextSampleContext);
+  return ctx ? ctx : null;
 }
