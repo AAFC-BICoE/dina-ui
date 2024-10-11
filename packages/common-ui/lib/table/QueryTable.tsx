@@ -348,8 +348,6 @@ export function QueryTable<TData extends KitsuResource>({
     });
   });
 
-  const [, forceUpdate] = useReducer((x) => x + 1, 0);
-
   return (
     <div
       className="query-table-wrapper"

@@ -4,6 +4,7 @@ import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import {
   AreYouSureModal,
+  FormikButton,
   QueryTable,
   useApiClient
 } from "../../../common-ui/lib";
@@ -54,7 +55,8 @@ export function SaveWorkbookProgress({
   const [savedResources, setSavedResources] = useState<
     PersistedResource<KitsuResource>[]
   >([]);
-  const [existingResources, setExistingResources] = useState<any[]>([]);
+  const existingResources = useRef<any[]>([]);
+  const existingResource = useRef<any>(undefined);
 
   const resourcesUpdatedCount = useRef<number>(0);
 
@@ -128,24 +130,36 @@ export function SaveWorkbookProgress({
       for (const resource of chunkedResources) {
         resource.sourceSet = sourceSetInternal;
 
-        if (appendData && resource.type === "material-sample") {
-          const resp = await apiClient.get<MaterialSample[]>(
-            "collection-api/material-sample",
-            {
-              filter: {
-                rsql: `materialSampleName=="${resource?.materialSampleName}";group==${group}`
+        // There was no existingResource cached from user clicking the Select button from table
+        if (!existingResource.current) {
+          if (appendData && resource.type === "material-sample") {
+            // In appendData mode, fetch resources that might have matching names
+            const resp = await apiClient.get<MaterialSample[]>(
+              "collection-api/material-sample",
+              {
+                filter: {
+                  rsql: `materialSampleName=="${resource?.materialSampleName}";group==${group}`
+                }
               }
+            );
+
+            // If multiple resources with matching names, pause upload and display table to user to select resource to append to
+            if (resp.data.length > 1) {
+              existingResources.current = resp.data;
+              pause();
+              return;
             }
-          );
-          if (resp.data.length > 1) {
-            setExistingResources(resp.data);
-            pause();
+            // Else Only one resource with matching name, append data to resource
+            existingResource.current = resp.data[0];
+            if (existingResource.current) {
+              resource.id = existingResource.current.id;
+              resourcesUpdatedCount.current = resourcesUpdatedCount.current + 1;
+            }
           }
-          const existingResource = resp.data[0];
-          if (existingResource) {
-            resource.id = existingResource.id;
-            resourcesUpdatedCount.current = resourcesUpdatedCount.current + 1;
-          }
+        } else {
+          // There was a cached existingResource selected by user, append data to resource selected by user
+          resource.id = existingResource.current.id;
+          resourcesUpdatedCount.current = resourcesUpdatedCount.current + 1;
         }
 
         for (const key of Object.keys(resource)) {
@@ -169,6 +183,7 @@ export function SaveWorkbookProgress({
         { apiBaseUrl }
       );
       setSavedResources([...savedResources, ...savedArgs]);
+      existingResource.current = undefined;
     }
 
     // Split big array into small chunks, which chunk size is 5.
@@ -188,10 +203,12 @@ export function SaveWorkbookProgress({
         await delay(10); // Yield to render the progress bar
         break;
       }
-      const next = i + chunkSize;
-      setNow(next);
-      saveProgress(next);
-      await delay(10); // Yield to render the progress bar
+      if (statusRef.current === "SAVING") {
+        const next = i + chunkSize;
+        setNow(next);
+        saveProgress(next);
+        await delay(10); // Yield to render the progress bar
+      }
     }
     if (statusRef.current === "SAVING") {
       statusRef.current = "FINISHED";
@@ -274,9 +291,11 @@ export function SaveWorkbookProgress({
       )}
       {statusRef.current === "PAUSED" && now < workbookResources.length && (
         <div className="mt-3 text-center">
-          {existingResources.length > 0 && (
+          {existingResources.current.length > 0 ? (
             <QueryTable<any>
-              filter={{ id: existingResources.join(",") }}
+              filter={{
+                rsql: `materialSampleName=="${existingResources.current?.[0].materialSampleName}";group==${group}`
+              }}
               path={"collection-api/material-sample"}
               columns={[
                 {
@@ -301,34 +320,64 @@ export function SaveWorkbookProgress({
                     </Link>
                   ),
                   accessorKey: "materialSampleName"
+                },
+                {
+                  cell: ({
+                    row: {
+                      original: { id }
+                    }
+                  }) => id,
+                  accessorKey: "id"
+                },
+                {
+                  cell: ({ row: { original } }) => (
+                    <Button
+                      className="btn btn-primary select-sample"
+                      onClick={() => {
+                        existingResource.current = original;
+                        statusRef.current = "SAVING";
+                        resumeSavingWorkbook();
+                        saveWorkbook();
+                      }}
+                    >
+                      <DinaMessage id="selectAndResume" />
+                    </Button>
+                  ),
+                  size: 250,
+                  accessorKey: "select",
+                  enableSorting: false
                 }
               ]}
             />
+          ) : (
+            <>
+              {" "}
+              <p>
+                <DinaMessage id="confirmToResumeSavingWorkbook" />
+              </p>
+              <Button
+                className="mt-1 mb-2 btn"
+                onClick={() => {
+                  statusRef.current = "SAVING";
+                  resumeSavingWorkbook();
+                  saveWorkbook();
+                }}
+              >
+                <DinaMessage id="yes" />
+              </Button>
+              <Button
+                variant="secondary"
+                className="mt-1 mb-2 ms-4"
+                onClick={() => {
+                  statusRef.current = "CANCELED";
+                  cancelSavingWorkbook(type);
+                  onWorkbookCanceled?.();
+                }}
+              >
+                <DinaMessage id="no" />
+              </Button>
+            </>
           )}
-          <p>
-            <DinaMessage id="confirmToResumeSavingWorkbook" />
-          </p>
-          <Button
-            className="mt-1 mb-2 btn"
-            onClick={() => {
-              statusRef.current = "SAVING";
-              resumeSavingWorkbook();
-              saveWorkbook();
-            }}
-          >
-            <DinaMessage id="yes" />
-          </Button>
-          <Button
-            variant="secondary"
-            className="mt-1 mb-2 ms-4"
-            onClick={() => {
-              statusRef.current = "CANCELED";
-              cancelSavingWorkbook(type);
-              onWorkbookCanceled?.();
-            }}
-          >
-            <DinaMessage id="no" />
-          </Button>
         </div>
       )}
     </>
