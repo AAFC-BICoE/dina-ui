@@ -26,7 +26,6 @@ const TABLE_COLUMNS: ColumnDefinition<PcrBatch>[] = [
     }) => <Link href={`/seqdb/pcr-batch/view?id=${id}`}>{name || id}</Link>,
     accessorKey: "name"
   },
-  "group",
   "primerForward.name",
   "primerReverse.name",
   groupCell("group"),
