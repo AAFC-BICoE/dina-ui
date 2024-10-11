@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FaInfoCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
 import { useCopyToNextSample } from "./material-sample/next-sample-functions";
+import { useFormikContext } from "formik";
 
 export interface SaveAndCopyToNextSuccessAlertProps {
   id: string;
@@ -20,7 +21,7 @@ export function SaveAndCopyToNextSuccessAlert({
 }: SaveAndCopyToNextSuccessAlertProps) {
   const { formatMessage } = useDinaIntl();
   const copyToNextSampleInfo = useCopyToNextSample();
-  // console.log(copyToNextSampleInfo)
+  const formik = useFormikContext<any>();
 
   return (
     <>
@@ -69,7 +70,10 @@ export function SaveAndCopyToNextSuccessAlert({
                   className="mt-3"
                   variant="secondary"
                   onClick={() =>
-                    warning.duplicateAnyway(copyToNextSampleInfo.originalSample)
+                    warning.duplicateAnyway(
+                      copyToNextSampleInfo.originalSample,
+                      formik
+                    )
                   }
                 >
                   Duplicate {warning.componentName} from "{displayName}"

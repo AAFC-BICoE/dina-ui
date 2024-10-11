@@ -25,7 +25,8 @@ import {
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
   AssemblageSelectSection,
-  OrganismsField
+  OrganismsField,
+  useCopyToNextSample
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
@@ -61,6 +62,7 @@ import { RestrictionField } from "./RestrictionField";
 import { CollectionSelectSection } from "../CollectionSelectSection";
 import { NotPubliclyReleasableSection } from "../../tag-editor/NotPubliclyReleasableSection";
 import { ShowParentAttributesField } from "./ShowParentAttributesField";
+import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -205,6 +207,8 @@ export function MaterialSampleForm({
       reduceRendering,
       visibleManagedAttributeKeys
     });
+
+  const copyFromNextSample = useCopyToNextSample();
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
@@ -501,6 +505,22 @@ export function MaterialSampleForm({
       isBulkEditAllTab={isBulkEditAllTab}
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
+      {copyFromNextSample && (
+        <>
+          <SaveAndCopyToNextSuccessAlert
+            id={copyFromNextSample.lastCreatedId ?? ""}
+            displayName={
+              !!copyFromNextSample.originalSample.materialSampleName?.length
+                ? copyFromNextSample.originalSample.materialSampleName
+                : copyFromNextSample.lastCreatedId ?? ""
+            }
+            entityPath={"collection/material-sample"}
+          />
+          <h1 id="wb-cont">
+            <DinaMessage id={"addMaterialSampleTitle"} />
+          </h1>
+        </>
+      )}
       {buttonBar}
       {formLayout}
     </DinaForm>

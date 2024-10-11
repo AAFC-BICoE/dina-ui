@@ -2,6 +2,7 @@ import { PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import { MaterialSample } from "../../../types/collection-api";
 import { createContext, useContext } from "react";
+import { FormikContextType } from "formik";
 
 /** Calculates the next sample name based on the previous name's suffix. */
 export function nextSampleName(previousName?: string | null): string {
@@ -42,21 +43,59 @@ export function nextSampleInitialValues(
     ...copiedValues
   } = originalSample;
 
+  let notCopiedOverWarnings: NotCopiedOverWarning[] = [];
+
   // Omit the IDs from the original sample's organisms:
   const newOrganisms = organism?.map((org) => org && { ...org, id: undefined });
 
   // Calculate the next suffix:
   const newMaterialSampleName = nextSampleName(materialSampleName);
 
-  // Remove storage if coordinates are provided since that's specific to
+  const storageUnitUsageFound = !!copiedValues?.storageUnitUsage?.id;
+  const attachmentFound =
+    !!copiedValues?.attachment && copiedValues?.attachment?.length > 0;
+
+  // Remove storage if coordinates are provided since that's specific to the previous material sample.
+  if (storageUnitUsageFound) {
+    notCopiedOverWarnings = [
+      ...notCopiedOverWarnings,
+      {
+        componentName: "Storage",
+        duplicateAnyway(materialSample, formik) {
+          formik.setFieldValue("storageUnit", materialSample.storageUnit);
+          formik.setFieldValue(
+            "storageUnitUsage",
+            materialSample.storageUnitUsage
+          );
+        }
+      }
+    ];
+  }
+
+  // Attachments should not be copied over since they are also specific to the previous material sample.
+  if (attachmentFound) {
+    notCopiedOverWarnings = [
+      ...notCopiedOverWarnings,
+      {
+        componentName: "Attachment",
+        duplicateAnyway(materialSample, formik) {
+          formik.setFieldValue("attachment", materialSample.attachment);
+        }
+      }
+    ];
+  }
 
   const initialValues = {
     ...copiedValues,
     materialSampleName: newMaterialSampleName,
-    organism: newOrganisms
+    organism: newOrganisms,
+    ...(storageUnitUsageFound
+      ? { storageUnit: undefined, storageUnitUsage: undefined }
+      : {}),
+    ...(attachmentFound ? { attachment: undefined } : {})
   };
 
-  return initialValues;
+  return { initialValues, notCopiedOverWarnings };
 }
 
 export interface NotCopiedOverWarning {
@@ -67,7 +106,10 @@ export interface NotCopiedOverWarning {
    * @param materialSample Original material sample to alter.
    * @returns
    */
-  duplicateAnyway: (materialSample: MaterialSample) => void;
+  duplicateAnyway: (
+    materialSample: MaterialSample,
+    formik: FormikContextType<any>
+  ) => void;
 }
 
 export interface CopyToNextSampleContextI {
@@ -75,6 +117,9 @@ export interface CopyToNextSampleContextI {
    * The original initial values before changes are made.
    */
   originalSample: MaterialSample;
+
+  /** UUID of the copied material sample */
+  lastCreatedId: string;
 
   /** Warnings to display to the user and logic for adding it back if the user wants to. */
   notCopiedOverWarnings: NotCopiedOverWarning[];

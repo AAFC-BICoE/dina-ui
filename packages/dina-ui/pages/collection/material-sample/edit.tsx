@@ -126,36 +126,16 @@ export default function MaterialSampleEditPage() {
           })
         ) : copyFromId ? (
           withResponse(copyFromQuery, ({ data: originalSample }) => {
-            const initialValues = nextSampleInitialValues(originalSample);
+            const { initialValues, notCopiedOverWarnings } =
+              nextSampleInitialValues(originalSample);
             return (
               <CopyToNextSampleProvider
                 value={{
                   originalSample,
-                  notCopiedOverWarnings: [
-                    {
-                      componentName: "storage",
-                      duplicateAnyway(materialSample) {
-                        if (materialSample) {
-                          return;
-                        }
-                        return;
-                      }
-                    }
-                  ]
+                  notCopiedOverWarnings,
+                  lastCreatedId: lastCreatedId ?? ""
                 }}
               >
-                <SaveAndCopyToNextSuccessAlert
-                  id={lastCreatedId ?? ""}
-                  displayName={
-                    !!originalSample.materialSampleName?.length
-                      ? originalSample.materialSampleName
-                      : lastCreatedId ?? ""
-                  }
-                  entityPath={"collection/material-sample"}
-                />
-                <h1 id="wb-cont">
-                  <DinaMessage id={title} />
-                </h1>
                 <MaterialSampleForm
                   {...sampleFormProps}
                   materialSample={initialValues}
