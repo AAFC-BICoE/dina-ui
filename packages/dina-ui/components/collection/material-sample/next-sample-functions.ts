@@ -3,6 +3,7 @@ import { padStart } from "lodash";
 import { MaterialSample } from "../../../types/collection-api";
 import { createContext, useContext } from "react";
 import { FormikContextType } from "formik";
+import { useMaterialSampleSave } from "./useMaterialSample";
 
 /** Calculates the next sample name based on the previous name's suffix. */
 export function nextSampleName(previousName?: string | null): string {
@@ -61,12 +62,13 @@ export function nextSampleInitialValues(
       ...notCopiedOverWarnings,
       {
         componentName: "Storage",
-        duplicateAnyway(materialSample, formik) {
+        duplicateAnyway(materialSample, formik, dataComponentState) {
           formik.setFieldValue("storageUnit", materialSample.storageUnit);
           formik.setFieldValue(
             "storageUnitUsage",
             materialSample.storageUnitUsage
           );
+          dataComponentState.setEnableStorage(true);
         }
       }
     ];
@@ -78,7 +80,7 @@ export function nextSampleInitialValues(
       ...notCopiedOverWarnings,
       {
         componentName: "Attachment",
-        duplicateAnyway(materialSample, formik) {
+        duplicateAnyway(materialSample, formik, _) {
           formik.setFieldValue("attachment", materialSample.attachment);
         }
       }
@@ -108,7 +110,10 @@ export interface NotCopiedOverWarning {
    */
   duplicateAnyway: (
     materialSample: MaterialSample,
-    formik: FormikContextType<any>
+    formik: FormikContextType<any>,
+    componentStates: ReturnType<
+      typeof useMaterialSampleSave
+    >["dataComponentState"]
   ) => void;
 }
 

@@ -515,6 +515,7 @@ export function MaterialSampleForm({
                 : copyFromNextSample.lastCreatedId ?? ""
             }
             entityPath={"collection/material-sample"}
+            dataComponentState={dataComponentState}
           />
           <h1 id="wb-cont">
             <DinaMessage id={"addMaterialSampleTitle"} />
