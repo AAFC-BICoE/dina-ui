@@ -63,11 +63,14 @@ export function nextSampleInitialValues(
       {
         componentName: "Storage",
         duplicateAnyway(materialSample, formik, dataComponentState) {
+          // Remove the ID here so a new one is generated on save.
+          const duplicatedStorageUnitUsage = {
+            ...materialSample.storageUnitUsage,
+            id: undefined
+          };
+
           formik.setFieldValue("storageUnit", materialSample.storageUnit);
-          formik.setFieldValue(
-            "storageUnitUsage",
-            materialSample.storageUnitUsage
-          );
+          formik.setFieldValue("storageUnitUsage", duplicatedStorageUnitUsage);
           dataComponentState.setEnableStorage(true);
         }
       }
@@ -128,6 +131,9 @@ export interface CopyToNextSampleContextI {
 
   /** Warnings to display to the user and logic for adding it back if the user wants to. */
   notCopiedOverWarnings: NotCopiedOverWarning[];
+
+  /** Used to remove a warning from once it has been dismissed or actioned. */
+  removeWarning: (warningToRemove: NotCopiedOverWarning) => void;
 }
 
 const CopyToNextSampleContext = createContext<CopyToNextSampleContextI | null>(

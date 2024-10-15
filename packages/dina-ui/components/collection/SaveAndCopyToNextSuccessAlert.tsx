@@ -74,13 +74,17 @@ export function SaveAndCopyToNextSuccessAlert({
                 <Button
                   className="mt-3"
                   variant="secondary"
-                  onClick={() =>
+                  onClick={() => {
+                    // Perform logic to add it back, this is defined in the next-sample-functions.
                     warning.duplicateAnyway(
                       copyToNextSampleInfo.originalSample,
                       formik,
                       dataComponentState
-                    )
-                  }
+                    );
+
+                    // Remove this warning since it's been actioned.
+                    copyToNextSampleInfo.removeWarning(warning);
+                  }}
                 >
                   Duplicate {warning.componentName} from "{displayName}"
                 </Button>

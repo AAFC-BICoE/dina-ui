@@ -11,7 +11,8 @@ import {
   nextSampleInitialValues,
   useMaterialSampleFormTemplateSelectState,
   useMaterialSampleQuery,
-  CopyToNextSampleProvider
+  CopyToNextSampleProvider,
+  NotCopiedOverWarning
 } from "../../../components";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -32,6 +33,8 @@ export default function MaterialSampleEditPage() {
 
   /** The page to redirect to after saving. */
   const [saveRedirect, setSaveRedirect] = useState<PostSaveRedirect>("VIEW");
+
+  const [copyWarnings, setCopyWarnings] = useState<NotCopiedOverWarning[]>([]);
 
   async function moveToViewPage(savedId: string) {
     await router.push(`/collection/material-sample/view?id=${savedId}`);
@@ -128,12 +131,25 @@ export default function MaterialSampleEditPage() {
           withResponse(copyFromQuery, ({ data: originalSample }) => {
             const { initialValues, notCopiedOverWarnings } =
               nextSampleInitialValues(originalSample);
+
+            // Set the initial warnings found.
+            setCopyWarnings(notCopiedOverWarnings);
+
+            const removeWarning = (warningToRemove: NotCopiedOverWarning) => {
+              setCopyWarnings(
+                copyWarnings.filter(
+                  (warn) => warn.componentName === warningToRemove.componentName
+                )
+              );
+            };
+
             return (
               <CopyToNextSampleProvider
                 value={{
                   originalSample,
-                  notCopiedOverWarnings,
-                  lastCreatedId: lastCreatedId ?? ""
+                  notCopiedOverWarnings: copyWarnings,
+                  lastCreatedId: lastCreatedId ?? "",
+                  removeWarning
                 }}
               >
                 <MaterialSampleForm
