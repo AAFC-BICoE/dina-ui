@@ -69,16 +69,17 @@ export function useColumnMapping() {
   const [fieldOptions, setFieldOptions] = useState<FieldOptionType[]>([]);
   const [fieldMap, setFieldMap] = useState<FieldMapType[]>([]);
 
-  const { loading: attrLoading, response: attrResp } = useQuery<
-    ManagedAttribute[]
-  >({
+  const {
+    loading: attrLoadingMaterialSample,
+    response: attrRespMaterialSample
+  } = useQuery<ManagedAttribute[]>({
     path: "collection-api/managed-attribute",
     filter: filterBy([], {
       extraFilters: [
         {
           selector: "managedAttributeComponent",
-          comparison: "==",
-          arguments: "MATERIAL_SAMPLE"
+          comparison: "=in=",
+          arguments: ["MATERIAL_SAMPLE", "PREPARATION", "COLLECTING_EVENT"]
         }
       ]
     })(""),
@@ -184,7 +185,7 @@ export function useColumnMapping() {
   );
 
   const loadingData =
-    attrLoading ||
+    attrLoadingMaterialSample ||
     assemblageLoading ||
     collectionLoading ||
     preparationTypeLoading ||
@@ -196,7 +197,7 @@ export function useColumnMapping() {
     taxonomicRankLoading ||
     metadataLoading;
 
-  const managedAttributes = attrResp?.data || [];
+  const managedAttributes = [...(attrRespMaterialSample?.data ?? [])];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
   const assemblages = (assemblageResp?.data || []).map((item) => ({
     ...item,
@@ -505,12 +506,34 @@ export function useColumnMapping() {
             columnHeader.toLowerCase().trim()
         );
         if (targetManagedAttr) {
-          map.push({
-            targetField: "managedAttributes",
-            skipped: false,
-            targetKey: targetManagedAttr,
-            columnHeader
-          });
+          if (
+            targetManagedAttr.managedAttributeComponent === "MATERIAL_SAMPLE"
+          ) {
+            map.push({
+              targetField: "managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr,
+              columnHeader
+            });
+          } else if (
+            targetManagedAttr.managedAttributeComponent === "PREPARATION"
+          ) {
+            map.push({
+              targetField: "preparationManagedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr,
+              columnHeader
+            });
+          } else if (
+            targetManagedAttr.managedAttributeComponent === "COLLECTING_EVENT"
+          ) {
+            map.push({
+              targetField: "collectingEvent.managedAttributes",
+              skipped: false,
+              targetKey: targetManagedAttr,
+              columnHeader
+            });
+          }
         } else if (targetTaxonomicRank) {
           map.push({
             targetField: "organism.determination.scientificNameDetails",
