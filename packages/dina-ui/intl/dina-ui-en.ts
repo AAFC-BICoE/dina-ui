@@ -1075,5 +1075,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editContents: "Edit Contents",
   storageUnitGridTitle: "Storage Unit Grid",
   field_appendData_tooltip:
-    "If enabled, append data to existing record with matching name. Otherwise, create new record."
+    "If enabled, append data to existing record with matching name. Otherwise, create new record.",
+  selectAndResume: "Select and Resume"
 };
