@@ -381,21 +381,22 @@ export function QueryPage<TData extends KitsuResource>({
   const [submittedQueryBuilderTree, setSubmittedQueryBuilderTree] =
     useState<ImmutableTree>(defaultQueryTree());
 
-  // The query builder configuration.
-  const { queryBuilderConfig, indexMap } = useQueryBuilderConfig({
-    indexName,
-    dynamicFieldMapping,
-    enableRelationshipPresence,
-    customViewFields,
-    nonSearchableColumns
-  });
-
   // Groups selected for the search.
   const GROUP_STORAGE_KEY = uniqueName + "_groupStorage";
   const [groups, setGroups] = useLocalStorage<string[]>(
     GROUP_STORAGE_KEY,
     groupNames ?? []
   );
+
+  // The query builder configuration.
+  const { queryBuilderConfig, indexMap } = useQueryBuilderConfig({
+    indexName,
+    groups: groups ?? [],
+    dynamicFieldMapping,
+    enableRelationshipPresence,
+    customViewFields,
+    nonSearchableColumns
+  });
 
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(
