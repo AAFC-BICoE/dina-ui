@@ -2,12 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
-import {
-  AreYouSureModal,
-  FormikButton,
-  QueryTable,
-  useApiClient
-} from "../../../common-ui/lib";
+import { dateCell, QueryTable, useApiClient } from "../../../common-ui/lib";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
@@ -343,7 +338,7 @@ export function SaveWorkbookProgress({
                         href={`/collection/material-sample/view?id=${id}`}
                         passHref={true}
                       >
-                        <a>
+                        <a target="_blank">
                           {materialSampleName ||
                             dwcOtherCatalogNumbers?.join?.(", ") ||
                             id}
@@ -360,6 +355,8 @@ export function SaveWorkbookProgress({
                     }) => id,
                     accessorKey: "id"
                   },
+                  "createdBy",
+                  dateCell("createdOn"),
                   {
                     cell: ({ row: { original } }) => (
                       <Button
@@ -379,6 +376,7 @@ export function SaveWorkbookProgress({
                     enableSorting: false
                   }
                 ]}
+                defaultSort={[{ desc: true, id: "createdOn" }]}
               />
             ) : (
               <>
