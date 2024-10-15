@@ -888,8 +888,11 @@ describe("Material Sample Edit Page", () => {
       })
     ).toEqual({
       // Omits id/createdBy/createdOn, increments the name:
-      type: "material-sample",
-      materialSampleName: "MY-SAMPLE-002"
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-002"
+      },
+      notCopiedOverWarnings: []
     });
 
     expect(
@@ -900,8 +903,11 @@ describe("Material Sample Edit Page", () => {
       })
     ).toEqual({
       // Increments the name:
-      type: "material-sample",
-      materialSampleName: "MY-SAMPLE-10"
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-10"
+      },
+      notCopiedOverWarnings: []
     });
 
     expect(
@@ -912,8 +918,11 @@ describe("Material Sample Edit Page", () => {
       })
     ).toEqual({
       // No way to increment the name, so it becomes blank:
-      type: "material-sample",
-      materialSampleName: ""
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: ""
+      },
+      notCopiedOverWarnings: []
     });
 
     // Organisms should not be linked to multiple Samples.
@@ -929,12 +938,87 @@ describe("Material Sample Edit Page", () => {
         ]
       })
     ).toEqual({
-      type: "material-sample",
-      materialSampleName: "MY-SAMPLE-101",
-      // The original organism IDs should be omitted:
-      organism: [
-        { type: "organism", lifeStage: "test lifestage 1" },
-        { type: "organism", lifeStage: "test lifestage 2" }
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-101",
+        // The original organism IDs should be omitted:
+        organism: [
+          { type: "organism", lifeStage: "test lifestage 1" },
+          { type: "organism", lifeStage: "test lifestage 2" }
+        ]
+      },
+      notCopiedOverWarnings: []
+    });
+  });
+
+  it("Creates the next material sample and provides a warning if they wish to duplicate storage unit usage", () => {
+    expect(
+      nextSampleInitialValues({
+        id: "123",
+        type: "material-sample",
+        createdBy: "Mat",
+        createdOn: "2020-05-04",
+        materialSampleName: "MY-SAMPLE-001",
+        storageUnit: {
+          id: "f50d2f5f-45fa-4893-b68f-f88960dd271a",
+          type: "storage-unit",
+          group: "aafc",
+          isGeneric: false,
+          name: "test"
+        },
+        storageUnitUsage: {
+          id: "b9fb78e1-d9d1-45ae-aeac-e52f2e20d63e",
+          type: "storage-unit-usage"
+        }
+      })
+    ).toEqual({
+      // storage unit and storage unit usage should not automatically provided, warning provided:
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-002",
+        storageUnit: undefined,
+        storageUnitUsage: undefined
+      },
+      notCopiedOverWarnings: [
+        {
+          componentName: "Storage",
+          duplicateAnyway: expect.anything()
+        }
+      ]
+    });
+  });
+
+  it("Creates the next material sample and provides a warning if they wish to duplicate attachments", () => {
+    expect(
+      nextSampleInitialValues({
+        id: "123",
+        type: "material-sample",
+        createdBy: "Mat",
+        createdOn: "2020-05-04",
+        materialSampleName: "MY-SAMPLE-001",
+        attachment: [
+          {
+            id: "a9b7c797-ab76-4e5d-98da-45c7415c7aea",
+            type: "metadata"
+          },
+          {
+            id: "6f679c58-468d-45af-95bb-d87f90768831",
+            type: "metadata"
+          }
+        ]
+      })
+    ).toEqual({
+      // attachments should not automatically provided, warning provided:
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-002",
+        attachment: undefined
+      },
+      notCopiedOverWarnings: [
+        {
+          componentName: "Attachment",
+          duplicateAnyway: expect.anything()
+        }
       ]
     });
   });

@@ -800,6 +800,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   save: "Save",
   saveAll: "Save All",
   saveAndCopyToNext: "Save & Copy To Next",
+  saveAndCopyToNextWarning:
+    'The "{componentName}" data component was not automatically copied over since it\'s specific to the previous Material Sample. Would you like to duplicate it anyway?',
+  saveAndCopyToNextWarningButton:
+    'Duplicate {componentName} from "{displayName}"',
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveAndGoToViewPageButton: "Save & Go To View Page",
   saveAndMarkAsComplete: "Save and Mark as Complete",
