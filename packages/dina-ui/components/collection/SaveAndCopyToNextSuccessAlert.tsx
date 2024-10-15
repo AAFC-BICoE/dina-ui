@@ -64,10 +64,9 @@ export function SaveAndCopyToNextSuccessAlert({
                 <div className="d-flex gap-3">
                   <FaInfoCircle style={{ width: "24px", height: "24px" }} />
                   <span style={{ fontSize: "1.2em", font: "fw-bold" }}>
-                    The <strong>{warning.componentName}</strong> data component
-                    was not automatically copied over since it's specific to the
-                    previous Material Sample. Would you like to duplicate it
-                    anyway?
+                    {formatMessage("saveAndCopyToNextWarning", {
+                      componentName: warning.componentName
+                    })}
                   </span>
                 </div>
 
@@ -86,7 +85,10 @@ export function SaveAndCopyToNextSuccessAlert({
                     copyToNextSampleInfo.removeWarning(warning);
                   }}
                 >
-                  Duplicate {warning.componentName} from "{displayName}"
+                  {formatMessage("saveAndCopyToNextWarningButton", {
+                    componentName: warning.componentName,
+                    displayName
+                  })}
                 </Button>
               </div>
             ))}

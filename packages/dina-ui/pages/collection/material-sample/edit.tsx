@@ -14,7 +14,6 @@ import {
   CopyToNextSampleProvider,
   NotCopiedOverWarning
 } from "../../../components";
-import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
@@ -34,7 +33,9 @@ export default function MaterialSampleEditPage() {
   /** The page to redirect to after saving. */
   const [saveRedirect, setSaveRedirect] = useState<PostSaveRedirect>("VIEW");
 
-  const [copyWarnings, setCopyWarnings] = useState<NotCopiedOverWarning[]>([]);
+  const [copyWarnings, setCopyWarnings] = useState<
+    NotCopiedOverWarning[] | undefined
+  >(undefined);
 
   async function moveToViewPage(savedId: string) {
     await router.push(`/collection/material-sample/view?id=${savedId}`);
@@ -132,13 +133,19 @@ export default function MaterialSampleEditPage() {
             const { initialValues, notCopiedOverWarnings } =
               nextSampleInitialValues(originalSample);
 
-            // Set the initial warnings found.
-            setCopyWarnings(notCopiedOverWarnings);
+            // Set the initial warnings found, only should be set on initial load.
+            if (copyWarnings === undefined) {
+              setCopyWarnings(notCopiedOverWarnings);
+            }
 
             const removeWarning = (warningToRemove: NotCopiedOverWarning) => {
+              if (copyWarnings === undefined) {
+                return;
+              }
+
               setCopyWarnings(
                 copyWarnings.filter(
-                  (warn) => warn.componentName === warningToRemove.componentName
+                  (warn) => warn.componentName !== warningToRemove.componentName
                 )
               );
             };
@@ -147,7 +154,7 @@ export default function MaterialSampleEditPage() {
               <CopyToNextSampleProvider
                 value={{
                   originalSample,
-                  notCopiedOverWarnings: copyWarnings,
+                  notCopiedOverWarnings: copyWarnings ?? [],
                   lastCreatedId: lastCreatedId ?? "",
                   removeWarning
                 }}
