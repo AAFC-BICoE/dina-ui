@@ -1,7 +1,4 @@
-import {
-  mountWithAppContext,
-  mountWithAppContext2
-} from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FormikButton } from "../FormikButton";
 import { MetersField, toMeters } from "../MetersField";
