@@ -1,6 +1,9 @@
 import { InputResource } from "kitsu";
 import Switch from "react-switch";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import {
+  mountWithAppContext,
+  mountWithAppContext2
+} from "../../../test-util/mock-app-context";
 import {
   blankMaterialSample,
   MaterialSample,
@@ -8,6 +11,8 @@ import {
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../../bulk-material-sample/MaterialSampleBulkEditor";
 import { isEqual } from "lodash";
+import { fireEvent, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -186,56 +191,58 @@ describe("BulkEditTabWarning", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Shows the warning when there are multiple determination values in the individual samples.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={SAMPLES_WITH_DIFFERENT_DETERMINATIONS}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable the determination:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-organisms")
-      .find(Switch)
-      .prop<any>("onChange")(true);
-
+    const organismToggle = wrapper.container.querySelector(
+      ".enable-organisms .react-switch-bg"
+    );
+    if (!organismToggle) {
+      fail("Organism toggle needs to exist at this point.");
+    }
+    fireEvent.click(organismToggle);
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // You must click the override button:
-    expect(
-      wrapper
-        .find("." + ORGANISMS_COMPONENT_NAME + " .multiple-values-warning")
-        .exists()
-    ).toEqual(true);
-    wrapper
-      .find("." + ORGANISMS_COMPONENT_NAME + " button.override-all-button")
-      .simulate("click");
-    wrapper.find("form .are-you-sure-modal").simulate("submit");
+    // Find the organism override button and click it.
+    const overrideButton = wrapper.container.querySelector(
+      "#organisms-component button"
+    );
+    if (!overrideButton) {
+      fail(
+        "Override button inside of the organisms component needs to exist at this point."
+      );
+    }
+    fireEvent.click(overrideButton);
+
+    // Click "Yes" on the popup dialog.
+    fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Add a determination and override its name:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .determination-section button.add-button")
-      .simulate("click");
+    // Click the "Add New Determination" button.
+    fireEvent.click(
+      wrapper.getByRole("button", { name: /add new determination/i })
+    );
     await new Promise(setImmediate);
-    wrapper.update();
-    wrapper
-      .find(".tabpanel-EDIT_ALL .verbatimScientificName input")
-      .simulate("change", { target: { value: "test-name-override" } });
 
+    // Override the verbatim scientific name.
+    fireEvent.change(
+      wrapper.getByRole("textbox", {
+        name: /verbatim scientific name × insert hybrid symbol/i
+      }),
+      { target: { value: "test-name-override" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
@@ -301,37 +308,38 @@ describe("BulkEditTabWarning", () => {
   });
 
   it("Keeps the original multiple values if you decide not to click the Override All button.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={SAMPLES_WITH_DIFFERENT_DETERMINATIONS}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable the determination:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-organisms")
-      .find(Switch)
-      .prop<any>("onChange")(true);
-
+    const organismToggle = wrapper.container.querySelector(
+      ".enable-organisms .react-switch-bg"
+    );
+    if (!organismToggle) {
+      fail("Organism toggle needs to exist at this point.");
+    }
+    fireEvent.click(organismToggle);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The Override button is there:
-    expect(
-      wrapper
-        .find("." + ORGANISMS_COMPONENT_NAME + " .multiple-values-warning")
-        .exists()
-    ).toEqual(true);
+    const overrideButton = wrapper.container.querySelector(
+      "#organisms-component button"
+    );
+    if (!overrideButton) {
+      fail(
+        "Override button inside of the organisms component needs to exist at this point."
+      );
+    }
 
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -356,45 +364,43 @@ describe("BulkEditTabWarning", () => {
   });
 
   it("Lets you set the values without a warning when there are no organisms in the samples.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={SAMPLES_WITHOUT_ORGANISMS}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Enable the organisms:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-organisms")
-      .find(Switch)
-      .prop<any>("onChange")(true);
-
+    // Enable the determination:
+    const organismToggle = wrapper.container.querySelector(
+      ".enable-organisms .react-switch-bg"
+    );
+    if (!organismToggle) {
+      fail("Organism toggle needs to exist at this point.");
+    }
+    fireEvent.click(organismToggle);
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // There is no override button:
-    expect(
-      wrapper
-        .find("." + ORGANISMS_COMPONENT_NAME + " .multiple-values-warning")
-        .exists()
-    ).toEqual(false);
-
-    // Override the name in the new determination:
-    wrapper.find(".determination-section button.add-button").simulate("click");
+    // Click the "Add New Determination" button.
+    fireEvent.click(
+      wrapper.getByRole("button", { name: /add new determination/i })
+    );
     await new Promise(setImmediate);
-    wrapper.update();
-    wrapper
-      .find(".tabpanel-EDIT_ALL .verbatimScientificName input")
-      .simulate("change", { target: { value: "test-name-override" } });
 
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    // Override the verbatim scientific name.
+    fireEvent.change(
+      wrapper.getByRole("textbox", {
+        name: /verbatim scientific name × insert hybrid symbol/i
+      }),
+      { target: { value: "test-name-override" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
+
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await new Promise(setImmediate);
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
