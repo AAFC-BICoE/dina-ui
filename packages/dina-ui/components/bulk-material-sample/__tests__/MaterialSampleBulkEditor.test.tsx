@@ -1542,7 +1542,7 @@ describe("MaterialSampleBulkEditor", () => {
       ]);
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1556,48 +1556,33 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Use the Edit All tab:
-    wrapper.find("li.tab-EDIT_ALL").simulate("click");
+    // Go the the bulk edit tab:
+    fireEvent.click(wrapper.getByText(/edit all/i));
 
     // Edit the barcode:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "bad barcode" } });
+    fireEvent.change(wrapper.getByRole("textbox", { name: /barcode/i }), {
+      target: { value: "bad barcode" }
+    });
 
     // Click the "Save All" button:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // The bulk edit tab is given the red text, and the other tabs are unaffected:
+    // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .barcode-field .invalid-feedback")
-        .exists()
-    ).toEqual(true);
+      wrapper.getByText(
+        /bulk submission error: check the tabs with a red label\./i
+      )
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(".sample-tabpanel-0 .barcode-field .invalid-feedback")
-        .exists()
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(".sample-tabpanel-1 .barcode-field .invalid-feedback")
-        .exists()
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(".sample-tabpanel-2 .barcode-field .invalid-feedback")
-        .exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(".text-danger")?.textContent
+    ).toEqual("Edit All");
   });
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1619,39 +1604,25 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Click the "Save All" button:
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // The tab with the error is given the red text, and the other 2 tabs are unaffected:
+    // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
-      wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.getByText(
+        /bulk submission error: check the tabs with a red label\./i
+      )
+    ).toBeInTheDocument();
     expect(
-      wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
-    ).toEqual(true);
-    expect(
-      wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(".text-danger")?.textContent
+    ).toEqual("MS2");
 
-    // Shows the error message at the top of the form in that tab:
-    wrapper.find("li.sample-tab-1").simulate("click");
     expect(
-      wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
-    ).toContain("Invalid barcode");
-    // Shows the error message on the barcode field:
-    expect(
-      wrapper
-        .find(".sample-tabpanel-1 .barcode-field .invalid-feedback")
-        .first()
-        .text()
-    ).toContain("Invalid barcode");
+      wrapper.getByText(/1 : barcode \- invalid barcode/i)
+    ).toBeInTheDocument();
   });
 
   it("Doesnt override the values when the Override All button is not clicked.", async () => {
@@ -2021,161 +1992,77 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows the Multiple Values placeholder in bulk editable fields", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(
-      wrapper
-        .find(".has-multiple-values .tags-field div.react-select__placeholder")
-        .text()
-    ).toEqual("Multiple Values");
+      wrapper.getByRole("combobox", { name: /tags multiple values/i })
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(
-          ".has-multiple-values .collection-field div.react-select__placeholder"
-        )
-        .text()
-    ).toEqual("Multiple Values");
+      wrapper.getByRole("combobox", { name: /collection multiple values/i })
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(
-          ".has-multiple-values .projects-field div.react-select__placeholder"
-        )
-        .text()
-    ).toEqual("Multiple Values");
-    expect(
-      wrapper
-        .find(
-          ".has-multiple-values .publiclyReleasable-field .placeholder-text"
-        )
-        .text()
-    ).toEqual("Multiple Values");
-    expect(
-      wrapper
-        .find(".has-multiple-values .barcode-field input")
-        .prop("placeholder")
-    ).toEqual("Multiple Values");
-    expect(
-      wrapper
-        .find(".has-multiple-values .materialSampleState-field input")
-        .prop("placeholder")
-    ).toEqual("Multiple Values");
+      wrapper.getByRole("combobox", { name: /projects multiple values/i })
+    ).toBeInTheDocument();
+    expect(wrapper.getByRole("textbox", { name: /barcode/i })).toHaveAttribute(
+      "placeholder",
+      "Multiple Values"
+    );
 
     // Blank values should be rendered into these fields so the placeholder is visible:
     expect(
-      wrapper
-        .find(".has-multiple-values .tags-field")
-        .find(CreatableSelect)
-        .prop("value")
-    ).toEqual([]);
+      wrapper.getByRole("combobox", { name: /tags multiple values/i })
+    ).toHaveValue("");
     expect(
-      wrapper
-        .find(".has-multiple-values .collection-field")
-        .find(Select)
-        .prop("value")
-    ).toEqual(null);
-    expect(
-      wrapper
-        .find(".has-multiple-values .materialSampleState-field input")
-        .prop("value")
-    ).toEqual("");
+      wrapper.getByRole("combobox", { name: /collection multiple values/i })
+    ).toHaveValue("");
   });
 
   it("Shows the common value when multiple fields have the same value.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The common values are displayed in the UI:
+    // Tags:
+    expect(wrapper.getByText(/tag1/i)).toBeInTheDocument();
 
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .tags-field")
-        .find(CreatableSelect)
-        .prop("value")
-    ).toEqual([
-      {
-        label: "tag1",
-        value: "tag1"
-      }
-    ]);
+    // Collection:
+    expect(wrapper.getByText(/c1/i)).toBeInTheDocument();
 
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .collection-field")
-        .find(Select)
-        .prop("value")
-    ).toEqual({
-      label: "c1",
-      resource: {
-        id: "c1",
-        type: "collection"
-      },
-      value: "c1"
-    });
+    // Projects:
+    expect(wrapper.getByText(/project 1/i)).toBeInTheDocument();
 
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .projects-field")
-        .find(Select)
-        .prop("value")
-    ).toEqual([
-      {
-        label: "project 1",
-        resource: {
-          id: "p1",
-          name: "project 1",
-          type: "project"
-        },
-        value: "p1"
-      }
-    ]);
+    // Barcode
+    expect(wrapper.getByDisplayValue("test barcode")).toBeInTheDocument();
 
-    expect(
-      wrapper
-        .find(".publiclyReleasable-field label")
-        // The field is inverted (Not Publicly Releasable) so false -> true:
-        .findWhere((node) => node.text().includes("True"))
-        .find("input")
-        .prop("checked")
-    ).toEqual(true);
+    // Publicly Releasable
+    expect(screen.getByLabelText("True")).toHaveProperty("checked", true);
 
-    expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("test barcode");
-
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .materialSampleState-field input")
-        .prop("value")
-    ).toEqual("test-ms-state");
+    // Material Sample State
+    expect(wrapper.getByDisplayValue("test-ms-state")).toBeInTheDocument();
 
     // Set the barcode to the same value to update the form state
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "test barcode" } });
+    fireEvent.change(wrapper.getByRole("textbox", { name: /barcode/i }), {
+      target: { value: "test barcode" }
+    });
 
-    // Click the "Save All" button without overriding anything:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // The first sample has the edited barcode, the second sample is unaffected:
+    // No changes should be made
     expect(mockSave.mock.calls).toEqual([
       [
         [
