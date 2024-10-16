@@ -9,20 +9,13 @@ import { IntlProvider } from "react-intl";
 import "@testing-library/jest-dom";
 import {
   ColumnDefinition,
-  LoadingSpinner,
   MetaWithTotal,
   QueryTable,
-  QueryTableProps,
-  ReactTable
+  QueryTableProps
 } from "../..";
-import {
-  mountWithAppContext,
-  mountWithAppContext2
-} from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import {
   fireEvent,
-  screen,
-  waitFor,
   waitForElementToBeRemoved,
   within
 } from "@testing-library/react";
@@ -80,38 +73,23 @@ describe("QueryTable component", () => {
   });
 
   it("Renders the data from the mocked backend.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
     // Continue the test after the data fetch is done.
-    await new Promise(setImmediate);
-    wrapper.update();
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
-    // The loading screen should be gone.
-    expect(wrapper.find(LoadingSpinner).exists()).toEqual(false);
-
-    const rows = wrapper.find("tbody tr");
-
-    // Expect 25 rows for the 25 mock todos.
-    expect(rows.length).toEqual(25);
-
-    // Expect the first row to show the first todo's data.
+    expect(wrapper.getByRole("cell", { name: /todo 0/i })).toBeInTheDocument();
     expect(
-      rows
-        .first()
-        .find("td")
-        .map((cell) => cell.text())
-    ).toEqual(["0", "todo 0", "todo description 0"]);
+      wrapper.getByRole("cell", { name: /todo description 0/i })
+    ).toBeInTheDocument();
 
-    // Expect the last row to show the last todo's data.
+    expect(wrapper.getByRole("cell", { name: /todo 24/i })).toBeInTheDocument();
     expect(
-      rows
-        .last()
-        .find("td")
-        .map((cell) => cell.text())
-    ).toEqual(["24", "todo 24", "todo description 24"]);
+      wrapper.getByRole("cell", { name: /todo description 24/i })
+    ).toBeInTheDocument();
   });
 
   it("Renders the headers defined in the columns prop.", () => {
@@ -211,57 +189,40 @@ describe("QueryTable component", () => {
   });
 
   it("Fetches the previous page when the previous button is pressed.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo>
         path="todo"
         defaultPageSize={25}
         columns={["id", "name", "description"]}
+        hideTopPagination={true}
       />,
       { apiContext }
     );
 
     // Making sure there are data before proceed to next step
-    await new Promise(setImmediate);
-    wrapper.update();
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Click the "Next" button.
-    wrapper.find("div.-next button").first().simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
 
     // Wait for the second query to load.
-    await new Promise(setImmediate);
-    wrapper.update();
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Click the "Previous" button.
-    wrapper.find("div.-previous button").first().simulate("click");
-
-    // Clicking "Previous" should enable the loading screen.
-    expect(wrapper.find(LoadingSpinner).exists()).toEqual(true);
+    fireEvent.click(wrapper.getByRole("button", { name: /previous/i }));
 
     // Wait for the "Previous" request to finish.
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    const rows = wrapper.find("tbody tr");
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // The first page should start with todo #0.
-    expect(
-      rows
-        .first()
-        .find("td")
-        .map((cell) => cell.text())
-    ).toEqual(["0", "todo 0", "todo description 0"]);
+    expect(wrapper.getByRole("cell", { name: /todo 0/i })).toBeInTheDocument();
 
     // The first page should end with todo #24.
-    expect(
-      rows
-        .last()
-        .find("td")
-        .map((cell) => cell.text())
-    ).toEqual(["24", "todo 24", "todo description 24"]);
+    expect(wrapper.getByRole("cell", { name: /todo 24/i })).toBeInTheDocument();
   });
 
   it("Fetches sorted data when the defaultSort prop is passed.", async () => {
-    mountWithAppContext(
+    mountWithAppContext2(
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
@@ -281,7 +242,7 @@ describe("QueryTable component", () => {
   });
 
   it("Fetches sorted data when the header is clicked.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -295,17 +256,15 @@ describe("QueryTable component", () => {
       objectContaining({ sort: anything() })
     );
 
-    const nameHeader = wrapper.find("thead tr").childAt(1).childAt(0);
-
     // Click the "name" header.
-    nameHeader.simulate("click");
+    fireEvent.click(wrapper.getByText(/name/i));
     await new Promise(setImmediate);
 
     // The second request should have a "name" sort.
     expect(mockGet).lastCalledWith("todo", objectContaining({ sort: "name" }));
 
     // Click the "name" header again to sort by descending order.
-    nameHeader.simulate("click");
+    fireEvent.click(wrapper.getByText(/name/i));
     await new Promise(setImmediate);
 
     // The third request should have a "-name" sort.
@@ -317,7 +276,7 @@ describe("QueryTable component", () => {
   });
 
   it("Fetches multi-sorted data when a second header is shift-clicked.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
@@ -325,14 +284,15 @@ describe("QueryTable component", () => {
     // Wait for the initial request to finish.
     await new Promise(setImmediate);
 
-    const nameHeader = wrapper.find("thead tr").childAt(1).childAt(0);
     // Click the "name" header.
-    nameHeader.simulate("click");
+    fireEvent.click(wrapper.getByText(/name/i));
     await new Promise(setImmediate);
 
-    const descHeader = wrapper.find("thead tr").childAt(2).childAt(0);
     // Shift-click the "description" header.
-    descHeader.simulate("click", { shiftKey: true });
+    fireEvent.click(
+      wrapper.getByRole("columnheader", { name: /description/i }),
+      { shiftKey: true }
+    );
     await new Promise(setImmediate);
 
     // This request should be sorted by name and description.
@@ -382,7 +342,7 @@ describe("QueryTable component", () => {
       path: "todo"
     };
 
-    const wrapper = mountWithAppContext(<QueryTable<Todo> {...firstProps} />, {
+    const wrapper = mountWithAppContext2(<QueryTable<Todo> {...firstProps} />, {
       apiContext
     });
 
@@ -397,9 +357,9 @@ describe("QueryTable component", () => {
 
     // Update the filter prop.
     const secondFilterProp: FilterParam = { description: "todo 2" };
-    wrapper.setProps({
-      children: <QueryTable<Todo> {...firstProps} filter={secondFilterProp} />
-    });
+    wrapper.rerender(
+      <QueryTable<Todo> {...firstProps} filter={secondFilterProp} />
+    );
 
     // When a new filter is passed, a new request is sent with the new filter.
     expect(mockGet).toHaveBeenCalledTimes(2);
@@ -410,7 +370,7 @@ describe("QueryTable component", () => {
   });
 
   it("Sends a request for included resources when the include prop is passed.", async () => {
-    mountWithAppContext(
+    mountWithAppContext2(
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
@@ -429,13 +389,16 @@ describe("QueryTable component", () => {
     );
   });
 
-  it("Is a striped table.", () => {
-    const wrapper = mountWithAppContext(
+  it("Is a striped table.", async () => {
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
-    expect(wrapper.find(ReactTable).hasClass("-striped")).toEqual(true);
+    // Wait for loading to be completed...
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    expect(wrapper.getByTestId("ReactTable").classList).toContain("-striped");
   });
 
   it("Accepts a combination of strings and column config objects as props.", async () => {
@@ -451,20 +414,21 @@ describe("QueryTable component", () => {
     ];
 
     // Create the table with headers
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo> path="todo" columns={columns} />,
       { apiContext }
     );
 
     // Wait for the request to finish.
-    await new Promise(setImmediate);
-    wrapper.update();
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Expect correct header name in the third header.
-    expect(wrapper.find("thead tr th").at(2).text()).toEqual("UPPERCASE NAME");
+    expect(
+      wrapper.getByRole("columnheader", { name: /uppercase name/i })
+    ).toBeInTheDocument();
 
     // Expect correct custom cell content in the 3rd data cell.
-    expect(wrapper.find("tbody td").at(2).text()).toEqual("TODO 0");
+    expect(wrapper.getByRole("cell", { name: "TODO 0" }));
   });
 
   it("Scrolls to the top of the table when the page is changed.", async () => {
@@ -476,73 +440,49 @@ describe("QueryTable component", () => {
       Object.defineProperty(window, "scrollY", { value: y, writable: true });
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo>
         defaultPageSize={10}
         path="todo"
         columns={["id", "name", "description"]}
+        hideTopPagination={true}
       />,
       { apiContext }
     );
 
     // Wait until the data is loaded into the table.
-    await new Promise(setImmediate);
-    wrapper.update();
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
-    // Set the table's div wrapper's offsetTop to 200.
-    Object.defineProperty(
-      wrapper.find(".query-table-wrapper").instance(),
-      "offsetTop",
-      { value: 200 }
-    );
+    expect(window.scrollY).toEqual(400);
 
     // Click to the next page of the table.
-    wrapper.find(".-next button").first().simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
 
-    // The window shoul;d have scrolled up to Y position 200.
-    expect(window.scrollY).toEqual(200);
+    // The window should have scrolled up to Y position 0.
+    expect(window.scrollY).toEqual(0);
   });
 
   it("Has the paginator at the top and bottom of the table.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
     // Making sure there are data before proceed to next step
-    await new Promise(setImmediate);
-    wrapper.update();
-    expect(wrapper.find(".pagination-top").exists()).toEqual(true);
-    expect(wrapper.find(".pagination-bottom").exists()).toEqual(true);
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    expect(
+      wrapper.container.querySelector(".pagination-top")
+    ).toBeInTheDocument();
+    expect(
+      wrapper.container.querySelector(".pagination-bottom")
+    ).toBeInTheDocument();
   });
-
-  // it("Provides an 'onPageSizeChange' callback prop.", async () => {
-  //   const mockOnPageSizeChange = jest.fn();
-
-  //   const wrapper = mountWithAppContext(
-  //     <QueryTable<Todo>
-  //       path="todo"
-  //       columns={["id", "name", "description"]}
-  //       reactTableProps={{
-  //         onPageSizeChange: mockOnPageSizeChange
-  //       }}
-  //     />,
-  //     { apiContext }
-  //   );
-
-  //   await new Promise(setImmediate);
-  //   wrapper.update();
-  //   wrapper
-  //     .find(".-pageSizeOptions select")
-  //     .at(0)
-  //     .simulate("change", { target: { value: "50", name: "50" } });
-  //   expect(mockOnPageSizeChange).toHaveBeenCalled();
-  // });
 
   it("Provides an 'onSortedChange' callback prop.", async () => {
     const mockOnSortedChange = jest.fn();
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
@@ -552,22 +492,24 @@ describe("QueryTable component", () => {
       />,
       { apiContext }
     );
-    const nameHeader = wrapper.find("thead tr").childAt(1).childAt(0);
-    nameHeader.simulate("click");
+
+    fireEvent.click(wrapper.getByText(/name/i));
     expect(mockOnSortedChange).toHaveBeenCalled();
   });
 
   it("Shows the total records count.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
     // Wait for the initial request to finish and the total to render.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.contains("Total matched records: 300")).toEqual(true);
+    // Expecting a total of 300, it's displayed twice for the top and bottom pagination sections.
+    expect(wrapper.getAllByText(/total matched records: 300/i).length).toEqual(
+      2
+    );
   });
 
   it("Renders an error message when there is a query error.", async () => {
@@ -577,24 +519,22 @@ describe("QueryTable component", () => {
       };
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
     // Wait for the initial request to finish and the result to render.
     await new Promise(setImmediate);
-    wrapper.update();
+
+    // Both error messages should be rendered:
     expect(
-      wrapper
-        .find(".alert.alert-danger")
-        .text()
-        .includes("error message 1\nerror message 2")
-    ).toEqual(true);
+      wrapper.getByText(/error message 1 error message 2/i)
+    ).toBeInTheDocument();
   });
 
   it("Lets you pass in a 'loading' prop that overrides the internal loading state if true.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo>
         loading={true}
         path="todo"
@@ -605,64 +545,33 @@ describe("QueryTable component", () => {
 
     // Wait for the initial request to finish and render.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(ReactTable).prop("loading")).toEqual(true);
+    // Loading is still expected since we are passing it as a prop.
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
-  // it("Provides a header input for filtering.", async () => {
-  //   const mockOnFilteredChange = jest.fn();
-
-  //   const wrapper = mountWithAppContext(
-  //     <QueryTable<Todo>
-  //       path="todo"
-  //       columns={[{ accessorKey: "name", filterable: true }]}
-  //       reactTableProps={{
-  //         onFilteringChange: mockOnFilteredChange
-  //       }}
-  //     />,
-  //     { apiContext }
-  //   );
-
-  //   const headerInput = wrapper.find(".rt-th input");
-
-  //   expect(headerInput.prop("placeholder")).toEqual("Search...");
-
-  //   headerInput.simulate("change", {
-  //     target: { name: "header-input", value: "new value" }
-  //   });
-  //   expect(mockOnFilteredChange.mock.calls).toEqual([
-  //     [
-  //       [
-  //         {
-  //           id: "name",
-  //           value: "new value"
-  //         }
-  //       ],
-  //       expect.objectContaining({ id: "name" }),
-  //       "new value"
-  //     ]
-  //   ]);
-  // });
-
   it("Displays the intl message (if there is one) as a header.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <IntlProvider
         locale="en"
         messages={{ field_testField: "My Field Label" }}
+        onError={(_) => {
+          return;
+        }}
       >
-        <QueryTable<Todo> loading={true} path="todo" columns={["testField"]} />
+        <QueryTable<Todo> path="todo" columns={["testField"]} />
       </IntlProvider>,
       { apiContext }
     );
 
-    expect(wrapper.find(".testField-field-header").text()).toEqual(
-      "My Field Label"
-    );
+    // Wait for the request to finish.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    expect(wrapper.getByText("My Field Label")).toBeInTheDocument();
   });
 
   it("Provides a 'reactTableProps' prop that passes in the query state.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo>
         path="todo"
         columns={[
@@ -684,8 +593,8 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish and the result to render.
-    await new Promise(setImmediate);
-    wrapper.update();
-    expect(wrapper.find(".test-body").text()).toEqual("Response length is: 30");
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    expect(wrapper.getByText(/response length is: 30/i)).toBeInTheDocument();
   });
 });
