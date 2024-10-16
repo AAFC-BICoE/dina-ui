@@ -143,8 +143,6 @@ export interface CustomViewField {
 export interface UseQueryBuilderConfigProps {
   indexName: string;
 
-  groups: string[];
-
   /**
    * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
    * be searched against. It will also define the path and data component if required.
@@ -176,7 +174,6 @@ export interface UseQueryBuilderConfigProps {
  */
 export function useQueryBuilderConfig({
   indexName,
-  groups,
   dynamicFieldMapping,
   enableRelationshipPresence,
   customViewFields,
@@ -200,7 +197,6 @@ export function useQueryBuilderConfig({
       generateBuilderConfig(
         indexMap,
         indexName,
-        groups,
         formatMessage,
         customViewFields,
         enableRelationshipPresence,
@@ -222,7 +218,6 @@ export function useQueryBuilderConfig({
 export function generateBuilderConfig(
   indexMap: ESIndexMapping[],
   indexName: string,
-  groups: string[],
   formatMessage: any,
   customViewFields?: CustomViewField[],
   enableRelationshipPresence?: boolean,
@@ -355,7 +350,6 @@ export function generateBuilderConfig(
           currentFieldName={factoryProps?.field}
           matchType={factoryProps?.operator}
           indexName={indexName}
-          groups={groups}
           indexMap={indexMap}
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
