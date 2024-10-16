@@ -33,11 +33,6 @@ interface QueryBuilderAutoSuggestionTextSearchProps {
   indexName: string;
 
   /**
-   * Groups to determine what suggestions should appear.
-   */
-  groups: string[];
-
-  /**
    * The elastic search mapping changes based on the field that is selected. This is used to
    * create the field name for the elastic search request.
    */
@@ -50,7 +45,6 @@ function QueryBuilderAutoSuggestionTextSearch({
   value,
   setValue,
   indexName,
-  groups,
   indexMap
 }: QueryBuilderAutoSuggestionTextSearchProps) {
   const { formatMessage } = useIntl();
@@ -73,7 +67,6 @@ function QueryBuilderAutoSuggestionTextSearch({
   // Retrieve the suggestions using elastic search. Only updates if the field/group change.
   const suggestions = useElasticSearchDistinctTerm({
     fieldName,
-    groups: groups ?? [],
     relationshipType: fieldSettings?.parentType,
     indexName,
     keywordMultiFieldSupport: fieldSettings?.keywordMultiFieldSupport ?? false

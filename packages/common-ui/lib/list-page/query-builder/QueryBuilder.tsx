@@ -15,6 +15,7 @@ import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElas
 
 export interface QueryBuilderContextI {
   performSubmit: () => void;
+  groups: string[];
 }
 
 const QueryBuilderContext = createContext<QueryBuilderContextI | null>(null);
@@ -141,7 +142,9 @@ function QueryBuilder({
 
   return (
     <>
-      <QueryBuilderContextProvider value={{ performSubmit: onSubmit }}>
+      <QueryBuilderContextProvider
+        value={{ performSubmit: onSubmit, groups: groups ?? [] }}
+      >
         <label
           style={{
             fontSize: 20,
