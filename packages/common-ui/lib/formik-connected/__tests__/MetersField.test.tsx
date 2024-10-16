@@ -166,7 +166,7 @@ describe("MetersField component", () => {
   });
 
   it("Does the unit conversion onSubmit.", async () => {
-    const wrapper = mountWithAppContext(
+    const { container } = mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -175,22 +175,24 @@ describe("MetersField component", () => {
       </DinaForm>
     );
 
-    wrapper.find(".length-field input").simulate("focus");
-    wrapper
-      .find(".length-field input")
-      .simulate("change", { target: { value: "1 ft" } });
+    // Simulate user input
+    const input = screen.getByRole("textbox", { name: /length/i });
+    userEvent.type(input, "1 ft");
 
-    wrapper.find("form").simulate("submit");
+    // Simulate form submission
+    const form = container.querySelector("form");
+    fireEvent.submit(form!);
 
-    await new Promise(setImmediate);
-
-    expect(mockSubmit).lastCalledWith({
-      length: "0.30"
+    // Wait for the form submission to be handled
+    await waitFor(() => {
+      expect(mockSubmit).toHaveBeenLastCalledWith({
+        length: "0.30"
+      });
     });
   });
 
   it("Renders the initial value.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ length: "10.00" }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -198,12 +200,12 @@ describe("MetersField component", () => {
         <MetersField name="length" />
       </DinaForm>
     );
-
-    expect(wrapper.find(".length-field input").prop("value")).toEqual("10.00");
+    const input = screen.getByRole("textbox", { name: /length/i });
+    expect(input).toHaveValue("10.00");
   });
 
   it("Updates the input value when the form state changes.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ length: "10.00" }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -218,9 +220,14 @@ describe("MetersField component", () => {
     );
 
     // Initial value:
-    expect(wrapper.find(".length-field input").prop("value")).toEqual("10.00");
-    wrapper.find("button").simulate("click");
+    const input = screen.getByRole("textbox", { name: /length/i });
+    expect(input).toHaveValue("10.00");
+
+    // Simulate button click to change form state
+    const button = screen.getByRole("button", { name: /change val/i });
+    userEvent.click(button);
+
     // The new value is rendered:
-    expect(wrapper.find(".length-field input").prop("value")).toEqual("20.5");
+    expect(input).toHaveValue("20.5");
   });
 });
