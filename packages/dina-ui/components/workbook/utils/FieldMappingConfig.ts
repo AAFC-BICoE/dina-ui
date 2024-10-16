@@ -112,6 +112,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
         habitat: { dataType: WorkbookDataTypeEnum.STRING },
         dwcMinimumElevationInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
         dwcMinimumDepthInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
+        managedAttributes: {
+          dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+          endpoint: "collection-api/managed-attribute",
+          managedAttributeComponent: "COLLECTING_EVENT"
+        },
         dwcMaximumElevationInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
         dwcMaximumDepthInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
         substrate: { dataType: WorkbookDataTypeEnum.STRING },
