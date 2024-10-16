@@ -7,7 +7,6 @@ import {
 import { range } from "lodash";
 import { IntlProvider } from "react-intl";
 import "@testing-library/jest-dom";
-
 import {
   ColumnDefinition,
   LoadingSpinner,
@@ -20,7 +19,13 @@ import {
   mountWithAppContext,
   mountWithAppContext2
 } from "../../test-util/mock-app-context";
-import { fireEvent, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
+  within
+} from "@testing-library/react";
 
 /** Example of an API resource interface definition for a todo-list entry. */
 interface Todo extends KitsuResource {
@@ -66,12 +71,12 @@ describe("QueryTable component", () => {
   });
 
   it("Renders loading state initially.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
-    expect(wrapper.find(LoadingSpinner).exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Renders the data from the mocked backend.", async () => {
@@ -111,103 +116,98 @@ describe("QueryTable component", () => {
 
   it("Renders the headers defined in the columns prop.", () => {
     // Create the table with headers
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
-    // Expect the field headers:.
-    expect(wrapper.find(".id-field-header").exists()).toEqual(true);
-    expect(wrapper.find(".name-field-header").exists()).toEqual(true);
-    expect(wrapper.find(".description-field-header").exists()).toEqual(true);
+    // Expect the field headers:
+    expect(wrapper.getByText(/id/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/name/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/description/i)).toBeInTheDocument();
   });
 
   it("Renders the total number of pages when no custom pageSize is specified.", async () => {
-    const wrapper = mountWithAppContext(
-      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+    const wrapper = mountWithAppContext2(
+      <QueryTable<Todo>
+        path="todo"
+        columns={["id", "name", "description"]}
+        hideTopPagination={true}
+      />,
       { apiContext }
     );
 
     // Wait until the data is loaded into the table.
-    await new Promise(setImmediate);
-    wrapper.update();
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Expect "12" for 12 pages, with 300 total matched records:
     expect(
-      // 300 total records with a pageSize of 25 means 12 pages.
-      wrapper.find("span.-totalPages").first().text()
-    ).toEqual("12");
+      within(wrapper.getByText(/page of/i)).getByText(/12/i)
+    ).toBeInTheDocument();
+    expect(wrapper.getAllByText(/total matched records: 300/i).length).toEqual(
+      2
+    );
   });
 
   it("Renders the total number of pages when a custom pageSize is specified.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo>
         path="todo"
         defaultPageSize={40}
         pageSizeOptions={[40, 80]}
         columns={["id", "name", "description"]}
+        hideTopPagination={true}
       />,
       { apiContext }
     );
 
     // Wait until the data is loaded into the table.
-    await new Promise(setImmediate);
-    wrapper.update();
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Expect "8" for 8 pages, with 300 total matched records:
     expect(
-      // 300 total records with a pageSize of 40 means 8 pages.
-      wrapper.find("span.-totalPages").first().text()
-    ).toEqual("8");
+      within(wrapper.getByText(/page of/i)).getByText(/8/i)
+    ).toBeInTheDocument();
+    expect(wrapper.getAllByText(/total matched records: 300/i).length).toEqual(
+      2
+    );
   });
 
   it("Fetches the next page when the Next button is pressed.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <QueryTable<Todo>
         path="todo"
         defaultPageSize={25}
         columns={["id", "name", "description"]}
+        hideTopPagination={true}
       />,
       { apiContext }
     );
 
     // Wait for page 1 to load.
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Wait until the data is loaded into the table.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
-    const page1Rows = wrapper.find("tbody tr");
-
-    // The first page should end with todo #24.
+    // To do 24 should exist but not 25.
+    expect(wrapper.getByRole("cell", { name: /todo 24/i })).toBeInTheDocument();
     expect(
-      page1Rows
-        .last()
-        .find("td")
-        .map((cell) => cell.text())
-    ).toEqual(["24", "todo 24", "todo description 24"]);
+      await wrapper.queryByRole("cell", { name: /todo 25/i })
+    ).not.toBeInTheDocument();
 
     // Click the "Next" button.
-    wrapper.find("div.-next button").first().simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /next/i }));
 
     // Clicking "Next" should enable the loading screen.
-    expect(wrapper.find(LoadingSpinner).exists()).toEqual(true);
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Wait for the second query to load.
     await new Promise(setImmediate);
-    wrapper.update();
-
-    const page2Rows = wrapper.find("tbody tr");
 
     // The second page should start with todo #25.
-    expect(
-      page2Rows
-        .first()
-        .find("td")
-        .map((cell) => cell.text())
-    ).toEqual(["25", "todo 25", "todo description 25"]);
+    expect(wrapper.getByRole("cell", { name: /todo 25/i })).toBeInTheDocument();
 
     // The second page should end with todo #49.
-    expect(
-      page2Rows
-        .last()
-        .find("td")
-        .map((cell) => cell.text())
-    ).toEqual(["49", "todo 49", "todo description 49"]);
+    expect(wrapper.getByRole("cell", { name: /todo 49/i })).toBeInTheDocument();
   });
 
   it("Fetches the previous page when the previous button is pressed.", async () => {
