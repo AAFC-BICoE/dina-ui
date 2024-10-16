@@ -18,8 +18,6 @@ import {
   ASSOCIATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
   FormTemplate,
-  IDENTIFIER_COMPONENT_NAME,
-  MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
   MaterialSample,
   ORGANISMS_COMPONENT_NAME,
@@ -28,7 +26,9 @@ import {
   blankMaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
-import { fireEvent, within } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 const TEST_COLLECTING_EVENT = {
   id: "col-event-1",
@@ -751,45 +751,6 @@ const formTemplate: PersistedResource<FormTemplate> = {
   ]
 };
 
-/** FormTemplate with the managed attributes enabled for Material Sample, Collecting Event and Determination. */
-const TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES = {
-  id: "cd6d8297-43a0-45c6-b44e-983db917eb11",
-  type: "form-template",
-  createdOn: "2022-03-03T16:36:30.422992Z",
-  createdBy: "cnc-cm",
-  name: "test view with managed attributes",
-  group: "cnc",
-  restrictToCreatedBy: false,
-  viewConfiguration: {
-    type: "material-sample-form-template",
-    navOrder: [MANAGED_ATTRIBUTES_COMPONENT_NAME, IDENTIFIER_COMPONENT_NAME],
-    formTemplate: {
-      MATERIAL_SAMPLE: {
-        templateFields: {
-          materialSampleName: { enabled: true, defaultValue: "default id" },
-          "organism[0].determination[0].managedAttributes.attribute_1": {
-            enabled: true
-          },
-          "managedAttributes.sample_attribute_1": {
-            enabled: true,
-            defaultValue: "sample attribute default value"
-          }
-        }
-      },
-      COLLECTING_EVENT: {
-        templateFields: {
-          "managedAttributes.collecting_event_attribute_1": {
-            enabled: true
-          }
-        }
-      }
-    },
-    managedAttributesOrder: ["sample_attribute_1"],
-    collectingEventManagedAttributesOrder: ["collecting_event_attribute_1"],
-    determinationManagedAttributesOrder: ["determination_attribute_1"]
-  }
-};
-
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/collection/1":
@@ -1128,39 +1089,35 @@ describe("MaterialSampleBulkEditor", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Bulk creates material samples.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Edit the first sample:
-    wrapper.find("li.sample-tab-0").simulate("click");
-    wrapper
-      .find(".sample-tabpanel-0 .barcode-field input")
-      .simulate("change", { target: { value: "edited-barcode-1" } });
+    fireEvent.click(wrapper.getByText(/ms1/i));
+    fireEvent.change(wrapper.getAllByRole("textbox", { name: /barcode/i })[1], {
+      target: { value: "edited-barcode-1" }
+    });
 
     // Edit the second sample:
-    wrapper.find("li.sample-tab-1").simulate("click");
-    wrapper
-      .find(".sample-tabpanel-1 .barcode-field input")
-      .simulate("change", { target: { value: "edited-barcode-2" } });
+    fireEvent.click(wrapper.getByText(/ms2/i));
+    fireEvent.change(wrapper.getAllByRole("textbox", { name: /barcode/i })[1], {
+      target: { value: "edited-barcode-2" }
+    });
 
     // Edit the third sample:
-    wrapper.find("li.sample-tab-2").simulate("click");
-    wrapper
-      .find(".sample-tabpanel-2 .barcode-field input")
-      .simulate("change", { target: { value: "edited-barcode-3" } });
+    fireEvent.click(wrapper.getByText(/ms3/i));
+    fireEvent.change(wrapper.getAllByRole("textbox", { name: /barcode/i })[1], {
+      target: { value: "edited-barcode-3" }
+    });
 
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the new material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -1370,61 +1327,49 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Go the the bulk edit tab:
-    wrapper.find("li.tab-EDIT_ALL").simulate("click");
-    // Enable the collecting event section:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
+    fireEvent.click(wrapper.getByText(/edit all/i));
 
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Put an invalid value in startEventDateTime. This is validated locally by yup:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .startEventDateTime-field")
-      .find(Cleave)
-      .prop<any>("onChange")({ target: { value: "11111" } });
+    const startDateTextbox = wrapper.getByRole("textbox", {
+      name: "Start Event Date Time Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory"
+    });
+    userEvent.type(startDateTextbox, "11111");
 
     // Click the "Save All" button:
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // The tab with the error is given the red text, and the other 3 tabs are unaffected:
+    // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
-      wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
-    ).toEqual(false);
-    expect(
-      wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(true);
-    expect(
-      wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
-    ).toEqual(false);
-    expect(
-      wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(".text-danger")?.textContent
+    ).toEqual("MS1");
 
     // Shows the error message:
     expect(
-      wrapper.find(".sample-tabpanel-0 .error-viewer").first().text()
-    ).toContain("Start Event Date Time");
-    expect(wrapper.find(".sample-tabpanel-0 .error-message").exists()).toEqual(
-      true
-    );
+      wrapper.getByText(
+        /1 : start event date time \- start event datetime format must be a subset of: yyyy\-mm\-ddthh:mm:ss\.mmm, if datetime is present, 't' is mandatory/i
+      )
+    ).toBeInTheDocument();
   });
 
   it("Shows an error indicator on the individual sample tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
@@ -1442,7 +1387,7 @@ describe("MaterialSampleBulkEditor", () => {
       );
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1456,29 +1401,27 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Edit the second sample:
-    wrapper.find("li.sample-tab-1").simulate("click");
-    // Enable the collecting event section:
-    wrapper
-      .find(".sample-tabpanel-1 .enable-collecting-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
-
+    fireEvent.click(wrapper.getByText(/ms2/i));
     await new Promise(setImmediate);
-    wrapper.update();
+
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[1]);
+    await new Promise(setImmediate);
 
     // Click the "Save All" button:
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The collecting event was saved separately.
-    // TODO let the Collecting Event be saved along with the Material Sample in one transaction.
     expect(mockSaveForBadColEvent).lastCalledWith(
       [
         {
@@ -1493,27 +1436,20 @@ describe("MaterialSampleBulkEditor", () => {
 
     // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
-      wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.getByText(
+        /bulk submission error: check the tabs with a red label\./i
+      )
+    ).toBeInTheDocument();
     expect(
-      wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(false);
-    expect(
-      wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
-    ).toEqual(true);
-    expect(
-      wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(".text-danger")?.textContent
+    ).toEqual("MS2");
 
     // Shows the error message:
     expect(
-      wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
-    ).toContain("Start Event Date Time");
-    expect(
-      wrapper
-        .find(".sample-tabpanel-1 .startEventDateTime-field .invalid-feedback")
-        .exists()
-    ).toEqual(true);
+      wrapper.getByText(
+        /1 : start event date time \- invalid collecting event/i
+      )
+    ).toBeInTheDocument();
   });
 
   it("Shows an error indicator on the Edit All tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
@@ -1531,7 +1467,7 @@ describe("MaterialSampleBulkEditor", () => {
       );
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1545,29 +1481,26 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Use the Edit All tab:
-    wrapper.find("li.tab-EDIT_ALL").simulate("click");
+    // Go the the bulk edit tab:
+    fireEvent.click(wrapper.getByText(/edit all/i));
 
     // Enable the collecting event section:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
-
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Click the "Save All" button:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The collecting event was saved separately.
-    // TODO let the Collecting Event be saved along with the Material Sample in one transaction.
     expect(mockSaveForBadColEvent).lastCalledWith(
       [
         {
@@ -1582,25 +1515,20 @@ describe("MaterialSampleBulkEditor", () => {
 
     // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
-      wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.getByText(
+        /bulk submission error: check the tabs with a red label\./i
+      )
+    ).toBeInTheDocument();
     expect(
-      wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(true);
-    expect(
-      wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
-    ).toEqual(false);
-    expect(
-      wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(".text-danger")?.textContent
+    ).toEqual("MS1");
 
     // Shows the error message:
     expect(
-      wrapper.find(".sample-tabpanel-0 .error-viewer").first().text()
-    ).toContain("Start Event Date Time");
-    expect(wrapper.find(".sample-tabpanel-0 .error-message").exists()).toEqual(
-      true
-    );
+      wrapper.getByText(
+        /1 : start event date time \- invalid collecting event/i
+      )
+    ).toBeInTheDocument();
   });
 
   it("Shows an error indicator on the Edit All tab when a bulk-edited causes a server-side field error.", async () => {
