@@ -2,7 +2,10 @@ import { ResourceSelect, ResourceWithHooks } from "common-ui";
 import { InputResource } from "kitsu";
 import { useState } from "react";
 import Switch from "react-switch";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import {
+  mountWithAppContext,
+  mountWithAppContext2
+} from "../../../test-util/mock-app-context";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   getSampleBulkOverrider,
@@ -12,6 +15,7 @@ import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-
 import { MaterialSampleFormProps } from "../../collection/material-sample/MaterialSampleForm";
 import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
+import { fireEvent, screen } from "@testing-library/react";
 
 const mockSubmitOverride = jest.fn();
 
@@ -24,7 +28,6 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   // Allow selecting a custom view for the form:
   const {
     sampleFormTemplate,
-    setSampleFormTemplateUUID,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues
@@ -37,9 +40,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   const {
     bulkEditFormRef,
     bulkEditSampleHook,
-    sampleHooks,
-    materialSampleForm,
-    formTemplateProps
+    materialSampleForm
   }: {
     bulkEditFormRef;
     bulkEditSampleHook;
@@ -78,7 +79,9 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
             )
           );
         }}
-      />
+      >
+        Get Overrides
+      </button>
     </div>
   );
 }
@@ -161,14 +164,11 @@ describe("Material sample bulk edit tab", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Without changing any fields, overrides nothing", async () => {
-    const wrapper = mountWithAppContext(<BulkEditTab />, testCtx);
+    const wrapper = mountWithAppContext2(<BulkEditTab />, testCtx);
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.get-overrides").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSubmitOverride).lastCalledWith({
       isRestricted: false,

@@ -1,17 +1,12 @@
 import { InputResource } from "kitsu";
-import Switch from "react-switch";
-import {
-  mountWithAppContext,
-  mountWithAppContext2
-} from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import {
   blankMaterialSample,
-  MaterialSample,
-  ORGANISMS_COMPONENT_NAME
+  MaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../../bulk-material-sample/MaterialSampleBulkEditor";
 import { isEqual } from "lodash";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockGet = jest.fn<any, any>(async (path) => {
@@ -446,7 +441,7 @@ describe("BulkEditTabWarning", () => {
   });
 
   it("Shows the Override button on the Organisms section, even when the Organisms are the same.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={SAMPLES_WITH_SAME_DETERMINATIONS}
@@ -455,55 +450,57 @@ describe("BulkEditTabWarning", () => {
     );
 
     // Make sure all samples have the sample organism for this test,
-    // even though the back-end shouldn't actually alloow this:
+    // even though the back-end shouldn't actually allow this:
     expect(
       SAMPLES_WITH_SAME_DETERMINATIONS.every((sample) =>
         isEqual(sample.organism, SAMPLES_WITH_SAME_DETERMINATIONS[0].organism)
       )
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Enable the organisms:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-organisms")
-      .find(Switch)
-      .prop<any>("onChange")(true);
-
+    // Enable the determination:
+    const organismToggle = wrapper.container.querySelector(
+      ".enable-organisms .react-switch-bg"
+    );
+    if (!organismToggle) {
+      fail("Organism toggle needs to exist at this point.");
+    }
+    fireEvent.click(organismToggle);
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // You must click the override button:
-    expect(
-      wrapper
-        .find("." + ORGANISMS_COMPONENT_NAME + " .multiple-values-warning")
-        .exists()
-    ).toEqual(true);
-    wrapper
-      .find("." + ORGANISMS_COMPONENT_NAME + " button.override-all-button")
-      .simulate("click");
-    wrapper.find("form .are-you-sure-modal").simulate("submit");
+    // Find the organism override button and click it.
+    const overrideButton = wrapper.container.querySelector(
+      "#organisms-component button"
+    );
+    if (!overrideButton) {
+      fail(
+        "Override button inside of the organisms component needs to exist at this point."
+      );
+    }
+    fireEvent.click(overrideButton);
+
+    // Click "Yes" on the popup dialog.
+    fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Add a determination and override its name:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .determination-section button.add-button")
-      .simulate("click");
+    // Click the "Add New Determination" button.
+    fireEvent.click(
+      wrapper.getByRole("button", { name: /add new determination/i })
+    );
     await new Promise(setImmediate);
-    wrapper.update();
-    wrapper
-      .find(".tabpanel-EDIT_ALL .verbatimScientificName input")
-      .simulate("change", { target: { value: "test-name-override" } });
 
+    // Override the verbatim scientific name.
+    fireEvent.change(
+      wrapper.getByRole("textbox", {
+        name: /verbatim scientific name × insert hybrid symbol/i
+      }),
+      { target: { value: "test-name-override" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
