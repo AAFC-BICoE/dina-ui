@@ -90,7 +90,9 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const autoSuggestionEquals = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
+          >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}
               indexMap={INDEX_MAP}
@@ -111,7 +113,9 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
 
       const autoSuggestionEmpty = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
+          >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}
               indexMap={INDEX_MAP}
@@ -136,7 +140,9 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       // Any changes to the layout, the snapshots will need to be updated.
       const autoSuggestionIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
+          >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}
               indexMap={INDEX_MAP}
@@ -157,7 +163,9 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
 
       const autoSuggestionNotIn = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
+          >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}
               indexMap={INDEX_MAP}
@@ -180,7 +188,9 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
     it("Display suggestions on equals or not equals operators", async () => {
       const autoSuggestionComponent = mountWithAppContext2(
         <DinaForm initialValues={{}}>
-          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: noop, groups: ["aafc", "cnc"] }}
+          >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}
               indexMap={INDEX_MAP}
@@ -216,7 +226,7 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
           },
           query: {
             terms: {
-              "data.attributes.group": ["aafc", "cnc"]
+              "data.attributes.group.keyword": ["aafc", "cnc"]
             }
           },
           size: 0
@@ -248,7 +258,10 @@ describe("QueryBuilderAutoSuggestionSearch", () => {
       const { getByRole } = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <QueryBuilderContextProvider
-            value={{ performSubmit: mockPerformSubmit }}
+            value={{
+              performSubmit: mockPerformSubmit,
+              groups: ["aafc", "cnc"]
+            }}
           >
             <QueryBuilderAutoSuggestionTextSearchMemo
               indexName={INDEX_NAME}

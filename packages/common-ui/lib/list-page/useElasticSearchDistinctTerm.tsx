@@ -1,7 +1,7 @@
 import Bodybuilder from "bodybuilder";
 import { castArray } from "lodash";
 import { useEffect, useState } from "react";
-import { useApiClient } from "..";
+import { useApiClient, useQueryBuilderContext } from "..";
 
 const TOTAL_SUGGESTIONS: number = 100;
 const FILTER_AGGREGATION_NAME: string = "included_type_filter";
@@ -15,9 +15,6 @@ interface QuerySuggestionFieldProps {
   /** If the field is a relationship, we need to know the type to filter it. */
   relationshipType?: string;
 
-  /** An array of the groups to filter the distinct terms by. This can be an empty group which will skip filtering by group. */
-  groups: string[];
-
   /** The index you want elastic search to perform the search on */
   indexName: string;
 
@@ -28,13 +25,14 @@ interface QuerySuggestionFieldProps {
 export function useElasticSearchDistinctTerm({
   fieldName,
   relationshipType,
-  groups,
   indexName,
   keywordMultiFieldSupport
 }: QuerySuggestionFieldProps) {
   const { apiClient } = useApiClient();
 
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  const { groups } = useQueryBuilderContext();
 
   // Every time the textEntered has changed, perform a new request for new suggestions.
   useEffect(() => {
@@ -50,7 +48,11 @@ export function useElasticSearchDistinctTerm({
     // Group needs to be queried to only show the users most used values.
     if (groups && groups.length !== 0) {
       // terms is used to be able to support multiple groups.
-      builder.query("terms", "data.attributes.group", castArray(groups));
+      builder.query(
+        "terms",
+        "data.attributes.group.keyword",
+        castArray(groups)
+      );
     }
 
     // If the field has a relationship type, we need to do a nested query to filter it.
