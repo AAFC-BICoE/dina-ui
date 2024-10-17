@@ -1,13 +1,16 @@
 import { Form, Formik } from "formik";
 import { DoOperationsError } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { ErrorViewer } from "../ErrorViewer";
 import { OnFormikSubmit, safeSubmit } from "../safeSubmit";
+import "@testing-library/jest-dom";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 function getWrapper(customOnSubmit: OnFormikSubmit) {
   const onSubmit = safeSubmit(customOnSubmit);
 
-  return mountWithAppContext(
+  return mountWithAppContext2(
     <Formik initialValues={{ testProperty: "testValue" }} onSubmit={onSubmit}>
       <Form translate={undefined}>
         <ErrorViewer />
@@ -22,11 +25,15 @@ describe("safeSubmit function", () => {
 
     const wrapper = getWrapper(onSubmit);
 
-    wrapper.find("form").simulate("submit");
+    // Use querySelector to find the form and simulate submit
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
+
+    // Wait for async operations to complete
     await new Promise(setImmediate);
 
-    // The submnit function is called with the form values and the FormikActions object.
-    expect(onSubmit).lastCalledWith(
+    // The submit function is called with the form values and the FormikActions object.
+    expect(onSubmit).toHaveBeenCalledWith(
       { testProperty: "testValue" },
       expect.objectContaining({ setStatus: expect.anything() })
     );
@@ -37,13 +44,17 @@ describe("safeSubmit function", () => {
       throw new Error("Test error message");
     });
 
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Use querySelector to find the form and simulate submit
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Test error message"
-    );
+    // Wait for async operations to complete
+    await new Promise(setImmediate);
+
+    // Use querySelector to check for the error message
+    const errorMessage = wrapper.container.querySelector(".alert.alert-danger");
+    expect(errorMessage).toBeInTheDocument(); // Ensure the error message is in the document
+    expect(errorMessage?.textContent).toEqual("Test error message");
   });
 
   it("Sets the form error message and the field errors..", async () => {
@@ -54,11 +65,20 @@ describe("safeSubmit function", () => {
       });
     });
 
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Use querySelector to find the form and simulate submit
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    expect(wrapper.find(".error-message").map((node) => node.text())).toEqual([
+    // Wait for async operations to complete
+    await new Promise(setImmediate);
+
+    // Use querySelector to get error messages
+    const errorMessages = wrapper.container.querySelectorAll(".error-message");
+    const errorTexts = Array.from(errorMessages).map(
+      (node) => node.textContent
+    );
+
+    expect(errorTexts).toEqual([
       "Test error message",
       "1 : Field A - must be a number",
       "2 : Field B - must be set"
@@ -70,12 +90,19 @@ describe("safeSubmit function", () => {
       throw new DoOperationsError("", {});
     });
 
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Use querySelector to find the form and simulate submit
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    expect(wrapper.find(".error-message").map((node) => node.text())).toEqual(
-      []
+    // Wait for async operations to complete
+    await new Promise(setImmediate);
+
+    // Use querySelector to get error messages
+    const errorMessages = wrapper.container.querySelectorAll(".error-message");
+    const errorTexts = Array.from(errorMessages).map(
+      (node) => node.textContent
     );
+
+    expect(errorTexts).toEqual([]);
   });
 });
