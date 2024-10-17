@@ -1,7 +1,10 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FormikButton } from "../FormikButton";
 import { MetersField, toMeters } from "../MetersField";
+import "@testing-library/jest-dom";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 const mockSubmit = jest.fn();
 
@@ -88,34 +91,37 @@ describe("MetersField component", () => {
     expect(toMeters("0.0000", 2)).toEqual("0.0000");
   });
 
-  it("Does the unit conversion onBlur.", () => {
-    const wrapper = mountWithAppContext(
+  it("Does the unit conversion onBlur.", async () => {
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <MetersField name="length" />
       </DinaForm>
     );
 
-    wrapper
-      .find(".length-field input")
-      .simulate("change", { target: { value: "5" } });
-    wrapper.find(".length-field input").simulate("blur");
-    expect(wrapper.find(".length-field input").prop("value")).toEqual("5");
-    // No error message on valid input:
-    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
+    const input = screen.getByRole("textbox", { name: /length/i });
 
-    wrapper
-      .find(".length-field input")
-      .simulate("change", { target: { value: "1 ft" } });
-    wrapper.find(".length-field input").simulate("blur");
-    expect(wrapper.find(".length-field input").prop("value")).toEqual("0.30");
-    // No error message on valid input:
-    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
+    // Change input value to 5
+    await userEvent.type(input, "5");
+    fireEvent.blur(input); // Simulate onBlur
+    expect(input).toHaveValue("5");
+
+    // Ensure no error message appears
+    expect(screen.queryByText(/invalid/i)).not.toBeInTheDocument();
+
+    // Change input value to "1 ft"
+    await userEvent.clear(input);
+    await userEvent.type(input, "1 ft");
+    fireEvent.blur(input); // Simulate onBlur
+    expect(input).toHaveValue("0.30");
+
+    // Ensure no error message appears
+    expect(screen.queryByText(/invalid/i)).not.toBeInTheDocument();
   });
 
   it("Shows an error message on invalid input.", async () => {
     const mockOnSubmit = jest.fn();
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -125,43 +131,39 @@ describe("MetersField component", () => {
     );
 
     // Input an invalid value that can't be converted to meters:
-    wrapper
-      .find(".length-field input")
-      .simulate("change", { target: { value: "bad value" } });
-    wrapper.find(".length-field input").simulate("blur");
-    expect(wrapper.find(".length-field input").prop("value")).toEqual(
-      "bad value"
-    );
+    const input = screen.getByRole("textbox", { name: /length/i });
+    await userEvent.type(input, "bad value");
+    fireEvent.blur(input);
+
+    expect(input).toHaveValue("bad value");
     // Shows the error message:
-    expect(wrapper.find(".invalid-feedback").text()).toEqual(
-      "Invalid meters value"
-    );
+    expect(await screen.findByText("Invalid meters value")).toBeInTheDocument();
 
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Simulate form submission
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    // Validation fails so the form doesn't submit:
-    expect(mockOnSubmit).toHaveBeenCalledTimes(0);
+    // Wait for the mock function to be called
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledTimes(0));
 
     // Change to a valid input:
-    wrapper
-      .find(".length-field input")
-      .simulate("change", { target: { value: "1ft" } });
+    await userEvent.clear(input);
+    await userEvent.type(input, "1ft");
+
     // No error message on valid input:
-    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
+    expect(screen.queryByText("Invalid meters value")).not.toBeInTheDocument();
 
-    // Submit the form:
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Simulate form submission
+    fireEvent.submit(form!);
 
-    // Validation fails so the form doesn't submit:
-    expect(mockOnSubmit).lastCalledWith({ length: "0.30" });
+    // Wait for the form submission to complete
+    await waitFor(() =>
+      expect(mockOnSubmit).toHaveBeenCalledWith({ length: "0.30" })
+    );
   });
 
   it("Does the unit conversion onSubmit.", async () => {
-    const wrapper = mountWithAppContext(
+    const { container } = mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -170,22 +172,24 @@ describe("MetersField component", () => {
       </DinaForm>
     );
 
-    wrapper.find(".length-field input").simulate("focus");
-    wrapper
-      .find(".length-field input")
-      .simulate("change", { target: { value: "1 ft" } });
+    // Simulate user input
+    const input = screen.getByRole("textbox", { name: /length/i });
+    userEvent.type(input, "1 ft");
 
-    wrapper.find("form").simulate("submit");
+    // Simulate form submission
+    const form = container.querySelector("form");
+    fireEvent.submit(form!);
 
-    await new Promise(setImmediate);
-
-    expect(mockSubmit).lastCalledWith({
-      length: "0.30"
+    // Wait for the form submission to be handled
+    await waitFor(() => {
+      expect(mockSubmit).toHaveBeenLastCalledWith({
+        length: "0.30"
+      });
     });
   });
 
   it("Renders the initial value.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ length: "10.00" }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -193,19 +197,19 @@ describe("MetersField component", () => {
         <MetersField name="length" />
       </DinaForm>
     );
-
-    expect(wrapper.find(".length-field input").prop("value")).toEqual("10.00");
+    const input = screen.getByRole("textbox", { name: /length/i });
+    expect(input).toHaveValue("10.00");
   });
 
   it("Updates the input value when the form state changes.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ length: "10.00" }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
       >
         <MetersField name="length" />
         <FormikButton
-          onClick={(_, form) => form.setFieldValue("length", "20.5")}
+          onClick={(_, form) => form.setFieldValue("length", "20.5") as any}
         >
           Change Val
         </FormikButton>
@@ -213,9 +217,14 @@ describe("MetersField component", () => {
     );
 
     // Initial value:
-    expect(wrapper.find(".length-field input").prop("value")).toEqual("10.00");
-    wrapper.find("button").simulate("click");
+    const input = screen.getByRole("textbox", { name: /length/i });
+    expect(input).toHaveValue("10.00");
+
+    // Simulate button click to change form state
+    const button = screen.getByRole("button", { name: /change val/i });
+    userEvent.click(button);
+
     // The new value is rendered:
-    expect(wrapper.find(".length-field input").prop("value")).toEqual("20.5");
+    expect(input).toHaveValue("20.5");
   });
 });

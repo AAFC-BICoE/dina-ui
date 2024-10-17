@@ -1,8 +1,11 @@
 import { KitsuResource } from "kitsu";
 import { useEffect } from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { useGroupedCheckBoxes } from "../GroupedCheckBoxFields";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 interface TestResource extends KitsuResource {
   name: string;
@@ -47,129 +50,141 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Renders checkboxes.", () => {
-    const wrapper = mountWithAppContext(<TestComponent />);
-    expect(
-      wrapper.find("CheckBoxField").find("input[type='checkbox']").length
-    ).toEqual(5);
+    const wrapper = mountWithAppContext2(<TestComponent />);
+    // Find all checkbox inputs
+    const checkboxes = screen.getAllByRole("checkbox", { name: /select/i });
+    // Assert that 5 checkboxes are rendered
+    expect(checkboxes).toHaveLength(5);
   });
 
   it("Sets the checked ID in the formik state.", async () => {
-    const wrapper = mountWithAppContext(<TestComponent />);
-    // Check the third checkbox.
-    wrapper.find("input[type='checkbox']").at(2).prop<any>("onClick")({
-      target: { checked: true }
-    } as any);
+    const wrapper = mountWithAppContext2(<TestComponent />);
 
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
+    const checkboxes = screen.getAllByRole("checkbox");
+    await userEvent.click(checkboxes[2]);
 
-    expect(mockOnSubmit).lastCalledWith({ checkedIds: { "3": true } });
+    // Simulate form submission
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
+
+    // Wait for the form submission to complete
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
+
+    // Wait for the async actions to complete.
+    await waitFor(() => {
+      // Verify the mockOnSubmit was called with the expected values.
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        checkedIds: { "3": true }
+      });
+    });
   });
 
   it("Lets you shift+click to toggle multiple check boxes at a time.", async () => {
-    const wrapper = mountWithAppContext(<TestComponent />);
+    const wrapper = mountWithAppContext2(<TestComponent />);
 
-    // Check the second checkbox.
-    wrapper.find("input[type='checkbox']").at(1).prop<any>("onClick")({
-      target: { checked: true }
-    } as any);
+    const checkboxes = screen.getAllByRole("checkbox", { name: /select/i });
 
-    wrapper.update();
+    // Check the second checkbox
+    await userEvent.click(checkboxes[1]);
 
-    // Shift+click the fourth checkbox.
-    wrapper.find("input[type='checkbox']").at(3).prop<any>("onClick")({
-      shiftKey: true,
-      target: { checked: true }
-    } as any);
+    // Shift+click the fourth checkbox to toggle multiple
+    await userEvent.click(checkboxes[3], { shiftKey: true });
 
-    wrapper.update();
-
-    // Boxes 2 to 4 should be checked.
+    // Assert that checkboxes 2 to 4 are checked (2nd to 4th checkboxes are true)
     expect(
-      wrapper
-        .find("CheckBoxField")
-        .find("input[type='checkbox']")
-        .map((i) => i.prop("value"))
+      checkboxes.map((checkbox) => (checkbox as HTMLInputElement).checked)
     ).toEqual([false, true, true, true, false]);
 
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
+    // Simulate form submission
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    expect(mockOnSubmit).lastCalledWith({
+    // Wait for the form submission to complete
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
+
+    // Assert that the form was submitted with the correct checked IDs
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       checkedIds: { "2": true, "3": true, "4": true }
     });
   });
 
   it("Multi-toggles checkboxes even when they are in reverse order.", async () => {
-    const wrapper = mountWithAppContext(<TestComponent />);
+    const wrapper = mountWithAppContext2(<TestComponent />);
 
-    // Click the fourth checkbox.
-    wrapper.find("input[type='checkbox']").at(3).prop<any>("onClick")({
-      target: { checked: true }
-    } as any);
-    wrapper.update();
+    const checkboxes = screen.getAllByRole("checkbox", { name: /select/i });
 
-    // Shift+click the second checkbox.
-    wrapper.find("input[type='checkbox']").at(1).prop<any>("onClick")({
-      shiftKey: true,
-      target: { checked: true }
-    } as any);
-    wrapper.update();
+    // Check the 4th checkbox
+    await userEvent.click(checkboxes[3]);
 
-    // Boxes 2 to 4 should be checked.
+    // Shift+click the 2 checkbox to toggle multiple
+    await userEvent.click(checkboxes[1], { shiftKey: true });
+
+    // Assert that checkboxes 2 to 4 are checked (2nd to 4th checkboxes are true)
     expect(
-      wrapper
-        .find("CheckBoxField")
-        .find("input[type='checkbox']")
-        .map((i) => i.prop("value"))
+      checkboxes.map((checkbox) => (checkbox as HTMLInputElement).checked)
     ).toEqual([false, true, true, true, false]);
 
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
+    // Simulate form submission
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    expect(mockOnSubmit).lastCalledWith({
+    // Wait for the form submission to complete
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
+
+    // Assert that the form was submitted with the correct checked IDs
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       checkedIds: { "2": true, "3": true, "4": true }
     });
   });
 
   it("Provides a checkbox to check all boxes.", async () => {
-    const wrapper = mountWithAppContext(<TestComponent />);
+    const wrapper = mountWithAppContext2(<TestComponent />);
 
-    // The header should show the total checked count.
-    expect(wrapper.text().includes("(0 selected)")).toEqual(true);
+    // The header should show the total checked count initially (0 selected).
+    expect(screen.getByText("(0 selected)")).toBeInTheDocument();
 
     // Check the check-all box.
-    wrapper.find("input.check-all-checkbox").prop<any>("onClick")({
-      target: { checked: true }
-    } as any);
-    wrapper.update();
+    const checkAllCheckbox = screen.getByRole("checkbox", {
+      name: /check all/i
+    });
+    await userEvent.click(checkAllCheckbox);
 
-    // The header should show the total checked count.
-    expect(wrapper.text().includes("(5 selected)")).toEqual(true);
+    // The header should show the total checked count (5 selected).
+    expect(screen.getByText("(5 selected)")).toBeInTheDocument();
 
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
+    // Simulate form submission.
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    expect(mockOnSubmit).lastCalledWith({
-      checkedIds: { "1": true, "2": true, "3": true, "4": true, "5": true },
-      selectAll: { checkedIds: true }
+    // Wait for the form submission and async actions.
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
+
+    // Verify the mockOnSubmit was called with the expected values.
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        checkedIds: { "1": true, "2": true, "3": true, "4": true, "5": true },
+        selectAll: { checkedIds: true }
+      });
     });
 
     // Uncheck the check-all box.
-    wrapper.find("input.check-all-checkbox").prop<any>("onClick")({
-      target: { checked: false }
-    } as any);
-    wrapper.update();
+    await userEvent.click(checkAllCheckbox);
 
-    // The header should show the total checked count.
-    expect(wrapper.text().includes("(0 selected)")).toEqual(true);
+    // The header should show the total checked count as 0 selected.
+    expect(screen.getByText("(0 selected)")).toBeInTheDocument();
 
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
+    // Simulate form submission again.
+    fireEvent.submit(form!);
 
-    expect(mockOnSubmit).lastCalledWith({
-      checkedIds: {},
-      selectAll: { checkedIds: false }
+    // Wait for the form submission and async actions.
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
+
+    // Verify the mockOnSubmit was called with the expected values for unchecked.
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({
+        checkedIds: {},
+        selectAll: { checkedIds: false }
+      });
     });
   });
 });
