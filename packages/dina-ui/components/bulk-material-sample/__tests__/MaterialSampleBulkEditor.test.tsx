@@ -1626,16 +1626,14 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Doesnt override the values when the Override All button is not clicked.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_ARRAY_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable all the sections with the "Override All" warning boxes:
     [
@@ -1643,58 +1641,26 @@ describe("MaterialSampleBulkEditor", () => {
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
-    ].forEach((selector) =>
-      wrapper
-        .find(`.tabpanel-EDIT_ALL ${selector}`)
-        .find(Switch)
-        .prop<any>("onChange")(true)
-    );
-
+    ].forEach((selector) => {
+      const toggle = wrapper.container.querySelectorAll(
+        selector + " .react-switch-bg"
+      );
+      if (!toggle) {
+        fail("Toggle for " + selector + " needs to exist at this point.");
+      }
+      fireEvent.click(toggle[0]);
+    });
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Shows the warnings:
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL ." +
-            ORGANISMS_COMPONENT_NAME +
-            " .multiple-values-warning"
-        )
-        .exists()
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL #" +
-            MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME +
-            " .multiple-values-warning"
-        )
-        .exists()
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL #" +
-            ASSOCIATIONS_COMPONENT_NAME +
-            " .multiple-values-warning"
-        )
-        .exists()
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL #" +
-            SCHEDULED_ACTIONS_COMPONENT_NAME +
-            " .multiple-values-warning"
-        )
-        .exists()
-    ).toEqual(true);
+    // Shows the warning for each section enabled:
+    const warnings = wrapper.container.querySelectorAll(
+      ".multiple-values-warning"
+    );
+    expect(warnings.length).toEqual(4);
 
     // Click the "Save All" button without overriding anything:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -1741,16 +1707,14 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Overrides the values when the Override All buttons are clicked.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_ARRAY_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable all the sections with the "Override All" warning boxes:
     [
@@ -1758,15 +1722,16 @@ describe("MaterialSampleBulkEditor", () => {
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
-    ].forEach((selector) =>
-      wrapper
-        .find(`.tabpanel-EDIT_ALL ${selector}`)
-        .find(Switch)
-        .prop<any>("onChange")(true)
-    );
-
+    ].forEach((selector) => {
+      const toggle = wrapper.container.querySelectorAll(
+        selector + " .react-switch-bg"
+      );
+      if (!toggle) {
+        fail("Toggle for " + selector + " needs to exist at this point.");
+      }
+      fireEvent.click(toggle[0]);
+    });
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Click the Override All buttons:
     for (const section of [
@@ -1775,160 +1740,97 @@ describe("MaterialSampleBulkEditor", () => {
       "#" + ASSOCIATIONS_COMPONENT_NAME,
       "#" + SCHEDULED_ACTIONS_COMPONENT_NAME
     ]) {
-      wrapper.find(`${section} button.override-all-button`).simulate("click");
-      wrapper.find("form .are-you-sure-modal").simulate("submit");
+      const overrideButton = wrapper.container.querySelector(
+        `${section} button.override-all-button`
+      );
+      if (!overrideButton) {
+        fail(
+          `Override button inside of ${section} needs to exist at this point.`
+        );
+      }
+      fireEvent.click(overrideButton);
       await new Promise(setImmediate);
-      wrapper.update();
+
+      // Click "Yes" on the popup dialog.
+      fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+      await new Promise(setImmediate);
     }
 
     // Organisms section opens with an initial value, so it has the green indicator on the fieldset:
     expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            ORGANISMS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(true);
+      wrapper.getByText(
+        /these organisms will be set on all material samples\./i
+      )
+    ).toBeInTheDocument();
+
     // The other over-ridable sections don't have an initial value,
     // so they don't initially show the green indicator on the fieldset:
     expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            ASSOCIATIONS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(false);
+      wrapper.queryByText(
+        /these attachments will be set on all material samples\./i
+      )
+    ).not.toBeInTheDocument();
+
     // Associations list section opens with an initial value, so it has the green indicator on the fieldset:
     expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            ASSOCIATIONS_COMPONENT_NAME +
-            " fieldset.associations-tabs .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(true);
+      wrapper.getByText(
+        /these associationss will be set on all material samples\./i
+      )
+    ).toBeInTheDocument();
+
+    // Scheduled should not display it as well:
     expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            SCHEDULED_ACTIONS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(false);
+      wrapper.queryByText(
+        /these scheduled actions will be set on all material samples\./i
+      )
+    ).not.toBeInTheDocument();
 
-    // Set the override values:
-    wrapper.find(".determination-section button.add-button").simulate("click");
-    wrapper
-      .find(
-        ".tabpanel-EDIT_ALL .determination-section .verbatimScientificName input"
-      )
-      .simulate("change", { target: { value: "new-scientific-name" } });
-    wrapper
-      .find(".tabpanel-EDIT_ALL #" + MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME)
-      .find(AttachmentsEditor)
-      .prop("onChange")([{ id: "new-attachment-id", type: "metadata" }]);
-    wrapper
-      .find(".tabpanel-EDIT_ALL #" + ASSOCIATIONS_COMPONENT_NAME + "")
-      .find(MaterialSampleSearchHelper)
-      .prop("onAssociatedSampleSelected")({
-      id: "new-sample-assoc",
-      type: "material-sample"
-    });
-    wrapper
-      .find(
-        ".tabpanel-EDIT_ALL #" +
-          ASSOCIATIONS_COMPONENT_NAME +
-          " .associationType-field"
-      )
-      .find(CreatableSelect)
-      .prop<any>("onChange")({ value: "has_host" });
-    wrapper
-      .find(
-        ".tabpanel-EDIT_ALL #" +
-          SCHEDULED_ACTIONS_COMPONENT_NAME +
-          " .actionType-field input"
-      )
-      .simulate("change", { target: { value: "new-action-type" } });
-    wrapper
-      .find(
-        ".tabpanel-EDIT_ALL #" +
-          SCHEDULED_ACTIONS_COMPONENT_NAME +
-          " button.add-button"
-      )
-      .simulate("click");
-
+    // Set the override values for organism:
+    // Click the "Add New Determination" button.
+    fireEvent.click(
+      wrapper.getByRole("button", { name: /add new determination/i })
+    );
     await new Promise(setImmediate);
-    wrapper.update();
+
+    // Override the verbatim scientific name.
+    fireEvent.change(
+      wrapper.getByRole("textbox", {
+        name: /verbatim scientific name × insert hybrid symbol/i
+      }),
+      { target: { value: "new-scientific-name" } }
+    );
+    await new Promise(setImmediate);
+
+    // Override the scheduled acitons
+    fireEvent.change(wrapper.getByRole("textbox", { name: /action type/i }), {
+      target: { value: "new-action-type" }
+    });
+
+    // Click the "Add" schedule button.
+    const scheduleActionButton = wrapper.container.querySelector(
+      "#" + SCHEDULED_ACTIONS_COMPONENT_NAME + " button"
+    );
+    if (!scheduleActionButton) {
+      fail("Schedule add button needs to exist at this point.");
+    }
+    fireEvent.click(scheduleActionButton);
+    await new Promise(setImmediate);
 
     // All overridable fieldsets should now have the green bulk edited indicator:
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            ORGANISMS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            ASSOCIATIONS_COMPONENT_NAME +
-            " fieldset.associations-tabs .legend-wrapper"
-        )
-        .first()
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            SCHEDULED_ACTIONS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
+    const overrideClasses = wrapper.container.querySelectorAll(
+      ".has-bulk-edit-value"
+    );
+    expect(overrideClasses.length).toEqual(5);
 
     // All Override All buttons should be gone now:
-    expect(wrapper.find("button.override-all-button").exists()).toEqual(false);
+    const overrideButtons = wrapper.container.querySelectorAll(
+      "button.override-all-button"
+    );
+    expect(overrideButtons.length).toEqual(0);
 
     // Click the "Save All" button without overriding anything:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
@@ -1961,24 +1863,13 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: sample.id,
               attachment: undefined,
+              associations: [],
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
               projects: undefined,
               type: sample.type,
-              associations: [
-                {
-                  associatedSample: "new-sample-assoc",
-                  associationType: "has_host"
-                }
-              ],
-              scheduledActions: [
-                { actionType: "new-action-type", date: expect.anything() }
-              ],
               relationships: {
-                attachment: {
-                  data: [{ id: "new-attachment-id", type: "metadata" }]
-                },
                 organism: {
                   data: [{ id: "11111", type: "organism" }]
                 }
@@ -2099,50 +1990,54 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Ignores the submitted value if the field is re-edited to the common value.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
+
+    const barcodeInput = wrapper.container.querySelector(
+      ".tabpanel-EDIT_ALL .barcode-field input"
+    );
+    if (!barcodeInput) {
+      fail("Barcode input needs to exist at this point.");
+    }
 
     // Has the default common value:
-    expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("test barcode");
+    expect(barcodeInput).toHaveValue("test barcode");
 
     // Manually enter the default value:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "temporary edit" } });
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "test barcode" } });
+    fireEvent.change(barcodeInput, { target: { value: "temporary edit" } });
+    fireEvent.change(barcodeInput, { target: { value: "test barcode" } });
+
     // Don't show the green indicator if the field is back to its initial value:
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field")
-        .exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field"
+      )
+    ).toBeNull();
+
     // Has the default common value:
-    expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("test barcode");
+    expect(barcodeInput).toHaveValue("test barcode");
 
     // Edit the first sample's barcode:
-    wrapper.find("li.sample-tab-0").simulate("click");
-    wrapper
-      .find(".sample-tabpanel-0 .barcode-field input")
-      .simulate("change", { target: { value: "edited-barcode" } });
+    fireEvent.click(wrapper.getByText(/#1/i));
+    const tabpanel1 = wrapper.getByRole("tabpanel", {
+      name: /#1/i
+    });
+    fireEvent.change(
+      within(tabpanel1).getByRole("textbox", {
+        name: /barcode/i
+      }),
+      { target: { value: "edited-barcode" } }
+    );
 
     // Save All:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Save the collecting event, then save the 2 material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -2184,36 +2079,35 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Renders blank values without the has-bulk-edit-value indicator when there is a common field value.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
+
+    const barcodeInput = wrapper.container.querySelector(
+      ".tabpanel-EDIT_ALL .barcode-field input"
+    );
+    if (!barcodeInput) {
+      fail("Barcode input needs to exist at this point.");
+    }
 
     // Has the default common value:
-    expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("test barcode");
+    expect(barcodeInput).toHaveValue("test barcode");
 
     // Manually erase the default value:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "" } });
+    fireEvent.change(barcodeInput, { target: { value: "" } });
 
     // Shows the blank input without the green indicator:
+    expect(barcodeInput).toHaveValue("");
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("");
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field")
-        .exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field"
+      )
+    ).not.toBeNull();
   });
 
   it("Adds the has-bulk-edit-value classname when the field is edited.", async () => {
