@@ -3,7 +3,7 @@ import { JsonTree } from "react-awesome-query-builder";
 /**
  * The current version of the saved search, this should change if the structure changes.
  */
-export const SAVED_SEARCH_VERSION = 2;
+export const SAVED_SEARCH_VERSION = 3;
 
 /**
  * Since saved searches are stored as JSON this is the structure to be used.
@@ -32,6 +32,11 @@ export interface SingleSavedSearch {
    * Query builder structure.
    */
   queryTree?: JsonTree;
+
+  /**
+   * Selected columns visibility structure.
+   */
+  columnVisibility?: string[];
 
   /**
    * Groups to load in.

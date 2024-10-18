@@ -8,7 +8,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
-import { get, isArray } from "lodash";
+import { compact, find, get, isArray, pick } from "lodash";
 import { useState } from "react";
 import { PersonSelectField } from "../..";
 import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
@@ -17,15 +17,13 @@ import {
   Determination,
   MaterialSample,
   Organism,
+  ScientificNameSource,
   Vocabulary
 } from "../../../types/collection-api";
 import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
-import {
-  GlobalNamesField,
-  SelectedScientificNameView
-} from "../global-names/GlobalNamesField";
 import { TabbedArrayField } from "../TabbedArrayField";
-import { find, compact } from "lodash";
+import { GlobalNamesField } from "../global-names/GlobalNamesField";
+import { ScientificNameField } from "./ScientificNameField";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -111,7 +109,11 @@ export function DeterminationField({
         typeName={formatMessage("determination")}
         sectionId={id}
         initialIndex={initialIndex}
-        makeNewElement={() => ({})}
+        makeNewElement={() => ({
+          scientificName: undefined,
+          scientificNameDetails: undefined,
+          scientificNameSource: undefined
+        })}
         renderTab={(det, index) => (
           <span className="m-3">
             {index + 1}
@@ -130,6 +132,18 @@ export function DeterminationField({
             form.values,
             fieldScientificNameSrcDetail
           );
+
+          const scientificNameSourceField = fieldProps(
+            "scientificNameSource"
+          ).name;
+          const scientificNameSourceVal = get(
+            form.values,
+            scientificNameSourceField
+          );
+
+          const isManualInput =
+            scientificNameSourceVal === ScientificNameSource.CUSTOM;
+
           return (
             <div className="row">
               {!readOnly && !isTemplate && (
@@ -194,7 +208,7 @@ export function DeterminationField({
                     {...fieldProps("typeStatus")}
                     jsonApiBackend={{
                       query: () => ({
-                        path: "collection-api/vocabulary/typeStatus"
+                        path: "collection-api/vocabulary2/typeStatus"
                       }),
                       option: (vocabElement, searchValue) =>
                         compact(
@@ -230,52 +244,10 @@ export function DeterminationField({
                   className="non-strip"
                   sectionName="organism-determination-section"
                 >
-                  {/* determination scientific name is used for display readonly and edit plain string entry  */}
-
-                  {((!hideScientificNameInput && !scientificNameSrcDetailVal) ||
-                    readOnly) && (
-                    <>
-                      <TextField
-                        {...fieldProps("scientificName")}
-                        readOnlyRender={(value, _form) => {
-                          const scientificNameSrcDetailUrlVal =
-                            _form.getFieldMeta(
-                              fieldProps("scientificNameDetails.sourceUrl").name
-                            ).value as string;
-                          return (
-                            <SelectedScientificNameView
-                              value={value}
-                              formik={_form}
-                              scientificNameDetailsField={
-                                fieldProps("scientificNameDetails").name
-                              }
-                              scientificNameSrcDetailUrlVal={
-                                scientificNameSrcDetailUrlVal
-                              }
-                            />
-                          );
-                        }}
-                        onChangeExternal={(_form, _, newVal) => {
-                          if (newVal && newVal?.trim().length > 0) {
-                            _form.setFieldValue(
-                              fieldProps("scientificNameSource").name,
-                              "GNA"
-                            );
-                          } else {
-                            _form.setFieldValue(
-                              fieldProps("scientificNameSource").name,
-                              null
-                            );
-                            _form.setFieldValue(
-                              fieldProps("scientificNameDetails").name,
-                              null
-                            );
-                          }
-                        }}
-                      />
-                      {!readOnly && <hr />}
-                    </>
-                  )}
+                  <ScientificNameField
+                    fieldProps={fieldProps}
+                    isManualInput={isManualInput}
+                  />
 
                   {/* determination scientific name search is used for search scientific name and display search result entry in edit mode */}
                   {!readOnly && (
@@ -285,11 +257,7 @@ export function DeterminationField({
                           ? "scientificNameInput"
                           : "scientificName"
                       )}
-                      label={
-                        hideScientificNameInput || !!scientificNameSrcDetailVal
-                          ? formatMessage("field_scientificNameInput")
-                          : formatMessage("scientificNameSearch")
-                      }
+                      label={formatMessage("scientificNameSearch")}
                       scientificNameDetailsField={
                         fieldProps("scientificNameDetails").name
                       }
@@ -300,25 +268,44 @@ export function DeterminationField({
                         fieldProps("scientificNameDetails.sourceUrl").name
                       }
                       onChange={(newValue, formik) => {
-                        formik.setFieldValue(
-                          fieldProps("scientificNameSource").name,
-                          newValue ? "GNA" : null
-                        );
-                        formik.setFieldValue(
-                          fieldProps("scientificNameDetails").name,
-                          newValue && isArray(newValue) ? newValue[0] : null
-                        );
-                        // If selected a result from search , set text input value to null and hide it
-                        // If a search value is removed, show the text input value
-                        if (newValue) {
+                        if (newValue && (newValue as any).isManual) {
                           formik.setFieldValue(
-                            fieldProps("scientificName").name,
-                            newValue?.[1]
+                            fieldProps("scientificNameSource").name,
+                            newValue ? "CUSTOM" : null
                           );
-                          // here need to set the synonym field as well
-                          setHideScientificNameInput(true);
+                          formik.setFieldValue(
+                            fieldProps("scientificNameDetails").name,
+                            newValue &&
+                              (newValue["classificationRanks"] ||
+                                newValue["classificationPath"])
+                              ? pick(newValue, [
+                                  "classificationRanks",
+                                  "classificationPath"
+                                ])
+                              : null
+                          );
                         } else {
-                          setHideScientificNameInput(false);
+                          formik.setFieldValue(
+                            fieldProps("scientificNameSource").name,
+                            newValue ? "GNA" : null
+                          );
+
+                          formik.setFieldValue(
+                            fieldProps("scientificNameDetails").name,
+                            newValue && isArray(newValue) ? newValue[0] : null
+                          );
+                          // If selected a result from search , set text input value to null and hide it
+                          // If a search value is removed, show the text input value
+                          if (newValue) {
+                            formik.setFieldValue(
+                              fieldProps("scientificName").name,
+                              newValue?.[1]
+                            );
+                            // here need to set the synonym field as well
+                            setHideScientificNameInput(true);
+                          } else {
+                            setHideScientificNameInput(false);
+                          }
                         }
                       }}
                       index={index}
@@ -338,20 +325,41 @@ export function DeterminationField({
                     {...fieldProps("determinationRemarks")}
                     multiLines={true}
                   />
+                  {readOnly && (
+                    <ManagedAttributesEditor
+                      valuesPath={fieldProps("managedAttributes").name}
+                      managedAttributeApiPath="collection-api/managed-attribute"
+                      managedAttributeComponent="DETERMINATION"
+                      attributeSelectorWidth={12}
+                      fieldSetProps={{
+                        legend: (
+                          <DinaMessage id="determinationManagedAttributes" />
+                        ),
+                        className: "non-strip",
+                        sectionName: "organism-managed-attributes-section"
+                      }}
+                      managedAttributeOrderFieldName="determinationManagedAttributesOrder"
+                      visibleAttributeKeys={visibleManagedAttributeKeys}
+                    />
+                  )}
                 </FieldSet>
-                <ManagedAttributesEditor
-                  valuesPath={fieldProps("managedAttributes").name}
-                  managedAttributeApiPath="collection-api/managed-attribute"
-                  managedAttributeComponent="DETERMINATION"
-                  attributeSelectorWidth={12}
-                  fieldSetProps={{
-                    legend: <DinaMessage id="determinationManagedAttributes" />,
-                    className: "non-strip",
-                    sectionName: "organism-managed-attributes-section"
-                  }}
-                  managedAttributeOrderFieldName="determinationManagedAttributesOrder"
-                  visibleAttributeKeys={visibleManagedAttributeKeys}
-                />
+                {!readOnly && (
+                  <ManagedAttributesEditor
+                    valuesPath={fieldProps("managedAttributes").name}
+                    managedAttributeApiPath="collection-api/managed-attribute"
+                    managedAttributeComponent="DETERMINATION"
+                    attributeSelectorWidth={12}
+                    fieldSetProps={{
+                      legend: (
+                        <DinaMessage id="determinationManagedAttributes" />
+                      ),
+                      className: "non-strip",
+                      sectionName: "organism-managed-attributes-section"
+                    }}
+                    managedAttributeOrderFieldName="determinationManagedAttributesOrder"
+                    visibleAttributeKeys={visibleManagedAttributeKeys}
+                  />
+                )}
               </div>
             </div>
           );

@@ -3,12 +3,21 @@ import DatePicker from "react-datepicker";
 import {
   includedTypeQuery,
   rangeQuery,
-  existsQuery
+  existsQuery,
+  betweenQuery,
+  inQuery,
+  inDateQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
-import { DATE_REGEX_PARTIAL } from "common-ui/lib";
+import { DATE_REGEX_NO_TIME, DATE_REGEX_PARTIAL } from "common-ui";
+import {
+  convertStringToBetweenState,
+  useQueryBetweenSupport
+} from "../query-builder-core-components/useQueryBetweenSupport";
+import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
 import moment from "moment";
 import { useIntl } from "react-intl";
+import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 
 interface QueryBuilderDateSearchProps {
   /**
@@ -34,42 +43,74 @@ export default function QueryBuilderDateSearch({
 }: QueryBuilderDateSearchProps) {
   const { formatMessage } = useIntl();
 
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
+
+  const { BetweenElement } = useQueryBetweenSupport({
+    type: "date",
+    matchType,
+    setValue,
+    value
+  });
+
   return (
     <>
-      {matchType !== "empty" && matchType !== "notEmpty" && matchType !== "in" && matchType !== "notIn" && (
-        <DatePicker
-          className="form-control"
-          value={value}
-          onChange={(newDate: Date, event) => {
-            if (
-              !event ||
-              event?.type === "click" ||
-              event?.type === "keydown"
-            ) {
-              setValue?.(newDate && newDate.toISOString().slice(0, 10));
-            }
-          }}
-          onChangeRaw={(event) => {
-            if (event?.type === "change") {
-              let newText = event.target.value;
-              const dashOccurrences = newText.split("-").length - 1;
-              if (newText.length === 8 && dashOccurrences === 0) {
-                newText =
-                  newText.slice(0, 4) +
-                  "-" +
-                  newText.slice(4, 6) +
-                  "-" +
-                  newText.slice(6);
-              }
-              setValue?.(newText);
-            }
-          }}
-          dateFormat="yyyy-MM-dd"
-          placeholderText="YYYY-MM-DD"
-          isClearable={true}
-          showYearDropdown={true}
-          todayButton="Today"
-        />
+      {matchType !== "empty" && matchType !== "notEmpty" && (
+        <>
+          {matchType === "between" ? (
+            BetweenElement
+          ) : (
+            <>
+              {matchType !== "in" && matchType !== "notIn" ? (
+                <DatePicker
+                  className="form-control"
+                  value={value}
+                  onChange={(newDate: Date, event) => {
+                    if (
+                      !event ||
+                      event?.type === "click" ||
+                      event?.type === "keydown"
+                    ) {
+                      setValue?.(newDate && newDate.toISOString().slice(0, 10));
+                    }
+                  }}
+                  onChangeRaw={(event) => {
+                    if (event?.type === "change") {
+                      let newText = event.target.value;
+                      const dashOccurrences = newText.split("-").length - 1;
+                      if (newText.length === 8 && dashOccurrences === 0) {
+                        newText =
+                          newText.slice(0, 4) +
+                          "-" +
+                          newText.slice(4, 6) +
+                          "-" +
+                          newText.slice(6);
+                      }
+                      setValue?.(newText);
+                    }
+                  }}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="YYYY-MM-DD"
+                  isClearable={true}
+                  showYearDropdown={true}
+                  todayButton="Today"
+                  onKeyDown={onKeyDown}
+                />
+              ) : (
+                <input
+                  type={"text"}
+                  value={value ?? ""}
+                  onChange={(newValue) => setValue?.(newValue?.target?.value)}
+                  className="form-control"
+                  placeholder={formatMessage({
+                    id: "queryBuilder_value_in_placeholder"
+                  })}
+                  onKeyDown={onKeyDown}
+                />
+              )}
+            </>
+          )}
+        </>
       )}
     </>
   );
@@ -118,6 +159,21 @@ export function transformDateSearchToDSL({
             fieldPath,
             buildDateRangeObject(operation, value, subType)
           );
+
+    // Between operator (range)
+    case "between":
+      return betweenQuery(fieldPath, value, parentType, "date", subType);
+
+    // List of dates, comma-separated.
+    case "in":
+    case "notIn":
+      return inDateQuery(
+        fieldPath,
+        value,
+        parentType,
+        subType,
+        operation === "notIn"
+      );
 
     // Not equals match type.
     case "notEquals":
@@ -271,10 +327,10 @@ export function transformDateSearchToDSL({
  * This will retrieve the users current timezone without the DST offset which can vary.
  *
  * This will return the timezone in IANA time zone format for elastic search to use.
- * 
+ *
  * @returns elasticsearch timezone section, using the users IANA timezone
  */
-function getTimezone() {
+export function getTimezone() {
   const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const timezoneConfig = {
@@ -310,12 +366,9 @@ function getTimezone() {
  * @param subType subtype of the date, used to determine if timezone should be included.
  * @returns numerical operator and value.
  */
-function buildDateRangeObject(matchType, value, subType) {
+export function buildDateRangeObject(matchType, value, subType) {
   // Local date does not store timezone, ignore it.
-  const timezone =
-    subType !== "local_date" && subType !== "local_date_time"
-      ? getTimezone()
-      : undefined;
+  const timezone = subType === "date_time" ? getTimezone() : undefined;
 
   switch (matchType) {
     case "containsDate":
@@ -369,18 +422,95 @@ function buildDateRangeObject(matchType, value, subType) {
   }
 }
 
-/**
- * Validate the date string to ensure it's something elastic search can accept.
- *
- * Partial dates and multiple dates are supported here.
- * @param value date value
- * @param formatMessage error message translation locale
- * @return null if valid, string error if not valid.
- */
-export function validateDate(value, formatMessage): string | null {
-  if (DATE_REGEX_PARTIAL.test(value)) {
-    return null;
+export function validateDate(
+  fieldName: string,
+  value: string,
+  operator: string,
+  formatMessage: any
+): ValidationResult {
+  switch (operator) {
+    // Contains (Partial formats supported here.)
+    case "containsDate":
+      if (value == null || value === "") return true;
+      if (!DATE_REGEX_PARTIAL.test(value)) {
+        return {
+          errorMessage: formatMessage({ id: "dateMustBeFormattedPartial" }),
+          fieldName
+        };
+      }
+      break;
+
+    // Normal date fields
+    case "equals":
+    case "notEquals":
+    case "greaterThan":
+    case "greaterThanOrEqualTo":
+    case "lessThan":
+    case "lessThanOrEqualTo":
+      if (value == null || value === "") return true;
+      if (!DATE_REGEX_NO_TIME.test(value)) {
+        return {
+          errorMessage: formatMessage({ id: "dateMustBeFormattedYyyyMmDd" }),
+          fieldName
+        };
+      }
+      break;
+
+    // Between (Check the low/high for correct values, ensure it's not greater than the other value.)
+    case "between":
+      const betweenStates = convertStringToBetweenState(value);
+      if (betweenStates.low === "" && betweenStates.high === "") return true;
+
+      // If just one between state is empty, then report an error.
+      if (betweenStates.low === "" || betweenStates.high === "") {
+        return {
+          errorMessage: formatMessage({ id: "dateBetweenMissingValues" }),
+          fieldName
+        };
+      }
+
+      if (
+        !DATE_REGEX_NO_TIME.test(betweenStates.low) ||
+        !DATE_REGEX_NO_TIME.test(betweenStates.high)
+      ) {
+        return {
+          errorMessage: formatMessage({ id: "dateMustBeFormattedYyyyMmDd" }),
+          fieldName
+        };
+      }
+
+      const fromMoment = moment(betweenStates.low, "YYYY-MM-DD");
+      const toMoment = moment(betweenStates.high, "YYYY-MM-DD");
+      if (!fromMoment.isSameOrBefore(toMoment)) {
+        return {
+          errorMessage: formatMessage({ id: "dateBetweenInvalid" }),
+          fieldName
+        };
+      }
+      break;
+
+    case "in":
+    case "notIn":
+      // Retrieve all of the potential dates, by spliting by commas and removing leading/trailing whitespace.
+      let invalidDateFound = false;
+      value
+        .split(",")
+        .map((item) => item.trim())
+        .forEach((val) => {
+          if (!DATE_REGEX_NO_TIME.test(val) && val !== "") {
+            invalidDateFound = true;
+          }
+        });
+
+      // If an invalid number was found, return an error message.
+      if (invalidDateFound) {
+        return {
+          errorMessage: formatMessage({ id: "dateInRangeInvalid" }),
+          fieldName
+        };
+      }
+      break;
   }
 
-  return formatMessage({ id: "dateMustBeFormattedPartial" });
+  return true;
 }

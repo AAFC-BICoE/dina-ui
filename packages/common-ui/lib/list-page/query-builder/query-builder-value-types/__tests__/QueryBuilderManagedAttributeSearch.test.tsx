@@ -6,6 +6,7 @@ interface TestValueStructure {
   operators: string[];
   subTypes: (string | undefined)[];
   useKeywordMultiField: boolean;
+  useKeywordNumericField: boolean;
 }
 
 /**
@@ -25,6 +26,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
             case "in":
             case "notIn":
               return "stringValue1, stringValue2,stringValue3"
+            case "between":
+              return "{\\\"low\\\":\\\"stringValue1\\\",\\\"high\\\":\\\"stringValue3\\\"}";
             default:
               return "stringValue"
           }
@@ -34,21 +37,36 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "wildcard",
           "in",
           "notIn",
+          "between",
           "startsWith",
           "notEquals",
           "empty",
           "notEmpty"
         ],
         subTypes: [undefined],
-        useKeywordMultiField: true
+        useKeywordMultiField: true,
+        useKeywordNumericField: true
       },
       {
         type: "DATE",
-        testValue: () => "1998-05-19",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "1998-05-19, 2020-01-01,2024-04-08"
+            case "between":
+              return "{\\\"low\\\":\\\"1998-05-19\\\",\\\"high\\\":\\\"2002-02-10\\\"}";
+            default:
+              return "1998-05-19"
+          }
+        },
         operators: [
           "equals",
           "notEquals",
           "containsDate",
+          "between",
+          "in",
+          "notIn",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -63,7 +81,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "date_time",
           "date_time_optional_tz"
         ],
-        useKeywordMultiField: false
+        useKeywordMultiField: false,
+        useKeywordNumericField: false
       },
       {
         type: "INTEGER",
@@ -71,9 +90,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           switch (operator) {
             case "in":
             case "notIn":
-              return "1, 2,4"
+              return "1, 2,4";
+            case "between":
+              return "{\\\"low\\\":1,\\\"high\\\":5}";
             default:
-              return "42"
+              return "42";
           }
         },
         operators: [
@@ -81,6 +102,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "notEquals",
           "in",
           "notIn",
+          "between",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -89,7 +111,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "notEmpty"
         ],
         subTypes: [undefined],
-        useKeywordMultiField: false
+        useKeywordMultiField: false,
+        useKeywordNumericField: false
       },
       {
         type: "DECIMAL",
@@ -97,9 +120,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           switch (operator) {
             case "in":
             case "notIn":
-              return "3, 3.1,12.5"
+              return "3, 3.1,12.5";
+            case "between":
+              return "{\\\"low\\\":1.5,\\\"high\\\":10.5}";
             default:
-              return "3.5"
+              return "3.5";
           }
         },
         operators: [
@@ -107,6 +132,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "notEquals",
           "in",
           "notIn",
+          "between",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -115,7 +141,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "notEmpty"
         ],
         subTypes: [undefined],
-        useKeywordMultiField: false
+        useKeywordMultiField: false,
+        useKeywordNumericField: false
       },
       {
         type: "PICK_LIST",
@@ -130,14 +157,16 @@ describe("QueryBuilderManagedAttributeSearch", () => {
         },
         operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"],
         subTypes: [undefined],
-        useKeywordMultiField: true
+        useKeywordMultiField: true,
+        useKeywordNumericField: false
       },
       {
         type: "BOOL",
         testValue: () => "true",
         operators: ["equals", "empty", "notEmpty"],
         subTypes: [undefined],
-        useKeywordMultiField: true
+        useKeywordMultiField: true,
+        useKeywordNumericField: false
       }
     ];
 
@@ -168,6 +197,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                         path: "data.attributes.managedAttributes",
                         apiEndpoint: "collection-api/managed-attribute"
                       },
+                      hideField: true,
                       value: "data.attributes.managedAttributes",
                       distinctTerm: false,
                       label: "managedAttributes",
@@ -178,7 +208,10 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                       ).useKeywordMultiField,
                       optimizedPrefix: false,
                       containsSupport: false,
-                      endsWithSupport: false,
+                      endsWithSupport: false,                      
+                      keywordNumericSupport: (
+                        testValue as TestValueStructure
+                      ).useKeywordNumericField,
                       subType
                     }
                   })
@@ -214,6 +247,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                         referencedType: "collecting-event",
                         apiEndpoint: "collection-api/managed-attribute"
                       } as any,
+                      hideField: true,
                       parentName: "collectingEvent",
                       parentPath: "included",
                       parentType: "collecting-event",
@@ -229,6 +263,9 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                       optimizedPrefix: false,
                       containsSupport: false,
                       endsWithSupport: false,
+                      keywordNumericSupport: (
+                        testValue as TestValueStructure
+                      ).useKeywordNumericField,
                       subType
                     }
                   })

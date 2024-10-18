@@ -1,6 +1,7 @@
 import { Person } from "packages/dina-ui/types/agent-api";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../useAutocompleteSearchButFallbackToRsqlApiSearch";
+import "@testing-library/jest-dom";
 
 // Mock out the debounce function to avoid waiting during tests.
 jest.mock("use-debounce", () => ({
@@ -77,7 +78,7 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Able to perform searches with elastic search, RSQL should be called for an empty response.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <TestPersonSearchComponent searchQuery={""} />,
       {
         apiContext: {
@@ -90,17 +91,18 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
 
-    expect(wrapper.find(".person-list li").length).toEqual(1);
-    expect(wrapper.find(".person-list li").first().text()).toEqual(
+    expect(wrapper.getAllByRole("listitem").length).toEqual(1);
+    expect(wrapper.getByRole("listitem").textContent).toEqual(
       "Person from Agent API"
     );
+    expect(wrapper.queryByText(/loading: false/i)).toBeInTheDocument();
+    wrapper.unmount();
 
     // Try again with a full query
-    const wrapper2 = mountWithAppContext(
+    const wrapper2 = mountWithAppContext2(
       <TestPersonSearchComponent searchQuery={"test-query"} />,
       {
         apiContext: {
@@ -113,7 +115,6 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper2.update();
 
     expect(mockSearchApiGet).toHaveBeenCalledTimes(1);
     expect(mockSearchApiGet).lastCalledWith(
@@ -130,14 +131,15 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
         }
       }
     );
-    expect(wrapper2.find(".person-list li").length).toEqual(1);
-    expect(wrapper2.find(".person-list li").first().text()).toEqual(
+    expect(wrapper2.getAllByRole("listitem").length).toEqual(1);
+    expect(wrapper2.getByRole("listitem").textContent).toEqual(
       "Person from Search API"
     );
+    expect(wrapper2.queryByText(/loading: false/i)).toBeInTheDocument();
   });
 
   it("Falls back to the RSQL filter API when the search API throws an error.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <TestPersonSearchComponent searchQuery={"test-query"} />,
       {
         apiContext: {
@@ -148,9 +150,8 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
         }
       }
     );
-
+    expect(wrapper.queryByText(/loading: true/i)).toBeInTheDocument();
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSearchApiGetWithError).toHaveBeenCalledTimes(1);
     expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
@@ -158,9 +159,10 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
       sort: "-createdOn"
     });
 
-    expect(wrapper.find(".person-list li").length).toEqual(1);
-    expect(wrapper.find(".person-list li").first().text()).toEqual(
+    expect(wrapper.getAllByRole("listitem").length).toEqual(1);
+    expect(wrapper.getByRole("listitem").textContent).toEqual(
       "Person from Agent API"
     );
+    expect(wrapper.queryByText(/loading: false/i)).toBeInTheDocument();
   });
 });

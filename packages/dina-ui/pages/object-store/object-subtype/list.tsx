@@ -43,14 +43,16 @@ export default function ObjectSubtypeListPage() {
   return (
     <>
       <Head title={formatMessage("objectSubtypeListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/object-store/object-subtype" />
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="objectSubtypeListTitle" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/object-store/object-subtype" />
-        </ButtonBar>
         <div className="w-100">
           <QueryTable {...queryTableProps} />
         </div>

@@ -42,6 +42,8 @@ export interface TooltipProps {
 
   setVisible?: React.Dispatch<React.SetStateAction<boolean>>;
   visible?: boolean;
+  className?: string;
+  directComponent?: JSX.Element | JSX.Element[];
 }
 
 export type tooltipPlacements = "top" | "bottom" | "left" | "right";
@@ -49,6 +51,7 @@ export type tooltipPlacements = "top" | "bottom" | "left" | "right";
 export function Tooltip({
   id,
   directText,
+  directComponent,
   intlValues,
   visibleElement,
   link,
@@ -56,7 +59,8 @@ export function Tooltip({
   image,
   altImage,
   disableSpanMargin,
-  placement = "top"
+  placement = "top",
+  className
 }: TooltipProps) {
   // Setup the internationalization functions.
   const { messages, formatMessage } = useIntl();
@@ -103,19 +107,22 @@ export function Tooltip({
     ) : null;
 
   return (
-    <span className={disableSpanMargin ? undefined : "m-2"}>
+    <span
+      className={className ? className : disableSpanMargin ? undefined : "m-2"}
+    >
       <RcTooltip
         id={id}
         overlay={
           <div style={{ maxWidth: "25rem", whiteSpace: "pre-wrap" }}>
             {tooltipMessage}
+            {directComponent}
             {tooltipImage}
             {tooltipLink}
           </div>
         }
         placement={placement}
         trigger={["focus", "hover"]}
-        zIndex={3001}
+        zIndex={9001}
       >
         <span>
           {visibleElement ? (

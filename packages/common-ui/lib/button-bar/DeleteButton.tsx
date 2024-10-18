@@ -2,11 +2,15 @@ import { useRouter } from "next/router";
 import { CSSProperties, ReactNode, useContext } from "react";
 import {
   ApiClientContext,
-  DoOperationsOptions
+  DoOperationsOptions,
+  useApiClient
 } from "../api-client/ApiClientContext";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
 import { useModal } from "../modal/modal";
+import { MaterialSample } from "../../../dina-ui/types/collection-api";
+import { KitsuResponse } from "kitsu";
+import { StorageUnitUsage } from "../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 interface DeleteButtonProps {
   /** Additional button classes. */
@@ -35,6 +39,8 @@ interface DeleteButtonProps {
   withLeadingSlash?: boolean;
 
   reload?: boolean;
+
+  deleteRelationships?: boolean;
 }
 
 export function DeleteButton({
@@ -49,13 +55,27 @@ export function DeleteButton({
   reload,
   onDeleted,
   children,
-  style
+  style,
+  deleteRelationships = false
 }: DeleteButtonProps) {
   const { openModal } = useModal();
   const { doOperations } = useContext(ApiClientContext);
   const router = useRouter();
+  const { apiClient, save } = useApiClient();
 
   async function doDelete() {
+    let materialSample: KitsuResponse<MaterialSample, undefined> = {
+      data: { id: "", type: "material-sample" },
+      meta: undefined
+    };
+    if (type === "material-sample" && deleteRelationships) {
+      materialSample = await apiClient.get<MaterialSample>(
+        `collection-api/material-sample/${id}`,
+        {
+          include: "storageUnitUsage"
+        }
+      );
+    }
     await doOperations(
       [
         {
@@ -65,6 +85,23 @@ export function DeleteButton({
       ],
       options
     );
+
+    // Delete StorageUnitUsage if there is one linked
+    if (materialSample.data.storageUnitUsage?.id && deleteRelationships) {
+      await save<StorageUnitUsage>(
+        [
+          {
+            delete: {
+              id: materialSample.data.storageUnitUsage?.id ?? null,
+              type: "storage-unit-usage"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      );
+    }
 
     onDeleted?.();
 
@@ -87,7 +124,7 @@ export function DeleteButton({
       className={
         replaceClassName ?? `btn btn-danger delete-button ${className}`
       }
-      style={{ width: "6rem", ...style }}
+      style={{ paddingLeft: "15px", paddingRight: "15px", ...style }}
       disabled={disabled}
       onClick={() =>
         openModal(

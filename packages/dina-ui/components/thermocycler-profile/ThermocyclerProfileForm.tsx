@@ -50,13 +50,17 @@ export function ThermocyclerProfileForm({
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar>
-        <BackButton
-          entityId={id as string}
-          entityLink="/seqdb/thermocycler-profile"
-        />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={id as string}
+            entityLink="/seqdb/thermocycler-profile"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
-      <SubmitButton className="ms-auto" />
       <ThermocyclerProfileFormFields readOnly={readOnly} />
     </DinaForm>
   );

@@ -8,7 +8,6 @@ import {
 import Link from "next/link";
 import { groupCell } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { PreparationType } from "../../../types/collection-api";
 
 const PROJECT_FILTER_ATTRIBUTES = ["name", "status", "multilingualDescription"];
@@ -29,12 +28,14 @@ const PROJECT_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
 ];
 
 export default function collectionMethodListPage() {
-  const { formatMessage } = useDinaIntl();
-
   return (
     <PageLayout
       titleId="projectListTitle"
-      buttonBarContent={<CreateButton entityLink="/collection/project" />}
+      buttonBarContent={
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/project" />
+        </div>
+      }
     >
       <ListPageLayout
         filterAttributes={PROJECT_FILTER_ATTRIBUTES}

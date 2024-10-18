@@ -2,8 +2,11 @@ import { KitsuResource } from "kitsu";
 import lodash from "lodash";
 import Select from "react-select/base";
 import { ResourceSelectField } from "../../";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
+import "@testing-library/jest-dom";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 interface TestGroup extends KitsuResource {
   groupName: string;
@@ -56,7 +59,7 @@ jest.mock("use-debounce", () => ({
 
 describe("ResourceSelectField component", () => {
   it("Displays the Formik field's value.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ group: { id: "3", groupName: "Mat's Group" } }}
       >
@@ -70,13 +73,11 @@ describe("ResourceSelectField component", () => {
       { apiContext }
     );
 
-    const { value } = wrapper.find(Select).props();
+    // Query the selected value inside the `react-select__single-value` element:
+    const selectedOption = screen.getByText("Mat's Group");
 
-    expect(value).toEqual({
-      label: "Mat's Group",
-      resource: { groupName: "Mat's Group", id: "3" },
-      value: "3"
-    });
+    // Check that the selected option is rendered correctly
+    expect(selectedOption).toBeInTheDocument();
   });
 
   it("Changes the Formik field's value.", async () => {
@@ -84,7 +85,7 @@ describe("ResourceSelectField component", () => {
       group: { groupName?: string } | null;
     }
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm<TestForm> initialValues={{ group: null }}>
         {({ values: { group } }) => (
           <div>
@@ -93,7 +94,7 @@ describe("ResourceSelectField component", () => {
               model="test-api/group"
               filter={(groupName) => ({ groupName })}
               /* tslint:disable-next-line */
-              optionLabel={group => group.groupName}
+              optionLabel={(group) => group.groupName}
             />
             <div id="value-display">{group && group.groupName}</div>
           </div>
@@ -104,40 +105,36 @@ describe("ResourceSelectField component", () => {
 
     // Wait for the options to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Simulate the select component's input change.
-    (wrapper.find(Select).props() as any).onInputChange("Mat", "input-change");
+    // Simulate input change to trigger search in Select field.
+    const input = screen.getByRole("combobox");
+    userEvent.type(input, "Mat");
 
-    // Wait for the filtered options to load.
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Wait for the mock get to be called.
+    await waitFor(() =>
+      expect(mockGet).toHaveBeenCalledWith("test-api/group", {
+        filter: { groupName: "Mat" },
+        page: { limit: 6 },
+        sort: "-createdOn"
+      })
+    );
 
-    // The "get" function should have been called with the filter.
-    expect(mockGet).lastCalledWith("test-api/group", {
-      filter: {
-        groupName: "Mat"
-      },
-      page: { limit: 6 },
-      sort: "-createdOn"
+    // Assume options are loaded; simulate option selection.
+    const option = screen.getByText("Mat's Group");
+    userEvent.click(option);
+
+    // Verify the selected group is displayed.
+    await waitFor(() => {
+      const valueDisplay = wrapper.container.querySelector("#value-display");
+      expect(valueDisplay).toHaveTextContent("Mat's Group");
     });
-
-    const options = wrapper.find<any>(Select).prop("options")[0].options;
-    const onChange = wrapper.find<any>(Select).prop("onChange");
-
-    const groupToSelect = options[0];
-
-    // Simulate selecting a new option.
-    onChange(groupToSelect);
-
-    // The new selected group's name should be rendered into the value-display div.
-    expect(wrapper.find("#value-display").text()).toEqual("Mat's Group");
   });
 
-  it("Provides an onChange callback prop.", () => {
+  it("Provides an onChange callback prop.", async () => {
     const mockOnChange = jest.fn();
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}>
         <ResourceSelectField<TestGroup>
           name="group"
@@ -150,12 +147,18 @@ describe("ResourceSelectField component", () => {
       { apiContext }
     );
 
-    // Change the value.
-    wrapper.find(Select).prop<any>("onChange")({
-      resource: MOCK_GROUPS.data[1]
-    });
+    // Simulate user selecting "Group 2"
+    const select = screen.getByRole("combobox");
 
-    expect(mockOnChange).lastCalledWith({
+    // Open the select dropdown
+    userEvent.click(select);
+
+    // Select "Group 2" from the dropdown
+    const option = await screen.findByText("Group 2"); // Wait for the option to appear
+    userEvent.click(option); // Simulate selecting the option
+
+    // Assert the mock function was called with expected arguments
+    expect(mockOnChange).toHaveBeenLastCalledWith({
       groupName: "Group 2",
       id: "2",
       type: "group"
@@ -163,7 +166,7 @@ describe("ResourceSelectField component", () => {
   });
 
   it("Renders the read-only view.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{
           singleGroup: { id: "1", groupName: "Group 1" },
@@ -193,28 +196,43 @@ describe("ResourceSelectField component", () => {
       { apiContext }
     );
 
-    expect(wrapper.find(".singleGroup-field .read-only-view").text()).toEqual(
-      "Group 1"
-    );
-    // Renders the link:
+    // Check that the single group field renders correctly
     expect(
-      wrapper.find(".singleGroup-field .read-only-view a").prop("href")
-    ).toEqual("/group/view?id=1");
+      wrapper.container.querySelector(".singleGroup-field .read-only-view")
+        ?.textContent
+    ).toEqual("Group 1");
 
-    // Joins the names with commas:
+    // Renders the link for the single group
+    const singleGroupLink = wrapper.container.querySelector(
+      ".singleGroup-field .read-only-view a"
+    );
+    expect(singleGroupLink).toHaveAttribute("href", "/group/view?id=1");
+
+    // Check for multiple groups field using container.querySelector
+    const multipleGroupsHeader = wrapper.container.querySelector(
+      ".multipleGroups-field-header"
+    );
+    expect(multipleGroupsHeader).toBeInTheDocument();
+
+    // Get the read-only view for multiple groups
+    const multipleGroupsView = multipleGroupsHeader
+      ?.closest(".multipleGroups-field")
+      ?.querySelector(".read-only-view");
+
+    // Check that the multiple groups links are rendered correctly
+    expect(multipleGroupsView?.textContent).toEqual("Group 2, Group 3");
+
+    // Find the links within the multiple groups container
+    const multipleGroupLinks = multipleGroupsView?.querySelectorAll("a");
+
+    // Renders each link for multiple groups and checks href attributes
     expect(
-      wrapper.find(".multipleGroups-field .read-only-view").text()
-    ).toEqual("Group 2, Group 3");
-    // Renders each link:
-    expect(
-      wrapper
-        .find(".multipleGroups-field .read-only-view a")
-        .map((node) => node.prop("href"))
+      Array.from(multipleGroupLinks!).map((link) => link.getAttribute("href"))
     ).toEqual(["/group/view?id=2", "/group/view?id=3"]);
   });
 
   it("Renders the read-only view for a shallow reference by fetching the full object", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{
           singleGroup: { id: "100", type: "group" },
@@ -253,9 +271,6 @@ describe("ResourceSelectField component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
-    await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockBulkGet.mock.calls).toEqual([
       [
@@ -274,12 +289,36 @@ describe("ResourceSelectField component", () => {
       ]
     ]);
 
-    expect(wrapper.find(".singleGroup-field .read-only-view").text()).toEqual(
-      "100-fetched-from-bulkGet"
-    );
     expect(
-      wrapper.find(".multipleGroups-field .read-only-view").text()
+      wrapper.container.querySelector(".singleGroup-field .read-only-view")
+        ?.textContent
+    ).toEqual("100-fetched-from-bulkGet");
+
+    expect(
+      wrapper.container.querySelector(".multipleGroups-field .read-only-view")
+        ?.textContent
     ).toEqual("200-fetched-from-bulkGet, 300-fetched-from-bulkGet");
-    expect(wrapper.find(".nullGroup-field .read-only-view").text()).toEqual("");
+
+    expect(
+      wrapper.container.querySelector(".nullGroup-field .read-only-view")
+        ?.textContent
+    ).toEqual("");
+
+    expect(mockBulkGet.mock.calls).toEqual([
+      [
+        ["group/100"],
+        {
+          apiBaseUrl: "/test-api",
+          returnNullForMissingResource: true
+        }
+      ],
+      [
+        ["group/200", "group/300"],
+        {
+          apiBaseUrl: "/test-api",
+          returnNullForMissingResource: true
+        }
+      ]
+    ]);
   });
 });

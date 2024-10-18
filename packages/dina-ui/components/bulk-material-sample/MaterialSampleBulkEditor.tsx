@@ -10,10 +10,10 @@ import {
   useApiClient,
   withoutBlankFields
 } from "common-ui";
-import { isEmpty } from "lodash";
+import { isEmpty, cloneDeep } from "lodash";
 import { InputResource, PersistedResource, KitsuResource } from "kitsu";
 import { keys, omit, pick, pickBy } from "lodash";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, RefObject } from "react";
 import { Promisable } from "type-fest";
 import {
   MaterialSampleFormTemplateSelect,
@@ -31,13 +31,17 @@ import {
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { FormikProps } from "formik";
 import { VisibleManagedAttributesConfig } from "..";
-import { FormTemplate } from "packages/dina-ui/types/collection-api";
+import {
+  CollectingEvent,
+  FormTemplate
+} from "packages/dina-ui/types/collection-api";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
   onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
   disableSampleNameField?: boolean;
   onPreviousClick?: () => void;
+  overrideMaterialSampleType?: string;
   initialFormTemplateUUID?: string;
 }
 
@@ -46,7 +50,8 @@ export function MaterialSampleBulkEditor({
   disableSampleNameField,
   onSaved,
   onPreviousClick,
-  initialFormTemplateUUID
+  initialFormTemplateUUID,
+  overrideMaterialSampleType
 }: MaterialSampleBulkEditorProps) {
   // Allow selecting a custom view for the form:
   const {
@@ -56,7 +61,8 @@ export function MaterialSampleBulkEditor({
     materialSampleInitialValues,
     collectingEventInitialValues
   } = useMaterialSampleFormTemplateSelectState({
-    temporaryFormTemplateUUID: initialFormTemplateUUID
+    temporaryFormTemplateUUID: initialFormTemplateUUID,
+    overrideMaterialSampleType
   });
 
   const [selectedTab, setSelectedTab] = useState<
@@ -68,13 +74,15 @@ export function MaterialSampleBulkEditor({
     bulkEditSampleHook,
     sampleHooks,
     materialSampleForm,
-    formTemplateProps
+    formTemplateProps,
+    bulkEditCollectingEvtFormRef
   }: {
     bulkEditFormRef;
     bulkEditSampleHook;
     sampleHooks: any;
     materialSampleForm: JSX.Element;
     formTemplateProps: Partial<MaterialSampleFormProps>;
+    bulkEditCollectingEvtFormRef;
   } = initializeRefHookFormProps(
     samplesProp,
     visibleManagedAttributeKeys,
@@ -103,23 +111,27 @@ export function MaterialSampleBulkEditor({
   const { saveAll } = useBulkSampleSave({
     onSaved,
     samplePreProcessor: sampleBulkOverrider,
-    bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef }
+    bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef },
+    bulkEditCollectingEvtFormRef,
+    bulkEditSampleHook
   });
 
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <ButtonBar className="gap-4">
+        <ButtonBar className="mb-3">
           {onPreviousClick && (
-            <FormikButton
-              className="btn btn-outline-secondary previous-button"
-              onClick={onPreviousClick}
-              buttonProps={() => ({ style: { width: "13rem" } })}
-            >
-              <DinaMessage id="goToThePreviousStep" />
-            </FormikButton>
+            <div className="col-md-4">
+              <FormikButton
+                className="btn btn-outline-secondary previous-button"
+                onClick={onPreviousClick}
+                buttonProps={() => ({ style: { width: "13rem" } })}
+              >
+                <DinaMessage id="goToThePreviousStep" />
+              </FormikButton>
+            </div>
           )}
-          <div className="flex-grow-1">
+          <div className="col-md-5">
             <div className="mx-auto">
               <MaterialSampleFormTemplateSelect
                 value={sampleFormTemplate}
@@ -127,13 +139,17 @@ export function MaterialSampleBulkEditor({
               />
             </div>
           </div>
-          <FormikButton
-            className="btn btn-primary bulk-save-button"
-            onClick={saveAll}
-            buttonProps={() => ({ style: { width: "10rem" } })}
-          >
-            <DinaMessage id="saveAll" />
-          </FormikButton>
+          <div className="col-md-3 flex d-flex">
+            <div className="ms-auto">
+              <FormikButton
+                className="btn btn-primary bulk-save-button"
+                onClick={saveAll}
+                buttonProps={() => ({ style: { width: "10rem" } })}
+              >
+                <DinaMessage id="saveAll" />
+              </FormikButton>
+            </div>
+          </div>
         </ButtonBar>
       </DinaForm>
       {selectedTab && (
@@ -171,14 +187,6 @@ export function MaterialSampleBulkEditor({
   );
 }
 
-interface BulkSampleSaveParams {
-  onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
-  samplePreProcessor?: () => (
-    sample: InputResource<MaterialSample>
-  ) => Promise<InputResource<MaterialSample>>;
-  bulkEditCtx: BulkEditTabContextI<MaterialSample>;
-}
-
 export function initializeRefHookFormProps(
   samplesProp,
   visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
@@ -204,6 +212,8 @@ export function initializeRefHookFormProps(
 
   const bulkEditFormRef =
     useRef<FormikProps<InputResource<MaterialSample>>>(null);
+  const bulkEditCollectingEvtFormRef =
+    useRef<FormikProps<InputResource<CollectingEvent>>>(null);
 
   // don't use form template's materialSampleName default value for bulk edit
   delete materialSampleInitialValues?.materialSampleName;
@@ -211,7 +221,8 @@ export function initializeRefHookFormProps(
     ...formTemplateProps,
     materialSample: materialSampleInitialValues ?? initialValues,
     collectingEventInitialValues,
-    showChangedIndicatorsInNestedForms: true
+    showChangedIndicatorsInNestedForms: true,
+    colEventFormRef: bulkEditCollectingEvtFormRef
   });
 
   const sampleHooks = getSampleHooks(
@@ -232,7 +243,8 @@ export function initializeRefHookFormProps(
     bulkEditSampleHook,
     sampleHooks,
     materialSampleForm,
-    formTemplateProps
+    formTemplateProps,
+    bulkEditCollectingEvtFormRef
   };
 }
 
@@ -283,7 +295,7 @@ export function getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook) {
     }
 
     /** Sample override object with only the non-empty fields. */
-    const overrides = withoutBlankFields(bulkEditSample);
+    const overrides = withoutBlankFields(bulkEditSample, formik.values);
 
     // Combine the managed attributes dictionaries:
     const newManagedAttributes = {
@@ -335,8 +347,21 @@ function getMaterialSampleForm(
       // Disable the nav's Are You Sure prompt when removing components,
       // because you aren't actually deleting data.
       disableNavRemovePrompt={true}
+      isBulkEditAllTab={true}
     />
   );
+}
+
+interface BulkSampleSaveParams {
+  onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
+  samplePreProcessor?: () => (
+    sample: InputResource<MaterialSample>
+  ) => Promise<InputResource<MaterialSample>>;
+  bulkEditCtx: BulkEditTabContextI<MaterialSample>;
+  bulkEditCollectingEvtFormRef: RefObject<
+    FormikProps<InputResource<CollectingEvent>>
+  >;
+  bulkEditSampleHook: any;
 }
 
 /**
@@ -346,7 +371,9 @@ function getMaterialSampleForm(
 function useBulkSampleSave({
   onSaved,
   samplePreProcessor,
-  bulkEditCtx
+  bulkEditCtx,
+  bulkEditCollectingEvtFormRef,
+  bulkEditSampleHook
 }: BulkSampleSaveParams) {
   // Force re-render when there is a bulk submission error:
   const [_error, setError] = useState<unknown | null>(null);
@@ -359,6 +386,11 @@ function useBulkSampleSave({
     setError(null);
     bulkEditFormRef.current?.setStatus(null);
     bulkEditFormRef.current?.setErrors({});
+    const bulkEditCollectingEventRefPermanent = bulkEditSampleHook
+      ?.colEventFormRef?.current?.values
+      ? cloneDeep(bulkEditCollectingEvtFormRef)
+      : undefined;
+
     try {
       // First clear all tab errors:
       for (const { formRef } of sampleHooks) {
@@ -402,7 +434,11 @@ function useBulkSampleSave({
                 }
                 throw error;
               }
-            }
+            },
+            collectingEventRefExternal: bulkEditSampleHook.dataComponentState
+              .enableCollectingEvent
+              ? bulkEditCollectingEventRefPermanent
+              : undefined
           });
           saveOperations.push(saveOp);
         } catch (error: unknown) {

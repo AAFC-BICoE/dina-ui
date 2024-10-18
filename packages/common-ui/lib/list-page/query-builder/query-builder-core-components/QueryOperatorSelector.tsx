@@ -33,9 +33,13 @@ export function QueryOperatorSelector({
   setOperator,
   selectedFieldMapping
 }: QueryOperatorSelectorProps) {
+  const handleOperatorChange = (newValue) => {
+    setOperator?.(newValue?.value ?? "");
+  };
+
   // Do not render if no operators are available, specifically the managed attributes.
   if (options?.length === 1 && options[0].key === "noOperator") {
-    setOperator?.("noOperator");
+    handleOperatorChange({ value: "noOperator" });
     return <></>;
   }
 
@@ -54,6 +58,14 @@ export function QueryOperatorSelector({
   // Some options are displayed only if it is supported.
   const operationOptions = options
     ?.filter((option) => {
+      // Only display the exact match option if keyword support exist.
+      if (
+        (option.key === "exactMatch" || option.key === "notEquals") &&
+        !selectedFieldMapping?.keywordMultiFieldSupport
+      ) {
+        return false;
+      }
+
       // Only display the infix option if it is supported in the mapping.
       if (
         option.key === "containsText" &&
@@ -77,8 +89,12 @@ export function QueryOperatorSelector({
         return false;
       }
 
-      // "In" and "Not in" options not supported for nested values yet.
-      if ((option.key === "in" || option.key === "notIn") && selectedFieldMapping?.parentName) {
+      // Between for the text type should only be displayed if numeric keyword exists.
+      if (
+        option.key === "between" &&
+        selectedFieldMapping?.type === "text" &&
+        !selectedFieldMapping?.keywordNumericSupport
+      ) {
         return false;
       }
 
@@ -100,7 +116,7 @@ export function QueryOperatorSelector({
         className={`flex-grow-1 me-2 ps-0`}
         styles={customStyles}
         value={selectedOption}
-        onChange={(newValue) => setOperator?.(newValue?.value ?? "")}
+        onChange={handleOperatorChange}
       />
     </div>
   );

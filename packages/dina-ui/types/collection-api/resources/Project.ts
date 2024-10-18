@@ -12,6 +12,7 @@ export interface ProjectAttributes {
   createdOn?: string;
   createdBy?: string;
   group?: string;
+  extensionValues?: Record<string, string>;
 }
 
 export interface ProjectRelationships {

@@ -9,6 +9,7 @@ import {
   FieldSet,
   generateDirectMaterialSampleChildrenTree,
   materialSampleCultureStrainChildrenQuery,
+  useApiClient,
   useElasticSearchQuery,
   withResponse
 } from "common-ui";
@@ -17,49 +18,54 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
+import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import {
   AssociationsField,
   CollectingEventFormLayout,
   Footer,
-  Head,
   HOST_ORGANISM_FIELDS,
+  Head,
   ManagedAttributesEditor,
   MaterialSampleBreadCrumb,
+  MaterialSampleFormTemplateSelect,
   MaterialSampleIdentifiersSection,
   MaterialSampleInfoSection,
-  MaterialSampleStateWarning,
   Nav,
   OrganismsField,
-  PreparationField,
   PREPARATION_FIELDS,
-  ProjectSelectSection,
-  AssemblageSelectSection,
-  TagSelectReadOnly,
-  SamplesView,
+  PreparationField,
   ScheduledActionsField,
   StorageLinkerField,
-  TagsAndRestrictionsSection,
   useCollectingEventQuery,
+  useMaterialSampleFormTemplateSelectState,
   useMaterialSampleQuery,
-  withOrganismEditorValues,
-  TransactionMaterialDirectionSection
+  withOrganismEditorValues
 } from "../../../components";
-import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { MaterialSample } from "../../../types/collection-api";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
-import { PersistedResource } from "kitsu";
+import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
+import { MaterialSampleBadges } from "../../../components/collection/material-sample/MaterialSampleBadges";
+import { ShowParentAttributesField } from "../../../components/collection/material-sample/ShowParentAttributesField";
 import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
-import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
-import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
 import { useMaterialSampleRelationshipColumns } from "../../../components/collection/material-sample/useMaterialSampleRelationshipColumns";
+import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
+import { MaterialSampleTransactionList } from "../../../components/transaction/MaterialSampleTransactionList";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import {
+  COLLECTING_EVENT_COMPONENT_NAME,
+  MaterialSample,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
+} from "../../../types/collection-api";
+import { Row } from "@tanstack/react-table";
+import { CSSProperties } from "react";
+import { dynamicFieldMappingForMaterialSample } from "./list";
+import { StorageUnitUsage } from "../../../types/collection-api/resources/StorageUnitUsage";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
   const { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW } =
     useMaterialSampleRelationshipColumns();
   const id = router.query.id?.toString();
+  const { save } = useApiClient();
 
   const materialSampleQuery = useMaterialSampleQuery(id);
 
@@ -131,12 +137,89 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       query: transactionQueryDSL
     }
   });
+  const {
+    sampleFormTemplate,
+    setSampleFormTemplateUUID,
+    visibleManagedAttributeKeys
+  } = useMaterialSampleFormTemplateSelectState({});
+
+  const rowStyling = (row: Row<any>): CSSProperties | undefined => {
+    if (row?.original?.data?.attributes?.materialSampleState) {
+      return { opacity: 0.4 };
+    }
+    return undefined;
+  };
 
   return (
     <div>
       {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
         const materialSample = withOrganismEditorValues(materialSampleData);
-        const buttonBar = buttonBarComponent(materialSample);
+        if (materialSample.identifiers) {
+          (materialSample as any).identifiers = Object.entries(
+            materialSample.identifiers
+          ).map(([type, value]) => ({ type, value }));
+        }
+        const buttonBar = id && (
+          <ButtonBar>
+            <div className="col-md-2 col-sm-12 mt-2">
+              <BackButton
+                entityId={id}
+                entityLink="/collection/material-sample"
+                byPassView={true}
+              />
+            </div>
+
+            <div className="col-md-5 col-sm-12">
+              <MaterialSampleFormTemplateSelect
+                value={sampleFormTemplate}
+                onChange={setSampleFormTemplateUUID}
+              />
+            </div>
+            <div className="col-md-5 flex d-flex col-sm-12 gap-1">
+              <EditButton
+                entityId={id}
+                entityLink="collection/material-sample"
+              />
+              <SplitMaterialSampleDropdownButton
+                ids={[id]}
+                disabled={!materialSample.materialSampleName}
+                materialSampleType={materialSample.materialSampleType}
+                className="me-0"
+              />
+              <GenerateLabelDropdownButton resource={materialSample} />
+              <Link href={`/collection/material-sample/revisions?id=${id}`}>
+                <a className="btn btn-info me-3">
+                  <DinaMessage id="revisionsButtonText" />
+                </a>
+              </Link>
+              <DeleteButton
+                id={id}
+                options={{ apiBaseUrl: "/collection-api" }}
+                postDeleteRedirect="/collection/material-sample/list"
+                type="material-sample"
+                className="ms-auto"
+                onDeleted={async () => {
+                  // Delete storageUnitUsage if there is one linked
+                  if (materialSampleData.storageUnitUsage?.id) {
+                    await save<StorageUnitUsage>(
+                      [
+                        {
+                          delete: {
+                            id: materialSampleData.storageUnitUsage?.id ?? null,
+                            type: "storage-unit-usage"
+                          }
+                        }
+                      ],
+                      {
+                        apiBaseUrl: "/collection-api"
+                      }
+                    );
+                  }
+                }}
+              />
+            </div>
+          </ButtonBar>
+        );
         const hasPreparations = PREPARATION_FIELDS.some(
           (fieldName) => !isEmpty(materialSample[fieldName])
         );
@@ -158,57 +241,62 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             (fieldName) => materialSample.hostOrganism?.[fieldName]
           );
 
+        const hasShowParentAttributes =
+          (!!materialSample.parentMaterialSample &&
+            sampleFormTemplate?.components?.find(
+              (comp) =>
+                comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME &&
+                comp.visible
+            )?.visible) ??
+          false;
+
         return (
           <>
             <Head
               title={formatMessage("materialSampleViewTitle", {
-                primaryID: materialSample?.materialSampleName
+                primaryID:
+                  materialSample?.materialSampleName ?? materialSample.id
               })}
             />
-            <Nav />
-            <main className="container-fluid">
-              <DinaForm<MaterialSample>
-                initialValues={materialSample}
-                readOnly={true}
-              >
-                {buttonBar}
-                <MaterialSampleStateWarning />
-
+            <Nav marginBottom={false} />
+            <DinaForm<MaterialSample>
+              initialValues={materialSample}
+              readOnly={true}
+              formTemplate={sampleFormTemplate}
+            >
+              {buttonBar}
+              <main className="container-fluid centered">
                 {/* Material Sample Hierarchy */}
                 <MaterialSampleBreadCrumb
                   materialSample={materialSample}
                   disableLastLink={true}
                   enableGroupSelectField={true}
                 />
-                <div className="d-flex flex-row gap-2">
-                  <TagsAndRestrictionsSection />
-                </div>
-                <div className="d-flex flex-row gap-2">
-                  <TagSelectReadOnly />
-                  <ProjectSelectSection />
-                  <AssemblageSelectSection />
-                  {withResponse(
-                    transactionElasticQuery as any,
-                    ({ data: query }) => {
-                      return (
-                        <TransactionMaterialDirectionSection
-                          transactionElasticQuery={query}
-                        />
-                      );
-                    }
-                  )}
-                </div>
 
-                <MaterialSampleIdentifiersSection />
-                {materialSample.parentMaterialSample && (
-                  <SamplesView
-                    samples={[materialSample.parentMaterialSample]}
-                    fieldSetId={<DinaMessage id="parentMaterialSample" />}
+                {/* Material Sample Badges */}
+                <MaterialSampleBadges
+                  transactionElasticQuery={transactionElasticQuery}
+                />
+
+                {hasShowParentAttributes && (
+                  <ShowParentAttributesField
+                    id={id}
+                    isTemplate={false}
+                    attrList={
+                      sampleFormTemplate?.components?.find(
+                        (comp) =>
+                          comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
+                      )?.sections?.[0].items?.[0].defaultValue
+                    }
+                    materialSample={materialSample}
                   />
                 )}
 
+                <MaterialSampleIdentifiersSection />
+
                 {/* Custom Query View */}
                 <CustomQueryPageView
+                  rowStyling={rowStyling}
                   indexName="dina_material_sample_index"
                   columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
                   uniqueName="material-sample-children"
@@ -241,6 +329,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   defaultSort={[
                     { id: "data.attributes.materialSampleName", desc: false }
                   ]}
+                  dynamicFieldMapping={dynamicFieldMappingForMaterialSample}
+                  enableColumnSelector={true}
+                  mandatoryDisplayedColumns={["materialSampleName"]}
+                  excludedRelationshipTypes={["collecting-event"]}
                 />
 
                 <MaterialSampleInfoSection />
@@ -267,6 +359,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     <FieldSet
                       legend={<DinaMessage id="collectingEvent" />}
                       wrapLegend={legendWrapper()}
+                      componentName={COLLECTING_EVENT_COMPONENT_NAME}
                     >
                       {materialSample.parentMaterialSample && (
                         <div
@@ -280,14 +373,31 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                           />
                         </div>
                       )}
-                      <DinaForm initialValues={colEvent} readOnly={true}>
+                      <DinaForm
+                        initialValues={colEvent}
+                        readOnly={true}
+                        formTemplate={sampleFormTemplate}
+                      >
                         <CollectingEventFormLayout />
                       </DinaForm>
                     </FieldSet>
                   );
                 })}
-                {hasPreparations && <PreparationField />}
-                {hasOrganism && <OrganismsField name="organism" />}
+                {hasPreparations && (
+                  <PreparationField
+                    visibleManagedAttributeKeys={
+                      visibleManagedAttributeKeys?.preparations
+                    }
+                  />
+                )}
+                {hasOrganism && (
+                  <OrganismsField
+                    name="organism"
+                    visibleManagedAttributeKeys={
+                      visibleManagedAttributeKeys?.determination
+                    }
+                  />
+                )}
                 {hasInheritedDetermination && (
                   <div className="row">
                     <div className="col-md-6">
@@ -319,21 +429,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
                   }}
                 />
-                <div className="row">
-                  <div className="col-md-6">
-                    <ManagedAttributesEditor
-                      fieldSetProps={{
-                        legend: (
-                          <DinaMessage id="materialSampleManagedAttributes" />
-                        )
-                      }}
-                      valuesPath="managedAttributes"
-                      managedAttributeApiPath="collection-api/managed-attribute"
-                      managedAttributeComponent="MATERIAL_SAMPLE"
-                    />
-                  </div>
-                </div>
-
                 <CollapsibleSection id="transactions" headerKey="transactions">
                   <MaterialSampleTransactionList
                     transactionQueryDSL={transactionQueryDSL}
@@ -351,51 +446,14 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     )}
                   </Field>
                 </div>
-              </DinaForm>
-              {buttonBar}
-            </main>
+              </main>
+            </DinaForm>
           </>
         );
       })}
       <Footer />
     </div>
   );
-
-  function buttonBarComponent(
-    materialSample: PersistedResource<MaterialSample>
-  ) {
-    return (
-      id && (
-        <ButtonBar className="flex">
-          <BackButton
-            entityId={id}
-            entityLink="/collection/material-sample"
-            byPassView={true}
-            className="me-auto"
-          />
-          <EditButton entityId={id} entityLink="collection/material-sample" />
-          <SplitMaterialSampleDropdownButton
-            ids={[id]}
-            disabled={!materialSample.materialSampleName}
-            materialSampleType={materialSample.materialSampleType}
-          />
-          <GenerateLabelDropdownButton materialSample={materialSample} />
-          <Link href={`/collection/material-sample/revisions?id=${id}`}>
-            <a className="btn btn-info ms-5">
-              <DinaMessage id="revisionsButtonText" />
-            </a>
-          </Link>
-          <DeleteButton
-            className="ms-5"
-            id={id}
-            options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/material-sample/list"
-            type="material-sample"
-          />
-        </ButtonBar>
-      )
-    );
-  }
 }
 
 export default withRouter(MaterialSampleViewPage);

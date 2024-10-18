@@ -4,9 +4,13 @@ import { noop } from "lodash";
 import Link from "next/link";
 import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
 import { useEffect } from "react";
-import { ContainerGrid } from "./ContainerGrid";
-import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
-import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
+
+import {
+  PcrBatchItemSample,
+  usePCRBatchItemGridControls
+} from "./usePCRBatchItemGridControls";
+import { DraggableItemList } from "../../container-grid/DraggableItemList";
+import { ContainerGrid } from "../../container-grid/ContainerGrid";
 
 export interface PCRBatchItemGridProps {
   pcrBatchId: string;
@@ -21,16 +25,14 @@ export interface PCRBatchItemGridProps {
   setPerformSave: (newValue: boolean) => void;
 }
 
-export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
-  const {
-    pcrBatchId,
-    pcrBatch,
-    onSaved,
-    editMode,
-    setEditMode,
-    performSave,
-    setPerformSave
-  } = props;
+export function SangerPcrBatchItemGridStep({
+  pcrBatchId,
+  pcrBatch,
+  onSaved,
+  editMode,
+  performSave,
+  setPerformSave
+}: PCRBatchItemGridProps) {
   const {
     availableItems,
     cellGrid,
@@ -72,15 +74,6 @@ export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
   if (!isStorage) {
     return (
       <div className="mt-3">
-        <div className="row mb-2">
-          <div className="col-12 text-end">
-            <Link href={`/seqdb/pcr-workflow/worksheet?id=${pcrBatchId}`}>
-              <a target="_blank" className="btn btn-primary">
-                Worksheet
-              </a>
-            </Link>
-          </div>
-        </div>
         <div className="row">
           <div className="col-12">
             <div className="alert alert-warning">
@@ -94,17 +87,6 @@ export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
 
   return (
     <div className="mt-3">
-      {!editMode && (
-        <div className="row">
-          <div className="col-12 text-end">
-            <Link href={`/seqdb/pcr-workflow/worksheet?id=${pcrBatchId}`}>
-              <a target="_blank" className="btn btn-primary">
-                Worksheet
-              </a>
-            </Link>
-          </div>
-        </div>
-      )}
       {editMode && (
         <div className="row">
           <div className="col-3" />
@@ -151,7 +133,7 @@ export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
           <strong>
             Selected Material Samples ({availableItems.length} in list)
           </strong>
-          <DraggablePCRBatchItemList
+          <DraggableItemList<PcrBatchItemSample>
             availableItems={availableItems}
             selectedItems={selectedItems}
             movedItems={movedItems}
@@ -174,8 +156,11 @@ export function SangerPcrBatchItemGridStep(props: PCRBatchItemGridProps) {
         </div>
         <div className="col-9">
           <strong>Container wells</strong>
-          <ContainerGrid
-            pcrBatch={pcrBatch}
+          <ContainerGrid<
+            PcrBatch & { gridLayoutDefinition?: any },
+            PcrBatchItemSample
+          >
+            batch={pcrBatch}
             cellGrid={cellGrid}
             movedItems={movedItems}
             onDrop={onGridDrop}

@@ -1,8 +1,17 @@
-import { DinaForm, FieldView, useApiClient, useIsMounted } from "common-ui";
+import {
+  DinaForm,
+  FieldView,
+  LabelView,
+  Tooltip,
+  useApiClient,
+  useIsMounted
+} from "common-ui";
 import { toPairs } from "lodash";
 import { ManagedAttribute } from "../../types/collection-api";
 import { useEffect, useState } from "react";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { get } from "http";
+import { getManagedAttributeTooltipText } from "./ManagedAttributeField";
 
 export interface ManagedAttributesViewerProps {
   /**
@@ -17,9 +26,10 @@ export function ManagedAttributesViewer({
   values,
   managedAttributeApiPath
 }: ManagedAttributesViewerProps) {
+  const { locale, formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
   const [allAttrKeyNameMap, setAllAttrKeyNameMap] = useState<{
-    [key: string]: string;
+    [key: string]: Record<string, string>;
   }>({});
   const isMounted = useIsMounted();
   // Call API to fetch all ManagedAttributes
@@ -27,16 +37,20 @@ export function ManagedAttributesViewer({
     async function fetchAllManagedAttributes() {
       try {
         const { data } = await apiClient.get<ManagedAttribute[]>(
-          `${managedAttributeApiPath}?fields=key,name`,
+          `${managedAttributeApiPath}?fields=key,name,multilingualDescription`,
           {}
         );
         const attrKeyNameMap = data.reduce(
           (accu, obj) => ({
             ...accu,
-            [obj.key]: obj.name
+            [obj.key]: {
+              name: obj.name,
+              multilingualDescription: obj.multilingualDescription
+            }
           }),
-          {} as { [key: string]: string }
+          {} as { [key: string]: {} }
         );
+
         if (isMounted.current) {
           setAllAttrKeyNameMap(attrKeyNameMap);
         }
@@ -47,7 +61,6 @@ export function ManagedAttributesViewer({
     }
     fetchAllManagedAttributes();
   }, []);
-
   const managedAttributeValues = (
     values
       ? toPairs(values).map(([key, mav]) => ({
@@ -58,9 +71,14 @@ export function ManagedAttributesViewer({
   )
     .map((item) => ({
       ...item,
-      name: allAttrKeyNameMap[item.key]
+      name: allAttrKeyNameMap[item.key]?.name,
+      multilingualDescription:
+        allAttrKeyNameMap[item.key]?.multilingualDescription
     }))
-    .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    .sort((a, b) =>
+      a?.name?.localeCompare(b?.name, locale, { sensitivity: "base" })
+    );
+
   const managedAttributesInitialValues = managedAttributeValues?.reduce(
     (prev, curr) => ({ ...prev, [curr.key]: curr.value }),
     {}
@@ -70,12 +88,19 @@ export function ManagedAttributesViewer({
       {managedAttributeValues?.length ? (
         <div className="row">
           {managedAttributeValues?.map((mav) => {
+            const tooltipText = getManagedAttributeTooltipText(
+              mav as any,
+              locale,
+              formatMessage
+            );
             return (
               <FieldView
                 className="col-6"
-                label={mav.name}
+                customName={mav.name}
                 name={`${mav.key}`}
                 key={mav.key}
+                tooltipOverride={tooltipText}
+                startCaseLabel={false}
               />
             );
           })}

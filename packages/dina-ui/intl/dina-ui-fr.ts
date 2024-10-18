@@ -281,6 +281,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_description: "Description",
   "field_description.en": "Description anglaise",
   "field_description.fr": "Description française",
+  "field_description.de": "Description allemande",
   field_determination: "Déterminations",
   "field_determination.typeStatus": "Type d'état",
   "field_determination.verbatimScientificName": "Nom scientifique verbatim",
@@ -655,6 +656,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   organismsQuantity: "Quantité d'organismes",
   organizationEnglishNameLabel: "Nom anglais ",
   organizationFrenchNameLabel: "Nom français ",
+  organizationGermanNameLabel: "Nom allemand ",
   organizationListTitle: "Organisations",
   originalFile: "Fichier original",
   originalMaterialSampleLabel: "Échantillon de matière original",
@@ -770,7 +772,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   savedSearchOverwriteExisting:
     "Il existe déjà une recherche enregistrée portant le nom « {savedSearchName} ». La création de cette recherche enregistrée écrasera la recherche enregistrée existante.",
   scheduledActions: "Actions prévues",
-  scientificNameSearch: "Recherche de nom scientifique",
+  scientificNameSearch: "Classification",
   searchButton: "Recherche",
   searchOnCOL: "Chercher dans le Catalogue of Life",
   searchPreviousTags: "Consulter les précédentes étiquettes",
@@ -908,7 +910,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   withAKeyboard: "Avec un clavier",
   withAMouse: "Avec une souris",
   workBookDuplicateFieldMap:
-    "Cette colonne ne doit pas être mise en correspondance avec le même champ",
+    "Cette colonne ne doit pas être mise en correspondance avec le même champ ({fieldName})",
   workBookInvalidDataFormat:
     "Format de données invalide, feuille : {sheet}, rangée : {index}, champ : {field}, le type de données doit être {dataType}",
   workBookInvalidManagedAttributeDataType:

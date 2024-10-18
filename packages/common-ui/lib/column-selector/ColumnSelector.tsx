@@ -1,146 +1,312 @@
-import {
-  TextField,
-  DATA_EXPORT_QUERY_KEY,
-  useApiClient,
-  LoadingSpinner,
-  LabelView,
-  FieldHeader
-} from "..";
-import { CustomMenuProps } from "../../../dina-ui/components/collection/material-sample/GenerateLabelDropdownButton";
+import { KitsuResource } from "kitsu";
+import { ColumnSelectorList } from "./ColumnSelectorList";
+import { useState, useEffect } from "react";
+import React from "react";
+import { Dropdown } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useState, useEffect, useCallback } from "react";
-import Dropdown from "react-bootstrap/Dropdown";
-import { useIntl } from "react-intl";
-import { compact, startCase } from "lodash";
-import { Button } from "react-bootstrap";
-import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
-import { DataExport } from "packages/dina-ui/types/dina-export-api";
-import Kitsu from "kitsu";
-import { Table, VisibilityState, Column } from "@tanstack/react-table";
-import { Checkbox } from "./GroupedCheckboxWithLabel";
 import {
-  addColumnToStateVariable,
-  getColumnSelectorIndexMapColumns,
-  getGroupedIndexMappings
-} from "./ColumnSelectorUtils";
-import { DynamicFieldsMappingConfig } from "../list-page/types";
-import { useIndexMapping } from "../list-page/useIndexMapping";
+  DynamicFieldsMappingConfig,
+  ESIndexMapping,
+  TableColumn
+} from "../list-page/types";
+import { generateColumnDefinition } from "./ColumnSelectorUtils";
+import { useApiClient } from "../api-client/ApiClientContext";
+import useLocalStorage from "@rehooks/local-storage";
+import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
 
-const MAX_DATA_EXPORT_FETCH_RETRIES = 60;
-export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleIndexColumns";
-export interface ColumnSelectorProps<TData> {
-  /** A unique identifier to be used for local storage key */
+export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
+
+export interface ColumnSelectorProps<TData extends KitsuResource> {
+  /**
+   * A unique identifier to be used for local storage key
+   */
   uniqueName?: string;
-  hideExportButton?: boolean;
-  reactTable: Table<TData> | undefined;
-  menuOnly?: boolean;
-  /**
-   * Used for the listing page to understand which columns can be provided. Filters are generated
-   * based on the index provided.
-   *
-   * Also used to store saved searches under a specific type:
-   *
-   * `UserPreference.savedSearches.[INDEX_NAME].[SAVED_SEARCH_NAME]`
-   *
-   * For example, to get the default saved searches for the material sample index:
-   * `UserPreference.savedSearches.dina_material_sample_index.default.filters`
-   */
-  indexName?: string;
 
   /**
-   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
-   * be searched against. It will also define the path and data component if required.
-   *
-   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
-   * or grouped terms.
+   * Display the column selector for exporting purposes instead of what columns to display in a list
+   * table.
    */
-  dynamicFieldMapping?: DynamicFieldsMappingConfig;
+  exportMode?: boolean;
 
-  // State setter to pass the processed index map columns to parent components
-  setColumnSelectorIndexMapColumns?: React.Dispatch<
-    React.SetStateAction<any[]>
+  /**
+   * Index mapping containing all of the fields that should be displayed in the list.
+   */
+  indexMapping: ESIndexMapping[] | undefined;
+
+  /**
+   * Dynamic field mapping configuration.
+   */
+  dynamicFieldsMappingConfig?: DynamicFieldsMappingConfig;
+
+  /**
+   * The currently displayed columns on the table.
+   */
+  displayedColumns: TableColumn<TData>[];
+
+  /**
+   * Once the selection is applied, this will be used to set the current columns.
+   */
+  setDisplayedColumns: React.Dispatch<
+    React.SetStateAction<TableColumn<TData>[]>
   >;
 
-  // State setter to pass the processed index map columns to parent components
-  setSelectedColumnSelectorIndexMapColumns?: React.Dispatch<
-    React.SetStateAction<any[]>
+  /**
+   * When provided, it will be set as the setDisplayedColumns. This is populated from the
+   * saved export hook.
+   */
+  overrideDisplayedColumns?: SavedExportColumnStructure;
+
+  /**
+   * Should only be set to empty, indicating it has been processed.
+   */
+  setOverrideDisplayedColumns?: React.Dispatch<
+    React.SetStateAction<SavedExportColumnStructure | undefined>
   >;
 
-  // If true, index map columns are being loaded and processed from back end
-  setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
+  /**
+   * IDs of the columns that should always be displayed and cannot be deleted.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   */
+  mandatoryDisplayedColumns?: string[];
 
-  // The default visible columns
-  columnSelectorDefaultColumns?: any[];
+  /**
+   * IDs of the columns that should always be displayed and cannot be deleted.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   */
+  nonExportableColumns?: string[];
+
+  /**
+   * The default columns to be loaded in if no columns are found in the local storage.
+   */
+  defaultColumns?: TableColumn<TData>[];
+
+  /**
+   * Indicate if all the columns have been loading in...
+   */
+  setColumnSelectorLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+
+  /**
+   * Array of relationshipType columns to be excluded from the dropdown menu
+   */
+  excludedRelationshipTypes?: string[];
+
+  /**
+   * Should all the input/buttons be disabled, Helpful if loading and do not want user to
+   * interact with fields.
+   */
+  disabled?: boolean;
 }
 
-// Ids of columns not supported for exporting
-export const NOT_EXPORTABLE_COLUMN_IDS: string[] = [
-  "selectColumn",
-  "thumbnail",
-  "viewPreviewButtonText"
-];
+export function ColumnSelector<TData extends KitsuResource>(
+  props: ColumnSelectorProps<TData>
+) {
+  const { apiClient } = useApiClient();
 
-export function ColumnSelector<TData>({
-  uniqueName,
-  reactTable,
-  menuOnly,
-  hideExportButton = false,
-  indexName,
-  dynamicFieldMapping,
-  setColumnSelectorIndexMapColumns,
-  setLoadingIndexMapColumns,
-  columnSelectorDefaultColumns,
-  setSelectedColumnSelectorIndexMapColumns
-}: ColumnSelectorProps<TData>) {
-  const [localStorageColumnStates, setLocalStorageColumnStates] =
-    useLocalStorage<VisibilityState | undefined>(
-      `${uniqueName}_columnSelector`,
-      {}
+  const {
+    exportMode,
+    indexMapping,
+    dynamicFieldsMappingConfig,
+    uniqueName,
+    defaultColumns,
+    setColumnSelectorLoading,
+    setDisplayedColumns,
+    overrideDisplayedColumns,
+    excludedRelationshipTypes
+  } = props;
+
+  // Loading state, specifically for dynamically loaded columns.
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const [injectedIndexMapping, setInjectedIndexMapping] =
+    useState<ESIndexMapping[]>();
+
+  // Local storage of the displayed columns that are saved.
+  const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
+    useLocalStorage<string[]>(
+      `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
+      []
     );
-  const [loadedIndexMapColumns, setLoadedIndexMapColumns] =
-    useState<boolean>(false);
+
+  useEffect(() => {
+    let injectedMappings: (ESIndexMapping | undefined)[] = [];
+
+    if (indexMapping) {
+      if (defaultColumns) {
+        injectedMappings = defaultColumns
+          .map<ESIndexMapping | undefined>((column) => {
+            // Check if this exists within the index mapping already, if not we do not need to inject it inside.
+            if (
+              indexMapping.find(
+                (mapping) =>
+                  mapping.label === column.id || mapping.value === column.id
+              )
+            ) {
+              return undefined;
+            }
+
+            return {
+              label: column.id ?? column.label ?? "",
+              path: (column as any)?.accessorKey,
+              type: "text",
+              value: column.id ?? column.label ?? "",
+              hideField: false,
+              distinctTerm: false,
+              keywordMultiFieldSupport: column.isKeyword ?? false,
+              keywordNumericSupport: false,
+              optimizedPrefix: false,
+              containsSupport: false,
+              endsWithSupport: false
+            };
+          })
+          .filter((injected) => injected !== undefined);
+
+        // Combine index mapping fields.
+        injectedMappings = [
+          ...indexMapping,
+          ...(injectedMappings as ESIndexMapping[])
+        ];
+      } else {
+        // Combine index mapping fields.
+        injectedMappings = indexMapping;
+      }
+
+      // Remove excluded relationships from the list if provided.
+      if (excludedRelationshipTypes && excludedRelationshipTypes?.length > 0) {
+        injectedMappings = injectedMappings.filter((mapping) => {
+          return mapping?.parentType
+            ? !excludedRelationshipTypes.includes(mapping?.parentType)
+            : true;
+        });
+      }
+
+      // Add UUID field as an additional field.
+      injectedMappings = injectedMappings.concat({
+        label: "id",
+        value: "id",
+        path: "id",
+        hideField: false,
+        type: "text",
+        containsSupport: false,
+        distinctTerm: false,
+        endsWithSupport: false,
+        keywordMultiFieldSupport: false,
+        keywordNumericSupport: false,
+        optimizedPrefix: false,
+        dynamicField: undefined
+      });
+
+      // Finally, set it as the state.
+      setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
+    }
+  }, [indexMapping, defaultColumns]);
+
+  // This useEffect is responsible for loading in the new local storage displayed columns.
+  useEffect(() => {
+    function isDefinedColumn(
+      column: TableColumn<TData> | undefined
+    ): column is TableColumn<TData> {
+      return column !== undefined && column.id !== undefined;
+    }
+
+    async function loadColumnsFromLocalStorage() {
+      if (injectedIndexMapping) {
+        const promises = localStorageDisplayedColumns.map(
+          async (localColumn) => {
+            const newColumnDefinition = await generateColumnDefinition({
+              indexMappings: injectedIndexMapping,
+              dynamicFieldsMappingConfig,
+              apiClient,
+              defaultColumns,
+              path: localColumn
+            });
+            return newColumnDefinition;
+          }
+        );
+
+        const columns = (await Promise.all(promises)).filter(isDefinedColumn);
+        setDisplayedColumns(columns);
+      }
+    }
+
+    async function loadColumnsFromSavedExport() {
+      if (injectedIndexMapping && overrideDisplayedColumns) {
+        const promises = overrideDisplayedColumns?.columns?.map?.(
+          async (localColumn, index) => {
+            const newColumnDefinition = await generateColumnDefinition({
+              indexMappings: injectedIndexMapping,
+              dynamicFieldsMappingConfig,
+              apiClient,
+              defaultColumns,
+              path: localColumn
+            });
+
+            // Set the column header if saved.
+            if (newColumnDefinition) {
+              newColumnDefinition.exportHeader =
+                overrideDisplayedColumns?.columnAliases?.[index] ?? "";
+            }
+
+            return newColumnDefinition;
+          }
+        );
+
+        const columns = (await Promise.all(promises)).filter(isDefinedColumn);
+        setDisplayedColumns(columns);
+      }
+    }
+
+    // Check if overrides are provided from the saved exports.
+    if (overrideDisplayedColumns) {
+      loadColumnsFromSavedExport();
+      setLoading(false);
+      setColumnSelectorLoading?.(false);
+      return;
+    }
+
+    if (
+      !localStorageDisplayedColumns ||
+      localStorageDisplayedColumns?.length === 0
+    ) {
+      // No local storage to load from, load the default columns in.
+      setDisplayedColumns(defaultColumns ?? []);
+
+      // Set the default columns into local storage.
+      if (defaultColumns) {
+        setLocalStorageDisplayedColumns(
+          defaultColumns.map((column) => column?.id ?? "")
+        );
+      }
+    } else {
+      loadColumnsFromLocalStorage();
+      setLoading(false);
+      setColumnSelectorLoading?.(false);
+    }
+  }, [
+    localStorageDisplayedColumns,
+    injectedIndexMapping,
+    overrideDisplayedColumns
+  ]);
+
   const {
     show: showMenu,
     showDropdown: showDropdownMenu,
     hideDropdown: hideDropdownMenu,
     onKeyDown: onKeyPressDown
   } = menuDisplayControl();
-  const { apiClient, save } = useApiClient();
-  let groupedIndexMappings;
-  let indexMap;
-  if (indexName) {
-    const indexObject = useIndexMapping({
-      indexName,
-      dynamicFieldMapping
-    });
-    indexMap = indexObject.indexMap;
-    groupedIndexMappings = getGroupedIndexMappings(indexName, indexMap);
-  }
-
-  const [visibleIndexMapColumns, setVisibleIndexMapColumns] = useLocalStorage<
-    any[]
-  >(`${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`, []);
 
   function menuDisplayControl() {
     const [show, setShow] = useState(false);
 
-    const showDropdown = async () => {
-      if (!loadedIndexMapColumns) {
-        setLoading(true);
-        await getColumnSelectorIndexMapColumns({
-          groupedIndexMappings,
-          setLoadedIndexMapColumns,
-          setColumnSelectorIndexMapColumns,
-          apiClient,
-          columnSelectorDefaultColumns
-        });
-        setLoading(false);
-      }
+    const showDropdown = () => {
       setShow(true);
     };
+
     const hideDropdown = () => {
       setShow(false);
     };
+
     function onKeyDown(e) {
       if (
         e.key === "ArrowDown" ||
@@ -154,391 +320,53 @@ export function ColumnSelector<TData>({
         hideDropdown();
       }
     }
+
     function onKeyDownLastItem(e) {
       if (!e.shiftKey && e.key === "Tab") {
         hideDropdown();
       }
     }
+
     return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
   }
 
-  const { formatMessage, messages } = useIntl();
-  // For finding columns using text search
-  const columnSearchMapping: { label: string; id: string }[] | undefined =
-    reactTable?.getAllLeafColumns().map((column) => {
-      const messageKey = `field_${column.id}`;
-      const label = messages[messageKey]
-        ? formatMessage({ id: messageKey as any })
-        : startCase(column.id);
-      return { label: label.toLowerCase(), id: column.id };
-    });
-
-  // Keep track of user selected options for when user presses "Apply"
-  const filteredColumnsState: VisibilityState = localStorageColumnStates
-    ? localStorageColumnStates
-    : {};
-  // Columns filtered from text search
-  const [searchedColumns, setSearchedColumns] =
-    useState<Column<TData, unknown>[]>();
-
-  // Set initial columns for column selector dropdown and local storage
-  useEffect(() => {
-    if (localStorageColumnStates) {
-      reactTable?.setColumnVisibility(localStorageColumnStates);
-    }
-    setSearchedColumns(reactTable?.getAllLeafColumns());
-  }, [reactTable, reactTable?.getAllColumns().length]);
-
-  const [loading, setLoading] = useState(false);
-  const [dataExportError, setDataExportError] = useState<JSX.Element>();
-
-  // Keep track of column text search value
-  const [filterColumsValue, setFilterColumnsValue] = useState<string>("");
-
-  const [queryObject] = useLocalStorage<object>(DATA_EXPORT_QUERY_KEY);
-
-  if (queryObject) {
-    delete (queryObject as any)._source;
-  }
-
-  const queryString = JSON.stringify(queryObject)?.replace(/"/g, '"');
-
-  function handleToggleAll(event) {
-    const visibilityState = reactTable?.getState()?.columnVisibility;
-    if (visibilityState) {
-      Object.keys(visibilityState).forEach((columnId) => {
-        visibilityState[columnId] = event.target.checked;
-      });
-      NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
-        visibilityState[columnId] = true;
-      });
-      setLocalStorageColumnStates(visibilityState);
-    }
-    const reactTableToggleAllHander =
-      reactTable?.getToggleAllColumnsVisibilityHandler();
-    if (reactTableToggleAllHander) {
-      reactTableToggleAllHander(event);
-      NOT_EXPORTABLE_COLUMN_IDS.forEach((columnId) => {
-        reactTable?.getColumn(columnId)?.toggleVisibility(true);
-      });
-    }
-  }
-
-  function applyFilterColumns() {
-    setSelectedColumnSelectorIndexMapColumns?.([]);
-    if (filteredColumnsState) {
-      const checkedColumnIds = Object.keys(filteredColumnsState)
-        .filter((key) => {
-          return filteredColumnsState[key];
-        })
-        .filter((id) => !NOT_EXPORTABLE_COLUMN_IDS.includes(id));
-      checkedColumnIds.forEach((id) => {
-        const columnToAddToIndexMapColumns = searchedColumns?.find(
-          (column) => column.id === id
-        );
-        if (columnToAddToIndexMapColumns) {
-          addColumnToStateVariable(
-            columnToAddToIndexMapColumns.columnDef,
-            setSelectedColumnSelectorIndexMapColumns,
-            columnSelectorDefaultColumns
-          );
-        }
-      });
-
-      reactTable?.setColumnVisibility(filteredColumnsState);
-      setSelectedColumnSelectorIndexMapColumns?.((selectedIndexMapColumns) => {
-        writeStorage(
-          `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
-          selectedIndexMapColumns
-        );
-        return selectedIndexMapColumns;
-      });
-    }
-    setLoadingIndexMapColumns?.((current) => !current);
-    setLocalStorageColumnStates(filteredColumnsState);
-  }
-
-  async function exportData() {
-    setLoading(true);
-    // Make query to data-export
-    const exportColumns = reactTable
-      ?.getAllLeafColumns()
-      .filter((column) => {
-        if (NOT_EXPORTABLE_COLUMN_IDS.includes(column.id)) {
-          return false;
-        } else {
-          return column.getIsVisible();
-        }
-      })
-      .map((column) => column.id);
-    const dataExportSaveArg = {
-      resource: {
-        type: "data-export",
-        source: indexName,
-        query: queryString,
-        columns: reactTable ? exportColumns : []
-      },
-      type: "data-export"
-    };
-    const dataExportPostResponse = await save<DataExport>([dataExportSaveArg], {
-      apiBaseUrl: "/dina-export-api"
-    });
-
-    // data-export POST will return immediately but export won't necessarily be available
-    // continue to get status of export until it's COMPLETED
-    let isFetchingDataExport = true;
-    let fetchDataExportRetries = 0;
-    let dataExportGetResponse;
-    while (isFetchingDataExport) {
-      if (fetchDataExportRetries <= MAX_DATA_EXPORT_FETCH_RETRIES) {
-        fetchDataExportRetries += 1;
-        if (dataExportGetResponse?.data?.status === "COMPLETED") {
-          // Get the exported data
-          await downloadDataExport(apiClient, dataExportPostResponse[0].id);
-          isFetchingDataExport = false;
-        } else if (dataExportGetResponse?.data?.status === "ERROR") {
-          isFetchingDataExport = false;
-          setLoading(false);
-          setDataExportError(
-            <div className="alert alert-danger">
-              <DinaMessage id="dataExportError" />
-            </div>
-          );
-        } else {
-          dataExportGetResponse = await apiClient.get<DataExport>(
-            `dina-export-api/data-export/${dataExportPostResponse[0].id}`,
-            {}
-          );
-          // Wait 1 second before retrying
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-      } else {
-        // Max retries reached
-        isFetchingDataExport = false;
-        setLoading(false);
-        setDataExportError(
-          <div className="alert alert-danger">
-            <DinaMessage id="dataExportError" />
-          </div>
-        );
-      }
-    }
-    isFetchingDataExport = false;
-    setLoading(false);
-  }
-
-  const CheckboxItem = React.forwardRef((props: any, ref) => {
+  if (exportMode) {
     return (
-      <Checkbox
-        key={props.id}
-        id={props.id}
-        isChecked={props.isChecked}
-        isField={props.isField}
-        filteredColumnsState={filteredColumnsState}
-        ref={ref}
-        handleClick={props.handleClick}
+      <ColumnSelectorList
+        {...props}
+        indexMapping={injectedIndexMapping}
+        loading={loading}
       />
     );
-  });
-
-  const ColumnSelectorMenu = React.forwardRef(
-    (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
-      if (props.style) {
-        props.style.transform = "translate(0px, 40px)";
-      }
-      return (
-        <div
-          ref={ref}
-          style={{
-            ...props.style,
-            width: "400px",
-            padding: "20px",
-            zIndex: 1
-          }}
-          className={props.className}
-          aria-labelledby={props.labelledBy}
-        >
-          {dataExportError}
-          <strong>{<FieldHeader name="filterColumns" />}</strong>
-          <input
-            autoFocus={true}
-            name="filterColumns"
-            className="form-control"
-            type="text"
-            placeholder="Search"
-            value={filterColumsValue}
-            onChange={(event) => {
-              const value = event.target.value;
-              setFilterColumnsValue(value);
-              if (value === "" || !value) {
-                setSearchedColumns(reactTable?.getAllLeafColumns());
-              } else {
-                const searchedColumnsIds = columnSearchMapping
-                  ?.filter((columnMapping) =>
-                    columnMapping.label.includes(value?.toLowerCase())
-                  )
-                  .map((filteredMapping) => filteredMapping.id);
-                const filteredColumns = reactTable
-                  ?.getAllLeafColumns()
-                  .filter((column) => searchedColumnsIds?.includes(column.id));
-                setSearchedColumns(filteredColumns);
-              }
-            }}
-          />
-          <Dropdown.Divider />
-          {
-            <div className="d-flex gap-2">
-              {!hideExportButton && (
-                <Button
-                  disabled={loading}
-                  className="btn btn-primary mt-1 mb-2 bulk-edit-button"
-                  onClick={exportData}
-                >
-                  {loading ? (
-                    <LoadingSpinner loading={loading} />
-                  ) : (
-                    formatMessage({ id: "exportButtonText" })
-                  )}
-                </Button>
-              )}
-              {!menuOnly && (
-                <Button
-                  disabled={loading}
-                  className="btn btn-primary mt-1 mb-2 bulk-edit-button"
-                  onClick={applyFilterColumns}
-                >
-                  {loading ? (
-                    <LoadingSpinner loading={loading} />
-                  ) : (
-                    formatMessage({ id: "applyButtonText" })
-                  )}
-                </Button>
-              )}
-            </div>
-          }
-          {props.children}
-        </div>
-      );
-    }
-  );
-
-  return loading ? (
-    <LoadingSpinner loading={loading} />
-  ) : menuOnly ? (
-    <ColumnSelectorMenu>
-      <Dropdown.Item
-        id="selectAll"
-        handleClick={handleToggleAll}
-        isChecked={reactTable?.getIsAllColumnsVisible()}
-        as={CheckboxItem}
-      />
-      {searchedColumns?.map((column) => {
-        function handleToggle(event) {
-          const reactTableToggleHandler = column?.getToggleVisibilityHandler();
-          reactTableToggleHandler(event);
-          const columnId = column.id;
-          setLocalStorageColumnStates({
-            ...localStorageColumnStates,
-            [columnId]: event.target.checked
-          });
-          if (event.target.checked) {
-            const visibleIndexMapColumn = searchedColumns?.find(
-              (searchedColumn) => {
-                if (
-                  !NOT_EXPORTABLE_COLUMN_IDS.includes(column.id) &&
-                  !columnSelectorDefaultColumns?.find(
-                    (defaultColumn) => defaultColumn.id === column.id
-                  ) &&
-                  searchedColumn.id === column.id
-                ) {
-                  return true;
-                }
-                return false;
-              }
-            );
-            setVisibleIndexMapColumns([
-              ...visibleIndexMapColumns,
-              visibleIndexMapColumn?.columnDef
-            ]);
-          } else {
-            setVisibleIndexMapColumns(
-              visibleIndexMapColumns.filter(
-                (visibleColumn) => visibleColumn.id !== column.id
-              )
-            );
-          }
-        }
-        return (
-          <>
-            <Dropdown.Item
-              key={column?.id}
-              id={column?.id}
-              isChecked={column?.getIsVisible()}
-              isField={true}
-              handleClick={handleToggle}
-              as={CheckboxItem}
-            />
-          </>
-        );
-      })}
-    </ColumnSelectorMenu>
-  ) : (
-    <Dropdown
-      onMouseDown={showDropdownMenu}
-      onKeyDown={onKeyPressDown}
-      onMouseLeave={hideDropdownMenu}
-      show={showMenu}
-    >
-      <Dropdown.Toggle>
-        <DinaMessage id="selectColumn" />
-      </Dropdown.Toggle>
-      <Dropdown.Menu
-        as={ColumnSelectorMenu}
-        style={{ maxHeight: "20rem", overflowY: "scroll" }}
+  } else {
+    return (
+      <Dropdown
+        onMouseDown={showDropdownMenu}
+        onKeyDown={onKeyPressDown}
+        onMouseLeave={hideDropdownMenu}
+        show={showMenu}
       >
-        <Dropdown.Item
-          id="selectAll"
-          handleClick={handleToggleAll}
-          isChecked={reactTable?.getIsAllColumnsVisible()}
-          as={CheckboxItem}
-        />
-        {searchedColumns?.map((column) => {
-          return (
-            <>
-              <Dropdown.Item
-                key={column?.id}
-                id={column?.id}
-                isChecked={column?.getIsVisible()}
-                isField={true}
-                as={CheckboxItem}
-              />
-            </>
-          );
-        })}
-      </Dropdown.Menu>
-    </Dropdown>
-  );
-}
-
-export async function downloadDataExport(
-  apiClient: Kitsu,
-  id: string | undefined
-) {
-  if (id) {
-    const getFileResponse = await apiClient.get(
-      `dina-export-api/file/${id}?type=DATA_EXPORT`,
-      {
-        responseType: "blob"
-      }
+        <Dropdown.Toggle>
+          <DinaMessage id="selectColumn" />
+        </Dropdown.Toggle>
+        <Dropdown.Menu
+          style={{
+            height: "30rem",
+            overflowY: "scroll",
+            width: "25rem",
+            padding: "1.25rem 1.25rem 1.25rem 1.25rem",
+            zIndex: 9000
+          }}
+        >
+          <ColumnSelectorList
+            {...props}
+            indexMapping={injectedIndexMapping}
+            loading={loading}
+          />
+        </Dropdown.Menu>
+      </Dropdown>
     );
-
-    // Download the data
-    const url = window?.URL.createObjectURL(getFileResponse as any);
-    const link = document?.createElement("a");
-    link.href = url ?? "";
-    link?.setAttribute("download", `${id}`);
-    document?.body?.appendChild(link);
-    link?.click();
-    window?.URL?.revokeObjectURL(url ?? "");
   }
 }
+
+export const ColumnSelectorMemo = React.memo(ColumnSelector);

@@ -155,8 +155,8 @@ interface StorageUnitSelectFieldProps {
     ResourceSelectFieldProps<StorageUnit>,
     ProvidedProps
   >;
-  restrictedField: string;
-  restrictedFieldValue: string;
+  restrictedField?: string;
+  restrictedFieldValue?: string;
 }
 
 export function StorageUnitSelectField({
@@ -178,7 +178,7 @@ export function StorageUnitSelectField({
           restrictedFieldValue
         })
       }
-      readOnlyLink="/storageUnit/view?id="
+      readOnlyLink="/collection/storage-unit/view?id="
       filter={filterBy(["name"])}
       model="collection-api/storage-unit"
       optionLabel={(storageUnit) => {
@@ -189,7 +189,9 @@ export function StorageUnitSelectField({
   );
 }
 
-/** CollectingEvent Select Field. **/
+/**
+ * CollectingEvent Select Field.
+ */
 export function CollectingEventSelectField(
   props: SetOptional<ResourceSelectFieldProps<CollectingEvent>, ProvidedProps>
 ) {
@@ -229,7 +231,9 @@ export function CollectingEventSelectField(
   );
 }
 
-/** Protocol Select Field. **/
+/**
+ * Protocol Select Field.
+ */
 export function ProtocolSelectField(
   props: SetOptional<ResourceSelectFieldProps<Protocol>, ProvidedProps>
 ) {
@@ -261,7 +265,9 @@ export function ProtocolSelectField(
   );
 }
 
-/** PreparationType Select Field. **/
+/**
+ * PreparationType Select Field.
+ */
 export function PreparationTypeSelectField(
   props: SetOptional<ResourceSelectFieldProps<PreparationType>, ProvidedProps>
 ) {
@@ -298,7 +304,9 @@ export function PreparationTypeSelectField(
   );
 }
 
-/** PreparationMethod Select Field. **/
+/**
+ * PreparationMethod Select Field.
+ */
 export function PreparationMethodSelectField(
   props: SetOptional<ResourceSelectFieldProps<PreparationMethod>, ProvidedProps>
 ) {
@@ -335,7 +343,9 @@ export function PreparationMethodSelectField(
   );
 }
 
-/** Project Select Field. **/
+/**
+ * Project Select Field.
+ */
 export function ProjectSelectField(
   props: SetOptional<ResourceSelectFieldProps<Project>, ProvidedProps>
 ) {

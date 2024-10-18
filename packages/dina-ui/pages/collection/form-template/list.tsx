@@ -33,7 +33,6 @@ export default function MaterialSampleFormTemplateListPage() {
     },
     "group",
     booleanCell("restrictToCreatedBy"),
-    booleanCell("splitConfiguration", "components[0].visible"),
     "createdBy",
     dateCell("createdOn"),
     {
@@ -79,7 +78,11 @@ export default function MaterialSampleFormTemplateListPage() {
   return (
     <PageLayout
       titleId="materialSampleFormTemplates"
-      buttonBarContent={<CreateButton entityLink="/collection/form-template" />}
+      buttonBarContent={
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/form-template" />
+        </div>
+      }
     >
       <ListPageLayout
         additionalFilters={(filterForm) => ({

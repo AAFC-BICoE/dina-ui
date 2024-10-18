@@ -16,14 +16,12 @@ import {
 } from "@tanstack/react-table";
 import classnames from "classnames";
 import { Fragment, useEffect, useState } from "react";
-
 import { useIntl } from "react-intl";
-import { ColumnSelector } from "../column-selector/ColumnSelector";
-import { DynamicFieldsMappingConfig } from "../list-page/types";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { FilterInput } from "./FilterInput";
 import { Pagination } from "./Pagination";
 import { DefaultRow, DraggableRow } from "./RowComponents";
+import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 200, 500, 1000];
 
@@ -61,6 +59,8 @@ export interface ReactTableProps<TData> {
   showPagination?: boolean;
   // Show pagination on the top
   showPaginationTop?: boolean;
+  // Display pagination with the icons only. Perfect for small tables.
+  smallPaginationButtons?: boolean;
   pageSizeOptions?: number[];
   defaultExpanded?: ExpandedState;
   // A function to render the SubComponent in the expanded area.
@@ -79,55 +79,6 @@ export interface ReactTableProps<TData> {
 
   // Hides the table rendering. Useful for accessing table states but don't want to render table
   hideTable?: boolean;
-
-  // Column Selector only get menu, no dropdown button
-  menuOnly?: boolean;
-
-  // Pass the Column Selector to parent caller
-  setColumnSelector?: React.Dispatch<React.SetStateAction<JSX.Element>>;
-
-  // uniqueName used for local storage
-  uniqueName?: string;
-
-  /**
-   * Used for the listing page to understand which columns can be provided. Filters are generated
-   * based on the index provided.
-   *
-   * Also used to store saved searches under a specific type:
-   *
-   * `UserPreference.savedSearches.[INDEX_NAME].[SAVED_SEARCH_NAME]`
-   *
-   * For example, to get the default saved searches for the material sample index:
-   * `UserPreference.savedSearches.dina_material_sample_index.default.filters`
-   */
-  indexName?: string;
-
-  /**
-   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
-   * be searched against. It will also define the path and data component if required.
-   *
-   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
-   * or grouped terms.
-   */
-  dynamicFieldMapping?: DynamicFieldsMappingConfig;
-
-  // State setter to pass the processed index map columns to parent components
-  setColumnSelectorIndexMapColumns?: React.Dispatch<
-    React.SetStateAction<any[]>
-  >;
-  // State setter to pass the processed index map columns to parent components
-  setSelectedColumnSelectorIndexMapColumns?: React.Dispatch<
-    React.SetStateAction<any[]>
-  >;
-
-  // If true, index map columns are being loaded and processed from back end
-  setLoadingIndexMapColumns?: React.Dispatch<React.SetStateAction<boolean>>;
-
-  // Hide column selector export button if true
-  hideExportButton?: boolean;
-
-  // The default visible columns
-  columnSelectorDefaultColumns?: any[];
 }
 
 const DEFAULT_SORT: SortingState = [
@@ -148,6 +99,7 @@ export function ReactTable<TData>({
   showPagination = false,
   showPaginationTop = false,
   manualPagination = false,
+  smallPaginationButtons = false,
   pageSize: initPageSize,
   pageCount,
   page,
@@ -171,17 +123,7 @@ export function ReactTable<TData>({
   manualFiltering = false,
   onColumnFiltersChange,
   defaultColumnFilters = [],
-  hideTable = false,
-  setColumnSelector,
-  uniqueName,
-  indexName,
-  dynamicFieldMapping,
-  setColumnSelectorIndexMapColumns,
-  setSelectedColumnSelectorIndexMapColumns,
-  setLoadingIndexMapColumns,
-  menuOnly,
-  hideExportButton,
-  columnSelectorDefaultColumns
+  hideTable = false
 }: ReactTableProps<TData>) {
   const { formatMessage } = useIntl();
   const [sorting, setSorting] = useState<SortingState>(sort ?? DEFAULT_SORT);
@@ -241,7 +183,7 @@ export function ReactTable<TData>({
     ...(enableSorting && { getSortedRowModel: getSortedRowModel() }),
     ...(enableFilters && { getFilteredRowModel: getFilteredRowModel() }),
     initialState: {
-      sorting: sort ?? sorting,
+      sorting,
       pagination: { pageIndex, pageSize },
       ...(defaultExpanded && {
         expanded: defaultExpanded
@@ -257,7 +199,7 @@ export function ReactTable<TData>({
         getExpandedRowModel: getExpandedRowModel()
       }),
     state: {
-      sorting: sort ?? sorting,
+      sorting,
       ...(columnVisibility && { columnVisibility }),
       ...(enableFilters && columnFilters && { columnFilters }),
       ...(manualPagination && {
@@ -298,26 +240,6 @@ export function ReactTable<TData>({
 
   const table = useReactTable<TData>(tableOption);
 
-  useEffect(() => {
-    if (setColumnSelector) {
-      const columnSelector = (
-        <ColumnSelector
-          uniqueName={uniqueName}
-          reactTable={table}
-          hideExportButton={hideExportButton}
-          menuOnly={menuOnly}
-          indexName={indexName}
-          dynamicFieldMapping={dynamicFieldMapping}
-          setColumnSelectorIndexMapColumns={setColumnSelectorIndexMapColumns}
-          setLoadingIndexMapColumns={setLoadingIndexMapColumns}
-          columnSelectorDefaultColumns={columnSelectorDefaultColumns}
-          setSelectedColumnSelectorIndexMapColumns={setSelectedColumnSelectorIndexMapColumns}
-        />
-      );
-      setColumnSelector?.(columnSelector);
-    }
-  }, [table.getState().columnVisibility, table.getAllLeafColumns().length]);
-
   return !hideTable ? (
     <div
       data-testid="ReactTable"
@@ -329,7 +251,15 @@ export function ReactTable<TData>({
     >
       {showPagination && showPaginationTop && (
         <div className="pagination-top">
-          <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+          <Pagination
+            table={table}
+            pageSizeOptions={pageSizeOptions}
+            isTop={true}
+            displayFirstAndLastOptions={
+              enableSorting && !!sorting && sorting?.length > 0
+            }
+            smallPaginationButtons={smallPaginationButtons}
+          />
         </div>
       )}
       <table className="w-100">
@@ -337,19 +267,23 @@ export function ReactTable<TData>({
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
-                const defaultSortRule = sort?.find(
+                const defaultSortRule = sorting?.find(
                   (sortRule) => sortRule.id === header.id
                 );
+
+                const isSortedDesc =
+                  header.column.getIsSorted() === "asc" ||
+                  defaultSortRule?.desc === false;
+                const isSortedAsc =
+                  header.column.getIsSorted() === "desc" ||
+                  defaultSortRule?.desc === true;
+
                 return (
                   <th
                     key={header.id}
                     colSpan={header.colSpan}
                     className={classnames(
-                      header.column.getCanSort() && "-cursor-pointer",
-                      header.column.getIsSorted() === "asc" && "-sort-asc",
-                      header.column.getIsSorted() === "desc" && "-sort-desc",
-                      defaultSortRule?.desc === false && "-sort-asc",
-                      defaultSortRule?.desc === true && "-sort-desc"
+                      header.column.getCanSort() && "-cursor-pointer"
                     )}
                     style={{
                       width:
@@ -357,20 +291,34 @@ export function ReactTable<TData>({
                           ? "auto"
                           : header.column.columnDef.size
                     }}
+                    onClick={header.column.getToggleSortingHandler()}
                   >
                     {header.isPlaceholder ? null : (
                       <div
                         className={
                           header.column.getCanSort()
-                            ? "-cursor-pointer select-none"
-                            : ""
+                            ? "-cursor-pointer select-none column-header"
+                            : "column-header"
                         }
-                        onClick={header.column.getToggleSortingHandler()}
                       >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        <span className="d-flex align-items-center justify-content-center">
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          {isSortedAsc && (
+                            <FaArrowDown
+                              className="-sort-asc"
+                              onClick={header.column.getToggleSortingHandler()}
+                            />
+                          )}
+                          {isSortedDesc && (
+                            <FaArrowUp
+                              className="-sort-desc"
+                              onClick={header.column.getToggleSortingHandler()}
+                            />
+                          )}
+                        </span>
                       </div>
                     )}
                     {header.column.getCanFilter() ? (
@@ -447,7 +395,15 @@ export function ReactTable<TData>({
       </table>
       {showPagination && (
         <div className="pagination-bottom">
-          <Pagination table={table} pageSizeOptions={pageSizeOptions} />
+          <Pagination
+            table={table}
+            pageSizeOptions={pageSizeOptions}
+            isTop={false}
+            displayFirstAndLastOptions={
+              enableSorting && !!sorting && sorting?.length > 0
+            }
+            smallPaginationButtons={smallPaginationButtons}
+          />
         </div>
       )}
     </div>

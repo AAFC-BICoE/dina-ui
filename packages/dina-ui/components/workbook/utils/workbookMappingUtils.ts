@@ -1,10 +1,12 @@
+import { find, trim } from "lodash";
+import { ValidationError } from "yup";
+import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 import {
   ColumnUniqueValues,
   WorkbookJSON,
   WorkbookRow
 } from "../types/Workbook";
-import { find, trim } from "lodash";
-import { ValidationError } from "yup";
+import _ from "lodash";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
@@ -35,6 +37,70 @@ export function _toPlainString(value: string) {
   }
 }
 
+const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
+  ["parent.", "parentMaterialSample."],
+  ["parent id", "parentMaterialSample.materialSampleName"],
+  ["parent", "parentMaterialSample.materialSampleName"],
+  ["parent material sample", "parentMaterialSample.materialSampleName"],
+  ["preparationmethod", "preparationMethod.name"],
+  ["preparation method", "preparationMethod.name"],
+  ["identifier", "materialSampleName"],
+  ["type", "materialSampleType"],
+  ["collection", "collection.name"],
+  ["collections", "collection.name"],
+  ["storage unit", "storageUnitUsage.storageUnit.name"],
+  ["storage", "storageUnitUsage.storageUnit.name"],
+  ["storageunit", "storageUnitUsage.storageUnit.name"],
+  ["project", "projects.name"],
+  ["projects", "projects.name"],
+  ["preparation type", "preparationType.name"],
+  ["preparationtype", "preparationType.name"],
+  ["prepared by", "preparedBy.displayName"],
+  ["preparedby", "preparedBy.displayName"],
+  ["preparationprotocol", "preparationProtocol.name"],
+  ["preparation protocol", "preparationProtocol.name"],
+  ["assemblage", "assemblages.name"],
+  ["assemblages", "assemblages.name"],
+  ["collectors", "collectingEvent.collectors.displayName"],
+  ["collector", "collectingEvent.collectors.displayName"],
+  ["attachment", "attachment.name"],
+  ["attachments", "attachment.name"],
+  ["hostorganism", "hostOrganism.name"],
+  ["host organism", "hostOrganism.name"],
+  ["hostremarks", "hostOrganism.remarks"],
+  ["host remarks", "hostOrganism.remarks"],
+  ["collector's number", "collectingEvent.dwcRecordNumber"],
+  ["collector number", "collectingEvent.dwcRecordNumber"],
+  ["well column", "storageUnitUsage.wellColumn"],
+  ["well row", "storageUnitUsage.wellRow"],
+  [
+    "decimal latitude",
+    "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"
+  ],
+  [
+    "decimal longitude",
+    "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
+  ],
+  [
+    "latitude",
+    "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"
+  ],
+  [
+    "longitude",
+    "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
+  ]
+]);
+
+export type FieldOptionType = {
+  label: string;
+  value?: string;
+  options?: {
+    label: string;
+    value: string;
+    parentPath: string;
+  }[];
+};
+
 /**
  * find the possible field that match the column header
  * @param columnHeader The column header from excel file
@@ -43,47 +109,95 @@ export function _toPlainString(value: string) {
  */
 export function findMatchField(
   columnHeader: string,
-  fieldOptions: 
-    {
-        label: string;
-        value?: string;
-        options?: 
-          {
-            label: string;
-            value: string;
-            parentPath: string;
-          }[]
-      }[]
-    
+  fieldOptions: FieldOptionType[]
 ) {
-  const plainOptions: {label: string; value: string}[] = [];
+  let columnHeader2: string = columnHeader.toLowerCase();
+  if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {
+    columnHeader2 = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(columnHeader2)!;
+  }
+  const plainOptions: { label: string; value: string }[] = [];
   for (const opt of fieldOptions) {
     if (opt.options) {
       for (const nestOpt of opt.options) {
-        plainOptions.push({label: nestOpt.label, value: nestOpt.value})
+        plainOptions.push({ label: nestOpt.label, value: nestOpt.value });
       }
     } else {
-      plainOptions.push({label: opt.label, value: opt.value!})
+      plainOptions.push({ label: opt.label, value: opt.value! });
     }
   }
+  const prefixPos = columnHeader2.lastIndexOf(".");
+  let prefix: string;
+  if (prefixPos !== -1) {
+    prefix = columnHeader2.substring(0, prefixPos + 1);
+  }
+
   const option = find(plainOptions, (item) => {
-    const pos = columnHeader.lastIndexOf(".");
-    if (pos !== -1) {
-      const prefix = columnHeader.substring(0, pos + 1);
+    if (prefix) {
+      if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(prefix)) {
+        prefix = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(prefix)!;
+      }
       if (
-        item.value.startsWith(prefix) &&
-        _toPlainString(item.label) ===
-          _toPlainString(columnHeader.substring(pos + 1))
+        item.value.toLowerCase().startsWith(prefix.toLowerCase()) &&
+        (item.value.toLowerCase() === columnHeader2.toLowerCase() ||
+          _toPlainString(item.label) ===
+            _toPlainString(columnHeader2.substring(prefixPos + 1)))
       ) {
         return true;
       } else {
         return false;
       }
     } else {
-      return _toPlainString(item.label) === _toPlainString(columnHeader);
+      const validOptionLabel = isValidOptionLabel(
+        item,
+        plainOptions,
+        columnHeader
+      );
+      return (
+        item.value.toLowerCase() === columnHeader2.toLowerCase() ||
+        validOptionLabel
+      );
     }
   });
   return option ? option.value : undefined;
+}
+
+/**
+ * Determine if the given option is valid to be used for column mapping based on option's label
+ * An option is valid if its label matches the columnHeader and the option value is not nested
+ * If the option value is nested, the option label must not have duplicates in plainOptions
+ * @param option Dropdown option to be used for column mapping
+ * @param plainOptions Dropdown options that can be used for column mapping
+ * @param columnHeader The column header from excel file
+ * @returns true if given option should be used for column mapping, false otherwise
+ */
+function isValidOptionLabel(
+  option: {
+    label: string;
+    value: string;
+  },
+  plainOptions: { label: string; value: string }[],
+  columnHeader: string
+): boolean {
+  const duplicateLabelOptions = plainOptions
+    .map((plainOption) =>
+      _toPlainString(plainOption.label) === _toPlainString(columnHeader)
+        ? plainOption
+        : undefined
+    )
+    .filter((plainOption) => plainOption !== undefined);
+  duplicateLabelOptions.find((duplicateLabelOption) =>
+    duplicateLabelOption?.value.includes(".")
+  );
+  if (option.value?.includes(".")) {
+    // If option value is nested, the option label must match the column header and must not have duplicates
+    return (
+      _toPlainString(option.label) === _toPlainString(columnHeader) &&
+      duplicateLabelOptions.length < 2
+    );
+  } else {
+    // Option value is not nested, it must match the column header
+    return _toPlainString(option.label) === _toPlainString(columnHeader);
+  }
 }
 
 /**
@@ -91,14 +205,14 @@ export function findMatchField(
  *
  * @param spreadsheetData Whole spreadsheet data to retrieve the headers from.
  * @param sheetNumber the sheet index (starting from 0) to pull the header columns from.
- * @param fieldNames
+ * @param fieldMaps
  * @param getRowNumber (optional) - if yes, gets the corresponding row number in the workbook for the row data
  * @returns
  */
 export function getDataFromWorkbook(
   spreadsheetData: WorkbookJSON | undefined,
   sheetNumber: number,
-  fieldNames: (string | undefined)[],
+  fieldMaps: FieldMapType[],
   getRowNumber?: boolean
 ) {
   const data: { [key: string]: any }[] = [];
@@ -108,10 +222,44 @@ export function getDataFromWorkbook(
   for (let i = 1; i < (workbookData?.length ?? 0); i++) {
     const row = workbookData?.[i];
     const rowData: { [key: string]: any } = {};
-    for (let index = 0; index < fieldNames.length; index++) {
-      const field = fieldNames[index];
-      if (field !== undefined) {
-        rowData[field] = row?.content[index];
+    for (let index = 0; index < fieldMaps.length; index++) {
+      const fieldMap = fieldMaps[index];
+      if (!fieldMap?.skipped) {
+        if (fieldMap.targetKey) {
+          if ("vocabularyElementType" in fieldMap.targetKey) {
+            const managedAttributes: { [key: string]: any } =
+              rowData[fieldMap.targetField!] ?? {};
+            let value: any;
+            switch (fieldMap.targetKey.vocabularyElementType) {
+              case "BOOL":
+                value = convertBoolean(row?.content[index]);
+                break;
+              case "INTEGER":
+              case "DECIMAL":
+                value = convertNumber(row?.content[index]);
+                break;
+              case "DATE":
+                value = convertDate(row?.content[index]);
+                break;
+              case "PICKLIST":
+              case "STRING":
+                value = convertString(row?.content[index]);
+                break;
+            }
+            if (value !== null) {
+              managedAttributes[fieldMap.targetKey.key] = value;
+              rowData[fieldMap.targetField!] = managedAttributes;
+            }
+          } else if ("key" in fieldMap.targetKey) {
+            if (!rowData[fieldMap.targetField!]) {
+              rowData[fieldMap.targetField!] = {};
+            }
+            rowData[fieldMap.targetField!][fieldMap.targetKey.key] =
+              row?.content[index];
+          }
+        } else {
+          rowData[fieldMap.targetField!] = row?.content[index];
+        }
       }
     }
     if (!!getRowNumber) {
@@ -177,7 +325,7 @@ export function isBooleanArray(value: string): boolean {
  */
 export function isMap(value: string): boolean {
   const regex =
-    /^[a-zA-Z_]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+))(?:,\s*[a-zA-Z_]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+)))*$/;
+    /^[a-zA-Z_0-9]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+))(?:,\s*[a-zA-Z_0-9]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+)))*$/;
   return !!value && regex.test(value);
 }
 
@@ -230,7 +378,7 @@ export function isValidManagedAttribute(
  * @param value string
  * @returns number
  */
-export function convertNumber(value: any): number | null {
+export function convertNumber(value: any, _fieldName?: string): number | null {
   if (value !== null && value !== undefined && value !== "" && !isNaN(+value)) {
     return +value;
   } else {
@@ -243,7 +391,7 @@ export function convertNumber(value: any): number | null {
  * @param value string, it can be 'true', 'false', 'yes', or 'no'
  * @returns boolean
  */
-export function convertBoolean(value: any): boolean {
+export function convertBoolean(value: any, _fieldName?: string): boolean {
   const strBoolean = String(value).toLowerCase().trim();
   if (strBoolean === "false" || strBoolean === "no" || strBoolean === "0") {
     return false;
@@ -259,7 +407,7 @@ export function convertBoolean(value: any): boolean {
  * @param value Comma separated string, e.g.  `asdb,deeasdf,sdf,"sdf,sadf" , sdfd`
  *
  */
-export function convertStringArray(value: string): string[] {
+export function convertStringArray(value: any, _fieldName?: string): string[] {
   const arr = value.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
   return arr.map((str) => trim(trim(str, '"')));
 }
@@ -270,12 +418,12 @@ export function convertStringArray(value: string): string[] {
  * @param value comma separated number string, e.g. "111,222,333,444"
  * Any items that are not number will be filter out.
  */
-export function convertNumberArray(value: string): number[] {
+export function convertNumberArray(value: any, fieldName?: string): number[] {
   const arr = value.split(",");
   return arr
     .map((item) => trim(item))
     .filter((item) => item !== "")
-    .map((item) => convertNumber(item.trim()))
+    .map((item) => convertNumber(item.trim(), fieldName))
     .filter((item) => typeof item === "number" && !isNaN(item)) as number[];
 }
 
@@ -283,12 +431,12 @@ export function convertNumberArray(value: string): number[] {
  * convert comma separated boolean string into array of boolean
  * @param value
  */
-export function convertBooleanArray(value: string): boolean[] {
+export function convertBooleanArray(value: any, fieldName?: string): boolean[] {
   const arr = value.split(",");
   return arr
     .map((item) => trim(item))
     .filter((item) => item !== "")
-    .map((item) => convertBoolean(item.trim())) as boolean[];
+    .map((item) => convertBoolean(item.trim(), fieldName)) as boolean[];
 }
 
 /**
@@ -304,7 +452,10 @@ export function convertBooleanArray(value: string): boolean[] {
  * Any item in the value string has no key or value will be filtered out.
  *
  */
-export function convertMap(value: string): { [key: string]: any } {
+export function convertMap(
+  value: any,
+  _fieldName?: string
+): { [key: string]: any } {
   const regx = /:(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/;
   const items = value
     .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
@@ -331,15 +482,23 @@ export function convertMap(value: string): { [key: string]: any } {
   return map;
 }
 
-export function convertDate(value: string) {
+export function convertDate(value: any, _fieldName?: string) {
   if (isNumber(value)) {
     const dateNum = convertNumber(value);
     const excelEpoc = new Date(1900, 0, -1).getTime();
     const msDay = 86400000;
     const date = new Date(excelEpoc + (dateNum ?? 0) * msDay);
     return date.toISOString().split("T")[0];
-  } else if (typeof value === "string") {
-    return value;
+  } else if (typeof value === "string" && value.trim() !== "") {
+    return value.trim();
+  } else {
+    return null;
+  }
+}
+
+export function convertString(value: any, _filename?: string) {
+  if (value && typeof value === "string" && value.trim() !== "") {
+    return value.trim();
   } else {
     return null;
   }
@@ -347,6 +506,40 @@ export function convertDate(value: string) {
 
 export function isObject(value: any) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function isEmptyWorkbookValue(value: any): boolean {
+  if (value === undefined || value === null) {
+    return true;
+  }
+  if (typeof value === "string" && value.trim() === "") {
+    return true;
+  }
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return true;
+    } else {
+      let emptyObject = true;
+      for (const item of value) {
+        if (!isEmptyWorkbookValue(item)) {
+          emptyObject = false;
+        }
+      }
+      return emptyObject;
+    }
+  }
+  if (typeof value === "object" && !Array.isArray(value)) {
+    const keys = Object.keys(value).filter((k) => k !== "relationshipConfig");
+    let emptyObject = true;
+    for (const key of keys) {
+      if (!isEmptyWorkbookValue(value[key])) {
+        emptyObject = false;
+        break;
+      }
+    }
+    return emptyObject;
+  }
+  return false;
 }
 
 /**
@@ -381,6 +574,33 @@ export function flattenObject(source: any) {
 
 export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+export const NON_ALPHA_NUMERIC_REGEX = /[^a-z0-9]/gi; // Matches any character except a-z and 0-9 (case-insensitive)
+
+/**
+ *
+ * @param str1 string to compare
+ * @param str2 string to compare
+ * @returns true if strings are equal, false otherwise
+ */
+export function compareAlphanumeric(str1, str2) {
+  if (str1 === str2) {
+    return true;
+  }
+  const str1NoSpecialChars = _.deburr(str1).replace(
+    NON_ALPHA_NUMERIC_REGEX,
+    ""
+  );
+  const str2NoSpecialChars = _.deburr(str2).replace(
+    NON_ALPHA_NUMERIC_REGEX,
+    ""
+  );
+  return (
+    str1NoSpecialChars.localeCompare(str2NoSpecialChars, undefined, {
+      sensitivity: "base"
+    }) === 0
+  );
+}
+
 export function calculateColumnUniqueValuesFromSpreadsheetData(
   spreadsheetData: WorkbookJSON
 ): ColumnUniqueValues {
@@ -394,12 +614,16 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
     for (let colIndex = 0; colIndex < columnNames.length; colIndex++) {
       const counts: { [value: string]: number } = {};
       for (let rowIndex = 1; rowIndex < workbookRows.length; rowIndex++) {
-        const value = workbookRows[rowIndex].content[colIndex];
-        if (value !== undefined) {
+        if (
+          !!workbookRows[rowIndex].content[colIndex] &&
+          workbookRows[rowIndex].content[colIndex].trim() !== ""
+        ) {
+          // Replace right single quotation mark with normal apostrophe
+          const value = workbookRows[rowIndex].content[colIndex].trim();
           counts[value] = 1 + (counts[value] || 0);
         }
       }
-      columnUniqueValues[columnNames[colIndex]] = counts;
+      columnUniqueValues[columnNames[colIndex].replace(".", "_")] = counts;
     }
     result[sheet] = columnUniqueValues;
   }
@@ -413,4 +637,40 @@ export function getParentFieldPath(fieldPath: string) {
   } else {
     return undefined;
   }
+}
+
+export function removeEmptyColumns(data: WorkbookJSON) {
+  for (const sheet of Object.keys(data)) {
+    const sheetData: WorkbookRow[] = data[sheet];
+    const emptyColumnIndexes: number[] = [];
+    if (sheetData.length > 1) {
+      const headerRow = sheetData[0];
+      headerRow.content = headerRow.content.map((header) => header.trim());
+      for (let i = headerRow.content.length - 1; i >= 0; i--) {
+        if (headerRow.content[i].trim() === "") {
+          emptyColumnIndexes.push(i);
+          headerRow.content.splice(i, 1);
+        }
+      }
+      for (let i = 1; i < sheetData.length; i++) {
+        const dataRow = sheetData[i];
+        for (const emptyIdx of emptyColumnIndexes) {
+          dataRow.content.splice(emptyIdx, 1);
+        }
+      }
+    }
+  }
+  return data;
+}
+
+export function trimSpace(workbookData: WorkbookJSON) {
+  for (const rows of Object.values(workbookData)) {
+    for (const row of rows as WorkbookRow[]) {
+      for (let i = 0; i < row.content.length; i++) {
+        const value = row.content[i];
+        row.content[i] = value.trim();
+      }
+    }
+  }
+  return workbookData;
 }

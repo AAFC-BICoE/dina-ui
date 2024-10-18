@@ -1,7 +1,7 @@
 import { take } from "lodash";
-import { WorkbookJSON, WorkbookRow } from "./types/Workbook";
 import { Card } from "react-bootstrap";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { WorkbookJSON, WorkbookRow } from "./types/Workbook";
 
 /**
  * This component is currently not used anywhere yet. It will be implemented in a future ticket.
@@ -27,10 +27,16 @@ export function WorkbookDisplay({
     </div>
   ));
   const dataRows = dataToDisplay.map((row: WorkbookRow, index: number) => {
+    // Skip row if all row content empty
+    const skipRow = row.content.every((content) => !!content === false);
+
     // Skip the first row since it's already been displayed.
-    if (index !== 0) {
+    if (index !== 0 && !skipRow) {
+      while (row.content.length < numOfColumns) {
+        row.content.push("");
+      }
       return row.content.map((col, i) => (
-        <div key={i} className="cells_content">
+        <div key={i} className="cells_content" title={col}>
           {col}
         </div>
       ));
@@ -42,14 +48,14 @@ export function WorkbookDisplay({
           .cells {
             position: relative;
             display: grid;
-            grid-template-columns: 40px repeat(${numOfColumns}, calc((100% - 53px) / ${numOfColumns}));
+            grid-template-columns: 40px repeat(${numOfColumns}, auto);
             grid-template-rows: 50px repeat(${numOfRows}, 30px);
             grid-gap: 1px;
             background: #cdcdcd;
             grid-auto-flow: dense;
             max-width: 100%;
-            overflow: hidden;
             height: calc(51px + ${numOfRows}*31px);
+            overflow-x: auto;
           }
           .cells_spacer {
             background: #e6e6e6;
@@ -69,7 +75,10 @@ export function WorkbookDisplay({
             display: flex;
             justify-content: center;
             align-items: center;
-            word-wrap: anywhere;
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: clip;
+            padding: 0 10px; /* Adds padding to the left and right */
           }
           .cells_number {
             background: #e6e6e6;
@@ -88,12 +97,12 @@ export function WorkbookDisplay({
             padding: 6px;
             background: #f3f2f1;
           }
-        `}</style>
+  `}</style>
       <Card
         className="mb-3"
         style={{ width: "100%", overflowX: "auto", height: "70hp" }}
       >
-        <Card.Header style={{fontSize: "1.4em"}}>
+        <Card.Header style={{ fontSize: "1.4em" }}>
           <DinaMessage id="workbookPreviewTitle" /> ({numOfRows} /{" "}
           {workbookJsonData ? workbookJsonData[sheetIndex].length - 1 : 0})
         </Card.Header>

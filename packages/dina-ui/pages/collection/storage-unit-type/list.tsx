@@ -5,11 +5,7 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import {
-  groupCell,
-  GroupSelectField,
-  KeepContentsTogetherToggleForm
-} from "../../../components";
+import { groupCell, GroupSelectField } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnitType } from "../../../types/collection-api";
@@ -26,12 +22,6 @@ const STORAGE_UNIT_TYPE_TABLE_COLUMNS: ColumnDefinition<StorageUnitType>[] = [
     ),
     accessorKey: "name"
   },
-  {
-    cell: ({ row: { original } }) => (
-      <KeepContentsTogetherToggleForm initialValues={original as any} />
-    ),
-    accessorKey: "isInseperable"
-  },
   groupCell("group"),
   "createdBy",
   dateCell("createdOn")
@@ -44,7 +34,9 @@ export default function StorageUnitTypeListPage() {
     <PageLayout
       titleId={formatMessage("storageUnitTypeListTitle")}
       buttonBarContent={
-        <CreateButton entityLink="/collection/storage-unit-type" />
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/storage-unit-type" />
+        </div>
       }
     >
       <ListPageLayout

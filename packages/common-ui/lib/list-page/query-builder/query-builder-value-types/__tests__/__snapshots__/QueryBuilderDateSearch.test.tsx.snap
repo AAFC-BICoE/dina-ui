@@ -2,27 +2,42 @@
 
 exports[`QueryBuilderDateSearch QueryBuilderDateSearch Component Display field if match type is equals: Expect date field not to be displayed since the match type is not equals 1`] = `
 <DocumentFragment>
-  <div />
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+    </form>
+  </div>
 </DocumentFragment>
 `;
 
 exports[`QueryBuilderDateSearch QueryBuilderDateSearch Component Display field if match type is equals: Expect date field to be displayed since match type is equals 1`] = `
 <DocumentFragment>
   <div>
-    <div
-      class="react-datepicker-wrapper"
+    <form
+      action="#"
     >
       <div
-        class="react-datepicker__input-container"
+        class="error-viewer"
+      />
+      <div
+        class="react-datepicker-wrapper"
       >
-        <input
-          class="form-control"
-          placeholder="YYYY-MM-DD"
-          type="text"
-          value="test"
-        />
+        <div
+          class="react-datepicker__input-container"
+        >
+          <input
+            class="form-control"
+            placeholder="YYYY-MM-DD"
+            type="text"
+            value="test"
+          />
+        </div>
       </div>
-    </div>
+    </form>
   </div>
 </DocumentFragment>
 `;
@@ -73,7 +88,6 @@ Object {
       "format": "yyyy",
       "gte": "1998||/y",
       "lte": "1998||/y",
-      "time_zone": "UTC",
     },
   },
 }
@@ -86,7 +100,6 @@ Object {
       "format": "yyyy-MM",
       "gte": "1998-05||/M",
       "lte": "1998-05||/M",
-      "time_zone": "UTC",
     },
   },
 }
@@ -99,7 +112,6 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
-      "time_zone": "UTC",
     },
   },
 }
@@ -184,7 +196,6 @@ Object {
       "format": "yyyy",
       "gte": "1998||/y",
       "lte": "1998||/y",
-      "time_zone": "UTC",
     },
   },
 }
@@ -197,7 +208,6 @@ Object {
       "format": "yyyy-MM",
       "gte": "1998-05||/M",
       "lte": "1998-05||/M",
-      "time_zone": "UTC",
     },
   },
 }
@@ -210,7 +220,6 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "1998-05-19||/d",
       "lte": "1998-05-19||/d",
-      "time_zone": "UTC",
     },
   },
 }
@@ -296,7 +305,6 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "2013-12-16",
       "lte": "2013-12-16",
-      "time_zone": "UTC",
     },
   },
 }
@@ -333,7 +341,6 @@ Object {
       "format": "yyyy-MM-dd",
       "gte": "2013-12-16",
       "lte": "2013-12-16",
-      "time_zone": "UTC",
     },
   },
 }
@@ -355,7 +362,6 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gt": "1970-07-31",
-      "time_zone": "UTC",
     },
   },
 }
@@ -386,7 +392,6 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gt": "1970-07-31",
-      "time_zone": "UTC",
     },
   },
 }
@@ -408,7 +413,6 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gte": "1981-06-15",
-      "time_zone": "UTC",
     },
   },
 }
@@ -439,7 +443,168 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "gte": "1981-06-15",
-      "time_zone": "UTC",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the in operator, date_time subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2002-12-30",
+                "lte": "2002-12-30",
+                "time_zone": "UTC",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the in operator, date_time_optional_tz subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2002-12-30",
+                "lte": "2002-12-30",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the in operator, local_date subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2002-12-30",
+                "lte": "2002-12-30",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the in operator, local_date_time subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2002-12-30",
+                "lte": "2002-12-30",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the in operator, undefined subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2002-12-30",
+                "lte": "2002-12-30",
+              },
+            },
+          },
+        ],
+      },
     },
   },
 }
@@ -461,7 +626,6 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lt": "1982-04-20",
-      "time_zone": "UTC",
     },
   },
 }
@@ -492,7 +656,6 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lt": "1982-04-20",
-      "time_zone": "UTC",
     },
   },
 }
@@ -514,7 +677,6 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lte": "1995-06-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -545,7 +707,6 @@ Object {
   "range": Object {
     "data.attributes.dateField": Object {
       "lte": "1995-06-19",
-      "time_zone": "UTC",
     },
   },
 }
@@ -635,7 +796,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2002-12-30",
                 "lte": "2002-12-30",
-                "time_zone": "UTC",
               },
             },
           },
@@ -729,7 +889,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2002-12-30",
                 "lte": "2002-12-30",
-                "time_zone": "UTC",
               },
             },
           },
@@ -745,6 +904,168 @@ Object {
         },
       },
     ],
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the notIn operator, date_time subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+                "time_zone": "UTC",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2002-12-30",
+                "lte": "2002-12-30",
+                "time_zone": "UTC",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the notIn operator, date_time_optional_tz subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2002-12-30",
+                "lte": "2002-12-30",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the notIn operator, local_date subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2002-12-30",
+                "lte": "2002-12-30",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the notIn operator, local_date_time subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2002-12-30",
+                "lte": "2002-12-30",
+              },
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Attribute level tests Using the notIn operator, undefined subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "bool": Object {
+        "minimum_should_match": 1,
+        "should": Array [
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "1998-05-19",
+                "lte": "1998-05-19",
+              },
+            },
+          },
+          Object {
+            "range": Object {
+              "data.attributes.dateField": Object {
+                "format": "yyyy-MM-dd",
+                "gte": "2002-12-30",
+                "lte": "2002-12-30",
+              },
+            },
+          },
+        ],
+      },
+    },
   },
 }
 `;
@@ -851,7 +1172,6 @@ Object {
                 "format": "yyyy",
                 "gte": "1998||/y",
                 "lte": "1998||/y",
-                "time_zone": "UTC",
               },
             },
           },
@@ -880,7 +1200,6 @@ Object {
                 "format": "yyyy-MM",
                 "gte": "1998-05||/M",
                 "lte": "1998-05||/M",
-                "time_zone": "UTC",
               },
             },
           },
@@ -909,7 +1228,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1106,7 +1424,6 @@ Object {
                 "format": "yyyy",
                 "gte": "1998||/y",
                 "lte": "1998||/y",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1135,7 +1452,6 @@ Object {
                 "format": "yyyy-MM",
                 "gte": "1998-05||/M",
                 "lte": "1998-05||/M",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1164,7 +1480,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "1998-05-19||/d",
                 "lte": "1998-05-19||/d",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1437,7 +1752,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2013-12-16",
                 "lte": "2013-12-16",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1522,7 +1836,6 @@ Object {
                 "format": "yyyy-MM-dd",
                 "gte": "2013-12-16",
                 "lte": "2013-12-16",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1576,7 +1889,6 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gt": "1970-07-31",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1655,7 +1967,6 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gt": "1970-07-31",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1709,7 +2020,6 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gte": "1981-06-15",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1788,8 +2098,369 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "gte": "1981-06-15",
-                "time_zone": "UTC",
               },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the in operator, date_time subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                  "time_zone": "UTC",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2002-12-30",
+                                  "lte": "2002-12-30",
+                                  "time_zone": "UTC",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the in operator, date_time_optional_tz subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2002-12-30",
+                                  "lte": "2002-12-30",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the in operator, local_date subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2002-12-30",
+                                  "lte": "2002-12-30",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the in operator, local_date_time subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2002-12-30",
+                                  "lte": "2002-12-30",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the in operator, undefined subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2002-12-30",
+                                  "lte": "2002-12-30",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
             },
           },
           Object {
@@ -1842,7 +2513,6 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lt": "1982-04-20",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1921,7 +2591,6 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lt": "1982-04-20",
-                "time_zone": "UTC",
               },
             },
           },
@@ -1975,7 +2644,6 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lte": "1995-06-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -2054,7 +2722,6 @@ Object {
             "range": Object {
               "includes.name": Object {
                 "lte": "1995-06-19",
-                "time_zone": "UTC",
               },
             },
           },
@@ -2271,7 +2938,6 @@ Object {
                     "format": "yyyy-MM-dd",
                     "gte": "2002-12-30",
                     "lte": "2002-12-30",
-                    "time_zone": "UTC",
                   },
                 },
               },
@@ -2452,7 +3118,6 @@ Object {
                     "format": "yyyy-MM-dd",
                     "gte": "2002-12-30",
                     "lte": "2002-12-30",
-                    "time_zone": "UTC",
                   },
                 },
               },
@@ -2489,6 +3154,368 @@ Object {
         },
       },
     ],
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the notIn operator, date_time subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must_not": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                  "time_zone": "UTC",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2002-12-30",
+                                  "lte": "2002-12-30",
+                                  "time_zone": "UTC",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the notIn operator, date_time_optional_tz subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must_not": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2002-12-30",
+                                  "lte": "2002-12-30",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the notIn operator, local_date subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must_not": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2002-12-30",
+                                  "lte": "2002-12-30",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the notIn operator, local_date_time subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must_not": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2002-12-30",
+                                  "lte": "2002-12-30",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Relationship level tests Using the notIn operator, undefined subtype, testing with 1998-05-19, 2002-12-30 value 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "bool": Object {
+              "must_not": Array [
+                Object {
+                  "bool": Object {
+                    "minimum_should_match": 1,
+                    "should": Array [
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "1998-05-19",
+                                  "lte": "1998-05-19",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      Object {
+                        "bool": Object {
+                          "must": Array [
+                            Object {
+                              "range": Object {
+                                "includes.name": Object {
+                                  "format": "yyyy-MM-dd",
+                                  "gte": "2002-12-30",
+                                  "lte": "2002-12-30",
+                                },
+                              },
+                            },
+                            Object {
+                              "term": Object {
+                                "included.type": "collection",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
   },
 }
 `;

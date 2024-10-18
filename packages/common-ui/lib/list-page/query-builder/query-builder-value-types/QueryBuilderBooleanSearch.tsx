@@ -7,6 +7,7 @@ import {
 import Select from "react-select";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
+import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 
 interface QueryBuilderBooleanSearchProps {
   /**
@@ -32,6 +33,9 @@ export default function QueryBuilderBooleanSearch({
 }: QueryBuilderBooleanSearchProps) {
   const { formatMessage } = useIntl();
 
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
+
   /**
    * The possible states of a boolean if the Equals match is being used.
    */
@@ -52,6 +56,7 @@ export default function QueryBuilderBooleanSearch({
           options={QueryBuilderBooleanOptions as any}
           className="flex-fill"
           onChange={(selected) => setValue?.(selected?.value ?? "true")}
+          onKeyDown={onKeyDown}
         />
       )}
     </>

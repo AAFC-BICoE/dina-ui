@@ -8,13 +8,14 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  SPLIT_CONFIGURATION_COMPONENT_NAME,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
 import { ScrollTarget } from "./MaterialSampleFormNav";
 import { AssociationsSwitch } from "./AssociationsSwitch";
 import { OrganismsSwitch } from "./OrganismsSwitch";
 import { useMaterialSampleSave } from "../useMaterialSample";
+import { ShowParentAttributesSwitch } from "./ShowParentAttributesSwitch";
 
 export interface MaterialSampleSectionOrderParams {
   dataComponentState: ReturnType<
@@ -41,9 +42,10 @@ export function useMaterialSampleSectionOrder({
 
   /** Switch information to apply to the legend. */
   const scrollTargetSwitches: { [key: string]: Partial<ScrollTarget> } = {
-    [SPLIT_CONFIGURATION_COMPONENT_NAME]: {
-      disabled: !dataComponentState.enableSplitConfiguration,
-      setEnabled: dataComponentState.setEnableSplitConfiguration
+    [SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME]: {
+      disabled: !dataComponentState.enableShowParentAttributes,
+      setEnabled: dataComponentState.setEnableShowParentAttributes,
+      customSwitch: ShowParentAttributesSwitch
     },
     [COLLECTING_EVENT_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableCollectingEvent,

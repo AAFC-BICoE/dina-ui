@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
 
@@ -51,7 +51,7 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
             name: "materialSampleName",
             type: "text",
             path: "data.attributes",
-            fields: ["prefix", "infix", "prefix_reverse"]
+            fields: ["prefix", "infix", "prefix_reverse", "keyword_numeric"]
           },
           {
             name: "materialSampleRemarks",
@@ -88,9 +88,15 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
               {
                 name: "dwcOtherRecordNumbers",
                 type: "text",
-                path: "attributes"
+                path: "attributes",
+                fields: ["keyword_numeric"]
               },
-              { name: "dwcRecordNumber", type: "text", path: "attributes" },
+              {
+                name: "dwcRecordNumber",
+                type: "text",
+                path: "attributes",
+                fields: ["keyword"]
+              },
               {
                 name: "startEventDateTime",
                 type: "date",
@@ -194,7 +200,7 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
 
 describe("Use Index Mapping Hook", () => {
   it("Retrieve index and transform the structure.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext2(
       <UseIndexMappingWrapper
         indexMapRetrieved={(newIndexMap: any) => {
           mockIndexMapRetrieved(newIndexMap);
@@ -210,8 +216,8 @@ describe("Use Index Mapping Hook", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    expect(mockIndexMapRetrieved).toHaveBeenCalledTimes(1);
     expect(mockIndexMapRetrieved).toMatchSnapshot();
   });
 });

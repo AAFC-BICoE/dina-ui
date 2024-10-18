@@ -61,6 +61,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
           find(options, (option) => option.value === item)?.label || item
       )
     );
+
     return (
       <div className="read-only-view">
         <ReadOnlyValue
@@ -108,7 +109,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
           if (!selectedOption || Object.keys(selectedOption).length === 0) {
             const optionWithNested = options?.filter((opt) => !!opt["options"]);
             optionWithNested?.map((option) =>
-              option["options"].map((opt) => {
+              option?.["options"]?.map((opt) => {
                 if (opt.value === value) {
                   selectedOption = opt;
                   return;

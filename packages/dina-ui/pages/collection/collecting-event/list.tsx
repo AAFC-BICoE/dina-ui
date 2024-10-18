@@ -39,7 +39,6 @@ export default function CollectingEventListPage() {
     "dwcFieldNumber",
     "dwcRecordNumber",
     stringArrayCell("otherRecordNumbers"),
-    "createdBy",
     "startEventDateTime",
     "endEventDateTime",
     "verbatimEventDateTime",
@@ -52,7 +51,9 @@ export default function CollectingEventListPage() {
     <PageLayout
       titleId="collectingEventListTitle"
       buttonBarContent={
-        <CreateButton entityLink="/collection/collecting-event" />
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/collecting-event" />
+        </div>
       }
     >
       <Head title={formatMessage("collectingEventListTitle")} />

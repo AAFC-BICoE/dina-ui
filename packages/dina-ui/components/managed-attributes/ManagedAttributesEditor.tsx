@@ -109,61 +109,77 @@ export function ManagedAttributesEditor({
         const visibleAttributes = lastFetchedAttributes.current;
 
         return (
-          <FieldSet
-            legend={<DinaMessage id="managedAttributes" />}
-            {...fieldSetProps}
-          >
-            <div className="mb-3 managed-attributes-editor">
-              {isTemplate && managedAttributeOrderFieldName ? (
-                <ManagedAttributesSorter
-                  managedAttributeComponent={managedAttributeComponent}
-                  name={managedAttributeOrderFieldName}
-                  managedAttributeApiPath={managedAttributeApiPath}
-                  valuesPath={valuesPath}
-                />
-              ) : (
-                <div>
-                  {!readOnly && (
-                    <div className="row">
-                      <label
-                        className={`visible-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
-                      >
-                        <div className="mb-2">
-                          <strong>
-                            <DinaMessage id="field_visibleManagedAttributes" />
-                          </strong>
-                          <Tooltip id="field_visibleManagedAttributes_tooltip" />
-                        </div>
-                        <ManagedAttributeMultiSelect
-                          managedAttributeApiPath={managedAttributeApiPath}
-                          managedAttributeComponent={managedAttributeComponent}
-                          onChange={setVisibleAttributeKeys}
-                          visibleAttributes={visibleAttributes}
-                          loading={loading}
-                        />
-                      </label>
+          <>
+            {!readOnly && (
+              <FieldSet
+                legend={<DinaMessage id="managedAttributes" />}
+                {...fieldSetProps}
+              >
+                <div className="mb-3 managed-attributes-editor">
+                  {isTemplate && managedAttributeOrderFieldName ? (
+                    <ManagedAttributesSorter
+                      managedAttributeComponent={managedAttributeComponent}
+                      name={managedAttributeOrderFieldName}
+                      managedAttributeApiPath={managedAttributeApiPath}
+                      valuesPath={valuesPath}
+                    />
+                  ) : (
+                    <div>
+                      <div className="row">
+                        <label
+                          className={`visible-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
+                        >
+                          <div className="mb-2">
+                            <strong>
+                              <DinaMessage id="field_visibleManagedAttributes" />
+                            </strong>
+                            <Tooltip id="field_visibleManagedAttributes_tooltip" />
+                          </div>
+                          <ManagedAttributeMultiSelect
+                            managedAttributeApiPath={managedAttributeApiPath}
+                            managedAttributeComponent={
+                              managedAttributeComponent
+                            }
+                            onChange={setVisibleAttributeKeys}
+                            visibleAttributes={visibleAttributes}
+                            loading={loading}
+                          />
+                        </label>
+                      </div>
+                      {!!visibleAttributes.length && <hr />}
+                      <div className="row">
+                        {visibleAttributes.map((attribute) => (
+                          <ManagedAttributeFieldWithLabel
+                            key={attribute.key}
+                            attribute={attribute}
+                            values={values}
+                            valuesPath={valuesPath}
+                            onRemoveClick={(attributeKey) =>
+                              setVisibleAttributeKeys((current) =>
+                                current.filter((it) => it !== attributeKey)
+                              )
+                            }
+                          />
+                        ))}
+                      </div>
                     </div>
                   )}
-                  {!!visibleAttributes.length && <hr />}
-                  <div className="row">
-                    {visibleAttributes.map((attribute) => (
-                      <ManagedAttributeFieldWithLabel
-                        key={attribute.key}
-                        attribute={attribute}
-                        values={values}
-                        valuesPath={valuesPath}
-                        onRemoveClick={(attributeKey) =>
-                          setVisibleAttributeKeys((current) =>
-                            current.filter((it) => it !== attributeKey)
-                          )
-                        }
-                      />
-                    ))}
-                  </div>
                 </div>
-              )}
-            </div>
-          </FieldSet>
+              </FieldSet>
+            )}
+            {readOnly && (
+              <div className="row">
+                {visibleAttributes.map((attribute) => (
+                  <ManagedAttributeFieldWithLabel
+                    key={attribute.key}
+                    attribute={attribute}
+                    values={values}
+                    valuesPath={valuesPath}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         );
       }}
     </FieldSpy>

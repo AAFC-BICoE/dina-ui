@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "..";
 import { DynamicFieldsMappingConfig, ESIndexMapping } from "./types";
+import { RELATIONSHIP_PRESENCE_FIELDNAME } from "./query-builder/useQueryBuilderConfig";
 
 export interface UseIndexMappingProps {
   indexName: string;
@@ -13,6 +14,11 @@ export interface UseIndexMappingProps {
    * or grouped terms.
    */
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
+
+  /**
+   * This will add an option to the QueryBuilder to allow users to check if a relationship exists.
+   */
+  enableRelationshipPresence?: boolean;
 }
 
 /**
@@ -25,7 +31,8 @@ export interface UseIndexMappingProps {
  */
 export function useIndexMapping({
   indexName,
-  dynamicFieldMapping
+  dynamicFieldMapping,
+  enableRelationshipPresence
 }: UseIndexMappingProps) {
   const { apiClient } = useApiClient();
 
@@ -60,10 +67,14 @@ export function useIndexMapping({
       });
 
       // Fields that are dynamic do not need to be listed here.
-      const fieldsToSkip =
-        dynamicFieldMapping?.fields?.map<string>(
+      const fieldsToSkip = [
+        ...(dynamicFieldMapping?.fields?.map<string>(
           (fieldMapping) => fieldMapping.path
-        ) ?? [];
+        ) ?? []),
+        ...(dynamicFieldMapping?.relationshipFields?.map<string>(
+          (relationshipFieldMapping) => relationshipFieldMapping.path
+        ) ?? [])
+      ];
 
       const result: ESIndexMapping[] = [];
 
@@ -78,36 +89,36 @@ export function useIndexMapping({
             attrPrefix = path.substring(prefix.length + 1);
           }
 
-          // Manually remove managed attributes and extension fields from here,
-          // they are handled using the dynamic mapping config. See the dynamicFieldMapping.
-          if (!fieldsToSkip.some((skipPath) => path.startsWith(skipPath))) {
-            result.push({
-              label: attrPrefix ? attrPrefix + "." + key.name : key.name,
-              value: key.path
-                ? key.path + "." + key.name
-                : key.name === "id"
-                ? "data." + key.name
-                : key.name,
-              type: key.type,
-              subType: key?.subtype ? key.subtype : undefined,
-              path: key.path,
+          result.push({
+            label: attrPrefix ? attrPrefix + "." + key.name : key.name,
+            value: key.path
+              ? key.path + "." + key.name
+              : key.name === "id"
+              ? "data." + key.name
+              : key.name,
+            hideField: fieldsToSkip.some((skipPath) =>
+              path.startsWith(skipPath)
+            ),
+            type: key.type,
+            subType: key?.subtype ? key.subtype : undefined,
+            path: key.path,
 
-              // Additional options for the field:
-              distinctTerm: key.distinct_term_agg,
-              keywordMultiFieldSupport:
-                key?.fields?.includes("keyword") ?? false,
-              optimizedPrefix: key?.fields?.includes("prefix") ?? false,
-              containsSupport: key?.fields?.includes("infix") ?? false,
-              endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
-            });
-          }
+            // Additional options for the field:
+            distinctTerm: key.distinct_term_agg,
+            keywordMultiFieldSupport: key?.fields?.includes("keyword") ?? false,
+            keywordNumericSupport:
+              key?.fields?.includes("keyword_numeric") ?? false,
+            optimizedPrefix: key?.fields?.includes("prefix") ?? false,
+            containsSupport: key?.fields?.includes("infix") ?? false,
+            endsWithSupport: key?.fields?.includes("prefix_reverse") ?? false
+          });
         });
 
       // Read relationship attributes.
       resp.data?.relationships?.map((relationship) => {
         relationship?.attributes?.map((relationshipAttribute) => {
           // This is the user-friendly label to display on the search dropdown.
-          let attributeLabel = relationshipAttribute.path?.includes(".")
+          const attributeLabel = relationshipAttribute.path?.includes(".")
             ? relationshipAttribute.path.substring(
                 relationshipAttribute.path.indexOf(".") + 1
               ) +
@@ -115,16 +126,19 @@ export function useIndexMapping({
               relationshipAttribute.name
             : relationshipAttribute.name;
 
-          if (
-            relationship.referencedBy === "acMetadataCreator" ||
-            relationship.referencedBy === "dcCreator"
-          ) {
-            attributeLabel = `${relationship.referencedBy}.${relationshipAttribute.name}`;
-          }
+          const fullPath =
+            relationship.path +
+            "." +
+            relationshipAttribute.path +
+            "." +
+            attributeLabel;
 
           result.push({
             label: attributeLabel,
             value: relationship.referencedBy + "." + attributeLabel,
+            hideField: fieldsToSkip.some((skipPath) =>
+              fullPath.startsWith(skipPath)
+            ),
             type: relationshipAttribute.type,
             subType: relationshipAttribute?.subtype
               ? relationshipAttribute.subtype
@@ -136,7 +150,11 @@ export function useIndexMapping({
 
             // Additional options for the field:
             distinctTerm: relationshipAttribute.distinct_term_agg,
-            keywordMultiFieldSupport: true, // Forced for relationships.
+            keywordMultiFieldSupport:
+              relationshipAttribute?.fields?.includes("keyword") ?? false,
+            keywordNumericSupport:
+              relationshipAttribute?.fields?.includes("keyword_numeric") ??
+              false,
             optimizedPrefix:
               relationshipAttribute?.fields?.includes("prefix") ?? false,
             containsSupport:
@@ -150,41 +168,72 @@ export function useIndexMapping({
       // Inject dynamic field mapping config into these.
       if (dynamicFieldMapping) {
         dynamicFieldMapping.fields.forEach((fieldMapping) => {
-          result.push({
-            dynamicField: fieldMapping,
-            value: fieldMapping.path,
-            distinctTerm: false,
-            label: fieldMapping.label,
-            path: fieldMapping.path,
-            type: fieldMapping.type,
-            keywordMultiFieldSupport: false,
-            optimizedPrefix: false,
-            containsSupport: false,
-            endsWithSupport: false
-          });
+          if (fieldMapping.type !== "unsupported") {
+            result.push({
+              dynamicField: fieldMapping,
+              value: fieldMapping.path,
+              distinctTerm: false,
+              label: fieldMapping.label,
+              path: fieldMapping.path,
+              type: fieldMapping.type,
+              keywordMultiFieldSupport: false,
+              keywordNumericSupport: false,
+              optimizedPrefix: false,
+              containsSupport: false,
+              endsWithSupport: false,
+              hideField: false
+            });
+          }
         });
         dynamicFieldMapping.relationshipFields.forEach(
           (relationshipFieldMapping) => {
-            result.push({
-              dynamicField: relationshipFieldMapping,
-              parentName: relationshipFieldMapping.referencedBy,
-              parentPath: "included",
-              parentType: relationshipFieldMapping.referencedType,
-              value:
-                relationshipFieldMapping.path +
-                "_" +
-                relationshipFieldMapping.referencedBy,
-              distinctTerm: false,
-              label: relationshipFieldMapping.label,
-              path: relationshipFieldMapping.path,
-              type: relationshipFieldMapping.type,
-              keywordMultiFieldSupport: false,
-              optimizedPrefix: false,
-              containsSupport: false,
-              endsWithSupport: false
-            });
+            if (relationshipFieldMapping.type !== "unsupported") {
+              result.push({
+                dynamicField: relationshipFieldMapping,
+                parentName: relationshipFieldMapping.referencedBy,
+                parentPath: "included",
+                parentType: relationshipFieldMapping.referencedType,
+                value:
+                  relationshipFieldMapping.path +
+                  "_" +
+                  relationshipFieldMapping.referencedBy,
+                distinctTerm: false,
+                label: relationshipFieldMapping.label,
+                path: relationshipFieldMapping.path,
+                type: relationshipFieldMapping.type,
+                keywordMultiFieldSupport: false,
+                keywordNumericSupport: false,
+                optimizedPrefix: false,
+                containsSupport: false,
+                endsWithSupport: false,
+                hideField: false
+              });
+            }
           }
         );
+      }
+
+      // Add relationship presence to the query builder list.
+      if (enableRelationshipPresence === true) {
+        result.push({
+          dynamicField: {
+            apiEndpoint: RELATIONSHIP_PRESENCE_FIELDNAME,
+            label: RELATIONSHIP_PRESENCE_FIELDNAME,
+            path: RELATIONSHIP_PRESENCE_FIELDNAME,
+            type: "relationshipPresence"
+          },
+          value: RELATIONSHIP_PRESENCE_FIELDNAME,
+          distinctTerm: false,
+          label: RELATIONSHIP_PRESENCE_FIELDNAME,
+          path: RELATIONSHIP_PRESENCE_FIELDNAME,
+          type: "relationshipPresence",
+          keywordMultiFieldSupport: false,
+          keywordNumericSupport: false,
+          optimizedPrefix: false,
+          containsSupport: false,
+          endsWithSupport: false,
+          hideField: false
+        });
       }
 
       return result;

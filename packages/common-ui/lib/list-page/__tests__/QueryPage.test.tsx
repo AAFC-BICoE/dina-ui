@@ -308,7 +308,7 @@ describe("QueryPage test", () => {
 
       // Collection Name (External Relationship)
       {
-        id: "collectionName",
+        id: "collection.name",
         cell: ({
           row: {
             original: { included }
@@ -450,7 +450,7 @@ describe("QueryPage test", () => {
         }}
         bulkEditPath="/collection/material-sample/bulk-edit"
         dataExportProps={{
-          dataExportPath: "/data-export/export",
+          dataExportPath: "/export/data-export/export",
           entityLink: "/collection/material-sample"
         }}
         // bulkSplitPath="/collection/material-sample/bulk-split"

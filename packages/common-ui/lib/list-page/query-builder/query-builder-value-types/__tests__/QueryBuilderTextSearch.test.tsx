@@ -2,6 +2,10 @@ import { mountWithAppContext2 } from "common-ui/lib/test-util/mock-app-context";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "../QueryBuilderTextSearch";
+import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
+import { noop } from "lodash";
+import { QueryBuilderContextProvider } from "../../QueryBuilder";
+import userEvent from "@testing-library/user-event";
 
 describe("QueryBuilderTextSearch", () => {
   describe("QueryBuilderTextSearch Component", () => {
@@ -9,11 +13,15 @@ describe("QueryBuilderTextSearch", () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
       const textSearchEquals = mountWithAppContext2(
-        <QueryBuilderTextSearch
-          matchType="equals"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderTextSearch
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
+        </DinaForm>
       );
 
       // Expect a snapshot with the text field being displayed.
@@ -22,11 +30,15 @@ describe("QueryBuilderTextSearch", () => {
       );
 
       const textSearchEmpty = mountWithAppContext2(
-        <QueryBuilderTextSearch
-          matchType="empty"
-          value="test"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderTextSearch
+              matchType="empty"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
+        </DinaForm>
       );
 
       // Expect a snapshot without the text field being displayed.
@@ -39,11 +51,15 @@ describe("QueryBuilderTextSearch", () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
       const textSearchIn = mountWithAppContext2(
-        <QueryBuilderTextSearch
-          matchType="in"
-          value="test1, test2, test3"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderTextSearch
+              matchType="in"
+              value="test1, test2, test3"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
+        </DinaForm>
       );
 
       // Expect a snapshot with the text field being with a different placeholder.
@@ -52,17 +68,50 @@ describe("QueryBuilderTextSearch", () => {
       );
 
       const textSearchNotIn = mountWithAppContext2(
-        <QueryBuilderTextSearch
-          matchType="notIn"
-          value="test1, test2, test3"
-          setValue={jest.fn}
-        />
+        <DinaForm initialValues={{}}>
+          <QueryBuilderContextProvider value={{ performSubmit: noop }}>
+            <QueryBuilderTextSearch
+              matchType="notIn"
+              value="test1, test2, test3"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
+        </DinaForm>
       );
 
       // Expect a snapshot with the text field being with a different placeholder.
       expect(textSearchNotIn.asFragment()).toMatchSnapshot(
         "Expect text field to be displayed with a different placeholder."
       );
+    });
+
+    it("Should call performSubmit on enter key press in textfield", async () => {
+      const mockPerformSubmit = jest.fn();
+      const { getByRole } = mountWithAppContext2(
+        <DinaForm initialValues={{}}>
+          <QueryBuilderContextProvider
+            value={{ performSubmit: mockPerformSubmit }}
+          >
+            <QueryBuilderTextSearch
+              matchType="equals"
+              value="test"
+              setValue={jest.fn}
+            />
+          </QueryBuilderContextProvider>
+        </DinaForm>
+      );
+
+      // Find the text field element
+      const textField = getByRole("textbox");
+
+      // Expect performSubmit to not be called yet.
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(0);
+
+      // Simulate user typing "enter" key
+      userEvent.type(textField, "{enter}");
+
+      // Expect performSubmit to be called once
+      expect(mockPerformSubmit).toHaveBeenCalledTimes(1);
     });
   });
 

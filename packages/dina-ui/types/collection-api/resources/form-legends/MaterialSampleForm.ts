@@ -1,8 +1,8 @@
 import { FormLegendComponentInformation } from "packages/dina-ui/types/common/resources/FormLegendInformation";
 
 // Data Components for Material Samples.
-export const SPLIT_CONFIGURATION_COMPONENT_NAME: string =
-  "split-configuration-component";
+export const SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME: string =
+  "show-parent-attributes-component";
 export const IDENTIFIER_COMPONENT_NAME: string = "identifiers-component";
 export const MATERIAL_SAMPLE_INFO_COMPONENT_NAME: string =
   "material-sample-info-component";
@@ -28,35 +28,19 @@ export const FIELD_EXTENSIONS_COMPONENT_NAME: string =
  */
 export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
   {
-    id: SPLIT_CONFIGURATION_COMPONENT_NAME,
-    labelKey: "materialSampleSplitConfiguration",
+    id: SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
+    labelKey: "materialSampleShowParentAttributes",
     maxGridSizeX: 2,
     formTemplateOnly: true,
     sections: [
       {
-        id: "split-configuration-condition-section",
-        labelKey: "materialSampleSplitConfigurationCondition",
+        id: "parent-attributes-section",
+        labelKey: "materialSampleShowParentAttributes",
         maxGridSizeX: 2,
         items: [
           {
-            id: "splitConfiguration.condition.conditionType"
-          },
-          {
-            id: "splitConfiguration.condition.materialSampleType"
-          }
-        ]
-      },
-      {
-        id: "split-configuration-material-sample-name-generation-section",
-        labelKey:
-          "materialSampleSplitConfigurationMaterialSampleNameGeneration",
-        maxGridSizeX: 2,
-        items: [
-          {
-            id: "splitConfiguration.materialSampleNameGeneration.strategy"
-          },
-          {
-            id: "splitConfiguration.materialSampleNameGeneration.characterType"
+            id: "parentAttributes",
+            visible: true
           }
         ]
       }
@@ -110,6 +94,9 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "barcode"
+          },
+          {
+            id: "identifiers"
           }
         ]
       }
@@ -399,6 +386,17 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
             id: "preparationProtocol"
           }
         ]
+      },
+      {
+        id: "preparations-managed-attributes-section",
+        maxGridSizeX: 2,
+        items: [
+          {
+            id: "preparationManagedAttributes",
+            visible: true
+          },
+          { id: "preparationManagedAttributesOrder", visible: true }
+        ]
       }
     ]
   },
@@ -423,7 +421,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
             id: "organism[0].remarks"
           },
           {
-            id: "organism"
+            id: "organism[0].managedAttributes"
           }
         ]
       },
@@ -542,7 +540,9 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         items: [
           {
             id: "storageUnit"
-          }
+          },
+          { id: "storageUnitUsage.wellRow", visible: true },
+          { id: "storageUnitUsage.wellColumn", visible: true }
         ]
       }
     ]

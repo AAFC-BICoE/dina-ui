@@ -9,7 +9,7 @@ import {
   useStringComparator
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { sortBy, compact } from "lodash";
+import { compact, sortBy } from "lodash";
 import { useEffect, useState } from "react";
 import { MaterialSampleSummary } from "../../../types/collection-api";
 import {
@@ -18,6 +18,7 @@ import {
   pcrBatchItemResultColor
 } from "../../../types/seqdb-api";
 import { getDeterminations } from "../../collection/material-sample/organismUtils";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export function usePcrReactionData(pcrBatchId?: string) {
   const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>([]);
@@ -50,27 +51,50 @@ export function usePcrReactionData(pcrBatchId?: string) {
               }
             ]
           })(""),
-          include: "materialSample",
+          include: "materialSample,storageUnitUsage",
           page: {
             limit: 1000 // Maximum page limit
           }
         })
-        .then((response) => {
+        .then(async (response) => {
           const batchItems: PersistedResource<PcrBatchItem>[] =
             response.data?.filter(
               (item) => item?.materialSample?.id !== undefined
             );
-          fetchMaterialSamples(batchItems);
+          await fetchMaterialSamples(batchItems);
         });
     }
   }
 
-  function fetchMaterialSamples(batchItems: PersistedResource<PcrBatchItem>[]) {
+  async function fetchMaterialSamples(
+    batchItems: PersistedResource<PcrBatchItem>[]
+  ) {
     if (!batchItems || batchItems.length === 0) {
       setLoading(false);
       return;
     }
-    bulkGet<MaterialSampleSummary>(
+    let processedPcrBatchItems: PcrBatchItem[] = [];
+    const batchItemPaths = batchItems
+      .filter((batchItem) => !!batchItem.storageUnitUsage)
+      .map((item) => "/storage-unit-usage/" + item?.storageUnitUsage?.id);
+    const fetchedStorageUnitUsages = await bulkGet<StorageUnitUsage>(
+      batchItemPaths,
+      {
+        apiBaseUrl: "/collection-api",
+        returnNullForMissingResource: true
+      }
+    );
+
+    processedPcrBatchItems = batchItems.map((batchItem) => ({
+      ...batchItem,
+      storageUnitUsage: fetchedStorageUnitUsages.find(
+        (fetchedStorageUnitUsage) => {
+          return fetchedStorageUnitUsage?.id === batchItem.storageUnitUsage?.id;
+        }
+      )
+    }));
+
+    const fetchedMaterialSampleSummary = await bulkGet<MaterialSampleSummary>(
       batchItems.map(
         (item) => "/material-sample-summary/" + item?.materialSample?.id
       ),
@@ -78,20 +102,20 @@ export function usePcrReactionData(pcrBatchId?: string) {
         apiBaseUrl: "/collection-api",
         returnNullForMissingResource: true
       }
-    ).then((response) => {
-      const sampleSummaries = compact(response ?? []);
-      batchItems = batchItems.filter(
-        (item) =>
-          !!sampleSummaries.find(
-            (sample) =>
-              item.materialSample?.id && sample.id === item.materialSample?.id
-          )
-      );
-      sortPcrBatchItems(batchItems, sampleSummaries);
-      setPcrBatchItems(batchItems);
-      setMaterialSampleSummaries(sampleSummaries);
-      setLoading(false);
-    });
+    );
+    const sampleSummaries = compact(fetchedMaterialSampleSummary ?? []);
+    processedPcrBatchItems = processedPcrBatchItems.filter(
+      (item) =>
+        !!sampleSummaries.find(
+          (sample) =>
+            item.materialSample?.id && sample.id === item.materialSample?.id
+        )
+    );
+
+    sortPcrBatchItems(processedPcrBatchItems, sampleSummaries);
+    setPcrBatchItems(processedPcrBatchItems);
+    setMaterialSampleSummaries(sampleSummaries);
+    setLoading(false);
   }
 
   function sortPcrBatchItems(
@@ -131,24 +155,55 @@ export function PcrReactionTable({
   readOnlyOverride = false
 }: PcrReactionTableProps) {
   const { readOnly } = useDinaFormContext();
+  const { compareByStringAndNumber } = useStringComparator();
 
   const PCR_REACTION_COLUMN: ColumnDef<PcrBatchItem>[] = [
     {
       id: "wellCoordinates",
-      cell: ({ row }) => (
-        <>
-          {row.original?.wellRow === null || row.original?.wellColumn === null
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          !a.original?.storageUnitUsage ||
+          a.original?.storageUnitUsage?.wellRow === null ||
+          a.original?.storageUnitUsage?.wellColumn === null
             ? ""
-            : `${row.original.wellRow}${row.original.wellColumn}`}
-        </>
-      ),
-      header: () => <FieldHeader name={"wellCoordinates"} />
+            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+        const bString =
+          !b.original?.storageUnitUsage ||
+          b.original?.storageUnitUsage?.wellRow === null ||
+          b.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      }
     },
     {
       id: "tubeNumber",
       cell: ({ row: { original } }) =>
-        original?.cellNumber === undefined ? <></> : <>{original.cellNumber}</>,
-      header: () => <FieldHeader name={"tubeNumber"} />
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
     },
     {
       id: "materialSampleName",
@@ -160,7 +215,21 @@ export function PcrReactionTable({
         if (!fetchedMaterialSample) return <></>;
         return <p>{fetchedMaterialSample.materialSampleName}</p>;
       },
-      header: () => <FieldHeader name={"materialSampleName"} />
+      header: () => <FieldHeader name={"materialSampleName"} />,
+      accessorKey: "materialSampleName",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          materialSamples.find(
+            (materialSample) =>
+              materialSample?.id === a.original?.materialSample?.id
+          )?.materialSampleName ?? "";
+        const bString =
+          materialSamples.find(
+            (materialSample) =>
+              materialSample?.id === b.original?.materialSample?.id
+          )?.materialSampleName ?? "";
+        return compareByStringAndNumber(aString, bString);
+      }
     },
     {
       id: "scientificName",
@@ -175,7 +244,24 @@ export function PcrReactionTable({
         );
         return <>{scientificName}</>;
       },
-      header: () => <FieldHeader name={"scientificName"} />
+      header: () => <FieldHeader name={"scientificName"} />,
+      accessorKey: "scientificName",
+      sortingFn: (a: any, b: any): number => {
+        const aString = getDeterminations(
+          materialSamples.find(
+            (materialSample) =>
+              materialSample?.id === a.original?.materialSample?.id
+          )?.effectiveDeterminations
+        );
+
+        const bString = getDeterminations(
+          materialSamples.find(
+            (materialSample) =>
+              materialSample?.id === b.original?.materialSample?.id
+          )?.effectiveDeterminations
+        );
+        return compareByStringAndNumber(aString, bString);
+      }
     },
     {
       id: "result",
@@ -211,17 +297,30 @@ export function PcrReactionTable({
           </div>
         );
       },
-      header: () => <FieldHeader name={"result"} />
+      header: () => <FieldHeader name={"result"} />,
+      accessorKey: "result",
+      sortingFn: (a: any, b: any): number => {
+        const aString = a.original.result;
+        const bString = b.original.result;
+        return compareByStringAndNumber(aString, bString);
+      }
     }
   ];
-
   return (
     <ReactTable<PcrBatchItem>
       className="-striped react-table-overflow"
       columns={PCR_REACTION_COLUMN}
-      data={sortBy(pcrBatchItems, "cellNumber")}
+      data={pcrBatchItems}
       showPagination={false}
-      manualPagination={true}
+      pageSize={1000}
+      enableSorting={true}
+      sort={[
+        {
+          id: "tubeNumber",
+          desc: false
+        }
+      ]}
+      enableMultiSort={true}
     />
   );
 }

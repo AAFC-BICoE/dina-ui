@@ -19,7 +19,6 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
 
@@ -60,19 +59,19 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/coordinate-system":
     case "collection-api/srs":
     case "collection-api/material-sample-type":
-    case "collection-api/vocabulary/degreeOfEstablishment":
-    case "collection-api/vocabulary/srs":
+    case "collection-api/vocabulary2/degreeOfEstablishment":
+    case "collection-api/vocabulary2/srs":
     case "collection-api/material-sample":
     case "collection-api/managed-attribute":
-    case "collection-api/vocabulary/materialSampleState":
+    case "collection-api/vocabulary2/materialSampleState":
     case "collection-api/collection":
     case "collection-api/project":
-    case "collection-api/vocabulary/materialSampleType":
-    case "collection-api/vocabulary/typeStatus":
+    case "collection-api/vocabulary2/materialSampleType":
+    case "collection-api/vocabulary2/typeStatus":
     case "collection-api/organism":
     case "collection-api/collection-method":
-    case "collection-api/vocabulary/coordinateSystem":
-    case "collection-api/vocabulary/materialSampleType":
+    case "collection-api/vocabulary2/coordinateSystem":
+    case "collection-api/vocabulary2/materialSampleType":
     case "objectstore-api/metadata":
     case "user-api/user":
       return { data: [] };
@@ -229,11 +228,6 @@ const formTemplate: PersistedResource<FormTemplate> = {
   restrictToCreatedBy: true,
   viewConfiguration: {},
   components: [
-    {
-      name: SPLIT_CONFIGURATION_COMPONENT_NAME,
-      visible: true,
-      order: 0
-    },
     {
       name: IDENTIFIER_COMPONENT_NAME,
       visible: true,
@@ -948,7 +942,7 @@ describe("Form template edit page", () => {
       mockOnSaved.mock.calls[0][0]
     );
     expect(navOrder).toEqual([
-      "split-configuration-component",
+      "show-parent-attributes-component",
       "identifiers-component",
       "material-sample-info-component",
       "collecting-event-component",
@@ -1010,43 +1004,22 @@ describe("Form template edit page", () => {
       viewConfiguration: { type: "material-sample-form-template" },
       components: [
         {
-          name: "split-configuration-component",
-          visible: false,
+          name: "show-parent-attributes-component",
           order: 0,
           sections: [
             {
               items: [
                 {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.condition.conditionType",
-                  visible: true
-                },
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.condition.materialSampleType",
+                  defaultValue: [],
+                  name: "parentAttributes",
                   visible: true
                 }
               ],
-              name: "split-configuration-condition-section",
-              visible: true
-            },
-            {
-              items: [
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.materialSampleNameGeneration.strategy",
-                  visible: true
-                },
-                {
-                  defaultValue: undefined,
-                  name: "splitConfiguration.materialSampleNameGeneration.characterType",
-                  visible: true
-                }
-              ],
-              name: "split-configuration-material-sample-name-generation-section",
+              name: "parent-attributes-section",
               visible: true
             }
-          ]
+          ],
+          visible: false
         },
         {
           name: "identifiers-component",
@@ -1109,7 +1082,12 @@ describe("Form template edit page", () => {
                   name: "dwcOtherCatalogNumbers",
                   visible: false
                 },
-                { defaultValue: undefined, name: "barcode", visible: false }
+                { defaultValue: undefined, name: "barcode", visible: false },
+                {
+                  defaultValue: undefined,
+                  name: "identifiers",
+                  visible: false
+                }
               ]
             }
           ]
@@ -1502,6 +1480,22 @@ describe("Form template edit page", () => {
                   visible: false
                 }
               ]
+            },
+            {
+              name: "preparations-managed-attributes-section",
+              visible: true,
+              items: [
+                {
+                  defaultValue: undefined,
+                  name: "preparationManagedAttributes",
+                  visible: true
+                },
+                {
+                  defaultValue: undefined,
+                  name: "preparationManagedAttributesOrder",
+                  visible: true
+                }
+              ]
             }
           ]
         },
@@ -1529,7 +1523,11 @@ describe("Form template edit page", () => {
                   name: "organism[0].remarks",
                   visible: false
                 },
-                { defaultValue: undefined, name: "organism", visible: false }
+                {
+                  defaultValue: undefined,
+                  name: "organism[0].managedAttributes",
+                  visible: false
+                }
               ]
             },
             {
@@ -1674,6 +1672,16 @@ describe("Form template edit page", () => {
                   defaultValue: undefined,
                   name: "storageUnit",
                   visible: false
+                },
+                {
+                  defaultValue: undefined,
+                  name: "storageUnitUsage.wellRow",
+                  visible: true
+                },
+                {
+                  defaultValue: undefined,
+                  name: "storageUnitUsage.wellColumn",
+                  visible: true
                 }
               ]
             }

@@ -29,6 +29,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import {
   AttachmentsField,
+  Footer,
   GroupSelectField,
   Head,
   Nav,
@@ -90,7 +91,7 @@ export default function TransactionEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         <div>
           <h1 id="wb-cont">
             <DinaMessage id={title} />
@@ -107,6 +108,7 @@ export default function TransactionEditPage() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
@@ -182,12 +184,16 @@ export function TransactionForm({
   };
 
   const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={fetchedTransaction?.id}
-        entityLink="/loan-transaction/transaction"
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-4">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={fetchedTransaction?.id}
+          entityLink="/loan-transaction/transaction"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 
@@ -201,7 +207,6 @@ export function TransactionForm({
         selectedResources={selectedResources}
         setSelectedResources={setSelectedResources}
       />
-      {buttonBar}
     </DinaForm>
   );
 }
@@ -400,6 +405,7 @@ export function TransactionFormLayout({
             indexName={"dina_material_sample_index"}
             uniqueName="transaction-edit-material-sample"
             columns={ELASTIC_SEARCH_COLUMN}
+            enableColumnSelector={false}
             selectionMode={!readOnly}
             selectionResources={
               readOnly ? selectedResourcesView : selectedResources

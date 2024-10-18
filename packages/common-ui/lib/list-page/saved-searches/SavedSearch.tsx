@@ -9,7 +9,11 @@ import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
 import { Alert, Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
-import { LoadingSpinner, defaultJsonTree } from "../..";
+import {
+  LoadingSpinner,
+  VISIBLE_INDEX_LOCAL_STORAGE_KEY,
+  defaultJsonTree
+} from "../..";
 import {
   Config,
   ImmutableTree,
@@ -28,6 +32,7 @@ import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
 import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useIntl } from "react-intl";
 import { useSessionStorage } from "usehooks-ts";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 export interface SavedSearchProps {
   /**
@@ -89,6 +94,13 @@ export interface SavedSearchProps {
    * to remain the same across tables, it can share the same name.
    */
   uniqueName: string;
+
+  // Reference for triggering the search. This helps prevent more searches than necessary.
+  triggerSearch: React.MutableRefObject<boolean>;
+}
+
+export function createSessionStorageLastUsedTreeKey(uniqueName: string) {
+  return `${uniqueName}-last-used-tree`;
 }
 
 /**
@@ -114,7 +126,8 @@ export function SavedSearch({
   groups,
   setGroups,
   performSubmit,
-  uniqueName
+  uniqueName,
+  triggerSearch
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -145,11 +158,17 @@ export function SavedSearch({
   const [selectedSavedSearchName, setSelectedSavedSearchName] =
     useState<string>();
 
+  // Local storage of the displayed columns that are saved.
+  const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
+    useLocalStorage<string[]>(
+      `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
+      []
+    );
+
   // Functionality for the last loaded search.
-  useLastSavedSearch({
+  const { loadLastSavedSearch } = useLastSavedSearch({
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
-    setDefaultLoadedIn,
     performSubmit,
     uniqueName
   });
@@ -190,9 +209,11 @@ export function SavedSearch({
     return undefined;
   }, [selectedSavedSearch, userPreferences]);
 
-  const sessionStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
   const [sessionStorageQueryTree, setSessionStorageQueryTree] =
-    useSessionStorage<JsonTree>(sessionStorageLastUsedTreeKey, defaultJsonTree);
+    useSessionStorage<JsonTree>(
+      createSessionStorageLastUsedTreeKey(uniqueName),
+      defaultJsonTree
+    );
 
   // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {
@@ -204,6 +225,7 @@ export function SavedSearch({
     if (!selectedSavedSearch || !userPreferences) return;
     setQueryError(undefined);
     loadSavedSearch(selectedSavedSearch);
+    triggerSearch.current = true;
   }, [selectedSavedSearch, lastSelected]);
 
   // User Preferences has been loaded in and apply default loaded search:
@@ -215,18 +237,22 @@ export function SavedSearch({
     // exists and pre-load it in.
     const defaultSavedSearch = getDefaultSavedSearch();
 
-    if (defaultSavedSearch && defaultSavedSearch.savedSearchName) {
-      if (defaultSavedSearch?.queryTree) {
-        const isQueryChanged = getDefaultSavedSearchChanged(defaultSavedSearch);
-        if (isQueryChanged) {
-          setSelectedSavedSearchName(defaultSavedSearch.savedSearchName);
-          setChangesMade(true);
-          setCurrentIsDefault(defaultSavedSearch.default);
-        } else {
-          loadSavedSearch(defaultSavedSearch.savedSearchName);
-        }
+    if (
+      defaultSavedSearch &&
+      defaultSavedSearch.savedSearchName &&
+      defaultSavedSearch?.queryTree
+    ) {
+      const isQueryChanged = getDefaultSavedSearchChanged(defaultSavedSearch);
+      if (isQueryChanged) {
+        loadLastSavedSearch();
+      } else {
+        loadSavedSearch(defaultSavedSearch.savedSearchName);
       }
+    } else {
+      // Default search not loaded in, check if last saved search can be loaded in.
+      loadLastSavedSearch();
     }
+
     setDefaultLoadedIn(true);
   }, [userPreferences]);
 
@@ -256,8 +282,18 @@ export function SavedSearch({
       isQueryChanged = true;
     }
 
+    // Check if the columns displayed has changed.
+    if (
+      !isEqual(
+        sortBy(savedSearch?.columnVisibility),
+        sortBy(localStorageDisplayedColumns)
+      )
+    ) {
+      isQueryChanged = true;
+    }
+
     setChangesMade(isQueryChanged);
-  }, [queryBuilderTree, groups]);
+  }, [queryBuilderTree, groups, localStorageDisplayedColumns]);
 
   function getDefaultSavedSearchChanged(defaultSavedSearch: SingleSavedSearch) {
     let isQueryChanged = false;
@@ -375,6 +411,11 @@ export function SavedSearch({
         setChangesMade(true);
       }
 
+      // Load the displayed columns for this search.
+      if (savedSearchToLoad.columnVisibility) {
+        setLocalStorageDisplayedColumns(savedSearchToLoad.columnVisibility);
+      }
+
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
@@ -416,6 +457,9 @@ export function SavedSearch({
           [savedSearchName]: {
             version: SAVED_SEARCH_VERSION,
             default: setAsDefault,
+
+            // Save selected columns
+            columnVisibility: localStorageDisplayedColumns,
 
             // If updateQueryTree is true, then we will retrieve the current query tree from the
             // query builder, otherwise it will remain the same as before.
@@ -465,7 +509,7 @@ export function SavedSearch({
       setChangesMade(false);
       setQueryError(undefined);
     },
-    [userPreferences, queryBuilderTree, groups]
+    [userPreferences, queryBuilderTree, groups, localStorageDisplayedColumns]
   );
 
   /**
@@ -509,7 +553,14 @@ export function SavedSearch({
       openModal(
         <AreYouSureModal
           actionMessage={<DinaMessage id="removeSavedSearch" />}
-          messageBody={<DinaMessage id="areYouSureRemoveSavedSearch" values={{savedSearchName: savedSearchName}} />}
+          messageBody={
+            <>
+              <strong>
+                <DinaMessage id="areYouSureRemoveSavedSearch" />
+              </strong>
+              <br />"{savedSearchName}"
+            </>
+          }
           onYesButtonClicked={deleteSearch}
         />
       );

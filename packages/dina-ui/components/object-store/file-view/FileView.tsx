@@ -1,7 +1,12 @@
-import { LoadingSpinner, useApiClient, useQuery } from "../../../../common-ui";
+import {
+  LoadingSpinner,
+  useApiClient,
+  useIsVisible,
+  useQuery
+} from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ComponentType, ReactNode, useState, useEffect } from "react";
+import { ComponentType, ReactNode, useState, useRef } from "react";
 import Link from "next/link";
 import { SmallThumbnail } from "../../table/thumbnail-cell";
 import { Metadata } from "../../../types/objectstore-api";
@@ -43,6 +48,8 @@ export const IMG_TAG_SUPPORTED_FORMATS = [
 
 const SPREADSHEET_FORMATS = ["ods", "xls", "xlsm", "xlsx", "csv"];
 
+const DOCUMENT_FORMATS = ["doc", "docx", "pdf"];
+
 export function FileView({
   clickToDownload,
   filePath,
@@ -56,6 +63,7 @@ export function FileView({
 }: FileViewProps) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
+
   const [objectURL, setObjectURL] = useState<string>();
   async function fetchObjectBlob(path) {
     return await apiClient.axios.get(path, {
@@ -65,8 +73,19 @@ export function FileView({
   }
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
+  const isTextDoc = DOCUMENT_FORMATS.includes(fileType.toLowerCase());
   const [isFallbackRender, setIsFallBackRender] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
+
+  const visibleRef = useRef<HTMLDivElement>(null);
+
+  const isVisible = useIsVisible({
+    ref: visibleRef,
+    doNotReset: true,
+    // Start loading images when it's 300px below the view port.
+    offset: "0px 0px 300px 0px"
+  });
+
   const shownTypeIndicatorFallback = (
     <div className="shown-file-type">
       <strong>
@@ -75,17 +94,34 @@ export function FileView({
       {` ${formatMessage("thumbnail")}`}
     </div>
   );
-  const showFile = !isSpreadsheet;
+  const showFile = !(isSpreadsheet || isTextDoc);
+
   function onSuccess(response) {
     setObjectURL(window?.URL?.createObjectURL(response));
   }
+
+  const disableRequest = () => {
+    // Check if it's visible to the user, if not, then disable the request.
+    if (isVisible === false) {
+      return true;
+    }
+
+    // Check if it's something that can be loaded...
+    if (metadata) {
+      return (
+        metadata?.dcType !== "IMAGE" && metadata?.dcType !== "MOVING_IMAGE"
+      );
+    }
+
+    // It's visible and the metadata is an image.
+    return false;
+  };
+
   const resp = useQuery(
     { path: filePath, responseType: "blob", timeout: 0 },
     {
       onSuccess,
-      disabled: metadata
-        ? metadata?.dcType !== "IMAGE" && metadata?.dcType !== "MOVING_IMAGE"
-        : false
+      disabled: disableRequest()
     }
   );
 
@@ -152,89 +188,91 @@ export function FileView({
     );
   }
 
-  if (resp?.loading) {
-    return <LoadingSpinner loading={true} />;
-  }
   const errorStatus = (resp.error as any)?.cause?.status;
-
   return (
-    <div className="file-viewer-wrapper text-center">
-      {showFile ? (
-        errorStatus === undefined ? (
-          <a
-            href={objectURL}
-            target="_blank"
-            style={{
-              color: "inherit",
-              textDecoration: "none",
-              pointerEvents: clickToDownload ? undefined : "none",
-              display: "block",
-              marginLeft: "auto",
-              marginRight: "auto",
-              width: "fit-content"
-            }}
-          >
-            {isImage ? (
-              <img
-                alt={imgAlt ?? `File path : ${filePath}`}
-                src={objectURL}
-                style={{ height: imgHeight }}
-                onError={(event) =>
-                  (event.currentTarget.style.display = "none")
-                }
-              />
-            ) : (
-              <FileViewer
-                filePath={objectURL}
-                fileType={fileType}
-                unsupportedComponent={fallBackRender}
-                errorComponent={fallBackRender}
-              />
-            )}
-          </a>
-        ) : errorStatus === 403 ? (
-          <DinaMessage id="unauthorized" />
-        ) : (
-          <DinaMessage id="failedToRenderFile" />
-        )
+    <div className="file-viewer-wrapper text-center" ref={visibleRef}>
+      {resp?.loading ? (
+        <LoadingSpinner loading={true} />
       ) : (
-        <DinaMessage id="previewNotAvailable" />
-      )}
-      {!preview && (
-        <div className="d-flex justify-content-center">
-          {downloadLinks?.original && (
-            <DownloadLink
-              id="originalFile"
-              path={downloadLinks?.original}
-              isDownloading={isDownloading}
-              handleDownloadLink={handleDownloadLink}
-            />
+        <>
+          {showFile ? (
+            errorStatus === undefined ? (
+              <a
+                href={objectURL}
+                target="_blank"
+                style={{
+                  color: "inherit",
+                  textDecoration: "none",
+                  pointerEvents: clickToDownload ? undefined : "none",
+                  display: "block",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  width: "fit-content"
+                }}
+              >
+                {isImage ? (
+                  <img
+                    alt={imgAlt ?? `File path : ${filePath}`}
+                    src={objectURL}
+                    style={{ height: imgHeight }}
+                    onError={(event) =>
+                      (event.currentTarget.style.display = "none")
+                    }
+                  />
+                ) : (
+                  <FileViewer
+                    filePath={objectURL}
+                    fileType={fileType}
+                    unsupportedComponent={fallBackRender}
+                    errorComponent={fallBackRender}
+                  />
+                )}
+              </a>
+            ) : errorStatus === 403 ? (
+              <DinaMessage id="unauthorized" />
+            ) : (
+              <DinaMessage id="thumbnailNotAvailableText" />
+            )
+          ) : (
+            <DinaMessage id="previewNotAvailable" />
           )}
-          {downloadLinks?.thumbNail && (
-            <DownloadLink
-              id="thumbnail"
-              path={downloadLinks?.thumbNail}
-              isDownloading={isDownloading}
-              handleDownloadLink={handleDownloadLink}
-            />
+          {!preview && (
+            <div className="d-flex justify-content-center">
+              {downloadLinks?.original && (
+                <DownloadLink
+                  id="originalFile"
+                  path={downloadLinks?.original}
+                  isDownloading={isDownloading}
+                  handleDownloadLink={handleDownloadLink}
+                />
+              )}
+              {downloadLinks?.thumbNail && (
+                <DownloadLink
+                  id="thumbnail"
+                  path={downloadLinks?.thumbNail}
+                  isDownloading={isDownloading}
+                  handleDownloadLink={handleDownloadLink}
+                />
+              )}
+              {downloadLinks?.largeData && (
+                <DownloadLink
+                  id="largeImg"
+                  path={downloadLinks?.largeData}
+                  isDownloading={isDownloading}
+                  handleDownloadLink={handleDownloadLink}
+                />
+              )}
+            </div>
           )}
-          {downloadLinks?.largeData && (
-            <DownloadLink
-              id="largeImg"
-              path={downloadLinks?.largeData}
-              isDownloading={isDownloading}
-              handleDownloadLink={handleDownloadLink}
-            />
+          {!preview && (
+            <div>
+              {showFile &&
+                (isFallbackRender
+                  ? shownTypeIndicatorFallback
+                  : shownTypeIndicator)}
+            </div>
           )}
-        </div>
-      )}
-      {!preview && (
-        <div>
-          {showFile &&
-            (isFallbackRender
-              ? shownTypeIndicatorFallback
-              : shownTypeIndicator)}
-        </div>
+        </>
       )}
     </div>
   );

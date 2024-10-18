@@ -65,11 +65,11 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
-    case "collection-api/vocabulary/srs":
-    case "collection-api/vocabulary/coordinateSystem":
-    case "collection-api/vocabulary/degreeOfEstablishment":
-    case "collection-api/vocabulary/materialSampleState":
-    case "collection-api/vocabulary/typeStatus":
+    case "collection-api/vocabulary2/srs":
+    case "collection-api/vocabulary2/coordinateSystem":
+    case "collection-api/vocabulary2/degreeOfEstablishment":
+    case "collection-api/vocabulary2/materialSampleState":
+    case "collection-api/vocabulary2/typeStatus":
     case "collection-api/storage-unit-type":
     case "collection-api/storage-unit":
     case "objectstore-api/metadata":
@@ -77,9 +77,9 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/collection-method":
     case "collection-api/storage-unit/76575":
     case "collection-api/project":
-    case "collection-api/vocabulary/associationType":
+    case "collection-api/vocabulary2/associationType":
     case "collection-api/form-template":
-    case "collection-api/vocabulary/materialSampleType":
+    case "collection-api/vocabulary2/materialSampleType":
     case "collection-api/organism":
       return { data: [], meta: { totalResourceCount: 0 } };
   }
@@ -212,12 +212,16 @@ describe("Material Sample Edit Page", () => {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
-              storageUnit: { id: null, type: "storage-unit" },
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
               publiclyReleasable: true, // Default value
-              relationships: { organism: { data: [] } },
+              relationships: {
+                organism: { data: [] },
+                storageUnitUsage: { data: null }
+              },
               type: "material-sample",
               attachment: undefined,
               organism: undefined,
@@ -228,8 +232,10 @@ describe("Material Sample Edit Page", () => {
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
               scheduledAction: undefined,
-              preparationMethod: undefined,
-              collection: undefined
+              preparedBy: undefined,
+              collection: undefined,
+              assemblages: undefined,
+              storageUnitUsage: undefined
             },
             type: "material-sample"
           }
@@ -272,39 +278,44 @@ describe("Material Sample Edit Page", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
-
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
-        // Doesn't save the existing Collecting Event because it wasn't edited:
         [
-          // New material-sample:
           {
             resource: {
-              associations: [],
-              collectingEvent: {
-                id: "1",
-                type: "collecting-event"
-              },
-              storageUnit: { id: null, type: "storage-unit" },
-              materialSampleName: "test-material-sample-id",
-              hostOrganism: null,
-              managedAttributes: {},
-              collection: undefined,
-              publiclyReleasable: true, // Default value
+              startEventDateTime: "2021-04-13",
+              verbatimEventDateTime: "2021-04-13",
+              id: "1",
+              type: "collecting-event",
+              group: "test group",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
               type: "material-sample",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              preparationMethod: undefined,
-              projects: undefined,
-              isRestricted: false,
+              managedAttributes: {},
+              publiclyReleasable: true,
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
+              materialSampleName: "test-material-sample-id",
               restrictionFieldsExtension: null,
+              isRestricted: false,
               restrictionRemarks: null,
-              scheduledAction: undefined,
+              associations: [],
+              hostOrganism: null,
+              collectingEvent: { id: "1", type: "collecting-event" },
               relationships: {
-                organism: { data: [] }
+                organism: { data: [] },
+                storageUnitUsage: { data: null }
               }
             },
             type: "material-sample"
@@ -343,14 +354,32 @@ describe("Material Sample Edit Page", () => {
 
     expect(mockSave.mock.calls).toEqual([
       [
-        // Edits existing material-sample
-        // And only includes the updated field:
+        [
+          {
+            resource: {
+              startEventDateTime: "2021-04-13",
+              verbatimEventDateTime: "2021-04-13",
+              id: "1",
+              type: "collecting-event",
+              group: "test group",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
         [
           {
             resource: {
               id: "1",
               type: "material-sample",
               materialSampleName: "test-material-sample-id",
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
+              collectingEvent: { id: "1", type: "collecting-event" },
               relationships: {}
             },
             type: "material-sample"
@@ -440,6 +469,8 @@ describe("Material Sample Edit Page", () => {
                 type: "collecting-event"
               },
               id: "1",
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               type: "material-sample",
               relationships: {}
             },
@@ -485,10 +516,9 @@ describe("Material Sample Edit Page", () => {
           type: "material-sample",
           id: "333",
           materialSampleName: "test-ms",
-          storageUnit: {
+          storageUnitUsage: {
             id: "76575",
-            type: "storage-unit",
-            name: "test-storage-unit"
+            type: "storage-unit-usage"
           } as KitsuResourceLink
         }}
         onSaved={mockOnSaved}
@@ -601,18 +631,34 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              startEventDateTime: "2021-04-13",
+              verbatimEventDateTime: "2021-04-13",
+              id: "1",
+              type: "collecting-event",
+              group: "test group",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
               id: "333",
-              relationships: {},
-              attachment: undefined,
-              projects: undefined,
-              type: "material-sample"
+              type: "material-sample",
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
+              collectingEvent: { id: "1", type: "collecting-event" },
+              relationships: {}
             },
             type: "material-sample"
           }
         ],
-        {
-          apiBaseUrl: "/collection-api"
-        }
+        { apiBaseUrl: "/collection-api" }
       ]
     ]);
   });
@@ -685,16 +731,34 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              startEventDateTime: "2021-04-13",
+              verbatimEventDateTime: "2021-04-13",
+              id: "1",
+              type: "collecting-event",
+              group: "test group",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
               id: "333",
-              relationships: {},
-              type: "material-sample"
+              type: "material-sample",
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
+              collectingEvent: { id: "1", type: "collecting-event" },
+              relationships: {}
             },
             type: "material-sample"
           }
         ],
-        {
-          apiBaseUrl: "/collection-api"
-        }
+        { apiBaseUrl: "/collection-api" }
       ]
     ]);
   });
@@ -824,8 +888,11 @@ describe("Material Sample Edit Page", () => {
       })
     ).toEqual({
       // Omits id/createdBy/createdOn, increments the name:
-      type: "material-sample",
-      materialSampleName: "MY-SAMPLE-002"
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-002"
+      },
+      notCopiedOverWarnings: []
     });
 
     expect(
@@ -836,8 +903,11 @@ describe("Material Sample Edit Page", () => {
       })
     ).toEqual({
       // Increments the name:
-      type: "material-sample",
-      materialSampleName: "MY-SAMPLE-10"
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-10"
+      },
+      notCopiedOverWarnings: []
     });
 
     expect(
@@ -848,8 +918,11 @@ describe("Material Sample Edit Page", () => {
       })
     ).toEqual({
       // No way to increment the name, so it becomes blank:
-      type: "material-sample",
-      materialSampleName: ""
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: ""
+      },
+      notCopiedOverWarnings: []
     });
 
     // Organisms should not be linked to multiple Samples.
@@ -865,12 +938,87 @@ describe("Material Sample Edit Page", () => {
         ]
       })
     ).toEqual({
-      type: "material-sample",
-      materialSampleName: "MY-SAMPLE-101",
-      // The original organism IDs should be omitted:
-      organism: [
-        { type: "organism", lifeStage: "test lifestage 1" },
-        { type: "organism", lifeStage: "test lifestage 2" }
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-101",
+        // The original organism IDs should be omitted:
+        organism: [
+          { type: "organism", lifeStage: "test lifestage 1" },
+          { type: "organism", lifeStage: "test lifestage 2" }
+        ]
+      },
+      notCopiedOverWarnings: []
+    });
+  });
+
+  it("Creates the next material sample and provides a warning if they wish to duplicate storage unit usage", () => {
+    expect(
+      nextSampleInitialValues({
+        id: "123",
+        type: "material-sample",
+        createdBy: "Mat",
+        createdOn: "2020-05-04",
+        materialSampleName: "MY-SAMPLE-001",
+        storageUnit: {
+          id: "f50d2f5f-45fa-4893-b68f-f88960dd271a",
+          type: "storage-unit",
+          group: "aafc",
+          isGeneric: false,
+          name: "test"
+        },
+        storageUnitUsage: {
+          id: "b9fb78e1-d9d1-45ae-aeac-e52f2e20d63e",
+          type: "storage-unit-usage"
+        }
+      })
+    ).toEqual({
+      // storage unit and storage unit usage should not automatically provided, warning provided:
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-002",
+        storageUnit: undefined,
+        storageUnitUsage: undefined
+      },
+      notCopiedOverWarnings: [
+        {
+          componentName: "Storage",
+          duplicateAnyway: expect.anything()
+        }
+      ]
+    });
+  });
+
+  it("Creates the next material sample and provides a warning if they wish to duplicate attachments", () => {
+    expect(
+      nextSampleInitialValues({
+        id: "123",
+        type: "material-sample",
+        createdBy: "Mat",
+        createdOn: "2020-05-04",
+        materialSampleName: "MY-SAMPLE-001",
+        attachment: [
+          {
+            id: "a9b7c797-ab76-4e5d-98da-45c7415c7aea",
+            type: "metadata"
+          },
+          {
+            id: "6f679c58-468d-45af-95bb-d87f90768831",
+            type: "metadata"
+          }
+        ]
+      })
+    ).toEqual({
+      // attachments should not automatically provided, warning provided:
+      initialValues: {
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-002",
+        attachment: undefined
+      },
+      notCopiedOverWarnings: [
+        {
+          componentName: "Attachment",
+          duplicateAnyway: expect.anything()
+        }
       ]
     });
   });

@@ -1,12 +1,14 @@
 import { useApiClient } from "common-ui";
 import { InputResource, KitsuResource } from "kitsu";
-import { filter, get, has, pick } from "lodash";
+import { filter, get, has, pick, unset } from "lodash";
+import { useMemo } from "react";
 import {
   FieldMappingConfigType,
   LinkOrCreateSetting,
   WorkbookColumnMap,
   WorkbookDataTypeEnum
 } from "..";
+import { ScientificNameSource } from "../../../../dina-ui/types/collection-api";
 import {
   CollectingEventSelectField,
   CollectionMethodSelectField,
@@ -15,32 +17,24 @@ import {
   PreparationMethodSelectField,
   PreparationTypeSelectField,
   ProjectSelectField,
-  ProtocolSelectField
+  ProtocolSelectField,
+  StorageUnitSelectField
 } from "../../resource-select-fields/resource-select-fields";
+import FieldMappingConfig from "./FieldMappingConfig";
 import {
   convertBoolean,
   convertBooleanArray,
   convertDate,
-  convertMap,
   convertNumber,
   convertNumberArray,
+  convertString,
   convertStringArray,
   flattenObject,
   getParentFieldPath,
+  isEmptyWorkbookValue,
   isObject
 } from "./workbookMappingUtils";
-
-export const DATATYPE_CONVERTER_MAPPING = {
-  [WorkbookDataTypeEnum.NUMBER]: convertNumber,
-  [WorkbookDataTypeEnum.BOOLEAN]: convertBoolean,
-  [WorkbookDataTypeEnum.STRING_ARRAY]: convertStringArray,
-  [WorkbookDataTypeEnum.NUMBER_ARRAY]: convertNumberArray,
-  [WorkbookDataTypeEnum.MANAGED_ATTRIBUTES]: convertMap,
-  [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
-  [WorkbookDataTypeEnum.DATE]: convertDate,
-  [WorkbookDataTypeEnum.STRING]: (value) => value,
-  [WorkbookDataTypeEnum.VOCABULARY]: (value) => value
-};
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export const THRESHOLD_NUM_TO_SHOW_MAP_RELATIONSHIP = 10;
 
@@ -49,20 +43,93 @@ export function useWorkbookConverter(
   entityName: string
 ) {
   const { apiClient, save } = useApiClient();
+  const { formatMessage } = useDinaIntl();
+
+  const FIELD_TO_VOCAB_ELEMS_MAP = useMemo(() => {
+    // Have to load end-points up front, save all responses in a map
+    const fieldToVocabElemsMap = new Map();
+    for (const recordType of Object.keys(FieldMappingConfig)) {
+      const recordFieldsMap = FieldMappingConfig[recordType];
+      for (const recordField of Object.keys(recordFieldsMap)) {
+        const { dataType, endpoint } = recordFieldsMap[recordField];
+        switch (dataType) {
+          case WorkbookDataTypeEnum.VOCABULARY:
+            if (endpoint) {
+              apiClient.get(endpoint, {}).then((response) => {
+                const vocabElements = (
+                  response.data as any
+                )?.vocabularyElements?.map((vocabElement) => vocabElement.name);
+                fieldToVocabElemsMap.set(recordField, vocabElements);
+              });
+            }
+            break;
+          case WorkbookDataTypeEnum.MANAGED_ATTRIBUTES:
+            if (endpoint) {
+              // load available Managed Attributes
+              apiClient
+                .get(endpoint, { page: { limit: 1000 } })
+                .then((response) => {
+                  fieldToVocabElemsMap.set(recordField, response.data);
+                });
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    return fieldToVocabElemsMap;
+  }, [entityName]);
+
+  const DATATYPE_CONVERTER_MAPPING = {
+    [WorkbookDataTypeEnum.NUMBER]: convertNumber,
+    [WorkbookDataTypeEnum.BOOLEAN]: convertBoolean,
+    [WorkbookDataTypeEnum.STRING_ARRAY]: convertStringArray,
+    [WorkbookDataTypeEnum.NUMBER_ARRAY]: convertNumberArray,
+    [WorkbookDataTypeEnum.MANAGED_ATTRIBUTES]: (
+      value: any,
+      _fieldName?: string
+    ) => value,
+    [WorkbookDataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
+    [WorkbookDataTypeEnum.DATE]: convertDate,
+    [WorkbookDataTypeEnum.STRING]: convertString,
+    [WorkbookDataTypeEnum.STRING_COORDINATE]: (
+      value: any,
+      _fieldName?: string
+    ) => convertString((value as string).toUpperCase(), _fieldName),
+    [WorkbookDataTypeEnum.VOCABULARY]: (value: any, _fieldName?: string) =>
+      value.toUpperCase().replace(" ", "_"),
+    [WorkbookDataTypeEnum.CLASSIFICATION]: (value: {
+      [key: string]: string;
+    }) => {
+      if (value) {
+        return {
+          classificationRanks: Object.keys(value).join("|"),
+          classificationPath: Object.values(value).join("|")
+        };
+      } else {
+        return {
+          classificationRanks: undefined,
+          classificationPath: undefined
+        };
+      }
+    }
+  };
+
   /**
    * The data structure in the flatternedConfig is like this
    * {
    *    stringArrayField: { dataType: 'string[]' },
-   *    vocabularyField: { dataType: 'vocabulary', vocabularyEndpoint: 'vocabulary endpoint' },
+   *    vocabularyField: { dataType: 'vocabulary', endpoint: 'vocabulary endpoint' },
    *    objectField: {
    *      dataType: 'object',
    *      attributes: { name: [Object], age: [Object] }
    *      relationshipConfig: {
-            baseApiPath: "fake-api",
-            hasGroup: true,
-            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-            type: "object-field"
-          }
+   *         baseApiPath: "fake-api",
+   *         hasGroup: true,
+   *         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+   *         type: "object-field"
+   *       }
    *    },
    *    'objectField.name': { dataType: 'string' },
    *    'objectField.age': { dataType: 'number' }
@@ -122,7 +189,9 @@ export function useWorkbookConverter(
         (parentConfig.relationshipConfig.linkOrCreateSetting ===
           LinkOrCreateSetting.LINK ||
           parentConfig.relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.LINK_OR_CREATE)
+            LinkOrCreateSetting.LINK_OR_CREATE ||
+          parentConfig.relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_OR_ERROR)
       );
     }
     return false;
@@ -145,6 +214,12 @@ export function useWorkbookConverter(
       : undefined;
   }
 
+  /**
+   * Convert workbook from the uploaded file into API resources, which are ready to call the API to save them.
+   * @param workbookData
+   * @param group
+   * @returns
+   */
   function convertWorkbook(
     workbookData: { [key: string]: any }[],
     group: string
@@ -200,6 +275,7 @@ export function useWorkbookConverter(
         const fieldPath = getPathOfField(fieldNameInWorkbook);
         if (fieldPath) {
           let parent = resource;
+
           // Handle nested attributes
           const fieldNameArray = fieldPath.split(".");
           let childPath = "";
@@ -242,8 +318,18 @@ export function useWorkbookConverter(
           const convertField = getFieldConverter(fieldPath);
           if (!!convertField) {
             parent[fieldNameArray[fieldNameArray.length - 1]] = convertField(
-              workbookRow[fieldNameInWorkbook]
+              workbookRow[fieldNameInWorkbook],
+              fieldNameInWorkbook
             );
+            if (
+              fieldPath.includes("dwcDecimalLongitude") ||
+              fieldPath.includes("dwcDecimalLatitude")
+            ) {
+              parent["isPrimary"] = true;
+            }
+            if (fieldPath === "organism.determination.scientificNameDetails") {
+              parent["scientificNameSource"] = ScientificNameSource.CUSTOM;
+            }
           }
         }
       }
@@ -301,14 +387,7 @@ export function useWorkbookConverter(
       }
     });
     if (foundMappings.length > 0) {
-      return foundMappings.reduce<{
-        [fieldPath: string]: {
-          [value: string]: {
-            id: string;
-            type: string;
-          };
-        };
-      }>((accu, curr) => {
+      return foundMappings.reduce((accu, curr) => {
         if (curr.fieldPath) {
           accu[curr.fieldPath] = curr.valueMapping;
         }
@@ -359,10 +438,12 @@ export function useWorkbookConverter(
     fieldPath: string,
     group: string
   ) {
-    // const filteredWorkbookColumnMap =
-    //   filterWorkbookColumnMap(workbookColumnMap);
     const attributeName = fieldPath.substring(fieldPath.lastIndexOf(".") + 1);
     const value = resource[attributeName];
+    if (isEmptyWorkbookValue(value)) {
+      delete resource[attributeName];
+      return;
+    }
     if (attributeName === "relationshipConfig") {
       resource.type = value.type;
       resource.relationships = {};
@@ -375,12 +456,14 @@ export function useWorkbookConverter(
       const relationshipConfig = value.relationshipConfig;
       if (relationshipConfig) {
         // If the value is an Object type, and there is a relationshipConfig defined
+        let valueToLink;
         if (
           relationshipConfig.linkOrCreateSetting === LinkOrCreateSetting.LINK ||
           relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.LINK_OR_CREATE
+            LinkOrCreateSetting.LINK_OR_CREATE ||
+          relationshipConfig.linkOrCreateSetting ===
+            LinkOrCreateSetting.LINK_OR_ERROR
         ) {
-          let valueToLink;
           // get valueToLink from workbookColumnMap
           const columnMap = searchColumnMap(fieldPath, workbookColumnMap);
           if (columnMap) {
@@ -392,7 +475,9 @@ export function useWorkbookConverter(
                 !Array.isArray(childValue)
               ) {
                 valueToLink =
-                  columnMap[fieldPath + "." + attrNameInValue]?.[childValue];
+                  columnMap[fieldPath + "." + attrNameInValue]?.[
+                    childValue.trim().replace(".", "_")
+                  ];
                 if (valueToLink) {
                   break;
                 }
@@ -408,12 +493,31 @@ export function useWorkbookConverter(
             };
             delete resource[attributeName];
             return;
+          } else {
+            if (
+              relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK
+            ) {
+              // if the field is link only, and there is no matching record, then ignore it.
+              delete resource[attributeName];
+              return;
+            } else if (
+              relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK_OR_ERROR
+            ) {
+              // if the field is LINK_OR_ERR, and there is no matching record, then throw new error.
+              unset(value, "relationshipConfig");
+              const notFoundValue = JSON.stringify(value);
+              delete resource[attributeName];
+              throw new Error(`${attributeName} not found: ${notFoundValue}`);
+            }
           }
         }
 
         if (
-          relationshipConfig.linkOrCreateSetting ===
-            LinkOrCreateSetting.CREATE ||
+          (!valueToLink &&
+            relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.CREATE) ||
           relationshipConfig.linkOrCreateSetting ===
             LinkOrCreateSetting.LINK_OR_CREATE
         ) {
@@ -426,6 +530,24 @@ export function useWorkbookConverter(
               group
             );
           }
+
+          // Link storageUnit to storageUnitUsage before creating storageUnitUsage
+          if (
+            resource.type === "material-sample" &&
+            attributeName === "storageUnitUsage"
+          ) {
+            // Check that storage unit is given if row has well column and well row
+            if (
+              !(resource as any)?.storageUnitUsage?.relationships?.storageUnit
+                ?.data?.id
+            ) {
+              throw new Error(formatMessage("workBookStorageUnitIsRequired"));
+            }
+
+            // Supply the mandatory usage type.
+            value["usageType"] = "material-sample";
+          }
+
           const newCreatedValue = await save(
             [
               {
@@ -478,7 +600,9 @@ export function useWorkbookConverter(
             relationshipConfig.linkOrCreateSetting ===
               LinkOrCreateSetting.LINK ||
             relationshipConfig.linkOrCreateSetting ===
-              LinkOrCreateSetting.LINK_OR_CREATE
+              LinkOrCreateSetting.LINK_OR_CREATE ||
+            relationshipConfig.linkOrCreateSetting ===
+              LinkOrCreateSetting.LINK_OR_ERROR
           ) {
             // get valueToLink from workbookColumnMap
             const columnMap = searchColumnMap(fieldPath, workbookColumnMap);
@@ -491,7 +615,9 @@ export function useWorkbookConverter(
                   !Array.isArray(childValue)
                 ) {
                   valueToLink =
-                    columnMap[fieldPath + "." + attrNameInValue]?.[childValue];
+                    columnMap[fieldPath + "." + attrNameInValue]?.[
+                      childValue.trim().replace(".", "_")
+                    ];
                   if (valueToLink) {
                     break;
                   }
@@ -500,6 +626,24 @@ export function useWorkbookConverter(
             }
             if (valueToLink) {
               valuesForRelationship.push(valueToLink);
+            } else {
+              if (
+                relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK
+              ) {
+                // if the field is link only, and there is no matching record, then ignore it.
+                delete resource[attributeName];
+                return;
+              } else if (
+                relationshipConfig.linkOrCreateSetting ===
+                LinkOrCreateSetting.LINK_OR_ERROR
+              ) {
+                // if the field is LINK_OR_ERR, and there is no matching record, then throw new error.
+                unset(value, "relationshipConfig");
+                const notFoundValue = JSON.stringify(value);
+                delete resource[attributeName];
+                throw new Error(`${attributeName} not found: ${notFoundValue}`);
+              }
             }
           }
 
@@ -568,7 +712,7 @@ export function useWorkbookConverter(
     const eleName = `relationshipMapping.${columnName.replaceAll(
       ".",
       "_"
-    )}.${value}`;
+    )}.${value.replaceAll(".", "_")}`;
     const resourceSelectProps = {
       hideLabel: true,
       selectProps: { isClearable: true },
@@ -593,6 +737,8 @@ export function useWorkbookConverter(
         return <PreparationMethodSelectField {...resourceSelectProps} />;
       case "project":
         return <ProjectSelectField {...resourceSelectProps} />;
+      case "storage-unit":
+        return <StorageUnitSelectField resourceProps={resourceSelectProps} />;
     }
   }
 
@@ -605,6 +751,7 @@ export function useWorkbookConverter(
     getPathOfField,
     getFieldRelationshipConfig,
     isFieldInALinkableRelationshipField,
-    getResourceSelectForRelationshipField
+    getResourceSelectForRelationshipField,
+    FIELD_TO_VOCAB_ELEMS_MAP
   };
 }

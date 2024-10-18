@@ -31,7 +31,9 @@ const PREPARATION_METHOD_TABLE_COLUMNS: ColumnDefinition<PreparationMethod>[] =
 
 export default function preparationMethodListPage() {
   const buttonBarContent = (
-    <CreateButton entityLink="/collection/preparation-method" />
+    <div className="flex d-flex ms-auto">
+      <CreateButton entityLink="/collection/preparation-method" />
+    </div>
   );
 
   return (

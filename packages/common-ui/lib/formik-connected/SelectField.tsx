@@ -9,6 +9,7 @@ import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 export interface SelectOption<T> {
   label: string;
   value?: T;
+  options?: SelectOption<T>[];
 }
 
 export interface SelectFieldProps<T> extends FieldWrapperProps {
@@ -107,7 +108,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
           if (!selectedOption || Object.keys(selectedOption).length === 0) {
             const optionWithNested = options?.filter((opt) => !!opt["options"]);
             optionWithNested?.map((option) =>
-              option["options"].map((opt) => {
+              option?.["options"]?.map((opt) => {
                 if (opt.value === value) {
                   selectedOption = opt;
                   return;

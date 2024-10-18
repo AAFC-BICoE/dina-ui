@@ -38,7 +38,7 @@ export function FilterGroup({
         {children.map((element, i) => (
           <div key={i}>
             {element}
-            <div className="text-center">
+            <div className="text-center" data-testid="group-operator">
               {i !== children.length - 1 &&
                 formatMessage({ id: model.operator })}
             </div>
@@ -69,6 +69,7 @@ export function FilterGroup({
             className="btn btn-dark d-block remove"
             onClick={onRemoveClick}
             type="button"
+            data-testid="group-delete-button"
           >
             -
           </button>

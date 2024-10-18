@@ -24,6 +24,11 @@ interface QueryRowTextSearchProps {
    * config and will be used to determine what endpoint to use to retrieve the field extensions.
    */
   fieldExtensionConfig?: ESIndexMapping;
+
+  /**
+   * If being used in the column selector, operators and different styling is applied.
+   */
+  isInColumnSelector: boolean;
 }
 
 export interface FieldExtensionPackageOption extends SelectOption<string> {
@@ -51,7 +56,8 @@ export interface FieldExtensionSearchStates {
 export default function QueryRowFieldExtensionSearch({
   value,
   setValue,
-  fieldExtensionConfig
+  fieldExtensionConfig,
+  isInColumnSelector
 }: QueryRowTextSearchProps) {
   const { formatMessage } = useIntl();
 
@@ -166,11 +172,11 @@ export default function QueryRowFieldExtensionSearch({
   }
 
   return (
-    <div className="row">
+    <div className={isInColumnSelector ? "" : "row"}>
       {/* Extension Selector */}
       <Select<FieldExtensionPackageOption>
         options={extensionOptions}
-        className={`col me-1 ms-2 ps-0`}
+        className={isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"}
         value={selectedExtension}
         placeholder={formatMessage({
           id: "queryBuilder_extension_placeholder"
@@ -185,6 +191,10 @@ export default function QueryRowFieldExtensionSearch({
         }
         onInputChange={(inputValue) => setExtensionSearchValue(inputValue)}
         inputValue={extensionSearchValue}
+        captureMenuScroll={true}
+        menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+        menuShouldScrollIntoView={false}
+        minMenuHeight={600}
       />
 
       {/* Field Selector */}
@@ -192,7 +202,7 @@ export default function QueryRowFieldExtensionSearch({
         <>
           <Select<FieldExtensionOption>
             options={selectedExtension?.fieldOptions}
-            className={`col me-1 ps-0`}
+            className={isInColumnSelector ? "ps-0 mt-2" : "col me-1 ps-0"}
             value={selectedField}
             placeholder={formatMessage({
               id: "queryBuilder_extension_field_placeholder"
@@ -205,6 +215,10 @@ export default function QueryRowFieldExtensionSearch({
             }
             onInputChange={(inputValue) => setFieldSearchValue(inputValue)}
             inputValue={fieldSearchValue}
+            captureMenuScroll={true}
+            menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+            menuShouldScrollIntoView={false}
+            minMenuHeight={600}
           />
         </>
       ) : (
@@ -212,7 +226,7 @@ export default function QueryRowFieldExtensionSearch({
       )}
 
       {/* Operator Selector */}
-      {selectedField ? (
+      {!isInColumnSelector && selectedField ? (
         <>
           <Select<SelectOption<string>>
             options={operatorOptions}
@@ -224,6 +238,10 @@ export default function QueryRowFieldExtensionSearch({
                 selectedOperator: selected?.value ?? ""
               })
             }
+            captureMenuScroll={true}
+            menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+            menuShouldScrollIntoView={false}
+            minMenuHeight={600}
           />
 
           {/* Search Value */}
@@ -280,8 +298,14 @@ export function transformFieldExtensionToDSL({
   fieldInfo
 }: TransformToDSLProps): any {
   // Parse the field extension search options. Trim the search value.
-  const fieldExtensionSearchValue: FieldExtensionSearchStates =
-    JSON.parse(value);
+  let fieldExtensionSearchValue: FieldExtensionSearchStates;
+  try {
+    fieldExtensionSearchValue = JSON.parse(value);
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+
   fieldExtensionSearchValue.searchValue =
     fieldExtensionSearchValue.searchValue.trim();
 

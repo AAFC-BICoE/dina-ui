@@ -17,7 +17,8 @@ export function useLibraryPoolQuery(id?: string, deps?: any[]) {
   return useQuery<LibraryPool>(
     {
       path: `seqdb-api/library-pool/${id}`,
-      include: "containerType,product,protocol,thermocyclerProfile"
+      include:
+        "product,protocol,thermocyclerProfile,storageUnit,storageUnitType"
     },
     { disabled: !id, deps }
   );
@@ -83,7 +84,9 @@ export default function NgsWorkFlowPoolingRunPage() {
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/ngs-workflow-pooling" />
+      <div className="col-md-4">
+        <BackToListButton entityLink="/seqdb/ngs-workflow-pooling" />
+      </div>
       {editMode ? (
         <>
           <Button
@@ -100,7 +103,7 @@ export default function NgsWorkFlowPoolingRunPage() {
               variant={"primary"}
               className="ms-2"
               onClick={() => setPerformSave(true)}
-              style={{ width: "10rem" }}
+              style={{ width: "10rem", marginRight: "15px" }}
             >
               {performSave ? (
                 <>
@@ -121,7 +124,7 @@ export default function NgsWorkFlowPoolingRunPage() {
             </Button>
           ) : (
             <>
-              <Dropdown as={ButtonGroup}>
+              <Dropdown as={ButtonGroup} style={{ width: "12rem" }}>
                 <Button
                   variant={"primary"}
                   className="ms-2"
@@ -180,7 +183,7 @@ export default function NgsWorkFlowPoolingRunPage() {
           variant={"primary"}
           className="ms-auto"
           onClick={() => setEditMode(true)}
-          style={{ width: "10rem" }}
+          style={{ width: "10rem", marginRight: "15px" }}
         >
           <SeqdbMessage id="editButtonText" />
         </Button>

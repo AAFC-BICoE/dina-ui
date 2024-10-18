@@ -44,7 +44,7 @@ describe("VocabularySelectField component", () => {
       >
         <VocabularySelectField
           name="fieldName"
-          path="collection-api/vocabulary/substrate"
+          path="collection-api/vocabulary2/substrate"
           isMulti={true}
         />
       </DinaForm>,
@@ -92,7 +92,7 @@ describe("VocabularySelectField component", () => {
       >
         <VocabularySelectField
           name="fieldName"
-          path="collection-api/vocabulary/substrate"
+          path="collection-api/vocabulary2/substrate"
         />
       </DinaForm>,
       testCtx
@@ -135,7 +135,7 @@ describe("VocabularySelectField component", () => {
       >
         <VocabularySelectField
           name="fieldName"
-          path="collection-api/vocabulary/substrate"
+          path="collection-api/vocabulary2/substrate"
         />
       </DinaForm>,
       testCtx

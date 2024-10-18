@@ -2,6 +2,7 @@ export enum WorkbookDataTypeEnum {
   NUMBER = "number",
   BOOLEAN = "boolean",
   STRING = "string",
+  STRING_COORDINATE = "letter",
   DATE = "date",
   STRING_ARRAY = "string[]",
   NUMBER_ARRAY = "number[]",
@@ -9,5 +10,6 @@ export enum WorkbookDataTypeEnum {
   MANAGED_ATTRIBUTES = "managedAttributes",
   VOCABULARY = "vocabulary",
   OBJECT = "object",
-  OBJECT_ARRAY = "object[]"
+  OBJECT_ARRAY = "object[]",
+  CLASSIFICATION = "classification"
 }

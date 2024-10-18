@@ -1,5 +1,8 @@
-import { FieldMappingConfigType, LinkOrCreateSetting } from "../";
-import { WorkbookDataTypeEnum } from "../";
+import {
+  FieldMappingConfigType,
+  LinkOrCreateSetting,
+  WorkbookDataTypeEnum
+} from "../";
 
 const FieldMappingConfig: FieldMappingConfigType = {
   "material-sample": {
@@ -15,6 +18,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
     preparationSubstrate: { dataType: WorkbookDataTypeEnum.STRING },
     preparationDate: { dataType: WorkbookDataTypeEnum.DATE },
     preparationRemarks: { dataType: WorkbookDataTypeEnum.STRING },
+    preparationManagedAttributes: {
+      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+      endpoint: "collection-api/managed-attribute",
+      managedAttributeComponent: "PREPARATION"
+    },
     description: { dataType: WorkbookDataTypeEnum.STRING },
     dwcDegreeOfEstablishment: { dataType: WorkbookDataTypeEnum.STRING },
     barcode: { dataType: WorkbookDataTypeEnum.STRING },
@@ -25,36 +33,35 @@ const FieldMappingConfig: FieldMappingConfigType = {
     tags: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
     materialSampleType: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
-      vocabularyEndpoint: "/collection-api/vocabulary/materialSampleType"
+      endpoint: "/collection-api/vocabulary2/materialSampleType"
     },
-    managedAttributes: { dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES },
+    managedAttributes: {
+      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+      endpoint: "collection-api/managed-attribute",
+      managedAttributeComponent: "MATERIAL_SAMPLE"
+    },
     organismsIndividualEntry: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     useTargetOrganism: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     publiclyReleasable: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     useNextSequence: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     isRestricted: { dataType: WorkbookDataTypeEnum.BOOLEAN },
+    hostOrganism: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING },
+        remarks: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
     collection: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
         hasGroup: true,
-        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
         type: "collection",
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING },
-        code: { dataType: WorkbookDataTypeEnum.STRING },
-        webpage: { dataType: WorkbookDataTypeEnum.STRING },
-        contact: { dataType: WorkbookDataTypeEnum.STRING },
-        address: { dataType: WorkbookDataTypeEnum.STRING },
-        remarks: { dataType: WorkbookDataTypeEnum.STRING },
-        identifiers: {
-          dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
-          attributes: {
-            type: { dataType: WorkbookDataTypeEnum.STRING },
-            uri: { dataType: WorkbookDataTypeEnum.STRING }
-          }
-        }
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
     collectingEvent: {
@@ -95,8 +102,6 @@ const FieldMappingConfig: FieldMappingConfigType = {
         verbatimEventDateTime: { dataType: WorkbookDataTypeEnum.STRING },
         dwcVerbatimLocality: { dataType: WorkbookDataTypeEnum.STRING },
         host: { dataType: WorkbookDataTypeEnum.STRING },
-        dwcVerbatimLatitude: { dataType: WorkbookDataTypeEnum.STRING },
-        dwcVerbatimLongitude: { dataType: WorkbookDataTypeEnum.STRING },
         dwcVerbatimCoordinateSystem: { dataType: WorkbookDataTypeEnum.STRING },
         dwcVerbatimSRS: { dataType: WorkbookDataTypeEnum.STRING },
         dwcVerbatimElevation: { dataType: WorkbookDataTypeEnum.STRING },
@@ -107,6 +112,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
         habitat: { dataType: WorkbookDataTypeEnum.STRING },
         dwcMinimumElevationInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
         dwcMinimumDepthInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
+        managedAttributes: {
+          dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+          endpoint: "collection-api/managed-attribute",
+          managedAttributeComponent: "COLLECTING_EVENT"
+        },
         dwcMaximumElevationInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
         dwcMaximumDepthInMeters: { dataType: WorkbookDataTypeEnum.NUMBER },
         substrate: { dataType: WorkbookDataTypeEnum.STRING },
@@ -145,17 +155,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
           relationshipConfig: {
             hasGroup: false,
             type: "person",
-            linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+            linkOrCreateSetting: LinkOrCreateSetting.LINK,
             baseApiPath: "agent-api"
           },
           attributes: {
-            displayName: { dataType: WorkbookDataTypeEnum.STRING },
-            email: { dataType: WorkbookDataTypeEnum.STRING },
-            givenNames: { dataType: WorkbookDataTypeEnum.STRING },
-            familyNames: { dataType: WorkbookDataTypeEnum.STRING },
-            aliases: { dataType: WorkbookDataTypeEnum.STRING },
-            webpage: { dataType: WorkbookDataTypeEnum.STRING },
-            remarks: { dataType: WorkbookDataTypeEnum.STRING }
+            displayName: { dataType: WorkbookDataTypeEnum.STRING }
           }
         }
       }
@@ -193,8 +197,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING },
-        protocolType: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
     preparedBy: {
@@ -202,30 +205,36 @@ const FieldMappingConfig: FieldMappingConfigType = {
       relationshipConfig: {
         hasGroup: false,
         type: "person",
-        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
         baseApiPath: "agent-api"
       },
       attributes: {
-        displayName: { dataType: WorkbookDataTypeEnum.STRING },
-        email: { dataType: WorkbookDataTypeEnum.STRING },
-        givenNames: { dataType: WorkbookDataTypeEnum.STRING },
-        familyNames: { dataType: WorkbookDataTypeEnum.STRING },
-        aliases: { dataType: WorkbookDataTypeEnum.STRING },
-        webpage: { dataType: WorkbookDataTypeEnum.STRING },
-        remarks: { dataType: WorkbookDataTypeEnum.STRING }
+        displayName: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
-    storageUnit: {
+    storageUnitUsage: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
-        hasGroup: true,
-        linkOrCreateSetting: LinkOrCreateSetting.LINK,
-        type: "storage-unit",
+        hasGroup: false,
+        linkOrCreateSetting: LinkOrCreateSetting.CREATE,
+        type: "storage-unit-usage",
         baseApiPath: "/collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING },
-        barcode: { dataType: WorkbookDataTypeEnum.STRING }
+        wellColumn: { dataType: WorkbookDataTypeEnum.NUMBER },
+        wellRow: { dataType: WorkbookDataTypeEnum.STRING_COORDINATE },
+        storageUnit: {
+          dataType: WorkbookDataTypeEnum.OBJECT,
+          relationshipConfig: {
+            hasGroup: true,
+            linkOrCreateSetting: LinkOrCreateSetting.LINK,
+            type: "storage-unit",
+            baseApiPath: "/collection-api"
+          },
+          attributes: {
+            name: { dataType: WorkbookDataTypeEnum.STRING }
+          }
+        }
       }
     },
     projects: {
@@ -233,14 +242,11 @@ const FieldMappingConfig: FieldMappingConfigType = {
       relationshipConfig: {
         hasGroup: true,
         type: "project",
-        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
         baseApiPath: "collection-api"
       },
       attributes: {
-        name: { dataType: WorkbookDataTypeEnum.STRING },
-        startDate: { dataType: WorkbookDataTypeEnum.DATE },
-        endDate: { dataType: WorkbookDataTypeEnum.DATE },
-        status: { dataType: WorkbookDataTypeEnum.STRING }
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     },
     organism: {
@@ -262,9 +268,49 @@ const FieldMappingConfig: FieldMappingConfigType = {
             verbatimScientificName: { dataType: WorkbookDataTypeEnum.STRING },
             verbatimDeterminer: { dataType: WorkbookDataTypeEnum.STRING },
             verbatimDate: { dataType: WorkbookDataTypeEnum.DATE },
-            typeStatus: { dataType: WorkbookDataTypeEnum.STRING }
+            typeStatus: { dataType: WorkbookDataTypeEnum.STRING },
+            scientificName: { dataType: WorkbookDataTypeEnum.STRING },
+            scientificNameDetails: {
+              dataType: WorkbookDataTypeEnum.CLASSIFICATION
+            }
           }
         }
+      }
+    },
+    parentMaterialSample: {
+      dataType: WorkbookDataTypeEnum.OBJECT,
+      relationshipConfig: {
+        linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_ERROR,
+        type: "material-sample",
+        hasGroup: true,
+        baseApiPath: "/collection-api"
+      },
+      attributes: {
+        materialSampleName: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
+    assemblages: {
+      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+      relationshipConfig: {
+        hasGroup: true,
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
+        type: "assemblage",
+        baseApiPath: "/collection-api"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING }
+      }
+    },
+    attachment: {
+      dataType: WorkbookDataTypeEnum.OBJECT_ARRAY,
+      relationshipConfig: {
+        hasGroup: false,
+        type: "metadata",
+        linkOrCreateSetting: LinkOrCreateSetting.LINK,
+        baseApiPath: "/objectstore-api"
+      },
+      attributes: {
+        name: { dataType: WorkbookDataTypeEnum.STRING }
       }
     }
   }

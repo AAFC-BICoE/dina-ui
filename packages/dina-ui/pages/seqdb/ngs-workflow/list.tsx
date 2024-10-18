@@ -49,16 +49,18 @@ export default function NgsWorkflowListPage() {
   return (
     <div>
       <Head title={formatMessage("ngsWorkflowWholeGenomeSeqTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">{formatMessage("ngsWorkflowWholeGenomeSeqTitle")}</h1>
-        <ButtonBar>
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex">
           <Link href={`/seqdb/ngs-workflow/run`}>
-            <a className="btn btn-primary">
+            <a className="btn btn-primary ms-auto">
               <SeqdbMessage id="startNewWorkflow" />
             </a>
           </Link>
-        </ButtonBar>
+        </div>
+      </ButtonBar>
+      <main className="container-fluid">
+        <h1 id="wb-cont">{formatMessage("ngsWorkflowWholeGenomeSeqTitle")}</h1>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             isCompleted: false,

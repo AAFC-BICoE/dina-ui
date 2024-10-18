@@ -2,7 +2,7 @@ import { useQuery, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { ProtocolForm } from "../../../../dina-ui/components/collection/protocol/ProtocolForm";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Protocol } from "../../../types/collection-api/resources/Protocol";
 
@@ -32,7 +32,7 @@ export default function ProtocolEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         <div>
           <h1 id="wb-cont">
             <DinaMessage id={title} />
@@ -46,6 +46,7 @@ export default function ProtocolEditPage() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

@@ -11,6 +11,7 @@ const STORAGE_UNIT_CHILDREN = ["B", "C", "D"].map<
   group: "group",
   name: letter,
   type: "storage-unit",
+  isGeneric: false,
   storageUnitType: {
     id: "BOX",
     name: "Box",
@@ -26,6 +27,7 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
   group: "group",
   name: "A",
   type: "storage-unit",
+  isGeneric: false,
   storageUnitChildren: STORAGE_UNIT_CHILDREN
 };
 
@@ -34,6 +36,7 @@ const STORAGE_B: PersistedResource<StorageUnit> = {
   id: "B",
   group: "group",
   name: "B",
+  isGeneric: false,
   type: "storage-unit"
 };
 
@@ -90,7 +93,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       };
     case "collection-api/material-sample":
       // Stored material samples:
-      if (params?.filter?.rsql === "storageUnit.uuid==A") {
+      if (params?.filter?.rsql === "storageUnitUsage.storageUnit.uuid==A") {
         return { data: [{ id: "ms-1", type: "material-sample" }] };
       } else {
         return { data: [{ id: "ms-1", type: "material-sample" }] };
@@ -130,6 +133,7 @@ const storageUnitA: StorageUnit = {
   id: "A",
   name: "testNameA",
   group: "aafc",
+  isGeneric: false,
   storageUnitChildren: STORAGE_UNIT_CHILDREN
 };
 
@@ -137,7 +141,8 @@ const storageUnitX: StorageUnit = {
   type: "storage-unit",
   id: "X",
   name: "testNameX",
-  group: "aafc"
+  group: "aafc",
+  isGeneric: false
 };
 
 describe("StorageUnitChildrenViewer component", () => {
@@ -174,7 +179,8 @@ describe("StorageUnitChildrenViewer component", () => {
         accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
       }
     );
-
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper.find("button.enable-move-content").simulate("click");
 
     await new Promise(setImmediate);
@@ -223,7 +229,8 @@ describe("StorageUnitChildrenViewer component", () => {
         accountContext: { groupNames: ["aafc", "cnc", "overy-lab"] }
       }
     );
-
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper.find("button.add-existing-as-child").simulate("click");
 
     await new Promise(setImmediate);

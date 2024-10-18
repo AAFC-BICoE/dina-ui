@@ -16,7 +16,9 @@ import {
   isBooleanArray,
   isMap,
   isNumber,
-  calculateColumnUniqueValuesFromSpreadsheetData
+  calculateColumnUniqueValuesFromSpreadsheetData,
+  isEmptyWorkbookValue as isEmptyWorkbookValue,
+  trimSpace
 } from "../workbookMappingUtils";
 
 const mockConfig: FieldMappingConfigType = {
@@ -28,13 +30,17 @@ const mockConfig: FieldMappingConfigType = {
     },
     stringField: {
       dataType: WorkbookDataTypeEnum.VOCABULARY,
-      vocabularyEndpoint: "/collection-api/vocabulary/materialSampleType"
+      endpoint: "/collection-api/vocabulary2/materialSampleType"
     },
     numberField: { dataType: WorkbookDataTypeEnum.NUMBER },
     booleanField: { dataType: WorkbookDataTypeEnum.BOOLEAN },
     stringArrayField: { dataType: WorkbookDataTypeEnum.STRING_ARRAY },
     numberArrayField: { dataType: WorkbookDataTypeEnum.NUMBER_ARRAY },
-    mapField: { dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES },
+    mapField: {
+      dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES,
+      endpoint: "managed attribute endpoint",
+      managedAttributeComponent: "component"
+    },
     objectField1: {
       dataType: WorkbookDataTypeEnum.OBJECT,
       relationshipConfig: {
@@ -170,7 +176,12 @@ describe("workbookMappingUtils functions", () => {
             ]
           },
           0, // Return first sheet.
-          ["field1", "field2", "field3"]
+          [
+            { targetField: "field1", skipped: false },
+            { targetField: "field2", skipped: false },
+            { targetField: "field3", skipped: false },
+            { targetField: "field4", skipped: true }
+          ]
         )
       ).toEqual([
         {
@@ -196,7 +207,11 @@ describe("workbookMappingUtils functions", () => {
         getDataFromWorkbook(
           undefined,
           0, // Return first sheet.
-          ["field1", "field2", "field3"]
+          [
+            { targetField: "field1", skipped: false },
+            { targetField: "field2", skipped: false },
+            { targetField: "field3", skipped: false }
+          ]
         )
       ).toEqual([]);
     });
@@ -265,7 +280,7 @@ describe("workbookMappingUtils functions", () => {
   });
 
   it("isMap", () => {
-    expect(isMap("asdfa : asdfas")).toBeTruthy();
+    expect(isMap("asdfa_1 : asdfas")).toBeTruthy();
     expect(isMap("asdfas: asdfas, adsfasf:asdfasf")).toBeTruthy();
     expect(isMap('asdf:"asdfa  sdfdsf"')).toBeTruthy();
     expect(isMap('asdf:"asdfa sdfdsf" : asd : "sdfsdf "sdf sdf')).toBeFalsy();
@@ -273,6 +288,8 @@ describe("workbookMappingUtils functions", () => {
     expect(isMap('asdf:"asdfa sdfdsf')).toBeFalsy();
     expect(isMap('asdf:asdfa sdfdsf", "sdfsdf "sdf sdf')).toBeFalsy();
     expect(isMap('asdf:"asdfa sdfdsf", asd : "sdfsdf "sdf sdf')).toBeFalsy();
+    expect(isMap("attr_1:ddddss, attr_2:sssddd")).toBeTruthy();
+    expect(isMap("attr_1: 222, attr_2: true")).toBeTruthy();
   });
 
   it("convertNumber", () => {
@@ -320,12 +337,14 @@ describe("workbookMappingUtils functions", () => {
     expect(flattenObject(mockConfig)).toEqual({
       "mockEntity.booleanField.dataType": "boolean",
       "mockEntity.mapField.dataType": "managedAttributes",
+      "mockEntity.mapField.endpoint": "managed attribute endpoint",
+      "mockEntity.mapField.managedAttributeComponent": "component",
       "mockEntity.numberArrayField.dataType": "number[]",
       "mockEntity.numberField.dataType": "number",
       "mockEntity.stringArrayField.dataType": "string[]",
       "mockEntity.stringField.dataType": "vocabulary",
-      "mockEntity.stringField.vocabularyEndpoint":
-        "/collection-api/vocabulary/materialSampleType",
+      "mockEntity.stringField.endpoint":
+        "/collection-api/vocabulary2/materialSampleType",
       "mockEntity.objectField1.attributes.address.attributes.addressLine1.dataType":
         "string",
       "mockEntity.objectField1.attributes.address.attributes.city.dataType":
@@ -358,6 +377,101 @@ describe("workbookMappingUtils functions", () => {
       "mockEntity.relationshipConfig.baseApiPath": "/fake-api",
       "mockEntity.relationshipConfig.hasGroup": true,
       "mockEntity.relationshipConfig.type": "mock-entity"
+    });
+  });
+
+  it("isEmptyValue", () => {
+    expect(isEmptyWorkbookValue(null)).toBeTruthy();
+    expect(isEmptyWorkbookValue(undefined)).toBeTruthy();
+    expect(isEmptyWorkbookValue("")).toBeTruthy();
+    expect(isEmptyWorkbookValue([])).toBeTruthy();
+    expect(isEmptyWorkbookValue({})).toBeTruthy();
+    expect(isEmptyWorkbookValue({ relationshipConfig: {} })).toBeTruthy();
+    expect(
+      isEmptyWorkbookValue({ a: "", relationshipConfig: {} })
+    ).toBeTruthy();
+    expect(
+      isEmptyWorkbookValue({ a: "", b: [], relationshipConfig: {} })
+    ).toBeTruthy();
+    expect(
+      isEmptyWorkbookValue({
+        a: { nested: "", relationshipConfig: {} },
+        relationshipConfig: {}
+      })
+    ).toBeTruthy();
+
+    expect(isEmptyWorkbookValue([null])).toBeTruthy();
+    expect(isEmptyWorkbookValue([undefined])).toBeTruthy();
+    expect(isEmptyWorkbookValue([""])).toBeTruthy();
+    expect(isEmptyWorkbookValue([[]])).toBeTruthy();
+    expect(isEmptyWorkbookValue([{}])).toBeTruthy();
+    expect(isEmptyWorkbookValue([{ relationshipConfig: {} }])).toBeTruthy();
+    expect(
+      isEmptyWorkbookValue([{ a: "", relationshipConfig: {} }])
+    ).toBeTruthy();
+    expect(
+      isEmptyWorkbookValue([{ a: "", b: [], relationshipConfig: {} }])
+    ).toBeTruthy();
+    expect(
+      isEmptyWorkbookValue([
+        { a: { nested: "", relationshipConfig: {} }, relationshipConfig: {} }
+      ])
+    ).toBeTruthy();
+
+    expect(isEmptyWorkbookValue(0)).toBeFalsy();
+    expect(isEmptyWorkbookValue(1)).toBeFalsy();
+    expect(isEmptyWorkbookValue(true)).toBeFalsy();
+    expect(isEmptyWorkbookValue(false)).toBeFalsy();
+    expect(isEmptyWorkbookValue([0])).toBeFalsy();
+    expect(isEmptyWorkbookValue({ a: 10 })).toBeFalsy();
+    expect(isEmptyWorkbookValue({ a: 10, relationshipConfig: {} })).toBeFalsy();
+    expect(
+      isEmptyWorkbookValue({
+        a: { nested: "value", relationshipConfig: {} },
+        relationshipConfig: {}
+      })
+    ).toBeFalsy();
+
+    expect(isEmptyWorkbookValue([0])).toBeFalsy();
+    expect(isEmptyWorkbookValue([1])).toBeFalsy();
+    expect(isEmptyWorkbookValue([true])).toBeFalsy();
+    expect(isEmptyWorkbookValue([false])).toBeFalsy();
+    expect(isEmptyWorkbookValue([[0]])).toBeFalsy();
+    expect(isEmptyWorkbookValue([{ a: 10 }])).toBeFalsy();
+    expect(
+      isEmptyWorkbookValue([{ a: 10, relationshipConfig: {} }])
+    ).toBeFalsy();
+    expect(
+      isEmptyWorkbookValue([
+        {
+          a: { nested: "value", relationshipConfig: {} },
+          relationshipConfig: {}
+        }
+      ])
+    ).toBeFalsy();
+  });
+
+  it("trimSpace", () => {
+    expect(
+      trimSpace({
+        "0": [
+          { rowNumber: 0, content: ["header1 ", "header2 ", "header3 "] },
+          { rowNumber: 1, content: ["data1 ", " data2", " data3"] }
+        ],
+        "1": [
+          { rowNumber: 0, content: ["header4 ", " header5", "header6 "] },
+          { rowNumber: 1, content: ["data4 ", " data5", "data6 "] }
+        ]
+      })
+    ).toEqual({
+      "0": [
+        { rowNumber: 0, content: ["header1", "header2", "header3"] },
+        { rowNumber: 1, content: ["data1", "data2", "data3"] }
+      ],
+      "1": [
+        { rowNumber: 0, content: ["header4", "header5", "header6"] },
+        { rowNumber: 1, content: ["data4", "data5", "data6"] }
+      ]
     });
   });
 });

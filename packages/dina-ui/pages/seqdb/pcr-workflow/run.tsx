@@ -31,7 +31,9 @@ export default function PCRWorkFlowRunPage() {
   );
 
   // Global edit mode state.
-  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editMode, setEditMode] = useState<boolean>(
+    router.query.editMode === "true"
+  );
 
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
@@ -78,7 +80,9 @@ export default function PCRWorkFlowRunPage() {
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/pcr-workflow" />
+      <div className="col-md-4">
+        <BackToListButton entityLink="/seqdb/pcr-workflow" />
+      </div>
       {editMode ? (
         <>
           <Button
@@ -95,7 +99,7 @@ export default function PCRWorkFlowRunPage() {
               variant={"primary"}
               className="ms-2"
               onClick={() => setPerformSave(true)}
-              style={{ width: "10rem" }}
+              style={{ width: "10rem", marginRight: "15px" }}
             >
               {performSave ? (
                 <>
@@ -116,10 +120,10 @@ export default function PCRWorkFlowRunPage() {
             </Button>
           ) : (
             <>
-              <Dropdown as={ButtonGroup}>
+              <Dropdown as={ButtonGroup} style={{ width: "12rem" }}>
                 <Button
                   variant={"primary"}
-                  className="ms-2"
+                  className="ms-auto"
                   onClick={() => setPerformSave(true)}
                   style={{ width: "10rem" }}
                 >
@@ -145,7 +149,6 @@ export default function PCRWorkFlowRunPage() {
                   <Dropdown.Item
                     as="button"
                     href="#/action-1"
-                    className="ms-2"
                     onClick={() => {
                       setPerformComplete(true);
                       setPerformSave(true);
@@ -175,7 +178,7 @@ export default function PCRWorkFlowRunPage() {
           variant={"primary"}
           className="ms-auto"
           onClick={() => setEditMode(true)}
-          style={{ width: "10rem" }}
+          style={{ width: "10rem", marginRight: "15px" }}
         >
           <SeqdbMessage id="editButtonText" />
         </Button>

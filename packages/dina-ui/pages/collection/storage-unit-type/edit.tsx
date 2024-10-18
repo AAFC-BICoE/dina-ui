@@ -79,7 +79,7 @@ export function StorageUnitTypeForm({
       submittedValues.enableGrid === false &&
       submittedValues.gridLayoutDefinition
     ) {
-      submittedValues.gridLayoutDefinition = null;
+      delete submittedValues.gridLayoutDefinition;
     }
     delete submittedValues.enableGrid;
 
@@ -97,12 +97,16 @@ export function StorageUnitTypeForm({
   }
 
   const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={storageUnitType?.id}
-        entityLink="/collection/storage-unit-type"
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={storageUnitType?.id}
+          entityLink="/collection/storage-unit-type"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 
@@ -159,7 +163,6 @@ export function StorageUnitTypeFormFields() {
             className="col-md-6"
           />
         )}
-        <ToggleField className="col-md-3" name="isInseperable" />
         <ToggleField className="col-md-3" name="enableGrid" />
       </div>
       {formik.values.enableGrid && (

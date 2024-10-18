@@ -30,7 +30,7 @@ export function SeqReactionTable({
     {
       id: "pcrTubeNumber",
       cell: ({ row: { original } }) => (
-        <div>{original?.pcrBatchItem?.cellNumber || ""}</div>
+        <div>{original?.pcrBatchItem?.storageUnitUsage?.cellNumber || ""}</div>
       ),
       header: () => (
         <b>
@@ -53,9 +53,9 @@ export function SeqReactionTable({
       id: "pcrWellCoordinates",
       cell: ({ row }) => (
         <div>
-          {(row.original.pcrBatchItem?.wellRow ?? "") +
+          {(row.original.pcrBatchItem?.storageUnitUsage?.wellRow ?? "") +
             "" +
-            (row.original.pcrBatchItem?.wellColumn ?? "")}
+            (row.original.pcrBatchItem?.storageUnitUsage?.wellColumn ?? "")}
         </div>
       ),
       header: () => (
@@ -69,7 +69,9 @@ export function SeqReactionTable({
       id: "seqWellCoordinates",
       cell: ({ row }) => (
         <div>
-          {(row.original.wellRow ?? "") + "" + (row.original.wellColumn ?? "")}
+          {(row.original?.storageUnitUsage?.wellRow ?? "") +
+            "" +
+            (row.original?.storageUnitUsage?.wellColumn ?? "")}
         </div>
       ),
       header: () => (
@@ -81,7 +83,9 @@ export function SeqReactionTable({
     },
     {
       id: "seqTubeNumber",
-      cell: ({ row }) => <div>{row.original?.cellNumber ?? ""}</div>,
+      cell: ({ row }) => (
+        <div>{row.original?.storageUnitUsage?.cellNumber ?? ""}</div>
+      ),
       header: () => (
         <b>
           <DinaMessage id={"seqTubeNumber"} />

@@ -31,9 +31,22 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   createNew: "Create New",
   created: "created",
   date: "Date",
+  numberInvalid: "Please enter a valid number.",
+  numberBetweenInvalid:
+    "Invalid between search: from number is greater than to number",
+  numberBetweenMissingValues:
+    "Invalid between search: two numbers need to be provided.",
+  numberInRangeInvalid:
+    "Invalid in/not in search: Numbers must be valid and comma seperated (e.g. 12.5, 2, 4)",
   dateMustBeFormattedPartial:
     "Date must be formatted as one of the following options: YYYY-MM-DD, YYYY-MM, or YYYY",
   dateMustBeFormattedYyyyMmDd: "Date must be formatted as YYYY-MM-DD",
+  dateBetweenInvalid:
+    "Invalid between search: from date is greater than to date",
+  dateBetweenMissingValues:
+    "Invalid between search: two dates need to be provided.",
+  dateInRangeInvalid:
+    "Invalid in/not in search: Dates must be valid (YYYY-MM-DD) and comma seperated (e.g. 2001-05-19, 2008-12-25, 2023-01-01)",
   deleteAllButtonText: "Delete All",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
@@ -91,6 +104,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   multipleValuesFound: "Multiple Values Found",
   name: "Name",
   navigation: "Navigation",
+  first: "First",
+  last: "Last",
   next: "Next",
   no: "No",
   noRowsFound: "No Rows Found",
@@ -156,5 +171,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   applyButtonText: "Apply",
   exportObjectsButtonText: "Export Objects",
   exportObjectsMaxLimitTooltip:
-    "Export Objects has a maximum limit of 100 files. Select up to 100 files to export."
+    "Export Objects has a maximum limit of 100 files. Select up to 100 files to export.",
+  mismatchMaterialSampleTypeError:
+    "Some Material Samples do not match the Split Configuration and were removed."
 };

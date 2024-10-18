@@ -19,10 +19,11 @@ import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
 export default function DinaUserDetailsPage() {
   const router = useRouter();
-  const { isAdmin, rolesPerGroup, subject, username } = useAccount();
+  const { isAdmin, rolesPerGroup, subject } = useAccount();
 
   // Get the user ID from the URL, otherwise use the current user:
   const id = router.query.id?.toString() ?? subject;
+  const hideBackButton = router.query.hideBackButton === "true";
 
   const { formatMessage } = useDinaIntl();
 
@@ -49,19 +50,25 @@ export default function DinaUserDetailsPage() {
   return (
     <div>
       <Head title={formatMessage("userViewTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="col-md-6 col-sm-12 mt-2">
+          {!hideBackButton && (
+            <BackButton entityLink="/dina-user" className="mt-2" />
+          )}
+        </div>
+        {currentUserCanEdit && (
+          <div className="col-md-6 col-sm-12 d-flex">
+            <EditButton
+              className="ms-auto"
+              entityId={id as string}
+              entityLink="dina-user"
+            />
+          </div>
+        )}
+      </ButtonBar>
       {withResponse(userQuery, ({ data: dinaUser }) => (
-        <main className="container">
-          <ButtonBar>
-            <BackButton entityLink="/dina-user" />
-            {currentUserCanEdit && (
-              <EditButton
-                className="ms-auto"
-                entityId={id as string}
-                entityLink="dina-user"
-              />
-            )}
-          </ButtonBar>
+        <main className="container-fluid">
           <h1 id="wb-cont">
             <DinaMessage id={"userViewTitle"} />
           </h1>
@@ -89,7 +96,7 @@ export default function DinaUserDetailsPage() {
                     <h2>
                       <DinaMessage id="dataExports" />
                     </h2>
-                    <DataExportListPageLayout username={username} />
+                    <DataExportListPageLayout username={dinaUser.username} />
                   </div>
                 </div>
               </div>

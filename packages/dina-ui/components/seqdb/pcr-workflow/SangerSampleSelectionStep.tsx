@@ -259,7 +259,6 @@ export function SangerSampleSelectionStep({
     } finally {
       // Clear the previously selected resources.
       setPreviouslySelectedResources([]);
-      // setEditMode(false);
     }
   }
 
@@ -270,27 +269,44 @@ export function SangerSampleSelectionStep({
 
   return (
     <div>
-      {!editMode && (
-        <strong>
-          <SeqdbMessage id="selectedSamplesTitle" />
-        </strong>
+      {!editMode ? (
+        <>
+          <strong>
+            <SeqdbMessage id="selectedSamplesTitle" />
+          </strong>
+          <QueryPage<any>
+            indexName={"dina_material_sample_index"}
+            uniqueName="pcr-material-sample-selection-step-read-only"
+            columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
+            enableColumnSelector={false}
+            selectionMode={false}
+            selectionResources={selectedResources}
+            viewMode={true}
+            reactTableProps={{
+              enableSorting: true,
+              enableMultiSort: true
+            }}
+          />
+        </>
+      ) : (
+        <QueryPage<any>
+          indexName={"dina_material_sample_index"}
+          uniqueName="pcr-material-sample-selection-step-edit"
+          columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
+          enableColumnSelector={false}
+          selectionMode={true}
+          selectionResources={selectedResources}
+          setSelectionResources={setSelectedResourcesAndSaveOrder}
+          viewMode={false}
+          enableDnd={true}
+          onDeselect={(unselected) => onSelectMaterial(unselected)}
+          onSelect={(selected) => onDeselectMaterial(selected)}
+          reactTableProps={{
+            enableSorting: true,
+            enableMultiSort: true
+          }}
+        />
       )}
-      <QueryPage<any>
-        indexName={"dina_material_sample_index"}
-        uniqueName="pcr-material-sample-selection-step"
-        columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
-        selectionMode={editMode}
-        selectionResources={selectedResources}
-        setSelectionResources={setSelectedResourcesAndSaveOrder}
-        viewMode={!editMode}
-        enableDnd={true}
-        onDeselect={(unselected) => onSelectMaterial(unselected)}
-        onSelect={(selected) => onDeselectMaterial(selected)}
-        reactTableProps={{
-          enableSorting: true,
-          enableMultiSort: true
-        }}
-      />
     </div>
   );
 }

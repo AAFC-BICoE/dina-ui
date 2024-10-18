@@ -23,24 +23,13 @@
   text-align: center;
 }
 
-.ReactTable thead th.-sort-asc,
-.ReactTable thead td.-sort-asc {
+.ReactTable thead .-sort-desc,
+.ReactTable thead .-sort-desc,
+.ReactTable thead .-sort-asc,
+.ReactTable thead .-sort-asc {
   box-shadow: none !important;
-  &:before {
-    content: "▲";
-    float: right;
-    pointer-events: none;
-  }
-}
-
-.ReactTable thead th.-sort-desc,
-.ReactTable thead td.-sort-desc {
-  box-shadow: none !important;
-  &:before {
-    content: "▼";
-    float: right;
-    pointer-events: none;
-  }
+  pointer-events: none;
+  margin-left: 5px;
 }
 
 .ReactTable th,
@@ -104,6 +93,14 @@
   background-color: rgb(222, 252, 222);
 }
 
+.ReactTable .pagination-top {
+  box-shadow: 0 0 -15px 0 rgba(0, 0, 0, 0.1);
+}
+
+.ReactTable .pagination-bottom {
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+}
+
 .ReactTable .-pagination {
   z-index: 1;
   display: -webkit-box;
@@ -118,8 +115,6 @@
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
   padding: 3px;
-  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
-  border-top: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 .ReactTable .-pagination input,
@@ -158,12 +153,36 @@
   color: #fff;
 }
 .ReactTable .-pagination .-previous,
-.ReactTable .-pagination .-next {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
+.ReactTable .-pagination .-next,
+.ReactTable .-pagination .-first,
+.ReactTable .-pagination .-last {
+  height: 35px;
+  width: 115px;
+  margin-top: 5px;
   text-align: center;
+  margin-left: 5px;
 }
+
+.ReactTable .-pagination-small .-previous,
+.ReactTable .-pagination-small .-next,
+.ReactTable .-pagination-small .-first,
+.ReactTable .-pagination-small .-last {
+  width: 35px !important;
+}
+
+.ReactTable .-pagination .-last {
+  margin-right: 5px;
+  margin-left: 0px;
+}
+
+.ReactTable .-pagination .-next {
+  margin-right: 5px;
+}
+
+.ReactTable .-pagination-icon {
+  margin-top: -3px;
+}
+
 .ReactTable .-pagination .-center {
   -webkit-box-flex: 3;
   -ms-flex: 3;
@@ -196,6 +215,7 @@
 .ReactTable .-pagination .-pageJump input {
   width: 70px;
   text-align: center;
+  height: 30px;
 }
 .ReactTable .-pagination .-select-wrap {
   display: flex;
@@ -203,7 +223,7 @@
   gap: 0.3em;
 }
 .ReactTable .-pagination .-pageSizeOptions {
-  margin: 3px 10px;
+  margin: 8px 10px;
 }
 
 .ReactTable .-pagination select:focus {

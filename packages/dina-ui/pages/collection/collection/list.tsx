@@ -40,7 +40,11 @@ const COLLECTION_FILTER_ATTRIBUTES: FilterAttribute[] = [
 ];
 
 export default function CollectionListPage() {
-  const buttonBarContent = <CreateButton entityLink="/collection/collection" />;
+  const buttonBarContent = (
+    <div className="flex d-flex ms-auto">
+      <CreateButton entityLink="/collection/collection" />
+    </div>
+  );
 
   return (
     <PageLayout

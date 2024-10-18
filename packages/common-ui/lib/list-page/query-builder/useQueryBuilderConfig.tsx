@@ -24,8 +24,7 @@ import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
 } from "./query-builder-value-types/QueryBuilderBooleanSearch";
 import QueryBuilderDateSearch, {
-  transformDateSearchToDSL,
-  validateDate
+  transformDateSearchToDSL
 } from "./query-builder-value-types/QueryBuilderDateSearch";
 import QueryRowFieldExtensionSearch, {
   transformFieldExtensionToDSL
@@ -40,6 +39,15 @@ import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./query-builder-value-types/QueryBuilderTextSearch";
 import { transformUUIDSearchToDSL } from "./query-builder-value-types/QueryBuilderUUIDSearch";
+import QueryRowGlobalSearchSearch, {
+  transformGlobalSearchToDSL
+} from "./query-builder-value-types/QueryBuilderGlobalSearch";
+import QueryRowRelationshipPresenceSearch, {
+  transformRelationshipPresenceToDSL
+} from "./query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
+import QueryRowIdentifierSearch, {
+  transformIdentifierToDSL
+} from "./query-builder-value-types/QueryBuilderIdentifierSearch";
 
 /**
  * Helper function to get the index settings for a field value.
@@ -47,7 +55,7 @@ import { transformUUIDSearchToDSL } from "./query-builder-value-types/QueryBuild
  * The index settings has more information than what can be stored in the list, especially for
  * nested fields.
  */
-function fieldValueToIndexSettings(
+export function fieldValueToIndexSettings(
   fieldPath: string,
   indexMap: ESIndexMapping[]
 ): ESIndexMapping | undefined {
@@ -89,6 +97,8 @@ function getQueryBuilderTypeFromIndexType(
     case "boolean":
     case "managedAttribute":
     case "fieldExtension":
+    case "identifier":
+    case "relationshipPresence":
       return type;
 
     // If it's stored directly as a keyword, it's considered a text field.
@@ -112,22 +122,11 @@ function getQueryBuilderTypeFromIndexType(
   return "unsupported";
 }
 
-/**
- * Depending on the field type, a different validation will need to be performed.
- *
- * @param value string value to validate against.
- * @param type the type of the field, to determine how to validate the value.
- * @param formatMessage internationalization support.
- * @returns null if no validation errors or string with the error message.
- */
-function validateField(value: string, type: string, formatMessage: any) {
-  switch (type) {
-    case "date":
-      return validateDate(value, formatMessage);
-    default:
-      return true;
-  }
-}
+// Unique fieldname identifier for global search.
+export const GLOBAL_SEARCH_FIELDNAME = "_globalSearch";
+
+// Unique fieldname identifier for relationship presence.
+export const RELATIONSHIP_PRESENCE_FIELDNAME = "_relationshipPresence";
 
 export interface CustomViewField {
   /**
@@ -153,7 +152,21 @@ export interface UseQueryBuilderConfigProps {
    */
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
+  /**
+   * This will add an option to the QueryBuilder to allow users to check if a relationship exists.
+   */
+  enableRelationshipPresence?: boolean;
+
   customViewFields?: CustomViewField[];
+
+  /**
+   * IDs of the columns that should not be displayed in the Query Builder field selector.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  nonSearchableColumns?: string[];
 }
 
 /**
@@ -162,12 +175,15 @@ export interface UseQueryBuilderConfigProps {
 export function useQueryBuilderConfig({
   indexName,
   dynamicFieldMapping,
-  customViewFields
+  enableRelationshipPresence,
+  customViewFields,
+  nonSearchableColumns
 }: UseQueryBuilderConfigProps) {
   // Load index map using the index name.
   const { indexMap } = useIndexMapping({
     indexName,
-    dynamicFieldMapping
+    dynamicFieldMapping,
+    enableRelationshipPresence
   });
   const { formatMessage, locale } = useIntl();
 
@@ -182,12 +198,14 @@ export function useQueryBuilderConfig({
         indexMap,
         indexName,
         formatMessage,
-        customViewFields
+        customViewFields,
+        enableRelationshipPresence,
+        nonSearchableColumns
       )
     );
   }, [indexMap, customViewFields, locale]);
 
-  return { queryBuilderConfig };
+  return { queryBuilderConfig, indexMap };
 }
 
 /**
@@ -201,7 +219,9 @@ export function generateBuilderConfig(
   indexMap: ESIndexMapping[],
   indexName: string,
   formatMessage: any,
-  customViewFields?: CustomViewField[]
+  customViewFields?: CustomViewField[],
+  enableRelationshipPresence?: boolean,
+  nonSearchableColumns?: string[]
 ): Config {
   // If the index map doesn't exist, then there is no point of loading the config yet.
   if (!indexMap) {
@@ -280,6 +300,10 @@ export function generateBuilderConfig(
     containsDate: {
       // Displayed as "Contains" - Used for searching "2017-08" or "2023" in dates.
       label: formatMessage({ id: "queryBuilder_operator_containsDate" }),
+      cardinality: 1
+    },
+    between: {
+      label: formatMessage({ id: "queryBuilder_operator_between" }),
       cardinality: 1
     },
     uuid: {
@@ -420,6 +444,25 @@ export function generateBuilderConfig(
         });
       }
     },
+    globalSearch: {
+      ...BasicConfig.widgets.text,
+      type: "globalSearch",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowGlobalSearchSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      ),
+      elasticSearchFormatValue: (_queryType, val, _op, field, _config) => {
+        return transformGlobalSearchToDSL({
+          value: val,
+          fieldPath: field,
+          operation: "",
+          queryType: ""
+        });
+      }
+    },
     managedAttribute: {
       ...BasicConfig.widgets.text,
       type: "managedAttribute",
@@ -432,6 +475,8 @@ export function generateBuilderConfig(
             (factoryProps?.fieldDefinition?.fieldSettings as any)
               ?.mapping as ESIndexMapping
           }
+          indexMap={indexMap}
+          isInColumnSelector={false}
         />
       ),
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {
@@ -441,7 +486,8 @@ export function generateBuilderConfig(
           operation: op,
           value: val,
           queryType,
-          fieldInfo: indexSettings
+          fieldInfo: indexSettings,
+          indexMap
         });
       }
     },
@@ -457,6 +503,7 @@ export function generateBuilderConfig(
             (factoryProps?.fieldDefinition?.fieldSettings as any)
               ?.mapping as ESIndexMapping
           }
+          isInColumnSelector={false}
         />
       ),
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {
@@ -466,7 +513,60 @@ export function generateBuilderConfig(
           operation: op,
           value: val,
           queryType,
-          fieldInfo: indexSettings
+          fieldInfo: indexSettings,
+          indexMap
+        });
+      }
+    },
+    identifier: {
+      ...BasicConfig.widgets.text,
+      type: "identifier",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowIdentifierSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          identifierConfig={
+            (factoryProps?.fieldDefinition?.fieldSettings as any)
+              ?.mapping as ESIndexMapping
+          }
+          indexMap={indexMap}
+          isInColumnSelector={false}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformIdentifierToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings,
+          indexMap
+        });
+      }
+    },
+    relationshipPresence: {
+      ...BasicConfig.widgets.text,
+      type: "relationshipPresence",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowRelationshipPresenceSearch
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+          indexMapping={indexMap}
+          isInColumnSelector={false}
+        />
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformRelationshipPresenceToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings,
+          indexMap
         });
       }
     }
@@ -475,14 +575,14 @@ export function generateBuilderConfig(
   const types: Types = {
     text: {
       valueSources: ["value"],
-      defaultOperator: "exactMatch",
       widgets: {
         text: {
           operators: [
-            "exactMatch",
+            "exactMatch", // Only displayed if keyword support exists.
             "wildcard",
             "in",
             "notIn",
+            "between", // Only displayed if supported in the mapping for text.
             "startsWith", // Only displayed if supported on the mapping.
             "containsText", // Only displayed if supported on the mapping.
             "endsWith", // Only displayed if supported on the mapping.
@@ -498,14 +598,7 @@ export function generateBuilderConfig(
       defaultOperator: "equals",
       widgets: {
         autoComplete: {
-          operators: [
-            "equals", 
-            "notEquals", 
-            "in",
-            "notIn",
-            "empty", 
-            "notEmpty"
-          ]
+          operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"]
         }
       }
     },
@@ -534,6 +627,9 @@ export function generateBuilderConfig(
             "equals",
             "notEquals",
             "containsDate",
+            "between",
+            "in",
+            "notIn",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",
@@ -554,6 +650,7 @@ export function generateBuilderConfig(
             "notEquals",
             "in",
             "notIn",
+            "between",
             "greaterThan",
             "greaterThanOrEqualTo",
             "lessThan",
@@ -573,6 +670,15 @@ export function generateBuilderConfig(
         }
       }
     },
+    globalSearch: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        globalSearch: {
+          operators: ["noOperator"]
+        }
+      }
+    },
     managedAttribute: {
       valueSources: ["value"],
       defaultOperator: "noOperator",
@@ -587,6 +693,24 @@ export function generateBuilderConfig(
       defaultOperator: "noOperator",
       widgets: {
         fieldExtension: {
+          operators: ["noOperator"]
+        }
+      }
+    },
+    identifier: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        identifier: {
+          operators: ["noOperator"]
+        }
+      }
+    },
+    relationshipPresence: {
+      valueSources: ["value"],
+      defaultOperator: "noOperator",
+      widgets: {
+        relationshipPresence: {
           operators: ["noOperator"]
         }
       }
@@ -630,6 +754,8 @@ export function generateBuilderConfig(
         indexMap={indexMap}
         currentField={fieldDropdownProps?.selectedPath?.join(".") ?? ""}
         setField={fieldDropdownProps?.setField}
+        isInColumnSelector={false}
+        nonSearchableColumns={nonSearchableColumns}
       />
     ),
     renderOperator: (operatorDropdownProps) => {
@@ -669,8 +795,8 @@ export function generateBuilderConfig(
     showNot: false,
     canRegroup: true,
     canReorder: true,
-    clearValueOnChangeField: false,
-    clearValueOnChangeOp: false,
+    clearValueOnChangeField: true,
+    clearValueOnChangeOp: true,
     showErrorMessage: true,
     removeIncompleteRulesOnLoad: false,
     removeEmptyGroupsOnLoad: false
@@ -693,9 +819,7 @@ export function generateBuilderConfig(
         type,
         valueSources: ["value"],
         fieldSettings: {
-          mapping: indexItem,
-          validateValue: (value, _fieldSettings) =>
-            validateField(value, type, formatMessage)
+          mapping: indexItem
         }
       };
       return field;
@@ -712,6 +836,31 @@ export function generateBuilderConfig(
           };
           return field;
         })
+      : []),
+
+    // Global Search support
+    {
+      [GLOBAL_SEARCH_FIELDNAME]: {
+        label: GLOBAL_SEARCH_FIELDNAME,
+        type: "globalSearch",
+        valueSources: ["value"],
+        fieldSettings: {
+          isGlobalSearch: true
+        }
+      }
+    },
+
+    // Relationship Presence support
+    ...(enableRelationshipPresence === true
+      ? [
+          {
+            [RELATIONSHIP_PRESENCE_FIELDNAME]: {
+              label: RELATIONSHIP_PRESENCE_FIELDNAME,
+              type: "relationshipPresence",
+              valueSources: ["value"]
+            }
+          }
+        ]
       : [])
   );
 

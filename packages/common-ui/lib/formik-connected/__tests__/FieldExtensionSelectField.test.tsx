@@ -1,8 +1,11 @@
 import React from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FieldExtensionSelectField } from "../FieldExtensionSelectField";
 import Select from "react-select/base";
+import "@testing-library/jest-dom";
+import { waitFor, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 const TEST_FIELD_EXTENTION_DATA = {
   data: {
@@ -39,32 +42,58 @@ const apiContext: any = {
 };
 describe("FieldExtensionSelectField component", () => {
   it("Renders the FieldExtensionSelectField's options correctly.", async () => {
-    const wrapper = mountWithAppContext(
-      <DinaForm initialValues={{}}>
-        <FieldExtensionSelectField
-          name="cfia_ppc"
-          className="col-md-6 field-extention"
-          query={() => ({
-            path: "test-path/extension/cfia_ppc"
-          })}
-        />
+    // Render the component using the provided RTL wrapper function
+    const wrapper = mountWithAppContext2(
+      <DinaForm initialValues={{ cfia_ppc: undefined }}>
+        {({ values: { cfia_ppc } }) => (
+          <>
+            <FieldExtensionSelectField
+              name="cfia_ppc"
+              className="col-md-6 field-extention"
+              query={() => ({
+                path: "test-path/extension/cfia_ppc"
+              })}
+            />
+            <div id="value-display">{JSON.stringify(cfia_ppc)}</div>
+          </>
+        )}
       </DinaForm>,
       { apiContext }
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Wait for the mock API call to complete and verify it was called with the correct path
+    await waitFor(() =>
+      expect(mockGet).lastCalledWith("test-path/extension/cfia_ppc", {})
+    );
 
-    expect(mockGet).lastCalledWith("test-path/extension/cfia_ppc", {});
+    // Find the select element using screen
+    const selectElement = screen.getByRole("combobox");
 
-    const option = wrapper.find<any>(Select).prop("options")[1];
+    // Simulate a user clicking on the select element
+    await userEvent.click(selectElement);
 
-    expect(option.label).toEqual("Level 1 (PPC-1)");
-    expect(option.value).toEqual({
-      extKey: "cfia_ppc",
-      extTerm: "level",
-      extVersion: "2022-02",
-      value: "Level 1 (PPC-1)"
+    // Wait for the options to be rendered and visible
+    await waitFor(() =>
+      screen.getByRole("option", { name: /Level 1 \(PPC-1\)/ })
+    );
+
+    // Find the specific option element by its text content
+    const optionElement = screen.getByRole("option", {
+      name: "Level 1 (PPC-1)"
     });
+
+    // Assertions for the specific option label and value
+    expect(optionElement).toBeInTheDocument();
+    expect(optionElement).toHaveTextContent("Level 1 (PPC-1)");
+
+    // Simulate a user clicking on the select element
+    await userEvent.click(optionElement);
+
+    // The new value should be re-rendered into the value-display div.
+    expect(
+      screen.getByText(
+        /\{"extkey":"cfia_ppc","extterm":"level","extversion":"2022\-02","value":"level 1 \(ppc\-1\)"\}/i
+      )
+    ).toBeInTheDocument();
   });
 });

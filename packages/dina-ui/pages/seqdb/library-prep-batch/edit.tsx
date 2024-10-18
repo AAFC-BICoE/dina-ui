@@ -16,16 +16,21 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { useFormikContext } from "formik";
+import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
 import { cloneDeep } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { GroupSelectField, Head, Nav } from "../../../components";
-import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { Protocol } from "../../../types/collection-api";
 import {
-  ContainerType,
+  Footer,
+  GroupSelectField,
+  Head,
+  Nav,
+  StorageUnitSelectField
+} from "../../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
+import { Protocol, StorageUnitType } from "../../../types/collection-api";
+import {
   IndexSet,
   LibraryPrepBatch,
   Product,
@@ -36,7 +41,8 @@ export function useLibraryPrepBatchQuery(id?: string, deps?: any[]) {
   return useQuery<LibraryPrepBatch>(
     {
       path: `seqdb-api/library-prep-batch/${id}`,
-      include: "containerType,product,protocol,thermocyclerProfile"
+      include:
+        "product,protocol,thermocyclerProfile,storageUnit,storageUnitType,indexSet"
     },
     { disabled: !id, deps }
   );
@@ -58,23 +64,26 @@ export default function LibraryPrepBatchEditPage() {
   }
 
   return (
-    <main className="container-fluid">
+    <>
       <Head title={formatMessage(title)} />
       <Nav />
-      <h1 id="wb-cont">
-        <SeqdbMessage id={title} />
-      </h1>
-      {id ? (
-        withResponse(resourceQuery, ({ data: libraryPrepBatchData }) => (
-          <LibraryPrepBatchForm
-            libraryPrepBatch={libraryPrepBatchData}
-            onSaved={moveToViewPage}
-          />
-        ))
-      ) : (
-        <LibraryPrepBatchForm onSaved={moveToViewPage} />
-      )}
-    </main>
+      <main className="container-fluid">
+        <h1 id="wb-cont">
+          <SeqdbMessage id={title} />
+        </h1>
+        {id ? (
+          withResponse(resourceQuery, ({ data: libraryPrepBatchData }) => (
+            <LibraryPrepBatchForm
+              libraryPrepBatch={libraryPrepBatchData}
+              onSaved={moveToViewPage}
+            />
+          ))
+        ) : (
+          <LibraryPrepBatchForm onSaved={moveToViewPage} />
+        )}
+      </main>
+      <Footer />
+    </>
   );
 }
 
@@ -90,12 +99,16 @@ export function LibraryPrepBatchForm({
   libraryPrepBatch,
   onSaved,
   buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={libraryPrepBatch?.id}
-        entityLink="/seqdb/library-prep-batch"
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={libraryPrepBatch?.id}
+          entityLink="/seqdb/library-prep-batch"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   ),
   readOnlyOverride
@@ -115,44 +128,71 @@ export function LibraryPrepBatchForm({
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
-    if (submittedValues.containerType) {
-      (submittedValues as any).relationships.containerType = {
-        data: {
-          id: submittedValues.containerType.id,
-          type: "container-type"
-        }
+    // Storage unit type is not stored, used to help filter the storage unit dropdown.
+    delete submittedValues.storageUnitType;
+    if (submittedValues.storageUnit) {
+      (submittedValues as any).relationships.storageUnit = {
+        data:
+          submittedValues.storageUnit.id !== null
+            ? {
+                id: submittedValues.storageUnit.id,
+                type: "storage-unit"
+              }
+            : null
       };
-      delete submittedValues.containerType;
+      delete submittedValues.storageUnit;
     }
 
     if (submittedValues.product) {
       (submittedValues as any).relationships.product = {
-        data: {
-          id: submittedValues.product.id,
-          type: "product"
-        }
+        data:
+          submittedValues.product.id !== null
+            ? {
+                id: submittedValues.product.id,
+                type: "product"
+              }
+            : null
       };
       delete submittedValues.product;
     }
 
     if (submittedValues.protocol) {
       (submittedValues as any).relationships.protocol = {
-        data: {
-          id: submittedValues.protocol.id,
-          type: "protocol"
-        }
+        data:
+          submittedValues.protocol.id !== null
+            ? {
+                id: submittedValues.protocol.id,
+                type: "protocol"
+              }
+            : null
       };
       delete submittedValues.protocol;
     }
 
     if (submittedValues.thermocyclerProfile) {
       (submittedValues as any).relationships.thermocyclerProfile = {
-        data: {
-          id: submittedValues.thermocyclerProfile.id,
-          type: "thermocycler-profile"
-        }
+        data:
+          submittedValues.thermocyclerProfile.id !== null
+            ? {
+                id: submittedValues.thermocyclerProfile.id,
+                type: "thermocycler-profile"
+              }
+            : null
       };
       delete submittedValues.thermocyclerProfile;
+    }
+
+    if (submittedValues.indexSet) {
+      (submittedValues as any).relationships.indexSet = {
+        data:
+          submittedValues.indexSet.id !== null
+            ? {
+                id: submittedValues.indexSet.id,
+                type: "index-set"
+              }
+            : null
+      };
+      delete submittedValues.indexSet;
     }
 
     const [savedResource] = await save<LibraryPrepBatch>(
@@ -203,8 +243,27 @@ export function LoadExternalDataForLibraryPrepBatchForm({
 
 /** Re-usable field layout between edit and view pages. */
 function LibraryPrepBatchFormFields() {
-  const { readOnly, initialValues } = useDinaFormContext();
+  const { readOnly } = useDinaFormContext();
   const { values } = useFormikContext<any>();
+
+  // When the storage unit type is changed, the storage unit needs to be cleared.
+  const StorageUnitTypeSelectorComponent = connect(
+    ({ formik: { setFieldValue } }) => {
+      return (
+        <ResourceSelectField<StorageUnitType>
+          className="col-md-6"
+          name="storageUnitType"
+          filter={filterBy(["name"])}
+          model="collection-api/storage-unit-type"
+          optionLabel={(storageUnitType) => `${storageUnitType.name}`}
+          readOnlyLink="/collection/storage-unit-type/view?id="
+          onChange={() => {
+            setFieldValue("storageUnit.id", null);
+          }}
+        />
+      );
+    }
+  );
 
   return (
     <div>
@@ -242,12 +301,24 @@ function LibraryPrepBatchFormFields() {
           model="collection-api/protocol"
           optionLabel={(protocol) => protocol.name}
         />
-        <ResourceSelectField<ContainerType>
-          className="col-md-6"
-          name="containerType"
-          filter={filterBy(["name"])}
-          model="seqdb-api/container-type"
-          optionLabel={(ct) => ct.name}
+        {!readOnly && <StorageUnitTypeSelectorComponent />}
+        <StorageUnitSelectField
+          resourceProps={{
+            name: "storageUnit",
+            filter: filterBy(["name"], {
+              extraFilters: values?.storageUnitType?.id
+                ? [
+                    {
+                      selector: "storageUnitType.uuid",
+                      comparison: "==",
+                      arguments: values?.storageUnitType?.id ?? ""
+                    }
+                  ]
+                : undefined
+            }),
+            isDisabled: !values?.storageUnitType?.id,
+            className: "col-md-6"
+          }}
         />
         <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
@@ -263,6 +334,7 @@ function LibraryPrepBatchFormFields() {
           filter={filterBy(["name"])}
           model="seqdb-api/index-set"
           optionLabel={(set) => set.name}
+          readOnlyLink="/seqdb/index-set/view?id="
         />
         <NumberField className="col-md-6" name="totalLibraryYieldNm" />
         <TextField className="col-md-6" name="yieldNotes" multiLines={true} />

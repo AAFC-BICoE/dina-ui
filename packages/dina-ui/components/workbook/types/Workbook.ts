@@ -2,9 +2,10 @@ import { InputResource, KitsuResource } from "kitsu";
 import { WorkbookDataTypeEnum } from "./WorkbookDataTypeEnum";
 
 export enum LinkOrCreateSetting {
-  LINK = "LINK", // Find the existing object then set to relationships
+  LINK = "LINK", // Find the existing object then set to relationships. It will ignore if not found.
   CREATE = "CREATE", // Create a new object then set to relationships
-  LINK_OR_CREATE = "LINK_OR_CREATE" // Try to find an existing object, if not found, then create one, then set to relationships
+  LINK_OR_CREATE = "LINK_OR_CREATE", // Try to find an existing object, if not found, then create one, then set to relationships
+  LINK_OR_ERROR = "LINK_OR_ERROR" // Try to find an existing object, if not found, then throw an new error
 }
 
 /**
@@ -39,6 +40,7 @@ export interface PrimitiveField {
     | WorkbookDataTypeEnum.NUMBER
     | WorkbookDataTypeEnum.BOOLEAN
     | WorkbookDataTypeEnum.STRING
+    | WorkbookDataTypeEnum.STRING_COORDINATE
     | WorkbookDataTypeEnum.DATE
     | WorkbookDataTypeEnum.STRING_ARRAY
     | WorkbookDataTypeEnum.NUMBER_ARRAY
@@ -47,11 +49,13 @@ export interface PrimitiveField {
 
 export interface ManagedAttributeField {
   dataType: WorkbookDataTypeEnum.MANAGED_ATTRIBUTES;
+  managedAttributeComponent: string;
+  endpoint: string;
 }
 
 export interface VocabularyField {
   dataType: WorkbookDataTypeEnum.VOCABULARY;
-  vocabularyEndpoint: string;
+  endpoint: string;
 }
 
 export interface ObjectField {
@@ -66,11 +70,16 @@ export interface ObjectField {
   };
 }
 
+export interface ClassificationType {
+  dataType: WorkbookDataTypeEnum.CLASSIFICATION;
+}
+
 export type FieldConfigType =
   | PrimitiveField
   | VocabularyField
   | ManagedAttributeField
-  | ObjectField;
+  | ObjectField
+  | ClassificationType;
 
 export type WorkbookResourceType = InputResource<
   KitsuResource & {
@@ -95,13 +104,29 @@ export interface WorkbookColumnMap {
   [columnName: string]: // columnName in the spreadsheet
   {
     fieldPath?: string; // Mapped fieldPath in the configuration
+    originalColumnName: string;
+    showOnUI: boolean;
     mapRelationship: boolean; // If relationship mapping needed.
     numOfUniqueValues: number;
     valueMapping: {
-      [value: string]: {
-        id: string;
-        type: string;
-      };
+      [value: string]:
+        | {
+            id: string;
+            type: string;
+          }
+        | {
+            key: string;
+            name?: string;
+          };
+    };
+  };
+}
+
+export interface RelationshipMapping {
+  [columnHeader: string]: {
+    [value: string]: {
+      id: string;
+      type: string;
     };
   };
 }

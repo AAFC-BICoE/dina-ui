@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   Protocol,
   ProtocolData,
@@ -10,6 +10,7 @@ import styles from "./SeqProtocolReactionTable.module.css";
 import { SeqReaction } from "packages/dina-ui/types/seqdb-api";
 import classNames from "classnames";
 import useVocabularyOptions from "../../collection/useVocabularyOptions";
+import { ErrorBanner } from "../../error/ErrorBanner";
 
 /**
  * JavaScript has an issue that 0.1 + 0.2 = 0.30000000000000004
@@ -28,12 +29,14 @@ export function SeqProtocolReactionTable({
   protocol?: Protocol;
   seqReactions?: SeqReaction[];
 }) {
+  const { formatMessage } = useDinaIntl();
+  const unitMismatchComponents = useRef<string[]>([]);
   const { vocabOptions: unitsOfMeasurement } = useVocabularyOptions({
-    path: "collection-api/vocabulary/unitsOfMeasurement"
+    path: "collection-api/vocabulary2/unitsOfMeasurement"
   });
 
   const { vocabOptions: protocolData } = useVocabularyOptions({
-    path: "collection-api/vocabulary/protocolData"
+    path: "collection-api/vocabulary2/protocolData"
   });
 
   const primerRxnsNumber = useMemo<{
@@ -100,14 +103,22 @@ export function SeqProtocolReactionTable({
       concentration: string | null;
       ulRxn: number | null;
     }[] = [];
+    const unitMismatches: string[] = [];
     for (const pd of pdArray ?? []) {
       const ulRxn = convertNumber(
-        pd.protocolDataElement?.find(
-          (pde) =>
+        pd.protocolDataElement?.find((pde) => {
+          if (
             pde.elementType === "quantity" &&
             pde.unit === ProtocolDataUnitEnum.UL_RXN
-        )?.value ?? ""
+          ) {
+            return true;
+          } else {
+            unitMismatches.push(findProtocolLabel(pd.key));
+            return false;
+          }
+        })?.value ?? ""
       );
+
       const concentrationElement = pd.protocolDataElement?.find(
         (pde) => pde.elementType === "concentration"
       );
@@ -121,11 +132,19 @@ export function SeqProtocolReactionTable({
         ulRxn
       });
     }
+    unitMismatchComponents.current = unitMismatches;
     return result;
   }
 
   return (
     <>
+      {unitMismatchComponents.current.length > 0 && (
+        <ErrorBanner
+          errorMessage={formatMessage("unitMismatchComponents", {
+            components: unitMismatchComponents.current.join(", ")
+          })}
+        />
+      )}
       <table className={classNames("mb-3", styles.primer)}>
         <tbody>
           <tr>

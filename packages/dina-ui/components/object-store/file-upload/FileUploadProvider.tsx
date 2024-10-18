@@ -12,6 +12,7 @@ export interface UploadFileParams {
   files: IFileWithMeta[];
   group: string;
   isDerivative?: boolean;
+  isReportTemplate?: boolean;
 }
 
 const FileUploadContext = createContext<FileUploadContextI | null>(null);
@@ -31,12 +32,23 @@ export function FileUploadProviderImpl({ children }) {
   const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useDinaIntl();
 
-  async function uploadFiles({ files, group, isDerivative }: UploadFileParams) {
+  async function uploadFiles({
+    files,
+    group,
+    isDerivative,
+    isReportTemplate
+  }: UploadFileParams) {
     const uploadRespsT: ObjectUpload[] = [];
     for (const { file } of files) {
       // Wrap the file in a FormData:
       const formData = new FormData();
-      formData.append("file", file);
+
+      if (isReportTemplate) {
+        const blob = file?.slice(0, file?.size, "text/x-freemarker-template");
+        formData.append("file", blob, file?.name);
+      } else {
+        formData.append("file", file);
+      }
 
       // Upload the file:
       const response = await apiClient.axios.post(

@@ -3,6 +3,14 @@ import { KitsuResource } from "kitsu";
 import { isEmpty, reject, uniq, compact } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { TableColumn } from "../../types";
+import {
+  SupportedBetweenTypes,
+  convertStringToBetweenState
+} from "../query-builder-core-components/useQueryBetweenSupport";
+import {
+  buildDateRangeObject,
+  getTimezone
+} from "../query-builder-value-types/QueryBuilderDateSearch";
 
 export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
   /**
@@ -192,80 +200,82 @@ export function applySortingRules<TData extends KitsuResource>(
   columns: TableColumn<TData>[]
 ) {
   if (sortingRules && sortingRules.length > 0) {
-    const sortingQueries = compact(sortingRules.map((columnSort) => {
-      const columnDefinition = columns.find((column) => {
-        // Depending on if it's a string or not.
-        if (typeof column === "string") {
-          return column === columnSort.id;
+    const sortingQueries = compact(
+      sortingRules.map((columnSort) => {
+        const columnDefinition = columns.find((column) => {
+          // Depending on if it's a string or not.
+          if (typeof column === "string") {
+            return column === columnSort.id;
+          }
+
+          // Otherwise, check if sorting is enabled for the column and matches.
+          if (column.enableSorting !== false) {
+            if (column.id) {
+              return column.id === columnSort.id;
+            } else {
+              return (column as any).accessorKey.endsWith(columnSort.id);
+            }
+          }
+          return false;
+        });
+
+        // Edge case for when strings are only provided for the column definition.
+        if (typeof columnDefinition === "string") {
+          return {
+            [columnDefinition]: {
+              order: columnSort.desc ? "desc" : "asc"
+            }
+          };
         }
 
-        // Otherwise, check if sorting is enabled for the column and matches.
-        if (column.enableSorting !== false) {
-          if (column.id) {
-            return column.id === columnSort.id;
-          } else {
-            return (column as any).accessorKey.endsWith(columnSort.id);
-          }
+        if (
+          !columnDefinition ||
+          (!(columnDefinition as any)?.accessorKey &&
+            !(columnDefinition as any)?.accessorFn)
+        ) {
+          return;
         }
-        return false;
-      });
 
-      // Edge case for when strings are only provided for the column definition.
-      if (typeof columnDefinition === "string") {
-        return {
-          [columnDefinition]: {
-            order: columnSort.desc ? "desc" : "asc"
-          }
-        };
-      }
+        let accessor: string | null = null;
+        if (!!(columnDefinition as any)?.accessorKey) {
+          accessor = (columnDefinition as any)?.accessorKey;
+        } else if (!!(columnDefinition as any)?.accessorFn) {
+          accessor = (columnDefinition as any)?.accessorFn();
+        }
 
-      if (
-        !columnDefinition ||
-        (!(columnDefinition as any)?.accessorKey &&
-          !(columnDefinition as any)?.accessorFn)
-      ) {
-        return;
-      }
+        if (!accessor) {
+          return;
+        }
 
-      let accessor: string | null = null;
-      if (!!(columnDefinition as any)?.accessorKey) {
-        accessor = (columnDefinition as any)?.accessorKey;
-      } else if (!!(columnDefinition as any)?.accessorFn) {
-        accessor = (columnDefinition as any)?.accessorFn();
-      }
+        const indexPath =
+          accessor +
+          (columnDefinition.isKeyword && columnDefinition.isKeyword === true
+            ? ".keyword"
+            : "");
 
-      if (!accessor) {
-        return;
-      }
-
-      const indexPath =
-        accessor +
-        (columnDefinition.isKeyword && columnDefinition.isKeyword === true
-          ? ".keyword"
-          : "");
-
-      if (columnDefinition.relationshipType) {
-        return {
-          [indexPath]: {
-            order: columnSort.desc ? "desc" : "asc",
-            nested: {
-              path: "included",
-              filter: {
-                term: {
-                  "included.type": columnDefinition.relationshipType
+        if (columnDefinition.relationshipType) {
+          return {
+            [indexPath]: {
+              order: columnSort.desc ? "desc" : "asc",
+              nested: {
+                path: "included",
+                filter: {
+                  term: {
+                    "included.type": columnDefinition.relationshipType
+                  }
                 }
               }
             }
-          }
-        };
-      } else {
-        return {
-          [indexPath]: {
-            order: columnSort.desc ? "desc" : "asc"
-          }
-        };
-      }
-    }));
+          };
+        } else {
+          return {
+            [indexPath]: {
+              order: columnSort.desc ? "desc" : "asc"
+            }
+          };
+        }
+      })
+    );
 
     // Add all of the queries to the existing elastic search query.
     if (!isEmpty(sortingQueries)) {
@@ -299,6 +309,7 @@ export function applySourceFiltering<TData extends KitsuResource>(
   const sourceFilteringColumns: string[] = [
     "data.id",
     "data.type",
+    "data.relationships",
     ...columns
       .map((column) => {
         const accessors: string[] = [];
@@ -398,6 +409,65 @@ export function applyRootQuery(elasticSearchQuery: any) {
   };
 }
 
+/**
+ * This function is responsible for taking the elastic search results can converting it to something
+ * the display table can read.
+ *
+ * The included section will be added as an object unless it's a to-many relationship, then it's
+ * transfered to an array.
+ *
+ * @param results Elasticsearch JSON result
+ */
+export function processResults(result: any) {
+  return result?.hits.map((rslt) => {
+    return {
+      id: rslt._source?.data?.id,
+      type: rslt._source?.data?.type,
+      data: {
+        attributes: rslt._source?.data?.attributes,
+        relationships: rslt._source?.data?.relationships
+      },
+      included: rslt._source?.included?.reduce(
+        (includedAccumulator, currentIncluded) => {
+          const relationships = rslt._source?.data?.relationships ?? {};
+          const currentID = currentIncluded?.id;
+          const relationshipKeys = Object.keys(relationships).filter((key) => {
+            const relationshipData = relationships[key].data;
+            return Array.isArray(relationshipData)
+              ? relationshipData.some((item) => item.id === currentID)
+              : relationshipData?.id === currentID;
+          });
+
+          relationshipKeys.forEach((key) => {
+            if (!includedAccumulator[key]) {
+              // No found before, treat it as an object.
+              includedAccumulator[key] = currentIncluded;
+            } else {
+              // Found again, treat it as an array.
+              if (
+                typeof includedAccumulator[key] !== "object" ||
+                !Array.isArray(includedAccumulator[key])
+              ) {
+                // Convert it to an array from an object.
+                includedAccumulator[key] = [
+                  includedAccumulator[key],
+                  currentIncluded
+                ];
+              } else {
+                // Already an array, push the new one into it.
+                includedAccumulator[key].push(currentIncluded);
+              }
+            }
+          });
+
+          return includedAccumulator;
+        },
+        {}
+      )
+    };
+  });
+}
+
 // If it's a relationship search, ensure that the included type is being filtered out.
 export function includedTypeQuery(parentType: string): any {
   return {
@@ -424,102 +494,186 @@ export function termQuery(
 export function inQuery(
   fieldName: string,
   matchValues: string,
-  parentType: string | undefined,  
+  parentType: string | undefined,
   keywordMultiFieldSupport: boolean,
   not: boolean
 ): any {
   const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
-      .map(value => value.trim());
+    .map((value) => value.trim())
+    .filter((value) => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
 
   return parentType
-  ? {
-      nested: {
-        path: "included",
-        query: {
-          bool: {
-            must: [
-              {
-                bool: {
-                  [not ? "must_not" : "must"]: {
-                    terms: {
-                      [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValuesArray
-                    }        
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    [not ? "must_not" : "must"]: {
+                      terms: {
+                        [fieldName +
+                        (keywordMultiFieldSupport ? ".keyword" : "")]:
+                          matchValuesArray
+                      }
+                    }
                   }
-                }
-              },
-              includedTypeQuery(parentType)
-            ]
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
           }
         }
       }
-    } : {
-    bool: {
-      [not ? "must_not" : "must"]: {
-        terms: {
-          [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValuesArray
-        }        
-      }
-    }
-  };
+    : {
+        bool: {
+          [not ? "must_not" : "must"]: {
+            terms: {
+              [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]:
+                matchValuesArray
+            }
+          }
+        }
+      };
 }
 
 // Multi-search exact matches (case-insensitive) (in/not in)
 export function inTextQuery(
   fieldName: string,
   matchValues: string,
-  parentType: string | undefined,  
+  parentType: string | undefined,
   keywordMultiFieldSupport: boolean,
   not: boolean
 ): any {
   const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
-      .map(value => value.trim());
+    .map((value) => value.trim())
+    .filter((value) => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
 
   return parentType
-  ? {
-      nested: {
-        path: "included",
-        query: {
-          bool: {
-            must: [
-              {
-                bool: {
-                  [not ? "must_not" : "must"]: {
-                    bool: {
-                      should: matchValuesArray.map(value => ({
-                        term: {
-                          [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
-                            value: value,
-                            case_insensitive: true
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    [not ? "must_not" : "must"]: {
+                      bool: {
+                        should: matchValuesArray.map((value) => ({
+                          term: {
+                            [fieldName +
+                            (keywordMultiFieldSupport ? ".keyword" : "")]: {
+                              value,
+                              case_insensitive: true
+                            }
                           }
-                        }
-                      })),
-                      minimum_should_match: 1                      
+                        })),
+                        minimum_should_match: 1
+                      }
                     }
                   }
-                }
-              },
-              includedTypeQuery(parentType)
-            ]
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
           }
         }
       }
-    } : {
-      bool: {
-        [not ? "must_not" : "must"]: {
-          bool: {
-            should: matchValuesArray.map(value => ({
-              term: {
-                [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
-                  value: value,
-                  case_insensitive: true
+    : {
+        bool: {
+          [not ? "must_not" : "must"]: {
+            bool: {
+              should: matchValuesArray.map((value) => ({
+                term: {
+                  [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
+                    value,
+                    case_insensitive: true
+                  }
                 }
-              }
-            })),
-            minimum_should_match: 1
+              })),
+              minimum_should_match: 1
+            }
+          }
+        }
+      };
+}
+
+// Multi-search exact date matches (case-insensitive) (in/not in)
+export function inDateQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,
+  subType: string | undefined,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+    .map((value) => value.trim())
+    .filter((value) => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    [not ? "must_not" : "must"]: [
+                      {
+                        bool: {
+                          should: matchValuesArray.map((value) => ({
+                            bool: {
+                              must: [
+                                rangeQuery(
+                                  fieldName,
+                                  buildDateRangeObject("equals", value, subType)
+                                ),
+                                includedTypeQuery(parentType)
+                              ]
+                            }
+                          })),
+                          minimum_should_match: 1
+                        }
+                      }
+                    ]
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
           }
         }
       }
-    };
+    : {
+        bool: {
+          [not ? "must_not" : "must"]: {
+            bool: {
+              should: matchValuesArray.map((value) => {
+                return rangeQuery(
+                  fieldName,
+                  buildDateRangeObject("equals", value, subType)
+                );
+              }),
+              minimum_should_match: 1
+            }
+          }
+        }
+      };
 }
 
 // Query used for wildcard searches (contains).
@@ -577,14 +731,16 @@ export function inRangeQuery(
               must: [
                 {
                   bool: {
-                    [not ? "should_not" : "should"]: matchValuesArray.map((date) => ({
-                      range: {
-                        [fieldName]: {
-                          gte: date,
-                          lte: date
+                    [not ? "should_not" : "should"]: matchValuesArray.map(
+                      (date) => ({
+                        range: {
+                          [fieldName]: {
+                            gte: date,
+                            lte: date
+                          }
                         }
-                      }
-                    }))
+                      })
+                    )
                   }
                 },
                 includedTypeQuery(parentType)
@@ -749,4 +905,77 @@ export function uuidQuery(uuids: string[]) {
       }
     }
   };
+}
+
+/**
+ * Generate a range query for getting all the values between two numbers.
+ *
+ * @param fieldName Fieldname path for the elastic search query.
+ * @param value String containing the low and high values represented as a JSON.
+ * @param parentType Determines if the query should be nested or not.
+ * @param type If being done on a text field, a specific field should be used. (keyword_numeric)
+ * @param subType Only applicable for date type, determines if timezone should be included or not.
+ */
+export function betweenQuery(
+  fieldName: string,
+  value: string,
+  parentType: string | undefined,
+  type: SupportedBetweenTypes,
+  subType?: string | undefined
+) {
+  const betweenStates = convertStringToBetweenState(value);
+
+  // Ignore empty between dates.
+  if (betweenStates.high === "" || betweenStates.low === "") {
+    return {};
+  }
+
+  const timezone =
+    type === "date"
+      ? subType !== "local_date" && subType !== "local_date_time"
+        ? getTimezone()
+        : undefined
+      : undefined;
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  range: {
+                    [fieldName + (type === "text" ? ".keyword_numeric" : "")]: {
+                      ...timezone,
+                      gte:
+                        type === "number"
+                          ? Number(betweenStates.low)
+                          : betweenStates.low,
+                      lte:
+                        type === "number"
+                          ? Number(betweenStates.high)
+                          : betweenStates.high
+                    }
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        range: {
+          [fieldName + (type === "text" ? ".keyword_numeric" : "")]: {
+            ...timezone,
+            gte:
+              type === "number" ? Number(betweenStates.low) : betweenStates.low,
+            lte:
+              type === "number"
+                ? Number(betweenStates.high)
+                : betweenStates.high
+          }
+        }
+      };
 }

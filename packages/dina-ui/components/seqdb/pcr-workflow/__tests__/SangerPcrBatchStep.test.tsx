@@ -80,17 +80,13 @@ describe("SangerPcrBatchStep component", () => {
     wrapper.update();
 
     expect(mockOnSaved).lastCalledWith(1, {
-      createdBy: "test-user",
-      id: "11111111-1111-1111-1111-111111111111",
-      name: PCR_BATCH_NAME,
       storageUnit: {
         id: null,
         type: "storage-unit"
       },
-      storageUnitType: {
-        id: null,
-        type: "storage-unit-type"
-      },
+      createdBy: "test-user",
+      id: "11111111-1111-1111-1111-111111111111",
+      name: PCR_BATCH_NAME,
       relationships: {
         attachment: {
           data: []
@@ -153,19 +149,15 @@ describe("SangerPcrBatchStep component", () => {
     wrapper.update();
 
     expect(mockOnSaved).lastCalledWith(1, {
+      storageUnit: {
+        id: null,
+        type: "storage-unit"
+      },
       createdBy: "test-user",
       id: "11111111-1111-1111-1111-111111111111",
       name: PCR_BATCH_NAME,
       isCompleted: false,
       objective: "test-objective",
-      storageUnit: {
-        id: null,
-        type: "storage-unit"
-      },
-      storageUnitType: {
-        id: null,
-        type: "storage-unit-type"
-      },
       relationships: {
         attachment: {
           data: []

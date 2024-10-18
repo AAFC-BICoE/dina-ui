@@ -242,9 +242,10 @@ function usePromptToDeleteEmptyStorage() {
     const hasChildSamples = !!(
       await apiClient.get<MaterialSample[]>("collection-api/material-sample", {
         filter: {
-          rsql: `storageUnit.uuid==${storageId}${currentContentFilter}`
+          rsql: `storageUnitUsage.storageUnit.uuid==${storageId}${currentContentFilter}`
         },
-        page: { limit: 1 }
+        page: { limit: 1 },
+        include: "storageUnitUsage"
       })
     ).data.length;
 

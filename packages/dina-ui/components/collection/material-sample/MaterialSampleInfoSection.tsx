@@ -5,6 +5,7 @@ import {
   FieldSet,
   FieldSpy,
   TextField,
+  ToggleField,
   useDinaFormContext
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../..//intl/dina-ui-intl";
@@ -15,6 +16,8 @@ import {
 import { Vocabulary } from "../../../types/collection-api";
 import { MaterialSampleStateReadOnlyRender } from "../MaterialSampleStateWarning";
 import { find, compact } from "lodash";
+import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
+import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 
 export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
   "materialSampleRemarks",
@@ -22,10 +25,16 @@ export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
   "materialSampleType"
 ];
 
-export function MaterialSampleInfoSection({ id }: { id?: string }) {
+export function MaterialSampleInfoSection({
+  id,
+  visibleManagedAttributeKeys
+}: {
+  id?: string;
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
+}) {
   const { locale, formatMessage } = useDinaIntl();
 
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, isTemplate } = useDinaFormContext();
 
   const onMaterialSampleStateChanged = (form, _name, value) => {
     if (value === "") {
@@ -46,7 +55,7 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
           <ControlledVocabularySelectField
             name="materialSampleType"
             query={() => ({
-              path: "collection-api/vocabulary/materialSampleType"
+              path: "collection-api/vocabulary2/materialSampleType"
             })}
           />
           {!readOnly ? (
@@ -54,7 +63,7 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
               name="materialSampleState"
               jsonApiBackend={{
                 query: () => ({
-                  path: "collection-api/vocabulary/materialSampleState"
+                  path: "collection-api/vocabulary2/materialSampleState"
                 }),
                 option: (vocabElement) =>
                   compact(
@@ -77,6 +86,12 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
           )}
         </div>
         <div className="col-md-6">
+          {!isTemplate && (
+            <ToggleField
+              name="isBaseForSplitByType"
+              disableTemplateCheckbox={true}
+            />
+          )}
           <TextField name="materialSampleRemarks" multiLines={true} />
         </div>
       </div>
@@ -100,6 +115,23 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
             ) : null
           }
         </FieldSpy>
+      )}
+      {readOnly && (
+        <div className="row">
+          <div className="col-md-12">
+            <ManagedAttributesEditor
+              valuesPath="managedAttributes"
+              managedAttributeApiPath="collection-api/managed-attribute"
+              managedAttributeComponent="MATERIAL_SAMPLE"
+              fieldSetProps={{
+                id,
+                legend: <DinaMessage id="materialSampleManagedAttributes" />
+              }}
+              managedAttributeOrderFieldName="managedAttributesOrder"
+              visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
+            />
+          </div>
+        </div>
       )}
     </FieldSet>
   );

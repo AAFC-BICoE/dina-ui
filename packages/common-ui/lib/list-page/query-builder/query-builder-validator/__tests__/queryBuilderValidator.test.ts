@@ -11,6 +11,7 @@ const testIndexMap: ESIndexMapping[] = [
     distinctTerm: false,
     endsWithSupport: false,
     keywordMultiFieldSupport: true,
+    keywordNumericSupport: false,
     label: "dwcRecordNumber",
     optimizedPrefix: false,
     parentName: "collectingEvent",

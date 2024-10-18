@@ -5,7 +5,7 @@ import { MultilingualDescription } from "../../common";
 export interface ManagedAttributeAttributes<TComponent = string> {
   type: "managed-attribute";
   name: string;
-  vocabularyElementType: string;
+  vocabularyElementType: VocabularyElementType;
   unit?: string;
   managedAttributeComponent?: TComponent;
   acceptedValues?: string[] | null;
@@ -25,10 +25,11 @@ export type VocabularyElementType =
   | "BOOL";
 
 export const COLLECTION_MODULE_TYPES = [
-  "COLLECTING_EVENT",
-  "MATERIAL_SAMPLE",
-  "DETERMINATION",
   "ASSEMBLAGE",
+  "COLLECTING_EVENT",
+  "DETERMINATION",
+  "MATERIAL_SAMPLE",
+  "ORGANISM",
   "PREPARATION"
 ] as const;
 export type CollectionModuleType = typeof COLLECTION_MODULE_TYPES[number];
@@ -36,10 +37,11 @@ export const COLLECTION_MODULE_TYPE_LABELS: Record<
   CollectionModuleType,
   string
 > = {
-  COLLECTING_EVENT: "collectingEvent",
-  MATERIAL_SAMPLE: "materialSample",
-  DETERMINATION: "determination",
   ASSEMBLAGE: "assemblage",
+  COLLECTING_EVENT: "collectingEvent",
+  DETERMINATION: "determination",
+  MATERIAL_SAMPLE: "materialSample",
+  ORGANISM: "organism",
   PREPARATION: "preparation"
 };
 

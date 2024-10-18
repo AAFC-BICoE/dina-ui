@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "../..";
 import { Query, Builder, Utils, JsonTree } from "react-awesome-query-builder";
-import { useCallback } from "react";
+import { createContext, useCallback, useContext } from "react";
 import {
   Config,
   ImmutableTree,
@@ -11,6 +11,28 @@ import { Button } from "react-bootstrap";
 import { SavedSearch } from "../saved-searches/SavedSearch";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { CommonMessage } from "common-ui";
+import { ValidationError } from "./query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+
+export interface QueryBuilderContextI {
+  performSubmit: () => void;
+  groups: string[];
+}
+
+const QueryBuilderContext = createContext<QueryBuilderContextI | null>(null);
+
+export const QueryBuilderContextProvider = QueryBuilderContext.Provider;
+
+/** Exposes the needed features from the query page provider. */
+export function useQueryBuilderContext(): QueryBuilderContextI {
+  const ctx = useContext(QueryBuilderContext);
+  if (!ctx) {
+    throw new Error(
+      "No QueryBuilderContext available, is this component inside of a QueryPage?"
+    );
+  }
+  return ctx;
+}
+
 interface QueryBuilderProps {
   /**
    * Index name being used for the QueryPage.
@@ -72,6 +94,15 @@ interface QueryBuilderProps {
    * to remain the same across tables, it can share the same name.
    */
   uniqueName: string;
+
+  /**
+   * Validation errors reported. This should disable the "Search" button to prevent the user from
+   * submitting a broken query.
+   */
+  validationErrors: ValidationError[];
+
+  // Reference for triggering the search. This helps prevent more searches than necessary.
+  triggerSearch: React.MutableRefObject<boolean>;
 }
 
 function QueryBuilder({
@@ -85,7 +116,9 @@ function QueryBuilder({
   setPageOffset,
   groups,
   setGroups,
-  uniqueName
+  uniqueName,
+  validationErrors,
+  triggerSearch
 }: QueryBuilderProps) {
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryBuilderTree(immutableTree);
@@ -109,42 +142,51 @@ function QueryBuilder({
 
   return (
     <>
-      <label
-        style={{
-          fontSize: 20,
-          fontFamily: "sans-serif",
-          fontWeight: "bold"
-        }}
-        className="mb-2"
+      <QueryBuilderContextProvider
+        value={{ performSubmit: onSubmit, groups: groups ?? [] }}
       >
-        <DinaMessage id="search" />
-      </label>
-      <SavedSearch
-        indexName={indexName}
-        queryBuilderTree={queryBuilderTree}
-        setQueryBuilderTree={setQueryBuilderTree}
-        queryBuilderConfig={queryBuilderConfig}
-        setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-        performSubmit={onSubmit}
-        setPageOffset={setPageOffset}
-        groups={groups}
-        setGroups={setGroups}
-        uniqueName={uniqueName}
-      />
-      <Query
-        {...queryBuilderConfig}
-        value={queryBuilderTree}
-        onChange={onChange}
-        renderBuilder={renderBuilder}
-      />
-      <div className="mt-2">
-        <Button onClick={onSubmit} className="me-2">
+        <label
+          style={{
+            fontSize: 20,
+            fontFamily: "sans-serif",
+            fontWeight: "bold"
+          }}
+          className="mb-2"
+        >
           <DinaMessage id="search" />
-        </Button>
-        <Button onClick={onReset} variant="secondary">
-          <CommonMessage id="resetButtonText" />
-        </Button>
-      </div>
+        </label>
+        <SavedSearch
+          indexName={indexName}
+          queryBuilderTree={queryBuilderTree}
+          setQueryBuilderTree={setQueryBuilderTree}
+          queryBuilderConfig={queryBuilderConfig}
+          setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+          performSubmit={onSubmit}
+          setPageOffset={setPageOffset}
+          groups={groups}
+          setGroups={setGroups}
+          uniqueName={uniqueName}
+          triggerSearch={triggerSearch}
+        />
+        <Query
+          {...queryBuilderConfig}
+          value={queryBuilderTree}
+          onChange={onChange}
+          renderBuilder={renderBuilder}
+        />
+        <div className="mt-2">
+          <Button
+            onClick={onSubmit}
+            className="me-2"
+            disabled={validationErrors.length > 0}
+          >
+            <DinaMessage id="search" />
+          </Button>
+          <Button onClick={onReset} variant="secondary">
+            <CommonMessage id="resetButtonText" />
+          </Button>
+        </div>
+      </QueryBuilderContextProvider>
     </>
   );
 }

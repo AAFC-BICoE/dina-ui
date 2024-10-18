@@ -1,4 +1,4 @@
-import { FieldSpy, useBulkEditTabContext } from "common-ui";
+import { FieldSpy, useBulkEditTabContext, useDinaFormContext } from "common-ui";
 import Switch from "react-switch";
 import { Organism } from "../../../../types/collection-api";
 
@@ -6,6 +6,7 @@ import { Organism } from "../../../../types/collection-api";
 
 export function OrganismsSwitch(props) {
   const bulkTabCtx = useBulkEditTabContext();
+  const { isTemplate } = useDinaFormContext();
 
   return (
     <FieldSpy<Organism[]> fieldName="organism">
@@ -15,7 +16,9 @@ export function OrganismsSwitch(props) {
           onChange={(newVal) => {
             props.onChange?.(newVal);
             if (!bulkTabCtx && newVal && !organism?.length) {
-              setFieldValue("organism", [{}]);
+              setFieldValue("organism", [
+                isTemplate ? { determination: [{}] } : {}
+              ]);
               setFieldValue("organismsQuantity", 1);
             }
           }}

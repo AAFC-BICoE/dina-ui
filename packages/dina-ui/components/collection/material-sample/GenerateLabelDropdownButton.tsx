@@ -1,9 +1,7 @@
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import Dropdown from "react-bootstrap/Dropdown";
 import Button from "react-bootstrap/Button";
 import React, { useState } from "react";
-import { PersistedResource } from "kitsu";
-import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import { ReportTemplate } from "../../../types/dina-export-api";
 import Select from "react-select";
 import { useAccount, useQuery } from "../../../../common-ui/lib";
@@ -12,7 +10,7 @@ import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientCont
 interface ReportTemplateOption {
   label: string;
   value: string;
-  includesBarcode: boolean;
+  includesBarcode?: boolean;
 }
 
 export type CustomMenuProps = {
@@ -23,11 +21,11 @@ export type CustomMenuProps = {
 };
 
 interface GenerateLabelDropdownButtonProps {
-  materialSample: PersistedResource<MaterialSample>;
+  resource: any;
 }
 
 export function GenerateLabelDropdownButton({
-  materialSample
+  resource
 }: GenerateLabelDropdownButtonProps) {
   const [reportTemplate, setReportTemplate] = useState<
     ReportTemplateOption | undefined
@@ -83,13 +81,11 @@ export function GenerateLabelDropdownButton({
             elements: [
               {
                 barcode: {
-                  id: materialSample.barcode ?? "",
-                  content: reportTemplate.includesBarcode
-                    ? materialSample.id
-                    : ""
+                  id: resource.barcode ?? "",
+                  content: reportTemplate.includesBarcode ? resource.id : ""
                 },
                 data: {
-                  attributes: materialSample
+                  attributes: resource
                 }
               }
             ]
@@ -121,9 +117,13 @@ export function GenerateLabelDropdownButton({
         : filePath.substring(filePath.lastIndexOf("/") + 1);
       link?.setAttribute(
         "download",
-        `${materialSample.materialSampleName ?? fileName}_${
-          reportTemplate.label
-        }`
+        `${
+          resource.materialSampleName
+            ? resource.materialSampleName
+            : resource.name
+            ? resource.name
+            : fileName
+        }_${reportTemplate.label}`
       );
       document?.body?.appendChild(link);
       link?.click();

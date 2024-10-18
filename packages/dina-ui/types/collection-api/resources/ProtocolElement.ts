@@ -1,11 +1,7 @@
-import { KitsuResource } from "kitsu";
-import { MultilingualTitle } from "../../common";
+import { TypedVocabulary } from "./TypedVocabularyElement";
 
 export interface ProtocolElementAttributes {
   type: "protocol-element";
-  term?: string;
-  vocabularyElementType?: string;
-  multilingualTitle?: MultilingualTitle;
 }
 
-export type ProtocolElement = KitsuResource & ProtocolElementAttributes;
+export type ProtocolElement = TypedVocabulary & ProtocolElementAttributes;

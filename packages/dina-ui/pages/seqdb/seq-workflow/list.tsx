@@ -50,18 +50,20 @@ export default function SangerWorkflowSequencingListPage() {
   return (
     <div>
       <Head title={formatMessage("sangerWorkflowSequencingListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex">
+          <Link href={`/seqdb/seq-workflow/run`}>
+            <a className="btn btn-primary ms-auto">
+              <SeqdbMessage id="startNewWorkflow" />
+            </a>
+          </Link>
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           {formatMessage("sangerWorkflowSequencingListTitle")}
         </h1>
-        <ButtonBar>
-          <Link href={`/seqdb/seq-workflow/run`}>
-            <a className="btn btn-primary">
-              <SeqdbMessage id="startNewWorkflow" />
-            </a>
-          </Link>
-        </ButtonBar>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             isCompleted: false,

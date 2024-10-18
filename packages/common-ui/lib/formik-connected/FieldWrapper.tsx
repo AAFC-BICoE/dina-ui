@@ -73,6 +73,9 @@ export interface FieldWrapperProps {
   children?:
     | JSX.Element
     | ((renderProps: FieldWrapperRenderProps) => JSX.Element);
+
+  /** Optional flag to make label of the field StartCase. */
+  startCaseLabel?: boolean;
 }
 
 export interface FieldWrapperRenderProps {
@@ -116,7 +119,15 @@ export function FieldWrapper(props: FieldWrapperProps) {
           const visibleManagedAttributes = find(sectionFound.items, {
             name: "managedAttributesOrder"
           })?.defaultValue;
-          return visibleManagedAttributes.includes(
+          return visibleManagedAttributes?.includes(
+            templateCheckboxFieldName ?? name
+          );
+        }
+        if (name.includes("preparationManagedAttributes")) {
+          const visibleManagedAttributes = find(sectionFound.items, {
+            name: "preparationManagedAttributesOrder"
+          })?.defaultValue;
+          return visibleManagedAttributes?.includes(
             templateCheckboxFieldName ?? name
           );
         }
@@ -171,7 +182,8 @@ function LabelWrapper({
     tooltipImageAlt,
     tooltipLink,
     tooltipLinkText,
-    disableTemplateCheckbox
+    disableTemplateCheckbox,
+    startCaseLabel
   },
   fieldSpyProps: {
     field: { value },
@@ -195,6 +207,7 @@ function LabelWrapper({
       tooltipImageAlt={tooltipImageAlt}
       tooltipLink={tooltipLink}
       tooltipLinkText={tooltipLinkText}
+      startCaseLabel={startCaseLabel}
     />
   );
 

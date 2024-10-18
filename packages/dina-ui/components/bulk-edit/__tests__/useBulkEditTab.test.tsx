@@ -93,16 +93,16 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/managed-attribute":
     case "collection-api/material-sample-type":
     case "collection-api/project":
-    case "collection-api/vocabulary/materialSampleState":
+    case "collection-api/vocabulary2/materialSampleState":
     case "collection-api/preparation-type":
     case "objectstore-api/metadata":
     case "user-api/group":
     case "user-api/user":
     case "collection-api/storage-unit":
     case "collection-api/storage-unit-type":
-    case "collection-api/vocabulary/degreeOfEstablishment":
-    case "collection-api/vocabulary/srs":
-    case "collection-api/vocabulary/coordinateSystem":
+    case "collection-api/vocabulary2/degreeOfEstablishment":
+    case "collection-api/vocabulary2/srs":
+    case "collection-api/vocabulary2/coordinateSystem":
     case "collection-api/form-template":
       return { data: [] };
   }
@@ -240,11 +240,6 @@ describe("Material sample bulk edit tab", () => {
       // Keeps the name and type:
       type: "material-sample",
       materialSampleName: "test-sample",
-      // Adds the Col event:
-      collectingEvent: {
-        id: "11111111-1111-1111-1111-111111111111",
-        type: "collecting-event"
-      },
       // Sets the default association because it's enabled and there are no values set in the other tabs:
       associations: [{}],
       // Sets the default organism because it's enabled and there are no values set in the other tabs:

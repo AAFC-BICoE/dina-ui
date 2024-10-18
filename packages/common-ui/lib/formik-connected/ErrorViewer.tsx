@@ -4,8 +4,12 @@ import { compact, toPairs } from "lodash";
 import { useMemo } from "react";
 import { useFieldLabels } from "../field-header/FieldHeader";
 
+interface ErrorViewProps {
+  customErrorViewerMessage?: (field: string, error: any) => string;
+}
+
 /** Renders the Formik status as an error message. */
-export function ErrorViewer() {
+export function ErrorViewer({ customErrorViewerMessage }: ErrorViewProps) {
   // "status" is the form-level error, and
   // "errors" are the field-level errors.
   const { isSubmitting, errors, status } = useFormikContext();
@@ -32,6 +36,16 @@ export function ErrorViewer() {
           (typeof error !== "string" && typeof error !== "function")
         ) {
           return null;
+        }
+
+        // Check if a custom error viewer is being used.
+        const customErrorView = customErrorViewerMessage?.(field, error);
+        if (customErrorView) {
+          return (
+            <div className="error-message" key={index}>
+              {customErrorView}
+            </div>
+          );
         }
 
         // The error can be a renderable component:

@@ -13,7 +13,7 @@ import { SeqdbMessage } from "../intl/seqdb-intl";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 
 export function Home() {
-  const { isAdmin, rolesPerGroup } = useAccount();
+  const { isAdmin, rolesPerGroup, subject } = useAccount();
 
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
@@ -25,7 +25,7 @@ export function Home() {
       <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
       <Nav />
       <main role="main">
-        <Container fluid={true} className="px-5">
+        <Container fluid={true}>
           {/* Quick create menu */}
           <Card bg="light" className="mb-4">
             <Card.Body>
@@ -73,7 +73,7 @@ export function Home() {
           </Card>
 
           {/* Split page into lg sections */}
-          <Row lg={4} md={2} xs={1} className="mb-5">
+          <Row lg={4} md={2} xs={1}>
             {/* Collection Links */}
             <Col className="mb-4">
               <h2>
@@ -296,11 +296,6 @@ export function Home() {
                     <DinaMessage id="fieldExtensions" />
                   </a>
                 </Link>
-                <Link href="/collection/form-template/list">
-                  <a>
-                    <DinaMessage id="formTemplates" />
-                  </a>
-                </Link>
                 <Link href="/collection/institution/list">
                   <a>
                     <DinaMessage id="institutionListTitle" />
@@ -334,6 +329,39 @@ export function Home() {
               </Stack>
             </Col>
 
+            {/* Configuration Links */}
+            <Col className="mb-4">
+              <h2>
+                <DinaMessage id="dinaConfigurationSectionTitle" />
+              </h2>
+
+              <Stack style={{ display: "inline-flex" }}>
+                <Link href="/collection/form-template/list">
+                  <a>
+                    <DinaMessage id="formTemplates" />
+                  </a>
+                </Link>
+                <Link href="/collection/split-configuration/list">
+                  <a>
+                    <DinaMessage id="splitConfigurationTitle" />
+                  </a>
+                </Link>
+                <Link
+                  href={{
+                    pathname: `/dina-user/view`,
+                    query: {
+                      id: subject,
+                      hideBackButton: true
+                    }
+                  }}
+                >
+                  <a>
+                    <DinaMessage id="userProfile" />
+                  </a>
+                </Link>
+              </Stack>
+            </Col>
+
             {/* Management Links (Only visible to collection managers) */}
             {showManagementNavigation && (
               <Col className="mb-4">
@@ -343,11 +371,18 @@ export function Home() {
 
                 <Stack style={{ display: "inline-flex" }}>
                   {isAdmin && (
-                    <Link href="/dina-user/list">
-                      <a>
-                        <DinaMessage id="userListTitle" />
-                      </a>
-                    </Link>
+                    <>
+                      <Link href="/dina-user/list">
+                        <a>
+                          <DinaMessage id="userListTitle" />
+                        </a>
+                      </Link>
+                      <Link href="/export/report-template/upload">
+                        <a>
+                          <DinaMessage id="reportTemplateUpload" />
+                        </a>
+                      </Link>
+                    </>
                   )}
                 </Stack>
               </Col>

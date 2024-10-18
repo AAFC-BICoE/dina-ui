@@ -16,7 +16,6 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import _ from "lodash";
 import { useRouter } from "next/router";
-import { onValidateSplitConfiguration } from "../../../components/collection/material-sample/SplitConfigurationSection";
 import { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import {
@@ -27,8 +26,7 @@ import {
   getMaterialSampleComponentValues,
   getComponentOrderFromTemplate,
   getComponentValues,
-  getFormTemplateCheckboxes,
-  getSplitConfigurationComponentValues
+  getFormTemplateCheckboxes
 } from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
@@ -51,7 +49,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  SPLIT_CONFIGURATION_COMPONENT_NAME,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
 
@@ -130,10 +128,6 @@ export function FormTemplateEditPageLoaded({
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
 
-  // Get Split Configuration Settings
-  const splitConfigurationInitialValues =
-    getSplitConfigurationComponentValues(fetchedFormTemplate);
-
   const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
 
   // Initial values do not need to contain the components object.
@@ -146,7 +140,6 @@ export function FormTemplateEditPageLoaded({
     ...fetchedFormTemplateWithoutComponents,
     ...allMaterialSampleComponentValues,
     ...formTemplateCheckboxes,
-    ...(splitConfigurationInitialValues ?? {}),
     id,
     type: "form-template"
   };
@@ -156,11 +149,9 @@ export function FormTemplateEditPageLoaded({
     isTemplate: true,
     colEventTemplateInitialValues: collectingEventInitialValues,
     materialSampleTemplateInitialValues: allMaterialSampleComponentValues,
-    colEventFormRef: collectingEvtFormRef,
-    splitConfigurationInitialState: !_.isUndefined(
-      splitConfigurationInitialValues
-    )
+    colEventFormRef: collectingEvtFormRef
   });
+
   const dataComponentState = materialSampleSaveHook.dataComponentState;
 
   async function onSaveTemplateSubmit({
@@ -168,6 +159,9 @@ export function FormTemplateEditPageLoaded({
     submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
     // Get collecting event checkboxes and values
+    submittedValues.parentAttributes = _.compact(
+      submittedValues.parentAttributes
+    );
     const {
       templateCheckboxes: collectingEventCheckboxes,
       ...collectinEventFormRefValues
@@ -224,9 +218,14 @@ export function FormTemplateEditPageLoaded({
                     `collectingEvent.${field.id}`
                   );
                   break;
-                case SPLIT_CONFIGURATION_COMPONENT_NAME:
-                  // Displayed by default. Visibility cannot be configured.
-                  item.visible = true;
+                case IDENTIFIER_COMPONENT_NAME:
+                  if (
+                    field.id === "identifiers" ||
+                    field.id === "dwcOtherCatalogNumbers"
+                  ) {
+                    item.defaultValue = undefined;
+                  }
+                  break;
               }
 
               return item;
@@ -243,48 +242,31 @@ export function FormTemplateEditPageLoaded({
     await onSaved(savedDefinition);
   }
 
-  /**
-   * Validation rules to apply for the form template.
-   */
-  function onValidate(values: FormTemplate & FormTemplateComponents) {
-    // Get switches for validation purposes.
-    const dataComponentsStateMap =
-      getDataComponentsStateMap(dataComponentState);
-
-    let errors: any = {};
-
-    // Split Configuration Validation Checking
-    if (dataComponentsStateMap[SPLIT_CONFIGURATION_COMPONENT_NAME]) {
-      errors = Object.assign(
-        {},
-        errors,
-        onValidateSplitConfiguration(values, errors, formatMessage)
-      );
-    }
-
-    return errors;
-  }
-
   const buttonBarContent = (
     <>
-      <BackButton
-        entityId={id}
-        className="me-auto"
-        entityLink="/collection/form-template"
-        byPassView={true}
-      />
-
-      {id && (
-        <DeleteButton
-          id={id}
-          options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collection/form-template/list"
-          type="form-template"
-          className="me-3"
+      <div className="col-md-6 mt-2">
+        <BackButton
+          entityId={id}
+          className="me-auto"
+          entityLink="/collection/form-template"
+          byPassView={true}
         />
-      )}
+      </div>
 
-      <SubmitButton />
+      <div className="col-md-6 d-flex">
+        <div className="ms-auto" />
+        {id && (
+          <DeleteButton
+            id={id}
+            options={{ apiBaseUrl: "/collection-api" }}
+            postDeleteRedirect="/collection/form-template/list"
+            type="form-template"
+            className="me-2"
+          />
+        )}
+
+        <SubmitButton />
+      </div>
     </>
   );
 
@@ -292,7 +274,6 @@ export function FormTemplateEditPageLoaded({
     <DinaForm<FormTemplate & FormTemplateComponents>
       initialValues={initialValues}
       onSubmit={onSaveTemplateSubmit}
-      validate={onValidate}
     >
       <PageLayout titleId={pageTitle} buttonBarContent={buttonBarContent}>
         {/* Form Template Specific Configuration */}
@@ -358,8 +339,8 @@ export function FormTemplateEditPageLoaded({
 }
 function getDataComponentsStateMap(dataComponentState) {
   const dataComponentEnabledMap = {};
-  dataComponentEnabledMap[SPLIT_CONFIGURATION_COMPONENT_NAME] =
-    dataComponentState.enableSplitConfiguration;
+  dataComponentEnabledMap[SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME] =
+    dataComponentState.enableShowParentAttributes;
   dataComponentEnabledMap[IDENTIFIER_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MATERIAL_SAMPLE_INFO_COMPONENT_NAME] = true;
   dataComponentEnabledMap[ASSOCIATIONS_COMPONENT_NAME] =

@@ -9,8 +9,11 @@ import {
   suffixQuery,
   infixQuery,
   wildcardQuery,
-  inTextQuery
+  inTextQuery,
+  betweenQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
+import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 
 interface QueryRowTextSearchProps {
   /**
@@ -36,19 +39,40 @@ export default function QueryRowTextSearch({
 }: QueryRowTextSearchProps) {
   const { formatMessage } = useIntl();
 
+  const { BetweenElement } = useQueryBetweenSupport({
+    type: "text",
+    matchType,
+    setValue,
+    value
+  });
+
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
+
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {matchType !== "empty" && matchType !== "notEmpty" && (
-        <input
-          type="text"
-          value={value ?? ""}
-          onChange={(newValue) => setValue?.(newValue?.target?.value)}
-          className="form-control"
-          placeholder={matchType !== "in" && matchType !== "notIn" ? formatMessage({
-            id: "queryBuilder_value_text_placeholder"
-          }) : formatMessage({ id: "queryBuilder_value_in_placeholder" })}
-        />
+        <>
+          {matchType === "between" ? (
+            BetweenElement
+          ) : (
+            <input
+              type="text"
+              value={value ?? ""}
+              onChange={(newValue) => setValue?.(newValue?.target?.value)}
+              className="form-control"
+              placeholder={
+                matchType !== "in" && matchType !== "notIn"
+                  ? formatMessage({
+                      id: "queryBuilder_value_text_placeholder"
+                    })
+                  : formatMessage({ id: "queryBuilder_value_in_placeholder" })
+              }
+              onKeyDown={onKeyDown}
+            />
+          )}
+        </>
       )}
     </>
   );
@@ -67,12 +91,8 @@ export function transformTextSearchToDSL({
     return {};
   }
 
-  const {
-    parentType,
-    parentName,
-    optimizedPrefix,
-    keywordMultiFieldSupport
-  } = fieldInfo;
+  const { parentType, parentName, optimizedPrefix, keywordMultiFieldSupport } =
+    fieldInfo;
 
   switch (operation) {
     // Wild card search
@@ -96,7 +116,17 @@ export function transformTextSearchToDSL({
     // Comma-separated search (in/not in)
     case "in":
     case "notIn":
-      return inTextQuery(fieldPath, value, parentType, keywordMultiFieldSupport, operation === "notIn");
+      return inTextQuery(
+        fieldPath,
+        value,
+        parentType,
+        keywordMultiFieldSupport,
+        operation === "notIn"
+      );
+
+    // Between, only supported if the numeric keyword exists.
+    case "between":
+      return betweenQuery(fieldPath, value, parentType, "text");
 
     // Prefix partial match
     case "startsWith":

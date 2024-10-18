@@ -1,5 +1,6 @@
+import { StorageUnit } from "../../../../types/collection-api";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { PcrBatch } from "../../../../types/seqdb-api";
+import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { SangerPcrBatchItemGridStep } from "../pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { noop } from "lodash";
 
@@ -22,16 +23,23 @@ const MATERIAL_SAMPLE_NAME_3 = "Name 3";
 const MATERIAL_SAMPLE_NAME_4 = "Name 4";
 const MATERIAL_SAMPLE_NAME_5 = "Name 5";
 
+const STORAGE_UNIT_USAGE_ID_4 = "storage-unit-usage-4";
+const STORAGE_UNIT_USAGE_ID_5 = "storage-unit-usage-5";
+
 const GRID_ROW_SIZE = 5;
 const GRID_COL_SIZE = 8;
 
-const PCR_BATCH: PcrBatch = {
-  name: "pcr-batch-name",
-  type: "pcr-batch",
-  isCompleted: false,
-  id: PCR_BATCH_ID,
-  storageRestriction: {
-    layout: {
+let STORAGE_UNIT_1: StorageUnit = {
+  id: "storage-unit-1",
+  type: "storage-unit",
+  name: "storage unit 1",
+  group: "aafc",
+  isGeneric: false,
+  storageUnitType: {
+    type: "storage-unit-type",
+    name: "storage unit type 1",
+    group: "aafc",
+    gridLayoutDefinition: {
       numberOfColumns: GRID_COL_SIZE,
       numberOfRows: GRID_ROW_SIZE,
       fillDirection: "BY_COLUMN"
@@ -39,79 +47,103 @@ const PCR_BATCH: PcrBatch = {
   }
 };
 
-const PCR_BATCH_NO_STORAGE: PcrBatch = {
+let STORAGE_UNIT_USAGE_4 = {
+  id: STORAGE_UNIT_USAGE_ID_4,
+  type: "storage-unit-usage",
+  wellColumn: 1,
+  wellRow: "A"
+};
+let STORAGE_UNIT_USAGE_5 = {
+  id: STORAGE_UNIT_USAGE_ID_5,
+  type: "storage-unit-usage",
+  wellColumn: 2,
+  wellRow: "A"
+};
+
+let PCR_BATCH: PcrBatch & { gridLayoutDefinition?: any } = {
+  name: "pcr-batch-name",
+  type: "pcr-batch",
+  isCompleted: false,
+  id: PCR_BATCH_ID,
+  storageUnit: STORAGE_UNIT_1 as any
+};
+
+let PCR_BATCH_NO_STORAGE: PcrBatch = {
   name: "pcr-batch-name",
   type: "pcr-batch",
   isCompleted: false,
   id: PCR_BATCH_ID
 };
 
+let PCR_BATCH_ITEMS: PcrBatchItem[] = [
+  {
+    id: PCR_BATCH_ITEM_ID_1,
+    type: "pcr-batch-item",
+    createdBy: "dina-admin",
+    group: "aafc",
+    materialSample: {
+      id: MATERIAL_SAMPLE_ID_1,
+      type: "material-sample"
+    }
+  },
+  {
+    id: PCR_BATCH_ITEM_ID_2,
+    type: "pcr-batch-item",
+    createdBy: "dina-admin",
+    group: "aafc",
+    materialSample: {
+      id: MATERIAL_SAMPLE_ID_2,
+      type: "material-sample"
+    }
+  },
+  {
+    id: PCR_BATCH_ITEM_ID_3,
+    type: "pcr-batch-item",
+    createdBy: "dina-admin",
+    group: "aafc",
+    materialSample: {
+      id: MATERIAL_SAMPLE_ID_3,
+      type: "material-sample"
+    }
+  },
+  {
+    id: PCR_BATCH_ITEM_ID_4,
+    type: "pcr-batch-item",
+    createdBy: "dina-admin",
+    group: "aafc",
+    storageUnitUsage: {
+      id: STORAGE_UNIT_USAGE_ID_4,
+      type: "storage-unit-usage"
+    },
+    materialSample: {
+      id: MATERIAL_SAMPLE_ID_4,
+      type: "material-sample"
+    }
+  },
+  {
+    id: PCR_BATCH_ITEM_ID_5,
+    type: "pcr-batch-item",
+    createdBy: "dina-admin",
+    group: "aafc",
+    storageUnitUsage: {
+      id: STORAGE_UNIT_USAGE_ID_5,
+      type: "storage-unit-usage"
+    },
+    materialSample: {
+      id: MATERIAL_SAMPLE_ID_5,
+      type: "material-sample"
+    }
+  }
+];
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "/seqdb-api/pcr-batch-item":
       return {
-        data: [
-          {
-            id: PCR_BATCH_ITEM_ID_1,
-            type: "pcr-batch-item",
-            createdBy: "dina-admin",
-            group: "aafc",
-            wellColumn: null,
-            wellRow: null,
-            materialSample: {
-              id: MATERIAL_SAMPLE_ID_1,
-              type: "material-sample"
-            }
-          },
-          {
-            id: PCR_BATCH_ITEM_ID_2,
-            type: "pcr-batch-item",
-            createdBy: "dina-admin",
-            group: "aafc",
-            wellColumn: null,
-            wellRow: null,
-            materialSample: {
-              id: MATERIAL_SAMPLE_ID_2,
-              type: "material-sample"
-            }
-          },
-          {
-            id: PCR_BATCH_ITEM_ID_3,
-            type: "pcr-batch-item",
-            createdBy: "dina-admin",
-            group: "aafc",
-            wellColumn: null,
-            wellRow: null,
-            materialSample: {
-              id: MATERIAL_SAMPLE_ID_3,
-              type: "material-sample"
-            }
-          },
-          {
-            id: PCR_BATCH_ITEM_ID_4,
-            type: "pcr-batch-item",
-            createdBy: "dina-admin",
-            group: "aafc",
-            wellColumn: 1,
-            wellRow: "A",
-            materialSample: {
-              id: MATERIAL_SAMPLE_ID_4,
-              type: "material-sample"
-            }
-          },
-          {
-            id: PCR_BATCH_ITEM_ID_5,
-            type: "pcr-batch-item",
-            createdBy: "dina-admin",
-            group: "aafc",
-            wellColumn: 2,
-            wellRow: "A",
-            materialSample: {
-              id: MATERIAL_SAMPLE_ID_5,
-              type: "material-sample"
-            }
-          }
-        ]
+        data: PCR_BATCH_ITEMS
+      };
+    case "/collection-api/storage-unit/storage-unit-1":
+      return {
+        data: STORAGE_UNIT_1
       };
   }
 });
@@ -119,36 +151,40 @@ const mockGet = jest.fn<any, any>(async (path) => {
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
   return paths.map((path) => {
     switch (path) {
-      case "/material-sample/" + MATERIAL_SAMPLE_ID_1:
+      case "/material-sample-summary/" + MATERIAL_SAMPLE_ID_1:
         return {
           id: MATERIAL_SAMPLE_ID_1,
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_1
         };
-      case "/material-sample/" + MATERIAL_SAMPLE_ID_2:
+      case "/material-sample-summary/" + MATERIAL_SAMPLE_ID_2:
         return {
           id: MATERIAL_SAMPLE_ID_2,
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_2
         };
-      case "/material-sample/" + MATERIAL_SAMPLE_ID_3:
+      case "/material-sample-summary/" + MATERIAL_SAMPLE_ID_3:
         return {
           id: MATERIAL_SAMPLE_ID_3,
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_3
         };
-      case "/material-sample/" + MATERIAL_SAMPLE_ID_4:
+      case "/material-sample-summary/" + MATERIAL_SAMPLE_ID_4:
         return {
           id: MATERIAL_SAMPLE_ID_4,
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_4
         };
-      case "/material-sample/" + MATERIAL_SAMPLE_ID_5:
+      case "/material-sample-summary/" + MATERIAL_SAMPLE_ID_5:
         return {
           id: MATERIAL_SAMPLE_ID_5,
           type: "material-sample",
           materialSampleName: MATERIAL_SAMPLE_NAME_5
         };
+      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_ID_4:
+        return STORAGE_UNIT_USAGE_4;
+      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_ID_5:
+        return STORAGE_UNIT_USAGE_5;
     }
   });
 });
@@ -169,6 +205,119 @@ const mockOnSaved = jest.fn();
 
 describe("SangerPcrBatchItemGridStep component", () => {
   beforeEach(jest.clearAllMocks);
+  afterEach(() => {
+    STORAGE_UNIT_1 = {
+      id: "storage-unit-1",
+      type: "storage-unit",
+      name: "storage unit 1",
+      group: "aafc",
+      isGeneric: false,
+      storageUnitType: {
+        type: "storage-unit-type",
+        name: "storage unit type 1",
+        group: "aafc",
+        gridLayoutDefinition: {
+          numberOfColumns: GRID_COL_SIZE,
+          numberOfRows: GRID_ROW_SIZE,
+          fillDirection: "BY_COLUMN"
+        }
+      }
+    };
+
+    STORAGE_UNIT_USAGE_4 = {
+      id: STORAGE_UNIT_USAGE_ID_4,
+      type: "storage-unit-usage",
+      wellColumn: 1,
+      wellRow: "A"
+    };
+    STORAGE_UNIT_USAGE_5 = {
+      id: STORAGE_UNIT_USAGE_ID_5,
+      type: "storage-unit-usage",
+      wellColumn: 2,
+      wellRow: "A"
+    };
+
+    PCR_BATCH = {
+      name: "pcr-batch-name",
+      type: "pcr-batch",
+      isCompleted: false,
+      id: PCR_BATCH_ID,
+      gridLayoutDefinition: {
+        numberOfColumns: GRID_COL_SIZE,
+        numberOfRows: GRID_ROW_SIZE,
+        fillDirection: "BY_COLUMN"
+      },
+      storageUnit: STORAGE_UNIT_1 as any
+    };
+
+    PCR_BATCH_NO_STORAGE = {
+      name: "pcr-batch-name",
+      type: "pcr-batch",
+      isCompleted: false,
+      id: PCR_BATCH_ID
+    };
+
+    PCR_BATCH_ITEMS = [
+      {
+        id: PCR_BATCH_ITEM_ID_1,
+        type: "pcr-batch-item",
+        createdBy: "dina-admin",
+        group: "aafc",
+        materialSample: {
+          id: MATERIAL_SAMPLE_ID_1,
+          type: "material-sample"
+        }
+      },
+      {
+        id: PCR_BATCH_ITEM_ID_2,
+        type: "pcr-batch-item",
+        createdBy: "dina-admin",
+        group: "aafc",
+        materialSample: {
+          id: MATERIAL_SAMPLE_ID_2,
+          type: "material-sample"
+        }
+      },
+      {
+        id: PCR_BATCH_ITEM_ID_3,
+        type: "pcr-batch-item",
+        createdBy: "dina-admin",
+        group: "aafc",
+        materialSample: {
+          id: MATERIAL_SAMPLE_ID_3,
+          type: "material-sample"
+        }
+      },
+      {
+        id: PCR_BATCH_ITEM_ID_4,
+        type: "pcr-batch-item",
+        createdBy: "dina-admin",
+        group: "aafc",
+        storageUnitUsage: {
+          id: STORAGE_UNIT_USAGE_ID_4,
+          type: "storage-unit-usage"
+        },
+        materialSample: {
+          id: MATERIAL_SAMPLE_ID_4,
+          type: "material-sample"
+        }
+      },
+      {
+        id: PCR_BATCH_ITEM_ID_5,
+        type: "pcr-batch-item",
+        createdBy: "dina-admin",
+        group: "aafc",
+        storageUnitUsage: {
+          id: STORAGE_UNIT_USAGE_ID_5,
+          type: "storage-unit-usage"
+        },
+        materialSample: {
+          id: MATERIAL_SAMPLE_ID_5,
+          type: "material-sample"
+        }
+      }
+    ];
+  });
 
   it("Display material samples in selection list", async () => {
     const wrapper = mountWithAppContext(
@@ -407,51 +556,61 @@ describe("SangerPcrBatchItemGridStep component", () => {
       [
         {
           resource: {
-            id: PCR_BATCH_ITEM_ID_4,
-            type: "pcr-batch-item",
+            id: STORAGE_UNIT_USAGE_ID_4,
+            type: "storage-unit-usage",
             wellColumn: 4,
-            wellRow: "A"
+            wellRow: "A",
+            storageUnit: STORAGE_UNIT_1,
+            usageType: "pcr-batch-item"
           },
-          type: "pcr-batch-item"
+          type: "storage-unit-usage"
         },
         {
           resource: {
-            id: PCR_BATCH_ITEM_ID_5,
-            type: "pcr-batch-item",
+            id: "storage-unit-usage-5",
+            type: "storage-unit-usage",
             wellColumn: 5,
-            wellRow: "A"
+            wellRow: "A",
+            storageUnit: STORAGE_UNIT_1,
+            usageType: "pcr-batch-item"
           },
-          type: "pcr-batch-item"
+          type: "storage-unit-usage"
         },
         {
           resource: {
-            id: PCR_BATCH_ITEM_ID_1,
-            type: "pcr-batch-item",
+            id: undefined,
+            type: "storage-unit-usage",
             wellColumn: 1,
-            wellRow: "A"
+            wellRow: "A",
+            storageUnit: STORAGE_UNIT_1,
+            usageType: "pcr-batch-item"
           },
-          type: "pcr-batch-item"
+          type: "storage-unit-usage"
         },
         {
           resource: {
-            id: PCR_BATCH_ITEM_ID_2,
-            type: "pcr-batch-item",
+            id: undefined,
+            type: "storage-unit-usage",
             wellColumn: 2,
-            wellRow: "A"
+            wellRow: "A",
+            storageUnit: STORAGE_UNIT_1,
+            usageType: "pcr-batch-item"
           },
-          type: "pcr-batch-item"
+          type: "storage-unit-usage"
         },
         {
           resource: {
-            id: PCR_BATCH_ITEM_ID_3,
-            type: "pcr-batch-item",
+            id: undefined,
+            type: "storage-unit-usage",
             wellColumn: 3,
-            wellRow: "A"
+            wellRow: "A",
+            storageUnit: STORAGE_UNIT_1,
+            usageType: "pcr-batch-item"
           },
-          type: "pcr-batch-item"
+          type: "storage-unit-usage"
         }
       ],
-      { apiBaseUrl: "/seqdb-api" }
+      { apiBaseUrl: "/collection-api" }
     );
   });
 
@@ -464,7 +623,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
         setEditMode={noop}
         performSave={false}
         setPerformSave={noop}
-        onSaved={mockOnSaved}
+        onSaved={jest.fn()}
       />,
       testCtx
     );
@@ -526,25 +685,19 @@ describe("SangerPcrBatchItemGridStep component", () => {
     expect(mockSave).lastCalledWith(
       [
         {
-          resource: {
-            id: PCR_BATCH_ITEM_ID_4,
-            type: "pcr-batch-item",
-            wellColumn: null,
-            wellRow: null
-          },
-          type: "pcr-batch-item"
+          delete: {
+            id: "storage-unit-usage-4",
+            type: "storage-unit-usage"
+          }
         },
         {
-          resource: {
-            id: PCR_BATCH_ITEM_ID_5,
-            type: "pcr-batch-item",
-            wellColumn: null,
-            wellRow: null
-          },
-          type: "pcr-batch-item"
+          delete: {
+            id: "storage-unit-usage-5",
+            type: "storage-unit-usage"
+          }
         }
       ],
-      { apiBaseUrl: "/seqdb-api" }
+      { apiBaseUrl: "/collection-api" }
     );
   });
 

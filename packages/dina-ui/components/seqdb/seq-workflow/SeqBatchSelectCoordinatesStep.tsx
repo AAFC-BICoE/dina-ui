@@ -3,9 +3,12 @@ import { noop } from "lodash";
 import Link from "next/link";
 import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
 import { useEffect } from "react";
-import { ContainerGrid } from "./seq-batch-select-coordinats-step/ContainerGrid";
-import { DraggableSeqReactionList } from "./seq-batch-select-coordinats-step/DraggableSeqReactionList";
-import { useSeqSelectCoordinatesControls } from "./seq-batch-select-coordinats-step/useSeqSelectCoordinatesControls";
+import {
+  SeqReactionSample,
+  useSeqSelectCoordinatesControls
+} from "./seq-batch-select-coordinats-step/useSeqSelectCoordinatesControls";
+import { DraggableItemList } from "../container-grid/DraggableItemList";
+import { ContainerGrid } from "../container-grid/ContainerGrid";
 
 export interface SeqBatchSelectCoordinatesStepProps {
   seqBatchId: string;
@@ -132,7 +135,7 @@ export function SeqBatchSelectCoordinatesStep(
           <strong>
             Selected Material Samples ({availableItems.length} in list)
           </strong>
-          <DraggableSeqReactionList
+          <DraggableItemList<SeqReactionSample>
             availableItems={availableItems}
             selectedItems={selectedItems}
             movedItems={movedItems}
@@ -155,8 +158,11 @@ export function SeqBatchSelectCoordinatesStep(
         </div>
         <div className="col-9">
           <strong>Container wells</strong>
-          <ContainerGrid
-            seqBatch={seqBatch}
+          <ContainerGrid<
+            SeqBatch & { gridLayoutDefinition?: any },
+            SeqReactionSample
+          >
+            batch={seqBatch}
             cellGrid={cellGrid}
             movedItems={movedItems}
             onDrop={onGridDrop}

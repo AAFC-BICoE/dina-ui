@@ -1,3 +1,4 @@
+import { deleteFromStorage } from "@rehooks/local-storage";
 import Cleave from "cleave.js/react";
 import {
   DoOperationsError,
@@ -8,24 +9,26 @@ import { InputResource, PersistedResource } from "kitsu";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { default as ReactSwitch, default as Switch } from "react-switch";
-import { AttachmentsEditor } from "../..";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { AttachmentsEditor, SAMPLE_FORM_TEMPLATE_KEY } from "../..";
+import {
+  mountWithAppContext,
+  mountWithAppContext2
+} from "../../../test-util/mock-app-context";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
-  blankMaterialSample,
   COLLECTING_EVENT_COMPONENT_NAME,
   FormTemplate,
   IDENTIFIER_COMPONENT_NAME,
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
-  MaterialSample,
   MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+  MaterialSample,
   ORGANISMS_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  StorageUnit
+  StorageUnit,
+  blankMaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
-import { deleteFromStorage } from "@rehooks/local-storage";
-import { SAMPLE_FORM_TEMPLATE_KEY } from "../..";
+import { fireEvent, within } from "@testing-library/react";
 
 const TEST_COLLECTING_EVENT = {
   id: "col-event-1",
@@ -42,6 +45,7 @@ const TEST_COLLECTION_1 = {
 
 const TEST_STORAGE_UNIT: PersistedResource<StorageUnit> = {
   id: "su-1",
+  isGeneric: false,
   type: "storage-unit",
   name: "storage unit 1",
   group: "test-group",
@@ -57,6 +61,7 @@ const TEST_STORAGE_UNITS = ["A", "B", "C"].map<PersistedResource<StorageUnit>>(
   (id) => ({
     id,
     type: "storage-unit",
+    isGeneric: false,
     group: "test-group",
     name: `storage unit ${id}`,
     storageUnitType: {
@@ -810,25 +815,54 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_STORAGE_UNITS[2] };
     case "collection-api/form-template/cd6d8297-43a0-45c6-b44e-983db917eb11":
       return { data: formTemplate };
+    case "collection-api/identifier-type":
+      return {
+        data: {
+          id: "materialSampleIdentifierType",
+          type: "vocabulary",
+          attributes: {
+            vocabularyElements: [
+              {
+                key: "seqdb_id",
+                name: "SeqDB ID",
+                term: null,
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "SeqDB ID"
+                    },
+                    {
+                      lang: "fr",
+                      title: "ID SeqDB"
+                    }
+                  ]
+                },
+                inverseOf: null
+              }
+            ]
+          }
+        }
+      };
     case "collection-api/storage-unit-type":
     case "collection-api/collection":
     case "collection-api/collection-method":
     case "collection-api/collecting-event":
     case "objectstore-api/metadata":
     case "agent-api/person":
-    case "collection-api/vocabulary/typeStatus":
-    case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/vocabulary2/typeStatus":
+    case "collection-api/vocabulary2/degreeOfEstablishment":
     case "collection-api/preparation-type":
     case "collection-api/material-sample":
     case "collection-api/managed-attribute":
-    case "collection-api/vocabulary/materialSampleState":
+    case "collection-api/vocabulary2/materialSampleState":
     case "collection-api/material-sample-type":
     case "collection-api/project":
     case "user-api/group":
-    case "collection-api/vocabulary/associationType":
-    case "collection-api/vocabulary/srs":
-    case "collection-api/vocabulary/coordinateSystem":
-    case "collection-api/vocabulary/materialSampleType":
+    case "collection-api/vocabulary2/associationType":
+    case "collection-api/vocabulary2/srs":
+    case "collection-api/vocabulary2/coordinateSystem":
+    case "collection-api/vocabulary2/materialSampleType":
       return { data: [] };
   }
 });
@@ -1182,6 +1216,159 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
+  it("Bulk creates material samples using other catalogue and other identifiers", async () => {
+    const wrapper = mountWithAppContext2(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx
+    );
+    await new Promise(setImmediate);
+
+    // Edit the first sample:
+    fireEvent.click(wrapper.getByRole("tab", { name: /ms1/i }));
+    fireEvent.change(
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
+      { target: { value: "otherCatalog1" } }
+    );
+
+    // Edit the second sample:
+    fireEvent.click(wrapper.getByRole("tab", { name: /ms2/i }));
+    fireEvent.change(
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
+      { target: { value: "otherCatalog2" } }
+    );
+
+    // Edit the third sample:
+    fireEvent.click(wrapper.getByRole("tab", { name: /ms3/i }));
+    fireEvent.change(
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
+      { target: { value: "otherCatalog3" } }
+    );
+
+    // Submit the form.
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await new Promise(setImmediate);
+
+    // Saves the new material samples:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              dwcOtherCatalogNumbers: ["otherCatalog1"],
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS1",
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          {
+            resource: expect.objectContaining({
+              dwcOtherCatalogNumbers: ["otherCatalog2"],
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS2",
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          {
+            resource: expect.objectContaining({
+              dwcOtherCatalogNumbers: ["otherCatalog3"],
+              collection: {
+                id: "1",
+                type: "collection"
+              },
+              materialSampleName: "MS3",
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+
+    // The saved samples are mocked by mockSave and are passed into the onSaved callback.
+    // Check the IDs to make sure they were saved:
+    expect(mockOnSaved.mock.calls[0][0].map((sample) => sample.id)).toEqual([
+      "11111",
+      "11111",
+      "11111"
+    ]);
+  });
+
+  it("Bulk edit all material samples using other catalogue and other identifiers", async () => {
+    const wrapper = mountWithAppContext2(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={
+          [
+            {
+              id: "1",
+              type: "material-sample",
+              dwcOtherCatalogNumbers: ["otherCatalog1"]
+            },
+            {
+              id: "2",
+              type: "material-sample",
+              dwcOtherCatalogNumbers: ["otherCatalog2"]
+            },
+            {
+              id: "3",
+              type: "material-sample",
+              dwcOtherCatalogNumbers: ["otherCatalog3"]
+            }
+          ] as InputResource<MaterialSample>[]
+        }
+      />,
+      testCtx
+    );
+    await new Promise(setImmediate);
+
+    fireEvent.click(
+      wrapper.getAllByRole("button", { name: /override all/i })[1]
+    );
+    fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+    await new Promise(setImmediate);
+
+    // Update the other cataloge value:
+    fireEvent.change(
+      within(wrapper.getByTestId("dwcOtherCatalogNumbers[0]")).getByRole(
+        "textbox"
+      ),
+      { target: { value: "otherCatalogAll" } }
+    );
+
+    // Submit the form.
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
+    await new Promise(setImmediate);
+
+    // Saves the new material samples:
+    expect(mockSave.mock.calls).toMatchSnapshot();
+
+    // The saved samples are mocked by mockSave and are passed into the onSaved callback.
+    // Check the IDs to make sure they were saved:
+    expect(mockOnSaved.mock.calls[0][0].map((sample) => sample.id)).toEqual([
+      "1",
+      "2",
+      "3"
+    ]);
+  });
+
   it("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
@@ -1220,10 +1407,10 @@ describe("MaterialSampleBulkEditor", () => {
     // The tab with the error is given the red text, and the other 3 tabs are unaffected:
     expect(
       wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
-    ).toEqual(true);
+    ).toEqual(false);
     expect(
       wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+    ).toEqual(true);
     expect(
       wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
     ).toEqual(false);
@@ -1233,13 +1420,11 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Shows the error message:
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .error-viewer").first().text()
+      wrapper.find(".sample-tabpanel-0 .error-viewer").first().text()
     ).toContain("Start Event Date Time");
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .startEventDateTime-field .invalid-feedback")
-        .exists()
-    ).toEqual(true);
+    expect(wrapper.find(".sample-tabpanel-0 .error-message").exists()).toEqual(
+      true
+    );
   });
 
   it("Shows an error indicator on the individual sample tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
@@ -1398,10 +1583,10 @@ describe("MaterialSampleBulkEditor", () => {
     // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
       wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
-    ).toEqual(true);
+    ).toEqual(false);
     expect(
       wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+    ).toEqual(true);
     expect(
       wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
     ).toEqual(false);
@@ -1411,13 +1596,11 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Shows the error message:
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .error-viewer").first().text()
+      wrapper.find(".sample-tabpanel-0 .error-viewer").first().text()
     ).toContain("Start Event Date Time");
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .startEventDateTime-field .invalid-feedback")
-        .exists()
-    ).toEqual(true);
+    expect(wrapper.find(".sample-tabpanel-0 .error-message").exists()).toEqual(
+      true
+    );
   });
 
   it("Shows an error indicator on the Edit All tab when a bulk-edited causes a server-side field error.", async () => {
@@ -1694,7 +1877,7 @@ describe("MaterialSampleBulkEditor", () => {
       "#" + SCHEDULED_ACTIONS_COMPONENT_NAME
     ]) {
       wrapper.find(`${section} button.override-all-button`).simulate("click");
-      wrapper.find(".are-you-sure-modal form").simulate("submit");
+      wrapper.find("form .are-you-sure-modal").simulate("submit");
       await new Promise(setImmediate);
       wrapper.update();
     }
@@ -1853,7 +2036,10 @@ describe("MaterialSampleBulkEditor", () => {
         determination: [
           {
             verbatimScientificName: "new-scientific-name",
-            determiner: undefined
+            determiner: undefined,
+            scientificName: undefined,
+            scientificNameDetails: undefined,
+            scientificNameSource: undefined
           }
         ],
         type: "organism",
@@ -2154,6 +2340,8 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
+              identifiers: {},
+              dwcOtherCatalogNumbers: null,
               projects: undefined,
               barcode: "edited-barcode",
               relationships: {},
@@ -2322,7 +2510,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toEqual(true);
   });
 
-  it("Creates and links a common Collecting Event to all samples", async () => {
+  it("Creates and links a unique Collecting Event to all samples", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -2371,10 +2559,16 @@ describe("MaterialSampleBulkEditor", () => {
       [
         [
           {
-            resource: expect.objectContaining({
+            resource: {
+              type: "collecting-event",
+              geoReferenceAssertions: [{ isPrimary: true }],
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              publiclyReleasable: true,
               dwcVerbatimLocality: "test locality",
-              type: "collecting-event"
-            }),
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
             type: "collecting-event"
           }
         ],
@@ -2383,33 +2577,132 @@ describe("MaterialSampleBulkEditor", () => {
       [
         [
           {
-            resource: expect.objectContaining({
-              collectingEvent: {
-                id: "11111",
-                type: "collecting-event"
-              },
-              type: "material-sample"
-            }),
+            resource: {
+              type: "collecting-event",
+              geoReferenceAssertions: [{ isPrimary: true }],
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              publiclyReleasable: true,
+              dwcVerbatimLocality: "test locality",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
+              type: "collecting-event",
+              geoReferenceAssertions: [{ isPrimary: true }],
+              dwcVerbatimCoordinateSystem: null,
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              publiclyReleasable: true,
+              dwcVerbatimLocality: "test locality",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
+              type: "material-sample",
+              materialSampleName: "MS1",
+              collection: { id: "1", type: "collection" },
+              restrictionFieldsExtension: null,
+              preparationType: { id: null, type: "preparation-type" },
+              preparationDate: null,
+              preparationRemarks: null,
+              dwcDegreeOfEstablishment: null,
+              preparationMethod: { id: null, type: "preparation-method" },
+              preservationType: null,
+              preparationFixative: null,
+              preparationMaterials: null,
+              preparationSubstrate: null,
+              preparationProtocol: { id: null, type: "protocol" },
+              preparationManagedAttributes: {},
+              isRestricted: false,
+              restrictionRemarks: null,
+              collectingEvent: { id: "11111", type: "collecting-event" },
+              associations: [],
+              hostOrganism: null,
+              relationships: {
+                organism: { data: [] },
+                preparedBy: { data: [] },
+                collection: { data: { id: "1", type: "collection" } },
+                storageUnitUsage: { data: null }
+              }
+            },
             type: "material-sample"
           },
           {
-            resource: expect.objectContaining({
-              collectingEvent: {
-                id: "11111",
-                type: "collecting-event"
-              },
-              type: "material-sample"
-            }),
+            resource: {
+              type: "material-sample",
+              materialSampleName: "MS2",
+              collection: { id: "1", type: "collection" },
+              restrictionFieldsExtension: null,
+              preparationType: { id: null, type: "preparation-type" },
+              preparationDate: null,
+              preparationRemarks: null,
+              dwcDegreeOfEstablishment: null,
+              preparationMethod: { id: null, type: "preparation-method" },
+              preservationType: null,
+              preparationFixative: null,
+              preparationMaterials: null,
+              preparationSubstrate: null,
+              preparationProtocol: { id: null, type: "protocol" },
+              preparationManagedAttributes: {},
+              isRestricted: false,
+              restrictionRemarks: null,
+              collectingEvent: { id: "11111", type: "collecting-event" },
+              associations: [],
+              hostOrganism: null,
+              relationships: {
+                organism: { data: [] },
+                preparedBy: { data: [] },
+                collection: { data: { id: "1", type: "collection" } },
+                storageUnitUsage: { data: null }
+              }
+            },
             type: "material-sample"
           },
           {
-            resource: expect.objectContaining({
-              collectingEvent: {
-                id: "11111",
-                type: "collecting-event"
-              },
-              type: "material-sample"
-            }),
+            resource: {
+              type: "material-sample",
+              materialSampleName: "MS3",
+              collection: { id: "1", type: "collection" },
+              restrictionFieldsExtension: null,
+              preparationType: { id: null, type: "preparation-type" },
+              preparationDate: null,
+              preparationRemarks: null,
+              dwcDegreeOfEstablishment: null,
+              preparationMethod: { id: null, type: "preparation-method" },
+              preservationType: null,
+              preparationFixative: null,
+              preparationMaterials: null,
+              preparationSubstrate: null,
+              preparationProtocol: { id: null, type: "protocol" },
+              preparationManagedAttributes: {},
+              isRestricted: false,
+              restrictionRemarks: null,
+              collectingEvent: { id: "11111", type: "collecting-event" },
+              associations: [],
+              hostOrganism: null,
+              relationships: {
+                organism: { data: [] },
+                preparedBy: { data: [] },
+                collection: { data: { id: "1", type: "collection" } },
+                storageUnitUsage: { data: null }
+              }
+            },
             type: "material-sample"
           }
         ],
@@ -2473,10 +2766,13 @@ describe("MaterialSampleBulkEditor", () => {
       [
         [
           {
-            resource: expect.objectContaining({
+            resource: {
+              id: "col-event-1",
+              type: "collecting-event",
               dwcVerbatimLocality: "bulk edited locality",
-              type: "collecting-event"
-            }),
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
             type: "collecting-event"
           }
         ],
@@ -2486,35 +2782,34 @@ describe("MaterialSampleBulkEditor", () => {
         [
           {
             resource: {
-              collectingEvent: {
-                id: "col-event-1",
-                type: "collecting-event"
-              },
-              relationships: {},
+              id: "col-event-1",
+              type: "collecting-event",
+              dwcVerbatimLocality: "bulk edited locality",
+              relationships: { attachment: { data: [] } },
+              otherRecordNumbers: null
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: {
               id: "1",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              type: "material-sample"
+              type: "material-sample",
+              collectingEvent: { id: "col-event-1", type: "collecting-event" },
+              relationships: {}
             },
             type: "material-sample"
           },
           {
             resource: {
-              collectingEvent: {
-                id: "col-event-1",
-                type: "collecting-event"
-              },
-              relationships: {},
               id: "2",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              type: "material-sample"
+              type: "material-sample",
+              collectingEvent: { id: "col-event-1", type: "collecting-event" },
+              relationships: {}
             },
             type: "material-sample"
           }
@@ -2575,40 +2870,94 @@ describe("MaterialSampleBulkEditor", () => {
         [
           {
             resource: {
-              id: "1",
-              attachment: undefined,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              projects: undefined,
-              relationships: {},
+              id: undefined,
               storageUnit: {
                 id: "C",
                 type: "storage-unit"
               },
+              type: "storage-unit-usage",
+              usageType: "material-sample"
+            },
+            type: "storage-unit-usage"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ],
+      [
+        [
+          {
+            resource: {
+              id: undefined,
+              storageUnit: {
+                id: "C",
+                type: "storage-unit"
+              },
+              type: "storage-unit-usage",
+              usageType: "material-sample"
+            },
+            type: "storage-unit-usage"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ],
+      [
+        [
+          {
+            resource: {
+              assemblages: undefined,
+              attachment: undefined,
+              id: "1",
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparedBy: undefined,
+              projects: undefined,
+              relationships: {
+                storageUnitUsage: {
+                  data: {
+                    id: "11111",
+                    type: "storage-unit-usage"
+                  }
+                }
+              },
+              storageUnit: undefined,
+              storageUnitUsage: undefined,
               type: "material-sample"
             },
             type: "material-sample"
           },
           {
             resource: {
-              id: "2",
+              assemblages: undefined,
               attachment: undefined,
+              id: "2",
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
+              preparedBy: undefined,
               projects: undefined,
-              relationships: {},
-              storageUnit: {
-                id: "C",
-                type: "storage-unit"
+              relationships: {
+                storageUnitUsage: {
+                  data: {
+                    id: "11111",
+                    type: "storage-unit-usage"
+                  }
+                }
               },
+              storageUnit: undefined,
+              storageUnitUsage: undefined,
               type: "material-sample"
             },
             type: "material-sample"
           }
         ],
-        { apiBaseUrl: "/collection-api" }
+        {
+          apiBaseUrl: "/collection-api"
+        }
       ]
     ]);
   });
@@ -2785,9 +3134,10 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
+
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
         .exists()
     ).toEqual(true);
 
@@ -2812,9 +3162,10 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
+
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field input")
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
         .exists()
     ).toEqual(false);
 
@@ -2827,9 +3178,10 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".sample-tabpanel-0 .barcode-field input").exists()
     ).toEqual(true);
+
     expect(
       wrapper
-        .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers-field input")
+        .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers_0_-field input")
         .exists()
     ).toEqual(false);
   });
@@ -2849,9 +3201,10 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
+
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
         .exists()
     ).toEqual(true);
 
@@ -2876,11 +3229,13 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
     ).toEqual(true);
+
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers input")
         .exists()
     ).toEqual(false);
+
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
     ).toEqual("1111");

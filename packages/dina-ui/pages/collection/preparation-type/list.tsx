@@ -28,7 +28,9 @@ const PREPARATION_TYPE_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
 
 export default function preparationTypeListPage() {
   const buttonBarContent = (
-    <CreateButton entityLink="/collection/preparation-type" />
+    <div className="flex d-flex ms-auto">
+      <CreateButton entityLink="/collection/preparation-type" />
+    </div>
   );
 
   return (

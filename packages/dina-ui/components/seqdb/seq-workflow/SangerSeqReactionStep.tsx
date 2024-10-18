@@ -38,6 +38,7 @@ import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { SeqReactionDndTable } from "./seq-reaction-step/SeqReactionDndTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { useSeqReactionState } from "./seq-reaction-step/useSeqReactionState";
+import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export interface SangerSeqReactionStepProps {
   seqBatch?: SeqBatch;
@@ -61,6 +62,7 @@ export function SangerSeqReactionStep({
   const { formatMessage } = useDinaIntl();
   const { isAdmin, groupNames, username } = useAccount();
   const [searchResult, setSearchResults] = useState<PcrBatchItem[]>([]);
+  const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>([]);
   const [selectedPcrPrimer, setSelectedPcrPrimer] = useState<PcrPrimer>();
   const [group, setGroup] = useState(
     groupNames && groupNames.length > 0 ? groupNames[0] : ""
@@ -75,7 +77,8 @@ export function SangerSeqReactionStep({
     seqReactionSortOrder,
     setSeqReactionSortOrder,
     previouslySelectedResourcesIDMap,
-    setPreviouslySelectedResourcesIDMap
+    setPreviouslySelectedResourcesIDMap,
+    loadingSeqReactions
   } = useSeqReactionState(seqBatch?.id);
 
   const defaultValues = {
@@ -176,7 +179,7 @@ export function SangerSeqReactionStep({
   const pcrBatchItemQuery = useQuery<PcrBatchItem[]>(
     {
       path: `seqdb-api/pcr-batch-item`,
-      include: ["pcrBatch", "materialSample"].join(","),
+      include: ["pcrBatch", "materialSample", "storageUnitUsage"].join(","),
       filter: {
         "pcrBatch.uuid": selectedPcrBatch?.id as string
       },
@@ -185,9 +188,29 @@ export function SangerSeqReactionStep({
     {
       disabled: !selectedPcrBatch,
       onSuccess: async ({ data }) => {
+        let processedPcrBatchItems: PcrBatchItem[] = [];
+        const fetchedStorageUnitUsages = await bulkGet<StorageUnitUsage>(
+          data.map(
+            (item) => "/storage-unit-usage/" + item?.storageUnitUsage?.id
+          ),
+          {
+            apiBaseUrl: "/collection-api",
+            returnNullForMissingResource: true
+          }
+        );
+        processedPcrBatchItems = data.map((batchItem) => ({
+          ...batchItem,
+          storageUnitUsage: fetchedStorageUnitUsages.find(
+            (fetchedStorageUnitUsage) =>
+              fetchedStorageUnitUsage.id === batchItem.storageUnitUsage?.id
+          )
+        }));
+
         const materialSamples = compact(
           await bulkGet<MaterialSample, true>(
-            data?.map((item) => `/material-sample/${item.materialSample?.id}`),
+            data?.map(
+              (item) => `/material-sample-summary/${item.materialSample?.id}`
+            ),
             {
               apiBaseUrl: "/collection-api",
               returnNullForMissingResource: true
@@ -195,7 +218,7 @@ export function SangerSeqReactionStep({
           )
         );
 
-        data.map((item) => {
+        processedPcrBatchItems.map((item) => {
           if (item.materialSample && item.materialSample.id) {
             const foundSample = materialSamples.find(
               (sample) => sample.id === item.materialSample?.id
@@ -206,16 +229,16 @@ export function SangerSeqReactionStep({
           return item;
         });
 
-        data.sort((a, b) => {
+        processedPcrBatchItems.sort((a, b) => {
           const sampleName1 =
             (a.materialSample as MaterialSample)?.materialSampleName ?? "";
           const sampleName2 =
             (b.materialSample as MaterialSample)?.materialSampleName ?? "";
           return compareByStringAndNumber(sampleName1, sampleName2);
         });
-
-        setAvailableItems(data);
-        setSearchResults(data);
+        setAvailableItems(processedPcrBatchItems);
+        setSearchResults(processedPcrBatchItems);
+        setPcrBatchItems(processedPcrBatchItems);
       }
     }
   );
@@ -258,15 +281,18 @@ export function SangerSeqReactionStep({
     {
       id: "welColumn",
       cell: ({ row }) =>
-        row.original?.wellRow === null || row.original?.wellColumn === null
+        row.original?.storageUnitUsage?.wellRow === null ||
+        row.original?.storageUnitUsage?.wellColumn === null
           ? ""
-          : row.original.wellRow + "" + row.original.wellColumn,
+          : row.original?.storageUnitUsage?.wellRow +
+            "" +
+            row.original?.storageUnitUsage?.wellColumn,
       header: () => <FieldHeader name={"wellCoordinates"} />,
       enableSorting: false
     },
     {
       id: "tubeNumber",
-      cell: ({ row }) => row.original?.cellNumber || "",
+      cell: ({ row }) => row.original?.storageUnitUsage?.cellNumber || "",
       header: () => <FieldHeader name={"tubeNumber"} />,
       enableSorting: false
     }
@@ -285,7 +311,8 @@ export function SangerSeqReactionStep({
         <ReactTable<PcrBatchItem>
           className="w-100 -striped"
           columns={PCR_BATCH_ITEM_COLUMN}
-          data={pcrBatchItemQuery?.response?.data ?? []}
+          data={pcrBatchItems}
+          enableSorting={false}
         />
       )}
     </div>
@@ -407,7 +434,9 @@ export function SangerSeqReactionStep({
     formik.setFieldValue("itemIdsToSelect", {});
   }
 
-  return editMode ? (
+  return loadingSeqReactions ? (
+    <LoadingSpinner loading={true} />
+  ) : editMode ? (
     <DinaForm key={formKey} initialValues={defaultValues}>
       <div className="row">
         <TextField
