@@ -11,7 +11,7 @@ export interface StorageUnitAttributes {
   storageUnitChildren?: StorageUnit[];
   uuid?: string;
   isMultiple?: boolean | null;
-  isGeneric: boolean;
+  isGeneric?: boolean;
   barcode?: string;
 }
 

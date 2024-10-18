@@ -19,7 +19,7 @@ import {
   useModal,
   useQuery
 } from "common-ui";
-import { PersistedResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import { isArray } from "lodash";
 import * as yup from "yup";
 import {
@@ -34,10 +34,10 @@ import {
   StorageUnit,
   StorageUnitType
 } from "../../types/collection-api";
-import { useState } from "react";
+import { Ref, useState } from "react";
 import { ResourceNameIdentifier } from "../../types/common/resources/ResourceNameIdentifier";
 import StorageUnitGrid from "./grid/StorageUnitGrid";
-import { useFormikContext } from "formik";
+import { FormikProps, useFormikContext } from "formik";
 
 export const storageUnitFormSchema = yup.object({
   storageUnitType: yup.object().required()
@@ -46,9 +46,15 @@ export const storageUnitFormSchema = yup.object({
 export interface StorageUnitFormProps {
   initialParent?: PersistedResource<StorageUnit>;
   storageUnit?: PersistedResource<StorageUnit>;
-  onSaved: (storageUnit: PersistedResource<StorageUnit>[]) => Promise<void>;
+  onSaved?: (storageUnit: PersistedResource<StorageUnit>[]) => Promise<void>;
   buttonBar?: JSX.Element;
   parentIdInURL?: string;
+  /** Optionally call the hook from the parent component. */
+  // :ReturnType<typeof useMetadataSave>;
+  storageUnitSaveHook?: any;
+
+  // Form ref from parent component
+  storageUnitFormRef?: Ref<FormikProps<InputResource<StorageUnit>>>;
 }
 
 export function StorageUnitForm({
@@ -118,7 +124,7 @@ export function StorageUnitForm({
       const savedStorage = await save<StorageUnit>(savedArgs, {
         apiBaseUrl: "/collection-api"
       });
-      await onSaved(savedStorage);
+      await onSaved?.(savedStorage);
     };
 
     // Check for any duplicates...
