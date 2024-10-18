@@ -79,7 +79,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
           setInitialized(true);
         }
       });
-  }, []);
+  }, [accountContext]);
 
   // Non-authenticated users should never see the the full website. Display a loading indicator.
   if (!authenticated || !initialized || !keycloak) {
