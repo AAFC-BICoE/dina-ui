@@ -424,10 +424,10 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
         params
       );
 
-      if (managedAttribute[0]) {
+      if (managedAttribute?.[0]) {
         return getAttributesManagedAttributeColumn<TData>(
           path,
-          managedAttribute[0],
+          managedAttribute?.[0],
           fieldConfigMatch
         );
       }
@@ -440,10 +440,10 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
         relationshipConfigMatch.apiEndpoint,
         params
       );
-      if (managedAttribute[0]) {
+      if (managedAttribute?.[0]) {
         return getIncludedManagedAttributeColumn<TData>(
           path,
-          managedAttribute[0],
+          managedAttribute?.[0],
           relationshipConfigMatch
         );
       }
@@ -1021,6 +1021,10 @@ export function RelationshipPresenceLabel({
 
 // Fetch filtered dynamic field from back end
 async function fetchDynamicField(apiClient: Kitsu, path, params?: GetParams) {
-  const { data } = await apiClient.get(path, params ?? {});
-  return data;
+  try {
+    const { data } = await apiClient.get(path, params ?? {});
+    return data;
+  } catch {
+    return undefined;
+  }
 }
