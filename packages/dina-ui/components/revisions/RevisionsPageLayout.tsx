@@ -206,7 +206,7 @@ export function RevisionsPage({
   const resource = query?.response?.data;
 
   const pageTitle = formatMessage("revisionsListTitle", {
-    name: get(resource, nameField) ?? resource?.id
+    name: get(resource, nameField) ?? id
   });
   if (query?.loading) {
     return <LoadingSpinner loading={true} />;
@@ -219,7 +219,7 @@ export function RevisionsPage({
         <Link
           href={`${detailsPageLink}/${
             isExternalResourceMetadata ? "external-resource-view" : "view"
-          }?id=${resource?.id}`}
+          }?id=${id}`}
         >
           <a className="back-button my-auto me-auto mt-2">
             <DinaMessage id="detailsPageLink" />
