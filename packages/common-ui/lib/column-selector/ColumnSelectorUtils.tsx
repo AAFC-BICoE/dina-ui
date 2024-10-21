@@ -213,14 +213,16 @@ function getNestedColumn<TData extends KitsuResource>(
   indexColumn: ESIndexMapping
 ): TableColumn<TData> {
   const accessorKeyRelationship = `${indexColumn.parentPath}.${indexColumn.parentName}`;
-  const accessorKeyRelationshipAttribute = `${indexColumn.path}.${indexColumn.label}`;
+  const accessorKeyRelationshipAttribute = `${indexColumn.path}.${
+    indexColumn?.label?.split?.(".")?.pop() ?? indexColumn?.label
+  }`;
   const accessorKeyFull = `${accessorKeyRelationship}.${accessorKeyRelationshipAttribute}`;
 
   if (indexColumn.type === "date") {
     return {
       ...dateCell(
         indexColumn.value,
-        accessorKeyFull,
+        `${indexColumn.parentPath}.${accessorKeyRelationshipAttribute}`,
         indexColumn.parentType,
         true,
         indexColumn
@@ -236,7 +238,7 @@ function getNestedColumn<TData extends KitsuResource>(
           relationship={indexColumn.parentName ?? ""}
         />
       ),
-      accessorKey: accessorKeyFull,
+      accessorKey: `${indexColumn.parentPath}.${accessorKeyRelationshipAttribute}`,
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
       cell: ({ row: { original } }) => {
@@ -424,10 +426,10 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
         params
       );
 
-      if (managedAttribute[0]) {
+      if (managedAttribute?.[0]) {
         return getAttributesManagedAttributeColumn<TData>(
           path,
-          managedAttribute[0],
+          managedAttribute?.[0],
           fieldConfigMatch
         );
       }
@@ -440,10 +442,10 @@ async function getManagedAttributesColumn<TData extends KitsuResource>(
         relationshipConfigMatch.apiEndpoint,
         params
       );
-      if (managedAttribute[0]) {
+      if (managedAttribute?.[0]) {
         return getIncludedManagedAttributeColumn<TData>(
           path,
-          managedAttribute[0],
+          managedAttribute?.[0],
           relationshipConfigMatch
         );
       }
@@ -1021,6 +1023,10 @@ export function RelationshipPresenceLabel({
 
 // Fetch filtered dynamic field from back end
 async function fetchDynamicField(apiClient: Kitsu, path, params?: GetParams) {
-  const { data } = await apiClient.get(path, params ?? {});
-  return data;
+  try {
+    const { data } = await apiClient.get(path, params ?? {});
+    return data;
+  } catch {
+    return undefined;
+  }
 }
