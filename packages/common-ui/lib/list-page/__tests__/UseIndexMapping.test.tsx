@@ -103,13 +103,7 @@ const mockSearchApiGet = jest.fn<any, any>((path) => {
                 path: "attributes",
                 subtype: "local_date"
               },
-              { name: "endEventDateTime", type: "date", path: "attributes" },
-              {
-                name: "name",
-                type: "text",
-                path: "attributes.geographicPlaceNameSourceDetail.country",
-                distinct_term_agg: true
-              }
+              { name: "endEventDateTime", type: "date", path: "attributes" }
             ]
           },
           {

@@ -131,7 +131,7 @@ export function useIndexMapping({
             "." +
             relationshipAttribute.path +
             "." +
-            relationshipAttribute.name;
+            attributeLabel;
 
           result.push({
             label: attributeLabel,

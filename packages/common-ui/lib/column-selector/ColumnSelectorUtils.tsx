@@ -213,16 +213,14 @@ function getNestedColumn<TData extends KitsuResource>(
   indexColumn: ESIndexMapping
 ): TableColumn<TData> {
   const accessorKeyRelationship = `${indexColumn.parentPath}.${indexColumn.parentName}`;
-  const accessorKeyRelationshipAttribute = `${indexColumn.path}.${
-    indexColumn?.label?.split?.(".")?.pop() ?? indexColumn?.label
-  }`;
+  const accessorKeyRelationshipAttribute = `${indexColumn.path}.${indexColumn.label}`;
   const accessorKeyFull = `${accessorKeyRelationship}.${accessorKeyRelationshipAttribute}`;
 
   if (indexColumn.type === "date") {
     return {
       ...dateCell(
         indexColumn.value,
-        `${indexColumn.parentPath}.${accessorKeyRelationshipAttribute}`,
+        accessorKeyFull,
         indexColumn.parentType,
         true,
         indexColumn
@@ -238,7 +236,7 @@ function getNestedColumn<TData extends KitsuResource>(
           relationship={indexColumn.parentName ?? ""}
         />
       ),
-      accessorKey: `${indexColumn.parentPath}.${accessorKeyRelationshipAttribute}`,
+      accessorKey: accessorKeyFull,
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
       cell: ({ row: { original } }) => {
