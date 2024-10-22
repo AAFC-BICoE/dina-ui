@@ -198,7 +198,7 @@ export function useColumnMapping() {
     taxonomicRankLoading ||
     metadataLoading;
 
-  const managedAttributes = [...(attrRespMaterialSample?.data ?? [])];
+  const managedAttributes = [...(attrRespMaterialSamplem?.data ?? [])];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
   const assemblages = (assemblageResp?.data || []).map((item) => ({
     ...item,
