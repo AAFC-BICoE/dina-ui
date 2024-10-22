@@ -516,14 +516,20 @@ describe("workbookMappingUtils functions", () => {
         }
       })
     ).toEqual({
-      "0": [
-        { rowNumber: 0, content: ["header1", "header2", "header3"] },
-        { rowNumber: 1, content: ["data1", "data2", "data3"] }
-      ],
-      "1": [
-        { rowNumber: 0, content: ["header4", "header5", "header6"] },
-        { rowNumber: 1, content: ["data4", "data5", "data6"] }
-      ]
+      "0": {
+        sheetName: "Test Sheet 0",
+        rows: [
+          { rowNumber: 0, content: ["header1", "header2", "header3"] },
+          { rowNumber: 1, content: ["data1", "data2", "data3"] }
+        ]
+      },
+      "1": {
+        sheetName: "Test Sheet 1",
+        rows: [
+          { rowNumber: 0, content: ["header4", "header5", "header6"] },
+          { rowNumber: 1, content: ["data4", "data5", "data6"] }
+        ]
+      }
     });
   });
 });
