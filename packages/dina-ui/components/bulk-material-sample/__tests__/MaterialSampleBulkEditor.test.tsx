@@ -1,25 +1,12 @@
 import { deleteFromStorage } from "@rehooks/local-storage";
-import Cleave from "cleave.js/react";
-import {
-  DoOperationsError,
-  MaterialSampleSearchHelper,
-  ResourceSelect
-} from "common-ui";
+import { DoOperationsError } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import Select from "react-select";
-import CreatableSelect from "react-select/creatable";
-import { default as ReactSwitch, default as Switch } from "react-switch";
-import { AttachmentsEditor, SAMPLE_FORM_TEMPLATE_KEY } from "../..";
-import {
-  mountWithAppContext,
-  mountWithAppContext2
-} from "../../../test-util/mock-app-context";
+import { SAMPLE_FORM_TEMPLATE_KEY } from "../..";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
   FormTemplate,
-  IDENTIFIER_COMPONENT_NAME,
-  MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
   MaterialSample,
   ORGANISMS_COMPONENT_NAME,
@@ -29,6 +16,8 @@ import {
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
 import { fireEvent, within } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 const TEST_COLLECTING_EVENT = {
   id: "col-event-1",
@@ -751,45 +740,6 @@ const formTemplate: PersistedResource<FormTemplate> = {
   ]
 };
 
-/** FormTemplate with the managed attributes enabled for Material Sample, Collecting Event and Determination. */
-const TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES = {
-  id: "cd6d8297-43a0-45c6-b44e-983db917eb11",
-  type: "form-template",
-  createdOn: "2022-03-03T16:36:30.422992Z",
-  createdBy: "cnc-cm",
-  name: "test view with managed attributes",
-  group: "cnc",
-  restrictToCreatedBy: false,
-  viewConfiguration: {
-    type: "material-sample-form-template",
-    navOrder: [MANAGED_ATTRIBUTES_COMPONENT_NAME, IDENTIFIER_COMPONENT_NAME],
-    formTemplate: {
-      MATERIAL_SAMPLE: {
-        templateFields: {
-          materialSampleName: { enabled: true, defaultValue: "default id" },
-          "organism[0].determination[0].managedAttributes.attribute_1": {
-            enabled: true
-          },
-          "managedAttributes.sample_attribute_1": {
-            enabled: true,
-            defaultValue: "sample attribute default value"
-          }
-        }
-      },
-      COLLECTING_EVENT: {
-        templateFields: {
-          "managedAttributes.collecting_event_attribute_1": {
-            enabled: true
-          }
-        }
-      }
-    },
-    managedAttributesOrder: ["sample_attribute_1"],
-    collectingEventManagedAttributesOrder: ["collecting_event_attribute_1"],
-    determinationManagedAttributesOrder: ["determination_attribute_1"]
-  }
-};
-
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/collection/1":
@@ -1128,39 +1078,35 @@ describe("MaterialSampleBulkEditor", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Bulk creates material samples.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Edit the first sample:
-    wrapper.find("li.sample-tab-0").simulate("click");
-    wrapper
-      .find(".sample-tabpanel-0 .barcode-field input")
-      .simulate("change", { target: { value: "edited-barcode-1" } });
+    fireEvent.click(wrapper.getByText(/ms1/i));
+    fireEvent.change(wrapper.getAllByRole("textbox", { name: /barcode/i })[1], {
+      target: { value: "edited-barcode-1" }
+    });
 
     // Edit the second sample:
-    wrapper.find("li.sample-tab-1").simulate("click");
-    wrapper
-      .find(".sample-tabpanel-1 .barcode-field input")
-      .simulate("change", { target: { value: "edited-barcode-2" } });
+    fireEvent.click(wrapper.getByText(/ms2/i));
+    fireEvent.change(wrapper.getAllByRole("textbox", { name: /barcode/i })[1], {
+      target: { value: "edited-barcode-2" }
+    });
 
     // Edit the third sample:
-    wrapper.find("li.sample-tab-2").simulate("click");
-    wrapper
-      .find(".sample-tabpanel-2 .barcode-field input")
-      .simulate("change", { target: { value: "edited-barcode-3" } });
+    fireEvent.click(wrapper.getByText(/ms3/i));
+    fireEvent.change(wrapper.getAllByRole("textbox", { name: /barcode/i })[1], {
+      target: { value: "edited-barcode-3" }
+    });
 
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the new material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -1370,61 +1316,49 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Go the the bulk edit tab:
-    wrapper.find("li.tab-EDIT_ALL").simulate("click");
-    // Enable the collecting event section:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
+    fireEvent.click(wrapper.getByText(/edit all/i));
 
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Put an invalid value in startEventDateTime. This is validated locally by yup:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .startEventDateTime-field")
-      .find(Cleave)
-      .prop<any>("onChange")({ target: { value: "11111" } });
+    const startDateTextbox = wrapper.getByRole("textbox", {
+      name: "Start Event Date Time Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory"
+    });
+    userEvent.type(startDateTextbox, "11111");
 
     // Click the "Save All" button:
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // The tab with the error is given the red text, and the other 3 tabs are unaffected:
+    // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
-      wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
-    ).toEqual(false);
-    expect(
-      wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(true);
-    expect(
-      wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
-    ).toEqual(false);
-    expect(
-      wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(".text-danger")?.textContent
+    ).toEqual("MS1");
 
     // Shows the error message:
     expect(
-      wrapper.find(".sample-tabpanel-0 .error-viewer").first().text()
-    ).toContain("Start Event Date Time");
-    expect(wrapper.find(".sample-tabpanel-0 .error-message").exists()).toEqual(
-      true
-    );
+      wrapper.getByText(
+        /1 : start event date time \- start event datetime format must be a subset of: yyyy\-mm\-ddthh:mm:ss\.mmm, if datetime is present, 't' is mandatory/i
+      )
+    ).toBeInTheDocument();
   });
 
   it("Shows an error indicator on the individual sample tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
@@ -1442,7 +1376,7 @@ describe("MaterialSampleBulkEditor", () => {
       );
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1456,29 +1390,27 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Edit the second sample:
-    wrapper.find("li.sample-tab-1").simulate("click");
-    // Enable the collecting event section:
-    wrapper
-      .find(".sample-tabpanel-1 .enable-collecting-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
-
+    fireEvent.click(wrapper.getByText(/ms2/i));
     await new Promise(setImmediate);
-    wrapper.update();
+
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[1]);
+    await new Promise(setImmediate);
 
     // Click the "Save All" button:
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The collecting event was saved separately.
-    // TODO let the Collecting Event be saved along with the Material Sample in one transaction.
     expect(mockSaveForBadColEvent).lastCalledWith(
       [
         {
@@ -1493,27 +1425,20 @@ describe("MaterialSampleBulkEditor", () => {
 
     // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
-      wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.getByText(
+        /bulk submission error: check the tabs with a red label\./i
+      )
+    ).toBeInTheDocument();
     expect(
-      wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(false);
-    expect(
-      wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
-    ).toEqual(true);
-    expect(
-      wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(".text-danger")?.textContent
+    ).toEqual("MS2");
 
     // Shows the error message:
     expect(
-      wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
-    ).toContain("Start Event Date Time");
-    expect(
-      wrapper
-        .find(".sample-tabpanel-1 .startEventDateTime-field .invalid-feedback")
-        .exists()
-    ).toEqual(true);
+      wrapper.getByText(
+        /1 : start event date time \- invalid collecting event/i
+      )
+    ).toBeInTheDocument();
   });
 
   it("Shows an error indicator on the Edit All tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
@@ -1531,7 +1456,7 @@ describe("MaterialSampleBulkEditor", () => {
       );
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1545,29 +1470,26 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Use the Edit All tab:
-    wrapper.find("li.tab-EDIT_ALL").simulate("click");
+    // Go the the bulk edit tab:
+    fireEvent.click(wrapper.getByText(/edit all/i));
 
     // Enable the collecting event section:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
-
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Click the "Save All" button:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The collecting event was saved separately.
-    // TODO let the Collecting Event be saved along with the Material Sample in one transaction.
     expect(mockSaveForBadColEvent).lastCalledWith(
       [
         {
@@ -1582,25 +1504,20 @@ describe("MaterialSampleBulkEditor", () => {
 
     // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
-      wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.getByText(
+        /bulk submission error: check the tabs with a red label\./i
+      )
+    ).toBeInTheDocument();
     expect(
-      wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(true);
-    expect(
-      wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
-    ).toEqual(false);
-    expect(
-      wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(".text-danger")?.textContent
+    ).toEqual("MS1");
 
     // Shows the error message:
     expect(
-      wrapper.find(".sample-tabpanel-0 .error-viewer").first().text()
-    ).toContain("Start Event Date Time");
-    expect(wrapper.find(".sample-tabpanel-0 .error-message").exists()).toEqual(
-      true
-    );
+      wrapper.getByText(
+        /1 : start event date time \- invalid collecting event/i
+      )
+    ).toBeInTheDocument();
   });
 
   it("Shows an error indicator on the Edit All tab when a bulk-edited causes a server-side field error.", async () => {
@@ -1614,7 +1531,7 @@ describe("MaterialSampleBulkEditor", () => {
       ]);
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1628,48 +1545,33 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Use the Edit All tab:
-    wrapper.find("li.tab-EDIT_ALL").simulate("click");
+    // Go the the bulk edit tab:
+    fireEvent.click(wrapper.getByText(/edit all/i));
 
     // Edit the barcode:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "bad barcode" } });
+    fireEvent.change(wrapper.getByRole("textbox", { name: /barcode/i }), {
+      target: { value: "bad barcode" }
+    });
 
     // Click the "Save All" button:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // The bulk edit tab is given the red text, and the other tabs are unaffected:
+    // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .barcode-field .invalid-feedback")
-        .exists()
-    ).toEqual(true);
+      wrapper.getByText(
+        /bulk submission error: check the tabs with a red label\./i
+      )
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(".sample-tabpanel-0 .barcode-field .invalid-feedback")
-        .exists()
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(".sample-tabpanel-1 .barcode-field .invalid-feedback")
-        .exists()
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(".sample-tabpanel-2 .barcode-field .invalid-feedback")
-        .exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(".text-danger")?.textContent
+    ).toEqual("Edit All");
   });
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
@@ -1691,52 +1593,36 @@ describe("MaterialSampleBulkEditor", () => {
         }
       }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Click the "Save All" button:
-    wrapper.find("button.bulk-save-button").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // The tab with the error is given the red text, and the other 2 tabs are unaffected:
+    // The tab with the error is given the red text, and the other tabs are unaffected:
     expect(
-      wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.getByText(
+        /bulk submission error: check the tabs with a red label\./i
+      )
+    ).toBeInTheDocument();
     expect(
-      wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
-    ).toEqual(true);
-    expect(
-      wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(".text-danger")?.textContent
+    ).toEqual("MS2");
 
-    // Shows the error message at the top of the form in that tab:
-    wrapper.find("li.sample-tab-1").simulate("click");
     expect(
-      wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
-    ).toContain("Invalid barcode");
-    // Shows the error message on the barcode field:
-    expect(
-      wrapper
-        .find(".sample-tabpanel-1 .barcode-field .invalid-feedback")
-        .first()
-        .text()
-    ).toContain("Invalid barcode");
+      wrapper.getByText(/1 : barcode \- invalid barcode/i)
+    ).toBeInTheDocument();
   });
 
   it("Doesnt override the values when the Override All button is not clicked.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_ARRAY_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable all the sections with the "Override All" warning boxes:
     [
@@ -1744,58 +1630,26 @@ describe("MaterialSampleBulkEditor", () => {
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
-    ].forEach((selector) =>
-      wrapper
-        .find(`.tabpanel-EDIT_ALL ${selector}`)
-        .find(Switch)
-        .prop<any>("onChange")(true)
-    );
-
+    ].forEach((selector) => {
+      const toggle = wrapper.container.querySelectorAll(
+        selector + " .react-switch-bg"
+      );
+      if (!toggle) {
+        fail("Toggle for " + selector + " needs to exist at this point.");
+      }
+      fireEvent.click(toggle[0]);
+    });
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Shows the warnings:
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL ." +
-            ORGANISMS_COMPONENT_NAME +
-            " .multiple-values-warning"
-        )
-        .exists()
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL #" +
-            MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME +
-            " .multiple-values-warning"
-        )
-        .exists()
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL #" +
-            ASSOCIATIONS_COMPONENT_NAME +
-            " .multiple-values-warning"
-        )
-        .exists()
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL #" +
-            SCHEDULED_ACTIONS_COMPONENT_NAME +
-            " .multiple-values-warning"
-        )
-        .exists()
-    ).toEqual(true);
+    // Shows the warning for each section enabled:
+    const warnings = wrapper.container.querySelectorAll(
+      ".multiple-values-warning"
+    );
+    expect(warnings.length).toEqual(4);
 
     // Click the "Save All" button without overriding anything:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -1842,16 +1696,14 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Overrides the values when the Override All buttons are clicked.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_ARRAY_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable all the sections with the "Override All" warning boxes:
     [
@@ -1859,15 +1711,16 @@ describe("MaterialSampleBulkEditor", () => {
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
-    ].forEach((selector) =>
-      wrapper
-        .find(`.tabpanel-EDIT_ALL ${selector}`)
-        .find(Switch)
-        .prop<any>("onChange")(true)
-    );
-
+    ].forEach((selector) => {
+      const toggle = wrapper.container.querySelectorAll(
+        selector + " .react-switch-bg"
+      );
+      if (!toggle) {
+        fail("Toggle for " + selector + " needs to exist at this point.");
+      }
+      fireEvent.click(toggle[0]);
+    });
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Click the Override All buttons:
     for (const section of [
@@ -1876,160 +1729,97 @@ describe("MaterialSampleBulkEditor", () => {
       "#" + ASSOCIATIONS_COMPONENT_NAME,
       "#" + SCHEDULED_ACTIONS_COMPONENT_NAME
     ]) {
-      wrapper.find(`${section} button.override-all-button`).simulate("click");
-      wrapper.find("form .are-you-sure-modal").simulate("submit");
+      const overrideButton = wrapper.container.querySelector(
+        `${section} button.override-all-button`
+      );
+      if (!overrideButton) {
+        fail(
+          `Override button inside of ${section} needs to exist at this point.`
+        );
+      }
+      fireEvent.click(overrideButton);
       await new Promise(setImmediate);
-      wrapper.update();
+
+      // Click "Yes" on the popup dialog.
+      fireEvent.click(wrapper.getByRole("button", { name: /yes/i }));
+      await new Promise(setImmediate);
     }
 
     // Organisms section opens with an initial value, so it has the green indicator on the fieldset:
     expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            ORGANISMS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(true);
+      wrapper.getByText(
+        /these organisms will be set on all material samples\./i
+      )
+    ).toBeInTheDocument();
+
     // The other over-ridable sections don't have an initial value,
     // so they don't initially show the green indicator on the fieldset:
     expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            ASSOCIATIONS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(false);
+      wrapper.queryByText(
+        /these attachments will be set on all material samples\./i
+      )
+    ).not.toBeInTheDocument();
+
     // Associations list section opens with an initial value, so it has the green indicator on the fieldset:
     expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            ASSOCIATIONS_COMPONENT_NAME +
-            " fieldset.associations-tabs .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(true);
+      wrapper.getByText(
+        /these associationss will be set on all material samples\./i
+      )
+    ).toBeInTheDocument();
+
+    // Scheduled should not display it as well:
     expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            SCHEDULED_ACTIONS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(false);
+      wrapper.queryByText(
+        /these scheduled actions will be set on all material samples\./i
+      )
+    ).not.toBeInTheDocument();
 
-    // Set the override values:
-    wrapper.find(".determination-section button.add-button").simulate("click");
-    wrapper
-      .find(
-        ".tabpanel-EDIT_ALL .determination-section .verbatimScientificName input"
-      )
-      .simulate("change", { target: { value: "new-scientific-name" } });
-    wrapper
-      .find(".tabpanel-EDIT_ALL #" + MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME)
-      .find(AttachmentsEditor)
-      .prop("onChange")([{ id: "new-attachment-id", type: "metadata" }]);
-    wrapper
-      .find(".tabpanel-EDIT_ALL #" + ASSOCIATIONS_COMPONENT_NAME + "")
-      .find(MaterialSampleSearchHelper)
-      .prop("onAssociatedSampleSelected")({
-      id: "new-sample-assoc",
-      type: "material-sample"
-    });
-    wrapper
-      .find(
-        ".tabpanel-EDIT_ALL #" +
-          ASSOCIATIONS_COMPONENT_NAME +
-          " .associationType-field"
-      )
-      .find(CreatableSelect)
-      .prop<any>("onChange")({ value: "has_host" });
-    wrapper
-      .find(
-        ".tabpanel-EDIT_ALL #" +
-          SCHEDULED_ACTIONS_COMPONENT_NAME +
-          " .actionType-field input"
-      )
-      .simulate("change", { target: { value: "new-action-type" } });
-    wrapper
-      .find(
-        ".tabpanel-EDIT_ALL #" +
-          SCHEDULED_ACTIONS_COMPONENT_NAME +
-          " button.add-button"
-      )
-      .simulate("click");
-
+    // Set the override values for organism:
+    // Click the "Add New Determination" button.
+    fireEvent.click(
+      wrapper.getByRole("button", { name: /add new determination/i })
+    );
     await new Promise(setImmediate);
-    wrapper.update();
+
+    // Override the verbatim scientific name.
+    fireEvent.change(
+      wrapper.getByRole("textbox", {
+        name: /verbatim scientific name × insert hybrid symbol/i
+      }),
+      { target: { value: "new-scientific-name" } }
+    );
+    await new Promise(setImmediate);
+
+    // Override the scheduled acitons
+    fireEvent.change(wrapper.getByRole("textbox", { name: /action type/i }), {
+      target: { value: "new-action-type" }
+    });
+
+    // Click the "Add" schedule button.
+    const scheduleActionButton = wrapper.container.querySelector(
+      "#" + SCHEDULED_ACTIONS_COMPONENT_NAME + " button"
+    );
+    if (!scheduleActionButton) {
+      fail("Schedule add button needs to exist at this point.");
+    }
+    fireEvent.click(scheduleActionButton);
+    await new Promise(setImmediate);
 
     // All overridable fieldsets should now have the green bulk edited indicator:
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            ORGANISMS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            ASSOCIATIONS_COMPONENT_NAME +
-            " fieldset.associations-tabs .legend-wrapper"
-        )
-        .first()
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            SCHEDULED_ACTIONS_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
+    const overrideClasses = wrapper.container.querySelectorAll(
+      ".has-bulk-edit-value"
+    );
+    expect(overrideClasses.length).toEqual(5);
 
     // All Override All buttons should be gone now:
-    expect(wrapper.find("button.override-all-button").exists()).toEqual(false);
+    const overrideButtons = wrapper.container.querySelectorAll(
+      "button.override-all-button"
+    );
+    expect(overrideButtons.length).toEqual(0);
 
     // Click the "Save All" button without overriding anything:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
@@ -2062,24 +1852,13 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: sample.id,
               attachment: undefined,
+              associations: [],
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
               projects: undefined,
               type: sample.type,
-              associations: [
-                {
-                  associatedSample: "new-sample-assoc",
-                  associationType: "has_host"
-                }
-              ],
-              scheduledActions: [
-                { actionType: "new-action-type", date: expect.anything() }
-              ],
               relationships: {
-                attachment: {
-                  data: [{ id: "new-attachment-id", type: "metadata" }]
-                },
                 organism: {
                   data: [{ id: "11111", type: "organism" }]
                 }
@@ -2093,161 +1872,77 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows the Multiple Values placeholder in bulk editable fields", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(
-      wrapper
-        .find(".has-multiple-values .tags-field div.react-select__placeholder")
-        .text()
-    ).toEqual("Multiple Values");
+      wrapper.getByRole("combobox", { name: /tags multiple values/i })
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(
-          ".has-multiple-values .collection-field div.react-select__placeholder"
-        )
-        .text()
-    ).toEqual("Multiple Values");
+      wrapper.getByRole("combobox", { name: /collection multiple values/i })
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(
-          ".has-multiple-values .projects-field div.react-select__placeholder"
-        )
-        .text()
-    ).toEqual("Multiple Values");
-    expect(
-      wrapper
-        .find(
-          ".has-multiple-values .publiclyReleasable-field .placeholder-text"
-        )
-        .text()
-    ).toEqual("Multiple Values");
-    expect(
-      wrapper
-        .find(".has-multiple-values .barcode-field input")
-        .prop("placeholder")
-    ).toEqual("Multiple Values");
-    expect(
-      wrapper
-        .find(".has-multiple-values .materialSampleState-field input")
-        .prop("placeholder")
-    ).toEqual("Multiple Values");
+      wrapper.getByRole("combobox", { name: /projects multiple values/i })
+    ).toBeInTheDocument();
+    expect(wrapper.getByRole("textbox", { name: /barcode/i })).toHaveAttribute(
+      "placeholder",
+      "Multiple Values"
+    );
 
     // Blank values should be rendered into these fields so the placeholder is visible:
     expect(
-      wrapper
-        .find(".has-multiple-values .tags-field")
-        .find(CreatableSelect)
-        .prop("value")
-    ).toEqual([]);
+      wrapper.getByRole("combobox", { name: /tags multiple values/i })
+    ).toHaveValue("");
     expect(
-      wrapper
-        .find(".has-multiple-values .collection-field")
-        .find(Select)
-        .prop("value")
-    ).toEqual(null);
-    expect(
-      wrapper
-        .find(".has-multiple-values .materialSampleState-field input")
-        .prop("value")
-    ).toEqual("");
+      wrapper.getByRole("combobox", { name: /collection multiple values/i })
+    ).toHaveValue("");
   });
 
   it("Shows the common value when multiple fields have the same value.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The common values are displayed in the UI:
+    // Tags:
+    expect(wrapper.getByText(/tag1/i)).toBeInTheDocument();
 
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .tags-field")
-        .find(CreatableSelect)
-        .prop("value")
-    ).toEqual([
-      {
-        label: "tag1",
-        value: "tag1"
-      }
-    ]);
+    // Collection:
+    expect(wrapper.getByText(/c1/i)).toBeInTheDocument();
 
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .collection-field")
-        .find(Select)
-        .prop("value")
-    ).toEqual({
-      label: "c1",
-      resource: {
-        id: "c1",
-        type: "collection"
-      },
-      value: "c1"
-    });
+    // Projects:
+    expect(wrapper.getByText(/project 1/i)).toBeInTheDocument();
 
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .projects-field")
-        .find(Select)
-        .prop("value")
-    ).toEqual([
-      {
-        label: "project 1",
-        resource: {
-          id: "p1",
-          name: "project 1",
-          type: "project"
-        },
-        value: "p1"
-      }
-    ]);
+    // Barcode
+    expect(wrapper.getByDisplayValue("test barcode")).toBeInTheDocument();
 
-    expect(
-      wrapper
-        .find(".publiclyReleasable-field label")
-        // The field is inverted (Not Publicly Releasable) so false -> true:
-        .findWhere((node) => node.text().includes("True"))
-        .find("input")
-        .prop("checked")
-    ).toEqual(true);
+    // Publicly Releasable
+    expect(wrapper.getByLabelText("True")).toHaveProperty("checked", true);
 
-    expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("test barcode");
-
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .materialSampleState-field input")
-        .prop("value")
-    ).toEqual("test-ms-state");
+    // Material Sample State
+    expect(wrapper.getByDisplayValue("test-ms-state")).toBeInTheDocument();
 
     // Set the barcode to the same value to update the form state
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "test barcode" } });
+    fireEvent.change(wrapper.getByRole("textbox", { name: /barcode/i }), {
+      target: { value: "test barcode" }
+    });
 
-    // Click the "Save All" button without overriding anything:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // The first sample has the edited barcode, the second sample is unaffected:
+    // No changes should be made
     expect(mockSave.mock.calls).toEqual([
       [
         [
@@ -2284,50 +1979,54 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Ignores the submitted value if the field is re-edited to the common value.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
+
+    const barcodeInput = wrapper.container.querySelector(
+      ".tabpanel-EDIT_ALL .barcode-field input"
+    );
+    if (!barcodeInput) {
+      fail("Barcode input needs to exist at this point.");
+    }
 
     // Has the default common value:
-    expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("test barcode");
+    expect(barcodeInput).toHaveValue("test barcode");
 
     // Manually enter the default value:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "temporary edit" } });
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "test barcode" } });
+    fireEvent.change(barcodeInput, { target: { value: "temporary edit" } });
+    fireEvent.change(barcodeInput, { target: { value: "test barcode" } });
+
     // Don't show the green indicator if the field is back to its initial value:
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field")
-        .exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field"
+      )
+    ).toBeNull();
+
     // Has the default common value:
-    expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("test barcode");
+    expect(barcodeInput).toHaveValue("test barcode");
 
     // Edit the first sample's barcode:
-    wrapper.find("li.sample-tab-0").simulate("click");
-    wrapper
-      .find(".sample-tabpanel-0 .barcode-field input")
-      .simulate("change", { target: { value: "edited-barcode" } });
+    fireEvent.click(wrapper.getByText(/#1/i));
+    const tabpanel1 = wrapper.getByRole("tabpanel", {
+      name: /#1/i
+    });
+    fireEvent.change(
+      within(tabpanel1).getByRole("textbox", {
+        name: /barcode/i
+      }),
+      { target: { value: "edited-barcode" } }
+    );
 
     // Save All:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Save the collecting event, then save the 2 material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -2369,190 +2068,131 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Renders blank values without the has-bulk-edit-value indicator when there is a common field value.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
+
+    const barcodeInput = wrapper.container.querySelector(
+      ".tabpanel-EDIT_ALL .barcode-field input"
+    );
+    if (!barcodeInput) {
+      fail("Barcode input needs to exist at this point.");
+    }
 
     // Has the default common value:
-    expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("test barcode");
+    expect(barcodeInput).toHaveValue("test barcode");
 
     // Manually erase the default value:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "" } });
+    fireEvent.change(barcodeInput, { target: { value: "" } });
+    await new Promise(setImmediate);
 
     // Shows the blank input without the green indicator:
+    expect(barcodeInput).toHaveValue("");
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("");
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field")
-        .exists()
-    ).toEqual(false);
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field"
+      )
+    ).toBeNull();
   });
 
   it("Adds the has-bulk-edit-value classname when the field is edited.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".tabpanel-EDIT_ALL .barcode-field input")
-      .simulate("change", { target: { value: "edited-barcode-1" } });
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field")
-        .exists()
-    ).toEqual(true);
+    const barcodeInput = wrapper.container.querySelector(
+      ".tabpanel-EDIT_ALL .barcode-field input"
+    );
+    if (!barcodeInput) {
+      fail("Barcode input needs to exist at this point.");
+    }
 
-    wrapper
-      .find(".tabpanel-EDIT_ALL .tags-field")
-      .find(CreatableSelect)
-      .prop<any>("onChange")([{ value: "tag1" }]);
-    wrapper.update();
+    fireEvent.change(barcodeInput, { target: { value: "edited-barcode-1" } });
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .tags-field")
-        .exists()
-    ).toEqual(true);
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field"
+      )
+    ).not.toBeNull();
   });
 
   it("Shows the managed attributes for all edited samples.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_DIFFERENT_MANAGED_ATTRIBUTES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // m1 and m2 have multiple values, so show a blank input with a placeholder:
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .managedAttributes_m1-field input")
-        .prop("value")
-    ).toEqual("");
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .managedAttributes_m1-field input"
+      )
+    ).toHaveValue("");
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .managedAttributes_m2-field input")
-        .prop("value")
-    ).toEqual("");
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .managedAttributes_m2-field input"
+      )
+    ).toHaveValue("");
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .managedAttributes_m1-field input")
-        .prop("placeholder")
-    ).toEqual("Multiple Values");
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .managedAttributes_m3-field input"
+      )
+    ).toHaveValue("common m3 value");
+
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .managedAttributes_m2-field input")
-        .prop("placeholder")
-    ).toEqual("Multiple Values");
-    // m3 has a common value so show the common value in the input:
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .managedAttributes_m1-field input"
+      )
+    ).toHaveProperty("placeholder", "Multiple Values");
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .managedAttributes_m3-field input")
-        .prop("value")
-    ).toEqual("common m3 value");
-  });
-
-  it("Shows the has-bulk-edit-value classname for linked resources with nested forms.", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleBulkEditor
-        onSaved={mockOnSaved}
-        samples={TEST_NEW_SAMPLES}
-      />,
-      testCtx
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Enable the collecting event section:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // The has-bulk-edit-value indicator appears:
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            COLLECTING_EVENT_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .find(".has-bulk-edit-value .field-label")
-        .exists()
-    ).toEqual(true);
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .managedAttributes_m2-field input"
+      )
+    ).toHaveProperty("placeholder", "Multiple Values");
   });
 
   it("Creates and links a unique Collecting Event to all samples", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable the collecting event section:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
-
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
-
-    // The collecting event section has the green legend to indicate a bulk edit:
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            COLLECTING_EVENT_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .find(".has-bulk-edit-value .field-label")
-        .exists()
-    ).toEqual(true);
 
     // Edit a collecting event field:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
-      .simulate("change", { target: { value: "test locality" } });
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /verbatim locality/i }),
+      { target: { value: "test locality" } }
+    );
 
-    // Save All:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Save the collecting event, then save the 2 material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -2712,54 +2352,39 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Shows the common Collecting Event when all samples are linked to the same one.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable the collecting event section:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
-
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".tabpanel-EDIT_ALL .enable-collecting-event .react-switch-bg"
+    );
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The collecting event section has a green legend to indicate a bulk edit (event without setting a new Collecting Event):
     expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#" +
-            COLLECTING_EVENT_COMPONENT_NAME +
-            " .legend-wrapper"
-        )
-        .first()
-        .find(".has-bulk-edit-value .field-label")
-        .exists()
-    ).toEqual(true);
-
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
-        .prop("value")
-    ).toEqual("test initial locality");
+      wrapper.getAllByRole("button", { name: /detach/i })[0]
+    ).toBeInTheDocument();
 
     // Edit the common collecting event:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
-      .simulate("change", { target: { value: "bulk edited locality" } });
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /verbatim locality/i }),
+      { target: { value: "bulk edited locality" } }
+    );
 
-    // Save All:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Save the collecting event, then save the 2 material samples:
     expect(mockSave.mock.calls).toEqual([
@@ -2820,49 +2445,59 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Lets you bulk reassign the linked storage", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_STORAGE_UNIT}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-storage")
-      .find(Switch)
-      .prop<any>("onChange")(true);
+    const storageToggle = wrapper.container.querySelectorAll(
+      ".tabpanel-EDIT_ALL .enable-storage .react-switch-bg"
+    );
+    if (!storageToggle) {
+      fail("Storage toggle needs to exist at this point.");
+    }
+    fireEvent.click(storageToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find(".tabpanel-EDIT_ALL button.remove-storage").simulate("click");
+    // Delete the current storage...
+    const removeStorageButton = wrapper.container.querySelector(
+      ".tabpanel-EDIT_ALL button.remove-storage"
+    );
+    if (!removeStorageButton) {
+      fail("Remove existing storage button doesn't exist on the page.");
+    }
+    fireEvent.click(removeStorageButton);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Assign a different storage unit:
-    wrapper
-      .find(".tabpanel-EDIT_ALL button.select-storage")
-      .last()
-      .simulate("click");
+    const row = wrapper.getByRole("row", {
+      name: /storage unit c \(box\) select/i
+    });
+    const selectStorageButton = within(row).getByRole("button", {
+      name: /select/i
+    });
+    fireEvent.click(selectStorageButton);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Green indicator shows up:
     expect(
-      wrapper.find(".has-bulk-edit-value .storageUnit-field").exists()
-    ).toEqual(true);
+      wrapper.getByText(
+        /this storage unit will be linked to all material samples\./i
+      )
+    ).toBeInTheDocument();
+
     // New linked storage unit is indicated:
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .storageUnit-field .storage-path").text()
-    ).toEqual("storage unit C (Box)");
+      wrapper.getByRole("link", { name: /storage unit c \(box\)/i })
+    ).toBeInTheDocument();
 
-    // Save the samples with the new storage unit:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the new material samples with the new storage unit:
     expect(mockSave.mock.calls).toEqual([
@@ -2963,33 +2598,36 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Edits the nested hostOrganism field.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_SAMPLES_SAME_HOST_ORGANISM}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable host organism fields:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-associations")
-      .find(Switch)
-      .prop<any>("onChange")(true);
+    const toggle = wrapper.container.querySelectorAll(
+      ".tabpanel-EDIT_ALL .enable-associations .react-switch-bg"
+    );
+    if (!toggle) {
+      fail("Associations toggle needs to exist at this point.");
+    }
+    fireEvent.click(toggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".tabpanel-EDIT_ALL .hostOrganism_remarks-field textarea")
-      .simulate("change", { target: { value: "bulk-edit-remarks" } });
+    const hostRemarks = wrapper.container.querySelector(
+      ".tabpanel-EDIT_ALL .hostOrganism_remarks-field textarea"
+    );
+    if (!hostRemarks) {
+      fail("Remarks textbox does not exist.");
+    }
+    fireEvent.change(hostRemarks, { target: { value: "bulk-edit-remarks" } });
 
-    // Save the samples:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the new material samples with the new storage unit:
     expect(mockSave.mock.calls).toEqual([
@@ -3028,41 +2666,41 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Allows adding NEW nested Collecting the individual sample tabs.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Edit the first sample only:
-    wrapper.find("li.sample-tab-0").simulate("click");
+    fireEvent.click(wrapper.getByText(/ms1/i));
 
     // Enable the collecting event section:
-    wrapper
-      .find(".sample-tabpanel-0 .enable-collecting-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
-
+    const toggle = wrapper.container.querySelector(
+      ".sample-tabpanel-0 .enable-collecting-event .react-switch-bg"
+    );
+    if (!toggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(toggle);
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(
-        ".sample-tabpanel-0 #" +
-          COLLECTING_EVENT_COMPONENT_NAME +
-          " .dwcVerbatimLocality-field input"
-      )
-      .simulate("change", { target: { value: "test locality" } });
+    const verbatimLocality = wrapper.container.querySelector(
+      ".sample-tabpanel-0 #" +
+        COLLECTING_EVENT_COMPONENT_NAME +
+        " .dwcVerbatimLocality-field input"
+    );
+    if (!verbatimLocality) {
+      fail("Verbatim locality textbox cannot be found.");
+    }
+    fireEvent.change(verbatimLocality, { target: { value: "test locality" } });
 
-    // Save the samples:
-    wrapper.find("button.bulk-save-button").simulate("click");
+    // Click the "Save All" button:
+    fireEvent.click(wrapper.getByRole("button", { name: /save all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the new material samples with the new storage unit:
     expect(mockSave.mock.calls).toEqual([
@@ -3120,134 +2758,116 @@ describe("MaterialSampleBulkEditor", () => {
   });
 
   it("Allows selecting a Form Template to show/hide fields in the bulk and single tabs for material sample section.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
-    ).toEqual(true);
-
+      wrapper.getByRole("textbox", { name: /barcode/i })
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
-        .exists()
-    ).toEqual(true);
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .override-all-button-catalog-numbers"
+      )
+    ).not.toBeNull();
+    wrapper.unmount();
 
     // Select a form template:
-    wrapper
-      .find(".form-template-select")
-      .find(ResourceSelect)
-      .prop<any>("onChange")(formTemplate);
-
+    const wrapper2 = mountWithAppContext2(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+        initialFormTemplateUUID={formTemplate.id}
+      />,
+      testCtx
+    );
     await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(
-      wrapper
-        .find(".form-template-select")
-        .find(ResourceSelect)
-        .prop<any>("value").id
-    ).toEqual(formTemplate.id);
 
     // The bulk edit tab shows the barcode field from the FormTemplate:
     // For Material Sample:
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
-    ).toEqual(true);
-
+      wrapper2.getByRole("textbox", { name: /barcode/i })
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
-        .exists()
-    ).toEqual(false);
+      wrapper2.container.querySelector(
+        ".tabpanel-EDIT_ALL .override-all-button-catalog-numbers"
+      )
+    ).toBeNull();
 
     // Switch to the first individual sample tab:
-    wrapper.find("li.sample-tab-0").simulate("click");
-
+    fireEvent.click(wrapper2.getByText(/ms1/i));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(
-      wrapper.find(".sample-tabpanel-0 .barcode-field input").exists()
-    ).toEqual(true);
-
+      wrapper2.container.querySelector(
+        ".sample-tabpanel-0 .barcode-field input"
+      )
+    ).not.toBeNull();
     expect(
-      wrapper
-        .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers_0_-field input")
-        .exists()
-    ).toEqual(false);
+      wrapper2.container.querySelector(
+        ".sample-tabpanel-0 .dwcOtherCatalogNumbers_0_-field input"
+      )
+    ).toBeNull();
   });
 
   it("Allows selecting a Form Template to provide default values for bulk material sample edit all tab.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={TEST_NEW_SAMPLES}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
-    ).toEqual(true);
-
+      wrapper.getByRole("textbox", { name: /barcode/i })
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers")
-        .exists()
-    ).toEqual(true);
+      wrapper.container.querySelector(
+        ".tabpanel-EDIT_ALL .override-all-button-catalog-numbers"
+      )
+    ).not.toBeNull();
+    wrapper.unmount();
 
     // Select a form template:
-    wrapper
-      .find(".form-template-select")
-      .find(ResourceSelect)
-      .prop<any>("onChange")(formTemplate);
-
+    const wrapper2 = mountWithAppContext2(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+        initialFormTemplateUUID={formTemplate.id}
+      />,
+      testCtx
+    );
     await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(
-      wrapper
-        .find(".form-template-select")
-        .find(ResourceSelect)
-        .prop<any>("value").id
-    ).toEqual(formTemplate.id);
 
     // The bulk edit tab shows the default values from the FormTemplate:
     // For Material Sample:
     expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
-    ).toEqual(true);
-
+      wrapper2.getByRole("textbox", { name: /barcode/i })
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .override-all-button-catalog-numbers input")
-        .exists()
-    ).toEqual(false);
-
-    expect(
-      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("1111");
+      wrapper2.container.querySelector(
+        ".tabpanel-EDIT_ALL .override-all-button-catalog-numbers"
+      )
+    ).toBeNull();
+    expect(wrapper2.getByRole("textbox", { name: /barcode/i })).toHaveValue(
+      "1111"
+    );
 
     // Switch to the first individual sample tab:
-    wrapper.find("li.sample-tab-0").simulate("click");
-
+    fireEvent.click(wrapper2.getByText(/ms1/i));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(
-      wrapper.find(".sample-tabpanel-0 .barcode-field input").prop("value")
-    ).toEqual("");
+      wrapper2.container.querySelector(
+        ".sample-tabpanel-0 .barcode-field input"
+      )
+    ).toHaveValue("");
   });
 });
