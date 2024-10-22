@@ -587,11 +587,11 @@ export function useColumnMapping() {
       };
     } = {};
     if (spreadsheetData) {
-      const spreadsheetHeaders = spreadsheetData[sheet][0].content;
+      const spreadsheetHeaders = spreadsheetData[sheet].rows[0].content;
       const colIndex = spreadsheetHeaders.indexOf(columnHeader) ?? -1;
       if (colIndex > -1) {
-        for (let i = 1; i < spreadsheetData[sheet].length; i++) {
-          const parentValue = spreadsheetData[sheet][i].content[colIndex];
+        for (let i = 1; i < spreadsheetData[sheet].rows.length; i++) {
+          const parentValue = spreadsheetData[sheet].rows[i].content[colIndex];
           if (parentValue) {
             const response = await apiClient.get<ResourceNameIdentifier[]>(
               `/collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=material-sample&filter[name][EQ]=${parentValue}`,

@@ -88,14 +88,20 @@ describe("workbookMappingUtils functions", () => {
       expect(
         getColumnHeaders(
           {
-            "0": [
-              { rowNumber: 0, content: ["header1", "header2", "header3"] },
-              { rowNumber: 1, content: ["data1", "data2", "data3"] }
-            ],
-            "1": [
-              { rowNumber: 0, content: ["header4", "header5", "header6"] },
-              { rowNumber: 1, content: ["data4", "data5", "data6"] }
-            ]
+            "0": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                { rowNumber: 0, content: ["header1", "header2", "header3"] },
+                { rowNumber: 1, content: ["data1", "data2", "data3"] }
+              ]
+            },
+            "1": {
+              sheetName: "Test Sheet 1",
+              rows: [
+                { rowNumber: 0, content: ["header4", "header5", "header6"] },
+                { rowNumber: 1, content: ["data4", "data5", "data6"] }
+              ]
+            }
           },
           0 // Return first sheet.
         )
@@ -104,14 +110,20 @@ describe("workbookMappingUtils functions", () => {
       expect(
         getColumnHeaders(
           {
-            "0": [
-              { rowNumber: 0, content: ["header1", "header2", "header3"] },
-              { rowNumber: 1, content: ["data1", "data2", "data3"] }
-            ],
-            "1": [
-              { rowNumber: 0, content: ["header4", "header5", "header6"] },
-              { rowNumber: 1, content: ["data4", "data5", "data6"] }
-            ]
+            "0": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                { rowNumber: 0, content: ["header1", "header2", "header3"] },
+                { rowNumber: 1, content: ["data1", "data2", "data3"] }
+              ]
+            },
+            "1": {
+              sheetName: "Test Sheet 1",
+              rows: [
+                { rowNumber: 0, content: ["header4", "header5", "header6"] },
+                { rowNumber: 1, content: ["data4", "data5", "data6"] }
+              ]
+            }
           },
           1 // Return first sheet.
         )
@@ -122,20 +134,23 @@ describe("workbookMappingUtils functions", () => {
       expect(
         getColumnHeaders(
           {
-            "0": [
-              {
-                rowNumber: 0,
-                content: []
-              },
-              {
-                rowNumber: 1,
-                content: ["header1", "header2", "header3"]
-              },
-              {
-                rowNumber: 2,
-                content: ["data1", "data2", "data3"]
-              }
-            ]
+            "0": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                {
+                  rowNumber: 0,
+                  content: []
+                },
+                {
+                  rowNumber: 1,
+                  content: ["header1", "header2", "header3"]
+                },
+                {
+                  rowNumber: 2,
+                  content: ["data1", "data2", "data3"]
+                }
+              ]
+            }
           },
           0
         )
@@ -146,12 +161,15 @@ describe("workbookMappingUtils functions", () => {
       expect(
         getColumnHeaders(
           {
-            "0": [
-              {
-                rowNumber: 0,
-                content: []
-              }
-            ]
+            "0": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                {
+                  rowNumber: 0,
+                  content: []
+                }
+              ]
+            }
           },
           0
         )
@@ -164,23 +182,45 @@ describe("workbookMappingUtils functions", () => {
       expect(
         getDataFromWorkbook(
           {
-            "0": [
-              { rowNumber: 0, content: ["header1", "header2", "header3"] },
-              { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
-              { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
-              { rowNumber: 3, content: ["dataC1", "dataC2", "dataC3"] }
-            ],
-            "1": [
-              { rowNumber: 0, content: ["header4", "header5", "header6"] },
-              { rowNumber: 1, content: ["data4", "data5", "data6"] }
-            ]
+            "0": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                { rowNumber: 0, content: ["header1", "header2", "header3"] },
+                { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
+                { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
+                { rowNumber: 3, content: ["dataC1", "dataC2", "dataC3"] }
+              ]
+            },
+            "1": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                { rowNumber: 0, content: ["header4", "header5", "header6"] },
+                { rowNumber: 1, content: ["data4", "data5", "data6"] }
+              ]
+            }
           },
           0, // Return first sheet.
           [
-            { targetField: "field1", skipped: false },
-            { targetField: "field2", skipped: false },
-            { targetField: "field3", skipped: false },
-            { targetField: "field4", skipped: true }
+            {
+              targetField: "field1",
+              skipped: false,
+              columnHeader: ""
+            },
+            {
+              targetField: "field2",
+              skipped: false,
+              columnHeader: ""
+            },
+            {
+              targetField: "field3",
+              skipped: false,
+              columnHeader: ""
+            },
+            {
+              targetField: "field4",
+              skipped: true,
+              columnHeader: ""
+            }
           ]
         )
       ).toEqual([
@@ -208,9 +248,9 @@ describe("workbookMappingUtils functions", () => {
           undefined,
           0, // Return first sheet.
           [
-            { targetField: "field1", skipped: false },
-            { targetField: "field2", skipped: false },
-            { targetField: "field3", skipped: false }
+            { targetField: "field1", skipped: false, columnHeader: "" },
+            { targetField: "field2", skipped: false, columnHeader: "" },
+            { targetField: "field3", skipped: false, columnHeader: "" }
           ]
         )
       ).toEqual([]);
@@ -219,24 +259,30 @@ describe("workbookMappingUtils functions", () => {
     test("resolveNumberOfUniqueValueFromSpreadsheetData", () => {
       expect(
         calculateColumnUniqueValuesFromSpreadsheetData({
-          "0": [
-            { rowNumber: 0, content: ["header1", "header2", "header3"] },
-            { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
-            { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
-            { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
-            { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
-            { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
-            { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
-          ],
-          "1": [
-            { rowNumber: 0, content: ["header4", "header5", "header6"] },
-            { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
-            { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
-            { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
-            { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
-            { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
-            { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
-          ]
+          "0": {
+            sheetName: "Test Sheet 0",
+            rows: [
+              { rowNumber: 0, content: ["header1", "header2", "header3"] },
+              { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
+              { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
+              { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
+              { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
+              { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
+              { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
+            ]
+          },
+          "1": {
+            sheetName: "Test Sheet 1",
+            rows: [
+              { rowNumber: 0, content: ["header4", "header5", "header6"] },
+              { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
+              { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
+              { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
+              { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
+              { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
+              { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
+            ]
+          }
         })
       ).toEqual({
         "0": {
@@ -454,14 +500,20 @@ describe("workbookMappingUtils functions", () => {
   it("trimSpace", () => {
     expect(
       trimSpace({
-        "0": [
-          { rowNumber: 0, content: ["header1 ", "header2 ", "header3 "] },
-          { rowNumber: 1, content: ["data1 ", " data2", " data3"] }
-        ],
-        "1": [
-          { rowNumber: 0, content: ["header4 ", " header5", "header6 "] },
-          { rowNumber: 1, content: ["data4 ", " data5", "data6 "] }
-        ]
+        "0": {
+          sheetName: "Test Sheet 0",
+          rows: [
+            { rowNumber: 0, content: ["header1 ", "header2 ", "header3 "] },
+            { rowNumber: 1, content: ["data1 ", " data2", " data3"] }
+          ]
+        },
+        "1": {
+          sheetName: "Test Sheet 1",
+          rows: [
+            { rowNumber: 0, content: ["header4 ", " header5", "header6 "] },
+            { rowNumber: 1, content: ["data4 ", " data5", "data6 "] }
+          ]
+        }
       })
     ).toEqual({
       "0": [
