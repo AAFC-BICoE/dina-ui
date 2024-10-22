@@ -10,10 +10,20 @@ import _ from "lodash";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
+export interface WorkbookColumnInfo {
+  /**
+   * In the spreadsheet, the top row.
+   */
+  columnHeader: string;
+
+  /**
+   * Hidden properties inside of the excel file, these are generated from templates.
+   */
+  originalColumn?: string;
+}
+
 /**
- * This is currently a pretty simple function but in the future you will be able to select the
- * sheet to get the headers from. For now this will simply just retrieve the first row with
- * content.
+ * Using the WorkbookJSON provided, generate a list columns.
  *
  * @param spreadsheetData Whole spreadsheet data to retrieve the headers from.
  * @param sheetNumber the sheet index (starting from 0) to pull the header columns from.
