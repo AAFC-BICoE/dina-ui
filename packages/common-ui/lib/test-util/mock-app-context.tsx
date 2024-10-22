@@ -60,7 +60,11 @@ export function MockAppContextProvider({
   );
 
   const DEFAULT_INSTANCE_CONTEXT_VALUE: InstanceContextI = useMemo(
-    () => ({ supportedLanguages: "en,fr", instanceMode: "developer" }),
+    () => ({
+      supportedLanguages: "en,fr",
+      instanceMode: "developer",
+      instanceName: "AAFC"
+    }),
     []
   );
 
