@@ -215,12 +215,13 @@ function getNestedColumn<TData extends KitsuResource>(
   const accessorKeyRelationship = `${indexColumn.parentPath}.${indexColumn.parentName}`;
   const accessorKeyRelationshipAttribute = `${indexColumn.path}.${indexColumn.label}`;
   const accessorKeyFull = `${accessorKeyRelationship}.${accessorKeyRelationshipAttribute}`;
+  const accessorKeyElasticSearch = `${indexColumn.parentPath}.${accessorKeyRelationshipAttribute}`;
 
   if (indexColumn.type === "date") {
     return {
       ...dateCell(
         indexColumn.value,
-        accessorKeyFull,
+        accessorKeyElasticSearch,
         indexColumn.parentType,
         true,
         indexColumn
@@ -236,7 +237,7 @@ function getNestedColumn<TData extends KitsuResource>(
           relationship={indexColumn.parentName ?? ""}
         />
       ),
-      accessorKey: accessorKeyFull,
+      accessorKey: accessorKeyElasticSearch,
       isKeyword: indexColumn.keywordMultiFieldSupport,
       isColumnVisible: true,
       cell: ({ row: { original } }) => {
