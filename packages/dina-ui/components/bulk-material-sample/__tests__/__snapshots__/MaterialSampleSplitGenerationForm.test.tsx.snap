@@ -77,7 +77,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot with matching materia
                 >
                   <a
                     class="px-0 btn btn-link"
-                    href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+                    href="https://github.com/AAFC-BICoE/dina-feedback/issues/new?labels=AAFC"
                     role="button"
                     tabindex="0"
                   >
@@ -693,7 +693,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot without matching mate
                 >
                   <a
                     class="px-0 btn btn-link"
-                    href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+                    href="https://github.com/AAFC-BICoE/dina-feedback/issues/new?labels=AAFC"
                     role="button"
                     tabindex="0"
                   >
