@@ -57,9 +57,10 @@ export function useColumnMapping() {
     if (spreadsheetData) {
       return Object.entries(spreadsheetData).map(([sheetNumberString, _]) => {
         const sheetNumber = +sheetNumberString;
-        // This label is hardcoded for now, it will eventually be replaced with the sheet name in a
-        // future ticket.
-        return { label: "Sheet " + (sheetNumber + 1), value: sheetNumber };
+        return {
+          label: spreadsheetData[sheetNumber].sheetName,
+          value: sheetNumber
+        };
       });
     } else {
       return [];
@@ -71,7 +72,7 @@ export function useColumnMapping() {
 
   const {
     loading: attrLoadingMaterialSample,
-    response: attrRespMaterialSample
+    response: attrRespMaterialSamplem
   } = useQuery<ManagedAttribute[]>({
     path: "collection-api/managed-attribute",
     filter: filterBy([], {
