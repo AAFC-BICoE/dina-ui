@@ -128,9 +128,16 @@ function SkipLinks() {
 }
 
 function FeedbackButton() {
+  const instanceContext = useInstanceContext();
+
+  // The labels are set using the template (bug_report.md), however, it still needs to be set to
+  // a value using the URL param. I just used "template" since it will just revert to the bug_report.md
+  // provided value. The title will be pre-populated with the instance name.
   return (
     <Link
-      href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+      href={`https://github.com/AAFC-BICoE/dina-feedback/issues/new?template=bug_report.md&labels=template&title=%5B${
+        instanceContext?.instanceName ?? "AAFC"
+      }%5D%20`}
       passHref={true}
     >
       <Button variant="link" className="px-0">

@@ -4,6 +4,7 @@ import { useApiClient } from "../api-client/ApiClientContext";
 export interface InstanceContextI {
   supportedLanguages: string;
   instanceMode: string;
+  instanceName: string;
 }
 
 export const InstanceContext = createContext<InstanceContextI | undefined>(
@@ -31,12 +32,16 @@ export function DefaultInstanceContextProvider({
               : "en",
             instanceMode: !!response["instance-mode"]
               ? response["instance-mode"]
-              : "developer"
+              : "developer",
+            instanceName: !!response["instance-name"]
+              ? response["instance-name"]
+              : "AAFC"
           });
         } else {
           setInstanceJson({
             supportedLanguages: "en",
-            instanceMode: "developer"
+            instanceMode: "developer",
+            instanceName: "AAFC"
           });
         }
       } catch (error) {
