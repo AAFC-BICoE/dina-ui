@@ -23,7 +23,7 @@ export function getColumnHeaders(
   spreadsheetData: WorkbookJSON | undefined,
   sheetNumber: number
 ) {
-  const data = spreadsheetData?.[sheetNumber]?.find(
+  const data = spreadsheetData?.[sheetNumber]?.rows?.find(
     (rowData) => rowData.content.length !== 0
   );
   return data?.content ?? null;
@@ -81,14 +81,8 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
     "decimal longitude",
     "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
   ],
-  [
-    "latitude",
-    "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"
-  ],
-  [
-    "longitude",
-    "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
-  ]
+  ["latitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"],
+  ["longitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"]
 ]);
 
 export type FieldOptionType = {
@@ -216,7 +210,7 @@ export function getDataFromWorkbook(
   getRowNumber?: boolean
 ) {
   const data: { [key: string]: any }[] = [];
-  const workbookData = spreadsheetData?.[sheetNumber].filter(
+  const workbookData = spreadsheetData?.[sheetNumber]?.rows.filter(
     (rowData) => rowData.content.length !== 0
   );
   for (let i = 1; i < (workbookData?.length ?? 0); i++) {
@@ -609,7 +603,7 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
     const columnUniqueValues: {
       [columnName: string]: { [value: string]: number };
     } = {};
-    const workbookRows: WorkbookRow[] = spreadsheetData[sheet];
+    const workbookRows: WorkbookRow[] = spreadsheetData[sheet]?.rows;
     const columnNames: string[] = workbookRows[0].content;
     for (let colIndex = 0; colIndex < columnNames.length; colIndex++) {
       const counts: { [value: string]: number } = {};
@@ -641,7 +635,7 @@ export function getParentFieldPath(fieldPath: string) {
 
 export function removeEmptyColumns(data: WorkbookJSON) {
   for (const sheet of Object.keys(data)) {
-    const sheetData: WorkbookRow[] = data[sheet];
+    const sheetData: WorkbookRow[] = data[sheet]?.rows;
     const emptyColumnIndexes: number[] = [];
     if (sheetData.length > 1) {
       const headerRow = sheetData[0];
@@ -665,7 +659,7 @@ export function removeEmptyColumns(data: WorkbookJSON) {
 
 export function trimSpace(workbookData: WorkbookJSON) {
   for (const rows of Object.values(workbookData)) {
-    for (const row of rows as WorkbookRow[]) {
+    for (const row of rows?.rows as WorkbookRow[]) {
       for (let i = 0; i < row.content.length; i++) {
         const value = row.content[i];
         row.content[i] = value.trim();
