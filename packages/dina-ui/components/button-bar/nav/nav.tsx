@@ -128,9 +128,13 @@ function SkipLinks() {
 }
 
 function FeedbackButton() {
+  const instanceContext = useInstanceContext();
+
   return (
     <Link
-      href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+      href={`https://github.com/AAFC-BICoE/dina-feedback/issues/new?labels=${
+        instanceContext?.instanceName ?? "AAFC"
+      }`}
       passHref={true}
     >
       <Button variant="link" className="px-0">
