@@ -129,8 +129,10 @@ export function SaveWorkbookProgress({
         resource.sourceSet = sourceSet.current;
         i += 1;
         progressInternal += 1;
-        // There was no existingResource cached from user clicking the Select button from table
+
+        // Handle appendData logic
         if (!existingResource.current) {
+          // There was no existingResource cached from user clicking the Select button from table
           if (appendData && resource.type === "material-sample") {
             // In appendData mode, fetch resources that might have matching names
             const resp = await apiClient.get<MaterialSample[]>(
@@ -282,6 +284,54 @@ export function SaveWorkbookProgress({
     onWorkbookFailed?.();
   }
 
+  const appendExistingDataColumns = [
+    {
+      cell: ({
+        row: {
+          original: { id, materialSampleName, dwcOtherCatalogNumbers }
+        }
+      }) => (
+        <Link
+          href={`/collection/material-sample/view?id=${id}`}
+          passHref={true}
+        >
+          <a target="_blank">
+            {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
+          </a>
+        </Link>
+      ),
+      accessorKey: "materialSampleName"
+    },
+    {
+      cell: ({
+        row: {
+          original: { id }
+        }
+      }) => id,
+      accessorKey: "id"
+    },
+    "createdBy",
+    dateCell("createdOn"),
+    {
+      cell: ({ row: { original } }) => (
+        <Button
+          className="btn btn-primary select-sample"
+          onClick={() => {
+            existingResource.current = original;
+            statusRef.current = "SAVING";
+            resumeSavingWorkbook();
+            saveWorkbook();
+          }}
+        >
+          <DinaMessage id="selectAndResume" />
+        </Button>
+      ),
+      size: 250,
+      accessorKey: "select",
+      enableSorting: false
+    }
+  ];
+
   return (
     <>
       <ProgressBar
@@ -318,66 +368,19 @@ export function SaveWorkbookProgress({
         progress < workbookResources.length && (
           <div className="mt-3 text-center">
             {existingResources.current.length > 0 ? (
-              <QueryTable<any>
-                filter={{
-                  rsql: `materialSampleName=="${existingResources.current?.[0].materialSampleName}";group==${group}`
-                }}
-                path={"collection-api/material-sample"}
-                columns={[
-                  {
-                    cell: ({
-                      row: {
-                        original: {
-                          id,
-                          materialSampleName,
-                          dwcOtherCatalogNumbers
-                        }
-                      }
-                    }) => (
-                      <Link
-                        href={`/collection/material-sample/view?id=${id}`}
-                        passHref={true}
-                      >
-                        <a target="_blank">
-                          {materialSampleName ||
-                            dwcOtherCatalogNumbers?.join?.(", ") ||
-                            id}
-                        </a>
-                      </Link>
-                    ),
-                    accessorKey: "materialSampleName"
-                  },
-                  {
-                    cell: ({
-                      row: {
-                        original: { id }
-                      }
-                    }) => id,
-                    accessorKey: "id"
-                  },
-                  "createdBy",
-                  dateCell("createdOn"),
-                  {
-                    cell: ({ row: { original } }) => (
-                      <Button
-                        className="btn btn-primary select-sample"
-                        onClick={() => {
-                          existingResource.current = original;
-                          statusRef.current = "SAVING";
-                          resumeSavingWorkbook();
-                          saveWorkbook();
-                        }}
-                      >
-                        <DinaMessage id="selectAndResume" />
-                      </Button>
-                    ),
-                    size: 250,
-                    accessorKey: "select",
-                    enableSorting: false
-                  }
-                ]}
-                defaultSort={[{ desc: true, id: "createdOn" }]}
-              />
+              <div>
+                <p>
+                  <DinaMessage id="appendDataSelectExistingResource" />
+                </p>
+                <QueryTable<any>
+                  filter={{
+                    rsql: `materialSampleName=="${existingResources.current?.[0].materialSampleName}";group==${group}`
+                  }}
+                  path={"collection-api/material-sample"}
+                  columns={appendExistingDataColumns}
+                  defaultSort={[{ desc: true, id: "createdOn" }]}
+                />
+              </div>
             ) : (
               <>
                 {" "}
