@@ -109,6 +109,11 @@ export default function storageUnitListPage() {
         enableRelationshipPresence={true}
         columns={columns}
         mandatoryDisplayedColumns={["name"]}
+        bulkDeleteButtonProps={{
+          typeName: "storage-unit",
+          apiBaseUrl: "/collection-api"
+        }}
+        bulkEditPath="/collection/storage-unit/bulk-edit"
       />
     </PageLayout>
   );
