@@ -13,7 +13,7 @@ import {
   VocabularyElement
 } from "packages/dina-ui/types/collection-api";
 import { Ref, useRef } from "react";
-import { Card } from "react-bootstrap";
+import { Alert, Card } from "react-bootstrap";
 import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
@@ -627,6 +627,30 @@ export function WorkbookColumnMapping({
                     />
                     <CheckBoxField name="appendData" />
                   </div>
+
+                  <Alert variant="warning" className="mb-0">
+                    <Alert.Heading>Template Integrity Warning</Alert.Heading>
+                    <p>
+                      It appears that the column headers in your Excel template
+                      have been modified. To ensure accurate data processing,
+                      please avoid altering the original column headers.
+                    </p>
+                    <hr />
+                    <strong className="mb-0">Recommended Action:</strong>
+                    <ul className="mb-0">
+                      <li>
+                        <strong>Generate a new template:</strong> If you wish to
+                        make changes to the column headers or the order of
+                        columns, we recommend generating a new template using
+                        the template generator.
+                      </li>
+                      <li>
+                        <strong>Verify column mappings:</strong> If you choose
+                        to proceed with the modified template, carefully review
+                        and adjust the column mappings.
+                      </li>
+                    </ul>
+                  </Alert>
                 </Card.Body>
               </Card>
 

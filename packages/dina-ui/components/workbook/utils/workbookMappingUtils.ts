@@ -1,4 +1,4 @@
-import { find, trim } from "lodash";
+import { find, max, trim } from "lodash";
 import { ValidationError } from "yup";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 import {
@@ -15,6 +15,12 @@ export interface WorkbookColumnInfo {
    * In the spreadsheet, the top row.
    */
   columnHeader: string;
+
+  /**
+   * Alises generated from the template generator, this should match the current column header.
+   * If not, a warning should appear to the user.
+   */
+  columnAlias?: string;
 
   /**
    * Hidden properties inside of the excel file, these are generated from templates.
@@ -36,12 +42,75 @@ export function getColumnHeaders(
   const data = spreadsheetData?.[sheetNumber]?.rows?.find(
     (rowData) => rowData.content.length !== 0
   );
-  return (
-    data?.content?.map((header, index) => ({
-      columnHeader: header,
-      originalColumn: spreadsheetData?.[sheetNumber]?.originalColumns?.[index]
-    })) ?? null
-  );
+
+  const maxLength =
+    max([
+      data?.content?.length ?? 0,
+      spreadsheetData?.[sheetNumber]?.originalColumns?.length ?? 0,
+      spreadsheetData?.[sheetNumber]?.columnAliases?.length ?? 0
+    ]) ?? 0;
+
+  const columnHeaders: WorkbookColumnInfo[] = [];
+  for (let i = 0; i < maxLength; i++) {
+    columnHeaders.push({
+      columnHeader: data?.content?.[i] ?? "",
+      originalColumn: spreadsheetData?.[sheetNumber]?.originalColumns?.[i],
+      columnAlias: spreadsheetData?.[sheetNumber]?.columnAliases?.[i]
+    });
+  }
+
+  return columnHeaders.length > 0 ? columnHeaders : null;
+}
+
+/**
+ * Scans through the Workbook columns and detects if there is a template integrity warning that
+ * should appear.
+ *
+ * This occurs when the generated template excel column headers don't match the hidden properties
+ * aliases.
+ *
+ * @param spreadsheetColumns List of all the columns to scan against.
+ * @returns true if valid, false if invalid.
+ */
+export function validateTemplateIntegrity(
+  spreadsheetColumns: WorkbookColumnInfo[]
+): boolean {
+  const allOriginalColumns = spreadsheetColumns
+    .map((col) => col.originalColumn)
+    .filter((originalCol) => originalCol !== undefined);
+  const allColumnAliases = spreadsheetColumns
+    .map((col) => col.columnAlias)
+    .filter((aliasCol) => aliasCol !== undefined);
+  const allColumnHeaders = spreadsheetColumns
+    .map((col) => col.columnHeader)
+    .filter((columnHeader) => columnHeader !== "");
+
+  // If no original or aliases provided, no validation required.
+  if (allOriginalColumns.length === 0 && allColumnAliases.length === 0) {
+    return true;
+  }
+
+  // Check for mismatch of number of columns.
+  if (
+    allOriginalColumns.length !== allColumnHeaders.length ||
+    allColumnAliases.length !== allColumnHeaders.length
+  ) {
+    return false;
+  }
+
+  // Check for changed column names.
+  for (let i = 0; i < allColumnHeaders.length; i++) {
+    const currentHeader = allColumnHeaders[i];
+    if (
+      currentHeader !== allOriginalColumns[i] &&
+      currentHeader !== allColumnAliases[i]
+    ) {
+      return false;
+    }
+  }
+
+  // All headers match originals or aliases, return true
+  return true;
 }
 
 export function _toPlainString(value: string) {

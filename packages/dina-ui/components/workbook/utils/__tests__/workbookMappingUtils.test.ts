@@ -18,7 +18,8 @@ import {
   isNumber,
   calculateColumnUniqueValuesFromSpreadsheetData,
   isEmptyWorkbookValue as isEmptyWorkbookValue,
-  trimSpace
+  trimSpace,
+  validateTemplateIntegrity
 } from "../workbookMappingUtils";
 
 const mockConfig: FieldMappingConfigType = {
@@ -108,15 +109,18 @@ describe("workbookMappingUtils functions", () => {
       ).toEqual([
         {
           columnHeader: "header1",
-          originalColumn: undefined
+          originalColumn: undefined,
+          columnAlias: undefined
         },
         {
           columnHeader: "header2",
-          originalColumn: undefined
+          originalColumn: undefined,
+          columnAlias: undefined
         },
         {
           columnHeader: "header3",
-          originalColumn: undefined
+          originalColumn: undefined,
+          columnAlias: undefined
         }
       ]);
 
@@ -143,15 +147,18 @@ describe("workbookMappingUtils functions", () => {
       ).toEqual([
         {
           columnHeader: "header4",
-          originalColumn: undefined
+          originalColumn: undefined,
+          columnAlias: undefined
         },
         {
           columnHeader: "header5",
-          originalColumn: undefined
+          originalColumn: undefined,
+          columnAlias: undefined
         },
         {
           columnHeader: "header6",
-          originalColumn: undefined
+          originalColumn: undefined,
+          columnAlias: undefined
         }
       ]);
     });
@@ -183,15 +190,18 @@ describe("workbookMappingUtils functions", () => {
       ).toEqual([
         {
           columnHeader: "header1",
-          originalColumn: undefined
+          originalColumn: undefined,
+          columnAlias: undefined
         },
         {
           columnHeader: "header2",
-          originalColumn: undefined
+          originalColumn: undefined,
+          columnAlias: undefined
         },
         {
           columnHeader: "header3",
-          originalColumn: undefined
+          originalColumn: undefined,
+          columnAlias: undefined
         }
       ]);
     });
@@ -233,15 +243,71 @@ describe("workbookMappingUtils functions", () => {
       ).toEqual([
         {
           columnHeader: "header4",
-          originalColumn: "originalColumn4"
+          originalColumn: "originalColumn4",
+          columnAlias: "header4"
         },
         {
           columnHeader: "header5",
-          originalColumn: "originalColumn5"
+          originalColumn: "originalColumn5",
+          columnAlias: "header5"
         },
         {
           columnHeader: "header6",
-          originalColumn: "originalColumn6"
+          originalColumn: "originalColumn6",
+          columnAlias: "header6"
+        }
+      ]);
+    });
+
+    test("Invalid template spreadsheet.", async () => {
+      expect(
+        getColumnHeaders(
+          {
+            "0": {
+              sheetName: "Test Sheet 0",
+              originalColumns: [
+                "originalColumn1",
+                "originalColumn2",
+                "originalColumn3"
+              ],
+              columnAliases: ["header1", "header2", "header3"],
+              rows: [
+                { rowNumber: 0, content: ["header1", "header2"] },
+                { rowNumber: 1, content: ["data1", "data2"] }
+              ]
+            },
+            "1": {
+              sheetName: "Test Sheet 1",
+              originalColumns: [
+                "originalColumn4",
+                "originalColumn5",
+                "originalColumn6"
+              ],
+              columnAliases: ["header4", "header5", "header6"],
+              rows: [
+                { rowNumber: 0, content: [] },
+                { rowNumber: 1, content: ["header4", "header5", "header6"] },
+                { rowNumber: 2, content: ["data4", "data5", "data6"] }
+              ]
+            }
+          },
+          0 // Return first sheet.
+        )
+      ).toEqual([
+        {
+          columnHeader: "header1",
+          originalColumn: "originalColumn1",
+          columnAlias: "header1"
+        },
+        {
+          columnHeader: "header2",
+          originalColumn: "originalColumn2",
+          columnAlias: "header2"
+        },
+        {
+          columnHeader: "",
+          originalColumn: "originalColumn3",
+          columnAlias: "header3"
         }
       ]);
     });
@@ -263,6 +329,136 @@ describe("workbookMappingUtils functions", () => {
           0
         )
       ).toBeNull();
+    });
+  });
+
+  describe("validateTemplateIntegrity", () => {
+    test("Non-template spreadsheet validation", () => {
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header4",
+            originalColumn: undefined,
+            columnAlias: undefined
+          },
+          {
+            columnHeader: "header5",
+            originalColumn: undefined,
+            columnAlias: undefined
+          },
+          {
+            columnHeader: "header6",
+            originalColumn: undefined,
+            columnAlias: undefined
+          }
+        ])
+      ).toEqual(true);
+    });
+
+    test("Valid template spreadsheet validation", () => {
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header4",
+            originalColumn: "originalColumn4",
+            columnAlias: "header4"
+          },
+          {
+            columnHeader: "header5",
+            originalColumn: "originalColumn5",
+            columnAlias: "header5"
+          },
+          {
+            columnHeader: "header6",
+            originalColumn: "originalColumn6",
+            columnAlias: "header6"
+          }
+        ])
+      ).toEqual(true);
+    });
+
+    test("Invalid template spreadsheet validation - changed headers", () => {
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header4-changed",
+            originalColumn: "originalColumn4",
+            columnAlias: "header4"
+          },
+          {
+            columnHeader: "header5",
+            originalColumn: "originalColumn5",
+            columnAlias: "header5"
+          },
+          {
+            columnHeader: "header6",
+            originalColumn: "originalColumn6",
+            columnAlias: "header6"
+          }
+        ])
+      ).toEqual(false);
+
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header5",
+            originalColumn: "originalColumn4",
+            columnAlias: "header4"
+          },
+          {
+            columnHeader: "header4",
+            originalColumn: "originalColumn5",
+            columnAlias: "header5"
+          },
+          {
+            columnHeader: "header6",
+            originalColumn: "originalColumn6",
+            columnAlias: "header6"
+          }
+        ])
+      ).toEqual(false);
+    });
+
+    test("Invalid template spreadsheet validation - incorrect number of headers", () => {
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header4",
+            originalColumn: "originalColumn4",
+            columnAlias: "header4"
+          },
+          {
+            columnHeader: "header5",
+            originalColumn: "originalColumn5",
+            columnAlias: "header5"
+          },
+          {
+            columnHeader: "header6",
+            originalColumn: undefined,
+            columnAlias: undefined
+          }
+        ])
+      ).toEqual(false);
+
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header4",
+            originalColumn: "originalColumn4",
+            columnAlias: "header4"
+          },
+          {
+            columnHeader: "header5",
+            originalColumn: "originalColumn5",
+            columnAlias: "header5"
+          },
+          {
+            columnHeader: "",
+            originalColumn: "originalColumn6",
+            columnAlias: "header6"
+          }
+        ])
+      ).toEqual(false);
     });
   });
 
