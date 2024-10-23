@@ -364,7 +364,7 @@ export function useColumnMapping() {
         mapRelationship: true,
         numOfUniqueValues: 1,
         valueMapping,
-        ...(multipleValueMappings && { multipleValueMappings }) // Conditionally add if not undefined
+        multipleValueMappings
       };
     } else {
       const mapRelationship =
@@ -584,9 +584,11 @@ export function useColumnMapping() {
       };
     };
     multipleValueMappings?: {
-      id: string;
-      type: string;
-    }[];
+      [value: string]: {
+        id: string;
+        type: string;
+      }[];
+    };
   }> {
     const valueMapping: {
       [value: string]: {
@@ -595,12 +597,12 @@ export function useColumnMapping() {
       };
     } = {};
 
-    let multipleValueMappings:
-      | {
-          id: string;
-          type: string;
-        }[]
-      | undefined;
+    const multipleValueMappings: {
+      [value: string]: {
+        id: string;
+        type: string;
+      }[];
+    } = {};
 
     if (spreadsheetData) {
       const spreadsheetHeaders = spreadsheetData[sheet][0].content;
@@ -619,10 +621,12 @@ export function useColumnMapping() {
               valueMapping[parentValue] = { id: response.data[0].id, type };
 
               if (response.data.length > 1) {
-                multipleValueMappings = response.data.map((resource) => ({
-                  id: resource.id,
-                  type
-                }));
+                multipleValueMappings[parentValue] = response.data.map(
+                  (resource) => ({
+                    id: resource.id,
+                    type
+                  })
+                );
               }
             }
           }

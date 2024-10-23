@@ -120,9 +120,11 @@ export interface WorkbookColumnMap {
           };
     };
     multipleValueMappings?: {
-      id: string;
-      type: string;
-    }[];
+      [value: string]: {
+        id: string;
+        type: string;
+      }[];
+    };
   };
 }
 
