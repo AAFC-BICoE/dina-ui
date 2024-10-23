@@ -18,7 +18,8 @@ import {
   isNumber,
   calculateColumnUniqueValuesFromSpreadsheetData,
   isEmptyWorkbookValue as isEmptyWorkbookValue,
-  trimSpace
+  trimSpace,
+  validateTemplateIntegrity
 } from "../workbookMappingUtils";
 
 const mockConfig: FieldMappingConfigType = {
@@ -88,74 +89,376 @@ describe("workbookMappingUtils functions", () => {
       expect(
         getColumnHeaders(
           {
-            "0": [
-              { rowNumber: 0, content: ["header1", "header2", "header3"] },
-              { rowNumber: 1, content: ["data1", "data2", "data3"] }
-            ],
-            "1": [
-              { rowNumber: 0, content: ["header4", "header5", "header6"] },
-              { rowNumber: 1, content: ["data4", "data5", "data6"] }
-            ]
+            "0": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                { rowNumber: 0, content: ["header1", "header2", "header3"] },
+                { rowNumber: 1, content: ["data1", "data2", "data3"] }
+              ]
+            },
+            "1": {
+              sheetName: "Test Sheet 1",
+              rows: [
+                { rowNumber: 0, content: ["header4", "header5", "header6"] },
+                { rowNumber: 1, content: ["data4", "data5", "data6"] }
+              ]
+            }
           },
           0 // Return first sheet.
         )
-      ).toEqual(["header1", "header2", "header3"]);
+      ).toEqual([
+        {
+          columnHeader: "header1",
+          originalColumn: undefined,
+          columnAlias: undefined
+        },
+        {
+          columnHeader: "header2",
+          originalColumn: undefined,
+          columnAlias: undefined
+        },
+        {
+          columnHeader: "header3",
+          originalColumn: undefined,
+          columnAlias: undefined
+        }
+      ]);
 
       expect(
         getColumnHeaders(
           {
-            "0": [
-              { rowNumber: 0, content: ["header1", "header2", "header3"] },
-              { rowNumber: 1, content: ["data1", "data2", "data3"] }
-            ],
-            "1": [
-              { rowNumber: 0, content: ["header4", "header5", "header6"] },
-              { rowNumber: 1, content: ["data4", "data5", "data6"] }
-            ]
+            "0": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                { rowNumber: 0, content: ["header1", "header2", "header3"] },
+                { rowNumber: 1, content: ["data1", "data2", "data3"] }
+              ]
+            },
+            "1": {
+              sheetName: "Test Sheet 1",
+              rows: [
+                { rowNumber: 0, content: ["header4", "header5", "header6"] },
+                { rowNumber: 1, content: ["data4", "data5", "data6"] }
+              ]
+            }
           },
           1 // Return first sheet.
         )
-      ).toEqual(["header4", "header5", "header6"]);
+      ).toEqual([
+        {
+          columnHeader: "header4",
+          originalColumn: undefined,
+          columnAlias: undefined
+        },
+        {
+          columnHeader: "header5",
+          originalColumn: undefined,
+          columnAlias: undefined
+        },
+        {
+          columnHeader: "header6",
+          originalColumn: undefined,
+          columnAlias: undefined
+        }
+      ]);
     });
 
     test("Blank first row, use next row as headers", async () => {
       expect(
         getColumnHeaders(
           {
-            "0": [
-              {
-                rowNumber: 0,
-                content: []
-              },
-              {
-                rowNumber: 1,
-                content: ["header1", "header2", "header3"]
-              },
-              {
-                rowNumber: 2,
-                content: ["data1", "data2", "data3"]
-              }
-            ]
+            "0": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                {
+                  rowNumber: 0,
+                  content: []
+                },
+                {
+                  rowNumber: 1,
+                  content: ["header1", "header2", "header3"]
+                },
+                {
+                  rowNumber: 2,
+                  content: ["data1", "data2", "data3"]
+                }
+              ]
+            }
           },
           0
         )
-      ).toEqual(["header1", "header2", "header3"]);
+      ).toEqual([
+        {
+          columnHeader: "header1",
+          originalColumn: undefined,
+          columnAlias: undefined
+        },
+        {
+          columnHeader: "header2",
+          originalColumn: undefined,
+          columnAlias: undefined
+        },
+        {
+          columnHeader: "header3",
+          originalColumn: undefined,
+          columnAlias: undefined
+        }
+      ]);
+    });
+
+    test("Original Columns exist in the spreadsheet.", async () => {
+      expect(
+        getColumnHeaders(
+          {
+            "0": {
+              sheetName: "Test Sheet 0",
+              originalColumns: [
+                "originalColumn1",
+                "originalColumn2",
+                "originalColumn3"
+              ],
+              columnAliases: ["header1", "header2", "header3"],
+              rows: [
+                { rowNumber: 0, content: ["header1", "header2", "header3"] },
+                { rowNumber: 1, content: ["data1", "data2", "data3"] }
+              ]
+            },
+            "1": {
+              sheetName: "Test Sheet 1",
+              originalColumns: [
+                "originalColumn4",
+                "originalColumn5",
+                "originalColumn6"
+              ],
+              columnAliases: ["header4", "header5", "header6"],
+              rows: [
+                { rowNumber: 0, content: [] },
+                { rowNumber: 1, content: ["header4", "header5", "header6"] },
+                { rowNumber: 2, content: ["data4", "data5", "data6"] }
+              ]
+            }
+          },
+          1 // Return first sheet.
+        )
+      ).toEqual([
+        {
+          columnHeader: "header4",
+          originalColumn: "originalColumn4",
+          columnAlias: "header4"
+        },
+        {
+          columnHeader: "header5",
+          originalColumn: "originalColumn5",
+          columnAlias: "header5"
+        },
+        {
+          columnHeader: "header6",
+          originalColumn: "originalColumn6",
+          columnAlias: "header6"
+        }
+      ]);
+    });
+
+    test("Invalid template spreadsheet.", async () => {
+      expect(
+        getColumnHeaders(
+          {
+            "0": {
+              sheetName: "Test Sheet 0",
+              originalColumns: [
+                "originalColumn1",
+                "originalColumn2",
+                "originalColumn3"
+              ],
+              columnAliases: ["header1", "header2", "header3"],
+              rows: [
+                { rowNumber: 0, content: ["header1", "header2"] },
+                { rowNumber: 1, content: ["data1", "data2"] }
+              ]
+            },
+            "1": {
+              sheetName: "Test Sheet 1",
+              originalColumns: [
+                "originalColumn4",
+                "originalColumn5",
+                "originalColumn6"
+              ],
+              columnAliases: ["header4", "header5", "header6"],
+              rows: [
+                { rowNumber: 0, content: [] },
+                { rowNumber: 1, content: ["header4", "header5", "header6"] },
+                { rowNumber: 2, content: ["data4", "data5", "data6"] }
+              ]
+            }
+          },
+          0 // Return first sheet.
+        )
+      ).toEqual([
+        {
+          columnHeader: "header1",
+          originalColumn: "originalColumn1",
+          columnAlias: "header1"
+        },
+        {
+          columnHeader: "header2",
+          originalColumn: "originalColumn2",
+          columnAlias: "header2"
+        },
+        {
+          columnHeader: "",
+          originalColumn: "originalColumn3",
+          columnAlias: "header3"
+        }
+      ]);
     });
 
     test("Return null if not a valid spreadsheet.", async () => {
       expect(
         getColumnHeaders(
           {
-            "0": [
-              {
-                rowNumber: 0,
-                content: []
-              }
-            ]
+            "0": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                {
+                  rowNumber: 0,
+                  content: []
+                }
+              ]
+            }
           },
           0
         )
       ).toBeNull();
+    });
+  });
+
+  describe("validateTemplateIntegrity", () => {
+    test("Non-template spreadsheet validation", () => {
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header4",
+            originalColumn: undefined,
+            columnAlias: undefined
+          },
+          {
+            columnHeader: "header5",
+            originalColumn: undefined,
+            columnAlias: undefined
+          },
+          {
+            columnHeader: "header6",
+            originalColumn: undefined,
+            columnAlias: undefined
+          }
+        ])
+      ).toEqual(true);
+    });
+
+    test("Valid template spreadsheet validation", () => {
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header4",
+            originalColumn: "originalColumn4",
+            columnAlias: "header4"
+          },
+          {
+            columnHeader: "header5",
+            originalColumn: "originalColumn5",
+            columnAlias: "header5"
+          },
+          {
+            columnHeader: "header6",
+            originalColumn: "originalColumn6",
+            columnAlias: "header6"
+          }
+        ])
+      ).toEqual(true);
+    });
+
+    test("Invalid template spreadsheet validation - changed headers", () => {
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header4-changed",
+            originalColumn: "originalColumn4",
+            columnAlias: "header4"
+          },
+          {
+            columnHeader: "header5",
+            originalColumn: "originalColumn5",
+            columnAlias: "header5"
+          },
+          {
+            columnHeader: "header6",
+            originalColumn: "originalColumn6",
+            columnAlias: "header6"
+          }
+        ])
+      ).toEqual(false);
+
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header5",
+            originalColumn: "originalColumn4",
+            columnAlias: "header4"
+          },
+          {
+            columnHeader: "header4",
+            originalColumn: "originalColumn5",
+            columnAlias: "header5"
+          },
+          {
+            columnHeader: "header6",
+            originalColumn: "originalColumn6",
+            columnAlias: "header6"
+          }
+        ])
+      ).toEqual(false);
+    });
+
+    test("Invalid template spreadsheet validation - incorrect number of headers", () => {
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header4",
+            originalColumn: "originalColumn4",
+            columnAlias: "header4"
+          },
+          {
+            columnHeader: "header5",
+            originalColumn: "originalColumn5",
+            columnAlias: "header5"
+          },
+          {
+            columnHeader: "header6",
+            originalColumn: undefined,
+            columnAlias: undefined
+          }
+        ])
+      ).toEqual(false);
+
+      expect(
+        validateTemplateIntegrity([
+          {
+            columnHeader: "header4",
+            originalColumn: "originalColumn4",
+            columnAlias: "header4"
+          },
+          {
+            columnHeader: "header5",
+            originalColumn: "originalColumn5",
+            columnAlias: "header5"
+          },
+          {
+            columnHeader: "",
+            originalColumn: "originalColumn6",
+            columnAlias: "header6"
+          }
+        ])
+      ).toEqual(false);
     });
   });
 
@@ -164,23 +467,45 @@ describe("workbookMappingUtils functions", () => {
       expect(
         getDataFromWorkbook(
           {
-            "0": [
-              { rowNumber: 0, content: ["header1", "header2", "header3"] },
-              { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
-              { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
-              { rowNumber: 3, content: ["dataC1", "dataC2", "dataC3"] }
-            ],
-            "1": [
-              { rowNumber: 0, content: ["header4", "header5", "header6"] },
-              { rowNumber: 1, content: ["data4", "data5", "data6"] }
-            ]
+            "0": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                { rowNumber: 0, content: ["header1", "header2", "header3"] },
+                { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
+                { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
+                { rowNumber: 3, content: ["dataC1", "dataC2", "dataC3"] }
+              ]
+            },
+            "1": {
+              sheetName: "Test Sheet 0",
+              rows: [
+                { rowNumber: 0, content: ["header4", "header5", "header6"] },
+                { rowNumber: 1, content: ["data4", "data5", "data6"] }
+              ]
+            }
           },
           0, // Return first sheet.
           [
-            { targetField: "field1", skipped: false },
-            { targetField: "field2", skipped: false },
-            { targetField: "field3", skipped: false },
-            { targetField: "field4", skipped: true }
+            {
+              targetField: "field1",
+              skipped: false,
+              columnHeader: ""
+            },
+            {
+              targetField: "field2",
+              skipped: false,
+              columnHeader: ""
+            },
+            {
+              targetField: "field3",
+              skipped: false,
+              columnHeader: ""
+            },
+            {
+              targetField: "field4",
+              skipped: true,
+              columnHeader: ""
+            }
           ]
         )
       ).toEqual([
@@ -208,9 +533,9 @@ describe("workbookMappingUtils functions", () => {
           undefined,
           0, // Return first sheet.
           [
-            { targetField: "field1", skipped: false },
-            { targetField: "field2", skipped: false },
-            { targetField: "field3", skipped: false }
+            { targetField: "field1", skipped: false, columnHeader: "" },
+            { targetField: "field2", skipped: false, columnHeader: "" },
+            { targetField: "field3", skipped: false, columnHeader: "" }
           ]
         )
       ).toEqual([]);
@@ -219,24 +544,30 @@ describe("workbookMappingUtils functions", () => {
     test("resolveNumberOfUniqueValueFromSpreadsheetData", () => {
       expect(
         calculateColumnUniqueValuesFromSpreadsheetData({
-          "0": [
-            { rowNumber: 0, content: ["header1", "header2", "header3"] },
-            { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
-            { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
-            { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
-            { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
-            { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
-            { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
-          ],
-          "1": [
-            { rowNumber: 0, content: ["header4", "header5", "header6"] },
-            { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
-            { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
-            { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
-            { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
-            { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
-            { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
-          ]
+          "0": {
+            sheetName: "Test Sheet 0",
+            rows: [
+              { rowNumber: 0, content: ["header1", "header2", "header3"] },
+              { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
+              { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
+              { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
+              { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
+              { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
+              { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
+            ]
+          },
+          "1": {
+            sheetName: "Test Sheet 1",
+            rows: [
+              { rowNumber: 0, content: ["header4", "header5", "header6"] },
+              { rowNumber: 1, content: ["dataA1", "dataA2", "dataA3"] },
+              { rowNumber: 2, content: ["dataB1", "dataB2", "dataB3"] },
+              { rowNumber: 3, content: ["dataB1", "dataB2", "dataB3"] },
+              { rowNumber: 4, content: ["dataC1", "dataC2", "dataC3"] },
+              { rowNumber: 5, content: ["dataC1", "dataC2", "dataC3"] },
+              { rowNumber: 6, content: ["dataC1", "dataC2", "dataC3"] }
+            ]
+          }
         })
       ).toEqual({
         "0": {
@@ -454,24 +785,36 @@ describe("workbookMappingUtils functions", () => {
   it("trimSpace", () => {
     expect(
       trimSpace({
-        "0": [
-          { rowNumber: 0, content: ["header1 ", "header2 ", "header3 "] },
-          { rowNumber: 1, content: ["data1 ", " data2", " data3"] }
-        ],
-        "1": [
-          { rowNumber: 0, content: ["header4 ", " header5", "header6 "] },
-          { rowNumber: 1, content: ["data4 ", " data5", "data6 "] }
-        ]
+        "0": {
+          sheetName: "Test Sheet 0",
+          rows: [
+            { rowNumber: 0, content: ["header1 ", "header2 ", "header3 "] },
+            { rowNumber: 1, content: ["data1 ", " data2", " data3"] }
+          ]
+        },
+        "1": {
+          sheetName: "Test Sheet 1",
+          rows: [
+            { rowNumber: 0, content: ["header4 ", " header5", "header6 "] },
+            { rowNumber: 1, content: ["data4 ", " data5", "data6 "] }
+          ]
+        }
       })
     ).toEqual({
-      "0": [
-        { rowNumber: 0, content: ["header1", "header2", "header3"] },
-        { rowNumber: 1, content: ["data1", "data2", "data3"] }
-      ],
-      "1": [
-        { rowNumber: 0, content: ["header4", "header5", "header6"] },
-        { rowNumber: 1, content: ["data4", "data5", "data6"] }
-      ]
+      "0": {
+        sheetName: "Test Sheet 0",
+        rows: [
+          { rowNumber: 0, content: ["header1", "header2", "header3"] },
+          { rowNumber: 1, content: ["data1", "data2", "data3"] }
+        ]
+      },
+      "1": {
+        sheetName: "Test Sheet 1",
+        rows: [
+          { rowNumber: 0, content: ["header4", "header5", "header6"] },
+          { rowNumber: 1, content: ["data4", "data5", "data6"] }
+        ]
+      }
     });
   });
 });

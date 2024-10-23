@@ -13,7 +13,7 @@ export function WorkbookDisplay({
   workbookJsonData?: WorkbookJSON;
   sheetIndex: number;
 }) {
-  const dataToDisplay = take(workbookJsonData?.[sheetIndex], 11);
+  const dataToDisplay = take(workbookJsonData?.[sheetIndex]?.rows, 11);
   const numOfColumns = dataToDisplay[0].content.length;
   const numOfRows = dataToDisplay.length - 1;
   const headerRow = dataToDisplay[0].content.map((col) => (
@@ -104,7 +104,7 @@ export function WorkbookDisplay({
       >
         <Card.Header style={{ fontSize: "1.4em" }}>
           <DinaMessage id="workbookPreviewTitle" /> ({numOfRows} /{" "}
-          {workbookJsonData ? workbookJsonData[sheetIndex].length - 1 : 0})
+          {workbookJsonData ? workbookJsonData[sheetIndex].rows.length - 1 : 0})
         </Card.Header>
         <Card.Body>
           <div className="cells">

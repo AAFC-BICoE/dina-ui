@@ -13,7 +13,7 @@ import {
   VocabularyElement
 } from "packages/dina-ui/types/collection-api";
 import { Ref, useRef } from "react";
-import { Card } from "react-bootstrap";
+import { Alert, Card } from "react-bootstrap";
 import Select from "react-select";
 import * as yup from "yup";
 import { ValidationError } from "yup";
@@ -33,7 +33,8 @@ import {
   isBoolean,
   isBooleanArray,
   isNumber,
-  isNumberArray
+  isNumberArray,
+  WorkbookColumnInfo
 } from "../utils/workbookMappingUtils";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
@@ -41,6 +42,7 @@ import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
 
 export type FieldMapType = {
   columnHeader: string;
+  originalColumn?: string;
   targetField: string | undefined;
   targetKey?: ManagedAttribute | VocabularyElement; // When targetField is managedAttribute, targetKey stores the matching managed attribute
   // When targetField is scientificNameDetails, targetKey stores the matching taxonomicRank
@@ -102,6 +104,7 @@ export function WorkbookColumnMapping({
     fieldMap,
     fieldOptions,
     headers,
+    templateIntegrityWarning,
     sheetOptions,
     workbookColumnMap,
     relationshipMapping,
@@ -501,12 +504,13 @@ export function WorkbookColumnMapping({
   }
 
   async function onFieldMappingChange(
-    columnName: string,
+    columnName: WorkbookColumnInfo,
     newFieldPath: string
   ) {
+    // Might need to set replace before sending it over. TODO
     const { newWorkbookColumnMap, newRelationshipMapping } =
       await resolveColumnMappingAndRelationshipMapping(
-        columnName.replace(".", "_"),
+        columnName,
         newFieldPath
       );
 
@@ -624,6 +628,35 @@ export function WorkbookColumnMapping({
                     />
                     <CheckBoxField name="appendData" />
                   </div>
+
+                  {!templateIntegrityWarning && (
+                    <Alert variant="warning" className="mb-0">
+                      <Alert.Heading>
+                        <DinaMessage id="workbook_templateIntegrityWarning_title" />
+                      </Alert.Heading>
+                      <p>
+                        <DinaMessage id="workbook_templateIntegrityWarning_description" />
+                      </p>
+                      <hr />
+                      <strong className="mb-0">
+                        <DinaMessage id="workbook_templateIntegrityWarning_recommended" />
+                      </strong>
+                      <ul className="mb-0">
+                        <li>
+                          <strong>
+                            <DinaMessage id="workbook_templateIntegrityWarning_recommended_newTemplate_title" />
+                          </strong>{" "}
+                          <DinaMessage id="workbook_templateIntegrityWarning_recommended_newTemplate_description" />
+                        </li>
+                        <li>
+                          <strong>
+                            <DinaMessage id="workbook_templateIntegrityWarning_recommended_verify_title" />
+                          </strong>{" "}
+                          <DinaMessage id="workbook_templateIntegrityWarning_recommended_verify_description" />
+                        </li>
+                      </ul>
+                    </Alert>
+                  )}
                 </Card.Body>
               </Card>
 
