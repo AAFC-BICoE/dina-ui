@@ -105,7 +105,20 @@ describe("workbookMappingUtils functions", () => {
           },
           0 // Return first sheet.
         )
-      ).toEqual(["header1", "header2", "header3"]);
+      ).toEqual([
+        {
+          columnHeader: "header1",
+          originalColumn: undefined
+        },
+        {
+          columnHeader: "header2",
+          originalColumn: undefined
+        },
+        {
+          columnHeader: "header3",
+          originalColumn: undefined
+        }
+      ]);
 
       expect(
         getColumnHeaders(
@@ -127,7 +140,20 @@ describe("workbookMappingUtils functions", () => {
           },
           1 // Return first sheet.
         )
-      ).toEqual(["header4", "header5", "header6"]);
+      ).toEqual([
+        {
+          columnHeader: "header4",
+          originalColumn: undefined
+        },
+        {
+          columnHeader: "header5",
+          originalColumn: undefined
+        },
+        {
+          columnHeader: "header6",
+          originalColumn: undefined
+        }
+      ]);
     });
 
     test("Blank first row, use next row as headers", async () => {
@@ -154,7 +180,70 @@ describe("workbookMappingUtils functions", () => {
           },
           0
         )
-      ).toEqual(["header1", "header2", "header3"]);
+      ).toEqual([
+        {
+          columnHeader: "header1",
+          originalColumn: undefined
+        },
+        {
+          columnHeader: "header2",
+          originalColumn: undefined
+        },
+        {
+          columnHeader: "header3",
+          originalColumn: undefined
+        }
+      ]);
+    });
+
+    test("Original Columns exist in the spreadsheet.", async () => {
+      expect(
+        getColumnHeaders(
+          {
+            "0": {
+              sheetName: "Test Sheet 0",
+              originalColumns: [
+                "originalColumn1",
+                "originalColumn2",
+                "originalColumn3"
+              ],
+              columnAliases: ["header1", "header2", "header3"],
+              rows: [
+                { rowNumber: 0, content: ["header1", "header2", "header3"] },
+                { rowNumber: 1, content: ["data1", "data2", "data3"] }
+              ]
+            },
+            "1": {
+              sheetName: "Test Sheet 1",
+              originalColumns: [
+                "originalColumn4",
+                "originalColumn5",
+                "originalColumn6"
+              ],
+              columnAliases: ["header4", "header5", "header6"],
+              rows: [
+                { rowNumber: 0, content: [] },
+                { rowNumber: 1, content: ["header4", "header5", "header6"] },
+                { rowNumber: 2, content: ["data4", "data5", "data6"] }
+              ]
+            }
+          },
+          1 // Return first sheet.
+        )
+      ).toEqual([
+        {
+          columnHeader: "header4",
+          originalColumn: "originalColumn4"
+        },
+        {
+          columnHeader: "header5",
+          originalColumn: "originalColumn5"
+        },
+        {
+          columnHeader: "header6",
+          originalColumn: "originalColumn6"
+        }
+      ]);
     });
 
     test("Return null if not a valid spreadsheet.", async () => {

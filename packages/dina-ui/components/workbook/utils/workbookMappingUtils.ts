@@ -32,11 +32,16 @@ export interface WorkbookColumnInfo {
 export function getColumnHeaders(
   spreadsheetData: WorkbookJSON | undefined,
   sheetNumber: number
-) {
+): WorkbookColumnInfo[] | null {
   const data = spreadsheetData?.[sheetNumber]?.rows?.find(
     (rowData) => rowData.content.length !== 0
   );
-  return data?.content ?? null;
+  return (
+    data?.content?.map((header, index) => ({
+      columnHeader: header,
+      originalColumn: spreadsheetData?.[sheetNumber]?.originalColumns?.[index]
+    })) ?? null
+  );
 }
 
 export function _toPlainString(value: string) {
@@ -112,10 +117,13 @@ export type FieldOptionType = {
  * @returns
  */
 export function findMatchField(
-  columnHeader: string,
+  columnHeader: WorkbookColumnInfo,
   fieldOptions: FieldOptionType[]
 ) {
-  let columnHeader2: string = columnHeader.toLowerCase();
+  // Search the original column if available, otherwise, just use the column header.
+  let columnHeader2: string = (
+    columnHeader.originalColumn ?? columnHeader.columnHeader
+  ).toLowerCase();
   if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {
     columnHeader2 = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(columnHeader2)!;
   }
@@ -154,7 +162,7 @@ export function findMatchField(
       const validOptionLabel = isValidOptionLabel(
         item,
         plainOptions,
-        columnHeader
+        columnHeader2
       );
       return (
         item.value.toLowerCase() === columnHeader2.toLowerCase() ||

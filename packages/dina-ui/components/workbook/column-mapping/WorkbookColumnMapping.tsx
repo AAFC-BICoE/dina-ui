@@ -33,7 +33,8 @@ import {
   isBoolean,
   isBooleanArray,
   isNumber,
-  isNumberArray
+  isNumberArray,
+  WorkbookColumnInfo
 } from "../utils/workbookMappingUtils";
 import { ColumnMappingRow } from "./ColumnMappingRow";
 import { useColumnMapping } from "./useColumnMapping";
@@ -41,6 +42,7 @@ import { WorkbookWarningDialog } from "../WorkbookWarningDialog";
 
 export type FieldMapType = {
   columnHeader: string;
+  originalColumn?: string;
   targetField: string | undefined;
   targetKey?: ManagedAttribute | VocabularyElement; // When targetField is managedAttribute, targetKey stores the matching managed attribute
   // When targetField is scientificNameDetails, targetKey stores the matching taxonomicRank
@@ -501,12 +503,13 @@ export function WorkbookColumnMapping({
   }
 
   async function onFieldMappingChange(
-    columnName: string,
+    columnName: WorkbookColumnInfo,
     newFieldPath: string
   ) {
+    // Might need to set replace before sending it over. TODO
     const { newWorkbookColumnMap, newRelationshipMapping } =
       await resolveColumnMappingAndRelationshipMapping(
-        columnName.replace(".", "_"),
+        columnName,
         newFieldPath
       );
 

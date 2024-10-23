@@ -21,6 +21,7 @@ import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
   FieldOptionType,
+  WorkbookColumnInfo,
   compareAlphanumeric,
   findMatchField,
   getColumnHeaders
@@ -323,11 +324,14 @@ export function useColumnMapping() {
   }
 
   async function resolveColumnMappingAndRelationshipMapping(
-    columnHeader: string,
+    columnHeader: WorkbookColumnInfo,
     fieldPath?: string
   ) {
-    const originalColumnHeader = columnHeader;
-    columnHeader = columnHeader.replace(".", "_");
+    const columnHeaderValue = (
+      columnHeader.originalColumn ?? columnHeader.columnHeader
+    ).replace(".", "_");
+    const originalColumnHeader =
+      columnHeader.originalColumn ?? columnHeader.columnHeader;
 
     const newWorkbookColumnMap: WorkbookColumnMap = {};
     const newRelationshipMapping: RelationshipMapping = {};
@@ -335,7 +339,8 @@ export function useColumnMapping() {
       if (
         managedAttributes.findIndex(
           (item) =>
-            item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+            item.name.toLowerCase().trim() ===
+            columnHeaderValue.toLowerCase().trim()
         ) > -1
       ) {
         handleManagedAttributeMapping(
@@ -346,7 +351,7 @@ export function useColumnMapping() {
         taxonomicRanks.findIndex(
           (item) =>
             item.name?.toLowerCase().trim() ===
-            columnHeader.toLowerCase().trim()
+            columnHeaderValue.toLowerCase().trim()
         ) > -1
       ) {
         handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
@@ -356,8 +361,8 @@ export function useColumnMapping() {
     } else if (fieldPath === "managedAttributes") {
       handleManagedAttributeMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath?.startsWith("parentMaterialSample.")) {
-      const valueMapping = await resolveParentMapping(columnHeader);
-      newWorkbookColumnMap[columnHeader] = {
+      const valueMapping = await resolveParentMapping(columnHeaderValue);
+      newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
         originalColumnName: originalColumnHeader,
         showOnUI: false,
@@ -374,19 +379,23 @@ export function useColumnMapping() {
           ?.relationshipConfig?.linkOrCreateSetting ===
           LinkOrCreateSetting.LINK;
 
-      newWorkbookColumnMap[columnHeader] = {
+      newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
         originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship,
         numOfUniqueValues: Object.keys(
-          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+          columnUniqueValues?.[sheet]?.[columnHeaderValue] ?? {}
         ).length,
         valueMapping: {}
       };
 
       if (mapRelationship) {
-        resolveRelationships(newRelationshipMapping, columnHeader, fieldPath);
+        resolveRelationships(
+          newRelationshipMapping,
+          columnHeaderValue,
+          fieldPath
+        );
       }
     }
     return {
@@ -493,18 +502,21 @@ export function useColumnMapping() {
       : [];
     const map: FieldMapType[] = [];
     for (const columnHeader of headers || []) {
+      const columnHeaderValue =
+        columnHeader.originalColumn ?? columnHeader.columnHeader;
       const fieldPath = findMatchField(columnHeader, newFieldOptions);
       if (fieldPath === undefined) {
-        // check if the columnHeader is one of managedAttributes
+        // check if the columnHeaderValue is one of managedAttributes
         const targetManagedAttr = managedAttributes.find(
           (item) =>
-            item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+            item.name.toLowerCase().trim() ===
+            columnHeaderValue.toLowerCase().trim()
         );
-        // check if the columnHeader is one of taxonomicRankss
+        // check if the columnHeaderValue is one of taxonomicRankss
         const targetTaxonomicRank = taxonomicRanks.find(
           (item) =>
             item.name?.toLowerCase().trim() ===
-            columnHeader.toLowerCase().trim()
+            columnHeaderValue.toLowerCase().trim()
         );
         if (targetManagedAttr) {
           if (
@@ -514,7 +526,8 @@ export function useColumnMapping() {
               targetField: "managedAttributes",
               skipped: false,
               targetKey: targetManagedAttr,
-              columnHeader
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
             });
           } else if (
             targetManagedAttr.managedAttributeComponent === "PREPARATION"
@@ -523,7 +536,8 @@ export function useColumnMapping() {
               targetField: "preparationManagedAttributes",
               skipped: false,
               targetKey: targetManagedAttr,
-              columnHeader
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
             });
           } else if (
             targetManagedAttr.managedAttributeComponent === "COLLECTING_EVENT"
@@ -532,7 +546,8 @@ export function useColumnMapping() {
               targetField: "collectingEvent.managedAttributes",
               skipped: false,
               targetKey: targetManagedAttr,
-              columnHeader
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
             });
           }
         } else if (targetTaxonomicRank) {
@@ -540,20 +555,23 @@ export function useColumnMapping() {
             targetField: "organism.determination.scientificNameDetails",
             skipped: false,
             targetKey: targetTaxonomicRank,
-            columnHeader
+            columnHeader: columnHeader.columnHeader,
+            originalColumn: columnHeader.originalColumn
           });
         } else {
           map.push({
             targetField: fieldPath,
             skipped: false,
-            columnHeader
+            columnHeader: columnHeader.columnHeader,
+            originalColumn: columnHeader.originalColumn
           });
         }
       } else {
         map.push({
           targetField: fieldPath,
           skipped: false,
-          columnHeader
+          columnHeader: columnHeader.columnHeader,
+          originalColumn: columnHeader.originalColumn
         });
       }
     }
