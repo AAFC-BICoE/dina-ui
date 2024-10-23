@@ -24,7 +24,8 @@ import {
   WorkbookColumnInfo,
   compareAlphanumeric,
   findMatchField,
-  getColumnHeaders
+  getColumnHeaders,
+  validateTemplateIntegrity
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
@@ -52,6 +53,15 @@ export function useColumnMapping() {
   const headers = useMemo(() => {
     return getColumnHeaders(spreadsheetData, sheet ?? 0);
   }, [sheet]);
+
+  // Determine if the template provided has been altered.
+  const templateIntegrityWarning = useMemo<boolean>(() => {
+    if (headers === null) {
+      return true;
+    }
+
+    return validateTemplateIntegrity(headers);
+  }, [headers]);
 
   // Generate sheet dropdown options
   const sheetOptions = useMemo(() => {
@@ -872,6 +882,7 @@ export function useColumnMapping() {
     fieldMap,
     fieldOptions,
     headers,
+    templateIntegrityWarning,
     sheetOptions,
     taxonomicRanks,
 

@@ -104,6 +104,7 @@ export function WorkbookColumnMapping({
     fieldMap,
     fieldOptions,
     headers,
+    templateIntegrityWarning,
     sheetOptions,
     workbookColumnMap,
     relationshipMapping,
@@ -628,29 +629,34 @@ export function WorkbookColumnMapping({
                     <CheckBoxField name="appendData" />
                   </div>
 
-                  <Alert variant="warning" className="mb-0">
-                    <Alert.Heading>Template Integrity Warning</Alert.Heading>
-                    <p>
-                      It appears that the column headers in your Excel template
-                      have been modified. To ensure accurate data processing,
-                      please avoid altering the original column headers.
-                    </p>
-                    <hr />
-                    <strong className="mb-0">Recommended Action:</strong>
-                    <ul className="mb-0">
-                      <li>
-                        <strong>Generate a new template:</strong> If you wish to
-                        make changes to the column headers or the order of
-                        columns, we recommend generating a new template using
-                        the template generator.
-                      </li>
-                      <li>
-                        <strong>Verify column mappings:</strong> If you choose
-                        to proceed with the modified template, carefully review
-                        and adjust the column mappings.
-                      </li>
-                    </ul>
-                  </Alert>
+                  {!templateIntegrityWarning && (
+                    <Alert variant="warning" className="mb-0">
+                      <Alert.Heading>
+                        <DinaMessage id="workbook_templateIntegrityWarning_title" />
+                      </Alert.Heading>
+                      <p>
+                        <DinaMessage id="workbook_templateIntegrityWarning_description" />
+                      </p>
+                      <hr />
+                      <strong className="mb-0">
+                        <DinaMessage id="workbook_templateIntegrityWarning_recommended" />
+                      </strong>
+                      <ul className="mb-0">
+                        <li>
+                          <strong>
+                            <DinaMessage id="workbook_templateIntegrityWarning_recommended_newTemplate_title" />
+                          </strong>{" "}
+                          <DinaMessage id="workbook_templateIntegrityWarning_recommended_newTemplate_description" />
+                        </li>
+                        <li>
+                          <strong>
+                            <DinaMessage id="workbook_templateIntegrityWarning_recommended_verify_title" />
+                          </strong>{" "}
+                          <DinaMessage id="workbook_templateIntegrityWarning_recommended_verify_description" />
+                        </li>
+                      </ul>
+                    </Alert>
+                  )}
                 </Card.Body>
               </Card>
 
