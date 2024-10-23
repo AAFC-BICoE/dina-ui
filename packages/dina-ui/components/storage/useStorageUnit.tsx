@@ -7,10 +7,10 @@ import {
   useModal
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import { isArray, keys } from "lodash";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { StorageUnit } from "packages/dina-ui/types/collection-api";
-import { ResourceNameIdentifier } from "packages/dina-ui/types/common";
+import { isArray } from "lodash";
+import { DinaMessage } from "../../intl/dina-ui-intl";
+import { StorageUnit } from "../../types/collection-api";
+import { ResourceNameIdentifier } from "../../types/common";
 
 export interface UseStorageUnitSaveParams {
   initialValues?: any;
