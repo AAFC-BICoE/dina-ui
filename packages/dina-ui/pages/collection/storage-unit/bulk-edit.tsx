@@ -3,7 +3,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ExistingMetadataBulkEditor } from "../../../components/bulk-metadata/ExistingMetadataBulkEditor";
+import { ExistingStorageUnitBulkEditor } from "../../../components/storage/ExistingStorageUnitBulkEditor";
 
 export default function MetadataBulkEditPage() {
   const router = useRouter();
@@ -24,7 +24,7 @@ export default function MetadataBulkEditPage() {
     }
   }
 
-  const title = ids ? "editMetadataTitle" : "addMetadataTitle";
+  const title = "editStorageUnitTitle";
 
   return (
     <div>
@@ -33,10 +33,10 @@ export default function MetadataBulkEditPage() {
       <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage(title)}</h1>
         {ids && (
-          <ExistingMetadataBulkEditor
+          <ExistingStorageUnitBulkEditor
             ids={ids}
             onSaved={onSaved}
-            onPreviousClick={() => router.push("/object-store/object/list")}
+            onPreviousClick={() => router.push("/collection/storage-unit/list")}
           />
         )}
       </main>

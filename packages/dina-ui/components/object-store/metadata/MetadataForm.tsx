@@ -43,15 +43,6 @@ export interface MetadataFormProps {
 
   // Form ref from parent component
   metadataFormRef?: Ref<FormikProps<InputResource<Metadata>>>;
-
-  /**
-   * Removes the html tag IDs from hidden tabs.
-   * This needs to be done for off-screen forms in the bulk editor.
-   */
-  isOffScreen?: boolean;
-
-  /** Reduces the rendering to improve performance when bulk editing many material samples. */
-  reduceRendering?: boolean;
 }
 
 export function MetadataForm({

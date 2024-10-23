@@ -1,6 +1,5 @@
 import React from "react";
-import { InputResource, PersistedResource, KitsuResource } from "kitsu";
-import { Promisable } from "type-fest";
+import { InputResource } from "kitsu";
 import {
   BulkEditTabContextI,
   ButtonBar,
@@ -19,13 +18,12 @@ import {
 } from "../bulk-edit/BulkEditNavigator";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormikProps } from "formik";
-import { useMetadataSave } from "../object-store/metadata/useMetadata";
-import { MetadataForm } from "../object-store/metadata/MetadataForm";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { isEmpty, keys, omit, pick, pickBy } from "lodash";
+import { keys, omit, pick, pickBy } from "lodash";
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { StorageUnit } from "packages/dina-ui/types/collection-api";
 import { StorageUnitForm } from "./StorageUnitForm";
+import { useStorageUnitSave } from "./useStorageUnit";
 
 export interface StorageUnitBulkEditorProps {
   storageUnits: InputResource<StorageUnit>[];
@@ -38,7 +36,7 @@ function getStorageUnitHooks(storageUnits) {
     return {
       key,
       resource,
-      saveHook: useMetadataSave({
+      saveHook: useStorageUnitSave({
         initialValues: resource
       }),
       formRef: useRef(null)
@@ -55,15 +53,13 @@ export function StorageUnitBulkEditor({
     BulkNavigatorTab | ResourceWithHooks
   >();
 
-  // Make sure the metadatas list doesn't change during this component's lifecycle:
   const storageUnits = useMemo(() => storageUnitsProp, []);
 
   const initialValues: InputResource<StorageUnit> = {
-    type: "storage-unit",
-    group: ""
+    type: "storage-unit"
   };
 
-  const bulkEditStorageUnitHook = useMetadataSave({
+  const bulkEditStorageUnitHook = useStorageUnitSave({
     initialValues
   });
 
@@ -76,11 +72,11 @@ export function StorageUnitBulkEditor({
       storageUnit={initialValues as any}
       storageUnitFormRef={bulkEditFormRef}
       storageUnitSaveHook={bulkEditStorageUnitHook}
+      buttonBar={<></>}
     />
   );
 
-  function metadataBulkOverrider() {
-    /** Metadata input including blank/empty fields. */
+  function storageUnitBulkOverrider() {
     return getStorageUnitBulkOverrider(bulkEditFormRef);
   }
 
@@ -100,34 +96,40 @@ export function StorageUnitBulkEditor({
 
   const { saveAll } = useBulkStorageUnitSave({
     onSaved,
-    storageUnitPreProcessor: metadataBulkOverrider,
+    storageUnitPreProcessor: storageUnitBulkOverrider,
     bulkEditCtx: { resourceHooks: storageUnitHooks, bulkEditFormRef }
   });
 
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <ButtonBar className="gap-4">
+        <ButtonBar className="button-bar">
           {onPreviousClick && (
-            <div className="flex-grow-1">
-              <div className="mx-auto">
-                <FormikButton
-                  className="btn btn-outline-secondary previous-button"
-                  onClick={onPreviousClick}
-                  buttonProps={() => ({ style: { width: "13rem" } })}
-                >
-                  <DinaMessage id="goToThePreviousStep" />
-                </FormikButton>
-              </div>
+            <div style={{ display: "inline-block", width: "50%" }}>
+              <FormikButton
+                className="btn btn-outline-secondary previous-button"
+                onClick={onPreviousClick}
+                buttonProps={() => ({ style: { width: "13rem" } })}
+              >
+                <DinaMessage id="goToThePreviousStep" />
+              </FormikButton>
             </div>
           )}
-          <FormikButton
-            className="btn btn-primary bulk-save-button"
-            onClick={saveAll}
-            buttonProps={() => ({ style: { width: "10rem" } })}
+          <div
+            style={{
+              display: "inline-block",
+              width: "50%",
+              textAlign: "right"
+            }}
           >
-            <DinaMessage id="saveAll" />
-          </FormikButton>
+            <FormikButton
+              className="btn btn-primary bulk-save-button"
+              onClick={saveAll}
+              buttonProps={() => ({ style: { width: "10rem" } })}
+            >
+              <DinaMessage id="saveAll" />
+            </FormikButton>
+          </div>
         </ButtonBar>
       </DinaForm>
       {selectedTab && (
@@ -139,9 +141,9 @@ export function StorageUnitBulkEditor({
           tabNameConfig={(storageUnit: ResourceWithHooks<StorageUnit>) =>
             storageUnit?.resource?.name
           }
-          renderOneResource={({ index, isSelected }) => (
-            <MetadataForm
-              metadataFormRef={(form) => {
+          renderOneResource={({ index }) => (
+            <StorageUnitForm
+              storageUnitFormRef={(form) => {
                 const isLastRefSetter =
                   storageUnitHooks.filter((it) => !it.formRef.current)
                     .length === 1;
@@ -150,10 +152,8 @@ export function StorageUnitBulkEditor({
                   setInitialized(true);
                 }
               }}
-              metadataSaveHook={storageUnitHooks[index].saveHook}
-              buttonBar={null}
-              isOffScreen={!isSelected}
-              reduceRendering={!isSelected}
+              storageUnitSaveHook={storageUnitHooks[index].saveHook}
+              buttonBar={<></>}
             />
           )}
         />
@@ -183,18 +183,9 @@ export function getStorageUnitBulkOverrider(bulkEditFormRef) {
     /** Override object with only the non-empty fields. */
     const overrides = withoutBlankFields(bulkEditStorageUnit);
 
-    // Combine the managed attributes dictionaries:
-    // const newManagedAttributes = {
-    //   ...withoutBlankFields(baseStorageUnit.managedAttributes),
-    //   ...withoutBlankFields(bulkEditStorageUnit?.managedAttributes)
-    // };
-
     const newStorageUnit: InputResource<StorageUnit> = {
       ...baseStorageUnit,
       ...overrides
-      //   ...(!isEmpty(newManagedAttributes) && {
-      //     managedAttributes: newManagedAttributes
-      //   })
     };
 
     return newStorageUnit;
@@ -202,9 +193,9 @@ export function getStorageUnitBulkOverrider(bulkEditFormRef) {
 }
 
 interface BulkStorageUnitSaveParams {
-  onSaved: (metadataIds: string[]) => void | Promise<void>;
+  onSaved: (storageUnitIds: string[]) => void | Promise<void>;
   storageUnitPreProcessor?: () => (
-    metadata: InputResource<StorageUnit>
+    storageUnit: InputResource<StorageUnit>
   ) => Promise<InputResource<StorageUnit>>;
   bulkEditCtx: BulkEditTabContextI<StorageUnit>;
 }
@@ -251,7 +242,6 @@ function useBulkStorageUnitSave({
 
         try {
           const submittedValues = formik.values;
-
           const saveOp = await saveHook.prepareStorageUnitSaveOperation({
             submittedValues,
             preProcessStorageUnit: async (original) => {
@@ -273,17 +263,6 @@ function useBulkStorageUnitSave({
               }
             }
           });
-          if (saveOp.resource.license) {
-            // The Metadata's xmpRightsWebStatement field stores the license's url.
-            saveOp.resource.xmpRightsWebStatement =
-              saveOp.resource.license?.url ?? "";
-            // No need to store this ; The url should be enough.
-            saveOp.resource.xmpRightsUsageTerms = "";
-          }
-          delete saveOp.resource.license;
-          saveOp.resource.acSubtype =
-            saveOp.resource.acSubtype?.acSubtype ?? null;
-
           saveOperations.push(saveOp);
         } catch (error: unknown) {
           if (error instanceof DoOperationsError) {
@@ -305,7 +284,7 @@ function useBulkStorageUnitSave({
       }
 
       const savedStorageUnits = await save<StorageUnit>(saveOperations, {
-        apiBaseUrl: "/collection/storage-unit"
+        apiBaseUrl: "/collection-api"
       });
       const savedStorageUnitIds = savedStorageUnits.map(
         (storageUnit) => storageUnit.id
