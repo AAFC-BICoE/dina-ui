@@ -119,6 +119,10 @@ export interface WorkbookColumnMap {
             name?: string;
           };
     };
+    multipleValueMappings?: {
+      id: string;
+      type: string;
+    }[];
   };
 }
 
