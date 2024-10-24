@@ -13,6 +13,7 @@ import {
 } from "../../components";
 import { IFileWithMeta } from "../../components/object-store";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import Link from "next/link";
 
 export function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
@@ -137,7 +138,13 @@ export function UploadWorkbookPage() {
           </Button>
         </div>
       </>
-    ) : undefined;
+    ) : (
+      <Link href={`/workbook/generator`}>
+        <a className="btn btn-primary ms-auto me-2" style={{ width: "20rem" }}>
+          Generate Workbook Template
+        </a>
+      </Link>
+    );
 
   return (
     <PageLayout titleId="workbookGroupUploadTitle" buttonBarContent={buttonBar}>

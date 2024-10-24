@@ -978,6 +978,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookStorageUnitIsRequired:
     "Storage unit not provided. Must provide valid storage unit for well row and well column.",
   workbookGroupUploadTitle: "Upload Workbook",
+  workbookGenerateTemplateTitle: "Generate Spreadsheet Template",
   workbookTitle: "Workbooks",
   workbookPreviewTitle: "Workbook preview",
   mapRelationshipTitle: "Relationship Mapping",
