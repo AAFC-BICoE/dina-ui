@@ -278,6 +278,7 @@ export function ColumnSelector<TData extends KitsuResource>(
           defaultColumns.map((column) => column?.id ?? "")
         );
       }
+      setLoading(false);
     } else {
       loadColumnsFromLocalStorage();
       setLoading(false);
