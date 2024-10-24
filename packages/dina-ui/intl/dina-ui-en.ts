@@ -978,6 +978,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookStorageUnitIsRequired:
     "Storage unit not provided. Must provide valid storage unit for well row and well column.",
   workbookGroupUploadTitle: "Upload Workbook",
+  workbookGenerateTemplateTitle: "Generate Spreadsheet Template",
   workbookTitle: "Workbooks",
   workbookPreviewTitle: "Workbook preview",
   mapRelationshipTitle: "Relationship Mapping",
@@ -1071,6 +1072,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedExport_createName: "Saved Export Template Name",
   savedExport_columnsToBeSaved: "Columns to be saved",
   export_columnsToExport: "Columns To Export",
+  templateGenerator_columnsToGenerate: "Columns To Generate",
   usage: "Usage",
   editContents: "Edit Contents",
   storageUnitGridTitle: "Storage Unit Grid",
