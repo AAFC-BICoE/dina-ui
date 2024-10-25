@@ -4,7 +4,9 @@ import {
   ColumnSelectorMemo,
   DinaForm,
   FieldWrapper,
+  SaveArgs,
   SubmitButton,
+  TextField,
   useApiClient
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -17,9 +19,10 @@ import {
 } from "common-ui/lib/list-page/types";
 import { dynamicFieldMappingForMaterialSample } from "../collection/material-sample/list";
 import { useIndexMapping } from "common-ui/lib/list-page/useIndexMapping";
-import { KitsuResource } from "kitsu";
+import { KitsuResource, KitsuResponse, PersistedResource } from "kitsu";
 import { WorkbookGeneration } from "packages/dina-ui/types/dina-export-api/resources/WorkbookGeneration";
 import Link from "next/link";
+import { isEqual } from "lodash";
 
 export interface EntityConfiguration {
   name: string;
@@ -68,22 +71,67 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
     dynamicFieldMapping: type.dynamicConfig
   });
 
-  async function generateTemplate() {
+  async function generateTemplate(formik) {
     setLoading(true);
     setErrorMessage(undefined);
 
-    const generateTemplateArg: WorkbookGeneration = {
-      columns: columnsToGenerate.map((col) => col.id),
-      aliases: columnsToGenerate.map((col) =>
-        col?.exportHeader ? col.exportHeader : col.id
+    const generateTemplateArg: any = {
+      data: {
+        type: "workbook-generation",
+        attributes: {
+          columns: columnsToGenerate.map((col) => col.id),
+          aliases: columnsToGenerate.map((col) =>
+            col?.exportHeader ? col.exportHeader : col.id
+          )
+        }
+      }
+    };
+
+    // If columns and aliases are the same, do not send the aliases over.
+    if (
+      isEqual(
+        generateTemplateArg.data.attributes.columns,
+        generateTemplateArg.data.attributes?.aliases ?? []
       )
-    } as WorkbookGeneration;
+    ) {
+      delete generateTemplateArg.data.attributes.aliases;
+    }
 
     try {
       const workbookGenerationPostResponse = await apiClient.axios.post(
         "objectstore-api/workbook/generation",
-        generateTemplateArg
+        generateTemplateArg,
+        {
+          headers: {
+            "Content-Type": "application/vnd.api+json"
+          },
+          responseType: "blob"
+        }
       );
+
+      // Retrieve the filename.
+      const fileName = formik?.values?.name ?? "template";
+
+      // Ensure the filename provided is supported by Windows.
+      const validFilenameRegex = /^[a-zA-Z0-9\s\-_]+$/;
+      if (!validFilenameRegex.test(fileName)) {
+        setErrorMessage(
+          "Please enter a valid filename. Only letters, numbers, spaces, hyphens, and underscores are allowed."
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Download the data
+      const url = window?.URL.createObjectURL(
+        workbookGenerationPostResponse.data as any
+      );
+      const link = document?.createElement("a");
+      link.href = url ?? "";
+      link?.setAttribute("download", fileName + ".xlsx");
+      document?.body?.appendChild(link);
+      link?.click();
+      window?.URL?.revokeObjectURL(url ?? "");
     } catch (error) {
       // Log the error for debugging
       console.error("Error generating workbook template:", error);
@@ -136,10 +184,10 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
             <div className="col-md-6 col-sm-12 d-flex">
               <SubmitButton
                 className="ms-auto"
-                buttonProps={() => ({
+                buttonProps={(formik) => ({
                   style: { width: "12rem" },
                   disabled: loading || columnsToGenerate.length === 0,
-                  onClick: () => generateTemplate()
+                  onClick: () => generateTemplate(formik)
                 })}
               >
                 {loading ? (
@@ -159,6 +207,12 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
         <Card>
           <Card.Body>
             <div className="list-inline d-flex flex-row gap-4 pt-2">
+              <TextField
+                name={"name"}
+                customName="templateName"
+                disabled={loading}
+                className="flex-grow-1"
+              />
               <FieldWrapper name="type" className="flex-grow-1">
                 <Select
                   isDisabled={entityTypes.length === 1}

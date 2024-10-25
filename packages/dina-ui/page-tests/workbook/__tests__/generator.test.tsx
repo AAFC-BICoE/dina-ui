@@ -122,8 +122,13 @@ describe("Workbook Template Generator", () => {
     expect(mockPost).toHaveBeenCalledWith(
       "objectstore-api/workbook/generation",
       {
-        aliases: ["Sample Name", "Bar code"],
-        columns: ["materialSampleName", "barcode"]
+        data: {
+          attributes: {
+            aliases: ["Sample Name", "Bar code"],
+            columns: ["materialSampleName", "barcode"]
+          },
+          type: "workbook-generation"
+        }
       }
     );
   });
@@ -164,8 +169,12 @@ describe("Workbook Template Generator", () => {
     expect(mockPost).toHaveBeenCalledWith(
       "objectstore-api/workbook/generation",
       {
-        aliases: ["materialSampleName", "barcode"],
-        columns: ["materialSampleName", "barcode"]
+        data: {
+          attributes: {
+            columns: ["materialSampleName", "barcode"]
+          },
+          type: "workbook-generation"
+        }
       }
     );
   });
