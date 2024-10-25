@@ -4,6 +4,7 @@ import { filter, get, has, pick, unset } from "lodash";
 import { useMemo } from "react";
 import {
   FieldMappingConfigType,
+  getFlattenedConfig,
   LinkOrCreateSetting,
   WorkbookColumnMap,
   WorkbookDataTypeEnum
@@ -116,48 +117,7 @@ export function useWorkbookConverter(
     }
   };
 
-  /**
-   * The data structure in the flatternedConfig is like this
-   * {
-   *    stringArrayField: { dataType: 'string[]' },
-   *    vocabularyField: { dataType: 'vocabulary', endpoint: 'vocabulary endpoint' },
-   *    objectField: {
-   *      dataType: 'object',
-   *      attributes: { name: [Object], age: [Object] }
-   *      relationshipConfig: {
-   *         baseApiPath: "fake-api",
-   *         hasGroup: true,
-   *         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
-   *         type: "object-field"
-   *       }
-   *    },
-   *    'objectField.name': { dataType: 'string' },
-   *    'objectField.age': { dataType: 'number' }
-   * }
-   */
-  const flattenedConfig = getFlattenedConfig(entityName);
-
-  function getFlattenedConfig(eName: string) {
-    const config = {};
-    if (has(mappingConfig, entityName)) {
-      const flattened = flattenObject(mappingConfig[eName]);
-      for (const key of Object.keys(flattened)) {
-        const lastPos = key.lastIndexOf(".");
-        if (lastPos > -1) {
-          const path = key.substring(0, lastPos);
-          if (!path.endsWith(".relationshipConfig")) {
-            const value = get(mappingConfig, eName + "." + path);
-            config[path.replaceAll(".attributes.", ".")] = value;
-          }
-        } else {
-          const path = key;
-          const value = get(mappingConfig, eName + "." + path);
-          config[path] = value;
-        }
-      }
-    }
-    return config;
-  }
+  const flattenedConfig = getFlattenedConfig(mappingConfig, entityName);
 
   /**
    * Find the data type of the filed configure in FiledMappingConfig.ts.

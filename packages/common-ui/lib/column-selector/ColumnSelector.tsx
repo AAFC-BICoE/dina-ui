@@ -13,6 +13,7 @@ import { generateColumnDefinition } from "./ColumnSelectorUtils";
 import { useApiClient } from "../api-client/ApiClientContext";
 import useLocalStorage from "@rehooks/local-storage";
 import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
+import { FieldOptionType } from "../../../dina-ui/components/workbook/utils/workbookMappingUtils";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
 
@@ -27,6 +28,12 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    * table.
    */
   exportMode?: boolean;
+
+  /**
+   * Specific to the workbook template generator. This will filter the list so the index mapping
+   * only contains supported fields for the generator as well as adding any missing fields.
+   */
+  generatorFields?: FieldOptionType[];
 
   /**
    * Index mapping containing all of the fields that should be displayed in the list.
@@ -106,6 +113,7 @@ export function ColumnSelector<TData extends KitsuResource>(
 
   const {
     exportMode,
+    generatorFields,
     indexMapping,
     dynamicFieldsMappingConfig,
     uniqueName,
@@ -133,6 +141,26 @@ export function ColumnSelector<TData extends KitsuResource>(
     let injectedMappings: (ESIndexMapping | undefined)[] = [];
 
     if (indexMapping) {
+      if (generatorFields) {
+        injectedMappings = indexMapping;
+
+        // Remove index items that are not included in the generatorFields.
+        injectedMappings = injectedMappings.filter((mapping) => {
+          return (
+            generatorFields.findIndex(
+              (generatorField) => generatorField.value === mapping?.label
+            ) !== -1
+          );
+        });
+
+        // Add missing index items from the generatorFields.
+
+        // console.log(indexMapping);
+        // console.log(injectedMappings);
+        setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
+        return;
+      }
+
       if (defaultColumns) {
         injectedMappings = defaultColumns
           .map<ESIndexMapping | undefined>((column) => {

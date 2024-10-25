@@ -4,7 +4,6 @@ import {
   ColumnSelectorMemo,
   DinaForm,
   FieldWrapper,
-  SaveArgs,
   SubmitButton,
   TextField,
   useApiClient
@@ -12,17 +11,23 @@ import {
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Alert, Card, Spinner } from "react-bootstrap";
 import Select from "react-select";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   DynamicFieldsMappingConfig,
   TableColumn
 } from "common-ui/lib/list-page/types";
 import { dynamicFieldMappingForMaterialSample } from "../collection/material-sample/list";
 import { useIndexMapping } from "common-ui/lib/list-page/useIndexMapping";
-import { KitsuResource, KitsuResponse, PersistedResource } from "kitsu";
-import { WorkbookGeneration } from "packages/dina-ui/types/dina-export-api/resources/WorkbookGeneration";
+import { KitsuResource } from "kitsu";
 import Link from "next/link";
 import { isEqual } from "lodash";
+import { useWorkbookConverter } from "../../components/workbook/utils/useWorkbookConverter";
+import FieldMappingConfig from "../../components/workbook/utils/FieldMappingConfig";
+import {
+  FieldOptionType,
+  generateWorkbookFieldOptions,
+  getFlattenedConfig
+} from "../../components/workbook/utils/workbookMappingUtils";
 
 export interface EntityConfiguration {
   name: string;
@@ -70,6 +75,11 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
     indexName: type.indexName,
     dynamicFieldMapping: type.dynamicConfig
   });
+
+  const flattenedConfig = getFlattenedConfig(FieldMappingConfig, type.name);
+  const newFieldOptions = useMemo(() => {
+    return generateWorkbookFieldOptions(flattenedConfig, formatMessage);
+  }, [flattenedConfig]);
 
   async function generateTemplate(formik) {
     setLoading(true);
@@ -241,6 +251,7 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
           <Card.Body>
             <ColumnSelectorMemo
               exportMode={true}
+              generatorFields={newFieldOptions as FieldOptionType[]}
               displayedColumns={columnsToGenerate as any}
               setDisplayedColumns={setColumnsToGenerate as any}
               indexMapping={indexMap}
