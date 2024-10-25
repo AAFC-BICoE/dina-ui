@@ -138,7 +138,7 @@ export function ColumnSelector<TData extends KitsuResource>(
     );
 
   useEffect(() => {
-    let injectedMappings: (ESIndexMapping | undefined)[] = [];
+    let injectedMappings: ESIndexMapping[] = [];
 
     if (indexMapping) {
       if (generatorFields) {
@@ -153,10 +153,49 @@ export function ColumnSelector<TData extends KitsuResource>(
           );
         });
 
-        // Add missing index items from the generatorFields.
+        // Add missing index items from the generatorFields
+        const missingFields = generatorFields.filter(
+          (generatorField) =>
+            !injectedMappings.some(
+              (mapping) => mapping?.label === generatorField.value
+            )
+        );
+        missingFields.forEach((field: FieldOptionType) => {
+          if (field.options && field.options.length !== 0) {
+            field.options.forEach((parentField) => {
+              injectedMappings.push({
+                label: parentField.label,
+                path: parentField.value ?? parentField.label,
+                type: "text",
+                value: parentField.value ?? parentField.label,
+                hideField: false,
+                distinctTerm: false,
+                keywordMultiFieldSupport: false,
+                keywordNumericSupport: false,
+                optimizedPrefix: false,
+                containsSupport: false,
+                endsWithSupport: false,
+                parentName: field.label,
+                parentPath: parentField.parentPath
+              });
+            });
+          } else {
+            injectedMappings.push({
+              label: field.value ?? field.label,
+              path: field.label,
+              type: "text",
+              value: field.label,
+              hideField: false,
+              distinctTerm: false,
+              keywordMultiFieldSupport: false,
+              keywordNumericSupport: false,
+              optimizedPrefix: false,
+              containsSupport: false,
+              endsWithSupport: false
+            });
+          }
+        });
 
-        // console.log(indexMapping);
-        // console.log(injectedMappings);
         setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
         return;
       }

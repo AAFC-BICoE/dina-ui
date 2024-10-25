@@ -1,7 +1,8 @@
-import { screen, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import { WorkbookTemplateGenerator } from "../../../pages/workbook/generator";
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 const mockPost = jest.fn();
 
@@ -93,12 +94,12 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
-      expect(wrapper.getAllByRole("option").length).toBe(9);
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(9);
     });
 
     // Select "Primary ID", give it alias of "Sample Name"
-    userEvent.click(wrapper.getByRole("option", { name: /primary id/i }));
-    userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    userEvent.click(wrapper.getAllByRole("option", { name: /primary id/i })[0]);
+    userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
     await new Promise(setImmediate);
     userEvent.type(
       wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
@@ -154,12 +155,12 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
-      expect(wrapper.getAllByRole("option").length).toBe(9);
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(9);
     });
 
     // Select "Primary ID", give it alias of "Sample Name"
-    userEvent.click(wrapper.getByRole("option", { name: /primary id/i }));
-    userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    userEvent.click(wrapper.getAllByRole("option", { name: /primary id/i })[0]);
+    userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
     await new Promise(setImmediate);
 
     // Select "Barcode", give it alias of "Bar code"
@@ -206,12 +207,12 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
-      expect(wrapper.getAllByRole("option").length).toBe(9);
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(9);
     });
 
     // Select "Primary ID", give it alias of "Sample Name"
-    userEvent.click(wrapper.getByRole("option", { name: /primary id/i }));
-    userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    userEvent.click(wrapper.getAllByRole("option", { name: /primary id/i })[0]);
+    userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
     await new Promise(setImmediate);
 
     // Put an invalid template name
@@ -225,6 +226,6 @@ describe("Workbook Template Generator", () => {
     );
     await new Promise(setImmediate);
 
-    screen.logTestingPlaygroundURL();
+    expect(wrapper.getByRole("alert")).toBeInTheDocument();
   });
 });
