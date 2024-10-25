@@ -978,7 +978,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookStorageUnitIsRequired:
     "Storage unit not provided. Must provide valid storage unit for well row and well column.",
   workbookGroupUploadTitle: "Upload Workbook",
-  workbookGenerateTemplateTitle: "Generate Spreadsheet Template",
+  workbookGenerateTemplateTitle: "Generate Workbook Template",
   workbookTitle: "Workbooks",
   workbookPreviewTitle: "Workbook preview",
   mapRelationshipTitle: "Relationship Mapping",
@@ -1038,6 +1038,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   maxNumUploadExceeded: "Max number of uploads exceeded",
   addReportTemplateTitle: "Add Report Template",
   backToUpload: "Back to Upload",
+  backToUploadWorkbook: "Back to Upload Workbook",
   field_reportTemplateName: "Report Template Name",
   field_includesBarcode: "Includes Barcode",
   field_templateOutputMediaType: "Template Output Media Type",

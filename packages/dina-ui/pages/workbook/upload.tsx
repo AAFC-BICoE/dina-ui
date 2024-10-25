@@ -139,11 +139,13 @@ export function UploadWorkbookPage() {
         </div>
       </>
     ) : (
-      <Link href={`/workbook/generator`}>
-        <a className="btn btn-primary ms-auto me-2" style={{ width: "20rem" }}>
-          Generate Workbook Template
-        </a>
-      </Link>
+      <div className="col-md-6 col-sm-12 d-flex ms-auto">
+        <Link href={`/workbook/generator`}>
+          <a className="btn btn-primary ms-auto" style={{ width: "16rem" }}>
+            <DinaMessage id="workbookGenerateTemplateTitle" />
+          </a>
+        </Link>
+      </div>
     );
 
   return (

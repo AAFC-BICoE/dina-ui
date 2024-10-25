@@ -1,7 +1,6 @@
 import { withRouter } from "next/router";
 import PageLayout from "../../components/page/PageLayout";
 import {
-  BackButton,
   ColumnSelectorMemo,
   DinaForm,
   FieldWrapper,
@@ -20,6 +19,7 @@ import { dynamicFieldMappingForMaterialSample } from "../collection/material-sam
 import { useIndexMapping } from "common-ui/lib/list-page/useIndexMapping";
 import { KitsuResource } from "kitsu";
 import { WorkbookGeneration } from "packages/dina-ui/types/dina-export-api/resources/WorkbookGeneration";
+import Link from "next/link";
 
 export interface EntityConfiguration {
   name: string;
@@ -126,7 +126,13 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
         titleId="workbookGenerateTemplateTitle"
         buttonBarContent={
           <>
-            <div className="col-md-6 col-sm-12 mt-2" />
+            <div className="col-md-6 col-sm-12 mt-2">
+              <Link href={"/workbook/upload"}>
+                <a className={`back-button my-auto`}>
+                  <DinaMessage id={"backToUploadWorkbook"} />
+                </a>
+              </Link>
+            </div>
             <div className="col-md-6 col-sm-12 d-flex">
               <SubmitButton
                 className="ms-auto"

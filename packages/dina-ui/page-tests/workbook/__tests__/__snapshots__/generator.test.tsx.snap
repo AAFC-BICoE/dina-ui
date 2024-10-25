@@ -286,7 +286,14 @@ exports[`Workbook Template Generator Page Layout 1`] = `
           >
             <div
               class="col-md-6 col-sm-12 mt-2"
-            />
+            >
+              <a
+                class="back-button my-auto"
+                href="/workbook/upload"
+              >
+                Back to Upload Workbook
+              </a>
+            </div>
             <div
               class="col-md-6 col-sm-12 d-flex"
             >
@@ -309,7 +316,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
         <h1
           id="wb-cont"
         >
-          Generate Spreadsheet Template
+          Generate Workbook Template
         </h1>
         <h4
           class="mt-4"
