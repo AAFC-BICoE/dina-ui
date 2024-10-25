@@ -1,4 +1,4 @@
-import { waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { WorkbookTemplateGenerator } from "../../../pages/workbook/generator";
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import userEvent from "@testing-library/user-event";
@@ -100,7 +100,10 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getByRole("option", { name: /primary id/i }));
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
     await new Promise(setImmediate);
-    userEvent.type(wrapper.getByRole("textbox"), "Sample Name");
+    userEvent.type(
+      wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
+      "Sample Name"
+    );
 
     // Select "Barcode", give it alias of "Bar code"
     userEvent.click(wrapper.getByRole("combobox"));
@@ -129,6 +132,12 @@ describe("Workbook Template Generator", () => {
           },
           type: "workbook-generation"
         }
+      },
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json"
+        },
+        responseType: "blob"
       }
     );
   });
@@ -175,7 +184,47 @@ describe("Workbook Template Generator", () => {
           },
           type: "workbook-generation"
         }
+      },
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json"
+        },
+        responseType: "blob"
       }
     );
+  });
+
+  it("Template name validation", async () => {
+    const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
+      apiContext
+    });
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledTimes(1);
+    });
+
+    // Click the "Add new column" dropdown
+    userEvent.click(wrapper.getByRole("combobox"));
+    await waitFor(() => {
+      // Total number of options expected based on the dynamic config and index map returned.
+      expect(wrapper.getAllByRole("option").length).toBe(29);
+    });
+
+    // Select "Primary ID", give it alias of "Sample Name"
+    userEvent.click(wrapper.getByRole("option", { name: /primary id/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    await new Promise(setImmediate);
+
+    // Put an invalid template name
+    userEvent.type(
+      wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
+      "Test.xlsx"
+    );
+    mockPost.mockReturnValue("pretendFileData");
+    userEvent.click(
+      wrapper.getByRole("button", { name: /generate template/i })
+    );
+    await new Promise(setImmediate);
+
+    screen.logTestingPlaygroundURL();
   });
 });
