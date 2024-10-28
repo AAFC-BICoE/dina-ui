@@ -312,6 +312,7 @@ describe("Material sample bulk edit tab", () => {
     });
     fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
     await new Promise(setImmediate);
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
     fireEvent.click(
       wrapper.getByRole("option", { name: /managed attribute 3/i })
     );
