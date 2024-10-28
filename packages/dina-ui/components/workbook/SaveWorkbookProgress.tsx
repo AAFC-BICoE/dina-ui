@@ -2,7 +2,12 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import ProgressBar from "react-bootstrap/ProgressBar";
-import { dateCell, QueryTable, useApiClient } from "../../../common-ui/lib";
+import {
+  dateCell,
+  DoOperationsError,
+  QueryTable,
+  useApiClient
+} from "../../../common-ui/lib";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { WorkBookSavingStatus, useWorkbookContext } from "./WorkbookProvider";
 import FieldMappingConfig from "./utils/FieldMappingConfig";
@@ -11,6 +16,7 @@ import { delay } from "./utils/workbookMappingUtils";
 import { PersistedResource, KitsuResource } from "kitsu";
 import { MaterialSample } from "../../types/collection-api";
 import Link from "next/link";
+import { ErrorBanner } from "../error/ErrorBanner";
 
 export interface SaveWorkbookProgressProps {
   onWorkbookCanceled: () => void;
@@ -281,7 +287,7 @@ export function SaveWorkbookProgress({
 
     onWorkbookFailed?.();
   }
-
+  // `Field: ${fieldErrorKey} has an error: ${error.fieldErrors[fieldErrorKey]}`
   return (
     <>
       <ProgressBar
@@ -300,7 +306,20 @@ export function SaveWorkbookProgress({
 
       {statusRef.current === "FAILED" && (
         <div className="mt-3 text-center">
-          <p className="text-start">{`Error: ${error?.message}`}</p>
+          {error?.message ? (
+            <ErrorBanner errorMessage={error?.message} />
+          ) : (
+            error instanceof DoOperationsError &&
+            Object.keys(error.fieldErrors).map((fieldErrorKey) => (
+              <ErrorBanner
+                key={fieldErrorKey}
+                errorMessage={formatMessage("doOperationsFieldError", {
+                  fieldErrorKey,
+                  fieldErrorMessage: error.fieldErrors[fieldErrorKey] as string
+                })}
+              />
+            ))
+          )}
           <Button
             className="mt-1 mb-2 me-2"
             onClick={() => onWorkbookFailed?.()}
