@@ -140,20 +140,11 @@ export function ColumnSelector<TData extends KitsuResource>(
   useEffect(() => {
     let injectedMappings: ESIndexMapping[] = [];
 
-    if (indexMapping) {
+    if (indexMapping !== undefined) {
       if (generatorFields) {
         injectedMappings = indexMapping;
 
-        // Remove index items that are not included in the generatorFields.
-        injectedMappings = injectedMappings.filter((mapping) => {
-          return (
-            generatorFields.findIndex(
-              (generatorField) => generatorField.value === mapping?.label
-            ) !== -1
-          );
-        });
-
-        // Add missing index items from the generatorFields
+        // Add missing index items from the generatorFields configuration
         const missingFields = generatorFields.filter(
           (generatorField) =>
             !injectedMappings.some(
@@ -267,7 +258,7 @@ export function ColumnSelector<TData extends KitsuResource>(
       // Finally, set it as the state.
       setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
     }
-  }, [indexMapping, defaultColumns]);
+  }, [indexMapping, defaultColumns, generatorFields]);
 
   // This useEffect is responsible for loading in the new local storage displayed columns.
   useEffect(() => {
@@ -322,6 +313,13 @@ export function ColumnSelector<TData extends KitsuResource>(
         const columns = (await Promise.all(promises)).filter(isDefinedColumn);
         setDisplayedColumns(columns);
       }
+    }
+
+    // Generator fields do not need to load values.
+    if (generatorFields) {
+      setLoading(false);
+      setColumnSelectorLoading?.(false);
+      return;
     }
 
     // Check if overrides are provided from the saved exports.

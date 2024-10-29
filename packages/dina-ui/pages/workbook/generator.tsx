@@ -17,11 +17,9 @@ import {
   TableColumn
 } from "common-ui/lib/list-page/types";
 import { dynamicFieldMappingForMaterialSample } from "../collection/material-sample/list";
-import { useIndexMapping } from "common-ui/lib/list-page/useIndexMapping";
 import { KitsuResource } from "kitsu";
 import Link from "next/link";
 import { isEqual } from "lodash";
-import { useWorkbookConverter } from "../../components/workbook/utils/useWorkbookConverter";
 import FieldMappingConfig from "../../components/workbook/utils/FieldMappingConfig";
 import {
   FieldOptionType,
@@ -70,11 +68,6 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
     instance: entityType
   }));
   const selectedType = entityTypes.find((item) => item.value === type.name);
-
-  const { indexMap } = useIndexMapping({
-    indexName: type.indexName,
-    dynamicFieldMapping: type.dynamicConfig
-  });
 
   const flattenedConfig = getFlattenedConfig(FieldMappingConfig, type.name);
   const newFieldOptions = useMemo(() => {
@@ -254,7 +247,7 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
               generatorFields={newFieldOptions as FieldOptionType[]}
               displayedColumns={columnsToGenerate as any}
               setDisplayedColumns={setColumnsToGenerate as any}
-              indexMapping={indexMap}
+              indexMapping={[]}
               uniqueName={type.uniqueName}
               dynamicFieldsMappingConfig={type.dynamicConfig}
               disabled={loading}

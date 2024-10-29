@@ -6,64 +6,8 @@ import "@testing-library/jest-dom";
 
 const mockPost = jest.fn();
 
-const mockGet = jest.fn<any, any>(async (path) => {
-  switch (path) {
-    case "search-api/search-ws/mapping":
-      return {
-        data: {
-          attributes: [
-            { name: "barcode", type: "date", path: "data.attributes" },
-            {
-              name: "materialSampleName",
-              type: "text",
-              fields: ["keyword"],
-              path: "data.attributes"
-            }
-          ],
-          relationships: [
-            {
-              referencedBy: "collectingEvent",
-              name: "type",
-              path: "included",
-              value: "collecting-event",
-              attributes: [
-                { name: "createdBy", type: "text", path: "attributes" },
-                { name: "createdOn", type: "date", path: "attributes" },
-                { name: "tags", type: "text", path: "attributes" },
-                { name: "habitat", type: "text", path: "attributes" },
-                { name: "substrate", type: "text", path: "attributes" },
-                {
-                  name: "dwcOtherRecordNumbers",
-                  type: "text",
-                  path: "attributes"
-                },
-                { name: "dwcRecordNumber", type: "text", path: "attributes" },
-                {
-                  name: "startEventDateTime",
-                  type: "date",
-                  path: "attributes"
-                },
-                { name: "endEventDateTime", type: "date", path: "attributes" },
-                { name: "host", type: "text", path: "attributes" },
-                {
-                  name: "dwcVerbatimLocality",
-                  type: "text",
-                  path: "attributes"
-                }
-              ]
-            }
-          ],
-          index_name: "dina_material_sample_index"
-        }
-      };
-    default:
-      return { data: [] };
-  }
-});
-
 const apiContext: any = {
-  get: mockGet,
-  apiClient: { axios: { post: mockPost, get: mockGet } }
+  apiClient: { axios: { post: mockPost } }
 };
 
 describe("Workbook Template Generator", () => {
@@ -75,9 +19,6 @@ describe("Workbook Template Generator", () => {
     const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
       apiContext
     });
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledTimes(1);
-    });
 
     expect(wrapper.asFragment()).toMatchSnapshot();
   });
@@ -85,9 +26,6 @@ describe("Workbook Template Generator", () => {
   it("Select multiple columns and set aliases", async () => {
     const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
       apiContext
-    });
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledTimes(1);
     });
 
     // Click the "Add new column" dropdown
@@ -147,9 +85,7 @@ describe("Workbook Template Generator", () => {
     const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
       apiContext
     });
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledTimes(1);
-    });
+    await new Promise(setImmediate);
 
     // Click the "Add new column" dropdown
     userEvent.click(wrapper.getByRole("combobox"));
@@ -199,9 +135,7 @@ describe("Workbook Template Generator", () => {
     const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
       apiContext
     });
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledTimes(1);
-    });
+    await new Promise(setImmediate);
 
     // Click the "Add new column" dropdown
     userEvent.click(wrapper.getByRole("combobox"));
