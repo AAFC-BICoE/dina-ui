@@ -1,8 +1,7 @@
-import { ResourceSelect, ResourceWithHooks } from "common-ui";
+import { ResourceWithHooks } from "common-ui";
 import { InputResource } from "kitsu";
 import { useState } from "react";
-import Switch from "react-switch";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   getSampleBulkOverrider,
@@ -12,6 +11,11 @@ import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-
 import { MaterialSampleFormProps } from "../../collection/material-sample/MaterialSampleForm";
 import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
+import {
+  fireEvent,
+  waitForElementToBeRemoved,
+  screen
+} from "@testing-library/react";
 
 const mockSubmitOverride = jest.fn();
 
@@ -24,7 +28,6 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   // Allow selecting a custom view for the form:
   const {
     sampleFormTemplate,
-    setSampleFormTemplateUUID,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues
@@ -37,9 +40,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   const {
     bulkEditFormRef,
     bulkEditSampleHook,
-    sampleHooks,
-    materialSampleForm,
-    formTemplateProps
+    materialSampleForm
   }: {
     bulkEditFormRef;
     bulkEditSampleHook;
@@ -78,19 +79,49 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
             )
           );
         }}
-      />
+      >
+        Get Overrides
+      </button>
     </div>
   );
 }
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
+    case "collection-api/managed-attribute":
+      return {
+        data: [
+          {
+            id: "1",
+            type: "managed-attribute",
+            vocabularyElementType: "STRING",
+            managedAttributeComponent: "MATERIAL_SAMPLE",
+            key: "a",
+            name: "Managed Attribute 1"
+          },
+          {
+            id: "2",
+            type: "managed-attribute",
+            vocabularyElementType: "STRING",
+            managedAttributeComponent: "MATERIAL_SAMPLE",
+            key: "b",
+            name: "Managed Attribute 2"
+          },
+          {
+            id: "3",
+            type: "managed-attribute",
+            vocabularyElementType: "STRING",
+            managedAttributeComponent: "MATERIAL_SAMPLE",
+            key: "c",
+            name: "Managed Attribute 3"
+          }
+        ]
+      };
     case "agent-api/person":
     case "collection-api/collection":
     case "collection-api/collection-method":
     case "collection-api/collecting-event":
     case "collection-api/material-sample":
-    case "collection-api/managed-attribute":
     case "collection-api/material-sample-type":
     case "collection-api/project":
     case "collection-api/vocabulary2/materialSampleState":
@@ -161,14 +192,11 @@ describe("Material sample bulk edit tab", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Without changing any fields, overrides nothing", async () => {
-    const wrapper = mountWithAppContext(<BulkEditTab />, testCtx);
+    const wrapper = mountWithAppContext2(<BulkEditTab />, testCtx);
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.get-overrides").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSubmitOverride).lastCalledWith({
       isRestricted: false,
@@ -177,7 +205,7 @@ describe("Material sample bulk edit tab", () => {
   });
 
   it("Overrides the barcode field", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <BulkEditTab
         baseSample={{
           type: "material-sample",
@@ -187,19 +215,15 @@ describe("Material sample bulk edit tab", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Update the barcode
-    wrapper
-      .find(".barcode-field input")
-      .simulate("change", { target: { value: "test-barcode-override" } });
+    fireEvent.change(wrapper.getByRole("textbox", { name: /barcode/i }), {
+      target: { value: "test-barcode-override" }
+    });
 
-    wrapper.find("button.get-overrides").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSubmitOverride).lastCalledWith({
       type: "material-sample",
@@ -210,7 +234,7 @@ describe("Material sample bulk edit tab", () => {
   });
 
   it("Overrides only the linked resources after enabling all data components", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <BulkEditTab
         baseSample={{
           type: "material-sample",
@@ -219,22 +243,22 @@ describe("Material sample bulk edit tab", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".material-sample-nav")
-      .find(Switch)
-      .forEach((node) => node.prop<any>("onChange")(true));
-
+    // Enable all data components...
+    const switches = wrapper.container.querySelectorAll(
+      ".material-sample-nav .react-switch-bg"
+    );
+    if (!switches || switches.length === 0) {
+      fail("Data component switches are expected...");
+    }
+    switches.forEach((switchFound) => {
+      fireEvent.click(switchFound);
+    });
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.get-overrides").simulate("click");
-
+    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSubmitOverride).lastCalledWith({
       // Keeps the name and type:
@@ -249,7 +273,7 @@ describe("Material sample bulk edit tab", () => {
   });
 
   it("Combines managed attribute values from the original and the bulk override.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <BulkEditTab
         baseSample={{
           type: "material-sample",
@@ -262,33 +286,52 @@ describe("Material sample bulk edit tab", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Override values for attributes B and C:
-    wrapper
-      .find(".managed-attributes-editor")
-      .find(ResourceSelect)
-      .prop<any>("onChange")([
-      { key: "b", vocabularyElementType: "STRING" },
-      { key: "c", vocabularyElementType: "STRING" }
-    ]);
+    const managedAttributesVisible = wrapper.getByRole("combobox", {
+      name: /add new/i
+    });
 
+    // Select the "B" managed attribute to display.
+    fireEvent.focus(managedAttributesVisible);
+    fireEvent.change(managedAttributesVisible, {
+      target: { value: "Managed Attribute 2" }
+    });
+    fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
     await new Promise(setImmediate);
-    wrapper.update();
-
-    wrapper
-      .find(".b-field input")
-      .simulate("change", { target: { value: "new-b-value" } });
-    wrapper
-      .find(".c-field input")
-      .simulate("change", { target: { value: "new-c-value" } });
-
-    wrapper.find("button.get-overrides").simulate("click");
-
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    fireEvent.click(
+      wrapper.getByRole("option", { name: /managed attribute 2/i })
+    );
     await new Promise(setImmediate);
-    wrapper.update();
+
+    // Select the "C" managed attribute to display.
+    fireEvent.focus(managedAttributesVisible);
+    fireEvent.change(managedAttributesVisible, {
+      target: { value: "Managed Attribute 3" }
+    });
+    fireEvent.keyDown(managedAttributesVisible, { key: "ArrowDown" });
+    await new Promise(setImmediate);
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+    fireEvent.click(
+      wrapper.getByRole("option", { name: /managed attribute 3/i })
+    );
+    await new Promise(setImmediate);
+
+    const textboxB = wrapper.container.querySelector(
+      ".managedAttributes_b-field input"
+    );
+    const textboxC = wrapper.container.querySelector(
+      ".managedAttributes_c-field input"
+    );
+    if (!textboxB || !textboxC) {
+      fail("The managed attribute textboxes need to exist at this point.");
+    }
+    fireEvent.change(textboxB, { target: { value: "new-b-value" } });
+    fireEvent.change(textboxC, { target: { value: "new-c-value" } });
+
+    fireEvent.click(wrapper.getByRole("button", { name: /get overrides/i }));
+    await new Promise(setImmediate);
 
     expect(mockSubmitOverride).lastCalledWith({
       // Keeps the name and type:

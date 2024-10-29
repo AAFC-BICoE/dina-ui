@@ -1088,5 +1088,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbook_templateIntegrityWarning_recommended_verify_title:
     "Verify column mappings:",
   workbook_templateIntegrityWarning_recommended_verify_description:
-    "If you choose to proceed with the modified template, carefully review and adjust the column mappings."
+    "If you choose to proceed with the modified template, carefully review and adjust the column mappings.",
+  selectResourceAppendData: "Select resource to append data to",
+  selectParentMaterialSample:
+    "Select Parent Material Sample to link resource to"
 };

@@ -371,14 +371,16 @@ export function useColumnMapping() {
     } else if (fieldPath === "managedAttributes") {
       handleManagedAttributeMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath?.startsWith("parentMaterialSample.")) {
-      const valueMapping = await resolveParentMapping(columnHeaderValue);
+      const { valueMapping, multipleValueMappings } =
+        await resolveParentMapping(columnHeaderValue);
       newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
         originalColumnName: originalColumnHeader,
         showOnUI: false,
         mapRelationship: true,
         numOfUniqueValues: 1,
-        valueMapping
+        valueMapping,
+        multipleValueMappings
       };
     } else {
       const mapRelationship =
@@ -604,9 +606,17 @@ export function useColumnMapping() {
    * @returns
    */
   async function resolveParentMapping(columnHeader: string): Promise<{
-    [value: string]: {
-      id: string;
-      type: string;
+    valueMapping: {
+      [value: string]: {
+        id: string;
+        type: string;
+      };
+    };
+    multipleValueMappings?: {
+      [value: string]: {
+        id: string;
+        type: string;
+      }[];
     };
   }> {
     const valueMapping: {
@@ -615,6 +625,14 @@ export function useColumnMapping() {
         type: string;
       };
     } = {};
+
+    const multipleValueMappings: {
+      [value: string]: {
+        id: string;
+        type: string;
+      }[];
+    } = {};
+
     if (spreadsheetData) {
       const spreadsheetHeaders = spreadsheetData[sheet].rows[0].content;
       const colIndex = spreadsheetHeaders.indexOf(columnHeader) ?? -1;
@@ -630,12 +648,22 @@ export function useColumnMapping() {
             );
             if (response && response.data.length > 0) {
               valueMapping[parentValue] = { id: response.data[0].id, type };
+
+              if (response.data.length > 1) {
+                multipleValueMappings[parentValue] = response.data.map(
+                  (resource) => ({
+                    id: resource.id,
+                    type
+                  })
+                );
+              }
             }
           }
         }
       }
     }
-    return valueMapping;
+
+    return { valueMapping, multipleValueMappings };
   }
 
   function resolveRelationships(
