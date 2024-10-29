@@ -47,8 +47,10 @@ export interface StorageUnitFormProps {
   /** Optionally call the hook from the parent component. */
   storageUnitSaveHook?: ReturnType<typeof useStorageUnitSave>;
 
-  // Form ref from parent component
+  // Form ref from bulk edit tab
   storageUnitFormRef?: Ref<FormikProps<InputResource<StorageUnit>>>;
+
+  isBulkEditTabForm?: boolean;
 }
 
 export function StorageUnitForm({
@@ -78,7 +80,8 @@ export function StorageUnitForm({
     </ButtonBar>
   ),
   storageUnitSaveHook,
-  storageUnitFormRef
+  storageUnitFormRef,
+  isBulkEditTabForm
 }: StorageUnitFormProps) {
   const { initialValues, onSubmit } =
     storageUnitSaveHook ??
@@ -103,7 +106,10 @@ export function StorageUnitForm({
       innerRef={storageUnitFormRef}
     >
       {buttonBar}
-      <StorageUnitFormFields parentIdInURL={parentIdInURL} />
+      <StorageUnitFormFields
+        parentIdInURL={parentIdInURL}
+        isBulkEditTabForm={isBulkEditTabForm}
+      />
     </DinaForm>
   );
 }
@@ -112,11 +118,14 @@ export interface StorageUnitFormFieldsProps {
   parentIdInURL?: string;
   /** Reduces the rendering to improve performance when bulk editing many resources. */
   reduceRendering?: boolean;
+
+  isBulkEditTabForm?: boolean;
 }
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields({
   parentIdInURL,
-  reduceRendering
+  reduceRendering,
+  isBulkEditTabForm
 }: StorageUnitFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
@@ -139,7 +148,7 @@ export function StorageUnitFormFields({
     <div>
       <div className="row">
         <div className="col-md-6 d-flex">
-          {!readOnly && !initialValues.id && (
+          {!readOnly && !initialValues.id && !isBulkEditTabForm && (
             <ToggleField
               className="me-4"
               onChangeExternal={onStorageUnitMultipleToggled}

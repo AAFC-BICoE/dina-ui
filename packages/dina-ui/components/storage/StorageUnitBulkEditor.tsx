@@ -73,6 +73,7 @@ export function StorageUnitBulkEditor({
       storageUnitFormRef={bulkEditFormRef}
       storageUnitSaveHook={bulkEditStorageUnitHook}
       buttonBar={<></>}
+      isBulkEditTabForm={true}
     />
   );
 
