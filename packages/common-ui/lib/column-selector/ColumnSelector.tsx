@@ -138,7 +138,7 @@ export function ColumnSelector<TData extends KitsuResource>(
     );
 
   useEffect(() => {
-    let injectedMappings: ESIndexMapping[] = [];
+    let injectedMappings: (ESIndexMapping | undefined)[] = [];
 
     if (indexMapping !== undefined) {
       if (generatorFields) {
