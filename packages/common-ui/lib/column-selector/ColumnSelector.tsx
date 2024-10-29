@@ -151,11 +151,25 @@ export function ColumnSelector<TData extends KitsuResource>(
               (mapping) => mapping?.label === generatorField.value
             )
         );
+
         missingFields.forEach((field: FieldOptionType) => {
           if (field.options && field.options.length !== 0) {
             field.options.forEach((parentField) => {
+              // Search relationship dynamic configuration fields.
+              const dynamicConfig =
+                dynamicFieldsMappingConfig?.relationshipFields?.find(
+                  (config) => {
+                    return (
+                      config.referencedBy === parentField.parentPath &&
+                      config.path ===
+                        "included.attributes." +
+                          parentField.value?.split?.(".")?.pop?.()
+                    );
+                  }
+                );
+
               injectedMappings.push({
-                label: parentField.label,
+                label: dynamicConfig?.label ?? parentField.label,
                 path: parentField.value ?? parentField.label,
                 type: "text",
                 value: parentField.value ?? parentField.label,
@@ -167,12 +181,20 @@ export function ColumnSelector<TData extends KitsuResource>(
                 containsSupport: false,
                 endsWithSupport: false,
                 parentName: field.label,
-                parentPath: parentField.parentPath
+                parentPath: parentField.parentPath,
+                dynamicField: dynamicConfig
               });
             });
           } else {
+            // Search entity level dynamic field configurations.
+            const dynamicConfig = dynamicFieldsMappingConfig?.fields?.find(
+              (config) => {
+                return config.path === "data.attributes." + field.value;
+              }
+            );
+
             injectedMappings.push({
-              label: field.value ?? field.label,
+              label: dynamicConfig?.label ?? field.value ?? field.label,
               path: field.label,
               type: "text",
               value: field.label,
@@ -182,7 +204,8 @@ export function ColumnSelector<TData extends KitsuResource>(
               keywordNumericSupport: false,
               optimizedPrefix: false,
               containsSupport: false,
-              endsWithSupport: false
+              endsWithSupport: false,
+              dynamicField: dynamicConfig
             });
           }
         });
