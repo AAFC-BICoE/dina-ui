@@ -126,28 +126,6 @@ export function ManagedAttributesEditor({
                   ) : (
                     <div>
                       <div className="row">
-                        <label
-                          className={`visible-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
-                        >
-                          <div className="mb-2">
-                            <strong>
-                              <DinaMessage id="field_visibleManagedAttributes" />
-                            </strong>
-                            <Tooltip id="field_visibleManagedAttributes_tooltip" />
-                          </div>
-                          <ManagedAttributeMultiSelect
-                            managedAttributeApiPath={managedAttributeApiPath}
-                            managedAttributeComponent={
-                              managedAttributeComponent
-                            }
-                            onChange={setVisibleAttributeKeys}
-                            visibleAttributes={visibleAttributes}
-                            loading={loading}
-                          />
-                        </label>
-                      </div>
-                      {!!visibleAttributes.length && <hr />}
-                      <div className="row">
                         {visibleAttributes.map((attribute) => (
                           <ManagedAttributeFieldWithLabel
                             key={attribute.key}
@@ -161,6 +139,21 @@ export function ManagedAttributesEditor({
                             }
                           />
                         ))}
+                      </div>
+                      <div className="row">
+                        <label
+                          className={`visible-attribute-menu col-sm-${attributeSelectorWidth}`}
+                        >
+                          <ManagedAttributeMultiSelect
+                            managedAttributeApiPath={managedAttributeApiPath}
+                            managedAttributeComponent={
+                              managedAttributeComponent
+                            }
+                            onChange={setVisibleAttributeKeys}
+                            visibleAttributes={visibleAttributes}
+                            loading={loading}
+                          />
+                        </label>
                       </div>
                     </div>
                   )}
@@ -226,7 +219,11 @@ export function ManagedAttributeMultiSelect({
       isLoading={loading}
       onChange={onChangeInternal}
       value={visibleAttributes}
-      selectProps={{ controlShouldRenderValue: false, isClearable: false }}
+      selectProps={{
+        controlShouldRenderValue: false,
+        isClearable: false,
+        placeholder: "Add new"
+      }}
     />
   );
 }
