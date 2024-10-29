@@ -1077,6 +1077,18 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_appendData_tooltip:
     "If enabled, append data to existing record with matching name. Otherwise, create new record.",
   selectAndResume: "Select and Resume",
+  workbook_templateIntegrityWarning_title: "Template Integrity Warning",
+  workbook_templateIntegrityWarning_description:
+    "It appears that the column headers in your Excel template have been modified. To ensure accurate data processing, please avoid altering the original column headers.",
+  workbook_templateIntegrityWarning_recommended: "Recommended Actions:",
+  workbook_templateIntegrityWarning_recommended_newTemplate_title:
+    "Generate a new template:",
+  workbook_templateIntegrityWarning_recommended_newTemplate_description:
+    "If you wish to make changes to the column headers or the order of columns, we recommend generating a new template using the template generator.",
+  workbook_templateIntegrityWarning_recommended_verify_title:
+    "Verify column mappings:",
+  workbook_templateIntegrityWarning_recommended_verify_description:
+    "If you choose to proceed with the modified template, carefully review and adjust the column mappings.",
   selectResourceAppendData: "Select resource to append data to",
   selectParentMaterialSample:
     "Select Parent Material Sample to link resource to"
