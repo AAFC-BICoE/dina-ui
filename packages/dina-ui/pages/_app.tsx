@@ -4,6 +4,7 @@ import {
   AuthenticatedApiClientProvider,
   DefaultInstanceContextProvider,
   KeycloakAccountProvider,
+  DevUserAccountProvider,
   ModalProvider
 } from "common-ui";
 import "common-ui/common-ui-style.scss";
@@ -45,25 +46,27 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
 
   return (
     <ApiClientImplProvider>
-      <KeycloakAccountProvider>
-        <AuthenticatedApiClientProvider>
-          <DinaIntlProvider>
-            <DefaultInstanceContextProvider>
-              <FileUploadProviderImpl>
-                <ErrorBoundaryPage>
-                  <DndProvider backend={HTML5Backend}>
-                    <ModalProvider appElement={appElement}>
-                      <WorkbookUploadContextProvider>
-                        <Component {...pageProps} />
-                      </WorkbookUploadContextProvider>
-                    </ModalProvider>
-                  </DndProvider>
-                </ErrorBoundaryPage>
-              </FileUploadProviderImpl>
-            </DefaultInstanceContextProvider>
-          </DinaIntlProvider>
-        </AuthenticatedApiClientProvider>
-      </KeycloakAccountProvider>
+      <DevUserAccountProvider>
+        <KeycloakAccountProvider>
+          <AuthenticatedApiClientProvider>
+            <DinaIntlProvider>
+              <DefaultInstanceContextProvider>
+                <FileUploadProviderImpl>
+                  <ErrorBoundaryPage>
+                    <DndProvider backend={HTML5Backend}>
+                      <ModalProvider appElement={appElement}>
+                        <WorkbookUploadContextProvider>
+                          <Component {...pageProps} />
+                        </WorkbookUploadContextProvider>
+                      </ModalProvider>
+                    </DndProvider>
+                  </ErrorBoundaryPage>
+                </FileUploadProviderImpl>
+              </DefaultInstanceContextProvider>
+            </DinaIntlProvider>
+          </AuthenticatedApiClientProvider>
+        </KeycloakAccountProvider>
+      </DevUserAccountProvider>
     </ApiClientImplProvider>
   );
 }

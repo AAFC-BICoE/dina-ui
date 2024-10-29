@@ -31,6 +31,13 @@ respond /keycloak.json "{
 	\"confidential-port\": 0
 }"
 
+# Provide the dev-user configuration to the front-end:
+respond /dev-user.json "{ 
+	\"keycloakEnabled\": {$KEYCLOAK_ENABLED:true},
+	\"devUserEnabled\": {$DEV_USER_ENABLED:false},
+	\"groupRole\": \"{$DEV_USER_GROUP_ROLE}\"
+}"
+
 respond /api/instance.json "{ 
 	\"instance-mode\": \"{$INSTANCE_MODE}\",
 	\"instance-name\": \"{$INSTANCE_NAME}\",
