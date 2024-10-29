@@ -126,8 +126,8 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
       }
 
       // Download the data
-      const url = window?.URL.createObjectURL(
-        workbookGenerationPostResponse.data as any
+      const url = window?.URL?.createObjectURL?.(
+        workbookGenerationPostResponse?.data as any
       );
       const link = document?.createElement("a");
       link.href = url ?? "";

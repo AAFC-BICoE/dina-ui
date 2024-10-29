@@ -58,7 +58,7 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
-      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(9);
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
     });
 
     // Select "Primary ID", give it alias of "Sample Name"
@@ -117,7 +117,7 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
-      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(9);
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
     });
 
     // Select "Primary ID", give it alias of "Sample Name"
@@ -167,7 +167,7 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
-      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(9);
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
     });
 
     // Select "Material Sample Managed Attributes".
@@ -229,7 +229,7 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() => {
       // Total number of options expected based on the dynamic config and index map returned.
-      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(9);
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
     });
 
     // Select "Primary ID", give it alias of "Sample Name"

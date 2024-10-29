@@ -246,10 +246,17 @@ export function useColumnMapping() {
     columnHeader = columnHeader.replace(".", "_");
 
     const fieldPath = "managedAttributes";
-    const targetManagedAttr = managedAttributes.find(
-      (item) =>
-        item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
-    );
+
+    // Scan for keys match first, then it will scan for searching the name.
+    const targetManagedAttr =
+      managedAttributes.find(
+        (item) => item.key === originalColumnHeader.trim()
+      ) ??
+      managedAttributes.find(
+        (item) =>
+          item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+      );
+
     if (targetManagedAttr) {
       newWorkbookColumnMap[columnHeader] = {
         fieldPath,
