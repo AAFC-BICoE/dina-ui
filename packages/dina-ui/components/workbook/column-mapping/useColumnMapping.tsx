@@ -21,9 +21,11 @@ import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
   FieldOptionType,
+  WorkbookColumnInfo,
   compareAlphanumeric,
   findMatchField,
-  getColumnHeaders
+  getColumnHeaders,
+  validateTemplateIntegrity
 } from "../utils/workbookMappingUtils";
 import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
@@ -52,14 +54,24 @@ export function useColumnMapping() {
     return getColumnHeaders(spreadsheetData, sheet ?? 0);
   }, [sheet]);
 
+  // Determine if the template provided has been altered.
+  const templateIntegrityWarning = useMemo<boolean>(() => {
+    if (headers === null) {
+      return true;
+    }
+
+    return validateTemplateIntegrity(headers);
+  }, [headers]);
+
   // Generate sheet dropdown options
   const sheetOptions = useMemo(() => {
     if (spreadsheetData) {
       return Object.entries(spreadsheetData).map(([sheetNumberString, _]) => {
         const sheetNumber = +sheetNumberString;
-        // This label is hardcoded for now, it will eventually be replaced with the sheet name in a
-        // future ticket.
-        return { label: "Sheet " + (sheetNumber + 1), value: sheetNumber };
+        return {
+          label: spreadsheetData[sheetNumber].sheetName,
+          value: sheetNumber
+        };
       });
     } else {
       return [];
@@ -71,7 +83,7 @@ export function useColumnMapping() {
 
   const {
     loading: attrLoadingMaterialSample,
-    response: attrRespMaterialSample
+    response: attrRespMaterialSamplem
   } = useQuery<ManagedAttribute[]>({
     path: "collection-api/managed-attribute",
     filter: filterBy([], {
@@ -197,7 +209,7 @@ export function useColumnMapping() {
     taxonomicRankLoading ||
     metadataLoading;
 
-  const managedAttributes = [...(attrRespMaterialSample?.data ?? [])];
+  const managedAttributes = [...(attrRespMaterialSamplem?.data ?? [])];
   const taxonomicRanks = taxonomicRankResp?.data?.vocabularyElements || [];
   const assemblages = (assemblageResp?.data || []).map((item) => ({
     ...item,
@@ -322,11 +334,14 @@ export function useColumnMapping() {
   }
 
   async function resolveColumnMappingAndRelationshipMapping(
-    columnHeader: string,
+    columnHeader: WorkbookColumnInfo,
     fieldPath?: string
   ) {
-    const originalColumnHeader = columnHeader;
-    columnHeader = columnHeader.replace(".", "_");
+    const columnHeaderValue = (
+      columnHeader.originalColumn ?? columnHeader.columnHeader
+    ).replace(".", "_");
+    const originalColumnHeader =
+      columnHeader.originalColumn ?? columnHeader.columnHeader;
 
     const newWorkbookColumnMap: WorkbookColumnMap = {};
     const newRelationshipMapping: RelationshipMapping = {};
@@ -334,7 +349,8 @@ export function useColumnMapping() {
       if (
         managedAttributes.findIndex(
           (item) =>
-            item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+            item.name.toLowerCase().trim() ===
+            columnHeaderValue.toLowerCase().trim()
         ) > -1
       ) {
         handleManagedAttributeMapping(
@@ -345,7 +361,7 @@ export function useColumnMapping() {
         taxonomicRanks.findIndex(
           (item) =>
             item.name?.toLowerCase().trim() ===
-            columnHeader.toLowerCase().trim()
+            columnHeaderValue.toLowerCase().trim()
         ) > -1
       ) {
         handleClassificationMapping(originalColumnHeader, newWorkbookColumnMap);
@@ -355,14 +371,16 @@ export function useColumnMapping() {
     } else if (fieldPath === "managedAttributes") {
       handleManagedAttributeMapping(originalColumnHeader, newWorkbookColumnMap);
     } else if (fieldPath?.startsWith("parentMaterialSample.")) {
-      const valueMapping = await resolveParentMapping(columnHeader);
-      newWorkbookColumnMap[columnHeader] = {
+      const { valueMapping, multipleValueMappings } =
+        await resolveParentMapping(columnHeaderValue);
+      newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
         originalColumnName: originalColumnHeader,
         showOnUI: false,
         mapRelationship: true,
         numOfUniqueValues: 1,
-        valueMapping
+        valueMapping,
+        multipleValueMappings
       };
     } else {
       const mapRelationship =
@@ -373,19 +391,23 @@ export function useColumnMapping() {
           ?.relationshipConfig?.linkOrCreateSetting ===
           LinkOrCreateSetting.LINK;
 
-      newWorkbookColumnMap[columnHeader] = {
+      newWorkbookColumnMap[columnHeaderValue] = {
         fieldPath,
         originalColumnName: originalColumnHeader,
         showOnUI: true,
         mapRelationship,
         numOfUniqueValues: Object.keys(
-          columnUniqueValues?.[sheet]?.[columnHeader] ?? {}
+          columnUniqueValues?.[sheet]?.[columnHeaderValue] ?? {}
         ).length,
         valueMapping: {}
       };
 
       if (mapRelationship) {
-        resolveRelationships(newRelationshipMapping, columnHeader, fieldPath);
+        resolveRelationships(
+          newRelationshipMapping,
+          columnHeaderValue,
+          fieldPath
+        );
       }
     }
     return {
@@ -492,18 +514,21 @@ export function useColumnMapping() {
       : [];
     const map: FieldMapType[] = [];
     for (const columnHeader of headers || []) {
+      const columnHeaderValue =
+        columnHeader.originalColumn ?? columnHeader.columnHeader;
       const fieldPath = findMatchField(columnHeader, newFieldOptions);
       if (fieldPath === undefined) {
-        // check if the columnHeader is one of managedAttributes
+        // check if the columnHeaderValue is one of managedAttributes
         const targetManagedAttr = managedAttributes.find(
           (item) =>
-            item.name.toLowerCase().trim() === columnHeader.toLowerCase().trim()
+            item.name.toLowerCase().trim() ===
+            columnHeaderValue.toLowerCase().trim()
         );
-        // check if the columnHeader is one of taxonomicRankss
+        // check if the columnHeaderValue is one of taxonomicRankss
         const targetTaxonomicRank = taxonomicRanks.find(
           (item) =>
             item.name?.toLowerCase().trim() ===
-            columnHeader.toLowerCase().trim()
+            columnHeaderValue.toLowerCase().trim()
         );
         if (targetManagedAttr) {
           if (
@@ -513,7 +538,8 @@ export function useColumnMapping() {
               targetField: "managedAttributes",
               skipped: false,
               targetKey: targetManagedAttr,
-              columnHeader
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
             });
           } else if (
             targetManagedAttr.managedAttributeComponent === "PREPARATION"
@@ -522,7 +548,8 @@ export function useColumnMapping() {
               targetField: "preparationManagedAttributes",
               skipped: false,
               targetKey: targetManagedAttr,
-              columnHeader
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
             });
           } else if (
             targetManagedAttr.managedAttributeComponent === "COLLECTING_EVENT"
@@ -531,7 +558,8 @@ export function useColumnMapping() {
               targetField: "collectingEvent.managedAttributes",
               skipped: false,
               targetKey: targetManagedAttr,
-              columnHeader
+              columnHeader: columnHeader.columnHeader,
+              originalColumn: columnHeader.originalColumn
             });
           }
         } else if (targetTaxonomicRank) {
@@ -539,20 +567,23 @@ export function useColumnMapping() {
             targetField: "organism.determination.scientificNameDetails",
             skipped: false,
             targetKey: targetTaxonomicRank,
-            columnHeader
+            columnHeader: columnHeader.columnHeader,
+            originalColumn: columnHeader.originalColumn
           });
         } else {
           map.push({
             targetField: fieldPath,
             skipped: false,
-            columnHeader
+            columnHeader: columnHeader.columnHeader,
+            originalColumn: columnHeader.originalColumn
           });
         }
       } else {
         map.push({
           targetField: fieldPath,
           skipped: false,
-          columnHeader
+          columnHeader: columnHeader.columnHeader,
+          originalColumn: columnHeader.originalColumn
         });
       }
     }
@@ -575,9 +606,17 @@ export function useColumnMapping() {
    * @returns
    */
   async function resolveParentMapping(columnHeader: string): Promise<{
-    [value: string]: {
-      id: string;
-      type: string;
+    valueMapping: {
+      [value: string]: {
+        id: string;
+        type: string;
+      };
+    };
+    multipleValueMappings?: {
+      [value: string]: {
+        id: string;
+        type: string;
+      }[];
     };
   }> {
     const valueMapping: {
@@ -586,12 +625,20 @@ export function useColumnMapping() {
         type: string;
       };
     } = {};
+
+    const multipleValueMappings: {
+      [value: string]: {
+        id: string;
+        type: string;
+      }[];
+    } = {};
+
     if (spreadsheetData) {
-      const spreadsheetHeaders = spreadsheetData[sheet][0].content;
+      const spreadsheetHeaders = spreadsheetData[sheet].rows[0].content;
       const colIndex = spreadsheetHeaders.indexOf(columnHeader) ?? -1;
       if (colIndex > -1) {
-        for (let i = 1; i < spreadsheetData[sheet].length; i++) {
-          const parentValue = spreadsheetData[sheet][i].content[colIndex];
+        for (let i = 1; i < spreadsheetData[sheet].rows.length; i++) {
+          const parentValue = spreadsheetData[sheet].rows[i].content[colIndex];
           if (parentValue) {
             const response = await apiClient.get<ResourceNameIdentifier[]>(
               `/collection-api/resource-name-identifier?filter[group][EQ]=${groupName}&filter[type][EQ]=material-sample&filter[name][EQ]=${parentValue}`,
@@ -601,12 +648,22 @@ export function useColumnMapping() {
             );
             if (response && response.data.length > 0) {
               valueMapping[parentValue] = { id: response.data[0].id, type };
+
+              if (response.data.length > 1) {
+                multipleValueMappings[parentValue] = response.data.map(
+                  (resource) => ({
+                    id: resource.id,
+                    type
+                  })
+                );
+              }
             }
           }
         }
       }
     }
-    return valueMapping;
+
+    return { valueMapping, multipleValueMappings };
   }
 
   function resolveRelationships(
@@ -853,6 +910,7 @@ export function useColumnMapping() {
     fieldMap,
     fieldOptions,
     headers,
+    templateIntegrityWarning,
     sheetOptions,
     taxonomicRanks,
 

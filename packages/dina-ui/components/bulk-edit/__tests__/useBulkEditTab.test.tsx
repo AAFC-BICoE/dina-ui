@@ -11,7 +11,11 @@ import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-
 import { MaterialSampleFormProps } from "../../collection/material-sample/MaterialSampleForm";
 import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
-import { fireEvent, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  fireEvent,
+  waitForElementToBeRemoved,
+  screen
+} from "@testing-library/react";
 
 const mockSubmitOverride = jest.fn();
 
@@ -285,7 +289,7 @@ describe("Material sample bulk edit tab", () => {
     await new Promise(setImmediate);
 
     const managedAttributesVisible = wrapper.getByRole("combobox", {
-      name: "Visible Managed Attributes in Editor Adding or removing an attribute using this dropdown doesn't change or remove the value. It only affects the attribute's visibility in this editor. Type here to search."
+      name: /add new/i
     });
 
     // Select the "B" managed attribute to display.

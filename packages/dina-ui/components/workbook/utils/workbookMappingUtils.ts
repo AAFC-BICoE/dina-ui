@@ -1,4 +1,4 @@
-import { find, trim } from "lodash";
+import { find, max, trim } from "lodash";
 import { ValidationError } from "yup";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 import {
@@ -10,10 +10,26 @@ import _ from "lodash";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
+export interface WorkbookColumnInfo {
+  /**
+   * In the spreadsheet, the top row.
+   */
+  columnHeader: string;
+
+  /**
+   * Alises generated from the template generator, this should match the current column header.
+   * If not, a warning should appear to the user.
+   */
+  columnAlias?: string;
+
+  /**
+   * Hidden properties inside of the excel file, these are generated from templates.
+   */
+  originalColumn?: string;
+}
+
 /**
- * This is currently a pretty simple function but in the future you will be able to select the
- * sheet to get the headers from. For now this will simply just retrieve the first row with
- * content.
+ * Using the WorkbookJSON provided, generate a list columns.
  *
  * @param spreadsheetData Whole spreadsheet data to retrieve the headers from.
  * @param sheetNumber the sheet index (starting from 0) to pull the header columns from.
@@ -22,11 +38,79 @@ const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 export function getColumnHeaders(
   spreadsheetData: WorkbookJSON | undefined,
   sheetNumber: number
-) {
-  const data = spreadsheetData?.[sheetNumber]?.find(
+): WorkbookColumnInfo[] | null {
+  const data = spreadsheetData?.[sheetNumber]?.rows?.find(
     (rowData) => rowData.content.length !== 0
   );
-  return data?.content ?? null;
+
+  const maxLength =
+    max([
+      data?.content?.length ?? 0,
+      spreadsheetData?.[sheetNumber]?.originalColumns?.length ?? 0,
+      spreadsheetData?.[sheetNumber]?.columnAliases?.length ?? 0
+    ]) ?? 0;
+
+  const columnHeaders: WorkbookColumnInfo[] = [];
+  for (let i = 0; i < maxLength; i++) {
+    columnHeaders.push({
+      columnHeader: data?.content?.[i] ?? "",
+      originalColumn: spreadsheetData?.[sheetNumber]?.originalColumns?.[i],
+      columnAlias: spreadsheetData?.[sheetNumber]?.columnAliases?.[i]
+    });
+  }
+
+  return columnHeaders.length > 0 ? columnHeaders : null;
+}
+
+/**
+ * Scans through the Workbook columns and detects if there is a template integrity warning that
+ * should appear.
+ *
+ * This occurs when the generated template excel column headers don't match the hidden properties
+ * aliases.
+ *
+ * @param spreadsheetColumns List of all the columns to scan against.
+ * @returns true if valid, false if invalid.
+ */
+export function validateTemplateIntegrity(
+  spreadsheetColumns: WorkbookColumnInfo[]
+): boolean {
+  const allOriginalColumns = spreadsheetColumns
+    .map((col) => col.originalColumn)
+    .filter((originalCol) => originalCol !== undefined);
+  const allColumnAliases = spreadsheetColumns
+    .map((col) => col.columnAlias)
+    .filter((aliasCol) => aliasCol !== undefined);
+  const allColumnHeaders = spreadsheetColumns
+    .map((col) => col.columnHeader)
+    .filter((columnHeader) => columnHeader !== "");
+
+  // If no original or aliases provided, no validation required.
+  if (allOriginalColumns.length === 0 && allColumnAliases.length === 0) {
+    return true;
+  }
+
+  // Check for mismatch of number of columns.
+  if (
+    allOriginalColumns.length !== allColumnHeaders.length ||
+    allColumnAliases.length !== allColumnHeaders.length
+  ) {
+    return false;
+  }
+
+  // Check for changed column names.
+  for (let i = 0; i < allColumnHeaders.length; i++) {
+    const currentHeader = allColumnHeaders[i];
+    if (
+      currentHeader !== allOriginalColumns[i] &&
+      currentHeader !== allColumnAliases[i]
+    ) {
+      return false;
+    }
+  }
+
+  // All headers match originals or aliases, return true
+  return true;
 }
 
 export function _toPlainString(value: string) {
@@ -103,10 +187,13 @@ export type FieldOptionType = {
  * @returns
  */
 export function findMatchField(
-  columnHeader: string,
+  columnHeader: WorkbookColumnInfo,
   fieldOptions: FieldOptionType[]
 ) {
-  let columnHeader2: string = columnHeader.toLowerCase();
+  // Search the original column if available, otherwise, just use the column header.
+  let columnHeader2: string = (
+    columnHeader.originalColumn ?? columnHeader.columnHeader
+  ).toLowerCase();
   if (MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.has(columnHeader2)) {
     columnHeader2 = MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS.get(columnHeader2)!;
   }
@@ -145,7 +232,7 @@ export function findMatchField(
       const validOptionLabel = isValidOptionLabel(
         item,
         plainOptions,
-        columnHeader
+        columnHeader2
       );
       return (
         item.value.toLowerCase() === columnHeader2.toLowerCase() ||
@@ -211,7 +298,7 @@ export function getDataFromWorkbook(
   getRowNumber?: boolean
 ) {
   const data: { [key: string]: any }[] = [];
-  const workbookData = spreadsheetData?.[sheetNumber].filter(
+  const workbookData = spreadsheetData?.[sheetNumber]?.rows.filter(
     (rowData) => rowData.content.length !== 0
   );
   for (let i = 1; i < (workbookData?.length ?? 0); i++) {
@@ -604,7 +691,7 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
     const columnUniqueValues: {
       [columnName: string]: { [value: string]: number };
     } = {};
-    const workbookRows: WorkbookRow[] = spreadsheetData[sheet];
+    const workbookRows: WorkbookRow[] = spreadsheetData[sheet]?.rows;
     const columnNames: string[] = workbookRows[0].content;
     for (let colIndex = 0; colIndex < columnNames.length; colIndex++) {
       const counts: { [value: string]: number } = {};
@@ -636,7 +723,7 @@ export function getParentFieldPath(fieldPath: string) {
 
 export function removeEmptyColumns(data: WorkbookJSON) {
   for (const sheet of Object.keys(data)) {
-    const sheetData: WorkbookRow[] = data[sheet];
+    const sheetData: WorkbookRow[] = data[sheet]?.rows;
     const emptyColumnIndexes: number[] = [];
     if (sheetData.length > 1) {
       const headerRow = sheetData[0];
@@ -660,7 +747,7 @@ export function removeEmptyColumns(data: WorkbookJSON) {
 
 export function trimSpace(workbookData: WorkbookJSON) {
   for (const rows of Object.values(workbookData)) {
-    for (const row of rows as WorkbookRow[]) {
+    for (const row of rows?.rows as WorkbookRow[]) {
       for (let i = 0; i < row.content.length; i++) {
         const value = row.content[i];
         row.content[i] = value.trim();

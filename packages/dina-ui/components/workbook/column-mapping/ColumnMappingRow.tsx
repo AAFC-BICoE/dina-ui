@@ -1,9 +1,10 @@
 import { useCallback } from "react";
 import { CheckBoxField, FieldSpy } from "../../../../common-ui/lib";
 import { WorkbookFieldSelectField } from "./WorkbookFieldSelectField";
+import { WorkbookColumnInfo } from "../utils/workbookMappingUtils";
 
 export interface ColumnMappingRowProps {
-  columnName: string;
+  columnName: WorkbookColumnInfo;
   columnIndex: number;
   fieldOptions: {
     label: string;
@@ -14,7 +15,7 @@ export interface ColumnMappingRowProps {
       parentPath: string;
     }[];
   }[];
-  onFieldMappingChange: (columnName: string, newFieldPath) => void;
+  onFieldMappingChange: (columnName: WorkbookColumnInfo, newFieldPath) => void;
 }
 
 export function ColumnMappingRow({
@@ -30,7 +31,7 @@ export function ColumnMappingRow({
   return (
     <div className="row">
       <div className="col-md-4 d-flex align-items-center justify-content-start">
-        {columnName}
+        {columnName.columnHeader}
       </div>
       <div className="col-md-6">
         <FieldSpy<boolean> fieldName={`fieldMap[${columnIndex}].skipped`}>

@@ -1,4 +1,5 @@
 export * from "./account/AccountProvider";
+export * from "./account/DevUserProvider";
 export * from "./account/AuthenticatedApiClientProvider";
 export * from "./account/NavBarUserControl";
 export * from "./api-client/ApiClientContext";

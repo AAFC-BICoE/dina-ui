@@ -1,26 +1,20 @@
 import {
-  AreYouSureModal,
   BackButton,
   ButtonBar,
   DateField,
   DinaForm,
-  DinaFormSubmitParams,
   FieldWrapper,
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
-  SaveArgs,
   StringArrayField,
   SubmitButton,
   TextField,
   ToggleField,
-  useApiClient,
   useDinaFormContext,
-  useModal,
   useQuery
 } from "common-ui";
-import { PersistedResource } from "kitsu";
-import { isArray } from "lodash";
+import { InputResource, PersistedResource } from "kitsu";
 import * as yup from "yup";
 import {
   GroupSelectField,
@@ -28,16 +22,16 @@ import {
   StorageUnitBreadCrumb,
   StorageUnitChildrenViewer
 } from "..";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   MaterialSample,
   StorageUnit,
   StorageUnitType
 } from "../../types/collection-api";
-import { useState } from "react";
-import { ResourceNameIdentifier } from "../../types/common/resources/ResourceNameIdentifier";
+import { Ref, useState } from "react";
 import StorageUnitGrid from "./grid/StorageUnitGrid";
-import { useFormikContext } from "formik";
+import { FormikProps, useFormikContext } from "formik";
+import { useStorageUnitSave } from "./useStorageUnit";
 
 export const storageUnitFormSchema = yup.object({
   storageUnitType: yup.object().required()
@@ -46,9 +40,17 @@ export const storageUnitFormSchema = yup.object({
 export interface StorageUnitFormProps {
   initialParent?: PersistedResource<StorageUnit>;
   storageUnit?: PersistedResource<StorageUnit>;
-  onSaved: (storageUnit: PersistedResource<StorageUnit>[]) => Promise<void>;
+  onSaved?: (storageUnit: PersistedResource<StorageUnit>[]) => Promise<void>;
   buttonBar?: JSX.Element;
   parentIdInURL?: string;
+
+  /** Optionally call the hook from the parent component. */
+  storageUnitSaveHook?: ReturnType<typeof useStorageUnitSave>;
+
+  // Form ref from bulk edit tab
+  storageUnitFormRef?: Ref<FormikProps<InputResource<StorageUnit>>>;
+
+  isBulkEditTabForm?: boolean;
 }
 
 export function StorageUnitForm({
@@ -76,112 +78,54 @@ export function StorageUnitForm({
         <SubmitButton className="ms-auto" />
       </div>
     </ButtonBar>
-  )
+  ),
+  storageUnitSaveHook,
+  storageUnitFormRef,
+  isBulkEditTabForm
 }: StorageUnitFormProps) {
-  const { apiClient } = useApiClient();
-  const { openModal } = useModal();
+  const { initialValues, onSubmit } =
+    storageUnitSaveHook ??
+    useStorageUnitSave({
+      initialValues: storageUnit || {
+        type: "storage-unit",
+        parentStorageUnit: initialParent,
+        isGeneric: false
+      },
+      onSaved
+    });
 
-  const initialValues = storageUnit || {
-    type: "storage-unit",
-    parentStorageUnit: initialParent,
-    isGeneric: false
+  const storageUnitOnSubmit = async (submittedValues) => {
+    await onSubmit(submittedValues);
   };
 
-  async function onSubmit({
-    submittedValues,
-    api: { save }
-  }: DinaFormSubmitParams<StorageUnit>) {
-    const savedArgs: SaveArgs<StorageUnit>[] = [];
-
-    const proceedWithSave = async () => {
-      if (submittedValues.isMultiple) {
-        const names = isArray(submittedValues.name)
-          ? submittedValues.name
-          : [submittedValues.name];
-        delete submittedValues.isMultiple;
-        names.map((unitName) =>
-          savedArgs.push({
-            resource: { ...submittedValues, name: unitName },
-            type: "storage-unit"
-          })
-        );
-      } else {
-        delete submittedValues.isMultiple;
-        savedArgs.push({
-          resource: isArray(submittedValues.name)
-            ? { ...submittedValues, name: submittedValues.name.join() }
-            : submittedValues,
-          type: "storage-unit"
-        });
-      }
-
-      const savedStorage = await save<StorageUnit>(savedArgs, {
-        apiBaseUrl: "/collection-api"
-      });
-      await onSaved(savedStorage);
-    };
-
-    // Check for any duplicates...
-    const duplicatesFound = await checkForDuplicates(
-      submittedValues.name,
-      submittedValues.group
-    );
-
-    if (duplicatesFound) {
-      openModal(
-        <AreYouSureModal
-          actionMessage={<DinaMessage id="storageUnit_duplicate_title" />}
-          messageBody={
-            <DinaMessage
-              id="storageUnit_duplicate_body"
-              values={{ duplicatedName: submittedValues.name }}
-            />
-          }
-          onYesButtonClicked={proceedWithSave}
-        />
-      );
-    } else {
-      await proceedWithSave();
-    }
-  }
-
-  async function checkForDuplicates(name: string, group: string) {
-    const response = await apiClient.get<ResourceNameIdentifier[]>(
-      `/collection-api/resource-name-identifier?filter[type][EQ]=storage-unit&filter[group][EQ]=${group}&filter[name][EQ]=${name}`,
-      {
-        page: { limit: 1 }
-      }
-    );
-
-    if (response && response.data.length > 0) {
-      // If the returned result is the current record, do not consider it a duplicate.
-      if (response.data.at(0)?.id === storageUnit?.id) {
-        return false;
-      }
-
-      return true;
-    }
-    return false;
-  }
-
   return (
-    <DinaForm<Partial<StorageUnit>>
+    <DinaForm<InputResource<StorageUnit>>
       initialValues={initialValues}
       validationSchema={storageUnitFormSchema}
-      onSubmit={onSubmit}
+      onSubmit={storageUnitOnSubmit}
+      innerRef={storageUnitFormRef}
     >
       {buttonBar}
-      <StorageUnitFormFields parentIdInURL={parentIdInURL} />
+      <StorageUnitFormFields
+        parentIdInURL={parentIdInURL}
+        isBulkEditTabForm={isBulkEditTabForm}
+      />
     </DinaForm>
   );
 }
 
 export interface StorageUnitFormFieldsProps {
   parentIdInURL?: string;
+  /** Reduces the rendering to improve performance when bulk editing many resources. */
+  reduceRendering?: boolean;
+
+  isBulkEditTabForm?: boolean;
 }
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields({
-  parentIdInURL
+  parentIdInURL,
+  reduceRendering,
+  isBulkEditTabForm
 }: StorageUnitFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
@@ -204,7 +148,7 @@ export function StorageUnitFormFields({
     <div>
       <div className="row">
         <div className="col-md-6 d-flex">
-          {!readOnly && !initialValues.id && (
+          {!readOnly && !initialValues.id && !isBulkEditTabForm && (
             <ToggleField
               className="me-4"
               onChangeExternal={onStorageUnitMultipleToggled}
@@ -262,7 +206,8 @@ export function StorageUnitFormFields({
           readOnlyLink="/collection/storage-unit-type/view?id="
         />
       </div>
-      {initialValues?.storageUnitType?.gridLayoutDefinition &&
+      {!reduceRendering &&
+        initialValues?.storageUnitType?.gridLayoutDefinition &&
         !formik?.values?.isGeneric && (
           <StorageUnitGrid
             storageUnit={initialValues}
@@ -281,12 +226,14 @@ export function StorageUnitFormFields({
           )}
         />
       ) : (
-        <StorageLinkerField
-          name="parentStorageUnit"
-          targetType="storage-unit"
-          parentIdInURL={parentIdInURL}
-          parentStorageUnitUUID={initialValues.id}
-        />
+        !reduceRendering && (
+          <StorageLinkerField
+            name="parentStorageUnit"
+            targetType="storage-unit"
+            parentIdInURL={parentIdInURL}
+            parentStorageUnitUUID={initialValues.id}
+          />
+        )
       )}
       {readOnly && (
         <StorageUnitChildrenViewer

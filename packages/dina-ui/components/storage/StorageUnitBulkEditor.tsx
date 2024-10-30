@@ -1,7 +1,5 @@
 import React from "react";
-import { License, Metadata } from "../../types/objectstore-api";
-import { InputResource, PersistedResource, KitsuResource } from "kitsu";
-import { Promisable } from "type-fest";
+import { InputResource } from "kitsu";
 import {
   BulkEditTabContextI,
   ButtonBar,
@@ -20,25 +18,25 @@ import {
 } from "../bulk-edit/BulkEditNavigator";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormikProps } from "formik";
-import { useMetadataSave } from "../object-store/metadata/useMetadata";
-import { MetadataForm } from "../object-store/metadata/MetadataForm";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl"; // "packages/dina-ui/intl/dina-ui-intl"
-import { isEmpty, keys, omit, pick, pickBy } from "lodash";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { keys, omit, pick, pickBy } from "lodash";
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
+import { StorageUnit } from "packages/dina-ui/types/collection-api";
+import { StorageUnitForm } from "./StorageUnitForm";
+import { useStorageUnitSave } from "./useStorageUnit";
 
-export interface MetadataBulkEditorProps {
-  metadatas: InputResource<Metadata>[];
-  onSaved: (metadataIds: string[]) => void | Promise<void>;
-  disableMetadataNameField?: boolean;
+export interface StorageUnitBulkEditorProps {
+  storageUnits: InputResource<StorageUnit>[];
+  onSaved: (ids: string[]) => void | Promise<void>;
   onPreviousClick?: () => void;
 }
-function getMetadataHooks(metadatas) {
-  return metadatas.map((resource, index) => {
-    const key = `metadata-${index}`;
+function getStorageUnitHooks(storageUnits) {
+  return storageUnits.map((resource, index) => {
+    const key = `storage-unit-${index}`;
     return {
       key,
       resource,
-      saveHook: useMetadataSave({
+      saveHook: useStorageUnitSave({
         initialValues: resource
       }),
       formRef: useRef(null)
@@ -46,51 +44,49 @@ function getMetadataHooks(metadatas) {
   });
 }
 
-export function MetadataBulkEditor({
-  metadatas: metadatasProp,
+export function StorageUnitBulkEditor({
+  storageUnits: storageUnitsProp,
   onPreviousClick,
   onSaved
-}: MetadataBulkEditorProps) {
+}: StorageUnitBulkEditorProps) {
   const [selectedTab, setSelectedTab] = useState<
     BulkNavigatorTab | ResourceWithHooks
   >();
 
-  // Make sure the metadatas list doesn't change during this component's lifecycle:
-  const metadatas = useMemo(() => metadatasProp, []);
+  const storageUnits = useMemo(() => storageUnitsProp, []);
 
-  const initialValues: InputResource<Metadata> = {
-    type: "metadata",
-    group: ""
+  const initialValues: InputResource<StorageUnit> = {
+    type: "storage-unit"
   };
 
-  const bulkEditMetadataHook = useMetadataSave({
+  const bulkEditStorageUnitHook = useStorageUnitSave({
     initialValues
   });
 
-  const bulkEditFormRef = useRef<FormikProps<InputResource<Metadata>>>(null);
+  const bulkEditFormRef = useRef<FormikProps<InputResource<StorageUnit>>>(null);
 
-  const metadataHooks = getMetadataHooks(metadatas);
+  const storageUnitHooks = getStorageUnitHooks(storageUnits);
 
-  const metadataForm = (
-    <MetadataForm
-      metadata={initialValues}
-      buttonBar={null}
-      metadataFormRef={bulkEditFormRef}
-      metadataSaveHook={bulkEditMetadataHook}
+  const bulkEditTabStorageUnitForm = (
+    <StorageUnitForm
+      storageUnit={initialValues as any}
+      storageUnitFormRef={bulkEditFormRef}
+      storageUnitSaveHook={bulkEditStorageUnitHook}
+      buttonBar={<></>}
+      isBulkEditTabForm={true}
     />
   );
 
-  function metadataBulkOverrider() {
-    /** Metadata input including blank/empty fields. */
-    return getMetadataBulkOverrider(bulkEditFormRef);
+  function storageUnitBulkOverrider() {
+    return getStorageUnitBulkOverrider(bulkEditFormRef);
   }
 
   const [initialized, setInitialized] = useState(false);
 
   const { bulkEditTab } = useBulkEditTab({
-    resourceHooks: metadataHooks,
+    resourceHooks: storageUnitHooks,
     hideBulkEditTab: !initialized,
-    resourceForm: metadataForm,
+    resourceForm: bulkEditTabStorageUnitForm,
     bulkEditFormRef
   });
 
@@ -99,10 +95,10 @@ export function MetadataBulkEditor({
     setSelectedTab(bulkEditTab);
   }, []);
 
-  const { saveAll } = useBulkMetadataSave({
+  const { saveAll } = useBulkStorageUnitSave({
     onSaved,
-    metadataPreProcessor: metadataBulkOverrider,
-    bulkEditCtx: { resourceHooks: metadataHooks, bulkEditFormRef }
+    storageUnitPreProcessor: storageUnitBulkOverrider,
+    bulkEditCtx: { resourceHooks: storageUnitHooks, bulkEditFormRef }
   });
 
   return (
@@ -141,24 +137,24 @@ export function MetadataBulkEditor({
         <BulkEditNavigator
           selectedTab={selectedTab}
           onSelectTab={setSelectedTab}
-          resources={metadataHooks}
+          resources={storageUnitHooks}
           extraTabs={[bulkEditTab]}
-          tabNameConfig={(metadata: ResourceWithHooks<Metadata>) =>
-            metadata?.resource?.originalFilename
+          tabNameConfig={(storageUnit: ResourceWithHooks<StorageUnit>) =>
+            storageUnit?.resource?.name
           }
           renderOneResource={({ index }) => (
-            <MetadataForm
-              metadataFormRef={(form) => {
+            <StorageUnitForm
+              storageUnitFormRef={(form) => {
                 const isLastRefSetter =
-                  metadataHooks.filter((it) => !it.formRef.current).length ===
-                  1;
-                metadataHooks[index].formRef.current = form;
+                  storageUnitHooks.filter((it) => !it.formRef.current)
+                    .length === 1;
+                storageUnitHooks[index].formRef.current = form;
                 if (isLastRefSetter && form) {
                   setInitialized(true);
                 }
               }}
-              metadataSaveHook={metadataHooks[index].saveHook}
-              buttonBar={null}
+              storageUnitSaveHook={storageUnitHooks[index].saveHook}
+              buttonBar={<></>}
             />
           )}
         />
@@ -167,12 +163,12 @@ export function MetadataBulkEditor({
   );
 }
 
-export function getMetadataBulkOverrider(bulkEditFormRef) {
-  let bulkEditMetadata: InputResource<Metadata> | undefined;
+export function getStorageUnitBulkOverrider(bulkEditFormRef) {
+  let bulkEditStorageUnit: InputResource<StorageUnit> | undefined;
 
   /** Returns an object with the overridden values. */
   return async function withBulkEditOverrides(
-    baseMetadata: InputResource<Metadata>
+    baseStorageUnit: InputResource<StorageUnit>
   ) {
     const formik = bulkEditFormRef.current;
     // Shouldn't happen, but check for type safety:
@@ -181,54 +177,45 @@ export function getMetadataBulkOverrider(bulkEditFormRef) {
     }
 
     // Initialize the bulk values once to make sure the same object is used each time.
-    if (!bulkEditMetadata) {
-      bulkEditMetadata = formik.values;
+    if (!bulkEditStorageUnit) {
+      bulkEditStorageUnit = formik.values;
     }
 
     /** Override object with only the non-empty fields. */
-    const overrides = withoutBlankFields(bulkEditMetadata);
+    const overrides = withoutBlankFields(bulkEditStorageUnit);
 
-    // Combine the managed attributes dictionaries:
-    const newManagedAttributes = {
-      ...withoutBlankFields(baseMetadata.managedAttributes),
-      ...withoutBlankFields(bulkEditMetadata?.managedAttributes)
+    const newStorageUnit: InputResource<StorageUnit> = {
+      ...baseStorageUnit,
+      ...overrides
     };
 
-    const newMetadata: InputResource<Metadata> = {
-      ...baseMetadata,
-      ...overrides,
-      ...(!isEmpty(newManagedAttributes) && {
-        managedAttributes: newManagedAttributes
-      })
-    };
-
-    return newMetadata;
+    return newStorageUnit;
   };
 }
 
-interface BulkMetadataSaveParams {
-  onSaved: (metadataIds: string[]) => void | Promise<void>;
-  metadataPreProcessor?: () => (
-    metadata: InputResource<Metadata>
-  ) => Promise<InputResource<Metadata>>;
-  bulkEditCtx: BulkEditTabContextI<Metadata>;
+interface BulkStorageUnitSaveParams {
+  onSaved: (storageUnitIds: string[]) => void | Promise<void>;
+  storageUnitPreProcessor?: () => (
+    storageUnit: InputResource<StorageUnit>
+  ) => Promise<InputResource<StorageUnit>>;
+  bulkEditCtx: BulkEditTabContextI<StorageUnit>;
 }
 
 /**
  * Provides a "save" method to bulk save the in one database transaction
  * with try/catch error handling to put the error indicators on the correct tab.
  */
-function useBulkMetadataSave({
+function useBulkStorageUnitSave({
   onSaved,
-  metadataPreProcessor,
+  storageUnitPreProcessor,
   bulkEditCtx
-}: BulkMetadataSaveParams) {
+}: BulkStorageUnitSaveParams) {
   // Force re-render when there is a bulk submission error:
   const [_error, setError] = useState<unknown | null>(null);
   const { save, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const { bulkEditFormRef, resourceHooks: metadataHooks } = bulkEditCtx;
+  const { bulkEditFormRef, resourceHooks } = bulkEditCtx;
 
   async function saveAll() {
     setError(null);
@@ -236,39 +223,31 @@ function useBulkMetadataSave({
     bulkEditFormRef.current?.setErrors({});
     try {
       // First clear all tab errors:
-      for (const { formRef } of metadataHooks) {
+      for (const { formRef } of resourceHooks) {
         formRef.current?.setStatus(null);
         formRef.current?.setErrors({});
       }
 
-      const preProcessMetadata = metadataPreProcessor?.();
+      const preProcessStorageUnit = storageUnitPreProcessor?.();
 
       // To be saved to back-end
-      const saveOperations: SaveArgs<Metadata>[] = [];
-      for (let index = 0; index < metadataHooks.length; index++) {
-        const { formRef, resource, saveHook } = metadataHooks[index];
+      const saveOperations: SaveArgs<StorageUnit>[] = [];
+      for (let index = 0; index < resourceHooks.length; index++) {
+        const { formRef, resource, saveHook } = resourceHooks[index];
         const formik = formRef.current;
 
         // These two errors shouldn't happen:
         if (!formik) {
-          throw new Error(
-            `Missing Formik ref for ${resource.originalFilename}`
-          );
+          throw new Error(`Missing Formik ref for ${resource.name}`);
         }
 
         try {
           const submittedValues = formik.values;
-          const {
-            // Don't include derivatives in the form submission:
-            derivatives,
-            ...metadataValues
-          } = submittedValues;
-
-          const saveOp = await saveHook.prepareMetadataSaveOperation({
-            submittedValues: metadataValues,
-            preProcessMetadata: async (original) => {
+          const saveOp = await saveHook.prepareStorageUnitSaveOperation({
+            submittedValues,
+            preProcessStorageUnit: async (original) => {
               try {
-                return (await preProcessMetadata?.(original)) ?? original;
+                return (await preProcessStorageUnit?.(original)) ?? original;
               } catch (error: unknown) {
                 if (error instanceof DoOperationsError) {
                   // Re-throw as Edit All tab error:
@@ -285,17 +264,6 @@ function useBulkMetadataSave({
               }
             }
           });
-          if (saveOp.resource.license) {
-            // The Metadata's xmpRightsWebStatement field stores the license's url.
-            saveOp.resource.xmpRightsWebStatement =
-              saveOp.resource.license?.url ?? "";
-            // No need to store this ; The url should be enough.
-            saveOp.resource.xmpRightsUsageTerms = "";
-          }
-          delete saveOp.resource.license;
-          saveOp.resource.acSubtype =
-            saveOp.resource.acSubtype?.acSubtype ?? null;
-
           saveOperations.push(saveOp);
         } catch (error: unknown) {
           if (error instanceof DoOperationsError) {
@@ -316,19 +284,21 @@ function useBulkMetadataSave({
         }
       }
 
-      const savedMetadata = await save<Metadata>(saveOperations, {
-        apiBaseUrl: "/objectstore-api"
+      const savedStorageUnits = await save<StorageUnit>(saveOperations, {
+        apiBaseUrl: "/collection-api"
       });
-      const savedMetadataIds = savedMetadata.map((metadata) => metadata.id);
+      const savedStorageUnitIds = savedStorageUnits.map(
+        (storageUnit) => storageUnit.id
+      );
 
-      await onSaved(savedMetadataIds);
+      await onSaved(savedStorageUnitIds);
     } catch (error: unknown) {
       // When there is an error from the bulk save-all operation, put it into the correct form:
       if (error instanceof DoOperationsError) {
         for (const opError of error.individualErrors) {
           const formik =
             typeof opError.index === "number"
-              ? metadataHooks[opError.index].formRef.current
+              ? resourceHooks[opError.index].formRef.current
               : bulkEditFormRef.current;
 
           if (formik) {
@@ -352,7 +322,7 @@ function useBulkMetadataSave({
         });
         // Don't show the bulk edited fields' errors in the individual tabs
         // because the user can't fix them there:
-        metadataHooks
+        resourceHooks
           .map((it) => it.formRef?.current)
           .forEach((it) => it?.setErrors(omit(it.errors, badBulkEditedFields)));
       }
