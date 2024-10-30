@@ -2,6 +2,7 @@ import { Button, Card, Stack } from "react-bootstrap";
 import { FaArrowDown, FaArrowUp, FaTrash } from "react-icons/fa";
 import { TableColumn } from "../list-page/types";
 import { KitsuResource } from "kitsu";
+import { useMemo } from "react";
 
 export interface ColumnItemProps<TData extends KitsuResource> {
   column: TableColumn<TData>;
@@ -36,6 +37,14 @@ export function ColumnItem<TData extends KitsuResource>({
   isExportMode,
   isDisabled
 }: ColumnItemProps<TData>) {
+  const headerPlaceholder = useMemo(() => {
+    if ((column as any)?.managedAttribute?.name) {
+      return (column as any)?.managedAttribute?.name as string;
+    }
+
+    return column.id ?? "";
+  }, [column]);
+
   return (
     <>
       <Card className="mt-2">
@@ -61,7 +70,7 @@ export function ColumnItem<TData extends KitsuResource>({
                   className="ms-auto form-control me-2"
                   style={{ width: "500px" }}
                   value={column?.exportHeader}
-                  placeholder={column.id}
+                  placeholder={headerPlaceholder}
                   disabled={isDisabled}
                   onChange={(e) =>
                     column.id &&

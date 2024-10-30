@@ -13,6 +13,7 @@ import { generateColumnDefinition } from "./ColumnSelectorUtils";
 import { useApiClient } from "../api-client/ApiClientContext";
 import useLocalStorage from "@rehooks/local-storage";
 import { SavedExportColumnStructure } from "packages/dina-ui/types/user-api";
+import { FieldOptionType } from "../../../dina-ui/components/workbook/utils/workbookMappingUtils";
 
 export const VISIBLE_INDEX_LOCAL_STORAGE_KEY = "visibleColumns";
 
@@ -27,6 +28,12 @@ export interface ColumnSelectorProps<TData extends KitsuResource> {
    * table.
    */
   exportMode?: boolean;
+
+  /**
+   * Specific to the workbook template generator. This will filter the list so the index mapping
+   * only contains supported fields for the generator as well as adding any missing fields.
+   */
+  generatorFields?: FieldOptionType[];
 
   /**
    * Index mapping containing all of the fields that should be displayed in the list.
@@ -106,6 +113,7 @@ export function ColumnSelector<TData extends KitsuResource>(
 
   const {
     exportMode,
+    generatorFields,
     indexMapping,
     dynamicFieldsMappingConfig,
     uniqueName,
@@ -132,7 +140,90 @@ export function ColumnSelector<TData extends KitsuResource>(
   useEffect(() => {
     let injectedMappings: (ESIndexMapping | undefined)[] = [];
 
-    if (indexMapping) {
+    if (indexMapping !== undefined) {
+      if (generatorFields) {
+        injectedMappings = indexMapping;
+
+        // Add missing index items from the generatorFields configuration
+        const missingFields = generatorFields.filter(
+          (generatorField) =>
+            !injectedMappings.some(
+              (mapping) => mapping?.label === generatorField.value
+            )
+        );
+
+        missingFields.forEach((field: FieldOptionType) => {
+          if (field.options && field.options.length !== 0) {
+            field.options.forEach((parentField) => {
+              // Search relationship dynamic configuration fields.
+              const dynamicConfig =
+                dynamicFieldsMappingConfig?.relationshipFields?.find(
+                  (config) => {
+                    return (
+                      config.referencedBy === parentField.parentPath &&
+                      config.path ===
+                        "included.attributes." +
+                          parentField.value?.split?.(".")?.pop?.()
+                    );
+                  }
+                );
+
+              // Skipping collecting event managed attributes for now, will be handled in the future.
+              if (parentField.value === "collectingEvent.managedAttributes") {
+                return;
+              }
+
+              injectedMappings.push({
+                label: dynamicConfig?.label ?? parentField.label,
+                path: parentField.value ?? parentField.label,
+                type: "text",
+                value: parentField.value ?? parentField.label,
+                hideField: false,
+                distinctTerm: false,
+                keywordMultiFieldSupport: false,
+                keywordNumericSupport: false,
+                optimizedPrefix: false,
+                containsSupport: false,
+                endsWithSupport: false,
+                parentName: field.label,
+                parentPath: parentField.parentPath,
+                dynamicField: dynamicConfig
+              });
+            });
+          } else {
+            // Search entity level dynamic field configurations.
+            const dynamicConfig = dynamicFieldsMappingConfig?.fields?.find(
+              (config) => {
+                return config.path === "data.attributes." + field.value;
+              }
+            );
+
+            // Skipping prepared managed attributes for now, will be handled in the future.
+            if (field.value === "preparationManagedAttributes") {
+              return;
+            }
+
+            injectedMappings.push({
+              label: dynamicConfig?.label ?? field.label,
+              path: field.value ?? field.label,
+              type: "text",
+              value: field.value ?? field.label,
+              hideField: false,
+              distinctTerm: false,
+              keywordMultiFieldSupport: false,
+              keywordNumericSupport: false,
+              optimizedPrefix: false,
+              containsSupport: false,
+              endsWithSupport: false,
+              dynamicField: dynamicConfig
+            });
+          }
+        });
+
+        setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
+        return;
+      }
+
       if (defaultColumns) {
         injectedMappings = defaultColumns
           .map<ESIndexMapping | undefined>((column) => {
@@ -200,7 +291,7 @@ export function ColumnSelector<TData extends KitsuResource>(
       // Finally, set it as the state.
       setInjectedIndexMapping(injectedMappings as ESIndexMapping[]);
     }
-  }, [indexMapping, defaultColumns]);
+  }, [indexMapping, defaultColumns, generatorFields]);
 
   // This useEffect is responsible for loading in the new local storage displayed columns.
   useEffect(() => {
@@ -257,6 +348,13 @@ export function ColumnSelector<TData extends KitsuResource>(
       }
     }
 
+    // Generator fields do not need to load values.
+    if (generatorFields) {
+      setLoading(false);
+      setColumnSelectorLoading?.(false);
+      return;
+    }
+
     // Check if overrides are provided from the saved exports.
     if (overrideDisplayedColumns) {
       loadColumnsFromSavedExport();
@@ -278,6 +376,7 @@ export function ColumnSelector<TData extends KitsuResource>(
           defaultColumns.map((column) => column?.id ?? "")
         );
       }
+      setLoading(false);
     } else {
       loadColumnsFromLocalStorage();
       setLoading(false);
