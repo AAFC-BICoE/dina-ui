@@ -80,6 +80,18 @@ describe("Workbook Template Generator", () => {
       "Bar code"
     );
 
+    // Select a relationship level field, and give it an alias.
+    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(
+      wrapper.getAllByRole("option", { name: /collection number/i })[1]
+    );
+    userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    await new Promise(setImmediate);
+    userEvent.type(
+      wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
+      "Coll number"
+    );
+
     // Generate the template.
     userEvent.click(
       wrapper.getByRole("button", { name: /generate template/i })
@@ -92,8 +104,8 @@ describe("Workbook Template Generator", () => {
       {
         data: {
           attributes: {
-            aliases: ["Sample Name", "Bar code"],
-            columns: ["materialSampleName", "barcode"]
+            aliases: ["Sample Name", "Bar code", "Coll number"],
+            columns: ["Primary ID", "Barcode", "Collection Number"]
           },
           type: "workbook-generation"
         }
@@ -120,14 +132,22 @@ describe("Workbook Template Generator", () => {
       expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
     });
 
-    // Select "Primary ID", give it alias of "Sample Name"
+    // Select "Primary ID"
     userEvent.click(wrapper.getAllByRole("option", { name: /primary id/i })[0]);
     userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
     await new Promise(setImmediate);
 
-    // Select "Barcode", give it alias of "Bar code"
+    // Select "Barcode"
     userEvent.click(wrapper.getByRole("combobox"));
     userEvent.click(wrapper.getByRole("option", { name: /barcode/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    await new Promise(setImmediate);
+
+    // Select a relationship level field
+    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(
+      wrapper.getAllByRole("option", { name: /collection number/i })[1]
+    );
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
     await new Promise(setImmediate);
 
@@ -143,7 +163,7 @@ describe("Workbook Template Generator", () => {
       {
         data: {
           attributes: {
-            columns: ["materialSampleName", "barcode"]
+            columns: ["Primary ID", "Barcode", "Collection Number"]
           },
           type: "workbook-generation"
         }
@@ -205,7 +225,7 @@ describe("Workbook Template Generator", () => {
         data: {
           attributes: {
             aliases: ["Managed Attribute Alias"],
-            columns: ["managedAttributes.my_test_managed_attribute"]
+            columns: ["my test managed attribute"]
           },
           type: "workbook-generation"
         }

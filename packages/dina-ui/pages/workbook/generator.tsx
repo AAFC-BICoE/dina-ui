@@ -82,7 +82,13 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
       data: {
         type: "workbook-generation",
         attributes: {
-          columns: columnsToGenerate.map((col) => col.id),
+          columns: columnsToGenerate.map((col) => {
+            // Use managed attribute key instead
+            if ((col as any)?.managedAttribute?.name) {
+              return (col as any)?.managedAttribute?.name;
+            }
+            return col.id;
+          }),
           aliases: columnsToGenerate.map((col) =>
             col?.exportHeader ? col.exportHeader : col.id
           )

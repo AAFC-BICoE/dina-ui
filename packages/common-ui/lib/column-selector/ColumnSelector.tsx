@@ -194,10 +194,10 @@ export function ColumnSelector<TData extends KitsuResource>(
             );
 
             injectedMappings.push({
-              label: dynamicConfig?.label ?? field.value ?? field.label,
-              path: field.label,
+              label: dynamicConfig?.label ?? field.label,
+              path: field.value ?? field.label,
               type: "text",
-              value: field.label,
+              value: field.value ?? field.label,
               hideField: false,
               distinctTerm: false,
               keywordMultiFieldSupport: false,
