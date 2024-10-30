@@ -706,6 +706,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primaryId: "Primary ID",
   proceedToCreateMetadata: "Proceed to Create Metadata",
   projectAttachments: "Project Attachments",
+  pcrBatchAttachments: "PCR Batch Attachments",
   projectListTitle: "Projects",
   projects: "Projects",
   project: "Project",

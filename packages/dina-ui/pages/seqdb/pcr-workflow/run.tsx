@@ -8,18 +8,12 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { useState, useEffect } from "react";
-import {
-  Button,
-  Spinner,
-  Dropdown,
-  DropdownButton,
-  ButtonGroup
-} from "react-bootstrap";
+import { Button, Spinner, Dropdown, ButtonGroup } from "react-bootstrap";
 import { SangerPcrBatchItemGridStep } from "packages/dina-ui/components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { usePcrBatchQuery } from "../pcr-batch/edit";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
-import React, { ChangeEvent } from "react";
+import React from "react";
 
 export default function PCRWorkFlowRunPage() {
   const router = useRouter();
@@ -41,12 +35,19 @@ export default function PCRWorkFlowRunPage() {
   // Request completion to be performed.
   const [performComplete, setPerformComplete] = useState<boolean>(false);
 
+  const [reloadPcrBatch, setReloadPcrBatch] = useState<number>(Date.now());
+
   // Loaded PCR Batch ID.
   const [pcrBatchId, setPcrBatchId] = useState<string | undefined>(
     router.query.pcrBatchId?.toString()
   );
+
   // Loaded PCR Batch.
-  const pcrBatch = usePcrBatchQuery(pcrBatchId, [pcrBatchId, currentStep]);
+  const pcrBatch = usePcrBatchQuery(pcrBatchId, [
+    pcrBatchId,
+    currentStep,
+    reloadPcrBatch
+  ]);
 
   // Update the URL to contain the current step.
   useEffect(() => {
@@ -257,12 +258,14 @@ export default function PCRWorkFlowRunPage() {
           {pcrBatch.response?.data && pcrBatchId && (
             <SangerPcrReactionStep
               pcrBatchId={pcrBatchId}
+              pcrBatch={pcrBatch.response.data}
               editMode={editMode}
               performSave={performSave}
               setPerformSave={setPerformSave}
               performComplete={performComplete}
               setPerformComplete={setPerformComplete}
               setEditMode={setEditMode}
+              setReloadPcrBatch={setReloadPcrBatch}
             />
           )}
         </TabPanel>
