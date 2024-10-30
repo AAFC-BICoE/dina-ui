@@ -1093,5 +1093,5 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectParentMaterialSample:
     "Select Parent Material Sample to link resource to",
   doOperationsFieldError:
-    "Field '{fieldErrorKey}' has the following error: {fieldErrorMessage}"
+    'Field "{fieldErrorKey}" has the following error: {fieldErrorMessage}'
 };
