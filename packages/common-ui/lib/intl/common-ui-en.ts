@@ -65,6 +65,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   existing: "Existing",
   expand: "Expand",
   exportButtonText: "Export",
+  generateButtonText: "Generate Template",
   false: "False",
   field_address: "Address",
   field_author: "Author",

@@ -1,12 +1,14 @@
-import { find, max, trim } from "lodash";
+import { chain, find, get, has, startCase, trim, max } from "lodash";
 import { ValidationError } from "yup";
 import { FieldMapType } from "../column-mapping/WorkbookColumnMapping";
 import {
   ColumnUniqueValues,
+  FieldMappingConfigType,
   WorkbookJSON,
   WorkbookRow
 } from "../types/Workbook";
 import _ from "lodash";
+import { WorkbookDataTypeEnum } from "../types/WorkbookDataTypeEnum";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
@@ -179,6 +181,148 @@ export type FieldOptionType = {
     parentPath: string;
   }[];
 };
+
+/**
+ * Generates the full list of possible fields for the user to select.
+ *
+ * @param flattenedConfig Workbook configuration with all the possible fields.
+ * @param formatMessage for translation and label generation.
+ */
+export function generateWorkbookFieldOptions(
+  flattenedConfig: any,
+  formatMessage: (id, values?) => string
+) {
+  const nonNestedRowOptions: { label: string; value: string }[] = [];
+  const nestedRowOptions: {
+    label: string;
+    value: string;
+    parentPath: string;
+  }[] = [];
+
+  // const newFieldOptions: { label: string; value: string }[] = [];
+  Object.keys(flattenedConfig).forEach((fieldPath) => {
+    if (fieldPath === "relationshipConfig") {
+      return;
+    }
+    const config = flattenedConfig[fieldPath];
+    if (
+      config.dataType !== WorkbookDataTypeEnum.OBJECT &&
+      config.dataType !== WorkbookDataTypeEnum.OBJECT_ARRAY
+    ) {
+      // Handle creating options for nested path for dropdown component
+      if (fieldPath.includes(".")) {
+        const lastIndex = fieldPath.lastIndexOf(".");
+        const parentPath = fieldPath.substring(0, lastIndex);
+        const labelPath = fieldPath.substring(lastIndex + 1);
+        const label =
+          formatMessage(fieldPath as any)?.trim() ||
+          formatMessage(`field_${labelPath}` as any)?.trim() ||
+          formatMessage(labelPath as any)?.trim() ||
+          startCase(labelPath);
+        const option = {
+          label,
+          value: fieldPath,
+          parentPath
+        };
+        nestedRowOptions.push(option);
+      } else {
+        // Handle creating options for non nested path for dropdown component
+        const label =
+          formatMessage(`field_${fieldPath}` as any)?.trim() ||
+          formatMessage(fieldPath as any)?.trim() ||
+          startCase(fieldPath);
+        const option = {
+          label,
+          value: fieldPath
+        };
+        nonNestedRowOptions.push(option);
+      }
+    }
+  });
+  nonNestedRowOptions.sort((a, b) => a.label.localeCompare(b.label));
+
+  // Using the parent name, group the relationships into sections.
+  const groupedNestRowOptions = chain(nestedRowOptions)
+    .groupBy((prop) => prop.parentPath)
+    .map((group, key) => {
+      const keyArr = key.split(".");
+      let label: string | undefined;
+      for (let i = 0; i < keyArr.length; i++) {
+        const k = keyArr[i];
+        label =
+          label === undefined
+            ? formatMessage(k as any).trim() || startCase(k)
+            : label + (formatMessage(k as any).trim() || startCase(k));
+        if (i < keyArr.length - 1) {
+          label = label + ".";
+        }
+      }
+
+      return {
+        label: label!,
+        options: group
+      };
+    })
+    .sort((a, b) => a.label.localeCompare(b.label))
+    .value();
+
+  return nonNestedRowOptions
+    ? [...nonNestedRowOptions, ...groupedNestRowOptions]
+    : [];
+}
+
+/**
+ * Generate a transformed flatten version of the workbook uploader config.
+ *
+ * Structure looks like:
+ *
+ * ```
+ * {
+ *    stringArrayField: { dataType: 'string[]' },
+ *    vocabularyField: { dataType: 'vocabulary', endpoint: 'vocabulary endpoint' },
+ *    objectField: {
+ *      dataType: 'object',
+ *      attributes: { name: [Object], age: [Object] }
+ *      relationshipConfig: {
+ *         baseApiPath: "fake-api",
+ *         hasGroup: true,
+ *         linkOrCreateSetting: LinkOrCreateSetting.LINK_OR_CREATE,
+ *         type: "object-field"
+ *       }
+ *    },
+ *    'objectField.name': { dataType: 'string' },
+ *    'objectField.age': { dataType: 'number' }
+ * }
+ * ```
+ *
+ * @param mappingConfig Mapping configuration for the workbook uploader
+ * @param entityName Entity type (e.g. material-sample)
+ * @returns transformed flatten version of the config.
+ */
+export function getFlattenedConfig(
+  mappingConfig: FieldMappingConfigType,
+  entityName: string
+) {
+  const config = {};
+  if (has(mappingConfig, entityName)) {
+    const flattened = flattenObject(mappingConfig[entityName]);
+    for (const key of Object.keys(flattened)) {
+      const lastPos = key.lastIndexOf(".");
+      if (lastPos > -1) {
+        const path = key.substring(0, lastPos);
+        if (!path.endsWith(".relationshipConfig")) {
+          const value = get(mappingConfig, entityName + "." + path);
+          config[path.replaceAll(".attributes.", ".")] = value;
+        }
+      } else {
+        const path = key;
+        const value = get(mappingConfig, entityName + "." + path);
+        config[path] = value;
+      }
+    }
+  }
+  return config;
+}
 
 /**
  * find the possible field that match the column header
