@@ -168,6 +168,11 @@ export function ColumnSelector<TData extends KitsuResource>(
                   }
                 );
 
+              // Skipping collecting event managed attributes for now, will be handled in the future.
+              if (parentField.value === "collectingEvent.managedAttributes") {
+                return;
+              }
+
               injectedMappings.push({
                 label: dynamicConfig?.label ?? parentField.label,
                 path: parentField.value ?? parentField.label,
@@ -192,6 +197,11 @@ export function ColumnSelector<TData extends KitsuResource>(
                 return config.path === "data.attributes." + field.value;
               }
             );
+
+            // Skipping prepared managed attributes for now, will be handled in the future.
+            if (field.value === "preparationManagedAttributes") {
+              return;
+            }
 
             injectedMappings.push({
               label: dynamicConfig?.label ?? field.label,
