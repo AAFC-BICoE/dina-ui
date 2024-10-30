@@ -257,6 +257,7 @@ export default function PCRWorkFlowRunPage() {
           {pcrBatch.response?.data && pcrBatchId && (
             <SangerPcrReactionStep
               pcrBatchId={pcrBatchId}
+              pcrBatch={pcrBatch.response.data}
               editMode={editMode}
               performSave={performSave}
               setPerformSave={setPerformSave}

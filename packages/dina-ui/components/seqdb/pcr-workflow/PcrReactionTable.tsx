@@ -308,7 +308,7 @@ export function PcrReactionTable({
   ];
   return (
     <ReactTable<PcrBatchItem>
-      className="-striped react-table-overflow"
+      className="-striped react-table-overflow mb-3"
       columns={PCR_REACTION_COLUMN}
       data={pcrBatchItems}
       showPagination={false}
