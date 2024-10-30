@@ -17,6 +17,7 @@ export interface SangerPcrReactionProps {
   performComplete: boolean;
   setPerformComplete: (newValue: boolean) => void;
   setEditMode: (newValue: boolean) => void;
+  setReloadPcrBatch: (newValue: number) => void;
 }
 
 export function SangerPcrReactionStep({
@@ -27,7 +28,8 @@ export function SangerPcrReactionStep({
   setPerformSave,
   performComplete,
   setPerformComplete,
-  setEditMode
+  setEditMode,
+  setReloadPcrBatch
 }: SangerPcrReactionProps) {
   const { doOperations, save } = useApiClient();
   const formRef: Ref<FormikProps<Partial<PcrBatchItem>>> = useRef(null);
@@ -110,6 +112,9 @@ export function SangerPcrReactionStep({
           apiBaseUrl: "/seqdb-api"
         }
       );
+
+      // Reload the current PCR Batch.
+      setReloadPcrBatch(Date.now());
     }
 
     // Leave edit mode...
