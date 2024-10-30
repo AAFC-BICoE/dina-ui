@@ -5,8 +5,11 @@ import { noop } from "lodash";
 import { DINA_ADMIN } from "common-ui/types/DinaRoles";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 
-export function DevUserAccountProvider({ children }: { children: ReactNode }): JSX.Element {
-
+export function DevUserAccountProvider({
+  children
+}: {
+  children: ReactNode;
+}): JSX.Element {
   const [devModeEnabled, setDevModeEnabled] = useState<boolean | null>(null);
   const [keycloakEnabled, setKeycloakEnabled] = useState<boolean | null>(null);
   const [groupRole, setGroupRole] = useState<string | null>(null);
@@ -24,10 +27,10 @@ export function DevUserAccountProvider({ children }: { children: ReactNode }): J
         setDevModeEnabled(false);
         setKeycloakEnabled(true);
       }
-    }
+    };
     getDevUserConfig();
   }, []);
-  
+
   // Check if in dev environment first.
   if (process.env.NODE_ENV !== "development" || devModeEnabled === false) {
     // Skip this component and continue down the _app chain.
@@ -38,7 +41,12 @@ export function DevUserAccountProvider({ children }: { children: ReactNode }): J
   if (devModeEnabled) {
     // Check for configuration issue, report it to the developer.
     if (keycloakEnabled) {
-      return <p>Invalid DINA-UI environment variables provided. In order for the dev-user option to be enabled, keycloak needs to be disabled.</p>;
+      return (
+        <p>
+          Invalid DINA-UI environment variables provided. In order for the
+          dev-user option to be enabled, keycloak needs to be disabled.
+        </p>
+      );
     }
 
     const username = "dev";
@@ -61,7 +69,7 @@ export function DevUserAccountProvider({ children }: { children: ReactNode }): J
           subject: agentId,
           isAdmin: rolesPerGroup?.aafc?.includes(DINA_ADMIN) ?? false,
           rolesPerGroup,
-          getCurrentToken: () => Promise.resolve(token),
+          getCurrentToken: () => Promise.resolve(token)
         }}
       >
         {children}
@@ -80,7 +88,6 @@ export function DevUserAccountProvider({ children }: { children: ReactNode }): J
   );
 }
 
-
 interface ParseGroupRoleDevUserOutput {
   groupNames: string[];
   rolesPerGroup: any;
@@ -88,18 +95,20 @@ interface ParseGroupRoleDevUserOutput {
 
 /**
  * Parses the "groupRole" string to extract group names and roles.
- * 
+ *
  * Example: "/aafc/user, /bicoe/read-only, /aafc/super-user" will return:
  * groupNames: ["aafc", "bicoe"]
  * rolesPerGroup: {
  *    aafc: ["user", "super-user"],
  *    bicoe: ["read-only"]
  * }
- * 
+ *
  * @param groupRole - The input string containing group and role information.
  * @returns Object An object containing group names and roles per group.
  */
-export function parseGroupRoleDevUser(groupRole: string | null): ParseGroupRoleDevUserOutput {
+export function parseGroupRoleDevUser(
+  groupRole: string | null
+): ParseGroupRoleDevUserOutput {
   if (!groupRole || groupRole === "") {
     return {
       groupNames: [],
@@ -107,12 +116,12 @@ export function parseGroupRoleDevUser(groupRole: string | null): ParseGroupRoleD
     };
   }
 
-  const groups = groupRole.split(',').map(group => group.trim().substring(1));
-  const groupNames = [...new Set(groups.map(group => group.split('/')[0]))];
+  const groups = groupRole.split(",").map((group) => group.trim().substring(1));
+  const groupNames = [...new Set(groups.map((group) => group.split("/")[0]))];
   const rolesPerGroup = {};
 
-  groups.forEach(group => {
-    const [groupName, role] = group.split('/');
+  groups.forEach((group) => {
+    const [groupName, role] = group.split("/");
 
     if (!rolesPerGroup[groupName]) {
       rolesPerGroup[groupName] = new Set(); // Use a Set to store roles
@@ -123,7 +132,9 @@ export function parseGroupRoleDevUser(groupRole: string | null): ParseGroupRoleD
 
   // Convert Sets back to arrays
   for (const groupName in rolesPerGroup) {
-    rolesPerGroup[groupName] = [...rolesPerGroup[groupName]];
+    if (groupName) {
+      rolesPerGroup[groupName] = [...rolesPerGroup[groupName]];
+    }
   }
 
   return { groupNames, rolesPerGroup };

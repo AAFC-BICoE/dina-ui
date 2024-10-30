@@ -166,7 +166,8 @@ const MATERIAL_SAMPLE_FIELD_NAME_SYNONYMS = new Map<string, string>([
     "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"
   ],
   ["latitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLatitude"],
-  ["longitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"]
+  ["longitude", "collectingEvent.geoReferenceAssertions.dwcDecimalLongitude"],
+  ["collecting event remarks", "collectingEvent.remarks"]
 ]);
 
 export type FieldOptionType = {

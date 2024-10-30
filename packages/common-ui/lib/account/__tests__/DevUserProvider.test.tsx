@@ -8,8 +8,8 @@ describe("DevUserProvider", () => {
         groupNames: ["aafc", "bicoe"],
         rolesPerGroup: {
           aafc: ["user", "admin"],
-          bicoe: ["read-only"],
-        },
+          bicoe: ["read-only"]
+        }
       };
 
       const result = parseGroupRoleDevUser(groupRoleString);
@@ -22,8 +22,8 @@ describe("DevUserProvider", () => {
         groupNames: ["aafc", "bicoe"],
         rolesPerGroup: {
           aafc: ["user"],
-          bicoe: ["read-only"],
-        },
+          bicoe: ["read-only"]
+        }
       };
 
       const result = parseGroupRoleDevUser(groupRoleString);
@@ -36,7 +36,7 @@ describe("DevUserProvider", () => {
         groupNames: ["aafc"],
         rolesPerGroup: {
           aafc: ["user"]
-        },
+        }
       };
 
       const result = parseGroupRoleDevUser(groupRoleString);
@@ -47,7 +47,7 @@ describe("DevUserProvider", () => {
       const groupRoleString = "";
       const expectedResult = {
         groupNames: [],
-        rolesPerGroup: {},
+        rolesPerGroup: {}
       };
 
       const result1 = parseGroupRoleDevUser(groupRoleString);
