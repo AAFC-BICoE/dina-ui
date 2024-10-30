@@ -1,14 +1,16 @@
 import { Button, Card, Stack } from "react-bootstrap";
 import { FaArrowDown, FaArrowUp, FaTrash } from "react-icons/fa";
-import { TableColumn } from "../list-page/types";
-import { KitsuResource } from "kitsu";
-import { useMemo } from "react";
+import { GeneratorColumn } from "./GeneratorSelector";
 
-export interface ColumnItemProps<TData extends KitsuResource> {
-  column: TableColumn<TData>;
-  onColumnItemDelete: (columnId: string) => void;
-  onColumnItemChangeOrder: (direction: "up" | "down", columnId: string) => void;
-  onColumnItemChangeHeader: (headerValue: string, columnId: string) => void;
+export interface GeneratorItemProps {
+  column: GeneratorColumn;
+
+  onGeneratorItemDelete: (columnValue: string) => void;
+  onGeneratorItemChangeOrder: (
+    direction: "up" | "down",
+    columnValue: string
+  ) => void;
+  onGeneratorItemChangeAlias: (aliasValue: string, columnValue: string) => void;
 
   /** Used to determine if the sort up arrow should be disabled. */
   isTop: boolean;
@@ -16,27 +18,19 @@ export interface ColumnItemProps<TData extends KitsuResource> {
   /** Used to determine if the sort down arrow should be disabled. */
   isBottom: boolean;
 
-  /** Used to determine if the delete button should be disbaled. */
-  isMandatoryField: boolean;
-
-  /** Is the column item being displayed in export mode? (Displays the column header) */
-  isExportMode: boolean;
-
   /** Should all the options on the column item be disabled. (Useful when exporting to prevent edits) */
   isDisabled: boolean;
 }
 
-export function ColumnItem<TData extends KitsuResource>({
+export function GeneratorItem({
   column,
-  onColumnItemDelete,
-  onColumnItemChangeOrder,
-  onColumnItemChangeHeader,
+  onGeneratorItemDelete,
+  onGeneratorItemChangeOrder,
+  onGeneratorItemChangeAlias,
   isTop,
   isBottom,
-  isMandatoryField,
-  isExportMode,
   isDisabled
-}: ColumnItemProps<TData>) {
+}: GeneratorItemProps) {
   return (
     <>
       <Card className="mt-2">
@@ -52,32 +46,29 @@ export function ColumnItem<TData extends KitsuResource>({
                   whiteSpace: "nowrap"
                 }}
               >
-                {(column as any)?.header()}
+                {column.columnLabel}
               </p>
 
               {/* Header */}
-              {isExportMode && (
-                <input
-                  type="text"
-                  className="ms-auto form-control me-2"
-                  style={{ width: "500px" }}
-                  value={column?.exportHeader}
-                  placeholder={column.id}
-                  disabled={isDisabled}
-                  onChange={(e) =>
-                    column.id &&
-                    onColumnItemChangeHeader(e.target.value, column.id)
-                  }
-                />
-              )}
+              <input
+                type="text"
+                className="ms-auto form-control me-2"
+                style={{ width: "500px" }}
+                value={column.columnAlias}
+                placeholder={column.columnLabel}
+                disabled={isDisabled}
+                onChange={(e) =>
+                  onGeneratorItemChangeAlias(e.target.value, column.columnValue)
+                }
+              />
 
               {/* Order Up Button */}
               <Button
                 variant="light"
                 disabled={isTop || isDisabled}
-                className={isExportMode ? "" : "ms-auto"}
+                className={""}
                 onClick={() =>
-                  column.id && onColumnItemChangeOrder("up", column.id)
+                  onGeneratorItemChangeOrder("up", column.columnValue)
                 }
               >
                 <FaArrowUp />
@@ -89,7 +80,7 @@ export function ColumnItem<TData extends KitsuResource>({
                 variant="light"
                 disabled={isBottom || isDisabled}
                 onClick={() =>
-                  column.id && onColumnItemChangeOrder("down", column.id)
+                  onGeneratorItemChangeOrder("down", column.columnValue)
                 }
               >
                 <FaArrowDown />
@@ -99,8 +90,8 @@ export function ColumnItem<TData extends KitsuResource>({
               <Button
                 className="ms-1"
                 variant="danger"
-                disabled={isMandatoryField || isDisabled}
-                onClick={() => column.id && onColumnItemDelete(column.id)}
+                disabled={isDisabled}
+                onClick={() => onGeneratorItemDelete(column.columnValue)}
               >
                 <FaTrash />
               </Button>
