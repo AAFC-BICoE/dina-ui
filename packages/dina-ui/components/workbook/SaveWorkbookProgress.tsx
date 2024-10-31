@@ -60,7 +60,7 @@ export function SaveWorkbookProgress({
   const userSelectedSameNameExistingResource = useRef<any>(undefined);
 
   const sameNameParentSamples = useRef<any[]>([]);
-  const userSelectedSameNameParentSamples = useRef<any>(undefined);
+  const userSelectedSameNameParentSample = useRef<any>(undefined);
 
   const resourcesUpdatedCount = useRef<number>(0);
 
@@ -149,7 +149,8 @@ export function SaveWorkbookProgress({
               {
                 filter: {
                   rsql: `materialSampleName=="${resource?.materialSampleName}";group==${group}`
-                }
+                },
+                include: "attachment"
               }
             );
 
@@ -188,6 +189,7 @@ export function SaveWorkbookProgress({
               // Else Only one resource with matching name, append data to resource
               if (resp.data[0]) {
                 resource.id = resp.data[0].id;
+                userSelectedSameNameExistingResource.current = resp.data[0];
 
                 // Update count of existing resources updated for final confirmation screen
                 resourcesUpdatedCount.current =
@@ -201,9 +203,6 @@ export function SaveWorkbookProgress({
 
           // Update count of existing resources updated for final confirmation screen
           resourcesUpdatedCount.current = resourcesUpdatedCount.current + 1;
-
-          // Reset user selected resource to undefined
-          userSelectedSameNameExistingResource.current = undefined;
         }
 
         // Handle checking parent samples with same name logic
@@ -212,7 +211,7 @@ export function SaveWorkbookProgress({
 
         if (parentSampleName) {
           // There was no parent sample cached from user clicking the Select button from table
-          if (!userSelectedSameNameParentSamples.current) {
+          if (!userSelectedSameNameParentSample.current) {
             for (const columnMapping of Object.values(workbookColumnMap)) {
               if (
                 columnMapping.fieldPath ===
@@ -272,13 +271,11 @@ export function SaveWorkbookProgress({
                   "parentMaterialSample.materialSampleName"
               ) {
                 columnMapping.valueMapping[parentSampleName] = {
-                  id: userSelectedSameNameParentSamples.current.id,
-                  type: userSelectedSameNameParentSamples.current.type
+                  id: userSelectedSameNameParentSample.current.id,
+                  type: userSelectedSameNameParentSample.current.type
                 };
               }
             }
-            // Reset user selected resource to undefined for next
-            userSelectedSameNameParentSamples.current = undefined;
           }
         }
 
@@ -289,7 +286,14 @@ export function SaveWorkbookProgress({
             key,
             group ?? ""
           );
+          appendDataToArrayField(key, resource);
         }
+
+        // Reset user selected resource to undefined
+        userSelectedSameNameExistingResource.current = undefined;
+
+        // Reset user selected resource to undefined for next
+        userSelectedSameNameParentSample.current = undefined;
       }
 
       const savedArgs = await save(
@@ -335,6 +339,26 @@ export function SaveWorkbookProgress({
       setNow(workbookResources.length);
       saveProgress(workbookResources.length);
       finishUpload(sourceSet.current);
+    }
+
+    // Append data to resource[key] field if field is array
+    function appendDataToArrayField(key: string, resource: any) {
+      if (
+        userSelectedSameNameExistingResource.current &&
+        Array.isArray(userSelectedSameNameExistingResource.current[key])
+      ) {
+        if (resource[key]) {
+          resource[key] = [
+            ...resource[key],
+            ...userSelectedSameNameExistingResource.current[key]
+          ];
+        } else if (resource.relationships?.[key]) {
+          resource.relationships[key].data = [
+            ...resource.relationships?.[key].data,
+            ...userSelectedSameNameExistingResource.current[key]
+          ];
+        }
+      }
     }
   }
 
@@ -413,7 +437,7 @@ export function SaveWorkbookProgress({
             if (sameNameExistingResources.current.length > 0) {
               userSelectedSameNameExistingResource.current = original;
             } else if (sameNameParentSamples.current.length > 0) {
-              userSelectedSameNameParentSamples.current = original;
+              userSelectedSameNameParentSample.current = original;
             }
             statusRef.current = "SAVING";
             resumeSavingWorkbook();
@@ -488,6 +512,7 @@ export function SaveWorkbookProgress({
                   path={"collection-api/material-sample"}
                   columns={multipleMatchingResourcesColumns}
                   defaultSort={[{ desc: true, id: "createdOn" }]}
+                  include="attachment"
                 />
               </div>
             ) : sameNameParentSamples.current.length > 0 ? (

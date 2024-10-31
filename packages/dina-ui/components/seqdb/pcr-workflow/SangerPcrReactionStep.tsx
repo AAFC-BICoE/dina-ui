@@ -4,25 +4,32 @@ import { Ref, useEffect, useRef } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { PcrReactionTable, usePcrReactionData } from "./PcrReactionTable";
 import Link from "next/link";
+import { AttachmentsField } from "../../object-store/attachment-list/AttachmentsField";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { InputResource, KitsuResource } from "kitsu";
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
+  pcrBatch: PcrBatch;
   editMode: boolean;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
   performComplete: boolean;
   setPerformComplete: (newValue: boolean) => void;
   setEditMode: (newValue: boolean) => void;
+  setReloadPcrBatch: (newValue: number) => void;
 }
 
 export function SangerPcrReactionStep({
   pcrBatchId,
+  pcrBatch,
   editMode,
   performSave,
   setPerformSave,
   performComplete,
   setPerformComplete,
-  setEditMode
+  setEditMode,
+  setReloadPcrBatch
 }: SangerPcrReactionProps) {
   const { doOperations, save } = useApiClient();
   const formRef: Ref<FormikProps<Partial<PcrBatchItem>>> = useRef(null);
@@ -77,15 +84,27 @@ export function SangerPcrReactionStep({
       }
     }
 
-    if (performComplete) {
+    if (performComplete || (formRef as any)?.current?.values?.attachment) {
+      const resourceInput: InputResource<PcrBatch> = {
+        id: pcrBatchId,
+        isCompleted: performComplete ? true : pcrBatch.isCompleted,
+        type: "pcr-batch"
+      };
+      (resourceInput as any).relationships = {};
+
+      // Check if an attachment needs to be included as a relationship.
+      (resourceInput as any).relationships.attachment = {
+        data:
+          (formRef as any)?.current?.values?.attachment?.map?.((it) => ({
+            id: it.id,
+            type: it.type
+          })) ?? []
+      };
+
       await save<PcrBatch>(
         [
           {
-            resource: {
-              id: pcrBatchId,
-              isCompleted: true,
-              type: "pcr-batch"
-            } as any,
+            resource: resourceInput as any,
             type: "pcr-batch"
           }
         ],
@@ -93,6 +112,9 @@ export function SangerPcrReactionStep({
           apiBaseUrl: "/seqdb-api"
         }
       );
+
+      // Reload the current PCR Batch.
+      setReloadPcrBatch(Date.now());
     }
 
     // Leave edit mode...
@@ -109,7 +131,8 @@ export function SangerPcrReactionStep({
   const initialValues = {
     results: Object.fromEntries(
       pcrBatchItems.map((obj) => [obj.id, obj.result])
-    )
+    ),
+    attachment: pcrBatch.attachment
   };
 
   if (loading) {
@@ -136,6 +159,13 @@ export function SangerPcrReactionStep({
       <PcrReactionTable
         pcrBatchItems={pcrBatchItems}
         materialSamples={materialSamples}
+      />
+      <AttachmentsField
+        name="attachment"
+        title={<DinaMessage id="pcrBatchAttachments" />}
+        attachmentPath={`seqdb-api/pcr-batch/${pcrBatchId}/attachment`}
+        id="pcr-batch-attachments"
+        hideAddAttchmentBtn={true}
       />
     </DinaForm>
   );
