@@ -1,55 +1,30 @@
-import {
-  LoadingSpinner,
-  VISIBLE_INDEX_LOCAL_STORAGE_KEY,
-  GeneratorSelectorProps,
-  useApiClient
-} from "..";
+import { LoadingSpinner, SelectField, useApiClient } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "react-bootstrap";
-import Kitsu, { KitsuResource } from "kitsu";
-import { ESIndexMapping, TableColumn } from "../list-page/types";
-import useLocalStorage from "@rehooks/local-storage";
-import { QueryFieldSelector } from "../list-page/query-builder/query-builder-core-components/QueryFieldSelector";
 import { GeneratorItem } from "./GeneratorItem";
-import QueryRowManagedAttributeSearch, {
-  ManagedAttributeSearchStates
-} from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
-import QueryRowFieldExtensionSearch, {
-  FieldExtensionSearchStates
-} from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
-import {
-  generateColumnDefinition,
-  generateColumnPath
-} from "./GeneratorSelectorUtils";
-import QueryRowRelationshipPresenceSearch, {
-  RelationshipPresenceSearchStates
-} from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
-import QueryRowIdentifierSearch, {
-  IdentifierSearchStates
-} from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
+import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
+import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
+import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
+import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
+import { GeneratorColumn, GeneratorSelectorProps } from "./GeneratorSelector";
+import { startCase } from "lodash";
 
 export interface GeneratorSelectorListProps extends GeneratorSelectorProps {
   loading: boolean;
 }
 
-export function GeneratorSelectorList<TData extends KitsuResource>({
-  exportMode,
-  uniqueName,
+export function GeneratorSelectorList({
+  generatorFields,
   displayedColumns,
   setDisplayedColumns,
   loading,
-  defaultColumns,
-  indexMapping,
-  dynamicFieldsMappingConfig,
-  mandatoryDisplayedColumns,
-  nonExportableColumns,
   disabled
 }: GeneratorSelectorListProps) {
   const { apiClient } = useApiClient();
 
   // The selected field from the query field selector.
-  const [selectedField, setSelectedField] = useState<ESIndexMapping>();
+  const [selectedField, setSelectedField] = useState<GeneratorColumn>();
 
   // Used for dynamic fields to store the specific dynamic value selected.
   const [dynamicFieldValue, setDynamicFieldValue] = useState<string>();
@@ -57,21 +32,14 @@ export function GeneratorSelectorList<TData extends KitsuResource>({
   // Used for the "Add column" button to determine if it should be disabled or not.
   const [isValidField, setIsValidField] = useState<boolean>(false);
 
-  // Local storage of the displayed columns that are saved.
-  const [_localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
-    useLocalStorage<string[]>(
-      `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
-      []
-    );
-
   // Handle what happens when the user selects an option from the Query Field Selector. If a dynamic
   // field is selected, verify we are at a point where it can be added.
   useEffect(() => {
-    if (selectedField && indexMapping) {
+    if (selectedField && generatorFields) {
       // Check if it's a dynamic type.
-      if (selectedField.dynamicField) {
+      if (selectedField.dynamicConfig) {
         if (dynamicFieldValue) {
-          switch (selectedField.dynamicField.type) {
+          switch (selectedField.dynamicConfig.type) {
             case "managedAttribute":
               const managedAttributeValues: ManagedAttributeSearchStates =
                 JSON.parse(dynamicFieldValue);
@@ -117,39 +85,30 @@ export function GeneratorSelectorList<TData extends KitsuResource>({
     }
 
     setIsValidField(false);
-  }, [selectedField, dynamicFieldValue, indexMapping]);
+  }, [selectedField, dynamicFieldValue, generatorFields]);
 
   // Reset the dynamic field value so it doesn't get mixed with another one.
   useEffect(() => {
     setDynamicFieldValue(undefined);
   }, [selectedField]);
 
-  const onGeneratorItemDelete = (columnId: string) => {
+  const onGeneratorItemDelete = (columnValue: string) => {
     const newDisplayedColumns = displayedColumns.filter(
-      (column) => column.id !== columnId
+      (column) => column.columnValue !== columnValue
     );
     setDisplayedColumns(newDisplayedColumns);
-
-    // Do not save it locally when in export mode, since you can delete columns that are mandatory.
-    if (!exportMode) {
-      setLocalStorageDisplayedColumns(
-        newDisplayedColumns.map(
-          (column) => column?.generatorSelectorString ?? ""
-        )
-      );
-    }
   };
 
   const onGeneratorItemChangeOrder = (
     direction: "up" | "down",
-    columnId: string
+    columnValue: string
   ) => {
     // Create a copy of the displayedColumns array
     const newDisplayedColumns = [...displayedColumns];
 
     // Find the index of the column to be moved
     const columnIndex = newDisplayedColumns.findIndex(
-      (column) => column.id === columnId
+      (column) => column.columnValue === columnValue
     );
 
     // Check if the column exists and the direction is valid
@@ -170,36 +129,22 @@ export function GeneratorSelectorList<TData extends KitsuResource>({
 
     // Update the displayedColumns state with the modified array
     setDisplayedColumns(newDisplayedColumns);
-
-    // Update local storage if not in export mode
-    if (!exportMode) {
-      setLocalStorageDisplayedColumns(
-        newDisplayedColumns.map(
-          (column) => column?.generatorSelectorString ?? ""
-        )
-      );
-    }
   };
 
-  const onGeneratorItemChangeHeader = (
-    headerValue: string,
-    columnId: string
+  const onGeneratorItemChangeAlias = (
+    aliasValue: string,
+    columnValue: string
   ) => {
-    // This operation should not be possible if not in export mode.
-    if (!exportMode) {
-      return;
-    }
-
     // Create a copy of the displayedColumns array
     const newDisplayedColumns = [...displayedColumns];
 
     // Find the index of the column to be moved
     const columnIndex = newDisplayedColumns.findIndex(
-      (column) => column.id === columnId
+      (column) => column.columnValue === columnValue
     );
 
     if (columnIndex !== -1) {
-      newDisplayedColumns[columnIndex].exportHeader = headerValue;
+      newDisplayedColumns[columnIndex].columnAlias = aliasValue;
     }
 
     // Update the displayedColumns state with the modified array
@@ -207,201 +152,158 @@ export function GeneratorSelectorList<TData extends KitsuResource>({
   };
 
   const onGeneratorItemInsert = async () => {
-    if (isValidField && selectedField && indexMapping) {
-      const generatedColumnPath = generateColumnPath({
-        indexMapping: selectedField,
-        dynamicFieldValue
-      });
-
-      const newColumnDefinition = await generateColumnDefinition({
-        indexMappings: indexMapping,
-        dynamicFieldsMappingConfig,
-        path: generatedColumnPath,
-        defaultColumns,
-        apiClient
-      });
-
-      if (newColumnDefinition) {
-        // If the column already exists do not add it again.
-        if (
-          displayedColumns.find(
-            (column) =>
-              column.generatorSelectorString ===
-              newColumnDefinition.generatorSelectorString
-          )
-        ) {
-          setSelectedField(undefined);
-          return;
-        }
-
-        // Add new option to the bottom of the list.
-        const newDisplayedColumns: TableColumn<TData>[] = [
-          ...displayedColumns,
-          newColumnDefinition
-        ];
-
-        setDisplayedColumns(newDisplayedColumns);
+    if (isValidField && selectedField && generatorFields) {
+      // If the column already exists do not add it again.
+      if (
+        displayedColumns.find(
+          (column) => column.columnValue === selectedField.columnValue
+        )
+      ) {
         setSelectedField(undefined);
-
-        // Do not save when in export mode since manage fields that are mandatory to the list view.
-        if (!exportMode) {
-          setLocalStorageDisplayedColumns(
-            newDisplayedColumns.map(
-              (column) => column?.generatorSelectorString ?? ""
-            )
-          );
-        }
+        return;
       }
+
+      // Add new option to the bottom of the list.
+      const newDisplayedColumns: GeneratorColumn[] = [
+        ...displayedColumns,
+        selectedField
+      ];
+
+      setDisplayedColumns(newDisplayedColumns);
+      setSelectedField(undefined);
     }
   };
 
-  const onGeneratorItemSelected = (columnPath: string) => {
-    if (indexMapping) {
-      const columnIndex = indexMapping.find(
-        (index) => index.value === columnPath
+  const onGeneratorItemSelected = (columnValue: string) => {
+    if (generatorFields) {
+      const generatorField = generatorFields.find(
+        (genField) => genField.value === columnValue
       );
-      if (columnIndex) {
-        setSelectedField(columnIndex);
+
+      if (generatorField && generatorField.value) {
+        // Todo, dynamic config needs to be loaded here.
+
+        const newSelectedField: GeneratorColumn = {
+          columnLabel: generatorField.label,
+          columnValue: generatorField.value,
+          columnAlias: ""
+        };
+        setSelectedField(newSelectedField);
       }
     }
   };
 
-  // Filter the list to not include columns that cannot be removed/exported.
-  const displayedColumnsFiltered = useMemo(() => {
-    return displayedColumns.filter((column) => {
-      if (exportMode) {
-        return !(nonExportableColumns ?? []).some((id) =>
-          (column?.id ?? "").startsWith(id)
-        );
-      }
-      return true;
-    });
-  }, [displayedColumns, exportMode]);
-
-  const indexMappingFiltered = useMemo(() => {
-    if (indexMapping) {
-      return indexMapping.filter((mapping) => {
+  const generatorFieldsFiltered = useMemo(() => {
+    if (generatorFields) {
+      return generatorFields.filter((mapping) => {
         // Check if it's already been used, does not need to shown again since they are already displaying it.
-        const alreadyUsed = displayedColumns?.find((column) => {
-          // Check if it's a nested field or normal field:
-          if (mapping.parentType) {
-            return mapping?.value === column?.generatorSelectorString;
-          } else {
-            return mapping?.label === column?.generatorSelectorString;
-          }
-        });
+        const alreadyUsed = displayedColumns?.find(
+          (column) => column.columnValue === mapping.value
+        );
         if (alreadyUsed) {
           return false;
-        }
-
-        if (exportMode) {
-          return !(nonExportableColumns ?? []).some((id) =>
-            mapping?.parentType
-              ? (mapping?.value ?? "").startsWith(id)
-              : (mapping?.label ?? "").startsWith(id)
-          );
-        } else {
-          return !(mandatoryDisplayedColumns ?? []).some((id) =>
-            mapping?.parentType
-              ? (mapping?.value ?? "").startsWith(id)
-              : (mapping?.label ?? "").startsWith(id)
-          );
         }
       });
     }
     return undefined;
-  }, [indexMapping, exportMode, displayedColumns]);
+  }, [generatorFields, displayedColumns]);
+
+  // Custom styling to indent the group option menus.
+  const customStyles = useMemo(
+    () => ({
+      placeholder: (provided, _) => ({
+        ...provided,
+        color: "rgb(87,120,94)"
+      }),
+      menu: (base) => ({ ...base, zIndex: 1050 }),
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      control: (base) => ({
+        ...base
+      }),
+      // Grouped options (relationships) should be indented.
+      option: (baseStyle, { data }) => {
+        if (data?.parentPath) {
+          return {
+            ...baseStyle,
+            paddingLeft: "25px"
+          };
+        }
+
+        // Default style for everything else.
+        return {
+          ...baseStyle
+        };
+      },
+
+      // When viewing a group item, the parent path should be prefixed on to the value.
+      singleValue: (baseStyle, { data }) => {
+        if (data?.parentPath) {
+          return {
+            ...baseStyle,
+            ":before": {
+              content: `'${startCase(data.parentPath)} '`
+            }
+          };
+        }
+
+        return {
+          ...baseStyle
+        };
+      }
+    }),
+    []
+  );
 
   return (
     <>
-      {loading || !indexMappingFiltered || !indexMapping ? (
+      {loading || !generatorFieldsFiltered || !generatorFields ? (
         <LoadingSpinner loading={loading} />
       ) : (
         <>
           <strong>
-            <DinaMessage id="generatorSelector_addNewColumn" />
+            <DinaMessage id="columnSelector_addNewColumn" />
           </strong>
-          <QueryFieldSelector
-            indexMap={indexMappingFiltered}
-            currentField={selectedField?.value}
-            setField={onGeneratorItemSelected}
-            isInGeneratorSelector={true}
+          <SelectField
+            className="flex-fill"
+            name={`insertField`}
+            options={generatorFields}
+            selectProps={{
+              isClearable: true,
+              menuPortalTarget: document.body,
+              styles: customStyles
+            }}
+            hideLabel={true}
+            onChange={onGeneratorItemSelected}
+            disabled={disabled ?? false}
           />
-          {selectedField?.dynamicField?.type === "managedAttribute" && (
-            <QueryRowManagedAttributeSearch
-              indexMap={indexMapping}
-              managedAttributeConfig={selectedField}
-              isInGeneratorSelector={true}
-              setValue={setDynamicFieldValue}
-              value={dynamicFieldValue}
-            />
-          )}
-          {selectedField?.dynamicField?.type === "fieldExtension" && (
-            <QueryRowFieldExtensionSearch
-              fieldExtensionConfig={selectedField}
-              setValue={setDynamicFieldValue}
-              value={dynamicFieldValue}
-              isInGeneratorSelector={true}
-            />
-          )}
-          {selectedField?.dynamicField?.type === "identifier" && (
-            <QueryRowIdentifierSearch
-              indexMap={indexMapping}
-              identifierConfig={selectedField}
-              isInGeneratorSelector={true}
-              setValue={setDynamicFieldValue}
-              value={dynamicFieldValue}
-            />
-          )}
-          {selectedField?.dynamicField?.type === "relationshipPresence" && (
-            <QueryRowRelationshipPresenceSearch
-              setValue={setDynamicFieldValue}
-              value={dynamicFieldValue}
-              indexMapping={indexMapping}
-              isInGeneratorSelector={true}
-            />
-          )}
+          {selectedField?.dynamicConfig?.type === "managedAttribute" && <></>}
           <div className="mt-2 d-grid">
             <Button
               className="btn btn-primary"
               disabled={!isValidField}
               onClick={onGeneratorItemInsert}
             >
-              <DinaMessage id="generatorSelector_addColumnButton" />
+              <DinaMessage id="columnSelector_addColumnButton" />
             </Button>
           </div>
           <br />
 
-          {displayedColumnsFiltered.length > 0 && (
+          {displayedColumns.length > 0 && (
             <>
               <strong>
-                <DinaMessage
-                  id={
-                    exportMode
-                      ? "generatorSelector_columnsToBeExported"
-                      : "generatorSelector_currentlyDisplayed"
-                  }
-                />
+                <DinaMessage id={"columnSelector_columnsToBeExported"} />
               </strong>
-              {displayedColumnsFiltered.map((column, index) => {
+              {displayedColumns.map((column, index) => {
                 return (
                   <GeneratorItem
-                    key={column.id}
+                    key={column.columnValue}
                     column={column}
                     isTop={index === 0}
-                    isBottom={index === displayedColumnsFiltered.length - 1}
-                    isMandatoryField={
-                      exportMode
-                        ? false
-                        : (mandatoryDisplayedColumns ?? []).some((id) =>
-                            (column?.id ?? "").startsWith(id)
-                          )
-                    }
-                    isExportMode={exportMode ?? false}
+                    isBottom={index === displayedColumns.length - 1}
                     isDisabled={disabled ?? false}
                     onGeneratorItemDelete={onGeneratorItemDelete}
                     onGeneratorItemChangeOrder={onGeneratorItemChangeOrder}
-                    onGeneratorItemChangeHeader={onGeneratorItemChangeHeader}
+                    onGeneratorItemChangeAlias={onGeneratorItemChangeAlias}
                   />
                 );
               })}
@@ -411,29 +313,4 @@ export function GeneratorSelectorList<TData extends KitsuResource>({
       )}
     </>
   );
-}
-
-export async function downloadDataExport(
-  apiClient: Kitsu,
-  id: string | undefined,
-  name?: string
-) {
-  if (id) {
-    const getFileResponse = await apiClient.get(
-      `dina-export-api/file/${id}?type=DATA_EXPORT`,
-      {
-        responseType: "blob",
-        timeout: 0
-      }
-    );
-
-    // Download the data
-    const url = window?.URL.createObjectURL(getFileResponse as any);
-    const link = document?.createElement("a");
-    link.href = url ?? "";
-    link?.setAttribute("download", `${name ?? id}`);
-    document?.body?.appendChild(link);
-    link?.click();
-    window?.URL?.revokeObjectURL(url ?? "");
-  }
 }
