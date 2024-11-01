@@ -1,4 +1,4 @@
-import { waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { WorkbookTemplateGenerator } from "../../../pages/workbook/generator";
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import userEvent from "@testing-library/user-event";
@@ -83,7 +83,9 @@ describe("Workbook Template Generator", () => {
     // Select a relationship level field, and give it an alias.
     userEvent.click(wrapper.getByRole("combobox"));
     userEvent.click(
-      wrapper.getAllByRole("option", { name: /collection number/i })[1]
+      wrapper.getAllByRole("option", {
+        name: /additional collection number/i
+      })[0]
     );
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
     await new Promise(setImmediate);
@@ -105,7 +107,93 @@ describe("Workbook Template Generator", () => {
         data: {
           attributes: {
             aliases: ["Sample Name", "Bar code", "Coll number"],
-            columns: ["Primary ID", "Barcode", "Collection Number"]
+            columns: [
+              "materialSampleName",
+              "barcode",
+              "collectingEvent.otherRecordNumbers"
+            ]
+          },
+          type: "workbook-generation"
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json"
+        },
+        responseType: "blob"
+      }
+    );
+  });
+
+  it("Delete and moving functionality in the generator", async () => {
+    const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
+      apiContext
+    });
+
+    // Click the "Add new column" dropdown
+    userEvent.click(wrapper.getByRole("combobox"));
+    await waitFor(() => {
+      // Total number of options expected based on the dynamic config and index map returned.
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
+    });
+
+    // Select "Primary ID", give it alias of "Sample Name"
+    userEvent.click(wrapper.getAllByRole("option", { name: /primary id/i })[0]);
+    userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
+    await new Promise(setImmediate);
+    userEvent.type(
+      wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
+      "Sample Name"
+    );
+
+    // Select "Barcode", give it alias of "Bar code"
+    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(wrapper.getByRole("option", { name: /barcode/i }));
+    userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    await new Promise(setImmediate);
+    userEvent.type(
+      wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
+      "Bar code"
+    );
+
+    // Select a relationship level field, and give it an alias.
+    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(
+      wrapper.getAllByRole("option", {
+        name: /additional collection number/i
+      })[0]
+    );
+    userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    await new Promise(setImmediate);
+    userEvent.type(
+      wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
+      "Coll number"
+    );
+
+    // Remove the "Barcode" field.
+    userEvent.click(wrapper.getAllByTestId("delete-button")[1]);
+
+    // Move the material sample name down.
+    userEvent.click(wrapper.getAllByTestId("move-up-button")[0]);
+    screen.logTestingPlaygroundURL();
+
+    // Generate the template.
+    userEvent.click(
+      wrapper.getByRole("button", { name: /generate template/i })
+    );
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledTimes(1);
+    });
+    expect(mockPost).toHaveBeenCalledWith(
+      "objectstore-api/workbook/generation",
+      {
+        data: {
+          attributes: {
+            aliases: ["Coll number", "Sample Name"],
+            columns: [
+              "collectingEvent.otherRecordNumbers",
+              "materialSampleName"
+            ]
           },
           type: "workbook-generation"
         }

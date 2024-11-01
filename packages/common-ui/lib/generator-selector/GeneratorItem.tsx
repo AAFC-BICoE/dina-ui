@@ -38,7 +38,7 @@ export function GeneratorItem({
           <Card.Text>
             <Stack direction="horizontal" gap={1}>
               {/* Name of the Column */}
-              <p
+              <span
                 className="mt-0 mb-0"
                 style={{
                   textOverflow: "ellipsis",
@@ -47,7 +47,7 @@ export function GeneratorItem({
                 }}
               >
                 {column.columnLabel}
-              </p>
+              </span>
 
               {/* Header */}
               <input
@@ -70,6 +70,7 @@ export function GeneratorItem({
                 onClick={() =>
                   onGeneratorItemChangeOrder("up", column.columnValue)
                 }
+                data-testid="move-up-button"
               >
                 <FaArrowUp />
               </Button>
@@ -82,6 +83,7 @@ export function GeneratorItem({
                 onClick={() =>
                   onGeneratorItemChangeOrder("down", column.columnValue)
                 }
+                data-testid="move-down-button"
               >
                 <FaArrowDown />
               </Button>
@@ -92,6 +94,7 @@ export function GeneratorItem({
                 variant="danger"
                 disabled={isDisabled}
                 onClick={() => onGeneratorItemDelete(column.columnValue)}
+                data-testid="delete-button"
               >
                 <FaTrash />
               </Button>

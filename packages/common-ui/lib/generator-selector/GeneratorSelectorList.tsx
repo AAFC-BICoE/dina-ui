@@ -176,20 +176,34 @@ export function GeneratorSelectorList({
 
   const onGeneratorItemSelected = (columnValue: string) => {
     if (generatorFields) {
-      const generatorField = generatorFields.find(
-        (genField) => genField.value === columnValue
-      );
+      generatorFields.forEach((genField) => {
+        // If it a relationship field, search the options inside of it.
+        if (genField.options && genField.options.length !== 0) {
+          genField.options.forEach((parentGenField) => {
+            if (parentGenField.value === columnValue) {
+              // Todo, dynamic config needs to be loaded here.
 
-      if (generatorField && generatorField.value) {
-        // Todo, dynamic config needs to be loaded here.
+              const newSelectedField: GeneratorColumn = {
+                columnLabel: parentGenField.label,
+                columnValue: parentGenField.value,
+                columnAlias: ""
+              };
+              setSelectedField(newSelectedField);
+            }
+          });
+        }
 
-        const newSelectedField: GeneratorColumn = {
-          columnLabel: generatorField.label,
-          columnValue: generatorField.value,
-          columnAlias: ""
-        };
-        setSelectedField(newSelectedField);
-      }
+        if (genField.value === columnValue) {
+          // Todo, dynamic config needs to be loaded here.
+
+          const newSelectedField: GeneratorColumn = {
+            columnLabel: genField.label,
+            columnValue: genField.value,
+            columnAlias: ""
+          };
+          setSelectedField(newSelectedField);
+        }
+      });
     }
   };
 

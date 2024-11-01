@@ -86,7 +86,7 @@ export function WorkbookTemplateGenerator() {
             }
             return col.columnValue;
           }),
-          aliases: columnsToGenerate.map((col) =>
+          aliases: columnsToGenerate.map<string>((col) =>
             col?.columnAlias ? col.columnAlias : col.columnValue
           )
         }
