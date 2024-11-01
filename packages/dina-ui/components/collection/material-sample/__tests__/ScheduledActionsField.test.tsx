@@ -1,6 +1,8 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { ScheduledActionsField } from "../ScheduledActionsField";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockOnSubmit = jest.fn();
 
@@ -27,39 +29,43 @@ const testCtx = {
 
 describe("ScheduledActionsField", () => {
   it("Edits the scheduled actions.", async () => {
-    const wrapper = mountWithAppContext(
-      <DinaForm
-        initialValues={{}}
-        onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
-      >
-        <ScheduledActionsField defaultDate="2021-10-12" />
-      </DinaForm>,
-      testCtx
-    );
+    const { container, getByRole, getByText, getAllByRole } =
+      mountWithAppContext2(
+        <DinaForm
+          initialValues={{}}
+          onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
+        >
+          <ScheduledActionsField defaultDate="2021-10-12" />
+        </DinaForm>,
+        testCtx
+      );
 
     // No actions initially:
-    expect(wrapper.find(".ReactTable").exists()).toEqual(false);
+    expect(container.querySelector(".ReactTable")).toBeNull();
 
     // Add first action:
-    wrapper
-      .find(".actionType-field input")
-      .simulate("change", { target: { value: "at1" } });
-    wrapper
-      .find(".actionStatus-field input")
-      .simulate("change", { target: { value: "as1" } });
-    wrapper
-      .find(".remarks-field textarea")
-      .simulate("change", { target: { value: "remarks-1" } });
-    wrapper.find("button.add-button").simulate("click");
-    await new Promise(setImmediate);
-    wrapper.update();
-    wrapper.find("form").simulate("submit");
+    fireEvent.change(container.querySelector(".actionType-field input")!, {
+      target: { value: "at1" }
+    });
+    fireEvent.change(container.querySelector(".actionStatus-field input")!, {
+      target: { value: "as1" }
+    });
+    fireEvent.change(container.querySelector(".remarks-field textarea")!, {
+      target: { value: "remarks-1" }
+    });
 
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /add/i
+      })
+    );
     await new Promise(setImmediate);
-    wrapper.update();
+
+    fireEvent.submit(container.querySelector("form")!);
+    await new Promise(setImmediate);
 
     // One action added:
-    expect(mockOnSubmit).lastCalledWith({
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       scheduledActions: [
         {
           actionType: "at1",
@@ -71,30 +77,32 @@ describe("ScheduledActionsField", () => {
     });
 
     // The table is shown now:
-    expect(wrapper.find(".ReactTable").exists()).toEqual(true);
-    expect(wrapper.find(".ReactTable tbody tr").length).toEqual(1);
+    expect(container.querySelector(".ReactTable")).toBeInTheDocument();
+    expect(container.querySelectorAll(".ReactTable tbody tr").length).toBe(1);
 
     // Add a second Action:
-    wrapper.find("button.add-new-button").simulate("click");
-    wrapper
-      .find(".actionType-field input")
-      .simulate("change", { target: { value: "at2" } });
-    wrapper
-      .find(".actionStatus-field input")
-      .simulate("change", { target: { value: "as2" } });
-    wrapper
-      .find(".remarks-field textarea")
-      .simulate("change", { target: { value: "remarks-2" } });
-    wrapper.find("button.add-button").simulate("click");
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /add new/i
+      })
+    );
+    fireEvent.change(container.querySelector(".actionType-field input")!, {
+      target: { value: "at2" }
+    });
+    fireEvent.change(container.querySelector(".actionStatus-field input")!, {
+      target: { value: "as2" }
+    });
+    fireEvent.change(container.querySelector(".remarks-field textarea")!, {
+      target: { value: "remarks-2" }
+    });
+    fireEvent.click(getByText("Add"));
     await new Promise(setImmediate);
-    wrapper.update();
-    wrapper.find("form").simulate("submit");
 
+    fireEvent.submit(container.querySelector("form")!);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Two actions added:
-    expect(mockOnSubmit).lastCalledWith({
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       scheduledActions: [
         {
           actionType: "at1",
@@ -111,23 +119,30 @@ describe("ScheduledActionsField", () => {
       ]
     });
 
-    expect(wrapper.find(".ReactTable tbody tr").length).toEqual(2);
+    expect(container.querySelectorAll(".ReactTable tbody tr").length).toBe(2);
 
     // Edit the first action:
-    wrapper.find(".ReactTable .index-0 button.edit-button").simulate("click");
-    wrapper
-      .find(".remarks-field textarea")
-      .simulate("change", { target: { value: "edited-remarks-1" } });
-    wrapper.find("button.add-button").simulate("click");
-    await new Promise(setImmediate);
-    wrapper.update();
-    wrapper.find("form").simulate("submit");
+    fireEvent.click(
+      container.querySelector(".ReactTable .index-0 button.edit-button")!
+    );
+    fireEvent.change(container.querySelector(".remarks-field textarea")!, {
+      target: { value: "edited-remarks-1" }
+    });
 
     await new Promise(setImmediate);
-    wrapper.update();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /save/i
+      })
+    );
+    await new Promise(setImmediate);
+
+    fireEvent.submit(container.querySelector("form")!);
+    await new Promise(setImmediate);
 
     // Two actions saved:
-    expect(mockOnSubmit).lastCalledWith({
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       scheduledActions: [
         {
           actionType: "at1",
@@ -145,15 +160,15 @@ describe("ScheduledActionsField", () => {
     });
 
     // Remove the second action:
-    wrapper.find(".ReactTable .index-1 button.remove-button").simulate("click");
+    fireEvent.click(
+      container.querySelector(".ReactTable .index-1 button.remove-button")!
+    );
 
-    wrapper.find("form").simulate("submit");
-
+    fireEvent.submit(container.querySelector("form")!);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // One action saved:
-    expect(mockOnSubmit).lastCalledWith({
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       scheduledActions: [
         {
           actionType: "at1",
