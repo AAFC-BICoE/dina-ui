@@ -137,7 +137,9 @@ export function WorkbookTemplateGenerator() {
       link?.setAttribute("download", fileName + ".xlsx");
       document?.body?.appendChild(link);
       link?.click();
-      window?.URL?.revokeObjectURL(url ?? "");
+      if (typeof window !== "undefined" && window?.URL?.revokeObjectURL) {
+        window?.URL?.revokeObjectURL(url ?? "");
+      }
     } catch (error) {
       // Log the error for debugging
       console.error("Error generating workbook template:", error);

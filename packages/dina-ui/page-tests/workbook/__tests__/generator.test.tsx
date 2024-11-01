@@ -6,29 +6,53 @@ import "@testing-library/jest-dom";
 
 const mockPost = jest.fn();
 
-const mockGet = jest.fn<any, any>(async (path) => {
+const mockGet = jest.fn<any, any>(async (path, options) => {
   switch (path) {
     case "collection-api/managed-attribute":
-      return {
-        data: [
-          {
-            id: "0192ba73-340a-72b1-bea9-fc75cdcaf7c6",
-            type: "managed-attribute",
-            name: "my test managed attribute",
-            key: "my_test_managed_attribute",
-            vocabularyElementType: "STRING",
-            unit: null,
-            managedAttributeComponent: "MATERIAL_SAMPLE",
-            acceptedValues: null,
-            createdOn: "2024-10-23T17:36:05.296422Z",
-            createdBy: "dina-admin",
-            group: "aafc",
-            multilingualDescription: {
-              descriptions: []
-            }
-          }
-        ]
-      };
+      switch (options?.filter?.rsql) {
+        case "managedAttributeComponent==MATERIAL_SAMPLE":
+          return {
+            data: [
+              {
+                id: "0192ba73-340a-72b1-bea9-fc75cdcaf7c6",
+                type: "managed-attribute",
+                name: "my test managed attribute",
+                key: "my_test_managed_attribute",
+                vocabularyElementType: "STRING",
+                unit: null,
+                managedAttributeComponent: "MATERIAL_SAMPLE",
+                acceptedValues: null,
+                createdOn: "2024-10-23T17:36:05.296422Z",
+                createdBy: "dina-admin",
+                group: "aafc",
+                multilingualDescription: {
+                  descriptions: []
+                }
+              }
+            ]
+          };
+        case "managedAttributeComponent==PREPARATION":
+          return {
+            data: [
+              {
+                id: "0192e83f-e198-7fd8-b7e9-d7a24e11c683",
+                type: "managed-attribute",
+                name: "Test Preparation Managed Attribute",
+                key: "test_preparation_managed_attribute",
+                vocabularyElementType: "STRING",
+                unit: null,
+                managedAttributeComponent: "PREPARATION",
+                acceptedValues: null,
+                createdOn: "2024-10-23T17:36:05.296422Z",
+                createdBy: "dina-admin",
+                group: "aafc",
+                multilingualDescription: {
+                  descriptions: []
+                }
+              }
+            ]
+          };
+      }
   }
 });
 
@@ -174,8 +198,7 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getAllByTestId("delete-button")[1]);
 
     // Move the material sample name down.
-    userEvent.click(wrapper.getAllByTestId("move-up-button")[0]);
-    screen.logTestingPlaygroundURL();
+    userEvent.click(wrapper.getAllByTestId("move-up-button")[1]);
 
     // Generate the template.
     userEvent.click(
@@ -251,7 +274,11 @@ describe("Workbook Template Generator", () => {
       {
         data: {
           attributes: {
-            columns: ["Primary ID", "Barcode", "Collection Number"]
+            columns: [
+              "materialSampleName",
+              "barcode",
+              "collectingEvent.otherRecordNumbers"
+            ]
           },
           type: "workbook-generation"
         }
@@ -281,7 +308,7 @@ describe("Workbook Template Generator", () => {
     // Select "Material Sample Managed Attributes".
     userEvent.click(
       wrapper.getAllByRole("option", {
-        name: /material sample managed attributes/i
+        name: /managed attributes/i
       })[0]
     );
     await new Promise(setImmediate);
@@ -299,6 +326,36 @@ describe("Workbook Template Generator", () => {
       "Managed Attribute Alias"
     );
 
+    // Click the "Add new column" dropdown
+    userEvent.click(wrapper.getByRole("combobox"));
+    await waitFor(() => {
+      // Total number of options expected based on the dynamic config and index map returned.
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
+    });
+
+    // Select "Preparation Managed Attributes".
+    userEvent.click(
+      wrapper.getAllByRole("option", {
+        name: /preparation managed attributes/i
+      })[0]
+    );
+    await new Promise(setImmediate);
+
+    // Select a managed attribute to generate.
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await new Promise(setImmediate);
+    userEvent.click(
+      wrapper.getByRole("option", {
+        name: /test preparation managed attribute/i
+      })
+    );
+    userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    await new Promise(setImmediate);
+    userEvent.type(
+      wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
+      "Another Managed Attribute"
+    );
+
     // Generate the template.
     userEvent.click(
       wrapper.getByRole("button", { name: /generate template/i })
@@ -312,8 +369,11 @@ describe("Workbook Template Generator", () => {
       {
         data: {
           attributes: {
-            aliases: ["Managed Attribute Alias"],
-            columns: ["my test managed attribute"]
+            aliases: ["Managed Attribute Alias", "Another Managed Attribute"],
+            columns: [
+              "managedAttributes.my_test_managed_attribute",
+              "preparationManagedAttributes.test_preparation_managed_attribute"
+            ]
           },
           type: "workbook-generation"
         }

@@ -1,14 +1,17 @@
-import { LoadingSpinner, SelectField, useApiClient } from "..";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import {
+  filterBy,
+  LoadingSpinner,
+  ResourceSelectField,
+  SelectField,
+  TooltipSelectOption
+} from "..";
+import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "react-bootstrap";
 import { GeneratorItem } from "./GeneratorItem";
-import { ManagedAttributeSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderManagedAttributeSearch";
-import { FieldExtensionSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderFieldExtensionSearch";
-import { RelationshipPresenceSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderRelationshipPresenceSearch";
-import { IdentifierSearchStates } from "../list-page/query-builder/query-builder-value-types/QueryBuilderIdentifierSearch";
 import { GeneratorColumn, GeneratorSelectorProps } from "./GeneratorSelector";
 import { startCase } from "lodash";
+import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
 
 export interface GeneratorSelectorListProps extends GeneratorSelectorProps {
   loading: boolean;
@@ -19,15 +22,17 @@ export function GeneratorSelectorList({
   displayedColumns,
   setDisplayedColumns,
   loading,
-  disabled
+  disabled,
+  dynamicFieldsMappingConfig
 }: GeneratorSelectorListProps) {
-  const { apiClient } = useApiClient();
+  const { locale, formatMessage } = useDinaIntl();
 
   // The selected field from the query field selector.
   const [selectedField, setSelectedField] = useState<GeneratorColumn>();
 
   // Used for dynamic fields to store the specific dynamic value selected.
   const [dynamicFieldValue, setDynamicFieldValue] = useState<string>();
+  const [dynamicFieldLabel, setDynamicFieldLabel] = useState<string>();
 
   // Used for the "Add column" button to determine if it should be disabled or not.
   const [isValidField, setIsValidField] = useState<boolean>(false);
@@ -39,43 +44,8 @@ export function GeneratorSelectorList({
       // Check if it's a dynamic type.
       if (selectedField.dynamicConfig) {
         if (dynamicFieldValue) {
-          switch (selectedField.dynamicConfig.type) {
-            case "managedAttribute":
-              const managedAttributeValues: ManagedAttributeSearchStates =
-                JSON.parse(dynamicFieldValue);
-              if (managedAttributeValues?.selectedManagedAttribute?.id) {
-                setIsValidField(true);
-                return;
-              }
-              break;
-            case "fieldExtension":
-              const fieldExtensionValues: FieldExtensionSearchStates =
-                JSON.parse(dynamicFieldValue);
-              if (
-                fieldExtensionValues.selectedExtension &&
-                fieldExtensionValues.selectedField
-              ) {
-                setIsValidField(true);
-                return;
-              }
-              break;
-            case "relationshipPresence":
-              const relationshipPresenceValues: RelationshipPresenceSearchStates =
-                JSON.parse(dynamicFieldValue);
-              if (relationshipPresenceValues.selectedRelationship) {
-                setIsValidField(true);
-                return;
-              }
-              break;
-            case "identifier":
-              const identifierValues: IdentifierSearchStates =
-                JSON.parse(dynamicFieldValue);
-              if (identifierValues?.selectedIdentifier) {
-                setIsValidField(true);
-                return;
-              }
-              break;
-          }
+          setIsValidField(true);
+          return;
         }
       } else {
         // Regular field selected, not dynamic and requires more options.
@@ -90,6 +60,7 @@ export function GeneratorSelectorList({
   // Reset the dynamic field value so it doesn't get mixed with another one.
   useEffect(() => {
     setDynamicFieldValue(undefined);
+    setDynamicFieldLabel(undefined);
   }, [selectedField]);
 
   const onGeneratorItemDelete = (columnValue: string) => {
@@ -166,7 +137,11 @@ export function GeneratorSelectorList({
       // Add new option to the bottom of the list.
       const newDisplayedColumns: GeneratorColumn[] = [
         ...displayedColumns,
-        selectedField
+        {
+          ...selectedField,
+          columnValue: selectedField.columnValue + "." + dynamicFieldValue,
+          columnLabel: dynamicFieldLabel ?? selectedField.columnLabel
+        }
       ];
 
       setDisplayedColumns(newDisplayedColumns);
@@ -182,7 +157,6 @@ export function GeneratorSelectorList({
           genField.options.forEach((parentGenField) => {
             if (parentGenField.value === columnValue) {
               // Todo, dynamic config needs to be loaded here.
-
               const newSelectedField: GeneratorColumn = {
                 columnLabel: parentGenField.label,
                 columnValue: parentGenField.value,
@@ -194,12 +168,14 @@ export function GeneratorSelectorList({
         }
 
         if (genField.value === columnValue) {
-          // Todo, dynamic config needs to be loaded here.
-
           const newSelectedField: GeneratorColumn = {
             columnLabel: genField.label,
             columnValue: genField.value,
-            columnAlias: ""
+            columnAlias: "",
+            dynamicConfig: dynamicFieldsMappingConfig?.fields?.find?.(
+              (dynConfig) =>
+                dynConfig.path === "data.attributes." + genField.value
+            )
           };
           setSelectedField(newSelectedField);
         }
@@ -278,7 +254,7 @@ export function GeneratorSelectorList({
             <DinaMessage id="columnSelector_addNewColumn" />
           </strong>
           <SelectField
-            className="flex-fill"
+            className="flex-fill mb-0"
             name={`insertField`}
             options={generatorFields}
             selectProps={{
@@ -290,7 +266,61 @@ export function GeneratorSelectorList({
             onChange={onGeneratorItemSelected}
             disabled={disabled ?? false}
           />
-          {selectedField?.dynamicConfig?.type === "managedAttribute" && <></>}
+          {selectedField?.dynamicConfig?.type === "managedAttribute" && (
+            <ResourceSelectField<ManagedAttribute>
+              name={`insertManagedAttributeField`}
+              hideLabel={true}
+              selectProps={{
+                className: "mt-0",
+                menuPortalTarget: document.body,
+                styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+              }}
+              filter={filterBy(["name"], {
+                extraFilters: [
+                  {
+                    selector: "managedAttributeComponent",
+                    comparison: "==",
+                    arguments:
+                      selectedField?.dynamicConfig?.component ??
+                      "MATERIAL_SAMPLE"
+                  }
+                ]
+              })}
+              isDisabled={disabled}
+              omitNullOption={true}
+              additionalSort={"name"}
+              showGroupCategary={true}
+              onChange={(newValue) => {
+                if (newValue) {
+                  setDynamicFieldValue((newValue as any)?.key);
+                  setDynamicFieldLabel((newValue as any)?.name);
+                }
+              }}
+              model="collection-api/managed-attribute"
+              optionLabel={(ma) => {
+                const multiDescription =
+                  ma?.multilingualDescription?.descriptions?.find(
+                    (description) => description.lang === locale
+                  )?.desc;
+                const unit = ma?.unit;
+                const unitMessage = formatMessage("dataUnit");
+                const tooltipText = unit
+                  ? `${multiDescription}\n${unitMessage}${unit}`
+                  : multiDescription;
+                const fallbackTooltipText =
+                  ma?.multilingualDescription?.descriptions?.find(
+                    (description) => description.lang !== locale
+                  )?.desc;
+                return (
+                  <TooltipSelectOption
+                    tooltipText={tooltipText ?? fallbackTooltipText ?? ma.name}
+                  >
+                    {ma.name}
+                  </TooltipSelectOption>
+                );
+              }}
+            />
+          )}
           <div className="mt-2 d-grid">
             <Button
               className="btn btn-primary"
