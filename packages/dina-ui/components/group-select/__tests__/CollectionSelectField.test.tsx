@@ -1,7 +1,9 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { CollectionSelectField } from "../../resource-select-fields/resource-select-fields";
 import Select from "react-select/base";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const COLL1 = {
   id: "1",
@@ -65,18 +67,22 @@ describe("CollectionSelectField", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Shows admins all collections to choose from.", async () => {
-    const wrapper = mountWithAppContext(
+    // Mount the component with the context
+    mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <CollectionSelectField name="collection" />
       </DinaForm>,
       { ...testCtx, accountContext: { isAdmin: true } }
     );
 
+    // Wait for any asynchronous updates
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Not disabled or filtered:
-    expect(wrapper.find(Select).prop("isDisabled")).toEqual(false);
+    // Check that the select field is not disabled
+    const select = screen.getByRole("combobox", { name: /collection/i });
+    expect(select).not.toBeDisabled();
+
+    // Verify the API call for fetching collections
     expect(mockGet.mock.calls).toEqual([
       [
         "collection-api/collection",
@@ -89,7 +95,7 @@ describe("CollectionSelectField", () => {
   });
 
   it("Shows non-admin users with one group/collection just their collection", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ collection: COLL1 }}>
         <CollectionSelectField name="collection" />
       </DinaForm>,
@@ -97,9 +103,15 @@ describe("CollectionSelectField", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(Select).prop("isDisabled")).toEqual(true);
+    // Use querySelector to find the input element by its role
+    const combobox = wrapper.container.querySelector('input[role="combobox"]');
+
+    // Assert that the input element is found and is disabled
+    expect(combobox).toBeInTheDocument(); // Check that the combobox is in the document
+    expect(combobox).toBeDisabled(); // Check if it is disabled
+
+    // Verify the API call
     expect(mockGet.mock.calls).toEqual([
       [
         "collection-api/collection",
@@ -113,17 +125,20 @@ describe("CollectionSelectField", () => {
   });
 
   it("Shows non-admin users with multiple groups/collections all available collections", async () => {
-    const wrapper = mountWithAppContext(
+    const { getByRole } = mountWithAppContext2(
       <DinaForm initialValues={{ collection: COLL1 }}>
         <CollectionSelectField name="collection" />
       </DinaForm>,
       { ...testCtx, accountContext: { groupNames: ["aafc", "cnc"] } }
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Use waitFor to wait for any asynchronous state updates or effects
+    await waitFor(() => {
+      // Check if the select is enabled
+      expect(getByRole("combobox")).toBeEnabled();
+    });
 
-    expect(wrapper.find(Select).prop("isDisabled")).toEqual(false);
+    // Assert that the API call was made with the correct parameters
     expect(mockGet.mock.calls).toEqual([
       [
         "collection-api/collection",
