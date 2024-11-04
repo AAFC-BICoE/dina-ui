@@ -52,6 +52,27 @@ const mockGet = jest.fn<any, any>(async (path, options) => {
               }
             ]
           };
+        case "managedAttributeComponent==COLLECTING_EVENT":
+          return {
+            data: [
+              {
+                id: "0679a2cd-80e8-4fc7-bcfa-ca13e0892354",
+                type: "managed-attribute",
+                name: "Test Collecting Event Managed Attribute",
+                key: "test_collecting_event_managed_attribute",
+                vocabularyElementType: "STRING",
+                unit: null,
+                managedAttributeComponent: "COLLECTING_EVENT",
+                acceptedValues: null,
+                createdOn: "2024-10-23T17:36:05.296422Z",
+                createdBy: "dina-admin",
+                group: "aafc",
+                multilingualDescription: {
+                  descriptions: []
+                }
+              }
+            ]
+          };
       }
   }
 });
@@ -356,6 +377,32 @@ describe("Workbook Template Generator", () => {
       "Another Managed Attribute"
     );
 
+    // Click the "Add new column" dropdown
+    userEvent.click(wrapper.getByRole("combobox"));
+    await waitFor(() => {
+      // Total number of options expected based on the dynamic config and index map returned.
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
+    });
+
+    // Select "Collecting Event" managed attribute
+    userEvent.click(
+      wrapper.getAllByRole("option", {
+        name: /managed attributes/i
+      })[2]
+    );
+    await new Promise(setImmediate);
+
+    // Select a managed attribute to generate.
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    await new Promise(setImmediate);
+    userEvent.click(
+      wrapper.getByRole("option", {
+        name: /test collecting event managed attribute/i
+      })
+    );
+    userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    await new Promise(setImmediate);
+
     // Generate the template.
     userEvent.click(
       wrapper.getByRole("button", { name: /generate template/i })
@@ -369,10 +416,16 @@ describe("Workbook Template Generator", () => {
       {
         data: {
           attributes: {
-            aliases: ["Managed Attribute Alias", "Another Managed Attribute"],
+            aliases: [
+              "Managed Attribute Alias",
+              "Another Managed Attribute",
+              // No alias was defined, so the column path is used as expected:
+              "collectingEvent.managedAttributes.test_collecting_event_managed_attribute"
+            ],
             columns: [
               "managedAttributes.my_test_managed_attribute",
-              "preparationManagedAttributes.test_preparation_managed_attribute"
+              "preparationManagedAttributes.test_preparation_managed_attribute",
+              "collectingEvent.managedAttributes.test_collecting_event_managed_attribute"
             ]
           },
           type: "workbook-generation"

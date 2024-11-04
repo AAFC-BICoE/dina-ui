@@ -156,11 +156,19 @@ export function GeneratorSelectorList({
         if (genField.options && genField.options.length !== 0) {
           genField.options.forEach((parentGenField) => {
             if (parentGenField.value === columnValue) {
-              // Todo, dynamic config needs to be loaded here.
+              const parts = (parentGenField.value ?? "").split(".") ?? [];
+              const extractedValue = parts.splice(1).join(".");
               const newSelectedField: GeneratorColumn = {
                 columnLabel: parentGenField.label,
                 columnValue: parentGenField.value,
-                columnAlias: ""
+                columnAlias: "",
+                dynamicConfig:
+                  dynamicFieldsMappingConfig?.relationshipFields?.find?.(
+                    (dynConfig) =>
+                      dynConfig.path ===
+                        "included.attributes." + extractedValue &&
+                      dynConfig.referencedBy === parentGenField.parentPath
+                  )
               };
               setSelectedField(newSelectedField);
             }
@@ -267,61 +275,68 @@ export function GeneratorSelectorList({
             disabled={disabled ?? false}
           />
           {selectedField?.dynamicConfig?.type === "managedAttribute" && (
-            <ResourceSelectField<ManagedAttribute>
-              name={`insertManagedAttributeField`}
-              hideLabel={true}
-              selectProps={{
-                className: "mt-0",
-                menuPortalTarget: document.body,
-                styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
-              }}
-              filter={filterBy(["name"], {
-                extraFilters: [
-                  {
-                    selector: "managedAttributeComponent",
-                    comparison: "==",
-                    arguments:
-                      selectedField?.dynamicConfig?.component ??
-                      "MATERIAL_SAMPLE"
+            <>
+              <strong>
+                <DinaMessage id="columnSelector_selectManagedAttribute" />
+              </strong>
+              <ResourceSelectField<ManagedAttribute>
+                name={`insertManagedAttributeField`}
+                hideLabel={true}
+                selectProps={{
+                  className: "mt-0",
+                  menuPortalTarget: document.body,
+                  styles: { menuPortal: (base) => ({ ...base, zIndex: 9999 }) }
+                }}
+                filter={filterBy(["name"], {
+                  extraFilters: [
+                    {
+                      selector: "managedAttributeComponent",
+                      comparison: "==",
+                      arguments:
+                        selectedField?.dynamicConfig?.component ??
+                        "MATERIAL_SAMPLE"
+                    }
+                  ]
+                })}
+                isDisabled={disabled}
+                omitNullOption={true}
+                additionalSort={"name"}
+                showGroupCategary={true}
+                onChange={(newValue) => {
+                  if (newValue) {
+                    setDynamicFieldValue((newValue as any)?.key);
+                    setDynamicFieldLabel((newValue as any)?.name);
                   }
-                ]
-              })}
-              isDisabled={disabled}
-              omitNullOption={true}
-              additionalSort={"name"}
-              showGroupCategary={true}
-              onChange={(newValue) => {
-                if (newValue) {
-                  setDynamicFieldValue((newValue as any)?.key);
-                  setDynamicFieldLabel((newValue as any)?.name);
-                }
-              }}
-              model="collection-api/managed-attribute"
-              optionLabel={(ma) => {
-                const multiDescription =
-                  ma?.multilingualDescription?.descriptions?.find(
-                    (description) => description.lang === locale
-                  )?.desc;
-                const unit = ma?.unit;
-                const unitMessage = formatMessage("dataUnit");
-                const tooltipText = unit
-                  ? `${multiDescription}\n${unitMessage}${unit}`
-                  : multiDescription;
-                const fallbackTooltipText =
-                  ma?.multilingualDescription?.descriptions?.find(
-                    (description) => description.lang !== locale
-                  )?.desc;
-                return (
-                  <TooltipSelectOption
-                    tooltipText={tooltipText ?? fallbackTooltipText ?? ma.name}
-                  >
-                    {ma.name}
-                  </TooltipSelectOption>
-                );
-              }}
-            />
+                }}
+                model="collection-api/managed-attribute"
+                optionLabel={(ma) => {
+                  const multiDescription =
+                    ma?.multilingualDescription?.descriptions?.find(
+                      (description) => description.lang === locale
+                    )?.desc;
+                  const unit = ma?.unit;
+                  const unitMessage = formatMessage("dataUnit");
+                  const tooltipText = unit
+                    ? `${multiDescription}\n${unitMessage}${unit}`
+                    : multiDescription;
+                  const fallbackTooltipText =
+                    ma?.multilingualDescription?.descriptions?.find(
+                      (description) => description.lang !== locale
+                    )?.desc;
+                  return (
+                    <TooltipSelectOption
+                      tooltipText={
+                        tooltipText ?? fallbackTooltipText ?? ma.name
+                      }
+                    >
+                      {ma.name}
+                    </TooltipSelectOption>
+                  );
+                }}
+              />
+            </>
           )}
-          <div className="mt-2 d-grid">
+          <div className="d-grid">
             <Button
               className="btn btn-primary"
               disabled={!isValidField}
@@ -330,10 +345,9 @@ export function GeneratorSelectorList({
               <DinaMessage id="columnSelector_addColumnButton" />
             </Button>
           </div>
-          <br />
 
           {displayedColumns.length > 0 && (
-            <>
+            <div className="mt-3">
               <strong>
                 <DinaMessage id={"columnSelector_columnsToBeExported"} />
               </strong>
@@ -351,7 +365,7 @@ export function GeneratorSelectorList({
                   />
                 );
               })}
-            </>
+            </div>
           )}
         </>
       )}
