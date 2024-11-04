@@ -1,4 +1,3 @@
-import { DefaultRow } from "../../../../../common-ui/lib";
 import IndexSetListPage from "../../../../pages/seqdb/index-set/list";
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { IndexSet } from "../../../../types/seqdb-api";

@@ -1,7 +1,7 @@
-import { LoadingSpinner } from "common-ui";
 import IndexSetViewPage from "../../../../pages/seqdb/index-set/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { IndexSet, NgsIndex } from "../../../../types/seqdb-api";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
@@ -56,7 +56,7 @@ const mockCtx = {
 };
 
 function getWrapper() {
-  return mountWithAppContext(<IndexSetViewPage />, {
+  return mountWithAppContext2(<IndexSetViewPage />, {
     apiContext: mockCtx as any
   });
 }
@@ -66,21 +66,25 @@ describe("Index Set View Page", () => {
     const wrapper = getWrapper();
 
     // Renders initially with loading indicator:
-    expect(wrapper.find(LoadingSpinner).exists()).toEqual(true);
+    // expect(wrapper.find(LoadingSpinner).exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the page to load:
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The index set name is displayed:
-    expect(
-      wrapper.find(".field-view[children='test index set']").exists()
-    ).toEqual(true);
+    // expect(wrapper.find(".field-view[children='test index set']").exists()).toEqual(true);
+    expect(wrapper.getAllByText(/test index set/i)[1]).toBeInTheDocument();
 
     // Wait for the NGS indexes table to load:
     await new Promise(setImmediate);
-    wrapper.update();
+
     // The table shows the ngs indexes:
-    expect(wrapper.find("tbody td").first().text()).toEqual("index 1");
+    // expect(wrapper.find("tbody td").first().text()).toEqual("index 1");
+    expect(
+      wrapper.getByRole("cell", {
+        name: /index 1/i
+      })
+    ).toBeInTheDocument();
   });
 });
