@@ -109,7 +109,6 @@ describe("Workbook Template Generator", () => {
     // Select "Primary ID", give it alias of "Sample Name"
     userEvent.click(wrapper.getAllByRole("option", { name: /primary id/i })[0]);
     userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
-    await new Promise(setImmediate);
     userEvent.type(
       wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
       "Sample Name"
@@ -119,7 +118,6 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getByRole("combobox"));
     userEvent.click(wrapper.getByRole("option", { name: /barcode/i }));
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
-    await new Promise(setImmediate);
     userEvent.type(
       wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
       "Bar code"
@@ -133,7 +131,6 @@ describe("Workbook Template Generator", () => {
       })[0]
     );
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
-    await new Promise(setImmediate);
     userEvent.type(
       wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
       "Coll number"
@@ -255,7 +252,6 @@ describe("Workbook Template Generator", () => {
     const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
       apiContext
     });
-    await new Promise(setImmediate);
 
     // Click the "Add new column" dropdown
     userEvent.click(wrapper.getByRole("combobox"));
@@ -267,13 +263,11 @@ describe("Workbook Template Generator", () => {
     // Select "Primary ID"
     userEvent.click(wrapper.getAllByRole("option", { name: /primary id/i })[0]);
     userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
-    await new Promise(setImmediate);
 
     // Select "Barcode"
     userEvent.click(wrapper.getByRole("combobox"));
     userEvent.click(wrapper.getByRole("option", { name: /barcode/i }));
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
-    await new Promise(setImmediate);
 
     // Select a relationship level field
     userEvent.click(wrapper.getByRole("combobox"));
@@ -281,7 +275,6 @@ describe("Workbook Template Generator", () => {
       wrapper.getAllByRole("option", { name: /collection number/i })[1]
     );
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
-    await new Promise(setImmediate);
 
     // Generate the template.
     userEvent.click(
@@ -299,6 +292,11 @@ describe("Workbook Template Generator", () => {
               "materialSampleName",
               "barcode",
               "collectingEvent.otherRecordNumbers"
+            ],
+            aliases: [
+              "Primary ID",
+              "Barcode",
+              "Collecting Event Additional Collection Numbers"
             ]
           },
           type: "workbook-generation"
@@ -341,7 +339,6 @@ describe("Workbook Template Generator", () => {
       wrapper.getByRole("option", { name: /my test managed attribute/i })
     );
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
-    await new Promise(setImmediate);
     userEvent.type(
       wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
       "Managed Attribute Alias"
@@ -371,7 +368,6 @@ describe("Workbook Template Generator", () => {
       })
     );
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
-    await new Promise(setImmediate);
     userEvent.type(
       wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
       "Another Managed Attribute"
@@ -401,13 +397,11 @@ describe("Workbook Template Generator", () => {
       })
     );
     userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
-    await new Promise(setImmediate);
 
     // Generate the template.
     userEvent.click(
       wrapper.getByRole("button", { name: /generate template/i })
     );
-    await new Promise(setImmediate);
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledTimes(1);
     });
@@ -419,8 +413,8 @@ describe("Workbook Template Generator", () => {
             aliases: [
               "Managed Attribute Alias",
               "Another Managed Attribute",
-              // No alias was defined, so the column path is used as expected:
-              "collectingEvent.managedAttributes.test_collecting_event_managed_attribute"
+              // No alias was defined, so the column label is used instead:
+              "Test Collecting Event Managed Attribute"
             ],
             columns: [
               "managedAttributes.my_test_managed_attribute",
@@ -444,7 +438,6 @@ describe("Workbook Template Generator", () => {
     const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
       apiContext
     });
-    await new Promise(setImmediate);
 
     // Click the "Add new column" dropdown
     userEvent.click(wrapper.getByRole("combobox"));
@@ -456,7 +449,6 @@ describe("Workbook Template Generator", () => {
     // Select "Primary ID", give it alias of "Sample Name"
     userEvent.click(wrapper.getAllByRole("option", { name: /primary id/i })[0]);
     userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
-    await new Promise(setImmediate);
 
     // Put an invalid template name
     userEvent.type(
@@ -467,7 +459,6 @@ describe("Workbook Template Generator", () => {
     userEvent.click(
       wrapper.getByRole("button", { name: /generate template/i })
     );
-    await new Promise(setImmediate);
 
     // Error should be displayed on the page.
     expect(

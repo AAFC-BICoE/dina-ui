@@ -12,6 +12,7 @@ import { GeneratorItem } from "./GeneratorItem";
 import { GeneratorColumn, GeneratorSelectorProps } from "./GeneratorSelector";
 import { startCase } from "lodash";
 import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
+import { useFormikContext } from "formik";
 
 export interface GeneratorSelectorListProps extends GeneratorSelectorProps {
   loading: boolean;
@@ -26,6 +27,8 @@ export function GeneratorSelectorList({
   dynamicFieldsMappingConfig
 }: GeneratorSelectorListProps) {
   const { locale, formatMessage } = useDinaIntl();
+
+  const { setValues } = useFormikContext();
 
   // The selected field from the query field selector.
   const [selectedField, setSelectedField] = useState<GeneratorColumn>();
@@ -61,6 +64,11 @@ export function GeneratorSelectorList({
   useEffect(() => {
     setDynamicFieldValue(undefined);
     setDynamicFieldLabel(undefined);
+
+    // Reset the formik values if undefined.
+    if (selectedField === undefined) {
+      setValues({});
+    }
   }, [selectedField]);
 
   const onGeneratorItemDelete = (columnValue: string) => {
@@ -161,7 +169,7 @@ export function GeneratorSelectorList({
               const parts = (parentGenField.value ?? "").split(".") ?? [];
               const extractedValue = parts.splice(1).join(".");
               const newSelectedField: GeneratorColumn = {
-                columnLabel: parentGenField.label,
+                columnLabel: genField.label + " " + parentGenField.label,
                 columnValue: parentGenField.value,
                 columnAlias: "",
                 dynamicConfig:
