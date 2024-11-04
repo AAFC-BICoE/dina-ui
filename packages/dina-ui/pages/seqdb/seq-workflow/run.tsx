@@ -12,6 +12,7 @@ import { SangerSeqBatchStep } from "../../../components/seqdb/seq-workflow/Sange
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqBatch } from "../../../types/seqdb-api";
 import { useSeqBatchQuery } from "../seq-batch/edit";
+import { SangerRunStep } from "packages/dina-ui/components/seqdb/seq-workflow/SangerRunStep";
 
 export default function SangerWorkFlowSequencingRunPage() {
   const router = useRouter();
@@ -148,6 +149,7 @@ export default function SangerWorkFlowSequencingRunPage() {
           <Tab disabled={isDisabled(2, true)}>
             {formatMessage("selectCoordinates")}
           </Tab>
+          <Tab disabled={isDisabled(3, true)}>{formatMessage("runStep")}</Tab>
         </TabList>
         <TabPanel>
           <SangerSeqBatchStep
@@ -174,6 +176,18 @@ export default function SangerWorkFlowSequencingRunPage() {
         <TabPanel>
           {seqBatchQueryState.response?.data && seqBatchId && (
             <SeqBatchSelectCoordinatesStep
+              seqBatchId={seqBatchId}
+              seqBatch={seqBatchQueryState.response.data}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {seqBatchQueryState.response?.data && seqBatchId && (
+            <SangerRunStep
               seqBatchId={seqBatchId}
               seqBatch={seqBatchQueryState.response.data}
               editMode={editMode}

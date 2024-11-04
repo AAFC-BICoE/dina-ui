@@ -132,6 +132,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   selectAllCheckedSamplesButtonText: "Select all checked molecular samples -->",
   selectButtonText: "Select",
   selectCoordinates: "Select Coordinates",
+  runStep: "Run",
   selectLibraryPool: "Select Library Pool",
   selectLibraryPrepBatch: "Select Library Prep Batch",
   selectMaterialSamples: "Select Material Samples",
