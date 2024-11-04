@@ -1,4 +1,3 @@
-import { screen } from "@testing-library/react";
 import PersonDetailsPage from "../../../pages/person/view";
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/agent-api/resources/Person";
@@ -34,8 +33,6 @@ describe("Person details page", () => {
   it("Renders initially with a loading spinner.", () => {
     const wrapper = mountWithAppContext2(<PersonDetailsPage />, { apiContext });
 
-    screen.logTestingPlaygroundURL();
-
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
@@ -45,15 +42,11 @@ describe("Person details page", () => {
     // Wait for the page to load.
     await new Promise(setImmediate);
 
-    screen.logTestingPlaygroundURL();
-
     expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
     // The person's name should be rendered in a FieldView.
     expect(wrapper.getByText(/display name/i)).toBeInTheDocument();
     expect(wrapper.getAllByText(/person a/i)[1]).toBeInTheDocument();
-    // expect(wrapper.container.querySelector('#sandbox > div:nth-child(1) > div > div > main > form > div:nth-child(2) > div > label > div:nth-child(2) > div'));
-    // expect(wrapper.containsMatchingElement(<div>person a</div>)).toEqual(true);
 
     // // The person's email should be rendered in a FieldView.
     expect(wrapper.getByText(/email/i)).toBeInTheDocument();
