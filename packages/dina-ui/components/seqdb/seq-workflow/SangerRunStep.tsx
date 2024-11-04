@@ -1,14 +1,6 @@
-import { LoadingSpinner } from "common-ui";
-import { noop } from "lodash";
 import Link from "next/link";
 import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
-import { useEffect } from "react";
-import {
-  SeqReactionSample,
-  useSeqSelectCoordinatesControls
-} from "./seq-batch-select-coordinats-step/useSeqSelectCoordinatesControls";
-import { DraggableItemList } from "../container-grid/DraggableItemList";
-import { ContainerGrid } from "../container-grid/ContainerGrid";
+import { useEffect, useState } from "react";
 
 export interface SangerRunStepProps {
   seqBatchId: string;
@@ -19,15 +11,9 @@ export interface SangerRunStepProps {
   setPerformSave: (newValue: boolean) => void;
 }
 
-export function SangerRunStep({
-  seqBatchId,
-  // seqBatch,
-  // onSaved,
-  editMode
-}: // setEditMode,
-// performSave,
-// setPerformSave
-SangerRunStepProps) {
+export function SangerRunStep({ seqBatchId, editMode }: SangerRunStepProps) {
+  const [sequencingRunName, setSequencingRunName] = useState<string>();
+
   return (
     <>
       {!editMode && (
@@ -41,6 +27,22 @@ SangerRunStepProps) {
           </div>
         </div>
       )}
+      <div className="row">
+        <div className="col-4">
+          <strong>Sequencing Run:</strong>
+          <input
+            className="form-control"
+            name="sequencingRunName"
+            value={sequencingRunName}
+            onChange={(newValue) =>
+              setSequencingRunName(newValue.target.value ?? "")
+            }
+          />
+        </div>
+        <div className="col-12">
+          <strong>Sequencing Run Content:</strong>
+        </div>
+      </div>
     </>
   );
 }
