@@ -139,7 +139,9 @@ export function GeneratorSelectorList({
         ...displayedColumns,
         {
           ...selectedField,
-          columnValue: selectedField.columnValue + "." + dynamicFieldValue,
+          columnValue: dynamicFieldValue
+            ? selectedField.columnValue + "." + dynamicFieldValue
+            : selectedField.columnValue,
           columnLabel: dynamicFieldLabel ?? selectedField.columnLabel
         }
       ];

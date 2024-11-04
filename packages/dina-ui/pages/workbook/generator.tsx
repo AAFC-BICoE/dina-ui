@@ -75,6 +75,19 @@ export function WorkbookTemplateGenerator() {
     setLoading(true);
     setErrorMessage(undefined);
 
+    // Retrieve the filename.
+    const fileName = formik?.values?.name ?? "template";
+
+    // Ensure the filename provided is supported by Windows.
+    const validFilenameRegex = /^[a-zA-Z0-9\s\-_]+$/;
+    if (!validFilenameRegex.test(fileName)) {
+      setErrorMessage(
+        "Please enter a valid filename. Only letters, numbers, spaces, hyphens, and underscores are allowed."
+      );
+      setLoading(false);
+      return;
+    }
+
     const generateTemplateArg: any = {
       data: {
         type: "workbook-generation",
@@ -114,19 +127,6 @@ export function WorkbookTemplateGenerator() {
           responseType: "blob"
         }
       );
-
-      // Retrieve the filename.
-      const fileName = formik?.values?.name ?? "template";
-
-      // Ensure the filename provided is supported by Windows.
-      const validFilenameRegex = /^[a-zA-Z0-9\s\-_]+$/;
-      if (!validFilenameRegex.test(fileName)) {
-        setErrorMessage(
-          "Please enter a valid filename. Only letters, numbers, spaces, hyphens, and underscores are allowed."
-        );
-        setLoading(false);
-        return;
-      }
 
       // Download the data
       const url = window?.URL?.createObjectURL?.(

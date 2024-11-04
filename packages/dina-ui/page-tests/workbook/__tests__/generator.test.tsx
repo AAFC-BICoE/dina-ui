@@ -460,7 +460,7 @@ describe("Workbook Template Generator", () => {
 
     // Put an invalid template name
     userEvent.type(
-      wrapper.getAllByRole("textbox").at(-1) as HTMLElement,
+      wrapper.getAllByRole("textbox").at(0) as HTMLElement,
       "Test.xlsx"
     );
     mockPost.mockReturnValue("pretendFileData");
@@ -469,6 +469,11 @@ describe("Workbook Template Generator", () => {
     );
     await new Promise(setImmediate);
 
-    expect(wrapper.getByRole("alert")).toBeInTheDocument();
+    // Error should be displayed on the page.
+    expect(
+      wrapper.getByText(
+        /please enter a valid filename\. only letters, numbers, spaces, hyphens, and underscores are allowed\./i
+      )
+    ).toBeInTheDocument();
   });
 });
