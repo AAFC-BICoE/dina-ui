@@ -1,9 +1,28 @@
 import { DinaForm } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
 import { AttachmentSection } from "../AttachmentSection";
 import { AttachmentsField } from "../AttachmentsField";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
+
+const TEST_METADATAS: PersistedResource<Metadata>[] = [
+  {
+    id: "1",
+    type: "metadata",
+    originalFilename: "test-file-1",
+    bucket: "bucket",
+    fileIdentifier: "111"
+  },
+  {
+    id: "2",
+    type: "metadata",
+    originalFilename: "test-file-2",
+    bucket: "bucket",
+    fileIdentifier: "222"
+  }
+];
 
 const mockBulkGet = jest.fn<any, any>(async (paths) => {
   if (paths.length === 0) {
@@ -36,7 +55,7 @@ describe("AttachmentsField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Adds the selected Metadatas to the array.", async () => {
-    const wrapper = mountWithAppContext(
+    const { container, getByRole } = mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -52,44 +71,60 @@ describe("AttachmentsField component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Initially empty:
-    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(0);
+    expect(container.querySelectorAll("tbody tr").length).toEqual(0);
 
     // Add some attachments:
-    wrapper.find("button.add-attachments").simulate("click");
+    const addButton = getByRole("button", { name: /add attachments/i });
+    fireEvent.click(addButton);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Simulate adding 2 metadatas:
-    wrapper.find(AttachmentSection).prop("afterMetadatasSaved")([
-      "added-1",
-      "added-2"
-    ]);
+    fireEvent.click(
+      screen.getByRole("tab", {
+        name: /attach existing objects/i
+      })
+    );
+    await new Promise(setImmediate);
+
+    // Simulate saving the attachments
+    fireEvent.click(
+      screen.getByRole("checkbox", {
+        name: /check all/i
+      })
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /attach selected/i
+      })
+    );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The Metadatas should have been added:
-    expect(wrapper.find("tbody tr").length).toEqual(2);
+    expect(container.querySelectorAll("tbody tr").length).toEqual(2);
 
-    wrapper.find("form").simulate("submit");
+    // Submit the form
+    const form = container.querySelector("form");
+    if (form) {
+      fireEvent.submit(form);
+    }
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(mockOnSubmit).lastCalledWith({
+    // Check the mockOnSubmit was called with the correct values
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       attachment: [
-        { id: "added-1", type: "metadata" },
-        { id: "added-2", type: "metadata" }
+        { id: "1", type: "metadata" },
+        { id: "2", type: "metadata" }
       ]
     });
   });
 
   it("Prevents duplicate attachments from being attached.", async () => {
-    const wrapper = mountWithAppContext(
+    const { container, getByRole } = mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -105,48 +140,90 @@ describe("AttachmentsField component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Initially empty:
-    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(0);
+    expect(container.querySelectorAll("tbody tr").length).toEqual(0);
 
     // Add some attachments:
-    wrapper.find("button.add-attachments").simulate("click");
+    const addButton = getByRole("button", { name: /add attachments/i });
+    fireEvent.click(addButton);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Simulate adding duplicates of 2 metadatas:
-    wrapper.find(AttachmentSection).prop("afterMetadatasSaved")([
-      "added-1",
-      "added-1",
-      "added-1",
-      "added-2",
-      "added-2",
-      "added-2"
-    ]);
+    fireEvent.click(
+      screen.getByRole("tab", {
+        name: /attach existing objects/i
+      })
+    );
+    await new Promise(setImmediate);
+
+    // Simulate saving the attachments
+    fireEvent.click(
+      screen.getByRole("checkbox", {
+        name: /check all/i
+      })
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /attach selected/i
+      })
+    );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // The 2 unique Metadatas should have been added:
-    expect(wrapper.find("tbody tr").length).toEqual(2);
-
-    wrapper.find("form").simulate("submit");
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /add attachments/i
+      })
+    );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(mockOnSubmit).lastCalledWith({
+    // Add metadatas again
+    fireEvent.click(
+      screen.getByRole("tab", {
+        name: /attach existing objects/i
+      })
+    );
+    await new Promise(setImmediate);
+
+    fireEvent.click(
+      screen.getByRole("checkbox", {
+        name: /check all/i
+      })
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /attach selected/i
+      })
+    );
+
+    await new Promise(setImmediate);
+
+    // The Metadatas should have been added:
+    expect(container.querySelectorAll("tbody tr").length).toEqual(2);
+
+    // Submit the form
+    const form = container.querySelector("form");
+    if (form) {
+      fireEvent.submit(form);
+    }
+
+    await new Promise(setImmediate);
+
+    // Check the mockOnSubmit was called with the correct values
+    expect(mockOnSubmit).toHaveBeenLastCalledWith({
       attachment: [
-        { id: "added-1", type: "metadata" },
-        { id: "added-2", type: "metadata" }
+        { id: "1", type: "metadata" },
+        { id: "2", type: "metadata" }
       ]
     });
   });
 
   it("Removes selected Metadatas from the array.", async () => {
-    const wrapper = mountWithAppContext(
+    const { container, getByRole } = mountWithAppContext2(
       <DinaForm
         initialValues={{
           attachment: [
@@ -167,40 +244,26 @@ describe("AttachmentsField component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Renders 2 rows initially:
-    expect(wrapper.find("tbody tr").length).toEqual(2);
+    expect(container.querySelectorAll("tbody tr").length).toEqual(2);
 
-    wrapper.find("button.remove-attachment").first().simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    wrapper.find("form").simulate("submit");
+    const removeButtons = screen.getAllByRole("button", { name: /remove/i });
+    fireEvent.click(removeButtons[0]);
 
     await new Promise(setImmediate);
-    wrapper.update();
+
+    expect(container.querySelectorAll("tbody tr").length).toEqual(1);
+
+    // Submit the form
+    const form = container.querySelector("form");
+    if (form) {
+      fireEvent.submit(form);
+    }
+
+    await new Promise(setImmediate);
 
     expect(mockOnSubmit).lastCalledWith({
       attachment: [{ id: "example-2", type: "metadata" }]
     });
   });
 });
-
-const TEST_METADATAS: PersistedResource<Metadata>[] = [
-  {
-    id: "1",
-    type: "metadata",
-    originalFilename: "test-file-1",
-    bucket: "bucket",
-    fileIdentifier: "111"
-  },
-  {
-    id: "2",
-    type: "metadata",
-    originalFilename: "test-file-2",
-    bucket: "bucket",
-    fileIdentifier: "222"
-  }
-];
