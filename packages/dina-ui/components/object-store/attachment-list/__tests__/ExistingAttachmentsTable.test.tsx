@@ -1,7 +1,9 @@
 import { FormikButton, ReactTable } from "common-ui";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { ExistingMetadataBulkEditor } from "../../../bulk-metadata/ExistingMetadataBulkEditor";
 import { ExistingAttachmentsTable } from "../ExistingAttachmentsTable";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockBulkGet = jest.fn(async (paths) => {
   if (paths.length === 0) {
@@ -76,7 +78,7 @@ describe("ExistingAttachmentsTable component", () => {
   });
 
   it("Renders the attachments in a table", async () => {
-    const wrapper = mountWithAppContext(
+    const { container } = mountWithAppContext2(
       <ExistingAttachmentsTable
         attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
         onDetachMetadataIds={mockOnDetachMetadataIds}
@@ -85,35 +87,13 @@ describe("ExistingAttachmentsTable component", () => {
       { apiContext }
     );
 
+    // Wait for the data to render in the ReactTable component.
     await new Promise(setImmediate);
-    wrapper.update();
+    const rows = container.querySelectorAll(".ReactTable tbody tr");
+    expect(rows).toHaveLength(2);
 
-    // Renders the data into ReactTable:
-    expect(wrapper.find(ReactTable).prop("data")).toEqual([
-      {
-        id: "00000000-0000-0000-0000-000000000000",
-        metadata: {
-          acMetadataCreator: {
-            displayName: "Mat Poff",
-            id: "00000000-0000-0000-0000-000000000000",
-            type: "agent"
-          },
-          id: "00000000-0000-0000-0000-000000000000",
-          originalFileName: "test-file-1.png",
-          type: "metadata"
-        },
-        type: "metadata"
-      },
-      {
-        id: "11111111-1111-1111-1111-111111111111",
-        metadata: {
-          id: "11111111-1111-1111-1111-111111111111",
-          originalFileName: "test-file-2.png",
-          type: "metadata"
-        },
-        type: "metadata"
-      }
-    ]);
+    expect(screen.getByAltText("test-file-1.png")).toBeInTheDocument();
+    expect(screen.getByAltText("test-file-2.png")).toBeInTheDocument();
   });
 
   it("Lets you bulk edit attachment Metadatas.", async () => {
