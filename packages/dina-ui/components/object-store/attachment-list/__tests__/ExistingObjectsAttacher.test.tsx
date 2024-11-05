@@ -1,7 +1,9 @@
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
 import { ExistingObjectsAttacher } from "../ExistingObjectsAttacher";
+import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
@@ -52,25 +54,29 @@ describe("ExistingObjectsAttacher component", () => {
   });
 
   it("Provides the callback with the existing Metadatas", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ExistingObjectsAttacher onMetadataIdsSubmitted={mockSubmit} />,
       { apiContext }
     );
 
     // Await Metadata table to load:
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Select all 3 metadatas to edit.
-    wrapper.find(".grouped-checkbox-header input").prop<any>("onClick")({
-      target: { checked: true }
-    });
-
-    wrapper.find("button.existing-objects-attach-button").simulate("click");
+    // Select all 3 metadatas to attach.
+    fireEvent.click(
+      screen.getByRole("checkbox", {
+        name: /check all/i
+      })
+    );
+    // click Attach button
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /attach selected/i
+      })
+    );
 
     // Await form submit:
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The 3 test Metadata IDs should have been submitted:
     expect(mockSubmit).lastCalledWith(TEST_METADATAS.map(({ id }) => id));
