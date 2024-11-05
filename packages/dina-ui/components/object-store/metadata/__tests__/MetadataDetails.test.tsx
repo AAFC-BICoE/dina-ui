@@ -4,7 +4,6 @@ import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataDetails } from "../MetadataDetails";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import exp from "constants";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2"],
