@@ -1,8 +1,8 @@
-import { FormikButton, ReactTable } from "common-ui";
+import { DinaForm, FormikButton, ReactTable } from "common-ui";
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { ExistingMetadataBulkEditor } from "../../../bulk-metadata/ExistingMetadataBulkEditor";
 import { ExistingAttachmentsTable } from "../ExistingAttachmentsTable";
-import { screen, waitFor, fireEvent } from "@testing-library/react";
+import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockBulkGet = jest.fn(async (paths) => {
@@ -56,15 +56,63 @@ const mockGet = jest.fn(async (path) => {
         }
       ]
     };
+  } else if (
+    path === "objectstore-api/metadata/11111111-1111-1111-1111-111111111111"
+  ) {
+    return {
+      data: {
+        id: "11111111-1111-1111-1111-111111111111",
+        dcType: "TEXT",
+        createdBy: "dina-admin",
+        createdOn: "2024-11-04T20:39:06.256239Z",
+        originalFileName: "test-file-2.png",
+        type: "metadata",
+        sha1Hex: "5bc8b250dea269fae9f4abab7ddec787aceff4c3",
+        receivedMediaType: "application/pdf",
+        detectedMediaType: "application/pdf",
+        detectedFileExtension: ".pdf",
+        evaluatedMediaType: "application/pdf",
+        evaluatedFileExtension: ".pdf",
+        sizeInBytes: 331053,
+        bucket: "aafc",
+        dateTimeDigitized: null,
+        exif: {},
+        isDerivative: false
+      }
+    };
   } else {
     return { data: [] };
   }
 });
 
-const mockSave = jest.fn();
+const mockSave = jest.fn(() => {
+  return [
+    {
+      id: "11111111-1111-1111-1111-111111111111",
+      dcType: "TEXT",
+      createdBy: "dina-admin",
+      createdOn: "2024-11-04T20:39:06.256239Z",
+      originalFileName: "test-file-2.png",
+      type: "metadata",
+      sha1Hex: "5bc8b250dea269fae9f4abab7ddec787aceff4c3",
+      receivedMediaType: "application/pdf",
+      detectedMediaType: "application/pdf",
+      detectedFileExtension: ".pdf",
+      evaluatedMediaType: "application/pdf",
+      evaluatedFileExtension: ".pdf",
+      sizeInBytes: 331053,
+      bucket: "aafc",
+      dateTimeDigitized: null,
+      exif: {},
+      isDerivative: false
+    }
+  ];
+});
 
 const apiContext: any = {
-  apiClient: { get: mockGet },
+  apiClient: {
+    get: mockGet
+  },
   bulkGet: mockBulkGet,
   save: mockSave
 };
@@ -97,29 +145,45 @@ describe("ExistingAttachmentsTable component", () => {
   });
 
   it("Lets you bulk edit attachment Metadatas.", async () => {
-    const wrapper = mountWithAppContext(
-      <ExistingAttachmentsTable
-        attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
-        onDetachMetadataIds={mockOnDetachMetadataIds}
-        onMetadatasEdited={mockOnMetadatasEdited}
-      />,
+    const wrapper = mountWithAppContext2(
+      <DinaForm initialValues={{}}>
+        <ExistingAttachmentsTable
+          attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
+          onDetachMetadataIds={mockOnDetachMetadataIds}
+          onMetadatasEdited={mockOnMetadatasEdited}
+        />
+      </DinaForm>,
       { apiContext }
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find(FormikButton).first().prop<any>("onClick")({
-      selectedMetadatas: { "11111111-1111-1111-1111-111111111111": true }
+    // Get row 2
+    const row = screen.getByRole("row", {
+      name: /select test\-file\-2\.png/i
     });
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Click row 2 checkbox
+    const checkbox = within(row).getByRole("checkbox", {
+      name: /select/i
+    });
+    fireEvent.click(checkbox);
 
-    // Renders the bulk editor with our prop passed in.
-    await wrapper.find(ExistingMetadataBulkEditor).prop<any>("onSaved")([
-      "11111111-1111-1111-1111-111111111111"
-    ]);
+    // Click bulk Edit button to bring up modal
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /edit selected attachment metadata/i
+      })
+    );
+    await new Promise(setImmediate);
+
+    // Click the Save All button in the modal
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /save all/i
+      })
+    );
+    await new Promise(setImmediate);
 
     // The bulk editor should call our mock:
     expect(mockOnMetadatasEdited).lastCalledWith([
@@ -128,7 +192,7 @@ describe("ExistingAttachmentsTable component", () => {
   });
 
   it("Lets you detach attachment Metadatas.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ExistingAttachmentsTable
         attachmentPath="collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
         onDetachMetadataIds={mockOnDetachMetadataIds}
@@ -138,14 +202,26 @@ describe("ExistingAttachmentsTable component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find(FormikButton).at(1).prop<any>("onClick")({
-      selectedMetadatas: { "00000000-0000-0000-0000-000000000000": true }
+    // Get row 1
+    const row = screen.getByRole("row", {
+      name: /select test\-file\-1\.png/i
     });
 
+    // Click row 1 checkbox
+    const checkbox = within(row).getByRole("checkbox", {
+      name: /select/i
+    });
+    fireEvent.click(checkbox);
+
+    // Click detach button
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /detach selected/i
+      })
+    );
+
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockOnDetachMetadataIds).lastCalledWith([
       "00000000-0000-0000-0000-000000000000"
