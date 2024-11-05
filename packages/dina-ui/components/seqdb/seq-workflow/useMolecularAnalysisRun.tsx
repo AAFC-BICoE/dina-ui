@@ -3,6 +3,7 @@ import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resou
 import { useState } from "react";
 import { filterBy, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRun";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -56,18 +57,21 @@ export interface UseMolecularAnalysisRunReturn {
 export function useMolecularAnalysisRun({
   seqBatchId
 }: UseMolecularAnalysisRunProps): UseMolecularAnalysisRunReturn {
-  const { bulkGet } = useApiClient();
+  const { bulkGet, apiClient } = useApiClient();
 
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);
   const [multipleRunWarning, setMultipleRunWarning] = useState<boolean>(false);
   const [sequencingRunName, setSequencingRunName] = useState<string>();
 
-  // Run Items and Storage Unit are included
+  // Sequencing run, contains the name.
+  const [sequencingRun, setSequencingRun] = useState<MolecularAnalysisRun>();
+
+  // Run Items
   const [sequencingRunItems, setSequencingRunItems] =
     useState<SequencingRunItem[]>();
 
-  // SeqReactions query.
+  // Network Requests, starting with the SeqReaction
   useQuery<SeqReaction[]>(
     {
       filter: filterBy([], {
@@ -95,8 +99,7 @@ export function useMolecularAnalysisRun({
           seqReaction: SeqReaction[]
         ): SequencingRunItem[] {
           return seqReaction.map<SequencingRunItem>((reaction) => ({
-            seqReaction: reaction,
-            molecularAnalysisRunItem: reaction.molecularAnalysisRunItem
+            seqReaction: reaction
           }));
         }
 
@@ -132,10 +135,90 @@ export function useMolecularAnalysisRun({
           });
         }
 
+        async function attachMolecularAnalyisRunItem(
+          sequencingRunItem: SequencingRunItem[]
+        ): Promise<SequencingRunItem[]> {
+          const molecularAnalyisRunItemQuery =
+            await bulkGet<MolecularAnalysisRunItem>(
+              sequencingRunItem
+                .filter(
+                  (item) => item?.seqReaction?.molecularAnalysisRunItem?.id
+                )
+                .map(
+                  (item) =>
+                    "/molecular-analysis-run-item/" +
+                    item?.seqReaction?.molecularAnalysisRunItem?.id +
+                    "?include=molecularAnalysisRun"
+                ),
+              { apiBaseUrl: "/seqdb-api" }
+            );
+
+          return sequencingRunItem.map((runItem) => {
+            const queryStorageUnitUsage = molecularAnalyisRunItemQuery.find(
+              (molecularRunItem) =>
+                molecularRunItem?.id ===
+                runItem?.seqReaction?.molecularAnalysisRunItem?.id
+            );
+
+            return {
+              ...runItem,
+              molecularAnalysisRunItem:
+                queryStorageUnitUsage as MolecularAnalysisRunItem
+            };
+          });
+        }
+
+        /**
+         * Go through each of the SeqReactions and retrieve the Molecular Analysis Run. There
+         * should only be one for a set of SeqReactions (1 for each SeqBatch).
+         *
+         * If multiple are found, the first found is returned and a warning will be displayed
+         * to the user.
+         */
+        async function findMolecularAnalysisRun(
+          sequencingRunItem: SequencingRunItem[]
+        ) {
+          if (
+            !sequencingRunItem.some(
+              (item) => item?.molecularAnalysisRunItem?.run?.id
+            )
+          ) {
+            // Nothing to attach.
+            return;
+          }
+
+          // Extract unique run IDs
+          const uniqueRunIds = new Set(
+            sequencingRunItem
+              .filter((item) => item?.molecularAnalysisRunItem?.run?.id)
+              .map((item) => item?.molecularAnalysisRunItem?.run?.id)
+          );
+          if (uniqueRunIds.size === 0) {
+            // Nothing to attach.
+            return;
+          }
+
+          // Multiple exist, display the warning.
+          if (uniqueRunIds.size > 1) {
+            setMultipleRunWarning(true);
+          }
+
+          const molecularAnalysisRunQuery =
+            await apiClient.get<MolecularAnalysisRun>(
+              "/seqdb-api/molecular-analysis-run/" + uniqueRunIds[0],
+              {}
+            );
+        }
+
+        // Chain it all together to create one object.
         const sequencingRunItemsFromReactions = attachSeqReaction(seqReactions);
+        const sequencingRunItemsWithMolecularRunItems =
+          await attachMolecularAnalyisRunItem(sequencingRunItemsFromReactions);
         const sequencingRunItemsWithStorage = await attachStorageUnitUsage(
-          sequencingRunItemsFromReactions
+          sequencingRunItemsWithMolecularRunItems
         );
+
+        await findMolecularAnalysisRun(sequencingRunItemsWithStorage);
         setSequencingRunItems(sequencingRunItemsWithStorage);
         setLoading(false);
       }
