@@ -6,7 +6,6 @@ import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
 import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { wrap } from "module";
 
 const INSTANCE_DATA = {
   data: {
