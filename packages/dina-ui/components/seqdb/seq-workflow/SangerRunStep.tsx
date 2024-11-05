@@ -32,10 +32,7 @@ export function SangerRunStep({
   // Display loading if network requests from hook are still loading in...
   if (loading) {
     return (
-      <div
-        className="d-flex align-items-center justify-content-center"
-        style={{ marginTop: "calc(50vh - 10px)" }}
-      >
+      <div className="d-flex align-items-center justify-content-center">
         <LoadingSpinner loading={true} />
       </div>
     );
