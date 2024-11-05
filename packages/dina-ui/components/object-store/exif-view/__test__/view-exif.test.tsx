@@ -1,6 +1,6 @@
 import { AccountContextI } from "common-ui";
 import { noop } from "lodash";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import { ExifView } from "../ExifView";
 
@@ -57,10 +57,10 @@ describe("View Exif page", () => {
 
   it("renders exif props when received file upload response", () => {
     const elm = <ExifView objectUpload={TEST_OBJECTUPLOAD} />;
-    const wrapper = mountWithAppContext(elm, {
+    const wrapper = mountWithAppContext2(elm, {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });
 
-    expect(wrapper.find(ExifView).debug()).toMatchSnapshot();
+    expect(wrapper.asFragment()).toMatchSnapshot();
   });
 });
