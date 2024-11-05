@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
-import { useEffect, useState } from "react";
+import { useMolecularAnalysisRun } from "./useMolecularAnalysisRun";
+import { LoadingSpinner } from "common-ui";
+import { Alert } from "react-bootstrap";
 
 export interface SangerRunStepProps {
   seqBatchId: string;
@@ -11,11 +13,37 @@ export interface SangerRunStepProps {
   setPerformSave: (newValue: boolean) => void;
 }
 
-export function SangerRunStep({ seqBatchId, editMode }: SangerRunStepProps) {
-  const [sequencingRunName, setSequencingRunName] = useState<string>();
+export function SangerRunStep({
+  seqBatchId,
+  editMode,
+  performSave
+}: SangerRunStepProps) {
+  const {
+    loading,
+    multipleRunWarning,
+    setSequencingRunName,
+    sequencingRunName
+  } = useMolecularAnalysisRun({
+    editMode,
+    performSave,
+    seqBatchId
+  });
+
+  // Display loading if network requests from hook are still loading in...
+  if (loading) {
+    return (
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ marginTop: "calc(50vh - 10px)" }}
+      >
+        <LoadingSpinner loading={true} />
+      </div>
+    );
+  }
 
   return (
     <>
+      {/* Worksheet Buttton */}
       {!editMode && (
         <div className="row">
           <div className="col-12 text-end">
@@ -27,6 +55,18 @@ export function SangerRunStep({ seqBatchId, editMode }: SangerRunStepProps) {
           </div>
         </div>
       )}
+
+      {/* Multiple Runs Exist Warning */}
+      {multipleRunWarning && (
+        <div className="row">
+          <Alert variant="warning" className="mb-0">
+            <Alert.Heading>Multiple runs exist for this SeqBatch</Alert.Heading>
+            <p>Only one run should exist per SeqBatch.</p>
+          </Alert>
+        </div>
+      )}
+
+      {/* Run Information */}
       <div className="row">
         <div className="col-4">
           <strong>Sequencing Run:</strong>
