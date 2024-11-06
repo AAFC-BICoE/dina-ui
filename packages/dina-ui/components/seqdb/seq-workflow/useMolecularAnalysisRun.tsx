@@ -207,11 +207,20 @@ export function useMolecularAnalysisRun({
             setMultipleRunWarning(true);
           }
 
-          const molecularAnalysisRunQuery =
-            await apiClient.get<MolecularAnalysisRun>(
-              "/seqdb-api/molecular-analysis-run/" + uniqueRunIds[0],
-              {}
-            );
+          const firstSequencingRun = sequencingRunItem.find(
+            (item) =>
+              item?.molecularAnalysisRunItem?.run?.id === [...uniqueRunIds][0]
+          )?.molecularAnalysisRunItem?.run;
+          if (firstSequencingRun) {
+            setSequencingRun(firstSequencingRun);
+            setSequencingRunName(firstSequencingRun.name);
+          }
+          // Might not be needed:
+          // const molecularAnalysisRunQuery =
+          //   await apiClient.get<MolecularAnalysisRun>(
+          //     "/seqdb-api/molecular-analysis-run/" + uniqueRunIds[0],
+          //     {}
+          //   );
         }
 
         // Chain it all together to create one object.

@@ -5,9 +5,13 @@ import { screen, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
 import {
+  MOLECULAR_ANALYIS_RUN_ITEM_1,
+  MOLECULAR_ANALYIS_RUN_ITEM_2,
+  MOLECULAR_ANALYIS_RUN_ITEM_3,
   MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_1,
   MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_2,
   MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_3,
+  SEQ_REACTIONS,
   SEQ_REACTIONS_MULTIPLE,
   STORAGE_UNIT_USAGE_1,
   STORAGE_UNIT_USAGE_2,
@@ -35,6 +39,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       switch (params.filter.rsql) {
         case "seqBatch.uuid==" + SEQ_BATCH_ID_MULTIPLE_RUNS:
           return SEQ_REACTIONS_MULTIPLE;
+        case "seqBatch.uuid==" + SEQ_BATCH_ID:
+          return SEQ_REACTIONS;
       }
   }
 });
@@ -42,13 +48,21 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 const mockBulkGet = jest.fn(async (paths) => {
   return paths.map((path: string) => {
     switch (path) {
-      // Molecular Analyis Run Item Requests
+      // Molecular Analyis Run Item Requests (Multiple Runs)
       case "/molecular-analysis-run-item/d21066cc-c4e3-4263-aeba-8e6bc6badb36?include=molecularAnalysisRun":
         return MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_1;
       case "/molecular-analysis-run-item/83d21135-51eb-4637-a202-e5b73f7a8ff9?include=molecularAnalysisRun":
         return MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_2;
       case "/molecular-analysis-run-item/9a836ab0-f0ae-4d6a-aa48-b386ea6af2cf?include=molecularAnalysisRun":
         return MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_3;
+
+      // Molecular Analyis Run Item Requests (Single Run)
+      case "/molecular-analysis-run-item/cd8c4d28-586a-45c0-8f27-63030aba07cf?include=molecularAnalysisRun":
+        return MOLECULAR_ANALYIS_RUN_ITEM_1;
+      case "/molecular-analysis-run-item/ce53527e-7794-4c37-91d8-28efff006a56?include=molecularAnalysisRun":
+        return MOLECULAR_ANALYIS_RUN_ITEM_2;
+      case "/molecular-analysis-run-item/16cf5f0e-24d4-4080-a476-2c97f0adc18e?include=molecularAnalysisRun":
+        return MOLECULAR_ANALYIS_RUN_ITEM_3;
 
       // Storage Unit Usage Requests
       case "/storage-unit-usage/0192fd01-90a6-75a2-a7a3-daf1a4718471":
@@ -91,6 +105,29 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
+  it("Display the sequencing run in the UI", async () => {
+    const wrapper = mountWithAppContext2(
+      <SangerRunStep
+        editMode={false}
+        performSave={false}
+        seqBatch={SEQ_BATCH}
+        seqBatchId={SEQ_BATCH_ID}
+        setEditMode={noop}
+        setPerformSave={noop}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Alert should not exist, since there is only one run.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+
+    // Run name should be in the textbox.
+    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+  });
+
   it("Multiple runs exist for one seq-batch, display warning to user", async () => {
     const wrapper = mountWithAppContext2(
       <SangerRunStep
@@ -109,5 +146,8 @@ describe("Sanger Run Step from Sanger Workflow", () => {
 
     // Alert should exist indicating that multiple runs exist.
     expect(wrapper.getByRole("alert")).toBeInTheDocument();
+
+    // Run name should be in the textbox for the first run found.
+    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
   });
 });
