@@ -386,7 +386,7 @@ export const MOLECULAR_ANALYIS_RUN_ITEM_3: MolecularAnalysisRunItem = {
 export const STORAGE_UNIT_USAGE_1: StorageUnitUsage = {
   id: "0192fd01-90a6-75a2-a7a3-daf1a4718471",
   type: "storage-unit-usage",
-  cellNumber: 0,
+  cellNumber: 1,
   wellColumn: 1,
   wellRow: "A"
 };
@@ -394,7 +394,7 @@ export const STORAGE_UNIT_USAGE_1: StorageUnitUsage = {
 export const STORAGE_UNIT_USAGE_2: StorageUnitUsage = {
   id: "0192fd01-90c2-7e45-95a2-a5614f68052f",
   type: "storage-unit-usage",
-  cellNumber: 1,
+  cellNumber: 2,
   wellColumn: 2,
   wellRow: "A"
 };
@@ -402,7 +402,7 @@ export const STORAGE_UNIT_USAGE_2: StorageUnitUsage = {
 export const STORAGE_UNIT_USAGE_3: StorageUnitUsage = {
   id: "0192fd01-9104-72fa-a18f-80d97da0c935",
   type: "storage-unit-usage",
-  cellNumber: 2,
+  cellNumber: 3,
   wellColumn: 3,
   wellRow: "A"
 };

@@ -148,6 +148,33 @@ describe("Sanger Run Step from Sanger Workflow", () => {
 
     // Run name should be in the textbox.
     expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+
+    // Ensure Primary IDs are rendered in the table with links:
+    expect(
+      wrapper.getByRole("link", { name: /sample1/i }).getAttribute("href")
+    ).toEqual(
+      "/collection/material-sample/view?id=f1275d16-10d2-415b-91b8-3cd9c44a77a5"
+    );
+    expect(
+      wrapper.getByRole("link", { name: /sample2/i }).getAttribute("href")
+    ).toEqual(
+      "/collection/material-sample/view?id=ddf3c366-55e9-4c2e-8e5f-ea2ed5831cbf"
+    );
+    expect(
+      wrapper.getByRole("link", { name: /sample3/i }).getAttribute("href")
+    ).toEqual(
+      "/collection/material-sample/view?id=2308d337-756d-4714-90bb-57698b6f5819"
+    );
+
+    // Ensure Tube Number is rendered:
+    expect(wrapper.getByRole("cell", { name: "1" })).toBeInTheDocument();
+    expect(wrapper.getByRole("cell", { name: "2" })).toBeInTheDocument();
+    expect(wrapper.getByRole("cell", { name: "3" })).toBeInTheDocument();
+
+    // Ensure Well Coordinates is rendered:
+    expect(wrapper.getByRole("cell", { name: "A1" })).toBeInTheDocument();
+    expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
+    expect(wrapper.getByRole("cell", { name: "A3" })).toBeInTheDocument();
   });
 
   it("Multiple runs exist for one seq-batch, display warning to user", async () => {

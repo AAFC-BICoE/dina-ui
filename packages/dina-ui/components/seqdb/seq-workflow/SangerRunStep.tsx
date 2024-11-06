@@ -1,8 +1,17 @@
 import Link from "next/link";
 import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
-import { useMolecularAnalysisRun } from "./useMolecularAnalysisRun";
-import { LoadingSpinner } from "common-ui";
+import {
+  SequencingRunItem,
+  useMolecularAnalysisRun
+} from "./useMolecularAnalysisRun";
+import {
+  FieldHeader,
+  LoadingSpinner,
+  ReactTable,
+  useStringComparator
+} from "common-ui";
 import { Alert } from "react-bootstrap";
+import { ColumnDef } from "@tanstack/react-table";
 
 export interface SangerRunStepProps {
   seqBatchId: string;
@@ -18,16 +27,92 @@ export function SangerRunStep({
   editMode,
   performSave
 }: SangerRunStepProps) {
+  const { compareByStringAndNumber } = useStringComparator();
+
   const {
     loading,
     multipleRunWarning,
     setSequencingRunName,
-    sequencingRunName
+    sequencingRunName,
+    sequencingRunItems
   } = useMolecularAnalysisRun({
     editMode,
     performSave,
     seqBatchId
   });
+
+  // Table columns to display for the sequencing run.
+  const COLUMNS: ColumnDef<SequencingRunItem>[] = [
+    {
+      id: "wellCoordinates",
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          !a.original?.storageUnitUsage ||
+          a.original?.storageUnitUsage?.wellRow === null ||
+          a.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+        const bString =
+          !b.original?.storageUnitUsage ||
+          b.original?.storageUnitUsage?.wellRow === null ||
+          b.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      }
+    },
+    {
+      id: "tubeNumber",
+      cell: ({ row: { original } }) =>
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
+    },
+    {
+      id: "materialSampleName",
+      cell: ({ row: { original } }) => {
+        const materialSampleName =
+          original?.materialSampleSummary?.materialSampleName;
+        return (
+          <Link
+            href={`/collection/material-sample/view?id=${original.materialSampleId}`}
+          >
+            <a>{materialSampleName || original.materialSampleId}</a>
+          </Link>
+        );
+      },
+      header: () => <FieldHeader name="materialSampleName" />,
+      accessorKey: "data.attributes.materialSampleName",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleName,
+          b?.original?.materialSampleName
+        ),
+      enableSorting: true
+    }
+  ];
 
   // Display loading if network requests from hook are still loading in...
   if (loading) {
@@ -78,6 +163,11 @@ export function SangerRunStep({
         </div>
         <div className="col-12">
           <strong>Sequencing Run Content:</strong>
+          <ReactTable<SequencingRunItem>
+            className="-striped"
+            columns={COLUMNS}
+            data={sequencingRunItems ?? []}
+          />
         </div>
       </div>
     </>
