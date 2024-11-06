@@ -1,23 +1,20 @@
 import { withRouter } from "next/router";
 import PageLayout from "../../components/page/PageLayout";
 import {
-  ColumnSelectorMemo,
+  GeneratorSelectorMemo,
   DinaForm,
   FieldWrapper,
   SubmitButton,
   TextField,
-  useApiClient
+  useApiClient,
+  GeneratorColumn
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Alert, Card, Spinner } from "react-bootstrap";
 import Select from "react-select";
 import { useMemo, useState } from "react";
-import {
-  DynamicFieldsMappingConfig,
-  TableColumn
-} from "common-ui/lib/list-page/types";
+import { DynamicFieldsMappingConfig } from "common-ui/lib/list-page/types";
 import { dynamicFieldMappingForMaterialSample } from "../collection/material-sample/list";
-import { KitsuResource } from "kitsu";
 import Link from "next/link";
 import { isEqual } from "lodash";
 import FieldMappingConfig from "../../components/workbook/utils/FieldMappingConfig";
@@ -44,7 +41,7 @@ const ENTITY_TYPES: EntityConfiguration[] = [
   }
 ];
 
-export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
+export function WorkbookTemplateGenerator() {
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
 
@@ -58,9 +55,9 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
   const [type, setType] = useState<EntityConfiguration>(ENTITY_TYPES[0]);
 
   // Columns selected for the generator
-  const [columnsToGenerate, setColumnsToGenerate] = useState<
-    TableColumn<TData>[]
-  >([]);
+  const [columnsToGenerate, setColumnsToGenerate] = useState<GeneratorColumn[]>(
+    []
+  );
 
   const entityTypes = ENTITY_TYPES.map((entityType) => ({
     label: formatMessage(entityType.name as any),
@@ -78,6 +75,19 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
     setLoading(true);
     setErrorMessage(undefined);
 
+    // Retrieve the filename.
+    const fileName = formik?.values?.name ?? "template";
+
+    // Ensure the filename provided is supported by Windows.
+    const validFilenameRegex = /^[a-zA-Z0-9\s\-_]+$/;
+    if (!validFilenameRegex.test(fileName)) {
+      setErrorMessage(
+        "Please enter a valid filename. Only letters, numbers, spaces, hyphens, and underscores are allowed."
+      );
+      setLoading(false);
+      return;
+    }
+
     const generateTemplateArg: any = {
       data: {
         type: "workbook-generation",
@@ -87,10 +97,10 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
             if ((col as any)?.managedAttribute?.name) {
               return (col as any)?.managedAttribute?.name;
             }
-            return col.id;
+            return col.columnValue;
           }),
-          aliases: columnsToGenerate.map((col) =>
-            col?.exportHeader ? col.exportHeader : col.id
+          aliases: columnsToGenerate.map<string>((col) =>
+            col?.columnAlias ? col.columnAlias : col.columnLabel
           )
         }
       }
@@ -118,19 +128,6 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
         }
       );
 
-      // Retrieve the filename.
-      const fileName = formik?.values?.name ?? "template";
-
-      // Ensure the filename provided is supported by Windows.
-      const validFilenameRegex = /^[a-zA-Z0-9\s\-_]+$/;
-      if (!validFilenameRegex.test(fileName)) {
-        setErrorMessage(
-          "Please enter a valid filename. Only letters, numbers, spaces, hyphens, and underscores are allowed."
-        );
-        setLoading(false);
-        return;
-      }
-
       // Download the data
       const url = window?.URL?.createObjectURL?.(
         workbookGenerationPostResponse?.data as any
@@ -140,7 +137,9 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
       link?.setAttribute("download", fileName + ".xlsx");
       document?.body?.appendChild(link);
       link?.click();
-      window?.URL?.revokeObjectURL(url ?? "");
+      if (typeof window !== "undefined" && window?.URL?.revokeObjectURL) {
+        window?.URL?.revokeObjectURL(url ?? "");
+      }
     } catch (error) {
       // Log the error for debugging
       console.error("Error generating workbook template:", error);
@@ -248,13 +247,10 @@ export function WorkbookTemplateGenerator<TData extends KitsuResource>() {
         </h4>
         <Card>
           <Card.Body>
-            <ColumnSelectorMemo
-              exportMode={true}
+            <GeneratorSelectorMemo
               generatorFields={newFieldOptions as FieldOptionType[]}
               displayedColumns={columnsToGenerate as any}
               setDisplayedColumns={setColumnsToGenerate as any}
-              indexMapping={[]}
-              uniqueName={type.uniqueName}
               dynamicFieldsMappingConfig={type.dynamicConfig}
               disabled={loading}
             />

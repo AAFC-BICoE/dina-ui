@@ -334,6 +334,39 @@ export function useColumnMapping() {
     }
   }
 
+  /**
+   * Using the original column header, determine the managed attribute if possible.
+   *
+   * @param originalColumnHeader must be in a path format.
+   * @returns managed attribute or undefined.
+   */
+  function findManagedAttributeMatchFromTemplate(
+    originalColumnHeader: string
+  ): PersistedResource<ManagedAttribute> | undefined {
+    const parts = originalColumnHeader.split(".");
+    if (parts.length === 0) {
+      // Not in the correct path format. Assuming not a managed attribute path.
+      return undefined;
+    }
+
+    // Last part is always the key for the managed attribute.
+    const key = parts.at(-1);
+    const path = parts.slice(0, -1).join(".");
+
+    const config = flattenedConfig[path];
+    if (!config) {
+      // Assuming not a managed attribute, could not find configuration.
+      return undefined;
+    }
+
+    return managedAttributes.find(
+      (managedAttribute) =>
+        managedAttribute.key === key &&
+        managedAttribute.managedAttributeComponent ===
+          config?.managedAttributeComponent
+    );
+  }
+
   async function resolveColumnMappingAndRelationshipMapping(
     columnHeader: WorkbookColumnInfo,
     fieldPath?: string
@@ -347,7 +380,27 @@ export function useColumnMapping() {
     const newWorkbookColumnMap: WorkbookColumnMap = {};
     const newRelationshipMapping: RelationshipMapping = {};
     if (fieldPath === undefined) {
-      if (
+      const templateManagedAttribute =
+        findManagedAttributeMatchFromTemplate(originalColumnHeader);
+      if (templateManagedAttribute) {
+        newWorkbookColumnMap[columnHeaderValue] = {
+          fieldPath:
+            originalColumnHeader?.split?.(".")?.slice?.(0, -1)?.join?.(".") ??
+            originalColumnHeader,
+          originalColumnName: originalColumnHeader,
+          showOnUI: true,
+          mapRelationship: false,
+          numOfUniqueValues: Object.keys(
+            columnUniqueValues?.[sheet]?.[columnHeaderValue] ?? {}
+          ).length,
+          valueMapping: {
+            columnHeader: {
+              id: templateManagedAttribute.id,
+              type: templateManagedAttribute.type
+            }
+          }
+        };
+      } else if (
         managedAttributes.findIndex(
           (item) =>
             item.name.toLowerCase().trim() ===
@@ -450,11 +503,14 @@ export function useColumnMapping() {
       const fieldPath = findMatchField(columnHeader, newFieldOptions);
       if (fieldPath === undefined) {
         // check if the columnHeaderValue is one of managedAttributes
-        const targetManagedAttr = managedAttributes.find(
-          (item) =>
-            item.name.toLowerCase().trim() ===
-            columnHeaderValue.toLowerCase().trim()
-        );
+        const targetManagedAttr =
+          findManagedAttributeMatchFromTemplate(columnHeaderValue) ??
+          managedAttributes.find(
+            (item) =>
+              item.name.toLowerCase().trim() ===
+              columnHeaderValue.toLowerCase().trim()
+          );
+
         // check if the columnHeaderValue is one of taxonomicRankss
         const targetTaxonomicRank = taxonomicRanks.find(
           (item) =>
