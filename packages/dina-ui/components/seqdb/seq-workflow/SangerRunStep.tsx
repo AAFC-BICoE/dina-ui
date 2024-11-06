@@ -25,6 +25,7 @@ export interface SangerRunStepProps {
 export function SangerRunStep({
   seqBatchId,
   editMode,
+  setEditMode,
   performSave
 }: SangerRunStepProps) {
   const { compareByStringAndNumber } = useStringComparator();
@@ -37,6 +38,7 @@ export function SangerRunStep({
     sequencingRunItems
   } = useMolecularAnalysisRun({
     editMode,
+    setEditMode,
     performSave,
     seqBatchId
   });

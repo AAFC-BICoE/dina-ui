@@ -1,9 +1,12 @@
 import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
 import { SangerRunStep } from "../SangerRunStep";
 import { noop } from "lodash";
-import { screen, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  screen,
+  waitFor,
+  waitForElementToBeRemoved
+} from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
 import {
   MATERIAL_SAMPLE_SUMMARY_1,
   MATERIAL_SAMPLE_SUMMARY_2,
@@ -17,27 +20,18 @@ import {
   PCR_BATCH_ITEM_1,
   PCR_BATCH_ITEM_2,
   PCR_BATCH_ITEM_3,
+  SEQ_BATCH,
+  SEQ_BATCH_ID,
+  SEQ_BATCH_ID_MULTIPLE_RUNS,
+  SEQ_BATCH_NO_RUNS,
   SEQ_REACTIONS,
   SEQ_REACTIONS_MULTIPLE,
+  SEQ_REACTIONS_NO_RUNS,
   STORAGE_UNIT_USAGE_1,
   STORAGE_UNIT_USAGE_2,
   STORAGE_UNIT_USAGE_3
 } from "../__mocks__/SangerRunStepMocks";
-
-const SEQ_BATCH_ID = "d107d371-79cc-4939-9fcc-990cb7089fa4";
-const SEQ_BATCH_ID_MULTIPLE_RUNS = "d8a276bd-48b3-4642-a4f6-a6eb974de1e9";
-
-const SEQ_BATCH: SeqBatch = {
-  isCompleted: false,
-  id: SEQ_BATCH_ID,
-  name: "Test-Seq-Batch",
-  type: "seq-batch",
-  sequencingType: "Sanger",
-  storageUnit: {
-    id: "0192fcdf-4274-742c-ad44-978f08532025",
-    type: "storage-unit"
-  }
-};
+import userEvent from "@testing-library/user-event";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
@@ -47,6 +41,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           return SEQ_REACTIONS_MULTIPLE;
         case "seqBatch.uuid==" + SEQ_BATCH_ID:
           return SEQ_REACTIONS;
+        case "seqBatch.uuid==" + SEQ_BATCH_NO_RUNS:
+          return SEQ_REACTIONS_NO_RUNS;
       }
   }
 });
@@ -97,6 +93,8 @@ const mockBulkGet = jest.fn(async (paths) => {
   });
 });
 
+const mockSetEditMode = jest.fn();
+
 const testCtx = {
   apiContext: {
     apiClient: {
@@ -121,7 +119,8 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         seqBatchId={SEQ_BATCH_ID}
         setEditMode={noop}
         setPerformSave={noop}
-      />
+      />,
+      testCtx
     );
 
     expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
@@ -134,7 +133,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         performSave={false}
         seqBatch={SEQ_BATCH}
         seqBatchId={SEQ_BATCH_ID}
-        setEditMode={noop}
+        setEditMode={mockSetEditMode}
         setPerformSave={noop}
       />,
       testCtx
@@ -175,6 +174,9 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(wrapper.getByRole("cell", { name: "A1" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A3" })).toBeInTheDocument();
+
+    // Set edit mode should not be triggered in this test.
+    expect(mockSetEditMode).toBeCalledTimes(0);
   });
 
   it("Multiple runs exist for one seq-batch, display warning to user", async () => {
@@ -184,7 +186,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         performSave={false}
         seqBatch={SEQ_BATCH}
         seqBatchId={SEQ_BATCH_ID_MULTIPLE_RUNS} // Use the SeqBatch ID with multiple runs
-        setEditMode={noop}
+        setEditMode={mockSetEditMode}
         setPerformSave={noop}
       />,
       testCtx
@@ -198,5 +200,50 @@ describe("Sanger Run Step from Sanger Workflow", () => {
 
     // Run name should be in the textbox for the first run found.
     expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+
+    // Set edit mode should not be triggered in this test.
+    expect(mockSetEditMode).toBeCalledTimes(0);
+  });
+
+  it("No run exists, automatically switch to edit mode.", async () => {
+    mountWithAppContext2(
+      <SangerRunStep
+        editMode={false}
+        performSave={false}
+        seqBatch={SEQ_BATCH}
+        seqBatchId={SEQ_BATCH_NO_RUNS}
+        setEditMode={mockSetEditMode}
+        setPerformSave={noop}
+      />,
+      testCtx
+    );
+
+    // Automatically go into edit mode if no sequencing runs exist.
+    await waitFor(() => {
+      expect(mockSetEditMode).toBeCalledWith(true);
+    });
+  });
+
+  it("No run exists, in edit mode, create a new run", async () => {
+    const wrapper = mountWithAppContext2(
+      <SangerRunStep
+        editMode={true}
+        performSave={false}
+        seqBatch={SEQ_BATCH}
+        seqBatchId={SEQ_BATCH_NO_RUNS}
+        setEditMode={mockSetEditMode}
+        setPerformSave={noop}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Expect the Sequencing run to be empty since no run exists yet.
+    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("");
+
+    // Type a name for the run to be created.
+    userEvent.type(wrapper.getByRole("textbox"), "My new run");
   });
 });

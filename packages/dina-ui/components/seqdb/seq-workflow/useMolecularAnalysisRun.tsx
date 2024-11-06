@@ -1,6 +1,6 @@
 import { PcrBatchItem, SeqReaction } from "packages/dina-ui/types/seqdb-api";
 import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { filterBy, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRun";
@@ -10,6 +10,7 @@ import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
   editMode: boolean;
+  setEditMode: (newValue: boolean) => void;
   performSave: boolean;
 }
 
@@ -68,7 +69,8 @@ export interface UseMolecularAnalysisRunReturn {
 }
 
 export function useMolecularAnalysisRun({
-  seqBatchId
+  seqBatchId,
+  setEditMode
 }: UseMolecularAnalysisRunProps): UseMolecularAnalysisRunReturn {
   const { bulkGet, apiClient } = useApiClient();
 
@@ -305,6 +307,16 @@ export function useMolecularAnalysisRun({
       }
     }
   );
+
+  // After loaded, check if we should automatically switch to edit mode.
+  useEffect(() => {
+    if (
+      loading === false &&
+      !sequencingRunItems?.some((item) => item.molecularAnalysisRunItemId)
+    ) {
+      setEditMode(true);
+    }
+  }, [sequencingRunItems, loading]);
 
   return {
     loading,

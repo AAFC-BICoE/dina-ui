@@ -1,7 +1,24 @@
 import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
+import { PcrBatchItem, SeqBatch } from "packages/dina-ui/types/seqdb-api";
 import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
+
+export const SEQ_BATCH_ID = "d107d371-79cc-4939-9fcc-990cb7089fa4";
+export const SEQ_BATCH_ID_MULTIPLE_RUNS =
+  "d8a276bd-48b3-4642-a4f6-a6eb974de1e9";
+export const SEQ_BATCH_NO_RUNS = "6a6878d1-a4de-4250-9833-d939dc76bee1";
+
+export const SEQ_BATCH: SeqBatch = {
+  isCompleted: false,
+  id: SEQ_BATCH_ID,
+  name: "Test-Seq-Batch",
+  type: "seq-batch",
+  sequencingType: "Sanger",
+  storageUnit: {
+    id: "0192fcdf-4274-742c-ad44-978f08532025",
+    type: "storage-unit"
+  }
+};
 
 export const SEQ_REACTIONS_MULTIPLE = {
   data: [
@@ -319,6 +336,124 @@ export const SEQ_REACTIONS = {
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z"
       }
+    }
+  ]
+};
+
+export const SEQ_REACTIONS_NO_RUNS = {
+  data: [
+    {
+      id: "1dae4ea0-e705-4d49-95c0-0a51dd047796",
+      type: "seq-reaction",
+      attributes: {
+        createdBy: "dina-admin",
+        createdOn: "2024-11-05T15:43:18.56218Z",
+        group: "aafc"
+      },
+      relationships: {
+        storageUnitUsage: {
+          data: {
+            id: "0192fd01-90a6-75a2-a7a3-daf1a4718471",
+            type: "storage-unit-usage"
+          }
+        },
+        pcrBatchItem: {
+          data: {
+            id: "7525c062-4af7-40de-ab16-e643241b215c",
+            type: "pcr-batch-item"
+          }
+        }
+      }
+    },
+    {
+      id: "55f2cee7-ebb9-44ac-9a2e-e7c8588567f9",
+      type: "seq-reaction",
+      attributes: {
+        createdBy: "dina-admin",
+        createdOn: "2024-11-05T15:43:18.56218Z",
+        group: "aafc"
+      },
+      relationships: {
+        storageUnitUsage: {
+          data: {
+            id: "0192fd01-90c2-7e45-95a2-a5614f68052f",
+            type: "storage-unit-usage"
+          }
+        },
+        pcrBatchItem: {
+          data: {
+            id: "1ec0b67d-4810-4422-87ef-b521a1c61ed7",
+            type: "pcr-batch-item"
+          }
+        }
+      }
+    },
+    {
+      id: "b5588dd1-ac88-4fd2-a484-2f467d9a6df5",
+      type: "seq-reaction",
+      attributes: {
+        createdBy: "dina-admin",
+        createdOn: "2024-11-05T15:43:18.56218Z",
+        group: "aafc"
+      },
+      relationships: {
+        storageUnitUsage: {
+          data: {
+            id: "0192fd01-9104-72fa-a18f-80d97da0c935",
+            type: "storage-unit-usage"
+          }
+        },
+        pcrBatchItem: {
+          data: {
+            id: "792114ca-86ad-46fe-807e-5a115d1a22d8",
+            type: "pcr-batch-item"
+          }
+        }
+      }
+    }
+  ],
+  included: [
+    {
+      id: "1ec0b67d-4810-4422-87ef-b521a1c61ed7",
+      type: "pcr-batch-item",
+      attributes: {
+        createdBy: "dina-admin",
+        createdOn: "2024-11-05T15:29:30.230786Z",
+        group: "aafc",
+        result: "Good Band"
+      }
+    },
+    {
+      id: "7525c062-4af7-40de-ab16-e643241b215c",
+      type: "pcr-batch-item",
+      attributes: {
+        createdBy: "dina-admin",
+        createdOn: "2024-11-05T15:29:30.230786Z",
+        group: "aafc",
+        result: "Good Band"
+      }
+    },
+    {
+      id: "792114ca-86ad-46fe-807e-5a115d1a22d8",
+      type: "pcr-batch-item",
+      attributes: {
+        createdBy: "dina-admin",
+        createdOn: "2024-11-05T15:29:30.230786Z",
+        group: "aafc",
+        result: "Good Band"
+      }
+    },
+    {
+      id: "0192fd01-90a6-75a2-a7a3-daf1a4718471",
+      type: "storage-unit-usage"
+    },
+    {
+      id: "0192fd01-90c2-7e45-95a2-a5614f68052f",
+      type: "storage-unit-usage"
+    },
+    {
+      id: "0192fd01-9104-72fa-a18f-80d97da0c935",
+      type: "storage-unit-usage"
     }
   ]
 };
