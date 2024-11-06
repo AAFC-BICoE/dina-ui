@@ -1,429 +1,456 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`View Exif page renders exif props when received file upload response 1`] = `
-"<ExifView objectUpload={{...}}>
-  <CollapsableSection collapserId=\\"c0f78fce-1825-4c4e-89c7-92fe0ed9dc73\\" title=\\"Exif Properties\\">
-    <div className=\\"mb-3\\">
+<DocumentFragment>
+  <div>
+    <div
+      class="mb-3"
+    >
       <h4>
         Exif Properties
-        <Collapser>
-          <button className=\\"collapser-button m-2 btn btn-secondary\\" onClick={[Function: onClick]} type=\\"button\\" title=\\"Collapser Button\\">
-            <i style={{...}} />
-          </button>
-        </Collapser>
+        <button
+          class="collapser-button m-2 btn btn-secondary"
+          title="Collapser Button"
+          type="button"
+        >
+          <i
+            style="border: solid black; border-width: 0px 3px 3px 0px; display: inline-block; padding: 5px; transform: rotate(-135deg);"
+          />
+        </button>
       </h4>
-      <KeyValueTable data={{...}}>
-        <ReactTable className=\\"-striped\\" highlightRow={false} columns={{...}} data={{...}} showPagination={false} manualPagination={true}>
-          <div data-testid=\\"ReactTable\\" className=\\"ReactTable -striped\\">
-            <table className=\\"w-100\\">
-              <thead>
-                <tr>
-                  <th colSpan={1} className=\\"-cursor-pointer\\" style={{...}} onClick={[Function (anonymous)]}>
-                    <div className=\\"-cursor-pointer select-none column-header\\">
-                      <span className=\\"d-flex align-items-center justify-content-center\\">
-                        <header table={{...}} header={{...}} column={{...}}>
-                          <FormattedMessage id=\\"attributeLabel\\">
-                            <FormattedMessage defaultMessage=\\" \\" id=\\"attributeLabel\\">
-                              Attribute
-                            </FormattedMessage>
-                          </FormattedMessage>
-                        </header>
+      <div
+        class="ReactTable -striped"
+        data-testid="ReactTable"
+      >
+        <table
+          class="w-100"
+        >
+          <thead>
+            <tr>
+              <th
+                class="-cursor-pointer"
+                colspan="1"
+                style="width: 200px;"
+              >
+                <div
+                  class="-cursor-pointer select-none column-header"
+                >
+                  <span
+                    class="d-flex align-items-center justify-content-center"
+                  >
+                    Attribute
+                  </span>
+                </div>
+              </th>
+              <th
+                class="-cursor-pointer"
+                colspan="1"
+                style="width: auto;"
+              >
+                <div
+                  class="-cursor-pointer select-none column-header"
+                >
+                  <span
+                    class="d-flex align-items-center justify-content-center"
+                  >
+                    Value
+                  </span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              class="index-0 -odd"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="date original created-field-header"
+                  >
+                    Date Original Created
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  2000, Jan 8
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-1 -even"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="shutter speed-field-header"
+                  >
+                    Shutter Speed
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  1/200
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-2 -odd"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="exposure-field-header"
+                  >
+                    Exposure
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  0.5
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-3 -even"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="compensation-field-header"
+                  >
+                    Compensation
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  -0.5
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-4 -odd"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="aperture-field-header"
+                  >
+                    Aperture
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  f/8
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-5 -even"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="frame rate-field-header"
+                  >
+                    Frame Rate
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  30fps
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-6 -odd"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="f-number-field-header"
+                  >
+                    F Number
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  f/2.8
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-7 -even"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="resolution-field-header"
+                  >
+                    Resolution
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  300dpi
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-8 -odd"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="self-time mode usage-field-header"
+                  >
+                    Self Time Mode Usage
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  10s
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-9 -even"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="camera model-field-header"
+                  >
+                    Camera Model
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  Canon EOS R5
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-10 -odd"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="orientation-field-header"
+                  >
+                    Orientation
+                    <span
+                      class="m-2"
+                    >
+                      <span>
+                        <img
+                          alt="Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8."
+                          aria-describedby="field_orientation_tooltip"
+                          src="/static/images/iconInformation.gif"
+                          tabindex="0"
+                        />
                       </span>
-                    </div>
-                  </th>
-                  <th colSpan={1} className=\\"-cursor-pointer\\" style={{...}} onClick={[Function (anonymous)]}>
-                    <div className=\\"-cursor-pointer select-none column-header\\">
-                      <span className=\\"d-flex align-items-center justify-content-center\\">
-                        <header table={{...}} header={{...}} column={{...}}>
-                          <FormattedMessage id=\\"valueLabel\\">
-                            <FormattedMessage defaultMessage=\\" \\" id=\\"valueLabel\\">
-                              Value
-                            </FormattedMessage>
-                          </FormattedMessage>
-                        </header>
-                      </span>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <DefaultRow row={{...}} className=\\"index-0 -odd\\" style={[undefined]}>
-                  <tr className=\\"index-0 -odd\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"date original created\\">
-                            <div className=\\"date original created-field-header\\">
-                              Date Original Created
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"2000, Jan 8\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            2000, Jan 8
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-1 -even\\" style={[undefined]}>
-                  <tr className=\\"index-1 -even\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"shutter speed\\">
-                            <div className=\\"shutter speed-field-header\\">
-                              Shutter Speed
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"1/200\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            1/200
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-2 -odd\\" style={[undefined]}>
-                  <tr className=\\"index-2 -odd\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"exposure\\">
-                            <div className=\\"exposure-field-header\\">
-                              Exposure
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"0.5\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            0.5
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-3 -even\\" style={[undefined]}>
-                  <tr className=\\"index-3 -even\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"compensation\\">
-                            <div className=\\"compensation-field-header\\">
-                              Compensation
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"-0.5\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            -0.5
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-4 -odd\\" style={[undefined]}>
-                  <tr className=\\"index-4 -odd\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"aperture\\">
-                            <div className=\\"aperture-field-header\\">
-                              Aperture
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"f/8\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            f/8
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-5 -even\\" style={[undefined]}>
-                  <tr className=\\"index-5 -even\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"frame rate\\">
-                            <div className=\\"frame rate-field-header\\">
-                              Frame Rate
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"30fps\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            30fps
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-6 -odd\\" style={[undefined]}>
-                  <tr className=\\"index-6 -odd\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"f-number\\">
-                            <div className=\\"f-number-field-header\\">
-                              F Number
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"f/2.8\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            f/2.8
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-7 -even\\" style={[undefined]}>
-                  <tr className=\\"index-7 -even\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"resolution\\">
-                            <div className=\\"resolution-field-header\\">
-                              Resolution
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"300dpi\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            300dpi
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-8 -odd\\" style={[undefined]}>
-                  <tr className=\\"index-8 -odd\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"self-time mode usage\\">
-                            <div className=\\"self-time mode usage-field-header\\">
-                              Self Time Mode Usage
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"10s\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            10s
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-9 -even\\" style={[undefined]}>
-                  <tr className=\\"index-9 -even\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"camera model\\">
-                            <div className=\\"camera model-field-header\\">
-                              Camera Model
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"Canon EOS R5\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            Canon EOS R5
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-10 -odd\\" style={[undefined]}>
-                  <tr className=\\"index-10 -odd\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"orientation\\">
-                            <div className=\\"orientation-field-header\\">
-                              Orientation
-                              <Tooltip id=\\"field_orientation_tooltip\\" directText={[undefined]} image={[undefined]} altImage={[undefined]} link={[undefined]} linkText={[undefined]}>
-                                <span className=\\"m-2\\">
-                                  <ForwardRef(Tooltip) id=\\"field_orientation_tooltip\\" overlay={{...}} placement=\\"top\\" trigger={{...}} zIndex={9001}>
-                                    <Trigger popupClassName=\\"\\" prefixCls=\\"rc-tooltip\\" popup={[Function: getPopupElement]} action={{...}} builtinPlacements={{...}} popupPlacement=\\"top\\" popupAlign={{...}} getPopupContainer={[undefined]} onPopupVisibleChange={[Function: noop]} afterPopupVisibleChange={[Function: noop]} popupTransitionName={[undefined]} popupAnimation={[undefined]} popupMotion={[undefined]} defaultPopupVisible={false} destroyPopupOnHide={false} autoDestroy={false} mouseLeaveDelay={0.1} popupStyle={{...}} mouseEnterDelay={0} zIndex={9001} getPopupClassNameFromAlign={[Function: returnEmptyString]} getDocument={[Function: returnDocument]} onPopupAlign={[Function: noop]} focusDelay={0} blurDelay={0.15} mask={false} maskClosable={true} showAction={{...}} hideAction={{...}}>
-                                      <span onContextMenu={[undefined]} onClick={[undefined]} onMouseDown={[undefined]} onTouchStart={[undefined]} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onFocus={[Function (anonymous)]} onBlur={[Function (anonymous)]}>
-                                        <img src=\\"/static/images/iconInformation.gif\\" alt=\\"Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8.\\" aria-describedby=\\"field_orientation_tooltip\\" tabIndex={0} />
-                                      </span>
-                                    </Trigger>
-                                  </ForwardRef(Tooltip)>
-                                </span>
-                              </Tooltip>
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"landscape\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            landscape
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-11 -even\\" style={[undefined]}>
-                  <tr className=\\"index-11 -even\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"metering mode\\">
-                            <div className=\\"metering mode-field-header\\">
-                              Metering Mode
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"evaluative\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            evaluative
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-12 -odd\\" style={[undefined]}>
-                  <tr className=\\"index-12 -odd\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"ISO speed information\\">
-                            <div className=\\"ISO speed information-field-header\\">
-                              ISO Speed Information
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"100\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            100
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-13 -even\\" style={[undefined]}>
-                  <tr className=\\"index-13 -even\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"pixel dimensions\\">
-                            <div className=\\"pixel dimensions-field-header\\">
-                              Pixel Dimensions
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"6720x4480\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            6720x4480
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-                <DefaultRow row={{...}} className=\\"index-14 -odd\\" style={[undefined]}>
-                  <tr className=\\"index-14 -odd\\" style={[undefined]}>
-                    <td className=\\"key-cell\\" style={[undefined]}>
-                      <attributeCell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <strong>
-                          <FieldHeader name=\\"copyright information\\">
-                            <div className=\\"copyright information-field-header\\">
-                              Copyright Information
-                            </div>
-                          </FieldHeader>
-                        </strong>
-                      </attributeCell>
-                    </td>
-                    <td className=\\"value-cell\\" style={[undefined]}>
-                      <cell table={{...}} column={{...}} row={{...}} cell={{...}} getValue={[Function: getValue]} renderValue={[Function: getRenderValue]}>
-                        <ReadOnlyValue value=\\"John Doe\\">
-                          <div className=\\"field-view\\" style={{...}}>
-                            John Doe
-                          </div>
-                        </ReadOnlyValue>
-                      </cell>
-                    </td>
-                  </tr>
-                </DefaultRow>
-              </tbody>
-            </table>
-          </div>
-        </ReactTable>
-      </KeyValueTable>
+                    </span>
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  landscape
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-11 -even"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="metering mode-field-header"
+                  >
+                    Metering Mode
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  evaluative
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-12 -odd"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="ISO speed information-field-header"
+                  >
+                    ISO Speed Information
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  100
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-13 -even"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="pixel dimensions-field-header"
+                  >
+                    Pixel Dimensions
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  6720x4480
+                </div>
+              </td>
+            </tr>
+            <tr
+              class="index-14 -odd"
+            >
+              <td
+                class="key-cell"
+              >
+                <strong>
+                  <div
+                    class="copyright information-field-header"
+                  >
+                    Copyright Information
+                  </div>
+                </strong>
+              </td>
+              <td
+                class="value-cell"
+              >
+                <div
+                  class="field-view"
+                  style="white-space: pre-wrap;"
+                >
+                  John Doe
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </CollapsableSection>
-</ExifView>"
+  </div>
+</DocumentFragment>
 `;

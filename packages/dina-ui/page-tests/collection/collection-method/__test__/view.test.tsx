@@ -1,6 +1,8 @@
 import CollectionMethodDetailsPage from "../../../../pages/collection/collection-method/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
+import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 /** Test collection-method with all fields defined. */
 const TEST_COLLECTION_METHOD: CollectionMethod = {
@@ -31,26 +33,24 @@ jest.mock("next/router", () => ({
 
 describe("CollectionMethod details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(<CollectionMethodDetailsPage />, {
+    const wrapper = mountWithAppContext2(<CollectionMethodDetailsPage />, {
       apiContext
     });
-
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("Render the CollectionMethod details", async () => {
-    const wrapper = mountWithAppContext(<CollectionMethodDetailsPage />, {
+    const wrapper = mountWithAppContext2(<CollectionMethodDetailsPage />, {
       apiContext
     });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
 
-    expect(wrapper.find(".name-field .field-view").text()).toEqual(
-      "test collection method"
-    );
+    expect(
+      wrapper.container.querySelector(".name-field .field-view")!.textContent
+    ).toEqual("test collection method");
   });
 });

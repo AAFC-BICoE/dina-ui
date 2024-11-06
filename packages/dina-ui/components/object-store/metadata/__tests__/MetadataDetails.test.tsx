@@ -1,7 +1,9 @@
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataDetails } from "../MetadataDetails";
+import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2"],
@@ -45,14 +47,27 @@ const apiContext: any = {
 
 describe("MetadataDetails component", () => {
   it("Renders the metadata details.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MetadataDetails metadata={TEST_METADATA} />,
       { apiContext }
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.text().includes("attr1 value")).toEqual(true);
+    expect(
+      screen.getByRole("img", {
+        name: /attr1 value/i
+      })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: /attr2 value/i
+      })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("cell", {
+        name: /cf99c285\-0353\-4fed\-a15d\-ac963e0514f3/i
+      })
+    ).toBeInTheDocument();
   });
 });

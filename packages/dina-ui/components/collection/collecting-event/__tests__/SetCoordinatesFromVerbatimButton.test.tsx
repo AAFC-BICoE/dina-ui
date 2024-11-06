@@ -1,12 +1,14 @@
 import { DinaForm, NumberField } from "common-ui";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { SetCoordinatesFromVerbatimButton } from "../SetCoordinatesFromVerbatimButton";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 describe("SetCoordinatesFromVerbatimButton component", () => {
   it("Sets the lat/lon from the verbatim fields.", async () => {
     const onClickCallback = jest.fn();
 
-    const wrapper = mountWithAppContext(
+    const { container } = mountWithAppContext2(
       <DinaForm
         initialValues={{
           verbatimLatitude: "45°32′25″N",
@@ -29,16 +31,23 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
       </DinaForm>
     );
 
-    wrapper.find("button").simulate("click");
+    // Simulate button click
+    const button = screen.getByRole("button", { name: /test button/i });
+    fireEvent.click(button);
 
-    wrapper.update();
+    // Wait for state updates
+    await new Promise(setImmediate);
 
-    expect(wrapper.find(".decimalLatitude-field input").prop("value")).toEqual(
-      45.540278
-    );
-    expect(wrapper.find(".decimalLongitude-field input").prop("value")).toEqual(
-      -129.675278
-    );
+    // Check values of decimal latitude and longitude
+    const latitudeInput = screen.getByRole("textbox", {
+      name: /decimal latitude/i
+    }) as HTMLInputElement;
+    const longitudeInput = screen.getByRole("textbox", {
+      name: /decimal longitude/i
+    }) as HTMLInputElement;
+
+    expect(latitudeInput.value).toEqual("45.540278");
+    expect(longitudeInput.value).toEqual("-129.675278");
 
     expect(onClickCallback).lastCalledWith({
       lat: "45.540278",

@@ -1,19 +1,21 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { GroupFieldView } from "../GroupFieldView";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 describe("GroupFieldView component.", () => {
   it("Renders the default group name without accessing the user API.", async () => {
-    const wrapper = mountWithAppContext(
+    const { getByText } = mountWithAppContext2(
       <DinaForm initialValues={{ group: "mygroup" }}>
         <GroupFieldView name="group" />
       </DinaForm>
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find(".group-field p").text()).toEqual("mygroup");
+    // Wait for the component to render the expected output
+    await waitFor(() => {
+      expect(getByText("mygroup")).toBeInTheDocument();
+    });
   });
 
   it("Renders the group name from the user API.", async () => {
@@ -26,7 +28,7 @@ describe("GroupFieldView component.", () => {
       ]
     }));
 
-    const wrapper = mountWithAppContext(
+    const { getByText } = mountWithAppContext2(
       <DinaForm initialValues={{ group: "mygroup" }}>
         <GroupFieldView name="group" />
       </DinaForm>,
@@ -37,9 +39,9 @@ describe("GroupFieldView component.", () => {
       }
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find(".group-field p").text()).toEqual("My Group");
+    // Wait for the component to render the expected output
+    await waitFor(() => {
+      expect(getByText("My Group")).toBeInTheDocument();
+    });
   });
 });
