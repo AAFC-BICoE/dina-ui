@@ -1,13 +1,14 @@
-import { FormikButton, useDinaFormContext } from "common-ui";
+import { FormikButton, Tooltip, useDinaFormContext } from "common-ui";
 import Coordinates from "coordinate-parser";
 import { FormikContextType } from "formik";
 import { get } from "lodash";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ReactNode, useState } from "react";
+import { SiConvertio } from "react-icons/si";
 
 export interface SetCoordinatesFromVerbatimButtonProps {
   /** Button content */
-  children: ReactNode;
+  buttonText: string;
   className?: string;
 
   sourceLatField: string;
@@ -27,7 +28,7 @@ export function SetCoordinatesFromVerbatimButton({
   targetLonField,
   onClick,
   className = "btn btn-info",
-  children
+  buttonText
 }: SetCoordinatesFromVerbatimButtonProps) {
   const { readOnly } = useDinaFormContext();
   const [error, setError] = useState<string>("");
@@ -77,15 +78,18 @@ export function SetCoordinatesFromVerbatimButton({
 
   // Don't render in read-only mode.
   return readOnly ? null : (
-    <FormikButton
-      onClick={doConversion}
-      className={className}
-      buttonProps={({ values }) => ({
-        disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
-      })}
-    >
-      {error && <div className="alert alert-danger">{error}</div>}
-      {children}
-    </FormikButton>
+    <div>
+      <FormikButton
+        onClick={doConversion}
+        className={className}
+        buttonProps={({ values }) => ({
+          disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
+        })}
+      >
+        {error && <div className="alert alert-danger">{error}</div>}
+        <SiConvertio />
+      </FormikButton>
+      <Tooltip directText={buttonText} />
+    </div>
   );
 }

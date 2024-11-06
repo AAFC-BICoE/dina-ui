@@ -23,16 +23,15 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
           targetLatField="decimalLatitude"
           targetLonField="decimalLongitude"
           onClick={onClickCallback}
-        >
-          Test Button
-        </SetCoordinatesFromVerbatimButton>
+          buttonText="Test Button"
+        />
         <NumberField name="decimalLatitude" />
         <NumberField name="decimalLongitude" />
       </DinaForm>
     );
 
     // Simulate button click
-    const button = screen.getByRole("button", { name: /test button/i });
+    const button = screen.getByRole("button");
     fireEvent.click(button);
 
     // Wait for state updates

@@ -2,10 +2,12 @@ import {
   FormikButton,
   OnFormikSubmit,
   toMeters,
+  Tooltip,
   useDinaFormContext
 } from "common-ui";
 import { get } from "lodash";
 import { CollectingEvent } from "../../../types/collection-api";
+import { SiConvertio } from "react-icons/si";
 
 export interface ParseVerbatimToRangeButtonProps {
   verbatimField: string;
@@ -34,11 +36,14 @@ export function ParseVerbatimToRangeButton({
   const { readOnly } = useDinaFormContext();
 
   return readOnly ? null : (
-    <FormikButton
-      className="btn btn-info mb-3 parse-verbatim-to-range-button"
-      onClick={convertToMinMax}
-    >
-      {buttonText}
-    </FormikButton>
+    <div className="mb-3">
+      <FormikButton
+        className="btn btn-info parse-verbatim-to-range-button"
+        onClick={convertToMinMax}
+      >
+        <SiConvertio />
+      </FormikButton>
+      <Tooltip directText={buttonText} />
+    </div>
   );
 }

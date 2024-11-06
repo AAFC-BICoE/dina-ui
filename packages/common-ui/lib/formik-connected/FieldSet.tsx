@@ -7,7 +7,7 @@ import { find } from "lodash";
 
 export interface FieldSetProps extends DinaFormSectionProps {
   /** fieldset title. */
-  legend: JSX.Element;
+  legend?: JSX.Element;
 
   className?: string;
   style?: CSSProperties;
