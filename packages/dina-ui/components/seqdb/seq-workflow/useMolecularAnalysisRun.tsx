@@ -4,6 +4,7 @@ import { useState } from "react";
 import { filterBy, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRun";
+import { PersistedResource } from "kitsu";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -16,8 +17,13 @@ export interface UseMolecularAnalysisRunProps {
  */
 export interface SequencingRunItem {
   seqReaction?: SeqReaction;
+  seqReactionId?: string;
+
   storageUnitUsage?: StorageUnitUsage;
+  storageUnitUsageId?: string;
+
   molecularAnalysisRunItem?: MolecularAnalysisRunItem;
+  molecularAnalysisRunItemId?: string;
 }
 
 export interface UseMolecularAnalysisRunReturn {
@@ -93,14 +99,50 @@ export function useMolecularAnalysisRun({
          * Takes an array of SeqReactions, then turns it into the SequencingRunItem which will be
          * used to generate more data.
          * @param seqReaction
-         * @returns
+         * @returns The initial structure of SequencingRunItem.
          */
         function attachSeqReaction(
-          seqReaction: SeqReaction[]
+          seqReaction: PersistedResource<SeqReaction>[]
         ): SequencingRunItem[] {
           return seqReaction.map<SequencingRunItem>((reaction) => ({
-            seqReaction: reaction
+            seqReaction: reaction,
+            molecularAnalysisRunItemId: (reaction as any)?.relationships
+              ?.molecularAnalysisRunItem?.data?.id,
+            storageUnitUsageId: (reaction as any)?.relationships
+              ?.storageUnitUsage?.data?.id,
+            pcrBatchItemId: (reaction as any)?.relationships?.pcrBatchItem?.data
+              ?.id
           }));
+        }
+
+        async function attachMolecularAnalyisRunItem(
+          sequencingRunItem: SequencingRunItem[]
+        ): Promise<SequencingRunItem[]> {
+          const molecularAnalyisRunItemQuery =
+            await bulkGet<MolecularAnalysisRunItem>(
+              sequencingRunItem
+                .filter((item) => item?.molecularAnalysisRunItemId)
+                .map(
+                  (item) =>
+                    "/molecular-analysis-run-item/" +
+                    item?.molecularAnalysisRunItemId +
+                    "?include=molecularAnalysisRun"
+                ),
+              { apiBaseUrl: "/seqdb-api" }
+            );
+
+          return sequencingRunItem.map((runItem) => {
+            const queryStorageUnitUsage = molecularAnalyisRunItemQuery.find(
+              (molecularRunItem) =>
+                molecularRunItem?.id === runItem?.molecularAnalysisRunItemId
+            );
+
+            return {
+              ...runItem,
+              molecularAnalysisRunItem:
+                queryStorageUnitUsage as MolecularAnalysisRunItem
+            };
+          });
         }
 
         /**
@@ -113,57 +155,19 @@ export function useMolecularAnalysisRun({
         ): Promise<SequencingRunItem[]> {
           const storageUnitUsageQuery = await bulkGet<StorageUnitUsage>(
             sequencingRunItem
-              .filter((item) => item?.seqReaction?.storageUnitUsage?.id)
-              .map(
-                (item) =>
-                  "/storage-unit-usage/" +
-                  item?.seqReaction?.storageUnitUsage?.id
-              ),
+              .filter((item) => item?.storageUnitUsageId)
+              .map((item) => "/storage-unit-usage/" + item?.storageUnitUsageId),
             { apiBaseUrl: "/collection-api" }
           );
 
           return sequencingRunItem.map((runItem) => {
             const queryStorageUnitUsage = storageUnitUsageQuery.find(
               (storageUnitUsage) =>
-                storageUnitUsage?.id ===
-                runItem?.seqReaction?.storageUnitUsage?.id
+                storageUnitUsage?.id === runItem?.storageUnitUsageId
             );
             return {
               ...runItem,
               storageUnitUsage: queryStorageUnitUsage as StorageUnitUsage
-            };
-          });
-        }
-
-        async function attachMolecularAnalyisRunItem(
-          sequencingRunItem: SequencingRunItem[]
-        ): Promise<SequencingRunItem[]> {
-          const molecularAnalyisRunItemQuery =
-            await bulkGet<MolecularAnalysisRunItem>(
-              sequencingRunItem
-                .filter(
-                  (item) => item?.seqReaction?.molecularAnalysisRunItem?.id
-                )
-                .map(
-                  (item) =>
-                    "/molecular-analysis-run-item/" +
-                    item?.seqReaction?.molecularAnalysisRunItem?.id +
-                    "?include=molecularAnalysisRun"
-                ),
-              { apiBaseUrl: "/seqdb-api" }
-            );
-
-          return sequencingRunItem.map((runItem) => {
-            const queryStorageUnitUsage = molecularAnalyisRunItemQuery.find(
-              (molecularRunItem) =>
-                molecularRunItem?.id ===
-                runItem?.seqReaction?.molecularAnalysisRunItem?.id
-            );
-
-            return {
-              ...runItem,
-              molecularAnalysisRunItem:
-                queryStorageUnitUsage as MolecularAnalysisRunItem
             };
           });
         }
