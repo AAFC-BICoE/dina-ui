@@ -1,10 +1,11 @@
-import { SeqReaction } from "packages/dina-ui/types/seqdb-api";
+import { PcrBatchItem, SeqReaction } from "packages/dina-ui/types/seqdb-api";
 import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
 import { useState } from "react";
 import { filterBy, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRun";
 import { PersistedResource } from "kitsu";
+import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -24,6 +25,12 @@ export interface SequencingRunItem {
 
   molecularAnalysisRunItem?: MolecularAnalysisRunItem;
   molecularAnalysisRunItemId?: string;
+
+  pcrBatchItem?: PcrBatchItem;
+  pcrBatchItemId?: string;
+
+  materialSampleSummary?: MaterialSampleSummary;
+  materialSampleId?: string;
 }
 
 export interface UseMolecularAnalysisRunReturn {
@@ -173,6 +180,65 @@ export function useMolecularAnalysisRun({
         }
 
         /**
+         * Fetch PcrBatchItem linked to each SeqReactions.
+         */
+        async function attachPcrBatchItem(
+          sequencingRunItem: SequencingRunItem[]
+        ): Promise<SequencingRunItem[]> {
+          const pcrBatchItemQuery = await bulkGet<PcrBatchItem>(
+            sequencingRunItem
+              .filter((item) => item?.pcrBatchItemId)
+              .map(
+                (item) =>
+                  "/pcr-batch-item/" +
+                  item?.pcrBatchItemId +
+                  "?include=materialSample"
+              ),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+
+          return sequencingRunItem.map((runItem) => {
+            const queryPcrBatchItem = pcrBatchItemQuery.find(
+              (pcrBatchItem) => pcrBatchItem?.id === runItem?.pcrBatchItemId
+            );
+            return {
+              ...runItem,
+              pcrBatchItem: queryPcrBatchItem as PcrBatchItem,
+              materialSampleId: queryPcrBatchItem?.materialSample?.id
+            };
+          });
+        }
+
+        /**
+         * Fetch MaterialSampleSummary from each PcrBatchItem.
+         */
+        async function attachMaterialSampleSummary(
+          sequencingRunItem: SequencingRunItem[]
+        ): Promise<SequencingRunItem[]> {
+          const materialSampleSummaryQuery =
+            await bulkGet<MaterialSampleSummary>(
+              sequencingRunItem
+                .filter((item) => item?.materialSampleId)
+                .map(
+                  (item) => "/material-sample-summary/" + item?.materialSampleId
+                ),
+              { apiBaseUrl: "/collection-api" }
+            );
+
+          return sequencingRunItem.map((runItem) => {
+            const queryMaterialSampleSummary = materialSampleSummaryQuery.find(
+              (materialSample) =>
+                materialSample?.id === runItem?.materialSampleId
+            );
+            return {
+              ...runItem,
+              materialSampleSummary:
+                queryMaterialSampleSummary as MaterialSampleSummary
+            };
+          });
+        }
+
+        /**
          * Go through each of the SeqReactions and retrieve the Molecular Analysis Run. There
          * should only be one for a set of SeqReactions (1 for each SeqBatch).
          *
@@ -215,24 +281,26 @@ export function useMolecularAnalysisRun({
             setSequencingRun(firstSequencingRun);
             setSequencingRunName(firstSequencingRun.name);
           }
-          // Might not be needed:
-          // const molecularAnalysisRunQuery =
-          //   await apiClient.get<MolecularAnalysisRun>(
-          //     "/seqdb-api/molecular-analysis-run/" + uniqueRunIds[0],
-          //     {}
-          //   );
         }
 
         // Chain it all together to create one object.
-        const sequencingRunItemsFromReactions = attachSeqReaction(seqReactions);
-        const sequencingRunItemsWithMolecularRunItems =
-          await attachMolecularAnalyisRunItem(sequencingRunItemsFromReactions);
-        const sequencingRunItemsWithStorage = await attachStorageUnitUsage(
-          sequencingRunItemsWithMolecularRunItems
+        let sequencingRunItemsChain = attachSeqReaction(seqReactions);
+        sequencingRunItemsChain = await attachMolecularAnalyisRunItem(
+          sequencingRunItemsChain
         );
+        sequencingRunItemsChain = await attachStorageUnitUsage(
+          sequencingRunItemsChain
+        );
+        sequencingRunItemsChain = await attachPcrBatchItem(
+          sequencingRunItemsChain
+        );
+        sequencingRunItemsChain = await attachMaterialSampleSummary(
+          sequencingRunItemsChain
+        );
+        await findMolecularAnalysisRun(sequencingRunItemsChain);
 
-        await findMolecularAnalysisRun(sequencingRunItemsWithStorage);
-        setSequencingRunItems(sequencingRunItemsWithStorage);
+        // All finished loading.
+        setSequencingRunItems(sequencingRunItemsChain);
         setLoading(false);
       }
     }

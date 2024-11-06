@@ -5,12 +5,18 @@ import { screen, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { SeqBatch } from "packages/dina-ui/types/seqdb-api";
 import {
+  MATERIAL_SAMPLE_SUMMARY_1,
+  MATERIAL_SAMPLE_SUMMARY_2,
+  MATERIAL_SAMPLE_SUMMARY_3,
   MOLECULAR_ANALYIS_RUN_ITEM_1,
   MOLECULAR_ANALYIS_RUN_ITEM_2,
   MOLECULAR_ANALYIS_RUN_ITEM_3,
   MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_1,
   MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_2,
   MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_3,
+  PCR_BATCH_ITEM_1,
+  PCR_BATCH_ITEM_2,
+  PCR_BATCH_ITEM_3,
   SEQ_REACTIONS,
   SEQ_REACTIONS_MULTIPLE,
   STORAGE_UNIT_USAGE_1,
@@ -71,6 +77,22 @@ const mockBulkGet = jest.fn(async (paths) => {
         return STORAGE_UNIT_USAGE_2;
       case "/storage-unit-usage/0192fd01-9104-72fa-a18f-80d97da0c935":
         return STORAGE_UNIT_USAGE_3;
+
+      // Pcr Batch Items
+      case "/pcr-batch-item/7525c062-4af7-40de-ab16-e643241b215c?include=materialSample":
+        return PCR_BATCH_ITEM_1;
+      case "/pcr-batch-item/1ec0b67d-4810-4422-87ef-b521a1c61ed7?include=materialSample":
+        return PCR_BATCH_ITEM_2;
+      case "/pcr-batch-item/792114ca-86ad-46fe-807e-5a115d1a22d8?include=materialSample":
+        return PCR_BATCH_ITEM_3;
+
+      // Material Sample Summary
+      case "/material-sample-summary/f1275d16-10d2-415b-91b8-3cd9c44a77a5":
+        return MATERIAL_SAMPLE_SUMMARY_1;
+      case "/material-sample-summary/ddf3c366-55e9-4c2e-8e5f-ea2ed5831cbf":
+        return MATERIAL_SAMPLE_SUMMARY_2;
+      case "/material-sample-summary/2308d337-756d-4714-90bb-57698b6f5819":
+        return MATERIAL_SAMPLE_SUMMARY_3;
     }
   });
 });
@@ -108,7 +130,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
   it("Display the sequencing run in the UI", async () => {
     const wrapper = mountWithAppContext2(
       <SangerRunStep
-        editMode={false}
+        editMode={true}
         performSave={false}
         seqBatch={SEQ_BATCH}
         seqBatchId={SEQ_BATCH_ID}
@@ -131,7 +153,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
   it("Multiple runs exist for one seq-batch, display warning to user", async () => {
     const wrapper = mountWithAppContext2(
       <SangerRunStep
-        editMode={false}
+        editMode={true}
         performSave={false}
         seqBatch={SEQ_BATCH}
         seqBatchId={SEQ_BATCH_ID_MULTIPLE_RUNS} // Use the SeqBatch ID with multiple runs

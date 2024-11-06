@@ -1,4 +1,6 @@
+import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
 import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
 
 export const SEQ_REACTIONS_MULTIPLE = {
@@ -403,4 +405,61 @@ export const STORAGE_UNIT_USAGE_3: StorageUnitUsage = {
   cellNumber: 2,
   wellColumn: 3,
   wellRow: "A"
+};
+
+export const PCR_BATCH_ITEM_1: PcrBatchItem = {
+  id: "7525c062-4af7-40de-ab16-e643241b215c",
+  type: "pcr-batch-item",
+  createdBy: "dina-admin",
+  createdOn: "2024-11-05T15:29:30.230786Z",
+  group: "aafc",
+  result: "Good Band",
+  materialSample: {
+    type: "material-sample",
+    id: "f1275d16-10d2-415b-91b8-3cd9c44a77a5"
+  }
+};
+
+export const PCR_BATCH_ITEM_2: PcrBatchItem = {
+  id: "1ec0b67d-4810-4422-87ef-b521a1c61ed7",
+  type: "pcr-batch-item",
+  createdBy: "dina-admin",
+  createdOn: "2024-11-05T15:29:30.230786Z",
+  group: "aafc",
+  result: "Good Band",
+  materialSample: {
+    type: "material-sample",
+    id: "ddf3c366-55e9-4c2e-8e5f-ea2ed5831cbf"
+  }
+};
+
+export const PCR_BATCH_ITEM_3: PcrBatchItem = {
+  id: "792114ca-86ad-46fe-807e-5a115d1a22d8",
+  type: "pcr-batch-item",
+  createdBy: "dina-admin",
+  createdOn: "2024-11-05T15:29:30.230786Z",
+  group: "aafc",
+  result: "Good Band",
+  materialSample: {
+    type: "material-sample",
+    id: "2308d337-756d-4714-90bb-57698b6f5819"
+  }
+};
+
+export const MATERIAL_SAMPLE_SUMMARY_1: MaterialSampleSummary = {
+  id: "f1275d16-10d2-415b-91b8-3cd9c44a77a5",
+  type: "material-sample-summary",
+  materialSampleName: "Sample1"
+};
+
+export const MATERIAL_SAMPLE_SUMMARY_2: MaterialSampleSummary = {
+  id: "ddf3c366-55e9-4c2e-8e5f-ea2ed5831cbf",
+  type: "material-sample-summary",
+  materialSampleName: "Sample2"
+};
+
+export const MATERIAL_SAMPLE_SUMMARY_3: MaterialSampleSummary = {
+  id: "2308d337-756d-4714-90bb-57698b6f5819",
+  type: "material-sample-summary",
+  materialSampleName: "Sample3"
 };
