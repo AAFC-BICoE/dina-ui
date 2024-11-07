@@ -9,6 +9,7 @@ import {
 } from "./seq-batch-select-coordinats-step/useSeqSelectCoordinatesControls";
 import { DraggableItemList } from "../container-grid/DraggableItemList";
 import { ContainerGrid } from "../container-grid/ContainerGrid";
+import { PersistedResource } from "kitsu";
 
 export interface SeqBatchSelectCoordinatesStepProps {
   seqBatchId: string;
@@ -17,6 +18,10 @@ export interface SeqBatchSelectCoordinatesStepProps {
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
+  onSaved: (
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<SeqBatch>
+  ) => Promise<void>;
 }
 
 export function SeqBatchSelectCoordinatesStep(
@@ -57,6 +62,9 @@ export function SeqBatchSelectCoordinatesStep(
       await gridSubmit();
       setPerformSave(false);
       setEditMode(false);
+
+      // Continue to the last step.
+      props.onSaved(3);
     }
 
     if (performSave) {

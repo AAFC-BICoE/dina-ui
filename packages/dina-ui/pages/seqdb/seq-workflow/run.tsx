@@ -182,6 +182,7 @@ export default function SangerWorkFlowSequencingRunPage() {
               setEditMode={setEditMode}
               performSave={performSave}
               setPerformSave={setPerformSave}
+              onSaved={onSaved}
             />
           )}
         </TabPanel>

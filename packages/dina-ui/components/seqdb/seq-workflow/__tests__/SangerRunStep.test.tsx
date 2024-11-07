@@ -206,6 +206,9 @@ describe("Sanger Run Step from Sanger Workflow", () => {
 
     // Alert should exist indicating that multiple runs exist.
     expect(wrapper.getByRole("alert")).toBeInTheDocument();
+    expect(
+      wrapper.getByText(/multiple runs exist for this sanger workflow\./i)
+    ).toBeInTheDocument();
 
     // Run name should be in the textbox for the first run found.
     expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");

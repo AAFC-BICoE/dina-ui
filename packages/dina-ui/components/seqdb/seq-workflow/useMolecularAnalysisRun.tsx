@@ -6,6 +6,7 @@ import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resource
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRun";
 import { PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -82,6 +83,7 @@ export function useMolecularAnalysisRun({
   setPerformSave
 }: UseMolecularAnalysisRunProps): UseMolecularAnalysisRunReturn {
   const { bulkGet, save } = useApiClient();
+  const { formatMessage } = useDinaIntl();
 
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);
@@ -403,9 +405,7 @@ export function useMolecularAnalysisRun({
     if (!sequencingRun?.id) {
       setPerformSave(false);
       setLoading(false);
-      setErrorMessage(
-        "Unexpected error occurred. Sequencing Run ID should be set at this point."
-      );
+      setErrorMessage(formatMessage("sangerRunStep_missingSequencingRunID"));
       return;
     }
 
@@ -441,7 +441,7 @@ export function useMolecularAnalysisRun({
         setPerformSave(false);
         setLoading(false);
         setErrorMessage(
-          "No sequence reactions to generate a sequence run items."
+          formatMessage("sangerRunStep_missingSequenceReactions")
         );
         return;
       }
@@ -450,9 +450,7 @@ export function useMolecularAnalysisRun({
       if (!sequencingRunName || sequencingRunName.length === 0) {
         setPerformSave(false);
         setLoading(false);
-        setErrorMessage(
-          "A sequencing run name must be provided in order to generate a sequence run."
-        );
+        setErrorMessage(formatMessage("sangerRunStep_invalidRunName"));
         return;
       }
 

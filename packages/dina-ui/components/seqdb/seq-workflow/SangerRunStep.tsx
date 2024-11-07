@@ -12,6 +12,7 @@ import {
 } from "common-ui";
 import { Alert } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export interface SangerRunStepProps {
   seqBatchId: string;
@@ -136,7 +137,7 @@ export function SangerRunStep({
           <div className="col-12 text-end">
             <Link href={`/seqdb/seq-workflow/worksheet?id=${seqBatchId}`}>
               <a target="_blank" className="btn btn-primary">
-                Worksheet
+                <DinaMessage id="worksheet" />
               </a>
             </Link>
           </div>
@@ -147,8 +148,12 @@ export function SangerRunStep({
       {multipleRunWarning && (
         <div className="row">
           <Alert variant="warning" className="mb-0">
-            <Alert.Heading>Multiple runs exist for this SeqBatch</Alert.Heading>
-            <p>Only one run should exist per SeqBatch.</p>
+            <Alert.Heading>
+              <DinaMessage id="sangerRunStep_multipleRunWarning_title" />
+            </Alert.Heading>
+            <p>
+              <DinaMessage id="sangerRunStep_multipleRunWarning_description" />
+            </p>
           </Alert>
         </div>
       )}
@@ -165,7 +170,9 @@ export function SangerRunStep({
       {/* Run Information */}
       <div className="row">
         <div className="col-4">
-          <strong>Sequencing Run:</strong>
+          <strong>
+            <DinaMessage id="sangerRunStep_sequencingRun" />
+          </strong>
           <input
             className="form-control"
             name="sequencingRunName"
@@ -176,7 +183,9 @@ export function SangerRunStep({
           />
         </div>
         <div className="col-12">
-          <strong>Sequencing Run Content:</strong>
+          <strong>
+            <DinaMessage id="sangerRunStep_sequencingRunContent" />
+          </strong>
           <ReactTable<SequencingRunItem>
             className="-striped"
             columns={COLUMNS}
