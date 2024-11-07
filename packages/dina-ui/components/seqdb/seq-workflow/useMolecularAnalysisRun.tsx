@@ -12,6 +12,7 @@ export interface UseMolecularAnalysisRunProps {
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
+  setPerformSave: (newValue: boolean) => void;
 }
 
 /**
@@ -70,7 +71,10 @@ export interface UseMolecularAnalysisRunReturn {
 
 export function useMolecularAnalysisRun({
   seqBatchId,
-  setEditMode
+  editMode,
+  setEditMode,
+  performSave,
+  setPerformSave
 }: UseMolecularAnalysisRunProps): UseMolecularAnalysisRunReturn {
   const { bulkGet, apiClient } = useApiClient();
 
@@ -312,11 +316,28 @@ export function useMolecularAnalysisRun({
   useEffect(() => {
     if (
       loading === false &&
-      !sequencingRunItems?.some((item) => item.molecularAnalysisRunItemId)
+      !sequencingRunItems?.some((item) => item.molecularAnalysisRunItemId) &&
+      !editMode
     ) {
       setEditMode(true);
     }
-  }, [sequencingRunItems, loading]);
+  }, [sequencingRunItems, loading, editMode]);
+
+  // Handle saving
+  useEffect(() => {
+    if (performSave && !loading && editMode) {
+      // Determine if a new run should be created or update the existing one.
+      if (sequencingRun) {
+        // Update the existing one.
+      } else {
+        // Create a new sequencing run.
+      }
+
+      // Go back to view mode.
+      setPerformSave(false);
+      setEditMode(false);
+    }
+  }, [performSave, loading]);
 
   return {
     loading,

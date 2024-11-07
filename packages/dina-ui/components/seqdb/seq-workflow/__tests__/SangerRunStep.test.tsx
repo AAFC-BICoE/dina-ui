@@ -1,5 +1,5 @@
 import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
-import { SangerRunStep } from "../SangerRunStep";
+import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
 import { noop } from "lodash";
 import {
   screen,
@@ -32,6 +32,7 @@ import {
   STORAGE_UNIT_USAGE_3
 } from "../__mocks__/SangerRunStepMocks";
 import userEvent from "@testing-library/user-event";
+import { useState, useEffect } from "react";
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
@@ -205,45 +206,54 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(mockSetEditMode).toBeCalledTimes(0);
   });
 
-  it("No run exists, automatically switch to edit mode.", async () => {
-    mountWithAppContext2(
-      <SangerRunStep
-        editMode={false}
-        performSave={false}
-        seqBatch={SEQ_BATCH}
-        seqBatchId={SEQ_BATCH_NO_RUNS}
-        setEditMode={mockSetEditMode}
-        setPerformSave={noop}
-      />,
-      testCtx
+  // Helper component for performing saving and editing.
+  function TestComponent(props: Partial<SangerRunStepProps>) {
+    const [editMode, setEditMode] = useState<boolean>(false);
+    const [performSave, setPerformSave] = useState<boolean>(false);
+
+    useEffect(() => {
+      mockSetEditMode(editMode);
+    }, [editMode]);
+
+    return (
+      <>
+        <p>Edit mode: {editMode ? "true" : "false"}</p>
+        <button onClick={() => setPerformSave(true)}>Save</button>
+
+        <SangerRunStep
+          editMode={editMode}
+          performSave={performSave}
+          seqBatch={SEQ_BATCH}
+          seqBatchId={SEQ_BATCH_NO_RUNS}
+          setEditMode={setEditMode}
+          setPerformSave={setPerformSave}
+          {...props}
+        />
+      </>
     );
+  }
+
+  it("No run exists, in edit mode, create a new run", async () => {
+    const wrapper = mountWithAppContext2(<TestComponent />, testCtx);
 
     // Automatically go into edit mode if no sequencing runs exist.
     await waitFor(() => {
       expect(mockSetEditMode).toBeCalledWith(true);
     });
-  });
-
-  it("No run exists, in edit mode, create a new run", async () => {
-    const wrapper = mountWithAppContext2(
-      <SangerRunStep
-        editMode={true}
-        performSave={false}
-        seqBatch={SEQ_BATCH}
-        seqBatchId={SEQ_BATCH_NO_RUNS}
-        setEditMode={mockSetEditMode}
-        setPerformSave={noop}
-      />,
-      testCtx
-    );
-
-    // Wait for loading to be finished.
-    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     // Expect the Sequencing run to be empty since no run exists yet.
     expect(wrapper.getByRole("textbox")).toHaveDisplayValue("");
 
     // Type a name for the run to be created.
     userEvent.type(wrapper.getByRole("textbox"), "My new run");
+
+    // Click the save button.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    // Wait for all saving actions to be performed.
+    // await waitFor(() => {
+    //   expect(mockSetEditMode).toHaveBeenLastCalledWith(false);
+    // });
+    // screen.logTestingPlaygroundURL();
   });
 });

@@ -26,7 +26,8 @@ export function SangerRunStep({
   seqBatchId,
   editMode,
   setEditMode,
-  performSave
+  performSave,
+  setPerformSave
 }: SangerRunStepProps) {
   const { compareByStringAndNumber } = useStringComparator();
 
@@ -40,6 +41,7 @@ export function SangerRunStep({
     editMode,
     setEditMode,
     performSave,
+    setPerformSave,
     seqBatchId
   });
 
