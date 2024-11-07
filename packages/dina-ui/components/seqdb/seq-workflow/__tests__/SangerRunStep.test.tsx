@@ -94,6 +94,13 @@ const mockBulkGet = jest.fn(async (paths) => {
   });
 });
 
+const mockSave = jest.fn((ops) =>
+  ops.map((op) => ({
+    ...op.resource,
+    id: op.resource.id ?? "123"
+  }))
+);
+
 const mockSetEditMode = jest.fn();
 
 const testCtx = {
@@ -104,7 +111,8 @@ const testCtx = {
         get: mockGet
       }
     },
-    bulkGet: mockBulkGet
+    bulkGet: mockBulkGet,
+    save: mockSave
   }
 } as any;
 
@@ -244,16 +252,97 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     // Expect the Sequencing run to be empty since no run exists yet.
     expect(wrapper.getByRole("textbox")).toHaveDisplayValue("");
 
+    // Try saving with no sequencing run name, it should report an error.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).toBeInTheDocument();
+    });
+    expect(
+      wrapper.getByText(
+        /a sequencing run name must be provided in order to generate a sequence run\./i
+      )
+    ).toBeInTheDocument();
+
     // Type a name for the run to be created.
     userEvent.type(wrapper.getByRole("textbox"), "My new run");
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
-    // Wait for all saving actions to be performed.
-    // await waitFor(() => {
-    //   expect(mockSetEditMode).toHaveBeenLastCalledWith(false);
-    // });
-    // screen.logTestingPlaygroundURL();
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // No errors should be present at this point.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+
+    // Ensure all API save requests are made correctly.
+    expect(mockSave.mock.calls).toEqual([
+      // Molecular Analysis Run
+      [
+        [
+          {
+            resource: {
+              name: "My new run",
+              type: "molecular-analysis-run"
+            },
+            type: "molecular-analysis-run"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Molecular Analysis Run Items
+      [
+        [
+          {
+            resource: {
+              relationships: {
+                run: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run"
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
+          },
+          {
+            resource: {
+              relationships: {
+                run: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run"
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
+          },
+          {
+            resource: {
+              relationships: {
+                run: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run"
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ]
+    ]);
   });
 });

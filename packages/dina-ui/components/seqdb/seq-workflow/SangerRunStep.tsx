@@ -33,6 +33,7 @@ export function SangerRunStep({
 
   const {
     loading,
+    errorMessage,
     multipleRunWarning,
     setSequencingRunName,
     sequencingRunName,
@@ -148,6 +149,15 @@ export function SangerRunStep({
           <Alert variant="warning" className="mb-0">
             <Alert.Heading>Multiple runs exist for this SeqBatch</Alert.Heading>
             <p>Only one run should exist per SeqBatch.</p>
+          </Alert>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {errorMessage && (
+        <div className="row">
+          <Alert variant="danger" className="mb-0">
+            <p>{errorMessage}</p>
           </Alert>
         </div>
       )}

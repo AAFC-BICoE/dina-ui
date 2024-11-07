@@ -1,7 +1,7 @@
 import { PcrBatchItem, SeqReaction } from "packages/dina-ui/types/seqdb-api";
 import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
 import { useEffect, useState } from "react";
-import { filterBy, useApiClient, useQuery } from "common-ui";
+import { filterBy, SaveArgs, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRun";
 import { PersistedResource } from "kitsu";
@@ -42,6 +42,11 @@ export interface UseMolecularAnalysisRunReturn {
   loading: boolean;
 
   /**
+   * Error message, undefined if no error has occurred.
+   */
+  errorMessage?: string;
+
+  /**
    * Only 1 MolecularAnalysisRun should be present for each SeqBatch, if multiple are found this
    * will return true and a warning can be displayed in the UI.
    */
@@ -76,10 +81,11 @@ export function useMolecularAnalysisRun({
   performSave,
   setPerformSave
 }: UseMolecularAnalysisRunProps): UseMolecularAnalysisRunReturn {
-  const { bulkGet, apiClient } = useApiClient();
+  const { bulkGet, save } = useApiClient();
 
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>();
   const [multipleRunWarning, setMultipleRunWarning] = useState<boolean>(false);
   const [sequencingRunName, setSequencingRunName] = useState<string>();
 
@@ -323,6 +329,71 @@ export function useMolecularAnalysisRun({
     }
   }, [sequencingRunItems, loading, editMode]);
 
+  async function createNewRun() {
+    setLoading(true);
+    setErrorMessage(undefined);
+
+    // There must be sequencingRunItems to generate.
+    if (!sequencingRunItems || sequencingRunItems.length === 0) {
+      setPerformSave(false);
+      setLoading(false);
+      setErrorMessage(
+        "No sequence reactions to generate a sequence run items."
+      );
+      return;
+    }
+
+    // Ensure the sequencing name is valid.
+    if (!sequencingRunName || sequencingRunName.length === 0) {
+      setPerformSave(false);
+      setLoading(false);
+      setErrorMessage(
+        "A sequencing run name must be provided in order to generate a sequence run."
+      );
+      return;
+    }
+
+    // Create a new molecular analysis run.
+    const molecularAnalysisRunSaveArg: SaveArgs<MolecularAnalysisRun>[] = [
+      {
+        type: "molecular-analysis-run",
+        resource: {
+          type: "molecular-analysis-run",
+          name: sequencingRunName
+        }
+      }
+    ];
+    const savedMolecularAnalysisRun = await save(molecularAnalysisRunSaveArg, {
+      apiBaseUrl: "/seqdb-api"
+    });
+
+    // Create a run item for each seq reaction.
+    const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+      sequencingRunItems.map(() => ({
+        type: "molecular-analysis-run-item",
+        resource: {
+          type: "molecular-analysis-run-item",
+          relationships: {
+            run: {
+              data: {
+                id: savedMolecularAnalysisRun[0].id,
+                type: "molecular-analysis-run"
+              }
+            }
+          }
+        } as any
+      }));
+    const savedMolecularAnalysisRunItem = await save(
+      molecularAnalysisRunItemSaveArgs,
+      { apiBaseUrl: "/seqdb-api" }
+    );
+
+    // Go back to view mode once completed.
+    setPerformSave(false);
+    setEditMode(false);
+    setLoading(false);
+  }
+
   // Handle saving
   useEffect(() => {
     if (performSave && !loading && editMode) {
@@ -330,17 +401,14 @@ export function useMolecularAnalysisRun({
       if (sequencingRun) {
         // Update the existing one.
       } else {
-        // Create a new sequencing run.
+        createNewRun();
       }
-
-      // Go back to view mode.
-      setPerformSave(false);
-      setEditMode(false);
     }
   }, [performSave, loading]);
 
   return {
     loading,
+    errorMessage,
     multipleRunWarning,
     sequencingRunName,
     setSequencingRunName,
