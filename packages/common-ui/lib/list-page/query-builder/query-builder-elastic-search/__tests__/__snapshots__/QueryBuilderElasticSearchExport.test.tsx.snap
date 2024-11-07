@@ -1895,13 +1895,15 @@ Array [
     },
     "id": "01918f22-13a4-7f6d-894e-974bc1e14d23",
     "included": Object {
-      "projects": Object {
-        "attributes": Object {
-          "name": "Project A",
+      "projects": Array [
+        Object {
+          "attributes": Object {
+            "name": "Project A",
+          },
+          "id": "01919485-ed65-7a79-9080-91445b897ef4",
+          "type": "project",
         },
-        "id": "01919485-ed65-7a79-9080-91445b897ef4",
-        "type": "project",
-      },
+      ],
     },
     "type": "material-sample",
   },
