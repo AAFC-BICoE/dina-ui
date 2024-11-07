@@ -125,6 +125,7 @@ export function useMolecularAnalysisRun({
         ): SequencingRunItem[] {
           return seqReaction.map<SequencingRunItem>((reaction) => ({
             seqReaction: reaction,
+            seqReactionId: reaction.id,
             molecularAnalysisRunItemId: (reaction as any)?.relationships
               ?.molecularAnalysisRunItem?.data?.id,
             storageUnitUsageId: (reaction as any)?.relationships
@@ -330,26 +331,7 @@ export function useMolecularAnalysisRun({
   }, [sequencingRunItems, loading, editMode]);
 
   async function createNewRun() {
-    setLoading(true);
-    setErrorMessage(undefined);
-
-    // There must be sequencingRunItems to generate.
     if (!sequencingRunItems || sequencingRunItems.length === 0) {
-      setPerformSave(false);
-      setLoading(false);
-      setErrorMessage(
-        "No sequence reactions to generate a sequence run items."
-      );
-      return;
-    }
-
-    // Ensure the sequencing name is valid.
-    if (!sequencingRunName || sequencingRunName.length === 0) {
-      setPerformSave(false);
-      setLoading(false);
-      setErrorMessage(
-        "A sequencing run name must be provided in order to generate a sequence run."
-      );
       return;
     }
 
@@ -388,6 +370,60 @@ export function useMolecularAnalysisRun({
       { apiBaseUrl: "/seqdb-api" }
     );
 
+    // Update the existing seq-reactions.
+    const seqReactionSaveArgs: SaveArgs<SeqReaction>[] = sequencingRunItems.map(
+      (item, index) => ({
+        type: "seq-reaction",
+        resource: {
+          type: "seq-reaction",
+          id: item.seqReactionId,
+          relationships: {
+            molecularAnalysisRunItem: {
+              data: {
+                id: savedMolecularAnalysisRunItem[index].id,
+                type: "molecular-analysis-run-item"
+              }
+            }
+          }
+        }
+      })
+    );
+    const savedSeqReaction = await save(seqReactionSaveArgs, {
+      apiBaseUrl: "/seqdb-api"
+    });
+
+    // Go back to view mode once completed.
+    setPerformSave(false);
+    setEditMode(false);
+    setLoading(false);
+  }
+
+  async function updateSequencingName() {
+    // Sequencing run needs an id to update.
+    if (!sequencingRun?.id) {
+      setPerformSave(false);
+      setLoading(false);
+      setErrorMessage(
+        "Unexpected error occurred. Sequencing Run ID should be set at this point."
+      );
+      return;
+    }
+
+    // Update the existing molecular analysis run.
+    const molecularAnalysisRunSaveArg: SaveArgs<MolecularAnalysisRun>[] = [
+      {
+        type: "molecular-analysis-run",
+        resource: {
+          id: sequencingRun.id,
+          type: "molecular-analysis-run",
+          name: sequencingRunName
+        }
+      }
+    ];
+    const savedMolecularAnalysisRun = await save(molecularAnalysisRunSaveArg, {
+      apiBaseUrl: "/seqdb-api"
+    });
+
     // Go back to view mode once completed.
     setPerformSave(false);
     setEditMode(false);
@@ -397,9 +433,32 @@ export function useMolecularAnalysisRun({
   // Handle saving
   useEffect(() => {
     if (performSave && !loading && editMode) {
+      setLoading(true);
+      setErrorMessage(undefined);
+
+      // There must be sequencingRunItems to generate.
+      if (!sequencingRunItems || sequencingRunItems.length === 0) {
+        setPerformSave(false);
+        setLoading(false);
+        setErrorMessage(
+          "No sequence reactions to generate a sequence run items."
+        );
+        return;
+      }
+
+      // Ensure the sequencing name is valid.
+      if (!sequencingRunName || sequencingRunName.length === 0) {
+        setPerformSave(false);
+        setLoading(false);
+        setErrorMessage(
+          "A sequencing run name must be provided in order to generate a sequence run."
+        );
+        return;
+      }
+
       // Determine if a new run should be created or update the existing one.
       if (sequencingRun) {
-        // Update the existing one.
+        updateSequencingName();
       } else {
         createNewRun();
       }

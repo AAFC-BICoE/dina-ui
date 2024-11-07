@@ -227,6 +227,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
       <>
         <p>Edit mode: {editMode ? "true" : "false"}</p>
         <button onClick={() => setPerformSave(true)}>Save</button>
+        <button onClick={() => setEditMode(true)}>Edit</button>
 
         <SangerRunStep
           editMode={editMode}
@@ -337,6 +338,113 @@ describe("Sanger Run Step from Sanger Workflow", () => {
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Seq Reaction Update
+      [
+        [
+          {
+            resource: {
+              id: "1dae4ea0-e705-4d49-95c0-0a51dd047796",
+              relationships: {
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              },
+              type: "seq-reaction"
+            },
+            type: "seq-reaction"
+          },
+          {
+            resource: {
+              id: "55f2cee7-ebb9-44ac-9a2e-e7c8588567f9",
+              relationships: {
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              },
+              type: "seq-reaction"
+            },
+            type: "seq-reaction"
+          },
+          {
+            resource: {
+              id: "b5588dd1-ac88-4fd2-a484-2f467d9a6df5",
+              relationships: {
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              },
+              type: "seq-reaction"
+            },
+            type: "seq-reaction"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Run exists, in edit mode, update the existing run", async () => {
+    const wrapper = mountWithAppContext2(
+      <TestComponent seqBatchId={SEQ_BATCH_ID} />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Change the sequencing run name to something different.
+    userEvent.clear(wrapper.getByRole("textbox"));
+    userEvent.type(wrapper.getByRole("textbox"), "Updated run name");
+
+    // Click the save button.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // No errors should be present at this point.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Name should have not changed from edit mode true to false.
+    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("Updated run name");
+
+    // Expect the network request to only contain the update of the run.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
+              name: "Updated run name",
+              type: "molecular-analysis-run"
+            },
+            type: "molecular-analysis-run"
           }
         ],
         {
