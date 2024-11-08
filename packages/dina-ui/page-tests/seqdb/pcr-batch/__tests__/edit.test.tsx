@@ -1,7 +1,10 @@
+import { waitFor, fireEvent } from "@testing-library/react";
 import { PersistedResource } from "kitsu";
 import { PcrBatchForm } from "../../../../pages/seqdb/pcr-batch/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PcrBatch, PcrPrimer } from "../../../../types/seqdb-api";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 // UUID test data:
 const PCR_BATCH_UUID = "91a4b3ba-b8e6-4178-953d-79d12f75bcd7";
@@ -41,10 +44,16 @@ const TEST_PCRBATCH: PersistedResource<PcrBatch> = {
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
+    case "agent-api/person":
+      return {
+        data: [
+          { id: AGENT_1_UUID, type: "person", displayName: "person 1" },
+          { id: AGENT_2_UUID, type: "person", displayName: "person 2" }
+        ]
+      };
     case "seqdb-api/pcr-batch/" + PCR_BATCH_UUID:
       return { data: TEST_PCRBATCH };
     case "user-api/group":
-    case "agent-api/person":
     case "seqdb-api/region":
     case "seqdb-api/pcr-primer":
     case "seqdb-api/pcr-batch-item":
@@ -123,82 +132,80 @@ describe("PcrBatch edit page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Adds a new pcr batch", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <PcrBatchForm onSaved={mockOnSaved} />,
       { apiContext }
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "test new batch" } });
+    // Change textbox value to "test new batch"
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: { value: "test new batch" }
+    });
 
-    wrapper.find(".experimenters-field ResourceSelect").prop<any>("onChange")([
-      {
-        id: AGENT_1_UUID,
-        type: "person"
-      },
-      {
-        id: AGENT_2_UUID,
-        type: "person"
-      }
-    ]);
+    // Select person 1 from Experimenters Combo Box
+    userEvent.click(wrapper.getByRole("combobox", { name: /experimenters/i }));
+    userEvent.click(wrapper.getByRole("option", { name: /person 1/i }));
+    // Select person 2 from Experimenters Combo Box
+    userEvent.click(
+      wrapper.getByRole("combobox", { name: /experimenters person 1/i })
+    );
+    userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("form").simulate("submit");
+    // Submit Form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            createdBy: "test-user",
-            name: "test new batch",
-            type: "pcr-batch",
-            // Storage Unit / Storage Unit type are always set for each request.
-            storageUnit: {
-              id: null,
-              type: "storage-unit"
-            },
-            relationships: {
-              experimenters: {
-                data: [
-                  { id: AGENT_1_UUID, type: "person" },
-                  { id: AGENT_2_UUID, type: "person" }
-                ]
+    // Test for expected API Response
+    await waitFor(() =>
+      expect(mockSave).toHaveBeenCalledWith(
+        [
+          {
+            resource: {
+              createdBy: "test-user",
+              name: "test new batch",
+              type: "pcr-batch",
+              // Storage Unit / Storage Unit type are always set for each request.
+              storageUnit: {
+                id: null,
+                type: "storage-unit"
               },
-              attachment: {
-                data: []
+              relationships: {
+                experimenters: {
+                  data: [
+                    { id: AGENT_1_UUID, type: "person" },
+                    { id: AGENT_2_UUID, type: "person" }
+                  ]
+                },
+                attachment: {
+                  data: []
+                }
               }
-            }
-          },
-          type: "pcr-batch"
-        }
-      ],
-      { apiBaseUrl: "/seqdb-api" }
+            },
+            type: "pcr-batch"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      )
     );
   });
 
   it("Edits an existing PCR Batch", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <PcrBatchForm pcrBatch={TEST_PCRBATCH} onSaved={mockOnSaved} />,
       { apiContext }
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("form").simulate("submit");
+    // Submit Form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test for expected API Response
     expect(mockSave).lastCalledWith(
       [
         {
@@ -242,28 +249,33 @@ describe("PcrBatch edit page", () => {
   });
 
   it("Create a PcrBatch with a storage unit type", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <PcrBatchForm onSaved={mockOnSaved} />,
       { apiContext }
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "test new batch" } });
+    // Change textbox value to "test new batch"
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: { value: "test new batch" }
+    });
 
     // Select a storage unit type.
-    wrapper.find(".storageUnitType-field ResourceSelect").prop<any>("onChange")(
-      { id: STORAGE_UNIT_TYPE_UUID, type: "storage-unit-type" }
+    userEvent.click(
+      wrapper.getByRole("combobox", {
+        name: /storage unit type type here to search\./i
+      })
     );
+    await new Promise(setImmediate);
+    userEvent.click(wrapper.getByRole("option", { name: /undefined/i }));
 
-    wrapper.find("form").simulate("submit");
+    // Submit Form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test for expected API Response
     expect(mockSave).lastCalledWith(
       [
         {
@@ -289,40 +301,42 @@ describe("PcrBatch edit page", () => {
   });
 
   it("Create a PcrBatch with a storage unit", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <PcrBatchForm onSaved={mockOnSaved} />,
       { apiContext }
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "test new batch" } });
-
-    // Select a storage unit type.
-    wrapper.find(".storageUnitType-field ResourceSelect").prop<any>("onChange")(
-      { id: STORAGE_UNIT_TYPE_UUID, type: "storage-unit-type" }
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Select a storage unit.
-    wrapper.find(".storageUnit-field ResourceSelect").prop<any>("onChange")({
-      id: STORAGE_UNIT_UUID,
-      type: "storage-unit"
+    // Change textbox value to "test new batch"
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: { value: "test new batch" }
     });
 
+    // Select a storage unit type.
+    userEvent.click(
+      wrapper.getByRole("combobox", {
+        name: /storage unit type type here to search\./i
+      })
+    );
     await new Promise(setImmediate);
-    wrapper.update();
-
-    wrapper.find("form").simulate("submit");
+    userEvent.click(wrapper.getByRole("option", { name: /undefined/i }));
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Select a storage unit.
+    userEvent.click(wrapper.getByText(/<none>/i));
+    await new Promise(setImmediate);
+    userEvent.click(wrapper.getByRole("option", { name: "" }));
+
+    await new Promise(setImmediate);
+
+    // Submit Form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await new Promise(setImmediate);
+
+    // Test expected API Response
     expect(mockSave).lastCalledWith(
       [
         {

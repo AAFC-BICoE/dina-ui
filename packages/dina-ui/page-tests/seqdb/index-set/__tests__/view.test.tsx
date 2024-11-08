@@ -73,14 +73,12 @@ describe("Index Set View Page", () => {
     await new Promise(setImmediate);
 
     // The index set name is displayed:
-    // expect(wrapper.find(".field-view[children='test index set']").exists()).toEqual(true);
     expect(wrapper.getAllByText(/test index set/i)[1]).toBeInTheDocument();
 
     // Wait for the NGS indexes table to load:
     await new Promise(setImmediate);
 
     // The table shows the ngs indexes:
-    // expect(wrapper.find("tbody td").first().text()).toEqual("index 1");
     expect(
       wrapper.getByRole("cell", {
         name: /index 1/i
