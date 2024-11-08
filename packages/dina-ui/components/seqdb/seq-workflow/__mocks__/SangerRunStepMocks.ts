@@ -37,7 +37,12 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
         id: "d21066cc-c4e3-4263-aeba-8e6bc6badb36",
         type: "molecular-analysis-run-item",
         createdBy: "dina-admin",
-        createdOn: "2024-11-05T15:29:30.230786Z"
+        createdOn: "2024-11-05T15:29:30.230786Z",
+        run: {
+          type: "molecular-analysis-run",
+          id: "ef0963c3-8b6c-4a91-8ce9-1df3b4288425",
+          name: "run-name-1"
+        }
       },
       storageUnitUsage: {
         id: "0192fd01-90a6-75a2-a7a3-daf1a4718471",
@@ -62,7 +67,12 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
         id: "83d21135-51eb-4637-a202-e5b73f7a8ff9",
         type: "molecular-analysis-run-item",
         createdBy: "dina-admin",
-        createdOn: "2024-11-05T15:29:30.230786Z"
+        createdOn: "2024-11-05T15:29:30.230786Z",
+        run: {
+          type: "molecular-analysis-run",
+          id: "a2843cde-d2f3-473c-804d-2a1861f14646",
+          name: "run-name-2"
+        }
       },
       storageUnitUsage: {
         id: "0192fd01-90c2-7e45-95a2-a5614f68052f",
@@ -87,7 +97,12 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
         id: "9a836ab0-f0ae-4d6a-aa48-b386ea6af2cf",
         type: "molecular-analysis-run-item",
         createdBy: "dina-admin",
-        createdOn: "2024-11-05T15:29:30.230786Z"
+        createdOn: "2024-11-05T15:29:30.230786Z",
+        run: {
+          type: "molecular-analysis-run",
+          id: "ef0963c3-8b6c-4a91-8ce9-1df3b4288425",
+          name: "run-name-1"
+        }
       },
       storageUnitUsage: {
         id: "0192fd01-9104-72fa-a18f-80d97da0c935",
@@ -118,7 +133,12 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
         id: "cd8c4d28-586a-45c0-8f27-63030aba07cf",
         type: "molecular-analysis-run-item",
         createdBy: "dina-admin",
-        createdOn: "2024-11-05T15:29:30.230786Z"
+        createdOn: "2024-11-05T15:29:30.230786Z",
+        run: {
+          type: "molecular-analysis-run",
+          id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
+          name: "run-name-1"
+        }
       },
       storageUnitUsage: {
         id: "0192fd01-90a6-75a2-a7a3-daf1a4718471",
@@ -143,7 +163,12 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
         id: "ce53527e-7794-4c37-91d8-28efff006a56",
         type: "molecular-analysis-run-item",
         createdBy: "dina-admin",
-        createdOn: "2024-11-05T15:29:30.230786Z"
+        createdOn: "2024-11-05T15:29:30.230786Z",
+        run: {
+          type: "molecular-analysis-run",
+          id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
+          name: "run-name-1"
+        }
       },
       storageUnitUsage: {
         id: "0192fd01-90c2-7e45-95a2-a5614f68052f",
@@ -168,7 +193,12 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
         id: "16cf5f0e-24d4-4080-a476-2c97f0adc18e",
         type: "molecular-analysis-run-item",
         createdBy: "dina-admin",
-        createdOn: "2024-11-05T15:29:30.230786Z"
+        createdOn: "2024-11-05T15:29:30.230786Z",
+        run: {
+          type: "molecular-analysis-run",
+          id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
+          name: "run-name-1"
+        }
       },
       storageUnitUsage: {
         id: "0192fd01-9104-72fa-a18f-80d97da0c935",
@@ -240,66 +270,6 @@ export const SEQ_REACTIONS_NO_RUNS: KitsuResponse<SeqReaction[], undefined> = {
     }
   ],
   meta: undefined
-};
-
-export const MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_1: MolecularAnalysisRunItem = {
-  id: "d21066cc-c4e3-4263-aeba-8e6bc6badb36",
-  type: "molecular-analysis-run-item",
-  run: {
-    type: "molecular-analysis-run",
-    id: "ef0963c3-8b6c-4a91-8ce9-1df3b4288425",
-    name: "run-name-1"
-  }
-};
-
-export const MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_2: MolecularAnalysisRunItem = {
-  id: "83d21135-51eb-4637-a202-e5b73f7a8ff9",
-  type: "molecular-analysis-run-item",
-  run: {
-    type: "molecular-analysis-run",
-    id: "a2843cde-d2f3-473c-804d-2a1861f14646",
-    name: "run-name-2"
-  }
-};
-
-export const MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_3: MolecularAnalysisRunItem = {
-  id: "9a836ab0-f0ae-4d6a-aa48-b386ea6af2cf",
-  type: "molecular-analysis-run-item",
-  run: {
-    type: "molecular-analysis-run",
-    id: "ef0963c3-8b6c-4a91-8ce9-1df3b4288425",
-    name: "run-name-1"
-  }
-};
-
-export const MOLECULAR_ANALYIS_RUN_ITEM_1: MolecularAnalysisRunItem = {
-  id: "cd8c4d28-586a-45c0-8f27-63030aba07cf",
-  type: "molecular-analysis-run-item",
-  run: {
-    type: "molecular-analysis-run",
-    id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
-    name: "run-name-1"
-  }
-};
-
-export const MOLECULAR_ANALYIS_RUN_ITEM_2: MolecularAnalysisRunItem = {
-  id: "ce53527e-7794-4c37-91d8-28efff006a56",
-  type: "molecular-analysis-run-item",
-  run: {
-    type: "molecular-analysis-run",
-    id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
-    name: "run-name-1"
-  }
-};
-
-export const MOLECULAR_ANALYIS_RUN_ITEM_3: MolecularAnalysisRunItem = {
-  id: "16cf5f0e-24d4-4080-a476-2c97f0adc18e",
-  type: "molecular-analysis-run-item",
-  run: {
-    type: "molecular-analysis-run",
-    id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
-    name: "run-name-1"
-  }
 };
 
 export const STORAGE_UNIT_USAGE_1: StorageUnitUsage = {

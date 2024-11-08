@@ -1,22 +1,12 @@
 import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
 import { SangerRunStep, SangerRunStepProps } from "../SangerRunStep";
 import { noop } from "lodash";
-import {
-  screen,
-  waitFor,
-  waitForElementToBeRemoved
-} from "@testing-library/react";
+import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import {
   MATERIAL_SAMPLE_SUMMARY_1,
   MATERIAL_SAMPLE_SUMMARY_2,
   MATERIAL_SAMPLE_SUMMARY_3,
-  MOLECULAR_ANALYIS_RUN_ITEM_1,
-  MOLECULAR_ANALYIS_RUN_ITEM_2,
-  MOLECULAR_ANALYIS_RUN_ITEM_3,
-  MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_1,
-  MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_2,
-  MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_3,
   PCR_BATCH_ITEM_1,
   PCR_BATCH_ITEM_2,
   PCR_BATCH_ITEM_3,
@@ -51,22 +41,6 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 const mockBulkGet = jest.fn(async (paths) => {
   return paths.map((path: string) => {
     switch (path) {
-      // Molecular Analyis Run Item Requests (Multiple Runs)
-      case "/molecular-analysis-run-item/d21066cc-c4e3-4263-aeba-8e6bc6badb36?include=molecularAnalysisRun":
-        return MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_1;
-      case "/molecular-analysis-run-item/83d21135-51eb-4637-a202-e5b73f7a8ff9?include=molecularAnalysisRun":
-        return MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_2;
-      case "/molecular-analysis-run-item/9a836ab0-f0ae-4d6a-aa48-b386ea6af2cf?include=molecularAnalysisRun":
-        return MOLECULAR_ANALYIS_RUN_ITEM_MULTIPLE_3;
-
-      // Molecular Analyis Run Item Requests (Single Run)
-      case "/molecular-analysis-run-item/cd8c4d28-586a-45c0-8f27-63030aba07cf?include=molecularAnalysisRun":
-        return MOLECULAR_ANALYIS_RUN_ITEM_1;
-      case "/molecular-analysis-run-item/ce53527e-7794-4c37-91d8-28efff006a56?include=molecularAnalysisRun":
-        return MOLECULAR_ANALYIS_RUN_ITEM_2;
-      case "/molecular-analysis-run-item/16cf5f0e-24d4-4080-a476-2c97f0adc18e?include=molecularAnalysisRun":
-        return MOLECULAR_ANALYIS_RUN_ITEM_3;
-
       // Storage Unit Usage Requests
       case "/storage-unit-usage/0192fd01-90a6-75a2-a7a3-daf1a4718471":
         return STORAGE_UNIT_USAGE_1;

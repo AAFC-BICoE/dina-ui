@@ -113,7 +113,8 @@ export function useMolecularAnalysisRun({
       })(""),
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
-      include: "storageUnitUsage,molecularAnalysisRunItem,pcrBatchItem"
+      include:
+        "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,pcrBatchItem"
     },
     {
       onSuccess: async ({ data: seqReactions }) => {
@@ -129,40 +130,13 @@ export function useMolecularAnalysisRun({
           return seqReaction.map<SequencingRunItem>((reaction) => ({
             seqReaction: reaction,
             seqReactionId: reaction.id,
+            molecularAnalysisRunItem: reaction?.molecularAnalysisRunItem,
             molecularAnalysisRunItemId: reaction?.molecularAnalysisRunItem?.id,
             storageUnitUsageId: reaction?.storageUnitUsage?.id,
-            pcrBatchItemId: reaction?.pcrBatchItem?.id
+            pcrBatchItemId: reaction?.pcrBatchItem?.id,
+            pcrBatchItem: reaction?.pcrBatchItem as PcrBatchItem,
+            materialSampleId: reaction?.pcrBatchItem?.materialSample?.id
           }));
-        }
-
-        async function attachMolecularAnalyisRunItem(
-          sequencingRunItem: SequencingRunItem[]
-        ): Promise<SequencingRunItem[]> {
-          const molecularAnalyisRunItemQuery =
-            await bulkGet<MolecularAnalysisRunItem>(
-              sequencingRunItem
-                .filter((item) => item?.molecularAnalysisRunItemId)
-                .map(
-                  (item) =>
-                    "/molecular-analysis-run-item/" +
-                    item?.molecularAnalysisRunItemId +
-                    "?include=run"
-                ),
-              { apiBaseUrl: "/seqdb-api" }
-            );
-
-          return sequencingRunItem.map((runItem) => {
-            const queryStorageUnitUsage = molecularAnalyisRunItemQuery.find(
-              (molecularRunItem) =>
-                molecularRunItem?.id === runItem?.molecularAnalysisRunItemId
-            );
-
-            return {
-              ...runItem,
-              molecularAnalysisRunItem:
-                queryStorageUnitUsage as MolecularAnalysisRunItem
-            };
-          });
         }
 
         /**
@@ -298,9 +272,6 @@ export function useMolecularAnalysisRun({
 
         // Chain it all together to create one object.
         let sequencingRunItemsChain = attachSeqReaction(seqReactions);
-        sequencingRunItemsChain = await attachMolecularAnalyisRunItem(
-          sequencingRunItemsChain
-        );
         sequencingRunItemsChain = await attachStorageUnitUsage(
           sequencingRunItemsChain
         );
@@ -331,6 +302,11 @@ export function useMolecularAnalysisRun({
       setAutomaticEditMode(true);
     }
   }, [sequencingRunItems, loading, editMode]);
+
+  // Reset error messages between edit modes.
+  useEffect(() => {
+    setErrorMessage(undefined);
+  }, [editMode]);
 
   async function createNewRun() {
     if (!sequencingRunItems || sequencingRunItems.length === 0) {

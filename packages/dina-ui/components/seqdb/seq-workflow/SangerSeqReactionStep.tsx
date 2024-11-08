@@ -110,6 +110,10 @@ export function SangerSeqReactionStep({
       {} as { [key: string]: SeqReaction }
     );
 
+    // See if molecular analysis run items exist on any of the seqReactions.
+    // const allItems: SeqReaction[] = Object.keys(selectedResourceMap).map((key) => selectedResourceMap[key]);
+    // console.log(allItems);
+
     const itemsToCreate: SeqReaction[] = Object.keys(selectedResourceMap)
       .filter((key) => !previouslySelectedResourcesIDMap[key])
       .map((key) => selectedResourceMap[key]);
