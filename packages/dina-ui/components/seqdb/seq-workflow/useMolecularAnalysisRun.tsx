@@ -129,12 +129,9 @@ export function useMolecularAnalysisRun({
           return seqReaction.map<SequencingRunItem>((reaction) => ({
             seqReaction: reaction,
             seqReactionId: reaction.id,
-            molecularAnalysisRunItemId: (reaction as any)?.relationships
-              ?.molecularAnalysisRunItem?.data?.id,
-            storageUnitUsageId: (reaction as any)?.relationships
-              ?.storageUnitUsage?.data?.id,
-            pcrBatchItemId: (reaction as any)?.relationships?.pcrBatchItem?.data
-              ?.id
+            molecularAnalysisRunItemId: reaction?.molecularAnalysisRunItem?.id,
+            storageUnitUsageId: reaction?.storageUnitUsage?.id,
+            pcrBatchItemId: reaction?.pcrBatchItem?.id
           }));
         }
 
@@ -149,7 +146,7 @@ export function useMolecularAnalysisRun({
                   (item) =>
                     "/molecular-analysis-run-item/" +
                     item?.molecularAnalysisRunItemId +
-                    "?include=molecularAnalysisRun"
+                    "?include=run"
                 ),
               { apiBaseUrl: "/seqdb-api" }
             );
@@ -340,78 +337,93 @@ export function useMolecularAnalysisRun({
       return;
     }
 
-    // Create a new molecular analysis run.
-    const molecularAnalysisRunSaveArg: SaveArgs<MolecularAnalysisRun>[] = [
-      {
-        type: "molecular-analysis-run",
-        resource: {
+    try {
+      // Retrieve the group name from the seqReaction.
+      const groupName = sequencingRunItems?.[0]?.seqReaction?.group;
+
+      // Create a new molecular analysis run.
+      const molecularAnalysisRunSaveArg: SaveArgs<MolecularAnalysisRun>[] = [
+        {
           type: "molecular-analysis-run",
-          name: sequencingRunName
+          resource: {
+            type: "molecular-analysis-run",
+            name: sequencingRunName,
+            group: groupName
+          }
         }
-      }
-    ];
-    const savedMolecularAnalysisRun = await save(molecularAnalysisRunSaveArg, {
-      apiBaseUrl: "/seqdb-api"
-    });
+      ];
+      const savedMolecularAnalysisRun = await save(
+        molecularAnalysisRunSaveArg,
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      );
 
-    // Create a run item for each seq reaction.
-    const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-      sequencingRunItems.map(() => ({
-        type: "molecular-analysis-run-item",
-        resource: {
+      // Create a run item for each seq reaction.
+      const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+        sequencingRunItems.map(() => ({
           type: "molecular-analysis-run-item",
-          relationships: {
-            run: {
-              data: {
-                id: savedMolecularAnalysisRun[0].id,
-                type: "molecular-analysis-run"
+          resource: {
+            type: "molecular-analysis-run-item",
+            relationships: {
+              run: {
+                data: {
+                  id: savedMolecularAnalysisRun[0].id,
+                  type: "molecular-analysis-run"
+                }
               }
             }
-          }
-        } as any
-      }));
-    const savedMolecularAnalysisRunItem = await save(
-      molecularAnalysisRunItemSaveArgs,
-      { apiBaseUrl: "/seqdb-api" }
-    );
+          } as any
+        }));
+      const savedMolecularAnalysisRunItem = await save(
+        molecularAnalysisRunItemSaveArgs,
+        { apiBaseUrl: "/seqdb-api" }
+      );
 
-    // Update the existing seq-reactions.
-    const seqReactionSaveArgs: SaveArgs<SeqReaction>[] = sequencingRunItems.map(
-      (item, index) => ({
-        type: "seq-reaction",
-        resource: {
+      // Update the existing seq-reactions.
+      const seqReactionSaveArgs: SaveArgs<SeqReaction>[] =
+        sequencingRunItems.map((item, index) => ({
           type: "seq-reaction",
-          id: item.seqReactionId,
-          relationships: {
-            molecularAnalysisRunItem: {
-              data: {
-                id: savedMolecularAnalysisRunItem[index].id,
-                type: "molecular-analysis-run-item"
+          resource: {
+            type: "seq-reaction",
+            id: item.seqReactionId,
+            relationships: {
+              molecularAnalysisRunItem: {
+                data: {
+                  id: savedMolecularAnalysisRunItem[index].id,
+                  type: "molecular-analysis-run-item"
+                }
               }
             }
           }
-        }
-      })
-    );
-    const savedSeqReaction = await save(seqReactionSaveArgs, {
-      apiBaseUrl: "/seqdb-api"
-    });
+        }));
+      await save(seqReactionSaveArgs, {
+        apiBaseUrl: "/seqdb-api"
+      });
 
-    // Update the sequencing run items state.
-    setSequencingRunItems(
-      sequencingRunItems.map((item, index) => ({
-        ...item,
-        molecularAnalysisRunItemId: savedMolecularAnalysisRunItem[index].id,
-        molecularAnalysisRunItem: savedMolecularAnalysisRunItem[
-          index
-        ] as MolecularAnalysisRunItem
-      }))
-    );
+      // Update the sequencing run items state.
+      setSequencingRunItems(
+        sequencingRunItems.map((item, index) => ({
+          ...item,
+          molecularAnalysisRunItemId: savedMolecularAnalysisRunItem[index].id,
+          molecularAnalysisRunItem: savedMolecularAnalysisRunItem[
+            index
+          ] as MolecularAnalysisRunItem
+        }))
+      );
 
-    // Go back to view mode once completed.
-    setPerformSave(false);
-    setEditMode(false);
-    setLoading(false);
+      // Go back to view mode once completed.
+      setPerformSave(false);
+      setEditMode(false);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error creating a new sequencing run: ", error);
+      setPerformSave(false);
+      setLoading(false);
+      setErrorMessage(
+        "Error creating a new sequencing run: " + error.toString()
+      );
+    }
   }
 
   async function updateSequencingName() {
@@ -423,25 +435,32 @@ export function useMolecularAnalysisRun({
       return;
     }
 
-    // Update the existing molecular analysis run.
-    const molecularAnalysisRunSaveArg: SaveArgs<MolecularAnalysisRun>[] = [
-      {
-        type: "molecular-analysis-run",
-        resource: {
-          id: sequencingRun.id,
+    try {
+      // Update the existing molecular analysis run.
+      const molecularAnalysisRunSaveArg: SaveArgs<MolecularAnalysisRun>[] = [
+        {
           type: "molecular-analysis-run",
-          name: sequencingRunName
+          resource: {
+            id: sequencingRun.id,
+            type: "molecular-analysis-run",
+            name: sequencingRunName
+          }
         }
-      }
-    ];
-    const savedMolecularAnalysisRun = await save(molecularAnalysisRunSaveArg, {
-      apiBaseUrl: "/seqdb-api"
-    });
+      ];
+      await save(molecularAnalysisRunSaveArg, {
+        apiBaseUrl: "/seqdb-api"
+      });
 
-    // Go back to view mode once completed.
-    setPerformSave(false);
-    setEditMode(false);
-    setLoading(false);
+      // Go back to view mode once completed.
+      setPerformSave(false);
+      setEditMode(false);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error updating sequencing run: ", error);
+      setPerformSave(false);
+      setLoading(false);
+      setErrorMessage("Error updating sequencing run: " + error.toString());
+    }
   }
 
   // Handle saving

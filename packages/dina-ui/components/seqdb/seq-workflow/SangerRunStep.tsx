@@ -110,11 +110,11 @@ export function SangerRunStep({
         );
       },
       header: () => <FieldHeader name="materialSampleName" />,
-      accessorKey: "data.attributes.materialSampleName",
+      accessorKey: "materialSampleSummary.materialSampleName",
       sortingFn: (a: any, b: any): number =>
         compareByStringAndNumber(
-          a?.original?.materialSampleName,
-          b?.original?.materialSampleName
+          a?.original?.materialSampleSummary?.materialSampleName,
+          b?.original?.materialSampleSummary?.materialSampleName
         ),
       enableSorting: true
     }
@@ -131,77 +131,87 @@ export function SangerRunStep({
 
   return (
     <>
-      {/* Worksheet Buttton */}
-      {!editMode && (
-        <div className="row">
-          <div className="col-12 text-end">
-            <Link href={`/seqdb/seq-workflow/worksheet?id=${seqBatchId}`}>
-              <a target="_blank" className="btn btn-primary">
-                <DinaMessage id="worksheet" />
-              </a>
-            </Link>
-          </div>
-        </div>
-      )}
-
       {/* Multiple Runs Exist Warning */}
       {multipleRunWarning && (
         <div className="row">
-          <Alert variant="warning" className="mb-0">
-            <Alert.Heading>
-              <DinaMessage id="sangerRunStep_multipleRunWarning_title" />
-            </Alert.Heading>
-            <p>
-              <DinaMessage id="sangerRunStep_multipleRunWarning_description" />
-            </p>
-          </Alert>
+          <div className="col-12">
+            <Alert variant="warning" className="mb-0">
+              <Alert.Heading>
+                <DinaMessage id="sangerRunStep_multipleRunWarning_title" />
+              </Alert.Heading>
+              <p>
+                <DinaMessage id="sangerRunStep_multipleRunWarning_description" />
+              </p>
+            </Alert>
+          </div>
         </div>
       )}
 
       {/* Error Message */}
       {errorMessage && (
         <div className="row">
-          <Alert variant="danger" className="mb-0">
-            <p>{errorMessage}</p>
-          </Alert>
+          <div className="col-12">
+            <Alert variant="danger" className="mb-2">
+              {errorMessage}
+            </Alert>
+          </div>
         </div>
       )}
 
       {/* Run Information */}
       {editMode ||
       sequencingRunItems?.some((item) => item.molecularAnalysisRunItemId) ? (
-        <div className="row">
-          <div className="col-4">
+        <div className="row mt-4">
+          <div className="col-4 mb-3">
             <strong>
               <DinaMessage id="sangerRunStep_sequencingRun" />
             </strong>
-            <input
-              className="form-control"
-              name="sequencingRunName"
-              value={sequencingRunName}
-              onChange={(newValue) =>
-                setSequencingRunName(newValue.target.value ?? "")
-              }
-            />
+            {editMode ? (
+              <input
+                className="form-control mt-1"
+                name="sequencingRunName"
+                value={sequencingRunName}
+                onChange={(newValue) =>
+                  setSequencingRunName(newValue.target.value ?? "")
+                }
+              />
+            ) : (
+              <p>{sequencingRunName}</p>
+            )}
+          </div>
+          <div className="col-8 mb-3">
+            {/* Worksheet Buttton */}
+            {!editMode && (
+              <div className="row">
+                <div className="col-12 text-end">
+                  <Link href={`/seqdb/seq-workflow/worksheet?id=${seqBatchId}`}>
+                    <a target="_blank" className="btn btn-primary">
+                      <DinaMessage id="worksheet" />
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
           <div className="col-12">
             <strong>
               <DinaMessage id="sangerRunStep_sequencingRunContent" />
             </strong>
             <ReactTable<SequencingRunItem>
-              className="-striped"
+              className="-striped mt-2"
               columns={COLUMNS}
               data={sequencingRunItems ?? []}
+              sort={[{ id: "wellCoordinates", desc: false }]}
             />
           </div>
         </div>
       ) : (
         <div className="row">
-          <Alert variant="info" className="mb-0">
-            <p>
+          <div className="col-12">
+            <Alert variant="info" className="mb-0">
               <DinaMessage id="sangerRunStep_noRunExists" />
-            </p>
-          </Alert>
+            </Alert>
+          </div>
         </div>
       )}
     </>
