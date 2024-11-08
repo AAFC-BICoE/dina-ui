@@ -88,6 +88,7 @@ export function useMolecularAnalysisRun({
   // Used to display if the network calls are still in progress.
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>();
+  const [automaticEditMode, setAutomaticEditMode] = useState<boolean>(false);
   const [multipleRunWarning, setMultipleRunWarning] = useState<boolean>(false);
   const [sequencingRunName, setSequencingRunName] = useState<string>();
 
@@ -326,9 +327,11 @@ export function useMolecularAnalysisRun({
     if (
       loading === false &&
       !sequencingRunItems?.some((item) => item.molecularAnalysisRunItemId) &&
-      !editMode
+      !editMode &&
+      !automaticEditMode
     ) {
       setEditMode(true);
+      setAutomaticEditMode(true);
     }
   }, [sequencingRunItems, loading, editMode]);
 
@@ -393,6 +396,17 @@ export function useMolecularAnalysisRun({
     const savedSeqReaction = await save(seqReactionSaveArgs, {
       apiBaseUrl: "/seqdb-api"
     });
+
+    // Update the sequencing run items state.
+    setSequencingRunItems(
+      sequencingRunItems.map((item, index) => ({
+        ...item,
+        molecularAnalysisRunItemId: savedMolecularAnalysisRunItem[index].id,
+        molecularAnalysisRunItem: savedMolecularAnalysisRunItem[
+          index
+        ] as MolecularAnalysisRunItem
+      }))
+    );
 
     // Go back to view mode once completed.
     setPerformSave(false);

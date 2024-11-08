@@ -231,6 +231,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         <p>Edit mode: {editMode ? "true" : "false"}</p>
         <button onClick={() => setPerformSave(true)}>Save</button>
         <button onClick={() => setEditMode(true)}>Edit</button>
+        <button onClick={() => setEditMode(false)}>Cancel</button>
 
         <SangerRunStep
           editMode={editMode}
@@ -455,5 +456,24 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         }
       ]
     ]);
+  });
+
+  it("Automatically switch to edit mode and be able to cancel", async () => {
+    const wrapper = mountWithAppContext2(<TestComponent />, testCtx);
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should be in edit mode automatically since no runs exist.
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Cancel out of edit mode.
+    userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
+
+    // Even though we still have no runs, since the user explictly canceled
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Info alert to display that no sequencing runs exist
+    expect(wrapper.queryByRole("alert")).toBeInTheDocument();
   });
 });

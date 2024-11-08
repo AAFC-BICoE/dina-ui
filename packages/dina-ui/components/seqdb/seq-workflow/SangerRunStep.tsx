@@ -168,31 +168,42 @@ export function SangerRunStep({
       )}
 
       {/* Run Information */}
-      <div className="row">
-        <div className="col-4">
-          <strong>
-            <DinaMessage id="sangerRunStep_sequencingRun" />
-          </strong>
-          <input
-            className="form-control"
-            name="sequencingRunName"
-            value={sequencingRunName}
-            onChange={(newValue) =>
-              setSequencingRunName(newValue.target.value ?? "")
-            }
-          />
+      {editMode ||
+      sequencingRunItems?.some((item) => item.molecularAnalysisRunItemId) ? (
+        <div className="row">
+          <div className="col-4">
+            <strong>
+              <DinaMessage id="sangerRunStep_sequencingRun" />
+            </strong>
+            <input
+              className="form-control"
+              name="sequencingRunName"
+              value={sequencingRunName}
+              onChange={(newValue) =>
+                setSequencingRunName(newValue.target.value ?? "")
+              }
+            />
+          </div>
+          <div className="col-12">
+            <strong>
+              <DinaMessage id="sangerRunStep_sequencingRunContent" />
+            </strong>
+            <ReactTable<SequencingRunItem>
+              className="-striped"
+              columns={COLUMNS}
+              data={sequencingRunItems ?? []}
+            />
+          </div>
         </div>
-        <div className="col-12">
-          <strong>
-            <DinaMessage id="sangerRunStep_sequencingRunContent" />
-          </strong>
-          <ReactTable<SequencingRunItem>
-            className="-striped"
-            columns={COLUMNS}
-            data={sequencingRunItems ?? []}
-          />
+      ) : (
+        <div className="row">
+          <Alert variant="info" className="mb-0">
+            <p>
+              <DinaMessage id="sangerRunStep_noRunExists" />
+            </p>
+          </Alert>
         </div>
-      </div>
+      )}
     </>
   );
 }

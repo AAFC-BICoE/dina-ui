@@ -995,6 +995,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "No sequence reactions to generate a sequence run. Please use the 'Select PCR Batch' step.",
   sangerRunStep_invalidRunName:
     "A sequencing run name must be provided in order to generate a sequence run.",
+  sangerRunStep_noRunExists:
+    "No sequencing run created yet for this sanger workflow. Click edit to create a new run.",
   mapRelationshipTitle: "Relationship Mapping",
   value: "Value",
   count: "Count",
