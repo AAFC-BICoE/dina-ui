@@ -114,7 +114,7 @@ export function useMolecularAnalysisRun({
       page: { limit: 1000 },
       path: `/seqdb-api/seq-reaction`,
       include:
-        "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,pcrBatchItem"
+        "storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run,pcrBatchItem,seqPrimer"
     },
     {
       onSuccess: async ({ data: seqReactions }) => {

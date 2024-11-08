@@ -102,11 +102,16 @@ export function SangerRunStep({
         const materialSampleName =
           original?.materialSampleSummary?.materialSampleName;
         return (
-          <Link
-            href={`/collection/material-sample/view?id=${original.materialSampleId}`}
-          >
-            <a>{materialSampleName || original.materialSampleId}</a>
-          </Link>
+          <>
+            <Link
+              href={`/collection/material-sample/view?id=${original.materialSampleId}`}
+            >
+              <a>{materialSampleName || original.materialSampleId}</a>
+            </Link>
+            {" ("}
+            {original?.seqReaction?.seqPrimer?.name}
+            {")"}
+          </>
         );
       },
       header: () => <FieldHeader name="materialSampleName" />,

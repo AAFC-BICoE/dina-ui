@@ -6,7 +6,6 @@ import {
   SeqBatch,
   SeqReaction
 } from "packages/dina-ui/types/seqdb-api";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
 
 export const SEQ_BATCH_ID = "d107d371-79cc-4939-9fcc-990cb7089fa4";
 export const SEQ_BATCH_ID_MULTIPLE_RUNS =
@@ -55,6 +54,14 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
         createdOn: "2024-11-05T15:29:30.230786Z",
         group: "aafc",
         result: "Good Band"
+      },
+      seqPrimer: {
+        id: "a1a58060-b718-4897-9487-6dbfab49601f",
+        type: "PRIMER",
+        direction: "R",
+        name: "Primer1",
+        lotNumber: 1,
+        seq: ""
       }
     },
     {
@@ -85,6 +92,14 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
         createdOn: "2024-11-05T15:29:30.230786Z",
         group: "aafc",
         result: "Good Band"
+      },
+      seqPrimer: {
+        id: "a1a58060-b718-4897-9487-6dbfab49601f",
+        type: "PRIMER",
+        direction: "R",
+        name: "Primer1",
+        lotNumber: 1,
+        seq: ""
       }
     },
     {
@@ -115,6 +130,14 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
         createdOn: "2024-11-05T15:29:30.230786Z",
         group: "aafc",
         result: "Good Band"
+      },
+      seqPrimer: {
+        id: "a1a58060-b718-4897-9487-6dbfab49601f",
+        type: "PRIMER",
+        direction: "R",
+        name: "Primer1",
+        lotNumber: 1,
+        seq: ""
       }
     }
   ],
@@ -151,6 +174,14 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
         createdOn: "2024-11-05T15:29:30.230786Z",
         group: "aafc",
         result: "Good Band"
+      },
+      seqPrimer: {
+        id: "a1a58060-b718-4897-9487-6dbfab49601f",
+        type: "PRIMER",
+        direction: "R",
+        name: "Primer1",
+        lotNumber: 1,
+        seq: ""
       }
     },
     {
@@ -181,6 +212,14 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
         createdOn: "2024-11-05T15:29:30.230786Z",
         group: "aafc",
         result: "Good Band"
+      },
+      seqPrimer: {
+        id: "a1a58060-b718-4897-9487-6dbfab49601f",
+        type: "PRIMER",
+        direction: "R",
+        name: "Primer1",
+        lotNumber: 1,
+        seq: ""
       }
     },
     {
@@ -211,6 +250,14 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
         createdOn: "2024-11-05T15:29:30.230786Z",
         group: "aafc",
         result: "Good Band"
+      },
+      seqPrimer: {
+        id: "a1a58060-b718-4897-9487-6dbfab49601f",
+        type: "PRIMER",
+        direction: "R",
+        name: "Primer1",
+        lotNumber: 1,
+        seq: ""
       }
     }
   ],
@@ -247,6 +294,14 @@ export const SEQ_REACTIONS_NO_RUNS: KitsuResponse<SeqReaction[], undefined> = {
       pcrBatchItem: {
         id: "1ec0b67d-4810-4422-87ef-b521a1c61ed7",
         type: "pcr-batch-item"
+      },
+      seqPrimer: {
+        id: "a1a58060-b718-4897-9487-6dbfab49601f",
+        type: "PRIMER",
+        direction: "R",
+        name: "Primer1",
+        lotNumber: 1,
+        seq: ""
       }
     },
     {
@@ -266,6 +321,14 @@ export const SEQ_REACTIONS_NO_RUNS: KitsuResponse<SeqReaction[], undefined> = {
         createdOn: "2024-11-05T15:29:30.230786Z",
         group: "aafc",
         result: "Good Band"
+      },
+      seqPrimer: {
+        id: "a1a58060-b718-4897-9487-6dbfab49601f",
+        type: "PRIMER",
+        direction: "R",
+        name: "Primer1",
+        lotNumber: 1,
+        seq: ""
       }
     }
   ],

@@ -148,6 +148,17 @@ describe("Sanger Run Step from Sanger Workflow", () => {
       "/collection/material-sample/view?id=2308d337-756d-4714-90bb-57698b6f5819"
     );
 
+    // Primer name should be displayed.
+    expect(
+      wrapper.getByRole("cell", { name: /sample1 \(primer1\)/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("cell", { name: /sample2 \(primer1\)/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("cell", { name: /sample3 \(primer1\)/i })
+    ).toBeInTheDocument();
+
     // Ensure Tube Number is rendered:
     expect(wrapper.getByRole("cell", { name: "1" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "2" })).toBeInTheDocument();
