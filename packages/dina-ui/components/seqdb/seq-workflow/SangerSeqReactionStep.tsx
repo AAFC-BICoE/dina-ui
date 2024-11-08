@@ -39,6 +39,7 @@ import { SeqReactionDndTable } from "./seq-reaction-step/SeqReactionDndTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { useSeqReactionState } from "./seq-reaction-step/useSeqReactionState";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
 
 export interface SangerSeqReactionStepProps {
   seqBatch?: SeqBatch;
@@ -110,24 +111,51 @@ export function SangerSeqReactionStep({
       {} as { [key: string]: SeqReaction }
     );
 
-    // See if molecular analysis run items exist on any of the seqReactions.
-    // const allItems: SeqReaction[] = Object.keys(selectedResourceMap).map((key) => selectedResourceMap[key]);
-    // console.log(allItems);
+    const allItems: SeqReaction[] = Object.keys(selectedResourceMap).map(
+      (key) => selectedResourceMap[key]
+    );
 
     const itemsToCreate: SeqReaction[] = Object.keys(selectedResourceMap)
       .filter((key) => !previouslySelectedResourcesIDMap[key])
       .map((key) => selectedResourceMap[key]);
 
-    const itemIdsToDelete: string[] = compact(
+    const itemsToDelete: SeqReaction[] = compact(
       Object.keys(previouslySelectedResourcesIDMap)
         .filter((key) => !selectedResourceMap[key])
-        .map((key) => previouslySelectedResourcesIDMap[key])
+        .map((key) => selectedResourceMap[key])
     );
+
+    const runId = allItems.find(
+      (item) => item?.molecularAnalysisRunItem?.run?.id
+    )?.molecularAnalysisRunItem?.run?.id;
 
     // Perform create
     if (itemsToCreate.length !== 0) {
+      // If a molecular analysis exists on other seqReactions, then we need to create a
+      // molecular analysis run item.
+      let molecularRunItemsCreated: MolecularAnalysisRunItem[] = [];
+      if (runId) {
+        molecularRunItemsCreated = await save<MolecularAnalysisRunItem>(
+          itemsToCreate.map((_) => ({
+            resource: {
+              type: "molecular-analysis-run-item",
+              relationships: {
+                run: {
+                  data: {
+                    type: "molecular-analysis-run",
+                    id: runId
+                  }
+                }
+              }
+            },
+            type: "molecular-analysis-run-item"
+          })),
+          { apiBaseUrl: "/seqdb-api" }
+        );
+      }
+
       await save(
-        itemsToCreate.map((data) => ({
+        itemsToCreate.map((data, index) => ({
           resource: {
             type: "seq-reaction",
             group: data.group ?? "",
@@ -144,7 +172,18 @@ export function SangerSeqReactionStep({
                   type: "pcr-primer",
                   id: data.seqPrimer?.id ?? ""
                 }
-              }
+              },
+              // Included only if molecular run items were created.
+              molecularAnalysisRunItem:
+                molecularRunItemsCreated.length > 0 &&
+                molecularRunItemsCreated[index]
+                  ? {
+                      data: {
+                        type: "molecular-analysis-run-item",
+                        id: molecularRunItemsCreated[index].id
+                      }
+                    }
+                  : undefined
             }
           },
           type: "seq-reaction"
@@ -154,11 +193,40 @@ export function SangerSeqReactionStep({
     }
 
     // Perform deletes
-    if (itemIdsToDelete.length !== 0) {
+    if (itemsToDelete.length !== 0) {
+      // Check if molecular analysis items need to be deleted as well.
+      if (itemsToDelete.some((item) => item?.molecularAnalysisRunItem)) {
+        // Delete the run if all seq-reactions are being deleted.
+        if (itemsToDelete.length === allItems.length && runId) {
+          await save([
+            {
+              delete: {
+                id: runId,
+                type: "molecular-analysis-run"
+              }
+            }
+          ]);
+        }
+
+        // Delete the molecular analysis run items.
+        await save(
+          itemsToDelete
+            .filter((item) => item?.molecularAnalysisRunItem)
+            .map((item) => ({
+              delete: {
+                id: item?.molecularAnalysisRunItem?.id ?? "",
+                type: "molecular-analysis-run-item"
+              }
+            })),
+          { apiBaseUrl: "/seqdb-api" }
+        );
+      }
+
+      // Delete the seq reactions now.
       await save(
-        itemIdsToDelete.map((id) => ({
+        itemsToDelete.map((item) => ({
           delete: {
-            id: id ?? "",
+            id: item?.id ?? "",
             type: "seq-reaction"
           }
         })),
