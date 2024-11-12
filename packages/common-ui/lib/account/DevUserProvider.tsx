@@ -33,8 +33,8 @@ export function DevUserAccountProvider({
     };
 
     if (instanceContext !== undefined && keycloakEnabled === null) {
-      // Dev-user should only be enabled if using "developer" instance name.
-      if (instanceContext.instanceName === "developer") {
+      // Dev-user should only be enabled if using "developer" instance mode.
+      if (instanceContext.instanceMode === "developer") {
         getDevUserConfig();
       } else {
         // Use keycloak in this case.
