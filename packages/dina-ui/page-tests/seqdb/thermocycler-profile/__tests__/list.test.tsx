@@ -1,6 +1,7 @@
 import ThermocyclerProfileListPage from "../../../../pages/seqdb/thermocycler-profile/list";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -31,19 +32,15 @@ const apiContext: any = {
 
 describe("PcrProfile list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext(<ThermocyclerProfileListPage />, {
+    const wrapper = mountWithAppContext2(<ThermocyclerProfileListPage />, {
       apiContext
     });
 
+    // Wait for the page to load
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check that the table contains the links to profile details pages.
-    expect(wrapper.containsMatchingElement(<a>Test Profile 1</a>)).toEqual(
-      true
-    );
-    expect(wrapper.containsMatchingElement(<a>Test Profile 2</a>)).toEqual(
-      true
-    );
+    expect(wrapper.getByText(/test profile 1/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/test profile 2/i)).toBeInTheDocument();
   });
 });
