@@ -46,11 +46,11 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
 
   return (
     <ApiClientImplProvider>
-      <DevUserAccountProvider>
-        <KeycloakAccountProvider>
-          <AuthenticatedApiClientProvider>
-            <DinaIntlProvider>
-              <DefaultInstanceContextProvider>
+      <DefaultInstanceContextProvider>
+        <DevUserAccountProvider>
+          <KeycloakAccountProvider>
+            <AuthenticatedApiClientProvider>
+              <DinaIntlProvider>
                 <FileUploadProviderImpl>
                   <ErrorBoundaryPage>
                     <DndProvider backend={HTML5Backend}>
@@ -62,11 +62,11 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
                     </DndProvider>
                   </ErrorBoundaryPage>
                 </FileUploadProviderImpl>
-              </DefaultInstanceContextProvider>
-            </DinaIntlProvider>
-          </AuthenticatedApiClientProvider>
-        </KeycloakAccountProvider>
-      </DevUserAccountProvider>
+              </DinaIntlProvider>
+            </AuthenticatedApiClientProvider>
+          </KeycloakAccountProvider>
+        </DevUserAccountProvider>
+      </DefaultInstanceContextProvider>
     </ApiClientImplProvider>
   );
 }
