@@ -1,9 +1,11 @@
 import { OperationsResponse } from "common-ui";
 import { RegionEditPage } from "../../../../pages/seqdb/region/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
 import { writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -49,18 +51,18 @@ describe("Region edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <RegionEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
 
     // Edit the region name.
-    wrapper.find(".name-field input").simulate("change", {
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
       target: { name: "name", value: "New Region" }
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
@@ -104,25 +106,27 @@ describe("Region edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <RegionEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
 
     // Add a name.
-    wrapper.find(".name-field input").simulate("change", {
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
       target: { name: "name", value: "this-name-is-too-long" }
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: name size must be between 1 and 10"
-    );
+    // Test expected error response.
+    expect(
+      wrapper.getByText(
+        /constraint violation: name size must be between 1 and 10/i
+      )
+    ).toBeInTheDocument();
     expect(mockPush).toBeCalledTimes(0);
   });
 
@@ -140,28 +144,30 @@ describe("Region edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <RegionEditPage router={{ query: { id: 100 }, push: mockPush } as any} />,
       { apiContext }
     );
 
     // The page should load initially with a loading spinner.
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the region form to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check that the existing region's symbol value is in the field.
-    expect(wrapper.find(".symbol-field input").prop("value")).toEqual("symbol");
+    expect(wrapper.getByDisplayValue("symbol")).toBeInTheDocument();
 
     // Modify the "symbol" value.
-    wrapper.find(".symbol-field input").simulate("change", {
-      target: { name: "symbol", value: "new symbol" }
+    fireEvent.change(wrapper.getByRole("textbox", { name: /symbol/i }), {
+      target: {
+        name: "symbol",
+        value: "new symbol"
+      }
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
