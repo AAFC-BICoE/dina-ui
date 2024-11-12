@@ -1,6 +1,9 @@
 import PcrPrimerDetailsPage from "../../../../pages/seqdb/pcr-primer/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
+import "@testing-library/jest-dom";
+
+import { screen } from "@testing-library/react";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
@@ -34,28 +37,26 @@ jest.mock("next/router", () => ({
 
 describe("PcrPrimer details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(<PcrPrimerDetailsPage />, {
+    const wrapper = mountWithAppContext2(<PcrPrimerDetailsPage />, {
       apiContext
     });
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Render the PCR primer details", async () => {
-    const wrapper = mountWithAppContext(<PcrPrimerDetailsPage />, {
+    const wrapper = mountWithAppContext2(<PcrPrimerDetailsPage />, {
       apiContext
     });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    // expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
     // The primer's name should be rendered in a FieldView.
-    expect(wrapper.find(".name-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<div>Test Primer</div>)).toEqual(
-      true
-    );
+    expect(wrapper.getByText(/name/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/test primer/i)[1]).toBeInTheDocument();
   });
 });

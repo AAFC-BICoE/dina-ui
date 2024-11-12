@@ -1,4 +1,3 @@
-import { QueryTable } from "common-ui";
 import PcrPrimerListPage from "../../../../pages/seqdb/pcr-primer/list";
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
