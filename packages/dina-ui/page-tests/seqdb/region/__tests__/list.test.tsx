@@ -1,7 +1,8 @@
-import { QueryTable } from "common-ui";
 import RegionListPage from "../../../../pages/seqdb/region/list";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Region } from "../../../../types/seqdb-api/resources/Region";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -36,40 +37,39 @@ const apiContext: any = {
 
 describe("Region list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<RegionListPage />, { apiContext });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check that the table contains the links to region details pages.
-    expect(wrapper.containsMatchingElement(<a>Test Region 1</a>)).toEqual(true);
-    expect(wrapper.containsMatchingElement(<a>Test Region 2</a>)).toEqual(true);
+    expect(wrapper.getByText(/test region 1/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/test region 2/i)).toBeInTheDocument();
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<RegionListPage />, { apiContext });
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enter a search value.
-    wrapper
-      .find("input.filter-value")
-      .simulate("change", { target: { value: "omni" } });
+    fireEvent.change(wrapper.getByRole("textbox", { name: /filter/i }), {
+      target: {
+        value: "omni"
+      }
+    });
 
     // Submit the search form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API call and UI elements
     expect(mockGet).toHaveBeenCalledWith(
       "seqdb-api/region",
       expect.objectContaining({ filter: { rsql: "name==*omni*" } })
     );
-    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
-      rsql: "name==*omni*"
-    });
+    expect(wrapper.getByText(/test region 1/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/test region 2/i)).toBeInTheDocument();
   });
 });
