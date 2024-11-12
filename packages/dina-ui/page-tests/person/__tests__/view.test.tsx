@@ -48,7 +48,7 @@ describe("Person details page", () => {
     expect(wrapper.getByText(/display name/i)).toBeInTheDocument();
     expect(wrapper.getAllByText(/person a/i)[1]).toBeInTheDocument();
 
-    // // The person's email should be rendered in a FieldView.
+    // The person's email should be rendered in a FieldView.
     expect(wrapper.getByText(/email/i)).toBeInTheDocument();
     expect(wrapper.getByText(/testperson@a\.b/i)).toBeInTheDocument();
   });
