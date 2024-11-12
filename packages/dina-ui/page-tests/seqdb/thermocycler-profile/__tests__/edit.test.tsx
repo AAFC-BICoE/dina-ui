@@ -2,8 +2,10 @@ import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { ThermocyclerProfileEditPage } from "../../../../pages/seqdb/thermocycler-profile/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -50,7 +52,7 @@ describe("ThermocyclerProfile edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ThermocyclerProfileEditPage
         router={{ query: {}, push: mockPush } as any}
       />,
@@ -58,12 +60,12 @@ describe("ThermocyclerProfile edit page", () => {
     );
 
     // Edit the profile name.
-    wrapper.find(".name-field input").simulate("change", {
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
       target: { name: "name", value: "New ThermocyclerProfile" }
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     setImmediate(() => {
       expect(mockPatch).lastCalledWith(
@@ -109,7 +111,7 @@ describe("ThermocyclerProfile edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ThermocyclerProfileEditPage
         router={{ query: {}, push: mockPush } as any}
       />,
@@ -117,13 +119,14 @@ describe("ThermocyclerProfile edit page", () => {
     );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: name size must be between 1 and 10"
-      );
+      expect(
+        wrapper.getByText(
+          /constraint violation: name size must be between 1 and 10/i
+        )
+      ).toBeInTheDocument();
       expect(mockPush).toBeCalledTimes(0);
       done();
     });
@@ -143,7 +146,7 @@ describe("ThermocyclerProfile edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ThermocyclerProfileEditPage
         router={{ query: { id: 100 }, push: mockPush } as any}
       />,
@@ -151,23 +154,21 @@ describe("ThermocyclerProfile edit page", () => {
     );
 
     // The page should load initially with a loading spinner.
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the profile form to load.
     await new Promise(setImmediate);
-    wrapper.update();
-    // // Check that the existing profile's app value is in the field.
-    expect(wrapper.find(".application-field input").prop("value")).toEqual(
-      "PCR of ITS regions"
-    );
+
+    // Check that the existing profile's app value is in the field.
+    expect(wrapper.getByDisplayValue("PCR of ITS regions")).toBeInTheDocument();
 
     // Modify the application value.
-    wrapper.find(".application-field input").simulate("change", {
+    fireEvent.change(wrapper.getByRole("textbox", { name: /application/i }), {
       target: { name: "application", value: "new app value" }
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
