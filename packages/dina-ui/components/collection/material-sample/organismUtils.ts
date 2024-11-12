@@ -2,7 +2,7 @@ import {
   Determination,
   MaterialSample,
   Organism
-} from "packages/dina-ui/types/collection-api";
+} from "../../../types/collection-api";
 
 /**
  * Comma separated string with all of the scientific names of the organisms.

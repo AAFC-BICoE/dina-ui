@@ -1792,7 +1792,16 @@ Array [
           },
         },
         "organism": Object {
-          "data": Array [],
+          "data": Array [
+            Object {
+              "id": "6f8908fd-64c7-4524-8375-965d5c4573a4",
+              "type": "organism",
+            },
+          ],
+          "links": Object {
+            "related": "/api/v1/material-sample/0192da0b-b7b2-7840-a902-a5d26ee7edea/organism",
+            "self": "/api/v1/material-sample/0192da0b-b7b2-7840-a902-a5d26ee7edea/relationships/organism",
+          },
         },
         "parentMaterialSample": Object {},
         "preparationMethod": Object {
@@ -1886,13 +1895,15 @@ Array [
     },
     "id": "01918f22-13a4-7f6d-894e-974bc1e14d23",
     "included": Object {
-      "projects": Object {
-        "attributes": Object {
-          "name": "Project A",
+      "projects": Array [
+        Object {
+          "attributes": Object {
+            "name": "Project A",
+          },
+          "id": "01919485-ed65-7a79-9080-91445b897ef4",
+          "type": "project",
         },
-        "id": "01919485-ed65-7a79-9080-91445b897ef4",
-        "type": "project",
-      },
+      ],
     },
     "type": "material-sample",
   },

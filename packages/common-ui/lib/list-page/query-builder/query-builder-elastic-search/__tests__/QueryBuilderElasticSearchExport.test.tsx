@@ -485,7 +485,19 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
                   storageUnitUsage: {},
                   projects: { data: [] },
                   preparedBy: { data: [] },
-                  organism: { data: [] },
+                  organism: {
+                    data: [
+                      {
+                        id: "6f8908fd-64c7-4524-8375-965d5c4573a4",
+                        type: "organism"
+                      }
+                    ],
+                    links: {
+                      related:
+                        "/api/v1/material-sample/0192da0b-b7b2-7840-a902-a5d26ee7edea/organism",
+                      self: "/api/v1/material-sample/0192da0b-b7b2-7840-a902-a5d26ee7edea/relationships/organism"
+                    }
+                  },
                   attachment: { data: [] },
                   collection: {
                     data: {

@@ -440,8 +440,13 @@ export function processResults(result: any) {
 
           relationshipKeys.forEach((key) => {
             if (!includedAccumulator[key]) {
-              // No found before, treat it as an object.
-              includedAccumulator[key] = currentIncluded;
+              if (Array.isArray(relationships[key].data)) {
+                // if true, always use an array.
+                includedAccumulator[key] = [currentIncluded];
+              } else {
+                // false is only use an object.
+                includedAccumulator[key] = currentIncluded;
+              }
             } else {
               // Found again, treat it as an array.
               if (
