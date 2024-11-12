@@ -3,8 +3,6 @@ import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 import "@testing-library/jest-dom";
 
-import { screen } from "@testing-library/react";
-
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
 
