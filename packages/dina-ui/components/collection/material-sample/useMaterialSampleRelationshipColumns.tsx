@@ -4,11 +4,11 @@ import {
   DeleteButton,
   EditButton,
   FieldHeader,
+  scientificNameCell,
   stringArrayCell,
   useStringComparator
 } from "common-ui";
-import { Determination, MaterialSample } from "../../../types/collection-api";
-import { getDeterminations, getScientificNames } from "./organismUtils";
+import { MaterialSample } from "../../../types/collection-api";
 import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
 import Link from "next/link";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -188,45 +188,7 @@ export function useMaterialSampleRelationshipColumns() {
       isKeyword: true,
       enableSorting: true
     },
-    {
-      id: "scientificName",
-      cell: ({ row: { original } }) => {
-        let scientificNames: string = "";
-
-        if (original?.type === "material-sample") {
-          let determinations: Determination[] = [];
-          original?.included?.organism?.forEach((org) => {
-            determinations = determinations.concat(
-              org.attributes.determination
-            );
-          });
-          const organism = original?.included?.organism?.map((org) => ({
-            id: org?.id,
-            type: org?.type,
-            determination: org?.attributes?.determination,
-            isTarget: org?.attributes?.isTarget
-          }));
-          const materialSample: MaterialSample = {
-            type: "material-sample",
-            materialSampleName: original?.data?.attributes?.materialSampleName,
-            organism
-          };
-          scientificNames = getScientificNames(materialSample);
-        } else {
-          scientificNames = getDeterminations(
-            original?.effectiveDeterminations
-          );
-        }
-        return <div className="stringArray-cell">{scientificNames}</div>;
-      },
-      header: () => <FieldHeader name="determination.scientificName" />,
-      isKeyword: true,
-      enableSorting: false,
-      additionalAccessors: [
-        "included.attributes.determination",
-        "included.attributes.isTarget"
-      ]
-    }
+    scientificNameCell()
   ];
 
   const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
@@ -249,21 +211,7 @@ export function useMaterialSampleRelationshipColumns() {
       isKeyword: true,
       enableSorting: true
     },
-    {
-      id: "scientificName",
-      cell: ({ row: { original } }) => {
-        const organisms = (original as any).included?.organism ?? [];
-        const materialSample: MaterialSample = {
-          type: "material-sample",
-          organism: organisms
-        };
-        const scientificName = getScientificNames(materialSample);
-        return <div className="stringArray-cell">{scientificName}</div>;
-      },
-      header: () => <FieldHeader name="determination.scientificName" />,
-      isKeyword: true,
-      enableSorting: false
-    }
+    scientificNameCell()
   ];
 
   const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn<MaterialSample>[] = [
