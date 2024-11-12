@@ -1,6 +1,7 @@
 import ThermocyclerProfileDetailsPage from "../../../../pages/seqdb/thermocycler-profile/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
@@ -27,32 +28,26 @@ jest.mock("next/router", () => ({
 
 describe("PcrProfile details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(<ThermocyclerProfileDetailsPage />, {
+    const wrapper = mountWithAppContext2(<ThermocyclerProfileDetailsPage />, {
       apiContext
     });
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    // expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Renders the PCR profile details", async () => {
-    const wrapper = mountWithAppContext(<ThermocyclerProfileDetailsPage />, {
+    const wrapper = mountWithAppContext2(<ThermocyclerProfileDetailsPage />, {
       apiContext
     });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
     // The profile's name should be rendered in a FieldView.
-    expect(
-      wrapper.containsMatchingElement(
-        <strong>Thermocycler Profile Name</strong>
-      )
-    ).toEqual(true);
-    expect(wrapper.containsMatchingElement(<div>Test Profile</div>)).toEqual(
-      true
-    );
+    expect(wrapper.getByText(/thermocycler profile name/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/test profile/i)[1]).toBeInTheDocument();
   });
 });
