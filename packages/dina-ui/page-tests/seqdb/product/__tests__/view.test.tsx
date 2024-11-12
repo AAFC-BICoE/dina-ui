@@ -48,6 +48,6 @@ describe("Product details page", () => {
 
     // The product's name should be rendered in a FieldView.
     expect(wrapper.getByText(/name/i)).toBeInTheDocument();
-    expect(wrapper.getAllByText(/test product 1/i)[0]).toBeInTheDocument();
+    expect(wrapper.getAllByText(/test product 1/i)[1]).toBeInTheDocument();
   });
 });
