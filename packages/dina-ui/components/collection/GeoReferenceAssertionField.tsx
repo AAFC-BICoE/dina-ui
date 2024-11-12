@@ -58,7 +58,7 @@ export function GeoReferenceAssertionField({
         className="non-strip"
       >
         <TabbedArrayField<GeoReferenceAssertion>
-          className="non-strip"
+          className="non-strip border-0"
           typeName={formatMessage("geoReferenceAssertion")}
           renderAboveTabs={() =>
             isTemplate && (
