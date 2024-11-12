@@ -1,6 +1,7 @@
 import ProductDetailsPage from "../../../../pages/seqdb/product/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
@@ -27,28 +28,26 @@ jest.mock("next/router", () => ({
 
 describe("Product details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(<ProductDetailsPage />, {
+    const wrapper = mountWithAppContext2(<ProductDetailsPage />, {
       apiContext
     });
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Render the Product details", async () => {
-    const wrapper = mountWithAppContext(<ProductDetailsPage />, {
+    const wrapper = mountWithAppContext2(<ProductDetailsPage />, {
       apiContext
     });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    // Test loading spinner to not render when product fields are rendered
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
     // The product's name should be rendered in a FieldView.
-    expect(wrapper.find(".name-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<div>Test Product 1</div>)).toEqual(
-      true
-    );
+    expect(wrapper.getByText(/name/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/test product 1/i)[0]).toBeInTheDocument();
   });
 });
