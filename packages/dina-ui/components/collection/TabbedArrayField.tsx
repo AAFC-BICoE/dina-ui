@@ -3,13 +3,15 @@ import {
   FieldSet,
   FieldWrapperProps,
   FormikButton,
+  Tooltip,
   useDinaFormContext
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { clamp, get, isEmpty } from "lodash";
 import { ReactNode, useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { FaMinus, FaPlus } from "react-icons/fa";
 
 export interface TabbedArrayFieldProps<T> {
   className?: string;
@@ -17,13 +19,16 @@ export interface TabbedArrayFieldProps<T> {
   typeName: string;
   initialIndex?: number;
   name: string;
-  legend: JSX.Element;
+  legend?: JSX.Element;
   onChangeTabIndex?: (newIndex: number) => void;
   makeNewElement: (elements: T[]) => T;
   renderTabPanel: (panelCtx: TabPanelCtx<T>) => ReactNode;
   renderTab: (element: T, index: number) => ReactNode;
   renderAboveTabs?: () => ReactNode;
   wrapContent?: (content: ReactNode) => ReactNode;
+
+  /** Remove the padding and border around the fieldset. */
+  removePadding?: boolean;
 }
 
 export interface TabPanelCtx<T> {
@@ -43,6 +48,7 @@ export function TabbedArrayField<T>({
   sectionId,
   initialIndex = 0,
   legend,
+  removePadding,
   onChangeTabIndex,
   renderTabPanel,
   renderTab,
@@ -52,6 +58,7 @@ export function TabbedArrayField<T>({
   const { readOnly, isTemplate } = useDinaFormContext();
 
   const [activeTabIdx, setActiveTabIdx] = useState(initialIndex);
+  const { formatMessage } = useDinaIntl();
 
   useEffect(() => {
     onChangeTabIndex?.(activeTabIdx);
@@ -98,6 +105,7 @@ export function TabbedArrayField<T>({
             id={sectionId}
             legend={legend}
             fieldName={name}
+            removePadding={removePadding}
           >
             {wrapContent(
               <>
@@ -148,26 +156,37 @@ export function TabbedArrayField<T>({
                           >
                             {elementInternal(index)}
                             {!readOnly && !isTemplate && (
-                              <div className="list-inline">
-                                <FormikButton
-                                  className="list-inline-item btn btn-primary add-button"
-                                  onClick={addElement}
-                                >
-                                  <DinaMessage
-                                    id="addAnother"
-                                    values={{ typeName }}
-                                  />
-                                </FormikButton>
-                                {elements.length >= 1 && (
+                              <div className="list-inline d-flex align-items-center gap-2">
+                                <div className="d-inline-flex">
                                   <FormikButton
-                                    className="list-inline-item btn btn-dark"
-                                    onClick={() => removeElement(index)}
+                                    className="btn btn-primary add-button"
+                                    onClick={addElement}
                                   >
-                                    <DinaMessage
-                                      id="removeThisElement"
-                                      values={{ typeName }}
-                                    />
+                                    <FaPlus />
                                   </FormikButton>
+                                  <Tooltip
+                                    directText={formatMessage("addAnother", {
+                                      typeName
+                                    })}
+                                  />
+                                </div>
+                                {elements.length >= 1 && (
+                                  <div className="d-inline-flex">
+                                    <FormikButton
+                                      className="btn btn-dark"
+                                      onClick={() => removeElement(index)}
+                                    >
+                                      <FaMinus />
+                                    </FormikButton>
+                                    <Tooltip
+                                      directText={formatMessage(
+                                        "removeThisElement",
+                                        {
+                                          typeName
+                                        }
+                                      )}
+                                    />
+                                  </div>
                                 )}
                               </div>
                             )}

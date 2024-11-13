@@ -1,7 +1,7 @@
-import { DefaultRow } from "../../../../../common-ui/lib";
 import IndexSetListPage from "../../../../pages/seqdb/index-set/list";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { IndexSet } from "../../../../types/seqdb-api";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -33,7 +33,7 @@ const mockCtx = {
 };
 
 function getWrapper() {
-  return mountWithAppContext(<IndexSetListPage />, {
+  return mountWithAppContext2(<IndexSetListPage />, {
     apiContext: mockCtx as any
   });
 }
@@ -44,8 +44,7 @@ describe("Index set list page", () => {
 
     // Wait for data to load:
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(DefaultRow).first().text()).toEqual("index set 1");
+    expect(wrapper.getByText(/index set 1/i)).toBeInTheDocument();
   });
 });

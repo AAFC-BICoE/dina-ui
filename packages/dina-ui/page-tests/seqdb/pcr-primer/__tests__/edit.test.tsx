@@ -2,8 +2,10 @@ import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { PcrPrimerEditPage } from "../../../../pages/seqdb/pcr-primer/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -49,23 +51,25 @@ describe("PcrPrimer edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
 
     // Edit the primer name.
-    wrapper.find(".name-field input").simulate("change", {
-      target: { name: "name", value: "New PcrPrimer" }
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: {
+        value: "New PcrPrimer"
+      }
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the primer form to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API Response
     expect(mockPatch).lastCalledWith(
       "/seqdb-api/operations",
       [
@@ -110,22 +114,23 @@ describe("PcrPrimer edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the primer form to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.update();
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: name size must be between 1 and 10"
-    );
+    // Test expected error
+    expect(
+      wrapper.getByText(
+        /constraint violation: name size must be between 1 and 10/i
+      )
+    ).toBeInTheDocument();
     expect(mockPush).toBeCalledTimes(0);
   });
 
@@ -143,7 +148,7 @@ describe("PcrPrimer edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <PcrPrimerEditPage
         router={{ query: { id: 100 }, push: mockPush } as any}
       />,
@@ -151,28 +156,31 @@ describe("PcrPrimer edit page", () => {
     );
 
     // The page should load initially with a loading spinner.
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    // expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the primer form to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // // Check that the existing primer's seq value is in the field.
-    expect(wrapper.find(".seq-field input").prop("value")).toEqual(
-      "ACTACGATCAGCATCGATG"
-    );
+    // Check that the existing primer's seq value is in the field.
+    expect(
+      wrapper.getByDisplayValue("ACTACGATCAGCATCGATG")
+    ).toBeInTheDocument();
+    // expect(wrapper.getByRole('textbox', { name: /primer sequence \(5' \- 3'\)/i })).toHaveTextContent("ACTACGATCAGCATCGATG");
 
-    // Modify the "designedBy" value.
-    wrapper.find(".seq-field input").simulate("change", {
-      target: { name: "seq", value: "new seq value" }
+    // Modify the "seq"/Primer Sequence (5' - 3') value.
+    fireEvent.change(wrapper.getByRole("textbox", { name: /seq/i }), {
+      target: {
+        name: "seq",
+        value: "new seq value"
+      }
     });
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     // Wait for the primer form to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.

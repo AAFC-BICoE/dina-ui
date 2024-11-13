@@ -1,6 +1,7 @@
 import PersonDetailsPage from "../../../pages/person/view";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/agent-api/resources/Person";
+import "@testing-library/jest-dom";
 
 /** Test person with all fields defined. */
 const TEST_AGENT: Person = {
@@ -30,28 +31,25 @@ jest.mock("next/router", () => ({
 
 describe("Person details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(<PersonDetailsPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<PersonDetailsPage />, { apiContext });
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Render the Person details", async () => {
-    const wrapper = mountWithAppContext(<PersonDetailsPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<PersonDetailsPage />, { apiContext });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
     // The person's name should be rendered in a FieldView.
-    expect(wrapper.find(".displayName-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<div>person a</div>)).toEqual(true);
+    expect(wrapper.getByText(/display name/i)).toBeInTheDocument();
+    expect(wrapper.getAllByText(/person a/i)[1]).toBeInTheDocument();
 
     // The person's email should be rendered in a FieldView.
-    expect(wrapper.find(".email-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<div>testperson@a.b</div>)).toEqual(
-      true
-    );
+    expect(wrapper.getByText(/email/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/testperson@a\.b/i)).toBeInTheDocument();
   });
 });

@@ -4,12 +4,15 @@ import { AccountProvider } from "./AccountProvider";
 import { noop } from "lodash";
 import { DINA_ADMIN } from "common-ui/types/DinaRoles";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
+import { useInstanceContext } from "../instance/useInstanceContext";
 
 export function DevUserAccountProvider({
   children
 }: {
   children: ReactNode;
 }): JSX.Element {
+  const instanceContext = useInstanceContext();
+
   const [devModeEnabled, setDevModeEnabled] = useState<boolean | null>(null);
   const [keycloakEnabled, setKeycloakEnabled] = useState<boolean | null>(null);
   const [groupRole, setGroupRole] = useState<string | null>(null);
@@ -28,8 +31,18 @@ export function DevUserAccountProvider({
         setKeycloakEnabled(true);
       }
     };
-    getDevUserConfig();
-  }, []);
+
+    if (instanceContext !== undefined && keycloakEnabled === null) {
+      // Dev-user should only be enabled if using "developer" instance mode.
+      if (instanceContext.instanceMode === "developer") {
+        getDevUserConfig();
+      } else {
+        // Use keycloak in this case.
+        setDevModeEnabled(false);
+        setKeycloakEnabled(true);
+      }
+    }
+  }, [instanceContext]);
 
   // Check if in dev environment first.
   if (process.env.NODE_ENV !== "development" || devModeEnabled === false) {

@@ -122,3 +122,4 @@ export * from "./instance/InstanceContextProvider";
 export * from "./instance/useInstanceContext";
 export * from "./label/FieldLabel";
 export * from "./visibility/useIsVisible";
+export * from "./table/ScientificNameCell";

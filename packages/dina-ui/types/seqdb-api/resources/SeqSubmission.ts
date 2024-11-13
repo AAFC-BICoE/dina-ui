@@ -12,7 +12,6 @@ export interface SeqSubmissionAttributes {
 }
 
 export interface SeqSubmissionRelationships {
-  seqBatch?: SeqBatch;
   submittedBy?: Person;
   sequencingFacility?: SequencingFacility;
 }

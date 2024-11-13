@@ -1,7 +1,4 @@
-import {
-  DinaFormSection,
-  useDinaFormContext
-} from "common-ui";
+import { DinaFormSection, useDinaFormContext } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
 import { AiFillTags } from "react-icons/ai";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -29,20 +26,20 @@ export function TagsAndRestrictionsSection({
 
   return readOnly ? (
     <>
-      {(initialValues.restrictionFieldsExtension) && (
-          <div className="d-flex flex-column">
-            <div className="d-flex flex-row">
-              <div className="flex-grow-1">
-                <RestrictionWarning isRestrictionSelect={true} />
-              </div>
+      {initialValues.restrictionFieldsExtension && (
+        <div className="d-flex flex-column">
+          <div className="d-flex flex-row">
+            <div className="flex-grow-1">
+              <RestrictionWarning isRestrictionSelect={true} />
             </div>
-            {initialValues.restrictionRemarks && (
-              <div className="d-flex flex-row ">
-                <RestrictionWarning isRestrictionRemarks={true} />
-              </div>
-            )}
           </div>
-        )}
+          {initialValues.restrictionRemarks && (
+            <div className="d-flex flex-row ">
+              <RestrictionWarning isRestrictionRemarks={true} />
+            </div>
+          )}
+        </div>
+      )}
     </>
   ) : (
     <div className="row">
@@ -52,6 +49,7 @@ export function TagsAndRestrictionsSection({
           className="tags mb-3"
           name={tagsFieldName}
           groupSelectorName={groupSelectorName}
+          tagsFieldName={tagsFieldName}
           removeBottomMargin={true}
           label={
             <span>

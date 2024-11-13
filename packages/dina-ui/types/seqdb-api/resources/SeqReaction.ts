@@ -3,6 +3,7 @@ import { PcrBatchItem } from "./PcrBatchItem";
 import { PcrPrimer } from "./PcrPrimer";
 import { SeqBatch } from "./SeqBatch";
 import { StorageUnitUsage } from "../../collection-api/resources/StorageUnitUsage";
+import { MolecularAnalysisRunItem } from "./MolecularAnalysisRunItem";
 
 export interface SeqReactionAttributes {
   type: "seq-reaction";
@@ -16,6 +17,7 @@ export interface SeqReactionRelationships {
   pcrBatchItem?: PcrBatchItem;
   seqPrimer?: PcrPrimer;
   storageUnitUsage?: StorageUnitUsage;
+  molecularAnalysisRunItem?: MolecularAnalysisRunItem;
 }
 
 export type SeqReaction = KitsuResource &
