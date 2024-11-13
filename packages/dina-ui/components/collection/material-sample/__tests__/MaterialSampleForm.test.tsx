@@ -2,10 +2,7 @@ import { InputResource, KitsuResourceLink } from "kitsu";
 import Select from "react-select";
 import { default as ReactSwitch, default as Switch } from "react-switch";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
-import {
-  mountWithAppContext,
-  mountWithAppContext2
-} from "../../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   blankMaterialSample,
@@ -15,13 +12,6 @@ import {
   ORGANISMS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
-import {
-  fireEvent,
-  screen,
-  waitForElementToBeRemoved
-} from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -70,21 +60,10 @@ const mockGet = jest.fn<any, any>(async (path) => {
           { id: "1", materialSampleName: "test name", type: "material-sample" }
         ]
       };
-    case "user-api/group":
-      return {
-        data: [
-          {
-            id: "1",
-            type: "group",
-            name: "aafc",
-            path: "/aafc",
-            labels: { en: "AAFC", fr: "AAC" }
-          }
-        ]
-      };
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
     case "collection-api/material-sample-type":
+    case "user-api/group":
     case "agent-api/person":
     case "collection-api/vocabulary2/srs":
     case "collection-api/vocabulary2/coordinateSystem":
@@ -102,11 +81,6 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/form-template":
     case "collection-api/vocabulary2/materialSampleType":
     case "collection-api/organism":
-    case "collection-api/extension":
-    case "collection-api/protocol":
-    case "collection-api/preparation-method":
-    case "collection-api/identifier-type":
-    case "collection-api/assemblage":
       return { data: [], meta: { totalResourceCount: 0 } };
   }
 });
@@ -167,33 +141,37 @@ describe("Material Sample Edit Page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Submits a new material-sample with a new CollectingEvent.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
 
-    // Enable the collecting event section:
-    const collectingEventToggle = wrapper.container.querySelectorAll(
-      ".enable-collecting-event .react-switch-bg"
-    );
-    if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
-    }
-    fireEvent.click(collectingEventToggle[0]);
     await new Promise(setImmediate);
+    wrapper.update();
 
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /primary id/i }),
-      "test-material-sample-id"
+    // Enable Collecting Event and catalogue info form sections:
+    wrapper.find(".enable-collecting-event").find(Switch).prop<any>("onChange")(
+      true
     );
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
-      "2019-12-21T16:00"
+    wrapper.find(".enable-catalogue-info").find(Switch).prop<any>("onChange")(
+      true
     );
-
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    // Wait for the page to load.
     await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-material-sample-id" } });
+    wrapper
+      .find(".verbatimEventDateTime-field input")
+      .simulate("change", { target: { value: "2019-12-21T16:00" } });
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
@@ -237,13 +215,11 @@ describe("Material Sample Edit Page", () => {
               identifiers: {},
               dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
-              dwcDegreeOfEstablishment: null,
               hostOrganism: null,
               managedAttributes: {},
               publiclyReleasable: true, // Default value
               relationships: {
                 organism: { data: [] },
-                preparedBy: { data: [] },
                 storageUnitUsage: { data: null }
               },
               type: "material-sample",
@@ -259,27 +235,7 @@ describe("Material Sample Edit Page", () => {
               preparedBy: undefined,
               collection: undefined,
               assemblages: undefined,
-              storageUnitUsage: undefined,
-              storageUnit: undefined,
-              preservationType: null,
-              preparationDate: null,
-              preparationFixative: null,
-              preparationManagedAttributes: {},
-              preparationMaterials: null,
-              preparationMethod: {
-                id: null,
-                type: "preparation-method"
-              },
-              preparationProtocol: {
-                id: null,
-                type: "protocol"
-              },
-              preparationRemarks: null,
-              preparationSubstrate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              }
+              storageUnitUsage: undefined
             },
             type: "material-sample"
           }
@@ -290,34 +246,38 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Submits a new material-sample linked to an existing CollectingEvent.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-    await new Promise(setImmediate);
 
-    // Enable the collecting event section:
-    const collectingEventToggle = wrapper.container.querySelectorAll(
-      ".enable-collecting-event .react-switch-bg"
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Enable Collecting Event and catalogue info form sections:
+    wrapper.find(".enable-collecting-event").find(Switch).prop<any>("onChange")(
+      true
     );
-    if (!collectingEventToggle) {
-      fail("Collecting event toggle needs to exist at this point.");
-    }
-    fireEvent.click(collectingEventToggle[0]);
-    await new Promise(setImmediate);
-
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /primary id/i }),
-      "test-material-sample-id"
+    wrapper.find(".enable-catalogue-info").find(Switch).prop<any>("onChange")(
+      true
     );
 
-    // Select an existing collecting event.
-    userEvent.click(wrapper.getByRole("button", { name: /select/i }));
     await new Promise(setImmediate);
+    wrapper.update();
 
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-material-sample-id" } });
+
+    wrapper.find("button.collecting-event-link-button").simulate("click");
+
     await new Promise(setImmediate);
+    wrapper.update();
 
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
@@ -342,34 +302,6 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               type: "material-sample",
-              assemblages: undefined,
-              attachment: undefined,
-              collection: undefined,
-              dwcDegreeOfEstablishment: null,
-              organism: undefined,
-              organismsIndividualEntry: undefined,
-              organismsQuantity: undefined,
-              preparationDate: null,
-              preparationFixative: null,
-              preparationManagedAttributes: {},
-              preparationMaterials: null,
-              preparationMethod: {
-                id: null,
-                type: "preparation-method"
-              },
-              preparationProtocol: {
-                id: null,
-                type: "protocol"
-              },
-              preparationRemarks: null,
-              preparationSubstrate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: undefined,
-              preservationType: null,
-              projects: undefined,
               managedAttributes: {},
               publiclyReleasable: true,
               identifiers: {},
@@ -378,15 +310,11 @@ describe("Material Sample Edit Page", () => {
               restrictionFieldsExtension: null,
               isRestricted: false,
               restrictionRemarks: null,
-              scheduledAction: undefined,
-              storageUnit: undefined,
-              storageUnitUsage: undefined,
               associations: [],
               hostOrganism: null,
               collectingEvent: { id: "1", type: "collecting-event" },
               relationships: {
                 organism: { data: [] },
-                preparedBy: { data: [] },
                 storageUnitUsage: { data: null }
               }
             },
@@ -399,31 +327,32 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Edits an existing material-sample", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={testMaterialSample()}
         onSaved={mockOnSaved}
       />,
       testCtx
     );
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-    ).toHaveDisplayValue("2021-04-13");
+      wrapper.find(".startEventDateTime-field input").prop("value")
+    ).toEqual("2021-04-13");
 
-    // Update the Primary ID.
-    userEvent.clear(wrapper.getByRole("textbox", { name: /primary id/i }));
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /primary id/i }),
-      "test-material-sample-id"
-    );
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-material-sample-id" } });
 
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    wrapper.find("form").simulate("submit");
+
     await new Promise(setImmediate);
+    wrapper.update();
 
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       [
         [
           {
@@ -462,40 +391,47 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you remove the attached Collecting Event.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={testMaterialSample()}
         onSaved={mockOnSaved}
       />,
       testCtx
     );
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-    ).toHaveDisplayValue("2021-04-13");
+      wrapper.find(".verbatimEventDateTime-field input").prop("value")
+    ).toEqual("2021-04-13");
 
-    // Remove the existing Collecting Event.
-    userEvent.click(wrapper.getByRole("button", { name: /detach/i }));
+    wrapper
+      .find(
+        "#" + COLLECTING_EVENT_COMPONENT_NAME + " button.detach-resource-button"
+      )
+      .simulate("click");
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Existing CollectingEvent should be gone:
     expect(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
-    ).toHaveDisplayValue("");
+      wrapper.find(".verbatimEventDateTime-field input").prop("value")
+    ).toEqual("");
 
     // Set the new Collecting Event's verbatimEventDateTime:
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
-      "2019-12-21T16:00"
-    );
+    wrapper
+      .find(".verbatimEventDateTime-field input")
+      .simulate("change", { target: { value: "2019-12-21T16:00" } });
 
-    // Save
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    wrapper.find("form").simulate("submit");
+
     await new Promise(setImmediate);
+    wrapper.update();
 
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       [
         // New collecting-event created:
         [
@@ -547,7 +483,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Renders an existing Material Sample with the Preparations section enabled.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -563,16 +499,18 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Preparations are enabled:
     expect(
-      wrapper.container.querySelector(".enable-catalogue-info input")
-    ).toHaveAttribute("aria-checked", "true");
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
   });
 
   it("Renders an existing Material Sample with the Storage section enabled.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -587,19 +525,19 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Storage is enabled:
     expect(
-      wrapper.container.querySelector(".enable-storage input")
-    ).toHaveAttribute("aria-checked", "true");
-    expect(
-      wrapper.getByRole("heading", { name: /storage/i })
-    ).toBeInTheDocument();
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#" + STORAGE_COMPONENT_NAME).exists()).toEqual(true);
   });
 
   it("Renders an existing Material Sample with the Organisms section enabled.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -618,19 +556,19 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Determinations are enabled:
     expect(
-      wrapper.container.querySelector(".enable-organisms input")
-    ).toHaveAttribute("aria-checked", "true");
-    expect(
-      wrapper.getByRole("heading", { name: /organisms/i })
-    ).toBeInTheDocument();
+      wrapper.find(".enable-organisms").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("." + ORGANISMS_COMPONENT_NAME).exists()).toEqual(true);
   });
 
   it("Renders an existing Material Sample with the Association section enabled.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -644,19 +582,21 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Assoications are enabled:
     expect(
-      wrapper.container.querySelector(".enable-associations input")
-    ).toHaveAttribute("aria-checked", "true");
-    expect(
-      wrapper.getByRole("heading", { name: /associations/i })
-    ).toBeInTheDocument();
+      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#" + ASSOCIATIONS_COMPONENT_NAME).exists()).toEqual(
+      true
+    );
   });
 
   it("Save association with uuid mapped correctly for saving.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           ...testMaterialSample(),
@@ -668,24 +608,25 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
 
-    // Enable the associations section:
-    const associationsToggle = wrapper.container.querySelectorAll(
-      ".enable-associations .react-switch-bg"
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Associations are enabled:
+    expect(
+      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#" + ASSOCIATIONS_COMPONENT_NAME).exists()).toEqual(
+      true
     );
-    if (!associationsToggle) {
-      fail("Associations toggle needs to exist at this point.");
-    }
-    fireEvent.click(associationsToggle[0]);
-    await new Promise(setImmediate);
 
-    // Save
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    wrapper.find("form").simulate("submit");
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Saves the Material Sample:
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       [
         [
           {
@@ -723,7 +664,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Renders an existing Material Sample with all toggleable data components disabled.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -736,31 +677,33 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Data components are disabled:
     expect(
-      wrapper.container.querySelector(".enable-collecting-event input")
-    ).toHaveAttribute("aria-checked", "false");
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
     expect(
-      wrapper.container.querySelector(".enable-organisms input")
-    ).toHaveAttribute("aria-checked", "false");
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
     expect(
-      wrapper.container.querySelector(".enable-storage input")
-    ).toHaveAttribute("aria-checked", "false");
+      wrapper.find(".enable-organisms").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
     expect(
-      wrapper.container.querySelector(".enable-scheduled-actions input")
-    ).toHaveAttribute("aria-checked", "false");
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
     expect(
-      wrapper.container.querySelector(".enable-restrictions input")
-    ).toHaveAttribute("aria-checked", "false");
-    expect(
-      wrapper.container.querySelector(".enable-associations input")
-    ).toHaveAttribute("aria-checked", "false");
+      wrapper
+        .find(".enable-scheduled-actions")
+        .find(ReactSwitch)
+        .prop("checked")
+    ).toEqual(false);
   });
 
   it("Renders an existing Material Sample with the managed attribute when there is selected attribute with assinged value", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           ...testMaterialSample(),
@@ -774,13 +717,16 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-    await new Promise(setImmediate);
 
-    // Save
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
+    wrapper.update();
 
-    expect(mockSave.mock.calls).toMatchObject([
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
       [
         [
           {
@@ -818,75 +764,65 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Submits a new Material Sample with 3 Determinations.", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Set the group:
-    userEvent.click(
-      wrapper.getByRole("combobox", { name: /group select\.\.\./i })
-    );
-    userEvent.click(wrapper.getByRole("option", { name: /aafc/i }));
+    wrapper.find(".group-field Select").prop<any>("onChange")({
+      label: "group",
+      value: "test group"
+    });
 
-    // Set the Primary ID.
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /primary id/i }),
-      "test-material-sample-id"
-    );
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-material-sample-id" } });
 
     // Enable the Organisms form section:
-    const organismToggle = wrapper.container.querySelectorAll(
-      ".enable-organisms .react-switch-bg"
-    );
-    if (!organismToggle) {
-      fail("organism toggle needs to exist at this point.");
-    }
-    fireEvent.click(organismToggle[0]);
+    wrapper.find(".enable-organisms").find(Switch).prop<any>("onChange")(true);
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Add a determination:
-    userEvent.click(
-      wrapper.getByRole("button", { name: /add new determination/i })
-    );
+    wrapper.find(".determination-section button.add-button").simulate("click");
     await new Promise(setImmediate);
+    wrapper.update();
 
     function fillOutDetermination(num: number) {
-      userEvent.type(
-        wrapper.getByRole("textbox", {
-          name: /verbatim scientific name × insert hybrid symbol/i
-        }),
-        `test-name-${num}`
-      );
-      userEvent.type(
-        wrapper.getByRole("textbox", { name: /verbatim determiner/i }),
-        `test-agent-${num}`
-      );
+      wrapper
+        .find(".verbatimScientificName-field input")
+        .last()
+        .simulate("change", { target: { value: `test-name-${num}` } });
+      wrapper
+        .find(".verbatimDeterminer-field input")
+        .last()
+        .simulate("change", { target: { value: `test-agent-${num}` } });
     }
 
     // Enter the first determination:
     fillOutDetermination(1);
 
     // Enter the second determination:
-    userEvent.click(
-      wrapper.getByRole("button", { name: /add another determination/i })
-    );
+    wrapper.find(".determination-section button.add-button").simulate("click");
     await new Promise(setImmediate);
     fillOutDetermination(2);
 
     // Enter the third determination:
-    userEvent.click(
-      wrapper.getByRole("button", { name: /add another determination/i })
-    );
+    wrapper.find(".determination-section button.add-button").simulate("click");
     await new Promise(setImmediate);
     fillOutDetermination(3);
 
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    wrapper.find("form").simulate("submit");
+
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Saves the Material Sample:
-    expect(mockSave.mock.calls).toMatchObject([
+    expect(mockSave.mock.calls).toEqual([
       // First submits the organism in one transaction:
       [
         [
@@ -907,7 +843,7 @@ describe("Material Sample Edit Page", () => {
                 }
               ],
               // The organism should get the same group as the Material Sample:
-              group: "aafc",
+              group: "test group",
               type: "organism"
             },
             type: "organism"
@@ -920,7 +856,7 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: expect.objectContaining({
-              group: "aafc",
+              group: "test group",
               relationships: expect.objectContaining({
                 organism: {
                   data: [
@@ -1088,46 +1024,46 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Submits a new Material Sample with a duplicate sample name: Shows an error", async () => {
-    const wrapper = mountWithAppContext2(
+    const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
+
     await new Promise(setImmediate);
+    wrapper.update();
 
-    // Update the Primary ID.
-    userEvent.type(
-      wrapper.getByRole("textbox", { name: /primary id/i }),
-      "test-duplicate-name"
-    );
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-duplicate-name" } });
 
-    // Attempt to save, error should be displayed.
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
+    wrapper.update();
 
-    // Expect red outline around Primary ID.
-    expect(wrapper.getByRole("textbox", { name: /primary id/i })).toHaveClass(
-      "is-invalid"
-    );
     expect(
-      wrapper.getByText(/1 : primary id \- duplicate primary id found/i)
-    ).toBeInTheDocument();
+      wrapper.find(".materialSampleName-field input").hasClass("is-invalid")
+    ).toEqual(true);
 
     // You should not be able to submit the form until this error is resolved:
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
+    wrapper.update();
+
     expect(mockOnSaved).toHaveBeenCalledTimes(0);
 
     // Click the "allow" button:
-    userEvent.click(wrapper.getByRole("button", { name: /allow duplicate/i }));
+    wrapper.find("button.allow-duplicate-button").first().simulate("click");
     await new Promise(setImmediate);
+    wrapper.update();
 
     expect(
-      wrapper.getByRole("textbox", { name: /primary id/i })
-    ).not.toHaveClass("is-invalid");
+      wrapper.find(".materialSampleName-field input").hasClass("is-invalid")
+    ).toEqual(false);
 
     // Submit the form with no errors:
-    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Form submitted successfully:
     expect(mockOnSaved).lastCalledWith("11111111-1111-1111-1111-111111111111");
