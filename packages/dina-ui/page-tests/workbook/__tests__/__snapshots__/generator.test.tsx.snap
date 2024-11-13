@@ -77,7 +77,7 @@ exports[`Workbook Template Generator Page Layout 1`] = `
                 >
                   <a
                     class="px-0 btn btn-link"
-                    href="https://github.com/AAFC-BICoE/dina-feedback/issues/new?template=bug_report.md&labels=template&title=%5BAAFC%5D%20"
+                    href="/feedback"
                     role="button"
                     tabindex="0"
                   >

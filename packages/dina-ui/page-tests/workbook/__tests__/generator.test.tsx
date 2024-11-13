@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import { WorkbookTemplateGenerator } from "../../../pages/workbook/generator";
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import userEvent from "@testing-library/user-event";
