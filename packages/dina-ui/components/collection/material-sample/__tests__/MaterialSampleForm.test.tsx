@@ -7,13 +7,10 @@ import {
   mountWithAppContext2
 } from "../../../../test-util/mock-app-context";
 import {
-  ASSOCIATIONS_COMPONENT_NAME,
   blankMaterialSample,
   CollectingEvent,
   COLLECTING_EVENT_COMPONENT_NAME,
-  MaterialSample,
-  ORGANISMS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  MaterialSample
 } from "../../../../types/collection-api";
 import {
   fireEvent,
@@ -82,31 +79,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
           }
         ]
       };
-    case "collection-api/preparation-type":
-    case "collection-api/managed-attribute":
-    case "collection-api/material-sample-type":
-    case "agent-api/person":
-    case "collection-api/vocabulary2/srs":
-    case "collection-api/vocabulary2/coordinateSystem":
-    case "collection-api/vocabulary2/degreeOfEstablishment":
-    case "collection-api/vocabulary2/materialSampleState":
-    case "collection-api/vocabulary2/typeStatus":
-    case "collection-api/storage-unit-type":
-    case "collection-api/storage-unit":
-    case "objectstore-api/metadata":
-    case "collection-api/collection":
-    case "collection-api/collection-method":
-    case "collection-api/storage-unit/76575":
-    case "collection-api/project":
-    case "collection-api/vocabulary2/associationType":
-    case "collection-api/form-template":
-    case "collection-api/vocabulary2/materialSampleType":
-    case "collection-api/organism":
-    case "collection-api/extension":
-    case "collection-api/protocol":
-    case "collection-api/preparation-method":
-    case "collection-api/identifier-type":
-    case "collection-api/assemblage":
+    default:
       return { data: [], meta: { totalResourceCount: 0 } };
   }
 });
@@ -205,6 +178,7 @@ describe("Material Sample Edit Page", () => {
               otherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              group: "aafc",
               geoReferenceAssertions: [
                 {
                   isPrimary: true
@@ -1135,53 +1109,43 @@ describe("Material Sample Edit Page", () => {
 
   it("Add the associated sample selected from search result list to a new association.", async () => {
     // Mount a new material sample with no values
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable association:
-    wrapper
-      .find(".enable-associations")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
-
+    const associationToggle = wrapper.container.querySelectorAll(
+      ".enable-associations .react-switch-bg"
+    );
+    if (!associationToggle) {
+      fail("Association toggle needs to exist at this point.");
+    }
+    fireEvent.click(associationToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
-
-    // Add a new association
-    wrapper.find("button.add-button").simulate("click");
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find("button.searchSample")).toBeTruthy();
 
     // Click the search button to find from a material sample list
-    wrapper.find("button.searchSample").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button", { name: /search\.\.\./i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Search table is shown:
-    expect(wrapper.find(".associated-sample-search").exists()).toEqual(true);
+    expect(
+      wrapper.getByRole("link", { name: /test name/i })
+    ).toBeInTheDocument();
 
     // Select one sample from search result list
-    wrapper.find("button.associated-sample-search").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button", { name: /select/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Expect the selected sample being populated to the sample input
-    expect(wrapper.find(".associated-sample-link").text()).toEqual(
-      "my-sample-name"
-    );
+    expect(
+      wrapper.getByRole("link", { name: /my\-sample\-name/i })
+    ).toBeInTheDocument();
   });
 
   it("Lets you add an organism to an existing Material Sample", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1193,29 +1157,27 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enable the Organisms form section:
-    wrapper.find(".enable-organisms").find(Switch).prop<any>("onChange")(true);
+    const organismToggle = wrapper.container.querySelectorAll(
+      ".enable-organisms .react-switch-bg"
+    );
+    if (!organismToggle) {
+      fail("organism toggle needs to exist at this point.");
+    }
+    fireEvent.click(organismToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Add 1 new organism:
-    wrapper
-      .find(".organismsQuantity-field input")
-      .simulate("change", { target: { value: 1 } });
+    // Update the lifestage.
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /life stage/i }),
+      "test lifestage"
+    );
 
-    wrapper
-      .find(".lifeStage-field input")
-      .at(0)
-      .simulate("change", { target: { value: "test lifestage" } });
-
-    wrapper.find("form").simulate("submit");
-
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSave.mock.calls).toEqual([
       // Separate transaction to add the organism:
@@ -1260,7 +1222,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Removes linked organisms when you decrease the Organism Quantity and then submit.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1293,32 +1255,53 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find("." + ORGANISMS_COMPONENT_NAME).exists()).toEqual(true);
+    // Expect Organism Section automatically opened.
+    expect(
+      wrapper.getByRole("heading", { name: /organisms/i })
+    ).toBeInTheDocument();
+
+    // Expect the 3 organisms to be present based on the lifestage in the tables.
+    expect(
+      wrapper.getByRole("cell", { name: /lifestage 1/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("cell", { name: /lifestage 2/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("cell", { name: /lifestage 3/i })
+    ).toBeInTheDocument();
 
     // Expand all organism sections:
-    wrapper.find("button.expand-organism.not-expanded").at(0).simulate("click");
-    wrapper.find("button.expand-organism.not-expanded").at(0).simulate("click");
-    wrapper.find("button.expand-organism.not-expanded").at(0).simulate("click");
+    const expandButtons =
+      wrapper.container.querySelectorAll(".expand-organism");
+    if (!expandButtons || expandButtons.length !== 3) {
+      fail("Missing 3 expand buttons in the organism section.");
+    }
+    expandButtons.forEach((button) => {
+      userEvent.click(button);
+    });
 
     // Edit the 3rd organism and leave the 2nd one alone to make sure new and old data is being removed:
-    wrapper
-      .find(".lifeStage-field input")
-      .at(2)
-      .simulate("change", { target: { value: "this should be removed" } });
+    const lastLifestageField = wrapper.getAllByRole("textbox", {
+      name: /life stage/i
+    })[2];
+    userEvent.clear(lastLifestageField);
+    userEvent.type(lastLifestageField, "This should be removed...");
 
     // Reduce the organisms to 1:
-    wrapper
-      .find(".organismsQuantity-field input")
-      .simulate("change", { target: { value: "1" } });
+    userEvent.clear(
+      wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
+    );
+    userEvent.type(
+      wrapper.getByRole("spinbutton", { name: /organisms quantity/i }),
+      "1"
+    );
 
-    wrapper.find("form").simulate("submit");
-
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSave.mock.calls).toEqual([
       [
@@ -1362,7 +1345,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you remove an organism with the Remove button.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1389,29 +1372,30 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find("." + ORGANISMS_COMPONENT_NAME).exists()).toEqual(true);
+    expect(
+      wrapper.getByRole("heading", { name: /organisms/i })
+    ).toBeInTheDocument();
 
     // Initially has 2 organisms:
     expect(
-      wrapper.find(".organismsQuantity-field input").prop("value")
-    ).toEqual(2);
+      wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
+    ).toHaveDisplayValue("2");
 
     // Remove the first organism:
-    wrapper.find("button.remove-organism-button").first().simulate("click");
+    userEvent.click(
+      wrapper.getAllByRole("button", { name: /remove organism/i })[0]
+    );
+    await new Promise(setImmediate);
 
     // The quantity input is updated:
     expect(
-      wrapper.find(".organismsQuantity-field input").prop("value")
-    ).toEqual(1);
+      wrapper.getByRole("spinbutton", { name: /organisms quantity/i })
+    ).toHaveDisplayValue("1");
 
-    wrapper.find("form").simulate("submit");
-
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSave.mock.calls).toEqual([
       [
@@ -1456,7 +1440,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you remove all organisms by setting the quantity to 0.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1477,26 +1461,22 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
+
+    const organismQuantity = wrapper.getByRole("spinbutton", {
+      name: /organisms quantity/i
+    });
 
     // Initially has 1 organism:
-    expect(
-      wrapper.find(".organismsQuantity-field input").prop("value")
-    ).toEqual(1);
+    expect(organismQuantity).toHaveDisplayValue("1");
 
-    wrapper
-      .find(".organismsQuantity-field input")
-      .simulate("change", { target: { value: "0" } });
+    // Set to 0.
+    userEvent.clear(organismQuantity);
+    userEvent.type(organismQuantity, "0");
 
-    // The organism fields should be gone to indicate the organisms are gone:
-    expect(wrapper.find(".lifeStage-field").exists()).toEqual(false);
-
-    wrapper.find("form").simulate("submit");
-
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the Material Sample with no organisms:
     expect(mockSave.mock.calls).toEqual([
