@@ -2,7 +2,10 @@ import { InputResource, KitsuResourceLink } from "kitsu";
 import Select from "react-select";
 import { default as ReactSwitch, default as Switch } from "react-switch";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import {
+  mountWithAppContext,
+  mountWithAppContext2
+} from "../../../../test-util/mock-app-context";
 import {
   ASSOCIATIONS_COMPONENT_NAME,
   blankMaterialSample,
@@ -12,6 +15,12 @@ import {
   ORGANISMS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
+import {
+  fireEvent,
+  screen,
+  waitForElementToBeRemoved
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -141,37 +150,33 @@ describe("Material Sample Edit Page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Submits a new material-sample with a new CollectingEvent.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Enable Collecting Event and catalogue info form sections:
-    wrapper.find(".enable-collecting-event").find(Switch).prop<any>("onChange")(
-      true
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
     );
-    wrapper.find(".enable-catalogue-info").find(Switch).prop<any>("onChange")(
-      true
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
+    await new Promise(setImmediate);
+
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /primary id/i }),
+      "test-material-sample-id"
     );
-    // Wait for the page to load.
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
+      "2019-12-21T16:00"
+    );
+
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
-
-    wrapper
-      .find(".materialSampleName-field input")
-      .simulate("change", { target: { value: "test-material-sample-id" } });
-    wrapper
-      .find(".verbatimEventDateTime-field input")
-      .simulate("change", { target: { value: "2019-12-21T16:00" } });
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
@@ -215,11 +220,13 @@ describe("Material Sample Edit Page", () => {
               identifiers: {},
               dwcOtherCatalogNumbers: null,
               materialSampleName: "test-material-sample-id",
+              dwcDegreeOfEstablishment: null,
               hostOrganism: null,
               managedAttributes: {},
               publiclyReleasable: true, // Default value
               relationships: {
                 organism: { data: [] },
+                preparedBy: { data: [] },
                 storageUnitUsage: { data: null }
               },
               type: "material-sample",
@@ -235,7 +242,27 @@ describe("Material Sample Edit Page", () => {
               preparedBy: undefined,
               collection: undefined,
               assemblages: undefined,
-              storageUnitUsage: undefined
+              storageUnitUsage: undefined,
+              storageUnit: undefined,
+              preservationType: null,
+              preparationDate: null,
+              preparationFixative: null,
+              preparationManagedAttributes: {},
+              preparationMaterials: null,
+              preparationMethod: {
+                id: null,
+                type: "preparation-method"
+              },
+              preparationProtocol: {
+                id: null,
+                type: "protocol"
+              },
+              preparationRemarks: null,
+              preparationSubstrate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              }
             },
             type: "material-sample"
           }
@@ -246,38 +273,34 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Submits a new material-sample linked to an existing CollectingEvent.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Enable Collecting Event and catalogue info form sections:
-    wrapper.find(".enable-collecting-event").find(Switch).prop<any>("onChange")(
-      true
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
     );
-    wrapper.find(".enable-catalogue-info").find(Switch).prop<any>("onChange")(
-      true
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
+    await new Promise(setImmediate);
+
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /primary id/i }),
+      "test-material-sample-id"
     );
 
+    // Select an existing collecting event.
+    userEvent.click(wrapper.getByRole("button", { name: /select/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".materialSampleName-field input")
-      .simulate("change", { target: { value: "test-material-sample-id" } });
-
-    wrapper.find("button.collecting-event-link-button").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
@@ -302,6 +325,15 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               type: "material-sample",
+              assemblages: undefined,
+              attachment: undefined,
+              collection: undefined,
+              dwcDegreeOfEstablishment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationDate: null,
+              preparationFixative: null,
               managedAttributes: {},
               publiclyReleasable: true,
               identifiers: {},
