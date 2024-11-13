@@ -21,6 +21,7 @@ import {
   waitForElementToBeRemoved
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -328,12 +329,31 @@ describe("Material Sample Edit Page", () => {
               assemblages: undefined,
               attachment: undefined,
               collection: undefined,
-              dwcDegreeOfEstablishment: undefined,
+              dwcDegreeOfEstablishment: null,
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
               preparationDate: null,
               preparationFixative: null,
+              preparationManagedAttributes: {},
+              preparationMaterials: null,
+              preparationMethod: {
+                id: null,
+                type: "preparation-method"
+              },
+              preparationProtocol: {
+                id: null,
+                type: "protocol"
+              },
+              preparationRemarks: null,
+              preparationSubstrate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: undefined,
+              preservationType: null,
+              projects: undefined,
               managedAttributes: {},
               publiclyReleasable: true,
               identifiers: {},
@@ -342,11 +362,15 @@ describe("Material Sample Edit Page", () => {
               restrictionFieldsExtension: null,
               isRestricted: false,
               restrictionRemarks: null,
+              scheduledAction: undefined,
+              storageUnit: undefined,
+              storageUnitUsage: undefined,
               associations: [],
               hostOrganism: null,
               collectingEvent: { id: "1", type: "collecting-event" },
               relationships: {
                 organism: { data: [] },
+                preparedBy: { data: [] },
                 storageUnitUsage: { data: null }
               }
             },
@@ -359,32 +383,31 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Edits an existing material-sample", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={testMaterialSample()}
         onSaved={mockOnSaved}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.find(".startEventDateTime-field input").prop("value")
-    ).toEqual("2021-04-13");
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+    ).toHaveDisplayValue("2021-04-13");
 
-    wrapper
-      .find(".materialSampleName-field input")
-      .simulate("change", { target: { value: "test-material-sample-id" } });
+    // Update the Primary ID.
+    userEvent.clear(wrapper.getByRole("textbox", { name: /primary id/i }));
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /primary id/i }),
+      "test-material-sample-id"
+    );
 
-    wrapper.find("form").simulate("submit");
-
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(mockSave.mock.calls).toEqual([
+    expect(mockSave.mock.calls).toMatchObject([
       [
         [
           {
@@ -423,47 +446,40 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you remove the attached Collecting Event.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={testMaterialSample()}
         onSaved={mockOnSaved}
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.find(".verbatimEventDateTime-field input").prop("value")
-    ).toEqual("2021-04-13");
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+    ).toHaveDisplayValue("2021-04-13");
 
-    wrapper
-      .find(
-        "#" + COLLECTING_EVENT_COMPONENT_NAME + " button.detach-resource-button"
-      )
-      .simulate("click");
-
+    // Remove the existing Collecting Event.
+    userEvent.click(wrapper.getByRole("button", { name: /detach/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Existing CollectingEvent should be gone:
     expect(
-      wrapper.find(".verbatimEventDateTime-field input").prop("value")
-    ).toEqual("");
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+    ).toHaveDisplayValue("");
 
     // Set the new Collecting Event's verbatimEventDateTime:
-    wrapper
-      .find(".verbatimEventDateTime-field input")
-      .simulate("change", { target: { value: "2019-12-21T16:00" } });
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
+      "2019-12-21T16:00"
+    );
 
-    wrapper.find("form").simulate("submit");
-
+    // Save
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(mockSave.mock.calls).toEqual([
+    expect(mockSave.mock.calls).toMatchObject([
       [
         // New collecting-event created:
         [
