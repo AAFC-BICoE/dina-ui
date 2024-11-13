@@ -12,16 +12,16 @@ export default function MolecularAnalysisRunViewPage() {
         </DinaForm>
       )}
       query={(id) => ({
-        path: `seqdb-api/molecular-analysis-run-item?include=run,result&filter[rsql]=run.uuid==${id}`
+        path: `seqdb-api/molecular-analysis-run/${id}`
       })}
-      entityLink="/seqdb-api/molecular-analysis-run"
+      entityLink="/seqdb/molecular-analysis-run"
       type="molecular-analysis-run"
       apiBaseUrl="/seqdb-api"
       deleteButton={(formProps) => (
         <DeleteButton
           id={formProps.initialValues.id}
           options={{ apiBaseUrl: "/seqdb-api" }}
-          postDeleteRedirect="/seqdb-api/molecular-analysis-run/list"
+          postDeleteRedirect="/seqdb/molecular-analysis-run/list"
           type="molecular-analysis-run"
         />
       )}
