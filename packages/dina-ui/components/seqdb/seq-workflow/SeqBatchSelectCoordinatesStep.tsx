@@ -9,6 +9,7 @@ import {
 } from "./seq-batch-select-coordinats-step/useSeqSelectCoordinatesControls";
 import { DraggableItemList } from "../container-grid/DraggableItemList";
 import { ContainerGrid } from "../container-grid/ContainerGrid";
+import { PersistedResource } from "kitsu";
 
 export interface SeqBatchSelectCoordinatesStepProps {
   seqBatchId: string;
@@ -17,6 +18,10 @@ export interface SeqBatchSelectCoordinatesStepProps {
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
+  onSaved: (
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<SeqBatch>
+  ) => Promise<void>;
 }
 
 export function SeqBatchSelectCoordinatesStep(
@@ -57,6 +62,9 @@ export function SeqBatchSelectCoordinatesStep(
       await gridSubmit();
       setPerformSave(false);
       setEditMode(false);
+
+      // Continue to the last step.
+      props.onSaved(3);
     }
 
     if (performSave) {
@@ -78,17 +86,6 @@ export function SeqBatchSelectCoordinatesStep(
 
   return (
     <div className="mt-3">
-      {!editMode && (
-        <div className="row">
-          <div className="col-12 text-end">
-            <Link href={`/seqdb/seq-workflow/worksheet?id=${seqBatchId}`}>
-              <a target="_blank" className="btn btn-primary">
-                Worksheet
-              </a>
-            </Link>
-          </div>
-        </div>
-      )}
       {editMode && (
         <div className="row">
           <div className="col-3" />

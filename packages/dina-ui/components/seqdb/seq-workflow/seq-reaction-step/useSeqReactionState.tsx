@@ -58,7 +58,13 @@ export function useSeqReactionState(seqBatchId?: string) {
         filter: {
           "seqBatch.uuid": seqBatchId as string
         },
-        include: ["pcrBatchItem", "seqPrimer", "storageUnitUsage"].join(","),
+        include: [
+          "pcrBatchItem",
+          "seqPrimer",
+          "storageUnitUsage",
+          "molecularAnalysisRunItem",
+          "molecularAnalysisRunItem.run"
+        ].join(","),
         sort: "pcrBatchItem",
         page: { limit: 1000 }
       }

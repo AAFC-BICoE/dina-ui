@@ -983,6 +983,21 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workbookGenerateTemplateTitle: "Generate Workbook Template",
   workbookTitle: "Workbooks",
   workbookPreviewTitle: "Workbook preview",
+  worksheet: "Worksheet",
+  sangerRunStep_multipleRunWarning_title:
+    "Multiple runs exist for this Sanger workflow.",
+  sangerRunStep_multipleRunWarning_description:
+    "This sanger workflow should only have one associated run. Please verify and correct it.",
+  sangerRunStep_sequencingRun: "Sequencing Run:",
+  sangerRunStep_sequencingRunContent: "Sequencing Run Content:",
+  sangerRunStep_missingSequencingRunID:
+    "Unexpected error occurred. Sequencing Run ID should be set at this point.",
+  sangerRunStep_missingSequenceReactions:
+    "No sequence reactions to generate a sequence run. Please use the 'Select PCR Batch' step.",
+  sangerRunStep_invalidRunName:
+    "A sequencing run name must be provided in order to generate a sequence run.",
+  sangerRunStep_noRunExists:
+    "No sequencing run created yet for this sanger workflow. Click edit to create a new run.",
   mapRelationshipTitle: "Relationship Mapping",
   value: "Value",
   count: "Count",
