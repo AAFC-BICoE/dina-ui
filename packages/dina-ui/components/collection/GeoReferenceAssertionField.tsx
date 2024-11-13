@@ -60,7 +60,7 @@ export function GeoReferenceAssertionField({
         <TabbedArrayField<GeoReferenceAssertion>
           className="non-strip"
           typeName={formatMessage("geoReferenceAssertion")}
-          legend={<DinaMessage id="geoReferencingLegend" />}
+          removePadding={true}
           renderAboveTabs={() =>
             isTemplate && (
               <Field name="includeAllGeoReference">

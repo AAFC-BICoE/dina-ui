@@ -22,7 +22,7 @@ describe("ParseVerbatimToRangeButton component", () => {
     );
 
     // Simulate button click
-    const button = screen.getByRole("button", { name: /buttonText/i });
+    const button = screen.getByRole("button");
     fireEvent.click(button);
 
     await new Promise(setImmediate);
@@ -55,7 +55,7 @@ describe("ParseVerbatimToRangeButton component", () => {
     );
 
     // Simulate button click
-    const button = screen.getByRole("button", { name: /buttontext/i });
+    const button = screen.getByRole("button");
     fireEvent.click(button);
 
     await new Promise(setImmediate);

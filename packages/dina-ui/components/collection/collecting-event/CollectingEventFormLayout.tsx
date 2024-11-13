@@ -835,9 +835,8 @@ export function CollectingEventFormLayout({
                         onClick={({ lat, lon }) =>
                           setGeoSearchValue(`${lat}, ${lon}`)
                         }
-                      >
-                        <DinaMessage id="latLongAutoSetterButton" />
-                      </SetCoordinatesFromVerbatimButton>
+                        buttonText={formatMessage("latLongAutoSetterButton")}
+                      />
                     </div>
                   </>
                 );
