@@ -1,7 +1,8 @@
-import { QueryTable } from "common-ui";
 import PcrPrimerListPage from "../../../../pages/seqdb/pcr-primer/list";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -36,40 +37,38 @@ const apiContext: any = {
 
 describe("PcrPrimer list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext(<PcrPrimerListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<PcrPrimerListPage />, { apiContext });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check that the table contains the links to primer details pages.
-    expect(wrapper.containsMatchingElement(<a>Test Primer 1</a>)).toEqual(true);
-    expect(wrapper.containsMatchingElement(<a>Test Primer 2</a>)).toEqual(true);
+    expect(wrapper.getByText(/test primer 1/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/test primer 2/i)).toBeInTheDocument();
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithAppContext(<PcrPrimerListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<PcrPrimerListPage />, { apiContext });
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enter a search value.
-    wrapper
-      .find("input.filter-value")
-      .simulate("change", { target: { value: "101F" } });
+    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
+      target: {
+        value: "101F"
+      }
+    });
 
     // Submit the search form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGet).toHaveBeenCalledWith(
       "seqdb-api/pcr-primer",
       expect.objectContaining({ filter: { rsql: "name==*101F*" } })
     );
-    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
-      rsql: "name==*101F*"
-    });
+    expect(wrapper.getByText(/test primer 1/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/test primer 2/i)).toBeInTheDocument();
   });
 });

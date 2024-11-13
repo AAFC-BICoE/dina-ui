@@ -1,7 +1,8 @@
-import { QueryTable } from "common-ui";
 import ProductListPage from "../../../../pages/seqdb/product/list";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -32,43 +33,36 @@ const apiContext: any = {
 
 describe("Product list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<ProductListPage />, { apiContext });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check that the table contains the links to product details pages.
-    expect(wrapper.containsMatchingElement(<a>Test Product 1</a>)).toEqual(
-      true
-    );
-    expect(wrapper.containsMatchingElement(<a>Test Product 2</a>)).toEqual(
-      true
-    );
+    expect(wrapper.getByText(/test product 1/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/test product 2/i)).toBeInTheDocument();
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
+    const wrapper = mountWithAppContext2(<ProductListPage />, { apiContext });
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Enter a search value.
-    wrapper
-      .find("input.filter-value")
-      .simulate("change", { target: { value: "omni" } });
+    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
+      target: { value: "omni" }
+    });
 
     // Submit the search form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
+
     expect(mockGet).toHaveBeenCalledWith(
       "seqdb-api/product",
       expect.objectContaining({ filter: { rsql: "name==*omni*" } })
     );
-    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
-      rsql: "name==*omni*"
-    });
+    expect(wrapper.getByText(/test product 1/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/test product 2/i)).toBeInTheDocument();
   });
 });
