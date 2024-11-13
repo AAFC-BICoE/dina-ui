@@ -226,6 +226,16 @@ export const DINAUI_MESSAGES_ENGLISH = {
   extensionListTitle: " Field Extensions",
   externalResourceListTitle: "External Resources",
   feedbackButtonText: "Feedback",
+  feedbackTitle: "Feedback is recorded in public GitHub Issues",
+  feedbackWarningTitle:
+    "Warning: GitHub Issues are publicly visible, allowing anyone to view and search the content.",
+  feedbackWarningDescription:
+    "Before posting, review your text and attachments to ensure they don’t inadvertently disclose sensitive details. Private data, credentials, or proprietary project information should be considered exposed if included in issue descriptions, comments, or attachments.",
+  feedbackContactUs:
+    "If you need to discuss sensitive matters, please communicate via email.",
+  feedbackLinkHeader: "Submit GitHub Issue here:",
+  feedbackLinkTitle: "GitHub Issues",
+  feedbackExternal: "(external, GitHub account required)",
   fieldExtensions: "Field Extensions",
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
