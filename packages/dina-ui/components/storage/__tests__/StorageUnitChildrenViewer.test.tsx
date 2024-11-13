@@ -1,8 +1,10 @@
 import { PersistedResource } from "kitsu";
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitChildrenViewer } from "../StorageUnitChildrenViewer";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 const STORAGE_UNIT_CHILDREN = ["B", "C", "D"].map<
   PersistedResource<StorageUnit>
@@ -149,30 +151,44 @@ describe("StorageUnitChildrenViewer component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Shows the storage units children.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}} readOnly={true}>
-        <StorageUnitChildrenViewer storageUnit={storageUnitA} />,
+        <StorageUnitChildrenViewer
+          storageUnit={storageUnitA}
+          materialSamples={undefined}
+        />
+        ,
       </DinaForm>,
       { apiContext }
     );
 
     // The page should load initially with a loading spinner.
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
+    // Test expected links that show storage units children
     expect(
-      wrapper.find(".storage-unit-name").map((node) => node.text())
-    ).toEqual(["B (Box)", "C (Box)", "D (Box)"]);
+      wrapper.getByRole("link", { name: /b \(box\)/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("link", { name: /c \(box\)/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("link", { name: /d \(box\)/i })
+    ).toBeInTheDocument();
   });
 
   it("Lets you move all stored samples and storages to another storage unit.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}} readOnly={true}>
-        <StorageUnitChildrenViewer storageUnit={storageUnitA} />,
+        <StorageUnitChildrenViewer
+          storageUnit={storageUnitA}
+          materialSamples={undefined}
+        />
+        ,
       </DinaForm>,
       {
         apiContext,
@@ -180,16 +196,18 @@ describe("StorageUnitChildrenViewer component", () => {
       }
     );
     await new Promise(setImmediate);
-    wrapper.update();
-    wrapper.find("button.enable-move-content").simulate("click");
+
+    // Click "Move All Content" button
+    userEvent.click(wrapper.getByRole("button", { name: /move all content/i }));
 
     await new Promise(setImmediate);
-    wrapper.update();
-    wrapper.find("button.select-storage").simulate("click");
+
+    // Click "Select" button for B (Box) storage unit
+    userEvent.click(wrapper.getAllByRole("button", { name: /select/i })[0]);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API Call
     expect(mockSave).lastCalledWith(
       [
         ...STORAGE_UNIT_CHILDREN.map((unit) => ({
@@ -220,9 +238,13 @@ describe("StorageUnitChildrenViewer component", () => {
 
   it("Lets you move an existing Storage Unit into this Storage Unit", async () => {
     // Render a storage unit with no children:
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}} readOnly={true}>
-        <StorageUnitChildrenViewer storageUnit={storageUnitX} />,
+        <StorageUnitChildrenViewer
+          storageUnit={storageUnitX}
+          materialSamples={undefined}
+        />
+        ,
       </DinaForm>,
       {
         apiContext,
@@ -230,16 +252,18 @@ describe("StorageUnitChildrenViewer component", () => {
       }
     );
     await new Promise(setImmediate);
-    wrapper.update();
-    wrapper.find("button.add-existing-as-child").simulate("click");
+
+    // Click "Add Existing Storage Unit" button
+    userEvent.click(
+      wrapper.getByRole("button", { name: /add existing storage unit/i })
+    );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.select-storage").simulate("click");
+    // Click "Select" button to select storage B
+    userEvent.click(wrapper.getByRole("button", { name: /select/i }));
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Updates B to set X as the new parent:
     expect(mockSave).lastCalledWith(
