@@ -26,6 +26,9 @@ export interface TabbedArrayFieldProps<T> {
   renderTab: (element: T, index: number) => ReactNode;
   renderAboveTabs?: () => ReactNode;
   wrapContent?: (content: ReactNode) => ReactNode;
+
+  /** Remove the padding and border around the fieldset. */
+  removePadding?: boolean;
 }
 
 export interface TabPanelCtx<T> {
@@ -45,6 +48,7 @@ export function TabbedArrayField<T>({
   sectionId,
   initialIndex = 0,
   legend,
+  removePadding,
   onChangeTabIndex,
   renderTabPanel,
   renderTab,
@@ -101,6 +105,7 @@ export function TabbedArrayField<T>({
             id={sectionId}
             legend={legend}
             fieldName={name}
+            removePadding={removePadding}
           >
             {wrapContent(
               <>
