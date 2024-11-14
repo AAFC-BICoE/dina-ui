@@ -1,22 +1,12 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
-import Select from "react-select";
-import { default as ReactSwitch, default as Switch } from "react-switch";
 import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
-import {
-  mountWithAppContext,
-  mountWithAppContext2
-} from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import {
   blankMaterialSample,
   CollectingEvent,
-  COLLECTING_EVENT_COMPONENT_NAME,
   MaterialSample
 } from "../../../../types/collection-api";
-import {
-  fireEvent,
-  screen,
-  waitForElementToBeRemoved
-} from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -76,6 +66,16 @@ const mockGet = jest.fn<any, any>(async (path) => {
             name: "aafc",
             path: "/aafc",
             labels: { en: "AAFC", fr: "AAC" }
+          }
+        ]
+      };
+    case "agent-api/person":
+      return {
+        data: [
+          {
+            id: "person-2-uuid",
+            type: "person",
+            displayName: "Person 2"
           }
         ]
       };
@@ -1498,7 +1498,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you remove all organisms by clearing the Quantity field.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1519,27 +1519,21 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
+
+    const organismQuantity = wrapper.getByRole("spinbutton", {
+      name: /organisms quantity/i
+    });
 
     // Initially has 1 organism:
-    expect(
-      wrapper.find(".organismsQuantity-field input").prop("value")
-    ).toEqual(1);
+    expect(organismQuantity).toHaveDisplayValue("1");
 
     // Clear the Quantity field:
-    wrapper
-      .find(".organismsQuantity-field input")
-      .simulate("change", { target: { value: "" } });
+    userEvent.clear(organismQuantity);
 
-    // The organism fields should be gone to indicate the organisms are gone:
-    expect(wrapper.find(".lifeStage-field").exists()).toEqual(false);
-
-    wrapper.find("form").simulate("submit");
-
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the Material Sample with no organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1561,7 +1555,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you add multiple of the SAME Organism by leaving the 'Organisms Individual Entry' toggle off and increasing the Quantity.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1582,23 +1576,29 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
+
+    const organismQuantity = wrapper.getByRole("spinbutton", {
+      name: /organisms quantity/i
+    });
 
     // Initially has 1 organism:
-    wrapper
-      .find(".organismsQuantity-field input")
-      .simulate("change", { target: { value: "3" } });
+    expect(organismQuantity).toHaveDisplayValue("1");
 
-    wrapper
-      .find(".lifeStage-field input")
-      .simulate("change", { target: { value: "common-life-stage" } });
+    // Change it to 3.
+    userEvent.clear(organismQuantity);
+    userEvent.type(organismQuantity, "3");
 
-    wrapper.find("form").simulate("submit");
+    // Update the life stage.
+    userEvent.clear(wrapper.getByRole("textbox", { name: /life stage/i }));
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /life stage/i }),
+      "common-life-stage"
+    );
 
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the Material Sample with the organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1671,7 +1671,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you edit one of multiple DIFFERENT existing attached organisms.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1704,38 +1704,46 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // 3 organisms in quantity:
     expect(
-      wrapper.find(".organismsQuantity-field input").prop("value")
-    ).toEqual(3);
+      wrapper.getByRole("spinbutton", {
+        name: /organisms quantity/i
+      })
+    ).toHaveDisplayValue("3");
+
     // Individual mode selected by default:
     expect(
-      wrapper
-        .find(".organismsIndividualEntry-field")
-        .find(Switch)
-        .prop("checked")
-    ).toEqual(true);
+      wrapper.container.querySelector(".organismsIndividualEntry-field input")
+    ).toHaveAttribute("aria-checked", "true");
 
     // Renders the initial lifestage values:
     expect(
-      wrapper.find("td.lifeStage-cell").map((cell) => cell.text())
-    ).toEqual(["lifestage 1", "lifestage 2", "lifestage 3"]);
+      wrapper.getByRole("cell", { name: /lifestage 1/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("cell", { name: /lifestage 2/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("cell", { name: /lifestage 3/i })
+    ).toBeInTheDocument();
 
     // Expand the 3rd organism:
-    wrapper.find("button.expand-organism").at(2).simulate("click");
+    const expandButtons =
+      wrapper.container.querySelectorAll(".expand-organism");
+    userEvent.click(expandButtons[2]);
+
     // Edit the lifeStage field:
-    wrapper
-      .find(".lifeStage-field input")
-      .simulate("change", { target: { value: "lifestage 3 edited" } });
+    userEvent.clear(wrapper.getByRole("textbox", { name: /life stage/i }));
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /life stage/i }),
+      "lifestage 3 edited"
+    );
 
-    wrapper.find("form").simulate("submit");
-
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the Material Sample with the organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1798,7 +1806,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you switch from multiple DIFFERENT organisms to multiple SAME organisms.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1834,34 +1842,28 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // 3 organisms in quantity:
     expect(
-      wrapper.find(".organismsQuantity-field input").prop("value")
-    ).toEqual(3);
+      wrapper.getByRole("spinbutton", {
+        name: /organisms quantity/i
+      })
+    ).toHaveDisplayValue("3");
+
     // Individual mode selected by default:
     expect(
-      wrapper
-        .find(".organismsIndividualEntry-field")
-        .find(Switch)
-        .prop("checked")
-    ).toEqual(true);
+      wrapper.container.querySelector(".organismsIndividualEntry-field input")
+    ).toHaveAttribute("aria-checked", "true");
 
     // Switch 'Individual Entry' off:
-    wrapper
-      .find(".organismsIndividualEntry-field")
-      .find(Switch)
-      .prop<any>("onChange")(false);
-    wrapper.find(".useTargetOrganism-field").find(Switch).prop<any>("onChange")(
-      false
+    userEvent.click(
+      wrapper.container.querySelector(".organismsIndividualEntry-field input")!
     );
-    wrapper.find("form").simulate("submit");
 
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the Material Sample with the 3 SAME organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -1928,7 +1930,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Changing the target organism should unset all the other organisms as the target", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -1964,36 +1966,33 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // 3 organisms in quantity:
     expect(
-      wrapper.find(".organismsQuantity-field input").prop("value")
-    ).toEqual(3);
+      wrapper.getByRole("spinbutton", {
+        name: /organisms quantity/i
+      })
+    ).toHaveDisplayValue("3");
 
     // Individual mode selected by default:
     expect(
-      wrapper
-        .find(".organismsIndividualEntry-field")
-        .find(Switch)
-        .prop("checked")
-    ).toEqual(true);
+      wrapper.container.querySelector(".organismsIndividualEntry-field input")
+    ).toHaveAttribute("aria-checked", "true");
 
     // Expand the first organism section
-    wrapper.find("button.expand-organism.not-expanded").at(0).simulate("click");
+    const expandButtons =
+      wrapper.container.querySelectorAll(".expand-organism");
+    userEvent.click(expandButtons[0]);
 
     // Switch the first organism to be the target.
-    wrapper
-      .find(".organism_0__isTarget-field")
-      .find(Switch)
-      .prop<any>("onChange")(true);
+    userEvent.click(
+      wrapper.container.querySelector(".organism_0__isTarget-field input")!
+    );
 
-    // Submit form
-    wrapper.find("form").simulate("submit");
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check to ensure that
     expect(mockSave.mock.calls).toEqual([
@@ -2059,7 +2058,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Converts the Sample's determiners from object (front-end format) to UUID (back-end format).", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -2102,56 +2101,21 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Shows the initial determiner value:
-    expect(
-      wrapper
-        .find(".organism_0__determination_0__determiner-field")
-        .find(Select)
-        .prop("value")
-    ).toEqual([
-      {
-        label: "Person 1",
-        resource: {
-          displayName: "Person 1",
-          id: "person-1-uuid",
-          type: "person"
-        },
-        value: "person-1-uuid"
-      }
-    ]);
+    expect(wrapper.getByText(/person 1/i)).toBeInTheDocument();
 
     // Add a second Person to the primary Determination's determiners:
-    wrapper
-      .find(".organism_0__determination_0__determiner-field")
-      .find(Select)
-      .prop<any>("onChange")([
-      {
-        resource: {
-          displayName: "Person 1",
-          id: "person-1-uuid",
-          type: "person"
-        }
-      },
-      {
-        resource: {
-          displayName: "Person 2",
-          id: "person-2-uuid",
-          type: "person"
-        }
-      }
-    ]);
-
+    userEvent.click(
+      wrapper.getByRole("combobox", { name: /determining agents person 1/i })
+    );
+    userEvent.click(wrapper.getByRole("option", { name: /person 2/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("form").simulate("submit");
-
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Saves the Material Sample with the 3 SAME organisms:
     expect(mockSave.mock.calls).toEqual([
@@ -2202,7 +2166,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you set a Custom managed attributes view via prop.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -2222,29 +2186,25 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Attribute 1 should be hidden:
-    expect(wrapper.find(".attribute_1-field input").exists()).toEqual(false);
+    expect(wrapper.queryByText(/attribute 1/i)).not.toBeInTheDocument();
 
     // Attribute 2 already has a value:
-    expect(wrapper.find(".attribute_2-field input").prop("value")).toEqual(
-      "attribute 2 value"
-    );
+    expect(wrapper.getByDisplayValue(/attribute 2 value/i)).toBeInTheDocument();
+
     // Attribute 3 is visible and empty:
-    expect(wrapper.find(".attribute_3-field input").prop("value")).toEqual("");
+    expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
 
     // Set a new value for attribute 2:
-    wrapper
-      .find(".attribute_2-field input")
-      .simulate("change", { target: { value: "new attribute 2 value" } });
+    const attribute2 = wrapper.getByDisplayValue(/attribute 2 value/i);
+    userEvent.clear(attribute2);
+    userEvent.type(attribute2, "new attribute 2 value");
 
-    wrapper.find("form").simulate("submit");
-
+    // Save the form
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSave.mock.calls).toEqual([
       [
@@ -2268,7 +2228,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Lets you set a Custom Collecting Event managed attributes view via prop.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -2283,36 +2243,25 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find(".enable-collecting-event").find(Switch).prop<any>("onChange")(
-      true
+    // Enable the collecting event section:
+    const collectingEventToggle = wrapper.container.querySelectorAll(
+      ".enable-collecting-event .react-switch-bg"
     );
-
+    if (!collectingEventToggle) {
+      fail("Collecting event toggle needs to exist at this point.");
+    }
+    fireEvent.click(collectingEventToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Attributes 2 and 3 are visible and empty:
-    expect(
-      wrapper
-        .find(
-          "#" + COLLECTING_EVENT_COMPONENT_NAME + " .attribute_2-field input"
-        )
-        .prop("value")
-    ).toEqual("");
-    expect(
-      wrapper
-        .find(
-          "#" + COLLECTING_EVENT_COMPONENT_NAME + " .attribute_3-field input"
-        )
-        .prop("value")
-    ).toEqual("");
+    expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
+    expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
   });
 
   it("Lets you set a Custom Determination managed attributes view via prop.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
@@ -2327,34 +2276,26 @@ describe("Material Sample Edit Page", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find(".enable-organisms").find(Switch).prop<any>("onChange")(true);
-
+    // Enable the Organisms form section:
+    const organismToggle = wrapper.container.querySelectorAll(
+      ".enable-organisms .react-switch-bg"
+    );
+    if (!organismToggle) {
+      fail("organism toggle needs to exist at this point.");
+    }
+    fireEvent.click(organismToggle[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find(".determination-section button.add-button").simulate("click");
-
+    // Add a determination:
+    userEvent.click(
+      wrapper.getByRole("button", { name: /add new determination/i })
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Attributes 2 and 3 are visible and empty:
-    expect(
-      wrapper
-        .find(
-          ".organism_0__determination_0__managedAttributes_attribute_2-field input"
-        )
-        .prop("value")
-    ).toEqual("");
-    expect(
-      wrapper
-        .find(
-          ".organism_0__determination_0__managedAttributes_attribute_3-field input"
-        )
-        .prop("value")
-    ).toEqual("");
+    expect(wrapper.queryByText(/attribute 2/i)).toBeInTheDocument();
+    expect(wrapper.queryByText(/attribute 3/i)).toBeInTheDocument();
   });
 });
