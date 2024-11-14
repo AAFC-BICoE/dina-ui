@@ -541,9 +541,7 @@ export function QueryPage<TData extends KitsuResource>({
     // ElasticSearch has an offset limit of 10,000, display a user-friendly error message if
     // exceeded.
     if (pageOffset >= MAX_OFFSET) {
-      setError(
-        "Page number exceeds system limit. To get more relevant results, please modify your search query or change the sort order."
-      );
+      setError(formatMessage({ id: "pageSizeError" }));
       setLoading(false);
       return;
     }

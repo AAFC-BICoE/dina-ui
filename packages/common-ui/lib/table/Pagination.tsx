@@ -96,11 +96,17 @@ export function Pagination<TData>({
             <input
               aria-label="jump to page"
               type="number"
-              value={pageNumberField}
+              value={pageNumberField === 0 ? "" : pageNumberField}
               min={1}
               max={totalPages}
               onChange={(e) => {
                 const newPageSelected: number = Number(e.target.value);
+
+                // User cleared the value, set it to 0 internally but treat it as a blank.
+                if (newPageSelected === 0) {
+                  setPageNumberField(0);
+                  return;
+                }
 
                 // Do not allow the user to type lower/higher supported values.
                 if (newPageSelected > totalPages || newPageSelected < 1) {
@@ -116,13 +122,16 @@ export function Pagination<TData>({
               }}
               onBlur={() => {
                 setPageNumberFocus(false);
-                table.setPageIndex(pageNumberField - 1);
+
+                if (pageNumberField !== 0) {
+                  table.setPageIndex(pageNumberField - 1);
+                }
               }}
               onFocus={() => {
                 setPageNumberFocus(true);
               }}
               onKeyPress={(e) => {
-                if (e.key === "Enter") {
+                if (e.key === "Enter" && pageNumberField !== 0) {
                   table.setPageIndex(pageNumberField - 1);
                 }
               }}

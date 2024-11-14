@@ -20,6 +20,7 @@ import {
   waitForElementToBeRemoved,
   within
 } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 /** Example of an API resource interface definition for a todo-list entry. */
 interface Todo extends KitsuResource {
@@ -600,8 +601,16 @@ describe("QueryTable component", () => {
   });
 
   it("Allow user to type the pagination number", async () => {
+    const onPageChangeMock = jest.fn();
+
     const wrapper = mountWithAppContext2(
-      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+      <QueryTable<Todo>
+        path="todo"
+        columns={["id", "name", "description"]}
+        reactTableProps={{
+          onPageChange: onPageChangeMock
+        }}
+      />,
       { apiContext }
     );
 
@@ -614,5 +623,27 @@ describe("QueryTable component", () => {
 
     // Should start at 1.
     expect(pageSelector).toHaveDisplayValue("1");
+    expect(onPageChangeMock).toBeCalledTimes(0);
+
+    // Change it to 12.
+    userEvent.clear(pageSelector);
+    userEvent.type(pageSelector, "12");
+    fireEvent.blur(pageSelector);
+    expect(pageSelector).toHaveDisplayValue("12");
+    expect(onPageChangeMock).toBeCalledTimes(1);
+
+    // Change it to 8.
+    userEvent.clear(pageSelector);
+    userEvent.type(pageSelector, "8");
+    fireEvent.blur(pageSelector);
+    expect(pageSelector).toHaveDisplayValue("8");
+    expect(onPageChangeMock).toBeCalledTimes(2);
+
+    // Change it to 13, invalid.
+    userEvent.clear(pageSelector);
+    userEvent.type(pageSelector, "13");
+    fireEvent.blur(pageSelector);
+    expect(pageSelector).toHaveDisplayValue("1");
+    expect(onPageChangeMock).toBeCalledTimes(3);
   });
 });
