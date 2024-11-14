@@ -1,6 +1,6 @@
 import { Table } from "@tanstack/react-table";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import CreatableSelect from "react-select/creatable";
 import { SelectOption } from "../formik-connected/SelectField";
@@ -34,6 +34,15 @@ export function Pagination<TData>({
       label: `${pageSize}`
     }))
   );
+
+  const [pageNumberField, setPageNumberField] = useState<number>(1);
+  const [pageNumberFocus, setPageNumberFocus] = useState<boolean>(false);
+
+  useEffect(() => {
+    setPageNumberField(table.getState().pagination.pageIndex + 1);
+  }, [table.getState().pagination.pageIndex]);
+
+  const totalPages = table.getPageCount() !== 0 ? table.getPageCount() : 1;
 
   return (
     <div
@@ -87,19 +96,40 @@ export function Pagination<TData>({
             <input
               aria-label="jump to page"
               type="number"
-              value={table.getState().pagination.pageIndex + 1}
+              value={pageNumberField}
               min={1}
-              max={table.getPageCount() !== 0 ? table.getPageCount() : 1}
+              max={totalPages}
               onChange={(e) => {
-                const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                table.setPageIndex(page);
+                const newPageSelected: number = Number(e.target.value);
+
+                // Do not allow the user to type lower/higher supported values.
+                if (newPageSelected > totalPages || newPageSelected < 1) {
+                  return;
+                }
+
+                // It's likely the user is using the up/down arrows in the browser. Set the page number field.
+                if (pageNumberFocus === false) {
+                  table.setPageIndex(newPageSelected - 1);
+                }
+
+                setPageNumberField(newPageSelected);
+              }}
+              onBlur={() => {
+                setPageNumberFocus(false);
+                table.setPageIndex(pageNumberField - 1);
+              }}
+              onFocus={() => {
+                setPageNumberFocus(true);
+              }}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  table.setPageIndex(pageNumberField - 1);
+                }
               }}
             />
           </div>{" "}
           {formatMessage({ id: "of" })}{" "}
-          <span className="-totalPages">
-            {table.getPageCount() !== 0 ? table.getPageCount() : 1}
-          </span>
+          <span className="-totalPages">{totalPages}</span>
         </span>
         <span className="-select-wrap -pageSizeOptions">
           <span style={{ textTransform: "capitalize" }}>

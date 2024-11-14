@@ -16,6 +16,7 @@ import {
 import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import {
   fireEvent,
+  screen,
   waitForElementToBeRemoved,
   within
 } from "@testing-library/react";
@@ -596,5 +597,22 @@ describe("QueryTable component", () => {
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     expect(wrapper.getByText(/response length is: 30/i)).toBeInTheDocument();
+  });
+
+  it("Allow user to type the pagination number", async () => {
+    const wrapper = mountWithAppContext2(
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+      { apiContext }
+    );
+
+    // Continue the test after the data fetch is done.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    const pageSelector = wrapper.getAllByRole("spinbutton", {
+      name: /jump to page/i
+    })[0];
+
+    // Should start at 1.
+    expect(pageSelector).toHaveDisplayValue("1");
   });
 });
