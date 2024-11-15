@@ -339,9 +339,9 @@ export function useMolecularAnalysisRun({
       const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
         sequencingRunItems.map(() => ({
           type: "molecular-analysis-run-item",
-          usageType: "seq-reaction",
           resource: {
             type: "molecular-analysis-run-item",
+            usageType: "seq-reaction",
             relationships: {
               run: {
                 data: {
