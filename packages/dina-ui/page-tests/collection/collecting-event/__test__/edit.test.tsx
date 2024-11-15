@@ -5,7 +5,7 @@ import { Person } from "../../../../types/agent-api/resources/Person";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
