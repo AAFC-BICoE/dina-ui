@@ -195,5 +195,5 @@ export const SEQDB_MESSAGES_ENGLISH = {
   sequencingFacility: "Sequencing Facility",
   molecularAnalysisRunListTitle: "Molecular Analysis Runs",
   field_molecularAnalysisRunName: "Molecular Analysis Run Name",
-  molecularAnalysisResults: "Molecular Analysis Results"
+  molecularAnalysisRunItems: "Molecular Analysis Run Items"
 };

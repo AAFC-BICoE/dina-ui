@@ -1,6 +1,8 @@
 import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/MolecularAnalysisRunItem";
 import {
+  filterBy,
   LoadingSpinner,
+  ReactTable,
   TextField,
   useDinaFormContext,
   useQuery
@@ -8,15 +10,19 @@ import {
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { GroupSelectField } from "../group-select/GroupSelectField";
 import { AttachmentsField } from "../object-store/attachment-list/AttachmentsField";
+import {
+  SequencingRunItem,
+  useMolecularAnalysisRunView
+} from "./useMolecularAnalysisRun";
+import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
 
 export function MolecularAnalysisRunFormFields() {
-  // `seqdb-api/molecular-analysis-run-item?include=run,result&filter[rsql]=run.uuid==${id}`
   const { initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
-  const molecularAnalysisRunItemQuery = useQuery<MolecularAnalysisRunItem>({
-    path: `seqdb-api/molecular-analysis-run-item?include=run,result&filter[rsql]=run.uuid==${initialValues.id}`
+  const { loading, sequencingRunItems, columns } = useMolecularAnalysisRunView({
+    molecularAnalysisRunId: initialValues.id
   });
-  return molecularAnalysisRunItemQuery.loading ? (
+  return loading ? (
     <LoadingSpinner loading={true} />
   ) : (
     <div>
@@ -32,15 +38,17 @@ export function MolecularAnalysisRunFormFields() {
           className="col-md-6"
         />
       </div>
-      <AttachmentsField
-        name="attachments"
-        title={<DinaMessage id="molecularAnalysisResults" />}
-        id="molecular-analysis-reults-section"
-        allowNewFieldName="attachmentsConfig.allowNew"
-        allowExistingFieldName="attachmentsConfig.allowExisting"
-        attachmentPath={`seqdb-api/molecular-analysis-result/${molecularAnalysisRunItemQuery?.response?.data?.[0]?.result?.id}/attachments`}
-        hideAddAttchmentBtn={true}
-      />
+      <div className="col-12">
+        <strong>
+          <SeqdbMessage id="molecularAnalysisRunItems" />
+        </strong>
+        <ReactTable<SequencingRunItem>
+          className="-striped mt-2"
+          columns={columns}
+          data={sequencingRunItems ?? []}
+          sort={[{ id: "wellCoordinates", desc: false }]}
+        />
+      </div>
     </div>
   );
 }

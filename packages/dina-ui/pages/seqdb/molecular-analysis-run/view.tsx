@@ -25,9 +25,10 @@ export default function MolecularAnalysisRunViewPage() {
           type="molecular-analysis-run"
         />
       )}
-      showGenerateLabelButton={true}
       nameField={(resource) => (resource?.name ? resource.name : "")}
-      showRevisionsLink={true}
+      showRevisionsLink={false}
+      showGenerateLabelButton={false}
+      showEditButton={false}
     />
   );
 }
