@@ -9,21 +9,21 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { compact, pick, uniq, difference, concat } from "lodash";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import {
   MaterialSample,
   MaterialSampleSummary
 } from "../../../../dina-ui/types/collection-api";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
+import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 
-export interface SangerSampleSelectionStepProps {
-  pcrBatchId: string;
+export interface MolecularAnalysisSampleSelectionStepProps {
+  molecularAnalysisId: string;
   onSaved: (
     nextStep: number,
-    pcrBatchSaved?: PersistedResource<PcrBatch>
+    molecularAnalysisSaved?: PersistedResource<GenericMolecularAnalysis>
   ) => Promise<void>;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
@@ -31,14 +31,14 @@ export interface SangerSampleSelectionStepProps {
   setPerformSave: (newValue: boolean) => void;
 }
 
-export function SangerSampleSelectionStep({
-  pcrBatchId,
+export function MolecularAnalysisSampleSelectionStep({
+  molecularAnalysisId,
   editMode,
   onSaved,
   setEditMode,
   performSave,
   setPerformSave
-}: SangerSampleSelectionStepProps) {
+}: MolecularAnalysisSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
   const { username } = useAccount();
   const { PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN } =
@@ -47,7 +47,7 @@ export function SangerSampleSelectionStep({
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
     async function performSaveInternal() {
-      await savePcrBatchItems();
+      await saveMolecularAnalysisItems();
       setPerformSave(false);
       await onSaved(2);
     }
@@ -59,7 +59,7 @@ export function SangerSampleSelectionStep({
 
   // Keep track of the previously selected resources to compare.
   const [previouslySelectedResources, setPreviouslySelectedResources] =
-    useState<PcrBatchItem[]>([]);
+    useState<GenericMolecularAnalysisItem[]>([]);
 
   // The selected resources to be used for the QueryPage.
   const [selectedResources, setSelectedResources] = useState<
@@ -68,7 +68,7 @@ export function SangerSampleSelectionStep({
 
   const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
     string[]
-  >(`pcrWorkflowMaterialSampleSortOrder-${pcrBatchId}`);
+  >(`molecularAnalysisWorkflowMaterialSampleSortOrder-${molecularAnalysisId}`);
 
   /**
    * When the page is first loaded, check if saved samples has already been chosen and reload them.
@@ -124,34 +124,40 @@ export function SangerSampleSelectionStep({
   }
 
   /**
-   * Retrieve all of the PCR Batch Items that are associated with the PCR Batch from step 1.
+   * Retrieve all of the Molecular Analysis Items that are associated with the Molecular Analysis
+   * from step 1.
    */
   async function fetchSampledIds() {
     await apiClient
-      .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId
-            }
-          ]
-        })(""),
-        include: "materialSample",
-        page: {
-          limit: 1000 // Maximum page size.
+      .get<GenericMolecularAnalysisItem[]>(
+        "/seqdb-api/generic-molecular-analysis-item",
+        {
+          filter: filterBy([], {
+            extraFilters: [
+              {
+                selector: "genericMolecularAnalysis.uuid",
+                comparison: "==",
+                arguments: molecularAnalysisId
+              }
+            ]
+          })(""),
+          include: "materialSample",
+          page: {
+            limit: 1000 // Maximum page size.
+          }
         }
-      })
+      )
       .then((response) => {
-        const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
+        const molecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
           response?.data?.filter(
             (item) => item?.materialSample?.id !== undefined
           );
         const materialSampleIds: string[] =
-          pcrBatchItems.map((item) => item?.materialSample?.id as string) ?? [];
+          molecularAnalysisItems.map(
+            (item) => item?.materialSample?.id as string
+          ) ?? [];
 
-        setPreviouslySelectedResources(pcrBatchItems);
+        setPreviouslySelectedResources(molecularAnalysisItems);
         fetchSamples(materialSampleIds);
       });
   }
@@ -176,12 +182,13 @@ export function SangerSampleSelectionStep({
     });
   }
 
-  async function savePcrBatchItems() {
+  async function saveMolecularAnalysisItems() {
     try {
-      const { data: pcrBatch } = await apiClient.get<PcrBatch>(
-        `seqdb-api/pcr-batch/${pcrBatchId}`,
-        {}
-      );
+      const { data: genericMolecularAnalysis } =
+        await apiClient.get<GenericMolecularAnalysis>(
+          `seqdb-api/generic-molecular-analysis/${molecularAnalysisId}`,
+          {}
+        );
 
       // Convert to UUID arrays to compare the two arrays.
       const selectedResourceUUIDs = compact(
@@ -190,11 +197,11 @@ export function SangerSampleSelectionStep({
       const previouslySelectedResourcesUUIDs = compact(
         previouslySelectedResources?.map((item) => ({
           materialSampleUUID: item?.materialSample?.id,
-          pcrBatchItemUUID: item?.id
+          molecularAnalysisItemUUID: item?.id
         }))
       );
 
-      // UUIDs of PCR Batch Items that need to be created.
+      // UUIDs of Molecular Analysis Items that need to be created.
       const itemsToCreate = uniq(
         selectedResourceUUIDs.filter(
           (uuid) =>
@@ -204,7 +211,7 @@ export function SangerSampleSelectionStep({
         )
       );
 
-      // UUIDs of PCR Batch Items that need to be deleted.
+      // UUIDs of Molecular Analysis Items that need to be deleted.
       const itemsToDelete = uniq(
         previouslySelectedResourcesUUIDs.filter(
           (uuid) =>
@@ -217,10 +224,13 @@ export function SangerSampleSelectionStep({
         await save(
           itemsToCreate.map((materialUUID) => ({
             resource: {
-              type: "pcr-batch-item",
-              group: pcrBatch.group ?? "",
+              type: "generic-molecular-analysis-item",
               createdBy: username ?? "",
-              pcrBatch: pick(pcrBatch, "id", "type"),
+              genericMolecularAnalysis: pick(
+                genericMolecularAnalysis,
+                "id",
+                "type"
+              ),
               relationships: {
                 materialSample: {
                   data: {
@@ -230,7 +240,7 @@ export function SangerSampleSelectionStep({
                 }
               }
             },
-            type: "pcr-batch-item"
+            type: "generic-molecular-analysis-item"
           })),
           { apiBaseUrl: "/seqdb-api" }
         );
@@ -241,8 +251,8 @@ export function SangerSampleSelectionStep({
         await save(
           itemsToDelete.map((item) => ({
             delete: {
-              id: item.pcrBatchItemUUID ?? "",
-              type: "pcr-batch-item"
+              id: item.molecularAnalysisItemUUID ?? "",
+              type: "generic-molecular-analysis-item"
             }
           })),
           { apiBaseUrl: "/seqdb-api" }
@@ -272,7 +282,7 @@ export function SangerSampleSelectionStep({
           </strong>
           <QueryPage<any>
             indexName={"dina_material_sample_index"}
-            uniqueName="pcr-material-sample-selection-step-read-only"
+            uniqueName="molecular-analysis-material-sample-selection-step-read-only"
             columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
             enableColumnSelector={false}
             selectionMode={false}
@@ -287,7 +297,7 @@ export function SangerSampleSelectionStep({
       ) : (
         <QueryPage<any>
           indexName={"dina_material_sample_index"}
-          uniqueName="pcr-material-sample-selection-step-edit"
+          uniqueName="molecular-analysis-material-sample-selection-step-edit"
           columns={PCR_WORKFLOW_ELASTIC_SEARCH_COLUMN}
           enableColumnSelector={false}
           selectionMode={true}

@@ -11,6 +11,7 @@ import React from "react";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { useMolecularAnalysisQuery } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/useMolecularAnalysisQuery";
 import { MolecularAnalysisDetailsStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisDetailsStep";
+import { MolecularAnalysisSampleSelectionStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisSampleSelectionStep";
 
 export default function MolecularAnalysisWorkflowRunPage() {
   const router = useRouter();
@@ -237,16 +238,16 @@ export default function MolecularAnalysisWorkflowRunPage() {
           />
         </TabPanel>
         <TabPanel>
-          {/* {molecularAnalysisId && (
-            <SangerSampleSelectionStep
-              pcrBatchId={molecularAnalysisId}
+          {molecularAnalysisId && (
+            <MolecularAnalysisSampleSelectionStep
+              molecularAnalysisId={molecularAnalysisId}
               onSaved={onSaved}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}
               setPerformSave={setPerformSave}
             />
-          )} */}
+          )}
         </TabPanel>
         <TabPanel>
           {/* {pcrBatch.response?.data && molecularAnalysisId && (
