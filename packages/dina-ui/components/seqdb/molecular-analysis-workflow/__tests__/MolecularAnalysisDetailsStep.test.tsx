@@ -6,7 +6,7 @@ import {
 } from "../MolecularAnalysisDetailsStep";
 import { PersistedResource } from "kitsu";
 import { Group } from "packages/dina-ui/types/user-api";
-import { Vocabulary } from "packages/dina-ui/types/collection-api";
+import { Protocol, Vocabulary } from "packages/dina-ui/types/collection-api";
 import { useState, useEffect } from "react";
 import "@testing-library/jest-dom";
 
@@ -49,11 +49,26 @@ const TEST_TYPES: PersistedResource<Vocabulary> = {
   ]
 };
 
+const TEST_PROTOCOLS: PersistedResource<Protocol>[] = [
+  {
+    id: "232f661a-bcd4-4ff2-8c6b-dace481b939a",
+    type: "protocol",
+    name: "Protocol Test 1"
+  },
+  {
+    id: "4faf8fdc-243b-42e8-b106-cf173da67f08",
+    type: "protocol",
+    name: "Protocol Test 2"
+  }
+];
+
 const onSavedMock = jest.fn();
 const mockSetEditMode = jest.fn();
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
+    case "collection-api/protocol":
+      return { data: TEST_PROTOCOLS };
     case "user-api/group":
       return TEST_GROUP;
     case "seqdb-api/vocabulary/molecularAnalysisType":
@@ -101,8 +116,9 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
 
         <MolecularAnalysisDetailsStep
           onSaved={onSavedMock}
-          performSave={performSave}
+          editMode={editMode}
           setEditMode={setEditMode}
+          performSave={performSave}
           setPerformSave={setPerformSave}
           {...props}
         />
@@ -145,6 +161,12 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
       })
     );
 
+    // Select the protocol from the dropdown.
+    userEvent.click(
+      wrapper.getByRole("combobox", { name: /protocol type here to search\./i })
+    );
+    userEvent.click(wrapper.getByRole("option", { name: /protocol test 1/i }));
+
     // Perform save
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
@@ -158,6 +180,107 @@ describe("Molecular Analysis Workflow - Step 1 - Molecular Analysis Details Step
             createdBy: "test-user",
             group: "aafc",
             name: "Test Molecular Analysis Name",
+            protocol: {
+              id: "232f661a-bcd4-4ff2-8c6b-dace481b939a",
+              name: "Protocol Test 1",
+              type: "protocol"
+            },
+            type: "generic-molecular-analysis"
+          },
+          type: "generic-molecular-analysis"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
+  });
+
+  it("Edit a existing molecular analysis", async () => {
+    const wrapper = mountWithAppContext2(
+      <TestComponentWrapper
+        genericMolecularAnalysis={{
+          id: "be4a1145-377d-42c4-8ff3-93f2bc6db97b",
+          name: "Existing Name",
+          type: "generic-molecular-analysis",
+          analysisType: "gcms",
+          group: "aafc",
+          createdBy: "test-user",
+          createdOn: "2024-08-29",
+          protocol: {
+            id: "4faf8fdc-243b-42e8-b106-cf173da67f08",
+            type: "protocol",
+            name: "Protocol Test 2"
+          }
+        }}
+        genericMolecularAnalysisId={"be4a1145-377d-42c4-8ff3-93f2bc6db97b"}
+      />,
+      testCtx
+    );
+    await new Promise(setImmediate);
+
+    // Should not be in edit mode automatically.
+    expect(wrapper.getByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Data should be displayed
+    expect(wrapper.getByText(/existing name/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/aafc/i)).toBeInTheDocument();
+    expect(
+      wrapper.getByText(
+        /gas chromatography coupled to low\-resolution mass spectrometry \(gcms\)/i
+      )
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("link", { name: /protocol test 2/i })
+    ).toBeInTheDocument();
+    expect(wrapper.getByText(/test\-user/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/2024\-08\-29/i)).toBeInTheDocument();
+
+    // Switch into edit mode.
+    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+
+    // Set the name for the new molecular analysis.
+    userEvent.clear(wrapper.getByRole("textbox", { name: /name/i }));
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "New Molecular Analysis Name"
+    );
+
+    // Select the type of the molecular analysis.
+    userEvent.click(
+      wrapper.getByRole("combobox", {
+        name: /analysis type gas chromatography coupled to low\-resolution mass spectrometry \(gcms\)/i
+      })
+    );
+    userEvent.click(
+      wrapper.getByRole("option", {
+        name: /high resolution mass spectrometry \(hrms\)/i
+      })
+    );
+
+    // Set the protocol to empty - remove the link.
+    userEvent.click(
+      wrapper.getByRole("combobox", { name: /protocol protocol test 2/i })
+    );
+    await new Promise(setImmediate);
+    userEvent.click(wrapper.getByRole("option", { name: /<none>/i }));
+
+    // Perform save
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await new Promise(setImmediate);
+
+    // Expect the save request to contain the UUID and changes made.
+    expect(mockSave).toBeCalledWith(
+      [
+        {
+          resource: {
+            id: "be4a1145-377d-42c4-8ff3-93f2bc6db97b",
+            analysisType: "hrms",
+            createdBy: "test-user",
+            createdOn: "2024-08-29",
+            group: "aafc",
+            name: "New Molecular Analysis Name",
+            protocol: {
+              id: null
+            },
             type: "generic-molecular-analysis"
           },
           type: "generic-molecular-analysis"

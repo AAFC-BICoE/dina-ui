@@ -2,6 +2,8 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
+  filterBy,
+  ResourceSelectField,
   SubmitButton,
   TextField,
   useAccount,
@@ -12,6 +14,7 @@ import { useEffect } from "react";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { VocabularySelectField } from "../../collection/VocabularySelectField";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
+import { Protocol } from "packages/dina-ui/types/collection-api";
 
 export interface MolecularAnalysisDetailsStepProps {
   genericMolecularAnalysisId?: string;
@@ -20,6 +23,7 @@ export interface MolecularAnalysisDetailsStepProps {
     nextStep: number,
     molecularAnalysisSaved?: PersistedResource<GenericMolecularAnalysis>
   ) => Promise<void>;
+  editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
@@ -29,6 +33,7 @@ export function MolecularAnalysisDetailsStep({
   genericMolecularAnalysisId,
   genericMolecularAnalysis,
   onSaved,
+  editMode,
   setEditMode,
   performSave,
   setPerformSave
@@ -90,6 +95,7 @@ export function MolecularAnalysisDetailsStep({
     <DinaForm<Partial<GenericMolecularAnalysis>>
       initialValues={initialValues}
       onSubmit={onSubmit}
+      readOnly={!editMode}
     >
       {buttonBar}
       <MolecularAnalysisForm />
@@ -104,17 +110,25 @@ export function MolecularAnalysisForm() {
     <div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        {!readOnly && (
-          <GroupSelectField
-            name="group"
-            enableStoredDefaultGroup={true}
-            className="col-md-6"
-          />
-        )}
+        <GroupSelectField
+          name="group"
+          enableStoredDefaultGroup={true}
+          className="col-md-6"
+        />
+      </div>
+      <div className="row">
         <VocabularySelectField
           className="col-md-6"
           name="analysisType"
           path="seqdb-api/vocabulary/molecularAnalysisType"
+        />
+        <ResourceSelectField<Protocol>
+          className="col-md-6"
+          name="protocol"
+          filter={filterBy(["name"])}
+          model="collection-api/protocol"
+          optionLabel={(protocol) => protocol.name}
+          readOnlyLink="/collection/protocol/view?id="
         />
       </div>
       {readOnly && (
