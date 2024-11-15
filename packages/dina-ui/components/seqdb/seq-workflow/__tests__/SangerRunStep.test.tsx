@@ -299,7 +299,8 @@ describe("Sanger Run Step from Sanger Workflow", () => {
               },
               type: "molecular-analysis-run-item"
             },
-            type: "molecular-analysis-run-item"
+            type: "molecular-analysis-run-item",
+            usageType: "seq-reaction"
           },
           {
             resource: {
@@ -313,7 +314,8 @@ describe("Sanger Run Step from Sanger Workflow", () => {
               },
               type: "molecular-analysis-run-item"
             },
-            type: "molecular-analysis-run-item"
+            type: "molecular-analysis-run-item",
+            usageType: "seq-reaction"
           },
           {
             resource: {
@@ -327,7 +329,8 @@ describe("Sanger Run Step from Sanger Workflow", () => {
               },
               type: "molecular-analysis-run-item"
             },
-            type: "molecular-analysis-run-item"
+            type: "molecular-analysis-run-item",
+            usageType: "seq-reaction"
           }
         ],
         {
