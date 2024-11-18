@@ -211,7 +211,7 @@ export default function MolecularAnalysisWorkflowRunPage() {
 
   return (
     <PageLayout
-      titleId={"molecularAnalysis"}
+      titleId={"molecularAnalysisWorkflowTitle"}
       buttonBarContent={buttonBarContent}
     >
       <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>

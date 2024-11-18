@@ -34,7 +34,7 @@ export function useMolecularAnalysisGridControls({
   molecularAnalysisId,
   molecularAnalysis
 }: ContainerGridProps) {
-  const { save, bulkGet, apiClient } = useContext(ApiClientContext);
+  const { save, bulkGet } = useContext(ApiClientContext);
 
   const { compareByStringAndNumber } = useStringComparator();
 

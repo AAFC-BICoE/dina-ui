@@ -33,6 +33,7 @@ export function MolecularAnalysisGridStep({
   molecularAnalysis,
   onSaved,
   editMode,
+  setEditMode,
   performSave,
   setPerformSave
 }: MolecularAnalysisGridStepProps) {
@@ -61,6 +62,13 @@ export function MolecularAnalysisGridStep({
     molecularAnalysisId,
     molecularAnalysis
   });
+
+  // Automatically go into edit mode if no storage units exist.
+  useEffect(() => {
+    if (loading === false && isStorage === false) {
+      setEditMode(true);
+    }
+  }, [loading, isStorage]);
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
