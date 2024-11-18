@@ -10,13 +10,15 @@ import {
 import { compact, isEmpty, omitBy, pick, set } from "lodash";
 import {
   MaterialSample,
-  StorageUnit
+  StorageUnit,
+  StorageUnitType
 } from "packages/dina-ui/types/collection-api";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { CellGrid } from "../container-grid/ContainerGrid";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { PersistedResource } from "kitsu";
 
 interface ContainerGridProps {
   molecularAnalysisId: string;
@@ -53,6 +55,15 @@ export function useMolecularAnalysisGridControls({
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
 
   const [isStorage, setIsStorage] = useState<boolean>(false);
+
+  const [storageUnitType, setStorageUnitType] =
+    useState<PersistedResource<StorageUnitType>>();
+
+  const [storageUnit, setStorageUnit] =
+    useState<PersistedResource<StorageUnit>>();
+
+  const [multipleStorageUnitsWarning, setMultipleStorageUnitsWarning] =
+    useState<boolean>(false);
 
   const [materialSampleSortOrder, setMaterialSampleSortOrder] = useLocalStorage<
     string[]
@@ -108,7 +119,10 @@ export function useMolecularAnalysisGridControls({
             molecularAnalysisItems
               .filter((item) => item.storageUnitUsage?.id)
               .map(
-                (item) => "/storage-unit-usage/" + item.storageUnitUsage?.id
+                (item) =>
+                  "/storage-unit-usage/" +
+                  item.storageUnitUsage?.id +
+                  "?include=storageUnit"
               ),
             { apiBaseUrl: "/collection-api" }
           );
@@ -206,38 +220,36 @@ export function useMolecularAnalysisGridControls({
     }
   );
 
+  // See if the storage unit has been selected yet.
   useEffect(() => {
-    if (!molecularAnalysis || !molecularAnalysis) return;
-
-    async function fetchStorageUnitTypeLayout() {
-      // This needs to be redone...
-      // const storageUnitReponse = await apiClient.get<StorageUnit>(
-      //   `/collection-api/storage-unit/${pcrBatch?.storageUnit?.id}`,
-      //   { include: "storageUnitType" }
-      // );
-      // if (storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition) {
-      //   const gridLayoutDefinition =
-      //     storageUnitReponse?.data.storageUnitType?.gridLayoutDefinition;
-      //   set(
-      //     pcrBatch,
-      //     "gridLayoutDefinition.numberOfColumns",
-      //     gridLayoutDefinition.numberOfColumns
-      //   );
-      //   set(
-      //     pcrBatch,
-      //     "gridLayoutDefinition.numberOfRows",
-      //     gridLayoutDefinition.numberOfRows
-      //   );
-      //   setNumberOfColumns(gridLayoutDefinition.numberOfColumns);
-      //   setNumberOfRows(gridLayoutDefinition.numberOfRows);
-      //   setFillMode(
-      //     gridLayoutDefinition.fillDirection === "BY_ROW" ? "ROW" : "COLUMN"
-      //   );
-      //   setIsStorage(true);
-      // }
+    if (loadingRelationships === false) {
+      if (
+        storageUnit?.id &&
+        storageUnitType?.id &&
+        storageUnitType?.gridLayoutDefinition
+      ) {
+        const gridLayoutDefinition = storageUnitType.gridLayoutDefinition;
+        set(
+          molecularAnalysis,
+          "gridLayoutDefinition.numberOfColumns",
+          gridLayoutDefinition.numberOfColumns
+        );
+        set(
+          molecularAnalysis,
+          "gridLayoutDefinition.numberOfRows",
+          gridLayoutDefinition.numberOfRows
+        );
+        setNumberOfColumns(gridLayoutDefinition.numberOfColumns);
+        setNumberOfRows(gridLayoutDefinition.numberOfRows);
+        setFillMode(
+          gridLayoutDefinition.fillDirection === "BY_ROW" ? "ROW" : "COLUMN"
+        );
+        setIsStorage(true);
+      } else {
+        setIsStorage(false);
+      }
     }
-    fetchStorageUnitTypeLayout();
-  }, [molecularAnalysis]);
+  }, [loadingRelationships, storageUnit, storageUnitType]);
 
   function sortAvailableItems(batchItemSamples: MolecularAnalysisItemSample[]) {
     if (materialSampleSortOrder) {
@@ -524,6 +536,10 @@ export function useMolecularAnalysisGridControls({
     selectedItems,
     setFillMode,
     isStorage,
-    gridIsPopulated
+    gridIsPopulated,
+    storageUnitType,
+    setStorageUnitType,
+    storageUnit,
+    setStorageUnit
   };
 }

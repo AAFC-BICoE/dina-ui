@@ -12,6 +12,7 @@ import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resou
 import { useMolecularAnalysisQuery } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/useMolecularAnalysisQuery";
 import { MolecularAnalysisDetailsStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisDetailsStep";
 import { MolecularAnalysisSampleSelectionStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisSampleSelectionStep";
+import { MolecularAnalysisGridStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisGridStep";
 
 export default function MolecularAnalysisWorkflowRunPage() {
   const router = useRouter();
@@ -238,7 +239,7 @@ export default function MolecularAnalysisWorkflowRunPage() {
           />
         </TabPanel>
         <TabPanel>
-          {molecularAnalysisId && (
+          {molecularAnalysisId && molecularAnalysis.response?.data && (
             <MolecularAnalysisSampleSelectionStep
               molecularAnalysisId={molecularAnalysisId}
               onSaved={onSaved}
@@ -250,17 +251,17 @@ export default function MolecularAnalysisWorkflowRunPage() {
           )}
         </TabPanel>
         <TabPanel>
-          {/* {pcrBatch.response?.data && molecularAnalysisId && (
-            <SangerPcrBatchItemGridStep
-              pcrBatchId={molecularAnalysisId}
-              pcrBatch={pcrBatch.response.data}
+          {molecularAnalysisId && molecularAnalysis.response?.data && (
+            <MolecularAnalysisGridStep
+              molecularAnalysisId={molecularAnalysisId}
+              molecularAnalysis={molecularAnalysis.response.data}
               onSaved={onSaved}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}
               setPerformSave={setPerformSave}
             />
-          )} */}
+          )}
         </TabPanel>
         <TabPanel>
           {/* {pcrBatch.response?.data && molecularAnalysisId && (
