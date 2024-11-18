@@ -35,6 +35,7 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "d21066cc-c4e3-4263-aeba-8e6bc6badb36",
         type: "molecular-analysis-run-item",
+        usageType: "seq-reaction",
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: {
@@ -73,6 +74,7 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "83d21135-51eb-4637-a202-e5b73f7a8ff9",
         type: "molecular-analysis-run-item",
+        usageType: "seq-reaction",
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: {
@@ -111,6 +113,7 @@ export const SEQ_REACTIONS_MULTIPLE: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "9a836ab0-f0ae-4d6a-aa48-b386ea6af2cf",
         type: "molecular-analysis-run-item",
+        usageType: "seq-reaction",
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: {
@@ -155,6 +158,7 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "cd8c4d28-586a-45c0-8f27-63030aba07cf",
         type: "molecular-analysis-run-item",
+        usageType: "seq-reaction",
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: {
@@ -193,6 +197,7 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "ce53527e-7794-4c37-91d8-28efff006a56",
         type: "molecular-analysis-run-item",
+        usageType: "seq-reaction",
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: {
@@ -231,6 +236,7 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
       molecularAnalysisRunItem: {
         id: "16cf5f0e-24d4-4080-a476-2c97f0adc18e",
         type: "molecular-analysis-run-item",
+        usageType: "seq-reaction",
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
         run: {

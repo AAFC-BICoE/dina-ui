@@ -156,6 +156,7 @@ export function SangerSeqReactionStep({
           itemsToCreate.map((_) => ({
             resource: {
               type: "molecular-analysis-run-item",
+              usageType: "seq-reaction",
               relationships: {
                 run: {
                   data: {
