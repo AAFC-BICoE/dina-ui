@@ -2,6 +2,7 @@ import { KitsuResource } from "kitsu";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { GenericMolecularAnalysis } from "./GenericMolecularAnalysis";
 import { MolecularAnalysisRunItem } from "./MolecularAnalysisRunItem";
+import { StorageUnitUsage } from "../../collection-api/resources/StorageUnitUsage";
 
 export interface GenericMolecularAnalysisItemAttributes {
   type: "generic-molecular-analysis-item";
@@ -11,7 +12,7 @@ export interface GenericMolecularAnalysisItemAttributes {
 
 export interface GenericMolecularAnalysisItemRelationships {
   materialSample?: ResourceIdentifierObject;
-  storageUnitUsage?: ResourceIdentifierObject;
+  storageUnitUsage?: StorageUnitUsage;
   genericMolecularAnalysis?: GenericMolecularAnalysis;
   molecularAnalysisRunItem?: MolecularAnalysisRunItem;
 }
