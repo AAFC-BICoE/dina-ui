@@ -55,7 +55,8 @@ export function MolecularAnalysisGridStep({
     storageUnitType,
     setStorageUnitType,
     storageUnit,
-    setStorageUnit
+    setStorageUnit,
+    multipleStorageUnitsWarning
   } = useMolecularAnalysisGridControls({
     molecularAnalysisId,
     molecularAnalysis
@@ -80,13 +81,21 @@ export function MolecularAnalysisGridStep({
 
   return (
     <>
+      {multipleStorageUnitsWarning && (
+        <div className="col-12">
+          <div className="alert alert-danger">
+            Multiple storage units have been found for the molecular analysis
+            items.
+          </div>
+        </div>
+      )}
       <div className="row">
         <div className="col-md-6">
           <strong>
             <DinaMessage id="storageUnitType" />
           </strong>
-          {editMode && (
-            <div className="mt-2">
+          <div className="mt-2">
+            {editMode ? (
               <ResourceSelect<StorageUnitType>
                 model="collection-api/storage-unit-type"
                 optionLabel={(it) => it.name}
@@ -99,15 +108,17 @@ export function MolecularAnalysisGridStep({
                 value={storageUnitType}
                 styles={{ container: () => ({ flex: "auto" }) }}
               />
-            </div>
-          )}
+            ) : (
+              <p>{storageUnitType?.name}</p>
+            )}
+          </div>
         </div>
         <div className="col-md-6">
           <strong>
             <DinaMessage id="field_storageUnit" />
           </strong>
-          {editMode && (
-            <div className="mt-2">
+          <div className="mt-2">
+            {editMode ? (
               <ResourceSelect<StorageUnit>
                 model="collection-api/storage-unit"
                 optionLabel={(it) => it.name}
@@ -127,8 +138,10 @@ export function MolecularAnalysisGridStep({
                 styles={{ container: () => ({ flex: "auto" }) }}
                 isDisabled={!storageUnitType?.id}
               />
-            </div>
-          )}
+            ) : (
+              <p>{storageUnit?.name}</p>
+            )}
+          </div>
         </div>
       </div>
       {isStorage && !storageUnitType?.gridLayoutDefinition && (

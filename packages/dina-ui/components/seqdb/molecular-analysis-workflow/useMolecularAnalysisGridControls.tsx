@@ -122,10 +122,35 @@ export function useMolecularAnalysisGridControls({
                 (item) =>
                   "/storage-unit-usage/" +
                   item.storageUnitUsage?.id +
-                  "?include=storageUnit"
+                  "?include=storageUnit,storageUnit.storageUnitType"
               ),
             { apiBaseUrl: "/collection-api" }
           );
+
+          const storageUnitsFound = storageUnitUsageQuery
+            .filter((su) => su?.storageUnit)
+            .map((su) => su?.storageUnit);
+
+          const allDuplicateValues = storageUnitsFound
+            .map((su) => su?.id)
+            .filter((su) => su)
+            .reduce((hasMultiple, currentId, index, allIds) => {
+              // Check if the current ID exists in the previous elements (excluding itself)
+              const isDuplicate = allIds.slice(0, index).includes(currentId);
+              // If a duplicate is found and we haven't already identified multiple IDs, update hasMultiple
+              return hasMultiple || isDuplicate;
+            }, false);
+
+          if (!allDuplicateValues) {
+            setMultipleStorageUnitsWarning(true);
+          }
+
+          // Even if multiple exists, just use the first one found.
+          if (storageUnitsFound.length !== 0) {
+            setStorageUnit(storageUnitsFound.at(0));
+            setStorageUnitType(storageUnitsFound.at(0)?.storageUnitType);
+          }
+
           const molecularAnalysisItemsWithStorageUnitUsage =
             molecularAnalysisItems.map((molecularAnalysisItem) => {
               const queryStorageUnitUsage = storageUnitUsageQuery.find(
@@ -433,7 +458,7 @@ export function useMolecularAnalysisGridControls({
             resource: {
               wellColumn: item.storageUnitUsage?.wellColumn,
               wellRow: item.storageUnitUsage?.wellRow,
-              // storageUnit: pcrBatch.storageUnit,
+              storageUnit: pick(storageUnit, "id", "type") as any,
               type: "storage-unit-usage",
               id: item.storageUnitUsage?.id,
               usageType: "generic-molecular-analysis-item"
@@ -540,6 +565,7 @@ export function useMolecularAnalysisGridControls({
     storageUnitType,
     setStorageUnitType,
     storageUnit,
-    setStorageUnit
+    setStorageUnit,
+    multipleStorageUnitsWarning
   };
 }
