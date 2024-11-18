@@ -62,6 +62,9 @@ export function useMolecularAnalysisGridControls({
   const [storageUnit, setStorageUnit] =
     useState<PersistedResource<StorageUnit>>();
 
+  const [loadedStorageUnit, setLoadedStorageUnit] =
+    useState<PersistedResource<StorageUnit>>();
+
   const [multipleStorageUnitsWarning, setMultipleStorageUnitsWarning] =
     useState<boolean>(false);
 
@@ -127,28 +130,26 @@ export function useMolecularAnalysisGridControls({
             { apiBaseUrl: "/collection-api" }
           );
 
-          const storageUnitsFound = storageUnitUsageQuery
-            .filter((su) => su?.storageUnit)
-            .map((su) => su?.storageUnit);
+          const uniqueStorageUnitIds = new Set(
+            storageUnitUsageQuery
+              .filter((su) => su?.storageUnit)
+              .map((su) => su?.storageUnit?.id)
+          );
 
-          const allDuplicateValues = storageUnitsFound
-            .map((su) => su?.id)
-            .filter((su) => su)
-            .reduce((hasMultiple, currentId, index, allIds) => {
-              // Check if the current ID exists in the previous elements (excluding itself)
-              const isDuplicate = allIds.slice(0, index).includes(currentId);
-              // If a duplicate is found and we haven't already identified multiple IDs, update hasMultiple
-              return hasMultiple || isDuplicate;
-            }, false);
-
-          if (!allDuplicateValues) {
+          // If more than one unique storage unit ID exists, then display a warning to the user.
+          if (uniqueStorageUnitIds.size > 1) {
             setMultipleStorageUnitsWarning(true);
           }
 
           // Even if multiple exists, just use the first one found.
-          if (storageUnitsFound.length !== 0) {
-            setStorageUnit(storageUnitsFound.at(0));
-            setStorageUnitType(storageUnitsFound.at(0)?.storageUnitType);
+          if (uniqueStorageUnitIds.size !== 0) {
+            const firstStorageUnitId = Array.from(uniqueStorageUnitIds)[0];
+            const storageUnitToLoad = storageUnitUsageQuery.find(
+              (su) => su?.storageUnit?.id === firstStorageUnitId
+            )?.storageUnit;
+            setStorageUnit(storageUnitToLoad);
+            setLoadedStorageUnit(storageUnitToLoad);
+            setStorageUnitType(storageUnitToLoad?.storageUnitType);
           }
 
           const molecularAnalysisItemsWithStorageUnitUsage =
@@ -253,6 +254,15 @@ export function useMolecularAnalysisGridControls({
         storageUnitType?.id &&
         storageUnitType?.gridLayoutDefinition
       ) {
+        if (loadedStorageUnit) {
+          // User changed the storage unit to something new...
+          if (loadedStorageUnit.id !== storageUnit.id) {
+            clearGrid();
+          }
+        } else {
+          setLoadedStorageUnit(storageUnit);
+        }
+
         const gridLayoutDefinition = storageUnitType.gridLayoutDefinition;
         set(
           molecularAnalysis,
