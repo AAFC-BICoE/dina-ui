@@ -1,7 +1,9 @@
 import { PersistedResource } from "kitsu";
 import { CollectionForm } from "../../../pages/collection/collection/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { Collection } from "../../../types/collection-api";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const TEST_COLLECTION: PersistedResource<Collection> = {
   id: "123",
@@ -47,25 +49,32 @@ describe("Collection edit page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new Collection", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <CollectionForm router={mockRouter as any} />,
       { apiContext }
     );
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "test-name" } });
-    wrapper
-      .find(".code-field input")
-      .simulate("change", { target: { value: "test-code" } });
+    // Fill in name information
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: {
+        value: "test-name"
+      }
+    });
 
-    wrapper.find("form").simulate("submit");
+    // Fill in code information
+    fireEvent.change(wrapper.getByRole("textbox", { name: /code/i }), {
+      target: {
+        value: "test-code"
+      }
+    });
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API response
     expect(mockSave).lastCalledWith(
       [
         {
@@ -83,7 +92,7 @@ describe("Collection edit page", () => {
   });
 
   it("Lets you edit an existing Collection", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <CollectionForm
         collection={TEST_COLLECTION}
         router={mockRouter as any}
@@ -91,21 +100,25 @@ describe("Collection edit page", () => {
       { apiContext }
     );
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".name-field input").prop("value")).toEqual(
+    // Test default name value
+    expect(wrapper.getByRole("textbox", { name: /name/i })).toHaveDisplayValue(
       "test collection"
     );
 
-    wrapper
-      .find(".code-field input")
-      .simulate("change", { target: { value: "edited code" } });
+    // Change code field value
+    fireEvent.change(wrapper.getByRole("textbox", { name: /code/i }), {
+      target: {
+        value: "edited code"
+      }
+    });
 
-    wrapper.find("form").simulate("submit");
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API response
     expect(mockSave).lastCalledWith(
       [
         {
