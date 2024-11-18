@@ -1,5 +1,7 @@
 import { InstitutionForm } from "../../../../pages/collection/institution/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
   data: {
@@ -61,25 +63,35 @@ describe("InstitutionForm.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new Institution", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <InstitutionForm onSaved={mockOnSaved} />,
       { apiContext }
     );
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "test-institution" } });
-    wrapper
-      .find(".en-description textarea")
-      .simulate("change", { target: { value: "test eng desc" } });
+    // Change name field value
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: {
+        value: "test-institution"
+      }
+    });
 
-    wrapper.find("form").simulate("submit");
+    // Change English Description field value
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /english description/i }),
+      {
+        target: {
+          value: "test eng desc"
+        }
+      }
+    );
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API response
     expect(mockSave).lastCalledWith(
       [
         {
@@ -116,7 +128,7 @@ describe("InstitutionForm.", () => {
   });
 
   it("Lets you edit a Institution", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <InstitutionForm
         onSaved={mockOnSaved}
         institution={{
@@ -138,20 +150,29 @@ describe("InstitutionForm.", () => {
       { apiContext }
     );
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "edited-name" } });
-    wrapper
-      .find(".fr-description textarea")
-      .simulate("change", { target: { value: "test-fr-desc" } });
+    // Change name field value
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: {
+        value: "edited-name"
+      }
+    });
+    // Change French Description field value
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /french description/i }),
+      {
+        target: {
+          value: "test-fr-desc"
+        }
+      }
+    );
 
-    wrapper.find("form").simulate("submit");
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API response
     expect(mockSave).lastCalledWith(
       [
         {
