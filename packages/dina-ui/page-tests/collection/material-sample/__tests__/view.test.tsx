@@ -5,7 +5,6 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const TEST_COLLECTION_EVENT: CollectingEvent = {
