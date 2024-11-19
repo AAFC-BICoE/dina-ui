@@ -1,6 +1,8 @@
 import PreparationTypeDetailsPage from "../../../../pages/collection/preparation-type/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
+import { fireEvent, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 /** Test preparation-type with all fields defined. */
 const TEST_PREPARATION_TYPE: PreparationType = {
@@ -31,26 +33,28 @@ jest.mock("next/router", () => ({
 
 describe("PreparationType details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(<PreparationTypeDetailsPage />, {
+    const wrapper = mountWithAppContext2(<PreparationTypeDetailsPage />, {
       apiContext
     });
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    // Test for spinner to render while page is loading
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Render the PreparationType details", async () => {
-    const wrapper = mountWithAppContext(<PreparationTypeDetailsPage />, {
+    const wrapper = mountWithAppContext2(<PreparationTypeDetailsPage />, {
       apiContext
     });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    // Test that the spinner does not render once page has loaded
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
-    expect(wrapper.find(".name-field .field-view").text()).toEqual(
-      "test preparation type"
-    );
+    // Test that Preparation Type Name field is populated with the proper output
+    expect(
+      wrapper.getAllByText(/test preparation type/i)[1]
+    ).toBeInTheDocument();
   });
 });

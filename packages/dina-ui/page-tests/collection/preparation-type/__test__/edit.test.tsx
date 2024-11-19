@@ -4,7 +4,7 @@ import PreparationTypeEditPage, {
 } from "../../../../pages/collection/preparation-type/edit";
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
