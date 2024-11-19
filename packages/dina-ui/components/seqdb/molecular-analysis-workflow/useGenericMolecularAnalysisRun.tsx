@@ -314,6 +314,7 @@ export function useGenericMolecularAnalysisRun({
           type: "molecular-analysis-run-item",
           resource: {
             type: "molecular-analysis-run-item",
+            usageType: "generic-molecular-analysis-item",
             relationships: {
               run: {
                 data: {

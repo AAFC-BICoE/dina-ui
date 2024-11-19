@@ -235,6 +235,7 @@ export function MolecularAnalysisSampleSelectionStep({
             itemsToCreate.map((_) => ({
               resource: {
                 type: "molecular-analysis-run-item",
+                usageType: "generic-molecular-analysis-item",
                 relationships: {
                   run: {
                     data: {
