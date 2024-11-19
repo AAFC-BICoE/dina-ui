@@ -1,9 +1,11 @@
-import { DinaForm, DeleteButton } from "common-ui";
+import { DinaForm, DeleteButton, useApiClient, Operation } from "common-ui";
 import { ViewPageLayout } from "../../../components";
 import { MolecularAnalysisRun } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { MolecularAnalysisRunFormFields } from "../../../components/molecular-analysis/MolecularAnalysisRunFormFields";
+import { MolecularAnalysisRunItem } from "../../../types/seqdb-api/resources/MolecularAnalysisRunItem";
 
 export default function MolecularAnalysisRunViewPage() {
+  const { doOperations, apiClient } = useApiClient();
   return (
     <ViewPageLayout<MolecularAnalysisRun>
       form={(props) => (
@@ -17,18 +19,11 @@ export default function MolecularAnalysisRunViewPage() {
       entityLink="/seqdb/molecular-analysis-run"
       type="molecular-analysis-run"
       apiBaseUrl="/seqdb-api"
-      deleteButton={(formProps) => (
-        <DeleteButton
-          id={formProps.initialValues.id}
-          options={{ apiBaseUrl: "/seqdb-api" }}
-          postDeleteRedirect="/seqdb/molecular-analysis-run/list"
-          type="molecular-analysis-run"
-        />
-      )}
       nameField={(resource) => (resource?.name ? resource.name : "")}
       showRevisionsLink={false}
       showGenerateLabelButton={false}
       showEditButton={false}
+      showDeleteButton={false}
     />
   );
 }

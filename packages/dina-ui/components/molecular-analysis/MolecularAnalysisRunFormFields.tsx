@@ -1,15 +1,11 @@
-import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/MolecularAnalysisRunItem";
 import {
-  filterBy,
   LoadingSpinner,
   ReactTable,
   TextField,
-  useDinaFormContext,
-  useQuery
+  useDinaFormContext
 } from "../../../common-ui/lib";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { GroupSelectField } from "../group-select/GroupSelectField";
-import { AttachmentsField } from "../object-store/attachment-list/AttachmentsField";
 import {
   SequencingRunItem,
   useMolecularAnalysisRunView
