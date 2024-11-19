@@ -13,6 +13,7 @@ import { useMolecularAnalysisQuery } from "packages/dina-ui/components/seqdb/mol
 import { MolecularAnalysisDetailsStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisDetailsStep";
 import { MolecularAnalysisSampleSelectionStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisSampleSelectionStep";
 import { MolecularAnalysisGridStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisGridStep";
+import { MolecularAnalysisRunStep } from "packages/dina-ui/components/seqdb/molecular-analysis-workflow/MolecularAnalysisRunStep";
 
 export default function MolecularAnalysisWorkflowRunPage() {
   const router = useRouter();
@@ -98,84 +99,29 @@ export default function MolecularAnalysisWorkflowRunPage() {
             Cancel
           </Button>
 
-          {currentStep !== 3 ? (
-            <Button
-              variant={"primary"}
-              className="ms-2"
-              onClick={() => setPerformSave(true)}
-              style={{ width: "10rem", marginRight: "15px" }}
-            >
-              {performSave ? (
-                <>
-                  <Spinner
-                    as="span"
-                    animation="border"
-                    size="sm"
-                    role="status"
-                    aria-hidden="true"
-                  />
-                  <span className="visually-hidden">
-                    <DinaMessage id="loading" />
-                  </span>
-                </>
-              ) : (
-                <DinaMessage id="save" />
-              )}
-            </Button>
-          ) : (
-            <>
-              <Dropdown as={ButtonGroup} style={{ width: "12rem" }}>
-                <Button
-                  variant={"primary"}
-                  className="ms-auto"
-                  onClick={() => setPerformSave(true)}
-                  style={{ width: "10rem" }}
-                >
-                  {performSave ? (
-                    <>
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                      />
-                      <span className="visually-hidden">
-                        <DinaMessage id="loading" />
-                      </span>
-                    </>
-                  ) : (
-                    <DinaMessage id="save" />
-                  )}
-                </Button>
-                <Dropdown.Toggle split={true} id="dropdown-split-basic" />
-                <Dropdown.Menu>
-                  <Dropdown.Item
-                    as="button"
-                    href="#/action-1"
-                    onClick={() => {
-                      setPerformComplete(true);
-                      setPerformSave(true);
-                    }}
-                  >
-                    {performComplete ? (
-                      <>
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                        />
-                        <span className="visually-hidden">Loading...</span>
-                      </>
-                    ) : null}
-                    <DinaMessage id="saveAndMarkAsComplete" />
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </>
-          )}
+          <Button
+            variant={"primary"}
+            className="ms-2"
+            onClick={() => setPerformSave(true)}
+            style={{ width: "10rem", marginRight: "15px" }}
+          >
+            {performSave ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                <span className="visually-hidden">
+                  <DinaMessage id="loading" />
+                </span>
+              </>
+            ) : (
+              <DinaMessage id="save" />
+            )}
+          </Button>
         </>
       ) : (
         <Button
@@ -264,19 +210,16 @@ export default function MolecularAnalysisWorkflowRunPage() {
           )}
         </TabPanel>
         <TabPanel>
-          {/* {pcrBatch.response?.data && molecularAnalysisId && (
-            <SangerPcrReactionStep
-              pcrBatchId={pcrBatchId}
-              pcrBatch={pcrBatch.response.data}
+          {molecularAnalysisId && molecularAnalysis.response?.data && (
+            <MolecularAnalysisRunStep
+              molecularAnalysisId={molecularAnalysisId}
+              molecularAnalysis={molecularAnalysis.response.data}
               editMode={editMode}
+              setEditMode={setEditMode}
               performSave={performSave}
               setPerformSave={setPerformSave}
-              performComplete={performComplete}
-              setPerformComplete={setPerformComplete}
-              setEditMode={setEditMode}
-              setReloadPcrBatch={setReloadPcrBatch}
             />
-          )} */}
+          )}
         </TabPanel>
       </Tabs>
     </PageLayout>

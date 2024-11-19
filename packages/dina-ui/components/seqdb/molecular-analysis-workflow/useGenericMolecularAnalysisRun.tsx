@@ -113,7 +113,8 @@ export function useGenericMolecularAnalysisRun({
       })(""),
       page: { limit: 1000 },
       path: `/seqdb-api/generic-molecular-analysis-item`,
-      include: "storageUnitUsage,materialSample"
+      include:
+        "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run"
     },
     {
       onSuccess: async ({ data: genericMolecularAnalysisItems }) => {
