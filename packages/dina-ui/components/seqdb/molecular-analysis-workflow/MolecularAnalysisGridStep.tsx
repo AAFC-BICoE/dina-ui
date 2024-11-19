@@ -108,13 +108,13 @@ export function MolecularAnalysisGridStep({
                 model="collection-api/storage-unit-type"
                 optionLabel={(it) => it.name}
                 filter={filterBy(["name"])}
-                onChange={(value) =>
+                onChange={(value) => {
                   setStorageUnitType(
                     value as PersistedResource<StorageUnitType>
-                  )
-                }
+                  );
+                  setStorageUnit(undefined);
+                }}
                 value={storageUnitType}
-                styles={{ container: () => ({ flex: "auto" }) }}
               />
             ) : (
               <p>{storageUnitType?.name}</p>
@@ -143,7 +143,6 @@ export function MolecularAnalysisGridStep({
                   setStorageUnit(value as PersistedResource<StorageUnit>)
                 }
                 value={storageUnit}
-                styles={{ container: () => ({ flex: "auto" }) }}
                 isDisabled={!storageUnitType?.id}
               />
             ) : (

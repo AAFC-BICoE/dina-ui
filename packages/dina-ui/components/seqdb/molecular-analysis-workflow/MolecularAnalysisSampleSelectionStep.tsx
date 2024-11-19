@@ -18,6 +18,7 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
 
 export interface MolecularAnalysisSampleSelectionStepProps {
   molecularAnalysisId: string;
@@ -141,7 +142,8 @@ export function MolecularAnalysisSampleSelectionStep({
               }
             ]
           })(""),
-          include: "materialSample",
+          include:
+            "materialSample,storageUnitUsage,molecularAnalysisRunItem,molecularAnalysisRunItem.run",
           page: {
             limit: 1000 // Maximum page size.
           }
@@ -219,10 +221,37 @@ export function MolecularAnalysisSampleSelectionStep({
         )
       );
 
+      const runId = previouslySelectedResources.find(
+        (item) => item?.molecularAnalysisRunItem?.run?.id
+      )?.molecularAnalysisRunItem?.run?.id;
+
       // Perform create
       if (itemsToCreate.length !== 0) {
+        // If a molecular analysis exists, then we need to create a
+        // molecular analysis run item.
+        let molecularRunItemsCreated: MolecularAnalysisRunItem[] = [];
+        if (runId) {
+          molecularRunItemsCreated = await save<MolecularAnalysisRunItem>(
+            itemsToCreate.map((_) => ({
+              resource: {
+                type: "molecular-analysis-run-item",
+                relationships: {
+                  run: {
+                    data: {
+                      type: "molecular-analysis-run",
+                      id: runId
+                    }
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item"
+            })),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+        }
+
         await save(
-          itemsToCreate.map((materialUUID) => ({
+          itemsToCreate.map((materialUUID, index) => ({
             resource: {
               type: "generic-molecular-analysis-item",
               createdBy: username ?? "",
@@ -237,7 +266,18 @@ export function MolecularAnalysisSampleSelectionStep({
                     id: materialUUID,
                     type: "material-sample"
                   }
-                }
+                },
+                // Included only if molecular run items were created.
+                molecularAnalysisRunItem:
+                  molecularRunItemsCreated.length > 0 &&
+                  molecularRunItemsCreated[index]
+                    ? {
+                        data: {
+                          type: "molecular-analysis-run-item",
+                          id: molecularRunItemsCreated[index].id
+                        }
+                      }
+                    : undefined
               }
             },
             type: "generic-molecular-analysis-item"
@@ -257,6 +297,59 @@ export function MolecularAnalysisSampleSelectionStep({
           })),
           { apiBaseUrl: "/seqdb-api" }
         );
+
+        // Delete the storage unit usage if linked.
+        const storageUnitUsageUUIDs = itemsToDelete
+          .map(
+            (item) =>
+              previouslySelectedResources.find(
+                (resource) => resource.id === item.molecularAnalysisItemUUID
+              )?.storageUnitUsage?.id
+          )
+          .filter((item) => item);
+        if (storageUnitUsageUUIDs.length > 0) {
+          await save(
+            storageUnitUsageUUIDs.map((item) => ({
+              delete: {
+                id: item ?? "",
+                type: "storage-unit-usage"
+              }
+            })),
+            { apiBaseUrl: "/collection-api" }
+          );
+        }
+
+        // Check if molecular analysis items need to be deleted as well.
+        if (runId) {
+          // Delete the molecular analysis run items.
+          await save(
+            itemsToDelete.map((item) => ({
+              delete: {
+                id:
+                  previouslySelectedResources.find(
+                    (resource) => resource.id === item.molecularAnalysisItemUUID
+                  )?.molecularAnalysisRunItem?.id ?? "",
+                type: "molecular-analysis-run-item"
+              }
+            })),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+
+          // Delete the run if all seq-reactions are being deleted.
+          if (itemsToDelete.length === previouslySelectedResources.length) {
+            await save(
+              [
+                {
+                  delete: {
+                    id: runId,
+                    type: "molecular-analysis-run"
+                  }
+                }
+              ],
+              { apiBaseUrl: "/seqdb-api" }
+            );
+          }
+        }
       }
     } catch (e) {
       if (e.toString() === "Error: Access is denied") {
