@@ -1,6 +1,6 @@
 import { ProjectForm } from "../../../../pages/collection/project/edit";
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
