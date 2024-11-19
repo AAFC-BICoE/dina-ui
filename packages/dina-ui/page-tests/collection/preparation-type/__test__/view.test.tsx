@@ -1,7 +1,6 @@
 import PreparationTypeDetailsPage from "../../../../pages/collection/preparation-type/view";
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
-import { fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 /** Test preparation-type with all fields defined. */
