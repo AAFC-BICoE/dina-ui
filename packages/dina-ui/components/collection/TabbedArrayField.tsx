@@ -162,7 +162,9 @@ export function TabbedArrayField<T>({
                                     className="btn btn-primary add-button"
                                     onClick={addElement}
                                   >
-                                    <FaPlus />
+                                    <div data-testid="add-another-button">
+                                      <FaPlus />
+                                    </div>
                                   </FormikButton>
                                   <Tooltip
                                     directText={formatMessage("addAnother", {
@@ -176,7 +178,9 @@ export function TabbedArrayField<T>({
                                       className="btn btn-dark"
                                       onClick={() => removeElement(index)}
                                     >
-                                      <FaMinus />
+                                      <div data-testid="remove-this-button">
+                                        <FaMinus />
+                                      </div>
                                     </FormikButton>
                                     <Tooltip
                                       directText={formatMessage(
