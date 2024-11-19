@@ -151,7 +151,7 @@ export function MolecularAnalysisGridStep({
           </div>
         </div>
       </div>
-      {isStorage && !storageUnitType?.gridLayoutDefinition && (
+      {!storageUnitType?.gridLayoutDefinition && (
         <div className="mt-3">
           <div className="row">
             <div className="col-12">

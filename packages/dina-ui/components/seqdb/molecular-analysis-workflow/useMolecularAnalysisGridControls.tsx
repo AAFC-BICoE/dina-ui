@@ -429,6 +429,25 @@ export function useMolecularAnalysisGridControls({
     try {
       const { cellGrid, movedItems } = gridState;
 
+      // If no storage unit, everything in the cell grid should be deleted.
+      if (!storageUnit?.id || !storageUnitType?.gridLayoutDefinition) {
+        const itemsToDelete = Object.entries(cellGrid).map((item) => item[1]);
+        const deleteAllStorageUnitUsageArgs: DeleteArgs[] = itemsToDelete.map(
+          (item) => ({
+            delete: {
+              id: item.storageUnitUsage?.id ?? "",
+              type: "storage-unit-usage"
+            }
+          })
+        );
+        if (deleteAllStorageUnitUsageArgs.length) {
+          await save<StorageUnitUsage>(deleteAllStorageUnitUsageArgs, {
+            apiBaseUrl: "/collection-api"
+          });
+        }
+        return;
+      }
+
       const materialSampleItemsToSave = movedItems.map((movedItem) => {
         // Get the coords from the cell grid.
         const coords = Object.keys(cellGrid).find(
@@ -455,6 +474,7 @@ export function useMolecularAnalysisGridControls({
 
         return movedItem;
       });
+
       // Save storageUnitUsage resources with valid wellColumn and wellRow
       const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] =
         materialSampleItemsToSave
