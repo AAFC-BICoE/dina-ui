@@ -18,6 +18,8 @@ import { MaterialSampleSummary } from "../../types/collection-api";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
+import { attachGenericMolecularAnalysisItems } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
+import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -554,11 +556,29 @@ export function useMolecularAnalysisRunView({
           }
           return seqReactions;
         }
-        const usageType = molecularAnalysisRunItems?.[0].usageType;
-        if (usageType === "seq-reaction") {
-          setColumns(
-            getMolecularAnalysisRunColumns(compareByStringAndNumber, usageType)
+
+        async function fetchGenericMolecularAnalysisItems() {
+          const fetchPaths = molecularAnalysisRunItems.map(
+            (molecularAnalysisRunItem) =>
+              `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
           );
+          const genericMolecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
+            [];
+          for (const path of fetchPaths) {
+            const genericMolecularAnalysisItem = await apiClient.get<
+              GenericMolecularAnalysisItem[]
+            >(path, {});
+            genericMolecularAnalysisItems.push(
+              genericMolecularAnalysisItem.data[0]
+            );
+          }
+          return genericMolecularAnalysisItems;
+        }
+        const usageType = molecularAnalysisRunItems?.[0].usageType;
+        setColumns(
+          getMolecularAnalysisRunColumns(compareByStringAndNumber, usageType)
+        );
+        if (usageType === "seq-reaction") {
           const seqReactions = await fetchSeqReactions();
 
           // Chain it all together to create one object.
@@ -577,6 +597,23 @@ export function useMolecularAnalysisRunView({
             bulkGet
           );
 
+          // All finished loading.
+          setSequencingRunItems(sequencingRunItemsChain);
+          setLoading(false);
+        } else if (usageType === "generic-molecular-analysis-item") {
+          const genericMolecularAnalysisItems =
+            await fetchGenericMolecularAnalysisItems();
+          let sequencingRunItemsChain = attachGenericMolecularAnalysisItems(
+            genericMolecularAnalysisItems
+          );
+          sequencingRunItemsChain = await attachStorageUnitUsage(
+            sequencingRunItemsChain,
+            bulkGet
+          );
+          sequencingRunItemsChain = await attachMaterialSampleSummary(
+            sequencingRunItemsChain,
+            bulkGet
+          );
           // All finished loading.
           setSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
@@ -669,8 +706,83 @@ export function getMolecularAnalysisRunColumns(compareByStringAndNumber, type) {
       enableSorting: true
     }
   ];
+
+  const GENERIC_MOLECULAR_ANALYSIS_COLUMNS: ColumnDef<SequencingRunItem>[] = [
+    {
+      id: "wellCoordinates",
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          !a.original?.storageUnitUsage ||
+          a.original?.storageUnitUsage?.wellRow === null ||
+          a.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+        const bString =
+          !b.original?.storageUnitUsage ||
+          b.original?.storageUnitUsage?.wellRow === null ||
+          b.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      }
+    },
+    {
+      id: "tubeNumber",
+      cell: ({ row: { original } }) =>
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
+    },
+    {
+      id: "materialSampleName",
+      cell: ({ row: { original } }) => {
+        const materialSampleName =
+          original?.materialSampleSummary?.materialSampleName;
+        return (
+          <>
+            <Link
+              href={`/collection/material-sample/view?id=${original.materialSampleId}`}
+            >
+              <a>{materialSampleName || original.materialSampleId}</a>
+            </Link>
+          </>
+        );
+      },
+      header: () => <FieldHeader name="materialSampleName" />,
+      accessorKey: "materialSampleSummary.materialSampleName",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleSummary?.materialSampleName,
+          b?.original?.materialSampleSummary?.materialSampleName
+        ),
+      enableSorting: true
+    }
+  ];
   const MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP = {
-    "seq-reaction": SEQ_REACTION_COLUMNS
+    "seq-reaction": SEQ_REACTION_COLUMNS,
+    "generic-molecular-analysis-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS
   };
   return MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP[type];
 }
