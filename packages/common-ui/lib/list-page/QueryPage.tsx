@@ -81,6 +81,14 @@ const DEFAULT_SORT: SortingState = [
  */
 const MAX_COUNT_SIZE: number = 10000;
 
+/**
+ * Elastic search has an offset limit of 10,000 records. If you offset more than 10,000 records
+ * it will result in a bad request error.
+ *
+ * A user-friendly error message will be displayed instead.
+ */
+const MAX_OFFSET: number = 10000;
+
 export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Columns to render on the table. This will also be used to map the data to a specific column.
@@ -529,6 +537,14 @@ export function QueryPage<TData extends KitsuResource>({
 
     // Save elastic search query for export page
     setElasticSearchQuery({ ...queryDSL });
+
+    // ElasticSearch has an offset limit of 10,000, display a user-friendly error message if
+    // exceeded.
+    if (pageOffset >= MAX_OFFSET) {
+      setError(formatMessage({ id: "pageSizeError" }));
+      setLoading(false);
+      return;
+    }
 
     if (isActionTriggeredQuery.current === true) {
       isActionTriggeredQuery.current = false;

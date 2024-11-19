@@ -236,6 +236,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   feedbackLinkHeader: "Submit GitHub Issue here:",
   feedbackLinkTitle: "GitHub Issues",
   feedbackExternal: "(external, GitHub account required)",
+  pageSizeError:
+    "Page number exceeds system limit. To get more relevant results, please modify your search query or change the sort order.",
   fieldExtensions: "Field Extensions",
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",

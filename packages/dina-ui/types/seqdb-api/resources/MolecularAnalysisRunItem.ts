@@ -6,6 +6,7 @@ export interface MolecularAnalysisRunItemAttributes {
   type: "molecular-analysis-run-item";
   createdBy?: string;
   createdOn?: string;
+  usageType: string;
 }
 
 export interface MolecularAnalysisRunItemRelationships {

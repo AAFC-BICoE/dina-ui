@@ -16,9 +16,11 @@ import {
 import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import {
   fireEvent,
+  screen,
   waitForElementToBeRemoved,
   within
 } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 /** Example of an API resource interface definition for a todo-list entry. */
 interface Todo extends KitsuResource {
@@ -596,5 +598,52 @@ describe("QueryTable component", () => {
     await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
 
     expect(wrapper.getByText(/response length is: 30/i)).toBeInTheDocument();
+  });
+
+  it("Allow user to type the pagination number", async () => {
+    const onPageChangeMock = jest.fn();
+
+    const wrapper = mountWithAppContext2(
+      <QueryTable<Todo>
+        path="todo"
+        columns={["id", "name", "description"]}
+        reactTableProps={{
+          onPageChange: onPageChangeMock
+        }}
+      />,
+      { apiContext }
+    );
+
+    // Continue the test after the data fetch is done.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    const pageSelector = wrapper.getAllByRole("spinbutton", {
+      name: /jump to page/i
+    })[0];
+
+    // Should start at 1.
+    expect(pageSelector).toHaveDisplayValue("1");
+    expect(onPageChangeMock).toBeCalledTimes(0);
+
+    // Change it to 12.
+    userEvent.clear(pageSelector);
+    userEvent.type(pageSelector, "12");
+    fireEvent.blur(pageSelector);
+    expect(pageSelector).toHaveDisplayValue("12");
+    expect(onPageChangeMock).toBeCalledTimes(1);
+
+    // Change it to 8.
+    userEvent.clear(pageSelector);
+    userEvent.type(pageSelector, "8");
+    fireEvent.blur(pageSelector);
+    expect(pageSelector).toHaveDisplayValue("8");
+    expect(onPageChangeMock).toBeCalledTimes(2);
+
+    // Change it to 13, invalid.
+    userEvent.clear(pageSelector);
+    userEvent.type(pageSelector, "13");
+    fireEvent.blur(pageSelector);
+    expect(pageSelector).toHaveDisplayValue("1");
+    expect(onPageChangeMock).toBeCalledTimes(3);
   });
 });

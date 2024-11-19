@@ -341,6 +341,7 @@ export function useMolecularAnalysisRun({
           type: "molecular-analysis-run-item",
           resource: {
             type: "molecular-analysis-run-item",
+            usageType: "seq-reaction",
             relationships: {
               run: {
                 data: {
