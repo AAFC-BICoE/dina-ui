@@ -1010,6 +1010,20 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A sequencing run name must be provided in order to generate a sequence run.",
   sangerRunStep_noRunExists:
     "No sequencing run created yet for this sanger workflow. Click edit to create a new run.",
+  molecularAnalysisRunStep_multipleRunWarning_title:
+    "Multiple runs exist for this Molecular Analysis workflow.",
+  molecularAnalysisRunStep_multipleRunWarning_description:
+    "This molecular analysis workflow should only have one associated run. Please verify and correct it.",
+  molecularAnalysisRunStep_sequencingRun: "Sequencing Run:",
+  molecularAnalysisRunStep_sequencingRunContent: "Sequencing Run Content:",
+  molecularAnalysisRunStep_missingSequencingRunID:
+    "Unexpected error occurred. Sequencing Run ID should be set at this point.",
+  molecularAnalysisRunStep_missingSequenceReactions:
+    "No molecular analysis to generate a sequence run. Please use the 'Select Material Sample' step.",
+  molecularAnalysisRunStep_invalidRunName:
+    "A sequencing run name must be provided in order to generate a sequence run.",
+  molecularAnalysisRunStep_noRunExists:
+    "No sequencing run created yet for this molecular analysis workflow. Click edit to create a new run.",
   mapRelationshipTitle: "Relationship Mapping",
   value: "Value",
   count: "Count",
