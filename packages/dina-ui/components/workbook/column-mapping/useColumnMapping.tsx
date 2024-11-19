@@ -847,6 +847,7 @@ export function useColumnMapping() {
     const duplicateResourcesSelected = duplicateResources.includes(fieldValue);
     const showDuplicateWarningTooltip =
       hasDuplicatesResources && duplicateResourcesSelected;
+    const multiSelectFields = new Set(["preparedBy.displayName"]);
 
     return (
       <div className="d-flex">
@@ -855,7 +856,7 @@ export function useColumnMapping() {
           name={selectElemName}
           options={options}
           hideLabel={true}
-          isMulti={false}
+          isMulti={multiSelectFields.has(fieldPath)}
           selectProps={{
             isClearable: true,
             menuPortalTarget: document.body,
