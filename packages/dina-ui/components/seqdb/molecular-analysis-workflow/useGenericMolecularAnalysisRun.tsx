@@ -119,27 +119,6 @@ export function useGenericMolecularAnalysisRun({
     {
       onSuccess: async ({ data: genericMolecularAnalysisItems }) => {
         /**
-         * Takes an array of GenericMolecularAnalysisItems, then turns it into the SequencingRunItem which will be
-         * used to generate more data.
-         * @param genericMolecularAnalysisItem
-         * @returns The initial structure of SequencingRunItem.
-         */
-        function attachGenericMolecularAnalysisItems(
-          genericMolecularAnalysisItem: PersistedResource<GenericMolecularAnalysisItem>[]
-        ): SequencingRunItem[] {
-          return genericMolecularAnalysisItem.map<SequencingRunItem>(
-            (item) => ({
-              molecularAnalysisItem: item,
-              molecularAnalysisItemId: item.id,
-              molecularAnalysisRunItem: item?.molecularAnalysisRunItem,
-              molecularAnalysisRunItemId: item?.molecularAnalysisRunItem?.id,
-              storageUnitUsageId: item?.storageUnitUsage?.id,
-              materialSampleId: item?.materialSample?.id
-            })
-          );
-        }
-
-        /**
          * Fetch StorageUnitUsage linked to each GenericMolecularAnalysisItems. This will perform the API request
          * to retrieve the full storage unit since it's stored in the collection-api.
          * @returns The updated SequencingRunItem with storage unit attached.
@@ -458,4 +437,23 @@ export function useGenericMolecularAnalysisRun({
     setSequencingRunName,
     sequencingRunItems
   };
+}
+
+/**
+ * Takes an array of GenericMolecularAnalysisItems, then turns it into the SequencingRunItem which will be
+ * used to generate more data.
+ * @param genericMolecularAnalysisItem
+ * @returns The initial structure of SequencingRunItem.
+ */
+export function attachGenericMolecularAnalysisItems(
+  genericMolecularAnalysisItem: PersistedResource<GenericMolecularAnalysisItem>[]
+): SequencingRunItem[] {
+  return genericMolecularAnalysisItem.map<SequencingRunItem>((item) => ({
+    molecularAnalysisItem: item,
+    molecularAnalysisItemId: item.id,
+    molecularAnalysisRunItem: item?.molecularAnalysisRunItem,
+    molecularAnalysisRunItemId: item?.molecularAnalysisRunItem?.id,
+    storageUnitUsageId: item?.storageUnitUsage?.id,
+    materialSampleId: item?.materialSample?.id
+  }));
 }
