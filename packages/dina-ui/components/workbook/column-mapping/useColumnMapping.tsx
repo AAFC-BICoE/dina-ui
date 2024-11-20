@@ -21,6 +21,7 @@ import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
   FieldOptionType,
+  PERSON_SELECT_FIELDS,
   WorkbookColumnInfo,
   compareAlphanumeric,
   findMatchField,
@@ -33,11 +34,6 @@ import { Person } from "../../../types/agent-api/resources/Person";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { ResourceNameIdentifier } from "../../../types/common/resources/ResourceNameIdentifier";
 import { PersonSelectField } from "../../resource-select-fields/resource-select-fields";
-
-const PERSON_SELECT_FIELDS = new Set([
-  "preparedBy.displayName",
-  "collectingEvent.collectors.displayName"
-]);
 
 export function useColumnMapping() {
   const { formatMessage } = useDinaIntl();
