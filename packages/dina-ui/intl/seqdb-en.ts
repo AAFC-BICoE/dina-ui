@@ -193,6 +193,9 @@ export const SEQDB_MESSAGES_ENGLISH = {
   workflowStepTab: "Step {number}: {name}",
   workflowViewTitle: "NGS Workflow",
   sequencingFacility: "Sequencing Facility",
+  molecularAnalysisRunListTitle: "Molecular Analysis Runs",
+  field_molecularAnalysisRunName: "Molecular Analysis Run Name",
+  molecularAnalysisRunItems: "Molecular Analysis Run Items",
   molecularAnalysisWorkflowTitle: "Molecular Analysis Workflow",
   molecularAnalysisName: "Molecular Analysis Name",
   molecularAnalysis: "Molecular Analysis"

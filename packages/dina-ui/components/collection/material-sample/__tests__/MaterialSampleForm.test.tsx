@@ -843,16 +843,12 @@ describe("Material Sample Edit Page", () => {
     fillOutDetermination(1);
 
     // Enter the second determination:
-    userEvent.click(
-      wrapper.getByRole("button", { name: /add another determination/i })
-    );
+    userEvent.click(wrapper.getByTestId("add-another-button"));
     await new Promise(setImmediate);
     fillOutDetermination(2);
 
     // Enter the third determination:
-    userEvent.click(
-      wrapper.getByRole("button", { name: /add another determination/i })
-    );
+    userEvent.click(wrapper.getByTestId("add-another-button"));
     await new Promise(setImmediate);
     fillOutDetermination(3);
 
