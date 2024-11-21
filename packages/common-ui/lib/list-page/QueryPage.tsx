@@ -1198,7 +1198,9 @@ export function QueryPage<TData extends KitsuResource>({
                       className="btn btn-dark w-100 mb-5"
                       onClick={removeSelectedResources}
                     >
-                      <FiChevronLeft />
+                      <div data-testid="remove-resources">
+                        <FiChevronLeft />
+                      </div>
                     </FormikButton>
                   </div>
                 </div>
