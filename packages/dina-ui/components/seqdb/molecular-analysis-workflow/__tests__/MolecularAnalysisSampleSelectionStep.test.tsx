@@ -4,134 +4,21 @@ import {
   MolecularAnalysisSampleSelectionStepProps
 } from "../MolecularAnalysisSampleSelectionStep";
 import { useState, useEffect } from "react";
-import { PersistedResource } from "kitsu";
 import "@testing-library/jest-dom";
-import { Group } from "packages/dina-ui/types/user-api";
 import { DinaForm } from "common-ui";
 import userEvent from "@testing-library/user-event";
-import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
-import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
-
-const TEST_MOLECULAR_ANALYSIS_EMPTY_ID = "62f25a7d-ebf5-469d-b3ef-f6f3269a6e23";
-
-const TEST_MOLECULAR_ANALYSIS_EMPTY: PersistedResource<GenericMolecularAnalysis> =
-  {
-    id: TEST_MOLECULAR_ANALYSIS_EMPTY_ID,
-    type: "generic-molecular-analysis",
-    name: "empty generic molecular analysis",
-    analysisType: "hrms",
-    group: "aafc"
-  };
-
-const TEST_MOLECULAR_ANALYSIS_RUN_ID = "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4";
-
-const TEST_MOLECULAR_ANALYSIS_ID = "2a4fe193-28c7-499e-8eaf-26d7dc1fcd06";
-
-const TEST_MOLECULAR_ANALYSIS: PersistedResource<GenericMolecularAnalysis> = {
-  id: TEST_MOLECULAR_ANALYSIS_ID,
-  type: "generic-molecular-analysis",
-  name: "empty generic molecular analysis",
-  analysisType: "hrms",
-  group: "aafc"
-};
-
-const MATERIAL_SAMPLE_SUMMARY: PersistedResource<MaterialSampleSummary>[] = [
-  {
-    id: "01932b12-fa1a-74dc-b70c-453f55f42444",
-    type: "material-sample-summary",
-    materialSampleName: "Sample 1"
-  },
-  {
-    id: "1182ca20-d3df-47e1-b27f-2a9cd9b6074f",
-    type: "material-sample-summary",
-    materialSampleName: "Sample 2"
-  },
-  {
-    id: "239aaf35-9d02-409c-b099-987948cdcd63",
-    type: "material-sample-summary",
-    materialSampleName: "Sample 3"
-  }
-];
-
-const TEST_MOLECULAR_ANALYSIS_ITEMS: PersistedResource<GenericMolecularAnalysisItem>[] =
-  [
-    {
-      id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
-      type: "generic-molecular-analysis-item",
-      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
-      materialSample: MATERIAL_SAMPLE_SUMMARY[0],
-      molecularAnalysisRunItem: {
-        id: "f65ed036-eb92-40d9-af03-d027646e8948",
-        type: "molecular-analysis-run-item",
-        usageType: "hrms",
-        run: {
-          id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
-          type: "molecular-analysis-run"
-        }
-      },
-      storageUnitUsage: {
-        id: "45ed6126-26b8-4ebd-a89f-1bbcf6c69d27",
-        type: "storage-unit-usage"
-      }
-    },
-    {
-      id: "169eafe4-44f2-407e-aa90-1a5483edf522",
-      type: "generic-molecular-analysis-item",
-      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
-      materialSample: MATERIAL_SAMPLE_SUMMARY[1],
-      molecularAnalysisRunItem: {
-        id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
-        type: "molecular-analysis-run-item",
-        usageType: "hrms",
-        run: {
-          id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
-          type: "molecular-analysis-run"
-        }
-      },
-      storageUnitUsage: {
-        id: "be81e29a-b634-43c7-8f1a-53bf394d87f2",
-        type: "storage-unit-usage"
-      }
-    }
-  ];
-
-const TEST_GROUP: PersistedResource<Group>[] = [
-  {
-    id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
-    type: "group",
-    name: "Agriculture and Agri-food Canada",
-    path: "",
-    labels: { en: "AAFC", fr: "AAC" }
-  }
-];
-
-const TEST_MAPPING = {
-  attributes: [
-    {
-      name: "materialSampleName",
-      type: "text",
-      fields: ["keyword"],
-      path: "data.attributes"
-    }
-  ],
-  relationships: [
-    {
-      referencedBy: "collectingEvent",
-      name: "type",
-      path: "included",
-      value: "collecting-event",
-      attributes: [
-        {
-          name: "dwcOtherRecordNumbers",
-          type: "text",
-          path: "attributes"
-        }
-      ]
-    }
-  ],
-  index_name: "dina_material_sample_index"
-};
+import {
+  TEST_GROUP,
+  TEST_MAPPING,
+  TEST_MATERIAL_SAMPLE_SUMMARY,
+  TEST_MOLECULAR_ANALYSIS,
+  TEST_MOLECULAR_ANALYSIS_EMPTY,
+  TEST_MOLECULAR_ANALYSIS_EMPTY_ID,
+  TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID,
+  TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN,
+  TEST_MOLECULAR_ANALYSIS_RUN_ID,
+  TEST_SEARCH_RESPONSE
+} from "../__mocks__/MolecularAnalysisMocks";
 
 const onSavedMock = jest.fn();
 const mockSetEditMode = jest.fn();
@@ -143,8 +30,9 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         case "genericMolecularAnalysis.uuid==" +
           TEST_MOLECULAR_ANALYSIS_EMPTY_ID:
           return { data: [] };
-        case "genericMolecularAnalysis.uuid==" + TEST_MOLECULAR_ANALYSIS_ID:
-          return { data: TEST_MOLECULAR_ANALYSIS_ITEMS };
+        case "genericMolecularAnalysis.uuid==" +
+          TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID:
+          return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN };
       }
     case "user-api/group":
       return TEST_GROUP;
@@ -155,7 +43,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "seqdb-api/generic-molecular-analysis/" +
       TEST_MOLECULAR_ANALYSIS_EMPTY_ID:
       return TEST_MOLECULAR_ANALYSIS_EMPTY;
-    case "seqdb-api/generic-molecular-analysis/" + TEST_MOLECULAR_ANALYSIS_ID:
+    case "seqdb-api/generic-molecular-analysis/" +
+      TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID:
       return TEST_MOLECULAR_ANALYSIS;
   }
 });
@@ -165,7 +54,7 @@ const mockBulkGet = jest.fn(async (paths) => {
     return [];
   }
   return paths.map((path: string) => {
-    return MATERIAL_SAMPLE_SUMMARY.find(
+    return TEST_MATERIAL_SAMPLE_SUMMARY.find(
       (sample) => "/material-sample-summary/" + sample.id === path
     );
   });
@@ -182,54 +71,7 @@ const mockSave = jest.fn(() => {
 const mockPost = jest.fn((post) => {
   switch (post) {
     case "search-api/search-ws/search":
-      return {
-        data: {
-          hits: {
-            total: {
-              relation: "eq",
-              value: 3
-            },
-            hits: [
-              {
-                _source: {
-                  data: {
-                    relationships: {},
-                    attributes: {
-                      materialSampleName: "Sample 1"
-                    },
-                    id: "01932b12-fa1a-74dc-b70c-453f55f42444",
-                    type: "material-sample"
-                  }
-                }
-              },
-              {
-                _source: {
-                  data: {
-                    relationships: {},
-                    attributes: {
-                      materialSampleName: "Sample 2"
-                    },
-                    id: "1182ca20-d3df-47e1-b27f-2a9cd9b6074f",
-                    type: "material-sample"
-                  }
-                }
-              },
-              {
-                _source: {
-                  data: {
-                    relationships: {},
-                    attributes: {
-                      materialSampleName: "Sample 3"
-                    },
-                    id: "239aaf35-9d02-409c-b099-987948cdcd63",
-                    type: "material-sample"
-                  }
-                }
-              }
-            ]
-          }
-        }
-      };
+      return TEST_SEARCH_RESPONSE;
   }
 });
 
@@ -373,7 +215,9 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
 
   it("Existing workflow, attach new and remove existing material samples", async () => {
     const wrapper = mountWithAppContext2(
-      <TestComponentWrapper molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_ID} />,
+      <TestComponentWrapper
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
       testCtx
     );
     await new Promise(setImmediate);
@@ -441,7 +285,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
             relationships: {
               materialSample: {
                 data: {
-                  id: MATERIAL_SAMPLE_SUMMARY[2].id, // Sample 3.
+                  id: TEST_MATERIAL_SAMPLE_SUMMARY[2].id, // Sample 3.
                   type: "material-sample"
                 }
               },
@@ -467,7 +311,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       [
         {
           delete: {
-            id: TEST_MOLECULAR_ANALYSIS_ITEMS[1].id,
+            id: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN[1].id,
             type: "generic-molecular-analysis-item"
           }
         }
@@ -482,7 +326,7 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       [
         {
           delete: {
-            id: TEST_MOLECULAR_ANALYSIS_ITEMS[1].storageUnitUsage?.id,
+            id: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN[1].storageUnitUsage?.id,
             type: "storage-unit-usage"
           }
         }
@@ -497,7 +341,8 @@ describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selec
       [
         {
           delete: {
-            id: TEST_MOLECULAR_ANALYSIS_ITEMS[1].molecularAnalysisRunItem?.id,
+            id: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN[1]
+              .molecularAnalysisRunItem?.id,
             type: "molecular-analysis-run-item"
           }
         }
