@@ -8,7 +8,14 @@ import {
   STORAGE_UNIT_USAGE_1,
   STORAGE_UNIT_USAGE_2,
   STORAGE_UNIT_USAGE_3,
-  TEST_MATERIAL_SAMPLE_SUMMARY
+  TEST_MATERIAL_SAMPLE_SUMMARY,
+  TEST_MOLECULAR_ANALYSIS,
+  TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN,
+  TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN,
+  TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN,
+  TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID,
+  TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID,
+  TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID
 } from "../__mocks__/MolecularAnalysisMocks";
 import {
   MolecularAnalysisRunStep,
@@ -19,12 +26,15 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "/seqdb-api/generic-molecular-analysis-item":
       switch (params.filter.rsql) {
-        case "genericMolecularAnalysis.uuid==" + SEQ_BATCH_ID_MULTIPLE_RUNS:
-          return SEQ_REACTIONS_MULTIPLE;
-        case "genericMolecularAnalysis.uuid==" + SEQ_BATCH_ID:
-          return SEQ_REACTIONS;
-        case "genericMolecularAnalysis.uuid==" + SEQ_BATCH_NO_RUNS:
-          return SEQ_REACTIONS_NO_RUNS;
+        case "genericMolecularAnalysis.uuid==" +
+          TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID:
+          return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN };
+        case "genericMolecularAnalysis.uuid==" +
+          TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID:
+          return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN };
+        case "genericMolecularAnalysis.uuid==" +
+          TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID:
+          return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN };
       }
   }
 });
@@ -33,19 +43,19 @@ const mockBulkGet = jest.fn(async (paths) => {
   return paths.map((path: string) => {
     switch (path) {
       // Storage Unit Usage Requests
-      case "/storage-unit-usage/0192fd01-90a6-75a2-a7a3-daf1a4718471":
+      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_1.id:
         return STORAGE_UNIT_USAGE_1;
-      case "/storage-unit-usage/0192fd01-90c2-7e45-95a2-a5614f68052f":
+      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_2.id:
         return STORAGE_UNIT_USAGE_2;
-      case "/storage-unit-usage/0192fd01-9104-72fa-a18f-80d97da0c935":
+      case "/storage-unit-usage/" + STORAGE_UNIT_USAGE_3.id:
         return STORAGE_UNIT_USAGE_3;
 
       // Material Sample Summary
-      case "/material-sample-summary/f1275d16-10d2-415b-91b8-3cd9c44a77a5":
+      case "/material-sample-summary/" + TEST_MATERIAL_SAMPLE_SUMMARY[0].id:
         return TEST_MATERIAL_SAMPLE_SUMMARY[0];
-      case "/material-sample-summary/ddf3c366-55e9-4c2e-8e5f-ea2ed5831cbf":
+      case "/material-sample-summary/" + TEST_MATERIAL_SAMPLE_SUMMARY[1].id:
         return TEST_MATERIAL_SAMPLE_SUMMARY[1];
-      case "/material-sample-summary/2308d337-756d-4714-90bb-57698b6f5819":
+      case "/material-sample-summary/" + TEST_MATERIAL_SAMPLE_SUMMARY[2].id:
         return TEST_MATERIAL_SAMPLE_SUMMARY[2];
     }
   });
@@ -73,7 +83,7 @@ const testCtx = {
   }
 } as any;
 
-describe("Sanger Run Step from Sanger Workflow", () => {
+describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Loading spinner is displayed on first load", async () => {
@@ -81,8 +91,8 @@ describe("Sanger Run Step from Sanger Workflow", () => {
       <MolecularAnalysisRunStep
         editMode={false}
         performSave={false}
-        seqBatch={SEQ_BATCH}
-        seqBatchId={SEQ_BATCH_ID}
+        molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
         setEditMode={noop}
         setPerformSave={noop}
       />,
@@ -97,8 +107,8 @@ describe("Sanger Run Step from Sanger Workflow", () => {
       <MolecularAnalysisRunStep
         editMode={true}
         performSave={false}
-        seqBatch={SEQ_BATCH}
-        seqBatchId={SEQ_BATCH_ID}
+        molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
         setEditMode={mockSetEditMode}
         setPerformSave={noop}
       />,
@@ -116,41 +126,25 @@ describe("Sanger Run Step from Sanger Workflow", () => {
 
     // Ensure Primary IDs are rendered in the table with links:
     expect(
-      wrapper.getByRole("link", { name: /sample1/i }).getAttribute("href")
+      wrapper.getByRole("link", { name: /sample 1/i }).getAttribute("href")
     ).toEqual(
-      "/collection/material-sample/view?id=f1275d16-10d2-415b-91b8-3cd9c44a77a5"
+      "/collection/material-sample/view?id=" +
+        TEST_MATERIAL_SAMPLE_SUMMARY[0].id
     );
     expect(
-      wrapper.getByRole("link", { name: /sample2/i }).getAttribute("href")
+      wrapper.getByRole("link", { name: /sample 2/i }).getAttribute("href")
     ).toEqual(
-      "/collection/material-sample/view?id=ddf3c366-55e9-4c2e-8e5f-ea2ed5831cbf"
+      "/collection/material-sample/view?id=" +
+        TEST_MATERIAL_SAMPLE_SUMMARY[1].id
     );
-    expect(
-      wrapper.getByRole("link", { name: /sample3/i }).getAttribute("href")
-    ).toEqual(
-      "/collection/material-sample/view?id=2308d337-756d-4714-90bb-57698b6f5819"
-    );
-
-    // Primer name should be displayed.
-    expect(
-      wrapper.getByRole("cell", { name: /sample1 \(primer1\)/i })
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("cell", { name: /sample2 \(primer1\)/i })
-    ).toBeInTheDocument();
-    expect(
-      wrapper.getByRole("cell", { name: /sample3 \(primer1\)/i })
-    ).toBeInTheDocument();
 
     // Ensure Tube Number is rendered:
     expect(wrapper.getByRole("cell", { name: "1" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "2" })).toBeInTheDocument();
-    expect(wrapper.getByRole("cell", { name: "3" })).toBeInTheDocument();
 
     // Ensure Well Coordinates is rendered:
     expect(wrapper.getByRole("cell", { name: "A1" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
-    expect(wrapper.getByRole("cell", { name: "A3" })).toBeInTheDocument();
 
     // Set edit mode should not be triggered in this test.
     expect(mockSetEditMode).toBeCalledTimes(0);
@@ -161,8 +155,8 @@ describe("Sanger Run Step from Sanger Workflow", () => {
       <MolecularAnalysisRunStep
         editMode={true}
         performSave={false}
-        seqBatch={SEQ_BATCH}
-        seqBatchId={SEQ_BATCH_ID_MULTIPLE_RUNS} // Use the SeqBatch ID with multiple runs
+        molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID} // Use the Molecular Analysis ID with multiple runs
         setEditMode={mockSetEditMode}
         setPerformSave={noop}
       />,
@@ -175,7 +169,9 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     // Alert should exist indicating that multiple runs exist.
     expect(wrapper.getByRole("alert")).toBeInTheDocument();
     expect(
-      wrapper.getByText(/multiple runs exist for this sanger workflow\./i)
+      wrapper.getByText(
+        /multiple runs exist for this molecular analysis workflow\./i
+      )
     ).toBeInTheDocument();
 
     // Run name should be in the textbox for the first run found.
@@ -204,8 +200,8 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         <MolecularAnalysisRunStep
           editMode={editMode}
           performSave={performSave}
-          seqBatch={SEQ_BATCH}
-          seqBatchId={SEQ_BATCH_NO_RUNS}
+          molecularAnalysis={TEST_MOLECULAR_ANALYSIS}
+          molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID}
           setEditMode={setEditMode}
           setPerformSave={setPerformSave}
           {...props}
@@ -280,7 +276,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
                   }
                 }
               },
-              usageType: "seq-reaction",
+              usageType: "generic-molecular-analysis-item",
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
@@ -295,7 +291,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
                   }
                 }
               },
-              usageType: "seq-reaction",
+              usageType: "generic-molecular-analysis-item",
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
@@ -310,7 +306,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
                   }
                 }
               },
-              usageType: "seq-reaction",
+              usageType: "generic-molecular-analysis-item",
               type: "molecular-analysis-run-item"
             },
             type: "molecular-analysis-run-item"
@@ -321,12 +317,12 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         }
       ],
 
-      // Seq Reaction Update
+      // Molecular-analysis-run-item Update
       [
         [
           {
             resource: {
-              id: "1dae4ea0-e705-4d49-95c0-0a51dd047796",
+              id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
               relationships: {
                 molecularAnalysisRunItem: {
                   data: {
@@ -335,13 +331,13 @@ describe("Sanger Run Step from Sanger Workflow", () => {
                   }
                 }
               },
-              type: "seq-reaction"
+              type: "generic-molecular-analysis-item"
             },
-            type: "seq-reaction"
+            type: "generic-molecular-analysis-item"
           },
           {
             resource: {
-              id: "55f2cee7-ebb9-44ac-9a2e-e7c8588567f9",
+              id: "169eafe4-44f2-407e-aa90-1a5483edf522",
               relationships: {
                 molecularAnalysisRunItem: {
                   data: {
@@ -350,13 +346,13 @@ describe("Sanger Run Step from Sanger Workflow", () => {
                   }
                 }
               },
-              type: "seq-reaction"
+              type: "generic-molecular-analysis-item"
             },
-            type: "seq-reaction"
+            type: "generic-molecular-analysis-item"
           },
           {
             resource: {
-              id: "b5588dd1-ac88-4fd2-a484-2f467d9a6df5",
+              id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
               relationships: {
                 molecularAnalysisRunItem: {
                   data: {
@@ -365,9 +361,9 @@ describe("Sanger Run Step from Sanger Workflow", () => {
                   }
                 }
               },
-              type: "seq-reaction"
+              type: "generic-molecular-analysis-item"
             },
-            type: "seq-reaction"
+            type: "generic-molecular-analysis-item"
           }
         ],
         {
@@ -379,7 +375,9 @@ describe("Sanger Run Step from Sanger Workflow", () => {
 
   it("Run exists, in edit mode, update the existing run", async () => {
     const wrapper = mountWithAppContext2(
-      <TestComponent seqBatchId={SEQ_BATCH_ID} />,
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
       testCtx
     );
 
@@ -416,7 +414,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
         [
           {
             resource: {
-              id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
+              id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
               name: "Updated run name",
               type: "molecular-analysis-run"
             },

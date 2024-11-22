@@ -120,7 +120,8 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN: PersistedResource<GenericMo
         usageType: "hrms",
         run: {
           id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
-          type: "molecular-analysis-run"
+          type: "molecular-analysis-run",
+          name: "run-name-1"
         }
       },
       storageUnitUsage: {
@@ -139,7 +140,8 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN: PersistedResource<GenericMo
         usageType: "hrms",
         run: {
           id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
-          type: "molecular-analysis-run"
+          type: "molecular-analysis-run",
+          name: "run-name-1"
         }
       },
       storageUnitUsage: {
@@ -150,7 +152,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN: PersistedResource<GenericMo
   ];
 
 export const STORAGE_UNIT_USAGE_1: StorageUnitUsage = {
-  id: "0192fd01-90a6-75a2-a7a3-daf1a4718471",
+  id: "45ed6126-26b8-4ebd-a89f-1bbcf6c69d27",
   type: "storage-unit-usage",
   cellNumber: 1,
   wellColumn: 1,
@@ -158,7 +160,7 @@ export const STORAGE_UNIT_USAGE_1: StorageUnitUsage = {
 };
 
 export const STORAGE_UNIT_USAGE_2: StorageUnitUsage = {
-  id: "0192fd01-90c2-7e45-95a2-a5614f68052f",
+  id: "be81e29a-b634-43c7-8f1a-53bf394d87f2",
   type: "storage-unit-usage",
   cellNumber: 2,
   wellColumn: 2,
@@ -203,6 +205,73 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN: PersistedResource<Generi
       type: "generic-molecular-analysis-item",
       genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
       materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[2],
+      storageUnitUsage: {
+        id: STORAGE_UNIT_USAGE_3.id ?? "",
+        type: "storage-unit-usage"
+      }
+    }
+  ];
+
+export const TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID =
+  "d984b9e0-3247-42df-8b5b-6b71b957cd21";
+
+export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN: PersistedResource<GenericMolecularAnalysisItem>[] =
+  [
+    {
+      id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
+      type: "generic-molecular-analysis-item",
+      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+      materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[0],
+      molecularAnalysisRunItem: {
+        id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+        type: "molecular-analysis-run-item",
+        usageType: "hrms",
+        run: {
+          id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
+          type: "molecular-analysis-run",
+          name: "run-name-1"
+        }
+      },
+      storageUnitUsage: {
+        id: STORAGE_UNIT_USAGE_1.id ?? "",
+        type: "storage-unit-usage"
+      }
+    },
+    {
+      id: "169eafe4-44f2-407e-aa90-1a5483edf522",
+      type: "generic-molecular-analysis-item",
+      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+      materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[1],
+      molecularAnalysisRunItem: {
+        id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+        type: "molecular-analysis-run-item",
+        usageType: "hrms",
+        run: {
+          id: "9ec624c9-8465-4f00-b3d4-1bbab5f1e2f2",
+          type: "molecular-analysis-run",
+          name: "run-name-2"
+        }
+      },
+      storageUnitUsage: {
+        id: STORAGE_UNIT_USAGE_2.id ?? "",
+        type: "storage-unit-usage"
+      }
+    },
+    {
+      id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
+      type: "generic-molecular-analysis-item",
+      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+      materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[2],
+      molecularAnalysisRunItem: {
+        id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
+        type: "molecular-analysis-run-item",
+        usageType: "hrms",
+        run: {
+          id: "9ec624c9-8465-4f00-b3d4-1bbab5f1e2f2",
+          type: "molecular-analysis-run",
+          name: "run-name-2"
+        }
+      },
       storageUnitUsage: {
         id: STORAGE_UNIT_USAGE_3.id ?? "",
         type: "storage-unit-usage"
