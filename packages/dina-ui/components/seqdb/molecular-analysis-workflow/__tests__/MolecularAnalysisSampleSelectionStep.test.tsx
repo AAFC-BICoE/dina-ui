@@ -91,6 +91,7 @@ const testCtx = {
 
 describe("Molecular Analysis Workflow - Step 2 - Molecular Analysis Sample Selection Step", () => {
   beforeEach(jest.clearAllMocks);
+
   function TestComponentWrapper(
     props: Partial<MolecularAnalysisSampleSelectionStepProps>
   ) {

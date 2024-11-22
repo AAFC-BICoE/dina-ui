@@ -156,7 +156,24 @@ export const STORAGE_UNIT_USAGE_1: StorageUnitUsage = {
   type: "storage-unit-usage",
   cellNumber: 1,
   wellColumn: 1,
-  wellRow: "A"
+  wellRow: "A",
+  storageUnit: {
+    id: "6f5f6d1c-69cc-49b1-b3ae-1675c18ef5b5",
+    type: "storage-unit",
+    group: "aafc",
+    name: "Storage Unit Name",
+    storageUnitType: {
+      id: "61909244-5af7-453c-bc57-99504ed4bec4",
+      type: "storage-unit-type",
+      group: "aafc",
+      name: "Storage Unit Type Name",
+      gridLayoutDefinition: {
+        fillDirection: "BY_ROW",
+        numberOfColumns: 5,
+        numberOfRows: 5
+      }
+    }
+  }
 };
 
 export const STORAGE_UNIT_USAGE_2: StorageUnitUsage = {
@@ -164,7 +181,24 @@ export const STORAGE_UNIT_USAGE_2: StorageUnitUsage = {
   type: "storage-unit-usage",
   cellNumber: 2,
   wellColumn: 2,
-  wellRow: "A"
+  wellRow: "A",
+  storageUnit: {
+    id: "6f5f6d1c-69cc-49b1-b3ae-1675c18ef5b5",
+    type: "storage-unit",
+    group: "aafc",
+    name: "Storage Unit Name",
+    storageUnitType: {
+      id: "61909244-5af7-453c-bc57-99504ed4bec4",
+      type: "storage-unit-type",
+      group: "aafc",
+      name: "Storage Unit Type Name",
+      gridLayoutDefinition: {
+        fillDirection: "BY_ROW",
+        numberOfColumns: 5,
+        numberOfRows: 5
+      }
+    }
+  }
 };
 
 export const STORAGE_UNIT_USAGE_3: StorageUnitUsage = {
@@ -172,7 +206,24 @@ export const STORAGE_UNIT_USAGE_3: StorageUnitUsage = {
   type: "storage-unit-usage",
   cellNumber: 3,
   wellColumn: 3,
-  wellRow: "A"
+  wellRow: "A",
+  storageUnit: {
+    id: "6f5f6d1c-69cc-49b1-b3ae-1675c18ef5b5",
+    type: "storage-unit",
+    group: "aafc",
+    name: "Storage Unit Name",
+    storageUnitType: {
+      id: "61909244-5af7-453c-bc57-99504ed4bec4",
+      type: "storage-unit-type",
+      group: "aafc",
+      name: "Storage Unit Type Name",
+      gridLayoutDefinition: {
+        fillDirection: "BY_ROW",
+        numberOfColumns: 5,
+        numberOfRows: 5
+      }
+    }
+  }
 };
 
 export const TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID =
