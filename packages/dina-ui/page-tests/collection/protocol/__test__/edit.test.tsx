@@ -1,7 +1,9 @@
 import { OperationsResponse } from "common-ui";
 import { ProtocolForm } from "../../../../../dina-ui/components/collection/protocol/ProtocolForm";
 import ProtocolEditPage from "../../../../pages/collection/protocol/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { fireEvent, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
   data: {
@@ -214,25 +216,34 @@ describe("protocol edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<ProtocolEditPage />, {
+    const wrapper = mountWithAppContext2(<ProtocolEditPage />, {
       apiContext
     });
 
-    wrapper.find(".protocolName input").simulate("change", {
+    // Change Protocol Name field value
+    fireEvent.change(wrapper.getByRole("textbox", { name: /protocol name/i }), {
       target: {
         name: "name",
         value: "updated Name"
       }
     });
 
-    wrapper.find(".en-description textarea").simulate("change", {
-      target: { value: "test english description" }
-    });
+    // Change English Description field value
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /english description/i }),
+      {
+        target: {
+          value: "test english description"
+        }
+      }
+    );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
     await new Promise(setImmediate);
 
+    // Test expected API response
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
       [
@@ -266,7 +277,7 @@ describe("protocol edit page", () => {
   it("Edits an existing protocol.", async () => {
     const mockOnSaved = jest.fn();
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ProtocolForm
         onSaved={mockOnSaved}
         fetchedProtocol={{
@@ -281,21 +292,28 @@ describe("protocol edit page", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".en-description textarea").prop("value")).toEqual(
-      "test english description"
+    // Test English Description field default value
+    expect(
+      wrapper.getByRole("textbox", { name: /english description/i })
+    ).toHaveDisplayValue("test english description");
+
+    // Change French Description field value
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /french description/i }),
+      {
+        target: {
+          value: "test french description"
+        }
+      }
     );
 
-    wrapper.find(".fr-description textarea").simulate("change", {
-      target: { value: "test french description" }
-    });
-
-    wrapper.find("form").simulate("submit");
+    // Submit the form.
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API response
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
       [
@@ -351,18 +369,20 @@ describe("protocol edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<ProtocolEditPage />, {
+    const wrapper = mountWithAppContext2(<ProtocolEditPage />, {
       apiContext
     });
 
-    wrapper.find("form").simulate("submit");
+    // wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
-    wrapper.update();
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: Name is mandatory"
-    );
+    // Test expected error
+    // expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+    //   "Constraint violation: Name is mandatory"
+    // );
+    expect(wrapper.getByText(/constraint violation: name is mandatory/i));
     expect(mockPush).toBeCalledTimes(0);
   });
 });
