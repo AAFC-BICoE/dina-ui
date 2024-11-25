@@ -2,7 +2,7 @@ import { OperationsResponse } from "common-ui";
 import { ProtocolForm } from "../../../../../dina-ui/components/collection/protocol/ProtocolForm";
 import ProtocolEditPage from "../../../../pages/collection/protocol/edit";
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
@@ -382,7 +382,9 @@ describe("protocol edit page", () => {
     // expect(wrapper.find(".alert.alert-danger").text()).toEqual(
     //   "Constraint violation: Name is mandatory"
     // );
-    expect(wrapper.getByText(/constraint violation: name is mandatory/i));
+    expect(
+      wrapper.getByText(/constraint violation: name is mandatory/i)
+    ).toBeInTheDocument();
     expect(mockPush).toBeCalledTimes(0);
   });
 });
