@@ -1141,6 +1141,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select Parent Material Sample to link resource to",
   doOperationsFieldError:
     'Field "{fieldErrorKey}" has the following error: {fieldErrorMessage}',
-  seqdbManagedAttributeTitle: "SeqDB",
+  seqdbManagedAttributeTitle: "Sequencing",
   genericMolecularAnalysis: "Generic Molecular Analysis"
 };
