@@ -79,7 +79,7 @@ export default function ManagedAttributesListPage() {
           <Tab>{formatMessage("collectionListTitle")}</Tab>
           <Tab>{formatMessage("objectStoreTitle")}</Tab>
           <Tab>{formatMessage("loanTransactionsSectionTitle")}</Tab>
-          <Tab>{formatMessage("seqdbTitle")}</Tab>
+          <Tab>{formatMessage("seqdbManagedAttributeTitle")}</Tab>
         </TabList>
         <TabPanel>
           <CollectionAttributeListView />
@@ -484,7 +484,7 @@ function SeqDBAttributeListView() {
   return (
     <>
       <h3 className="mb-3">
-        <DinaMessage id="seqdbTitle" />
+        <DinaMessage id="seqdbManagedAttributeTitle" />
       </h3>
 
       {/* Quick create menu */}
