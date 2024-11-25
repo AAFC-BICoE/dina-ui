@@ -380,6 +380,11 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="libraryPrepBatchListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/metagenomics-workflow/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/molecular-analysis-run/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="molecularAnalysisRunListTitle" />
@@ -442,7 +447,7 @@ function NavSequenceDropdown({ formatMessage }) {
       </Link>
       <Link href="/seqdb/seq-workflow/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
-          <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
+          <SeqdbMessage id="metagenomicsWorkflowTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/thermocycler-profile/list" passHref={true}>
