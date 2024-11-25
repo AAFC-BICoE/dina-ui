@@ -87,6 +87,18 @@ export function MolecularAnalysisGridStep({
     return <LoadingSpinner loading={true} />;
   }
 
+  /**
+   * Since this step is optional, the user can skip and go directly to the next step.
+   */
+  function skipStep() {
+    async function performSkipInternal() {
+      setPerformSave(false);
+      await onSaved(3);
+    }
+
+    performSkipInternal();
+  }
+
   return (
     <>
       {multipleStorageUnitsWarning && (
@@ -94,6 +106,19 @@ export function MolecularAnalysisGridStep({
           <div className="alert alert-danger">
             Multiple storage units have been found for the molecular analysis
             items.
+          </div>
+        </div>
+      )}
+      {isStorage === false && editMode === true && (
+        <div className="row">
+          <div className="col-md-12">
+            <button
+              className="btn btn-primary w-100"
+              onClick={skipStep}
+              type="button"
+            >
+              Skip Step
+            </button>
           </div>
         </div>
       )}
@@ -127,24 +152,28 @@ export function MolecularAnalysisGridStep({
           </strong>
           <div className="mt-2">
             {editMode ? (
-              <ResourceSelect<StorageUnit>
-                model="collection-api/storage-unit"
-                optionLabel={(it) => it.name}
-                filter={filterBy(["name"], {
-                  extraFilters: [
-                    {
-                      selector: "storageUnitType.uuid",
-                      comparison: "==",
-                      arguments: storageUnitType?.id ?? ""
+              <>
+                {storageUnitType?.id && (
+                  <ResourceSelect<StorageUnit>
+                    model="collection-api/storage-unit"
+                    optionLabel={(it) => it.name}
+                    filter={filterBy(["name"], {
+                      extraFilters: [
+                        {
+                          selector: "storageUnitType.uuid",
+                          comparison: "==",
+                          arguments: storageUnitType?.id ?? ""
+                        }
+                      ]
+                    })}
+                    onChange={(value) =>
+                      setStorageUnit(value as PersistedResource<StorageUnit>)
                     }
-                  ]
-                })}
-                onChange={(value) =>
-                  setStorageUnit(value as PersistedResource<StorageUnit>)
-                }
-                value={storageUnit}
-                isDisabled={!storageUnitType?.id}
-              />
+                    value={storageUnit}
+                    isDisabled={!storageUnitType?.id}
+                  />
+                )}
+              </>
             ) : (
               <p>{storageUnit?.name}</p>
             )}

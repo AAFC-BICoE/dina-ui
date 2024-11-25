@@ -2,6 +2,7 @@ import { PersistedResource } from "kitsu";
 import {
   MaterialSampleSummary,
   Protocol,
+  StorageUnitType,
   Vocabulary
 } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
@@ -226,6 +227,31 @@ export const STORAGE_UNIT_USAGE_3: StorageUnitUsage = {
   }
 };
 
+export const TEST_STORAGE_UNIT_TYPES: PersistedResource<StorageUnitType>[] = [
+  {
+    id: "e6781d27-ed23-4a7b-b02a-575a14a9c407",
+    type: "storage-unit-type",
+    group: "aafc",
+    name: "Test Storage Unit Type 1",
+    gridLayoutDefinition: {
+      fillDirection: "BY_ROW",
+      numberOfColumns: 5,
+      numberOfRows: 5
+    }
+  },
+  {
+    id: "1599d01b-cdf0-40ce-a96a-544d8c8cb840",
+    type: "storage-unit-type",
+    group: "aafc",
+    name: "Test Storage Unit Type 2",
+    gridLayoutDefinition: {
+      fillDirection: "BY_ROW",
+      numberOfColumns: 10,
+      numberOfRows: 10
+    }
+  }
+];
+
 export const TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID =
   "6222c981-41ac-42dd-98bc-42350b879721";
 
@@ -260,6 +286,31 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN: PersistedResource<Generi
         id: STORAGE_UNIT_USAGE_3.id ?? "",
         type: "storage-unit-usage"
       }
+    }
+  ];
+
+export const TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID =
+  "fcb75bec-8c3a-4708-8068-6d5060ef0310";
+
+export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_STORAGE: PersistedResource<GenericMolecularAnalysisItem>[] =
+  [
+    {
+      id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
+      type: "generic-molecular-analysis-item",
+      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+      materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[0]
+    },
+    {
+      id: "169eafe4-44f2-407e-aa90-1a5483edf522",
+      type: "generic-molecular-analysis-item",
+      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+      materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[1]
+    },
+    {
+      id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
+      type: "generic-molecular-analysis-item",
+      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+      materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[2]
     }
   ];
 
