@@ -23,6 +23,7 @@ import { PersistedResource } from "kitsu";
 interface ContainerGridProps {
   molecularAnalysisId: string;
   molecularAnalysis: GenericMolecularAnalysis;
+  editMode: boolean;
 }
 
 export interface MolecularAnalysisItemSample
@@ -32,7 +33,8 @@ export interface MolecularAnalysisItemSample
 
 export function useMolecularAnalysisGridControls({
   molecularAnalysisId,
-  molecularAnalysis
+  molecularAnalysis,
+  editMode
 }: ContainerGridProps) {
   const { save, bulkGet } = useContext(ApiClientContext);
 
@@ -63,6 +65,9 @@ export function useMolecularAnalysisGridControls({
     useState<PersistedResource<StorageUnit>>();
 
   const [loadedStorageUnit, setLoadedStorageUnit] =
+    useState<PersistedResource<StorageUnit>>();
+
+  const [initialStorageUnit, setInitialStorageUnit] =
     useState<PersistedResource<StorageUnit>>();
 
   const [multipleStorageUnitsWarning, setMultipleStorageUnitsWarning] =
@@ -149,6 +154,7 @@ export function useMolecularAnalysisGridControls({
             )?.storageUnit;
             setStorageUnit(storageUnitToLoad);
             setLoadedStorageUnit(storageUnitToLoad);
+            setInitialStorageUnit(storageUnitToLoad);
             setStorageUnitType(storageUnitToLoad?.storageUnitType);
           }
 
@@ -285,6 +291,15 @@ export function useMolecularAnalysisGridControls({
       }
     }
   }, [loadingRelationships, storageUnit, storageUnitType]);
+
+  useEffect(() => {
+    if (editMode === false) {
+      if (initialStorageUnit?.id !== storageUnit?.id) {
+        setStorageUnit(initialStorageUnit);
+        setStorageUnitType(initialStorageUnit?.storageUnitType);
+      }
+    }
+  }, [editMode]);
 
   function sortAvailableItems(batchItemSamples: MolecularAnalysisItemSample[]) {
     if (materialSampleSortOrder) {

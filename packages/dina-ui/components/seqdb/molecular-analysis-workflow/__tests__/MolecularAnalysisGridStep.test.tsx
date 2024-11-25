@@ -37,6 +37,14 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       }
     case "collection-api/storage-unit-type":
       return { data: TEST_STORAGE_UNIT_TYPES };
+    case "collection-api/storage-unit":
+      return {
+        data: [
+          STORAGE_UNIT_USAGE_1.storageUnit,
+          STORAGE_UNIT_USAGE_2.storageUnit,
+          STORAGE_UNIT_USAGE_3.storageUnit
+        ]
+      };
   }
 });
 
@@ -187,6 +195,27 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     expect(
       wrapper.getByRole("button", { name: /skip step/i })
     ).toBeInTheDocument();
-    screen.logTestingPlaygroundURL();
+
+    // Change the dropdowns.
+    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(
+      wrapper.getByRole("option", { name: /test storage unit type 1/i })
+    );
+    await new Promise(setImmediate);
+
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(
+      wrapper.getAllByRole("option", { name: /storage unit name/i })[0]
+    );
+
+    // Click cancel, nothing should be saved...
+    userEvent.click(wrapper.getByRole("button", { name: /cancel/i }));
+
+    // Expect nothing to be in the view since nothing was saved:
+    expect(
+      wrapper.getByText(
+        /no coordinates have been saved yet, click "edit" to begin adding coordinates\./i
+      )
+    ).toBeInTheDocument();
   });
 });

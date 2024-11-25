@@ -1,7 +1,7 @@
 import { filterBy, LoadingSpinner, ResourceSelect } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   MolecularAnalysisItemSample,
   useMolecularAnalysisGridControls
@@ -60,15 +60,21 @@ export function MolecularAnalysisGridStep({
     multipleStorageUnitsWarning
   } = useMolecularAnalysisGridControls({
     molecularAnalysisId,
-    molecularAnalysis
+    molecularAnalysis,
+    editMode
   });
+
+  const [pageLoaded, setPageLoaded] = useState<boolean>(false);
 
   // Automatically go into edit mode if no storage units exist.
   useEffect(() => {
-    if (loading === false && isStorage === false) {
-      setEditMode(true);
+    if (loading === false && pageLoaded === false) {
+      if (isStorage === false) {
+        setEditMode(true);
+      }
+      setPageLoaded(true);
     }
-  }, [loading, isStorage]);
+  }, [loading, isStorage, pageLoaded]);
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -109,11 +115,19 @@ export function MolecularAnalysisGridStep({
           </div>
         </div>
       )}
+      {editMode === false && !storageUnit?.id && (
+        <div className="col-12">
+          <div className="alert alert-info">
+            No coordinates have been saved yet, click "Edit" to begin adding
+            coordinates.
+          </div>
+        </div>
+      )}
       {isStorage === false && editMode === true && (
         <div className="row">
           <div className="col-md-12">
             <button
-              className="btn btn-primary w-100"
+              className="btn btn-secondary w-100 mb-4"
               onClick={skipStep}
               type="button"
             >
@@ -124,9 +138,11 @@ export function MolecularAnalysisGridStep({
       )}
       <div className="row">
         <div className="col-md-6">
-          <strong>
-            <DinaMessage id="storageUnitType" />
-          </strong>
+          {!(editMode === false && !storageUnit?.id) && (
+            <strong>
+              <DinaMessage id="storageUnitType" />
+            </strong>
+          )}
           <div className="mt-2">
             {editMode ? (
               <ResourceSelect<StorageUnitType>
@@ -147,9 +163,11 @@ export function MolecularAnalysisGridStep({
           </div>
         </div>
         <div className="col-md-6">
-          <strong>
-            <DinaMessage id="field_storageUnit" />
-          </strong>
+          {storageUnitType?.id && (
+            <strong>
+              <DinaMessage id="field_storageUnit" />
+            </strong>
+          )}
           <div className="mt-2">
             {editMode ? (
               <>
