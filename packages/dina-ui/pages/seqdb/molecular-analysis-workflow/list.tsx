@@ -3,7 +3,8 @@ import {
   ColumnDefinition,
   dateCell,
   FilterAttribute,
-  ListPageLayout
+  ListPageLayout,
+  LoadingSpinner
 } from "common-ui";
 import Link from "next/link";
 import {
@@ -15,33 +16,11 @@ import {
 } from "../../../components";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-
-const TABLE_COLUMNS: ColumnDefinition<GenericMolecularAnalysis>[] = [
-  {
-    cell: ({
-      row: {
-        original: { id, name }
-      }
-    }) => (
-      <Link
-        href={`/seqdb/molecular-analysis-workflow/run?genericMolecularAnalysisId=${id}`}
-      >
-        {name || id}
-      </Link>
-    ),
-    accessorKey: "name",
-    header: () => <SeqdbMessage id="molecularAnalysisName" />
-  },
-  "analysisType",
-  groupCell("group"),
-  "createdBy",
-  dateCell("createdOn")
-];
+import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import useVocabularyOptions from "packages/dina-ui/components/collection/useVocabularyOptions";
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [
   "name",
-  "analysisType",
   {
     name: "createdOn",
     type: "DATE"
@@ -51,6 +30,51 @@ const FILTER_ATTRIBUTES: FilterAttribute[] = [
 
 export default function MolecularAnalysisWorkflowListPage() {
   const { formatMessage } = useDinaIntl();
+
+  const { vocabOptions, loading } = useVocabularyOptions({
+    path: "seqdb-api/vocabulary/molecularAnalysisType"
+  });
+
+  const TABLE_COLUMNS: ColumnDefinition<GenericMolecularAnalysis>[] = [
+    {
+      cell: ({
+        row: {
+          original: { id, name }
+        }
+      }) => (
+        <Link
+          href={`/seqdb/molecular-analysis-workflow/run?genericMolecularAnalysisId=${id}`}
+        >
+          {name || id}
+        </Link>
+      ),
+      accessorKey: "name",
+      header: () => <SeqdbMessage id="molecularAnalysisName" />
+    },
+    {
+      cell: ({
+        row: {
+          original: { analysisType }
+        }
+      }) => (
+        <>
+          {loading ? (
+            <LoadingSpinner loading={true} />
+          ) : (
+            <>
+              {vocabOptions.find((option) => option.value === analysisType)
+                ?.label ?? analysisType}
+            </>
+          )}
+        </>
+      ),
+      accessorKey: "analysisType",
+      header: () => <DinaMessage id="field_analysisType" />
+    },
+    groupCell("group"),
+    "createdBy",
+    dateCell("createdOn")
+  ];
 
   return (
     <div>
