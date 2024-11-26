@@ -13,6 +13,7 @@ import { GeneratorColumn, GeneratorSelectorProps } from "./GeneratorSelector";
 import { startCase } from "lodash";
 import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
 import { useFormikContext } from "formik";
+import QueryRowScientificNameDetailsSearch from "../list-page/query-builder/query-builder-value-types/QueryBuilderScientificNameDetailsSearch";
 
 export interface GeneratorSelectorListProps extends GeneratorSelectorProps {
   loading: boolean;
@@ -345,6 +346,13 @@ export function GeneratorSelectorList({
                 }}
               />
             </>
+          )}
+          {selectedField?.dynamicConfig?.type === "scientificNameDetails" && (
+            <QueryRowScientificNameDetailsSearch
+              setValue={setDynamicFieldValue}
+              value={dynamicFieldValue}
+              isInColumnSelector={true}
+            />
           )}
           <div className="d-grid">
             <Button

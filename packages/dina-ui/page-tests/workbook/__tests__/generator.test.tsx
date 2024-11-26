@@ -1,4 +1,4 @@
-import { waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { WorkbookTemplateGenerator } from "../../../pages/workbook/generator";
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import userEvent from "@testing-library/user-event";
@@ -74,6 +74,161 @@ const mockGet = jest.fn<any, any>(async (path, options) => {
             ]
           };
       }
+    case "collection-api/vocabulary2/taxonomicRank":
+      return {
+        data: {
+          id: "taxonomicRank",
+          type: "vocabulary",
+          attributes: {
+            vocabularyElements: [
+              {
+                key: "kingdom",
+                name: "kingdom",
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "kingdom"
+                    },
+                    {
+                      lang: "fr",
+                      title: "règne"
+                    }
+                  ]
+                }
+              },
+              {
+                key: "phylum",
+                name: "phylum",
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "phylum"
+                    },
+                    {
+                      lang: "fr",
+                      title: "phylum"
+                    }
+                  ]
+                }
+              },
+              {
+                key: "class",
+                name: "class",
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "class"
+                    },
+                    {
+                      lang: "fr",
+                      title: "classe"
+                    }
+                  ]
+                }
+              },
+              {
+                key: "order",
+                name: "order",
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "order"
+                    },
+                    {
+                      lang: "fr",
+                      title: "ordre"
+                    }
+                  ]
+                }
+              },
+              {
+                key: "family",
+                name: "family",
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "family"
+                    },
+                    {
+                      lang: "fr",
+                      title: "famille"
+                    }
+                  ]
+                }
+              },
+              {
+                key: "genus",
+                name: "genus",
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "genus"
+                    },
+                    {
+                      lang: "fr",
+                      title: "genre"
+                    }
+                  ]
+                }
+              },
+              {
+                key: "species",
+                name: "species",
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "species"
+                    },
+                    {
+                      lang: "fr",
+                      title: "espèce"
+                    }
+                  ]
+                }
+              },
+              {
+                key: "subspecies",
+                name: "subspecies",
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "subspecies"
+                    },
+                    {
+                      lang: "fr",
+                      title: "sous-espèce"
+                    }
+                  ]
+                }
+              },
+              {
+                key: "variety",
+                name: "variety",
+                multilingualTitle: {
+                  titles: [
+                    {
+                      lang: "en",
+                      title: "variety"
+                    },
+                    {
+                      lang: "fr",
+                      title: "variété"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      };
   }
 });
 
@@ -432,6 +587,36 @@ describe("Workbook Template Generator", () => {
         responseType: "blob"
       }
     );
+  });
+
+  it("Selected scientificNameDetails fields and generate template", async () => {
+    const wrapper = mountWithAppContext2(<WorkbookTemplateGenerator />, {
+      apiContext
+    });
+    await new Promise(setImmediate);
+
+    // Click the "Add new column" dropdown
+    userEvent.click(wrapper.getByRole("combobox"));
+    await waitFor(() => {
+      // Total number of options expected based on the dynamic config and index map returned.
+      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
+    });
+
+    // Click the "Scientific Name Details" option.
+    userEvent.click(
+      wrapper.getByRole("option", {
+        name: /scientific name details/i
+      })
+    );
+    await new Promise(setImmediate);
+
+    // A new dropdown should appear:
+    expect(
+      wrapper.getByText(/select classification rank\.\.\./i)
+    ).toBeInTheDocument();
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+
+    // TO DO - Rest of test...
   });
 
   it("Template name validation", async () => {

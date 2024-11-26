@@ -37,7 +37,21 @@ const ENTITY_TYPES: EntityConfiguration[] = [
     name: "material-sample",
     indexName: "dina_material_sample_index",
     uniqueName: "material-sample-template-generator",
-    dynamicConfig: dynamicFieldMappingForMaterialSample
+    dynamicConfig: {
+      fields: dynamicFieldMappingForMaterialSample.fields,
+      relationshipFields: [
+        ...dynamicFieldMappingForMaterialSample.relationshipFields,
+        {
+          apiEndpoint: "collection-api/vocabulary2/taxonomicRank",
+          label: "scientificNameDetails",
+          path: "included.attributes.determination.scientificNameDetails",
+          referencedBy: "organism.determination",
+          referencedType: "organism",
+          type: "scientificNameDetails",
+          component: "ORGANISM"
+        }
+      ]
+    }
   }
 ];
 
