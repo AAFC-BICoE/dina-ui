@@ -1,7 +1,10 @@
 import { PersistedResource } from "kitsu";
 import { StorageUnitForm } from "../../../../components";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../../types/collection-api";
+import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 const STORAGE_UNIT_TYPE_NAME = "Type";
 
@@ -24,7 +27,15 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/storage-unit/A":
       return { data: PARENT_STORAGE_UNIT };
     case "collection-api/storage-unit-type":
-      return { data: [] };
+      return {
+        data: [
+          {
+            id: "cabinet",
+            type: "storage-unit-type",
+            name: STORAGE_UNIT_TYPE_NAME
+          }
+        ]
+      };
     case "user-api/group":
       return { data: [] };
   }
@@ -50,7 +61,7 @@ describe("Storage Unit edit page.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Adds a new Storage Unit with a pre-linked parent", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <StorageUnitForm
         onSaved={mockOnSaved}
         initialParent={PARENT_STORAGE_UNIT}
@@ -59,26 +70,34 @@ describe("Storage Unit edit page.", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test that A (Type) link is rendered
     expect(
-      wrapper
-        .find(".storage-path li.breadcrumb-item")
-        .map((node) => node.text())
-    ).toEqual(["A (" + STORAGE_UNIT_TYPE_NAME + ")"]);
+      wrapper.getByText("A (" + STORAGE_UNIT_TYPE_NAME + ")")
+    ).toBeInTheDocument();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "test-storage-unit" } });
-    wrapper.find(".storageUnitType-field ResourceSelect").prop<any>("onChange")(
-      { id: "cabinet", type: "storage-unit-type", name: "Cabinet" }
+    // Change Name field value
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: {
+        value: "test-storage-unit"
+      }
+    });
+
+    // Select Storage Unit Type
+    userEvent.click(
+      wrapper.getByRole("combobox", {
+        name: /storage unit type type here to search\./i
+      })
     );
+    await new Promise(setImmediate);
+    userEvent.click(wrapper.getByRole("option", { name: /type/i }));
 
-    wrapper.find("form").simulate("submit");
+    // Submit the form.
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API response
     expect(mockSave.mock.calls).toEqual([
       [
         [

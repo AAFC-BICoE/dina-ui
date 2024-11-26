@@ -1,7 +1,8 @@
 import { Person } from "../../../../types/agent-api/resources/Person";
 import CollectingEventDetailsPage from "../../../../pages/collection/collecting-event/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
+import "@testing-library/jest-dom";
 
 /** Test Collecting Event with all fields defined. */
 const TEST_COLLECTION_EVENT: CollectingEvent = {
@@ -63,46 +64,43 @@ jest.mock("next/router", () => ({
 
 describe("CollectingEvent details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(<CollectingEventDetailsPage />, {
+    const wrapper = mountWithAppContext2(<CollectingEventDetailsPage />, {
       apiContext
     });
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Render the CollectingEvent details", async () => {
-    const wrapper = mountWithAppContext(<CollectingEventDetailsPage />, {
+    const wrapper = mountWithAppContext2(<CollectingEventDetailsPage />, {
       apiContext
     });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    // expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
     // The collecting-event's start, end and verbatim time should be rendered in a FieldView.
-    expect(
-      wrapper.containsMatchingElement(<div>2019_01_01_10_10_10</div>)
-    ).toEqual(true);
-    expect(
-      wrapper.containsMatchingElement(<div>2019_01_06_10_10_10</div>)
-    ).toEqual(true);
+    expect(wrapper.getByText(/2019_01_01_10_10_10/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/2019_01_06_10_10_10/i)).toBeInTheDocument();
 
     // The collecting-event's verbatim datetime should be rendered in a FieldView.
     expect(
-      wrapper.containsMatchingElement(
-        <div>From 2019, 1,1,10,10,10 to 2019, 1.6, 10,10,10</div>
-      )
-    ).toEqual(true);
+      wrapper.getByText(/from 2019, 1,1,10,10,10 to 2019, 1\.6, 10,10,10/i)
+    ).toBeInTheDocument();
 
+    // The collecting-event's Additional Collection Numbers should be rendered in a FieldView.
+    expect(wrapper.getByText(/12, 13, 14/i)).toBeInTheDocument();
+
+    // The collecting-event's Decimal Longitude value should be rendered in a FieldView.
+    expect(wrapper.getByText(/12\.5/i)).toBeInTheDocument();
+
+    // The collecting-event's Georeferenced By (agent) value should be rendered in a FieldView.
     expect(
-      wrapper.find(".otherRecordNumbers-field .field-view").text()
-    ).toEqual("12, 13, 14");
-
-    expect(wrapper.containsMatchingElement(<div>12.5</div>)).toEqual(true);
-
-    expect(wrapper.containsMatchingElement(<a>person a</a>)).toEqual(true);
+      wrapper.getByRole("link", { name: /person a/i })
+    ).toBeInTheDocument();
   });
 });
 

@@ -1,36 +1,47 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { NotPubliclyReleasableWarning } from "../NotPubliclyReleasableWarning";
+import "@testing-library/jest-dom";
 
 describe("NotPubliclyReleasableWarning component", () => {
   it("Renders when Not Publicly Releasable and read-only.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ publiclyReleasable: false }} readOnly={true}>
         <NotPubliclyReleasableWarning />
       </DinaForm>
     );
 
-    expect(wrapper.find(".not-publicly-releasable-alert").exists()).toEqual(
-      true
-    );
+    // Test expected alert
+    expect(
+      wrapper.container.querySelector(".not-publicly-releasable-alert")
+    ).not.toBeNull();
   });
 
   it("Doesn't render when Publicly Releasable is true.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ publiclyReleasable: true }} readOnly={true}>
         <NotPubliclyReleasableWarning />
       </DinaForm>
     );
 
-    expect(wrapper.find(".alert").exists()).toEqual(false);
+    // Test alert does not show if publicly releasable
+    expect(wrapper.container.querySelector(".alert")).toBeNull();
+    expect(
+      wrapper.container.querySelector(".not-publicly-releasable-alert")
+    ).toBeNull();
   });
+
   it("Doesn't render when in an editable form.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ publiclyReleasable: false }}>
         <NotPubliclyReleasableWarning />
       </DinaForm>
     );
 
-    expect(wrapper.find(".alert").exists()).toEqual(false);
+    // Test alert does not show if in an editable form
+    expect(wrapper.container.querySelector(".alert")).toBeNull();
+    expect(
+      wrapper.container.querySelector(".not-publicly-releasable-alert")
+    ).toBeNull();
   });
 });

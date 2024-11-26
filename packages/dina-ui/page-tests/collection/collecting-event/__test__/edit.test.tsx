@@ -1,10 +1,13 @@
 import { OperationsResponse } from "common-ui";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Person } from "../../../../types/agent-api/resources/Person";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
+import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -110,38 +113,55 @@ describe("collecting-event edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
       apiContext
     });
+
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    // Test that spinner is not rendering after page has loaded
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
-    expect(wrapper.find(".startEventDateTime-field")).toHaveLength(1);
-    expect(wrapper.find(".endEventDateTime-field")).toHaveLength(1);
-    expect(wrapper.find(".verbatimEventDateTime-field")).toHaveLength(1);
-    // Edit the verbatime datetime
-    wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
-      target: {
-        name: "verbatimEventDateTime",
-        value: "From 2019,12,21 4pm to 2019,12,22 5pm"
+    // Find datetime fields
+    expect(
+      wrapper.getAllByRole("textbox", { name: /start event date time/i })
+    ).toHaveLength(1);
+    expect(
+      wrapper.getAllByRole("textbox", { name: /end event date time/i })
+    ).toHaveLength(1);
+    expect(
+      wrapper.getAllByRole("textbox", { name: /verbatim event datetime/i })
+    ).toHaveLength(1);
+
+    // Edit the verbatim datetime
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
+      {
+        target: {
+          name: "verbatimEventDateTime",
+          value: "From 2019,12,21 4pm to 2019,12,22 5pm"
+        }
       }
-    });
+    );
 
     // Edit the otherRecordNumbers
-    wrapper.find(".otherRecordNumbers-field textarea").simulate("change", {
-      target: {
-        name: "otherRecordNumbers",
-        value: "12\n23"
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /additional collection numbers/i }),
+      {
+        target: {
+          name: "otherRecordNumbers",
+          value: "12\n23"
+        }
       }
-    });
+    );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
     await new Promise(setImmediate);
 
+    // Test expected API Response
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
       [
@@ -191,35 +211,53 @@ describe("collecting-event edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
       apiContext
     });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Edit the verbatime datetime
-    wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
-      target: {
-        name: "verbatimEventDateTime",
-        value: "From 2019,12,21 4pm to 2019,12,22 5pm"
+    // Edit the verbatim datetime
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
+      {
+        target: {
+          name: "verbatimEventDateTime",
+          value: "From 2019,12,21 4pm to 2019,12,22 5pm"
+        }
       }
-    });
+    );
 
-    wrapper
-      .find(".dwcDecimalLatitude")
-      .find("input")
-      .simulate("change", { target: { value: "45.394728" } });
-    wrapper
-      .find(".dwcDecimalLongitude")
-      .find("input")
-      .simulate("change", { target: { value: "-75.701452" } });
-    wrapper
-      .find(".dwcCoordinateUncertaintyInMeters")
-      .find("input")
-      .simulate("change", { target: { value: "5" } });
+    // Change georeference values
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /decimal latitude/i }),
+      {
+        target: {
+          value: "45.394728"
+        }
+      }
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /decimal longitude/i }),
+      {
+        target: {
+          value: "-75.701452"
+        }
+      }
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", {
+        name: /coordinate uncertainty in meters/i
+      }),
+      {
+        target: {
+          value: "5"
+        }
+      }
+    );
 
-    wrapper.find("form").simulate("submit");
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
@@ -272,36 +310,38 @@ describe("collecting-event edit page", () => {
 
     mockQuery = { id: 1 };
 
-    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
       apiContext
     });
 
     // The page should load initially with a loading spinner.
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
 
     // Wait for the form to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Check that the existing value is in the field.
     expect(
-      wrapper.find(".verbatimEventDateTime-field input").prop("value")
-    ).toEqual("From 2019,12,21 4pm to 2019,12,22 4pm");
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i })
+    ).toHaveDisplayValue("From 2019,12,21 4pm to 2019,12,22 4pm");
 
     // Modify the value.
-    wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
-      target: {
-        name: "verbatimEventDateTime",
-        value: "From 2019,12,21 4pm to 2019,12,22 6pm"
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /verbatim event datetime/i }),
+      {
+        target: {
+          name: "verbatimEventDateTime",
+          value: "From 2019,12,21 4pm to 2019,12,22 6pm"
+        }
       }
-    });
+    );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected response.
     expect(mockPatch).toBeCalledTimes(1);
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
@@ -366,65 +406,64 @@ describe("collecting-event edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
       apiContext
     });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    // Test that spinner does not render after loading.
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
-    wrapper.find(".group-field Select").prop<any>("onChange")([
-      { label: "group", value: "test group" }
-    ]);
+    // Change combobox value.
+    fireEvent.change(
+      wrapper.getByRole("combobox", { name: /group select\.\.\./i }),
+      {
+        target: {
+          label: "group",
+          value: "test group"
+        }
+      }
+    );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Test Error Title: Test Error Detail"
-    );
+
+    // Test for expected error
+    expect(wrapper.getByText(/test error title: test error detail/i));
     expect(mockPush).toBeCalledTimes(0);
   });
 
   it("Lets you set the primary GeoReferenceAssertion.", async () => {
     mockQuery = {};
-    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
       apiContext
     });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The first assertion is already primary:
-    expect(
-      wrapper.find("button.primary-assertion-button").prop("disabled")
-    ).toEqual(true);
+    expect(wrapper.getByRole("button", { name: /primary/i })).toBeDisabled();
 
     // Add a second assertion:
-    wrapper
-      .find(".georeference-assertion-section button.add-button")
-      .at(0)
-      .simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Make 2nd assertion primary:
-    wrapper.find("button.primary-assertion-button").simulate("click");
-
-    const assertionTabs = wrapper.find(
-      ".georeference-assertion-section li.react-tabs__tab"
+    userEvent.click(
+      wrapper.getByRole("button", {
+        name: /add another georeference assertion/i
+      })
     );
 
+    await new Promise(setImmediate);
+
+    // Make 2nd assertion primary:
+    userEvent.click(wrapper.getByRole("button", { name: /primary/i }));
+
     // There should be 2 assertion tabs:
-    expect(assertionTabs.length).toEqual(2);
-    expect(assertionTabs.at(0).text()).toEqual("1");
-    expect(assertionTabs.at(1).text()).toEqual("2 (Primary)");
+    expect(wrapper.getAllByRole("tab")).toHaveLength(2);
+    expect(wrapper.getByRole("tab", { name: /1/i }));
+    expect(wrapper.getByRole("tab", { name: /2 \(primary\)/i }));
   });
 
   it("Removes the coordinate system if there are no coordinates set.", async () => {
@@ -447,22 +486,24 @@ describe("collecting-event edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+    const wrapper = mountWithAppContext2(<CollectingEventEditPage />, {
       apiContext
     });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Default value:
+    // expect(
+    //   wrapper.find(".dwcVerbatimCoordinateSystem-field input").prop("value")
+    // ).toEqual("decimal degrees");
     expect(
-      wrapper.find(".dwcVerbatimCoordinateSystem-field input").prop("value")
-    ).toEqual("decimal degrees");
+      wrapper.getByRole("textbox", { name: /verbatim coordinate system/i })
+    ).toHaveDisplayValue("decimal degrees");
 
-    wrapper.find("form").simulate("submit");
+    // wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",

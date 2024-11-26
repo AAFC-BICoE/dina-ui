@@ -1,5 +1,7 @@
 import { ProjectForm } from "../../../../pages/collection/project/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
   data: {
@@ -76,24 +78,38 @@ describe("ProjectForm.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new project", async () => {
-    const wrapper = mountWithAppContext(<ProjectForm onSaved={mockOnSaved} />, {
-      apiContext
+    const wrapper = mountWithAppContext2(
+      <ProjectForm onSaved={mockOnSaved} />,
+      {
+        apiContext
+      }
+    );
+    await new Promise(setImmediate);
+
+    // Change Name field value
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: {
+        value: "test-project"
+      }
     });
+
+    // Change Eng Description field value
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /english description/i }),
+      {
+        target: {
+          value: "test eng desc"
+        }
+      }
+    );
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    // Wait for page to load
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "test-project" } });
-    wrapper
-      .find(".en-description textarea")
-      .simulate("change", { target: { value: "test eng desc" } });
-
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
+    // Test expected API responses
     expect(mockSave).lastCalledWith(
       [
         {
@@ -140,7 +156,7 @@ describe("ProjectForm.", () => {
   });
 
   it("Lets you edit a project", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ProjectForm
         onSaved={mockOnSaved}
         fetchedProject={{
@@ -160,20 +176,30 @@ describe("ProjectForm.", () => {
       { apiContext }
     );
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "edited-name" } });
-    wrapper
-      .find(".fr-description textarea")
-      .simulate("change", { target: { value: "test-fr-desc" } });
+    // Change Name field value
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: {
+        value: "edited-name"
+      }
+    });
 
-    wrapper.find("form").simulate("submit");
+    // Change French Description field value
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /french description/i }),
+      {
+        target: {
+          value: "test-fr-desc"
+        }
+      }
+    );
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API response
     expect(mockSave).lastCalledWith(
       [
         {
