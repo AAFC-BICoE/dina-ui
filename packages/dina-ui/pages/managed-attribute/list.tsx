@@ -22,7 +22,9 @@ import {
   COLLECTION_MODULE_TYPE_LABELS,
   CollectionModuleType,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS,
-  ManagedAttribute
+  ManagedAttribute,
+  SEQDB_MODULE_TYPE_LABELS,
+  SeqDBModuleType
 } from "../../types/collection-api";
 
 export function useFilterManagedAttribute() {
@@ -77,6 +79,7 @@ export default function ManagedAttributesListPage() {
           <Tab>{formatMessage("collectionListTitle")}</Tab>
           <Tab>{formatMessage("objectStoreTitle")}</Tab>
           <Tab>{formatMessage("loanTransactionsSectionTitle")}</Tab>
+          <Tab>{formatMessage("seqdbManagedAttributeTitle")}</Tab>
         </TabList>
         <TabPanel>
           <CollectionAttributeListView />
@@ -86,6 +89,9 @@ export default function ManagedAttributesListPage() {
         </TabPanel>
         <TabPanel>
           <TransactionAttributeListView />
+        </TabPanel>
+        <TabPanel>
+          <SeqDBAttributeListView />
         </TabPanel>
       </Tabs>
     </PageLayout>
@@ -399,6 +405,101 @@ function TransactionAttributeListView() {
             </div>
           </div>
         )}
+      />
+    </>
+  );
+}
+
+function SeqDBAttributeListView() {
+  const { filterManagedAttributes } = useFilterManagedAttribute();
+  const { formatMessage } = useDinaIntl();
+
+  const SEQDB_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
+
+  const SEQDB_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<
+    ManagedAttribute<SeqDBModuleType>
+  >[] = [
+    {
+      cell: ({
+        row: {
+          original: { id, name }
+        }
+      }) => (
+        <Link href={`/seqdb/managed-attribute/view?id=${id}`}>
+          <a>{name}</a>
+        </Link>
+      ),
+      header: "Name",
+      accessorKey: "name"
+    },
+    {
+      cell: ({ row: { original } }) => {
+        const ma: ManagedAttribute<SeqDBModuleType> = original;
+        return (
+          <div>
+            {formatMessage(
+              SEQDB_MODULE_TYPE_LABELS[ma.managedAttributeComponent!] as any
+            )}
+          </div>
+        );
+      },
+      accessorKey: "managedAttributeComponent"
+    },
+    descriptionCell(false, false, "multilingualDescription"),
+    {
+      cell: ({
+        row: {
+          original: { acceptedValues, vocabularyElementType }
+        }
+      }) => {
+        const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
+          acceptedValues?.length
+            ? "field_vocabularyElementType_picklist_label"
+            : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
+                (option) => option.value === vocabularyElementType
+              )?.labelKey;
+
+        return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
+      },
+      accessorKey: "vocabularyElementType",
+      // The API sorts alphabetically by key, not displayed intl-ized value,
+      // so the displayed order wouldn't make sense.
+      enableSorting: false
+    },
+    {
+      cell: ({
+        row: {
+          original: { acceptedValues }
+        }
+      }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
+      accessorKey: "acceptedValues"
+    },
+    "createdBy",
+    {
+      accessorKey: "group",
+      header: () => <FieldHeader name={"group"} />
+    }
+  ];
+
+  return (
+    <>
+      <h3 className="mb-3">
+        <DinaMessage id="seqdbManagedAttributeTitle" />
+      </h3>
+
+      {/* Quick create menu */}
+      <CreateNewSection href="/seqdb/managed-attribute/edit" />
+
+      <ListPageLayout
+        enableInMemoryFilter={true}
+        filterFn={filterManagedAttributes}
+        filterType={ListLayoutFilterType.FREE_TEXT}
+        filterAttributes={SEQDB_ATTRIBUTES_FILTER_ATTRIBUTES}
+        id="seqdb-module-managed-attribute-list"
+        queryTableProps={{
+          columns: SEQDB_ATTRIBUTES_LIST_COLUMNS,
+          path: "seqdb-api/managed-attribute"
+        }}
       />
     </>
   );

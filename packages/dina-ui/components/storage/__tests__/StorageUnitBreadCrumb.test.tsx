@@ -1,13 +1,9 @@
 import { PersistedResource } from "kitsu";
-import {
-  mountWithAppContext,
-  mountWithAppContext2
-} from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitBreadCrumb } from "../StorageUnitBreadCrumb";
 import userEvent from "@testing-library/user-event";
-import { screen } from "@testing-library/react";
-import { render } from "enzyme";
+import "@testing-library/jest-dom";
 
 const storageUnitWithHierarchy: PersistedResource<StorageUnit> = {
   id: "A",
@@ -54,49 +50,59 @@ const storageUnitWithParentHierarchy: PersistedResource<StorageUnit> = {
 
 describe("StorageUnitBreadCrumb component", () => {
   it("Renders the breadcrumb path from the hierarchy", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <StorageUnitBreadCrumb storageUnit={storageUnitWithHierarchy} />
     );
-    const tooltip = wrapper.find("Tooltip");
 
-    const directComponent: any[] = tooltip.prop("directComponent");
-    expect(directComponent.length).toEqual(3);
+    // Hover over image to show tooltip
+    userEvent.hover(wrapper.getByRole("img"));
+    await new Promise(setImmediate);
 
-    const hrefs = directComponent.map((fragment) => {
-      return fragment.props.children[0].props.href;
-    });
-    expect(hrefs).toEqual([
-      "/collection/storage-unit/view?id=C",
-      "/collection/storage-unit/view?id=B",
-      "/collection/storage-unit/view?id=A"
-    ]);
-    const texts = directComponent.map((fragment) => {
-      return fragment.props.children[0].props.children.props.children;
-    });
-    expect(texts).toEqual(["C (Room)", "B (Cabinet)", "A (Box)"]);
+    // Test tooltip rendering while hovering on the img element
+    expect(
+      wrapper.getByRole("tooltip", {
+        name: /c \(room\) > b \(cabinet\) > a \(box\)/i
+      })
+    ).toBeInTheDocument();
+
+    // Test href value/attribute for each link in the tooltip
+    expect(wrapper.getByRole("link", { name: /c \(room\)/i })).toHaveAttribute(
+      "href",
+      "/collection/storage-unit/view?id=C"
+    );
+    expect(
+      wrapper.getByRole("link", { name: /b \(cabinet\)/i })
+    ).toHaveAttribute("href", "/collection/storage-unit/view?id=B");
+    expect(
+      wrapper.getAllByRole("link", { name: /a \(box\)/i })[0]
+    ).toHaveAttribute("href", "/collection/storage-unit/view?id=A");
   });
   it("Renders the breadcrumb path from the parent's hierarchy", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <StorageUnitBreadCrumb storageUnit={storageUnitWithParentHierarchy} />
     );
 
-    const tooltip = wrapper.find("Tooltip");
+    // Hover over image to show tooltip
+    userEvent.hover(wrapper.getByRole("img"));
+    await new Promise(setImmediate);
 
-    const directComponent: any[] = tooltip.prop("directComponent");
-    expect(directComponent.length).toEqual(3);
+    // Test tooltip rendering while hovering on the img element
+    expect(
+      wrapper.getByRole("tooltip", {
+        name: /c \(room\) > b \(cabinet\) > a \(box\)/i
+      })
+    ).toBeInTheDocument();
 
-    const hrefs = directComponent.map((fragment) => {
-      return fragment.props.children[0].props.href;
-    });
-    expect(hrefs).toEqual([
-      "/collection/storage-unit/view?id=C",
-      "/collection/storage-unit/view?id=B",
-      "/collection/storage-unit/view?id=A"
-    ]);
-
-    const texts = directComponent.map((fragment) => {
-      return fragment.props.children[0].props.children.props.children;
-    });
-    expect(texts).toEqual(["C (Room)", "B (Cabinet)", "A (Box)"]);
+    // Test href value/attribute for each link in the tooltip
+    expect(wrapper.getByRole("link", { name: /c \(room\)/i })).toHaveAttribute(
+      "href",
+      "/collection/storage-unit/view?id=C"
+    );
+    expect(
+      wrapper.getByRole("link", { name: /b \(cabinet\)/i })
+    ).toHaveAttribute("href", "/collection/storage-unit/view?id=B");
+    expect(
+      wrapper.getAllByRole("link", { name: /a \(box\)/i })[0]
+    ).toHaveAttribute("href", "/collection/storage-unit/view?id=A");
   });
 });

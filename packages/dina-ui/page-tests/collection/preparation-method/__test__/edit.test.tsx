@@ -2,8 +2,10 @@ import { OperationsResponse } from "common-ui";
 import PreparationMethodEditPage, {
   PreparationMethodForm
 } from "../../../../pages/collection/preparation-method/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PreparationMethod } from "../../../../types/collection-api/resources/PreparationMethod";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
   data: {
@@ -95,25 +97,34 @@ describe("preparation-method edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<PreparationMethodEditPage />, {
+    const wrapper = mountWithAppContext2(<PreparationMethodEditPage />, {
       apiContext
     });
 
-    wrapper.find(".preparationMethodName input").simulate("change", {
+    // Change value of the Name field
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
       target: {
         name: "name",
         value: "updated Name"
       }
     });
 
-    wrapper.find(".en-description textarea").simulate("change", {
-      target: { value: "test english description" }
-    });
+    // Change value of the Eng Description field
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /english description/i }),
+      {
+        target: {
+          value: "test english description"
+        }
+      }
+    );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
     await new Promise(setImmediate);
 
+    // Test expected API response
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
       [
@@ -142,7 +153,7 @@ describe("preparation-method edit page", () => {
   it("Edits an existing prep method.", async () => {
     const mockOnSaved = jest.fn();
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <PreparationMethodForm
         onSaved={mockOnSaved}
         fetchedPrepMethod={{
@@ -157,21 +168,35 @@ describe("preparation-method edit page", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".en-description textarea").prop("value")).toEqual(
-      "test english description"
+    // Test default Eng Description value
+    // expect(wrapper.find(".en-description textarea").prop("value")).toEqual(
+    //   "test english description"
+    // );
+    expect(
+      wrapper.getByRole("textbox", { name: /english description/i })
+    ).toHaveDisplayValue("test english description");
+
+    // Change Fr Description value
+    // wrapper.find(".fr-description textarea").simulate("change", {
+    //   target: { value: "test french description" }
+    // });
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /french description/i }),
+      {
+        target: {
+          value: "test french description"
+        }
+      }
     );
 
-    wrapper.find(".fr-description textarea").simulate("change", {
-      target: { value: "test french description" }
-    });
-
-    wrapper.find("form").simulate("submit");
+    // Submit form
+    // wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API response
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
       [
@@ -222,18 +247,19 @@ describe("preparation-method edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<PreparationMethodEditPage />, {
+    const wrapper = mountWithAppContext2(<PreparationMethodEditPage />, {
       apiContext
     });
 
-    wrapper.find("form").simulate("submit");
+    // Submit default form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
-    wrapper.update();
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: Name is mandatory"
-    );
+    // Test expected error
+    expect(
+      wrapper.getByText(/constraint violation: name is mandatory/i)
+    ).toBeInTheDocument();
     expect(mockPush).toBeCalledTimes(0);
   });
 });

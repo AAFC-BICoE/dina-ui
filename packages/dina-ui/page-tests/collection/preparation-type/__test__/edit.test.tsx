@@ -2,8 +2,10 @@ import { OperationsResponse } from "common-ui";
 import PreparationTypeEditPage, {
   PreparationTypeForm
 } from "../../../../pages/collection/preparation-type/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const INSTANCE_DATA = {
   data: {
@@ -95,25 +97,34 @@ describe("preparation-type edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<PreparationTypeEditPage />, {
+    const wrapper = mountWithAppContext2(<PreparationTypeEditPage />, {
       apiContext
     });
 
-    wrapper.find(".preparationTypeName input").simulate("change", {
+    // Change Name field value
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
       target: {
         name: "name",
         value: "updated Name"
       }
     });
 
-    wrapper.find(".en-description textarea").simulate("change", {
-      target: { value: "test english description" }
-    });
+    // Change English Description field value
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /english description/i }),
+      {
+        target: {
+          value: "test english description"
+        }
+      }
+    );
 
     // Submit the form.
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
     await new Promise(setImmediate);
 
+    // Test expected API response
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
       [
@@ -142,7 +153,7 @@ describe("preparation-type edit page", () => {
   it("Edits an existing prep type.", async () => {
     const mockOnSaved = jest.fn();
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <PreparationTypeForm
         onSaved={mockOnSaved}
         fetchedPrepType={{
@@ -156,22 +167,30 @@ describe("preparation-type edit page", () => {
       { apiContext }
     );
 
+    // Wait for the page to load
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".en-description textarea").prop("value")).toEqual(
-      "test english description"
+    // Test English Description field value
+    expect(
+      wrapper.getByRole("textbox", { name: /english description/i })
+    ).toHaveDisplayValue("test english description");
+
+    // Change French Description field value
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /french description/i }),
+      {
+        target: {
+          value: "test french description"
+        }
+      }
     );
 
-    wrapper.find(".fr-description textarea").simulate("change", {
-      target: { value: "test french description" }
-    });
-
-    wrapper.find("form").simulate("submit");
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected API response
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
       [
@@ -222,18 +241,19 @@ describe("preparation-type edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<PreparationTypeEditPage />, {
+    const wrapper = mountWithAppContext2(<PreparationTypeEditPage />, {
       apiContext
     });
 
-    wrapper.find("form").simulate("submit");
+    // Submit form without name field value
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
-    wrapper.update();
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: Name is mandatory"
-    );
+    // Test expected error
+    expect(
+      wrapper.getByText(/constraint violation: name is mandatory/i)
+    ).toBeInTheDocument();
     expect(mockPush).toBeCalledTimes(0);
   });
 });

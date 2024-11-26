@@ -1,11 +1,21 @@
 import IndexPage from "../../pages/index";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
+import "@testing-library/jest-dom";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 describe("Index page", () => {
   it("Renders the index page.", () => {
-    mountWithAppContext(<IndexPage />);
+    const wrapper = mountWithAppContext2(<IndexPage />);
+
+    // Test headings to make sure the page rendered
+    expect(wrapper.getByRole("heading", { name: /collection/i }));
+    expect(wrapper.getByRole("heading", { name: /transactions/i }));
+    expect(wrapper.getByRole("heading", { name: /object store/i }));
+    expect(wrapper.getByRole("heading", { name: /agents/i }));
+    expect(wrapper.getByRole("heading", { name: /sequencing/i }));
+    expect(wrapper.getByRole("heading", { name: /controlled vocabulary/i }));
+    expect(wrapper.getByRole("heading", { name: /configuration/i }));
   });
 });
