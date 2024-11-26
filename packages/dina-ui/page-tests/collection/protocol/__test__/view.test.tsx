@@ -1,6 +1,7 @@
 import ProtocolDetailsPage from "../../../../pages/collection/protocol/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Protocol } from "../../../../types/collection-api/resources/Protocol";
+import "@testing-library/jest-dom";
 
 /** Test protocol with all fields defined. */
 const TEST_PROTOCOL: Protocol = {
@@ -64,26 +65,26 @@ jest.mock("next/router", () => ({
 
 describe("Protocol details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(<ProtocolDetailsPage />, {
+    const wrapper = mountWithAppContext2(<ProtocolDetailsPage />, {
       apiContext
     });
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    // Test loading spinner to render
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Render the Protocol details", async () => {
-    const wrapper = mountWithAppContext(<ProtocolDetailsPage />, {
+    const wrapper = mountWithAppContext2(<ProtocolDetailsPage />, {
       apiContext
     });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    // Test that spinner does not render after page has loaded
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
-    expect(wrapper.find(".name-field .field-view").text()).toEqual(
-      "test protocol"
-    );
+    // Test Name field to have value "test protocol"
+    expect(wrapper.getAllByText(/test protocol/i)[1]).toBeInTheDocument();
   });
 });

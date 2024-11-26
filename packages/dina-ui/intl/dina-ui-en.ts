@@ -1144,5 +1144,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     'Field "{fieldErrorKey}" has the following error: {fieldErrorMessage}',
   changingTheStorageUnitTypeWillDeleteWarning:
     "Changing the storage unit type will clear the existing storage coordinates stored.",
-  changingTheStorageUnitTypeWillDeleteWarningButtonText: "Proceed"
+  changingTheStorageUnitTypeWillDeleteWarningButtonText: "Proceed",
+  seqdbManagedAttributeTitle: "Sequencing",
+  genericMolecularAnalysis: "Generic Molecular Analysis"
 };

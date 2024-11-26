@@ -125,7 +125,15 @@ export function MolecularAnalysisForm() {
         <ResourceSelectField<Protocol>
           className="col-md-6"
           name="protocol"
-          filter={filterBy(["name"])}
+          filter={filterBy(["name"], {
+            extraFilters: [
+              {
+                selector: "protocolType",
+                comparison: "==",
+                arguments: "molecular_analysis"
+              }
+            ]
+          })}
           model="collection-api/protocol"
           optionLabel={(protocol) => protocol.name}
           readOnlyLink="/collection/protocol/view?id="

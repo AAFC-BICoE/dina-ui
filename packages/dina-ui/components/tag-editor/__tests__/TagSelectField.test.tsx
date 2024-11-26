@@ -1,7 +1,9 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { TagSelectField } from "../TagSelectField";
-import CreatableSelect from "react-select/creatable";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -36,7 +38,7 @@ const testCtx = {
 
 describe("TagSelectField", () => {
   it("Lets you select tags from previous values.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <TagSelectField
           name="tags"
@@ -47,7 +49,6 @@ describe("TagSelectField", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGet).lastCalledWith("collection-api/material-sample", {
       fields: { "material-sample": "tags" }, // Only request tags field.
@@ -56,29 +57,33 @@ describe("TagSelectField", () => {
       sort: "-createdOn" // Newest first
     });
 
-    expect(wrapper.find(CreatableSelect).prop("options")).toEqual([
-      {
-        label: "Type New Tag or Search Previous Tags",
-        options: [
-          {
-            label: "example-tag-1",
-            value: "example-tag-1"
-          },
-          {
-            label: "example-tag-2",
-            value: "example-tag-2"
-          },
-          {
-            label: "example-tag-3",
-            value: "example-tag-3"
-          }
-        ]
-      }
-    ]);
+    // Test expected combobox
+    expect(
+      wrapper.getByRole("combobox", {
+        name: /tags type new tag or search previous tags/i
+      })
+    ).toBeInTheDocument();
+
+    userEvent.click(
+      wrapper.getByRole("combobox", {
+        name: /tags type new tag or search previous tags/i
+      })
+    );
+
+    // Test expected combobox options
+    expect(
+      wrapper.getByRole("option", { name: /example\-tag\-1/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("option", { name: /example\-tag\-2/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("option", { name: /example\-tag\-3/i })
+    ).toBeInTheDocument();
   });
 
   it("Lets you type in new tags.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <TagSelectField
           name="tags"
@@ -89,17 +94,24 @@ describe("TagSelectField", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find(CreatableSelect).prop<any>("onChange")([
-      { value: "my-tag-1" }
-    ]);
+    // Change combobox value
+    fireEvent.change(
+      wrapper.getByRole("combobox", {
+        name: /tags type new tag or search previous tags/i
+      }),
+      {
+        target: {
+          value: "my-tag-1"
+        }
+      }
+    );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(CreatableSelect).prop("value")).toEqual([
-      { label: "my-tag-1", value: "my-tag-1" }
-    ]);
+    // Test expected option in the combobox
+    expect(
+      wrapper.getByRole("option", { name: /add "my\-tag\-1"/i })
+    ).toBeInTheDocument();
   });
 });

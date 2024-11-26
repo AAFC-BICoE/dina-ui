@@ -1,5 +1,6 @@
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { ThumbnailCell } from "../thumbnail-cell";
+import "@testing-library/jest-dom";
 
 const METADATA_RESPONSE = {
   id: "45e290e9-2be4-45a6-b95c-8d375ad77b78",
@@ -33,7 +34,7 @@ describe("Thumbnail cell component", () => {
   window.URL.createObjectURL = jest.fn(() => MOCK_AXIOS_REPONSE);
 
   it("Using data from the API, display the thumbnail", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       (
         ThumbnailCell({
           bucketField: "data.attributes.bucket"
@@ -43,8 +44,8 @@ describe("Thumbnail cell component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find("img").prop("src")).toEqual(MOCK_AXIOS_REPONSE);
+    // Test expected thumbnail src value
+    expect(wrapper.getByRole("img")).toHaveAttribute("src", MOCK_AXIOS_REPONSE);
   });
 });

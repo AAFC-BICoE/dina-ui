@@ -1,10 +1,11 @@
 import { PersistedResource } from "kitsu";
 import { MaterialSampleViewPage } from "../../../../pages/collection/material-sample/view";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
+import "@testing-library/jest-dom";
 
 const TEST_COLLECTION_EVENT: CollectingEvent = {
   startEventDateTime: "2019_01_01_10_10_10",
@@ -35,7 +36,11 @@ const TEST_SAMPLE_WITH_ORGANISMS: PersistedResource<MaterialSample> = {
         { isPrimary: true, verbatimScientificName: "test scientific name 1" }
       ]
     },
-    { id: "org-2", type: "organism", lifeStage: "test lifestage 2" }
+    {
+      id: "org-2",
+      type: "organism",
+      lifeStage: "test lifestage 2"
+    }
   ]
 };
 
@@ -84,24 +89,20 @@ const testCtx = {
 
 describe("Material Sample View Page", () => {
   it("Renders the Material Sample with the linked Collecting Event", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleViewPage router={{ query: { id: "1" } } as any} />,
       testCtx
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(
-      wrapper.find(".materialSampleName-field .field-view").text()
-    ).toEqual("my-sample-name");
-    expect(
-      wrapper.find(".startEventDateTime-field .field-view").text()
-    ).toEqual("2019_01_01_10_10_10");
+    // Test Material Sample Name and Collecting Date Start Event Date Time to be rendered
+    expect(wrapper.getAllByText("my-sample-name")[0]).toBeInTheDocument();
+    expect(wrapper.getByText("2019_01_01_10_10_10")).toBeInTheDocument();
   });
 
   it("Renders the organisms expanded by default.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MaterialSampleViewPage
         router={{ query: { id: "ms-with-organisms" } } as any}
       />,
@@ -109,28 +110,30 @@ describe("Material Sample View Page", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Both organism sections should be expanded:
-    expect(wrapper.find("button.expand-organism").length).toEqual(2);
-    expect(wrapper.find("button.expand-organism.is-expanded").length).toEqual(
-      2
-    );
+    expect(wrapper.getAllByRole("button", { name: /•/i })).toHaveLength(2);
+    expect(wrapper.getAllByText(/test lifestage 1/i)[1]).toBeInTheDocument();
+    expect(wrapper.getAllByText(/test lifestage 2/i)[1]).toBeInTheDocument();
 
     // Only 1 organism has a determination:
-    expect(wrapper.find("fieldset.determination-section").length).toEqual(1);
     expect(
-      wrapper.find(".verbatimScientificName-field .field-view").text()
-    ).toEqual("test scientific name 1");
+      wrapper.getByRole("cell", { name: /test scientific name 1/i })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.queryByRole("cell", { name: /test scientific name 2/i })
+    ).not.toBeInTheDocument();
+
+    expect(
+      wrapper.getAllByText(/test scientific name 1/i)[1]
+    ).toBeInTheDocument();
 
     // Check the second lifeStage field:
-    expect(wrapper.find(".lifeStage-field .field-view").at(1).text()).toEqual(
-      "test lifestage 2"
-    );
+    expect(wrapper.getAllByText(/test lifestage 2/i)[1]).toBeInTheDocument();
 
     // Renders the primary determination name when present:
-    expect(wrapper.find(".organism-determination-cell").first().text()).toEqual(
-      "test scientific name 1"
-    );
+    expect(
+      wrapper.getByRole("cell", { name: /test scientific name 1/i })
+    ).toBeInTheDocument();
   });
 });

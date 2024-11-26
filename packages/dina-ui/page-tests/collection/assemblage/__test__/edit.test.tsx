@@ -1,5 +1,8 @@
 import { AssemblageForm } from "../../../../pages/collection/assemblage/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
+
 const INSTANCE_DATA = {
   data: {
     "instance-mode": "developer",
@@ -76,36 +79,57 @@ describe("AssemblageForm.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new assemblage", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <AssemblageForm onSaved={mockOnSaved} />,
       {
         apiContext
       }
     );
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "test-assemblage" } });
-    wrapper
-      .find(".en-title input")
-      .simulate("change", { target: { value: "test english title" } });
-    wrapper
-      .find(".fr-title input")
-      .simulate("change", { target: { value: "test french title" } });
-    wrapper
-      .find(".en-description textarea")
-      .simulate("change", { target: { value: "test english description" } });
-    wrapper
-      .find(".fr-description textarea")
-      .simulate("change", { target: { value: "test french description" } });
-
-    wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Fill form with test values
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /assemblage name/i }),
+      {
+        target: {
+          value: "test-assemblage"
+        }
+      }
+    );
+    fireEvent.change(wrapper.getByRole("textbox", { name: /english title/i }), {
+      target: {
+        value: "test english title"
+      }
+    });
+    fireEvent.change(wrapper.getByRole("textbox", { name: /french title/i }), {
+      target: {
+        value: "test french title"
+      }
+    });
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /english description/i }),
+      {
+        target: {
+          value: "test english description"
+        }
+      }
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /french description/i }),
+      {
+        target: {
+          value: "test french description"
+        }
+      }
+    );
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await new Promise(setImmediate);
+
+    // Test expected values
     expect(mockSave).lastCalledWith(
       [
         {
@@ -185,7 +209,7 @@ describe("AssemblageForm.", () => {
   });
 
   it("Lets you edit a assemblage", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <AssemblageForm
         onSaved={mockOnSaved}
         fetchedAssemblage={{
@@ -212,24 +236,38 @@ describe("AssemblageForm.", () => {
       />,
       { apiContext }
     );
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "edited-name" } });
-    wrapper
-      .find(".fr-description textarea")
-      .simulate("change", { target: { value: "test-fr-desc" } });
-    wrapper
-      .find(".en-title input")
-      .simulate("change", { target: { value: "test-eng-title-updated" } });
-
-    wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Edit form values
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /assemblage name/i }),
+      {
+        target: {
+          value: "edited-name"
+        }
+      }
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /french description/i }),
+      {
+        target: {
+          value: "test-fr-desc"
+        }
+      }
+    );
+    fireEvent.change(wrapper.getByRole("textbox", { name: /english title/i }), {
+      target: {
+        value: "test-eng-title-updated"
+      }
+    });
+
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
+
+    await new Promise(setImmediate);
+
+    // Test expected values
     expect(mockSave).lastCalledWith(
       [
         {
