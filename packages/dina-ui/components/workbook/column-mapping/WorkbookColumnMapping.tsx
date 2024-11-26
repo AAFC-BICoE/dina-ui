@@ -560,7 +560,10 @@ export function WorkbookColumnMapping({
           }));
           setRelationshipMapping({
             ...relationshipMapping,
-            [columnHeaderFormatted]: newValue
+            [columnHeaderFormatted]: {
+              ...relationshipMapping?.[columnHeaderFormatted],
+              [fieldValueFormatted]: newValue
+            }
           });
         } else {
           setRelationshipMapping({

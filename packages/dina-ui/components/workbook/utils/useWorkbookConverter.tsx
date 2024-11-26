@@ -577,16 +577,10 @@ export function useWorkbookConverter(
                   !isObject(childValue) &&
                   !Array.isArray(childValue)
                 ) {
-                  if (
-                    PERSON_SELECT_FIELDS.has(`${fieldPath}.${attrNameInValue}`)
-                  ) {
-                    valueToLink = columnMap[fieldPath + "." + attrNameInValue];
-                  } else {
-                    valueToLink =
-                      columnMap[fieldPath + "." + attrNameInValue]?.[
-                        childValue.trim().replace(".", "_")
-                      ];
-                  }
+                  valueToLink =
+                    columnMap[fieldPath + "." + attrNameInValue]?.[
+                      childValue.trim().replace(".", "_")
+                    ];
 
                   if (valueToLink) {
                     break;

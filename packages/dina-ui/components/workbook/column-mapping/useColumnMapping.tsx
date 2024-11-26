@@ -727,7 +727,7 @@ export function useColumnMapping() {
         // If relationship is found, set it. If not, reset it so it's empty.
         if (found) {
           if (PERSON_SELECT_FIELDS.has(fieldPath)) {
-            theRelationshipMapping[columnHeader] = [
+            theRelationshipMapping[columnHeader][value.replace(".", "_")] = [
               pick(found, ["id", "type"])
             ];
           } else {
@@ -755,7 +755,10 @@ export function useColumnMapping() {
     }
 
     const selectElemName = PERSON_SELECT_FIELDS.has(fieldPath)
-      ? `relationshipMapping.${columnHeader.replaceAll(".", "_")}`
+      ? `relationshipMapping.${columnHeader.replaceAll(
+          ".",
+          "_"
+        )}.${fieldValue.replaceAll(".", "_")}`
       : `relationshipMapping.${columnHeader.replaceAll(
           ".",
           "_"

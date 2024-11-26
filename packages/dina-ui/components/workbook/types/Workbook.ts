@@ -156,15 +156,15 @@ export interface WorkbookColumnMap {
 }
 
 export interface RelationshipMapping {
-  [columnHeader: string]:
-    | {
-        [value: string]: {
+  [columnHeader: string]: {
+    [value: string]:
+      | {
           id: string;
           type: string;
-        };
-      }
-    | {
-        id: string;
-        type: string;
-      }[];
+        }
+      | {
+          id: string;
+          type: string;
+        }[];
+  };
 }
