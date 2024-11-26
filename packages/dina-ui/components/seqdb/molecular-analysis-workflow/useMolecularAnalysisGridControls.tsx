@@ -520,7 +520,7 @@ export function useMolecularAnalysisGridControls({
 
       const saveArgs: SaveArgs<MolecularAnalysisItemSample>[] =
         materialSampleItemsToSave.map((item) => {
-          const matchedStorageUnitUsage = savedStorageUnitUsage.find(
+          const matchedStorageUnitUsage = savedStorageUnitUsage?.find?.(
             (storageUnitUsage) =>
               storageUnitUsage.wellColumn ===
                 item.storageUnitUsage?.wellColumn &&
@@ -560,12 +560,13 @@ export function useMolecularAnalysisGridControls({
             type: "storage-unit-usage"
           }
         }));
-      if (deleteStorageUnitUsageArgs.length) {
+      if (deleteStorageUnitUsageArgs.length !== 0) {
         await save<StorageUnitUsage>(deleteStorageUnitUsageArgs, {
           apiBaseUrl: "/collection-api"
         });
       }
     } catch (err) {
+      console.error(err);
       alert(err);
     }
     setSubmitting(false);

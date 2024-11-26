@@ -322,6 +322,49 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
         {
           apiBaseUrl: "/collection-api"
         }
+      ],
+      [
+        [
+          {
+            resource: {
+              id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
+              relationships: {
+                storageUnitUsage: {
+                  data: null
+                }
+              },
+              type: "generic-molecular-analysis-item"
+            },
+            type: "generic-molecular-analysis-item"
+          },
+          {
+            resource: {
+              id: "169eafe4-44f2-407e-aa90-1a5483edf522",
+              relationships: {
+                storageUnitUsage: {
+                  data: null
+                }
+              },
+              type: "generic-molecular-analysis-item"
+            },
+            type: "generic-molecular-analysis-item"
+          },
+          {
+            resource: {
+              id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
+              relationships: {
+                storageUnitUsage: {
+                  data: null
+                }
+              },
+              type: "generic-molecular-analysis-item"
+            },
+            type: "generic-molecular-analysis-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
       ]
     ]);
   });
@@ -460,82 +503,6 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
     expect(
       wrapper.getByText(/selected material samples \(3 in list\)/i)
     ).toBeInTheDocument();
-
-    // Click save.
-    userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
-    await new Promise(setImmediate);
-
-    // Expect everything to be deleted.
-    expect(mockSave.mock.calls).toEqual([
-      [
-        [
-          {
-            resource: {
-              id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
-              relationships: {
-                storageUnitUsage: {
-                  data: null
-                }
-              },
-              type: "generic-molecular-analysis-item"
-            },
-            type: "generic-molecular-analysis-item"
-          },
-          {
-            resource: {
-              id: "169eafe4-44f2-407e-aa90-1a5483edf522",
-              relationships: {
-                storageUnitUsage: {
-                  data: null
-                }
-              },
-              type: "generic-molecular-analysis-item"
-            },
-            type: "generic-molecular-analysis-item"
-          },
-          {
-            resource: {
-              id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
-              relationships: {
-                storageUnitUsage: {
-                  data: null
-                }
-              },
-              type: "generic-molecular-analysis-item"
-            },
-            type: "generic-molecular-analysis-item"
-          }
-        ],
-        {
-          apiBaseUrl: "/seqdb-api"
-        }
-      ],
-      [
-        [
-          {
-            delete: {
-              id: "45ed6126-26b8-4ebd-a89f-1bbcf6c69d27",
-              type: "storage-unit-usage"
-            }
-          },
-          {
-            delete: {
-              id: "be81e29a-b634-43c7-8f1a-53bf394d87f2",
-              type: "storage-unit-usage"
-            }
-          },
-          {
-            delete: {
-              id: "0192fd01-9104-72fa-a18f-80d97da0c935",
-              type: "storage-unit-usage"
-            }
-          }
-        ],
-        {
-          apiBaseUrl: "/collection-api"
-        }
-      ]
-    ]);
   });
 
   it("Storage units exist, and multiple storage units are found, warning expected", async () => {

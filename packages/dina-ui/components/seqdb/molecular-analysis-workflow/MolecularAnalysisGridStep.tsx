@@ -162,7 +162,8 @@ export function MolecularAnalysisGridStep({
                   if (storageUnitType?.id !== undefined) {
                     openModal(
                       <AreYouSureModal
-                        actionMessage={
+                        actionMessage={<DinaMessage id="areYouSure" />}
+                        messageBody={
                           <DinaMessage id="changingTheStorageUnitTypeWillDeleteWarning" />
                         }
                         yesButtonText={
