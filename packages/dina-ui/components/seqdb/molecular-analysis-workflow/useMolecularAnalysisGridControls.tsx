@@ -262,7 +262,10 @@ export function useMolecularAnalysisGridControls({
       ) {
         if (loadedStorageUnit) {
           // User changed the storage unit to something new...
-          if (loadedStorageUnit.id !== storageUnit.id) {
+          if (
+            loadedStorageUnit.id !== storageUnit.id ||
+            loadedStorageUnit?.storageUnitType?.id !== storageUnitType?.id
+          ) {
             clearGrid();
           }
         } else {

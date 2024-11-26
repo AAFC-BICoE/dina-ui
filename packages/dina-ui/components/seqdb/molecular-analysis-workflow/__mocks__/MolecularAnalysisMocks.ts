@@ -227,6 +227,31 @@ export const STORAGE_UNIT_USAGE_3: StorageUnitUsage = {
   }
 };
 
+export const STORAGE_UNIT_USAGE_4: StorageUnitUsage = {
+  id: "6cdbf4c8-3d83-45c7-9c54-65830b8e8ca8",
+  type: "storage-unit-usage",
+  cellNumber: 3,
+  wellColumn: 3,
+  wellRow: "A",
+  storageUnit: {
+    id: "2ad75f28-7666-43b9-a1c7-469cc4b7a8e5",
+    type: "storage-unit",
+    group: "aafc",
+    name: "Another Storage Unit Name",
+    storageUnitType: {
+      id: "61909244-5af7-453c-bc57-99504ed4bec4",
+      type: "storage-unit-type",
+      group: "aafc",
+      name: "Storage Unit Type Name",
+      gridLayoutDefinition: {
+        fillDirection: "BY_ROW",
+        numberOfColumns: 5,
+        numberOfRows: 5
+      }
+    }
+  }
+};
+
 export const TEST_STORAGE_UNIT_TYPES: PersistedResource<StorageUnitType>[] = [
   {
     id: "e6781d27-ed23-4a7b-b02a-575a14a9c407",
@@ -249,6 +274,12 @@ export const TEST_STORAGE_UNIT_TYPES: PersistedResource<StorageUnitType>[] = [
       numberOfColumns: 10,
       numberOfRows: 10
     }
+  },
+  {
+    id: "1599d01b-cdf0-40ce-a96a-544d8c8cb840",
+    type: "storage-unit-type",
+    group: "aafc",
+    name: "Test Storage Unit Type 3"
   }
 ];
 
@@ -376,6 +407,43 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN: PersistedResource<Gener
       },
       storageUnitUsage: {
         id: STORAGE_UNIT_USAGE_3.id ?? "",
+        type: "storage-unit-usage"
+      }
+    }
+  ];
+
+export const TEST_MOLECULAR_ANALYSIS_MULTIPLE_STORAGE_ID =
+  "df88f781-6884-455e-9c70-6a303e67a258";
+
+export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_STORAGE: PersistedResource<GenericMolecularAnalysisItem>[] =
+  [
+    {
+      id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
+      type: "generic-molecular-analysis-item",
+      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+      materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[0],
+      storageUnitUsage: {
+        id: STORAGE_UNIT_USAGE_1.id ?? "",
+        type: "storage-unit-usage"
+      }
+    },
+    {
+      id: "169eafe4-44f2-407e-aa90-1a5483edf522",
+      type: "generic-molecular-analysis-item",
+      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+      materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[1],
+      storageUnitUsage: {
+        id: STORAGE_UNIT_USAGE_2.id ?? "",
+        type: "storage-unit-usage"
+      }
+    },
+    {
+      id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
+      type: "generic-molecular-analysis-item",
+      genericMolecularAnalysis: TEST_MOLECULAR_ANALYSIS,
+      materialSample: TEST_MATERIAL_SAMPLE_SUMMARY[2],
+      storageUnitUsage: {
+        id: STORAGE_UNIT_USAGE_4.id ?? "",
         type: "storage-unit-usage"
       }
     }

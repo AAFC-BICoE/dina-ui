@@ -1,4 +1,11 @@
-import { filterBy, LoadingSpinner, ResourceSelect } from "common-ui";
+import {
+  AreYouSureModal,
+  CommonMessage,
+  filterBy,
+  LoadingSpinner,
+  ResourceSelect,
+  useModal
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { useEffect, useState } from "react";
@@ -37,6 +44,8 @@ export function MolecularAnalysisGridStep({
   performSave,
   setPerformSave
 }: MolecularAnalysisGridStepProps) {
+  const { openModal } = useModal();
+
   const {
     availableItems,
     cellGrid,
@@ -123,7 +132,7 @@ export function MolecularAnalysisGridStep({
           </div>
         </div>
       )}
-      {isStorage === false && editMode === true && (
+      {!storageUnit?.id && !storageUnitType?.id && editMode === true && (
         <div className="row">
           <div className="col-md-12">
             <button
@@ -150,10 +159,30 @@ export function MolecularAnalysisGridStep({
                 optionLabel={(it) => it.name}
                 filter={filterBy(["name"])}
                 onChange={(value) => {
-                  setStorageUnitType(
-                    value as PersistedResource<StorageUnitType>
-                  );
-                  setStorageUnit(undefined);
+                  if (storageUnitType?.id !== undefined) {
+                    openModal(
+                      <AreYouSureModal
+                        actionMessage={
+                          <DinaMessage id="changingTheStorageUnitTypeWillDeleteWarning" />
+                        }
+                        yesButtonText={
+                          <DinaMessage id="changingTheStorageUnitTypeWillDeleteWarningButtonText" />
+                        }
+                        noButtonText={<DinaMessage id="cancelButtonText" />}
+                        onYesButtonClicked={() => {
+                          setStorageUnitType(
+                            value as PersistedResource<StorageUnitType>
+                          );
+                          setStorageUnit(undefined);
+                        }}
+                      />
+                    );
+                  } else {
+                    setStorageUnitType(
+                      value as PersistedResource<StorageUnitType>
+                    );
+                    setStorageUnit(undefined);
+                  }
                 }}
                 value={storageUnitType}
               />

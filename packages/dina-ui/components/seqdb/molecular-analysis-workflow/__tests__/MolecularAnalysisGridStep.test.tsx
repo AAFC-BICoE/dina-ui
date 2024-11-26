@@ -3,7 +3,6 @@ import {
   MolecularAnalysisGridStep,
   MolecularAnalysisGridStepProps
 } from "../MolecularAnalysisGridStep";
-import { noop } from "lodash";
 import {
   STORAGE_UNIT_USAGE_1,
   STORAGE_UNIT_USAGE_2,
@@ -14,10 +13,13 @@ import {
   TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID,
   TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID,
   TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_STORAGE,
-  TEST_STORAGE_UNIT_TYPES
+  TEST_STORAGE_UNIT_TYPES,
+  TEST_MOLECULAR_ANALYSIS_MULTIPLE_STORAGE_ID,
+  TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_STORAGE,
+  STORAGE_UNIT_USAGE_4
 } from "../__mocks__/MolecularAnalysisMocks";
 import "@testing-library/jest-dom";
-import { screen, waitForElementToBeRemoved } from "@testing-library/react";
+import { waitForElementToBeRemoved } from "@testing-library/react";
 import { useState, useEffect } from "react";
 import userEvent from "@testing-library/user-event";
 
@@ -35,6 +37,9 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         case "genericMolecularAnalysis.uuid==" +
           TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_STORAGE };
+        case "genericMolecularAnalysis.uuid==" +
+          TEST_MOLECULAR_ANALYSIS_MULTIPLE_STORAGE_ID:
+          return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_STORAGE };
       }
     case "collection-api/storage-unit-type":
       return { data: TEST_STORAGE_UNIT_TYPES };
@@ -65,6 +70,10 @@ const mockBulkGet = jest.fn(async (paths) => {
         STORAGE_UNIT_USAGE_3.id +
         "?include=storageUnit,storageUnit.storageUnitType":
         return STORAGE_UNIT_USAGE_3;
+      case "/storage-unit-usage/" +
+        STORAGE_UNIT_USAGE_4.id +
+        "?include=storageUnit,storageUnit.storageUnitType":
+        return STORAGE_UNIT_USAGE_4;
 
       // Material Sample Summary
       case "/material-sample-summary/" + TEST_MATERIAL_SAMPLE_SUMMARY[0].id:
@@ -413,5 +422,177 @@ describe("Molecular Analysis Workflow - Step 3 - Molecular Analysis Coordinate S
         }
       ]
     ]);
+  });
+
+  it("Storage units exist, changing the storage unit type should clear the grid", async () => {
+    const wrapper = mountWithAppContext2(<TestComponentWrapper />, testCtx);
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Switch to edit mode.
+    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+
+    // Change the storage unit type...
+    userEvent.click(wrapper.getAllByRole("combobox")[0]);
+    await new Promise(setImmediate);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /test storage unit type 2/i })
+    );
+
+    // Expect a popup to ask are you sure you wish to change the storage unit type.
+    expect(
+      wrapper.getByText(
+        /changing the storage unit type will clear the existing storage coordinates stored\./i
+      )
+    ).toBeInTheDocument();
+
+    // Click proceed.
+    userEvent.click(wrapper.getByRole("button", { name: /proceed/i }));
+    await waitForElementToBeRemoved(wrapper.getAllByText(/loading\.\.\./i)[0]);
+
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(
+      wrapper.getAllByRole("option", { name: /storage unit name/i })[1]
+    );
+
+    // Expect the grid to be cleared automatically.
+    expect(
+      wrapper.getByText(/selected material samples \(3 in list\)/i)
+    ).toBeInTheDocument();
+
+    // Click save.
+    userEvent.click(wrapper.getByRole("button", { name: /save selections/i }));
+    await new Promise(setImmediate);
+
+    // Expect everything to be deleted.
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "99ecc6fc-7378-4641-8914-1b9104e37b95",
+              relationships: {
+                storageUnitUsage: {
+                  data: null
+                }
+              },
+              type: "generic-molecular-analysis-item"
+            },
+            type: "generic-molecular-analysis-item"
+          },
+          {
+            resource: {
+              id: "169eafe4-44f2-407e-aa90-1a5483edf522",
+              relationships: {
+                storageUnitUsage: {
+                  data: null
+                }
+              },
+              type: "generic-molecular-analysis-item"
+            },
+            type: "generic-molecular-analysis-item"
+          },
+          {
+            resource: {
+              id: "9df16fe8-8510-4723-8f88-0a6bc0536624",
+              relationships: {
+                storageUnitUsage: {
+                  data: null
+                }
+              },
+              type: "generic-molecular-analysis-item"
+            },
+            type: "generic-molecular-analysis-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+      [
+        [
+          {
+            delete: {
+              id: "45ed6126-26b8-4ebd-a89f-1bbcf6c69d27",
+              type: "storage-unit-usage"
+            }
+          },
+          {
+            delete: {
+              id: "be81e29a-b634-43c7-8f1a-53bf394d87f2",
+              type: "storage-unit-usage"
+            }
+          },
+          {
+            delete: {
+              id: "0192fd01-9104-72fa-a18f-80d97da0c935",
+              type: "storage-unit-usage"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Storage units exist, and multiple storage units are found, warning expected", async () => {
+    const wrapper = mountWithAppContext2(
+      <TestComponentWrapper
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_MULTIPLE_STORAGE_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Display a warning to the user.
+    expect(
+      wrapper.getByText(
+        /multiple storage units have been found for the molecular analysis items\./i
+      )
+    ).toBeInTheDocument();
+
+    // Switch to edit mode.
+    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+
+    // Warning should still be displayed in edit mode.
+    expect(
+      wrapper.getByText(
+        /multiple storage units have been found for the molecular analysis items\./i
+      )
+    ).toBeInTheDocument();
+  });
+
+  it("Storage units don't exist, attempt to use a storage unit type without grid support", async () => {
+    const wrapper = mountWithAppContext2(
+      <TestComponentWrapper
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITHOUT_STORAGE_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should be in edit mode since no storage units exist.
+    expect(wrapper.getByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Change the dropdowns.
+    userEvent.click(wrapper.getByRole("combobox"));
+    userEvent.click(
+      wrapper.getByRole("option", { name: /test storage unit type 3/i })
+    );
+    await new Promise(setImmediate);
+
+    // Expect a warning message to appear since this storage unit type has not grid support.
+    expect(
+      wrapper.getByText(
+        /the currently selected storage unit does not contain a container grid in order to use the storage selector\./i
+      )
+    ).toBeInTheDocument();
   });
 });
