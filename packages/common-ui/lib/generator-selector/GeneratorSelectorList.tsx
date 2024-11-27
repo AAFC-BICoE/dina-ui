@@ -13,7 +13,9 @@ import { GeneratorColumn, GeneratorSelectorProps } from "./GeneratorSelector";
 import { startCase } from "lodash";
 import { ManagedAttribute } from "packages/dina-ui/types/collection-api";
 import { useFormikContext } from "formik";
-import QueryRowScientificNameDetailsSearch from "../list-page/query-builder/query-builder-value-types/QueryBuilderScientificNameDetailsSearch";
+import QueryRowScientificNameDetailsSearch, {
+  ScientificNameDetailsSearchStates
+} from "../list-page/query-builder/query-builder-value-types/QueryBuilderScientificNameDetailsSearch";
 
 export interface GeneratorSelectorListProps extends GeneratorSelectorProps {
   loading: boolean;
@@ -348,11 +350,24 @@ export function GeneratorSelectorList({
             </>
           )}
           {selectedField?.dynamicConfig?.type === "scientificNameDetails" && (
-            <QueryRowScientificNameDetailsSearch
-              setValue={setDynamicFieldValue}
-              value={dynamicFieldValue}
-              isInColumnSelector={true}
-            />
+            <>
+              <strong>
+                <DinaMessage id="columnSelector_selectClassification" />
+              </strong>
+              <QueryRowScientificNameDetailsSearch
+                setValue={(newValue) => {
+                  const parsedValue = JSON.parse(
+                    newValue
+                  ) as ScientificNameDetailsSearchStates;
+                  setDynamicFieldValue(parsedValue.selectedClassificationRank);
+                  setDynamicFieldLabel(
+                    startCase(parsedValue.selectedClassificationRank)
+                  );
+                }}
+                value={dynamicFieldValue}
+                isInColumnSelector={true}
+              />
+            </>
           )}
           <div className="d-grid">
             <Button

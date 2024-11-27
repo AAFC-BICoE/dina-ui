@@ -3,6 +3,12 @@ import { WorkbookTemplateGenerator } from "../../../pages/workbook/generator";
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import {
+  TEST_CLASSIFICATIONS,
+  TEST_MANAGED_ATTRIBUTE_COLLECTING_EVENT,
+  TEST_MANAGED_ATTRIBUTE_MATERIAL_SAMPLE,
+  TEST_MANAGED_ATTRIBUTE_PREPARATION
+} from "./__mocks__/generator.mock";
 
 const mockPost = jest.fn();
 
@@ -11,224 +17,14 @@ const mockGet = jest.fn<any, any>(async (path, options) => {
     case "collection-api/managed-attribute":
       switch (options?.filter?.rsql) {
         case "managedAttributeComponent==MATERIAL_SAMPLE":
-          return {
-            data: [
-              {
-                id: "0192ba73-340a-72b1-bea9-fc75cdcaf7c6",
-                type: "managed-attribute",
-                name: "my test managed attribute",
-                key: "my_test_managed_attribute",
-                vocabularyElementType: "STRING",
-                unit: null,
-                managedAttributeComponent: "MATERIAL_SAMPLE",
-                acceptedValues: null,
-                createdOn: "2024-10-23T17:36:05.296422Z",
-                createdBy: "dina-admin",
-                group: "aafc",
-                multilingualDescription: {
-                  descriptions: []
-                }
-              }
-            ]
-          };
+          return { data: [TEST_MANAGED_ATTRIBUTE_MATERIAL_SAMPLE] };
         case "managedAttributeComponent==PREPARATION":
-          return {
-            data: [
-              {
-                id: "0192e83f-e198-7fd8-b7e9-d7a24e11c683",
-                type: "managed-attribute",
-                name: "Test Preparation Managed Attribute",
-                key: "test_preparation_managed_attribute",
-                vocabularyElementType: "STRING",
-                unit: null,
-                managedAttributeComponent: "PREPARATION",
-                acceptedValues: null,
-                createdOn: "2024-10-23T17:36:05.296422Z",
-                createdBy: "dina-admin",
-                group: "aafc",
-                multilingualDescription: {
-                  descriptions: []
-                }
-              }
-            ]
-          };
+          return { data: [TEST_MANAGED_ATTRIBUTE_PREPARATION] };
         case "managedAttributeComponent==COLLECTING_EVENT":
-          return {
-            data: [
-              {
-                id: "0679a2cd-80e8-4fc7-bcfa-ca13e0892354",
-                type: "managed-attribute",
-                name: "Test Collecting Event Managed Attribute",
-                key: "test_collecting_event_managed_attribute",
-                vocabularyElementType: "STRING",
-                unit: null,
-                managedAttributeComponent: "COLLECTING_EVENT",
-                acceptedValues: null,
-                createdOn: "2024-10-23T17:36:05.296422Z",
-                createdBy: "dina-admin",
-                group: "aafc",
-                multilingualDescription: {
-                  descriptions: []
-                }
-              }
-            ]
-          };
+          return { data: [TEST_MANAGED_ATTRIBUTE_COLLECTING_EVENT] };
       }
     case "collection-api/vocabulary2/taxonomicRank":
-      return {
-        data: {
-          id: "taxonomicRank",
-          type: "vocabulary",
-          attributes: {
-            vocabularyElements: [
-              {
-                key: "kingdom",
-                name: "kingdom",
-                multilingualTitle: {
-                  titles: [
-                    {
-                      lang: "en",
-                      title: "kingdom"
-                    },
-                    {
-                      lang: "fr",
-                      title: "règne"
-                    }
-                  ]
-                }
-              },
-              {
-                key: "phylum",
-                name: "phylum",
-                multilingualTitle: {
-                  titles: [
-                    {
-                      lang: "en",
-                      title: "phylum"
-                    },
-                    {
-                      lang: "fr",
-                      title: "phylum"
-                    }
-                  ]
-                }
-              },
-              {
-                key: "class",
-                name: "class",
-                multilingualTitle: {
-                  titles: [
-                    {
-                      lang: "en",
-                      title: "class"
-                    },
-                    {
-                      lang: "fr",
-                      title: "classe"
-                    }
-                  ]
-                }
-              },
-              {
-                key: "order",
-                name: "order",
-                multilingualTitle: {
-                  titles: [
-                    {
-                      lang: "en",
-                      title: "order"
-                    },
-                    {
-                      lang: "fr",
-                      title: "ordre"
-                    }
-                  ]
-                }
-              },
-              {
-                key: "family",
-                name: "family",
-                multilingualTitle: {
-                  titles: [
-                    {
-                      lang: "en",
-                      title: "family"
-                    },
-                    {
-                      lang: "fr",
-                      title: "famille"
-                    }
-                  ]
-                }
-              },
-              {
-                key: "genus",
-                name: "genus",
-                multilingualTitle: {
-                  titles: [
-                    {
-                      lang: "en",
-                      title: "genus"
-                    },
-                    {
-                      lang: "fr",
-                      title: "genre"
-                    }
-                  ]
-                }
-              },
-              {
-                key: "species",
-                name: "species",
-                multilingualTitle: {
-                  titles: [
-                    {
-                      lang: "en",
-                      title: "species"
-                    },
-                    {
-                      lang: "fr",
-                      title: "espèce"
-                    }
-                  ]
-                }
-              },
-              {
-                key: "subspecies",
-                name: "subspecies",
-                multilingualTitle: {
-                  titles: [
-                    {
-                      lang: "en",
-                      title: "subspecies"
-                    },
-                    {
-                      lang: "fr",
-                      title: "sous-espèce"
-                    }
-                  ]
-                }
-              },
-              {
-                key: "variety",
-                name: "variety",
-                multilingualTitle: {
-                  titles: [
-                    {
-                      lang: "en",
-                      title: "variety"
-                    },
-                    {
-                      lang: "fr",
-                      title: "variété"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      };
+      return { data: TEST_CLASSIFICATIONS };
   }
 });
 
@@ -595,28 +391,86 @@ describe("Workbook Template Generator", () => {
     });
     await new Promise(setImmediate);
 
-    // Click the "Add new column" dropdown
-    userEvent.click(wrapper.getByRole("combobox"));
+    // Go through all the possible classifications from the mock.
+    for (const element of TEST_CLASSIFICATIONS.vocabularyElements as any) {
+      // Click the "Add new column" dropdown
+      userEvent.click(wrapper.getByRole("combobox"));
+      await waitFor(() => {
+        // Total number of options expected based on the dynamic config and index map returned.
+        expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
+      });
+
+      // Click the "Scientific Name Details" option.
+      userEvent.click(
+        wrapper.getByRole("option", {
+          name: /scientific name details/i
+        })
+      );
+      await new Promise(setImmediate);
+
+      // A new dropdown should appear:
+      expect(
+        wrapper.getByText(/select classification rank\.\.\./i)
+      ).toBeInTheDocument();
+      userEvent.click(wrapper.getAllByRole("combobox")[1]);
+
+      // Select classification name.
+      userEvent.click(wrapper.getByRole("option", { name: element.name }));
+
+      // Add the column.
+      userEvent.click(wrapper.getByRole("button", { name: /add column/i }));
+    }
+
+    // Change one of the headers to make sure the alias is kept.
+    userEvent.type(wrapper.getByPlaceholderText(/kingdom/i), "Kingdom Test");
+
+    // Generate the template.
+    userEvent.click(
+      wrapper.getByRole("button", { name: /generate template/i })
+    );
     await waitFor(() => {
-      // Total number of options expected based on the dynamic config and index map returned.
-      expect(wrapper.getAllByRole("option").length).toBeGreaterThanOrEqual(1);
+      expect(mockPost).toHaveBeenCalledTimes(1);
     });
 
-    // Click the "Scientific Name Details" option.
-    userEvent.click(
-      wrapper.getByRole("option", {
-        name: /scientific name details/i
-      })
+    // Ensure the request is correct.
+    expect(mockPost).toHaveBeenCalledWith(
+      "objectstore-api/workbook/generation",
+      {
+        data: {
+          attributes: {
+            aliases: [
+              "Kingdom Test",
+              "Phylum",
+              "Class",
+              "Order",
+              "Family",
+              "Genus",
+              "Species",
+              "Subspecies",
+              "Variety"
+            ],
+            columns: [
+              "organism.determination.scientificNameDetails.kingdom",
+              "organism.determination.scientificNameDetails.phylum",
+              "organism.determination.scientificNameDetails.class",
+              "organism.determination.scientificNameDetails.order",
+              "organism.determination.scientificNameDetails.family",
+              "organism.determination.scientificNameDetails.genus",
+              "organism.determination.scientificNameDetails.species",
+              "organism.determination.scientificNameDetails.subspecies",
+              "organism.determination.scientificNameDetails.variety"
+            ]
+          },
+          type: "workbook-generation"
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/vnd.api+json"
+        },
+        responseType: "blob"
+      }
     );
-    await new Promise(setImmediate);
-
-    // A new dropdown should appear:
-    expect(
-      wrapper.getByText(/select classification rank\.\.\./i)
-    ).toBeInTheDocument();
-    userEvent.click(wrapper.getAllByRole("combobox")[1]);
-
-    // TO DO - Rest of test...
   });
 
   it("Template name validation", async () => {

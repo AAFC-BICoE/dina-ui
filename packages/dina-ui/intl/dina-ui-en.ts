@@ -851,6 +851,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   columnSelector_columnsToBeExported: "Columns to be exported:",
   columnSelector_addNewColumn: "Add a new column:",
   columnSelector_selectManagedAttribute: "Select managed attribute:",
+  columnSelector_selectClassification: "Select classification:",
   columnSelector_addColumnButton: "Add Column",
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
