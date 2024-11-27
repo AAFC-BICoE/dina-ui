@@ -1,5 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { NgsIndex } from "../ngs-workflow/NgsIndex";
+import { MetagenomicsBatch } from "./MetagenomicsBatch";
+import { PcrBatchItem } from "../PcrBatchItem";
 
 export interface MetagenomicsBatchItemAttributes {
   type: "metagenomics-batch-item";
@@ -7,12 +9,13 @@ export interface MetagenomicsBatchItemAttributes {
   createdOn?: string;
 }
 
-export interface MetagenomicsBatchRelationships {
+export interface MetagenomicsBatchItemRelationships {
   metagenomicsBatch?: MetagenomicsBatch;
   indexI5?: NgsIndex;
   indexI7?: NgsIndex;
+  pcrBatchItem?: PcrBatchItem;
 }
 
-export type MetagenomicsBatch = KitsuResource &
+export type MetagenomicsBatchItem = KitsuResource &
   MetagenomicsBatchItemAttributes &
-  MetagenomicsBatchRelationships;
+  MetagenomicsBatchItemRelationships;

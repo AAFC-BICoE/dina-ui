@@ -14,8 +14,8 @@ import {
   Nav
 } from "../../../components";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { MetagenomicsBatch } from "../../../types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 
 const TABLE_COLUMNS: ColumnDefinition<MetagenomicsBatch>[] = [
   {
@@ -24,14 +24,14 @@ const TABLE_COLUMNS: ColumnDefinition<MetagenomicsBatch>[] = [
         original: { id, name }
       }
     }) => (
-      <Link href={`/seqdb/metagenomics-workflow/run?metagenomicsBatchId=${id}`}>
+      <Link href={`/seqdb/metagenomics-workflow/run?pcrBatchId=${id}`}>
         {name || id}
       </Link>
     ),
-    accessorKey: "name",
-    header: () => <SeqdbMessage id="metagenomicsWorkflowName" />
+    accessorKey: "name"
   },
-  "analysisType",
+  "primerForward.name",
+  "primerReverse.name",
   groupCell("group"),
   "createdBy",
   dateCell("createdOn")
@@ -39,7 +39,8 @@ const TABLE_COLUMNS: ColumnDefinition<MetagenomicsBatch>[] = [
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [
   "name",
-  "analysisType",
+  "primerForward.name",
+  "primerReverse.name",
   {
     name: "createdOn",
     type: "DATE"
@@ -67,7 +68,6 @@ export default function MetagenomicsWorkflowListPage() {
         <h1 id="wb-cont">{formatMessage("metagenomicsWorkflowTitle")}</h1>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
-            isCompleted: false,
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
@@ -75,7 +75,11 @@ export default function MetagenomicsWorkflowListPage() {
           id="metagenomics-workflow-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/metagenomics-batch"
+            path: "seqdb-api/pcr-batch",
+            include: "primerForward,primerReverse",
+            filter: {
+              batchType: "illumina_metagenomics"
+            }
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

@@ -4,17 +4,20 @@ import {
   DinaFormSubmitParams,
   filterBy,
   ResourceSelectField,
+  SaveArgs,
   SubmitButton,
   TextField,
   useAccount,
+  useApiClient,
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
-import { Protocol } from "packages/dina-ui/types/collection-api";
-import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
-import { IndexSet } from "packages/dina-ui/types/seqdb-api";
+import { Protocol } from "../../../types/collection-api";
+import { MetagenomicsBatch } from "../../../types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
+import { IndexSet, PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
+import { MetagenomicsBatchItem } from "../../../types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 
 export interface MetagenomicsBatchDetailsStepProps {
   metagenomicsBatchId?: string;
@@ -27,6 +30,7 @@ export interface MetagenomicsBatchDetailsStepProps {
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
+  pcrBatch?: PcrBatch;
 }
 
 export function MetagenomicsBatchDetailsStep({
@@ -36,22 +40,53 @@ export function MetagenomicsBatchDetailsStep({
   editMode,
   setEditMode,
   performSave,
-  setPerformSave
+  setPerformSave,
+  pcrBatch
 }: MetagenomicsBatchDetailsStepProps) {
   const { username } = useAccount();
+  const { apiClient } = useApiClient();
+  const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>([]);
 
-  // If no Molecular Analysis has been created, automatically go to edit mode.
+  /**
+   * Retrieve all of the PCR Batch Items that are associated with the PCR Batch from step 1.
+   */
+  async function fetchPcrBatchItems() {
+    await apiClient
+      .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
+        filter: filterBy([], {
+          extraFilters: [
+            {
+              selector: "pcrBatch.uuid",
+              comparison: "==",
+              arguments: pcrBatch!.id!
+            }
+          ]
+        })("")
+      })
+      .then((response) => {
+        setPcrBatchItems(response?.data);
+      });
+  }
+
+  // If no Metagenomics Batch has been created, automatically go to edit mode.
   useEffect(() => {
     if (!metagenomicsBatchId) {
       setEditMode(true);
     }
   }, [metagenomicsBatchId]);
 
+  /**
+   * When the page is first loaded, get PcrBatchItems
+   */
+  useEffect(() => {
+    fetchPcrBatchItems();
+  }, [editMode]);
+
   async function onSavedInternal(
     resource: PersistedResource<MetagenomicsBatch>
   ) {
     setPerformSave(false);
-    await onSaved(1, resource);
+    await onSaved(5, resource);
   }
 
   const initialValues = metagenomicsBatch || {
@@ -76,8 +111,8 @@ export function MetagenomicsBatchDetailsStep({
     const inputResource = {
       ...submittedValues
     };
-
-    const [savedResource] = await save<MetagenomicsBatch>(
+    // Save MetagenomicsBatch
+    const [savedMetagenomicsBatch] = await save<MetagenomicsBatch>(
       [
         {
           resource: inputResource,
@@ -86,7 +121,38 @@ export function MetagenomicsBatchDetailsStep({
       ],
       { apiBaseUrl: "/seqdb-api" }
     );
-    await onSavedInternal(savedResource);
+
+    // Save MetagenomicsBatchItems
+    const metagenomicsBatchItemSaveArgs: SaveArgs<MetagenomicsBatchItem>[] =
+      pcrBatchItems.map((pcrBatchItem) => {
+        return {
+          type: "metagenomics-batch-item",
+          resource: {
+            type: "metagenomics-batch-item",
+            relationships: {
+              metagenomicsBatch: {
+                data: {
+                  id: savedMetagenomicsBatch.id,
+                  type: "metagenomics-batch"
+                }
+              },
+              pcrBatchItem: {
+                data: {
+                  id: pcrBatchItem.id,
+                  type: "pcr-batch-item"
+                }
+              }
+            }
+          }
+        };
+      });
+
+    const saveMetagenomicsBatchItems = await save<MetagenomicsBatchItem>(
+      metagenomicsBatchItemSaveArgs,
+      { apiBaseUrl: "/seqdb-api" }
+    );
+
+    await onSavedInternal(savedMetagenomicsBatch);
   }
 
   return (

@@ -8,15 +8,17 @@ import { useState, useEffect } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import React from "react";
-import { useMetagenomicsBatchQuery } from "./useMetagenomicsBatchQuery";
+import { useMetagenomicsBatchQuery } from "../../../components/seqdb/metagenomics-workflow/useMetagenomicsBatchQuery";
 import { MetagenomicsBatch } from "../../../types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 import { MetagenomicsBatchDetailsStep } from "../../../components/seqdb/metagenomics-workflow/MetagenomicsBatchDetailsStep";
-import { MetagenomicsSelectPCRBatchStep } from "../../../components/seqdb/metagenomics-workflow/MetagenomicsSelectPCRBatchStep";
-import { MetagenomicsBatchSelectCoordinatesStep } from "../../../components/seqdb/metagenomics-workflow/MetagenomicsBatchSelectCoordinatesStep";
-import { SangerRunStep } from "packages/dina-ui/components/seqdb/seq-workflow/SangerRunStep";
-import { IndexAssignmentStep } from "packages/dina-ui/components/seqdb/ngs-workflow/IndexAssignmentStep";
-import { MetagenomicsIndexAssignmentStep } from "packages/dina-ui/components/seqdb/metagenomics-workflow/MetagenomicsIndexAssignmentStep";
-import { SequencingRunStep } from "packages/dina-ui/components/seqdb/metagenomics-workflow/SequencingRunStep";
+import { MetagenomicsIndexAssignmentStep } from "../../../components/seqdb/metagenomics-workflow/MetagenomicsIndexAssignmentStep";
+import { SequencingRunStep } from "../../../components/seqdb/metagenomics-workflow/SequencingRunStep";
+import { usePcrBatchQuery } from "../pcr-batch/edit";
+import { SangerPcrBatchItemGridStep } from "../../../components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
+import { SangerPcrBatchStep } from "../../../components/seqdb/pcr-workflow/SangerPcrBatchStep";
+import { SangerPcrReactionStep } from "../../../components/seqdb/pcr-workflow/SangerPcrReactionStep";
+import { SangerSampleSelectionStep } from "../../../components/seqdb/pcr-workflow/SangerSampleSelectionStep";
+import { PcrBatch } from "../../../types/seqdb-api";
 
 export default function MetagenomicWorkflowRunPage() {
   const router = useRouter();
@@ -35,6 +37,23 @@ export default function MetagenomicWorkflowRunPage() {
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
 
+  // Request completion to be performed.
+  const [performComplete, setPerformComplete] = useState<boolean>(false);
+
+  const [reloadPcrBatch, setReloadPcrBatch] = useState<number>(Date.now());
+
+  // Loaded PCR Batch ID.
+  const [pcrBatchId, setPcrBatchId] = useState<string | undefined>(
+    router.query.pcrBatchId?.toString()
+  );
+
+  // Loaded PCR Batch.
+  const pcrBatchQuery = usePcrBatchQuery(pcrBatchId, [
+    pcrBatchId,
+    currentStep,
+    reloadPcrBatch
+  ]);
+
   // Used to determine if the resource needs to be reloaded.
   const [reloadMetagenomicsBatch, setReloadMetagenomicsBatch] =
     useState<number>(Date.now());
@@ -47,6 +66,8 @@ export default function MetagenomicWorkflowRunPage() {
   // Loaded resource
   const metagenomicsBatchQuery = useMetagenomicsBatchQuery(
     metagenomicsBatchId,
+    pcrBatchId,
+    setMetagenomicsBatchId,
     [metagenomicsBatchId, currentStep, reloadMetagenomicsBatch]
   );
 
@@ -58,7 +79,7 @@ export default function MetagenomicWorkflowRunPage() {
     });
   }, [currentStep]);
 
-  async function onSaved(
+  async function onSavedMetagenomicsBatch(
     nextStep: number,
     metagenomicsBatchSaved?: PersistedResource<MetagenomicsBatch>
   ) {
@@ -78,8 +99,22 @@ export default function MetagenomicWorkflowRunPage() {
     });
   }
 
-  if (metagenomicsBatchQuery.loading) {
-    return <LoadingSpinner loading={true} />;
+  async function onSavedPcrBatch(
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<PcrBatch>
+  ) {
+    setCurrentStep(nextStep);
+    if (pcrBatchSaved) {
+      setPcrBatchId(pcrBatchSaved.id);
+    }
+    await router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        pcrBatchId: pcrBatchSaved ? pcrBatchSaved.id : pcrBatchId,
+        step: "" + nextStep
+      }
+    });
   }
 
   const buttonBarContent = (
@@ -138,6 +173,7 @@ export default function MetagenomicWorkflowRunPage() {
   // Helper function to determine if a step should be disabled.
   const isDisabled = (
     stepNumber: number,
+    pcrBatchRequired: boolean,
     metagenomicsBatchRequired: boolean
   ) => {
     // While in edit mode, other steps should be disabled.
@@ -149,37 +185,52 @@ export default function MetagenomicWorkflowRunPage() {
     if (metagenomicsBatchRequired && !metagenomicsBatchId) {
       return true;
     }
-
+    // If a PCR Batch is required, and not provided then this step should be disabled.
+    if (pcrBatchRequired && !pcrBatchId) {
+      return true;
+    }
     // Not disabled.
     return false;
   };
-
-  return (
+  function isLoading() {
+    return metagenomicsBatchQuery.loading || pcrBatchQuery.loading;
+  }
+  return isLoading() ? (
+    <LoadingSpinner loading={true} />
+  ) : (
     <PageLayout
       titleId={"metagenomicsWorkflowTitle"}
       buttonBarContent={buttonBarContent}
     >
       <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>
         <TabList>
-          <Tab disabled={isDisabled(0, false)}>
-            {formatMessage("metagenomicsBatch")}
+          <Tab disabled={isDisabled(0, false, false)}>
+            {formatMessage("pcrBatch")}
           </Tab>
-          <Tab disabled={isDisabled(1, true)}>
-            {formatMessage("selectPcrBatch")}
+          <Tab disabled={isDisabled(1, true, false)}>
+            {formatMessage("selectMaterialSamples")}
           </Tab>
-          <Tab disabled={isDisabled(2, true)}>
+          <Tab disabled={isDisabled(2, true, false)}>
             {formatMessage("selectCoordinates")}
           </Tab>
-          <Tab disabled={isDisabled(3, true)}>
+          <Tab disabled={isDisabled(3, true, false)}>
+            {formatMessage("pcrReaction")}
+          </Tab>
+          <Tab disabled={isDisabled(4, true, false)}>
+            {formatMessage("metagenomicsBatch")}
+          </Tab>
+          <Tab disabled={isDisabled(5, true, true)}>
             {formatMessage("indexAssignmentStep")}
           </Tab>
-          <Tab disabled={isDisabled(4, true)}>{formatMessage("runStep")}</Tab>
+          <Tab disabled={isDisabled(6, true, true)}>
+            {formatMessage("runStep")}
+          </Tab>
         </TabList>
         <TabPanel>
-          <MetagenomicsBatchDetailsStep
-            metagenomicsBatchId={metagenomicsBatchId}
-            metagenomicsBatch={metagenomicsBatchQuery.response?.data}
-            onSaved={onSaved}
+          <SangerPcrBatchStep
+            pcrBatchId={pcrBatchId}
+            pcrBatch={pcrBatchQuery.response?.data}
+            onSaved={onSavedPcrBatch}
             editMode={editMode}
             setEditMode={setEditMode}
             performSave={performSave}
@@ -187,18 +238,57 @@ export default function MetagenomicWorkflowRunPage() {
           />
         </TabPanel>
         <TabPanel>
-          {metagenomicsBatchId && <MetagenomicsSelectPCRBatchStep />}
+          {pcrBatchId && (
+            <SangerSampleSelectionStep
+              pcrBatchId={pcrBatchId}
+              onSaved={onSavedPcrBatch}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
         </TabPanel>
         <TabPanel>
-          {metagenomicsBatchQuery.response?.data && metagenomicsBatchId && (
-            <MetagenomicsBatchSelectCoordinatesStep
-            // seqBatchId={seqBatchId}
-            // seqBatch={seqBatchQueryState.response.data}
-            // editMode={editMode}
-            // setEditMode={setEditMode}
-            // performSave={performSave}
-            // setPerformSave={setPerformSave}
-            // onSaved={onSaved}
+          {pcrBatchQuery.response?.data && pcrBatchId && (
+            <SangerPcrBatchItemGridStep
+              pcrBatchId={pcrBatchId}
+              pcrBatch={pcrBatchQuery.response.data}
+              onSaved={onSavedPcrBatch}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {pcrBatchQuery.response?.data && pcrBatchId && (
+            <SangerPcrReactionStep
+              pcrBatchId={pcrBatchId}
+              pcrBatch={pcrBatchQuery.response.data}
+              editMode={editMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+              performComplete={performComplete}
+              setPerformComplete={setPerformComplete}
+              setEditMode={setEditMode}
+              setReloadPcrBatch={setReloadPcrBatch}
+              onSaved={onSavedPcrBatch}
+            />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {pcrBatchQuery?.response?.data && (
+            <MetagenomicsBatchDetailsStep
+              metagenomicsBatchId={metagenomicsBatchId}
+              metagenomicsBatch={metagenomicsBatchQuery.response?.data}
+              onSaved={onSavedMetagenomicsBatch}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+              pcrBatch={pcrBatchQuery?.response?.data}
             />
           )}
         </TabPanel>
