@@ -93,8 +93,6 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       );
     }
 
-    await onSuccess?.(response);
-
     if (joinSpecs) {
       const { data } = response;
       const resources = isArray(data) ? data : [data];
@@ -103,6 +101,8 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
         await new ClientSideJoiner(bulkGet, resources, joinSpec).join();
       }
     }
+
+    await onSuccess?.(response);
 
     return response;
   }

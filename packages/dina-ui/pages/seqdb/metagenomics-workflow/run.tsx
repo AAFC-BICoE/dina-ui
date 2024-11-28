@@ -293,17 +293,22 @@ export default function MetagenomicWorkflowRunPage() {
           )}
         </TabPanel>
         <TabPanel>
-          {metagenomicsBatchQuery.response?.data && metagenomicsBatchId && (
-            <MetagenomicsIndexAssignmentStep
-            // batchId={metagenomicsBatchId}
-            // batch={metagenomicsBatchQuery.response?.data}
-            // onSaved={onSaved}
-            // editMode={editMode}
-            // setEditMode={setEditMode}
-            // performSave={performSave}
-            // setPerformSave={setPerformSave}
-            />
-          )}
+          {metagenomicsBatchQuery.response?.data &&
+            metagenomicsBatchId &&
+            pcrBatchQuery?.response?.data &&
+            pcrBatchId && (
+              <MetagenomicsIndexAssignmentStep
+                pcrBatchId={pcrBatchId}
+                pcrBatch={pcrBatchQuery?.response?.data}
+                metagenomicsBatchId={metagenomicsBatchId}
+                metagenomicsBatch={metagenomicsBatchQuery.response?.data}
+                onSaved={onSavedMetagenomicsBatch}
+                editMode={editMode}
+                setEditMode={setEditMode}
+                performSave={performSave}
+                setPerformSave={setPerformSave}
+              />
+            )}
         </TabPanel>
         <TabPanel>
           {metagenomicsBatchQuery.response?.data && metagenomicsBatchId && (
