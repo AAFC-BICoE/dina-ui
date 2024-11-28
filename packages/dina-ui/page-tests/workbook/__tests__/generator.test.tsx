@@ -8,7 +8,7 @@ import {
   TEST_MANAGED_ATTRIBUTE_COLLECTING_EVENT,
   TEST_MANAGED_ATTRIBUTE_MATERIAL_SAMPLE,
   TEST_MANAGED_ATTRIBUTE_PREPARATION
-} from "./__mocks__/generator.mock";
+} from "../__mocks__/generator.mock";
 
 const mockPost = jest.fn();
 
