@@ -99,7 +99,7 @@ export default function QueryRowScientificNameDetailsSearch({
         }}
         controlShouldRenderValue={true}
         isClearable={false}
-        className={isInColumnSelector ? "ps-0 mt-2" : "col me-1 ms-2 ps-0"}
+        className={isInColumnSelector ? "ps-0 mt-2 mb-3" : "col me-1 ms-2 ps-0"}
         onKeyDown={onKeyDown}
         captureMenuScroll={true}
         menuPlacement={isInColumnSelector ? "bottom" : "auto"}

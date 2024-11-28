@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import { WorkbookTemplateGenerator } from "../../../pages/workbook/generator";
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import userEvent from "@testing-library/user-event";
@@ -450,15 +450,15 @@ describe("Workbook Template Generator", () => {
               "Variety"
             ],
             columns: [
-              "organism.determination.scientificNameDetails.kingdom",
-              "organism.determination.scientificNameDetails.phylum",
-              "organism.determination.scientificNameDetails.class",
-              "organism.determination.scientificNameDetails.order",
-              "organism.determination.scientificNameDetails.family",
-              "organism.determination.scientificNameDetails.genus",
-              "organism.determination.scientificNameDetails.species",
-              "organism.determination.scientificNameDetails.subspecies",
-              "organism.determination.scientificNameDetails.variety"
+              "Kingdom",
+              "Phylum",
+              "Class",
+              "Order",
+              "Family",
+              "Genus",
+              "Species",
+              "Subspecies",
+              "Variety"
             ]
           },
           type: "workbook-generation"
