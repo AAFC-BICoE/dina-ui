@@ -139,12 +139,20 @@ export function WorkbookColumnMapping({
       const values = Object.keys(
         (columnUniqueValues ?? {})[sheet]?.[columnName] || {}
       );
-      if (!relationshipMapping[columnName] && values.length > 0) {
+
+      if (Array.isArray(relationshipMapping[columnName])) {
+        if (!relationshipMapping[columnName].length) {
+          unmappedColumnNames.push(
+            workbookColumnMap[columnName].originalColumnName
+          );
+        }
+      } else if (!relationshipMapping[columnName] && values.length > 0) {
         unmappedColumnNames.push(
           workbookColumnMap[columnName].originalColumnName
         );
       } else {
         const mappedValues = Object.keys(relationshipMapping[columnName] || {});
+
         for (const value of values) {
           if (mappedValues.indexOf(value.replace(".", "_")) === -1) {
             unmappedColumnNames.push(
@@ -530,12 +538,11 @@ export function WorkbookColumnMapping({
   async function onRelatedRecordChange(
     columnHeader: string,
     fieldValue: string,
-    relatedRecord: string,
+    relatedRecord: string | string[],
     targetType: string
   ) {
     const columnHeaderFormatted = columnHeader.replaceAll(".", "_");
     const fieldValueFormatted = fieldValue.replaceAll(".", "_");
-
     if (relationshipMapping) {
       // Check if the dropdown option selected is undefined (was cleared)
       if (!relatedRecord) {
@@ -546,16 +553,30 @@ export function WorkbookColumnMapping({
           setRelationshipMapping(updatedMapping);
         }
       } else {
-        setRelationshipMapping({
-          ...relationshipMapping,
-          [columnHeaderFormatted]: {
-            ...relationshipMapping?.[columnHeaderFormatted],
-            [fieldValueFormatted]: {
-              id: relatedRecord,
-              type: targetType
+        if (Array.isArray(relatedRecord)) {
+          const newValue = relatedRecord.map((id) => ({
+            id,
+            type: targetType
+          }));
+          setRelationshipMapping({
+            ...relationshipMapping,
+            [columnHeaderFormatted]: {
+              ...relationshipMapping?.[columnHeaderFormatted],
+              [fieldValueFormatted]: newValue
             }
-          }
-        });
+          });
+        } else {
+          setRelationshipMapping({
+            ...relationshipMapping,
+            [columnHeaderFormatted]: {
+              ...relationshipMapping?.[columnHeaderFormatted],
+              [fieldValueFormatted]: {
+                id: relatedRecord,
+                type: targetType
+              }
+            }
+          });
+        }
       }
     }
   }

@@ -900,3 +900,7 @@ export function trimSpace(workbookData: WorkbookJSON) {
   }
   return workbookData;
 }
+export const PERSON_SELECT_FIELDS = new Set([
+  "preparedBy.displayName",
+  "collectingEvent.collectors.displayName"
+]);

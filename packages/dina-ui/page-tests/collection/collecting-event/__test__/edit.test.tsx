@@ -449,12 +449,7 @@ describe("collecting-event edit page", () => {
     expect(wrapper.getByRole("button", { name: /primary/i })).toBeDisabled();
 
     // Add a second assertion:
-    userEvent.click(
-      wrapper.getByRole("button", {
-        name: /add another georeference assertion/i
-      })
-    );
-
+    userEvent.click(wrapper.getByTestId("add-another-button"));
     await new Promise(setImmediate);
 
     // Make 2nd assertion primary:

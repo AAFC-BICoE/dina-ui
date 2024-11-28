@@ -6,6 +6,7 @@ import {
   FieldMappingConfigType,
   getFlattenedConfig,
   LinkOrCreateSetting,
+  PERSON_SELECT_FIELDS,
   WorkbookColumnMap,
   WorkbookDataTypeEnum
 } from "..";
@@ -400,10 +401,12 @@ export function useWorkbookConverter(
   ) {
     const attributeName = fieldPath.substring(fieldPath.lastIndexOf(".") + 1);
     const value = resource[attributeName];
+
     if (isEmptyWorkbookValue(value)) {
       delete resource[attributeName];
       return;
     }
+
     if (attributeName === "relationshipConfig") {
       resource.type = value.type;
       resource.relationships = {};
@@ -578,6 +581,7 @@ export function useWorkbookConverter(
                     columnMap[fieldPath + "." + attrNameInValue]?.[
                       childValue.trim().replace(".", "_")
                     ];
+
                   if (valueToLink) {
                     break;
                   }
@@ -585,7 +589,9 @@ export function useWorkbookConverter(
               }
             }
             if (valueToLink) {
-              valuesForRelationship.push(valueToLink);
+              valuesForRelationship.push(
+                ...(Array.isArray(valueToLink) ? valueToLink : [valueToLink])
+              );
             } else {
               if (
                 relationshipConfig.linkOrCreateSetting ===
@@ -648,15 +654,14 @@ export function useWorkbookConverter(
           }
         }
       }
-      if (valuesForRelationship.length === value.length) {
-        if (!resource.relationships) {
-          resource.relationships = {};
-        }
+      if (!resource.relationships) {
+        resource.relationships = {};
+      }
+      if (valuesForRelationship.length) {
         resource.relationships[attributeName] = {
           data: valuesForRelationship
         };
         delete resource[attributeName];
-        return;
       }
     }
   }
