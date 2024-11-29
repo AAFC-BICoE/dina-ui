@@ -335,31 +335,26 @@ exports[`Workbook Template Generator Page Layout 1`] = `
               <div
                 class="flex-grow-1"
               >
-                <label
-                  class="name-field templateName-field mb-2 w-100 mb-3"
+                <strong>
+                  Template Name
+                </strong>
+                <div
+                  class="mt-2 input-group"
                 >
-                  <div
-                    class="field-label label-col mb-2"
+                  <input
+                    aria-describedby="extension"
+                    class="flex-grow-1 form-control form-control"
+                    name="name"
+                    placeholder="template"
+                    value=""
+                  />
+                  <span
+                    class="input-group-text"
+                    id="extension"
                   >
-                    <strong>
-                      <div
-                        class="templateName-field-header"
-                      >
-                        Template Name
-                      </div>
-                    </strong>
-                  </div>
-                  <div
-                    class="field-col"
-                    style="cursor: auto;"
-                  >
-                    <input
-                      class="form-control"
-                      type="text"
-                      value=""
-                    />
-                  </div>
-                </label>
+                    .xlsx
+                  </span>
+                </div>
               </div>
               <div
                 class="flex-grow-1"
