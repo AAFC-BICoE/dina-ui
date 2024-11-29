@@ -836,7 +836,8 @@ export function calculateColumnUniqueValuesFromSpreadsheetData(
       [columnName: string]: { [value: string]: number };
     } = {};
     const workbookRows: WorkbookRow[] = spreadsheetData[sheet]?.rows;
-    const columnNames: string[] = workbookRows[0].content;
+    const columnNames: string[] =
+      spreadsheetData[sheet]?.originalColumns ?? workbookRows[0].content;
     for (let colIndex = 0; colIndex < columnNames.length; colIndex++) {
       const counts: { [value: string]: number } = {};
       for (let rowIndex = 1; rowIndex < workbookRows.length; rowIndex++) {
