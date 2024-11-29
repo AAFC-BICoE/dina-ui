@@ -1,6 +1,8 @@
-import { useLocalStorage } from "@rehooks/local-storage";
 import { useEffect, useState } from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
+import { useSessionStorage } from "usehooks-ts";
+import { defaultJsonTree } from "../..";
+import { createSessionStorageLastUsedTreeKey } from "../saved-searches/SavedSearch";
 
 interface UseLastSavedSearchProps {
   /**
@@ -34,6 +36,10 @@ interface UseLastSavedSearchProps {
 interface UseLastSavedSearchReturn {
   // If the `reloadLastSearch` url param is present.
   loadLastUsed: boolean;
+
+  // Function to trigger the load of the last loaded search. This will be ran if the default
+  // search has not been loaded in.
+  loadLastSavedSearch: () => void;
 }
 
 export function useLastSavedSearch({
@@ -42,32 +48,23 @@ export function useLastSavedSearch({
   performSubmit,
   uniqueName
 }: UseLastSavedSearchProps): UseLastSavedSearchReturn {
-  const localStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
-
   const [queryLoaded, setQueryLoaded] = useState<boolean>(false);
 
-  const [localStorageQueryTree, setLocalStorageQueryTree] =
-    useLocalStorage<JsonTree>(localStorageLastUsedTreeKey);
+  const [sessionStorageQueryTree] = useSessionStorage<JsonTree>(
+    createSessionStorageLastUsedTreeKey(uniqueName),
+    defaultJsonTree
+  );
 
-  // Load in the last used save search
-  useEffect(() => {
-    if (localStorageQueryTree) {
-      setQueryBuilderTree(Utils.loadTree(localStorageQueryTree as JsonTree));
-      setQueryLoaded(true);
-      setSubmittedQueryBuilderTree(
-        Utils.loadTree(localStorageQueryTree as JsonTree)
-      );
-    } else {
-      // Nothing to load in, mark as loaded.
-      setQueryLoaded(true);
-    }
-  }, []);
+  const loadLastSavedSearch = () => {
+    setQueryLoaded(true);
+  };
 
   // Once the query builder tree has been loaded in, perform a submit.
   useEffect(() => {
-    if (localStorageQueryTree) {
+    if (sessionStorageQueryTree) {
+      setQueryBuilderTree(Utils.loadTree(sessionStorageQueryTree as JsonTree));
       setSubmittedQueryBuilderTree(
-        Utils.loadTree(localStorageQueryTree as JsonTree)
+        Utils.loadTree(sessionStorageQueryTree as JsonTree)
       );
     } else {
       performSubmit();
@@ -75,6 +72,7 @@ export function useLastSavedSearch({
   }, [queryLoaded]);
 
   return {
-    loadLastUsed: !!localStorageQueryTree
+    loadLastUsed: !!sessionStorageQueryTree,
+    loadLastSavedSearch
   };
 }

@@ -14,7 +14,7 @@ interface FilterFreeTextSearchFieldProps {
 
 export function FilterFreeTextSearchField({
   name,
-  filterAttributes,
+  filterAttributes
 }: FilterFreeTextSearchFieldProps) {
   return (
     <Field name={name}>
@@ -24,24 +24,24 @@ export function FilterFreeTextSearchField({
       }: FieldProps) => {
         function onChange(e) {
           const filterModel: FreeTextSearchFilterModel = {
-            type: 'FREE_TEXT_SEARCH_FILTER',
+            type: "FREE_TEXT_SEARCH_FILTER",
             filterAttributes,
-            value: e.target.value,
-          }
+            value: e.target.value
+          };
           setFieldValue(name, filterModel);
           setFieldTouched(name);
         }
         return (
           <div className="list-inline" style={{ display: "flex-shrink" }}>
             <div className="list-inline-item">
-            <input
-              name={name}
-              type="text"
-              aria-label="Filter Value"
-              className="filter-value form-control d-inline-block search-input w-100"
-              value={ value?.value ?? "" }
-              onChange={onChange}
-            />
+              <input
+                name={name}
+                type="text"
+                aria-label="Filter Value"
+                className="filter-value form-control d-inline-block search-input w-100"
+                value={value?.value ?? ""}
+                onChange={onChange}
+              />
             </div>
           </div>
         );

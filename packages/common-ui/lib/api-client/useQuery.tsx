@@ -83,7 +83,6 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       { fields, filter, sort, include, page, header, responseType, timeout },
       isUndefined
     );
-
     const response = await apiClient.get<TData, TMeta>(path, getParams);
 
     if (!response) {
@@ -136,16 +135,30 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
 interface AuditSnapshotRouterProps {
   error: any;
 }
+
 function AuditSnapshotRouter({ error }: AuditSnapshotRouterProps) {
   const errorDetails = (error as any)?.cause?.data?.errors?.[0];
   const auditSnapshotLink: string = errorDetails?.links?.about;
+
+  // UUID extracted from the audit link.
   const id: string | undefined = auditSnapshotLink
     ?.split("=")
     ?.at(-1)
     ?.split("/")
     ?.at(1);
-  return id ? <Link href={`revisions?id=${id}`}>Audit Snapshot</Link> : null;
+
+  // Resource extracted from the audit link.
+  const resource: string | undefined = auditSnapshotLink
+    ?.split("=")
+    ?.at(-1)
+    ?.split("/")
+    ?.at(0);
+
+  return id && resource ? (
+    <Link href={`../${resource}/revisions?id=${id}`}>Audit Snapshot</Link>
+  ) : null;
 }
+
 /**
  * Only render if there is a response, otherwise show generic 'loading' or 'error' indicators.
  *
@@ -170,7 +183,7 @@ export function withResponse<
         : error?.errors?.map((e) => e.detail).join("\n") ?? String(error);
     const errorDetails = (error as any)?.cause?.data?.errors?.[0];
     return (
-      <div className="alert alert-danger">
+      <div className="alert alert-danger mt-3">
         {`${message}. `}
         {errorDetails?.links?.about && <AuditSnapshotRouter error={error} />}
       </div>

@@ -29,10 +29,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "A",
-    wellColumn: 1,
-    cellNumber: 1,
-    result: "Good Band"
+    result: "Good Band",
+    storageUnitUsage: {
+      id: "storage-unit-usage-1",
+      type: "storage-unit-usage",
+      wellRow: "A",
+      wellColumn: 1,
+      cellNumber: 1
+    }
   },
   {
     id: "b5e12e85-84d4-461d-8cce-f2fa3af4644b",
@@ -44,10 +48,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "A",
-    wellColumn: 2,
-    cellNumber: 2,
-    result: "Good Band"
+    result: "Good Band",
+    storageUnitUsage: {
+      id: "storage-unit-usage-2",
+      type: "storage-unit-usage",
+      wellRow: "A",
+      wellColumn: 2,
+      cellNumber: 2
+    }
   },
   {
     id: "80e5b586-ff3f-4be7-b30c-ea4671cddc97",
@@ -59,10 +67,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "A",
-    wellColumn: 3,
-    cellNumber: 3,
-    result: "Good Band"
+    result: "Good Band",
+    storageUnitUsage: {
+      id: "storage-unit-usage-3",
+      type: "storage-unit-usage",
+      wellRow: "A",
+      wellColumn: 3,
+      cellNumber: 3
+    }
   },
   {
     id: "2dc0ccb3-abc1-4a01-9afd-60ec448d101e",
@@ -74,10 +86,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "A",
-    wellColumn: 4,
-    cellNumber: 4,
-    result: "Good Band"
+    result: "Good Band",
+    storageUnitUsage: {
+      id: "storage-unit-usage-4",
+      type: "storage-unit-usage",
+      wellRow: "A",
+      wellColumn: 4,
+      cellNumber: 4
+    }
   },
   {
     id: "6da5ebfe-d257-4d62-aa6b-99419d5864f3",
@@ -89,10 +105,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "A",
-    wellColumn: 5,
-    cellNumber: 5,
-    result: "Good Band"
+    result: "Good Band",
+    storageUnitUsage: {
+      id: "storage-unit-usage-5",
+      type: "storage-unit-usage",
+      wellRow: "A",
+      wellColumn: 5,
+      cellNumber: 5
+    }
   },
   {
     id: "93434a71-e608-4e3b-bda3-27bd7fa8a589",
@@ -104,10 +124,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "B",
-    wellColumn: 1,
-    cellNumber: 6,
-    result: "Weak Band"
+    result: "Weak Band",
+    storageUnitUsage: {
+      id: "storage-unit-usage-6",
+      type: "storage-unit-usage",
+      wellRow: "B",
+      wellColumn: 1,
+      cellNumber: 6
+    }
   },
   {
     id: "c3760849-7886-4a26-abf9-76734f9cd40d",
@@ -119,10 +143,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "B",
-    wellColumn: 2,
-    cellNumber: 7,
-    result: "Weak Band"
+    result: "Weak Band",
+    storageUnitUsage: {
+      id: "storage-unit-usage-7",
+      type: "storage-unit-usage",
+      wellRow: "B",
+      wellColumn: 2,
+      cellNumber: 7
+    }
   },
   {
     id: "bc27b891-d54a-4419-baa1-2f57c6395c9a",
@@ -134,10 +162,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "B",
-    wellColumn: 3,
-    cellNumber: 8,
-    result: "Weak Band"
+    result: "Weak Band",
+    storageUnitUsage: {
+      id: "storage-unit-usage-8",
+      type: "storage-unit-usage",
+      wellRow: "B",
+      wellColumn: 3,
+      cellNumber: 8
+    }
   },
   {
     id: "3a7bb639-9b12-4edd-8074-a0bd1d4ca453",
@@ -149,10 +181,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "B",
-    wellColumn: 4,
-    cellNumber: 9,
-    result: "Weak Band"
+    result: "Weak Band",
+    storageUnitUsage: {
+      id: "storage-unit-usage-9",
+      type: "storage-unit-usage",
+      wellRow: "B",
+      wellColumn: 4,
+      cellNumber: 9
+    }
   },
   {
     id: "3dc808d6-a958-448f-8743-71b837fc2224",
@@ -164,10 +200,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "B",
-    wellColumn: 5,
-    cellNumber: 10,
-    result: "Weak Band"
+    result: "Weak Band",
+    storageUnitUsage: {
+      id: "storage-unit-usage-10",
+      type: "storage-unit-usage",
+      wellRow: "B",
+      wellColumn: 5,
+      cellNumber: 10
+    }
   },
   {
     id: "688f20a3-1e6f-4731-95f6-668c860ac4a5",
@@ -179,10 +219,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "C",
-    wellColumn: 1,
-    cellNumber: 11,
-    result: "Multiple Bands"
+    result: "Multiple Bands",
+    storageUnitUsage: {
+      id: "storage-unit-usage-11",
+      type: "storage-unit-usage",
+      wellRow: "C",
+      wellColumn: 1,
+      cellNumber: 11
+    }
   },
   {
     id: "d82400db-8bf7-4948-87f4-c79bd66e7833",
@@ -194,10 +238,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "C",
-    wellColumn: 2,
-    cellNumber: 12,
-    result: "Multiple Bands"
+    result: "Multiple Bands",
+    storageUnitUsage: {
+      id: "storage-unit-usage-12",
+      type: "storage-unit-usage",
+      wellRow: "C",
+      wellColumn: 2,
+      cellNumber: 12
+    }
   },
   {
     id: "fe563156-a96a-4146-8548-0e606e52e579",
@@ -209,10 +257,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "C",
-    wellColumn: 3,
-    cellNumber: 13,
-    result: "Multiple Bands"
+    result: "Multiple Bands",
+    storageUnitUsage: {
+      id: "storage-unit-usage-13",
+      type: "storage-unit-usage",
+      wellRow: "C",
+      wellColumn: 3,
+      cellNumber: 13
+    }
   },
   {
     id: "d39a3180-9712-4aa2-966a-fd17092a00bc",
@@ -224,10 +276,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "C",
-    wellColumn: 4,
-    cellNumber: 14,
-    result: "Multiple Bands"
+    result: "Multiple Bands",
+    storageUnitUsage: {
+      id: "storage-unit-usage-14",
+      type: "storage-unit-usage",
+      wellRow: "C",
+      wellColumn: 4,
+      cellNumber: 14
+    }
   },
   {
     id: "9feb1c1d-2dbd-457c-9dd6-c971f290f891",
@@ -239,10 +295,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "C",
-    wellColumn: 5,
-    cellNumber: 15,
-    result: "Multiple Bands"
+    result: "Multiple Bands",
+    storageUnitUsage: {
+      id: "storage-unit-usage-15",
+      type: "storage-unit-usage",
+      wellRow: "C",
+      wellColumn: 5,
+      cellNumber: 15
+    }
   },
   {
     id: "354777cd-1454-4d54-bef0-06cc5ef69d6c",
@@ -254,10 +314,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "D",
-    wellColumn: 1,
-    cellNumber: 16,
-    result: "Contaminated"
+    result: "Contaminated",
+    storageUnitUsage: {
+      id: "storage-unit-usage-16",
+      type: "storage-unit-usage",
+      wellRow: "D",
+      wellColumn: 1,
+      cellNumber: 16
+    }
   },
   {
     id: "3c30eb8c-7957-41ce-ab63-ce12d72987a4",
@@ -269,10 +333,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "D",
-    wellColumn: 2,
-    cellNumber: 17,
-    result: "Contaminated"
+    result: "Contaminated",
+    storageUnitUsage: {
+      id: "storage-unit-usage-17",
+      type: "storage-unit-usage",
+      wellRow: "D",
+      wellColumn: 2,
+      cellNumber: 17
+    }
   },
   {
     id: "59d9c186-ae28-4acd-abc9-bb908ac7afc9",
@@ -284,10 +352,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "D",
-    wellColumn: 3,
-    cellNumber: 18,
-    result: "Contaminated"
+    result: "Contaminated",
+    storageUnitUsage: {
+      id: "storage-unit-usage-18",
+      type: "storage-unit-usage",
+      wellRow: "D",
+      wellColumn: 3,
+      cellNumber: 18
+    }
   },
   {
     id: "449e2f3f-6088-4003-be24-0471c605faab",
@@ -299,10 +371,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "D",
-    wellColumn: 4,
-    cellNumber: 19,
-    result: "Contaminated"
+    result: "Contaminated",
+    storageUnitUsage: {
+      id: "storage-unit-usage-19",
+      type: "storage-unit-usage",
+      wellRow: "D",
+      wellColumn: 4,
+      cellNumber: 19
+    }
   },
   {
     id: "cb94ebd1-9a4b-4c86-ba0d-483ff88d1268",
@@ -314,10 +390,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "D",
-    wellColumn: 5,
-    cellNumber: 20,
-    result: "Contaminated"
+    result: "Contaminated",
+    storageUnitUsage: {
+      id: "storage-unit-usage-20",
+      type: "storage-unit-usage",
+      wellRow: "D",
+      wellColumn: 5,
+      cellNumber: 20
+    }
   },
   {
     id: "9a84a5fa-3f53-4fa6-93e2-4beebbf49474",
@@ -329,10 +409,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "E",
-    wellColumn: 1,
-    cellNumber: 21,
-    result: "Smear"
+    result: "Smear",
+    storageUnitUsage: {
+      id: "storage-unit-usage-21",
+      type: "storage-unit-usage",
+      wellRow: "E",
+      wellColumn: 1,
+      cellNumber: 21
+    }
   },
   {
     id: "c02befb4-2b08-4450-b5b9-cf5efaffadd2",
@@ -344,10 +428,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "E",
-    wellColumn: 2,
-    cellNumber: 22,
-    result: "Smear"
+    result: "Smear",
+    storageUnitUsage: {
+      id: "storage-unit-usage-22",
+      type: "storage-unit-usage",
+      wellRow: "E",
+      wellColumn: 2,
+      cellNumber: 22
+    }
   },
   {
     id: "53393f5b-6ab7-4774-8ecd-3db660f443ac",
@@ -359,10 +447,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "E",
-    wellColumn: 3,
-    cellNumber: 23,
-    result: "Smear"
+    result: "Smear",
+    storageUnitUsage: {
+      id: "storage-unit-usage-23",
+      type: "storage-unit-usage",
+      wellRow: "E",
+      wellColumn: 3,
+      cellNumber: 23
+    }
   },
   {
     id: "d3f5ef2f-4c0d-44ae-a57a-ff365c492cb5",
@@ -374,10 +466,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "E",
-    wellColumn: 4,
-    cellNumber: 24,
-    result: "Smear"
+    result: "Smear",
+    storageUnitUsage: {
+      id: "storage-unit-usage-24",
+      type: "storage-unit-usage",
+      wellRow: "E",
+      wellColumn: 4,
+      cellNumber: 24
+    }
   },
   {
     id: "ed282ffc-7329-4624-9de4-d778edd04b76",
@@ -389,10 +485,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "E",
-    wellColumn: 5,
-    cellNumber: 25,
-    result: "Smear"
+    result: "Smear",
+    storageUnitUsage: {
+      id: "storage-unit-usage-25",
+      type: "storage-unit-usage",
+      wellRow: "E",
+      wellColumn: 5,
+      cellNumber: 25
+    }
   },
   {
     id: "968e4cf9-3504-4d11-851e-e70f55448c45",
@@ -404,10 +504,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "F",
-    wellColumn: 1,
-    cellNumber: 26,
-    result: "Custom Result"
+    result: "Custom Result",
+    storageUnitUsage: {
+      id: "storage-unit-usage-26",
+      type: "storage-unit-usage",
+      wellRow: "F",
+      wellColumn: 1,
+      cellNumber: 26
+    }
   },
   {
     id: "976560dd-efe9-4275-8c03-6d11606107f7",
@@ -419,10 +523,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "F",
-    wellColumn: 2,
-    cellNumber: 27,
-    result: ""
+    result: "",
+    storageUnitUsage: {
+      id: "storage-unit-usage-27",
+      type: "storage-unit-usage",
+      wellRow: "F",
+      wellColumn: 2,
+      cellNumber: 27
+    }
   },
   {
     id: "4d06a453-e650-46dc-9b05-d2f6a83634c6",
@@ -434,10 +542,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "F",
-    wellColumn: 3,
-    cellNumber: 28,
-    result: ""
+    result: "",
+    storageUnitUsage: {
+      id: "storage-unit-usage-28",
+      type: "storage-unit-usage",
+      wellRow: "F",
+      wellColumn: 3,
+      cellNumber: 28
+    }
   },
   {
     id: "f3d5f888-5a74-45bf-9663-495809da7346",
@@ -449,10 +561,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "F",
-    wellColumn: 4,
-    cellNumber: 29,
-    result: ""
+    result: "",
+    storageUnitUsage: {
+      id: "storage-unit-usage-29",
+      type: "storage-unit-usage",
+      wellRow: "F",
+      wellColumn: 4,
+      cellNumber: 29
+    }
   },
   {
     id: "763cce36-9ac0-461c-a833-eb94cc77bd54",
@@ -464,10 +580,14 @@ export const PCR_BATCH_ITEMS: PcrBatchItem[] = [
     createdBy: "dina-admin",
     createdOn: "2023-04-20T12:51:39.770718Z",
     group: "aafc",
-    wellRow: "F",
-    wellColumn: 5,
-    cellNumber: 30,
-    result: ""
+    result: "",
+    storageUnitUsage: {
+      id: "storage-unit-usage-30",
+      type: "storage-unit-usage",
+      wellRow: "F",
+      wellColumn: 5,
+      cellNumber: 30
+    }
   }
 ];
 

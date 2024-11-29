@@ -26,7 +26,6 @@ import {
 import { FilterForm } from "./FilterForm";
 import { ColumnSort, SortingState } from "@tanstack/react-table";
 import { FreeTextFilterForm } from "./FreeTextFilterForm";
-import { number } from "mathjs";
 
 export enum ListLayoutFilterType {
   FREE_TEXT = "FREE_TEXT",
@@ -99,7 +98,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   const [defaultPageSize, setDefaultPageSize] =
     useLocalStorage<number>(tablePageSizeKey);
 
-  let filterParam: FilterParam | undefined = undefined;
+  let filterParam: FilterParam | undefined;
   let inMemoryFilter:
     | ((
         value: PersistedResource<TData>,
@@ -151,7 +150,7 @@ export function ListPageLayout<TData extends KitsuResource>({
     CheckBoxHeader,
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
-    fieldName: "selectedResources"
+    fieldName: "itemIdsToSelect"
   });
 
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
@@ -217,11 +216,12 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   return (
     <div>
-      {filterAttributes && filterType === ListLayoutFilterType.FILTER_BUILDER && (
-        <FilterForm filterAttributes={filterAttributes} id={id}>
-          {filterFormchildren}
-        </FilterForm>
-      )}
+      {filterAttributes &&
+        filterType === ListLayoutFilterType.FILTER_BUILDER && (
+          <FilterForm filterAttributes={filterAttributes} id={id}>
+            {filterFormchildren}
+          </FilterForm>
+        )}
       {filterAttributes && filterType === ListLayoutFilterType.FREE_TEXT && (
         <FreeTextFilterForm filterAttributes={filterAttributes} id={id}>
           {filterFormchildren}

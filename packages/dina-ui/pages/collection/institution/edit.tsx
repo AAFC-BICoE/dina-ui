@@ -4,6 +4,7 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
+  MultilingualDescription,
   SelectOption,
   SubmitButton,
   TextField,
@@ -14,7 +15,7 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import { toPairs, fromPairs } from "lodash";
 import { useRouter } from "next/router";
-import { Head, Nav, IdentifierFields } from "../../../components";
+import { Head, Nav, IdentifierFields, Footer } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Institution } from "../../../types/collection-api";
 import { Field } from "formik";
@@ -43,7 +44,7 @@ export default function InstitutionEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container">
+      <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
@@ -54,7 +55,8 @@ export default function InstitutionEditPage() {
         ) : (
           <InstitutionForm onSaved={goToViewPage} />
         )}
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }
@@ -111,12 +113,16 @@ export function InstitutionForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={institution?.id}
-          entityLink="/collection/institution"
-        />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={institution?.id}
+            entityLink="/collection/institution"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <InstitutionFormLayout />
     </DinaForm>
@@ -139,22 +145,7 @@ export function InstitutionFormLayout() {
       <div className="row">
         <TextField className="col-md-6" name="name" />
       </div>
-      <div className="row">
-        <TextField
-          className="english-description"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="french-description"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
       <div className="row">
         <TextField className="col-md-6" name="webpage" />
         <TextField className="col-md-6" name="address" multiLines={true} />

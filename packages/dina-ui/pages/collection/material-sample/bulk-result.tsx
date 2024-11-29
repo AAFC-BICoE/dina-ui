@@ -9,7 +9,7 @@ import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import { Nav } from "../../../components/button-bar/nav/nav";
+import { Footer, Nav } from "../../../components/button-bar/nav/nav";
 import { Head } from "../../../components/head";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
@@ -46,11 +46,13 @@ export default function MaterialSampleBulkResult() {
   return (
     <div>
       <Head title={formatMessage("bulkOperationCompleteTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
       <ButtonBar>
-        <BackToListButton entityLink="/collection/material-sample" />
+        <div className="flex d-flex">
+          <BackToListButton entityLink="/collection/material-sample" />
+        </div>
       </ButtonBar>
-      <main className="container ">
+      <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage("bulkOperationCompleteTitle")}</h1>
         <div>
           <h3>{formatMessage("results")}:</h3>
@@ -99,6 +101,7 @@ export default function MaterialSampleBulkResult() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

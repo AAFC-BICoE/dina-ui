@@ -5,6 +5,38 @@ import PreparationTypeEditPage, {
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
 
+const INSTANCE_DATA = {
+  data: {
+    "instance-mode": "developer",
+    "supported-languages-iso": "en,fr"
+  },
+  status: 200,
+  statusText: "",
+  headers: {
+    "content-length": "99",
+    "content-type": "text/plain; charset=utf-8",
+    date: "Tue, 09 Jan 2024 17:03:48 GMT"
+  },
+  config: {
+    url: "/instance.json",
+    method: "get",
+    headers: {
+      Accept: "application/json, text/plain, */*"
+    },
+    transformRequest: [null],
+    transformResponse: [null],
+    timeout: 0,
+    xsrfCookieName: "XSRF-TOKEN",
+    xsrfHeaderName: "X-XSRF-TOKEN",
+    maxContentLength: -1
+  },
+  request: {}
+};
+
+const mockGetAxios = jest.fn(async (_path) => {
+  return INSTANCE_DATA;
+});
+
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
@@ -40,7 +72,7 @@ const mockGet = jest.fn(async (path) => {
 // Mock API requests:
 const mockPatch = jest.fn();
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: { get: mockGet, axios: { patch: mockPatch, get: mockGetAxios } }
 };
 
 describe("preparation-type edit page", () => {
@@ -74,7 +106,7 @@ describe("preparation-type edit page", () => {
       }
     });
 
-    wrapper.find(".english-description textarea").simulate("change", {
+    wrapper.find(".en-description textarea").simulate("change", {
       target: { value: "test english description" }
     });
 
@@ -124,11 +156,14 @@ describe("preparation-type edit page", () => {
       { apiContext }
     );
 
-    expect(wrapper.find(".english-description textarea").prop("value")).toEqual(
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".en-description textarea").prop("value")).toEqual(
       "test english description"
     );
 
-    wrapper.find(".french-description textarea").simulate("change", {
+    wrapper.find(".fr-description textarea").simulate("change", {
       target: { value: "test french description" }
     });
 

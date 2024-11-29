@@ -12,17 +12,26 @@ export function useMetadataThumbnailPath<TData extends KitsuResource>(
     original as any,
     "data.attributes.originalFileName"
   );
-  let derivatives: any[] | undefined = (original as any)?.included?.derivative;
-  let thumbnailDerivative = derivatives?.find(
-    (derivative) => derivative.attributes.derivativeType === "THUMBNAIL_IMAGE"
-  );
+  let derivatives: any[] | any | undefined = (original as any)?.included
+    ?.derivatives;
+  let thumbnailDerivative;
+  if (Array.isArray(derivatives)) {
+    thumbnailDerivative = derivatives?.find(
+      (derivative) => derivative.attributes.derivativeType === "THUMBNAIL_IMAGE"
+    );
+  } else {
+    if (derivatives?.attributes?.derivativeType === "THUMBNAIL_IMAGE") {
+      thumbnailDerivative = derivatives;
+    }
+  }
+
   let filePath = thumbnailDerivative
     ? `/objectstore-api/file/${bucket}/derivative/${thumbnailDerivative.attributes.fileIdentifier}`
     : "";
   let resourceExternalURL = (original as any)?.data?.attributes
     ?.resourceExternalURL;
   let hasExternalResourceDerivative =
-    resourceExternalURL && (original as any)?.included?.derivative;
+    resourceExternalURL && (original as any)?.included?.derivatives;
   if (isJsonApiQuery) {
     acCaption = get(original as any, "metadata.acCaption");
     originalFileName = get(original as any, "metadata.originalFileName");
@@ -38,7 +47,7 @@ export function useMetadataThumbnailPath<TData extends KitsuResource>(
     resourceExternalURL = (original as any)?.data?.attributes
       ?.resourceExternalURL;
     hasExternalResourceDerivative =
-      resourceExternalURL && (original as any)?.included?.derivative;
+      resourceExternalURL && (original as any)?.included?.derivatives;
   }
   const altImage = acCaption ? acCaption : originalFileName;
   return {

@@ -2,13 +2,12 @@ import { KitsuResource } from "kitsu";
 import { PcrBatchItem } from "./PcrBatchItem";
 import { PcrPrimer } from "./PcrPrimer";
 import { SeqBatch } from "./SeqBatch";
+import { StorageUnitUsage } from "../../collection-api/resources/StorageUnitUsage";
+import { MolecularAnalysisRunItem } from "./MolecularAnalysisRunItem";
 
 export interface SeqReactionAttributes {
   type: "seq-reaction";
   group?: string;
-  wellColumn?: number;
-  wellRow?: string;
-  cellNumber?: number;
   createdBy?: string;
   createdOn?: string;
 }
@@ -17,6 +16,8 @@ export interface SeqReactionRelationships {
   seqBatch?: SeqBatch;
   pcrBatchItem?: PcrBatchItem;
   seqPrimer?: PcrPrimer;
+  storageUnitUsage?: StorageUnitUsage;
+  molecularAnalysisRunItem?: MolecularAnalysisRunItem;
 }
 
 export type SeqReaction = KitsuResource &

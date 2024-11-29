@@ -164,7 +164,7 @@ export function RevisionsPageLayout({
                 </div>
               );
             },
-            defaultSorted: [],
+            sort: [],
             // Revisions are not sortable, they are pre-sorted by commit datetime.
             enableSorting: false,
             className: "no-hover-highlight"
@@ -206,7 +206,7 @@ export function RevisionsPage({
   const resource = query?.response?.data;
 
   const pageTitle = formatMessage("revisionsListTitle", {
-    name: get(resource, nameField) ?? resource?.id
+    name: get(resource, nameField) ?? id
   });
   if (query?.loading) {
     return <LoadingSpinner loading={true} />;
@@ -214,20 +214,21 @@ export function RevisionsPage({
   return (
     <>
       <Head title={pageTitle} />
-      <Nav />
-      <main className="container-fluid px-5">
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <Link
+          href={`${detailsPageLink}/${
+            isExternalResourceMetadata ? "external-resource-view" : "view"
+          }?id=${id}`}
+        >
+          <a className="back-button my-auto me-auto mt-2">
+            <DinaMessage id="detailsPageLink" />
+          </a>
+        </Link>
+      </ButtonBar>
+
+      <main className="container-fluid">
         <h1 id="wb-cont">{pageTitle}</h1>
-        <ButtonBar>
-          <Link
-            href={`${detailsPageLink}/${
-              isExternalResourceMetadata ? "external-resource-view" : "view"
-            }?id=${resource?.id}`}
-          >
-            <a className="back-button my-auto me-auto">
-              <DinaMessage id="detailsPageLink" />
-            </a>
-          </Link>
-        </ButtonBar>
         <RevisionsPageLayout
           auditSnapshotPath={auditSnapshotPath}
           instanceId={`${resourceType}/${id}`}

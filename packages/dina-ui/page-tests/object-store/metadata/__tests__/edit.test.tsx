@@ -140,7 +140,7 @@ describe("Metadata single record edit page.", () => {
     ]);
     wrapper
       .find(".managed-attributes-editor input")
-      .last()
+      .first()
       .simulate("change", {
         target: {
           value: "new-managed-attribute-value"

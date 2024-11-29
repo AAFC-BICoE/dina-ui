@@ -4,7 +4,7 @@ import AutoSuggest, { InputProps } from "react-autosuggest";
 import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import { noop } from "lodash";
-import { useAccount } from "common-ui/lib";
+import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 
 interface QueryBuilderAutoSuggestionTextSearchProps {
   /**
@@ -48,7 +48,9 @@ function QueryBuilderAutoSuggestionTextSearch({
   indexMap
 }: QueryBuilderAutoSuggestionTextSearchProps) {
   const { formatMessage } = useIntl();
-  const { groupNames } = useAccount();
+
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
 
   // Index settings for the field currently selected.
   const [fieldSettings, setFieldSettings] = useState<
@@ -65,7 +67,6 @@ function QueryBuilderAutoSuggestionTextSearch({
   // Retrieve the suggestions using elastic search. Only updates if the field/group change.
   const suggestions = useElasticSearchDistinctTerm({
     fieldName,
-    groups: groupNames ?? [],
     relationshipType: fieldSettings?.parentType,
     indexName,
     keywordMultiFieldSupport: fieldSettings?.keywordMultiFieldSupport ?? false
@@ -101,7 +102,8 @@ function QueryBuilderAutoSuggestionTextSearch({
     autoComplete: "none",
     className: "form-control",
     onFocus: () => setFocus(true),
-    onBlur: () => setFocus(false)
+    onBlur: () => setFocus(false),
+    onKeyDown
   };
 
   // Filter the suggestion list based on the value.
@@ -165,6 +167,17 @@ function QueryBuilderAutoSuggestionTextSearch({
             />
           </div>
         </>
+      )}
+      {(matchType === "in" || matchType === "notIn") && (
+        <input
+          type="text"
+          value={value ?? ""}
+          onChange={(newValue) => setValue?.(newValue?.target?.value)}
+          className="form-control"
+          placeholder={formatMessage({
+            id: "queryBuilder_value_in_placeholder"
+          })}
+        />
       )}
     </>
   );

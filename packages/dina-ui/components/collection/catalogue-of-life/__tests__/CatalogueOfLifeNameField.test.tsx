@@ -1,7 +1,9 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { CatalogueOfLifeNameField } from "../CatalogueOfLifeNameField";
 import { NameUsageSearchResult } from "../nameusage-types";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockOnChange = jest.fn((val, form) =>
   form.setFieldValue("scientificNameSource", val ? "COLPLUS" : null)
@@ -17,7 +19,7 @@ describe("CatalogueOfLifeNameField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Sets a value from the Catalogue of Life API.", async () => {
-    const wrapper = mountWithAppContext(
+    const { container } = mountWithAppContext2(
       <DinaForm
         initialValues={{ scientificName: "", scientificNameSource: null }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -32,24 +34,29 @@ describe("CatalogueOfLifeNameField component", () => {
       </DinaForm>
     );
 
-    wrapper
-      .find("input.col-search-input")
-      // The whitespace should be trimmed:
-      .simulate("change", { target: { value: "  Poa muralis  " } });
+    const input = screen.getByRole("textbox"); // Assuming the input has role "textbox"
+    fireEvent.change(input, { target: { value: "  Poa muralis  " } });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.col-search-button").simulate("click");
+    const searchButton = screen.getByRole("button", { name: /search/i });
+    fireEvent.click(searchButton);
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    await waitFor(() => {
+      expect(
+        screen.getByRole("link", {
+          name: /poa muralis honck\./i
+        })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", {
+          name: /poa muralis wibel, nom\. illeg\./i
+        })
+      ).toBeInTheDocument();
+    });
 
-    expect(
-      wrapper.find(".col-search-result-label").map((node) => node.text())
-    ).toEqual(["Poa muralis Honck.", "Poa muralis Wibel, nom. illeg."]);
-
-    wrapper.find("button.col-name-select-button").at(1).simulate("click");
+    const selectButton = screen.getAllByRole("button", { name: /select/i });
+    fireEvent.click(selectButton[1]);
 
     expect(mockOnChange).toBeCalledTimes(2);
 
@@ -68,34 +75,33 @@ describe("CatalogueOfLifeNameField component", () => {
         expect.anything()
       ]
     ]);
+
     // The whitespace for the query string should be trimmed:
     expect(mockFetchJson).lastCalledWith(
       "https://api.catalogueoflife.org/dataset/2328/nameusage?q=Poa+muralis"
     );
 
-    wrapper.update();
+    const form = container.querySelector("form");
+    fireEvent.submit(form!);
 
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(mockOnSubmit).lastCalledWith({
-      scientificName: "Poa muralis Wibel, nom. illeg.",
-      scientificNameSource: "COLPLUS"
+    await waitFor(() => {
+      expect(mockOnSubmit).lastCalledWith({
+        scientificName: "Poa muralis Wibel, nom. illeg.",
+        scientificNameSource: "COLPLUS"
+      });
     });
 
     // Remove the name:
-    wrapper.find("button.remove-button").simulate("click");
+    const removeButton = screen.getByRole("button", { name: /remove/i });
+    fireEvent.click(removeButton);
     expect(mockOnChange).lastCalledWith(null, expect.anything());
-    wrapper.find("form").simulate("submit");
+    fireEvent.submit(form!);
 
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(mockOnSubmit).lastCalledWith({
-      scientificName: null,
-      scientificNameSource: null
+    await waitFor(() => {
+      expect(mockOnSubmit).lastCalledWith({
+        scientificName: null,
+        scientificNameSource: null
+      });
     });
   });
 });

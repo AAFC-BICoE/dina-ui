@@ -21,7 +21,15 @@ export function NavbarUserControl() {
 
               {/* Profile Link */}
               <span className="me-4 my-auto h5">
-                <Link href={`/dina-user/view?id=${subject}`}>
+                <Link
+                  href={{
+                    pathname: `/dina-user/view`,
+                    query: {
+                      id: subject,
+                      hideBackButton: true
+                    }
+                  }}
+                >
                   <a>{username}</a>
                 </Link>
               </span>

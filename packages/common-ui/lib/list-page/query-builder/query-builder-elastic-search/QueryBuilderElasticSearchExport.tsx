@@ -1,8 +1,16 @@
 import { ColumnSort } from "@tanstack/react-table";
 import { KitsuResource } from "kitsu";
-import { isEmpty, reject, uniq } from "lodash";
+import { isEmpty, reject, uniq, compact } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { TableColumn } from "../../types";
+import {
+  SupportedBetweenTypes,
+  convertStringToBetweenState
+} from "../query-builder-core-components/useQueryBetweenSupport";
+import {
+  buildDateRangeObject,
+  getTimezone
+} from "../query-builder-value-types/QueryBuilderDateSearch";
 
 export interface ElasticSearchFormatExportProps<TData extends KitsuResource> {
   /**
@@ -192,9 +200,8 @@ export function applySortingRules<TData extends KitsuResource>(
   columns: TableColumn<TData>[]
 ) {
   if (sortingRules && sortingRules.length > 0) {
-    const sortingQueries = Object.assign(
-      {},
-      ...sortingRules.map((columnSort) => {
+    const sortingQueries = compact(
+      sortingRules.map((columnSort) => {
         const columnDefinition = columns.find((column) => {
           // Depending on if it's a string or not.
           if (typeof column === "string") {
@@ -203,7 +210,11 @@ export function applySortingRules<TData extends KitsuResource>(
 
           // Otherwise, check if sorting is enabled for the column and matches.
           if (column.enableSorting !== false) {
-            return column.id === columnSort.id;
+            if (column.id) {
+              return column.id === columnSort.id;
+            } else {
+              return (column as any).accessorKey.endsWith(columnSort.id);
+            }
           }
           return false;
         });
@@ -251,7 +262,7 @@ export function applySortingRules<TData extends KitsuResource>(
                 filter: {
                   term: {
                     "included.type": columnDefinition.relationshipType
-                  }                  
+                  }
                 }
               }
             }
@@ -298,6 +309,7 @@ export function applySourceFiltering<TData extends KitsuResource>(
   const sourceFilteringColumns: string[] = [
     "data.id",
     "data.type",
+    "data.relationships",
     ...columns
       .map((column) => {
         const accessors: string[] = [];
@@ -397,6 +409,70 @@ export function applyRootQuery(elasticSearchQuery: any) {
   };
 }
 
+/**
+ * This function is responsible for taking the elastic search results can converting it to something
+ * the display table can read.
+ *
+ * The included section will be added as an object unless it's a to-many relationship, then it's
+ * transfered to an array.
+ *
+ * @param results Elasticsearch JSON result
+ */
+export function processResults(result: any) {
+  return result?.hits.map((rslt) => {
+    return {
+      id: rslt._source?.data?.id,
+      type: rslt._source?.data?.type,
+      data: {
+        attributes: rslt._source?.data?.attributes,
+        relationships: rslt._source?.data?.relationships
+      },
+      included: rslt._source?.included?.reduce(
+        (includedAccumulator, currentIncluded) => {
+          const relationships = rslt._source?.data?.relationships ?? {};
+          const currentID = currentIncluded?.id;
+          const relationshipKeys = Object.keys(relationships).filter((key) => {
+            const relationshipData = relationships[key].data;
+            return Array.isArray(relationshipData)
+              ? relationshipData.some((item) => item.id === currentID)
+              : relationshipData?.id === currentID;
+          });
+
+          relationshipKeys.forEach((key) => {
+            if (!includedAccumulator[key]) {
+              if (Array.isArray(relationships[key].data)) {
+                // if true, always use an array.
+                includedAccumulator[key] = [currentIncluded];
+              } else {
+                // false is only use an object.
+                includedAccumulator[key] = currentIncluded;
+              }
+            } else {
+              // Found again, treat it as an array.
+              if (
+                typeof includedAccumulator[key] !== "object" ||
+                !Array.isArray(includedAccumulator[key])
+              ) {
+                // Convert it to an array from an object.
+                includedAccumulator[key] = [
+                  includedAccumulator[key],
+                  currentIncluded
+                ];
+              } else {
+                // Already an array, push the new one into it.
+                includedAccumulator[key].push(currentIncluded);
+              }
+            }
+          });
+
+          return includedAccumulator;
+        },
+        {}
+      )
+    };
+  });
+}
+
 // If it's a relationship search, ensure that the included type is being filtered out.
 export function includedTypeQuery(parentType: string): any {
   return {
@@ -417,6 +493,192 @@ export function termQuery(
       [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: matchValue
     }
   };
+}
+
+// Multi-search exact matches (Non-text based) (in/not in)
+export function inQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,
+  keywordMultiFieldSupport: boolean,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+    .map((value) => value.trim())
+    .filter((value) => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    [not ? "must_not" : "must"]: {
+                      terms: {
+                        [fieldName +
+                        (keywordMultiFieldSupport ? ".keyword" : "")]:
+                          matchValuesArray
+                      }
+                    }
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        bool: {
+          [not ? "must_not" : "must"]: {
+            terms: {
+              [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]:
+                matchValuesArray
+            }
+          }
+        }
+      };
+}
+
+// Multi-search exact matches (case-insensitive) (in/not in)
+export function inTextQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,
+  keywordMultiFieldSupport: boolean,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+    .map((value) => value.trim())
+    .filter((value) => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    [not ? "must_not" : "must"]: {
+                      bool: {
+                        should: matchValuesArray.map((value) => ({
+                          term: {
+                            [fieldName +
+                            (keywordMultiFieldSupport ? ".keyword" : "")]: {
+                              value,
+                              case_insensitive: true
+                            }
+                          }
+                        })),
+                        minimum_should_match: 1
+                      }
+                    }
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        bool: {
+          [not ? "must_not" : "must"]: {
+            bool: {
+              should: matchValuesArray.map((value) => ({
+                term: {
+                  [fieldName + (keywordMultiFieldSupport ? ".keyword" : "")]: {
+                    value,
+                    case_insensitive: true
+                  }
+                }
+              })),
+              minimum_should_match: 1
+            }
+          }
+        }
+      };
+}
+
+// Multi-search exact date matches (case-insensitive) (in/not in)
+export function inDateQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,
+  subType: string | undefined,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (matchValues?.split(",") ?? [matchValues])
+    .map((value) => value.trim())
+    .filter((value) => value !== "");
+
+  if (matchValuesArray.length === 0) {
+    return {};
+  }
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    [not ? "must_not" : "must"]: [
+                      {
+                        bool: {
+                          should: matchValuesArray.map((value) => ({
+                            bool: {
+                              must: [
+                                rangeQuery(
+                                  fieldName,
+                                  buildDateRangeObject("equals", value, subType)
+                                ),
+                                includedTypeQuery(parentType)
+                              ]
+                            }
+                          })),
+                          minimum_should_match: 1
+                        }
+                      }
+                    ]
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        bool: {
+          [not ? "must_not" : "must"]: {
+            bool: {
+              should: matchValuesArray.map((value) => {
+                return rangeQuery(
+                  fieldName,
+                  buildDateRangeObject("equals", value, subType)
+                );
+              }),
+              minimum_should_match: 1
+            }
+          }
+        }
+      };
 }
 
 // Query used for wildcard searches (contains).
@@ -451,6 +713,59 @@ export function rangeQuery(fieldName: string, rangeOptions: any): any {
       [fieldName]: rangeOptions
     }
   };
+}
+
+// Query for generating ranges to search multiple different values.
+// Range is used to ignore the time so it can just search for that specific days.
+export function inRangeQuery(
+  fieldName: string,
+  matchValues: string,
+  parentType: string | undefined,
+  not: boolean
+): any {
+  const matchValuesArray: string[] = (
+    matchValues?.split(",") ?? [matchValues]
+  ).map((value) => value.trim());
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  bool: {
+                    [not ? "should_not" : "should"]: matchValuesArray.map(
+                      (date) => ({
+                        range: {
+                          [fieldName]: {
+                            gte: date,
+                            lte: date
+                          }
+                        }
+                      })
+                    )
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        bool: {
+          [not ? "should_not" : "should"]: matchValuesArray.map((date) => ({
+            range: {
+              [fieldName]: {
+                gte: date,
+                lte: date
+              }
+            }
+          }))
+        }
+      };
 }
 
 // Query used for prefix partial matches
@@ -579,7 +894,7 @@ export function suffixQuery(
     : {
         prefix: {
           [fieldName + ".prefix_reverse"]: matchValue
-}
+        }
       };
 }
 
@@ -593,6 +908,79 @@ export function uuidQuery(uuids: string[]) {
       terms: {
         "data.id": uuids
       }
+    }
+  };
+}
+
+/**
+ * Generate a range query for getting all the values between two numbers.
+ *
+ * @param fieldName Fieldname path for the elastic search query.
+ * @param value String containing the low and high values represented as a JSON.
+ * @param parentType Determines if the query should be nested or not.
+ * @param type If being done on a text field, a specific field should be used. (keyword_numeric)
+ * @param subType Only applicable for date type, determines if timezone should be included or not.
+ */
+export function betweenQuery(
+  fieldName: string,
+  value: string,
+  parentType: string | undefined,
+  type: SupportedBetweenTypes,
+  subType?: string | undefined
+) {
+  const betweenStates = convertStringToBetweenState(value);
+
+  // Ignore empty between dates.
+  if (betweenStates.high === "" || betweenStates.low === "") {
+    return {};
+  }
+
+  const timezone =
+    type === "date"
+      ? subType !== "local_date" && subType !== "local_date_time"
+        ? getTimezone()
+        : undefined
+      : undefined;
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  range: {
+                    [fieldName + (type === "text" ? ".keyword_numeric" : "")]: {
+                      ...timezone,
+                      gte:
+                        type === "number"
+                          ? Number(betweenStates.low)
+                          : betweenStates.low,
+                      lte:
+                        type === "number"
+                          ? Number(betweenStates.high)
+                          : betweenStates.high
+                    }
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        range: {
+          [fieldName + (type === "text" ? ".keyword_numeric" : "")]: {
+            ...timezone,
+            gte:
+              type === "number" ? Number(betweenStates.low) : betweenStates.low,
+            lte:
+              type === "number"
+                ? Number(betweenStates.high)
+                : betweenStates.high
+          }
         }
       };
 }

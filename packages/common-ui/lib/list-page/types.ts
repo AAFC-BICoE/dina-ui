@@ -42,6 +42,18 @@ export type TableColumn<TData extends KitsuResource> = ColumnDef<TData> & {
   additionalAccessors?: string[];
 
   isColumnVisible?: boolean;
+
+  queryOption?: any;
+
+  /**
+   * Used for storing the column selector string, for local storage purposes.
+   */
+  columnSelectorString?: string;
+
+  /**
+   * Used for the column exporter to allow the user to
+   */
+  exportHeader?: string;
 };
 
 /**
@@ -69,6 +81,11 @@ export interface ESIndexMapping {
    * Example: determination.verbatimScientificName
    */
   label: string;
+
+  /**
+   * Determines if the field should be displayed on the field selector.
+   */
+  hideField: boolean;
 
   /**
    * The attributes type. This can change how the query row is displayed and the options provided.
@@ -134,6 +151,12 @@ export interface ESIndexMapping {
    * version if required.
    */
   keywordMultiFieldSupport: boolean;
+
+  /**
+   * Attribute contains a "keyword_numeric" field. If true, this will enable the "Between" operator
+   * for text types.
+   */
+  keywordNumericSupport: boolean;
 
   /**
    * The path for the attribute without the attribute name. This path does not include the parent
@@ -219,9 +242,24 @@ export interface TransformToDSLProps {
    * The elastic search mapping for the field.
    */
   fieldInfo?: ESIndexMapping;
+
+  /**
+   * All elastic search mapping fields. Used for managed attributes/field extensions.
+   */
+  indexMap?: ESIndexMapping[];
 }
 
-export type DynamicFieldType = "managedAttribute" | "fieldExtension";
+/**
+ * Dynamic field types supported by the Query Builder.
+ *
+ * "unsupported" will just hide the options without generating the single option.
+ */
+export type DynamicFieldType =
+  | "unsupported"
+  | "managedAttribute"
+  | "fieldExtension"
+  | "identifier"
+  | "relationshipPresence";
 
 export interface DynamicFieldsMappingConfig {
   /** Attribute level dynamic fields */

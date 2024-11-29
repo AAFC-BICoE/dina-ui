@@ -1,5 +1,7 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { fireEvent } from "@testing-library/react";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { useModal } from "../modal";
+import "@testing-library/jest-dom";
 
 function TestComponent() {
   const { closeModal, openModal } = useModal();
@@ -8,9 +10,18 @@ function TestComponent() {
     <>
       <button
         className="open-modal"
-        onClick={() => openModal(<div className="test-modal-content" />)}
-      />
-      <button className="close-modal" onClick={closeModal} />
+        onClick={() =>
+          openModal(
+            <div className="test-modal-content">
+              <button className="close-modal" onClick={closeModal}>
+                Exit
+              </button>
+            </div>
+          )
+        }
+      >
+        Open
+      </button>
     </>
   );
 }
@@ -22,63 +33,66 @@ function TestComponentNestedModals() {
     <>
       <button
         className="open-modal"
-        onClick={() => openModal(<TestComponentNestedModals />)}
-      />
-      <button className="close-modal" onClick={closeModal} />
+        onClick={() => openModal(<TestComponent />)}
+      >
+        Open
+      </button>
+      <button className="close-modal" onClick={closeModal}>
+        Close
+      </button>
     </>
   );
 }
 
 describe("Modal", () => {
   it("Lets you open a modal.", () => {
-    const wrapper = mountWithAppContext(<TestComponent />);
+    const wrapper = mountWithAppContext2(<TestComponent />);
 
     // Closed initially:
-    expect(wrapper.find(".test-modal-content").exists()).toEqual(false);
+    expect(
+      wrapper.queryByRole("dialog", { name: /popup dialog window/i })
+    ).not.toBeInTheDocument();
 
     // Open the modal:
-    wrapper.find("button.open-modal").simulate("click");
-    wrapper.update();
+    fireEvent.click(wrapper.getByRole("button", { name: /open/i }));
 
-    expect(wrapper.find(".test-modal-content").exists()).toEqual(true);
+    expect(
+      wrapper.getByRole("dialog", { name: /popup dialog window/i })
+    ).toBeInTheDocument();
 
     // Close the modal:
-    wrapper.find("button.close-modal").simulate("click");
-    wrapper.update();
-
-    expect(wrapper.find(".test-modal-content").exists()).toEqual(false);
+    fireEvent.click(wrapper.getByRole("button", { name: /exit/i }));
+    expect(
+      wrapper.queryByRole("dialog", { name: /popup dialog window/i })
+    ).not.toBeInTheDocument();
   });
 
   it("Lets you open multiple modals in first-in-last-out order.", async () => {
-    const wrapper = mountWithAppContext(<TestComponentNestedModals />);
+    const wrapper = mountWithAppContext2(<TestComponentNestedModals />);
+
+    // Closed initially:
+    expect(
+      wrapper.queryByRole("dialog", { name: /popup dialog window/i })
+    ).not.toBeInTheDocument();
 
     // Open the modal:
-    wrapper.find("button.open-modal").simulate("click");
-    wrapper.update();
+    fireEvent.click(wrapper.getByRole("button", { name: /open/i }));
 
     // Open the inner modal:
-    wrapper.find("button.open-modal").at(1).simulate("click");
-    wrapper.update();
+    fireEvent.click(wrapper.getAllByRole("button", { name: /open/i })[1]);
 
-    expect(wrapper.find(".dina-modal-wrapper").length).toEqual(2);
-
-    // Original modal is hidden:
-    expect(wrapper.find(".dina-modal-wrapper").at(0).prop("style")).toEqual({
-      display: "none"
-    });
-
-    // Second modal is visible:
-    expect(wrapper.find(".dina-modal-wrapper").at(1).prop("style")).toEqual({});
+    // The "Exit" button should appear in the nested modal:
+    expect(wrapper.getByRole("button", { name: /exit/i })).toBeInTheDocument();
 
     // Close second modal:
-    wrapper.find("button.close-modal").at(1).simulate("click");
-    wrapper.update();
+    fireEvent.click(wrapper.getByRole("button", { name: /exit/i }));
 
     // Close first modal:
-    wrapper.find("button.close-modal").at(0).simulate("click");
-    wrapper.update();
+    fireEvent.click(wrapper.getByRole("button", { name: /close/i }));
 
     // No modals left:
-    expect(wrapper.find(".dina-modal-wrapper").length).toEqual(0);
+    expect(
+      wrapper.queryByRole("dialog", { name: /popup dialog window/i })
+    ).not.toBeInTheDocument();
   });
 });

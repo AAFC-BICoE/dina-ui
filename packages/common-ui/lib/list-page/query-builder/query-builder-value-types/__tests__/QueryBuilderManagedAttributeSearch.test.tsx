@@ -2,10 +2,11 @@ import { transformManagedAttributeToDSL } from "../QueryBuilderManagedAttributeS
 
 interface TestValueStructure {
   type: string;
-  testValue: string;
+  testValue: (operator: string) => string;
   operators: string[];
   subTypes: (string | undefined)[];
   useKeywordMultiField: boolean;
+  useKeywordNumericField: boolean;
 }
 
 /**
@@ -20,27 +21,52 @@ describe("QueryBuilderManagedAttributeSearch", () => {
     const testValues: TestValueStructure[] = [
       {
         type: "STRING",
-        testValue: "stringValue",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "stringValue1, stringValue2,stringValue3";
+            case "between":
+              return '{\\"low\\":\\"stringValue1\\",\\"high\\":\\"stringValue3\\"}';
+            default:
+              return "stringValue";
+          }
+        },
         operators: [
           "exactMatch",
           "wildcard",
+          "in",
+          "notIn",
+          "between",
           "startsWith",
           "notEquals",
           "empty",
           "notEmpty"
         ],
-        subTypes: [
-          undefined
-        ],
-        useKeywordMultiField: true
+        subTypes: [undefined],
+        useKeywordMultiField: true,
+        useKeywordNumericField: true
       },
       {
         type: "DATE",
-        testValue: "1998-05-19",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "1998-05-19, 2020-01-01,2024-04-08";
+            case "between":
+              return '{\\"low\\":\\"1998-05-19\\",\\"high\\":\\"2002-02-10\\"}';
+            default:
+              return "1998-05-19";
+          }
+        },
         operators: [
           "equals",
           "notEquals",
           "containsDate",
+          "between",
+          "in",
+          "notIn",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -55,14 +81,28 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "date_time",
           "date_time_optional_tz"
         ],
-        useKeywordMultiField: false
+        useKeywordMultiField: false,
+        useKeywordNumericField: false
       },
       {
         type: "INTEGER",
-        testValue: "42",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "1, 2,4";
+            case "between":
+              return '{\\"low\\":1,\\"high\\":5}';
+            default:
+              return "42";
+          }
+        },
         operators: [
           "equals",
           "notEquals",
+          "in",
+          "notIn",
+          "between",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -70,17 +110,29 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "empty",
           "notEmpty"
         ],
-        subTypes: [
-          undefined
-        ],
-        useKeywordMultiField: false
+        subTypes: [undefined],
+        useKeywordMultiField: false,
+        useKeywordNumericField: false
       },
       {
         type: "DECIMAL",
-        testValue: "3.5",
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "3, 3.1,12.5";
+            case "between":
+              return '{\\"low\\":1.5,\\"high\\":10.5}';
+            default:
+              return "3.5";
+          }
+        },
         operators: [
           "equals",
           "notEquals",
+          "in",
+          "notIn",
+          "between",
           "greaterThan",
           "greaterThanOrEqualTo",
           "lessThan",
@@ -88,28 +140,33 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           "empty",
           "notEmpty"
         ],
-        subTypes: [
-          undefined
-        ],
-        useKeywordMultiField: false
+        subTypes: [undefined],
+        useKeywordMultiField: false,
+        useKeywordNumericField: false
       },
       {
         type: "PICK_LIST",
-        testValue: "3.5",
-        operators: ["equals", "notEquals", "empty", "notEmpty"],
-        subTypes: [
-          undefined
-        ],
-        useKeywordMultiField: true
+        testValue: (operator) => {
+          switch (operator) {
+            case "in":
+            case "notIn":
+              return "option1, option2,option3";
+            default:
+              return "option1";
+          }
+        },
+        operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"],
+        subTypes: [undefined],
+        useKeywordMultiField: true,
+        useKeywordNumericField: false
       },
       {
         type: "BOOL",
-        testValue: "true",
+        testValue: () => "true",
         operators: ["equals", "empty", "notEmpty"],
-        subTypes: [
-          undefined
-        ],
-        useKeywordMultiField: true
+        subTypes: [undefined],
+        useKeywordMultiField: true,
+        useKeywordNumericField: false
       }
     ];
 
@@ -127,9 +184,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                     fieldPath: "", // Not used.
                     operation: "", // Not used.
                     queryType: "", // Not used.
-                    value: `{"searchValue":"${
-                      (testValue as TestValueStructure).testValue
-                    }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
+                    value: `{"searchValue":"${(
+                      testValue as TestValueStructure
+                    ).testValue(
+                      operator
+                    )}","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
                       (testValue as TestValueStructure).type
                     }"}`,
                     fieldInfo: {
@@ -140,17 +199,21 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                         path: "data.attributes.managedAttributes",
                         apiEndpoint: "collection-api/managed-attribute"
                       },
+                      hideField: true,
                       value: "data.attributes.managedAttributes",
                       distinctTerm: false,
                       label: "managedAttributes",
                       path: "data.attributes.managedAttributes",
                       type: "managedAttribute",
-                      keywordMultiFieldSupport: (testValue as TestValueStructure)
-                        .useKeywordMultiField,
+                      keywordMultiFieldSupport: (
+                        testValue as TestValueStructure
+                      ).useKeywordMultiField,
                       optimizedPrefix: false,
                       containsSupport: false,
                       endsWithSupport: false,
-                      subType: subType
+                      keywordNumericSupport: (testValue as TestValueStructure)
+                        .useKeywordNumericField,
+                      subType
                     }
                   })
                 ).toMatchSnapshot();
@@ -170,9 +233,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                     fieldPath: "", // Not used.
                     operation: "", // Not used.
                     queryType: "", // Not used.
-                    value: `{"searchValue":"${
-                      (testValue as TestValueStructure).testValue
-                    }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
+                    value: `{"searchValue":"${(
+                      testValue as TestValueStructure
+                    ).testValue(
+                      operator
+                    )}","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
                       (testValue as TestValueStructure).type
                     }"}`,
                     fieldInfo: {
@@ -185,6 +250,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                         referencedType: "collecting-event",
                         apiEndpoint: "collection-api/managed-attribute"
                       } as any,
+                      hideField: true,
                       parentName: "collectingEvent",
                       parentPath: "included",
                       parentType: "collecting-event",
@@ -194,12 +260,15 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                       label: "managedAttributes",
                       path: "included.attributes.managedAttributes",
                       type: "managedAttribute",
-                      keywordMultiFieldSupport: (testValue as TestValueStructure)
-                        .useKeywordMultiField,
+                      keywordMultiFieldSupport: (
+                        testValue as TestValueStructure
+                      ).useKeywordMultiField,
                       optimizedPrefix: false,
                       containsSupport: false,
                       endsWithSupport: false,
-                      subType: subType
+                      keywordNumericSupport: (testValue as TestValueStructure)
+                        .useKeywordNumericField,
+                      subType
                     }
                   })
                 ).toMatchSnapshot();

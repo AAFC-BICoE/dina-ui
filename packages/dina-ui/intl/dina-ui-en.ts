@@ -1,3 +1,5 @@
+import { ColumnSelector } from "packages/common-ui/lib";
+
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */
@@ -180,6 +182,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   determiningDate: "Determining Date",
   dinaHomeH1: "Dina Home",
   dinaManagementSectionTitle: "Management",
+  dinaConfigurationSectionTitle: "Configuration",
+  userProfile: "User Profile",
   disabledForChildMaterialSamples: "Disabled for child Material Samples",
   dragDropInstructionsHeader: "To rearrange the attribute order:",
   dragDropKeyboardInstructions:
@@ -222,9 +226,22 @@ export const DINAUI_MESSAGES_ENGLISH = {
   extensionListTitle: " Field Extensions",
   externalResourceListTitle: "External Resources",
   feedbackButtonText: "Feedback",
+  feedbackTitle: "Feedback is recorded in public GitHub Issues",
+  feedbackWarningTitle:
+    "Warning: GitHub Issues are publicly visible, allowing anyone to view and search the content.",
+  feedbackWarningDescription:
+    "Before posting, review your text and attachments to ensure they don’t inadvertently disclose sensitive details. Private data, credentials, or proprietary project information should be considered exposed if included in issue descriptions, comments, or attachments.",
+  feedbackContactUs:
+    "If you need to discuss sensitive matters, please communicate via email.",
+  feedbackLinkHeader: "Submit GitHub Issue here:",
+  feedbackLinkTitle: "GitHub Issues",
+  feedbackExternal: "(external, GitHub account required)",
+  pageSizeError:
+    "Page number exceeds system limit. To get more relevant results, please modify your search query or change the sort order.",
   fieldExtensions: "Field Extensions",
   materialSampleFieldExtensions: "Material Sample Field Extensions",
   collectingEventFieldExtensions: "Collecting Event Field Extensions",
+  projectFieldExtensions: "Project Field Extensions",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
   field_acDigitizationDate: "Date Original Version Created",
@@ -271,8 +288,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_description: "Description",
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
+  "field_description.de": "German Description",
   field_determination: "Determinations",
   "field_determination.typeStatus": "Type Status",
+  "field_determination.scientificName": "Scientific Name",
   "field_determination.verbatimScientificName": "Verbatim Scientific Name",
   field_determinationRemarks: "Determination Remarks",
   field_displayName: "Display Name",
@@ -344,15 +363,18 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "End Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_familyNames: "Family Names",
   field_familyNames_tooltip: "Family name(s) including compound family names",
-  field_fieldExtensions: "Field extensions",
+  field_fieldExtensions: "Field Extensions",
   field_fileIdentifier: "File Identifier",
   field_fileSize: "File Size",
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
+  field__globalSearch: "Global search",
+  field__relationshipPresence: "Relationships",
+  field__relationshipPresence_column: "Has {relationshipName}",
   field_gridLayoutDefinition_column_label: "By Column",
   field_gridLayoutDefinition_row_label: "By Row",
   field_host: "Host",
-  field_id: "ID",
+  field_id: "UUID",
   field_isFiledAs_tooltip:
     "Make this determination the filed as. Only one determination can be filed as",
   field_isInseperable: "Keep Contents Together",
@@ -360,6 +382,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_isPrimary_tooltip:
     "Make this determination the primary data point when exported. Only one determination can be primary",
   field_isRestricted: "Is Restricted",
+  field_isBaseForSplitByType: "Use As Base Name For Split",
+  field_isBaseForSplitByType_tooltip:
+    "When enabled and using type based Split Configurations, if no parents contain a different Material Sample Type then this Material Sample will be used to derive the identifier from.",
   field_isolatedBy: "Isolated By",
   field_isolatedOn: "Isolated On",
   field_isolationRemarks: "Isolation Remarks",
@@ -430,15 +455,20 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_remarks: "Remarks",
   field_restrictToCreatedBy: "Private",
   field_restrictions: "Restrictions",
+  field_restriction: "Restriction",
+  field_restrictionRemarks: "Restriction Remarks",
   field_sampleName: "Sample Name",
   field_scientificName: "Scientific Name",
   field_scientificNameInput: "Scientific Name",
   field_sex: "Sex",
+  field_sourceSet: "Source Set",
   field_startDate: "Start Date",
   field_startEventDateTime: "Start Event Date Time",
   field_startEventDateTime_tooltip:
     "Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_tags: "Tags",
+  field_targetOrganismPrimaryScientificName:
+    "Target Organism Primary Scientific Name",
   field_title: "Title",
   "field_title.en": "English Title",
   "field_title.fr": "French Title",
@@ -517,6 +547,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   identifierType: "Identifier Type",
   identifierURI: "Identifier",
   identifiers: "Identifiers",
+  otherIdentifiers: "Other Identifiers",
   includeAll: "Include All",
   insertHybridSymbol: "Insert Hybrid Symbol",
   institution: "Institution",
@@ -525,8 +556,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   isTargetHeader: "Is Target ?",
   isolation: "Isolation",
   keepContentsTogether: "Keep Contents Together",
-  languageDescriptionEnglish: "English",
-  languageDescriptionFrench: "French",
   languageOfPage: "eng",
   largeImg: "Large Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
@@ -535,6 +564,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   literalGeoreferencedByLabel: "Georeferenced By",
   load: "Load",
   loading: "Loading",
+  loadingSpinner: "Loading...",
   loanTransaction: "Transaction",
   loanTransactionManagedAttributeListTitle:
     "Loans and Transactions Managed Attributes",
@@ -559,23 +589,37 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleFieldsMapping: "Material Sample Field",
+  skipColumn: "Skip",
   materialSampleFormTemplate: "Material Sample Form Template",
   materialSampleFormTemplates: "Material Sample Form Templates",
   materialSampleInfo: "Material Sample Info",
   materialSampleListTitle: "Material Samples",
   materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleName: "Material Sample Name",
+  materialSampleShowParentAttributes: "Parent Attributes",
+  showParentAttributes: "Parent Material Sample",
+  splitConfigurationTitle: "Split Configurations",
+  splitConfigurationEdit: "Edit Split Configuration",
+  splitConfigurationAdd: "Add Split Configuration",
   materialSampleSplitConfiguration: "Split Configuration",
   materialSampleSplitConfigurationCondition: "Condition",
   materialSampleSplitConfigurationConditionType: "Condition Type",
   materialSampleSplitConfigurationDirectParent: "Direct Parent",
   materialSampleSplitConfigurationMaterialSampleNameGeneration:
     "Material Sample Name Generation",
+  materialSampleSplitConfigurationMaterialSampleGeneration:
+    "Material Sample Generation",
   materialSampleSplitConfigurationRequiredMaterialSampleType:
     "Material Sample Type is required when the Split Configuration is using the Material Sample Type strategy.",
   materialSampleSplitConfigurationStrategy: "Strategy",
   materialSampleSplitConfigurationVisibleMaterialSampleType:
     "Material Sample Type must be visible when Split Configuration is using the Material Sample Type strategy.",
+  materialSampleSplitConfigurationSeparator: "Separator",
+  splitConfiguration_separator_dash: "Dash",
+  splitConfiguration_separator_underscore: "Underscore",
+  splitConfiguration_separator_space: "Space",
+  materialSampleSplitConfigurationTypeCreatedBySplit:
+    "Material Sample Type Created",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleViewTitle: "{primaryID} - Material Sample",
   materialSamples: "Material Samples",
@@ -614,6 +658,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   multiple: "Multiple",
   multipleMaterialSamples: "Multiple Material Samples",
   multipleUnits: "Multiple Units",
+  isGeneric: "Generic",
   mustBeValidDecimalValue: "Must be a valid decimal value.",
   mustBeValidIntegerValue: "Must be a valid integer value.",
   noChildren: "No Children",
@@ -637,8 +682,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organismState: "Organism State",
   organisms: "Organisms",
   organismsQuantity: "Organisms Quantity",
+  organismManagedAttributes: "Organism Managed Attributes",
   organizationEnglishNameLabel: "English Name",
   organizationFrenchNameLabel: "French Name",
+  organizationGermanNameLabel: "German Name",
   organizationListTitle: "Organizations",
   originalFile: "Original File",
   originalMaterialSampleLabel: "Original Material Sample",
@@ -655,7 +702,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "You have unsaved data, are you sure you want to leave the page?",
   preparation: "Preparation",
   preparationData: "Preparation Data",
-  preparationManagedAttributes: "Preparations Managed Attributes",
+  preparationManagedAttributes: "Preparation Managed Attributes",
   preparationMethodNameLabel: "Preparation Method Name",
   preparationProtocols: "Preparation Protocols",
   preparationTypeListTitle: "Preparation Type",
@@ -671,12 +718,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primaryId: "Primary ID",
   proceedToCreateMetadata: "Proceed to Create Metadata",
   projectAttachments: "Project Attachments",
+  pcrBatchAttachments: "PCR Batch Attachments",
   projectListTitle: "Projects",
   projects: "Projects",
+  project: "Project",
   protocolAttachments: "Protocol Attachments",
   protocolData: "Protocol Data",
   protocolListTitle: "Protocols",
   protocolNameLabel: "Protocol Name",
+  splitConfigurationNameLabel: "Split Configuration Name",
   protocolViewTitle: "Protocol",
   queryBuilder_addSearchGroup: "Add sub-query",
   queryBuilder_addSearchRule: "Add query",
@@ -685,14 +735,34 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_extension_field_placeholder:
     "Select extension field to search against...",
   queryBuilder_extension_placeholder: "Select extension to search against...",
+  queryBuilder_relationship_placeholder:
+    "Select relationship to search against...",
   queryBuilder_field_placeholder: "Select a field to search against...",
+  columnSelector_field_placeholder: "Select a field to add as a column...",
+  queryBuilder_globalSearch: "Global search",
+  queryBuilder_globalSearch_withText: 'Global search for "{globalSearchTerm}"',
+  queryBuilder_globalSearch_tooltip:
+    "Global search supports syntax to help refine your search further.",
+  queryBuilder_globalSearch_tooltipLink:
+    "See user documentation for all supported syntax.",
   queryBuilder_managedAttribute_placeholder:
     "Select managed attribute to search against...",
+  queryBuilder_identifier_placeholder:
+    "Select identifier type to search against...",
+  queryBuilder_operator_presence: "Presence",
+  queryBuilder_operator_absence: "Absence",
   queryBuilder_operator_containsDate: "Contains",
+  queryBuilder_operator_between: "Between",
+  queryBuilder_operator_between_tooltip:
+    "The search results will include the from/to values in the search. (inclusive range)",
+  queryBuilder_operator_from: "From",
+  queryBuilder_operator_to: "To",
   queryBuilder_operator_empty: "Empty",
   queryBuilder_operator_endsWith: "Ends with",
   queryBuilder_operator_equals: "Equals",
   queryBuilder_operator_exactMatch: "Exact match",
+  queryBuilder_operator_in: "In",
+  queryBuilder_operator_notIn: "Not in",
   queryBuilder_operator_greaterThan: "Greater than",
   queryBuilder_operator_greaterThanOrEqualTo: "Greater than or equal to",
   queryBuilder_operator_lessThan: "Less than",
@@ -702,12 +772,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_operator_wildcard: "Contains",
   queryBuilder_operator_startsWith: "Starts with",
   queryBuilder_pickList_placeholder: "Select an accepted value...",
+  queryBuilder_pickList_multiple_placeholder: "Select accepted values...",
   queryBuilder_savedSearches: "Saved searches",
   queryBuilder_value_false: "False",
   queryBuilder_value_number_placeholder: "Enter number search value...",
   queryBuilder_value_text_placeholder: "Enter text search value...",
+  queryBuilder_value_in_placeholder: "Enter comma-separated values...",
   queryBuilder_value_true: "True",
-  queryBuilder_invalid_query: "Some parts of your query were removed as they are no longer supported. Please review and update your query to use supported options:",
+  placeholder_decimal: "Enter decimal value",
+  placeholder_integer: "Enter integer value",
+  queryBuilder_invalid_query:
+    "Some parts of your query were removed as they are no longer supported. Please review and update your query to use supported options:",
   reception: "Reception",
   reloadSavedSearch: "Reload saved search",
   removeAssertionLabel: "Remove this GeoReference",
@@ -719,6 +794,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Remove Managed Attribute Value: {attributeNames}",
   removeOrganism: "Remove Organism",
   removeSavedSearch: "Remove Saved Search",
+  areYouSureRemoveSavedSearch: "Are you sure you want to remove:",
   removeThisElement: "Remove This {typeName}",
   removeThisPlaceLabel: " Remove this Place",
   requiredField: "Required field",
@@ -737,11 +813,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   save: "Save",
   saveAll: "Save All",
   saveAndCopyToNext: "Save & Copy To Next",
+  saveAndCopyToNextWarning:
+    'The "{componentName}" data component was not automatically copied over since it\'s specific to the previous Material Sample. Would you like to duplicate it anyway?',
+  saveAndCopyToNextWarningButton:
+    'Duplicate {componentName} from "{displayName}"',
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveAndGoToViewPageButton: "Save & Go To View Page",
   saveAndMarkAsComplete: "Save and Mark as Complete",
   saveAsDefault: "Save as Default",
-  saveChanges: "Save changes",
+  saveChanges: "Save Changes...",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   saveSearch: "Save Search",
   saveSearchInstruction:
@@ -753,7 +833,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   savedSearchOverwriteExisting:
     'There is currently already a saved search named "{savedSearchName}". Creating this saved search will overwrite the existing saved search.',
   scheduledActions: "Scheduled Actions",
-  scientificNameSearch: "Scientific Name Search",
+  scientificNameSearch: "Classification",
+  manual: "Manual",
   searchButton: "Search",
   searchOnCOL: " Search on Catalogue of Life",
   searchPreviousTags: "Search previous tags",
@@ -764,6 +845,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectColumn: "Select Column",
+  columnSelector_currentlyDisplayed: "Currently displayed columns:",
+  columnSelector_columnsToBeExported: "Columns to be exported:",
+  columnSelector_addNewColumn: "Add a new column:",
+  columnSelector_selectManagedAttribute: "Select managed attribute:",
+  columnSelector_addColumnButton: "Add Column",
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
   selectRuleSet: "Select Rule Set",
@@ -826,7 +912,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnitType: "Storage Unit Type",
   storageUnitTypeListTitle: "Storage Unit Types",
   storagesCreatedByMe: "Storages Created By Me",
+  field_sourceSet_tooltip:
+    "User-defined name that can be used to retrieve all material samples that were created in the same batch.",
+  sourceSet_workbook_tooltip:
+    "Automatically generated name by the workbook generator that can be used to retrieve all the material samples imported by this workbook upload.",
   tags: "Tags",
+  tag: "Tag",
   target: "Target",
   template: "Template",
   thisWillRemoveYourTemplate:
@@ -848,6 +939,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   tgnPreferredParent: "Preferred Parent",
   tgnSearchLabel: "Name",
   tgnSearchTooltip: "Search for either a name or a TGN Id",
+  title_acMetadataCreator: "Uploaded By",
+  title_dcCreator: "Digitized By",
   to: "To",
   toBeReturned: "To Be Returned",
   tooltipDefaultLinkMessage: "Click here to learn more.",
@@ -889,19 +982,69 @@ export const DINAUI_MESSAGES_ENGLISH = {
   whoAmITitle: "Who Am I",
   withAKeyboard: "With a keyboard",
   withAMouse: "With a mouse",
-  workBookDuplicateFieldMap: "This column should not map to the same field",
+  workBookDuplicateFieldMap:
+    "This column should not map to the same field ({fieldName})",
+  workBookSkippedField: "Please select a field or skip importing it",
+  missingParentMaterialSampleNames:
+    "Missing parent material sample names: {missingNames}",
   workBookInvalidDataFormat:
-    "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}",
+    "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be a {dataType}",
   workBookInvalidManagedAttributeDataType:
     "Invalid Managed Attribute data type: managed attribute key {key} expects {type} data type.",
   workBookInvalidManagedAttributeKey:
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
+  workBookManagedAttributeKeysTargetKeyIsRequired:
+    "Please select a Managed Attribute value",
+  workBookStorageUnitIsRequired:
+    "Storage unit not provided. Must provide valid storage unit for well row and well column.",
   workbookGroupUploadTitle: "Upload Workbook",
+  workbookGenerateTemplateTitle: "Generate Workbook Template",
   workbookTitle: "Workbooks",
+  workbookPreviewTitle: "Workbook preview",
+  worksheet: "Worksheet",
+  sangerRunStep_multipleRunWarning_title:
+    "Multiple runs exist for this Sanger workflow.",
+  sangerRunStep_multipleRunWarning_description:
+    "This sanger workflow should only have one associated run. Please verify and correct it.",
+  sangerRunStep_sequencingRun: "Sequencing Run:",
+  sangerRunStep_sequencingRunContent: "Sequencing Run Content:",
+  sangerRunStep_missingSequencingRunID:
+    "Unexpected error occurred. Sequencing Run ID should be set at this point.",
+  sangerRunStep_missingSequenceReactions:
+    "No sequence reactions to generate a sequence run. Please use the 'Select PCR Batch' step.",
+  sangerRunStep_invalidRunName:
+    "A sequencing run name must be provided in order to generate a sequence run.",
+  sangerRunStep_noRunExists:
+    "No sequencing run created yet for this sanger workflow. Click edit to create a new run.",
+  molecularAnalysisRunStep_multipleRunWarning_title:
+    "Multiple runs exist for this Molecular Analysis workflow.",
+  molecularAnalysisRunStep_multipleRunWarning_description:
+    "This molecular analysis workflow should only have one associated run. Please verify and correct it.",
+  molecularAnalysisRunStep_sequencingRun: "Sequencing Run:",
+  molecularAnalysisRunStep_sequencingRunContent: "Sequencing Run Content:",
+  molecularAnalysisRunStep_missingSequencingRunID:
+    "Unexpected error occurred. Sequencing Run ID should be set at this point.",
+  molecularAnalysisRunStep_missingSequenceReactions:
+    "No molecular analysis to generate a sequence run. Please use the 'Select Material Sample' step.",
+  molecularAnalysisRunStep_invalidRunName:
+    "A sequencing run name must be provided in order to generate a sequence run.",
+  molecularAnalysisRunStep_noRunExists:
+    "No sequencing run created yet for this molecular analysis workflow. Click edit to create a new run.",
+  mapRelationshipTitle: "Relationship Mapping",
+  value: "Value",
+  count: "Count",
   workbookUploadFailure:
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
+  proceedWithWarning: "Proceed with warnings?",
+  workbookImportAnywayButton: "Import anyway",
+  skippedColumnsTitle: "Skipped Columns",
+  skippedColumnsDescription:
+    "The workbook contains columns that will be skipped during import. These columns might contain important data.",
+  unmappedRelationshipsTitle: "Unmapped Relationships",
+  unmappedRelationshipsDescription:
+    "The import identified relationships in the workbook that could not be automatically mapped. This might lead to incomplete data transfer.",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
@@ -910,7 +1053,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataExports: "Data Exports",
   dataExportError: "A problem occured while trying to export data.",
   field_downloadExport: "Download Export",
+  pause: "Pause",
+  resume: "Resume",
+  leaveSaveWorkbookWarning: "Are you sure you want to leave this page?",
+  confirmToResumeSavingWorkbook: "Do you want to continue saving workbook?",
+  mapRelationship: "Map Relationship",
   field_storageUnit: "Storage Unit",
+  mapColumns: "Column Mapping",
   field_transactionNumber: "Transaction Number",
   field_transactionType: "Transaction Type",
   field_materialDirection: "Material Direction",
@@ -919,5 +1068,83 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_status: "Status",
   field_openedDate: "Opened Date",
   field_closedDate: "Closed Date",
-  field_dueDate: "Due Date"
+  field_dueDate: "Due Date",
+  unauthorized: "Unauthorized",
+  "parentMaterialSample.materialSampleName": "Primary ID",
+  preparationMethod: "Preparation Method",
+  collectionMethod: "Collection Method",
+  geoReferenceAssertions: "GEO Reference Assertions",
+  preparationProtocol: "Preparation Protocol",
+  preparationType: "Preparation Type",
+  viewExportHistoryButton: "View Export History",
+  exportColumns: "Export Columns:",
+  dataLabel: "Data",
+  objectsLabel: "Objects",
+  relatedRecord: "Related Record",
+  reportTemplateUpload: "Report Template Upload",
+  managedBy: "Managed By",
+  agentId: "Agent Link",
+  maxNumUploadExceeded: "Max number of uploads exceeded",
+  addReportTemplateTitle: "Add Report Template",
+  backToUpload: "Back to Upload",
+  backToUploadWorkbook: "Back to Upload Workbook",
+  templateName: "Workbook Template Name",
+  field_reportTemplateName: "Report Template Name",
+  field_includesBarcode: "Includes Barcode",
+  field_templateOutputMediaType: "Template Output Media Type",
+  field_outputMediaType: "Output Media Type",
+  field_reportType: "Report Type",
+  field_reportVariables: "Report Variables",
+  editReportTemplateTitle: "Edit Report Template",
+  duplicateResourcesFound:
+    "Warning: duplicate resources found {duplicateResources}",
+  field_row: "Row",
+  field_column: "Column",
+  deleteFailedImport: "Delete Failed Import",
+  workbook_confirmation_title: "Import Complete!",
+  workbook_confirmation_total: "{total} new material samples were created.",
+  workbook_updated_total: "{total} existing material samples were updated.",
+  workbook_confirmation_new: "Upload New Workbook",
+  workbook_confirmation_view: "View Imported Material Samples",
+  storageUnit_duplicate_title: "Storage Unit Name already exists",
+  storageUnit_duplicate_body:
+    'The name "{duplicatedName}" is already in use for another storage unit in this group. Would you still like to proceed?',
+  multipleSamplesWellCoordinates:
+    "Well coordinate {wellCoordinate} has multiple material samples: {samples}.",
+  baseNameGenerationErrorMessage:
+    'Unable to generate identifiers using this split configuration: The parent material samples do not have a different Material Sample Type to derive the identifier base name. Either edit the parent material sample type to be different from the Split Configuration type or enable the "use as base name for split" toggle.',
+  unitMismatchComponents:
+    "Some components units are not ul/rxn and will not show up in the reaction table: {components}.",
+  savedExport_exportType: "Export Type",
+  savedExport_exportDropdown: "Select Export Template",
+  savedExport_createTitle: "Save Export Template",
+  savedExport_overrideWarning:
+    'A export template exists with the name "{savedExportName}". Creating this export template will replace the existing one.',
+  savedExport_createName: "Saved Export Template Name",
+  savedExport_columnsToBeSaved: "Columns to be saved",
+  export_columnsToExport: "Columns To Export",
+  templateGenerator_columnsToGenerate: "Columns To Generate",
+  usage: "Usage",
+  editContents: "Edit Contents",
+  storageUnitGridTitle: "Storage Unit Grid",
+  field_appendData_tooltip:
+    "If enabled, append data to existing record with matching name. Otherwise, create new record.",
+  selectAndResume: "Select and Resume",
+  workbook_templateIntegrityWarning_title: "Template Integrity Warning",
+  workbook_templateIntegrityWarning_description:
+    "It appears that the column headers in your Excel template have been modified. To ensure accurate data processing, please avoid altering the original column headers.",
+  workbook_templateIntegrityWarning_recommended: "Recommended Actions:",
+  workbook_templateIntegrityWarning_recommended_newTemplate_title:
+    "Generate a new template:",
+  workbook_templateIntegrityWarning_recommended_newTemplate_description:
+    "If you wish to make changes to the column headers or the order of columns, we recommend generating a new template using the template generator.",
+  workbook_templateIntegrityWarning_recommended_verify_title:
+    "Verify column mappings:",
+  workbook_templateIntegrityWarning_recommended_verify_description:
+    "If you choose to proceed with the modified template, carefully review and adjust the column mappings.",
+  selectResourceAppendData: "Select resource to append data to",
+  selectParentMaterialSample:
+    "Select Parent Material Sample to link resource to",
+  doOperationsFieldError:
+    'Field "{fieldErrorKey}" has the following error: {fieldErrorMessage}'
 };

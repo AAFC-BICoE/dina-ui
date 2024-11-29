@@ -9,16 +9,30 @@ import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
 import { Alert, Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
-import { LoadingSpinner } from "../..";
-import { Config, ImmutableTree, Utils } from "react-awesome-query-builder";
-import { SavedSearchStructure, SingleSavedSearch, SAVED_SEARCH_VERSION } from "./types";
+import {
+  LoadingSpinner,
+  VISIBLE_INDEX_LOCAL_STORAGE_KEY,
+  defaultJsonTree
+} from "../..";
+import {
+  Config,
+  ImmutableTree,
+  Utils,
+  JsonTree
+} from "react-awesome-query-builder";
+import {
+  SavedSearchStructure,
+  SingleSavedSearch,
+  SAVED_SEARCH_VERSION
+} from "./types";
 import { map, cloneDeep, sortBy, isEqual } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
-import useLocalStorage, { writeStorage } from "@rehooks/local-storage";
 import { validateQueryTree } from "../query-builder/query-builder-validator/queryBuilderValidator";
 import { useIntl } from "react-intl";
+import { useSessionStorage } from "usehooks-ts";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 export interface SavedSearchProps {
   /**
@@ -80,6 +94,13 @@ export interface SavedSearchProps {
    * to remain the same across tables, it can share the same name.
    */
   uniqueName: string;
+
+  // Reference for triggering the search. This helps prevent more searches than necessary.
+  triggerSearch: React.MutableRefObject<boolean>;
+}
+
+export function createSessionStorageLastUsedTreeKey(uniqueName: string) {
+  return `${uniqueName}-last-used-tree`;
 }
 
 /**
@@ -105,7 +126,8 @@ export function SavedSearch({
   groups,
   setGroups,
   performSubmit,
-  uniqueName
+  uniqueName,
+  triggerSearch
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -133,8 +155,18 @@ export function SavedSearch({
 
   const [changesMade, setChangesMade] = useState<boolean>(false);
 
+  const [selectedSavedSearchName, setSelectedSavedSearchName] =
+    useState<string>();
+
+  // Local storage of the displayed columns that are saved.
+  const [localStorageDisplayedColumns, setLocalStorageDisplayedColumns] =
+    useLocalStorage<string[]>(
+      `${uniqueName}_${VISIBLE_INDEX_LOCAL_STORAGE_KEY}`,
+      []
+    );
+
   // Functionality for the last loaded search.
-  useLastSavedSearch({
+  const { loadLastSavedSearch } = useLastSavedSearch({
     setQueryBuilderTree,
     setSubmittedQueryBuilderTree,
     performSubmit,
@@ -177,7 +209,11 @@ export function SavedSearch({
     return undefined;
   }, [selectedSavedSearch, userPreferences]);
 
-  const localStorageLastUsedTreeKey = uniqueName + "-last-used-tree";
+  const [sessionStorageQueryTree, setSessionStorageQueryTree] =
+    useSessionStorage<JsonTree>(
+      createSessionStorageLastUsedTreeKey(uniqueName),
+      defaultJsonTree
+    );
 
   // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {
@@ -187,14 +223,10 @@ export function SavedSearch({
   // When a new saved search is selected.
   useEffect(() => {
     if (!selectedSavedSearch || !userPreferences) return;
-
+    setQueryError(undefined);
     loadSavedSearch(selectedSavedSearch);
+    triggerSearch.current = true;
   }, [selectedSavedSearch, lastSelected]);
-
-  // Clear saved-search-changed local storage if user closes window
-  window.addEventListener("beforeunload", (_e) => {
-    setChangesMade(false);
-  });
 
   // User Preferences has been loaded in and apply default loaded search:
   useEffect(() => {
@@ -204,9 +236,23 @@ export function SavedSearch({
     // User preferences have been loaded in, we can now check for the default saved search if it
     // exists and pre-load it in.
     const defaultSavedSearch = getDefaultSavedSearch();
-    if (defaultSavedSearch && defaultSavedSearch.savedSearchName) {
-      loadSavedSearch(defaultSavedSearch.savedSearchName);
+
+    if (
+      defaultSavedSearch &&
+      defaultSavedSearch.savedSearchName &&
+      defaultSavedSearch?.queryTree
+    ) {
+      const isQueryChanged = getDefaultSavedSearchChanged(defaultSavedSearch);
+      if (isQueryChanged) {
+        loadLastSavedSearch();
+      } else {
+        loadSavedSearch(defaultSavedSearch.savedSearchName);
+      }
+    } else {
+      // Default search not loaded in, check if last saved search can be loaded in.
+      loadLastSavedSearch();
     }
+
     setDefaultLoadedIn(true);
   }, [userPreferences]);
 
@@ -217,8 +263,9 @@ export function SavedSearch({
     }
 
     if (!userPreferences || !selectedSavedSearch || !queryBuilderTree) return;
-    const savedSearch = userPreferences?.savedSearches?.[indexName]?.[selectedSavedSearch];
-    let changesMade = false;
+    const savedSearch =
+      userPreferences?.savedSearches?.[indexName]?.[selectedSavedSearch];
+    let isQueryChanged = false;
 
     const currentQueryTreeString = Utils.queryString(
       queryBuilderTree,
@@ -227,16 +274,62 @@ export function SavedSearch({
 
     // Compare against currently selected tree.
     if (compareChangeSelected !== currentQueryTreeString) {
-      changesMade = true;
+      isQueryChanged = true;
     }
 
     // Check if the group has changed.
     if (!isEqual(sortBy(groups), sortBy(savedSearch?.groups))) {
-      changesMade = true;
+      isQueryChanged = true;
     }
 
-    setChangesMade(changesMade);
-  }, [queryBuilderTree, groups]);
+    // Check if the columns displayed has changed.
+    if (
+      !isEqual(
+        sortBy(savedSearch?.columnVisibility),
+        sortBy(localStorageDisplayedColumns)
+      )
+    ) {
+      isQueryChanged = true;
+    }
+
+    setChangesMade(isQueryChanged);
+  }, [queryBuilderTree, groups, localStorageDisplayedColumns]);
+
+  function getDefaultSavedSearchChanged(defaultSavedSearch: SingleSavedSearch) {
+    let isQueryChanged = false;
+    const sessionStorageImmutableTree = Utils.loadTree(
+      sessionStorageQueryTree as JsonTree
+    );
+    const sessionStorageQueryTreeString = Utils.queryString(
+      sessionStorageImmutableTree,
+      queryBuilderConfig
+    );
+    const defaultSavedSearchImmutableTree = Utils.loadTree(
+      defaultSavedSearch?.queryTree as JsonTree
+    );
+    const defaultSavedSearchQueryTreeString = Utils.queryString(
+      defaultSavedSearchImmutableTree,
+      queryBuilderConfig
+    );
+    const defaultJsonTreeString = Utils.queryString(
+      Utils.loadTree(defaultJsonTree),
+      queryBuilderConfig
+    );
+
+    // Compare defaultSavedSearch against localStorage
+    if (
+      defaultSavedSearchQueryTreeString !== sessionStorageQueryTreeString &&
+      defaultJsonTreeString !== sessionStorageQueryTreeString
+    ) {
+      isQueryChanged = true;
+    }
+
+    // Check if the group has changed.
+    if (!isEqual(sortBy(groups), sortBy(defaultSavedSearch?.groups))) {
+      isQueryChanged = true;
+    }
+    return isQueryChanged;
+  }
 
   /**
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch
@@ -308,18 +401,25 @@ export function SavedSearch({
       // Check if the query tree is valid against the current config.
       if (validateQueryTree(savedSearchToLoad.queryTree, queryBuilderConfig)) {
         // Valid saved search, submit and load the search.
-        setSubmittedQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+        setSubmittedQueryBuilderTree(
+          Utils.loadTree(savedSearchToLoad.queryTree)
+        );
         setPageOffset(0);
-        writeStorage(localStorageLastUsedTreeKey, savedSearchToLoad.queryTree);
+        setSessionStorageQueryTree(savedSearchToLoad.queryTree);
       } else {
         setQueryError(formatMessage({ id: "queryBuilder_invalid_query" }));
         setChangesMade(true);
       }
 
+      // Load the displayed columns for this search.
+      if (savedSearchToLoad.columnVisibility) {
+        setLocalStorageDisplayedColumns(savedSearchToLoad.columnVisibility);
+      }
+
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
       setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
       setCurrentIsDefault(savedSearchToLoad.default);
-      setGroups(savedSearchToLoad.groups ?? []);   
+      setGroups(savedSearchToLoad.groups ?? []);
     }
   }
 
@@ -358,6 +458,9 @@ export function SavedSearch({
             version: SAVED_SEARCH_VERSION,
             default: setAsDefault,
 
+            // Save selected columns
+            columnVisibility: localStorageDisplayedColumns,
+
             // If updateQueryTree is true, then we will retrieve the current query tree from the
             // query builder, otherwise it will remain the same as before.
             queryTree: updateQueryTree
@@ -365,7 +468,7 @@ export function SavedSearch({
               : userPreferences?.savedSearches?.[indexName]?.[savedSearchName]
                   ?.queryTree ?? undefined,
 
-            groups: groups
+            groups
           }
         }
       };
@@ -406,7 +509,7 @@ export function SavedSearch({
       setChangesMade(false);
       setQueryError(undefined);
     },
-    [userPreferences, queryBuilderTree, groups]
+    [userPreferences, queryBuilderTree, groups, localStorageDisplayedColumns]
   );
 
   /**
@@ -449,10 +552,13 @@ export function SavedSearch({
       // Ask the user if they sure they want to delete the saved search.
       openModal(
         <AreYouSureModal
-          actionMessage={
+          actionMessage={<DinaMessage id="removeSavedSearch" />}
+          messageBody={
             <>
-              <DinaMessage id="removeSavedSearch" />{" "}
-              {`${savedSearchName ?? ""}`}{" "}
+              <strong>
+                <DinaMessage id="areYouSureRemoveSavedSearch" />
+              </strong>
+              <br />"{savedSearchName}"
             </>
           }
           onYesButtonClicked={deleteSearch}
@@ -545,7 +651,7 @@ export function SavedSearch({
       </Dropdown>
       <SavedSearchListDropdown
         dropdownOptions={dropdownOptions}
-        selectedSavedSearch={selectedSavedSearch}
+        selectedSavedSearch={selectedSavedSearchName ?? selectedSavedSearch}
         currentIsDefault={currentIsDefault}
         error={error}
         onSavedSearchSelected={(savedSearchName) => {
@@ -554,11 +660,7 @@ export function SavedSearch({
         }}
         onSavedSearchDelete={deleteSavedSearch}
       />
-      {queryError && (
-        <Alert variant={"danger"}>
-          {queryError}
-        </Alert>        
-      )}
+      {queryError && <Alert variant={"danger"}>{queryError}</Alert>}
     </>
   );
 }

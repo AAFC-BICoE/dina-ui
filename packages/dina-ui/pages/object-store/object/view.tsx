@@ -17,6 +17,7 @@ import {
   Head,
   Nav,
   NotPubliclyReleasableWarning,
+  TagSelectReadOnly,
   TagsAndRestrictionsSection
 } from "../../../components";
 import { ExifView, MetadataDetails } from "../../../components/object-store";
@@ -57,94 +58,96 @@ export default function MetadataViewPage() {
 
   const buttonBar = (
     <ButtonBar>
-      <BackButton
-        byPassView={true}
-        className="me-auto"
-        entityId={uuid}
-        entityLink="/object-store/object"
-      />
-      {canEdit && (
-        <>
-          <Link href={`/object-store/metadata/edit?id=${uuid}`}>
-            <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
-              <DinaMessage id="editButtonText" />
-            </a>
-          </Link>
-          <UploadDerivativeButton acDerivedFrom={uuid} />
-        </>
-      )}
-      <Link href={`/object-store/metadata/revisions?id=${uuid}`}>
-        <a className="btn btn-info">
-          <DinaMessage id="revisionsButtonText" />
-        </a>
-      </Link>
-      {canDelete && (
-        <DeleteButton
-          className="ms-5"
-          id={uuid}
-          options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/object-store/object/list"
-          type="metadata"
+      <div className="col-md-4 mt-2">
+        <BackButton
+          byPassView={true}
+          className="me-auto"
+          entityId={uuid}
+          entityLink="/object-store/object"
         />
-      )}
+      </div>
+      <div className="col-md-8 flex d-flex gap-2">
+        {canEdit && (
+          <>
+            <Link href={`/object-store/metadata/edit?id=${uuid}`}>
+              <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
+                <DinaMessage id="editButtonText" />
+              </a>
+            </Link>
+            <UploadDerivativeButton acDerivedFrom={uuid} />
+          </>
+        )}
+        <Link href={`/object-store/metadata/revisions?id=${uuid}`}>
+          <a className="btn btn-info">
+            <DinaMessage id="revisionsButtonText" />
+          </a>
+        </Link>
+        {canDelete && (
+          <DeleteButton
+            className="ms-3"
+            id={uuid}
+            options={{ apiBaseUrl: "/objectstore-api" }}
+            postDeleteRedirect="/object-store/object/list"
+            type="metadata"
+          />
+        )}
+      </div>
     </ButtonBar>
   );
 
   return (
     <div>
       <Head title={metadata?.originalFilename} />
-      <Nav />
+      <Nav marginBottom={false} />
       <style>{OBJECT_DETAILS_PAGE_CSS}</style>
+      {buttonBar}
       <main className="container-fluid">
-        {buttonBar}
         {withResponse(query, (response) => {
           return (
-            <div className="row">
+            <div className="row mt-3">
               <div className="col-md-4">
                 <MetadataFileView metadata={response.data} preview={false} />
               </div>
               <div className="col-md-8">
-                <div className="container">
-                  <DinaForm initialValues={response.data} readOnly={true}>
-                    <NotPubliclyReleasableWarning />
-                    <TagsAndRestrictionsSection
-                      tagsFieldName="acTags"
-                      groupSelectorName="bucket"
+                <DinaForm initialValues={response.data} readOnly={true}>
+                  <TagSelectReadOnly tagsFieldName="acTags" />
+                  <NotPubliclyReleasableWarning />
+                  <TagsAndRestrictionsSection
+                    tagsFieldName="acTags"
+                    groupSelectorName="bucket"
+                  />
+                  <MetadataDetails metadata={response.data} />
+                  <ExifView objectUpload={response.data.objectUpload} />
+                  {customViewQuery && (
+                    <CustomQueryPageView
+                      titleKey="attachedMaterialSamples"
+                      uniqueName="attached-material-samples-object-store"
+                      columns={ELASTIC_SEARCH_COLUMN}
+                      indexName={"dina_material_sample_index"}
+                      viewMode={customViewQuery ? true : false}
+                      customViewQuery={customViewQuery ?? undefined}
+                      customViewFields={
+                        customViewQuery
+                          ? [
+                              {
+                                fieldName:
+                                  "data.relationships.attachment.data.id",
+                                type: "uuid"
+                              }
+                            ]
+                          : undefined
+                      }
+                      reactTableProps={{
+                        enableSorting: true,
+                        enableMultiSort: true
+                      }}
                     />
-                    <MetadataDetails metadata={response.data} />
-                    <ExifView objectUpload={response.data.objectUpload} />
-                    {customViewQuery && (
-                      <CustomQueryPageView
-                        titleKey="attachedMaterialSamples"
-                        uniqueName="attached-material-samples-object-store"
-                        columns={ELASTIC_SEARCH_COLUMN}
-                        indexName={"dina_material_sample_index"}
-                        viewMode={customViewQuery ? true : false}
-                        customViewQuery={customViewQuery ?? undefined}
-                        customViewFields={
-                          customViewQuery
-                            ? [
-                                {
-                                  fieldName:
-                                    "data.relationships.attachment.data.id",
-                                  type: "uuid"
-                                }
-                              ]
-                            : undefined
-                        }
-                        reactTableProps={{
-                          enableSorting: true,
-                          enableMultiSort: true
-                        }}
-                      />
-                    )}
-                  </DinaForm>
-                </div>
+                  )}
+                </DinaForm>
               </div>
             </div>
           );
         })}
-        {buttonBar}
       </main>
       <Footer />
     </div>

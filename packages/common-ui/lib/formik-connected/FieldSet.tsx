@@ -7,7 +7,7 @@ import { find } from "lodash";
 
 export interface FieldSetProps extends DinaFormSectionProps {
   /** fieldset title. */
-  legend: JSX.Element;
+  legend?: JSX.Element;
 
   className?: string;
   style?: CSSProperties;
@@ -19,6 +19,9 @@ export interface FieldSetProps extends DinaFormSectionProps {
 
   /** Renders this JSX to the right of the FieldSet legend. */
   wrapLegend?: (legend: JSX.Element) => JSX.Element;
+
+  /** Remove the padding and border around the fieldset. */
+  removePadding?: boolean;
 }
 
 /** Wrapper around HTML fieldset element with Bootstrap styling. */
@@ -29,13 +32,24 @@ export function FieldSet({
   fieldName,
   style,
   wrapLegend,
+  removePadding,
   ...formSectionProps
 }: FieldSetProps) {
   const context = useContext(DinaFormContext);
-  const { componentName, sectionName } = formSectionProps;
+  const { componentName, sectionName, isTemplate } = formSectionProps;
 
   // Check the section to see if it should be visible or not.
   const disableSection = useMemo(() => {
+    if (context?.formTemplate && componentName && !context?.isTemplate) {
+      if (
+        !context?.formTemplate?.components?.find(
+          (component) => component.name === componentName
+        )?.visible
+      ) {
+        return true;
+      }
+    }
+
     if (!context?.formTemplate || !componentName || !sectionName) return false;
 
     // First find the component we are looking for.
@@ -66,7 +80,11 @@ export function FieldSet({
   );
 
   const fieldSetProps = (fieldSpyProps?: FieldSpyRenderProps) => ({
-    className: classNames("mb-3 border card px-4 py-2", className),
+    className: classNames(
+      "mb-3 card",
+      className,
+      removePadding ? "border-0" : "border px-4 py-2"
+    ),
     style,
     id,
     children: (
@@ -75,7 +93,8 @@ export function FieldSet({
           className={classNames(
             "legend-wrapper",
             fieldSpyProps?.bulkContext?.bulkEditClasses,
-            fieldSpyProps?.isChanged && "changed-field"
+            fieldSpyProps?.isChanged && "changed-field",
+            removePadding && "d-none"
           )}
         >
           {wrapLegend?.(legendElement) ?? legendElement}

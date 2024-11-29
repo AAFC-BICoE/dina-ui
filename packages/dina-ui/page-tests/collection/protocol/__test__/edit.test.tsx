@@ -3,6 +3,34 @@ import { ProtocolForm } from "../../../../../dina-ui/components/collection/proto
 import ProtocolEditPage from "../../../../pages/collection/protocol/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
+const INSTANCE_DATA = {
+  data: {
+    "instance-mode": "developer",
+    "supported-languages-iso": "en,fr"
+  },
+  status: 200,
+  statusText: "",
+  headers: {
+    "content-length": "99",
+    "content-type": "text/plain; charset=utf-8",
+    date: "Tue, 09 Jan 2024 17:03:48 GMT"
+  },
+  config: {
+    url: "/instance.json",
+    method: "get",
+    headers: {
+      Accept: "application/json, text/plain, */*"
+    },
+    transformRequest: [null],
+    transformResponse: [null],
+    timeout: 0,
+    xsrfCookieName: "XSRF-TOKEN",
+    xsrfHeaderName: "X-XSRF-TOKEN",
+    maxContentLength: -1
+  },
+  request: {}
+};
+
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
@@ -32,7 +60,7 @@ const mockGet = jest.fn(async (path) => {
           group: "protocol-test-group"
         }
       };
-    case "collection-api/vocabulary/protocolData":
+    case "collection-api/vocabulary2/protocolData":
       return {
         data: {
           id: "protocolData",
@@ -65,7 +93,7 @@ const mockGet = jest.fn(async (path) => {
           }
         }
       };
-    case "collection-api/vocabulary/unitsOfMeasurement":
+    case "collection-api/vocabulary2/unitsOfMeasurement":
       return {
         data: {
           id: "unitsOfMeasurement",
@@ -156,10 +184,14 @@ const mockGet = jest.fn(async (path) => {
   }
 });
 
+const mockGetAxios = jest.fn(async (_path) => {
+  return INSTANCE_DATA;
+});
+
 // Mock API requests:
 const mockPatch = jest.fn();
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: { get: mockGet, axios: { patch: mockPatch, get: mockGetAxios } }
 };
 
 describe("protocol edit page", () => {
@@ -193,7 +225,7 @@ describe("protocol edit page", () => {
       }
     });
 
-    wrapper.find(".english-description textarea").simulate("change", {
+    wrapper.find(".en-description textarea").simulate("change", {
       target: { value: "test english description" }
     });
 
@@ -248,11 +280,14 @@ describe("protocol edit page", () => {
       { apiContext }
     );
 
-    expect(wrapper.find(".english-description textarea").prop("value")).toEqual(
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".en-description textarea").prop("value")).toEqual(
       "test english description"
     );
 
-    wrapper.find(".french-description textarea").simulate("change", {
+    wrapper.find(".fr-description textarea").simulate("change", {
       target: { value: "test french description" }
     });
 

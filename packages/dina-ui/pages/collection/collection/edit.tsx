@@ -10,7 +10,9 @@ import {
   withResponse,
   ResourceSelectField,
   filterBy,
-  SelectOption
+  SelectOption,
+  MultilingualDescription,
+  ButtonBar
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
@@ -21,7 +23,6 @@ import { toPairs, fromPairs } from "lodash";
 import { Field } from "formik";
 import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 import PageLayout from "../../../components/page/PageLayout";
-import ButtonBarLayout from "../../../components/page/ButtonBarLayout";
 
 export default function CollectionEditPage() {
   const router = useRouter();
@@ -102,13 +103,17 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
   }
 
   const buttonBar = (
-    <ButtonBarLayout>
-      <BackButton
-        entityId={collection?.id}
-        entityLink="/collection/collection"
-      />
-      <SubmitButton className="ms-auto" />
-    </ButtonBarLayout>
+    <ButtonBar className="mb-4">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={collection?.id}
+          entityLink="/collection/collection"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
+    </ButtonBar>
   );
 
   return (
@@ -171,20 +176,7 @@ export function CollectionFormFields() {
           />
         )}
       </div>
-      <div className="row">
-        <TextField
-          className="english-description col-md-6"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-        <TextField
-          className="french-description col-md-6"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
       <div className="row">
         <TextField className="col-md-6" name="webpage" />
         <TextField className="col-md-6" name="contact" />

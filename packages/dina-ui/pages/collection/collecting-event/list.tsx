@@ -1,5 +1,4 @@
 import {
-  ButtonBar,
   ColumnDefinition,
   CreateButton,
   dateCell,
@@ -7,10 +6,10 @@ import {
   stringArrayCell
 } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { CollectingEvent } from "packages/dina-ui/types/collection-api";
+import { groupCell, GroupSelectField, Head } from "../../../components";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export default function CollectingEventListPage() {
   const { formatMessage } = useDinaIntl();
@@ -40,10 +39,11 @@ export default function CollectingEventListPage() {
     "dwcFieldNumber",
     "dwcRecordNumber",
     stringArrayCell("otherRecordNumbers"),
-    "createdBy",
     "startEventDateTime",
     "endEventDateTime",
     "verbatimEventDateTime",
+    groupCell("group"),
+    "createdBy",
     dateCell("createdOn")
   ];
 
@@ -51,7 +51,9 @@ export default function CollectingEventListPage() {
     <PageLayout
       titleId="collectingEventListTitle"
       buttonBarContent={
-        <CreateButton entityLink="/collection/collecting-event" />
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/collecting-event" />
+        </div>
       }
     >
       <Head title={formatMessage("collectingEventListTitle")} />

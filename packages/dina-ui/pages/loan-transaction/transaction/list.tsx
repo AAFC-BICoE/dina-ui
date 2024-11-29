@@ -15,6 +15,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export const TRANSACTION_TABLE_COLUMNS: TableColumn<Transaction>[] = [
   {
+    id: "transactionNumber",
     cell: ({ row: { original } }) => (
       <Link href={`/loan-transaction/transaction/view?id=${original.id}`}>
         <a>
@@ -27,11 +28,13 @@ export const TRANSACTION_TABLE_COLUMNS: TableColumn<Transaction>[] = [
     isKeyword: true
   },
   {
+    id: "transactionType",
     header: () => <FieldHeader name="transactionType" />,
     accessorKey: "data.attributes.transactionType",
     isKeyword: true
   },
   {
+    id: "materialDirection",
     header: () => <FieldHeader name="materialDirection" />,
     accessorKey: "data.attributes.materialDirection",
     isKeyword: true
@@ -39,18 +42,21 @@ export const TRANSACTION_TABLE_COLUMNS: TableColumn<Transaction>[] = [
   stringArrayCell("otherIdentifiers", "data.attributes.otherIdentifiers"),
   booleanCell("materialToBeReturned", "data.attributes.materialToBeReturned"),
   {
+    id: "purpose",
     header: () => <FieldHeader name="purpose" />,
     accessorKey: "data.attributes.purpose",
     isKeyword: true
   },
   {
+    id: "status",
     header: () => <FieldHeader name="status" />,
     accessorKey: "data.attributes.status",
     isKeyword: true
   },
   dateCell("openedDate", "data.attributes.openedDate"),
   dateCell("closedDate", "data.attributes.closedDate"),
-  dateCell("dueDate", "data.attributes.dueDate")
+  dateCell("dueDate", "data.attributes.dueDate"),
+  dateCell("createdOn", "data.attributes.createdOn")
 ];
 
 export default function TransactionListPage() {
@@ -59,14 +65,16 @@ export default function TransactionListPage() {
   return (
     <div>
       <Head title={formatMessage("transactions")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/loan-transaction/transaction" />
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="transactions" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/loan-transaction/transaction" />
-        </ButtonBar>
         <QueryPage
           indexName={"dina_loan_transaction_index"}
           uniqueName="transaction-list-material-samples"
@@ -75,6 +83,9 @@ export default function TransactionListPage() {
             enableSorting: true,
             enableMultiSort: true
           }}
+          enableRelationshipPresence={false}
+          mandatoryDisplayedColumns={["transactionNumber"]}
+          nonExportableColumns={[]}
           dynamicFieldMapping={{
             fields: [
               {

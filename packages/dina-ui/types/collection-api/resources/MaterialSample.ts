@@ -12,6 +12,7 @@ import { PreparationType } from "./PreparationType";
 import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Person } from "../../objectstore-api";
+import { StorageUnitUsage } from "./StorageUnitUsage";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -21,7 +22,9 @@ export interface MaterialSampleAttributes {
   group?: string;
   createdOn?: string;
   createdBy?: string;
+  sourceSet?: string;
   dwcOtherCatalogNumbers?: string[];
+  identifiers?: { [identifierType: string]: string };
   preservationType?: string | null;
   preparationFixative?: string | null;
   preparationMaterials?: string | null;
@@ -47,6 +50,7 @@ export interface MaterialSampleAttributes {
   organismsQuantity?: number;
   organismsIndividualEntry?: boolean;
   useTargetOrganism?: boolean;
+  storageUnit?: StorageUnit;
 
   publiclyReleasable?: boolean | null;
   notPubliclyReleasableReason?: string;
@@ -75,6 +79,9 @@ export interface MaterialSampleAttributes {
   restrictionRemarks?: string | null;
   extensionValues?: any;
   version?: string;
+
+  // Client side for parent attributes
+  parentAttributes?: any;
 }
 
 export interface HostOrganism {
@@ -105,9 +112,9 @@ export interface MaterialSampleRelationships {
   preparationType?: PreparationType;
   preparedBy?: Person[];
   parentMaterialSample?: MaterialSample;
-  storageUnit?: StorageUnit;
   projects?: Project[];
   assemblages?: Assemblage[];
+  storageUnitUsage?: StorageUnitUsage;
 }
 
 interface MaterialSampleChildren extends MaterialSample {

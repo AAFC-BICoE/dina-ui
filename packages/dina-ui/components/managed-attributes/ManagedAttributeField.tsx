@@ -21,7 +21,7 @@ export interface ManagedAttributeFieldProps {
 
 export interface ManagedAttributeFieldWithLabelProps
   extends ManagedAttributeFieldProps {
-  onRemoveClick: (attributeKey: string) => void;
+  onRemoveClick?: (attributeKey: string) => void;
 }
 
 /** Single Managed Attribute Formik-connected field wrapped in a label. */
@@ -33,6 +33,46 @@ export function ManagedAttributeFieldWithLabel(
   const { locale, formatMessage } = useDinaIntl();
   const attributeKey = attribute.key;
   const attributePath = `${valuesPath}.${attributeKey}`;
+  const tooltipText = getManagedAttributeTooltipText(
+    attribute,
+    locale,
+    formatMessage
+  );
+
+  return (
+    <label
+      key={attributeKey}
+      className={`${attributeKey}-field col-sm-6 mb-3`}
+      htmlFor="none"
+    >
+      <div className="mb-2 d-flex align-items-center">
+        <strong className="me-auto">
+          {attribute.name ?? attributeKey}
+          <Tooltip directText={tooltipText} />
+        </strong>
+        {!readOnly && (
+          <FormikButton
+            className="btn remove-attribute"
+            onClick={(_, form) => {
+              // Delete the value and hide the managed attribute:
+              form.setFieldValue(attributePath, undefined);
+              onRemoveClick?.(attributeKey);
+            }}
+          >
+            <RiDeleteBinLine size="1.8em" />
+          </FormikButton>
+        )}
+      </div>
+      <ManagedAttributeField {...props} />
+    </label>
+  );
+}
+
+export function getManagedAttributeTooltipText(
+  attribute: PersistedResource<ManagedAttribute>,
+  locale: string,
+  formatMessage: any
+) {
   const multiDescription =
     attribute?.multilingualDescription?.descriptions?.find(
       (description) => description.lang === locale
@@ -49,36 +89,7 @@ export function ManagedAttributeFieldWithLabel(
     attribute?.multilingualDescription?.descriptions?.find(
       (description) => description.lang !== locale
     )?.desc;
-
-  return (
-    <label
-      key={attributeKey}
-      className={`${attributeKey}-field col-sm-6 mb-3`}
-      htmlFor="none"
-    >
-      <div className="mb-2 d-flex align-items-center">
-        <strong className="me-auto">
-          {attribute.name ?? attributeKey}
-          <Tooltip
-            directText={tooltipText ?? fallbackTooltipText ?? attribute.name}
-          />
-        </strong>
-        {!readOnly && (
-          <FormikButton
-            className="btn remove-attribute"
-            onClick={(_, form) => {
-              // Delete the value and hide the managed attribute:
-              form.setFieldValue(attributePath, undefined);
-              onRemoveClick(attributeKey);
-            }}
-          >
-            <RiDeleteBinLine size="1.8em" />
-          </FormikButton>
-        )}
-      </div>
-      <ManagedAttributeField {...props} />
-    </label>
-  );
+  return tooltipText ?? fallbackTooltipText ?? attribute.name;
 }
 
 /** Formik-connected field for a single Managed Attribute. No surrounding label tag. */

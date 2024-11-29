@@ -1,11 +1,77 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display field if match type is equals: Expect number field not to be displayed since the match type is not equals 1`] = `"<QueryBuilderNumberSearch matchType=\\"empty\\" value=\\"test\\" setValue={[Function: bound fn]} />"`;
+exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display different placeholder for in/not in operators: Placeholder expected to be different for in operator. 1`] = `
+<DocumentFragment>
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_in_placeholder"
+        type="text"
+        value="test"
+      />
+    </form>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display different placeholder for in/not in operators: Placeholder expected to be different for not in operator. 1`] = `
+<DocumentFragment>
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_in_placeholder"
+        type="text"
+        value="test"
+      />
+    </form>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display field if match type is equals: Expect number field not to be displayed since the match type is not equals 1`] = `
+<DocumentFragment>
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+    </form>
+  </div>
+</DocumentFragment>
+`;
 
 exports[`QueryBuilderNumberSearch QueryBuilderNumberSearch Component Display field if match type is equals: Expect number field to be displayed since match type is equals 1`] = `
-"<QueryBuilderNumberSearch matchType=\\"equals\\" value=\\"test\\" setValue={[Function: bound fn]}>
-  <input type=\\"number\\" value=\\"test\\" onChange={[Function: onChange]} className=\\"form-control\\" placeholder=\\"queryBuilder_value_number_placeholder\\" />
-</QueryBuilderNumberSearch>"
+<DocumentFragment>
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_number_placeholder"
+        type="number"
+        value="test"
+      />
+    </form>
+  </div>
+</DocumentFragment>
 `;
 
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Edge cases If no field value is provided, nothing should be generated. 1`] = `Object {}`;
@@ -73,22 +139,6 @@ Object {
 }
 `;
 
-exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Equals operation Normal field 2`] = `
-Object {
-  "term": Object {
-    "data.attributes.numberField": "123",
-  },
-}
-`;
-
-exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Equals operation Normal field 3`] = `
-Object {
-  "term": Object {
-    "data.attributes.numberField": "true",
-  },
-}
-`;
-
 exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Equals operation With relationship as field 1`] = `
 Object {
   "nested": Object {
@@ -99,54 +149,6 @@ Object {
           Object {
             "term": Object {
               "includes.name": "123",
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collection",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Equals operation With relationship as field 2`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "term": Object {
-              "includes.name": "123",
-            },
-          },
-          Object {
-            "term": Object {
-              "included.type": "collection",
-            },
-          },
-        ],
-      },
-    },
-  },
-}
-`;
-
-exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Equals operation With relationship as field 3`] = `
-Object {
-  "nested": Object {
-    "path": "included",
-    "query": Object {
-      "bool": Object {
-        "must": Array [
-          Object {
-            "term": Object {
-              "includes.name": "false",
             },
           },
           Object {
@@ -258,6 +260,23 @@ Object {
               "included.type": "collection",
             },
           },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function In operation Normal field 1`] = `
+Object {
+  "bool": Object {
+    "must": Object {
+      "terms": Object {
+        "data.attributes.numberField": Array [
+          "1",
+          "2",
+          "3.5",
+          "6",
         ],
       },
     },
@@ -409,6 +428,23 @@ Object {
               "included.type": "collection",
             },
           },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderNumberSearch transformNumberSearchToDSL function Not in operation Normal field 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "terms": Object {
+        "data.attributes.numberField": Array [
+          "1",
+          "2",
+          "3.5",
+          "6",
         ],
       },
     },

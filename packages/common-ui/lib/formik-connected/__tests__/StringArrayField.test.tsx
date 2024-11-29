@@ -1,7 +1,10 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { fireEvent } from "@testing-library/react";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FormikButton } from "../FormikButton";
 import { StringArrayField } from "../StringArrayField";
+import "@testing-library/jest-dom";
+import { SubmitButton } from "../SubmitButton";
 
 const mockSubmit = jest.fn();
 
@@ -9,26 +12,23 @@ describe("StringArrayField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Edits the array field using a textarea.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ lines: ["line1", "line2", "line3"] }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
       >
         <StringArrayField name="lines" />
+        <SubmitButton />
       </DinaForm>
     );
 
-    expect(wrapper.find("textarea").prop("value")).toEqual(
-      ["line1", "line2", "line3", ""].join("\n")
-    );
+    expect(wrapper.getByDisplayValue(/line1 line2 line3/i)).toBeInTheDocument();
 
-    wrapper.find("textarea").simulate("change", {
+    fireEvent.change(wrapper.getByRole("textbox"), {
       target: { value: ["line1", "line2", "line3", "", "line4"].join("\n") }
     });
 
-    wrapper.find("form").simulate("submit");
-
-    wrapper.update();
+    fireEvent.click(wrapper.getByRole("button"));
     await new Promise(setImmediate);
 
     expect(mockSubmit.mock.calls).toEqual([
@@ -37,24 +37,33 @@ describe("StringArrayField component", () => {
   });
 
   it("Displays the right value when the form state changes.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ lines: ["line1", "line2", "line3"] }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
       >
         <StringArrayField name="lines" />
         <FormikButton
-          onClick={(_, form) => form.setFieldValue("lines", ["new", "value"])}
+          onClick={async (_, form) => {
+            try {
+              await form.setFieldValue("lines", ["new", "value"]);
+            } catch (error) {
+              console.error(error);
+            }
+          }}
         >
           Set new field value
         </FormikButton>
+        <SubmitButton />
       </DinaForm>
     );
 
-    wrapper.find("button").simulate("click");
-    wrapper.find("form").simulate("submit");
+    fireEvent.click(
+      wrapper.getByRole("button", { name: /set new field value/i })
+    );
+    await new Promise(setImmediate);
 
-    wrapper.update();
+    fireEvent.click(wrapper.getByRole("button", { name: /save/i }));
     await new Promise(setImmediate);
 
     expect(mockSubmit.mock.calls).toEqual([[{ lines: ["new", "value"] }]]);

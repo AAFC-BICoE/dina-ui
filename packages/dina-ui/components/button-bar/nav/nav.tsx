@@ -1,45 +1,33 @@
 import {
   LanguageSelector,
   NavbarUserControl,
+  intlContext,
   useAccount,
-  intlContext
+  useInstanceContext
 } from "common-ui";
-import React from "react";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { useContext, useState, useEffect } from "react";
-import Button from "react-bootstrap/Button";
-import Navbar from "react-bootstrap/Navbar";
-import ReactNav from "react-bootstrap/Nav";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
-import axios from "axios";
+import { useContext, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import NavDropdown from "react-bootstrap/NavDropdown";
+import Navbar from "react-bootstrap/Navbar";
+import Row from "react-bootstrap/Row";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
 
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
   marginBottom?: boolean;
+
+  centered?: boolean;
 }
 
-export function Nav({ marginBottom = true }: NavProps) {
+export function Nav({ marginBottom = true, centered = true }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
-  const [instanceMode, setInstanceMode] = useState();
-
-  useEffect(() => {
-    const getInstanceMode = async () => {
-      try {
-        const response = await axios.get(`/instance.json`);
-        setInstanceMode(response.data["instance-mode"]);
-      } catch (error) {
-        setInstanceMode(undefined);
-      }
-    };
-    getInstanceMode();
-  }, []);
+  const instanceContext = useInstanceContext();
 
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
@@ -47,20 +35,28 @@ export function Nav({ marginBottom = true }: NavProps) {
       ?.flatMap((it) => it)
       ?.includes(SUPER_USER) || isAdmin;
 
+  const instanceMode = instanceContext?.instanceMode ?? "developer";
+
   return (
     <>
       <SkipLinks />
 
       <header className={marginBottom ? "mb-4" : undefined}>
-        <Container fluid={true}>
-          <Row xs={1} md={2} className="header-container row d-flex px-5">
+        <Container fluid={true} className={centered ? "centered" : ""}>
+          <Row
+            xs={1}
+            md={2}
+            className={
+              "header-container row d-flex " + (!centered ? "px-5" : "")
+            }
+          >
             {/* Left section of the header */}
-            <Col className="px-1">
+            <Col className={!centered ? "px-1" : ""}>
               <GovernmentLogo />
             </Col>
 
             {/* Right section of the header */}
-            <Col className="px-1 text-end">
+            <Col className={"text-end " + (!centered ? "px-1" : "")}>
               <ul className="list-inline mt-1 mb-1">
                 <li className="list-inline-item mr-1 my-auto">
                   <FeedbackButton />
@@ -79,7 +75,7 @@ export function Nav({ marginBottom = true }: NavProps) {
           </Row>
         </Container>
         <Navbar className="app-bar" expand="lg">
-          <Container fluid={true} className="px-5">
+          <Container fluid={true} className={centered ? "centered" : "px-5"}>
             <Link href="/" passHref={true}>
               <Navbar.Brand href="/" className="app-name">
                 {instanceMode === "PROD" || !instanceMode ? (
@@ -101,6 +97,7 @@ export function Nav({ marginBottom = true }: NavProps) {
               <NavAgentDropdown formatMessage={formatMessage} />
               <NavSequenceDropdown formatMessage={formatMessage} />
               <NavControlledVocabularyDropdown formatMessage={formatMessage} />
+              <NavDinaConfigurationDropdown formatMessage={formatMessage} />
 
               {/* Navigation menu right */}
               {showManagementNavigation && (
@@ -132,10 +129,7 @@ function SkipLinks() {
 
 function FeedbackButton() {
   return (
-    <Link
-      href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
-      passHref={true}
-    >
+    <Link href={`/feedback`} passHref={true}>
       <Button variant="link" className="px-0">
         <DinaMessage id="feedbackButtonText" />
       </Button>
@@ -227,6 +221,11 @@ function NavCollectionDropdown({ formatMessage }) {
       <Link href="/collection/collection/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="collectionListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/workbook/generator" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="workbookGenerateTemplateTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/material-sample/list" passHref={true}>
@@ -381,6 +380,16 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="libraryPrepBatchListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/molecular-analysis-run/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <SeqdbMessage id="molecularAnalysisRunListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/seqdb/molecular-analysis-workflow/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <SeqdbMessage id="molecularAnalysisWorkflowTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/ngs-workflow/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
           <SeqdbMessage id="ngsWorkflowWholeGenomeSeqTitle" />
@@ -469,11 +478,6 @@ function NavControlledVocabularyDropdown({ formatMessage }) {
           <DinaMessage id="fieldExtensions" />
         </NavDropdown.Item>
       </Link>
-      <Link href="/collection/form-template/list" passHref={true}>
-        <NavDropdown.Item role="menuitem">
-          <DinaMessage id="formTemplates" />
-        </NavDropdown.Item>
-      </Link>
       <Link href="/collection/institution/list" passHref={true}>
         <NavDropdown.Item role="menuitem">
           <DinaMessage id="institutionListTitle" />
@@ -523,34 +527,90 @@ function NavDinaManagementDropdown({ formatMessage }) {
       onKeyDown={onKeyDown}
       onMouseLeave={hideDropdown}
       show={show}
-      className="float-right"
+      className="float-right management-dropdown"
       role="menuitem"
       menuRole="menu"
       style={{ marginLeft: "auto" }}
     >
       {/* Admins only can view users. */}
       {isAdmin && (
-        <Link
-          href="/dina-user/list"
-          onKeyDown={onKeyDownLastItem}
-          passHref={true}
-        >
-          <NavDropdown.Item role="menuitem">
-            <DinaMessage id="userListTitle" />
-          </NavDropdown.Item>
-        </Link>
+        <>
+          <Link href="/dina-user/list" onKeyDown={onKeyDown} passHref={true}>
+            <NavDropdown.Item role="menuitem">
+              <DinaMessage id="userListTitle" />
+            </NavDropdown.Item>
+          </Link>
+          <Link
+            href="/export/report-template/upload"
+            onKeyDown={onKeyDownLastItem}
+            passHref={true}
+          >
+            <NavDropdown.Item role="menuitem">
+              <DinaMessage id="reportTemplateUpload" />
+            </NavDropdown.Item>
+          </Link>
+        </>
       )}
     </NavDropdown>
   );
 }
 
-export function Footer() {
+function NavDinaConfigurationDropdown({ formatMessage }) {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
+
+  const { subject } = useAccount();
+
+  return (
+    <NavDropdown
+      title={formatMessage("dinaConfigurationSectionTitle")}
+      onMouseOver={showDropdown}
+      onKeyDown={onKeyDown}
+      onMouseLeave={hideDropdown}
+      show={show}
+      role="menuitem"
+      menuRole="menu"
+    >
+      <Link href="/collection/form-template/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="formTemplates" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/collection/split-configuration/list" passHref={true}>
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="splitConfigurationTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link
+        href={{
+          pathname: `/dina-user/view`,
+          query: {
+            id: subject,
+            hideBackButton: true
+          }
+        }}
+        onKeyDown={onKeyDownLastItem}
+        passHref={true}
+      >
+        <NavDropdown.Item role="menuitem">
+          <DinaMessage id="userProfile" />
+        </NavDropdown.Item>
+      </Link>
+    </NavDropdown>
+  );
+}
+
+export interface FooterProps {
+  centered?: boolean;
+}
+
+export function Footer({ centered = true }: FooterProps) {
   const { formatMessage } = useDinaIntl();
   return (
     <footer id="wb-info" className="mt-3" style={{ zIndex: 0 }}>
       <div className="brand">
-        <Container fluid={true}>
-          <div className="row px-5">
+        <div className={"container-fluid " + (centered ? "centered" : "")}>
+          <div className={"row " + (!centered ? "px-5" : "")}>
             <nav className="col-md-10 ftr-urlt-lnk py-3">
               <ul>
                 <li>
@@ -601,7 +661,7 @@ export function Footer() {
               />
             </div>
           </div>
-        </Container>
+        </div>
       </div>
     </footer>
   );

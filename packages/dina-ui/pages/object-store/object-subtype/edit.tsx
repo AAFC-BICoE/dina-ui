@@ -84,14 +84,18 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar>
-        <SubmitButton />
-        <BackButton
-          entityId={id as string}
-          entityLink="/object-store/object-subtype"
-          byPassView={true}
-        />
-        <CustomDeleteButton />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={id as string}
+            entityLink="/object-store/object-subtype"
+            byPassView={true}
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+          <CustomDeleteButton />
+        </div>
       </ButtonBar>
       <div>
         <div className="row">
@@ -121,7 +125,7 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
 const CustomDeleteButton = connect<{}, ObjectSubtype>(
   ({ formik: { values: subType } }) => (
     <DeleteButton
-      className="ms-5"
+      className="ms-3"
       id={subType.id}
       options={{ apiBaseUrl: "/objectstore-api" }}
       postDeleteRedirect="/object-store/object-subtype/list"

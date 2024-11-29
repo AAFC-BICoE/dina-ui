@@ -8,18 +8,12 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { useState, useEffect } from "react";
-import {
-  Button,
-  Spinner,
-  Dropdown,
-  DropdownButton,
-  ButtonGroup
-} from "react-bootstrap";
+import { Button, Spinner, Dropdown, ButtonGroup } from "react-bootstrap";
 import { SangerPcrBatchItemGridStep } from "packages/dina-ui/components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { usePcrBatchQuery } from "../pcr-batch/edit";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
-import React, { ChangeEvent } from "react";
+import React from "react";
 
 export default function PCRWorkFlowRunPage() {
   const router = useRouter();
@@ -31,7 +25,9 @@ export default function PCRWorkFlowRunPage() {
   );
 
   // Global edit mode state.
-  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editMode, setEditMode] = useState<boolean>(
+    router.query.editMode === "true"
+  );
 
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
@@ -39,12 +35,19 @@ export default function PCRWorkFlowRunPage() {
   // Request completion to be performed.
   const [performComplete, setPerformComplete] = useState<boolean>(false);
 
+  const [reloadPcrBatch, setReloadPcrBatch] = useState<number>(Date.now());
+
   // Loaded PCR Batch ID.
   const [pcrBatchId, setPcrBatchId] = useState<string | undefined>(
     router.query.pcrBatchId?.toString()
   );
+
   // Loaded PCR Batch.
-  const pcrBatch = usePcrBatchQuery(pcrBatchId, [pcrBatchId, currentStep]);
+  const pcrBatch = usePcrBatchQuery(pcrBatchId, [
+    pcrBatchId,
+    currentStep,
+    reloadPcrBatch
+  ]);
 
   // Update the URL to contain the current step.
   useEffect(() => {
@@ -78,7 +81,9 @@ export default function PCRWorkFlowRunPage() {
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/pcr-workflow" />
+      <div className="col-md-4">
+        <BackToListButton entityLink="/seqdb/pcr-workflow" />
+      </div>
       {editMode ? (
         <>
           <Button
@@ -95,7 +100,7 @@ export default function PCRWorkFlowRunPage() {
               variant={"primary"}
               className="ms-2"
               onClick={() => setPerformSave(true)}
-              style={{ width: "10rem" }}
+              style={{ width: "10rem", marginRight: "15px" }}
             >
               {performSave ? (
                 <>
@@ -116,10 +121,10 @@ export default function PCRWorkFlowRunPage() {
             </Button>
           ) : (
             <>
-              <Dropdown as={ButtonGroup}>
+              <Dropdown as={ButtonGroup} style={{ width: "12rem" }}>
                 <Button
                   variant={"primary"}
-                  className="ms-2"
+                  className="ms-auto"
                   onClick={() => setPerformSave(true)}
                   style={{ width: "10rem" }}
                 >
@@ -145,7 +150,6 @@ export default function PCRWorkFlowRunPage() {
                   <Dropdown.Item
                     as="button"
                     href="#/action-1"
-                    className="ms-2"
                     onClick={() => {
                       setPerformComplete(true);
                       setPerformSave(true);
@@ -175,7 +179,7 @@ export default function PCRWorkFlowRunPage() {
           variant={"primary"}
           className="ms-auto"
           onClick={() => setEditMode(true)}
-          style={{ width: "10rem" }}
+          style={{ width: "10rem", marginRight: "15px" }}
         >
           <SeqdbMessage id="editButtonText" />
         </Button>
@@ -254,12 +258,14 @@ export default function PCRWorkFlowRunPage() {
           {pcrBatch.response?.data && pcrBatchId && (
             <SangerPcrReactionStep
               pcrBatchId={pcrBatchId}
+              pcrBatch={pcrBatch.response.data}
               editMode={editMode}
               performSave={performSave}
               setPerformSave={setPerformSave}
               performComplete={performComplete}
               setPerformComplete={setPerformComplete}
               setEditMode={setEditMode}
+              setReloadPcrBatch={setReloadPcrBatch}
             />
           )}
         </TabPanel>

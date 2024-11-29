@@ -2,10 +2,11 @@ import {
   ButtonBar,
   ColumnDefinition,
   CreateButton,
-  ListPageLayout
+  ListPageLayout,
+  dateCell
 } from "common-ui";
 import Link from "next/link";
-import { groupCell8, Head, Nav } from "../../../components";
+import { Footer, groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
@@ -22,9 +23,11 @@ const REGION_TABLE_COLUMNS: ColumnDefinition<Region>[] = [
     ),
     accessorKey: "name"
   },
-  groupCell8("group"),
   "description",
-  "symbol"
+  "symbol",
+  groupCell("group"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 const REGION_FILTER_ATTRIBUTES = ["name", "description", "symbol"];
@@ -35,9 +38,11 @@ export default function RegionListPage() {
   return (
     <>
       <Head title={formatMessage("regionListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
       <ButtonBar>
-        <CreateButton entityLink="/seqdb/region" />
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/seqdb/region" />
+        </div>
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
@@ -52,6 +57,7 @@ export default function RegionListPage() {
           }}
         />
       </main>
+      <Footer />
     </>
   );
 }

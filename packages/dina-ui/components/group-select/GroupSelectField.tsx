@@ -30,6 +30,11 @@ interface GroupSelectFieldProps extends Omit<SelectFieldProps<any>, "options"> {
    */
   enableStoredDefaultGroup?: boolean;
 
+  /**
+   * Determine if to hide the dropdown when the user has only one group.
+   */
+  hideWithOnlyOneGroup?: boolean;
+
   readOnlyHideLabel?: boolean;
 
   /**
@@ -45,6 +50,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     showAllGroups,
     enableStoredDefaultGroup = false,
     readOnlyHideLabel,
+    hideWithOnlyOneGroup = true,
     ...selectFieldProps
   } = groupSelectFieldProps;
 
@@ -83,7 +89,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   }, [String(groupSelectOptions), hasOnlyOneOption]);
 
   // Hide the field when there is only one group to pick from:
-  if (hasOnlyOneOption && !readOnly) {
+  if (hasOnlyOneOption && !readOnly && hideWithOnlyOneGroup) {
     return <div />;
   }
 
@@ -105,11 +111,15 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
         selectFieldProps.onChange?.(newValue, formik);
       }}
       options={options}
-      selectProps={{ isDisabled: hasOnlyOneOption, isClearable: false }}
+      selectProps={{
+        isDisabled: hasOnlyOneOption,
+        isClearable: false,
+        ...selectFieldProps.selectProps
+      }}
       hideLabel={readOnlyHideLabel && readOnly}
     />
   );
-};
+}
 
 export interface UseAvailableGroupOptionsParams {
   initialGroupName?: string;

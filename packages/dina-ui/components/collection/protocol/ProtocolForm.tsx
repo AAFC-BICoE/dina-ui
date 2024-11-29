@@ -5,6 +5,7 @@ import {
   ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
+  MultilingualDescription,
   SubmitButton,
   TextField,
   useDinaFormContext
@@ -76,12 +77,16 @@ export function ProtocolForm({ fetchedProtocol, onSaved }: ProtocolFormProps) {
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={fetchedProtocol?.id}
-          entityLink="/collection/protocol"
-        />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={fetchedProtocol?.id}
+            entityLink="/collection/protocol"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <ProtocolFormLayout />
     </DinaForm>
@@ -112,25 +117,10 @@ export function ProtocolFormLayout() {
         <VocabularySelectField
           className="col-md-6"
           name="protocolType"
-          path="collection-api/vocabulary/protocolType"
+          path="collection-api/vocabulary2/protocolType"
         />
       </div>
-      <div className="row">
-        <TextField
-          className="english-description"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="french-description"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
       <AttachmentsField
         name="attachments"
         title={<DinaMessage id="protocolAttachments" />}

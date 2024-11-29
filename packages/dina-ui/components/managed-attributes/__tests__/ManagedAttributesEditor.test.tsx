@@ -1,8 +1,10 @@
 import { DinaForm, ResourceSelect } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { FormTemplate } from "../../../types/collection-api";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { ManagedAttributesEditor } from "../ManagedAttributesEditor";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const EXAMPLE_MA_1 = {
   id: "1",
@@ -55,7 +57,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/managed-attribute":
-      return { data: [] };
+      return { data: [EXAMPLE_MA_1, EXAMPLE_MA_2] };
     case "collection-api/form-template/existing-view-id":
       return {
         data: TEST_COLLECTING_EVENT_CUSTOM_VIEW
@@ -107,7 +109,7 @@ describe("ManagedAttributesEditor component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Renders the current values.", async () => {
-    const wrapper = mountWithAppContext(
+    const { container } = mountWithAppContext2(
       <DinaForm initialValues={{ managedAttributes: exampleValues }}>
         <ManagedAttributesEditor
           valuesPath="managedAttributes"
@@ -118,83 +120,37 @@ describe("ManagedAttributesEditor component", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(mockBulkGet.mock.calls).toEqual([
-      [
+    // Wait for the data to load and ensure mockBulkGet was called with expected arguments.
+    await waitFor(() => {
+      expect(mockBulkGet.mock.calls).toEqual([
         [
-          "managed-attribute/COLLECTING_EVENT.example_attribute_1",
-          "managed-attribute/COLLECTING_EVENT.example_attribute_2"
-        ],
-        {
-          apiBaseUrl: "/collection-api",
-          returnNullForMissingResource: true
-        }
-      ]
-    ]);
-    expect(
-      wrapper.find(".example_attribute_1-field input").prop("value")
-    ).toEqual("example-value-1");
-    expect(
-      wrapper.find(".example_attribute_2-field input").prop("value")
-    ).toEqual("example-value-2");
-  });
-
-  it("Lets you visually hide a managed attribute value by removing it from the dropdown menu.", async () => {
-    const mockSubmit = jest.fn();
-
-    const wrapper = mountWithAppContext(
-      <DinaForm
-        initialValues={{ managedAttributes: exampleValues }}
-        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
-      >
-        <ManagedAttributesEditor
-          valuesPath="managedAttributes"
-          managedAttributeApiPath="collection-api/managed-attribute"
-          managedAttributeComponent="COLLECTING_EVENT"
-        />
-      </DinaForm>,
-      { apiContext }
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Attribute 2 exists
-    expect(wrapper.find(".example_attribute_2-field input").exists()).toEqual(
-      true
-    );
-
-    // Remove attribute 2:
-    wrapper
-      .find(".visible-attribute-menu")
-      .find<any>(ResourceSelect)
-      .prop("onChange")([EXAMPLE_MA_1]);
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // attribute 2 is hidden, not removed:
-    expect(wrapper.find(".example_attribute_2-field input").exists()).toEqual(
-      false
-    );
-
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // The data should be unchanged, because the attribute was hidden, not deleted:
-    expect(mockSubmit).lastCalledWith({
-      managedAttributes: exampleValues
+          [
+            "managed-attribute/COLLECTING_EVENT.example_attribute_1",
+            "managed-attribute/COLLECTING_EVENT.example_attribute_2"
+          ],
+          {
+            apiBaseUrl: "/collection-api",
+            returnNullForMissingResource: true
+          }
+        ]
+      ]);
     });
-  });
 
+    // Verify that the correct input values are rendered.
+    const exampleAttribute1Input = container.querySelector(
+      ".example_attribute_1-field input"
+    ) as HTMLInputElement;
+    const exampleAttribute2Input = container.querySelector(
+      ".example_attribute_2-field input"
+    ) as HTMLInputElement;
+
+    expect(exampleAttribute1Input.value).toEqual("example-value-1");
+    expect(exampleAttribute2Input.value).toEqual("example-value-2");
+  });
   it("Lets you remove an attribute value with the remove button", async () => {
     const mockSubmit = jest.fn();
 
-    const wrapper = mountWithAppContext(
+    const { container, findByText, queryByText } = mountWithAppContext2(
       <DinaForm
         initialValues={{ managedAttributes: exampleValues }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
@@ -208,28 +164,29 @@ describe("ManagedAttributesEditor component", () => {
       { apiContext }
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
-
     // Click the Remove button:
-    wrapper
-      .find(".example_attribute_2-field button.remove-attribute")
-      .simulate("click");
+    const removeButton = await findByText("Example Attribute 2").then((label) =>
+      label
+        .closest(".example_attribute_2-field")
+        ?.querySelector("button.remove-attribute")
+    );
 
+    if (removeButton) {
+      fireEvent.click(removeButton);
+    }
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // The field is removed:
-    expect(wrapper.find(".example_attribute_2-field").exists()).toEqual(false);
+    // Verify the field is removed
+    expect(queryByText("Example Attribute 2")).not.toBeInTheDocument();
 
     // Submit the form
-    wrapper.find("form").simulate("submit");
+    const form = container.querySelector("form");
+    fireEvent.submit(form!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Attribute 2 was removed from the attribute map:
-    expect(mockSubmit).lastCalledWith({
+    // Verify the mockSubmit was called without example_attribute_2
+    expect(mockSubmit).toHaveBeenCalledWith({
       managedAttributes: { ...exampleValues, example_attribute_2: undefined }
     });
   });

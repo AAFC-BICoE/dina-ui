@@ -25,7 +25,8 @@ import {
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
   AssemblageSelectSection,
-  OrganismsField
+  OrganismsField,
+  useCopyToNextSample
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
@@ -43,8 +44,8 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  SPLIT_CONFIGURATION_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  STORAGE_COMPONENT_NAME,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { AssociationsField } from "../AssociationsField";
@@ -58,7 +59,10 @@ import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
-import { SplitConfigurationSection } from "./SplitConfigurationSection";
+import { CollectionSelectSection } from "../CollectionSelectSection";
+import { NotPubliclyReleasableSection } from "../../tag-editor/NotPubliclyReleasableSection";
+import { ShowParentAttributesField } from "./ShowParentAttributesField";
+import { SaveAndCopyToNextSuccessAlert } from "../SaveAndCopyToNextSuccessAlert";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -143,6 +147,8 @@ export interface MaterialSampleFormProps {
    * When this prop is enabled, formik initialValues can be reinitialized
    */
   enableReinitialize?: boolean;
+
+  isBulkEditAllTab?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -166,14 +172,19 @@ export function MaterialSampleForm({
   disableCollectingEventSwitch,
   enableReinitialize,
   buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={materialSample?.id}
-        entityLink="/collection/material-sample"
-      />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={materialSample?.id}
+          entityLink="/collection/material-sample"
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
-  )
+  ),
+  isBulkEditAllTab
 }: MaterialSampleFormProps) {
   const { isTemplate, readOnly } = useContext(DinaFormContext) ?? {};
   const {
@@ -197,6 +208,8 @@ export function MaterialSampleForm({
       visibleManagedAttributeKeys
     });
 
+  const copyFromNextSample = useCopyToNextSample();
+
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
@@ -212,11 +225,20 @@ export function MaterialSampleForm({
    * - The value is the section's render function given the ID as a param.
    */
   const formSections: Record<string, (id: string) => ReactNode> = {
-    [SPLIT_CONFIGURATION_COMPONENT_NAME]: (id) =>
+    [SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
-      isTemplate &&
-      dataComponentState.enableSplitConfiguration && (
-        <SplitConfigurationSection id={id} />
+      (isTemplate || readOnly) &&
+      dataComponentState.enableShowParentAttributes && (
+        <ShowParentAttributesField
+          id={id}
+          isTemplate={isTemplate}
+          attrList={
+            formTemplate?.components?.find(
+              (comp) => comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
+            )?.sections?.[0].items?.[0].defaultValue
+          }
+          materialSample={materialSample}
+        />
       ),
     [IDENTIFIER_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
@@ -227,7 +249,12 @@ export function MaterialSampleForm({
         />
       ),
     [MATERIAL_SAMPLE_INFO_COMPONENT_NAME]: (id) =>
-      !reduceRendering && <MaterialSampleInfoSection id={id} />,
+      !reduceRendering && (
+        <MaterialSampleInfoSection
+          id={id}
+          visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+        />
+      ),
     [COLLECTING_EVENT_COMPONENT_NAME]: (id) =>
       dataComponentState.enableCollectingEvent && (
         <TabbedResourceLinker<CollectingEvent>
@@ -332,6 +359,7 @@ export function MaterialSampleForm({
             blockOptionsFilter={{
               "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
             }}
+            width={"100%"}
           />
         </DinaFormSection>
       ),
@@ -342,7 +370,7 @@ export function MaterialSampleForm({
           sectionName="managed-attributes-section"
         >
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-md-12">
               <ManagedAttributesEditor
                 valuesPath="managedAttributes"
                 managedAttributeApiPath="collection-api/managed-attribute"
@@ -439,15 +467,17 @@ export function MaterialSampleForm({
                   </div>
                 </div>
               )}
-              <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
-              <ProjectSelectSection
-                classNames="mt-3"
-                resourcePath="collection-api/project"
-              />
-              <AssemblageSelectSection
-                classNames="mt-2"
-                resourcePath="collection-api/assemblage"
-              />
+              <div className="row">
+                <div className="col-md-8">
+                  <CollectionSelectSection resourcePath="collection-api/collection" />
+                  <ProjectSelectSection resourcePath="collection-api/project" />
+                  <AssemblageSelectSection resourcePath="collection-api/assemblage" />
+                  <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
+                </div>
+                <div className="col-md-4">
+                  <NotPubliclyReleasableSection />
+                </div>
+              </div>
             </>
           )}
           {/* The toggleable / re-arrangeable form sections: */}
@@ -472,11 +502,28 @@ export function MaterialSampleForm({
       innerRef={materialSampleFormRef}
       initialValues={initialValues}
       onSubmit={onSubmit}
+      isBulkEditAllTab={isBulkEditAllTab}
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
+      {copyFromNextSample && (
+        <>
+          <SaveAndCopyToNextSuccessAlert
+            id={copyFromNextSample.lastCreatedId ?? ""}
+            displayName={
+              !!copyFromNextSample.originalSample.materialSampleName?.length
+                ? copyFromNextSample.originalSample.materialSampleName
+                : copyFromNextSample.lastCreatedId ?? ""
+            }
+            entityPath={"collection/material-sample"}
+            dataComponentState={dataComponentState}
+          />
+          <h1 id="wb-cont">
+            <DinaMessage id={"addMaterialSampleTitle"} />
+          </h1>
+        </>
+      )}
       {buttonBar}
       {formLayout}
-      {buttonBar}
     </DinaForm>
   );
 }

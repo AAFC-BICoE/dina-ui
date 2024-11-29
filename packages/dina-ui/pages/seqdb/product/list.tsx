@@ -2,10 +2,11 @@ import {
   ButtonBar,
   ColumnDefinition,
   CreateButton,
-  ListPageLayout
+  ListPageLayout,
+  dateCell
 } from "common-ui";
 import Link from "next/link";
-import { groupCell8, Head, Nav } from "../../../components";
+import { Footer, groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
@@ -22,13 +23,15 @@ const PRODUCT_TABLE_COLUMNS: ColumnDefinition<Product>[] = [
     ),
     accessorKey: "name"
   },
-  groupCell8("group"),
   {
     header: "UPC",
     accessorKey: "upc"
   },
   "type",
-  "description"
+  "description",
+  groupCell("group"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 const PRODUCT_FILTER_ATTRIBUTES = ["name", "upc", "type", "description"];
@@ -39,9 +42,11 @@ export default function ProductListPage() {
   return (
     <>
       <Head title={formatMessage("productListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
       <ButtonBar>
-        <CreateButton entityLink="/seqdb/product" />
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/seqdb/product" />
+        </div>
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
@@ -56,6 +61,7 @@ export default function ProductListPage() {
           }}
         />
       </main>
+      <Footer />
     </>
   );
 }

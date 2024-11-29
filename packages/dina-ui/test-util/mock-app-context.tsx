@@ -1,9 +1,12 @@
+import { render } from "@testing-library/react";
 import {
   AccountContextI,
   AccountProvider,
   ApiClientI,
   ApiClientImpl,
   ApiClientProvider,
+  InstanceContextI,
+  InstanceContextProvider,
   ModalProvider
 } from "common-ui";
 import { mount } from "enzyme";
@@ -19,6 +22,7 @@ import { DinaIntlProvider } from "../intl/dina-ui-intl";
 interface MockAppContextProviderProps {
   apiContext?: PartialDeep<ApiClientI>;
   accountContext?: Partial<AccountContextI>;
+  instanceContext?: Partial<InstanceContextI>;
   children?: React.ReactNode;
 }
 
@@ -29,7 +33,7 @@ interface MockAppContextProviderProps {
 export function MockAppContextProvider({
   accountContext,
   apiContext = { apiClient: { get: () => undefined as any } },
-
+  instanceContext,
   children
 }: MockAppContextProviderProps) {
   const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = useMemo(
@@ -43,6 +47,15 @@ export function MockAppContextProvider({
       getCurrentToken: () => Promise.resolve("test-token"),
       username: "test-user",
       isAdmin: false
+    }),
+    []
+  );
+
+  const DEFAULT_INSTANCE_CONTEXT_VALUE: InstanceContextI = useMemo(
+    () => ({
+      supportedLanguages: "en,fr",
+      instanceMode: "developer",
+      instanceName: "AAFC"
     }),
     []
   );
@@ -90,15 +103,19 @@ export function MockAppContextProvider({
           value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
           <DinaIntlProvider>
-            <FileUploadProviderImpl>
-              <DndProvider backend={HTML5Backend}>
-                <div ref={modalWrapperRef}>
-                  <ModalProvider appElement={modalWrapperRef.current}>
-                    {children}
-                  </ModalProvider>
-                </div>
-              </DndProvider>
-            </FileUploadProviderImpl>
+            <InstanceContextProvider
+              value={{ ...DEFAULT_INSTANCE_CONTEXT_VALUE, ...instanceContext }}
+            >
+              <FileUploadProviderImpl>
+                <DndProvider backend={HTML5Backend}>
+                  <div ref={modalWrapperRef}>
+                    <ModalProvider appElement={modalWrapperRef.current}>
+                      {children}
+                    </ModalProvider>
+                  </div>
+                </DndProvider>
+              </FileUploadProviderImpl>
+            </InstanceContextProvider>
           </DinaIntlProvider>
         </ApiClientProvider>
       </AccountProvider>
@@ -107,13 +124,28 @@ export function MockAppContextProvider({
 }
 
 /**
- * Helper function to get a test wrapper with the required context providers.
+ * Helper function to get a test wrapper with the required context providers using Enzyme.
+ * @deprecated Please mountWithAppContext2, which use React-testing library.  It is compatiple with React 18.
  */
 export function mountWithAppContext(
   element: React.ReactNode,
   mockAppContextProviderProps?: MockAppContextProviderProps
 ) {
   return mount(
+    <MockAppContextProvider {...mockAppContextProviderProps}>
+      {element}
+    </MockAppContextProvider>
+  );
+}
+
+/**
+ * Helper function to get a test wrapper with the required context providers using React-Testing library.
+ */
+export function mountWithAppContext2(
+  element: React.ReactNode,
+  mockAppContextProviderProps?: MockAppContextProviderProps
+) {
+  return render(
     <MockAppContextProvider {...mockAppContextProviderProps}>
       {element}
     </MockAppContextProvider>

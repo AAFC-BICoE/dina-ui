@@ -1,28 +1,35 @@
 import { KitsuResource } from "kitsu";
-
-export type Strategies = "TYPE_BASED" | "DIRECT_PARENT";
-export type CharacterTypes = "NUMBER" | "LOWER_LETTER" | "UPPER_LETTER";
+import {
+  Separators,
+  SplitStrategies,
+  SplitCharacterTypes
+} from "./SplitConfiguration";
 
 export interface MaterialSampleIdentifierGeneratorAttributes {
   type: "material-sample-identifier-generator";
 
   /** The "split from" UUID. */
-  currentParentUUID: string;
+  currentParentUUID?: string;
+
+  currentParentsUUID?: string[];
 
   /** The strategy to perform on the current parent UUID. */
-  strategy: Strategies;
+  strategy: SplitStrategies;
 
   /** Material Sample Type */
   materialSampleType?: string;
 
   /** Character type strategy (-1, -a, -A) */
-  characterType: CharacterTypes;
+  characterType: SplitCharacterTypes;
+
+  /** Separators to use in name generation (dash, underscore, space) */
+  separator: Separators;
 
   /** Amount of identifiers to be generated */
-  amount: number;
+  quantity?: number;
 
   // Result returned, not postable.
-  nextIdentifiers?: string[];
+  nextIdentifiers?: Record<string, string[]>;
 }
 
 export type MaterialSampleIdentifierGenerator = KitsuResource &

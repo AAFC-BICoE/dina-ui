@@ -106,6 +106,7 @@ export function PlaceSectionsSelectionField(
             columns={PLACE_SECTIONS_TABLE_COLUMNS}
             data={displayData}
             showPagination={false}
+            enableSorting={false}
           />
         );
       }}

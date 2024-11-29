@@ -30,6 +30,7 @@ import {
 } from "packages/dina-ui/types/collection-api";
 import { ReactNode } from "react";
 import {
+  Footer,
   GroupSelectField,
   Head,
   Nav,
@@ -52,7 +53,7 @@ export function useSeqBatchQuery(id?: string, deps?: any[]) {
     {
       path: `seqdb-api/seq-batch/${id}`,
       include:
-        "region,thermocyclerProfile,experimenters,protocol,,storageUnit,storageUnitType"
+        "region,thermocyclerProfile,experimenters,protocol,storageUnit,storageUnitType"
     },
     { disabled: !id, deps }
   );
@@ -76,7 +77,7 @@ export default function SeqBatchEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container">
+      <main className="container-fluid">
         <h1 id="wb-cont">
           <SeqdbMessage id={title} />
         </h1>
@@ -87,7 +88,8 @@ export default function SeqBatchEditPage() {
         ) : (
           <SeqBatchForm onSaved={moveToViewPage} />
         )}
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }
@@ -103,9 +105,13 @@ export function SeqBatchForm({
   seqBatch,
   onSaved,
   buttonBar = (
-    <ButtonBar>
-      <BackButton entityId={seqBatch?.id} entityLink="/seqdb/seq-batch" />
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton entityId={seqBatch?.id} entityLink="/seqdb/seq-batch" />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   ),
   readOnlyOverride
@@ -138,26 +144,12 @@ export function SeqBatchForm({
       experimenters: undefined
     };
 
-    // Storage Unit or Storage Unit Type can be set but not both.
-    if (inputResourceWithRelationships.storageUnit?.id) {
-      (inputResourceWithRelationships as any).storageUnitType = {
-        id: null,
-        type: "storage-unit-type"
-      };
-    } else if (inputResourceWithRelationships.storageUnitType?.id) {
+    // Delete storage unit type
+    delete (inputResourceWithRelationships as any).storageUnitType;
+    if (!inputResourceWithRelationships.storageUnit?.id) {
       (inputResourceWithRelationships as any).storageUnit = {
         id: null,
         type: "storage-unit"
-      };
-    } else {
-      // Clear both in this case.
-      (inputResourceWithRelationships as any).storageUnit = {
-        id: null,
-        type: "storage-unit"
-      };
-      (inputResourceWithRelationships as any).storageUnitType = {
-        id: null,
-        type: "storage-unit-type"
       };
     }
 
@@ -200,35 +192,7 @@ export function LoadExternalDataForSeqBatchForm({
     initialValues.id
   );
 
-  // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
-  const storageUnitQuery = useQuery<StorageUnit>(
-    {
-      path: `collection-api/storage-unit/${initialValues?.storageUnit?.id}`,
-      include: "storageUnitType"
-    },
-    {
-      disabled: !initialValues?.storageUnit?.id
-    }
-  );
-
-  // Add the storage unit type to the initial values.
-  if (storageUnitQuery?.response?.data) {
-    initialValues.storageUnitType = storageUnitQuery?.response?.data
-      ?.storageUnitType?.id
-      ? {
-          id: storageUnitQuery?.response.data.storageUnitType.id,
-          type: "storage-unit-type"
-        }
-      : undefined;
-  }
-
-  // Display loading indicator if not ready.
-  if (storageUnitQuery.loading) {
-    return <LoadingSpinner loading={true} />;
-  }
-
-  // Wait for response or if disabled, just continue with rendering.
-  return withResponseOrDisabled(storageUnitQuery, () => (
+  return (
     <>
       <DinaForm<Partial<SeqBatch>>
         {...dinaFormProps}
@@ -249,7 +213,7 @@ export function LoadExternalDataForSeqBatchForm({
         </FieldSet>
       )}
     </>
-  ));
+  );
 }
 
 /** Re-usable field layout between edit and view pages. */
@@ -267,19 +231,8 @@ export function SeqBatchFormFields() {
           model="collection-api/storage-unit-type"
           optionLabel={(storageUnitType) => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
-          onChange={(storageUnitType) => {
+          onChange={() => {
             setFieldValue("storageUnit.id", null);
-            if (
-              !Array.isArray(storageUnitType) &&
-              storageUnitType?.gridLayoutDefinition != null
-            ) {
-              setFieldValue(
-                "storageRestriction.layout",
-                storageUnitType.gridLayoutDefinition
-              );
-            } else {
-              setFieldValue("storageRestriction", null);
-            }
           }}
         />
       );
@@ -340,12 +293,17 @@ export function SeqBatchFormFields() {
           className="col-md-6"
           name="protocol"
           filter={filterBy(["name"])}
+          filterList={(resource) =>
+            resource.protocolType === "sequence_reaction"
+          }
           model="collection-api/protocol"
           optionLabel={(protocol) => protocol.name}
         />
-        <div className="col-md-6">
-          <StorageUnitTypeSelectorComponent />
-        </div>
+        {!readOnly && (
+          <div className="col-md-6">
+            <StorageUnitTypeSelectorComponent />
+          </div>
+        )}
         <div className="col-md-6">
           <StorageUnitSelectField
             resourceProps={{

@@ -1,12 +1,13 @@
 import {
   AutoSuggestTextField,
+  DinaFormSection,
   FieldSpy,
   TextField,
-  useDinaFormContext,
   ToggleField,
-  DinaFormSection
+  useDinaFormContext
 } from "common-ui";
-import { DeterminationField } from "../..";
+import { DeterminationField, ManagedAttributesEditor } from "../..";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api";
 
 /**
@@ -18,7 +19,8 @@ export const ORGANISM_FIELDS = [
   "sex",
   "remarks",
   "determination",
-  "isTarget"
+  "isTarget",
+  "managedAttributes"
 ] as const;
 
 export interface OrganismStateFieldProps {
@@ -44,7 +46,7 @@ export function OrganismStateField({
   const { readOnly } = useDinaFormContext();
 
   /** Applies name prefix to field props */
-  function fieldProps(fieldName: typeof ORGANISM_FIELDS[number]) {
+  function fieldProps(fieldName: (typeof ORGANISM_FIELDS)[number]) {
     return {
       name: `${namePrefix}${fieldName}`,
       // Don't use the prefix for the labels and tooltips:
@@ -108,6 +110,19 @@ export function OrganismStateField({
             multiLines={true}
           />
         </div>
+        <ManagedAttributesEditor
+          valuesPath={fieldProps("managedAttributes").name}
+          managedAttributeApiPath="collection-api/managed-attribute"
+          managedAttributeComponent="ORGANISM"
+          attributeSelectorWidth={12}
+          fieldSetProps={{
+            legend: <DinaMessage id="organismManagedAttributes" />,
+            className: "non-strip",
+            sectionName: "organism-managed-attributes-section"
+          }}
+          managedAttributeOrderFieldName="organismManagedAttributesOrder"
+          visibleAttributeKeys={visibleManagedAttributeKeys}
+        />
         <FieldSpy<[]> fieldName={determinationFieldProps.name}>
           {(determinations) =>
             // Hide in read-only mode when there are no determinations:

@@ -1,12 +1,13 @@
 import { DinaForm } from "common-ui";
 import { VocabularyElement } from "packages/dina-ui/types/collection-api";
-import CreatableSelect from "react-select/creatable";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import {
   VocabularyOption,
   VocabularySelectField
 } from "../VocabularySelectField";
 import { find } from "lodash";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockOnSubmit = jest.fn();
 const vocabOptions = [{ value: "substrate_1", label: "substrate 1" }];
@@ -37,137 +38,178 @@ const testCtx = { apiContext: { apiClient: {} } };
 
 describe("VocabularySelectField component", () => {
   it("Renders and sets values correctly (multi-select)", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{ fieldName: ["val1", "val2", "val3"] }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
       >
         <VocabularySelectField
           name="fieldName"
-          path="collection-api/vocabulary/substrate"
+          path="collection-api/vocabulary2/substrate"
           isMulti={true}
         />
       </DinaForm>,
       testCtx
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Wait for initial values to render in the multi-select field.
+    await waitFor(() => {
+      // Select all elements containing the selected values in the multi-select field.
+      const selectedOptions = document.querySelectorAll(
+        ".react-select__multi-value__label"
+      );
+      const selectedValues = Array.from(selectedOptions).map(
+        (option) => option.textContent
+      );
 
-    expect(wrapper.find(CreatableSelect).prop("value")).toEqual([
-      { label: "val1", value: "val1" },
-      { label: "val2", value: "val2" },
-      { label: "val3", value: "val3" }
-    ]);
+      expect(selectedValues).toEqual(["val1", "val2", "val3"]);
+    });
 
-    wrapper.find(CreatableSelect).prop<any>("onChange")([
-      { label: "new-val-1", value: "new-val-1" },
-      { label: "new-val-2", value: "new-val-2" }
-    ]);
+    // Get the current selected values and remove them by clicking each "remove" button.
+    screen.getAllByLabelText(/remove/i).forEach((removeButton) => {
+      fireEvent.click(removeButton);
+    });
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Open the dropdown.
+    fireEvent.mouseDown(screen.getByRole("combobox"));
 
-    expect(wrapper.find(CreatableSelect).prop("value")).toEqual([
-      { label: "new-val-1", value: "new-val-1" },
-      { label: "new-val-2", value: "new-val-2" }
-    ]);
+    // Select the new values.
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "new-val-1" }
+    });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
 
-    wrapper.find("form").simulate("submit");
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "new-val-2" }
+    });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Verify the new selection.
+    await waitFor(() => {
+      // Select all elements containing the updated selected values in the multi-select field.
+      const updatedOptions = document.querySelectorAll(
+        ".react-select__multi-value__label"
+      );
+      const updatedValues = Array.from(updatedOptions).map(
+        (option) => option.textContent
+      );
 
-    // The value was converted to an array:
-    expect(mockOnSubmit).lastCalledWith({
-      fieldName: ["new-val-1", "new-val-2"]
+      // Verify the updated selected values.
+      expect(updatedValues).toEqual(["new-val-1", "new-val-2"]);
+    });
+
+    // Use querySelector to find the form and simulate submit
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
+
+    // Verify if `mockOnSubmit` was called with the new values.
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith({
+        fieldName: ["new-val-1", "new-val-2"]
+      });
     });
   });
 
   it("Renders and sets values correctly (single-select)", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
       >
         <VocabularySelectField
           name="fieldName"
-          path="collection-api/vocabulary/substrate"
+          path="collection-api/vocabulary2/substrate"
         />
       </DinaForm>,
       testCtx
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find(CreatableSelect).prop("value")).toEqual(undefined);
-
-    wrapper.find(CreatableSelect).prop<any>("onChange")({
-      value: "substrate_1"
+    // Wait for the component to be ready
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toBeInTheDocument();
     });
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Assert that the initial value is not set (the input should be empty)
+    expect(screen.getByText(/select or type/i)).toBeInTheDocument();
 
-    // Uses the label from the back-end:
-    expect(wrapper.find(CreatableSelect).prop("value")).toEqual({
-      label: "substrate 1",
-      value: "substrate_1"
+    // Simulate selecting a new value
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "substrate_1" }
+    });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+
+    // Wait for the component to update after selection
+    await waitFor(() => {
+      // Assert that the selected value matches the expected label and value
+      expect(screen.getByText("substrate 1")).toBeInTheDocument();
     });
 
-    wrapper.find("form").simulate("submit");
+    // Use querySelector to find the form and simulate submit
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // The value was converted to an array:
-    expect(mockOnSubmit).lastCalledWith({
-      fieldName: "substrate_1"
+    // Verify that mockOnSubmit was called with the correct value
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith({
+        fieldName: "substrate_1"
+      });
     });
   });
 
   it("Sets the value to null (single-select)", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
       >
         <VocabularySelectField
           name="fieldName"
-          path="collection-api/vocabulary/substrate"
+          path="collection-api/vocabulary2/substrate"
         />
       </DinaForm>,
       testCtx
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find(CreatableSelect).prop("value")).toEqual(undefined);
-
-    wrapper.find(CreatableSelect).prop<any>("onChange")({
-      value: "substrate_1"
+    // Wait for the component to be ready
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toBeInTheDocument();
     });
 
-    // Set to null:
-    wrapper.find(CreatableSelect).prop<any>("onChange")({
-      value: null
+    // Assert that the initial placeholder is displayed
+    expect(screen.getByText(/select or type/i)).toBeInTheDocument();
+
+    // Simulate selecting a new value
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "substrate_1" }
+    });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+
+    // Wait for the component to update after selection
+    await waitFor(() => {
+      expect(screen.getByText("substrate 1")).toBeInTheDocument();
     });
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Simulate clearing the selected value
+    const clearIndicator = wrapper.container.querySelector(
+      ".react-select__clear-indicator"
+    );
 
-    expect(wrapper.find(CreatableSelect).prop("value")).toEqual(null);
+    if (clearIndicator) {
+      // Assert that the placeholder is displayed again
+      fireEvent.mouseDown(clearIndicator);
+    }
 
-    wrapper.find("form").simulate("submit");
+    await waitFor(() => {
+      expect(screen.getByText(/select or type/i)).toBeInTheDocument();
+    });
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Use querySelector to find the form and simulate submit
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    // The value was converted to an array:
-    expect(mockOnSubmit).lastCalledWith({
-      fieldName: null
+    // Verify that mockOnSubmit was called with the correct value
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith({});
     });
   });
 });

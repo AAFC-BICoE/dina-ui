@@ -19,6 +19,7 @@ export function booleanCell<TData extends KitsuResource>(
   accessorKey?: string
 ): TableColumn<TData> {
   return {
+    id: label,
     cell: ({ row: { original } }) => {
       const booleanValue = get(original, accessorKey ?? label)?.toString();
       if (booleanValue === "true") {

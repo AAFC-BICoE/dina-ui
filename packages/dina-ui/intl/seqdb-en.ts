@@ -132,9 +132,21 @@ export const SEQDB_MESSAGES_ENGLISH = {
   selectAllCheckedSamplesButtonText: "Select all checked molecular samples -->",
   selectButtonText: "Select",
   selectCoordinates: "Select Coordinates",
+  runStep: "Run",
   selectLibraryPool: "Select Library Pool",
   selectLibraryPrepBatch: "Select Library Prep Batch",
   selectMaterialSamples: "Select Material Samples",
+  indexAssignmentStep: "Index Assignment",
+  assignByGrid: "Assign by grid",
+  assignByTable: "Assign by table",
+  selectI5: "Select i5",
+  selectI7: "Select i7",
+  missingIndexForAssignment:
+    "Index Set must be set on the Library Prep Batch to assign indexes.",
+  missingContainerAndIndexForAssignment:
+    "Container Type and Index Set must be set to use the index grid.",
+  missingSelectedCoordinatesForAssignment:
+    "Coordinates needed to be selected in order to assign indexes using the grid.",
   selectPcrBatch: "Select PCR Batch",
   selectPcrBatchTitle: "Select PCR Batch",
   selectSamples: "Select Material Samples",
@@ -147,6 +159,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   seqSubmissionListTitle: "SEQ Submission",
   seqTubeNumber: "SEQ Tube Number",
   seqWellCoordinates: "SEQ Well Coordinates",
+  libraryPrepWorksheetTitle: "Library Prep Worksheet",
   seqWorkSheetErrors: " errors)",
   seqWorkSheetPleaseAdd: "(please add ",
   seqWorksheetComponents: "Components",
@@ -178,5 +191,12 @@ export const SEQDB_MESSAGES_ENGLISH = {
   workflowDetails: "Workflow Details",
   workflowDetailsTab: "Details",
   workflowStepTab: "Step {number}: {name}",
-  workflowViewTitle: "NGS Workflow"
+  workflowViewTitle: "NGS Workflow",
+  sequencingFacility: "Sequencing Facility",
+  molecularAnalysisRunListTitle: "Molecular Analysis Runs",
+  field_molecularAnalysisRunName: "Molecular Analysis Run Name",
+  molecularAnalysisRunItems: "Molecular Analysis Run Items",
+  molecularAnalysisWorkflowTitle: "Molecular Analysis Workflow",
+  molecularAnalysisName: "Molecular Analysis Name",
+  molecularAnalysis: "Molecular Analysis"
 };

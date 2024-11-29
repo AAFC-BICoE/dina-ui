@@ -11,6 +11,88 @@
 }
 
 /*
+ * Pill shaped badges to display information.
+ */
+.pill {
+  border-radius: 30px;
+}
+
+.pill > span, .pill > a, .pill > span {
+  margin-left: 5px;
+}
+
+/*
+ * To be used with the card class.
+ */
+.well {
+  background-color: #f5f5f5;
+}
+
+.container-fluid.centered, main {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.large-container-fluid {
+  max-width: 1500px !important;
+}
+
+/*
+ * Group label for the header styles.
+ */
+.header-group-text {
+  position: relative;
+  height: 38px;
+  color: #525252;
+  font-size: 0.65em;
+  padding-top: 6px;
+}
+
+.preview-buttonbar {
+  height: 3rem;
+  position: sticky;
+  top: -1rem;
+  background: white;
+  z-index: 100;
+  margin-bottom: 20px; 
+}
+
+.offcanvas-end {
+  width: 500px !important;
+}
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/*
+ * Breadcrumb CSS rules
+ */
+.breadcrumb-slash {
+  --bs-breadcrumb-divider: '/';
+}
+
+.breadcrumb-arrow {
+  --bs-breadcrumb-divider: '>';
+}
+
+/*
+ * Column Selector CSS rules
+ */
+.column-selector-apply-button {
+  position: sticky;
+  top: -1.25em;
+  left: -1.25em; 
+  background: white;
+  padding-top: 5px;
+
+}
+
+/*
 * Fixes WCAG contrast issue for react-select input elements
 * Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
 */
@@ -218,7 +300,10 @@ input[type="number"]::-webkit-outer-spin-button {
 /*
  * React Table Styles
  */
-.react-table-overflow .rt-td, .react-table-overflow .rt-tbody, .react-table-overflow .rt-table {
+.react-table-overflow .rt-td, 
+.react-table-overflow .rt-tbody, 
+.react-table-overflow .rt-table,
+.react-table-overflow th {
   overflow: visible !important;
 }
 
@@ -241,6 +326,10 @@ input[type="number"]::-webkit-outer-spin-button {
 /*
  * Accordion Styles
  */
+.accordion-header {
+  background-color: #c5c5c5;
+  margin-top: 0;
+}
 .accordion-button {
   font-size: 1.7rem !important;
   font-weight: 600;

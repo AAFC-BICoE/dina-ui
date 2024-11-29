@@ -1,8 +1,9 @@
 import { KitsuResource } from "kitsu";
-import AutoSuggest from "react-autosuggest";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { AutoSuggestTextField } from "../AutoSuggestTextField";
 import { DinaForm } from "../DinaForm";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 interface Person extends KitsuResource {
   name: string;
@@ -128,7 +129,7 @@ describe("AutoSuggestTextField", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Snapshot test", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
@@ -149,25 +150,28 @@ describe("AutoSuggestTextField", () => {
     );
 
     // Snapshot test will check to ensure the layout does not change for unknown reasons.
-    expect(wrapper.find(AutoSuggestTextField).debug()).toMatchSnapshot();
+    expect(wrapper.asFragment()).toMatchSnapshot();
 
     // Simulate clicking an option, first need to provide a search.
-    wrapper.find("input").simulate("focus");
-    wrapper.find("input").simulate("change", { target: { value: "p" } });
-
+    fireEvent.focus(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /example person name field/i }),
+      { target: { value: "p" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Select the first option in the list.
-    wrapper.find(AutoSuggestTextField).find("Item").at(0).simulate("click");
-    wrapper.update();
+    fireEvent.click(wrapper.getByText(/person1\-json\-api/i));
+    await new Promise(setImmediate);
 
     expect(suggestionSelectedMock).toBeCalledTimes(1);
     expect(suggestionSelectedMock.mock.calls[0][0]).toEqual("person1-json-api");
   });
 
   it("JSON API only provided, results are fetched from JSON API", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
@@ -186,11 +190,15 @@ describe("AutoSuggestTextField", () => {
       { apiContext: apiContextJsonAPIOnly }
     );
 
-    wrapper.find("input").simulate("focus");
-    wrapper.find("input").simulate("change", { target: { value: "p" } });
-
+    // Simulate clicking an option, first need to provide a search.
+    fireEvent.focus(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /example person name field/i }),
+      { target: { value: "p" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGet).lastCalledWith("agent-api/person", {
       filter: { rsql: "name==*p*" },
@@ -199,31 +207,38 @@ describe("AutoSuggestTextField", () => {
 
     expect(mockGet).toHaveBeenCalledTimes(1);
 
-    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
-      "person1-json-api",
-      "person2-json-api",
-      "person3-json-api"
-    ]);
+    // Verify all the suggestions are shown...
+    expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/person2\-json\-api/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/person3\-json\-api/i)).toBeInTheDocument();
 
     // Test to ensure number of API calls does is not excessive.
-    wrapper.find("input").simulate("change", { target: { value: "pe" } });
-
+    fireEvent.focus(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /example person name field/i }),
+      { target: { value: "pe" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGet).toHaveBeenCalledTimes(2);
 
     // Try an empty search, since blankSearchProvider is not supplied it should not do any requests.
-    wrapper.find("input").simulate("change", { target: { value: "" } });
-
+    fireEvent.focus(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /example person name field/i }),
+      { target: { value: "" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGet).toHaveBeenCalledTimes(2);
   });
 
   it("Elastic Search only provided, results are fetched from elastic search.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
@@ -238,30 +253,36 @@ describe("AutoSuggestTextField", () => {
       { apiContext: apiContextElasticSearchOnly }
     );
 
-    wrapper.find("input").simulate("focus");
-    wrapper.find("input").simulate("change", { target: { value: "p" } });
-
+    fireEvent.focus(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /example person name field/i }),
+      { target: { value: "p" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Expected suggestions to appear.
-    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
-      "person1-elastic-search",
-      "person2-elastic-search",
-      "person3-elastic-search"
-    ]);
+    expect(wrapper.getByText(/person1\-elastic\-search/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/person2\-elastic\-search/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/person3\-elastic\-search/i)).toBeInTheDocument();
 
     // Take a snapshot of the suggestion popup being displayed in the UI.
-    expect(
-      wrapper.find(AutoSuggestTextField).find(".list-group").debug()
-    ).toMatchSnapshot();
+    expect(wrapper.asFragment()).toMatchSnapshot();
 
     // Remove focus from input, the suggestions should no longer be displayed.
-    wrapper.find("input").simulate("blur");
-    wrapper.update();
+    fireEvent.blur(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
+    );
     expect(
-      wrapper.find(AutoSuggestTextField).find(".list-group").exists()
-    ).toBe(false);
+      wrapper.queryByText(/person1\-elastic\-search/i)
+    ).not.toBeInTheDocument();
+    expect(
+      wrapper.queryByText(/person2\-elastic\-search/i)
+    ).not.toBeInTheDocument();
+    expect(
+      wrapper.queryByText(/person3\-elastic\-search/i)
+    ).not.toBeInTheDocument();
 
     expect(mockGetAxios).lastCalledWith("search-api/search-ws/auto-complete", {
       params: {
@@ -276,25 +297,32 @@ describe("AutoSuggestTextField", () => {
     expect(mockGetAxios).toHaveBeenCalledTimes(1);
 
     // Test to ensure number of API calls does is not excessive.
-    wrapper.find("input").simulate("focus");
-    wrapper.find("input").simulate("change", { target: { value: "pe" } });
-
+    fireEvent.focus(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /example person name field/i }),
+      { target: { value: "pe" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGetAxios).toHaveBeenCalledTimes(2);
 
     // Try an empty search, since blankSearchProvider is not supplied it should not do any requests.
-    wrapper.find("input").simulate("change", { target: { value: "" } });
-
+    fireEvent.focus(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /example person name field/i }),
+      { target: { value: "" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGetAxios).toHaveBeenCalledTimes(2);
   });
 
   it("Custom options only provided, results come from custom options.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
@@ -309,23 +337,25 @@ describe("AutoSuggestTextField", () => {
       { apiContext: apiContextBothProviders }
     );
 
-    wrapper.find("input").simulate("focus");
-    wrapper.find("input").simulate("change", { target: { value: "3" } });
-
+    fireEvent.focus(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /example person name field/i }),
+      { target: { value: "3" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
-      "suggestion-1",
-      "suggestion-2",
-      "suggestion-3"
-    ]);
+    // Expected suggestions to appear.
+    expect(wrapper.getByText(/suggestion\-1/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/suggestion\-2/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/suggestion\-3/i)).toBeInTheDocument();
 
     expect(mockGetAll).toHaveBeenCalledTimes(0);
   });
 
   it("Both backend providers are used, preferred backend is used.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
@@ -350,22 +380,24 @@ describe("AutoSuggestTextField", () => {
       { apiContext: apiContextBothProviders }
     );
 
-    wrapper.find("input").simulate("focus");
-    wrapper.find("input").simulate("change", { target: { value: "p" } });
-
+    fireEvent.focus(
+      wrapper.getByRole("textbox", { name: /example person name field/i })
+    );
+    fireEvent.change(
+      wrapper.getByRole("textbox", { name: /example person name field/i }),
+      { target: { value: "p" } }
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockGetAll).lastCalledWith("agent-api/person", {
       filter: { rsql: "name==*p*" },
       sort: "-createdOn"
     });
 
-    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
-      "person1-json-api",
-      "person2-json-api",
-      "person3-json-api"
-    ]);
+    // Verify all the suggestions are shown...
+    expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/person2\-json\-api/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/person3\-json\-api/i)).toBeInTheDocument();
 
     // Should not have any calls to elastic search.
     expect(mockGetAll.mock.calls).toEqual([
@@ -381,7 +413,7 @@ describe("AutoSuggestTextField", () => {
 
   describe("Both backend providers are supplied, test what happens when a backend fails", () => {
     it("JSON-API is preferred, but fails, elastic search should be used instead.", async () => {
-      const wrapper = mountWithAppContext(
+      const wrapper = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>
             name="examplePersonNameField"
@@ -406,26 +438,37 @@ describe("AutoSuggestTextField", () => {
         { apiContext: apiContextJsonAPIFailure }
       );
 
-      wrapper.find("input").simulate("focus");
-      wrapper.find("input").simulate("change", { target: { value: "p" } });
-
+      fireEvent.focus(
+        wrapper.getByRole("textbox", { name: /example person name field/i })
+      );
+      fireEvent.change(
+        wrapper.getByRole("textbox", { name: /example person name field/i }),
+        { target: { value: "p" } }
+      );
       await new Promise(setImmediate);
-      wrapper.update();
 
       // JSON API should be tried first but fails.
       expect(mockGetFailure).toHaveBeenCalledTimes(1);
       expect(mockGetAxios).toHaveBeenCalledTimes(1);
 
-      expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
-        "person1-elastic-search",
-        "person2-elastic-search",
-        "person3-elastic-search"
-      ]);
+      expect(
+        wrapper.queryByText(/person1\-elastic\-search/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.queryByText(/person2\-elastic\-search/i)
+      ).toBeInTheDocument();
+      expect(
+        wrapper.queryByText(/person3\-elastic\-search/i)
+      ).toBeInTheDocument();
 
-      wrapper.find("input").simulate("change", { target: { value: "pe" } });
-
+      fireEvent.focus(
+        wrapper.getByRole("textbox", { name: /example person name field/i })
+      );
+      fireEvent.change(
+        wrapper.getByRole("textbox", { name: /example person name field/i }),
+        { target: { value: "pe" } }
+      );
       await new Promise(setImmediate);
-      wrapper.update();
 
       // JSON API should not be called again at this point. Already failed and should have switched to
       // elastic search.
@@ -434,7 +477,7 @@ describe("AutoSuggestTextField", () => {
     });
 
     it("Elastic-search is preferred, but fails, JSON-API should be used instead.", async () => {
-      const wrapper = mountWithAppContext(
+      const wrapper = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>
             name="examplePersonNameField"
@@ -459,28 +502,32 @@ describe("AutoSuggestTextField", () => {
         { apiContext: apiContextElasticSearchFailure }
       );
 
-      wrapper.find("input").simulate("focus");
-      wrapper.find("input").simulate("change", { target: { value: "p" } });
-
+      fireEvent.focus(
+        wrapper.getByRole("textbox", { name: /example person name field/i })
+      );
+      fireEvent.change(
+        wrapper.getByRole("textbox", { name: /example person name field/i }),
+        { target: { value: "p" } }
+      );
       await new Promise(setImmediate);
-      wrapper.update();
       await new Promise(setImmediate);
-      wrapper.update();
 
       // Elastic Search should be tried first, but fails.
       expect(mockGetFailure).toHaveBeenCalledTimes(1);
       expect(mockGet).toHaveBeenCalledTimes(1);
 
-      expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
-        "person1-json-api",
-        "person2-json-api",
-        "person3-json-api"
-      ]);
+      expect(wrapper.queryByText(/person1\-json\-api/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/person2\-json\-api/i)).toBeInTheDocument();
+      expect(wrapper.queryByText(/person3\-json\-api/i)).toBeInTheDocument();
 
-      wrapper.find("input").simulate("change", { target: { value: "pe" } });
-
+      fireEvent.focus(
+        wrapper.getByRole("textbox", { name: /example person name field/i })
+      );
+      fireEvent.change(
+        wrapper.getByRole("textbox", { name: /example person name field/i }),
+        { target: { value: "pe" } }
+      );
       await new Promise(setImmediate);
-      wrapper.update();
 
       // JSON API should not be called again at this point. Already failed and should have switched to
       // json api.
@@ -491,7 +538,7 @@ describe("AutoSuggestTextField", () => {
 
   describe("Blank search provider tests", () => {
     it("Blank search provider not supplied, options do not appear when empty search.", async () => {
-      const wrapper = mountWithAppContext(
+      const wrapper = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>
             name="examplePersonNameField"
@@ -510,14 +557,16 @@ describe("AutoSuggestTextField", () => {
         { apiContext: apiContextJsonAPIOnly }
       );
 
-      wrapper.find("input").simulate("focus");
+      fireEvent.focus(
+        wrapper.getByRole("textbox", { name: /example person name field/i })
+      );
 
       // Api should not be requested when search is empty since no blank search provider is supplied.
       expect(mockGet).toHaveBeenCalledTimes(0);
     });
 
     it("Blank search provider supplied, options should appear when empty search is focused.", async () => {
-      const wrapper = mountWithAppContext(
+      const wrapper = mountWithAppContext2(
         <DinaForm initialValues={{}}>
           <AutoSuggestTextField<Person>
             name="examplePersonNameField"
@@ -537,22 +586,15 @@ describe("AutoSuggestTextField", () => {
         { apiContext: apiContextJsonAPIOnly }
       );
 
-      wrapper.find("input").simulate("focus");
-
+      fireEvent.focus(
+        wrapper.getByRole("textbox", { name: /example person name field/i })
+      );
       await new Promise(setImmediate);
-      wrapper.update();
 
       // Expected suggestions to appear.
-      expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
-        "person1-json-api",
-        "person2-json-api",
-        "person3-json-api"
-      ]);
-
-      // Take a snapshot of the suggestion popup being displayed in the UI.
-      expect(
-        wrapper.find(AutoSuggestTextField).find(".list-group").debug()
-      ).toMatchSnapshot();
+      expect(wrapper.getByText(/person1\-json\-api/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/person2\-json\-api/i)).toBeInTheDocument();
+      expect(wrapper.getByText(/person3\-json\-api/i)).toBeInTheDocument();
     });
   });
 });

@@ -108,27 +108,33 @@ export function MetadataBulkEditor({
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <ButtonBar className="gap-4">
+        <ButtonBar className="button-bar">
           {onPreviousClick && (
-            <div className="flex-grow-1">
-              <div className="mx-auto">
-                <FormikButton
-                  className="btn btn-outline-secondary previous-button"
-                  onClick={onPreviousClick}
-                  buttonProps={() => ({ style: { width: "13rem" } })}
-                >
-                  <DinaMessage id="goToThePreviousStep" />
-                </FormikButton>
-              </div>
+            <div style={{ display: "inline-block", width: "50%" }}>
+              <FormikButton
+                className="btn btn-outline-secondary previous-button"
+                onClick={onPreviousClick}
+                buttonProps={() => ({ style: { width: "13rem" } })}
+              >
+                <DinaMessage id="goToThePreviousStep" />
+              </FormikButton>
             </div>
           )}
-          <FormikButton
-            className="btn btn-primary bulk-save-button"
-            onClick={saveAll}
-            buttonProps={() => ({ style: { width: "10rem" } })}
+          <div
+            style={{
+              display: "inline-block",
+              width: "50%",
+              textAlign: "right"
+            }}
           >
-            <DinaMessage id="saveAll" />
-          </FormikButton>
+            <FormikButton
+              className="btn btn-primary bulk-save-button"
+              onClick={saveAll}
+              buttonProps={() => ({ style: { width: "10rem" } })}
+            >
+              <DinaMessage id="saveAll" />
+            </FormikButton>
+          </div>
         </ButtonBar>
       </DinaForm>
       {selectedTab && (
@@ -140,7 +146,7 @@ export function MetadataBulkEditor({
           tabNameConfig={(metadata: ResourceWithHooks<Metadata>) =>
             metadata?.resource?.originalFilename
           }
-          renderOneResource={({ index, isSelected }) => (
+          renderOneResource={({ index }) => (
             <MetadataForm
               metadataFormRef={(form) => {
                 const isLastRefSetter =
@@ -153,8 +159,6 @@ export function MetadataBulkEditor({
               }}
               metadataSaveHook={metadataHooks[index].saveHook}
               buttonBar={null}
-              isOffScreen={!isSelected}
-              reduceRendering={!isSelected}
             />
           )}
         />

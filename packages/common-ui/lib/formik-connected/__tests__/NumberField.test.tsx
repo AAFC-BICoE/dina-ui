@@ -1,11 +1,13 @@
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { NumberField } from "../NumberField";
+import "@testing-library/jest-dom";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 
 const mockOnSubmit = jest.fn();
 
 function getWrapper({ initialValues }) {
-  return mountWithAppContext(
+  return mountWithAppContext2(
     <DinaForm
       initialValues={initialValues}
       onSubmit={async ({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -23,58 +25,78 @@ describe("NumberField component", () => {
   it("Displays the field's label and value.", async () => {
     const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
 
-    expect(wrapper.find("label").text()).toEqual("Test Field");
-    expect((wrapper.find("input").instance() as any).value).toEqual("123.23");
+    // Assert the label text
+    expect(screen.getByLabelText("Test Field")).toBeInTheDocument();
+
+    // Assert the input value
+    const input = screen.getByRole("textbox");
+    expect(input).toHaveValue("123.23");
   });
 
   it("Changes the field's value.", async () => {
     const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
 
-    // Change the value.
-    wrapper.find("input").simulate("change", { target: { value: "456.78" } });
+    // Change the value of the input field.
+    const input = screen.getByLabelText("Test Field");
+    fireEvent.change(input, { target: { value: "456.78" } });
 
-    // Submit the form.
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
+    // Simulate form submission
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    // Expect the correct value to have been submitted.
-    expect(mockOnSubmit).lastCalledWith({ testField: "456.78" });
+    // Wait for the submission to complete
+    await waitFor(() => {
+      // Expect the correct value to have been submitted
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({ testField: "456.78" });
+    });
   });
 
   it("Sets the field value as null if the input is blank.", async () => {
     const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
 
     // Change the value to blank.
-    wrapper.find("input").simulate("change", { target: { value: "" } });
+    const input = screen.getByLabelText("Test Field");
+    fireEvent.change(input, { target: { value: "" } });
 
-    // Submit the form.
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
+    // Simulate form submission
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
-    // Expect the correct value to have been submitted.
-    expect(mockOnSubmit).lastCalledWith({ testField: null });
+    // Wait for the submission to complete
+    await waitFor(() => {
+      // Expect the correct value to have been submitted
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({ testField: null });
+    });
   });
 
   it("Shows a blank input when the formik value is undefined.", async () => {
     const wrapper = getWrapper({ initialValues: {} });
-    expect(wrapper.find("input").prop("value")).toEqual("");
+    // Assert the input value
+    const input = screen.getByRole("textbox");
+    expect(input).toHaveValue("");
   });
 
-  it("Shows a blank input when the formik value becomes blank.", async () => {
+  it("Submits blank input when the formik value is changed to blank.", async () => {
     const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
-    expect(wrapper.find("input").prop("value")).toEqual(123.23);
+    // Assert the input value
+    const input = screen.getByRole("textbox");
+    expect(input).toHaveValue("123.23");
 
     // Change the value to undefined.
-    wrapper.find("input").simulate("change", { target: { value: "" } });
-    wrapper.update();
+    fireEvent.change(input, { target: { value: "" } });
 
     // The input should become blank.
-    expect(wrapper.find("input").prop("value")).toEqual("");
+    expect(input).toHaveValue("");
 
-    wrapper.find("form").simulate("submit");
-    await new Promise(setImmediate);
+    // Simulate form submission
+    const form = wrapper.container.querySelector("form");
+    fireEvent.submit(form!);
 
     // Expect the correct value to have been submitted.
-    expect(mockOnSubmit).lastCalledWith({ testField: null });
+    // Wait for the submission to complete
+    await waitFor(() => {
+      // Expect the correct value to have been submitted
+      expect(mockOnSubmit).toHaveBeenLastCalledWith({ testField: null });
+    });
   });
 });

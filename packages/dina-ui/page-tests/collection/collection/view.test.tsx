@@ -1,6 +1,8 @@
 import CollectionDetailsPage from "../../../pages/collection/collection/view";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { Collection } from "../../../types/collection-api";
+import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const TEST_COLLECTION: Collection = {
   id: "123",
@@ -31,16 +33,21 @@ jest.mock("next/router", () => ({
 
 describe("Collection view page", () => {
   it("Renders the Collection details", async () => {
-    const wrapper = mountWithAppContext(<CollectionDetailsPage />, {
+    const wrapper = mountWithAppContext2(<CollectionDetailsPage />, {
       apiContext
     });
 
-    // Wait for the page to load.
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Wait for the page to load and check for the collection name in the .name-field
+    await waitFor(() => {
+      const heading = screen.getByRole("heading", {
+        name: /test collection/i
+      });
 
-    expect(wrapper.find(".name-field .field-view").text()).toEqual(
-      "test collection"
-    );
+      expect(within(heading).getByText(/test collection/i)).toBeInTheDocument();
+
+      expect(within(heading).getByText(/cnc/i)).toBeInTheDocument();
+
+      expect(screen.getByText(/test\-code/i)).toBeInTheDocument();
+    });
   });
 });

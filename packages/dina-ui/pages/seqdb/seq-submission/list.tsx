@@ -2,10 +2,11 @@ import {
   ButtonBar,
   ColumnDefinition,
   CreateButton,
-  ListPageLayout
+  ListPageLayout,
+  dateCell
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav, groupCell8 } from "../../../components";
+import { Footer, Head, Nav, groupCell } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqSubmission } from "../../../types/seqdb-api/resources/SeqSubmission";
 
@@ -22,7 +23,9 @@ const SEQ_SUBMISSION_TABLE_COLUMNS: ColumnDefinition<SeqSubmission>[] = [
     ),
     accessorKey: "name"
   },
-  groupCell8("group")
+  groupCell("group"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 const SEQ_SUBMISSION_FILTER_ATTRIBUTES = ["name", "group"];
@@ -33,9 +36,11 @@ export default function SeqSubmissionListPage() {
   return (
     <>
       <Head title={formatMessage("seqSubmissionListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
       <ButtonBar>
-        <CreateButton entityLink="/seqdb/seq-submission" />
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/seqdb/seq-submission" />
+        </div>
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
@@ -50,6 +55,7 @@ export default function SeqSubmissionListPage() {
           }}
         />
       </main>
+      <Footer />
     </>
   );
 }

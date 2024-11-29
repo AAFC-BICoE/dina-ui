@@ -12,7 +12,9 @@ import {
   OperationError,
   SaveArgs,
   useApiClient,
-  DeleteArgs
+  DeleteArgs,
+  BackButton,
+  ButtonBar
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { Identifier } from "packages/dina-ui/types/agent-api/resources/Identifier";
@@ -49,12 +51,14 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
 
     // get save arguments. save() already automatically POSTs for new resources and PATCH for existing resources
     const identifierSaveArgs: SaveArgs<Identifier>[] =
-      submitted.identifiers?.map((resource) => {
-        return {
-          resource,
-          type: "identifier"
-        };
-      }) ?? [];
+      submitted.identifiers
+        ?.filter((item) => item && (item.type || item.value))
+        ?.map((resource) => {
+          return {
+            resource,
+            type: "identifier"
+          };
+        }) ?? [];
 
     delete submitted.identifiers;
     try {
@@ -178,8 +182,24 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     await onSubmitSuccess?.(savedPerson);
   };
 
+  const buttonBar = (
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
+        <BackButton
+          entityId={id as string}
+          entityLink="/person"
+          byPassView={true}
+        />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
+    </ButtonBar>
+  );
+
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      {buttonBar}
       <div style={{ width: "30rem" }}>
         <TextField name="displayName" />
       </div>
@@ -210,19 +230,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       </div>
       <div style={{ width: "30rem" }}>
         <TextField name="remarks" multiLines={true} />
-      </div>
-      <div className="mb-3 list-inline">
-        <div className="list-inline-item">
-          <SubmitButton />
-        </div>
-        <div className="list-inline-item">
-          <DeleteButton
-            id={id}
-            options={{ apiBaseUrl: "/agent-api" }}
-            postDeleteRedirect="/person/list"
-            type="person"
-          />
-        </div>
       </div>
     </DinaForm>
   );

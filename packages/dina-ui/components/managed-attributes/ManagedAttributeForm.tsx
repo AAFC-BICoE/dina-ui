@@ -3,6 +3,7 @@ import {
   DateField,
   DinaForm,
   DinaFormOnSubmit,
+  MultilingualDescription,
   SelectField,
   StringArrayField,
   SubmitButton,
@@ -109,9 +110,11 @@ export function ManagedAttributeForm({
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar>
-        {backButton}
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">{backButton}</div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <ManagedAttributeFormLayout
         componentField={componentField}
@@ -186,20 +189,7 @@ export function ManagedAttributeFormLayout({
           </div>
         </div>
       )}
-      <div className="row">
-        <TextField
-          className="col-md-6 english-description"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-        <TextField
-          className="col-md-6 french-description"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
       {readOnly && (
         <div className="row">
           <DateField

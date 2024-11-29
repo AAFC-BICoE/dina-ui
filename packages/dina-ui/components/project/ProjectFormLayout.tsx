@@ -1,7 +1,9 @@
 import {
   CustomQueryPageView,
+  DataEntryField,
   DateField,
   generateUUIDTree,
+  MultilingualDescription,
   TextField,
   useDinaFormContext
 } from "common-ui";
@@ -13,7 +15,6 @@ import { useMaterialSampleRelationshipColumns } from "../collection/material-sam
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
-
   const router = useRouter();
   const uuid = String(router?.query?.id);
   const customViewQuery = generateUUIDTree(
@@ -57,20 +58,17 @@ export function ProjectFormLayout() {
           label={formatMessage("field_endDate")}
         />
       </div>
-      <div className="row">
-        <TextField
-          className="col-md-6 english-description"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-        <TextField
-          className="col-md-6 french-description"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
+      <DataEntryField
+        legend={<DinaMessage id="projectFieldExtensions" />}
+        name="extensionValues"
+        readOnly={readOnly}
+        blockOptionsEndpoint={`collection-api/extension`}
+        blockOptionsFilter={{
+          "extension.fields.dinaComponent": "PROJECT"
+        }}
+        width={"100%"}
+      />
       <AttachmentsField
         name="attachment"
         title={<DinaMessage id="projectAttachments" />}

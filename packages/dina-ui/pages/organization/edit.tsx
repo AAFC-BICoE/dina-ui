@@ -11,8 +11,8 @@ import {
   withResponse
 } from "common-ui";
 import { NextRouter, useRouter } from "next/router";
-import { Head, Nav } from "../../components";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
+import PageLayout from "../../components/page/PageLayout";
 import {
   MultiligualName,
   Organization
@@ -30,7 +30,6 @@ export default function OrganizationEditPage() {
   const {
     query: { id }
   } = router;
-  const { formatMessage } = useDinaIntl();
   const title = id ? "editOrganizationTitle" : "addOrganizationTitle";
 
   const query = useQuery<Organization>({
@@ -38,29 +37,15 @@ export default function OrganizationEditPage() {
   });
 
   return (
-    <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
-      <main className="container-fluid">
-        {id ? (
-          <div>
-            <h1 id="wb-cont">
-              <DinaMessage id="editOrganizationTitle" />
-            </h1>
-            {withResponse(query, ({ data }) => (
-              <OrganizationForm organization={data} router={router} />
-            ))}
-          </div>
-        ) : (
-          <div>
-            <h1>
-              <DinaMessage id="addOrganizationTitle" />
-            </h1>
-            <OrganizationForm router={router} />
-          </div>
-        )}
-      </main>
-    </div>
+    <PageLayout titleId={title}>
+      {id ? (
+        withResponse(query, ({ data }) => (
+          <OrganizationForm organization={data} router={router} />
+        ))
+      ) : (
+        <OrganizationForm router={router} />
+      )}
+    </PageLayout>
   );
 }
 
@@ -151,16 +136,24 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     await router.push(`/organization/list`);
   };
 
-  return (
-    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar>
+  const buttonBar = (
+    <ButtonBar className="mb-3">
+      <div className="col-md-6 col-sm-12 mt-2">
         <BackButton
           entityId={id as string}
           entityLink="/organization"
           byPassView={true}
         />
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
         <SubmitButton className="ms-auto" />
-      </ButtonBar>
+      </div>
+    </ButtonBar>
+  );
+
+  return (
+    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      {buttonBar}
       <OrganizationFields />
     </DinaForm>
   );

@@ -56,16 +56,5 @@ export function DataEntryField({
       typeOptionsEndpoint={typeOptionsEndpoint}
     />
   );
-  return (
-    <div style={{ width: width ?? defaultWidth }}>
-      <FieldWrapper
-        disableLabelClick={true}
-        name={name}
-        hideLabel={true}
-        readOnlyRender={(_value, _form) => dataEntry}
-      >
-        {dataEntry}
-      </FieldWrapper>
-    </div>
-  );
+  return <div style={{ width: width ?? defaultWidth }}>{dataEntry}</div>;
 }

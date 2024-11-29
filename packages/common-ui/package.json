@@ -15,7 +15,7 @@
     "fast-xml-parser": "^4.3.2",
     "flat": "^5.0.2",
     "formik": "^2.2.7",
-    "keycloak-js": "19.0.3",
+    "keycloak-js": "21.1.2",
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
     "lodash": "^4.17.21",
@@ -46,6 +46,7 @@
     "swr": "^1.0.1",
     "type-fest": "^2.5.4",
     "use-debounce": "^7.0.1",
+    "usehooks-ts": "^2.13.0",
     "uuid": "^8.3.2",
     "yup": "^0.32.11"
   },

@@ -60,7 +60,9 @@ export const SubmitButton = connect<SubmitButtonProps>(
     }, [performSave]);
 
     return formik.isSubmitting ? (
-      <LoadingSpinner loading={formik.isSubmitting} />
+      <div className={className}>
+        <LoadingSpinner loading={formik.isSubmitting} />
+      </div>
     ) : isNestedForm ? (
       <FormikButton
         className={resolvedButtonProps.className}

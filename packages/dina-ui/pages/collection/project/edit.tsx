@@ -4,6 +4,8 @@ import {
   ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
+  processExtensionValuesLoading,
+  processExtensionValuesSaving,
   SubmitButton,
   useQuery,
   withResponse
@@ -12,8 +14,6 @@ import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Head, Nav, ViewPageLayout } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Project } from "../../../types/collection-api/resources/Project";
 import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
 import PageLayout from "../../../components/page/PageLayout";
@@ -28,7 +28,6 @@ export default function ProjectEditPage() {
   const {
     query: { id }
   } = router;
-  const { formatMessage } = useDinaIntl();
 
   async function goToViewPage(project: PersistedResource<Project>) {
     await router.push(`/collection/project/view?id=${project.id}`);
@@ -59,7 +58,12 @@ export interface ProjectFormValues extends InputResource<Project> {}
 
 export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
   const { save } = useContext(ApiClientContext);
-
+  // Process loaded back-end data into data structure that Forkmiks can use
+  if (fetchedProject?.extensionValues) {
+    fetchedProject.extensionValues = processExtensionValuesLoading(
+      fetchedProject.extensionValues
+    );
+  }
   const initialValues: ProjectFormValues = fetchedProject
     ? {
         ...fetchedProject,
@@ -76,7 +80,11 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
     submittedValues
   }) => {
     (submittedValues as any).relationships = {};
-
+    if (submittedValues.extensionValues) {
+      submittedValues.extensionValues = processExtensionValuesSaving(
+        submittedValues.extensionValues
+      );
+    }
     const input: InputResource<Project> = {
       ...submittedValues,
       // Convert the editable format to the stored format:
@@ -99,6 +107,26 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete input.attachment;
 
+    // Make a separte request to handle the Resource's extensionValues due to Crnk bug in backend where extensionValues are not correctly
+    // Changed when the Resource has multilingualDescription
+    if (input.extensionValues && input.id) {
+      await save<Project>(
+        [
+          {
+            resource: {
+              id: input.id,
+              type: input.type,
+              extensionValues: input.extensionValues
+            } as any,
+            type: "project"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      );
+      delete input.extensionValues;
+    }
     const [savedProject] = await save<Project>(
       [
         {
@@ -118,12 +146,16 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={fetchedProject?.id}
-          entityLink="/collection/project"
-        />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-4">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={fetchedProject?.id}
+            entityLink="/collection/project"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <ProjectFormLayout />
     </DinaForm>

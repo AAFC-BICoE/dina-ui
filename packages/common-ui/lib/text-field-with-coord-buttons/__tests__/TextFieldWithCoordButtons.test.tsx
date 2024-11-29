@@ -1,24 +1,32 @@
+import { fireEvent } from "@testing-library/react";
 import { DinaForm } from "../../formik-connected/DinaForm";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { TextFieldWithCoordButtons } from "../TextFieldWithCoordButtons";
+import "@testing-library/jest-dom";
 
 describe("TextFieldWithCoordButtons component", () => {
   it("Inserts the symbol at the cursor's position.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <TextFieldWithCoordButtons name="myField" />
       </DinaForm>
     );
 
-    wrapper.find("button.coord-button").at(0).simulate("click");
-    wrapper.update();
+    fireEvent.click(wrapper.getByRole("button", { name: /°/i }));
+    expect((wrapper.getByRole("textbox") as HTMLInputElement).value).toEqual(
+      "°"
+    );
 
-    expect(wrapper.find("input").prop("value")).toEqual("°");
+    // Move cursor to the second part in the textbox.
+    fireEvent.change(wrapper.getByRole("textbox"), {
+      target: {
+        value: "asdf"
+      }
+    });
 
-    wrapper.find("input").simulate("change", { target: { value: "asdf" } });
-    wrapper.find("input").getDOMNode<HTMLInputElement>().selectionStart = 2;
-    wrapper.find("button.coord-button").at(0).simulate("click");
-    wrapper.update();
-    expect(wrapper.find("input").prop("value")).toEqual("as°df");
+    fireEvent.click(wrapper.getByRole("button", { name: /″/i }));
+    expect((wrapper.getByRole("textbox") as HTMLInputElement).value).toEqual(
+      "asdf″"
+    );
   });
 });

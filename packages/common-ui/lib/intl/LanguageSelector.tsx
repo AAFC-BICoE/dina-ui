@@ -1,24 +1,26 @@
+import { capitalize } from "lodash";
 import { useContext } from "react";
-import { intlContext } from "./IntlSupport";
 import Button from "react-bootstrap/Button";
-
-const LANGUAGE_LABELS = {
-  en: "English",
-  fr: "Français"
-};
+import { useInstanceContext } from "../instance/useInstanceContext";
+import { intlContext } from "./IntlSupport";
 
 export function LanguageSelector() {
   const { locale, setLocale } = useContext(intlContext);
+  const instanceContext = useInstanceContext();
 
   // This component fails to server-side render because the user's locale is unknown, so only
   // render it on the client where the locale is retrieved correctly.
   if (!process.browser) {
     return null;
   }
-
+  const supportedLanguagesArray: string[] =
+    instanceContext?.supportedLanguages?.split(",")?.length &&
+    instanceContext?.supportedLanguages !== ""
+      ? instanceContext?.supportedLanguages?.split(",")
+      : ["en"];
   return (
-    <div>
-      {Object.keys(LANGUAGE_LABELS)
+    <div data-testid="languageSelector">
+      {supportedLanguagesArray
         .filter((key) => key !== locale)
         .map((key) => {
           function onClick() {
@@ -33,7 +35,9 @@ export function LanguageSelector() {
               key={key}
               className="px-0"
             >
-              {LANGUAGE_LABELS[key]}
+              {capitalize(
+                new Intl.DisplayNames(key, { type: "language" }).of(key)
+              )}
             </Button>
           );
         })}

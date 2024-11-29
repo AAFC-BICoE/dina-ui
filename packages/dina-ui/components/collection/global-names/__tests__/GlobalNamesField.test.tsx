@@ -1,8 +1,10 @@
 import { DinaForm } from "common-ui";
 import React from "react";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { GlobalNamesSearchResult } from "../global-names-search-result-type";
 import { GlobalNamesField } from "../GlobalNamesField";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockOnChange = jest.fn((val, form) =>
   form.setFieldValue("scientificNameSource", val ? "GNA" : null)
@@ -17,7 +19,7 @@ const mockOnSubmit = jest.fn();
 describe("GlobalNamesField component", () => {
   beforeEach(jest.clearAllMocks);
   it("Sets a value from the global name API.", async () => {
-    const wrapper = mountWithAppContext(
+    const { container } = mountWithAppContext2(
       <DinaForm
         initialValues={{ scientificName: "", scientificNameSource: null }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -33,23 +35,30 @@ describe("GlobalNamesField component", () => {
       </DinaForm>
     );
 
-    wrapper
-      .find("input.global-name-input")
-      .simulate("change", { target: { value: "  monodon  " } });
+    // Simulate input change for the global name
+    const input = container.querySelector("input.global-name-input");
+    fireEvent.change(input!, { target: { value: "  monodon  " } });
 
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.global-name-search-button").simulate("click");
+    // Simulate clicking the search button
+    const searchButton = screen.getByRole("button", {
+      name: /search/i
+    });
+    fireEvent.click(searchButton);
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    await waitFor(() => {
+      const searchResults = screen.getAllByText(
+        "Monodontidae: Monodon Linnaeus, 1758"
+      );
+      expect(searchResults).toHaveLength(1);
+    });
 
-    expect(
-      wrapper.find(".gn-search-result-label").map((node) => node.text())
-    ).toEqual(["Monodontidae: Monodon Linnaeus, 1758"]);
-
-    wrapper.find(".global-name-select-button").at(1).simulate("click");
+    // Simulate selecting a search result
+    const selectButton = screen.getByRole("button", {
+      name: /select/i
+    });
+    fireEvent.click(selectButton);
 
     expect(mockOnChange.mock.calls).toEqual([
       ["  monodon  ", expect.anything()],
@@ -76,16 +85,15 @@ describe("GlobalNamesField component", () => {
       "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false"
     );
 
-    wrapper.update();
+    // Submit the form
+    const form = container.querySelector("form");
+    fireEvent.submit(form!);
 
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(mockOnSubmit).lastCalledWith({
-      scientificName: "Monodon Linnaeus, 1758",
-      scientificNameSource: "GNA"
+    await waitFor(() => {
+      expect(mockOnSubmit).lastCalledWith({
+        scientificName: "Monodon Linnaeus, 1758",
+        scientificNameSource: "GNA"
+      });
     });
   });
 });

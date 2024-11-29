@@ -1,11 +1,12 @@
 import {
   ColumnDefinition,
   CreateButton,
+  dateCell,
   descriptionCell,
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { groupCell } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
 import { PreparationType } from "../../../types/collection-api";
 
@@ -20,16 +21,21 @@ const PROJECT_TABLE_COLUMNS: ColumnDefinition<PreparationType>[] = [
     accessorKey: "name"
   },
   "status",
-  descriptionCell("multilingualDescription")
+  descriptionCell(false, false, "multilingualDescription"),
+  groupCell("group"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 export default function collectionMethodListPage() {
-  const { formatMessage } = useDinaIntl();
-
   return (
     <PageLayout
       titleId="projectListTitle"
-      buttonBarContent={<CreateButton entityLink="/collection/project" />}
+      buttonBarContent={
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/collection/project" />
+        </div>
+      }
     >
       <ListPageLayout
         filterAttributes={PROJECT_FILTER_ATTRIBUTES}

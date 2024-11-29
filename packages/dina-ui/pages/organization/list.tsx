@@ -1,5 +1,4 @@
 import {
-  ButtonBar,
   ColumnDefinition,
   CreateButton,
   ListPageLayout,
@@ -7,9 +6,8 @@ import {
   stringArrayCell
 } from "common-ui";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../components";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Organization } from "../../types/agent-api";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 const ORGANIZATION_FILTER_ATTRIBUTES = ["createdBy"];
 const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition<Organization>[] = [
@@ -40,29 +38,25 @@ const ORGANIZATION_TABLE_COLUMNS: ColumnDefinition<Organization>[] = [
 ];
 
 export default function OrganizationListPage() {
-  const { formatMessage } = useDinaIntl();
+  const buttonBarContent = (
+    <div className="flex d-flex ms-auto">
+      <CreateButton entityLink="/organization" />
+    </div>
+  );
 
   return (
-    <div>
-      <Head title={formatMessage("organizationListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="organizationListTitle" />
-        </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/organization" />
-        </ButtonBar>
-        <ListPageLayout
-          filterAttributes={ORGANIZATION_FILTER_ATTRIBUTES}
-          id="organization-list"
-          queryTableProps={{
-            columns: ORGANIZATION_TABLE_COLUMNS,
-            path: "agent-api/organization"
-          }}
-        />
-      </main>
-      <Footer />
-    </div>
+    <PageLayout
+      titleId="organizationListTitle"
+      buttonBarContent={buttonBarContent}
+    >
+      <ListPageLayout
+        filterAttributes={ORGANIZATION_FILTER_ATTRIBUTES}
+        id="organization-list"
+        queryTableProps={{
+          columns: ORGANIZATION_TABLE_COLUMNS,
+          path: "agent-api/organization"
+        }}
+      />
+    </PageLayout>
   );
 }

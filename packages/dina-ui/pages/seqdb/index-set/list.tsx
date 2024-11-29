@@ -6,7 +6,7 @@ import {
   dateCell
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav, groupCell8 } from "../../../components";
+import { Footer, Head, Nav, groupCell } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { IndexSet } from "../../../types/seqdb-api";
 
@@ -30,9 +30,9 @@ const INDEX_SET_TABLE_COLUMNS: ColumnDefinition<IndexSet>[] = [
     header: "Name",
     accessorKey: "name"
   },
-  groupCell8("group"),
   "forwardAdapter",
   "reverseAdapter",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];
@@ -43,14 +43,16 @@ export default function IndexSetListPage() {
   return (
     <>
       <Head title={formatMessage("indexSetListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/seqdb/index-set" />
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           <SeqdbMessage id="indexSetListTitle" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/seqdb/index-set" />
-        </ButtonBar>
         <ListPageLayout
           filterAttributes={INDEX_SET_FILTER_ATTRIBUTES}
           id="index-set-list"
@@ -60,6 +62,7 @@ export default function IndexSetListPage() {
           }}
         />
       </main>
+      <Footer />
     </>
   );
 }

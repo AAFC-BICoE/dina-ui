@@ -10,7 +10,7 @@ import {
   KitsuResponse,
   PersistedResource
 } from "kitsu";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useReducer, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
   ClientSideJoinSpec,
@@ -20,13 +20,11 @@ import {
   MetaWithTotal,
   ReactTable,
   ReactTableProps,
-  useColumnChooser,
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
-import { Tooltip } from "../tooltip/Tooltip";
 import { MultiSortTooltip } from "../list-page/MultiSortTooltip";
 
 /**
@@ -130,8 +128,6 @@ export interface QueryTableProps<TData extends KitsuResource> {
   topRightCorner?: ReactNode;
 
   ariaLabel?: string;
-
-  enableColumnChooser?: boolean;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -162,8 +158,7 @@ export function QueryTable<TData extends KitsuResource>({
   ariaLabel,
   enableFilters = false,
   defaultColumnFilters = [],
-  onColumnFiltersChange,
-  enableColumnChooser
+  onColumnFiltersChange
 }: QueryTableProps<TData>) {
   const { formatMessage, formatNumber } = useIntl();
 
@@ -184,12 +179,6 @@ export function QueryTable<TData extends KitsuResource>({
   });
 
   const divWrapperRef = useRef<HTMLDivElement>(null);
-
-  const { columnChooser, checkedColumnIds } = useColumnChooser({
-    columns,
-    localStorageKey: path,
-    hideExportButton: true
-  });
 
   function onPageChangeInternal(pageNumber: number) {
     const newOffset = pageNumber * page.limit;
@@ -332,10 +321,10 @@ export function QueryTable<TData extends KitsuResource>({
       ? reactTableProps(queryState)
       : reactTableProps ?? {};
   if (resolvedReactTableProps.enableSorting === undefined) {
-    resolvedReactTableProps.enableSorting = true; 
+    resolvedReactTableProps.enableSorting = true;
   }
   if (resolvedReactTableProps.enableMultiSort === undefined) {
-    resolvedReactTableProps.enableMultiSort = true; 
+    resolvedReactTableProps.enableMultiSort = true;
   }
   // Show the last loaded page while loading the next page:
   const displayData = lastSuccessfulResponse.current?.data;
@@ -376,10 +365,7 @@ export function QueryTable<TData extends KitsuResource>({
           </span>
         )}
         <div className="ms-auto">
-          <div>
-            {enableColumnChooser && columnChooser}
-            {topRightCorner}
-          </div>
+          <div>{topRightCorner}</div>
 
           {/* Multi sort tooltip - Only shown if it's possible to sort */}
           {resolvedReactTableProps.enableMultiSort && <MultiSortTooltip />}
@@ -387,19 +373,9 @@ export function QueryTable<TData extends KitsuResource>({
       </div>
       <ReactTable<TData>
         className="-striped"
-        columns={
-          enableColumnChooser
-            ? mappedColumns.filter((column) =>
-                typeof column === "string"
-                  ? checkedColumnIds.includes(column)
-                  : (column as any).accessorKey
-                  ? checkedColumnIds.includes((column as any).accessorKey)
-                  : false
-              )
-            : mappedColumns
-        }
+        columns={mappedColumns}
         data={(displayData as TData[]) ?? []}
-        defaultSorted={sortingRules}
+        sort={sortingRules}
         loading={loadingProp || queryIsLoading}
         enableFilters={enableFilters}
         defaultColumnFilters={columnFilters}
@@ -444,6 +420,16 @@ export function QueryTable<TData extends KitsuResource>({
             : resolvedReactTableProps.TbodyComponent
         }
       />
+      {!omitPaging && (
+        <div className="mt-2">
+          <span>
+            <CommonMessage
+              id="tableTotalCount"
+              values={{ totalCount: formatNumber(totalCount) }}
+            />
+          </span>
+        </div>
+      )}
     </div>
   );
 }

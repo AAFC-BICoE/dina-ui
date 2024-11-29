@@ -7,10 +7,15 @@ import {
   BulkSelectableFormValues,
   CommonMessage,
   FormikButton,
+  Operation,
   useApiClient,
   useModal
 } from "..";
 import { uuidQuery } from "../list-page/query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { DynamicFieldsMappingConfig, TableColumn } from "../list-page/types";
+import { KitsuResource, PersistedResource } from "kitsu";
+import { useSessionStorage } from "usehooks-ts";
+import { MaterialSample } from "../../../dina-ui/types/collection-api";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -32,7 +37,7 @@ export function BulkDeleteButton({
 }: BulkDeleteButtonProps) {
   const router = useRouter();
   const { openModal } = useModal();
-  const { doOperations } = useApiClient();
+  const { apiClient, bulkGet, doOperations } = useApiClient();
 
   return (
     <FormikButton
@@ -52,13 +57,47 @@ export function BulkDeleteButton({
               </span>
             }
             onYesButtonClicked={async () => {
-              await doOperations(
-                resourceIds.map((id) => ({
-                  op: "DELETE",
-                  path: `${typeName}/${id}`
-                })),
-                { apiBaseUrl }
-              );
+              // Fetch the resources linked with material-sample for deletion
+              let materialSamples: PersistedResource<MaterialSample>[] = [];
+              if (typeName === "material-sample") {
+                materialSamples = await bulkGet<MaterialSample>(
+                  resourceIds.map(
+                    (id) => `/material-sample/${id}?include=storageUnitUsage`
+                  ),
+                  { apiBaseUrl: "/collection-api" }
+                );
+              }
+              for (const resourceId of resourceIds) {
+                try {
+                  await apiClient.axios.delete(
+                    `${apiBaseUrl}/${typeName}/${resourceId}`
+                  );
+                } catch (e) {
+                  if (e.cause.status === 404) {
+                    console.warn(e.cause);
+                  } else {
+                    throw e;
+                  }
+                }
+              }
+              // Delete resources linked to the deleted material samples
+              if (
+                typeName === "material-sample" &&
+                materialSamples.length > 0
+              ) {
+                const deleteOperations: Operation[] = materialSamples
+                  .filter(
+                    (materialSample) => !!materialSample.storageUnitUsage?.id
+                  )
+                  .map((materialSample) => ({
+                    op: "DELETE",
+                    path: `storage-unit-usage/${materialSample.storageUnitUsage?.id}`
+                  }));
+
+                await doOperations(deleteOperations, {
+                  apiBaseUrl: "/collection-api"
+                });
+              }
 
               // Refresh the page:
               await router.reload();
@@ -94,7 +133,7 @@ export function BulkEditButton({
   return (
     <FormikButton
       buttonProps={bulkButtonProps}
-      className="btn btn-primary ms-2 bulk-edit-button"
+      className="btn btn-primary bulk-edit-button"
       onClick={async (values: BulkSelectableFormValues) => {
         const ids = toPairs(values.itemIdsToSelect)
           .filter((pair) => pair[1])
@@ -113,12 +152,16 @@ export function BulkEditButton({
   );
 }
 
-export interface DataExportButtonProps {
+export interface DataExportButtonProps<TData extends KitsuResource> {
   /** Where to perform the request for the data export. */
   pathname: string;
   totalRecords: number;
   query: any;
+  uniqueName: string;
+  columns: TableColumn<TData>[];
+  dynamicFieldMapping: DynamicFieldsMappingConfig | undefined;
   indexName: string;
+  entityLink: string;
 }
 
 /**
@@ -126,39 +169,65 @@ export interface DataExportButtonProps {
  *
  * This constant is available to use for setting and retrieving the value.
  */
-export const DATA_EXPORT_SEARCH_RESULTS_KEY = "dataExportSearchResults";
+export const DATA_EXPORT_QUERY_KEY = "dataExportQuery";
 export const DATA_EXPORT_TOTAL_RECORDS_KEY = "dataExportTotalRecords";
+export const DATA_EXPORT_COLUMNS_KEY = "dataExportColumns";
+export const DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY = "dynamicFieldMapping";
+export const OBJECT_EXPORT_IDS_KEY = "objectExportIds";
 
-export function DataExportButton({
+export function DataExportButton<TData extends KitsuResource>({
   pathname,
   totalRecords,
   query,
-  indexName
-}: DataExportButtonProps) {
+  uniqueName,
+  columns,
+  dynamicFieldMapping,
+  indexName,
+  entityLink
+}: DataExportButtonProps<TData>) {
   const router = useRouter();
-
+  const [exportObjectIds, setExportObjectIds] = useSessionStorage<string[]>(
+    OBJECT_EXPORT_IDS_KEY,
+    []
+  );
+  const [_, setTotalRecords] = useSessionStorage<number>(
+    DATA_EXPORT_TOTAL_RECORDS_KEY,
+    totalRecords
+  );
   return (
     <FormikButton
       buttonProps={(_ctx) => ({ disabled: totalRecords === 0 })}
-      className="btn btn-primary ms-2 bulk-edit-button"
+      className="btn btn-primary"
       onClick={async (values: BulkSelectableFormValues) => {
         const selectedResourceIds: string[] = values.itemIdsToSelect
           ? Object.keys(values.itemIdsToSelect)
           : [];
         const selectedIdsQuery = uuidQuery(selectedResourceIds);
+        setExportObjectIds(selectedResourceIds);
         writeStorage<any>(
-          DATA_EXPORT_SEARCH_RESULTS_KEY,
+          DATA_EXPORT_QUERY_KEY,
           selectedResourceIds.length > 0 ? selectedIdsQuery : query
         );
-        writeStorage<number>(
-          DATA_EXPORT_TOTAL_RECORDS_KEY,
+        setTotalRecords(
           selectedResourceIds.length > 0
             ? selectedResourceIds.length
             : totalRecords
         );
+        writeStorage<TableColumn<TData>[]>(
+          `${uniqueName}_${DATA_EXPORT_COLUMNS_KEY}`,
+          columns
+        );
+        writeStorage<DynamicFieldsMappingConfig | undefined>(
+          `${uniqueName}_${DATA_EXPORT_DYNAMIC_FIELD_MAPPING_KEY}`,
+          dynamicFieldMapping
+        );
         await router.push({
           pathname,
-          query: { hideTable: true, indexName }
+          query: {
+            uniqueName,
+            indexName,
+            entityLink
+          }
         });
       }}
     >

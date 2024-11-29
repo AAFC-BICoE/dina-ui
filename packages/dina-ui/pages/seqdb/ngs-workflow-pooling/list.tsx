@@ -6,7 +6,13 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import {
+  Footer,
+  groupCell,
+  GroupSelectField,
+  Head,
+  Nav
+} from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { LibraryPool } from "../../../types/seqdb-api";
 
@@ -25,7 +31,7 @@ const TABLE_COLUMNS: ColumnDefinition<LibraryPool>[] = [
     header: () => <SeqdbMessage id="libraryPoolingName" />
   },
   dateCell("dateUsed"),
-  "group",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];
@@ -45,18 +51,20 @@ export default function NgsWorkflowPoolingListPage() {
   return (
     <div>
       <Head title={formatMessage("ngsWorkflowWholeGenomeSeqPoolingTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex">
+          <Link href={`/seqdb/ngs-workflow-pooling/run`}>
+            <a className="btn btn-primary ms-auto">
+              <SeqdbMessage id="startNewWorkflow" />
+            </a>
+          </Link>
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           {formatMessage("ngsWorkflowWholeGenomeSeqPoolingTitle")}
         </h1>
-        <ButtonBar>
-          <Link href={`/seqdb/ngs-workflow-pooling/run`}>
-            <a className="btn btn-primary">
-              <SeqdbMessage id="startNewWorkflow" />
-            </a>
-          </Link>
-        </ButtonBar>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             // Apply group filter:

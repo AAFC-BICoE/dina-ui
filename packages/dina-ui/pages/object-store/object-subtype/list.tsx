@@ -8,7 +8,7 @@ import {
   QueryTableProps
 } from "common-ui";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../../components";
+import { Footer, groupCell, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
@@ -27,6 +27,7 @@ const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
     header: () => <FieldHeader name="acSubtype" />
   },
   "dcType",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];
@@ -42,14 +43,16 @@ export default function ObjectSubtypeListPage() {
   return (
     <>
       <Head title={formatMessage("objectSubtypeListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex ms-auto">
+          <CreateButton entityLink="/object-store/object-subtype" />
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="objectSubtypeListTitle" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/object-store/object-subtype" />
-        </ButtonBar>
         <div className="w-100">
           <QueryTable {...queryTableProps} />
         </div>

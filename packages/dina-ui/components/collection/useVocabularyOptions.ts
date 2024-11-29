@@ -9,7 +9,10 @@ import { VocabularyOption } from "./VocabularySelectField";
 
 /** Gets the vocab options from the back-end. */
 export default function useVocabularyOptions({ path }) {
-  const { response, loading } = useQuery<Vocabulary>({ path });
+  const { response, loading } = useQuery<Vocabulary>({
+    path,
+    page: { limit: 1000 }
+  });
   const { locale } = useDinaIntl();
 
   const vocabOptions = response?.data?.vocabularyElements?.map(toOption) ?? [];

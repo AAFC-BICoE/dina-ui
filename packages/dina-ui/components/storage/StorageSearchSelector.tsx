@@ -19,7 +19,7 @@ import {
 
 export interface StorageSearchSelectorProps {
   /**
-   * To prevent displaying itself in the search results, this UUID will be filtered from the 
+   * To prevent displaying itself in the search results, this UUID will be filtered from the
    * results.
    */
   parentStorageUnitUUID?: string;
@@ -79,7 +79,10 @@ export function StorageSearchSelector({
           background-color: rgb(222, 252, 222) !important;
         }
       `}</style>
-      <StorageFilter onChange={setFilter} parentStorageUnitUUID={parentStorageUnitUUID} />
+      <StorageFilter
+        onChange={setFilter}
+        parentStorageUnitUUID={parentStorageUnitUUID}
+      />
       <QueryTable
         columns={tableColumns}
         path="collection-api/storage-unit"

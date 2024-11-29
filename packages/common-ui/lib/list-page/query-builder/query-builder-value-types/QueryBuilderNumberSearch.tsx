@@ -3,10 +3,21 @@ import {
   includedTypeQuery,
   rangeQuery,
   termQuery,
-  existsQuery
+  existsQuery,
+  inQuery,
+  betweenQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
+import {
+  convertStringToBetweenState,
+  useQueryBetweenSupport
+} from "../query-builder-core-components/useQueryBetweenSupport";
+import { ValidationResult } from "../query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
+
+// Decimal / Integer validation (Negative numbers supported.)
+export const NUMBER_REGEX = /^-?\d+(?:\.\d+)?$/;
 
 interface QueryBuilderNumberSearchProps {
   /**
@@ -32,19 +43,40 @@ export default function QueryBuilderNumberSearch({
 }: QueryBuilderNumberSearchProps) {
   const { formatMessage } = useIntl();
 
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
+
+  const { BetweenElement } = useQueryBetweenSupport({
+    type: "number",
+    matchType,
+    setValue,
+    value
+  });
+
+  const rangeSupport: boolean = matchType === "in" || matchType === "notIn";
+
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {matchType !== "empty" && matchType !== "notEmpty" && (
-        <input
-          type="number"
-          value={value ?? ""}
-          onChange={(newValue) => setValue?.(newValue?.target?.value)}
-          className="form-control"
-          placeholder={formatMessage({
-            id: "queryBuilder_value_number_placeholder"
-          })}
-        />
+        <>
+          {matchType === "between" ? (
+            BetweenElement
+          ) : (
+            <input
+              type={rangeSupport ? "text" : "number"}
+              value={value ?? ""}
+              onChange={(newValue) => setValue?.(newValue?.target?.value)}
+              className="form-control"
+              placeholder={formatMessage({
+                id: rangeSupport
+                  ? "queryBuilder_value_in_placeholder"
+                  : "queryBuilder_value_number_placeholder"
+              })}
+              onKeyDown={onKeyDown}
+            />
+          )}
+        </>
       )}
     </>
   );
@@ -89,6 +121,21 @@ export function transformNumberSearchToDSL({
             }
           }
         : rangeQuery(fieldPath, buildNumberRangeObject(operation, value));
+
+    // List of numbers, comma-separated.
+    case "in":
+    case "notIn":
+      return inQuery(
+        fieldPath,
+        value,
+        parentType,
+        false,
+        operation === "notIn"
+      );
+
+    // Between (range) operator
+    case "between":
+      return betweenQuery(fieldPath, value, parentType, "number");
 
     // Not equals match type.
     case "notEquals":
@@ -242,4 +289,84 @@ function buildNumberRangeObject(matchType, value) {
     case "lessThanOrEqualTo":
       return { lte: value };
   }
+}
+
+export function validateNumber(
+  fieldName: string,
+  value: string,
+  operator: string,
+  formatMessage: any
+): ValidationResult {
+  switch (operator) {
+    // Ensure a number is provided for these cases.
+    case "equals":
+    case "notEquals":
+    case "greaterThan":
+    case "greaterThanOrEqualTo":
+    case "lessThan":
+    case "lessThanOrEqualTo":
+      if (value == null || value === "") return true;
+      if (!NUMBER_REGEX.test(value)) {
+        return {
+          errorMessage: formatMessage({ id: "numberInvalid" }),
+          fieldName
+        };
+      }
+      break;
+
+    // Between validation
+    case "between":
+      const betweenStates = convertStringToBetweenState(value);
+      if (betweenStates.low === "" && betweenStates.high === "") return true;
+
+      // If just one between state is empty, then report an error.
+      if (betweenStates.low === "" || betweenStates.high === "") {
+        return {
+          errorMessage: formatMessage({ id: "numberBetweenMissingValues" }),
+          fieldName
+        };
+      }
+
+      if (
+        !NUMBER_REGEX.test(betweenStates.low) ||
+        !NUMBER_REGEX.test(betweenStates.high)
+      ) {
+        return {
+          errorMessage: formatMessage({ id: "numberInvalid" }),
+          fieldName
+        };
+      }
+
+      if (Number(betweenStates.low) > Number(betweenStates.high)) {
+        return {
+          errorMessage: formatMessage({ id: "numberBetweenInvalid" }),
+          fieldName
+        };
+      }
+      break;
+
+    case "in":
+    case "notIn":
+      // Retrieve all of the potential numbers, by spliting by commas and removing leading/trailing whitespace.
+      let invalidNumberFound = false;
+      value
+        .split(",")
+        .map((item) => item.trim())
+        .forEach((val) => {
+          if (!NUMBER_REGEX.test(val) && val !== "") {
+            invalidNumberFound = true;
+          }
+        });
+
+      // If an invalid number was found, return an error message.
+      if (invalidNumberFound) {
+        return {
+          errorMessage: formatMessage({ id: "numberInRangeInvalid" }),
+          fieldName
+        };
+      }
+      break;
+  }
+
+  return true;
 }

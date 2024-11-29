@@ -1,26 +1,27 @@
 import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
-import {
-  ColumnSort,
-  Row,
-  SortingState,
-  VisibilityState
-} from "@tanstack/react-table";
+import { ColumnSort, Row, SortingState } from "@tanstack/react-table";
 import { FormikContextType } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { compact, toPairs, uniqBy } from "lodash";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { toPairs, uniqBy } from "lodash";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  CSSProperties
+} from "react";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
 import {
+  ColumnSelectorMemo,
   FormikButton,
   ReactTable,
   ReactTableProps,
-  useAccount,
-  useColumnChooser
+  useAccount
 } from "..";
-import { GroupSelectField } from "../../../dina-ui/components";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import {
@@ -49,13 +50,21 @@ import {
   applyRootQuery,
   applySortingRules,
   applySourceFiltering,
-  elasticSearchFormatExport
+  elasticSearchFormatExport,
+  processResults
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import {
   CustomViewField,
   useQueryBuilderConfig
 } from "./query-builder/useQueryBuilderConfig";
 import { DynamicFieldsMappingConfig, TableColumn } from "./types";
+import { useSessionStorage } from "usehooks-ts";
+import {
+  ValidationError,
+  getElasticSearchValidationResults
+} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchValidator";
+import { MemoizedReactTable } from "./QueryPageTable";
+import { GroupSelectFieldMemoized } from "./QueryGroupSelection";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingState = [
@@ -72,9 +81,19 @@ const DEFAULT_SORT: SortingState = [
  */
 const MAX_COUNT_SIZE: number = 10000;
 
+/**
+ * Elastic search has an offset limit of 10,000 records. If you offset more than 10,000 records
+ * it will result in a bad request error.
+ *
+ * A user-friendly error message will be displayed instead.
+ */
+const MAX_OFFSET: number = 10000;
+
 export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Columns to render on the table. This will also be used to map the data to a specific column.
+   *
+   * If the column selector is being used, this is the default columns to be shown for new users.
    */
   columns: TableColumn<TData>[];
 
@@ -110,6 +129,43 @@ export interface QueryPageProps<TData extends KitsuResource> {
   dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
   /**
+   * This will add an option to the QueryBuilder to allow users to check if a relationship exists.
+   */
+  enableRelationshipPresence?: boolean;
+
+  /**
+   * Array of relationshipType columns to be excluded from the dropdown menu
+   */
+  excludedRelationshipTypes?: string[];
+
+  /**
+   * IDs of the columns that should always be displayed and cannot be deleted.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  mandatoryDisplayedColumns?: string[];
+
+  /**
+   * IDs of the columns that will not be shown in the export field list.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  nonExportableColumns?: string[];
+
+  /**
+   * IDs of the columns that should not be displayed in the Query Builder field selector.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  nonSearchableColumns?: string[];
+
+  /**
    * By default, the QueryPage will try sorting using `createdOn` attribute. You can override this
    * setting by providing your own default sort.
    */
@@ -129,10 +185,9 @@ export interface QueryPageProps<TData extends KitsuResource> {
   bulkEditPath?: string;
 
   /**
-   * Adds the data export button and the row checkboxes.
-   * The query path to perform for data exporting.
+   * Adds the data export button.
    */
-  dataExportPath?: string;
+  dataExportProps?: { dataExportPath: string; entityLink: string };
 
   /** Query path if user selected only 1 item */
   singleEditPath?: string;
@@ -225,11 +280,16 @@ export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Styling to be applied to each row of the React Table
    */
-  rowStyling?: (row: Row<TData>) => any;
+  rowStyling?: (row: Row<TData>) => CSSProperties | undefined;
 
   enableDnd?: boolean;
 
-  enableColumnChooser?: boolean;
+  /**
+   * Display the column selector, this will display all the same columns from the QueryBuilder.
+   *
+   * Default is true.
+   */
+  enableColumnSelector?: boolean;
 }
 
 /**
@@ -241,17 +301,23 @@ export interface QueryPageProps<TData extends KitsuResource> {
  * * Sorting
  * * Filtering using ElasticSearch Indexing
  * * Saved Searches
+ * * Column Selector
  */
 export function QueryPage<TData extends KitsuResource>({
   indexName,
   uniqueName,
   dynamicFieldMapping,
+  enableRelationshipPresence = false,
+  excludedRelationshipTypes,
+  mandatoryDisplayedColumns,
+  nonExportableColumns,
+  nonSearchableColumns,
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
   bulkSplitPath,
   singleEditPath,
-  dataExportPath,
+  dataExportProps,
   reactTableProps,
   defaultSort,
   defaultPageSize,
@@ -267,11 +333,16 @@ export function QueryPage<TData extends KitsuResource>({
   enableDnd = false,
   onSelect,
   onDeselect,
-  enableColumnChooser = true
+  enableColumnSelector = true
 }: QueryPageProps<TData>) {
+  // Loading state
+  const [loading, setLoading] = useState<boolean>(true);
+  const [columnSelectorLoading, setColumnSelectorLoading] =
+    useState<boolean>(true);
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
+  const isActionTriggeredQuery = useRef(false);
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -279,6 +350,12 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Total number of records from the query. This is not the total displayed on the screen.
   const [totalRecords, setTotalRecords] = useState<number>(0);
+
+  // Columns to be displayed on the table, if column selector is used this can be anything. Default
+  // is the columns prop if not being used.
+  const [displayedColumns, setDisplayedColumns] = useState<
+    TableColumn<TData>[]
+  >([]);
 
   // User applied sorting rules for elastic search to use.
   const localStorageLastUsedSortKey = uniqueName + "-last-used-sort";
@@ -313,10 +390,12 @@ export function QueryPage<TData extends KitsuResource>({
     useState<ImmutableTree>(defaultQueryTree());
 
   // The query builder configuration.
-  const { queryBuilderConfig } = useQueryBuilderConfig({
+  const { queryBuilderConfig, indexMap } = useQueryBuilderConfig({
     indexName,
     dynamicFieldMapping,
-    customViewFields
+    enableRelationshipPresence,
+    customViewFields,
+    nonSearchableColumns
   });
 
   // Groups selected for the search.
@@ -328,54 +407,108 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(
-    bulkDeleteButtonProps || bulkEditPath || dataExportPath
+    bulkDeleteButtonProps || bulkEditPath || dataExportProps
   );
-
-  // Loading state
-  const [loading, setLoading] = useState<boolean>(true);
 
   // Query Page error message state
   const [error, setError] = useState<any>();
 
-  const defaultGroups = {
-    group: groups
-  };
+  // Query page validation errors
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    []
+  );
+
+  const defaultGroups = useMemo(() => {
+    return { group: groups };
+  }, [groups]);
+
+  const sessionStorageLastUsedKeyTreeKey = uniqueName + "-last-used-tree";
+  const localStorageLastUsedSavedSearchChangedKey =
+    uniqueName + "-saved-search-changed";
+  const [sessionStorageQueryTree, setSessionStorageQueryTree] =
+    useSessionStorage<JsonTree>(
+      sessionStorageLastUsedKeyTreeKey,
+      defaultJsonTree
+    );
+
+  /** If column selector is not being used, just load the default columns in. */
+  useEffect(() => {
+    if (!enableColumnSelector) {
+      setDisplayedColumns(columns);
+    }
+  }, [enableColumnSelector]);
 
   useEffect(() => {
-    if (viewMode && selectedResources?.length) {
+    if (viewMode && selectedResources?.length !== undefined) {
       setTotalRecords(selectedResources?.length);
+      setLoading(false);
     }
   }, [viewMode, selectedResources]);
+
+  // Determine validation errors after each tree change.
+  useEffect(() => {
+    // Query builder is not setup yet.
+    if (!queryBuilderConfig) {
+      return;
+    }
+
+    // Custom validation logic.
+    if (!customViewElasticSearchQuery) {
+      const validationErrorsFound = getElasticSearchValidationResults(
+        queryBuilderTree,
+        queryBuilderConfig,
+        formatMessage
+      );
+
+      setValidationErrors(validationErrorsFound);
+    }
+  }, [queryBuilderTree]);
 
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
     // If in view mode with selected resources, no requests need to be made.
-    if (viewMode && selectedResources?.length) {
+    if (viewMode && selectedResources?.length !== undefined) {
       setLoading(false);
       return;
     }
-
-    setLoading(true);
 
     // Reset any error messages since we are trying again.
     setError(undefined);
 
     // Query builder is not setup yet.
     if (!submittedQueryBuilderTree || !queryBuilderConfig) {
-      setLoading(false);
       return;
     }
 
     // Check the tree for any validation issues. Do not submit query if issues exist.
     if (!Utils.isValidTree(submittedQueryBuilderTree)) {
-      setLoading(false);
+      return;
+    }
+
+    // Custom validation logic.
+    if (!customViewElasticSearchQuery) {
+      const validationErrorsFound = getElasticSearchValidationResults(
+        submittedQueryBuilderTree,
+        queryBuilderConfig,
+        formatMessage
+      );
+      setValidationErrors(validationErrorsFound);
+
+      // If any errors are found, do not continue with the search.
+      if (validationErrorsFound.length > 0) {
+        return;
+      }
+    }
+
+    // Ensure displayedColumns has been loaded in.
+    if (displayedColumns.length === 0) {
       return;
     }
 
     // Elastic search query with pagination settings.
     let queryDSL;
-
     if (customViewElasticSearchQuery) {
+      isActionTriggeredQuery.current = true;
       queryDSL = customViewElasticSearchQuery;
     } else {
       queryDSL = elasticSearchFormatExport(
@@ -384,101 +517,93 @@ export function QueryPage<TData extends KitsuResource>({
       );
     }
 
+    const combinedColumns = uniqBy([...columns, ...displayedColumns], "id");
+
     queryDSL = applyRootQuery(queryDSL);
-    queryDSL = applyGroupFilters(queryDSL, groups);
+
+    // Custom queries should not be adding the group.
+    if (!customViewElasticSearchQuery) {
+      queryDSL = applyGroupFilters(queryDSL, groups);
+    }
+
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
-    queryDSL = applySortingRules(queryDSL, sortingRules, columns);
-    queryDSL = applySourceFiltering(queryDSL, columns);
+    queryDSL = applySortingRules(queryDSL, sortingRules, combinedColumns);
+    queryDSL = applySourceFiltering(queryDSL, combinedColumns);
 
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) {
-      setLoading(false);
       return;
     }
 
     // Save elastic search query for export page
     setElasticSearchQuery({ ...queryDSL });
 
-    // Fetch data using elastic search.
-    // The included section will be transformed from an array to an object with the type name for each relationship.
-    elasticSearchRequest(queryDSL)
-      .then((result) => {
-        const processedResult = result?.hits.map((rslt) => {
-          return {
-            id: rslt._source?.data?.id,
-            type: rslt._source?.data?.type,
-            data: {
-              attributes: rslt._source?.data?.attributes
-            },
-            included: rslt._source?.included?.reduce(
-              (includedAccumulator, currentIncluded) => {
-                if (
-                  currentIncluded?.type === "organism" ||
-                  currentIncluded?.type === "derivative"
-                ) {
-                  if (!includedAccumulator[currentIncluded?.type]) {
-                    return (
-                      (includedAccumulator[currentIncluded?.type] = [
-                        currentIncluded
-                      ]),
-                      includedAccumulator
-                    );
-                  } else {
-                    return (
-                      includedAccumulator[currentIncluded?.type].push(
-                        currentIncluded
-                      ),
-                      includedAccumulator
-                    );
-                  }
-                } else {
-                  return (
-                    (includedAccumulator[currentIncluded?.type] =
-                      currentIncluded),
-                    includedAccumulator
-                  );
-                }
-              },
-              {}
-            )
-          };
-        });
-        // If we have reached the count limit, we will need to perform another request for the true
-        // query size.
-        if (result?.total.value === MAX_COUNT_SIZE) {
-          elasticSearchCountRequest(queryDSL)
-            .then((countResult) => {
-              setTotalRecords(countResult);
-            })
-            .catch((elasticSearchError) => {
-              setError(elasticSearchError);
-            });
-        } else {
-          setTotalRecords(result?.total?.value ?? 0);
-        }
+    // ElasticSearch has an offset limit of 10,000, display a user-friendly error message if
+    // exceeded.
+    if (pageOffset >= MAX_OFFSET) {
+      setError(formatMessage({ id: "pageSizeError" }));
+      setLoading(false);
+      return;
+    }
 
-        setAvailableResources(processedResult);
-        setSearchResults(processedResult);
-      })
-      .catch((elasticSearchError) => {
-        setError(elasticSearchError);
-      })
-      .finally(() => {
-        // No matter the end result, loading should stop.
-        setLoading(false);
-      });
-  }, [pageSize, pageOffset, sortingRules, submittedQueryBuilderTree, groups]);
+    if (isActionTriggeredQuery.current === true) {
+      isActionTriggeredQuery.current = false;
+      setLoading(true);
+
+      // Fetch data using elastic search.
+      // The included section will be transformed from an array to an object with the type name for each relationship.
+      elasticSearchRequest(queryDSL)
+        .then((result) => {
+          const processedResult = processResults(result);
+
+          // If we have reached the count limit, we will need to perform another request for the true
+          // query size.
+          if (result?.total.value === MAX_COUNT_SIZE) {
+            elasticSearchCountRequest(queryDSL)
+              .then((countResult) => {
+                setTotalRecords(countResult);
+              })
+              .catch((elasticSearchError) => {
+                setError(elasticSearchError);
+              });
+          } else {
+            setTotalRecords(result?.total?.value ?? 0);
+          }
+
+          setAvailableResources(processedResult);
+          setSearchResults(processedResult);
+        })
+        .catch((elasticSearchError) => {
+          setError(elasticSearchError);
+        })
+        .finally(() => {
+          // No matter the end result, loading should stop.
+          setLoading(false);
+        });
+    }
+  }, [
+    pageSize,
+    pageOffset,
+    sortingRules,
+    submittedQueryBuilderTree,
+    groups,
+    displayedColumns,
+    customViewElasticSearchQuery
+  ]);
 
   // Once the configuration is setup, we can display change the tree.
   useEffect(() => {
-    if (queryBuilderConfig && viewMode) {
-      if (customViewQuery) {
-        const newTree = Utils.loadTree(customViewQuery);
-        setSubmittedQueryBuilderTree(newTree);
-        setQueryBuilderTree(newTree);
-      } else if (customViewElasticSearchQuery) {
-        setSubmittedQueryBuilderTree(emptyQueryTree());
-        setQueryBuilderTree(emptyQueryTree());
+    if (queryBuilderConfig) {
+      isActionTriggeredQuery.current = true;
+      if (viewMode) {
+        if (customViewQuery) {
+          const newTree = Utils.loadTree(customViewQuery);
+          setSubmittedQueryBuilderTree(newTree);
+          setQueryBuilderTree(newTree);
+        } else if (customViewElasticSearchQuery && !enableColumnSelector) {
+          setSubmittedQueryBuilderTree(emptyQueryTree());
+          setQueryBuilderTree(emptyQueryTree());
+        }
       }
     }
   }, [
@@ -487,6 +612,13 @@ export function QueryPage<TData extends KitsuResource>({
     customViewFields,
     customViewElasticSearchQuery
   ]);
+
+  // If column selector is disabled, the loading spinner should be turned off.
+  useEffect(() => {
+    if (!enableColumnSelector) {
+      setColumnSelectorLoading(false);
+    }
+  }, [enableColumnSelector]);
 
   /**
    * Used for selection mode only.
@@ -501,6 +633,7 @@ export function QueryPage<TData extends KitsuResource>({
     formValues,
     formik: FormikContextType<any>
   ) {
+    isActionTriggeredQuery.current = true;
     // Ensure selectedResources has been setup correctly.
     if (!selectedResources || !setSelectedResources) {
       console.error(
@@ -544,6 +677,7 @@ export function QueryPage<TData extends KitsuResource>({
    * @param formik Formik Context
    */
   function removeSelectedResources(formValues, formik: FormikContextType<any>) {
+    isActionTriggeredQuery.current = true;
     // Ensure selectedResources has been setup correctly.
     if (!selectedResources || !setSelectedResources) {
       console.error(
@@ -641,26 +775,16 @@ export function QueryPage<TData extends KitsuResource>({
         )
       : reactTableProps;
 
-  const columnVisibility = compact(
-    columns.map((col) =>
-      col.isColumnVisible === false
-        ? { id: col.id, visibility: false }
-        : undefined
-    )
-  ).reduce<VisibilityState>(
-    (prev, cur, _) => ({ ...prev, [cur.id as string]: cur.visibility }),
-    {}
-  );
-
   const resolvedReactTableProps: Partial<ReactTableProps<TData>> = {
-    defaultSorted: sortingRules,
-    columnVisibility,
+    sort: sortingRules,
     ...computedReactTableProps
   };
 
   // Columns generated for the search results.
-  const columnsResults: TableColumn<TData>[] = [
-    ...(showRowCheckboxes || selectionMode
+  const columnsResults = useMemo(() => {
+    const showSelectColumn = showRowCheckboxes || selectionMode;
+
+    const selectColumn = showSelectColumn
       ? [
           {
             id: "selectColumn",
@@ -672,9 +796,10 @@ export function QueryPage<TData extends KitsuResource>({
             size: 200
           }
         ]
-      : []),
-    ...columns
-  ];
+      : [];
+
+    return uniqBy([...selectColumn, ...displayedColumns], "id");
+  }, [showRowCheckboxes, selectionMode, displayedColumns, searchResults]);
 
   // Columns generated for the selected resources, only in selection mode.
   const columnsSelected: TableColumn<TData>[] = [
@@ -694,18 +819,16 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
-  const localStorageLastUsedKey = uniqueName + "-last-used-tree";
-  const localStorageLastUsedTreeKey = uniqueName + "-saved-search-changed";
-
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
    * performed.
    */
   const onReset = useCallback(() => {
+    isActionTriggeredQuery.current = true;
     setSubmittedQueryBuilderTree(defaultQueryTree());
     setQueryBuilderTree(defaultQueryTree());
-    writeStorage(localStorageLastUsedKey, defaultJsonTree);
-    writeStorage(localStorageLastUsedTreeKey, false);
+    setSessionStorageQueryTree(defaultJsonTree);
+    writeStorage(localStorageLastUsedSavedSearchChangedKey, false);
     setSortingRules(defaultSort ?? DEFAULT_SORT);
     setError(undefined);
     setPageOffset(0);
@@ -716,17 +839,43 @@ export function QueryPage<TData extends KitsuResource>({
    * a new search.
    */
   const onSubmit = () => {
+    isActionTriggeredQuery.current = true;
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
-    writeStorage(localStorageLastUsedKey, Utils.getTree(queryBuilderTree));
+    setSessionStorageQueryTree(Utils.getTree(queryBuilderTree));
   };
 
   /**
    * When the group filter has changed, store the new value for the search.
    */
   const onGroupChange = useCallback((newGroups: string[]) => {
+    isActionTriggeredQuery.current = true;
     setGroups(newGroups);
   }, []);
+
+  /**
+   * When the displayed columns are changed from the column selector, we need to trigger
+   * a new elastic search query since the _source changes.
+   *
+   * Elasticsearch query is not regenerated if the order only changed since we still have all
+   * the fields required.
+   */
+  const onDisplayedColumnsChange = useCallback(
+    (newDisplayedColumns: TableColumn<TData>[]) => {
+      // Check if order has changed (ignoring different items)
+      const orderChanged =
+        displayedColumns.length === newDisplayedColumns.length;
+
+      // Update the flag based on order change
+      if (displayedColumns.length !== 0) {
+        isActionTriggeredQuery.current = !orderChanged;
+      }
+
+      // Update displayedColumns regardless of order change
+      setDisplayedColumns(newDisplayedColumns);
+    },
+    [displayedColumns] // Only re-render if displayedColumns changes
+  );
 
   /**
    * When the query builder tree has changed, store the new tree here.
@@ -744,6 +893,7 @@ export function QueryPage<TData extends KitsuResource>({
    * @param newPageSize
    */
   const onPageSizeChanged = useCallback((newPageSize: number) => {
+    isActionTriggeredQuery.current = true;
     setPageOffset(0);
     setPageSize(newPageSize);
     setLoading(true);
@@ -755,6 +905,7 @@ export function QueryPage<TData extends KitsuResource>({
    * This method will cause the useEffect with the search to trigger if the sorting has changed.
    */
   const onSortChange = useCallback((newSort: ColumnSort[]) => {
+    isActionTriggeredQuery.current = true;
     setSortingRules(newSort);
     setLoading(true);
 
@@ -778,6 +929,7 @@ export function QueryPage<TData extends KitsuResource>({
    */
   const onPageChanged = useCallback(
     (newPage: number) => {
+      isActionTriggeredQuery.current = true;
       setPageOffset(pageSize * newPage);
       setLoading(true);
     },
@@ -785,6 +937,7 @@ export function QueryPage<TData extends KitsuResource>({
   );
 
   function onRowMove(draggedRowIndex: number, targetRowIndex: number) {
+    isActionTriggeredQuery.current = true;
     if (!!selectedResources) {
       selectedResources.splice(
         targetRowIndex,
@@ -799,49 +952,77 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Generate the key for the DINA form. It should only be generated once.
   const formKey = useMemo(() => uuidv4(), []);
-  const { columnChooser, checkedColumnIds } = useColumnChooser({
-    columns: columnsResults,
-    localStorageKey: uniqueName,
-    hideExportButton: true
-  });
 
   return (
     <>
       {!viewMode && (
-        <QueryBuilderMemo
-          indexName={indexName}
-          queryBuilderTree={queryBuilderTree}
-          setQueryBuilderTree={onQueryBuildTreeChange}
-          queryBuilderConfig={queryBuilderConfig}
-          setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
-          setPageOffset={setPageOffset}
-          onSubmit={onSubmit}
-          onReset={onReset}
-          setGroups={setGroups}
-          groups={groups}
-          uniqueName={uniqueName}
-        />
+        <>
+          {validationErrors.length > 0 && (
+            <div
+              className="alert alert-danger"
+              style={{
+                whiteSpace: "pre-line"
+              }}
+            >
+              <h5>Validation Errors</h5>
+              <ul>
+                {validationErrors.map((validationError: ValidationError) => (
+                  <li key={validationError.fieldName}>
+                    <strong>{validationError.fieldName}: </strong>
+                    {validationError.errorMessage}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <QueryBuilderMemo
+            indexName={indexName}
+            queryBuilderTree={queryBuilderTree}
+            setQueryBuilderTree={onQueryBuildTreeChange}
+            queryBuilderConfig={queryBuilderConfig}
+            setSubmittedQueryBuilderTree={setSubmittedQueryBuilderTree}
+            setPageOffset={setPageOffset}
+            onSubmit={onSubmit}
+            onReset={onReset}
+            setGroups={setGroups}
+            groups={groups}
+            uniqueName={uniqueName}
+            validationErrors={validationErrors}
+            triggerSearch={isActionTriggeredQuery}
+          />
+        </>
       )}
+
       <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
         {/* Group Selection */}
-        {!viewMode && (
+        {!viewMode ? (
           <DinaFormSection horizontal={"flex"}>
             <div className="row">
-              <GroupSelectField
+              <GroupSelectFieldMemoized
                 isMulti={true}
                 name="group"
                 className="col-md-4 mt-3"
-                onChange={(newGroups) =>
-                  setImmediate(() => {
-                    onGroupChange(newGroups);
-                  })
-                }
+                onChange={onGroupChange}
                 groups={groups}
               />
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (
                 <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
-                  {enableColumnChooser && columnChooser}
+                  {enableColumnSelector && (
+                    <ColumnSelectorMemo
+                      uniqueName={uniqueName}
+                      exportMode={false}
+                      indexMapping={indexMap}
+                      dynamicFieldsMappingConfig={dynamicFieldMapping}
+                      displayedColumns={displayedColumns as any}
+                      setDisplayedColumns={onDisplayedColumnsChange as any}
+                      defaultColumns={columns as any}
+                      setColumnSelectorLoading={setColumnSelectorLoading}
+                      excludedRelationshipTypes={excludedRelationshipTypes}
+                      mandatoryDisplayedColumns={mandatoryDisplayedColumns}
+                      nonExportableColumns={nonExportableColumns}
+                    />
+                  )}
                   {bulkEditPath && (
                     <BulkEditButton
                       pathname={bulkEditPath}
@@ -851,16 +1032,45 @@ export function QueryPage<TData extends KitsuResource>({
                   {bulkDeleteButtonProps && (
                     <BulkDeleteButton {...bulkDeleteButtonProps} />
                   )}
-                  {dataExportPath && (
+                  {dataExportProps && (
                     <DataExportButton
-                      pathname={dataExportPath}
+                      pathname={dataExportProps.dataExportPath}
+                      entityLink={dataExportProps.entityLink}
                       totalRecords={totalRecords}
                       query={elasticSearchQuery}
+                      uniqueName={uniqueName}
+                      columns={columns}
+                      dynamicFieldMapping={dynamicFieldMapping}
                       indexName={indexName}
                     />
                   )}
                   {bulkSplitPath && (
                     <BulkSplitButton pathname={bulkSplitPath} />
+                  )}
+                </div>
+              )}
+            </div>
+          </DinaFormSection>
+        ) : (
+          <DinaFormSection horizontal={"flex"}>
+            <div className="row">
+              {/* Bulk edit buttons - Only shown when not in selection mode. */}
+              {!selectionMode && (
+                <div className="col-md-12 mt-3 d-flex gap-2 justify-content-end align-items-start">
+                  {enableColumnSelector && (
+                    <ColumnSelectorMemo
+                      uniqueName={uniqueName}
+                      exportMode={false}
+                      indexMapping={indexMap}
+                      displayedColumns={displayedColumns as any}
+                      setDisplayedColumns={onDisplayedColumnsChange as any}
+                      defaultColumns={columns as any}
+                      setColumnSelectorLoading={setColumnSelectorLoading}
+                      dynamicFieldsMappingConfig={dynamicFieldMapping}
+                      excludedRelationshipTypes={excludedRelationshipTypes}
+                      mandatoryDisplayedColumns={mandatoryDisplayedColumns}
+                      nonExportableColumns={nonExportableColumns}
+                    />
                   )}
                 </div>
               )}
@@ -878,8 +1088,8 @@ export function QueryPage<TData extends KitsuResource>({
               <div className="d-flex align-items-end">
                 <span id="queryPageCount">
                   {/* Loading indicator when total is not calculated yet. */}
-                  {loading ? (
-                    <LoadingSpinner loading={true} />
+                  {loading || columnSelectorLoading ? (
+                    <></>
                   ) : (
                     <CommonMessage
                       id="tableTotalCount"
@@ -917,51 +1127,58 @@ export function QueryPage<TData extends KitsuResource>({
                   </button>
                 </div>
               )}
-              <ReactTable<TData>
-                // Column and data props
-                columns={
-                  enableColumnChooser
-                    ? columnsResults.filter((column) =>
-                        typeof column === "string"
-                          ? checkedColumnIds.includes(column)
-                          : column.id
-                          ? checkedColumnIds.includes(column.id)
-                          : false
-                      )
-                    : columnsResults
-                }
-                data={
-                  (viewMode
-                    ? customViewFields
-                      ? searchResults
-                      : selectedResources
-                    : searchResults) ?? []
-                }
-                // Loading Table props
-                loading={loading}
-                // Pagination props
-                manualPagination={
-                  viewMode && selectedResources?.length ? false : true
-                }
-                pageSize={pageSize}
-                pageCount={
-                  totalRecords ? Math.ceil(totalRecords / pageSize) : 0
-                }
-                page={pageOffset / pageSize}
-                onPageChange={onPageChanged}
-                onPageSizeChange={onPageSizeChanged}
-                // Sorting props
-                manualSorting={
-                  viewMode && selectedResources?.length ? false : true
-                }
-                onSortingChange={onSortChange}
-                defaultSorted={sortingRules}
-                // Table customization props
-                {...resolvedReactTableProps}
-                className="-striped react-table-overflow"
-                rowStyling={rowStyling}
-                showPagination={true}
-              />
+              {loading || columnSelectorLoading ? (
+                <LoadingSpinner loading={true} />
+              ) : (
+                <MemoizedReactTable
+                  // Column and data props
+                  columns={columnsResults as any}
+                  data={
+                    (viewMode
+                      ? customViewFields
+                        ? searchResults
+                        : selectedResources
+                      : searchResults) ?? []
+                  }
+                  // Loading Table props
+                  loading={loading || columnSelectorLoading}
+                  // Pagination props
+                  manualPagination={
+                    viewMode && selectedResources?.length ? false : true
+                  }
+                  pageSize={pageSize}
+                  pageCount={
+                    totalRecords ? Math.ceil(totalRecords / pageSize) : 0
+                  }
+                  page={pageOffset / pageSize}
+                  onPageChange={onPageChanged}
+                  onPageSizeChange={onPageSizeChanged}
+                  // Sorting props
+                  manualSorting={
+                    viewMode && selectedResources?.length ? false : true
+                  }
+                  onSortingChange={onSortChange}
+                  sort={sortingRules}
+                  // Table customization props
+                  {...resolvedReactTableProps}
+                  className="-striped react-table-overflow"
+                  rowStyling={rowStyling}
+                  showPagination={true}
+                  showPaginationTop={true}
+                  smallPaginationButtons={selectionMode}
+                />
+              )}
+              <div className="mt-2">
+                {/* Loading indicator when total is not calculated yet. */}
+                {loading || columnSelectorLoading ? (
+                  <></>
+                ) : (
+                  <CommonMessage
+                    id="tableTotalCount"
+                    values={{ totalCount: formatNumber(totalRecords) }}
+                  />
+                )}
+              </div>
             </div>
             {selectionMode && (
               <>
@@ -999,6 +1216,7 @@ export function QueryPage<TData extends KitsuResource>({
                     enableSorting={!enableDnd}
                     showPagination={!enableDnd}
                     manualPagination={true}
+                    smallPaginationButtons={true}
                   />
                 </div>
               </>

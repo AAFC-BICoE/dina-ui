@@ -4,7 +4,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import React from "react";
-import { Nav } from "../../../components/button-bar/nav/nav";
+import { Footer, Nav } from "../../../components/button-bar/nav/nav";
 import { Head } from "../../../components/head";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
@@ -23,7 +23,7 @@ export default function StorageUnitBulkResult() {
     <div>
       <Head title={formatMessage("bulkOperationCompleteTitle")} />
       <Nav />
-      <main className="container ">
+      <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage("bulkOperationCompleteTitle")}</h1>
         <div>
           <h3>{formatMessage("results")}:</h3>
@@ -48,6 +48,7 @@ export default function StorageUnitBulkResult() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

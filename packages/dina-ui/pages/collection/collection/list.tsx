@@ -7,9 +7,9 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { GroupSelectField } from "../../../components";
-import { Collection } from "../../../types/collection-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { groupCell, GroupSelectField } from "../../../components";
+import { Collection } from "../../../types/collection-api";
 
 const COLLECTION_TABLE_COLUMNS: ColumnDefinition<Collection>[] = [
   {
@@ -24,6 +24,7 @@ const COLLECTION_TABLE_COLUMNS: ColumnDefinition<Collection>[] = [
     header: () => <FieldHeader name="name" />
   },
   "code",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];
@@ -39,7 +40,11 @@ const COLLECTION_FILTER_ATTRIBUTES: FilterAttribute[] = [
 ];
 
 export default function CollectionListPage() {
-  const buttonBarContent = <CreateButton entityLink="/collection/collection" />;
+  const buttonBarContent = (
+    <div className="flex d-flex ms-auto">
+      <CreateButton entityLink="/collection/collection" />
+    </div>
+  );
 
   return (
     <PageLayout

@@ -1,27 +1,31 @@
 import {
-  ColumnDefinition,
+  FieldHeader,
   FieldSet,
-  QueryTable,
+  LoadingSpinner,
+  ReactTable,
   useApiClient,
-  useDinaFormContext
+  useDinaFormContext,
+  useQuery
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
-
+import { TableColumn } from "../../../common-ui/lib/list-page/types";
 export interface StorageTreeFieldProps {
   storageUnit: StorageUnit;
+  materialSamples: PersistedResource<MaterialSample>[] | undefined;
 }
 
 export type StorageActionMode = "VIEW" | "MOVE_ALL" | "ADD_EXISTING_AS_CHILD";
 
 export function StorageUnitChildrenViewer({
-  storageUnit
+  storageUnit,
+  materialSamples
 }: StorageTreeFieldProps) {
   const { readOnly } = useDinaFormContext();
   const router = useRouter();
@@ -29,10 +33,11 @@ export function StorageUnitChildrenViewer({
   const [actionMode, setActionMode] = useState<StorageActionMode>("VIEW");
   const [hideMoveContents, setHideMoveContents] = useState<boolean>(false);
 
-  const samplesQueryParams = {
-    path: "collection-api/material-sample",
-    filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` }
-  };
+  useEffect(() => {
+    if (materialSamples?.length === 0) {
+      setHideMoveContents(true);
+    }
+  }, []);
 
   async function moveAllContent(targetUnit: PersistedResource<StorageUnit>) {
     const childStoragePath = `collection-api/storage-unit/${storageUnit?.id}?include=storageUnitChildren`;
@@ -44,12 +49,16 @@ export function StorageUnitChildrenViewer({
       // As of writing this code the "limit" is ignored and the API returns all children:
       { page: { limit: 1000 } }
     );
-
+    const samplesQueryParams = {
+      path: "collection-api/material-sample",
+      filter: { rsql: `storageUnitUsage.storageUnit.uuid==${storageUnit?.id}` }
+    };
     const { data: childSamples } = await apiClient.get<MaterialSample[]>(
       samplesQueryParams.path,
       {
         filter: samplesQueryParams.filter,
-        page: { limit: 1000 }
+        page: { limit: 1000 },
+        include: "storageUnitUsage"
       }
     );
 
@@ -99,7 +108,7 @@ export function StorageUnitChildrenViewer({
 
   return (
     <div className="mb-3">
-      {actionMode !== "VIEW" && (
+      {actionMode !== "VIEW" && !storageUnit.isGeneric && (
         <FieldSet
           legend={
             <div className="d-flex align-items-center gap-2 mb-2">
@@ -135,38 +144,40 @@ export function StorageUnitChildrenViewer({
       )}
       {actionMode === "VIEW" && (
         <div>
-          <div className="d-flex align-items-center gap-2 mb-3">
-            <strong>
-              <DinaMessage id="browseContents" />
-            </strong>
-            {readOnly && (
-              <>
-                <button
-                  className="btn btn-primary enable-move-content"
-                  onClick={() => setActionMode("MOVE_ALL")}
-                  disabled={hideMoveContents}
-                >
-                  <DinaMessage id="moveAllContent" />
-                </button>
-                <Link
-                  href={`/collection/storage-unit/edit?parentId=${storageUnit.id}`}
-                >
-                  <a className="btn btn-primary add-child-storage-unit">
-                    <DinaMessage id="addNewChildStorageUnit" />
-                  </a>
-                </Link>
-                <button
-                  className="btn btn-primary add-existing-as-child"
-                  onClick={() => setActionMode("ADD_EXISTING_AS_CHILD")}
-                >
-                  <DinaMessage id="addExistingStorageUnitAsChild" />
-                </button>
-              </>
-            )}
-          </div>
+          {!storageUnit.isGeneric && (
+            <div className="d-flex align-items-center gap-2 mb-3">
+              <strong>
+                <DinaMessage id="browseContents" />
+              </strong>
+              {readOnly && (
+                <>
+                  <button
+                    className="btn btn-primary enable-move-content"
+                    onClick={() => setActionMode("MOVE_ALL")}
+                    disabled={hideMoveContents}
+                  >
+                    <DinaMessage id="moveAllContent" />
+                  </button>
+                  <Link
+                    href={`/collection/storage-unit/edit?parentId=${storageUnit.id}`}
+                  >
+                    <a className="btn btn-primary add-child-storage-unit">
+                      <DinaMessage id="addNewChildStorageUnit" />
+                    </a>
+                  </Link>
+                  <button
+                    className="btn btn-primary add-existing-as-child"
+                    onClick={() => setActionMode("ADD_EXISTING_AS_CHILD")}
+                  >
+                    <DinaMessage id="addExistingStorageUnitAsChild" />
+                  </button>
+                </>
+              )}
+            </div>
+          )}
           <StorageUnitContents
-            onEmptyMaterialSamples={() => setHideMoveContents(true)}
             storageUnit={storageUnit}
+            materialSamples={materialSamples}
           />
         </div>
       )}
@@ -176,15 +187,15 @@ export function StorageUnitChildrenViewer({
 
 export interface StorageUnitContentsProps {
   storageUnit: StorageUnit;
-  onEmptyMaterialSamples: () => void;
+  materialSamples: PersistedResource<MaterialSample>[] | undefined;
 }
 
 /** Material Sample table and nested Storage Units UI. */
 export function StorageUnitContents({
   storageUnit,
-  onEmptyMaterialSamples
+  materialSamples
 }: StorageUnitContentsProps) {
-  const materialSampleColumns: ColumnDefinition<MaterialSample>[] = [
+  const materialSampleColumns: TableColumn<MaterialSample>[] = [
     {
       cell: ({
         row: {
@@ -195,16 +206,26 @@ export function StorageUnitContents({
           {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
         </Link>
       ),
+      header: () => <FieldHeader name="materialSampleName" />,
+      id: "materialSampleName",
       accessorKey: "materialSampleName"
     },
-    "materialSampleType",
+    // Material Sample Type
+    {
+      id: "materialSampleType",
+      header: () => <FieldHeader name="materialSampleType" />,
+      accessorKey: "materialSampleType",
+      isKeyword: true
+    },
     {
       cell: ({
         row: {
           original: { tags }
         }
       }) => <>{tags?.join(", ")}</>,
-      accessorKey: "tags"
+      accessorKey: "tags",
+      id: "tags",
+      header: () => <FieldHeader name="tags" />
     }
   ];
 
@@ -224,27 +245,21 @@ export function StorageUnitContents({
           disabled={true}
         />
       </div>
-      <div
-        className="p-2 mb-3"
-        style={{ border: "1px solid #d3d7cf", backgroundColor: "#f3f3f3" }}
-      >
-        <strong>
-          <DinaMessage id="materialSamples" />
-        </strong>
-
-        <QueryTable
-          columns={materialSampleColumns}
-          path="collection-api/material-sample"
-          filter={{
-            rsql: `storageUnit.uuid==${storageUnit.id}`
-          }}
-          onSuccess={({ meta }) => {
-            if (meta.totalResourceCount === 0) {
-              onEmptyMaterialSamples();
-            }
-          }}
-        />
-      </div>
+      {!storageUnit.isGeneric && (
+        <div
+          className="p-2 mb-3"
+          style={{ border: "1px solid #d3d7cf", backgroundColor: "#f3f3f3" }}
+        >
+          <strong>
+            <DinaMessage id="materialSamples" />
+          </strong>
+          <ReactTable<MaterialSample>
+            columns={materialSampleColumns}
+            data={materialSamples ?? []}
+            showPagination={true}
+          />
+        </div>
+      )}
     </>
   );
 }

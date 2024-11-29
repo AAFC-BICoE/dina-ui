@@ -1,30 +1,49 @@
 import React from "react";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { CheckBoxField } from "../CheckBoxField";
 import { DinaForm } from "../DinaForm";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 describe("CheckBoxField component", () => {
   it("Displays the field's label and value.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ testObject: { testField: false } }}>
         <CheckBoxField name="testObject.testField" />
       </DinaForm>
     );
-    expect(wrapper.find("label").text()).toEqual("Test Object Test Field");
-    expect((wrapper.find("input").instance() as any).checked).toEqual(false);
+
+    expect(wrapper.queryByText(/test object test field/i)).toBeInTheDocument();
+    expect(
+      (
+        wrapper.getByRole("checkbox", {
+          name: /test object test field/i
+        }) as HTMLInputElement
+      ).checked
+    ).toEqual(false);
   });
 
   it("Changes the field's value.", () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ testObject: { testField: false } }}>
         <CheckBoxField name="testObject.testField" />
       </DinaForm>
     );
 
-    wrapper.find("input").simulate("change", {
-      target: { name: "testObject.testField", checked: true }
-    });
-    expect((wrapper.find("input").instance() as any).checked).toEqual(true);
-    expect((wrapper.find("input").instance() as any).value).toEqual("true");
+    fireEvent.change(
+      wrapper.getByRole("checkbox", {
+        name: /test object test field/i
+      }) as HTMLInputElement,
+      {
+        target: { name: "testObject.testField", checked: true }
+      }
+    );
+    expect(
+      (
+        wrapper.getByRole("checkbox", {
+          name: /test object test field/i
+        }) as HTMLInputElement
+      ).checked
+    ).toEqual(true);
   });
 });

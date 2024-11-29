@@ -45,11 +45,38 @@ export function useMaterialSampleFormTemplateProps<
     materialSampleInitialValues.organism =
       materialSampleInitialValues.organism?.map((org) => {
         if (org?.determination?.length === 1) {
-          return {
-            ...org,
-            type: "organism",
-            determination: [{ ...org.determination[0], isPrimary: true }]
-          };
+          const ogsmDefaultValue: any =
+            actionDefinition.formTemplate.MATERIAL_SAMPLE?.templateFields[
+              "organism"
+            ]?.defaultValue;
+          let determinationHasDefaultValue = false;
+          if (
+            ogsmDefaultValue &&
+            ogsmDefaultValue.length > 0 &&
+            ogsmDefaultValue[0].determination &&
+            ogsmDefaultValue[0].determination.length > 0
+          ) {
+            const determinationDefaultValue =
+              ogsmDefaultValue[0].determination[0];
+            determinationHasDefaultValue = Object.values(
+              determinationDefaultValue
+            ).some((value) => !!value && value !== "");
+          }
+          if (determinationHasDefaultValue) {
+            // If there is any default value of determination in the form template, populate one determination.
+            return {
+              ...org,
+              type: "organism",
+              determination: [{ ...org.determination[0], isPrimary: true }]
+            };
+          } else {
+            // If there is no default value of determination in the form template, DO NOT populate determination.
+            return {
+              ...org,
+              type: "organism",
+              determination: []
+            };
+          }
         }
         return org;
       });
@@ -89,7 +116,8 @@ export function useMaterialSampleFormTemplateProps<
       visibleManagedAttributeKeys: {
         materialSample: actionDefinition.managedAttributesOrder,
         collectingEvent: actionDefinition.collectingEventManagedAttributesOrder,
-        determination: actionDefinition.determinationManagedAttributesOrder
+        determination: actionDefinition.determinationManagedAttributesOrder,
+        preparations: actionDefinition.preparationManagedAttributesOrder
       }
     };
 

@@ -10,7 +10,7 @@ import {
   SaveArgs,
   useApiClient,
   useQuery,
-  withResponse
+  withoutBlankFields
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -48,16 +48,19 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  STORAGE_COMPONENT_NAME,
+  ScientificNameSource,
+  SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
+import { StorageUnitUsage } from "../../../../dina-ui/types/collection-api/resources/StorageUnitUsage";
 
 export function useMaterialSampleQuery(id?: string | null) {
-  const { bulkGet } = useApiClient();
+  const { bulkGet, apiClient } = useApiClient();
 
   const materialSampleQuery = useQuery<MaterialSample>(
     {
@@ -70,13 +73,13 @@ export function useMaterialSampleQuery(id?: string | null) {
         "preparationType",
         "preparationMethod",
         "preparedBy",
-        "storageUnit",
         "hierarchy",
         "organism",
         "materialSampleChildren",
         "parentMaterialSample",
         "projects",
-        "assemblages"
+        "assemblages",
+        "storageUnitUsage"
       ].join(",")
     },
     {
@@ -103,9 +106,25 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         }
 
+        // Setup the storage unit if it's stored on the storage unit usage.
+        if (data?.storageUnitUsage?.id) {
+          const storageUnit = await apiClient.get<StorageUnitUsage>(
+            `collection-api/storage-unit-usage/${data.storageUnitUsage.id}`,
+            {
+              include: "storageUnit"
+            }
+          );
+
+          if (storageUnit?.data?.storageUnit) {
+            data.storageUnit = storageUnit.data.storageUnit;
+          }
+        }
+
         // Process loaded back-end data into data structure that Formik can use
         if (data.extensionValues) {
-          data.extensionValues = processExtensionValuesLoading(data.extensionValues);
+          data.extensionValues = processExtensionValuesLoading(
+            data.extensionValues
+          );
         }
 
         // Convert to separated list
@@ -167,10 +186,8 @@ export interface UseMaterialSampleSaveParams {
   };
   materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
+    parentAttributes?: string[];
   };
-
-  /** Split Configuration (Form Template Only) */
-  splitConfigurationInitialState?: boolean;
 
   /** Optionally restrict the form to these enabled fields. */
   formTemplate?: FormTemplate;
@@ -193,6 +210,7 @@ export interface PrepareSampleSaveOperationParams {
   preProcessSample?: (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
+  collectingEventRefExternal?: React.RefObject<FormikProps<any>>;
 }
 
 export function useMaterialSampleSave({
@@ -205,7 +223,6 @@ export function useMaterialSampleSave({
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
-  splitConfigurationInitialState,
   reduceRendering,
   disableNestedFormEdits,
   showChangedIndicatorsInNestedForms,
@@ -274,8 +291,12 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasShowParentAttributes =
+    isTemplate &&
+    (materialSampleTemplateInitialValues?.parentAttributes?.length ?? 0) > 0;
+
   // Enable Switch States:
-  const [enableSplitConfiguration, setEnableSplitConfiguration] =
+  const [enableShowParentAttributes, setEnableShowParentAttributes] =
     useState<boolean>(false);
   const [enableCollectingEvent, setEnableCollectingEvent] =
     useState<boolean>(false);
@@ -289,95 +310,108 @@ export function useMaterialSampleSave({
 
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
-    setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
-
+    setEnableShowParentAttributes(
+      Boolean(
+        hasShowParentAttributes
+          ? true
+          : formTemplate?.components?.find(
+              (comp) =>
+                comp.name === SHOW_PARENT_ATTRIBUTES_COMPONENT_NAME &&
+                comp.visible
+            )?.visible ?? false
+      )
+    );
     setEnableCollectingEvent(
       Boolean(
-        hasColEventTemplate ||
-          materialSample?.collectingEvent ||
-          (find(formTemplate?.components, {
-            name: COLLECTING_EVENT_COMPONENT_NAME
-          })?.visible ??
-            false)
+        hasColEventTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
+              name: COLLECTING_EVENT_COMPONENT_NAME
+            })?.visible ?? false
+          : materialSample?.collectingEvent
       )
     );
 
     setEnablePreparations(
       Boolean(
-        hasPreparationsTemplate ||
-          // Show the preparation section if a field is set or the field is enabled:
-          PREPARATION_FIELDS.some(
-            (prepFieldName) =>
-              !isEmpty(materialSample?.[prepFieldName]) ||
-              (find(formTemplate?.components, {
-                name: PREPARATIONS_COMPONENT_NAME
-              })?.visible ??
-                false)
-          )
+        hasPreparationsTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
+              name: PREPARATIONS_COMPONENT_NAME
+            })?.visible ?? false
+          : PREPARATION_FIELDS.some(
+              (prepFieldName) => !isEmpty(materialSample?.[prepFieldName])
+            )
       )
     );
 
     setEnableOrganisms(
       Boolean(
-        hasOrganismsTemplate ||
-          materialSample?.organism?.length ||
-          (find(formTemplate?.components, {
-            name: ORGANISMS_COMPONENT_NAME
-          })?.visible ??
-            false)
+        hasOrganismsTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
+              name: ORGANISMS_COMPONENT_NAME
+            })?.visible ?? false
+          : materialSample?.organism?.length
       )
     );
 
     setEnableStorage(
       // Show the Storage section if the storage field is set or the template enables it:
       Boolean(
-        hasStorageTemplate ||
-          materialSample?.storageUnit?.id ||
-          (find(formTemplate?.components, {
-            name: STORAGE_COMPONENT_NAME
-          })?.visible ??
-            false)
+        hasStorageTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
+              name: STORAGE_COMPONENT_NAME
+            })?.visible ?? false
+          : materialSample?.storageUnitUsage?.id
       )
     );
 
     setEnableScheduledActions(
       // Show the Scheduled Actions section if the field is set or the template enables it:
       Boolean(
-        hasScheduledActionsTemplate ||
-          materialSample?.scheduledActions?.length ||
-          (find(formTemplate?.components, {
-            name: SCHEDULED_ACTIONS_COMPONENT_NAME
-          })?.visible ??
-            false)
+        hasScheduledActionsTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
+              name: SCHEDULED_ACTIONS_COMPONENT_NAME
+            })?.visible ?? false
+          : materialSample?.scheduledActions?.length
       )
     );
 
     setEnableAssociations(
       // Show the associations section if the field is set or the template enables it:
       Boolean(
-        hasAssociationsTemplate ||
-          materialSample?.associations?.length ||
-          !isEmpty(materialSample?.hostOrganism) ||
-          !isEmpty(materialSample?.associations) ||
-          (find(formTemplate?.components, {
-            name: ASSOCIATIONS_COMPONENT_NAME
-          })?.visible ??
-            false)
+        hasAssociationsTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
+              name: ASSOCIATIONS_COMPONENT_NAME
+            })?.visible ?? false
+          : materialSample?.associations?.length ||
+            !isEmpty(materialSample?.hostOrganism) ||
+            !isEmpty(materialSample?.associations)
       )
     );
 
     setEnableRestrictions(
       Boolean(
-        hasRestrictionsTemplate ||
-          // Show the restriction section if a field is set or the field is enabled:
-          RESTRICTIONS_FIELDS.some(
-            (restrictFieldName) =>
-              !isEmpty(materialSample?.[restrictFieldName]) ||
-              (find(formTemplate?.components, {
-                name: RESTRICTION_COMPONENT_NAME
-              })?.visible ??
-                false)
-          )
+        hasRestrictionsTemplate
+          ? true
+          : formTemplate
+          ? find(formTemplate?.components, {
+              name: RESTRICTION_COMPONENT_NAME
+            })?.visible ?? false
+          : RESTRICTIONS_FIELDS.some(
+              (restrictFieldName) =>
+                !isEmpty(materialSample?.[restrictFieldName])
+            )
       )
     );
   }, [formTemplate]);
@@ -398,8 +432,8 @@ export function useMaterialSampleSave({
     setEnableAssociations,
     enableRestrictions,
     setEnableRestrictions,
-    enableSplitConfiguration,
-    setEnableSplitConfiguration
+    enableShowParentAttributes,
+    setEnableShowParentAttributes
   };
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
@@ -414,6 +448,11 @@ export function useMaterialSampleSave({
 
   const msInitialValues: InputResource<MaterialSample> =
     withOrganismEditorValues(materialSample ?? defaultValues);
+  if (msInitialValues.identifiers) {
+    (msInitialValues as any).identifiers = Object.entries(
+      msInitialValues.identifiers
+    ).map(([type, value]) => ({ type, value }));
+  }
 
   /** Used to get the values of the nested CollectingEvent form. */
   const colEventFormRef = colEventFormRefProp ?? useRef<FormikProps<any>>(null);
@@ -490,6 +529,38 @@ export function useMaterialSampleSave({
       );
     }
 
+    // Other identifiers saving
+    if (submittedValues.identifiers) {
+      const otherIdentifiers = (submittedValues.identifiers as any).reduce(
+        (acc, identifier) => {
+          if (identifier.type && identifier.value) {
+            acc[identifier.type] = identifier.value;
+          }
+          return acc;
+        },
+        {}
+      );
+
+      if (otherIdentifiers && Object.keys(otherIdentifiers).length > 0) {
+        submittedValues.identifiers = otherIdentifiers;
+      } else {
+        submittedValues.identifiers = {};
+      }
+    }
+
+    // Remove empty items from dwcOtherCatalogNumbers
+    if (submittedValues.dwcOtherCatalogNumbers) {
+      const otherCatalogNumbers = (
+        submittedValues.dwcOtherCatalogNumbers as any
+      ).filter((catNum) => catNum !== "");
+
+      if (otherCatalogNumbers.length !== 0) {
+        submittedValues.dwcOtherCatalogNumbers = otherCatalogNumbers;
+      } else {
+        (submittedValues.dwcOtherCatalogNumbers as any) = null;
+      }
+    }
+
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,
@@ -502,9 +573,9 @@ export function useMaterialSampleSave({
         organismsQuantity: undefined,
         organism: []
       }),
-
+      // Remove storageUnit and storageUnitUsage if toggle is disabled
       ...(!enableStorage && {
-        storageUnit: { id: null, type: "storage-unit" }
+        storageUnitUsage: { id: null, type: "storage-unit-usage" }
       }),
       ...(!enableCollectingEvent && {
         collectingEvent: { id: null, type: "collecting-event" }
@@ -514,55 +585,6 @@ export function useMaterialSampleSave({
       // Remove the scheduledAction field from the Form Template:
       ...{ scheduledAction: undefined }
     };
-
-    // Save and link the Collecting Event if enabled:
-    if (enableCollectingEvent && colEventFormRef.current) {
-      // Save the linked CollectingEvent if included:
-      const submittedCollectingEvent = cloneDeep(
-        colEventFormRef.current.values
-      );
-
-      const collectingEventWasEdited =
-        !submittedCollectingEvent.id ||
-        !isEqual(submittedCollectingEvent, collectingEventInitialValues);
-
-      try {
-        // Throw if the Collecting Event sub-form has errors:
-        const colEventErrors = await colEventFormRef.current.validateForm();
-        if (!isEmpty(colEventErrors)) {
-          throw new DoOperationsError("", colEventErrors);
-        }
-
-        // Only send the save request if the Collecting Event was edited:
-        const savedCollectingEvent = collectingEventWasEdited
-          ? // Use the same save method as the Collecting Event page:
-            await saveCollectingEvent(
-              submittedCollectingEvent,
-              colEventFormRef.current
-            )
-          : submittedCollectingEvent;
-
-        // Set the ColEventId here in case the next operation fails:
-        setColEventId(savedCollectingEvent.id);
-
-        // Link the MaterialSample to the CollectingEvent:
-        materialSampleInput.collectingEvent = {
-          id: savedCollectingEvent.id,
-          type: savedCollectingEvent.type
-        };
-      } catch (error: unknown) {
-        if (error instanceof DoOperationsError) {
-          // Put the error messages into both form states:
-          colEventFormRef.current.setStatus(error.message);
-          colEventFormRef.current.setErrors(error.fieldErrors);
-          throw new DoOperationsError(
-            error.message,
-            mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)
-          );
-        }
-        throw error;
-      }
-    }
 
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (
@@ -574,11 +596,46 @@ export function useMaterialSampleSave({
       );
     }
 
+    // Remote the empty scientificNameDetails.classificationPath and scientificNameDetails.classificationRanks
+    if (
+      materialSampleInput.organism &&
+      materialSampleInput.organism.length > 0
+    ) {
+      materialSampleInput.organism?.forEach((ogsm) => {
+        if (ogsm?.determination && ogsm.determination.length > 0) {
+          ogsm.determination.forEach((dtm) => {
+            // If this is manual classification input
+            if (
+              dtm.scientificNameSource === ScientificNameSource.CUSTOM &&
+              dtm.scientificNameDetails
+            ) {
+              const pathArray =
+                dtm.scientificNameDetails.classificationPath?.split("|") ?? [];
+              const rankArray =
+                dtm.scientificNameDetails.classificationRanks?.split("|") ?? [];
+              const firstEmptyIndex = pathArray.findIndex(
+                (path, index) => path === "" && rankArray[index] === ""
+              );
+              if (firstEmptyIndex > -1) {
+                dtm.scientificNameDetails.classificationRanks = rankArray
+                  .slice(0, firstEmptyIndex)
+                  .join("|");
+                dtm.scientificNameDetails.classificationPath = pathArray
+                  .slice(0, firstEmptyIndex)
+                  .join("|");
+              }
+            }
+          });
+        }
+      });
+    }
+
     delete materialSampleInput.phac_animal_rg;
     delete materialSampleInput.phac_cl;
     delete materialSampleInput.phac_human_rg;
     delete materialSampleInput.cfia_ppc;
     delete materialSampleInput.useTargetOrganism;
+    delete materialSampleInput.parentAttributes;
 
     return materialSampleInput;
   }
@@ -589,7 +646,8 @@ export function useMaterialSampleSave({
    */
   async function prepareSampleSaveOperation({
     submittedValues,
-    preProcessSample
+    preProcessSample,
+    collectingEventRefExternal
   }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample>> {
     const materialSampleInput = await prepareSampleInput(submittedValues);
 
@@ -604,6 +662,111 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
+    // Save and link the Collecting Event if enabled:
+    const colEventFormRefToUse = colEventFormRef?.current?.values
+      ? colEventFormRef
+      : collectingEventRefExternal;
+    if (colEventFormRefToUse?.current) {
+      const collectingEventValues = {
+        ...withoutBlankFields(colEventFormRef?.current?.values),
+        ...withoutBlankFields(collectingEventRefExternal?.current?.values)
+      };
+      colEventFormRefToUse.current.values = collectingEventValues;
+    }
+
+    if (
+      (enableCollectingEvent || collectingEventRefExternal) &&
+      colEventFormRefToUse?.current
+    ) {
+      // Save the linked CollectingEvent if included:
+      const submittedCollectingEvent = cloneDeep(
+        colEventFormRefToUse.current.values
+      );
+
+      const collectingEventWasEdited =
+        !submittedCollectingEvent.id ||
+        !isEqual(submittedCollectingEvent, collectingEventInitialValues);
+
+      try {
+        // Throw if the Collecting Event sub-form has errors:
+        const colEventErrors =
+          await colEventFormRefToUse?.current?.validateForm();
+        if (!isEmpty(colEventErrors)) {
+          throw new DoOperationsError("", colEventErrors);
+        }
+        // Only send the save request if the Collecting Event was edited:
+        const savedCollectingEvent = collectingEventWasEdited
+          ? // Use the same save method as the Collecting Event page:
+            await saveCollectingEvent(
+              submittedCollectingEvent,
+              colEventFormRefToUse.current
+            )
+          : submittedCollectingEvent;
+
+        // Set the ColEventId here in case the next operation fails:
+        setColEventId(savedCollectingEvent.id);
+
+        // Link the MaterialSample to the CollectingEvent:
+        msDiff.collectingEvent = {
+          id: savedCollectingEvent.id,
+          type: savedCollectingEvent.type
+        };
+      } catch (error: unknown) {
+        if (error instanceof DoOperationsError) {
+          // Put the error messages into both form states:
+          colEventFormRefToUse.current.setStatus(error.message);
+          colEventFormRefToUse.current.setErrors(error.fieldErrors);
+          const newOpError = new DoOperationsError(
+            error.message,
+            mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)
+          );
+          throw newOpError;
+        }
+        throw error;
+      }
+    }
+
+    // Check if there is any changes to the storage unit or storage unit usage.
+    if (msDiff?.storageUnit?.id || msDiff?.storageUnitUsage?.id) {
+      // Create new storageUnitUsage, the storageUnit is saved here.
+      const storageUnitUsageSaveArgs: SaveArgs<StorageUnitUsage>[] = [
+        {
+          type: "storage-unit-usage",
+          resource: {
+            ...(pick(
+              msDiff.storageUnitUsage,
+              "wellRow",
+              "wellColumn"
+            ) as StorageUnitUsage),
+            storageUnit: msPreprocessed?.storageUnit?.id
+              ? pick(msPreprocessed.storageUnit, "id", "type")
+              : undefined,
+            type: "storage-unit-usage",
+            id: msPreprocessed.storageUnitUsage?.id ?? undefined,
+            usageType: "material-sample"
+          }
+        }
+      ];
+
+      const savedStorageUnitUsage = await save<StorageUnitUsage>(
+        storageUnitUsageSaveArgs,
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      );
+
+      // Create link between material sample and created storageUnitUsage resource
+      msDiff.storageUnitUsage = savedStorageUnitUsage[0];
+    }
+
+    // If the storage unit is set to null in the diff then the storage unit usage should also be removed.
+    if (msDiff?.storageUnit?.id === null) {
+      msDiff.storageUnitUsage = {
+        id: null,
+        type: "storage-unit-usage"
+      };
+    }
+
     const organismsWereChanged =
       !!msDiff.organism ||
       msDiff.organismsQuantity !== undefined ||
@@ -612,7 +775,6 @@ export function useMaterialSampleSave({
     const msDiffWithOrganisms = organismsWereChanged
       ? { ...msDiff, organism: await saveAndAttachOrganisms(msPreprocessed) }
       : msDiff;
-
     /** Input to submit to the back-end API. */
     const msInputWithRelationships: InputResource<MaterialSample> & {
       relationships: any;
@@ -671,6 +833,13 @@ export function useMaterialSampleSave({
           collection: {
             data: pick(msDiffWithOrganisms.collection, "id", "type")
           }
+        }),
+        ...(msDiffWithOrganisms.storageUnitUsage && {
+          storageUnitUsage: {
+            data: msDiffWithOrganisms.storageUnitUsage?.id
+              ? pick(msDiffWithOrganisms.storageUnitUsage, "id", "type")
+              : null
+          }
         })
       },
 
@@ -679,7 +848,9 @@ export function useMaterialSampleSave({
       projects: undefined,
       organism: undefined,
       assemblages: undefined,
-      preparedBy: undefined
+      preparedBy: undefined,
+      storageUnitUsage: undefined,
+      storageUnit: undefined
     };
 
     // delete the association if associated sample is left unfilled
@@ -785,7 +956,6 @@ export function useMaterialSampleSave({
     const materialSampleSaveOp = await prepareSampleSaveOperation({
       submittedValues
     });
-
     async function saveToBackend() {
       delete materialSampleSaveOp.resource.useNextSequence;
       const [savedMaterialSample] = await withDuplicateSampleNameCheck(
@@ -795,6 +965,27 @@ export function useMaterialSampleSave({
           }),
         formik
       );
+
+      // Delete storageUnitUsage if there is one when no StorageUnit linked
+      if (
+        (!enableStorage || !submittedValues.storageUnit?.id) &&
+        submittedValues.storageUnitUsage?.id
+      ) {
+        await save<StorageUnitUsage>(
+          [
+            {
+              delete: {
+                id: submittedValues.storageUnitUsage?.id ?? null,
+                type: "storage-unit-usage"
+              }
+            }
+          ],
+          {
+            apiBaseUrl: "/collection-api"
+          }
+        );
+      }
+
       await onSaved?.(savedMaterialSample?.id);
     }
 
@@ -869,7 +1060,8 @@ export function useMaterialSampleSave({
     onSubmit,
     prepareSampleInput,
     prepareSampleSaveOperation,
-    loading
+    loading,
+    colEventFormRef
   };
 }
 

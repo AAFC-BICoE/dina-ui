@@ -1,4 +1,4 @@
-import { DinaForm } from "common-ui";
+import { DinaForm, processExtensionValuesLoading } from "common-ui";
 import { fromPairs } from "lodash";
 import { ViewPageLayout } from "../../../components";
 import { Project } from "../../../types/collection-api/resources/Project";
@@ -17,7 +17,12 @@ export default function ProjectDetailsPage() {
               props.initialValues.multilingualDescription?.descriptions?.map(
                 ({ desc, lang }) => [lang ?? "", desc ?? ""]
               )
-            )
+            ),
+            extensionValues: props.initialValues.extensionValues
+              ? processExtensionValuesLoading(
+                  props.initialValues.extensionValues
+                )
+              : undefined
           }}
         >
           <ProjectFormLayout />

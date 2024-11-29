@@ -1,5 +1,5 @@
-import { QueryTable, ReactTable } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { fireEvent } from "@testing-library/react";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { ListPageLayout } from "../ListPageLayout";
 
 /** Mock Kitsu "get" method. */
@@ -8,8 +8,13 @@ const mockGet = jest.fn();
 const mockApiCtx: any = { apiClient: { get: mockGet } };
 
 describe("ListPageLayout component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    window.localStorage.clear();
+  });
+
   it("Has a reset button to clear the filter form.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ListPageLayout
         id="test-layout"
         filterAttributes={["name"]}
@@ -23,14 +28,12 @@ describe("ListPageLayout component", () => {
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Do a filtered search.
-    wrapper
-      .find("input.filter-value")
-      .simulate("change", { target: { value: "101F" } });
-    wrapper.find("form").simulate("submit");
-
+    fireEvent.change(wrapper.getByRole("textbox", { name: /filter value/i }), {
+      target: { value: "101F" }
+    });
+    fireEvent.click(wrapper.getByRole("button", { name: /filter list/i }));
     await new Promise(setImmediate);
 
     // There should be an RSQL filter.
@@ -42,7 +45,7 @@ describe("ListPageLayout component", () => {
     );
 
     // Click the reset button.
-    wrapper.find("button.filter-reset-button").simulate("click");
+    fireEvent.click(wrapper.getByRole("button", { name: /reset filters/i }));
 
     // There should be no RSQL filter.
     expect(mockGet).lastCalledWith(
@@ -53,8 +56,8 @@ describe("ListPageLayout component", () => {
     );
   });
 
-  it("Stores the table's sort and page-size in localstorage.", async () => {
-    const wrapper = mountWithAppContext(
+  it("Stores the table's sort in localstorage.", async () => {
+    const wrapper = mountWithAppContext2(
       <ListPageLayout
         id="test-layout"
         filterAttributes={["name"]}
@@ -68,28 +71,32 @@ describe("ListPageLayout component", () => {
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    const testSort = [{ id: "type", desc: false }];
-
-    wrapper.find(ReactTable).prop<any>("onSortingChange")(testSort, null, null);
-    wrapper.find(ReactTable).prop<any>("onPageSizeChange")(5, null);
-
+    // Click the type header to trigger the sort.
+    fireEvent.click(wrapper.getByText("Type"));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(QueryTable).prop("defaultSort")).toEqual(testSort);
-    expect(wrapper.find(QueryTable).prop("defaultPageSize")).toEqual(5);
+    // There should be an RSQL filter.
+    expect(mockGet).lastCalledWith("pcrPrimer", {
+      filter: {},
+      page: { limit: 25, offset: 0 },
+      sort: "-type"
+    });
+
+    expect(window.localStorage.getItem("test-layout_tableSort")).toEqual(
+      '[{"id":"type","desc":true}]'
+    );
   });
 
   it("Allows a passed additionalFilters prop.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext2(
       <ListPageLayout
         id="test-layout"
         additionalFilters={{
           attr1: "a",
           rsql: "attr2==b"
         }}
+        defaultSort={[{ id: "createdOn", desc: true }]}
         filterAttributes={["name"]}
         queryTableProps={{
           columns: ["name", "type"],
@@ -98,10 +105,13 @@ describe("ListPageLayout component", () => {
       />,
       { apiContext: mockApiCtx }
     );
+    await new Promise(setImmediate);
 
-    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
-      attr1: "a",
-      rsql: "attr2==b"
+    // Ensure the additional filters are included in the request:
+    expect(mockGet).lastCalledWith("pcrPrimer", {
+      filter: { attr1: "a", rsql: "attr2==b" },
+      page: { limit: 25, offset: 0 },
+      sort: "-createdOn"
     });
   });
 });

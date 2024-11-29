@@ -8,6 +8,8 @@ export interface UseBulkGetParams {
   ids: string[];
   listPath: string;
   disabled?: boolean;
+  /** onSuccess callback. */
+  onSuccess?: (response) => void;
 }
 
 const LIST_PATH_REGEX = /^(.*)\/(.*)$/;
@@ -22,7 +24,8 @@ interface FetchResourcesResponse<TData extends KitsuResource> {
 export function useBulkGet<TData extends KitsuResource>({
   ids,
   listPath,
-  disabled
+  disabled,
+  onSuccess
 }: UseBulkGetParams) {
   const { bulkGet } = useApiClient();
 
@@ -51,6 +54,8 @@ export function useBulkGet<TData extends KitsuResource>({
       apiBaseUrl: `/${apiBaseUrl}`,
       returnNullForMissingResource: true
     });
+
+    await onSuccess?.(fetchedWithNulls);
 
     const fetchedWithoutNulls = fetchedWithNulls.map(
       (resource, idx) => resource ?? { id: ids[idx], type: typeName }

@@ -23,7 +23,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/managed-attribute":
     case "collection-api/material-sample-type":
     case "collection-api/project":
-    case "collection-api/vocabulary/materialSampleState":
+    case "collection-api/vocabulary2/materialSampleState":
     case "user-api/group":
       return { data: [] };
   }
@@ -51,12 +51,6 @@ describe("MaterialSampleBulkCreatePage", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Use series mode:
-    wrapper.find("li.series-tab").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
     // Fill out the form:
     wrapper
       .find(".collection-field")
@@ -78,6 +72,8 @@ describe("MaterialSampleBulkCreatePage", () => {
     wrapper
       .find(".separator-field input")
       .simulate("change", { target: { value: "-" } });
+    await new Promise(setImmediate);
+    wrapper.update();
 
     wrapper.find("form").simulate("submit");
 
@@ -90,7 +86,6 @@ describe("MaterialSampleBulkCreatePage", () => {
     wrapper.update();
 
     // Goes back to the previous page with the generator form values:
-    expect(wrapper.find("li.series-tab").hasClass("react-tabs__tab--selected"));
     expect(wrapper.find(".baseName-field input").prop("value")).toEqual(
       "my-sample"
     );

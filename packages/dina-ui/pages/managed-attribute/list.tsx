@@ -1,5 +1,6 @@
 import {
   ColumnDefinition,
+  dateCell,
   descriptionCell,
   FieldHeader,
   intlContext,
@@ -15,7 +16,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DINAUI_MESSAGES_ENGLISH } from "../../intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
-import { GroupSelectField } from "packages/dina-ui/components";
+import { groupCell, GroupSelectField } from "../../components";
 import PageLayout from "../../components/page/PageLayout";
 import {
   COLLECTION_MODULE_TYPE_LABELS,
@@ -26,7 +27,10 @@ import {
 
 export function useFilterManagedAttribute() {
   const { locale: language } = useContext(intlContext);
-  const filterManagedAttributes = (filterForm: any, value: ManagedAttribute) => {
+  const filterManagedAttributes = (
+    filterForm: any,
+    value: ManagedAttribute
+  ) => {
     let result = true;
     if (filterForm?.group) {
       result = result && value.group === filterForm.group;
@@ -34,19 +38,23 @@ export function useFilterManagedAttribute() {
     if (filterForm?.filterBuilderModel?.value) {
       result =
         result &&
-        (value.name.toLowerCase().indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
+        (value.name
+          .toLowerCase()
+          .indexOf(filterForm.filterBuilderModel.value.toLowerCase()) > -1 ||
           (
             value.multilingualDescription?.descriptions?.filter(
               (item) =>
                 item.lang === language &&
-                (item.desc ?? "").toLowerCase().indexOf(filterForm.filterBuilderModel.value.toLowerCase()) >
+                (item.desc ?? "")
+                  .toLowerCase()
+                  .indexOf(filterForm.filterBuilderModel.value.toLowerCase()) >
                   -1
             ) ?? []
           ).length > 0);
     }
     return result;
   };
-  return {filterManagedAttributes}
+  return { filterManagedAttributes };
 }
 
 export default function ManagedAttributesListPage() {
@@ -104,8 +112,8 @@ function CreateNewSection({ href }: CreateButtonProps) {
 
 function CollectionAttributeListView() {
   const { formatMessage } = useDinaIntl();
-  
-  const {filterManagedAttributes} = useFilterManagedAttribute();
+
+  const { filterManagedAttributes } = useFilterManagedAttribute();
 
   const COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES = [
     "name",
@@ -175,12 +183,10 @@ function CollectionAttributeListView() {
       }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
       accessorKey: "acceptedValues"
     },
-    descriptionCell("multilingualDescription"),
-    {
-      accessorKey: "group",
-      header: () => <FieldHeader name={"group"} />
-    },
-    "createdBy"
+    descriptionCell(false, false, "multilingualDescription"),
+    groupCell("group"),
+    "createdBy",
+    dateCell("createdOn")
   ];
 
   return (
@@ -200,8 +206,7 @@ function CollectionAttributeListView() {
         id="collections-module-managed-attribute-list"
         queryTableProps={{
           columns: COLLECTION_ATTRIBUTES_LIST_COLUMNS,
-          path: "collection-api/managed-attribute?page[limit]=1000",
-          enableColumnChooser: true
+          path: "collection-api/managed-attribute?page[limit]=1000"
         }}
         additionalFilters={(filterForm) => ({
           isCompleted: false,
@@ -225,7 +230,7 @@ function CollectionAttributeListView() {
 }
 
 function ObjectStoreAttributeListView() {
-  const {filterManagedAttributes} = useFilterManagedAttribute();
+  const { filterManagedAttributes } = useFilterManagedAttribute();
 
   const OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
@@ -244,7 +249,7 @@ function ObjectStoreAttributeListView() {
         header: "Name",
         accessorKey: "name"
       },
-      descriptionCell("multilingualDescription"),
+      descriptionCell(false, false, "multilingualDescription"),
       {
         cell: ({
           row: {
@@ -297,8 +302,7 @@ function ObjectStoreAttributeListView() {
         id="object-store-module-managed-attribute-list"
         queryTableProps={{
           columns: OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS,
-          path: "objectstore-api/managed-attribute",
-          enableColumnChooser: true
+          path: "objectstore-api/managed-attribute"
         }}
       />
     </>
@@ -306,7 +310,7 @@ function ObjectStoreAttributeListView() {
 }
 
 function TransactionAttributeListView() {
-  const {filterManagedAttributes} = useFilterManagedAttribute();
+  const { filterManagedAttributes } = useFilterManagedAttribute();
   const TRANSACTION_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
   const TRANSACTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] =
@@ -352,7 +356,7 @@ function TransactionAttributeListView() {
         }) => <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>,
         accessorKey: "acceptedValues"
       },
-      descriptionCell("multilingualDescription"),
+      descriptionCell(false, false, "multilingualDescription"),
       "createdBy",
       {
         accessorKey: "group",
@@ -377,8 +381,7 @@ function TransactionAttributeListView() {
         id="loan-transaction-module-managed-attribute-list"
         queryTableProps={{
           columns: TRANSACTION_ATTRIBUTES_LIST_COLUMNS,
-          path: "loan-transaction-api/managed-attribute",
-          enableColumnChooser: true
+          path: "loan-transaction-api/managed-attribute"
         }}
         additionalFilters={(filterForm) => ({
           isCompleted: false,

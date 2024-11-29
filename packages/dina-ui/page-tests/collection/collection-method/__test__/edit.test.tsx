@@ -2,8 +2,38 @@ import { OperationsResponse } from "common-ui";
 import CollectionMethodEditPage, {
   CollectionMethodForm
 } from "../../../../pages/collection/collection-method/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
+import { screen, waitFor, fireEvent, within } from "@testing-library/react";
+import "@testing-library/jest-dom";
+
+const INSTANCE_DATA = {
+  data: {
+    "instance-mode": "developer",
+    "supported-languages-iso": "en,fr"
+  },
+  status: 200,
+  statusText: "",
+  headers: {
+    "content-length": "99",
+    "content-type": "text/plain; charset=utf-8",
+    date: "Tue, 09 Jan 2024 17:03:48 GMT"
+  },
+  config: {
+    url: "/instance.json",
+    method: "get",
+    headers: {
+      Accept: "application/json, text/plain, */*"
+    },
+    transformRequest: [null],
+    transformResponse: [null],
+    timeout: 0,
+    xsrfCookieName: "XSRF-TOKEN",
+    xsrfHeaderName: "X-XSRF-TOKEN",
+    maxContentLength: -1
+  },
+  request: {}
+};
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -37,8 +67,12 @@ const mockPatch = jest.fn(() => ({
   data: [{ data: TEST_COLLECTION_METHOD, status: 201 }] as OperationsResponse
 }));
 
+const mockGetAxios = jest.fn(async (_path) => {
+  return INSTANCE_DATA;
+});
+
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: { get: mockGet, axios: { patch: mockPatch, get: mockGetAxios } }
 };
 
 describe("collection-method edit page", () => {
@@ -47,26 +81,32 @@ describe("collection-method edit page", () => {
     mockQuery = {};
   });
   it("Provides a form to add a collection-method.", async () => {
-    const wrapper = mountWithAppContext(<CollectionMethodEditPage />, {
-      apiContext
-    });
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    wrapper.find(".name input").simulate("change", {
-      target: {
-        name: "name",
-        value: "updated Name"
+    const { container, getByLabelText } = mountWithAppContext2(
+      <CollectionMethodEditPage />,
+      {
+        apiContext
       }
-    });
+    );
 
-    wrapper.find(".english-description textarea").simulate("change", {
+    // Wait for asynchronous updates
+    await new Promise(setImmediate);
+
+    // Simulate changing the name input
+    const nameInput = getByLabelText(/name/i);
+    fireEvent.change(nameInput, { target: { value: "updated Name" } });
+    // Simulate changing the English description textarea
+    const descriptionTextarea = screen.getByRole("textbox", {
+      name: /english description/i
+    });
+    fireEvent.change(descriptionTextarea, {
       target: { value: "test english description" }
     });
 
-    // Submit the form.
-    wrapper.find("form").simulate("submit");
+    // Submit the form
+    const form = container.querySelector("form");
+    fireEvent.submit(form!);
+
+    // Wait for async updates after submission
     await new Promise(setImmediate);
 
     expect(mockPatch).lastCalledWith(
@@ -90,12 +130,12 @@ describe("collection-method edit page", () => {
       expect.anything()
     );
 
-    // The user should be redirected to the new collection-method's details page.
+    // Check that the user is redirected to the new collection-method's details page
     expect(mockPush).lastCalledWith("/collection/collection-method/view?id=1");
   });
 
   it("Edits an existing collection method.", async () => {
-    const wrapper = mountWithAppContext(
+    const { container, getByLabelText, getByRole } = mountWithAppContext2(
       <CollectionMethodForm
         onSaved={mockOnSaved}
         fetchedCollectionMethod={{
@@ -110,26 +150,35 @@ describe("collection-method edit page", () => {
       { apiContext }
     );
 
-    expect(wrapper.find(".english-description textarea").prop("value")).toEqual(
-      "test english description"
-    );
+    // Wait for asynchronous updates
+    await new Promise(setImmediate);
 
-    wrapper.find(".french-description textarea").simulate("change", {
+    // Check the initial value of the English description textarea
+    const descriptionTextarea = getByLabelText(
+      /english description/i
+    ) as HTMLTextAreaElement;
+    expect(descriptionTextarea.value).toEqual("test english description");
+
+    // Simulate changing the French description textarea
+    const frenchDescriptionTextarea = getByLabelText(/french description/i);
+    fireEvent.change(frenchDescriptionTextarea, {
       target: { value: "test french description" }
     });
 
-    wrapper.find(".name input").simulate("change", {
-      target: {
-        name: "name",
-        value: "updated Name"
-      }
+    // Simulate changing the name input
+    const nameInput = getByLabelText(/name/i);
+    fireEvent.change(nameInput, {
+      target: { value: "updated Name" }
     });
 
-    wrapper.find("form").simulate("submit");
+    // Submit the form
+    const form = container.querySelector("form");
+    fireEvent.submit(form!);
 
+    // Wait for async updates after submission
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Check the last called patch request
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
       [
@@ -161,7 +210,7 @@ describe("collection-method edit page", () => {
     );
   });
 
-  it("Renders an error after form submit without specifying madatory field.", async () => {
+  it("Renders an error after form submit without specifying mandatory field.", async () => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -180,18 +229,24 @@ describe("collection-method edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<CollectionMethodEditPage />, {
-      apiContext
-    });
+    const { container, getByText } = mountWithAppContext2(
+      <CollectionMethodEditPage />,
+      { apiContext }
+    );
 
-    wrapper.find("form").simulate("submit");
+    // Submit the form
+    const form = container.querySelector("form");
+    fireEvent.submit(form!);
 
+    // Wait for asynchronous updates
     await new Promise(setImmediate);
 
-    wrapper.update();
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: Name is mandatory"
-    );
+    // Check that the error message is displayed
+    expect(
+      getByText("Constraint violation: Name is mandatory")
+    ).toBeInTheDocument();
+
+    // Ensure no redirection happened
     expect(mockPush).toBeCalledTimes(0);
   });
 });

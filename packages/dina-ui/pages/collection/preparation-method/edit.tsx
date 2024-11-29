@@ -8,13 +8,14 @@ import {
   TextField,
   useQuery,
   withResponse,
-  useDinaFormContext
+  useDinaFormContext,
+  MultilingualDescription
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { PreparationMethod } from "../../../types/collection-api/resources/PreparationMethod";
 
@@ -48,7 +49,7 @@ export default function PreparationMethodEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         <div>
           <h1 id="wb-cont">
             <DinaMessage id={title} />
@@ -65,6 +66,7 @@ export default function PreparationMethodEditPage() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
@@ -124,12 +126,16 @@ export function PreparationMethodForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={fetchedPrepMethod?.id}
-          entityLink="/collection/preparation-method"
-        />
-        <SubmitButton className="ms-auto" />
+      <ButtonBar className="mb-3">
+        <div className="col-md-6 col-sm-12 mt-2">
+          <BackButton
+            entityId={fetchedPrepMethod?.id}
+            entityLink="/collection/preparation-method"
+          />
+        </div>
+        <div className="col-md-6 col-sm-12 d-flex">
+          <SubmitButton className="ms-auto" />
+        </div>
       </ButtonBar>
       <PreparationMethodFormLayout />
     </DinaForm>
@@ -155,22 +161,7 @@ export function PreparationMethodFormLayout() {
           />
         )}
       </div>
-      <div className="row">
-        <TextField
-          className="english-description"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="french-description"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
+      <MultilingualDescription />
     </div>
   );
 }

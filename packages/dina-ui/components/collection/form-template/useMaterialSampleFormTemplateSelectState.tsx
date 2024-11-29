@@ -27,6 +27,11 @@ export interface UseMaterialSampleFormTemplateSelectStateProps {
    * This value will not be saved into local storage so it doesn't override their usual choice.
    */
   temporaryFormTemplateUUID?: string;
+
+  /**
+   * Used with split configurations to override the material sample type.
+   */
+  overrideMaterialSampleType?: string;
 }
 
 /**
@@ -35,12 +40,14 @@ export interface UseMaterialSampleFormTemplateSelectStateProps {
  * Only handles Form Templates (e.g. show/hide fields), not default values.
  */
 export function useMaterialSampleFormTemplateSelectState({
-  temporaryFormTemplateUUID
+  temporaryFormTemplateUUID,
+  overrideMaterialSampleType
 }: UseMaterialSampleFormTemplateSelectStateProps) {
   const { username } = useAccount();
   const { apiClient } = useApiClient();
   const router = useRouter();
-  const formTemplateId = router?.query?.formTemplateId?.toString();
+  const formTemplateId =
+    router?.query?.formTemplateId?.toString() ?? temporaryFormTemplateUUID;
   // Store the nav order in the Page components state:
   const [navOrder, setNavOrder] = useState<string[] | null>(null);
 
@@ -54,13 +61,13 @@ export function useMaterialSampleFormTemplateSelectState({
     useState<PersistedResource<FormTemplate>>();
 
   useEffect(() => {
-    if (temporaryFormTemplateUUID || sampleFormTemplateUUID) {
+    if (sampleFormTemplateUUID) {
       getFormTemplate();
     } else {
       setSampleFormTemplate(undefined);
       setNavOrder(null);
     }
-  }, [sampleFormTemplateUUID, temporaryFormTemplateUUID]);
+  }, [sampleFormTemplateUUID]);
 
   useEffect(() => {
     if (formTemplateId) {
@@ -71,9 +78,7 @@ export function useMaterialSampleFormTemplateSelectState({
   async function getFormTemplate() {
     await apiClient
       .get<FormTemplate>(
-        `collection-api/form-template/${
-          temporaryFormTemplateUUID ?? sampleFormTemplateUUID
-        }`,
+        `collection-api/form-template/${sampleFormTemplateUUID}`,
         {}
       )
       .then((response) => {
@@ -109,6 +114,8 @@ export function useMaterialSampleFormTemplateSelectState({
       materialSampleComponent.managedAttributesOrder ?? [],
     determinationManagedAttributesOrder:
       materialSampleComponent.determinationManagedAttributesOrder ?? [],
+    preparationManagedAttributesOrder:
+      materialSampleComponent.preparationManagedAttributesOrder ?? [],
     collectingEventManagedAttributesOrder:
       collectingEventComponent.managedAttributesOrder ?? [],
     formTemplate: {
@@ -144,6 +151,7 @@ export function useMaterialSampleFormTemplateSelectState({
   delete materialSampleInitialValues?.templateCheckboxes;
   delete materialSampleInitialValues?.templateFields;
   delete materialSampleInitialValues?.managedAttributesOrder;
+  delete materialSampleInitialValues?.preparationManagedAttributesOrder;
   delete collectingEventInitialValues?.templateCheckboxes;
   delete collectingEventInitialValues?.templateFields;
   delete collectingEventInitialValues?.managedAttributesOrder;
@@ -154,7 +162,12 @@ export function useMaterialSampleFormTemplateSelectState({
     navOrder,
     setNavOrder,
     visibleManagedAttributeKeys,
-    materialSampleInitialValues,
+    materialSampleInitialValues: {
+      ...materialSampleInitialValues,
+      ...(overrideMaterialSampleType
+        ? { materialSampleType: overrideMaterialSampleType }
+        : {})
+    },
     collectingEventInitialValues
   };
 }

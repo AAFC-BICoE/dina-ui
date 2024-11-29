@@ -51,21 +51,15 @@ export function DataBlock({
     : [];
 
   // Dynamic DataBlock type options that changes based on what DataBlock selection is
+  // Make SelectField component load initial values if they exist
   const [dynamicSelectedTypeOptions, setDynamicSelectedTypeOptions] =
-    useState<any>([]);
+    useState<any>(
+      getDynamicSelectedTypeOption(extensionValues?.[blockKey].select)
+    );
 
   function onBlockSelectChange(selected, formikCtx, oldValue?) {
-    const selectedFieldExtension = blockOptions?.find(
-      (data) => data.value === selected
-    );
-    const selectedExtensionFieldsOptions = selectedFieldExtension?.fields?.map(
-      (data) => ({
-        label: data.name,
-        value: data.key,
-        descriptions: data.multilingualDescription?.descriptions,
-        unit: data.unit
-      })
-    );
+    const selectedExtensionFieldsOptions =
+      getDynamicSelectedTypeOption(selected);
     setDynamicSelectedTypeOptions(selectedExtensionFieldsOptions);
 
     // Clear block rows if new block option selected
@@ -73,13 +67,31 @@ export function DataBlock({
       if (formikCtx?.values?.[rootName]) {
         Object.keys(formikCtx?.values?.[rootName]).forEach((extensionKey) => {
           if (formikCtx?.values?.[rootName][extensionKey].select === oldValue) {
-            formikCtx.values[rootName][extensionKey].rows = {
+            // Use setFieldValue to cause a rerender
+            formikCtx.setFieldValue(`${rootName}.${extensionKey}.rows`, {
               "extensionField-0": ""
-            };
+            });
           }
         });
       }
     }
+  }
+
+  function getDynamicSelectedTypeOption(selected: any) {
+    const selectedFieldExtension = blockOptions?.find(
+      (data) => data.value === selected
+    );
+
+    const selectedExtensionFieldsOptions = selectedFieldExtension?.fields?.map(
+      (data) => ({
+        label: data.name,
+        value: data.key,
+        descriptions: data.multilingualDescription?.descriptions,
+        unit: data.unit,
+        vocabularyElementType: data.vocabularyElementType
+      })
+    );
+    return selectedExtensionFieldsOptions;
   }
 
   function onCreatableSelectFieldChange(value, oldValue) {
@@ -93,12 +105,6 @@ export function DataBlock({
       onBlockSelectChange(value, formik, oldValue);
     }
   }
-  // Make SelectField component load initial values if they exist
-  useEffect(() => {
-    if (extensionValues) {
-      onBlockSelectChange(extensionValues[blockKey].select, formik);
-    }
-  }, []);
 
   return (
     <div>

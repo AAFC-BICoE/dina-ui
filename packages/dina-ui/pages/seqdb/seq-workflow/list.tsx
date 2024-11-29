@@ -6,7 +6,13 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import {
+  Footer,
+  groupCell,
+  GroupSelectField,
+  Head,
+  Nav
+} from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqBatch } from "../../../types/seqdb-api";
 
@@ -24,7 +30,7 @@ const TABLE_COLUMNS: ColumnDefinition<SeqBatch>[] = [
     accessorKey: "name",
     header: () => <SeqdbMessage id="seqBatchName" />
   },
-  "group",
+  groupCell("group"),
   "createdBy",
   dateCell("createdOn")
 ];
@@ -44,18 +50,20 @@ export default function SangerWorkflowSequencingListPage() {
   return (
     <div>
       <Head title={formatMessage("sangerWorkflowSequencingListTitle")} />
-      <Nav />
+      <Nav marginBottom={false} />
+      <ButtonBar>
+        <div className="flex d-flex">
+          <Link href={`/seqdb/seq-workflow/run`}>
+            <a className="btn btn-primary ms-auto">
+              <SeqdbMessage id="startNewWorkflow" />
+            </a>
+          </Link>
+        </div>
+      </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
           {formatMessage("sangerWorkflowSequencingListTitle")}
         </h1>
-        <ButtonBar>
-          <Link href={`/seqdb/seq-workflow/run`}>
-            <a className="btn btn-primary">
-              <SeqdbMessage id="startNewWorkflow" />
-            </a>
-          </Link>
-        </ButtonBar>
         <ListPageLayout
           additionalFilters={(filterForm) => ({
             isCompleted: false,

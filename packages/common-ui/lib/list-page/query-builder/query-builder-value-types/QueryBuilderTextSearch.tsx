@@ -1,14 +1,19 @@
 import React from "react";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
-import { 
+import {
   includedTypeQuery,
   termQuery,
   existsQuery,
   prefixQuery,
   suffixQuery,
   infixQuery,
-  wildcardQuery } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+  wildcardQuery,
+  inTextQuery,
+  betweenQuery
+} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { useQueryBetweenSupport } from "../query-builder-core-components/useQueryBetweenSupport";
+import { useQueryBuilderEnterToSearch } from "../query-builder-core-components/useQueryBuilderEnterToSearch";
 
 interface QueryRowTextSearchProps {
   /**
@@ -34,19 +39,40 @@ export default function QueryRowTextSearch({
 }: QueryRowTextSearchProps) {
   const { formatMessage } = useIntl();
 
+  const { BetweenElement } = useQueryBetweenSupport({
+    type: "text",
+    matchType,
+    setValue,
+    value
+  });
+
+  // Used for submitting the query builder if pressing enter on a text field inside of the QueryBuilder.
+  const onKeyDown = useQueryBuilderEnterToSearch();
+
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {matchType !== "empty" && matchType !== "notEmpty" && (
-        <input
-          type="text"
-          value={value ?? ""}
-          onChange={(newValue) => setValue?.(newValue?.target?.value)}
-          className="form-control"
-          placeholder={formatMessage({
-            id: "queryBuilder_value_text_placeholder"
-          })}
-        />
+        <>
+          {matchType === "between" ? (
+            BetweenElement
+          ) : (
+            <input
+              type="text"
+              value={value ?? ""}
+              onChange={(newValue) => setValue?.(newValue?.target?.value)}
+              className="form-control"
+              placeholder={
+                matchType !== "in" && matchType !== "notIn"
+                  ? formatMessage({
+                      id: "queryBuilder_value_text_placeholder"
+                    })
+                  : formatMessage({ id: "queryBuilder_value_in_placeholder" })
+              }
+              onKeyDown={onKeyDown}
+            />
+          )}
+        </>
       )}
     </>
   );
@@ -65,13 +91,8 @@ export function transformTextSearchToDSL({
     return {};
   }
 
-  const {
-    distinctTerm,
-    parentType,
-    parentName,
-    optimizedPrefix,
-    keywordMultiFieldSupport
-  } = fieldInfo;
+  const { parentType, parentName, optimizedPrefix, keywordMultiFieldSupport } =
+    fieldInfo;
 
   switch (operation) {
     // Wild card search
@@ -92,9 +113,30 @@ export function transformTextSearchToDSL({
           }
         : wildcardQuery(fieldPath, value, keywordMultiFieldSupport);
 
+    // Comma-separated search (in/not in)
+    case "in":
+    case "notIn":
+      return inTextQuery(
+        fieldPath,
+        value,
+        parentType,
+        keywordMultiFieldSupport,
+        operation === "notIn"
+      );
+
+    // Between, only supported if the numeric keyword exists.
+    case "between":
+      return betweenQuery(fieldPath, value, parentType, "text");
+
     // Prefix partial match
     case "startsWith":
-      return prefixQuery(fieldPath, value, parentType, optimizedPrefix, keywordMultiFieldSupport);
+      return prefixQuery(
+        fieldPath,
+        value,
+        parentType,
+        optimizedPrefix,
+        keywordMultiFieldSupport
+      );
 
     // Infix partial match
     case "containsText":
@@ -117,10 +159,10 @@ export function transformTextSearchToDSL({
                     query: {
                       bool: {
                         must_not: termQuery(
-                              fieldPath,
-                              value,
-                              keywordMultiFieldSupport
-                            ),
+                          fieldPath,
+                          value,
+                          keywordMultiFieldSupport
+                        ),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -156,7 +198,11 @@ export function transformTextSearchToDSL({
               should: [
                 {
                   bool: {
-                    must_not: termQuery(fieldPath, value, keywordMultiFieldSupport)
+                    must_not: termQuery(
+                      fieldPath,
+                      value,
+                      keywordMultiFieldSupport
+                    )
                   }
                 },
                 {
@@ -277,6 +323,6 @@ export function transformTextSearchToDSL({
               }
             }
           }
-        : termQuery(fieldPath, value, keywordMultiFieldSupport)
+        : termQuery(fieldPath, value, keywordMultiFieldSupport);
   }
 }

@@ -1,0 +1,116 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryBuilderAutoSuggestionSearch QueryBuilderAutoSuggestionSearch Component Display different placeholder on IN operators: Expect auto-suggestion field to be displayed with a different placeholder. 1`] = `
+<DocumentFragment>
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_in_placeholder"
+        type="text"
+        value="test"
+      />
+    </form>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`QueryBuilderAutoSuggestionSearch QueryBuilderAutoSuggestionSearch Component Display different placeholder on IN operators: Expect auto-suggestion field to be displayed with a different placeholder. 2`] = `
+<DocumentFragment>
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <input
+        class="form-control"
+        placeholder="queryBuilder_value_in_placeholder"
+        type="text"
+        value="test"
+      />
+    </form>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`QueryBuilderAutoSuggestionSearch QueryBuilderAutoSuggestionSearch Component Display field if match type is equals: Expect date field not to be displayed since the match type is not equals 1`] = `
+<DocumentFragment>
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+    </form>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`QueryBuilderAutoSuggestionSearch QueryBuilderAutoSuggestionSearch Component Display field if match type is equals: Expect date field to be displayed since match type is equals 1`] = `
+<DocumentFragment>
+  <div>
+    <form
+      action="#"
+    >
+      <div
+        class="error-viewer"
+      />
+      <style>
+        
+          .autosuggest-container {
+            position: relative;
+            width: 100%;
+          }
+          .autosuggest .suggestions-container {
+            display: none;
+          }
+          .autosuggest .suggestions-container-open {
+            display: block;
+            position: absolute;
+            width: 100%;
+            z-index: 20;
+          }
+          .autosuggest .suggestion-highlighted { 
+            background-color: #ddd;
+            cursor: pointer;
+          }
+        
+      </style>
+      <div
+        class="autosuggest"
+      >
+        <div
+          aria-expanded="false"
+          aria-haspopup="listbox"
+          aria-owns="react-autowhatever-1"
+          class="autosuggest-container"
+          role="combobox"
+        >
+          <input
+            aria-autocomplete="list"
+            aria-controls="react-autowhatever-1"
+            autocomplete="none"
+            class="form-control"
+            placeholder="Type here to search."
+            type="text"
+            value="test"
+          />
+          <div
+            class="suggestions-container"
+            id="react-autowhatever-1"
+            role="listbox"
+          />
+        </div>
+      </div>
+    </form>
+  </div>
+</DocumentFragment>
+`;

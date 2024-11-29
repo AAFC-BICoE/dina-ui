@@ -10,9 +10,10 @@ import {
   Nav,
   nextSampleInitialValues,
   useMaterialSampleFormTemplateSelectState,
-  useMaterialSampleQuery
+  useMaterialSampleQuery,
+  CopyToNextSampleProvider,
+  NotCopiedOverWarning
 } from "../../../components";
-import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
@@ -31,6 +32,10 @@ export default function MaterialSampleEditPage() {
 
   /** The page to redirect to after saving. */
   const [saveRedirect, setSaveRedirect] = useState<PostSaveRedirect>("VIEW");
+
+  const [copyWarnings, setCopyWarnings] = useState<
+    NotCopiedOverWarning[] | undefined
+  >(undefined);
 
   async function moveToViewPage(savedId: string) {
     await router.push(`/collection/material-sample/view?id=${savedId}`);
@@ -60,9 +65,11 @@ export default function MaterialSampleEditPage() {
     collectingEventInitialValues,
     enableStoredDefaultGroup: true,
     buttonBar: (
-      <ButtonBar>
-        <BackButton entityId={id} entityLink="/collection/material-sample" />
-        <div className="flex-grow-1 d-flex">
+      <ButtonBar className="mb-3">
+        <div className="col-md-3 col-sm-12 mt-2">
+          <BackButton entityId={id} entityLink="/collection/material-sample" />
+        </div>
+        <div className="col-md-4 flex-grow-1 d-flex">
           <div className="mx-auto">
             <MaterialSampleFormTemplateSelect
               value={sampleFormTemplate}
@@ -70,19 +77,22 @@ export default function MaterialSampleEditPage() {
             />
           </div>
         </div>
-        {!id && (
+        <div className="col-md-3 flex-grow-1 d-flex gap-2">
+          <div className="ms-auto" />
+          {!id && (
+            <SubmitButton
+              buttonProps={() => ({
+                style: { width: "12rem" },
+                onClick: () => setSaveRedirect("CREATE_NEXT")
+              })}
+            >
+              <DinaMessage id="saveAndCopyToNext" />
+            </SubmitButton>
+          )}
           <SubmitButton
-            buttonProps={() => ({
-              style: { width: "12rem" },
-              onClick: () => setSaveRedirect("CREATE_NEXT")
-            })}
-          >
-            <DinaMessage id="saveAndCopyToNext" />
-          </SubmitButton>
-        )}
-        <SubmitButton
-          buttonProps={() => ({ onClick: () => setSaveRedirect("VIEW") })}
-        />
+            buttonProps={() => ({ onClick: () => setSaveRedirect("VIEW") })}
+          />
+        </div>
       </ButtonBar>
     ),
     // On save either redirect to the view page or create the next sample with the same values:
@@ -95,22 +105,6 @@ export default function MaterialSampleEditPage() {
       <Head title={formatMessage(title)} />
       <Nav />
       <main className="container-fluid">
-        {!id &&
-          !!lastCreatedId &&
-          withResponse(copyFromQuery, ({ data: originalSample }) => (
-            <SaveAndCopyToNextSuccessAlert
-              id={lastCreatedId}
-              displayName={
-                !!originalSample.materialSampleName?.length
-                  ? originalSample.materialSampleName
-                  : lastCreatedId
-              }
-              entityPath={"collection/material-sample"}
-            />
-          ))}
-        <h1 id="wb-cont">
-          <DinaMessage id={title} />
-        </h1>
         {id ? (
           withResponse(materialSampleQuery, ({ data: sample }) => {
             if (sampleFormTemplate?.id) {
@@ -121,31 +115,69 @@ export default function MaterialSampleEditPage() {
               });
             }
             return (
-              <MaterialSampleForm
-                enableReinitialize={true}
-                navOrder={navOrder}
-                {...sampleFormProps}
-                materialSample={sample}
-              />
+              <>
+                <h1 id="wb-cont">
+                  <DinaMessage id={title} />
+                </h1>
+                <MaterialSampleForm
+                  enableReinitialize={true}
+                  navOrder={navOrder}
+                  {...sampleFormProps}
+                  materialSample={sample}
+                />
+              </>
             );
           })
         ) : copyFromId ? (
           withResponse(copyFromQuery, ({ data: originalSample }) => {
-            const initialValues = nextSampleInitialValues(originalSample);
+            const { initialValues, notCopiedOverWarnings } =
+              nextSampleInitialValues(originalSample);
+
+            // Set the initial warnings found, only should be set on initial load.
+            if (copyWarnings === undefined) {
+              setCopyWarnings(notCopiedOverWarnings);
+            }
+
+            const removeWarning = (warningToRemove: NotCopiedOverWarning) => {
+              if (copyWarnings === undefined) {
+                return;
+              }
+
+              setCopyWarnings(
+                copyWarnings.filter(
+                  (warn) => warn.componentName !== warningToRemove.componentName
+                )
+              );
+            };
+
             return (
-              <MaterialSampleForm
-                {...sampleFormProps}
-                materialSample={initialValues}
-                disableAutoNamePrefix={true}
-              />
+              <CopyToNextSampleProvider
+                value={{
+                  originalSample,
+                  notCopiedOverWarnings: copyWarnings ?? [],
+                  lastCreatedId: lastCreatedId ?? "",
+                  removeWarning
+                }}
+              >
+                <MaterialSampleForm
+                  {...sampleFormProps}
+                  materialSample={initialValues}
+                  disableAutoNamePrefix={true}
+                />
+              </CopyToNextSampleProvider>
             );
           })
         ) : (
-          <MaterialSampleForm
-            enableReinitialize={true}
-            navOrder={navOrder}
-            {...sampleFormProps}
-          />
+          <>
+            <h1 id="wb-cont">
+              <DinaMessage id={title} />
+            </h1>
+            <MaterialSampleForm
+              enableReinitialize={true}
+              navOrder={navOrder}
+              {...sampleFormProps}
+            />
+          </>
         )}
       </main>
       <Footer />

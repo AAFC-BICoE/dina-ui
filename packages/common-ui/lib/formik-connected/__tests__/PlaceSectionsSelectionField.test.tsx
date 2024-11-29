@@ -1,7 +1,9 @@
 import React from "react";
 import { DinaForm } from "../..";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../test-util/mock-app-context";
 import { PlaceSectionsSelectionField } from "../PlaceSectionsSelectionField";
+import "@testing-library/jest-dom";
+import { screen, waitFor } from "@testing-library/react";
 
 const TEST_SRC_ADMIN_LEVELS = [
   {
@@ -34,7 +36,7 @@ describe("PlaceSectionSelectionField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Display Src Admin Levels to table.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{ srcAdminLevels: TEST_SRC_ADMIN_LEVELS }}>
         <PlaceSectionsSelectionField
           name="srcAdminLevels"
@@ -43,23 +45,15 @@ describe("PlaceSectionSelectionField component", () => {
       </DinaForm>
     );
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    // Wait for the table rows to be rendered
+    await waitFor(() => expect(screen.getAllByRole("row").length).toEqual(5)); // Header + 4 rows
 
-    const rows = wrapper.find("tbody tr");
-    expect(rows.length).toEqual(4);
-    expect(
-      rows
-        .first()
-        .find("td")
-        .map((cell) => cell.text())
-    ).toEqual(["Ottawa"]);
+    const rows = screen.getAllByRole("row").slice(1); // Ignore the header row
 
-    expect(
-      rows
-        .last()
-        .find("td")
-        .map((cell) => cell.text())
-    ).toEqual(["Eastern Ontario"]);
+    // Assert the first row contains "Ottawa"
+    expect(rows[0]).toHaveTextContent("Ottawa");
+
+    // Assert the last row contains "Eastern Ontario"
+    expect(rows[rows.length - 1]).toHaveTextContent("Eastern Ontario");
   });
 });

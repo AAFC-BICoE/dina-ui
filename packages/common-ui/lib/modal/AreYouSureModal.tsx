@@ -15,12 +15,24 @@ export interface AreYouSureModalProps {
 
   /** Describes the message displaying to the user in order to make action decision. */
   messageBody?: ReactNode;
+
+  /**
+   * Replace the "Yes" button with a custom element
+   */
+  yesButtonText?: ReactNode;
+
+  /**
+   * Replace the "No" button with a custom element.
+   */
+  noButtonText?: ReactNode;
 }
 
 export function AreYouSureModal({
   actionMessage,
   messageBody,
-  onYesButtonClicked
+  onYesButtonClicked,
+  yesButtonText,
+  noButtonText
 }: AreYouSureModalProps) {
   const { closeModal } = useModal();
 
@@ -33,33 +45,34 @@ export function AreYouSureModal({
   }
 
   return (
-    <div className="modal-content are-you-sure-modal">
-      <div className="modal-header">
-        <h1 style={{ border: "none" }}>{actionMessage}</h1>
-      </div>
-      <div className="modal-body">
-        <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
+    <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
+      <div className="modal-content are-you-sure-modal">
+        <div className="modal-header">
+          <div className="modal-title h3">{actionMessage}</div>
+        </div>
+        <div className="modal-body">
           <main>
             <div className="message-body text-center">
-              <p style={{ fontSize: "x-large" }}>
-                {messageBody ?? <CommonMessage id="areYouSure" />}
-              </p>
+              <p>{messageBody ?? <CommonMessage id="areYouSure" />}</p>
             </div>
           </main>
-          <div className="d-flex gap-3 justify-content-center">
+        </div>
+        <div className="modal-footer" style={{ justifyContent: "center" }}>
+          <div className="d-flex gap-3">
             <FormikButton
               className="btn btn-dark no-button"
               onClick={closeModal}
               buttonProps={() => ({ style: { width: "10rem" } })}
             >
-              <CommonMessage id="no" />
+              {noButtonText ?? <CommonMessage id="no" />}
             </FormikButton>
+
             <SubmitButton className="yes-button">
-              <CommonMessage id="yes" />
+              {yesButtonText ?? <CommonMessage id="yes" />}
             </SubmitButton>
           </div>
-        </DinaForm>
+        </div>
       </div>
-    </div>
+    </DinaForm>
   );
 }

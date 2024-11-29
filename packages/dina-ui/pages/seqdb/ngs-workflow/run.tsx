@@ -12,6 +12,8 @@ import { LibraryPrepBatch } from "../../../types/seqdb-api";
 import { useLibraryPrepBatchQuery } from "../library-prep-batch/edit";
 import { NgsSampleSelectionStep } from "packages/dina-ui/components/seqdb";
 import { PreLibraryPrepStep } from "packages/dina-ui/components/seqdb/ngs-workflow/PreLibraryPrepStep";
+import { NgsSampleSelectCoordinatesStep } from "packages/dina-ui/components/seqdb/ngs-workflow/NgsSampleSelectCoordinatesStep";
+import { IndexAssignmentStep } from "packages/dina-ui/components/seqdb/ngs-workflow/IndexAssignmentStep";
 
 export default function NgsWorkFlowRunPage() {
   const router = useRouter();
@@ -23,7 +25,9 @@ export default function NgsWorkFlowRunPage() {
   );
 
   // Global edit mode state.
-  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editMode, setEditMode] = useState<boolean>(
+    router.query.editMode === "true"
+  );
 
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
@@ -32,12 +36,12 @@ export default function NgsWorkFlowRunPage() {
   const [performComplete, setPerformComplete] = useState<boolean>(false);
 
   // Loaded Batch ID.
-  const [batchId, setBatchId] = useState<string | undefined>(
-    router.query.batchId?.toString()
-  );
+  const [libraryPrepBatchId, setLibraryPrepBatchId] = useState<
+    string | undefined
+  >(router.query.batchId?.toString());
   // Loaded PCR Batch.
-  const libraryPrepBatch = useLibraryPrepBatchQuery(batchId, [
-    batchId,
+  const libraryPrepBatch = useLibraryPrepBatchQuery(libraryPrepBatchId, [
+    libraryPrepBatchId,
     currentStep
   ]);
 
@@ -55,13 +59,13 @@ export default function NgsWorkFlowRunPage() {
   ) {
     setCurrentStep(nextStep);
     if (batchSaved) {
-      setBatchId(batchSaved.id);
+      setLibraryPrepBatchId(batchSaved.id);
     }
     await router.push({
       pathname: router.pathname,
       query: {
         ...router.query,
-        batchId: batchSaved ? batchSaved.id : batchId,
+        batchId: batchSaved ? batchSaved.id : libraryPrepBatchId,
         step: "" + nextStep
       }
     });
@@ -73,7 +77,9 @@ export default function NgsWorkFlowRunPage() {
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/ngs-workflow" />
+      <div className="col-md-4">
+        <BackToListButton entityLink="/seqdb/ngs-workflow" />
+      </div>
       {editMode ? (
         <>
           <Button
@@ -85,12 +91,12 @@ export default function NgsWorkFlowRunPage() {
             Cancel
           </Button>
 
-          {currentStep !== 3 ? (
+          {currentStep !== 4 ? (
             <Button
               variant={"primary"}
               className="ms-2"
               onClick={() => setPerformSave(true)}
-              style={{ width: "10rem" }}
+              style={{ width: "10rem", marginRight: "15px" }}
             >
               {performSave ? (
                 <>
@@ -111,7 +117,7 @@ export default function NgsWorkFlowRunPage() {
             </Button>
           ) : (
             <>
-              <Dropdown as={ButtonGroup}>
+              <Dropdown as={ButtonGroup} style={{ width: "12rem" }}>
                 <Button
                   variant={"primary"}
                   className="ms-2"
@@ -170,7 +176,7 @@ export default function NgsWorkFlowRunPage() {
           variant={"primary"}
           className="ms-auto"
           onClick={() => setEditMode(true)}
-          style={{ width: "10rem" }}
+          style={{ width: "10rem", marginRight: "15px" }}
         >
           <SeqdbMessage id="editButtonText" />
         </Button>
@@ -186,7 +192,7 @@ export default function NgsWorkFlowRunPage() {
     }
 
     // If a PCR Batch is required, and not provided then this step should be disabled.
-    if (batchRequired && !batchId) {
+    if (batchRequired && !libraryPrepBatchId) {
       return true;
     }
 
@@ -210,10 +216,16 @@ export default function NgsWorkFlowRunPage() {
           <Tab disabled={isDisabled(2, true)}>
             {formatMessage("preLibraryPrep")}
           </Tab>
+          <Tab disabled={isDisabled(3, true)}>
+            {formatMessage("selectCoordinates")}
+          </Tab>
+          <Tab disabled={isDisabled(4, true)}>
+            {formatMessage("indexAssignmentStep")}
+          </Tab>
         </TabList>
         <TabPanel>
           <LibraryPrepBatchStep
-            batchId={batchId}
+            batchId={libraryPrepBatchId}
             batch={libraryPrepBatch.response?.data}
             onSaved={onSaved}
             editMode={editMode}
@@ -223,9 +235,9 @@ export default function NgsWorkFlowRunPage() {
           />
         </TabPanel>
         <TabPanel>
-          {batchId && (
+          {libraryPrepBatchId && (
             <NgsSampleSelectionStep
-              batchId={batchId}
+              batchId={libraryPrepBatchId}
               onSaved={onSaved}
               editMode={editMode}
               setEditMode={setEditMode}
@@ -235,9 +247,34 @@ export default function NgsWorkFlowRunPage() {
           )}
         </TabPanel>
         <TabPanel>
-          {batchId && !!libraryPrepBatch.response?.data && (
+          {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
             <PreLibraryPrepStep
-              batchId={batchId}
+              batchId={libraryPrepBatchId}
+              batch={libraryPrepBatch.response?.data}
+              onSaved={onSaved}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
+            <NgsSampleSelectCoordinatesStep
+              libraryPrepBatchId={libraryPrepBatchId}
+              libraryPrepBatch={libraryPrepBatch.response?.data}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {libraryPrepBatchId && !!libraryPrepBatch.response?.data && (
+            <IndexAssignmentStep
+              batchId={libraryPrepBatchId}
               batch={libraryPrepBatch.response?.data}
               onSaved={onSaved}
               editMode={editMode}

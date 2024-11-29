@@ -11,7 +11,7 @@ import { StorageUnitType } from "../../types/collection-api";
 
 export interface StorageFilterProps {
   /**
-   * To prevent displaying itself in the search results, this UUID will be filtered from the 
+   * To prevent displaying itself in the search results, this UUID will be filtered from the
    * results.
    */
   parentStorageUnitUUID?: string;
@@ -19,7 +19,10 @@ export interface StorageFilterProps {
   onChange: (newValue: FilterGroupModel | null) => void;
 }
 
-export function StorageFilter({ onChange, parentStorageUnitUUID }: StorageFilterProps) {
+export function StorageFilter({
+  onChange,
+  parentStorageUnitUUID
+}: StorageFilterProps) {
   const [searchText, setSearchText] = useState<string>("");
   const [storageTypeFilter, setStorageTypeFilter] =
     useState<PersistedResource<StorageUnitType>>();

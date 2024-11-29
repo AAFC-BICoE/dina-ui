@@ -1,6 +1,7 @@
 import { FormikContextType } from "formik";
 import Switch from "react-switch";
 import { FieldWrapper, FieldWrapperProps } from "..";
+import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 
 export interface ToggleFieldProps extends FieldWrapperProps {
   onChangeExternal?: (checked: boolean, formik: FormikContextType<any>) => void;
@@ -16,7 +17,9 @@ export function ToggleField({
   return (
     <FieldWrapper
       {...props}
-      readOnlyRender={(value) => String(!!value)}
+      readOnlyRender={(value) =>
+        !!value ?? false ? <FaCheckSquare /> : <FaRegSquare />
+      }
       disableLabelClick={true}
     >
       {({ value, setValue, formik }) => (

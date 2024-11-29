@@ -1,6 +1,8 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { DeterminationField } from "../DeterminationField";
+import { screen, waitFor, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockOnSubmit = jest.fn();
 
@@ -8,7 +10,7 @@ describe("DeterminationField component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Doesn't try to save what the user types into the name search box.", async () => {
-    const wrapper = mountWithAppContext(
+    const { container } = mountWithAppContext2(
       <DinaForm
         initialValues={{ determination: [{ isPrimary: true }] }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
@@ -18,18 +20,21 @@ describe("DeterminationField component", () => {
     );
 
     // Input some text:
-    wrapper
-      .find(".global-name-input")
-      .simulate("change", { target: { value: "test-name" } });
-
-    wrapper.find("form").simulate("submit");
-
     await new Promise(setImmediate);
-    wrapper.update();
+    const input = screen.getByRole("textbox", {
+      name: /global name search/i
+    });
+    fireEvent.change(input, { target: { value: "test-name" } });
 
-    // Empty determination submitted:
-    expect(mockOnSubmit).lastCalledWith({
-      determination: [{ isPrimary: true }]
+    // Submit the form using querySelector
+    const form = container.querySelector("form");
+    fireEvent.submit(form!);
+
+    await waitFor(() => {
+      // Empty determination submitted:
+      expect(mockOnSubmit).lastCalledWith({
+        determination: [{ isPrimary: true }]
+      });
     });
   });
 });

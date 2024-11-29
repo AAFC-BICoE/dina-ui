@@ -1,4 +1,4 @@
-import { AxiosError, AxiosAdapter } from "axios";
+import { AxiosError, AxiosAdapter, getAdapter } from "axios";
 import { cacheAdapterEnhancer } from "axios-extensions";
 import { FormikErrors } from "formik";
 import Kitsu, {
@@ -135,11 +135,14 @@ export class ApiClientImpl implements ApiClientI {
       (successResponse) => successResponse,
       makeAxiosErrorMoreReadable
     );
-
-    if (this.apiClient.axios?.defaults?.adapter) {
+    if (
+      this.apiClient.axios?.defaults?.adapter &&
+      typeof getAdapter === "function"
+    ) {
       const ONE_SECOND = 1000;
+      const defaultAdapter = getAdapter(this.apiClient.axios.defaults.adapter);
       this.apiClient.axios.defaults.adapter = cacheAdapterEnhancer(
-        this.apiClient.axios.defaults.adapter,
+        defaultAdapter as any,
         {
           // Invalidate the cache after one second.
           // All this does is batch requests if a set of react components all try to make the same request at once.
@@ -192,6 +195,7 @@ export class ApiClientImpl implements ApiClientI {
           };
         }
       }
+      console.warn(responses);
     }
 
     // Check for errors. At least one error means that the entire request's transaction was
@@ -394,9 +398,9 @@ export class DoOperationsError extends Error {
 }
 
 /** Show more details in the Axios errors. */
-export function makeAxiosErrorMoreReadable(error: AxiosError) {
+export function makeAxiosErrorMoreReadable(error: AxiosError<any>) {
   if (error.isAxiosError) {
-    let errorMessage = `${error.config.url}: ${error.response?.statusText}`;
+    let errorMessage = `${error.config?.url}: ${error.response?.statusText}`;
 
     // Special case: Make 502 "bad gateway" messages more user-friendly:
     if (error.response?.status === 502) {
@@ -431,7 +435,7 @@ export class CustomDinaKitsu extends Kitsu {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },
         params: paramsNet,
-        paramsSerializer: (p) => query(p),
+        // paramsSerializer: (p) => query(p),
         responseType,
         timeout
       });

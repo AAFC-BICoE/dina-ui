@@ -3,19 +3,18 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
-  DinaFormSubmitParams,
   FieldWrapper,
   filterBy,
+  LoadingSpinner,
   ResourceSelectField,
-  SaveArgs,
   StringArrayField,
   SubmitButton,
   TextField,
   ToggleField,
-  useDinaFormContext
+  useDinaFormContext,
+  useQuery
 } from "common-ui";
-import { PersistedResource } from "kitsu";
-import { isArray } from "lodash";
+import { InputResource, PersistedResource } from "kitsu";
 import * as yup from "yup";
 import {
   GroupSelectField,
@@ -24,9 +23,15 @@ import {
   StorageUnitChildrenViewer
 } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
-import { StorageUnit, StorageUnitType } from "../../types/collection-api";
-
-import { useState } from "react";
+import {
+  MaterialSample,
+  StorageUnit,
+  StorageUnitType
+} from "../../types/collection-api";
+import { Ref, useState } from "react";
+import StorageUnitGrid from "./grid/StorageUnitGrid";
+import { FormikProps, useFormikContext } from "formik";
+import { useStorageUnitSave } from "./useStorageUnit";
 
 export const storageUnitFormSchema = yup.object({
   storageUnitType: yup.object().required()
@@ -35,9 +40,17 @@ export const storageUnitFormSchema = yup.object({
 export interface StorageUnitFormProps {
   initialParent?: PersistedResource<StorageUnit>;
   storageUnit?: PersistedResource<StorageUnit>;
-  onSaved: (storageUnit: PersistedResource<StorageUnit>[]) => Promise<void>;
+  onSaved?: (storageUnit: PersistedResource<StorageUnit>[]) => Promise<void>;
   buttonBar?: JSX.Element;
   parentIdInURL?: string;
+
+  /** Optionally call the hook from the parent component. */
+  storageUnitSaveHook?: ReturnType<typeof useStorageUnitSave>;
+
+  // Form ref from bulk edit tab
+  storageUnitFormRef?: Ref<FormikProps<InputResource<StorageUnit>>>;
+
+  isBulkEditTabForm?: boolean;
 }
 
 export function StorageUnitForm({
@@ -46,98 +59,108 @@ export function StorageUnitForm({
   onSaved,
   parentIdInURL,
   buttonBar = (
-    <ButtonBar>
-      {parentIdInURL ? (
-        <BackButton
-          entityId={parentIdInURL}
-          entityLink={`/collection/storage-unit`}
-          buttonMsg={"backToParentUnit"}
-        />
-      ) : (
-        <BackButton
-          entityId={storageUnit?.id}
-          entityLink="/collection/storage-unit"
-        />
-      )}
-      <SubmitButton className="ms-auto" />
+    <ButtonBar className="mb-4">
+      <div className="col-md-6 col-sm-12 mt-2">
+        {parentIdInURL ? (
+          <BackButton
+            entityId={parentIdInURL}
+            entityLink={`/collection/storage-unit`}
+            buttonMsg={"backToParentUnit"}
+          />
+        ) : (
+          <BackButton
+            entityId={storageUnit?.id}
+            entityLink="/collection/storage-unit"
+          />
+        )}
+      </div>
+      <div className="col-md-6 col-sm-12 d-flex">
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
-  )
+  ),
+  storageUnitSaveHook,
+  storageUnitFormRef,
+  isBulkEditTabForm
 }: StorageUnitFormProps) {
-  const initialValues = storageUnit || {
-    type: "storage-unit",
-    parentStorageUnit: initialParent
+  const { initialValues, onSubmit } =
+    storageUnitSaveHook ??
+    useStorageUnitSave({
+      initialValues: storageUnit || {
+        type: "storage-unit",
+        parentStorageUnit: initialParent,
+        isGeneric: false
+      },
+      onSaved
+    });
+
+  const storageUnitOnSubmit = async (submittedValues) => {
+    await onSubmit(submittedValues);
   };
 
-  async function onSubmit({
-    submittedValues,
-    api: { save }
-  }: DinaFormSubmitParams<StorageUnit>) {
-    const savedArgs: SaveArgs<StorageUnit>[] = [];
-
-    if (submittedValues.isMultiple) {
-      const names = isArray(submittedValues.name)
-        ? submittedValues.name
-        : [submittedValues.name];
-      delete submittedValues.isMultiple;
-      names.map((unitName) =>
-        savedArgs.push({
-          resource: { ...submittedValues, name: unitName },
-          type: "storage-unit"
-        })
-      );
-    } else {
-      delete submittedValues.isMultiple;
-      savedArgs.push({
-        resource: isArray(submittedValues.name)
-          ? { ...submittedValues, name: submittedValues.name.join() }
-          : submittedValues,
-        type: "storage-unit"
-      });
-    }
-
-    const savedStorage = await save<StorageUnit>(savedArgs, {
-      apiBaseUrl: "/collection-api"
-    });
-    await onSaved(savedStorage);
-  }
-
   return (
-    <DinaForm<Partial<StorageUnit>>
+    <DinaForm<InputResource<StorageUnit>>
       initialValues={initialValues}
       validationSchema={storageUnitFormSchema}
-      onSubmit={onSubmit}
+      onSubmit={storageUnitOnSubmit}
+      innerRef={storageUnitFormRef}
     >
       {buttonBar}
-      <StorageUnitFormFields parentIdInURL={parentIdInURL} />
-      {buttonBar}
+      <StorageUnitFormFields
+        parentIdInURL={parentIdInURL}
+        isBulkEditTabForm={isBulkEditTabForm}
+      />
     </DinaForm>
   );
 }
 
 export interface StorageUnitFormFieldsProps {
   parentIdInURL?: string;
+  /** Reduces the rendering to improve performance when bulk editing many resources. */
+  reduceRendering?: boolean;
+
+  isBulkEditTabForm?: boolean;
 }
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields({
-  parentIdInURL
+  parentIdInURL,
+  reduceRendering,
+  isBulkEditTabForm
 }: StorageUnitFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const [showTextAreaInput, setShowTextAreaInput] = useState(false);
+  const formik = useFormikContext<StorageUnit>();
   const onStorageUnitMultipleToggled = (checked) => {
     setShowTextAreaInput(checked);
   };
 
-  return (
+  const materialSamplesQuery = useQuery<MaterialSample[]>({
+    path: "collection-api/material-sample",
+    filter: { rsql: `storageUnitUsage.storageUnit.uuid==${initialValues?.id}` },
+    include: "storageUnitUsage",
+    page: { limit: 1000 }
+  });
+
+  return materialSamplesQuery.loading ? (
+    <LoadingSpinner loading={true} />
+  ) : (
     <div>
       <div className="row">
-        <div className="col-md-6">
-          {!readOnly && !initialValues.id && (
+        <div className="col-md-6 d-flex">
+          {!readOnly && !initialValues.id && !isBulkEditTabForm && (
             <ToggleField
               className="me-4"
               onChangeExternal={onStorageUnitMultipleToggled}
               name="isMultiple"
               label={formatMessage("multipleUnits")}
+            />
+          )}
+          {(!readOnly || initialValues.isGeneric) && (
+            <ToggleField
+              className="me-4"
+              name="isGeneric"
+              label={formatMessage("isGeneric")}
             />
           )}
         </div>
@@ -183,6 +206,14 @@ export function StorageUnitFormFields({
           readOnlyLink="/collection/storage-unit-type/view?id="
         />
       </div>
+      {!reduceRendering &&
+        initialValues?.storageUnitType?.gridLayoutDefinition &&
+        !formik?.values?.isGeneric && (
+          <StorageUnitGrid
+            storageUnit={initialValues}
+            materialSamples={materialSamplesQuery.response?.data}
+          />
+        )}
       {readOnly ? (
         <FieldWrapper
           name="location"
@@ -195,14 +226,21 @@ export function StorageUnitFormFields({
           )}
         />
       ) : (
-        <StorageLinkerField
-          name="parentStorageUnit"
-          targetType="storage-unit"
-          parentIdInURL={parentIdInURL}
-          parentStorageUnitUUID={initialValues.id}
+        !reduceRendering && (
+          <StorageLinkerField
+            name="parentStorageUnit"
+            targetType="storage-unit"
+            parentIdInURL={parentIdInURL}
+            parentStorageUnitUUID={initialValues.id}
+          />
+        )
+      )}
+      {readOnly && (
+        <StorageUnitChildrenViewer
+          storageUnit={initialValues}
+          materialSamples={materialSamplesQuery?.response?.data}
         />
       )}
-      {readOnly && <StorageUnitChildrenViewer storageUnit={initialValues} />}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" showTime={true} />

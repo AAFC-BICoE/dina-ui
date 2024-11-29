@@ -28,6 +28,7 @@ import {
 import { ReactNode, Ref } from "react";
 import { InputResource } from "kitsu";
 import { FormikProps } from "formik";
+import MetadataBadges from "./MetadataBadges";
 
 export interface MetadataFormProps {
   metadata?: InputResource<Metadata>;
@@ -42,15 +43,6 @@ export interface MetadataFormProps {
 
   // Form ref from parent component
   metadataFormRef?: Ref<FormikProps<InputResource<Metadata>>>;
-
-  /**
-   * Removes the html tag IDs from hidden tabs.
-   * This needs to be done for off-screen forms in the bulk editor.
-   */
-  isOffScreen?: boolean;
-
-  /** Reduces the rendering to improve performance when bulk editing many material samples. */
-  reduceRendering?: boolean;
 }
 
 export function MetadataForm({
@@ -86,6 +78,7 @@ export function MetadataForm({
           <MetadataFileView metadata={metadata as Metadata} imgHeight="15rem" />
         )}
       </div>
+      <MetadataBadges />
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"

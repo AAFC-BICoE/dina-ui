@@ -18,7 +18,9 @@ export function DefaultRow<TData>({
       {row.getVisibleCells().map((cell) => {
         const cellClassNames: string =
           (cell.column.columnDef.meta as any)?.className ?? "";
-        const cellStyle: any = (cell.column.columnDef.meta as any)?.style;
+        const cellStyle: CSSProperties | undefined = (
+          cell.column.columnDef.meta as any
+        )?.style;
         return (
           <td key={cell.id} className={cellClassNames} style={cellStyle}>
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -80,7 +82,9 @@ export function DraggableRow<TData>({
       {row.getVisibleCells().map((cell) => {
         const cellClassNames: string =
           (cell.column.columnDef.meta as any)?.className ?? "";
-        const cellStyle: any = (cell.column.columnDef.meta as any)?.style;
+        const cellStyle: CSSProperties | undefined = (
+          cell.column.columnDef.meta as any
+        )?.style;
         return (
           <td key={cell.id} className={cellClassNames} style={cellStyle}>
             {flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -1,9 +1,12 @@
 import lodash, { startCase, flatMapDeep } from "lodash";
 import { DinaMessage } from "../../../../../dina-ui/intl/dina-ui-intl";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
-import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
 import { ESIndexMapping } from "../../types";
+import { GLOBAL_SEARCH_FIELDNAME } from "../useQueryBuilderConfig";
+import { useSessionStorage } from "usehooks-ts";
+import { SHORTCUT_GLOBAL_SEARCH_QUERY } from "../query-builder-value-types/QueryBuilderGlobalSearch";
 
 interface QueryFieldSelectorProps {
   /**
@@ -21,20 +24,62 @@ interface QueryFieldSelectorProps {
    * Pass the selected option to the Query Builder.
    */
   setField: ((fieldPath: string) => void) | undefined;
+
+  /**
+   * Is this component being used in the column selector, this changes the placeholder and
+   * displays different options not available for the search.
+   */
+  isInColumnSelector: boolean;
+
+  /**
+   * IDs of the columns that should not be displayed in the Query Builder field selector.
+   *
+   * Uses the startsWith match so you can define the full path or partial paths.
+   *
+   * Used for the column selector.
+   */
+  nonSearchableColumns?: string[];
 }
 
 export function QueryFieldSelector({
   indexMap,
   currentField,
-  setField
+  setField,
+  isInColumnSelector = false,
+  nonSearchableColumns
 }: QueryFieldSelectorProps) {
   const { formatMessage, messages, locale } = useIntl();
+
+  const [isGlobalSearch, setIsGlobalSearch] = useState<boolean>(false);
+
+  // Check if we are currently in global search mode.
+  useEffect(() => {
+    if (currentField === GLOBAL_SEARCH_FIELDNAME && !isGlobalSearch) {
+      setIsGlobalSearch(true);
+    } else {
+      setIsGlobalSearch(false);
+    }
+  }, [currentField]);
+
+  // If using the shortcut for global search.
+  const [_globalSearchQuery, setGlobalSearchQuery] = useSessionStorage<
+    string | undefined
+  >(SHORTCUT_GLOBAL_SEARCH_QUERY, undefined, {
+    initializeWithValue: false
+  });
 
   // Generate the options that can be selected for the field dropdown.
   const queryRowOptions = useMemo(() => {
     // Get all of the attributes from the index for the filter dropdown.
     const simpleRowOptions = indexMap
       ?.filter((prop) => !prop.parentPath)
+      ?.filter((prop) => prop.hideField === false)
+      ?.filter(
+        (prop) =>
+          !(nonSearchableColumns ?? []).some((id) =>
+            (prop?.label ?? "").startsWith(id)
+          )
+      )
       ?.map((prop) => ({
         label: messages["field_" + prop.label]
           ? formatMessage({ id: "field_" + prop.label })
@@ -46,6 +91,13 @@ export function QueryFieldSelector({
     // Get all the relationships for the search dropdown.
     const nestedRowOptions = indexMap
       ?.filter((prop) => !!prop.parentPath)
+      ?.filter((prop) => prop.hideField === false)
+      ?.filter(
+        (prop) =>
+          !(nonSearchableColumns ?? []).some((id) =>
+            (prop?.value ?? "").startsWith(id)
+          )
+      )
       ?.map((prop) => {
         return {
           parentName: prop.parentName,
@@ -75,7 +127,7 @@ export function QueryFieldSelector({
     return simpleRowOptions
       ? [...simpleRowOptions, ...groupedNestRowOptions]
       : [];
-  }, [indexMap, locale]);
+  }, [indexMap, locale, nonSearchableColumns]);
 
   // Custom styling to indent the group option menus.
   const customStyles = useMemo(
@@ -145,16 +197,53 @@ export function QueryFieldSelector({
     );
   }, [currentField, locale]);
 
+  const globalSearchOptionSelected = {
+    label: formatMessage({ id: "queryBuilder_globalSearch" }),
+    value: GLOBAL_SEARCH_FIELDNAME
+  };
+
+  const performGlobalSearch = (inputValue: string) => {
+    // Check if a search was provided during typing, if so save it to the session so it can pre-loaded
+    // in the QueryBuilderGlobalSearch.
+    if (inputValue !== "") {
+      setGlobalSearchQuery(inputValue);
+    }
+
+    setField?.(GLOBAL_SEARCH_FIELDNAME);
+  };
+
   return (
     <div style={{ width: "100%" }}>
       {/* Field Selection */}
-      <Select
+      <CreatableSelect
         options={queryRowOptions as any}
-        className={`flex-grow-1 me-2 ps-0`}
+        className={isInColumnSelector ? "ps-0" : "flex-grow-1 me-2 ps-0"}
         styles={customStyles}
-        value={selectedOption}
-        placeholder={<DinaMessage id="queryBuilder_field_placeholder" />}
+        value={isGlobalSearch ? globalSearchOptionSelected : selectedOption}
+        placeholder={
+          isInColumnSelector ? (
+            <DinaMessage id="columnSelector_field_placeholder" />
+          ) : (
+            <DinaMessage id="queryBuilder_field_placeholder" />
+          )
+        }
         onChange={(selected) => setField?.(selected?.value)}
+        // Global Search Specific Props
+        createOptionPosition={"first"}
+        formatCreateLabel={(inputValue) =>
+          inputValue === ""
+            ? formatMessage({ id: "queryBuilder_globalSearch" })
+            : formatMessage(
+                { id: "queryBuilder_globalSearch_withText" },
+                { globalSearchTerm: inputValue }
+              )
+        }
+        isValidNewOption={(_inputValue) => !isInColumnSelector}
+        onCreateOption={performGlobalSearch}
+        captureMenuScroll={true}
+        menuPlacement={isInColumnSelector ? "bottom" : "auto"}
+        menuShouldScrollIntoView={false}
+        minMenuHeight={600}
       />
     </div>
   );

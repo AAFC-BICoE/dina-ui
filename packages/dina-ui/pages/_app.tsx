@@ -2,7 +2,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import {
   ApiClientImplProvider,
   AuthenticatedApiClientProvider,
+  DefaultInstanceContextProvider,
   KeycloakAccountProvider,
+  DevUserAccountProvider,
   ModalProvider
 } from "common-ui";
 import "common-ui/common-ui-style.scss";
@@ -19,7 +21,10 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import "react-dropzone-uploader/dist/styles.css";
 import "react-tabs/style/react-tabs.css";
 import "setimmediate";
-import { ErrorBoundaryPage } from "../components";
+import {
+  ErrorBoundaryPage,
+  WorkbookUploadContextProvider
+} from "../components";
 import "../components/button-bar/nav/app-top.css";
 import "../components/button-bar/nav/nav.css";
 import "../components/button-bar/nav/wet-beow-bootstrap-4.css";
@@ -41,21 +46,27 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
 
   return (
     <ApiClientImplProvider>
-      <KeycloakAccountProvider>
-        <AuthenticatedApiClientProvider>
-          <DinaIntlProvider>
-            <FileUploadProviderImpl>
-              <ErrorBoundaryPage>
-                <DndProvider backend={HTML5Backend}>
-                  <ModalProvider appElement={appElement}>
-                    <Component {...pageProps} />
-                  </ModalProvider>
-                </DndProvider>
-              </ErrorBoundaryPage>
-            </FileUploadProviderImpl>
-          </DinaIntlProvider>
-        </AuthenticatedApiClientProvider>
-      </KeycloakAccountProvider>
+      <DefaultInstanceContextProvider>
+        <DevUserAccountProvider>
+          <KeycloakAccountProvider>
+            <AuthenticatedApiClientProvider>
+              <DinaIntlProvider>
+                <FileUploadProviderImpl>
+                  <ErrorBoundaryPage>
+                    <DndProvider backend={HTML5Backend}>
+                      <ModalProvider appElement={appElement}>
+                        <WorkbookUploadContextProvider>
+                          <Component {...pageProps} />
+                        </WorkbookUploadContextProvider>
+                      </ModalProvider>
+                    </DndProvider>
+                  </ErrorBoundaryPage>
+                </FileUploadProviderImpl>
+              </DinaIntlProvider>
+            </AuthenticatedApiClientProvider>
+          </KeycloakAccountProvider>
+        </DevUserAccountProvider>
+      </DefaultInstanceContextProvider>
     </ApiClientImplProvider>
   );
 }

@@ -17,6 +17,7 @@ export interface ControlledVocabularySelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
   isMulti?: boolean;
   disabled?: boolean;
+  isClearable?: boolean;
 }
 
 export function ControlledVocabularySelectField(
@@ -26,7 +27,8 @@ export function ControlledVocabularySelectField(
   const {
     query,
     isMulti = false,
-    disabled = false
+    disabled = false,
+    isClearable = false
   } = controlledVocabularySelectFieldProps;
 
   const vocQuery = useQuery<Vocabulary>(query?.() as any);
@@ -65,6 +67,8 @@ export function ControlledVocabularySelectField(
           function onChange(newValue) {
             if (Array.isArray(newValue)) {
               setValue(newValue.map((v) => v.value));
+            } else if (newValue === null) {
+              setValue(null);
             } else {
               setValue(newValue.value);
             }
@@ -89,6 +93,7 @@ export function ControlledVocabularySelectField(
                 distance={4}
                 isMulti={isMulti}
                 isDisabled={disabled}
+                isClearable={isClearable}
               />
             </div>
           );
