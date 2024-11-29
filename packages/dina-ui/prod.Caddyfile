@@ -37,7 +37,8 @@ respond /keycloak.json "{
 respond /api/instance.json "{ 
 	\"instance-mode\": \"{$INSTANCE_MODE}\",
 	\"instance-name\": \"{$INSTANCE_NAME}\",
-	\"supported-languages-iso\": \"{$SUPPORTED_LANGUAGES_ISO}\"
+	\"supported-languages-iso\": \"{$SUPPORTED_LANGUAGES_ISO}\",
+	\"tgn-search-base-url\": \"{$TGN_SEARCH_BASE_URL}\"
 }"
 
 # Proxy to the main back-end API:
@@ -86,12 +87,4 @@ route /api/search-api/* {
 route /api/dina-export-api/* {
     uri replace /api/dina-export-api /api/v1
     reverse_proxy {$REPORT_LABEL_API_ADDRESS}
-}
-
-# Proxy for TGN
-route /tgn/* {
-	uri replace /tgn /TGNService.asmx
-	reverse_proxy http://vocabsservices.getty.edu {
-			header_up Host {upstream_hostport}
-	}
 }

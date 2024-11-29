@@ -16,7 +16,8 @@ import {
   TextField,
   TextFieldWithCoordButtons,
   filterBy,
-  useDinaFormContext
+  useDinaFormContext,
+  useInstanceContext
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { compact, find } from "lodash";
@@ -143,6 +144,9 @@ export function CollectingEventFormLayout({
       revalidateOnReconnect: false
     }
   );
+
+  // Check if tgn should be displayed
+  const iContext = useInstanceContext();
 
   const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
 
@@ -357,7 +361,7 @@ export function CollectingEventFormLayout({
   }
 
   function removeTgn(formik: FormikContextType<{}>) {
-    formik.setFieldValue("tgnSourceDetail", null);
+    formik.setFieldValue("geographicThesaurus", null);
 
     setTgnResultSelection(undefined);
     setTgnSearchValue("");
@@ -617,7 +621,7 @@ export function CollectingEventFormLayout({
 
   const tgnSourceSelection = (
     <FieldSet
-      fieldName="tgnSourceDetail"
+      fieldName="geographicThesaurus"
       legend={<DinaMessage id="tgnLegend" />}
       className="non-strip"
       componentName={COLLECTING_EVENT_COMPONENT_NAME}
@@ -630,7 +634,7 @@ export function CollectingEventFormLayout({
           maxHeight: 600
         }}
       >
-        <Field name="tgnSourceDetail">
+        <Field name="geographicThesaurus">
           {({ field: { value: detail }, form }) =>
             detail ? (
               <div>
@@ -1080,7 +1084,14 @@ export function CollectingEventFormLayout({
             </div>
           </div>
           <div className="row">
-            <div className="col">{tgnSourceSelection}</div>
+            <div className="col">
+              {iContext?.tgnSearchBaseUrl ?? // Display tgn only if the TGN search url is provieded
+              !readOnly
+                ? tgnSourceSelection
+                : initialValues?.geographicThesaurus?.source === "TGN"
+                ? tgnSourceSelection
+                : null}
+            </div>
           </div>
         </div>
       </div>
