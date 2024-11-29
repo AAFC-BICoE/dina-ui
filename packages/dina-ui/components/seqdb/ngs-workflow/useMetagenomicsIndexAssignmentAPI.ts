@@ -27,7 +27,7 @@ import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resource
 export interface UseMetagenomicsIndexAssignmentReturn {
   loading: boolean;
   metagenomicsIndexAssignmentResources?: MetagenomicsIndexAssignmentResource[];
-  materialSamples?: MaterialSampleSummary[];
+  materialSampleSummaries?: MaterialSampleSummary[];
   ngsIndexes?: NgsIndex[];
   storageUnitType?: StorageUnitType;
   protocol?: Protocol;
@@ -62,7 +62,7 @@ export function useMetagenomicsIndexAssignmentAPI({
     metagenomicsIndexAssignmentResources,
     setMetagenomicsIndexAssignmentResources
   ] = useState<MetagenomicsIndexAssignmentResource[]>([]);
-  const [materialSamples, setMaterialSamples] =
+  const [materialSampleSummaries, setMaterialSamples] =
     useState<MaterialSampleSummary[]>();
   const [ngsIndexes, setNgsIndexes] = useState<NgsIndex[]>();
   const [protocol, setProtocol] = useState<Protocol>();
@@ -274,8 +274,8 @@ export function useMetagenomicsIndexAssignmentAPI({
     }
 
     const saveOps: SaveArgs[] = toPairs(edits).map(([id, prepEdit]) => ({
-      resource: { id, type: "library-prep", ...prepEdit },
-      type: "library-prep"
+      resource: { id, type: "metagenomics-batch-item", ...prepEdit },
+      type: "metagenomics-batch-item"
     }));
 
     await save(saveOps, { apiBaseUrl: "/seqdb-api" });
@@ -354,7 +354,7 @@ export function useMetagenomicsIndexAssignmentAPI({
   return {
     loading,
     metagenomicsIndexAssignmentResources,
-    materialSamples,
+    materialSampleSummaries,
     ngsIndexes,
     storageUnitType,
     protocol,

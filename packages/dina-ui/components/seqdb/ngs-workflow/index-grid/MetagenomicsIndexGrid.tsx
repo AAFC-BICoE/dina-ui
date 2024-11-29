@@ -10,7 +10,10 @@ import { LibraryPrep } from "../../../../types/seqdb-api";
 import { ColumnDef } from "@tanstack/react-table";
 import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
 import { MetagenomicsIndexAssignmentStepProps } from "../../metagenomics-workflow/MetagenomicsIndexAssignmentStep";
-import { UseMetagenomicsIndexAssignmentReturn } from "../useMetagenomicsIndexAssignmentAPI";
+import {
+  MetagenomicsIndexAssignmentResource,
+  UseMetagenomicsIndexAssignmentReturn
+} from "../useMetagenomicsIndexAssignmentAPI";
 
 interface CellData {
   row: number;
@@ -23,19 +26,20 @@ interface MetagenomicsIndexGridProps
 export function MetagenomicsIndexGrid(props: MetagenomicsIndexGridProps) {
   const {
     pcrBatch,
+    metagenomicsBatch,
     editMode,
     performSave,
     setPerformSave,
-    loading: libraryPrepsLoading,
-    metagenomicsIndexAssignmentResources: libraryPreps,
-    materialSamples,
+    loading,
+    metagenomicsIndexAssignmentResources,
+    materialSampleSummaries,
     ngsIndexes,
     storageUnitType,
     onSubmitGrid
   } = props;
 
   const { formatMessage } = useSeqdbIntl();
-  const { indexSet } = pcrBatch;
+  const { indexSet } = metagenomicsBatch;
 
   // Hidden button bar is used to submit the page from the button bar in a parent component.
   const hiddenButtonBar = (
@@ -46,7 +50,7 @@ export function MetagenomicsIndexGrid(props: MetagenomicsIndexGridProps) {
     />
   );
 
-  if (libraryPrepsLoading) {
+  if (loading) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -58,14 +62,16 @@ export function MetagenomicsIndexGrid(props: MetagenomicsIndexGridProps) {
     );
   }
 
-  if (libraryPreps) {
-    const libraryPrepsWithCoords = libraryPreps.filter(
-      (prep) =>
-        prep.storageUnitUsage?.wellRow && prep.storageUnitUsage?.wellColumn
-    );
+  if (metagenomicsIndexAssignmentResources) {
+    const indexAssignmentResourcesWithCoords =
+      metagenomicsIndexAssignmentResources.filter(
+        (indexAssignmentResource) =>
+          indexAssignmentResource.storageUnitUsage?.wellRow &&
+          indexAssignmentResource.storageUnitUsage?.wellColumn
+      );
 
     // Display an error if no coordinates have been selected yet, nothing to edit.
-    if (libraryPrepsWithCoords.length === 0) {
+    if (indexAssignmentResourcesWithCoords.length === 0) {
       return (
         <div className="alert alert-warning mt-2">
           {formatMessage("missingSelectedCoordinatesForAssignment")}
@@ -73,11 +79,11 @@ export function MetagenomicsIndexGrid(props: MetagenomicsIndexGridProps) {
       );
     }
 
-    const cellGrid: { [key: string]: LibraryPrep } = {};
-    for (const prep of libraryPrepsWithCoords) {
+    const cellGrid: { [key: string]: MetagenomicsIndexAssignmentResource } = {};
+    for (const resource of indexAssignmentResourcesWithCoords) {
       cellGrid[
-        `${prep.storageUnitUsage?.wellRow}_${prep.storageUnitUsage?.wellColumn}`
-      ] = prep;
+        `${resource.storageUnitUsage?.wellRow}_${resource.storageUnitUsage?.wellColumn}`
+      ] = resource;
     }
 
     const columns: ColumnDef<CellData>[] = [];
@@ -134,26 +140,29 @@ export function MetagenomicsIndexGrid(props: MetagenomicsIndexGridProps) {
         cell: ({ row: { original } }) => {
           const rowLabel = String.fromCharCode(original.row + 65);
           const coords = `${rowLabel}_${columnLabel}`;
-          const prep = cellGrid[coords];
+          const indexAssignmentResource: MetagenomicsIndexAssignmentResource =
+            cellGrid[coords];
 
-          return prep ? (
+          return indexAssignmentResource ? (
             <div className="h-100 w-100 list-group-item">
               <div>
-                {materialSamples?.find(
-                  (sample) => sample.id === prep?.materialSample?.id
+                {materialSampleSummaries?.find(
+                  (sample) =>
+                    sample.id ===
+                    indexAssignmentResource?.materialSampleSummary?.id
                 )?.materialSampleName ?? ""}
               </div>
               <div>
-                {prep.indexI5 && (
+                {indexAssignmentResource.indexI5 && (
                   <div>
                     <strong>i5: </strong>
-                    {prep.indexI5.name}
+                    {indexAssignmentResource.indexI5.name}
                   </div>
                 )}
-                {prep.indexI7 && (
+                {indexAssignmentResource.indexI7 && (
                   <div>
                     <strong>i7: </strong>
-                    {prep.indexI7.name}
+                    {indexAssignmentResource.indexI7.name}
                   </div>
                 )}
               </div>

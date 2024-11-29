@@ -22,7 +22,7 @@ import {
 } from "./useMetagenomicsIndexAssignmentAPI";
 
 interface MetagenomicsIndexAssignmentRow {
-  materialSample?: MaterialSampleSummary;
+  materialSampleSummary?: MaterialSampleSummary;
   metagenomicsIndexAssignmentResource?: MetagenomicsIndexAssignmentResource;
   pcrBatchItem?: PcrBatchItem;
 }
@@ -41,7 +41,7 @@ export function MetagenomicsIndexAssignmentTable(
     setPerformSave,
     loading,
     metagenomicsIndexAssignmentResources,
-    materialSamples,
+    materialSampleSummaries,
     ngsIndexes,
     onSubmitTable
   } = props;
@@ -153,13 +153,13 @@ export function MetagenomicsIndexAssignmentTable(
         ? metagenomicsIndexAssignmentResources.map<MetagenomicsIndexAssignmentRow>(
             (prep) => ({
               metagenomicsIndexAssignmentResource: prep,
-              materialSample: materialSamples?.find(
+              materialSampleSummary: materialSampleSummaries?.find(
                 (samp) => samp.id === prep?.materialSampleSummary?.id
               )
             })
           )
         : [],
-    [metagenomicsIndexAssignmentResources, materialSamples]
+    [metagenomicsIndexAssignmentResources, materialSampleSummaries]
   );
 
   const initialValues = useMemo(() => {
