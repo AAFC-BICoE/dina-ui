@@ -5,12 +5,11 @@ import {
   DinaForm,
   FieldWrapper,
   SubmitButton,
-  TextField,
   useApiClient,
   GeneratorColumn
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Alert, Card, Spinner } from "react-bootstrap";
+import { Alert, Card, Form, Spinner } from "react-bootstrap";
 import Select from "react-select";
 import { useMemo, useState } from "react";
 import { DynamicFieldsMappingConfig } from "common-ui/lib/list-page/types";
@@ -23,6 +22,7 @@ import {
   generateWorkbookFieldOptions,
   getFlattenedConfig
 } from "../../components/workbook/utils/workbookMappingUtils";
+import InputGroup from "react-bootstrap/InputGroup";
 
 export interface EntityConfiguration {
   name: string;
@@ -51,6 +51,9 @@ export function WorkbookTemplateGenerator() {
   // Generator errors
   const [errorMessage, setErrorMessage] = useState<string>();
 
+  // Filename
+  const [fileName, setFileName] = useState<string>("");
+
   // Entity to be generated (e.g. material-sample)
   const [type, setType] = useState<EntityConfiguration>(ENTITY_TYPES[0]);
 
@@ -71,16 +74,16 @@ export function WorkbookTemplateGenerator() {
     return generateWorkbookFieldOptions(flattenedConfig, formatMessage);
   }, [flattenedConfig]);
 
-  async function generateTemplate(formik) {
+  async function generateTemplate() {
     setLoading(true);
     setErrorMessage(undefined);
 
     // Retrieve the filename.
-    const fileName = formik?.values?.name ?? "template";
+    const safeFileName = fileName === "" ? "template" : fileName;
 
     // Ensure the filename provided is supported by Windows.
     const validFilenameRegex = /^[a-zA-Z0-9\s\-_]+$/;
-    if (!validFilenameRegex.test(fileName)) {
+    if (!validFilenameRegex.test(safeFileName)) {
       setErrorMessage(
         "Please enter a valid filename. Only letters, numbers, spaces, hyphens, and underscores are allowed."
       );
@@ -134,7 +137,7 @@ export function WorkbookTemplateGenerator() {
       );
       const link = document?.createElement("a");
       link.href = url ?? "";
-      link?.setAttribute("download", fileName + ".xlsx");
+      link?.setAttribute("download", safeFileName + ".xlsx");
       document?.body?.appendChild(link);
       link?.click();
       if (typeof window !== "undefined" && window?.URL?.revokeObjectURL) {
@@ -192,10 +195,10 @@ export function WorkbookTemplateGenerator() {
             <div className="col-md-6 col-sm-12 d-flex">
               <SubmitButton
                 className="ms-auto"
-                buttonProps={(formik) => ({
+                buttonProps={() => ({
                   style: { width: "12rem" },
                   disabled: loading || columnsToGenerate.length === 0,
-                  onClick: () => generateTemplate(formik)
+                  onClick: () => generateTemplate()
                 })}
               >
                 {loading ? (
@@ -215,12 +218,24 @@ export function WorkbookTemplateGenerator() {
         <Card>
           <Card.Body>
             <div className="list-inline d-flex flex-row gap-4 pt-2">
-              <TextField
-                name={"name"}
-                customName="templateName"
-                disabled={loading}
-                className="flex-grow-1"
-              />
+              <div className="flex-grow-1">
+                <strong>Template Name</strong>
+                <InputGroup className="mt-2">
+                  <Form.Control
+                    name="name"
+                    disabled={loading}
+                    className="flex-grow-1 form-control"
+                    onChange={(value) => {
+                      setFileName(value.target.value ?? "");
+                    }}
+                    value={fileName}
+                    placeholder="template"
+                    aria-describedby="extension"
+                  />
+                  <InputGroup.Text id="extension">.xlsx</InputGroup.Text>
+                </InputGroup>
+              </div>
+
               <FieldWrapper name="type" className="flex-grow-1">
                 <Select
                   isDisabled={entityTypes.length === 1}
