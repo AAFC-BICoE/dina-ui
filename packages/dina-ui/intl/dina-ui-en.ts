@@ -260,6 +260,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_assemblageName: "Assemblage Name",
   field_attachment: "Attachments",
   field_attributesTemplate: "Set Attributes Template",
+  field_analysisType: "Analysis Type",
   field_barcode: "Barcode",
   field_collectingEventCollectionMethod: "Collection Method",
   field_collectingEventCollectionMethod_tooltip:
@@ -1141,6 +1142,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select Parent Material Sample to link resource to",
   doOperationsFieldError:
     'Field "{fieldErrorKey}" has the following error: {fieldErrorMessage}',
+  changingTheStorageUnitTypeWillDeleteWarning:
+    "Changing the storage unit type will clear the existing storage coordinates stored.",
+  changingTheStorageUnitTypeWillDeleteWarningButtonText: "Proceed",
   seqdbManagedAttributeTitle: "Sequencing",
   genericMolecularAnalysis: "Generic Molecular Analysis"
 };

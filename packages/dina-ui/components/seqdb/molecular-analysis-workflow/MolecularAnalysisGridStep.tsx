@@ -1,7 +1,14 @@
-import { filterBy, LoadingSpinner, ResourceSelect } from "common-ui";
+import {
+  AreYouSureModal,
+  CommonMessage,
+  filterBy,
+  LoadingSpinner,
+  ResourceSelect,
+  useModal
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   MolecularAnalysisItemSample,
   useMolecularAnalysisGridControls
@@ -13,7 +20,7 @@ import {
   StorageUnit,
   StorageUnitType
 } from "packages/dina-ui/types/collection-api";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export interface MolecularAnalysisGridStepProps {
   molecularAnalysisId: string;
@@ -37,6 +44,8 @@ export function MolecularAnalysisGridStep({
   performSave,
   setPerformSave
 }: MolecularAnalysisGridStepProps) {
+  const { openModal } = useModal();
+
   const {
     availableItems,
     cellGrid,
@@ -60,15 +69,21 @@ export function MolecularAnalysisGridStep({
     multipleStorageUnitsWarning
   } = useMolecularAnalysisGridControls({
     molecularAnalysisId,
-    molecularAnalysis
+    molecularAnalysis,
+    editMode
   });
+
+  const [pageLoaded, setPageLoaded] = useState<boolean>(false);
 
   // Automatically go into edit mode if no storage units exist.
   useEffect(() => {
-    if (loading === false && isStorage === false) {
-      setEditMode(true);
+    if (loading === false && pageLoaded === false) {
+      if (isStorage === false) {
+        setEditMode(true);
+      }
+      setPageLoaded(true);
     }
-  }, [loading, isStorage]);
+  }, [loading, isStorage, pageLoaded]);
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -87,6 +102,18 @@ export function MolecularAnalysisGridStep({
     return <LoadingSpinner loading={true} />;
   }
 
+  /**
+   * Since this step is optional, the user can skip and go directly to the next step.
+   */
+  function skipStep() {
+    async function performSkipInternal() {
+      setPerformSave(false);
+      await onSaved(3);
+    }
+
+    performSkipInternal();
+  }
+
   return (
     <>
       {multipleStorageUnitsWarning && (
@@ -97,11 +124,34 @@ export function MolecularAnalysisGridStep({
           </div>
         </div>
       )}
+      {editMode === false && !storageUnit?.id && (
+        <div className="col-12">
+          <div className="alert alert-info">
+            No coordinates have been saved yet, click "Edit" to begin adding
+            coordinates.
+          </div>
+        </div>
+      )}
+      {!storageUnit?.id && !storageUnitType?.id && editMode === true && (
+        <div className="row">
+          <div className="col-md-12">
+            <button
+              className="btn btn-secondary w-100 mb-4"
+              onClick={skipStep}
+              type="button"
+            >
+              Skip Step
+            </button>
+          </div>
+        </div>
+      )}
       <div className="row">
         <div className="col-md-6">
-          <strong>
-            <DinaMessage id="storageUnitType" />
-          </strong>
+          {!(editMode === false && !storageUnit?.id) && (
+            <strong>
+              <DinaMessage id="storageUnitType" />
+            </strong>
+          )}
           <div className="mt-2">
             {editMode ? (
               <ResourceSelect<StorageUnitType>
@@ -109,10 +159,31 @@ export function MolecularAnalysisGridStep({
                 optionLabel={(it) => it.name}
                 filter={filterBy(["name"])}
                 onChange={(value) => {
-                  setStorageUnitType(
-                    value as PersistedResource<StorageUnitType>
-                  );
-                  setStorageUnit(undefined);
+                  if (storageUnitType?.id !== undefined) {
+                    openModal(
+                      <AreYouSureModal
+                        actionMessage={<DinaMessage id="areYouSure" />}
+                        messageBody={
+                          <DinaMessage id="changingTheStorageUnitTypeWillDeleteWarning" />
+                        }
+                        yesButtonText={
+                          <DinaMessage id="changingTheStorageUnitTypeWillDeleteWarningButtonText" />
+                        }
+                        noButtonText={<DinaMessage id="cancelButtonText" />}
+                        onYesButtonClicked={() => {
+                          setStorageUnitType(
+                            value as PersistedResource<StorageUnitType>
+                          );
+                          setStorageUnit(undefined);
+                        }}
+                      />
+                    );
+                  } else {
+                    setStorageUnitType(
+                      value as PersistedResource<StorageUnitType>
+                    );
+                    setStorageUnit(undefined);
+                  }
                 }}
                 value={storageUnitType}
               />
@@ -122,29 +193,35 @@ export function MolecularAnalysisGridStep({
           </div>
         </div>
         <div className="col-md-6">
-          <strong>
-            <DinaMessage id="field_storageUnit" />
-          </strong>
+          {storageUnitType?.id && (
+            <strong>
+              <DinaMessage id="field_storageUnit" />
+            </strong>
+          )}
           <div className="mt-2">
             {editMode ? (
-              <ResourceSelect<StorageUnit>
-                model="collection-api/storage-unit"
-                optionLabel={(it) => it.name}
-                filter={filterBy(["name"], {
-                  extraFilters: [
-                    {
-                      selector: "storageUnitType.uuid",
-                      comparison: "==",
-                      arguments: storageUnitType?.id ?? ""
+              <>
+                {storageUnitType?.id && (
+                  <ResourceSelect<StorageUnit>
+                    model="collection-api/storage-unit"
+                    optionLabel={(it) => it.name}
+                    filter={filterBy(["name"], {
+                      extraFilters: [
+                        {
+                          selector: "storageUnitType.uuid",
+                          comparison: "==",
+                          arguments: storageUnitType?.id ?? ""
+                        }
+                      ]
+                    })}
+                    onChange={(value) =>
+                      setStorageUnit(value as PersistedResource<StorageUnit>)
                     }
-                  ]
-                })}
-                onChange={(value) =>
-                  setStorageUnit(value as PersistedResource<StorageUnit>)
-                }
-                value={storageUnit}
-                isDisabled={!storageUnitType?.id}
-              />
+                    value={storageUnit}
+                    isDisabled={!storageUnitType?.id}
+                  />
+                )}
+              </>
             ) : (
               <p>{storageUnit?.name}</p>
             )}

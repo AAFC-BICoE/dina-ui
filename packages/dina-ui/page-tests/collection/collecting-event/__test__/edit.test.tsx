@@ -450,6 +450,7 @@ describe("collecting-event edit page", () => {
 
     // Add a second assertion:
     userEvent.click(wrapper.getByTestId("add-another-button"));
+
     await new Promise(setImmediate);
 
     // Make 2nd assertion primary:

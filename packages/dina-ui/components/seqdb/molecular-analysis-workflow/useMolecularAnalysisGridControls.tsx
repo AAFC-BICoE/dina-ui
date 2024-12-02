@@ -23,6 +23,7 @@ import { PersistedResource } from "kitsu";
 interface ContainerGridProps {
   molecularAnalysisId: string;
   molecularAnalysis: GenericMolecularAnalysis;
+  editMode: boolean;
 }
 
 export interface MolecularAnalysisItemSample
@@ -32,7 +33,8 @@ export interface MolecularAnalysisItemSample
 
 export function useMolecularAnalysisGridControls({
   molecularAnalysisId,
-  molecularAnalysis
+  molecularAnalysis,
+  editMode
 }: ContainerGridProps) {
   const { save, bulkGet } = useContext(ApiClientContext);
 
@@ -63,6 +65,9 @@ export function useMolecularAnalysisGridControls({
     useState<PersistedResource<StorageUnit>>();
 
   const [loadedStorageUnit, setLoadedStorageUnit] =
+    useState<PersistedResource<StorageUnit>>();
+
+  const [initialStorageUnit, setInitialStorageUnit] =
     useState<PersistedResource<StorageUnit>>();
 
   const [multipleStorageUnitsWarning, setMultipleStorageUnitsWarning] =
@@ -149,6 +154,7 @@ export function useMolecularAnalysisGridControls({
             )?.storageUnit;
             setStorageUnit(storageUnitToLoad);
             setLoadedStorageUnit(storageUnitToLoad);
+            setInitialStorageUnit(storageUnitToLoad);
             setStorageUnitType(storageUnitToLoad?.storageUnitType);
           }
 
@@ -256,7 +262,10 @@ export function useMolecularAnalysisGridControls({
       ) {
         if (loadedStorageUnit) {
           // User changed the storage unit to something new...
-          if (loadedStorageUnit.id !== storageUnit.id) {
+          if (
+            loadedStorageUnit.id !== storageUnit.id ||
+            loadedStorageUnit?.storageUnitType?.id !== storageUnitType?.id
+          ) {
             clearGrid();
           }
         } else {
@@ -285,6 +294,15 @@ export function useMolecularAnalysisGridControls({
       }
     }
   }, [loadingRelationships, storageUnit, storageUnitType]);
+
+  useEffect(() => {
+    if (editMode === false) {
+      if (initialStorageUnit?.id !== storageUnit?.id) {
+        setStorageUnit(initialStorageUnit);
+        setStorageUnitType(initialStorageUnit?.storageUnitType);
+      }
+    }
+  }, [editMode]);
 
   function sortAvailableItems(batchItemSamples: MolecularAnalysisItemSample[]) {
     if (materialSampleSortOrder) {
@@ -502,7 +520,7 @@ export function useMolecularAnalysisGridControls({
 
       const saveArgs: SaveArgs<MolecularAnalysisItemSample>[] =
         materialSampleItemsToSave.map((item) => {
-          const matchedStorageUnitUsage = savedStorageUnitUsage.find(
+          const matchedStorageUnitUsage = savedStorageUnitUsage?.find?.(
             (storageUnitUsage) =>
               storageUnitUsage.wellColumn ===
                 item.storageUnitUsage?.wellColumn &&
@@ -542,12 +560,13 @@ export function useMolecularAnalysisGridControls({
             type: "storage-unit-usage"
           }
         }));
-      if (deleteStorageUnitUsageArgs.length) {
+      if (deleteStorageUnitUsageArgs.length !== 0) {
         await save<StorageUnitUsage>(deleteStorageUnitUsageArgs, {
           apiBaseUrl: "/collection-api"
         });
       }
     } catch (err) {
+      console.error(err);
       alert(err);
     }
     setSubmitting(false);

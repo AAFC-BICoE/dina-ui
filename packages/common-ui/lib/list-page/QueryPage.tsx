@@ -1188,7 +1188,9 @@ export function QueryPage<TData extends KitsuResource>({
                       className="btn btn-primary w-100 mb-5"
                       onClick={moveSelectedResultsToSelectedResources}
                     >
-                      <FiChevronRight />
+                      <div data-testid="move-resources-over">
+                        <FiChevronRight />
+                      </div>
                     </FormikButton>
                   </div>
                   <div className="deselect-all-checked-button">
@@ -1196,7 +1198,9 @@ export function QueryPage<TData extends KitsuResource>({
                       className="btn btn-dark w-100 mb-5"
                       onClick={removeSelectedResources}
                     >
-                      <FiChevronLeft />
+                      <div data-testid="remove-resources">
+                        <FiChevronLeft />
+                      </div>
                     </FormikButton>
                   </div>
                 </div>

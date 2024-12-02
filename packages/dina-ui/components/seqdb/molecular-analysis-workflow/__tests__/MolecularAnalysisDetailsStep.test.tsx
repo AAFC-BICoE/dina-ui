@@ -4,63 +4,13 @@ import {
   MolecularAnalysisDetailsStep,
   MolecularAnalysisDetailsStepProps
 } from "../MolecularAnalysisDetailsStep";
-import { PersistedResource } from "kitsu";
-import { Group } from "packages/dina-ui/types/user-api";
-import { Protocol, Vocabulary } from "packages/dina-ui/types/collection-api";
 import { useState, useEffect } from "react";
 import "@testing-library/jest-dom";
-
-const TEST_GROUP: PersistedResource<Group>[] = [
-  {
-    id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
-    type: "group",
-    name: "Agriculture and Agri-food Canada",
-    path: "",
-    labels: { en: "AAFC", fr: "AAC" }
-  }
-];
-
-const TEST_TYPES: PersistedResource<Vocabulary> = {
-  id: "molecularAnalysisType",
-  type: "vocabulary",
-  vocabularyElements: [
-    {
-      key: "hrms",
-      name: "HRMS",
-      multilingualTitle: {
-        titles: [
-          { lang: "en", title: "High Resolution Mass Spectrometry (HRMS)" }
-        ]
-      }
-    },
-    {
-      key: "gcms",
-      name: "GCMS",
-      multilingualTitle: {
-        titles: [
-          {
-            lang: "en",
-            title:
-              "Gas chromatography coupled to low-resolution mass spectrometry (GCMS)"
-          }
-        ]
-      }
-    }
-  ]
-};
-
-const TEST_PROTOCOLS: PersistedResource<Protocol>[] = [
-  {
-    id: "232f661a-bcd4-4ff2-8c6b-dace481b939a",
-    type: "protocol",
-    name: "Protocol Test 1"
-  },
-  {
-    id: "4faf8fdc-243b-42e8-b106-cf173da67f08",
-    type: "protocol",
-    name: "Protocol Test 2"
-  }
-];
+import {
+  TEST_GROUP,
+  TEST_MOLECULAR_ANALYSIS_TYPES,
+  TEST_PROTOCOLS
+} from "../__mocks__/MolecularAnalysisMocks";
 
 const onSavedMock = jest.fn();
 const mockSetEditMode = jest.fn();
@@ -72,7 +22,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "user-api/group":
       return TEST_GROUP;
     case "seqdb-api/vocabulary/molecularAnalysisType":
-      return { data: TEST_TYPES };
+      return { data: TEST_MOLECULAR_ANALYSIS_TYPES };
   }
 });
 
