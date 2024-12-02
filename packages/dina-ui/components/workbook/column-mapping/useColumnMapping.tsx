@@ -6,6 +6,7 @@ import {
   Tooltip,
   filterBy,
   useApiClient,
+  useDinaFormContext,
   useQuery
 } from "../../../../common-ui/lib";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -20,6 +21,7 @@ import FieldMappingConfig from "../utils/FieldMappingConfig";
 import { useWorkbookConverter } from "../utils/useWorkbookConverter";
 import {
   FieldOptionType,
+  PERSON_SELECT_FIELDS,
   WorkbookColumnInfo,
   compareAlphanumeric,
   findMatchField,
@@ -31,6 +33,7 @@ import { FieldMapType } from "./WorkbookColumnMapping";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { ResourceNameIdentifier } from "../../../types/common/resources/ResourceNameIdentifier";
+import { PersonSelectField } from "../../resource-select-fields/resource-select-fields";
 
 export function useColumnMapping() {
   const { formatMessage } = useDinaIntl();
@@ -721,13 +724,16 @@ export function useColumnMapping() {
               metadatas.find((item) => compareAlphanumeric(item.name, value));
             break;
         }
-
         // If relationship is found, set it. If not, reset it so it's empty.
         if (found) {
-          theRelationshipMapping[columnHeader][value.replace(".", "_")] = pick(
-            found,
-            ["id", "type"]
-          );
+          if (PERSON_SELECT_FIELDS.has(fieldPath)) {
+            theRelationshipMapping[columnHeader][value.replace(".", "_")] = [
+              pick(found, ["id", "type"])
+            ];
+          } else {
+            theRelationshipMapping[columnHeader][value.replace(".", "_")] =
+              pick(found, ["id", "type"]);
+          }
         }
       }
     }
@@ -748,10 +754,15 @@ export function useColumnMapping() {
       return undefined;
     }
 
-    const selectElemName = `relationshipMapping.${columnHeader.replaceAll(
-      ".",
-      "_"
-    )}.${fieldValue.replaceAll(".", "_")}.id`;
+    const selectElemName = PERSON_SELECT_FIELDS.has(fieldPath)
+      ? `relationshipMapping.${columnHeader.replaceAll(
+          ".",
+          "_"
+        )}.${fieldValue.replaceAll(".", "_")}`
+      : `relationshipMapping.${columnHeader.replaceAll(
+          ".",
+          "_"
+        )}.${fieldValue.replaceAll(".", "_")}.id`;
 
     let options: any[] = [];
     let targetType: string = "";
@@ -850,28 +861,51 @@ export function useColumnMapping() {
 
     return (
       <div className="d-flex">
-        <SelectField
-          className="flex-fill"
-          name={selectElemName}
-          options={options}
-          hideLabel={true}
-          isMulti={false}
-          selectProps={{
-            isClearable: true,
-            menuPortalTarget: document.body,
-            styles: {
-              menuPortal: (base) => ({ ...base, zIndex: 9999 })
-            }
-          }}
-          onChange={(newValue) => {
-            onChangeRelatedRecord(
-              columnHeader,
-              fieldValue,
-              newValue as string,
-              targetType
-            );
-          }}
-        />
+        {PERSON_SELECT_FIELDS.has(fieldPath) ? (
+          <PersonSelectField
+            onChange={(newValue) => {
+              onChangeRelatedRecord(
+                columnHeader,
+                fieldValue,
+                (newValue as any)?.map((person) => person.id),
+                targetType
+              );
+            }}
+            className="flex-fill"
+            name={selectElemName}
+            hideLabel={true}
+            isMulti={true}
+            selectProps={{
+              isClearable: true,
+              menuPortalTarget: document.body,
+              styles: {
+                menuPortal: (base) => ({ ...base, zIndex: 9999 })
+              }
+            }}
+          />
+        ) : (
+          <SelectField
+            className="flex-fill"
+            name={selectElemName}
+            options={options}
+            hideLabel={true}
+            selectProps={{
+              isClearable: true,
+              menuPortalTarget: document.body,
+              styles: {
+                menuPortal: (base) => ({ ...base, zIndex: 9999 })
+              }
+            }}
+            onChange={(newValue) => {
+              onChangeRelatedRecord(
+                columnHeader,
+                fieldValue,
+                newValue as string,
+                targetType
+              );
+            }}
+          />
+        )}
         {showDuplicateWarningTooltip && (
           <Tooltip
             disableSpanMargin={true}
