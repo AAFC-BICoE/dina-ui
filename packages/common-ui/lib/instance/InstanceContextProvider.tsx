@@ -5,6 +5,7 @@ export interface InstanceContextI {
   supportedLanguages: string;
   instanceMode: string;
   instanceName: string;
+  supportedGeographicReferences: string;
   tgnSearchBaseUrl?: string;
 }
 
@@ -37,6 +38,11 @@ export function DefaultInstanceContextProvider({
             instanceName: !!response["instance-name"]
               ? response["instance-name"]
               : "AAFC",
+            supportedGeographicReferences: !!response[
+              "supported-geographic-references"
+            ]
+              ? response["supported-geographic-references"]
+              : "OSM",
             tgnSearchBaseUrl: !!response["tgn-search-base-url"]
               ? response["tgn-search-base-url"]
               : ""
@@ -46,6 +52,7 @@ export function DefaultInstanceContextProvider({
             supportedLanguages: "en",
             instanceMode: "developer",
             instanceName: "AAFC",
+            supportedGeographicReferences: "OSM",
             tgnSearchBaseUrl: ""
           });
         }

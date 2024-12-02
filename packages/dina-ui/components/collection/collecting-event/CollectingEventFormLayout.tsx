@@ -38,6 +38,7 @@ import { ManagedAttributesEditor } from "../../";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   COLLECTING_EVENT_COMPONENT_NAME,
+  GeographicThesaurusSource,
   Protocol,
   Vocabulary
 } from "../../../types/collection-api";
@@ -61,13 +62,7 @@ import {
   nominatimAddressDetailSearch
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
-import {
-  TgnDetails,
-  TgnSearchBox,
-  TgnSelectSearchResultDetail,
-  TgnViewDetailButton,
-  fetchTgnParents
-} from "./TgnIntegration";
+import { TgnSourceSelection } from "./TgnIntegration";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -89,6 +84,11 @@ export function CollectingEventFormLayout({
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
+
+  // Only show geo reference systems that are set. Use open street map as fallback
+  const instanceContext = useInstanceContext();
+  const supportedGeographicReferences: string[] =
+    instanceContext?.supportedGeographicReferences?.split(",") ?? ["OSM"];
 
   // Check if Georeferences are empty
   const georeferencesEmpty: [] = initialValues.geoReferenceAssertions.map(
@@ -112,10 +112,6 @@ export function CollectingEventFormLayout({
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
-  const [tgnSearchValue, setTgnSearchValue] = useState<string>("");
-  const [tgnResultSelection, setTgnResultSelection] =
-    useState<TgnSelectSearchResultDetail>();
-
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
   const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
@@ -134,19 +130,6 @@ export function CollectingEventFormLayout({
       revalidateOnReconnect: false
     }
   );
-
-  const { isValidating: tgnResultsIsLoading } = useSWR(
-    [tgnResultSelection],
-    fetchTgnParents,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
-
-  // Check if tgn should be displayed
-  const iContext = useInstanceContext();
 
   const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
 
@@ -358,13 +341,6 @@ export function CollectingEventFormLayout({
     formik.values.dwcVerbatimCoordinates === null
       ? formik.setFieldValue("dwcVerbatimCoordinates", "")
       : formik.setFieldValue("dwcVerbatimCoordinates", null);
-  }
-
-  function removeTgn(formik: FormikContextType<{}>) {
-    formik.setFieldValue("geographicThesaurus", null);
-
-    setTgnResultSelection(undefined);
-    setTgnSearchValue("");
   }
 
   const onChangeExternal = (form, name, value) => {
@@ -611,55 +587,6 @@ export function CollectingEventFormLayout({
                     }}
                   </Field>
                 }
-              />
-            ) : null
-          }
-        </Field>
-      </div>
-    </FieldSet>
-  );
-
-  const tgnSourceSelection = (
-    <FieldSet
-      fieldName="geographicThesaurus"
-      legend={<DinaMessage id="tgnLegend" />}
-      className="non-strip"
-      componentName={COLLECTING_EVENT_COMPONENT_NAME}
-      sectionName="current-tgn-place"
-    >
-      <div
-        style={{
-          overflowY: "auto",
-          overflowX: "hidden",
-          maxHeight: 600
-        }}
-      >
-        <Field name="geographicThesaurus">
-          {({ field: { value: detail }, form }) =>
-            detail ? (
-              <div>
-                <TgnDetails formik={form} />
-                <div className="row">
-                  {!readOnly && (
-                    <div className="col-md-4">
-                      <FormikButton
-                        className="btn btn-dark"
-                        onClick={(_, formik) => removeTgn(formik)}
-                      >
-                        <DinaMessage id="removeThisPlaceLabel" />
-                      </FormikButton>
-                    </div>
-                  )}
-                  <div className="col-md-4">
-                    <TgnViewDetailButton subjectId={detail?.subjectId} />
-                  </div>
-                </div>
-              </div>
-            ) : !readOnly ? (
-              <TgnSearchBox
-                onInputChange={setTgnSearchValue}
-                inputValue={tgnSearchValue}
-                onSelectSearchResult={setTgnResultSelection}
               />
             ) : null
           }
@@ -1074,25 +1001,29 @@ export function CollectingEventFormLayout({
           ) : null}
         </div>
         <div className="col-md-6">
-          <div className="row">
-            <div className="col">
-              {!readOnly
-                ? geographicPlaceNameSourceComponent
-                : initialValues?.geographicPlaceNameSource // if read-only, check for managed attributes
-                ? geographicPlaceNameSourceComponent
-                : null}
+          {supportedGeographicReferences.includes("OSM") ? (
+            <div className="row">
+              <div className="col">
+                {!readOnly
+                  ? geographicPlaceNameSourceComponent
+                  : initialValues?.geographicPlaceNameSource // if read-only, check for managed attributes
+                  ? geographicPlaceNameSourceComponent
+                  : null}
+              </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="col">
-              {iContext?.tgnSearchBaseUrl ?? // Display tgn only if the TGN search url is provieded
-              !readOnly
-                ? tgnSourceSelection
-                : initialValues?.geographicThesaurus?.source === "TGN"
-                ? tgnSourceSelection
-                : null}
+          ) : null}
+          {supportedGeographicReferences.includes("TGN") ? (
+            <div className="row">
+              <div className="col">
+                {!readOnly ? (
+                  <TgnSourceSelection />
+                ) : initialValues?.geographicThesaurus?.source ===
+                  GeographicThesaurusSource.TGN ? (
+                  <TgnSourceSelection />
+                ) : null}
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </div>
       <div>

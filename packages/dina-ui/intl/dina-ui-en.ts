@@ -937,6 +937,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   tgnLegend: "TGN Geographic Place",
   tgnPreferredTerm: "Preferred Term",
   tgnPreferredParent: "Preferred Parent",
+  tgnAdditionalParent: "Additional Parent",
   tgnSearchLabel: "Name",
   tgnSearchTooltip: "Search for either a name or a TGN Id",
   title_acMetadataCreator: "Uploaded By",

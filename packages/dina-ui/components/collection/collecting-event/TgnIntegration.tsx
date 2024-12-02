@@ -1,19 +1,25 @@
 import {
+  FieldSet,
   FormikButton,
   LoadingSpinner,
   Tooltip,
+  useDinaFormContext,
   useInstanceContext
 } from "common-ui";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useState } from "react";
 import useSWR from "swr";
 import { XMLParser } from "fast-xml-parser";
-import { FormikContextType, FormikProps } from "formik";
+import { Field, FormikContextType, FormikProps } from "formik";
+import {
+  COLLECTING_EVENT_COMPONENT_NAME,
+  GeographicThesaurusSource
+} from "../../../types/collection-api";
 
 /**
  * TGN TermMatch API, just for parsing the TGN response.
  */
-export interface TgnApiEntry {
+interface TgnApiEntry {
   Preferred_Term: string;
   Preferred_Parent: string;
   Subject_ID: string;
@@ -22,7 +28,7 @@ export interface TgnApiEntry {
 /**
  * TGN Parent, just for parsing the TGN response.
  */
-export interface TGNParent {
+interface TGNParent {
   Parent_Subject_ID: string;
   Parent_String: string;
 }
@@ -30,13 +36,13 @@ export interface TGNParent {
 /**
  * TGN Parents API, just for parsing the TGN response.
  */
-export interface TGNParentRelationships {
+interface TGNParentRelationships {
   Preferred_Parent: TGNParent;
   NonPreferred_Parent?: TGNParent[];
 }
 
-export interface TgnSelectSearchResultDetail {
-  tgn: TgnApiEntry;
+interface TgnSelectSearchResultDetail {
+  tgnApiEntry: TgnApiEntry;
   formik: FormikContextType<any>;
 }
 
@@ -46,72 +52,7 @@ interface TgnSearchBoxProps {
   onSelectSearchResult: (detail: TgnSelectSearchResultDetail) => void;
 }
 
-export async function fetchTgnParents({
-  tgn,
-  formik
-}: TgnSelectSearchResultDetail) {
-  const url = `/tgn/TGNGetParents?subjectID=${tgn.Subject_ID}`;
-
-  const parser = new XMLParser({
-    isArray: (name) => name === "Non-Preferred_Parent",
-    transformTagName: (tag) => tag.replaceAll("-", "")
-  });
-
-  return window
-    .fetch(url)
-    .then((p) => p.text())
-    .then((p) => {
-      return parser.parse(p)?.Vocabulary?.Subject
-        ?.Parent_Relationships as TGNParentRelationships;
-    })
-    .then((f) => {
-      formik.setFieldValue("geographicThesaurus.source", "TGN");
-      formik.setFieldValue("geographicThesaurus.subjectId", tgn.Subject_ID);
-      formik.setFieldValue(
-        "geographicThesaurus.preferredTerm",
-        tgn.Preferred_Term
-      );
-      formik.setFieldValue(
-        "geographicThesaurus.preferredParent",
-        f.Preferred_Parent.Parent_String
-      );
-
-      formik.setFieldValue(
-        "geographicThesaurus.additionalParents",
-        f.NonPreferred_Parent?.map((p) => p.Parent_String)
-      );
-    });
-}
-
-async function fetchSoapValues(
-  name: string,
-  tgnUrl: string
-): Promise<TgnApiEntry[] | null> {
-  if (!name?.trim()) {
-    return null;
-  }
-
-  // Ignore the nation and place filter
-  const url = `${tgnUrl}/TGNService.asmx/TGNGetTermMatch?name=${name}&placetypeid=&nationid=`;
-
-  const parser = new XMLParser({
-    isArray: (n) => n === "Subject" // for one element lists
-  });
-
-  return await window
-    .fetch(url)
-    .then((p) => p.text())
-    .then((p) => {
-      const response = parser.parse(p);
-      if (response?.Vocabulary?.Count === 0) {
-        return [];
-      }
-
-      return response?.Vocabulary?.Subject as TgnApiEntry[];
-    });
-}
-
-export function TgnViewDetailButton({ subjectId }: { subjectId: string }) {
+function TgnViewDetailButton({ subjectId }: { subjectId: string }) {
   return (
     <a
       title="tgn-detail"
@@ -125,14 +66,10 @@ export function TgnViewDetailButton({ subjectId }: { subjectId: string }) {
   );
 }
 
-export interface TgnDetailsProps {
-  formik: FormikProps<any>;
-}
-
 /**
  * Render text fields with details
  */
-export function TgnDetails(props: TgnDetailsProps) {
+export function TgnDetails(props: { formik: FormikProps<any> }) {
   const { formatMessage } = useDinaIntl();
 
   const subjectId = props.formik.getFieldMeta(
@@ -165,7 +102,10 @@ export function TgnDetails(props: TgnDetailsProps) {
       {additionalParents
         ? additionalParents.map((value, index) => (
             <div key={index}>
-              <strong>Additional Parent {index + 1}</strong>: {value}
+              <strong>
+                {formatMessage("tgnAdditionalParent")} {index + 1}
+              </strong>
+              : {value}
             </div>
           ))
         : null}
@@ -173,7 +113,7 @@ export function TgnDetails(props: TgnDetailsProps) {
   );
 }
 
-export function TgnSearchBox({
+function TgnSearchBox({
   onInputChange,
   inputValue,
   onSelectSearchResult
@@ -187,8 +127,33 @@ export function TgnSearchBox({
 
   const { formatMessage } = useDinaIntl();
 
+  async function fetchSoapValues(name: string): Promise<TgnApiEntry[] | null> {
+    if (!name?.trim()) {
+      return null;
+    }
+
+    // Ignore the nation and place filter
+    const url = `${instanceContext?.tgnSearchBaseUrl}/TGNService.asmx/TGNGetTermMatch?name=${name}&placetypeid=&nationid=`;
+
+    const parser = new XMLParser({
+      isArray: (n) => n === "Subject" // for one element lists
+    });
+
+    return await window
+      .fetch(url)
+      .then((p) => p.text())
+      .then((p) => {
+        const response = parser.parse(p);
+        if (response?.Vocabulary?.Count === 0) {
+          return [];
+        }
+
+        return response?.Vocabulary?.Subject as TgnApiEntry[];
+      });
+  }
+
   const { isValidating: tgnSearchIsLoading, data: tgnSearchResults } = useSWR(
-    [searchValue, instanceContext?.tgnSearchBaseUrl],
+    [searchValue],
     fetchSoapValues,
     {
       shouldRetryOnError: false,
@@ -239,34 +204,35 @@ export function TgnSearchBox({
         ) : tgnSearchResults?.length === 0 ? (
           <DinaMessage id="noResultsFound" />
         ) : (
-          tgnSearchResults?.map((p) => (
-            <div className="list-group-item" key={p.Subject_ID}>
+          tgnSearchResults?.map((tgnApiEntry) => (
+            <div className="list-group-item" key={tgnApiEntry.Subject_ID}>
               <div className="row">
                 <div className="col-md-8">
                   <strong>{formatMessage("tgnPreferredTerm")}:</strong>{" "}
-                  {p.Preferred_Term}
+                  {tgnApiEntry.Preferred_Term}
                 </div>
                 <div className="col-md-4">
-                  <strong>{formatMessage("tgnId")}:</strong> {p.Subject_ID}
+                  <strong>{formatMessage("tgnId")}:</strong>{" "}
+                  {tgnApiEntry.Subject_ID}
                 </div>
               </div>
               <div className="row">
                 <strong>{formatMessage("tgnPreferredParent")}:</strong>{" "}
-                {p.Preferred_Parent}
+                {tgnApiEntry.Preferred_Parent}
               </div>
               <div className="row">
                 <div className="col-md-4">
                   <FormikButton
                     className="btn btn-primary"
                     onClick={(_, formik) =>
-                      onSelectSearchResult({ tgn: p, formik })
+                      onSelectSearchResult({ tgnApiEntry, formik })
                     }
                   >
                     <DinaMessage id="select" />
                   </FormikButton>
                 </div>
                 <div className="col-md-4">
-                  <TgnViewDetailButton subjectId={p.Subject_ID} />
+                  <TgnViewDetailButton subjectId={tgnApiEntry.Subject_ID} />
                 </div>
               </div>
             </div>
@@ -274,5 +240,127 @@ export function TgnSearchBox({
         )}
       </div>
     </div>
+  );
+}
+
+export function TgnSourceSelection() {
+  const { readOnly } = useDinaFormContext();
+  const instanceContext = useInstanceContext();
+
+  const [tgnSearchValue, setTgnSearchValue] = useState<string>("");
+  const [tgnResultSelection, setTgnResultSelection] =
+    useState<TgnSelectSearchResultDetail>();
+
+  const removeTgn = (formik: FormikContextType<{}>) => {
+    formik.setFieldValue("geographicThesaurus", null);
+
+    setTgnResultSelection(undefined);
+    setTgnSearchValue("");
+  };
+
+  // Fetching additional information from the external TGN API
+  async function fetchTgnParents({
+    tgnApiEntry,
+    formik
+  }: TgnSelectSearchResultDetail) {
+    const url = `${instanceContext?.tgnSearchBaseUrl}/TGNService.asmx/TGNGetParents?subjectID=${tgnApiEntry.Subject_ID}`;
+
+    const parser = new XMLParser({
+      isArray: (name) => name === "Non-Preferred_Parent",
+      transformTagName: (tag) => tag.replaceAll("-", "")
+    });
+
+    return window
+      .fetch(url)
+      .then((p) => p.text())
+      .then((p) => {
+        return parser.parse(p)?.Vocabulary?.Subject
+          ?.Parent_Relationships as TGNParentRelationships;
+      })
+      .then((f) => {
+        formik.setFieldValue(
+          "geographicThesaurus.source",
+          GeographicThesaurusSource.TGN
+        );
+        formik.setFieldValue(
+          "geographicThesaurus.subjectId",
+          tgnApiEntry.Subject_ID
+        );
+        formik.setFieldValue(
+          "geographicThesaurus.preferredTerm",
+          tgnApiEntry.Preferred_Term
+        );
+        formik.setFieldValue(
+          "geographicThesaurus.preferredParent",
+          f.Preferred_Parent.Parent_String
+        );
+
+        formik.setFieldValue(
+          "geographicThesaurus.additionalParents",
+          f.NonPreferred_Parent?.map((p) => p.Parent_String)
+        );
+      });
+  }
+
+  // Fetch additional parents
+  const { isValidating: tgnResultsIsLoading } = useSWR(
+    [tgnResultSelection],
+    fetchTgnParents,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
+  );
+
+  return (
+    <FieldSet
+      fieldName="geographicThesaurus"
+      legend={<DinaMessage id="tgnLegend" />}
+      className="non-strip"
+      componentName={COLLECTING_EVENT_COMPONENT_NAME}
+      sectionName="current-tgn-place"
+    >
+      <div
+        style={{
+          overflowY: "auto",
+          overflowX: "hidden",
+          maxHeight: 600
+        }}
+      >
+        <Field name="geographicThesaurus">
+          {({ field: { value: detail }, form }) =>
+            tgnResultsIsLoading ? (
+              <LoadingSpinner loading={true} />
+            ) : detail ? (
+              <div>
+                <TgnDetails formik={form} />
+                <div className="row">
+                  {!readOnly && (
+                    <div className="col-md-4">
+                      <FormikButton
+                        className="btn btn-dark"
+                        onClick={(_, formik) => removeTgn(formik)}
+                      >
+                        <DinaMessage id="removeThisPlaceLabel" />
+                      </FormikButton>
+                    </div>
+                  )}
+                  <div className="col-md-4">
+                    <TgnViewDetailButton subjectId={detail?.subjectId} />
+                  </div>
+                </div>
+              </div>
+            ) : !readOnly ? (
+              <TgnSearchBox
+                onInputChange={setTgnSearchValue}
+                inputValue={tgnSearchValue}
+                onSelectSearchResult={setTgnResultSelection}
+              />
+            ) : null
+          }
+        </Field>
+      </div>
+    </FieldSet>
   );
 }
