@@ -104,7 +104,7 @@ export function MetagenomicsIndexAssignmentTable(
     },
     {
       header: "Material Sample Name",
-      accessorKey: "materialSample.materialSampleName"
+      accessorKey: "materialSampleSummary.materialSampleName"
     },
     {
       header: "Index i5",

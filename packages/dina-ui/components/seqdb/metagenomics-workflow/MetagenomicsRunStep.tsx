@@ -7,17 +7,21 @@ import {
 import { LoadingSpinner, ReactTable } from "common-ui";
 import { Alert } from "react-bootstrap";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { useMetagenomicsWorkflowMolecularAnalysisRun } from "../../molecular-analysis/useMetagenomicsWorkflowMolecularAnalysisRun";
+import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 
 export interface SequencingRunStepProps {
-  batchId: string;
+  metagenomicsBatchId: string;
+  metagenomicsBatch: MetagenomicsBatch;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
 }
 
-export function SequencingRunStep({
-  batchId,
+export function MetagenomicsRunStep({
+  metagenomicsBatchId,
+  metagenomicsBatch,
   editMode,
   setEditMode,
   performSave,
@@ -31,12 +35,13 @@ export function SequencingRunStep({
     sequencingRunName,
     sequencingRunItems,
     columns
-  } = useMolecularAnalysisRun({
+  } = useMetagenomicsWorkflowMolecularAnalysisRun({
     editMode,
     setEditMode,
     performSave,
     setPerformSave,
-    seqBatchId: batchId
+    metagenomicsBatchId,
+    metagenomicsBatch
   });
 
   // Display loading if network requests from hook are still loading in...
@@ -96,20 +101,6 @@ export function SequencingRunStep({
               />
             ) : (
               <p>{sequencingRunName}</p>
-            )}
-          </div>
-          <div className="col-8 mb-3">
-            {/* Worksheet Buttton */}
-            {!editMode && (
-              <div className="row">
-                <div className="col-12 text-end">
-                  <Link href={`/seqdb/seq-workflow/worksheet?id=${batchId}`}>
-                    <a target="_blank" className="btn btn-primary">
-                      <DinaMessage id="worksheet" />
-                    </a>
-                  </Link>
-                </div>
-              </div>
             )}
           </div>
           <div className="col-12">

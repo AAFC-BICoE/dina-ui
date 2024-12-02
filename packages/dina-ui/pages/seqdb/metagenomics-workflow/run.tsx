@@ -12,7 +12,7 @@ import { useMetagenomicsBatchQuery } from "../../../components/seqdb/metagenomic
 import { MetagenomicsBatch } from "../../../types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 import { MetagenomicsBatchDetailsStep } from "../../../components/seqdb/metagenomics-workflow/MetagenomicsBatchDetailsStep";
 import { MetagenomicsIndexAssignmentStep } from "../../../components/seqdb/metagenomics-workflow/MetagenomicsIndexAssignmentStep";
-import { SequencingRunStep } from "../../../components/seqdb/metagenomics-workflow/SequencingRunStep";
+import { MetagenomicsRunStep } from "../../../components/seqdb/metagenomics-workflow/MetagenomicsRunStep";
 import { usePcrBatchQuery } from "../pcr-batch/edit";
 import { SangerPcrBatchItemGridStep } from "../../../components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { SangerPcrBatchStep } from "../../../components/seqdb/pcr-workflow/SangerPcrBatchStep";
@@ -312,8 +312,9 @@ export default function MetagenomicWorkflowRunPage() {
         </TabPanel>
         <TabPanel>
           {metagenomicsBatchQuery.response?.data && metagenomicsBatchId && (
-            <SequencingRunStep
-              batchId={metagenomicsBatchId}
+            <MetagenomicsRunStep
+              metagenomicsBatchId={metagenomicsBatchId}
+              metagenomicsBatch={metagenomicsBatchQuery.response?.data}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}
