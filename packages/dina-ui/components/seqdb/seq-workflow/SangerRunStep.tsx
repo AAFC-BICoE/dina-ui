@@ -4,9 +4,11 @@ import {
   SequencingRunItem,
   useMolecularAnalysisRun
 } from "../../molecular-analysis/useMolecularAnalysisRun";
-import { LoadingSpinner, ReactTable } from "common-ui";
+import { DinaForm, LoadingSpinner, ReactTable } from "common-ui";
 import { Alert } from "react-bootstrap";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { AttachmentsEditor } from "../../object-store/attachment-list/AttachmentsField";
+import { AttachmentReadOnlySection } from "../../object-store/attachment-list/AttachmentReadOnlySection";
 
 export interface SangerRunStepProps {
   seqBatchId: string;
@@ -31,7 +33,10 @@ export function SangerRunStep({
     setSequencingRunName,
     sequencingRunName,
     sequencingRunItems,
-    columns
+    columns,
+    attachments,
+    setAttachments,
+    sequencingRunId
   } = useMolecularAnalysisRun({
     editMode,
     setEditMode,
@@ -123,6 +128,32 @@ export function SangerRunStep({
               data={sequencingRunItems ?? []}
               sort={[{ id: "wellCoordinates", desc: false }]}
             />
+          </div>
+          <div className="col-12 mt-3">
+            <DinaForm initialValues={{}}>
+              {editMode ? (
+                <AttachmentsEditor
+                  attachmentPath={``}
+                  name="attachments"
+                  onChange={setAttachments}
+                  value={attachments}
+                  title={
+                    <DinaMessage id="molecularAnalysisRunStep_attachments" />
+                  }
+                />
+              ) : (
+                <>
+                  {sequencingRunId && (
+                    <AttachmentReadOnlySection
+                      attachmentPath={`seqdb-api/molecular-analysis-run/${sequencingRunId}/attachments`}
+                      title={
+                        <DinaMessage id="molecularAnalysisRunStep_attachments" />
+                      }
+                    />
+                  )}
+                </>
+              )}
+            </DinaForm>
           </div>
         </div>
       ) : (

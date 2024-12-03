@@ -239,7 +239,7 @@ export function useGenericMolecularAnalysisRun({
           if (firstSequencingRun) {
             setSequencingRun(firstSequencingRun);
             setSequencingRunName(firstSequencingRun.name);
-            findMolecularAnalysisRunAttachments(firstSequencingRun);
+            await findMolecularAnalysisRunAttachments(firstSequencingRun);
           }
         }
 
