@@ -19,7 +19,10 @@ import {
   SEQ_REACTIONS_NO_RUNS,
   STORAGE_UNIT_USAGE_1,
   STORAGE_UNIT_USAGE_2,
-  STORAGE_UNIT_USAGE_3
+  STORAGE_UNIT_USAGE_3,
+  TEST_METADATA,
+  TEST_MOLECULAR_ANALYSIS_RUN,
+  TEST_MOLECULAR_ANALYSIS_RUN_ID
 } from "../__mocks__/SangerRunStepMocks";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -35,6 +38,21 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         case "seqBatch.uuid==" + SEQ_BATCH_NO_RUNS:
           return SEQ_REACTIONS_NO_RUNS;
       }
+
+    case "seqdb-api/molecular-analysis-run/" + TEST_MOLECULAR_ANALYSIS_RUN_ID:
+      return { data: TEST_MOLECULAR_ANALYSIS_RUN };
+
+    case "objectstore-api/metadata":
+    case "seqdb-api/molecular-analysis-run/" +
+      TEST_MOLECULAR_ANALYSIS_RUN_ID +
+      "/attachments":
+      return {
+        data: [TEST_METADATA]
+      };
+
+    // Blob storage
+    case "":
+      return {};
   }
 });
 
@@ -64,6 +82,11 @@ const mockBulkGet = jest.fn(async (paths) => {
         return MATERIAL_SAMPLE_SUMMARY_2;
       case "/material-sample-summary/2308d337-756d-4714-90bb-57698b6f5819":
         return MATERIAL_SAMPLE_SUMMARY_3;
+
+      // Attachments
+      case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=derivatives":
+      case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=acMetadataCreator,derivatives":
+        return TEST_METADATA;
     }
   });
 });
@@ -168,6 +191,13 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(wrapper.getByRole("cell", { name: "A1" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A3" })).toBeInTheDocument();
+
+    // Ensure attachment appears.
+    expect(
+      wrapper.getByRole("heading", {
+        name: /sequencing run attachments \(1\)/i
+      })
+    ).toBeInTheDocument();
 
     // Set edit mode should not be triggered in this test.
     expect(mockSetEditMode).toBeCalledTimes(0);
@@ -407,7 +437,7 @@ describe("Sanger Run Step from Sanger Workflow", () => {
     expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
     expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Change the sequencing run name to something different.
@@ -435,6 +465,16 @@ describe("Sanger Run Step from Sanger Workflow", () => {
             resource: {
               id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
               name: "Updated run name",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
               type: "molecular-analysis-run"
             },
             type: "molecular-analysis-run"
