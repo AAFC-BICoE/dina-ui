@@ -241,6 +241,7 @@ export default function MetagenomicWorkflowRunPage() {
           {pcrBatchId && (
             <SangerSampleSelectionStep
               pcrBatchId={pcrBatchId}
+              metagenomicsBatch={metagenomicsBatchQuery.response?.data}
               onSaved={onSavedPcrBatch}
               editMode={editMode}
               setEditMode={setEditMode}

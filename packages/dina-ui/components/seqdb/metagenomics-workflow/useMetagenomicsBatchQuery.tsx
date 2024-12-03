@@ -3,7 +3,7 @@ import { MetagenomicsBatch } from "../../../types/seqdb-api/resources/metagenomi
 import { PcrBatchItem } from "../../../types/seqdb-api";
 import { MetagenomicsBatchItem } from "../../../types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import { PersistedResource } from "kitsu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function useMetagenomicsBatchQuery(
   metagenomicsBatchId?: string,
@@ -14,8 +14,6 @@ export function useMetagenomicsBatchQuery(
   deps?: any[]
 ) {
   const { apiClient } = useApiClient();
-  const [metagenomicsBatchIdInternal, setMetagenomicsBatchIdInternal] =
-    useState<string | undefined>(metagenomicsBatchId);
   /**
    * Retrieve all of the PCR Batch Items that are associated with the PCR Batch from step 1.
    */
@@ -65,21 +63,26 @@ export function useMetagenomicsBatchQuery(
       const fetchedMetagenomicsBatchId = await getMetagenomicsBatchId(
         pcrBatchItems
       );
-      setMetagenomicsBatchIdInternal(fetchedMetagenomicsBatchId);
       setMetagenomicsBatchId?.(fetchedMetagenomicsBatchId);
     }
   }
-  if (!metagenomicsBatchId) {
-    if (pcrBatchId) {
-      fetchMetagenomicsBatch();
+  useEffect(() => {
+    if (!metagenomicsBatchId) {
+      if (pcrBatchId) {
+        fetchMetagenomicsBatch();
+      }
     }
-  }
+  }, [metagenomicsBatchId]);
+
   const metagenomicsBatch = useQuery<MetagenomicsBatch>(
     {
-      path: `seqdb-api/metagenomics-batch/${metagenomicsBatchIdInternal}`,
+      path: `seqdb-api/metagenomics-batch/${metagenomicsBatchId}`,
       include: "protocol,indexSet"
     },
-    { disabled: !metagenomicsBatchIdInternal, deps }
+    {
+      disabled: !metagenomicsBatchId,
+      deps
+    }
   );
   return metagenomicsBatch;
 }

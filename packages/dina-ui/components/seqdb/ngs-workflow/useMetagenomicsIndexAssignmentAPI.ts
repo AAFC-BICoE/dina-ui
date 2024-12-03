@@ -50,7 +50,8 @@ export function useMetagenomicsIndexAssignmentAPI({
   metagenomicsBatch,
   editMode,
   setEditMode,
-  setPerformSave
+  setPerformSave,
+  onSaved
 }: Partial<MetagenomicsIndexAssignmentStepProps>): UseMetagenomicsIndexAssignmentReturn {
   const { save, apiClient, bulkGet } = useContext(ApiClientContext);
 
@@ -282,6 +283,7 @@ export function useMetagenomicsIndexAssignmentAPI({
     setLastSave(Date.now());
     setPerformSave?.(false);
     setEditMode?.(false);
+    await onSaved?.(6);
   }
 
   /**
@@ -349,6 +351,7 @@ export function useMetagenomicsIndexAssignmentAPI({
 
     setPerformSave?.(false);
     setEditMode?.(false);
+    await onSaved?.(6);
   }
 
   return {

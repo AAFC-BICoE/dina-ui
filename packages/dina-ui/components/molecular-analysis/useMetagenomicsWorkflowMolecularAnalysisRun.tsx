@@ -390,7 +390,7 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
         }
       );
 
-      // Create a run item for each seq reaction.
+      // Create a MolecularAnalysisRunitem for each MetagenomicsBatchItem.
       const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
         sequencingRunItems.map(() => ({
           type: "molecular-analysis-run-item",
@@ -412,7 +412,7 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
         { apiBaseUrl: "/seqdb-api" }
       );
 
-      // Update the existing seq-reactions.
+      // Update the existing MetagenomicsBatchItems.
       const metagenomicsBatchItemsSaveArgs: SaveArgs<MetagenomicsBatchItem>[] =
         sequencingRunItems.map((item, index) => ({
           type: "metagenomics-batch-item",
