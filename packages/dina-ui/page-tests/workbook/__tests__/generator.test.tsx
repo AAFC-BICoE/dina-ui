@@ -439,6 +439,13 @@ describe("Workbook Template Generator", () => {
       apiContext
     });
 
+    const templateNameInput = wrapper
+      .getAllByRole("textbox")
+      .at(0) as HTMLElement;
+
+    // Put an invalid template name
+    userEvent.type(templateNameInput, "Test.xlsx");
+
     // Click the "Add new column" dropdown
     userEvent.click(wrapper.getByRole("combobox"));
     await waitFor(() => {
@@ -450,11 +457,9 @@ describe("Workbook Template Generator", () => {
     userEvent.click(wrapper.getAllByRole("option", { name: /primary id/i })[0]);
     userEvent.click(wrapper.getAllByRole("button", { name: /add column/i })[0]);
 
-    // Put an invalid template name
-    userEvent.type(
-      wrapper.getAllByRole("textbox").at(0) as HTMLElement,
-      "Test.xlsx"
-    );
+    // After setting a column, the filename should still be there.
+    expect(templateNameInput).toHaveDisplayValue("Test.xlsx");
+
     mockPost.mockReturnValue("pretendFileData");
     userEvent.click(
       wrapper.getByRole("button", { name: /generate template/i })
@@ -466,5 +471,8 @@ describe("Workbook Template Generator", () => {
         /please enter a valid filename\. only letters, numbers, spaces, hyphens, and underscores are allowed\./i
       )
     ).toBeInTheDocument();
+
+    // Ensure the name is still displayed for the user to correct it.
+    expect(templateNameInput).toHaveDisplayValue("Test.xlsx");
   });
 });
