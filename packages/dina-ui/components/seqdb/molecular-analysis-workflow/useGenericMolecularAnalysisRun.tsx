@@ -1,13 +1,13 @@
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
 import { useEffect, useState } from "react";
 import { filterBy, SaveArgs, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRun";
 import { PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 
 export interface UseGenericMolecularAnalysisRunProps {
   molecularAnalysis: GenericMolecularAnalysis;

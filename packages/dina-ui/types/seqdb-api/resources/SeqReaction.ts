@@ -3,7 +3,7 @@ import { PcrBatchItem } from "./PcrBatchItem";
 import { PcrPrimer } from "./PcrPrimer";
 import { SeqBatch } from "./SeqBatch";
 import { StorageUnitUsage } from "../../collection-api/resources/StorageUnitUsage";
-import { MolecularAnalysisRunItem } from "./MolecularAnalysisRunItem";
+import { MolecularAnalysisRunItem } from "./molecular-analysis/MolecularAnalysisRunItem";
 
 export interface SeqReactionAttributes {
   type: "seq-reaction";

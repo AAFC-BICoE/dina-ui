@@ -39,7 +39,7 @@ import { SeqReactionDndTable } from "./seq-reaction-step/SeqReactionDndTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { useSeqReactionState } from "./seq-reaction-step/useSeqReactionState";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
-import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
+import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 
 export interface SangerSeqReactionStepProps {
   seqBatch?: SeqBatch;

@@ -1,16 +1,14 @@
 import {
   ColumnDefinition,
-  CreateButton,
   FieldHeader,
   ListPageLayout,
   dateCell,
-  descriptionCell,
   titleCell
 } from "common-ui";
 import Link from "next/link";
 import { groupCell } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
-import { MolecularAnalysisRun } from "../../../types/seqdb-api/resources/MolecularAnalysisRun";
+import { MolecularAnalysisRun } from "../../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 
 const MOLECULAR_ANALYSIS_RUN_FILTER_ATTRIBUTES = ["name"];
 const MOLECULAR_ANALYSIS_RUN_TABLE_COLUMNS: ColumnDefinition<MolecularAnalysisRun>[] =
