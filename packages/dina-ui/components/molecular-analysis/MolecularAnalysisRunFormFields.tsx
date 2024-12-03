@@ -4,8 +4,9 @@ import {
   TextField,
   useDinaFormContext
 } from "../../../common-ui/lib";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { GroupSelectField } from "../group-select/GroupSelectField";
+import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import {
   SequencingRunItem,
   useMolecularAnalysisRunView
@@ -43,6 +44,12 @@ export function MolecularAnalysisRunFormFields() {
           columns={columns}
           data={sequencingRunItems ?? []}
           sort={[{ id: "wellCoordinates", desc: false }]}
+        />
+      </div>
+      <div className="col-12 mt-3">
+        <AttachmentReadOnlySection
+          attachmentPath={`seqdb-api/molecular-analysis-run/${initialValues.id}/attachments`}
+          title={<DinaMessage id="molecularAnalysisRunStep_attachments" />}
         />
       </div>
     </div>
