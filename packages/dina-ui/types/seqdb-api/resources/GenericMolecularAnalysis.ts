@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { Protocol } from "../../collection-api";
+import { ManagedAttributeValues, Protocol } from "../../collection-api";
 
 export interface GenericMolecularAnalysisAttributes {
   type: "generic-molecular-analysis";
@@ -8,6 +8,7 @@ export interface GenericMolecularAnalysisAttributes {
   createdOn?: string;
   group?: string;
   analysisType?: string;
+  managedAttributes?: ManagedAttributeValues;
 }
 
 export interface GenericMolecularAnalysisRelationships {
