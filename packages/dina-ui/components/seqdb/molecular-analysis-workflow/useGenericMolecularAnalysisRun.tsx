@@ -75,6 +75,11 @@ export interface UseGenericMolecularAnalysisRunReturn {
   sequencingRunItems?: SequencingRunItem[];
 
   /**
+   * UUID of the sequencing run.
+   */
+  sequencingRunId?: string;
+
+  /**
    * Displays the current attachments. This is used since the run not might exist yet and can't
    * be saved directly.
    */
@@ -487,7 +492,8 @@ export function useGenericMolecularAnalysisRun({
     setSequencingRunName,
     sequencingRunItems,
     attachments,
-    setAttachments
+    setAttachments,
+    sequencingRunId: sequencingRun?.id
   };
 }
 

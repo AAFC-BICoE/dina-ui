@@ -44,6 +44,9 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_MOLECULAR_ANALYSIS_RUN };
 
     case "objectstore-api/metadata":
+    case "seqdb-api/molecular-analysis-run/" +
+      TEST_MOLECULAR_ANALYSIS_RUN_ID +
+      "/attachments":
       return {
         data: [TEST_METADATA]
       };
@@ -75,6 +78,7 @@ const mockBulkGet = jest.fn(async (paths) => {
 
       // Attachments
       case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=derivatives":
+      case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=acMetadataCreator,derivatives":
         return TEST_METADATA;
     }
   });
@@ -414,7 +418,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
     expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Change the sequencing run name to something different.
