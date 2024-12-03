@@ -6,8 +6,10 @@ import {
   Vocabulary
 } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { Group } from "packages/dina-ui/types/user-api";
 
 export const TEST_GROUP: PersistedResource<Group>[] = [
@@ -65,6 +67,19 @@ export const TEST_PROTOCOLS: PersistedResource<Protocol>[] = [
 export const TEST_MOLECULAR_ANALYSIS_RUN_ID =
   "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4";
 
+export const TEST_MOLECULAR_ANALYSIS_RUN: PersistedResource<MolecularAnalysisRun> =
+  {
+    id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
+    type: "molecular-analysis-run",
+    name: "run-name-1",
+    attachments: [
+      {
+        id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+        type: "metadata"
+      }
+    ]
+  };
+
 export const TEST_MOLECULAR_ANALYSIS_EMPTY_ID =
   "62f25a7d-ebf5-469d-b3ef-f6f3269a6e23";
 
@@ -119,11 +134,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN: PersistedResource<GenericMo
         id: "f65ed036-eb92-40d9-af03-d027646e8948",
         type: "molecular-analysis-run-item",
         usageType: "hrms",
-        run: {
-          id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
-          type: "molecular-analysis-run",
-          name: "run-name-1"
-        }
+        run: TEST_MOLECULAR_ANALYSIS_RUN
       },
       storageUnitUsage: {
         id: "45ed6126-26b8-4ebd-a89f-1bbcf6c69d27",
@@ -139,11 +150,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN: PersistedResource<GenericMo
         id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
         type: "molecular-analysis-run-item",
         usageType: "hrms",
-        run: {
-          id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
-          type: "molecular-analysis-run",
-          name: "run-name-1"
-        }
+        run: TEST_MOLECULAR_ANALYSIS_RUN
       },
       storageUnitUsage: {
         id: "be81e29a-b634-43c7-8f1a-53bf394d87f2",
@@ -359,11 +366,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN: PersistedResource<Gener
         id: "021e1676-2eff-45e5-aed3-1c1b6cfece0a",
         type: "molecular-analysis-run-item",
         usageType: "hrms",
-        run: {
-          id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
-          type: "molecular-analysis-run",
-          name: "run-name-1"
-        }
+        run: TEST_MOLECULAR_ANALYSIS_RUN
       },
       storageUnitUsage: {
         id: STORAGE_UNIT_USAGE_1.id ?? "",
@@ -523,4 +526,19 @@ export const TEST_SEARCH_RESPONSE = {
       ]
     }
   }
+};
+
+export const TEST_METADATA: PersistedResource<Metadata> = {
+  id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+  type: "metadata",
+  createdOn: "2024-12-03T14:56:51.439016Z",
+  bucket: "aafc",
+  fileIdentifier: "01938d06-12e5-793c-aecf-cadc6b18d6c2",
+  fileExtension: ".jpg",
+  dcFormat: "image/jpeg",
+  dcType: "IMAGE",
+  acCaption: "japan.jpg",
+  originalFilename: "japan.jpg",
+  publiclyReleasable: true,
+  group: "aafc"
 };

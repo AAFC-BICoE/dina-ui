@@ -4,6 +4,7 @@ import {
   useGenericMolecularAnalysisRun
 } from "./useGenericMolecularAnalysisRun";
 import {
+  DinaForm,
   FieldHeader,
   LoadingSpinner,
   ReactTable,
@@ -13,6 +14,7 @@ import { Alert } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
+import { AttachmentsEditor } from "../../object-store/attachment-list/AttachmentsField";
 
 export interface MolecularAnalysisRunStepProps {
   molecularAnalysisId: string;
@@ -39,7 +41,9 @@ export function MolecularAnalysisRunStep({
     multipleRunWarning,
     setSequencingRunName,
     sequencingRunName,
-    sequencingRunItems
+    sequencingRunItems,
+    attachments,
+    setAttachments
   } = useGenericMolecularAnalysisRun({
     editMode,
     setEditMode,
@@ -193,6 +197,19 @@ export function MolecularAnalysisRunStep({
               data={sequencingRunItems ?? []}
               sort={[{ id: "wellCoordinates", desc: false }]}
             />
+          </div>
+          <div className="col-12 mt-3">
+            <DinaForm initialValues={{}}>
+              <AttachmentsEditor
+                attachmentPath={``}
+                name="attachments"
+                onChange={setAttachments}
+                value={attachments}
+                title={
+                  <DinaMessage id="molecularAnalysisRunStep_attachments" />
+                }
+              />
+            </DinaForm>
           </div>
         </div>
       ) : (
