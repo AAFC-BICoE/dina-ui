@@ -1,4 +1,9 @@
-import { useDinaFormContext, FieldWrapper, Tooltip, DinaFormSection } from "common-ui";
+import {
+  useDinaFormContext,
+  FieldWrapper,
+  Tooltip,
+  DinaFormSection
+} from "common-ui";
 import { FaExclamationCircle } from "react-icons/fa";
 import { useFormikContext } from "formik";
 
@@ -13,15 +18,15 @@ export function MaterialSampleStateWarning() {
   return (
     <DinaFormSection horizontal="flex">
       <div className="d-flex flex-row gap-2 mb-2">
-        <Tooltip 
-          visibleElement={(
-            <div
-              className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined bg-danger"
-            >
-              <FaExclamationCircle className="text-white"/>
-              <span className="text-white"><MaterialSampleStateReadOnlyRender removeLabel={true} /></span>
-            </div>                    
-          )} 
+        <Tooltip
+          visibleElement={
+            <div className="card pill py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined bg-danger">
+              <FaExclamationCircle className="text-white" />
+              <span className="text-white">
+                <MaterialSampleStateReadOnlyRender removeLabel={true} />
+              </span>
+            </div>
+          }
           id="field_materialSampleState"
           disableSpanMargin={true}
         />
@@ -50,7 +55,6 @@ export function MaterialSampleStateReadOnlyRender({ removeLabel }) {
       disableLabelClick={true}
       removeLabel={removeLabel}
       removeBottomMargin={removeLabel}
-      
       readOnlyRender={renderAsReadOnly}
     >
       <></>

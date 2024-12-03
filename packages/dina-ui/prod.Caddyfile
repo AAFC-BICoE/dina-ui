@@ -37,7 +37,9 @@ respond /keycloak.json "{
 respond /api/instance.json "{ 
 	\"instance-mode\": \"{$INSTANCE_MODE}\",
 	\"instance-name\": \"{$INSTANCE_NAME}\",
-	\"supported-languages-iso\": \"{$SUPPORTED_LANGUAGES_ISO}\"
+	\"supported-languages-iso\": \"{$SUPPORTED_LANGUAGES_ISO}\",
+	\"supported-geographic-references\": \"{$SUPPORTED_GEOINFORMATION_SYSTEMS}\",
+	\"tgn-search-base-url\": \"{$TGN_SEARCH_BASE_URL}\"
 }"
 
 # Proxy to the main back-end API:

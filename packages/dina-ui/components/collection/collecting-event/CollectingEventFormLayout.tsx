@@ -16,7 +16,8 @@ import {
   TextField,
   TextFieldWithCoordButtons,
   filterBy,
-  useDinaFormContext
+  useDinaFormContext,
+  useInstanceContext
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { compact, find } from "lodash";
@@ -37,6 +38,7 @@ import { ManagedAttributesEditor } from "../../";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   COLLECTING_EVENT_COMPONENT_NAME,
+  GeographicThesaurusSource,
   Protocol,
   Vocabulary
 } from "../../../types/collection-api";
@@ -60,6 +62,7 @@ import {
   nominatimAddressDetailSearch
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
+import { TgnSourceSelection } from "./TgnIntegration";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -81,6 +84,11 @@ export function CollectingEventFormLayout({
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
+
+  // Only show geo reference systems that are set. Use open street map as fallback
+  const instanceContext = useInstanceContext();
+  const supportedGeographicReferences: string[] =
+    instanceContext?.supportedGeographicReferences?.split(",") ?? ["OSM"];
 
   // Check if Georeferences are empty
   const georeferencesEmpty: [] = initialValues.geoReferenceAssertions.map(
@@ -993,11 +1001,29 @@ export function CollectingEventFormLayout({
           ) : null}
         </div>
         <div className="col-md-6">
-          {!readOnly
-            ? geographicPlaceNameSourceComponent
-            : initialValues?.geographicPlaceNameSource // if read-only, check for managed attributes
-            ? geographicPlaceNameSourceComponent
-            : null}
+          {supportedGeographicReferences.includes("OSM") ? (
+            <div className="row">
+              <div className="col">
+                {!readOnly
+                  ? geographicPlaceNameSourceComponent
+                  : initialValues?.geographicPlaceNameSource // if read-only, check for managed attributes
+                  ? geographicPlaceNameSourceComponent
+                  : null}
+              </div>
+            </div>
+          ) : null}
+          {supportedGeographicReferences.includes("TGN") ? (
+            <div className="row">
+              <div className="col">
+                {!readOnly ? (
+                  <TgnSourceSelection />
+                ) : initialValues?.geographicThesaurus?.source ===
+                  GeographicThesaurusSource.TGN ? (
+                  <TgnSourceSelection />
+                ) : null}
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
       <div>

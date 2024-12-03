@@ -24,33 +24,33 @@ export function TransactionMaterialDirectionSection({
   return transactionData ? (
     <DinaFormSection horizontal={"flex"}>
       <Tooltip
-          id="materialDirection_tooltip"
-          intlValues={{
-            materialDirection: transactionData.attributes.materialDirection
-          }}
-          disableSpanMargin={true}
-          visibleElement={(
-            <div className="card pill d-flex flex-row align-items-center mb-3 py-1 px-2 gap-1">
+        id="materialDirection_tooltip"
+        intlValues={{
+          materialDirection: transactionData.attributes.materialDirection
+        }}
+        disableSpanMargin={true}
+        visibleElement={
+          <div className="card pill d-flex flex-row align-items-center mb-3 py-1 px-2 gap-1">
+            <Link
+              href={`/loan-transaction/transaction/view?id=${transactionData.id}`}
+            >
+              {transactionData.attributes.materialDirection ===
+              MaterialDirection.OUT ? (
+                <FaLongArrowAltUp {...materialDirectionIconProps} />
+              ) : (
+                <FaLongArrowAltDown {...materialDirectionIconProps} />
+              )}
+            </Link>
+            {transactionData.attributes.transactionNumber && (
               <Link
                 href={`/loan-transaction/transaction/view?id=${transactionData.id}`}
               >
-                {transactionData.attributes.materialDirection ===
-                MaterialDirection.OUT ? (
-                  <FaLongArrowAltUp {...materialDirectionIconProps} />
-                ) : (
-                  <FaLongArrowAltDown {...materialDirectionIconProps} />
-                )}
+                <a>{transactionData.attributes.transactionNumber}</a>
               </Link>
-              {transactionData.attributes.transactionNumber && (
-                <Link
-                  href={`/loan-transaction/transaction/view?id=${transactionData.id}`}
-                >
-                  <a>{transactionData.attributes.transactionNumber}</a>
-                </Link>
-              )}
-            </div>            
-          )}
-        />
+            )}
+          </div>
+        }
+      />
     </DinaFormSection>
   ) : (
     <></>

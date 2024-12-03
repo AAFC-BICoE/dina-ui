@@ -5,6 +5,8 @@ export interface InstanceContextI {
   supportedLanguages: string;
   instanceMode: string;
   instanceName: string;
+  supportedGeographicReferences: string;
+  tgnSearchBaseUrl?: string;
 }
 
 export const InstanceContext = createContext<InstanceContextI | undefined>(
@@ -35,13 +37,23 @@ export function DefaultInstanceContextProvider({
               : "developer",
             instanceName: !!response["instance-name"]
               ? response["instance-name"]
-              : "AAFC"
+              : "AAFC",
+            supportedGeographicReferences: !!response[
+              "supported-geographic-references"
+            ]
+              ? response["supported-geographic-references"]
+              : "OSM",
+            tgnSearchBaseUrl: !!response["tgn-search-base-url"]
+              ? response["tgn-search-base-url"]
+              : ""
           });
         } else {
           setInstanceJson({
             supportedLanguages: "en",
             instanceMode: "developer",
-            instanceName: "AAFC"
+            instanceName: "AAFC",
+            supportedGeographicReferences: "OSM",
+            tgnSearchBaseUrl: ""
           });
         }
       } catch (error) {

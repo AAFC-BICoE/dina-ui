@@ -31,7 +31,7 @@ export function RestrictionWarning(props: RestrictionWarningProps) {
             path: "collection-api/extension/phac_animal_rg"
           })}
           isRestricted={isRestricted}
-        />        
+        />
       )}
 
       {initialValues?.restrictionFieldsExtension?.phac_human_rg && (
@@ -75,16 +75,23 @@ export function RestrictionWarning(props: RestrictionWarningProps) {
 
       {readOnly && initialValues.restrictionRemarks && (
         <Tooltip
-          visibleElement={(
+          visibleElement={
             <div>
-              <div className={"card pill py-1 px-2 flex-row align-items-center gap-1 mb-2 " + (isRestricted ? "bg-danger" : "bg-warning")}>
-                <FaFileAlt className={isRestricted ? "text-white" : undefined} />
+              <div
+                className={
+                  "card pill py-1 px-2 flex-row align-items-center gap-1 mb-2 " +
+                  (isRestricted ? "bg-danger" : "bg-warning")
+                }
+              >
+                <FaFileAlt
+                  className={isRestricted ? "text-white" : undefined}
+                />
                 <span className={isRestricted ? "text-white" : undefined}>
                   {initialValues.restrictionRemarks}
                 </span>
               </div>
             </div>
-          )}
+          }
           id="field_restrictionRemarks"
           disableSpanMargin={true}
         />

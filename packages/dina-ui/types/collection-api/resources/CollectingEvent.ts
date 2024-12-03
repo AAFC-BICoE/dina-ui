@@ -4,6 +4,7 @@ import {
   GeographicPlaceNameSourceDetail,
   SourceAdministrativeLevel
 } from "./GeographicPlaceNameSourceDetail";
+import { GeographicThesaurus } from "./GeographicThesaurus";
 import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 import { ManagedAttributeValues } from "./ManagedAttribute";
@@ -48,6 +49,8 @@ export interface CollectingEventAttributes {
   geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
   geographicPlaceNameSource?: GeographicPlaceNameSource;
   srcAdminLevels?: SourceAdministrativeLevel[];
+
+  geographicThesaurus?: GeographicThesaurus;
 
   habitat?: string;
   host?: string;
