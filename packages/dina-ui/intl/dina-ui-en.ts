@@ -738,6 +738,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_extension_placeholder: "Select extension to search against...",
   queryBuilder_relationship_placeholder:
     "Select relationship to search against...",
+  queryBuilder_scientificNameDetails_placeholder:
+    "Select classification rank...",
   queryBuilder_field_placeholder: "Select a field to search against...",
   columnSelector_field_placeholder: "Select a field to add as a column...",
   queryBuilder_globalSearch: "Global search",
@@ -850,6 +852,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   columnSelector_columnsToBeExported: "Columns to be exported:",
   columnSelector_addNewColumn: "Add a new column:",
   columnSelector_selectManagedAttribute: "Select managed attribute:",
+  columnSelector_selectClassification: "Select classification:",
   columnSelector_addColumnButton: "Add Column",
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
