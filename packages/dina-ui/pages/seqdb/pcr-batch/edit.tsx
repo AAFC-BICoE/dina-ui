@@ -108,6 +108,7 @@ export interface PcrBatchFormProps {
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
   buttonBar?: ReactNode;
   readOnlyOverride?: boolean;
+  isMetagenomicsWorkflow?: boolean;
 }
 
 export function PcrBatchForm({
@@ -123,7 +124,8 @@ export function PcrBatchForm({
       </div>
     </ButtonBar>
   ),
-  readOnlyOverride
+  readOnlyOverride,
+  isMetagenomicsWorkflow
 }: PcrBatchFormProps) {
   const { username } = useAccount();
   const { doOperations } = useApiClient();
@@ -131,7 +133,8 @@ export function PcrBatchForm({
   const initialValues = pcrBatch || {
     // TODO let the back-end set this:
     createdBy: username,
-    type: "pcr-batch"
+    type: "pcr-batch",
+    batchType: isMetagenomicsWorkflow ? "illumina_metagenomics" : undefined
   };
 
   async function savePcrReactionResults(submittedValues: any) {
@@ -235,6 +238,7 @@ export function PcrBatchForm({
         readOnly: readOnlyOverride
       }}
       buttonBar={buttonBar as any}
+      isMetagenomicsWorkflow={isMetagenomicsWorkflow}
     />
   );
 }
@@ -242,11 +246,13 @@ export function PcrBatchForm({
 interface LoadExternalDataForPcrBatchFormProps {
   dinaFormProps: DinaFormProps<PcrBatch>;
   buttonBar?: ReactNode;
+  isMetagenomicsWorkflow?: boolean;
 }
 
 export function LoadExternalDataForPcrBatchForm({
   dinaFormProps,
-  buttonBar
+  buttonBar,
+  isMetagenomicsWorkflow
 }: LoadExternalDataForPcrBatchFormProps) {
   const {
     loading: loadingReactionData,
@@ -275,6 +281,7 @@ export function LoadExternalDataForPcrBatchForm({
       <PcrBatchFormFields
         pcrBatchItems={pcrBatchItems}
         materialSamples={materialSamples}
+        isMetagenomicsWorkflow={isMetagenomicsWorkflow}
       />
     </DinaForm>
   );
@@ -283,12 +290,14 @@ export function LoadExternalDataForPcrBatchForm({
 interface PcrBatchFormFieldsProps {
   pcrBatchItems: PcrBatchItem[];
   materialSamples: MaterialSampleSummary[];
+  isMetagenomicsWorkflow?: boolean;
 }
 
 /** Re-usable field layout between edit and view pages. */
 function PcrBatchFormFields({
   pcrBatchItems,
-  materialSamples
+  materialSamples,
+  isMetagenomicsWorkflow
 }: PcrBatchFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { values } = useFormikContext<any>();
@@ -359,6 +368,7 @@ function PcrBatchFormFields({
           className="col-md-6"
           name="batchType"
           path="seqdb-api/vocabulary/pcrBatchType"
+          isDisabled={isMetagenomicsWorkflow}
         />
         <RegionSelectorComponent />
         <ResourceSelectField<ThermocyclerProfile>

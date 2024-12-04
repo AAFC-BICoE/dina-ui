@@ -46,7 +46,7 @@ export function OrganismStateField({
   const { readOnly } = useDinaFormContext();
 
   /** Applies name prefix to field props */
-  function fieldProps(fieldName: typeof ORGANISM_FIELDS[number]) {
+  function fieldProps(fieldName: (typeof ORGANISM_FIELDS)[number]) {
     return {
       name: `${namePrefix}${fieldName}`,
       // Don't use the prefix for the labels and tooltips:

@@ -55,7 +55,8 @@ export function MockAppContextProvider({
     () => ({
       supportedLanguages: "en,fr",
       instanceMode: "developer",
-      instanceName: "AAFC"
+      instanceName: "AAFC",
+      supportedGeographicReferences: "OSM"
     }),
     []
   );

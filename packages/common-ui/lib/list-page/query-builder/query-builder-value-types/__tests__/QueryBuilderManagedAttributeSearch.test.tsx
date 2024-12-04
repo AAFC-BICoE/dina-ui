@@ -25,11 +25,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           switch (operator) {
             case "in":
             case "notIn":
-              return "stringValue1, stringValue2,stringValue3"
+              return "stringValue1, stringValue2,stringValue3";
             case "between":
-              return "{\\\"low\\\":\\\"stringValue1\\\",\\\"high\\\":\\\"stringValue3\\\"}";
+              return '{\\"low\\":\\"stringValue1\\",\\"high\\":\\"stringValue3\\"}';
             default:
-              return "stringValue"
+              return "stringValue";
           }
         },
         operators: [
@@ -53,11 +53,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           switch (operator) {
             case "in":
             case "notIn":
-              return "1998-05-19, 2020-01-01,2024-04-08"
+              return "1998-05-19, 2020-01-01,2024-04-08";
             case "between":
-              return "{\\\"low\\\":\\\"1998-05-19\\\",\\\"high\\\":\\\"2002-02-10\\\"}";
+              return '{\\"low\\":\\"1998-05-19\\",\\"high\\":\\"2002-02-10\\"}';
             default:
-              return "1998-05-19"
+              return "1998-05-19";
           }
         },
         operators: [
@@ -92,7 +92,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
             case "notIn":
               return "1, 2,4";
             case "between":
-              return "{\\\"low\\\":1,\\\"high\\\":5}";
+              return '{\\"low\\":1,\\"high\\":5}';
             default:
               return "42";
           }
@@ -122,7 +122,7 @@ describe("QueryBuilderManagedAttributeSearch", () => {
             case "notIn":
               return "3, 3.1,12.5";
             case "between":
-              return "{\\\"low\\\":1.5,\\\"high\\\":10.5}";
+              return '{\\"low\\":1.5,\\"high\\":10.5}';
             default:
               return "3.5";
           }
@@ -150,9 +150,9 @@ describe("QueryBuilderManagedAttributeSearch", () => {
           switch (operator) {
             case "in":
             case "notIn":
-              return "option1, option2,option3"
+              return "option1, option2,option3";
             default:
-              return "option1"
+              return "option1";
           }
         },
         operators: ["equals", "notEquals", "in", "notIn", "empty", "notEmpty"],
@@ -184,9 +184,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                     fieldPath: "", // Not used.
                     operation: "", // Not used.
                     queryType: "", // Not used.
-                    value: `{"searchValue":"${
-                      (testValue as TestValueStructure).testValue(operator)
-                    }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
+                    value: `{"searchValue":"${(
+                      testValue as TestValueStructure
+                    ).testValue(
+                      operator
+                    )}","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
                       (testValue as TestValueStructure).type
                     }"}`,
                     fieldInfo: {
@@ -208,10 +210,9 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                       ).useKeywordMultiField,
                       optimizedPrefix: false,
                       containsSupport: false,
-                      endsWithSupport: false,                      
-                      keywordNumericSupport: (
-                        testValue as TestValueStructure
-                      ).useKeywordNumericField,
+                      endsWithSupport: false,
+                      keywordNumericSupport: (testValue as TestValueStructure)
+                        .useKeywordNumericField,
                       subType
                     }
                   })
@@ -232,9 +233,11 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                     fieldPath: "", // Not used.
                     operation: "", // Not used.
                     queryType: "", // Not used.
-                    value: `{"searchValue":"${
-                      (testValue as TestValueStructure).testValue(operator)
-                    }","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
+                    value: `{"searchValue":"${(
+                      testValue as TestValueStructure
+                    ).testValue(
+                      operator
+                    )}","selectedOperator":"${operator}","selectedManagedAttribute": { "key": "attributeName" },"selectedType":"${
                       (testValue as TestValueStructure).type
                     }"}`,
                     fieldInfo: {
@@ -263,9 +266,8 @@ describe("QueryBuilderManagedAttributeSearch", () => {
                       optimizedPrefix: false,
                       containsSupport: false,
                       endsWithSupport: false,
-                      keywordNumericSupport: (
-                        testValue as TestValueStructure
-                      ).useKeywordNumericField,
+                      keywordNumericSupport: (testValue as TestValueStructure)
+                        .useKeywordNumericField,
                       subType
                     }
                   })

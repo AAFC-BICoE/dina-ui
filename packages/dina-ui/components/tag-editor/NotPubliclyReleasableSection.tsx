@@ -1,4 +1,10 @@
-import { DinaFormSection, InverseToggleField, RadioButtonsField, TextField, useBulkEditTabContext } from "common-ui";
+import {
+  DinaFormSection,
+  InverseToggleField,
+  RadioButtonsField,
+  TextField,
+  useBulkEditTabContext
+} from "common-ui";
 import { useFormikContext } from "formik";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
@@ -41,5 +47,5 @@ export function NotPubliclyReleasableSection() {
           )}
       </DinaFormSection>
     </>
-  )
+  );
 }

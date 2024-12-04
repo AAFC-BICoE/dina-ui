@@ -259,7 +259,8 @@ export type DynamicFieldType =
   | "managedAttribute"
   | "fieldExtension"
   | "identifier"
-  | "relationshipPresence";
+  | "relationshipPresence"
+  | "scientificNameDetails";
 
 export interface DynamicFieldsMappingConfig {
   /** Attribute level dynamic fields */

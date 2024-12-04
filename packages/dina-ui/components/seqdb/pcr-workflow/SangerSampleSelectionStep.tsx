@@ -3,11 +3,13 @@ import {
   DoOperationsError,
   LoadingSpinner,
   QueryPage,
+  SaveArgs,
   filterBy,
   useAccount,
-  useApiClient
+  useApiClient,
+  useQuery
 } from "common-ui";
-import { PersistedResource } from "kitsu";
+import { KitsuResponse, PersistedResource } from "kitsu";
 import { compact, pick, uniq, difference, concat } from "lodash";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -18,6 +20,9 @@ import {
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useMaterialSampleRelationshipColumns } from "../../collection/material-sample/useMaterialSampleRelationshipColumns";
+import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
+import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
+import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/MolecularAnalysisRunItem";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -29,10 +34,12 @@ export interface SangerSampleSelectionStepProps {
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
+  metagenomicsBatch?: MetagenomicsBatch;
 }
 
 export function SangerSampleSelectionStep({
   pcrBatchId,
+  metagenomicsBatch,
   editMode,
   onSaved,
   setEditMode,
@@ -182,7 +189,6 @@ export function SangerSampleSelectionStep({
         `seqdb-api/pcr-batch/${pcrBatchId}`,
         {}
       );
-
       // Convert to UUID arrays to compare the two arrays.
       const selectedResourceUUIDs = compact(
         selectedResources?.map((material) => material.id)
@@ -212,9 +218,39 @@ export function SangerSampleSelectionStep({
         )
       );
 
+      let molecularAnalysisRunId: string | undefined;
+      let metagenomicsBatchItemsResp: KitsuResponse<
+        MetagenomicsBatchItem[],
+        undefined
+      >;
+
+      // If a MetagenomicsBatch exists
+      if (metagenomicsBatch && metagenomicsBatch.id) {
+        // Check for existing MolecularAnalysisRun before creating new MetagenomicsBatchItems
+        metagenomicsBatchItemsResp = await apiClient.get<
+          MetagenomicsBatchItem[]
+        >(`seqdb-api/metagenomics-batch-item`, {
+          filter: filterBy([], {
+            extraFilters: [
+              {
+                selector: "metagenomicsBatch.uuid",
+                comparison: "==",
+                arguments: metagenomicsBatch.id
+              }
+            ]
+          })(""),
+          page: { limit: 1000 },
+          include:
+            "molecularAnalysisRunItem,molecularAnalysisRunItem.run,pcrBatchItem"
+        });
+        molecularAnalysisRunId = metagenomicsBatchItemsResp?.data?.find(
+          (item) => item?.molecularAnalysisRunItem?.run?.id
+        )?.molecularAnalysisRunItem?.run?.id;
+      }
+
       // Perform create
       if (itemsToCreate.length !== 0) {
-        await save(
+        const pcrBatchItems = await save<PcrBatchItem>(
           itemsToCreate.map((materialUUID) => ({
             resource: {
               type: "pcr-batch-item",
@@ -234,10 +270,136 @@ export function SangerSampleSelectionStep({
           })),
           { apiBaseUrl: "/seqdb-api" }
         );
+
+        // If a MolecularAnalysisRun exists, then we need to create new
+        // MolecularAnalysisRunItems for new MetagenomicsBatchItems.
+        let molecularRunItemsCreated: MolecularAnalysisRunItem[] = [];
+        if (molecularAnalysisRunId) {
+          molecularRunItemsCreated = await save<MolecularAnalysisRunItem>(
+            itemsToCreate.map((_) => ({
+              resource: {
+                type: "molecular-analysis-run-item",
+                usageType: "seq-reaction",
+                relationships: {
+                  run: {
+                    data: {
+                      type: "molecular-analysis-run",
+                      id: molecularAnalysisRunId
+                    }
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item"
+            })),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+          if (metagenomicsBatch && metagenomicsBatch.id) {
+            // Create MetagenomicsBatchItems for new PcrBatchItems
+            const metagenomicsBatchItemSaveArgs: SaveArgs<MetagenomicsBatchItem>[] =
+              pcrBatchItems.map((pcrBatchItem, index) => {
+                return {
+                  type: "metagenomics-batch-item",
+                  resource: {
+                    type: "metagenomics-batch-item",
+                    relationships: {
+                      // Link back to existing MetagenomicsBatch
+                      metagenomicsBatch: {
+                        data: {
+                          id: metagenomicsBatch.id,
+                          type: "metagenomics-batch"
+                        }
+                      },
+                      // Link to new PcrBatchItem
+                      pcrBatchItem: {
+                        data: {
+                          id: pcrBatchItem.id,
+                          type: "pcr-batch-item"
+                        }
+                      },
+                      // Included only if molecular run items were created.
+                      molecularAnalysisRunItem:
+                        molecularRunItemsCreated.length > 0 &&
+                        molecularRunItemsCreated[index]
+                          ? {
+                              data: {
+                                type: "molecular-analysis-run-item",
+                                id: molecularRunItemsCreated[index].id
+                              }
+                            }
+                          : undefined
+                    }
+                  }
+                };
+              });
+            const saveMetagenomicsBatchItems =
+              await save<MetagenomicsBatchItem>(metagenomicsBatchItemSaveArgs, {
+                apiBaseUrl: "/seqdb-api"
+              });
+          }
+        }
       }
 
       // Perform deletes
       if (itemsToDelete.length !== 0) {
+        // Check if molecular analysis items need to be deleted.
+        if (molecularAnalysisRunId) {
+          // Delete the MetagenomicsBatchItems
+          await save(
+            itemsToDelete.map((item) => {
+              const metagenomicsBatchItem =
+                metagenomicsBatchItemsResp?.data?.find(
+                  (metagenBatchItem) =>
+                    metagenBatchItem?.pcrBatchItem?.id === item.pcrBatchItemUUID
+                );
+              return {
+                delete: {
+                  id: metagenomicsBatchItem?.id ?? "",
+                  type: "metagenomics-batch-item"
+                }
+              };
+            }),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+          // Delete the molecular analysis run items.
+          const deletedMolecularAnalysisRunItemsResp = await save(
+            itemsToDelete.map((itemToDelete) => {
+              const molecularAnalysisRunItem:
+                | MolecularAnalysisRunItem
+                | undefined = metagenomicsBatchItemsResp?.data?.find(
+                (metagenomicsBatchItem) =>
+                  metagenomicsBatchItem?.pcrBatchItem?.id ===
+                  itemToDelete.pcrBatchItemUUID
+              )?.molecularAnalysisRunItem;
+              return {
+                delete: {
+                  id: molecularAnalysisRunItem?.id ?? "",
+                  type: "molecular-analysis-run-item"
+                }
+              };
+            }),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+
+          // Delete the run if all seq-reactions are being deleted.
+          if (
+            itemsToDelete.length ===
+            previouslySelectedResourcesUUIDs.length +
+              selectedResourceUUIDs.length
+          ) {
+            await save(
+              [
+                {
+                  delete: {
+                    id: molecularAnalysisRunId,
+                    type: "molecular-analysis-run"
+                  }
+                }
+              ],
+              { apiBaseUrl: "/seqdb-api" }
+            );
+          }
+        }
+
         await save(
           itemsToDelete.map((item) => ({
             delete: {

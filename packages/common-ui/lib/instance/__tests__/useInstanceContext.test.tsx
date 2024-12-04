@@ -7,11 +7,7 @@ import { useInstanceContext } from "../useInstanceContext";
 import "@testing-library/jest-dom";
 import { ReactNode } from "react";
 
-function MockInstanceContextProvider({
-  children
-}: {
-  children: ReactNode;
-}) {
+function MockInstanceContextProvider({ children }: { children: ReactNode }) {
   const instanceJson: InstanceContextI = {
     supportedLanguages: "en,fr",
     instanceMode: "developer"
@@ -30,7 +26,6 @@ describe("InstanceContextProvider", () => {
   });
 
   it("useInstanceContext", async () => {
-    
     // get instance context
     const DumyComponent = () => {
       const instanceContext = useInstanceContext();
@@ -45,9 +40,9 @@ describe("InstanceContextProvider", () => {
     };
 
     const component = render(
-        <MockInstanceContextProvider>
-          <DumyComponent />
-        </MockInstanceContextProvider>
+      <MockInstanceContextProvider>
+        <DumyComponent />
+      </MockInstanceContextProvider>
     );
 
     const p1 = await component.findByTestId("supportedLanguages");

@@ -15,6 +15,8 @@ import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resou
 import { VocabularySelectField } from "../../collection/VocabularySelectField";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { Protocol } from "packages/dina-ui/types/collection-api";
+import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export interface MolecularAnalysisDetailsStepProps {
   genericMolecularAnalysisId?: string;
@@ -138,6 +140,18 @@ export function MolecularAnalysisForm() {
           optionLabel={(protocol) => protocol.name}
           readOnlyLink="/collection/protocol/view?id="
         />
+      </div>
+      <div className="row">
+        <div className="col-md-12">
+          <ManagedAttributesEditor
+            valuesPath="managedAttributes"
+            managedAttributeApiPath="seqdb-api/managed-attribute"
+            managedAttributeComponent="GENERIC_MOLECULAR_ANALYSIS"
+            fieldSetProps={{
+              legend: <DinaMessage id="managedAttributes" />
+            }}
+          />
+        </div>
       </div>
       {readOnly && (
         <div className="row">

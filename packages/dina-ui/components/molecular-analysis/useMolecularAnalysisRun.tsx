@@ -21,6 +21,13 @@ import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/r
 import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
+import {
+  attachMaterialSampleSummaryMetagenomics,
+  attachMetagenomicsBatchItem,
+  attachPcrBatchItemMetagenomics,
+  attachStorageUnitUsageMetagenomics
+} from "./useMetagenomicsWorkflowMolecularAnalysisRun";
 
 export interface UseMolecularAnalysisRunProps {
   seqBatchId: string;
@@ -631,6 +638,22 @@ export function useMolecularAnalysisRunView({
           }
           return genericMolecularAnalysisItems;
         }
+        async function fetchMetagenomicsBatchItems() {
+          const fetchPaths = molecularAnalysisRunItems.map(
+            (molecularAnalysisRunItem) =>
+              `seqdb-api/metagenomics-batch-item?include=pcrBatchItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+          );
+          const metagenomicsBatchItems: PersistedResource<MetagenomicsBatchItem>[] =
+            [];
+          for (const path of fetchPaths) {
+            const metagenomicsBatchItem = await apiClient.get<
+              MetagenomicsBatchItem[]
+            >(path, {});
+            metagenomicsBatchItems.push(metagenomicsBatchItem.data[0]);
+          }
+          return metagenomicsBatchItems;
+        }
+
         const usageType = molecularAnalysisRunItems?.[0].usageType;
         setColumns(
           getMolecularAnalysisRunColumns(compareByStringAndNumber, usageType)
@@ -671,6 +694,30 @@ export function useMolecularAnalysisRunView({
             sequencingRunItemsChain,
             bulkGet
           );
+          // All finished loading.
+          setSequencingRunItems(sequencingRunItemsChain);
+          setLoading(false);
+        } else if (usageType === "metagenomics-batch-item") {
+          const metagenomicsBatchItems = await fetchMetagenomicsBatchItems();
+
+          // Chain it all together to create one object.
+          let sequencingRunItemsChain = attachMetagenomicsBatchItem(
+            metagenomicsBatchItems
+          );
+          sequencingRunItemsChain = await attachPcrBatchItemMetagenomics(
+            sequencingRunItemsChain,
+            bulkGet
+          );
+          sequencingRunItemsChain = await attachStorageUnitUsageMetagenomics(
+            sequencingRunItemsChain,
+            bulkGet
+          );
+          sequencingRunItemsChain =
+            await attachMaterialSampleSummaryMetagenomics(
+              sequencingRunItemsChain,
+              bulkGet
+            );
+
           // All finished loading.
           setSequencingRunItems(sequencingRunItemsChain);
           setLoading(false);
@@ -839,7 +886,8 @@ export function getMolecularAnalysisRunColumns(compareByStringAndNumber, type) {
   ];
   const MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP = {
     "seq-reaction": SEQ_REACTION_COLUMNS,
-    "generic-molecular-analysis-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS
+    "generic-molecular-analysis-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS,
+    "metagenomics-batch-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS
   };
   return MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP[type];
 }

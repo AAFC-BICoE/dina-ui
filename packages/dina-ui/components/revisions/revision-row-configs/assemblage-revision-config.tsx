@@ -36,8 +36,11 @@ export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
       </div>
     ),
     multilingualTitle: titleCell(true, false, "multilingualTitle").cell,
-    multilingualDescription: descriptionCell(true, false, "multilingualDescription")
-      .cell,
+    multilingualDescription: descriptionCell(
+      true,
+      false,
+      "multilingualDescription"
+    ).cell,
 
     // Show the entire value of the metadata map in a key-value table:
     managedAttributes: ({

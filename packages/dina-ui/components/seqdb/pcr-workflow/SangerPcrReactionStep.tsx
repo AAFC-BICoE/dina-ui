@@ -5,8 +5,8 @@ import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { PcrReactionTable, usePcrReactionData } from "./PcrReactionTable";
 import Link from "next/link";
 import { AttachmentsField } from "../../object-store/attachment-list/AttachmentsField";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { InputResource, KitsuResource } from "kitsu";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { InputResource, KitsuResource, PersistedResource } from "kitsu";
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
@@ -18,6 +18,10 @@ export interface SangerPcrReactionProps {
   setPerformComplete: (newValue: boolean) => void;
   setEditMode: (newValue: boolean) => void;
   setReloadPcrBatch: (newValue: number) => void;
+  onSaved?: (
+    nextStep: number,
+    pcrBatchSaved?: PersistedResource<PcrBatch>
+  ) => Promise<void>;
 }
 
 export function SangerPcrReactionStep({
@@ -29,7 +33,8 @@ export function SangerPcrReactionStep({
   performComplete,
   setPerformComplete,
   setEditMode,
-  setReloadPcrBatch
+  setReloadPcrBatch,
+  onSaved
 }: SangerPcrReactionProps) {
   const { doOperations, save } = useApiClient();
   const formRef: Ref<FormikProps<Partial<PcrBatchItem>>> = useRef(null);
@@ -125,6 +130,7 @@ export function SangerPcrReactionStep({
     if (!!setPerformComplete) {
       setPerformComplete(false);
     }
+    await onSaved?.(4);
   }
 
   // Load the result based on the API request with the pcr-batch-item.

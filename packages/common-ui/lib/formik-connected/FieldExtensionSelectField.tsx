@@ -50,14 +50,26 @@ export function FieldExtensionSelectField(
         readOnlyRender={(value) =>
           value ? (
             <Tooltip
-              visibleElement={(
-                <div className={"card pill py-1 px-2 flex-row align-items-center mb-2 " + ((isRestricted ?? false) ? "bg-danger" : "bg-warning")}>
-                  <FaExclamationTriangle className={(isRestricted ?? false) ? "text-white" : undefined} />
-                  <span className={(isRestricted ?? false) ? "text-white" : undefined}>
-                    <strong>{fieldExtensionSelectFieldProps.label + ": "}</strong>{value?.value}
+              visibleElement={
+                <div
+                  className={
+                    "card pill py-1 px-2 flex-row align-items-center mb-2 " +
+                    (isRestricted ?? false ? "bg-danger" : "bg-warning")
+                  }
+                >
+                  <FaExclamationTriangle
+                    className={isRestricted ?? false ? "text-white" : undefined}
+                  />
+                  <span
+                    className={isRestricted ?? false ? "text-white" : undefined}
+                  >
+                    <strong>
+                      {fieldExtensionSelectFieldProps.label + ": "}
+                    </strong>
+                    {value?.value}
                   </span>
                 </div>
-              )}
+              }
               id="field_restriction"
               disableSpanMargin={true}
             />

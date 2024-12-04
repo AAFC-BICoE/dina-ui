@@ -1,6 +1,4 @@
-import {
-  withResponse
-} from "common-ui";
+import { withResponse } from "common-ui";
 import { AssemblageSelectSection } from "../../assemblage/AssemblageSelectSection";
 import { ProjectSelectSection } from "../../project/ProjectSelectSection";
 import { TagSelectReadOnly } from "../../tag-editor/TagSelectField";
@@ -26,16 +24,13 @@ export function MaterialSampleBadges({
         <CollectionSelectSection />
         <ProjectSelectSection />
         <AssemblageSelectSection />
-        {withResponse(
-          transactionElasticQuery as any,
-          ({ data: query }) => {
-            return (
-              <TransactionMaterialDirectionSection
-                transactionElasticQuery={query}
-              />
-            );
-          }
-        )}
+        {withResponse(transactionElasticQuery as any, ({ data: query }) => {
+          return (
+            <TransactionMaterialDirectionSection
+              transactionElasticQuery={query}
+            />
+          );
+        })}
 
         {/* Tags */}
         <TagSelectReadOnly />
