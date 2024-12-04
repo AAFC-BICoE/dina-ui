@@ -6,6 +6,7 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 import useVocabularyOptions from "./useVocabularyOptions";
 import { IdentifierType } from "packages/dina-ui/types/collection-api/resources/IdentifierType";
 import { startCase } from "lodash";
+import { boolean } from "zod";
 
 export interface VocabularySelectFieldProps extends FieldWrapperProps {
   path: string;
@@ -13,6 +14,7 @@ export interface VocabularySelectFieldProps extends FieldWrapperProps {
   selectProps?: Partial<
     CreatableProps<VocabularyOption, true, GroupBase<VocabularyOption>>
   >;
+  isDisabled?: boolean;
 }
 
 export interface VocabularyOption {
@@ -28,6 +30,7 @@ export function VocabularySelectField({
   path,
   selectProps,
   isMulti,
+  isDisabled,
   ...labelWrapperProps
 }: VocabularySelectFieldProps) {
   const { formatMessage } = useDinaIntl();
@@ -60,6 +63,7 @@ export function VocabularySelectField({
         return (
           <div className={invalid ? "is-invalid" : ""}>
             <CreatableSelect<VocabularyOption, boolean>
+              isDisabled={isDisabled}
               isClearable={true}
               options={vocabOptions}
               isLoading={loading}
