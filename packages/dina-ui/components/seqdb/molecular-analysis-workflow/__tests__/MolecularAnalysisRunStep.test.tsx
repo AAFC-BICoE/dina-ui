@@ -9,11 +9,14 @@ import {
   STORAGE_UNIT_USAGE_2,
   STORAGE_UNIT_USAGE_3,
   TEST_MATERIAL_SAMPLE_SUMMARY,
+  TEST_METADATA,
   TEST_MOLECULAR_ANALYSIS,
   TEST_MOLECULAR_ANALYSIS_ITEMS_MULTIPLE_RUN,
   TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN,
   TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN,
   TEST_MOLECULAR_ANALYSIS_MULTIPLE_RUN_ID,
+  TEST_MOLECULAR_ANALYSIS_RUN,
+  TEST_MOLECULAR_ANALYSIS_RUN_ID,
   TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID,
   TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID
 } from "../__mocks__/MolecularAnalysisMocks";
@@ -36,6 +39,21 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID:
           return { data: TEST_MOLECULAR_ANALYSIS_ITEMS_WITHOUT_RUN };
       }
+
+    case "seqdb-api/molecular-analysis-run/" + TEST_MOLECULAR_ANALYSIS_RUN_ID:
+      return { data: TEST_MOLECULAR_ANALYSIS_RUN };
+
+    case "objectstore-api/metadata":
+    case "seqdb-api/molecular-analysis-run/" +
+      TEST_MOLECULAR_ANALYSIS_RUN_ID +
+      "/attachments":
+      return {
+        data: [TEST_METADATA]
+      };
+
+    // Blob storage
+    case "":
+      return {};
   }
 });
 
@@ -57,6 +75,11 @@ const mockBulkGet = jest.fn(async (paths) => {
         return TEST_MATERIAL_SAMPLE_SUMMARY[1];
       case "/material-sample-summary/" + TEST_MATERIAL_SAMPLE_SUMMARY[2].id:
         return TEST_MATERIAL_SAMPLE_SUMMARY[2];
+
+      // Attachments
+      case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=derivatives":
+      case "metadata/7f3eccfa-3bc1-412f-9385-bb00e2319ac6?include=acMetadataCreator,derivatives":
+        return TEST_METADATA;
     }
   });
 });
@@ -145,6 +168,13 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     // Ensure Well Coordinates is rendered:
     expect(wrapper.getByRole("cell", { name: "A1" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
+
+    // Ensure attachment appears.
+    expect(
+      wrapper.getByRole("heading", {
+        name: /sequencing run attachments \(1\)/i
+      })
+    ).toBeInTheDocument();
 
     // Set edit mode should not be triggered in this test.
     expect(mockSetEditMode).toBeCalledTimes(0);
@@ -388,7 +418,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
 
     // Switch into edit mode:
-    userEvent.click(wrapper.getByRole("button", { name: /edit/i }));
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
     expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Change the sequencing run name to something different.
@@ -416,6 +446,16 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
             resource: {
               id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
               name: "Updated run name",
+              relationships: {
+                attachments: {
+                  data: [
+                    {
+                      id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+                      type: "metadata"
+                    }
+                  ]
+                }
+              },
               type: "molecular-analysis-run"
             },
             type: "molecular-analysis-run"

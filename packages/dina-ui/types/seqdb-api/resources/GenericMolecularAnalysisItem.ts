@@ -1,8 +1,8 @@
 import { KitsuResource } from "kitsu";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { GenericMolecularAnalysis } from "./GenericMolecularAnalysis";
-import { MolecularAnalysisRunItem } from "./MolecularAnalysisRunItem";
 import { StorageUnitUsage } from "../../collection-api/resources/StorageUnitUsage";
+import { MolecularAnalysisRunItem } from "./molecular-analysis/MolecularAnalysisRunItem";
 
 export interface GenericMolecularAnalysisItemAttributes {
   type: "generic-molecular-analysis-item";

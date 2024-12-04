@@ -1,5 +1,4 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
-import { MolecularAnalysisRunItem } from "../..//types/seqdb-api/resources/MolecularAnalysisRunItem";
 import { useEffect, useState } from "react";
 import {
   BulkGetOptions,
@@ -12,7 +11,6 @@ import {
   useStringComparator
 } from "common-ui";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
-import { MolecularAnalysisRun } from "../../types/seqdb-api/resources/MolecularAnalysisRun";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "../../types/collection-api";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
@@ -20,6 +18,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { attachGenericMolecularAnalysisItems } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
+import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
+import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import {
   attachMaterialSampleSummaryMetagenomics,
@@ -95,6 +96,23 @@ export interface UseMolecularAnalysisRunReturn {
   sequencingRunItems?: SequencingRunItem[];
 
   columns: ColumnDef<SequencingRunItem>[];
+
+  /**
+   * UUID of the sequencing run.
+   */
+  sequencingRunId?: string;
+
+  /**
+   * Displays the current attachments. This is used since the run not might exist yet and can't
+   * be saved directly.
+   */
+  attachments: ResourceIdentifierObject[];
+
+  /**
+   * Set the current attachments. This is used since the run not might exist yet and can't
+   * be saved directly.
+   */
+  setAttachments: (newMetadatas: ResourceIdentifierObject[]) => void;
 }
 
 /**
@@ -229,7 +247,7 @@ export function useMolecularAnalysisRun({
   performSave,
   setPerformSave
 }: UseMolecularAnalysisRunProps): UseMolecularAnalysisRunReturn {
-  const { bulkGet, save } = useApiClient();
+  const { bulkGet, save, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { compareByStringAndNumber } = useStringComparator();
   const columns = getMolecularAnalysisRunColumns(
@@ -250,6 +268,11 @@ export function useMolecularAnalysisRun({
   // Run Items
   const [sequencingRunItems, setSequencingRunItems] =
     useState<SequencingRunItem[]>();
+
+  // Sequencing run attachments
+  const [attachments, setAttachments] = useState<ResourceIdentifierObject[]>(
+    []
+  );
 
   // Network Requests, starting with the SeqReaction
   useQuery<SeqReaction[]>(
@@ -312,6 +335,25 @@ export function useMolecularAnalysisRun({
           if (firstSequencingRun) {
             setSequencingRun(firstSequencingRun);
             setSequencingRunName(firstSequencingRun.name);
+            await findMolecularAnalysisRunAttachments(firstSequencingRun);
+          }
+        }
+
+        async function findMolecularAnalysisRunAttachments(
+          run: MolecularAnalysisRun
+        ) {
+          // Only perform the request if a sequencing run exists.
+          if (run?.id) {
+            const runQuery = await apiClient.get(
+              `seqdb-api/molecular-analysis-run/${run?.id}`,
+              {
+                include: "attachments"
+              }
+            );
+
+            if (runQuery && (runQuery as any)?.data?.attachments) {
+              setAttachments((runQuery as any)?.data?.attachments);
+            }
           }
         }
 
@@ -372,8 +414,15 @@ export function useMolecularAnalysisRun({
           resource: {
             type: "molecular-analysis-run",
             name: sequencingRunName,
-            group: groupName
-          }
+            group: groupName,
+            ...(attachments.length > 0 && {
+              relationships: {
+                attachments: {
+                  data: attachments
+                }
+              }
+            })
+          } as any
         }
       ];
       const savedMolecularAnalysisRun = await save(
@@ -451,7 +500,7 @@ export function useMolecularAnalysisRun({
     }
   }
 
-  async function updateSequencingName() {
+  async function updateSequencingRun() {
     // Sequencing run needs an id to update.
     if (!sequencingRun?.id) {
       setPerformSave(false);
@@ -468,8 +517,13 @@ export function useMolecularAnalysisRun({
           resource: {
             id: sequencingRun.id,
             type: "molecular-analysis-run",
-            name: sequencingRunName
-          }
+            name: sequencingRunName,
+            relationships: {
+              attachments: {
+                data: attachments
+              }
+            }
+          } as any
         }
       ];
       await save(molecularAnalysisRunSaveArg, {
@@ -514,7 +568,7 @@ export function useMolecularAnalysisRun({
 
       // Determine if a new run should be created or update the existing one.
       if (sequencingRun) {
-        updateSequencingName();
+        updateSequencingRun();
       } else {
         createNewRun();
       }
@@ -528,7 +582,10 @@ export function useMolecularAnalysisRun({
     sequencingRunName,
     setSequencingRunName,
     sequencingRunItems,
-    columns
+    columns,
+    attachments,
+    setAttachments,
+    sequencingRunId: sequencingRun?.id
   };
 }
 

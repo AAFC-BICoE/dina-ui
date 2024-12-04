@@ -1,5 +1,5 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
-import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/MolecularAnalysisRunItem";
+import { MolecularAnalysisRunItem } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { useEffect, useState } from "react";
 import {
   BulkGetOptions,
@@ -12,14 +12,11 @@ import {
   useStringComparator
 } from "common-ui";
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
-import { MolecularAnalysisRun } from "../../types/seqdb-api/resources/MolecularAnalysisRun";
+import { MolecularAnalysisRun } from "../../types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "../../types/collection-api";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
-import { attachGenericMolecularAnalysisItems } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
-import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
 import { getMolecularAnalysisRunColumns } from "./useMolecularAnalysisRun";

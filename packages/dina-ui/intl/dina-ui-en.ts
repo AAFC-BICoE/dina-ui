@@ -1035,6 +1035,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A sequencing run name must be provided in order to generate a sequence run.",
   molecularAnalysisRunStep_noRunExists:
     "No sequencing run created yet for this molecular analysis workflow. Click edit to create a new run.",
+  molecularAnalysisRunStep_attachments: "Sequencing Run Attachments",
   mapRelationshipTitle: "Relationship Mapping",
   value: "Value",
   count: "Count",

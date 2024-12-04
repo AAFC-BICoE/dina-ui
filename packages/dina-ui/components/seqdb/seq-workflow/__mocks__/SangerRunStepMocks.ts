@@ -1,11 +1,29 @@
-import { KitsuResponse } from "kitsu";
+import { KitsuResponse, PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "packages/dina-ui/types/collection-api";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
 import {
   PcrBatchItem,
   SeqBatch,
   SeqReaction
 } from "packages/dina-ui/types/seqdb-api";
+import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
+
+export const TEST_MOLECULAR_ANALYSIS_RUN_ID =
+  "00aca736-67c5-4258-9b7c-b3bb3c1f6b58";
+
+export const TEST_MOLECULAR_ANALYSIS_RUN: PersistedResource<MolecularAnalysisRun> =
+  {
+    id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
+    type: "molecular-analysis-run",
+    name: "run-name-1",
+    attachments: [
+      {
+        id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+        type: "metadata"
+      }
+    ]
+  };
 
 export const SEQ_BATCH_ID = "d107d371-79cc-4939-9fcc-990cb7089fa4";
 export const SEQ_BATCH_ID_MULTIPLE_RUNS =
@@ -161,11 +179,7 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
         usageType: "seq-reaction",
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
-        run: {
-          type: "molecular-analysis-run",
-          id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
-          name: "run-name-1"
-        }
+        run: TEST_MOLECULAR_ANALYSIS_RUN
       },
       storageUnitUsage: {
         id: "0192fd01-90a6-75a2-a7a3-daf1a4718471",
@@ -200,11 +214,7 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
         usageType: "seq-reaction",
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
-        run: {
-          type: "molecular-analysis-run",
-          id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
-          name: "run-name-1"
-        }
+        run: TEST_MOLECULAR_ANALYSIS_RUN
       },
       storageUnitUsage: {
         id: "0192fd01-90c2-7e45-95a2-a5614f68052f",
@@ -239,11 +249,7 @@ export const SEQ_REACTIONS: KitsuResponse<SeqReaction[], undefined> = {
         usageType: "seq-reaction",
         createdBy: "dina-admin",
         createdOn: "2024-11-05T15:29:30.230786Z",
-        run: {
-          type: "molecular-analysis-run",
-          id: "00aca736-67c5-4258-9b7c-b3bb3c1f6b58",
-          name: "run-name-1"
-        }
+        run: TEST_MOLECULAR_ANALYSIS_RUN
       },
       storageUnitUsage: {
         id: "0192fd01-9104-72fa-a18f-80d97da0c935",
@@ -420,4 +426,19 @@ export const MATERIAL_SAMPLE_SUMMARY_3: MaterialSampleSummary = {
   id: "2308d337-756d-4714-90bb-57698b6f5819",
   type: "material-sample-summary",
   materialSampleName: "Sample3"
+};
+
+export const TEST_METADATA: PersistedResource<Metadata> = {
+  id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
+  type: "metadata",
+  createdOn: "2024-12-03T14:56:51.439016Z",
+  bucket: "aafc",
+  fileIdentifier: "01938d06-12e5-793c-aecf-cadc6b18d6c2",
+  fileExtension: ".jpg",
+  dcFormat: "image/jpeg",
+  dcType: "IMAGE",
+  acCaption: "japan.jpg",
+  originalFilename: "japan.jpg",
+  publiclyReleasable: true,
+  group: "aafc"
 };
