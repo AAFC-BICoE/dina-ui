@@ -235,6 +235,7 @@ export default function MetagenomicWorkflowRunPage() {
             setEditMode={setEditMode}
             performSave={performSave}
             setPerformSave={setPerformSave}
+            isMetagenomicsWorkflow={true}
           />
         </TabPanel>
         <TabPanel>

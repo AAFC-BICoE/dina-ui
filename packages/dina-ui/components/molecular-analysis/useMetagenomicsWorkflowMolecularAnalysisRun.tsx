@@ -22,6 +22,7 @@ import { attachGenericMolecularAnalysisItems } from "../seqdb/molecular-analysis
 import { GenericMolecularAnalysisItem } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysisItem";
 import { MetagenomicsBatchItem } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatchItem";
 import { MetagenomicsBatch } from "packages/dina-ui/types/seqdb-api/resources/metagenomics/MetagenomicsBatch";
+import { getMolecularAnalysisRunColumns } from "./useMolecularAnalysisRun";
 
 export interface UseMetagenomicsWorkflowMolecularAnalysisRunProps {
   metagenomicsBatchId: string;
@@ -99,7 +100,7 @@ export interface UseMolecularAnalysisRunReturn {
  * @param metagenomicsBatchItem
  * @returns The initial structure of SequencingRunItem.
  */
-function attachMetagenomicsBatchItem(
+export function attachMetagenomicsBatchItem(
   metagenomicsBatchItem: PersistedResource<MetagenomicsBatchItem>[]
 ): SequencingRunItem[] {
   return metagenomicsBatchItem.map<SequencingRunItem>((reaction) => {
@@ -120,7 +121,7 @@ function attachMetagenomicsBatchItem(
  * to retrieve the full storage unit since it's stored in the collection-api.
  * @returns The updated SeqReactionSample with storage unit attached.
  */
-async function attachStorageUnitUsage(
+export async function attachStorageUnitUsageMetagenomics(
   sequencingRunItem: SequencingRunItem[],
   bulkGet: <T extends KitsuResource, TReturnNull extends boolean = false>(
     paths: readonly string[],
@@ -157,7 +158,7 @@ async function attachStorageUnitUsage(
 /**
  * Fetch MaterialSampleSummary from each PcrBatchItem.
  */
-async function attachMaterialSampleSummary(
+export async function attachMaterialSampleSummaryMetagenomics(
   sequencingRunItem: SequencingRunItem[],
   bulkGet: <T extends KitsuResource, TReturnNull extends boolean = false>(
     paths: readonly string[],
@@ -189,7 +190,7 @@ async function attachMaterialSampleSummary(
 /**
  * Fetch PcrBatchItem linked to each SeqReactions.
  */
-async function attachPcrBatchItem(
+export async function attachPcrBatchItemMetagenomics(
   sequencingRunItem: SequencingRunItem[],
   bulkGet: <T extends KitsuResource, TReturnNull extends boolean = false>(
     paths: readonly string[],
@@ -323,16 +324,16 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
         let sequencingRunItemsChain = attachMetagenomicsBatchItem(
           metagenomicsBatchItems
         );
-        sequencingRunItemsChain = await attachPcrBatchItem(
+        sequencingRunItemsChain = await attachPcrBatchItemMetagenomics(
           sequencingRunItemsChain,
           bulkGet
         );
-        sequencingRunItemsChain = await attachStorageUnitUsage(
+        sequencingRunItemsChain = await attachStorageUnitUsageMetagenomics(
           sequencingRunItemsChain,
           bulkGet
         );
 
-        sequencingRunItemsChain = await attachMaterialSampleSummary(
+        sequencingRunItemsChain = await attachMaterialSampleSummaryMetagenomics(
           sequencingRunItemsChain,
           bulkGet
         );
@@ -537,268 +538,4 @@ export function useMetagenomicsWorkflowMolecularAnalysisRun({
     sequencingRunItems,
     columns
   };
-}
-
-export interface UseMetagenomicsMolecularAnalysisRunViewProps {
-  molecularAnalysisRunId: string;
-}
-export function useMetagenomicsMolecularAnalysisRunView({
-  molecularAnalysisRunId
-}: UseMetagenomicsMolecularAnalysisRunViewProps) {
-  const { apiClient, bulkGet } = useApiClient();
-  const [columns, setColumns] = useState<any[]>([]);
-  // Run Items
-  const [sequencingRunItems, setSequencingRunItems] =
-    useState<SequencingRunItem[]>();
-  const [loading, setLoading] = useState<boolean>(true);
-  const { compareByStringAndNumber } = useStringComparator();
-  const molecularAnalysisRunItemQuery = useQuery<MolecularAnalysisRunItem[]>(
-    {
-      path: `seqdb-api/molecular-analysis-run-item?filter[rsql]=run.uuid==${molecularAnalysisRunId}`
-    },
-    {
-      onSuccess: async ({ data: molecularAnalysisRunItems }) => {
-        async function fetchMetagenomicsBatchItems() {
-          const fetchPaths = molecularAnalysisRunItems.map(
-            (molecularAnalysisRunItem) =>
-              `seqdb-api/metagenomics-batch-items?include=pcrBatchItem&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
-          );
-          const metagenomicsBatchItems: PersistedResource<MetagenomicsBatchItem>[] =
-            [];
-          for (const path of fetchPaths) {
-            const metagenomicsBatchItem = await apiClient.get<
-              MetagenomicsBatchItem[]
-            >(path, {});
-            metagenomicsBatchItems.push(metagenomicsBatchItem.data[0]);
-          }
-          return metagenomicsBatchItems;
-        }
-
-        async function fetchGenericMolecularAnalysisItems() {
-          const fetchPaths = molecularAnalysisRunItems.map(
-            (molecularAnalysisRunItem) =>
-              `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
-          );
-          const genericMolecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
-            [];
-          for (const path of fetchPaths) {
-            const genericMolecularAnalysisItem = await apiClient.get<
-              GenericMolecularAnalysisItem[]
-            >(path, {});
-            genericMolecularAnalysisItems.push(
-              genericMolecularAnalysisItem.data[0]
-            );
-          }
-          return genericMolecularAnalysisItems;
-        }
-        const usageType = molecularAnalysisRunItems?.[0].usageType;
-        setColumns(
-          getMolecularAnalysisRunColumns(compareByStringAndNumber, usageType)
-        );
-        if (usageType === "metagenomics-batch-item") {
-          const metagenomicsBatchItems = await fetchMetagenomicsBatchItems();
-
-          // Chain it all together to create one object.
-          let sequencingRunItemsChain = attachMetagenomicsBatchItem(
-            metagenomicsBatchItems
-          );
-          sequencingRunItemsChain = await attachPcrBatchItem(
-            sequencingRunItemsChain,
-            bulkGet
-          );
-          sequencingRunItemsChain = await attachStorageUnitUsage(
-            sequencingRunItemsChain,
-            bulkGet
-          );
-          sequencingRunItemsChain = await attachMaterialSampleSummary(
-            sequencingRunItemsChain,
-            bulkGet
-          );
-
-          // All finished loading.
-          setSequencingRunItems(sequencingRunItemsChain);
-          setLoading(false);
-        } else if (usageType === "generic-molecular-analysis-item") {
-          const genericMolecularAnalysisItems =
-            await fetchGenericMolecularAnalysisItems();
-          let sequencingRunItemsChain = attachGenericMolecularAnalysisItems(
-            genericMolecularAnalysisItems
-          );
-          sequencingRunItemsChain = await attachStorageUnitUsage(
-            sequencingRunItemsChain,
-            bulkGet
-          );
-          sequencingRunItemsChain = await attachMaterialSampleSummary(
-            sequencingRunItemsChain,
-            bulkGet
-          );
-          // All finished loading.
-          setSequencingRunItems(sequencingRunItemsChain);
-          setLoading(false);
-        }
-      }
-    }
-  );
-  return {
-    loading: molecularAnalysisRunItemQuery.loading || loading,
-    sequencingRunItems,
-    columns
-  };
-}
-
-export function getMolecularAnalysisRunColumns(compareByStringAndNumber, type) {
-  // Table columns to display for the sequencing run.
-  const SEQ_REACTION_COLUMNS: ColumnDef<SequencingRunItem>[] = [
-    {
-      id: "wellCoordinates",
-      cell: ({ row }) => {
-        return (
-          <>
-            {!row.original?.storageUnitUsage ||
-            row.original?.storageUnitUsage?.wellRow === null ||
-            row.original?.storageUnitUsage?.wellColumn === null
-              ? ""
-              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
-          </>
-        );
-      },
-      header: () => <FieldHeader name={"wellCoordinates"} />,
-      accessorKey: "wellCoordinates",
-      sortingFn: (a: any, b: any): number => {
-        const aString =
-          !a.original?.storageUnitUsage ||
-          a.original?.storageUnitUsage?.wellRow === null ||
-          a.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
-        const bString =
-          !b.original?.storageUnitUsage ||
-          b.original?.storageUnitUsage?.wellRow === null ||
-          b.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
-        return compareByStringAndNumber(aString, bString);
-      }
-    },
-    {
-      id: "tubeNumber",
-      cell: ({ row: { original } }) =>
-        original?.storageUnitUsage?.cellNumber === undefined ? (
-          <></>
-        ) : (
-          <>{original.storageUnitUsage?.cellNumber}</>
-        ),
-      header: () => <FieldHeader name={"tubeNumber"} />,
-      accessorKey: "tubeNumber",
-      sortingFn: (a: any, b: any): number =>
-        compareByStringAndNumber(
-          a?.original?.storageUnitUsage?.cellNumber?.toString(),
-          b?.original?.storageUnitUsage?.cellNumber?.toString()
-        )
-    },
-    {
-      id: "materialSampleName",
-      cell: ({ row: { original } }) => {
-        const materialSampleName =
-          original?.materialSampleSummary?.materialSampleName;
-        return (
-          <>
-            <Link
-              href={`/collection/material-sample/view?id=${original.materialSampleId}`}
-            >
-              <a>{materialSampleName || original.materialSampleId}</a>
-            </Link>
-          </>
-        );
-      },
-      header: () => <FieldHeader name="materialSampleName" />,
-      accessorKey: "materialSampleSummary.materialSampleName",
-      sortingFn: (a: any, b: any): number =>
-        compareByStringAndNumber(
-          a?.original?.materialSampleSummary?.materialSampleName,
-          b?.original?.materialSampleSummary?.materialSampleName
-        ),
-      enableSorting: true
-    }
-  ];
-
-  const GENERIC_MOLECULAR_ANALYSIS_COLUMNS: ColumnDef<SequencingRunItem>[] = [
-    {
-      id: "wellCoordinates",
-      cell: ({ row }) => {
-        return (
-          <>
-            {!row.original?.storageUnitUsage ||
-            row.original?.storageUnitUsage?.wellRow === null ||
-            row.original?.storageUnitUsage?.wellColumn === null
-              ? ""
-              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
-          </>
-        );
-      },
-      header: () => <FieldHeader name={"wellCoordinates"} />,
-      accessorKey: "wellCoordinates",
-      sortingFn: (a: any, b: any): number => {
-        const aString =
-          !a.original?.storageUnitUsage ||
-          a.original?.storageUnitUsage?.wellRow === null ||
-          a.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
-        const bString =
-          !b.original?.storageUnitUsage ||
-          b.original?.storageUnitUsage?.wellRow === null ||
-          b.original?.storageUnitUsage?.wellColumn === null
-            ? ""
-            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
-        return compareByStringAndNumber(aString, bString);
-      }
-    },
-    {
-      id: "tubeNumber",
-      cell: ({ row: { original } }) =>
-        original?.storageUnitUsage?.cellNumber === undefined ? (
-          <></>
-        ) : (
-          <>{original.storageUnitUsage?.cellNumber}</>
-        ),
-      header: () => <FieldHeader name={"tubeNumber"} />,
-      accessorKey: "tubeNumber",
-      sortingFn: (a: any, b: any): number =>
-        compareByStringAndNumber(
-          a?.original?.storageUnitUsage?.cellNumber?.toString(),
-          b?.original?.storageUnitUsage?.cellNumber?.toString()
-        )
-    },
-    {
-      id: "materialSampleName",
-      cell: ({ row: { original } }) => {
-        const materialSampleName =
-          original?.materialSampleSummary?.materialSampleName;
-        return (
-          <>
-            <Link
-              href={`/collection/material-sample/view?id=${original.materialSampleId}`}
-            >
-              <a>{materialSampleName || original.materialSampleId}</a>
-            </Link>
-          </>
-        );
-      },
-      header: () => <FieldHeader name="materialSampleName" />,
-      accessorKey: "materialSampleSummary.materialSampleName",
-      sortingFn: (a: any, b: any): number =>
-        compareByStringAndNumber(
-          a?.original?.materialSampleSummary?.materialSampleName,
-          b?.original?.materialSampleSummary?.materialSampleName
-        ),
-      enableSorting: true
-    }
-  ];
-  const MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP = {
-    "seq-reaction": SEQ_REACTION_COLUMNS,
-    "generic-molecular-analysis-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS,
-    "metagenomics-batch-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS
-  };
-  return MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP[type];
 }

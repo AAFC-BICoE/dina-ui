@@ -15,6 +15,7 @@ export interface SangerPcrBatchStepProps {
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
+  isMetagenomicsWorkflow?: boolean;
 }
 
 export function SangerPcrBatchStep({
@@ -24,7 +25,8 @@ export function SangerPcrBatchStep({
   editMode,
   setEditMode,
   performSave,
-  setPerformSave
+  setPerformSave,
+  isMetagenomicsWorkflow
 }: SangerPcrBatchStepProps) {
   // If no PCR Batch has been created, automatically go to edit mode.
   useEffect(() => {
@@ -54,6 +56,7 @@ export function SangerPcrBatchStep({
       onSaved={onSavedInternal}
       buttonBar={buttonBar}
       readOnlyOverride={!editMode}
+      isMetagenomicsWorkflow={isMetagenomicsWorkflow}
     />
   );
 }
