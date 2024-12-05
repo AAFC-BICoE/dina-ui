@@ -1,8 +1,11 @@
 import { PersistedResource } from "kitsu";
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { BrowseStorageTree } from "../BrowseStorageTree";
+import { within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 const STORAGE_UNIT_TYPE_NAME = "Type";
 
@@ -112,52 +115,42 @@ describe("BrowseStorageTree component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you navigate the tree and select a Storage Unit.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <BrowseStorageTree onSelect={mockOnSelect} />
       </DinaForm>,
       { apiContext }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Open the top-level unit to show the nested units "B" and "C":
-    wrapper.find("svg.storage-collapser-icon").simulate("click");
-
+    userEvent.click(wrapper.getByTestId("collapser-button-A").children[0]);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Shows the nested storage units:
     expect(
-      wrapper
-        .find(".collapser-for-A .collapser-for-B a.storage-unit-name")
-        .text()
-    ).toEqual("B (" + STORAGE_UNIT_TYPE_NAME + ")");
+      wrapper.getByRole("link", { name: /b \(type\)/i })
+    ).toBeInTheDocument();
     expect(
-      wrapper
-        .find(".collapser-for-A .collapser-for-C a.storage-unit-name")
-        .text()
-    ).toEqual("C (" + STORAGE_UNIT_TYPE_NAME + ")");
+      wrapper.getByRole("link", { name: /c \(type\)/i })
+    ).toBeInTheDocument();
 
     // Select a storage:
-    wrapper
-      .find(".collapser-for-A .collapser-for-C button.select-storage")
-      .simulate("click");
+    userEvent.click(
+      within(wrapper.getByTestId("collapser-button-C")).getByRole("button")
+    );
 
     expect(mockOnSelect).lastCalledWith(STORAGE_C);
   });
 
   it("Filters the list based on a text filter.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <BrowseStorageTree onSelect={mockOnSelect} />
       </DinaForm>,
       { apiContext }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // With no filter, gets the top-level units:
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {
@@ -172,13 +165,12 @@ describe("BrowseStorageTree component", () => {
       sort: "storageUnitType.name,name"
     });
 
-    wrapper
-      .find("input.storage-tree-search")
-      .simulate("change", { target: { value: "test-search-text" } });
-    wrapper.find("button.storage-tree-search").simulate("click");
-
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      "test-search-text"
+    );
+    userEvent.click(wrapper.getByRole("button", { name: /search/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // With a filter, gets units from any level matching the search text:
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {
@@ -194,10 +186,8 @@ describe("BrowseStorageTree component", () => {
     });
 
     // Reset the search:
-    wrapper.find("button.storage-tree-search-reset").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button", { name: /reset/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // No filter again:
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {

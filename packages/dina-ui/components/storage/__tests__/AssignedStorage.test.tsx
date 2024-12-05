@@ -1,8 +1,10 @@
 import { DinaForm } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { AssignedStorage } from "../AssignedStorage";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 const STORAGE_A_SHALLOW: PersistedResource<StorageUnit> = {
   id: "A",
@@ -77,44 +79,32 @@ describe("AssignedStorage component", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Renders the storage unit path", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <AssignedStorage onChange={mockOnChange} value={STORAGE_A_SHALLOW} />
       </DinaForm>,
       { apiContext }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
+    userEvent.hover(wrapper.getByRole("img"));
 
-    const tooltip = wrapper.find("Tooltip");
-
-    const directComponent: any[] = tooltip.prop("directComponent");
-    const texts = directComponent.map((fragment) => {
-      return fragment.props.children[0].props.children.props.children;
-    });
-
-    expect(texts).toEqual([
-      "E (Building)",
-      "D (Room)",
-      "C (Cabinet)",
-      "B (Shelf)",
-      "A (Box)"
-    ]);
+    expect(
+      wrapper.getByRole("tooltip", {
+        name: /e \(building\) > d \(room\) > c \(cabinet\) > b \(shelf\) > a \(box\)/i
+      })
+    ).toBeInTheDocument();
   });
 
   it("Lets you remove the storage unit", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}}>
         <AssignedStorage onChange={mockOnChange} value={STORAGE_A_SHALLOW} />
       </DinaForm>,
       { apiContext }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.remove-storage").simulate("click");
+    userEvent.click(wrapper.getByRole("button"));
     expect(mockOnChange).lastCalledWith({ id: null });
   });
 });
