@@ -1,6 +1,8 @@
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { DinaForm } from "common-ui";
 import { StorageLinkerField } from "../StorageLinker";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -28,7 +30,7 @@ const testCtx = {
 
 describe("StorageLinker", () => {
   it("Prompts to remove the empty Storage when the stored Material Sample has no ID. e.g. creation form.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{
           storageUnit: { id: "A", type: "storage-unit", name: "A" }
@@ -38,23 +40,20 @@ describe("StorageLinker", () => {
       </DinaForm>,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.remove-storage").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button"));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".modal-body .message-body").text()).toEqual(
-      "Storage A is empty. Would you like to permanently delete this Storage Container?"
-    );
+    expect(
+      wrapper.getByText(
+        /storage a is empty\. would you like to permanently delete this storage container\?/i
+      )
+    ).toBeInTheDocument();
+
     // Confirm "yes":
-    wrapper.find("form .modal-body").simulate("submit");
-
+    userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Only the storage needs to be deleted:
     expect(mockSave).lastCalledWith(
@@ -64,7 +63,7 @@ describe("StorageLinker", () => {
   });
 
   it("Prompts to remove the empty Storage when the stored Material Sample has an ID. e.g. edit form.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm
         initialValues={{
           id: "123",
@@ -76,23 +75,20 @@ describe("StorageLinker", () => {
       </DinaForm>,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper.find("button.remove-storage").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button"));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".modal-body .message-body").text()).toEqual(
-      "Storage A is empty. Would you like to permanently delete this Storage Container?"
-    );
+    expect(
+      wrapper.getByText(
+        /storage a is empty\. would you like to permanently delete this storage container\?/i
+      )
+    ).toBeInTheDocument();
+
     // Confirm "yes":
-    wrapper.find("form .modal-body").simulate("submit");
-
+    userEvent.click(wrapper.getByRole("button", { name: /yes/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Only the storage needs to be deleted:
     expect(mockSave).lastCalledWith(

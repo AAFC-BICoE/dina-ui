@@ -1,16 +1,17 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PcrReactionTable } from "../PcrReactionTable";
 import {
   MATERIAL_SAMPLES,
   PCR_BATCH_ITEMS
 } from "../__mocks__/PcrWorkflowMocks";
+import "@testing-library/jest-dom";
 
 describe("PcrReactionTable component", () => {
   beforeEach(jest.clearAllMocks);
 
   test("Table renders correctly with mocked API calls", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <DinaForm initialValues={{}} readOnly={true}>
         <PcrReactionTable
           materialSamples={MATERIAL_SAMPLES as any}
@@ -20,35 +21,66 @@ describe("PcrReactionTable component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
-    // Ensure well coordinates are displayed correctly
-    let rowNumber = 0;
-    wrapper.find("table tbody tr").forEach((row) => {
-      // Well coordinates
-      expect(row.find("td").at(0).text()).toEqual(
-        PCR_BATCH_ITEMS?.[rowNumber]?.storageUnitUsage?.wellRow +
-          "" +
-          PCR_BATCH_ITEMS?.[rowNumber]?.storageUnitUsage?.wellColumn
-      );
 
-      // Tube Number
-      expect(row.find("td").at(1).text()).toEqual(
-        "" + PCR_BATCH_ITEMS?.[rowNumber]?.storageUnitUsage?.cellNumber
-      );
+    const tableRows = wrapper.getAllByRole("row");
+    expect(tableRows).toHaveLength(31); // 30 + header
 
-      // Primary ID
-      expect(row.find("td").at(2).text()).toEqual(
-        "" + MATERIAL_SAMPLES?.[rowNumber]?.materialSampleName
-      );
+    const expectedWellCoordinates = [
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5",
+      "B1",
+      "B2",
+      "B3",
+      "B4",
+      "B5",
+      "C1",
+      "C2",
+      "C3",
+      "C4",
+      "C5",
+      "D1",
+      "D2",
+      "D3",
+      "D4",
+      "D5",
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "F5"
+    ];
+    expectedWellCoordinates.forEach((cellData, index) => {
+      // Verify the well coordinates.
+      expect(wrapper.getByRole("cell", { name: cellData })).toBeInTheDocument();
 
-      // Scientific Name
-      expect(row.find("td").at(3).text()).toEqual("scientificName");
-
-      // Result
-      expect(row.find("td").at(4).html()).toMatchSnapshot(
-        `result band for row number: ${rowNumber}`
-      );
-      rowNumber++;
+      // Verify the tube number and primary id.
+      expect(
+        wrapper.getAllByRole("cell", { name: index + 1 + "" }).length
+      ).toBe(2);
     });
+
+    expect(
+      wrapper.getAllByRole("cell", { name: /scientificname/i }).length
+    ).toBe(30);
+    expect(wrapper.getAllByRole("cell", { name: "Good Band" }).length).toBe(5);
+    expect(wrapper.getAllByRole("cell", { name: "Weak Band" }).length).toBe(5);
+    expect(
+      wrapper.getAllByRole("cell", { name: "Multiple Bands" }).length
+    ).toBe(5);
+    expect(wrapper.getAllByRole("cell", { name: "Contaminated" }).length).toBe(
+      5
+    );
+    expect(wrapper.getAllByRole("cell", { name: "Smear" }).length).toBe(5);
+    expect(wrapper.getAllByRole("cell", { name: "Custom Result" }).length).toBe(
+      1
+    );
   });
 });

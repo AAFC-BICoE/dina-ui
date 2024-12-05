@@ -1,5 +1,4 @@
-import { DefaultRow } from "../../../../common-ui/lib";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { RevisionsPageLayout } from "../RevisionsPageLayout";
 
 const TEST_SNAPSHOTS = [
@@ -31,7 +30,7 @@ const mockGet = jest.fn(async (path) => {
 
 describe("RevisionsPageLayout component", () => {
   it("Renders the revisions.", async () => {
-    const wrapper = mountWithAppContext(
+    mountWithAppContext2(
       <RevisionsPageLayout
         auditSnapshotPath="objectstore-api/audit-snapshots"
         instanceId={`metadata/471bf855-f5da-492a-a58e-922238e5a257`}
@@ -40,8 +39,17 @@ describe("RevisionsPageLayout component", () => {
     );
 
     await new Promise(setImmediate);
-    wrapper.update();
-    // Renders the 2 rows:
-    expect(wrapper.find(DefaultRow).length).toEqual(2);
+
+    const table = document.querySelector("table");
+    if (!table) {
+      fail("A table is expected at this point...");
+    }
+
+    const numRows = table.rows.length;
+    const numCols = table.rows[0].cells.length;
+
+    // Expect a specific table layout
+    expect(numRows).toEqual(3); // 2 rows including the header.
+    expect(numCols).toEqual(6);
   });
 });

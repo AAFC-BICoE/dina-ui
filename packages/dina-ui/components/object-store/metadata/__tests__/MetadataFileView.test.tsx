@@ -1,6 +1,7 @@
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataFileView } from "../MetadataFileView";
+import "@testing-library/jest-dom";
 
 const TEST_METADATA = {
   id: "9978066e-4367-4975-8e32-cc46068ff7f0",
@@ -53,17 +54,18 @@ describe("MetadataFileView component", () => {
       () =>
         "/objectstore-api/file/dao/derivative/529755e1-7d36-478c-b29b-679385de155b"
     );
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MetadataFileView
         metadata={TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE as Metadata}
       />,
       { apiContext }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find("img").prop("src")).toContain(
+    expect(
+      wrapper.getByRole("img", { name: /test caption 2/i })
+    ).toHaveAttribute(
+      "src",
       "/objectstore-api/file/dao/derivative/529755e1-7d36-478c-b29b-679385de155b"
     );
   });
@@ -72,49 +74,47 @@ describe("MetadataFileView component", () => {
     window.URL.createObjectURL = jest.fn(
       () => "/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7"
     );
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <MetadataFileView metadata={TEST_METADATA as Metadata} />,
       { apiContext }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find("img").prop("src")).toContain(
+    expect(
+      wrapper.getByRole("img", { name: /test caption 1/i })
+    ).toHaveAttribute(
+      "src",
       "/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7"
     );
   });
 
   it("Displays the shown file's type and caption.", async () => {
-    const wrapper1 = mountWithAppContext(
+    const wrapper1 = mountWithAppContext2(
       <MetadataFileView metadata={TEST_METADATA as Metadata} />,
       { apiContext }
     );
-
     await new Promise(setImmediate);
-    wrapper1.update();
 
-    expect(wrapper1.find(".shown-file-type").text()).toEqual(
-      "Showing: Original File"
-    );
-    expect(wrapper1.find(".metadata-caption").text()).toEqual(
-      "Caption: test caption 1"
-    );
-    const wrapper2 = mountWithAppContext(
+    expect(
+      wrapper1.container.querySelector(".shown-file-type")?.textContent
+    ).toEqual("Showing: Original File");
+    expect(
+      wrapper1.container.querySelector(".metadata-caption")?.textContent
+    ).toEqual("Caption: test caption 1");
+
+    const wrapper2 = mountWithAppContext2(
       <MetadataFileView
         metadata={TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE as Metadata}
       />,
       { apiContext }
     );
-
     await new Promise(setImmediate);
-    wrapper2.update();
 
-    expect(wrapper2.find(".shown-file-type").text()).toEqual(
-      "Showing: Large Image"
-    );
-    expect(wrapper2.find(".metadata-caption").text()).toEqual(
-      "Caption: test caption 2"
-    );
+    expect(
+      wrapper2.container.querySelector(".shown-file-type")?.textContent
+    ).toEqual("Showing: Large Image");
+    expect(
+      wrapper2.container.querySelector(".metadata-caption")?.textContent
+    ).toEqual("Caption: test caption 2");
   });
 });

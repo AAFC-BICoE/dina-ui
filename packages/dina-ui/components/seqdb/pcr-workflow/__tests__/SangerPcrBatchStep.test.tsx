@@ -1,7 +1,9 @@
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { SangerPcrBatchStep } from "../SangerPcrBatchStep";
 import { noop } from "lodash";
 import { PcrBatch } from "../../../../types/seqdb-api";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 const PCR_BATCH_ID = "test-batch-id";
 const PCR_BATCH_NAME = "test-batch";
@@ -55,8 +57,9 @@ const testCtx = {
 
 describe("SangerPcrBatchStep component", () => {
   beforeEach(jest.clearAllMocks);
+
   it("Creates a new PcrBatch", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <SangerPcrBatchStep
         onSaved={mockOnSaved}
         editMode={true}
@@ -66,18 +69,15 @@ describe("SangerPcrBatchStep component", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: PCR_BATCH_NAME } });
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /name/i }),
+      PCR_BATCH_NAME
+    );
 
-    wrapper.find("form").simulate("submit");
-
+    userEvent.click(wrapper.getByRole("button"));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockOnSaved).lastCalledWith(1, {
       storageUnit: {
@@ -97,7 +97,7 @@ describe("SangerPcrBatchStep component", () => {
   });
 
   it("Edits an existing PcrBatch", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <SangerPcrBatchStep
         onSaved={mockOnSaved}
         pcrBatchId={PCR_BATCH_ID}
@@ -109,44 +109,35 @@ describe("SangerPcrBatchStep component", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // The form is initially in read-only mode:
-    expect(wrapper.find(".name-field .field-view").text()).toEqual(
-      PCR_BATCH_NAME
-    );
-
-    wrapper.update();
+    expect(wrapper.getByText(/test\-batch/i)).toBeInTheDocument();
+    wrapper.unmount();
 
     // Go to edit mode:
-    wrapper.setProps({
-      children: (
-        <SangerPcrBatchStep
-          onSaved={mockOnSaved}
-          pcrBatchId={PCR_BATCH_ID}
-          pcrBatch={PCR_BATCH}
-          editMode={true} // Change to edit mode.
-          setEditMode={noop}
-          performSave={false}
-          setPerformSave={noop}
-        />
-      )
-    });
-
+    const wrapper2 = mountWithAppContext2(
+      <SangerPcrBatchStep
+        onSaved={mockOnSaved}
+        pcrBatchId={PCR_BATCH_ID}
+        pcrBatch={PCR_BATCH}
+        editMode={true}
+        setEditMode={noop}
+        performSave={false}
+        setPerformSave={noop}
+      />,
+      testCtx
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Edit a field:
-    wrapper
-      .find(".objective-field input")
-      .simulate("change", { target: { value: "test-objective" } });
+    userEvent.type(
+      wrapper2.getByRole("textbox", { name: /objective/i }),
+      "test-objective"
+    );
 
-    wrapper.find("form").simulate("submit");
-
+    userEvent.click(wrapper2.getByRole("button"));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockOnSaved).lastCalledWith(1, {
       storageUnit: {

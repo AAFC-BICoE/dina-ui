@@ -1,8 +1,11 @@
 import { StorageUnit } from "../../../../types/collection-api";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { SangerPcrBatchItemGridStep } from "../pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { noop } from "lodash";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 
 const PCR_BATCH_ID = "pcr-batch-id";
 const PCR_BATCH_ITEM_ID_1 = "pcr-batch-item-id-1";
@@ -319,8 +322,29 @@ describe("SangerPcrBatchItemGridStep component", () => {
     ];
   });
 
+  function TestContainer() {
+    const [save, setSave] = useState<boolean>(false);
+    const [edit, setEdit] = useState<boolean>(false);
+
+    return (
+      <>
+        <button onClick={() => setSave(true)}>Perform Save</button>
+        <button onClick={() => setEdit(true)}>Switch to Edit</button>
+        <SangerPcrBatchItemGridStep
+          pcrBatch={PCR_BATCH}
+          pcrBatchId={PCR_BATCH_ID}
+          editMode={edit}
+          setEditMode={setEdit}
+          performSave={save}
+          setPerformSave={setSave}
+          onSaved={mockOnSaved}
+        />
+      </>
+    );
+  }
+
   it("Display material samples in selection list", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
@@ -332,35 +356,36 @@ describe("SangerPcrBatchItemGridStep component", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".alert").exists()).toBeFalsy();
+    // Alert should not appear at this point.
+    expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
 
     // Expect material sample list to be populated with material samples not in the container yet.
-    expect(wrapper.find(".available-sample-list").children()).toHaveLength(3);
-    expect(wrapper.find(".available-sample-list li").at(0).text()).toEqual(
-      MATERIAL_SAMPLE_NAME_1
-    );
-    expect(wrapper.find(".available-sample-list li").at(1).text()).toEqual(
-      MATERIAL_SAMPLE_NAME_2
-    );
-    expect(wrapper.find(".available-sample-list li").at(2).text()).toEqual(
-      MATERIAL_SAMPLE_NAME_3
-    );
+    expect(
+      wrapper.getByText(/selected material samples \(3 in list\)/i)
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("link", { name: MATERIAL_SAMPLE_NAME_1 })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("link", { name: MATERIAL_SAMPLE_NAME_2 })
+    ).toBeInTheDocument();
+    expect(
+      wrapper.getByRole("link", { name: MATERIAL_SAMPLE_NAME_3 })
+    ).toBeInTheDocument();
 
     // Expect material samples already saved to the grid to be rendered on it.
-    expect(wrapper.find(".well-A_1").find(".sample-box-text").text()).toEqual(
+    expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
       MATERIAL_SAMPLE_NAME_4
     );
-    expect(wrapper.find(".well-A_2").find(".sample-box-text").text()).toEqual(
+    expect(wrapper.container.querySelector(".well-A_2")?.textContent).toEqual(
       MATERIAL_SAMPLE_NAME_5
     );
   });
 
   it("Switch between view and edit mode", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
@@ -372,45 +397,41 @@ describe("SangerPcrBatchItemGridStep component", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Read only mode, certain buttons should be hidden from the user.
-    expect(wrapper.find(".move-all").exists()).toBeFalsy();
-    expect(wrapper.find(".grid-clear").exists()).toBeFalsy();
-    expect(wrapper.find(".fill-by").exists()).toBeFalsy();
+    expect(wrapper.container.querySelector(".move-all")).toBeNull();
+    expect(wrapper.container.querySelector(".grid-clear")).toBeNull();
+    expect(wrapper.container.querySelector(".fill-by")).toBeNull();
+    wrapper.unmount();
 
     // Switch to edit mode.
-    wrapper.setProps({
-      children: (
-        <SangerPcrBatchItemGridStep
-          pcrBatch={PCR_BATCH}
-          pcrBatchId={PCR_BATCH_ID}
-          editMode={true}
-          setEditMode={noop}
-          performSave={false}
-          setPerformSave={noop}
-          onSaved={mockOnSaved}
-        />
-      )
-    });
-
+    const wrapper2 = mountWithAppContext2(
+      <SangerPcrBatchItemGridStep
+        pcrBatch={PCR_BATCH}
+        pcrBatchId={PCR_BATCH_ID}
+        editMode={true}
+        setEditMode={noop}
+        performSave={false}
+        setPerformSave={noop}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Read only mode, certain buttons should be hidden from the user.
-    expect(wrapper.find(".move-all").exists()).toBeTruthy();
-    expect(wrapper.find(".grid-clear").exists()).toBeTruthy();
-    expect(wrapper.find(".fill-by").exists()).toBeTruthy();
+    expect(wrapper2.container.querySelector(".move-all")).not.toBeNull();
+    expect(wrapper2.container.querySelector(".grid-clear")).not.toBeNull();
+    expect(wrapper2.container.querySelector(".fill-by")).not.toBeNull();
   });
 
   it("Pre-populate fill by and grid row and columns", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH}
         pcrBatchId={PCR_BATCH_ID}
-        editMode={false}
+        editMode={true}
         setEditMode={noop}
         performSave={false}
         setPerformSave={noop}
@@ -418,139 +439,72 @@ describe("SangerPcrBatchItemGridStep component", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
-
-    // Switch to edit mode.
-    wrapper.setProps({
-      children: (
-        <SangerPcrBatchItemGridStep
-          pcrBatch={PCR_BATCH}
-          pcrBatchId={PCR_BATCH_ID}
-          editMode={true}
-          setEditMode={noop}
-          performSave={false}
-          setPerformSave={noop}
-          onSaved={mockOnSaved}
-        />
-      )
-    });
-
-    await new Promise(setImmediate);
-    wrapper.update();
 
     // The fill by column should be pre-selected.
-    expect(wrapper.find(".COLUMN-radio").props()).toHaveProperty("checked");
+    expect(wrapper.getByRole("radio", { name: /column/i })).toHaveProperty(
+      "checked"
+    );
 
     // Should be 8 (+1 for the column displaying the row letters)
-    expect(wrapper.find("thead tr").children()).toHaveLength(GRID_COL_SIZE + 1);
+    expect(wrapper.getByText("8")).toBeInTheDocument();
 
     // Should be 5 (React Table renders the header separately so it's not counted here.)
-    expect(wrapper.find("tbody").children()).toHaveLength(GRID_ROW_SIZE);
+    expect(wrapper.getByText("E")).toBeInTheDocument();
   });
 
   it("Move all functionality", async () => {
-    const wrapper = mountWithAppContext(
-      <SangerPcrBatchItemGridStep
-        pcrBatch={PCR_BATCH}
-        pcrBatchId={PCR_BATCH_ID}
-        editMode={false}
-        setEditMode={noop}
-        performSave={false}
-        setPerformSave={noop}
-        onSaved={mockOnSaved}
-      />,
-      testCtx
-    );
-
+    const wrapper = mountWithAppContext2(<TestContainer />, testCtx);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Switch to edit mode.
-    wrapper.setProps({
-      children: (
-        <SangerPcrBatchItemGridStep
-          pcrBatch={PCR_BATCH}
-          pcrBatchId={PCR_BATCH_ID}
-          editMode={true}
-          setEditMode={noop}
-          performSave={false}
-          setPerformSave={noop}
-          onSaved={mockOnSaved}
-        />
-      )
-    });
-
+    userEvent.click(wrapper.getByRole("button", { name: /switch to edit/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Clear the grid first, cannot move with items in the grid.
-    wrapper.find(".grid-clear").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Click the "Move All" button.
-    wrapper.find(".move-all").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button", { name: /move all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Expect the results to fill by column.
-    expect(wrapper.find(".well-A_1").find(".sample-box-text").text()).toEqual(
+    expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
       MATERIAL_SAMPLE_NAME_1
     );
-    expect(wrapper.find(".well-B_1").find(".sample-box-text").text()).toEqual(
+    expect(wrapper.container.querySelector(".well-B_1")?.textContent).toEqual(
       MATERIAL_SAMPLE_NAME_2
     );
-    expect(wrapper.find(".well-C_1").find(".sample-box-text").text()).toEqual(
+    expect(wrapper.container.querySelector(".well-C_1")?.textContent).toEqual(
       MATERIAL_SAMPLE_NAME_3
     );
 
     // Click the fill by row and try moving it again.
-    wrapper.find(".ROW-radio").simulate("click");
+    userEvent.click(wrapper.getByRole("radio", { name: /row/i }));
 
     // Clear the grid first, cannot move with items in the grid.
-    wrapper.find(".grid-clear").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Click the "Move All" button.
-    wrapper.find(".move-all").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button", { name: /move all/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
-    // Expect the results to fill by column.
-    expect(wrapper.find(".well-A_1").find(".sample-box-text").text()).toEqual(
+    // Expect the results to fill by row.
+    expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
       MATERIAL_SAMPLE_NAME_1
     );
-    expect(wrapper.find(".well-A_2").find(".sample-box-text").text()).toEqual(
+    expect(wrapper.container.querySelector(".well-A_2")?.textContent).toEqual(
       MATERIAL_SAMPLE_NAME_2
     );
-    expect(wrapper.find(".well-A_3").find(".sample-box-text").text()).toEqual(
+    expect(wrapper.container.querySelector(".well-A_3")?.textContent).toEqual(
       MATERIAL_SAMPLE_NAME_3
     );
 
     // Save the container...
-    wrapper.setProps({
-      children: (
-        <SangerPcrBatchItemGridStep
-          pcrBatch={PCR_BATCH}
-          pcrBatchId={PCR_BATCH_ID}
-          editMode={true}
-          setEditMode={noop}
-          performSave={true} // Perform save...
-          setPerformSave={noop}
-          onSaved={mockOnSaved}
-        />
-      )
-    });
-
+    userEvent.click(wrapper.getByRole("button", { name: /perform save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockSave).lastCalledWith(
       [
@@ -615,71 +569,28 @@ describe("SangerPcrBatchItemGridStep component", () => {
   });
 
   it("Load existing records and clear grid", async () => {
-    const wrapper = mountWithAppContext(
-      <SangerPcrBatchItemGridStep
-        pcrBatch={PCR_BATCH}
-        pcrBatchId={PCR_BATCH_ID}
-        editMode={false}
-        setEditMode={noop}
-        performSave={false}
-        setPerformSave={noop}
-        onSaved={jest.fn()}
-      />,
-      testCtx
-    );
-
+    const wrapper = mountWithAppContext2(<TestContainer />, testCtx);
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Expect material samples already saved to the grid to be rendered on it.
-    expect(wrapper.find(".well-A_1").find(".sample-box-text").text()).toEqual(
+    expect(wrapper.container.querySelector(".well-A_1")?.textContent).toEqual(
       MATERIAL_SAMPLE_NAME_4
     );
-    expect(wrapper.find(".well-A_2").find(".sample-box-text").text()).toEqual(
+    expect(wrapper.container.querySelector(".well-A_2")?.textContent).toEqual(
       MATERIAL_SAMPLE_NAME_5
     );
 
     // Switch to edit mode...
-    wrapper.setProps({
-      children: (
-        <SangerPcrBatchItemGridStep
-          pcrBatch={PCR_BATCH}
-          pcrBatchId={PCR_BATCH_ID}
-          editMode={true}
-          setEditMode={noop}
-          performSave={false}
-          setPerformSave={noop}
-          onSaved={mockOnSaved}
-        />
-      )
-    });
-
+    userEvent.click(wrapper.getByRole("button", { name: /switch to edit/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Click the "Clear all" button.
-    wrapper.find(".grid-clear").simulate("click");
-
+    userEvent.click(wrapper.getByRole("button", { name: /clear grid/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Save the container...
-    wrapper.setProps({
-      children: (
-        <SangerPcrBatchItemGridStep
-          pcrBatch={PCR_BATCH}
-          pcrBatchId={PCR_BATCH_ID}
-          editMode={true}
-          setEditMode={noop}
-          performSave={true} // Perform save...
-          setPerformSave={noop}
-          onSaved={mockOnSaved}
-        />
-      )
-    });
-
+    userEvent.click(wrapper.getByRole("button", { name: /perform save/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Only 4 and 5 has been changed and should be in the save request.
     expect(mockSave).lastCalledWith(
@@ -702,7 +613,7 @@ describe("SangerPcrBatchItemGridStep component", () => {
   });
 
   it("Display message if no storage unit is provided on PcrBatch", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <SangerPcrBatchItemGridStep
         pcrBatch={PCR_BATCH_NO_STORAGE}
         pcrBatchId={PCR_BATCH_ID}
@@ -714,11 +625,13 @@ describe("SangerPcrBatchItemGridStep component", () => {
       />,
       testCtx
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Look for alert message.
-    expect(wrapper.find(".alert").exists()).toBeTruthy();
+    expect(
+      wrapper.getByText(
+        /storage definition must be set to use the container grid\./i
+      )
+    ).toBeInTheDocument();
   });
 });

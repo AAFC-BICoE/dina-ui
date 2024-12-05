@@ -267,7 +267,10 @@ function StorageUnitCollapser({
     : true;
 
   return (
-    <div className={`d-flex flex-row gap-2 collapser-for-${storageUnit.id}`}>
+    <div
+      className={`d-flex flex-row gap-2 collapser-for-${storageUnit.id}`}
+      data-testid={`collapser-button-${storageUnit.id}`}
+    >
       <CollapserIcon
         onKeyPress={toggle}
         onClick={toggle}
