@@ -68,7 +68,8 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             name: "xmpMetadataDate",
             value: <DateView date={metadata.xmpMetadataDate} />
           },
-          "acMetadataCreator.displayName"
+          "acMetadataCreator.displayName",
+          ...(isExternalResource ? ["resourceExternalURL"] : [])
         ]}
         title={
           isExternalResource
@@ -90,7 +91,6 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
-          ...(isExternalResource ? ["resourceExternalURL"] : []),
           "dcFormat",
           "acCaption",
           "dcType",
