@@ -1,6 +1,7 @@
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/objectstore-api";
 import { ReferenceLink } from "../ReferenceLink";
+import "@testing-library/jest-dom";
 
 const mockGet = jest.fn(async () => ({
   data: {
@@ -12,7 +13,7 @@ const mockGet = jest.fn(async () => ({
 
 describe("ReferenceLink component", () => {
   it("Renders the link to a resource.", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <ReferenceLink<Person>
         baseApiPath="agent-api"
         type="person"
@@ -27,13 +28,12 @@ describe("ReferenceLink component", () => {
       />,
       { apiContext: { apiClient: { get: mockGet } as any } }
     );
-
     await new Promise(setImmediate);
-    wrapper.update();
 
     // Shows the custom ".display-name" span and the link:
-    expect(wrapper.find(".display-name").text()).toEqual("Mat Poff");
-    expect(wrapper.find("a").prop("href")).toEqual(
+    expect(wrapper.getByText(/mat poff/i)).toBeInTheDocument();
+    expect(wrapper.getByRole("link")).toHaveAttribute(
+      "href",
       "/person/view?id=64047517-b7d4-4af9-af86-4bef3ff36950"
     );
   });
