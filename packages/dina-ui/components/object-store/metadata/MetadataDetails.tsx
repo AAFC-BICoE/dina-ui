@@ -51,6 +51,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
+          ...(isExternalResource ? ["resourceExternalURL"] : []),
           ...(!isExternalResource ? ["originalFilename"] : []),
           {
             name: "acDigitizationDate",
@@ -90,7 +91,6 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
-          ...(isExternalResource ? ["resourceExternalURL"] : []),
           "dcFormat",
           "acCaption",
           "dcType",

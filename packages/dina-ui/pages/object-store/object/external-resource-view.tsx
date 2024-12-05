@@ -9,7 +9,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMetadataViewQuery } from "../../../components/object-store/metadata/useMetadata";
-import { Footer, Head, Nav } from "../../../components";
+import { Footer, Head, Nav, TagSelectReadOnly } from "../../../components";
 import { MetadataDetails } from "../../../components/object-store";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
@@ -68,6 +68,7 @@ export default function ExternalResourceMetadataViewPage() {
             {metadata.derivatives && (
               <MetadataFileView metadata={metadata} imgHeight="15rem" />
             )}
+            <TagSelectReadOnly tagsFieldName="acTags" />
             <MetadataDetails metadata={metadata} />
           </DinaForm>
         </main>
