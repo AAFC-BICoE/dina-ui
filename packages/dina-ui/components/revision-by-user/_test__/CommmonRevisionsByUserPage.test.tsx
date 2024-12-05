@@ -1,9 +1,10 @@
-import { DefaultRow } from "../../../../common-ui/lib";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { OBJECT_STORE_MODULE_REVISION_ROW_CONFIG } from "../../revisions/revision-modules";
 import RevisionsByUserPage, {
   AuthorFilterForm
 } from "../CommonRevisionsByUserPage";
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
 
 const TEST_SNAPSHOTS = [
   {
@@ -42,7 +43,7 @@ describe("MetadataRevisionListPage", () => {
   it("Renders the page.", async () => {
     mockUseRouter.mockReturnValue({ query: { author: "MatPoff" } });
 
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <RevisionsByUserPage
         snapshotPath="objectstore-api/audit-snapshot"
         revisionRowConfigsByType={OBJECT_STORE_MODULE_REVISION_ROW_CONFIG}
@@ -54,13 +55,26 @@ describe("MetadataRevisionListPage", () => {
 
     // Await revisions query:
     await new Promise(setImmediate);
-    wrapper.update();
+
+    const table = document.querySelector("table");
+    if (!table) {
+      fail("Table should exist at this point...");
+    }
+
+    // Get the number of rows
+    const numRows = table.rows.length;
+
+    // Get the number of columns in the first row (assuming consistent structure)
+    const numCols = table.rows[0].cells.length;
 
     // Renders the 2 revision rows:
-    expect(wrapper.find(DefaultRow).length).toEqual(2);
+    expect(numRows).toEqual(3);
+    expect(numCols).toEqual(8);
 
     // Renders the metadata's resource name cell:
-    expect(wrapper.find("name a").first().text()).toEqual("my-image-1.png");
+    expect(
+      wrapper.getAllByRole("link", { name: /my\-image\-1\.png/i }).at(0)
+    ).toHaveTextContent("my-image-1.png");
   });
 
   it("Provides a search input for author.", async () => {
@@ -71,16 +85,14 @@ describe("MetadataRevisionListPage", () => {
       query: {}
     });
 
-    const wrapper = mountWithAppContext(<AuthorFilterForm />);
+    const wrapper = mountWithAppContext2(<AuthorFilterForm />);
 
-    wrapper
-      .find(".author-field input")
-      .simulate("change", { target: { value: "searched-author" } });
-
-    wrapper.find("form").simulate("submit");
-
+    userEvent.type(
+      wrapper.getByRole("textbox", { name: /author/i }),
+      "searched-author"
+    );
+    userEvent.click(wrapper.getByRole("button", { name: /search/i }));
     await new Promise(setImmediate);
-    wrapper.update();
 
     expect(mockPush).lastCalledWith({
       pathname: "the-page-url",
