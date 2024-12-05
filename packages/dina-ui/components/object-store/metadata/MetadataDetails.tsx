@@ -51,6 +51,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
+          ...(isExternalResource ? ["resourceExternalURL"] : []),
           ...(!isExternalResource ? ["originalFilename"] : []),
           {
             name: "acDigitizationDate",
@@ -68,8 +69,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             name: "xmpMetadataDate",
             value: <DateView date={metadata.xmpMetadataDate} />
           },
-          "acMetadataCreator.displayName",
-          ...(isExternalResource ? ["resourceExternalURL"] : [])
+          "acMetadataCreator.displayName"
         ]}
         title={
           isExternalResource
