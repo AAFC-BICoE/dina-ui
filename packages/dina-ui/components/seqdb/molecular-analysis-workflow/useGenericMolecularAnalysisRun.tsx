@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { filterBy, SaveArgs, useApiClient, useQuery } from "common-ui";
 import { StorageUnitUsage } from "packages/dina-ui/types/collection-api/resources/StorageUnitUsage";
 import { PersistedResource } from "kitsu";
@@ -90,6 +90,13 @@ export interface UseGenericMolecularAnalysisRunReturn {
    * be saved directly.
    */
   setAttachments: (newMetadatas: ResourceIdentifierObject[]) => void;
+
+  /**
+   * Callback to set the molecular analysis run item names
+   */
+  setMolecularAnalysisRunItemNames?: Dispatch<
+    SetStateAction<(string | undefined)[]>
+  >;
 }
 
 export function useGenericMolecularAnalysisRun({
@@ -121,6 +128,10 @@ export function useGenericMolecularAnalysisRun({
   const [attachments, setAttachments] = useState<ResourceIdentifierObject[]>(
     []
   );
+
+  // Molecular Analysis Run Item names
+  const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
+    useState<(string | undefined)[]>([]);
 
   // Network Requests, starting with the GenericMolecularAnalysisItem
   useQuery<GenericMolecularAnalysisItem[]>(
@@ -339,11 +350,12 @@ export function useGenericMolecularAnalysisRun({
 
       // Create a run item for each seq reaction.
       const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-        sequencingRunItems.map(() => ({
+        sequencingRunItems.map((_item, index) => ({
           type: "molecular-analysis-run-item",
           resource: {
             type: "molecular-analysis-run-item",
             usageType: "generic-molecular-analysis-item",
+            name: molecularAnalysisRunItemNames[index],
             relationships: {
               run: {
                 data: {
@@ -352,7 +364,7 @@ export function useGenericMolecularAnalysisRun({
                 }
               }
             }
-          } as any
+          }
         }));
       const savedMolecularAnalysisRunItem = await save(
         molecularAnalysisRunItemSaveArgs,
@@ -493,7 +505,8 @@ export function useGenericMolecularAnalysisRun({
     sequencingRunItems,
     attachments,
     setAttachments,
-    sequencingRunId: sequencingRun?.id
+    sequencingRunId: sequencingRun?.id,
+    setMolecularAnalysisRunItemNames
   };
 }
 

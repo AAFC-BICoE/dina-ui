@@ -1157,5 +1157,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Changing the storage unit type will clear the existing storage coordinates stored.",
   changingTheStorageUnitTypeWillDeleteWarningButtonText: "Proceed",
   seqdbManagedAttributeTitle: "Sequencing",
-  genericMolecularAnalysis: "Generic Molecular Analysis"
+  genericMolecularAnalysis: "Generic Molecular Analysis",
+  molecularAnalysisRunItemName: "Run Item Name"
 };

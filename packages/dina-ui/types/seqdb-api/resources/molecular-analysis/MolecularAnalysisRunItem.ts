@@ -7,6 +7,7 @@ export interface MolecularAnalysisRunItemAttributes {
   createdBy?: string;
   createdOn?: string;
   usageType: string;
+  name?: string;
 }
 
 export interface MolecularAnalysisRunItemRelationships {
