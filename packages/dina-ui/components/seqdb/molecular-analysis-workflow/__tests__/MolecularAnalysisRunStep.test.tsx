@@ -1,6 +1,10 @@
 import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
 import { noop } from "lodash";
-import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  waitFor,
+  waitForElementToBeRemoved,
+  screen
+} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -145,7 +149,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
 
     // Run name should be in the textbox.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+    const sequencingRunNameInput = wrapper.container.querySelector(
+      'input[name="sequencingRunName"]'
+    );
+    expect(sequencingRunNameInput).toHaveDisplayValue("run-name-1");
 
     // Ensure Primary IDs are rendered in the table with links:
     expect(
@@ -205,7 +212,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ).toBeInTheDocument();
 
     // Run name should be in the textbox for the first run found.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+    const sequencingRunNameInput = wrapper.container.querySelector(
+      'input[name="sequencingRunName"]'
+    );
+    expect(sequencingRunNameInput).toHaveDisplayValue("run-name-1");
 
     // Set edit mode should not be triggered in this test.
     expect(mockSetEditMode).toBeCalledTimes(0);
@@ -249,7 +259,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     });
 
     // Expect the Sequencing run to be empty since no run exists yet.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("");
+    const sequencingRunNameInput = wrapper.container.querySelector(
+      'input[name="sequencingRunName"]'
+    );
+    expect(sequencingRunNameInput).toHaveDisplayValue("");
 
     // Try saving with no sequencing run name, it should report an error.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -263,7 +276,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ).toBeInTheDocument();
 
     // Type a name for the run to be created.
-    userEvent.type(wrapper.getByRole("textbox"), "My new run");
+    userEvent.type(sequencingRunNameInput!, "My new run");
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -422,8 +435,11 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Change the sequencing run name to something different.
-    userEvent.clear(wrapper.getByRole("textbox"));
-    userEvent.type(wrapper.getByRole("textbox"), "Updated run name");
+    const sequencingRunNameInput = wrapper.container.querySelector(
+      'input[name="sequencingRunName"]'
+    );
+    userEvent.clear(sequencingRunNameInput!);
+    userEvent.type(sequencingRunNameInput!, "Updated run name");
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
