@@ -95,7 +95,7 @@ export interface UseGenericMolecularAnalysisRunReturn {
    * Callback to set the molecular analysis run item names
    */
   setMolecularAnalysisRunItemNames?: Dispatch<
-    SetStateAction<(string | undefined)[]>
+    SetStateAction<Record<string, string>>
   >;
 }
 
@@ -128,10 +128,15 @@ export function useGenericMolecularAnalysisRun({
   const [attachments, setAttachments] = useState<ResourceIdentifierObject[]>(
     []
   );
+  // Used to determine if the resource needs to be reloaded.
+  const [
+    reloadGenericMolecularAnalysisRun,
+    setReloadGenericMolecularAnalysisRun
+  ] = useState<number>(Date.now());
 
-  // Molecular Analysis Run Item names
+  // Map of MolecularAnalysisRunItem {id:name}
   const [molecularAnalysisRunItemNames, setMolecularAnalysisRunItemNames] =
-    useState<(string | undefined)[]>([]);
+    useState<Record<string, string>>({});
 
   // Network Requests, starting with the GenericMolecularAnalysisItem
   useQuery<GenericMolecularAnalysisItem[]>(
@@ -151,6 +156,7 @@ export function useGenericMolecularAnalysisRun({
         "storageUnitUsage,materialSample,molecularAnalysisRunItem,molecularAnalysisRunItem.run"
     },
     {
+      deps: [reloadGenericMolecularAnalysisRun],
       onSuccess: async ({ data: genericMolecularAnalysisItems }) => {
         /**
          * Fetch StorageUnitUsage linked to each GenericMolecularAnalysisItems. This will perform the API request
@@ -350,22 +356,29 @@ export function useGenericMolecularAnalysisRun({
 
       // Create a run item for each seq reaction.
       const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-        sequencingRunItems.map((_item, index) => ({
-          type: "molecular-analysis-run-item",
-          resource: {
+        sequencingRunItems.map((item) => {
+          const molecularAnalysisRunItemName = item.materialSampleSummary?.id
+            ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
+            : undefined;
+          return {
             type: "molecular-analysis-run-item",
-            usageType: "generic-molecular-analysis-item",
-            name: molecularAnalysisRunItemNames[index],
-            relationships: {
-              run: {
-                data: {
-                  id: savedMolecularAnalysisRun[0].id,
-                  type: "molecular-analysis-run"
+            resource: {
+              type: "molecular-analysis-run-item",
+              usageType: "generic-molecular-analysis-item",
+              ...(molecularAnalysisRunItemName && {
+                name: molecularAnalysisRunItemName
+              }),
+              relationships: {
+                run: {
+                  data: {
+                    id: savedMolecularAnalysisRun[0].id,
+                    type: "molecular-analysis-run"
+                  }
                 }
               }
             }
-          }
-        }));
+          };
+        });
       const savedMolecularAnalysisRunItem = await save(
         molecularAnalysisRunItemSaveArgs,
         { apiBaseUrl: "/seqdb-api" }
@@ -449,10 +462,34 @@ export function useGenericMolecularAnalysisRun({
         apiBaseUrl: "/seqdb-api"
       });
 
+      // Update existing MolecularAnalysisRunItem names
+      if (sequencingRunItems) {
+        const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+          sequencingRunItems.map((item) => {
+            const molecularAnalysisRunItemName = item.materialSampleSummary?.id
+              ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
+              : undefined;
+            return {
+              type: "molecular-analysis-run-item",
+              resource: {
+                id: item.molecularAnalysisRunItemId,
+                type: "molecular-analysis-run-item",
+                ...(molecularAnalysisRunItemName && {
+                  name: molecularAnalysisRunItemName
+                })
+              }
+            };
+          });
+        await save(molecularAnalysisRunItemSaveArgs, {
+          apiBaseUrl: "/seqdb-api"
+        });
+      }
+
       // Go back to view mode once completed.
       setPerformSave(false);
       setEditMode(false);
       setLoading(false);
+      setReloadGenericMolecularAnalysisRun(Date.now());
     } catch (error) {
       console.error("Error updating sequencing run: ", error);
       setPerformSave(false);

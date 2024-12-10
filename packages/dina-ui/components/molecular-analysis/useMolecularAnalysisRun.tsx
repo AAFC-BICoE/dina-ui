@@ -1,12 +1,16 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState
+} from "react";
 import {
   BulkGetOptions,
   FieldHeader,
   filterBy,
-  rsql,
   SaveArgs,
-  TextField,
   useApiClient,
   useQuery,
   useStringComparator
@@ -737,10 +741,12 @@ export function getMolecularAnalysisRunColumns(
   compareByStringAndNumber,
   type,
   setMolecularAnalysisRunItemNames?: Dispatch<
-    SetStateAction<(string | undefined)[]>
+    SetStateAction<Record<string, string>>
   >,
   readOnly?: boolean
 ) {
+  // const formik = useDinaFormContext();
+  // console.log(formik);
   // Table columns to display for the sequencing run.
   const SEQ_REACTION_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
@@ -893,20 +899,28 @@ export function getMolecularAnalysisRunColumns(
     },
     {
       id: "molecularAnalysisRunItem.name",
-      cell: ({ row: { original, index } }) => {
+      cell: ({ row: { original } }) => {
         return readOnly ? (
           <>{original.molecularAnalysisRunItem?.name}</>
         ) : (
-          <TextField
-            name={`molecularAnalysisRunItem.name[${index}]`}
-            removeLabel={true}
-            onChangeExternal={(_form, _name, value) => {
+          <input
+            type="text"
+            className="w-100"
+            defaultValue={original.molecularAnalysisRunItem?.name}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setMolecularAnalysisRunItemNames?.(
                 (molecularAnalysisRunItemNames) => {
-                  if (molecularAnalysisRunItemNames.length >= index) {
-                    molecularAnalysisRunItemNames[index] = value ?? undefined;
+                  const molecularAnalysisRunItemNamesMap =
+                    molecularAnalysisRunItemNames;
+                  if (
+                    original?.materialSampleSummary?.id &&
+                    event.target.value
+                  ) {
+                    molecularAnalysisRunItemNamesMap[
+                      original?.materialSampleSummary?.id
+                    ] = event.target.value;
                   }
-                  return molecularAnalysisRunItemNames;
+                  return molecularAnalysisRunItemNamesMap;
                 }
               );
             }}
