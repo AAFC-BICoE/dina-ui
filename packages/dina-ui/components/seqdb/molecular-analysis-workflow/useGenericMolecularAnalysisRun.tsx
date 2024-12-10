@@ -465,24 +465,27 @@ export function useGenericMolecularAnalysisRun({
       // Update existing MolecularAnalysisRunItem names
       if (sequencingRunItems) {
         const molecularAnalysisRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
-          sequencingRunItems.map((item) => {
-            const molecularAnalysisRunItemName = item.materialSampleSummary?.id
-              ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
-              : undefined;
-            return {
+          [];
+        sequencingRunItems.forEach((item) => {
+          const molecularAnalysisRunItemName = item.materialSampleSummary?.id
+            ? molecularAnalysisRunItemNames[item.materialSampleSummary?.id]
+            : undefined;
+          if (molecularAnalysisRunItemName) {
+            molecularAnalysisRunItemSaveArgs.push({
               type: "molecular-analysis-run-item",
               resource: {
                 id: item.molecularAnalysisRunItemId,
                 type: "molecular-analysis-run-item",
-                ...(molecularAnalysisRunItemName && {
-                  name: molecularAnalysisRunItemName
-                })
+                name: molecularAnalysisRunItemName
               }
-            };
-          });
-        await save(molecularAnalysisRunItemSaveArgs, {
-          apiBaseUrl: "/seqdb-api"
+            });
+          }
         });
+        if (molecularAnalysisRunItemSaveArgs.length) {
+          await save(molecularAnalysisRunItemSaveArgs, {
+            apiBaseUrl: "/seqdb-api"
+          });
+        }
       }
 
       // Go back to view mode once completed.

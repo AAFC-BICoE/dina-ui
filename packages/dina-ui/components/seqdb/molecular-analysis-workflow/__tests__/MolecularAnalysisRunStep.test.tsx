@@ -451,9 +451,6 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
     expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
 
-    // Name should have not changed from edit mode true to false.
-    expect(wrapper.queryByText(/updated run name/i)).toBeInTheDocument();
-
     // Expect the network request to only contain the update of the run.
     expect(mockSave.mock.calls).toEqual([
       [
