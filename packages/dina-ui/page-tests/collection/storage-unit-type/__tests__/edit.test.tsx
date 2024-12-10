@@ -1,6 +1,6 @@
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { StorageUnitTypeForm } from "../../../../pages/collection/storage-unit-type/edit";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 const mockGet = jest.fn<any, any>(async (path) => {
@@ -83,18 +83,17 @@ describe("Storage Unit Type form.", () => {
     );
     await new Promise(setImmediate);
 
-    // wrapper
-    //   .find(".name-field input")
-    //   .simulate("change", { target: { value: "edited-name" } });
+    // Change Name field value
     fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
       target: { value: "edited-name" }
     });
 
-    // wrapper.find("form").simulate("submit");
+    // Submit form
     fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
 
+    // Test expected result
     expect(mockSave).lastCalledWith(
       [
         {
