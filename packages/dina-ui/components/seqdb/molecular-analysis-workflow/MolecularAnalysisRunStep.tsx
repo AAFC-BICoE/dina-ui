@@ -10,7 +10,7 @@ import {
   ReactTable,
   useStringComparator
 } from "common-ui";
-import { Alert } from "react-bootstrap";
+import { Alert, Button } from "react-bootstrap";
 import { ColumnDef } from "@tanstack/react-table";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resources/GenericMolecularAnalysis";
@@ -43,6 +43,9 @@ export function MolecularAnalysisRunStep({
     setSequencingRunName,
     sequencingRunName,
     sequencingRunItems,
+    qualityControls,
+    createNewQualityControl,
+    deleteQualityControl,
     attachments,
     setAttachments,
     sequencingRunId
@@ -189,6 +192,8 @@ export function MolecularAnalysisRunStep({
               <p>{sequencingRunName}</p>
             )}
           </div>
+
+          {/* Sequencing Run Content */}
           <div className="col-12">
             <strong>
               <DinaMessage id="molecularAnalysisRunStep_sequencingRunContent" />
@@ -200,6 +205,26 @@ export function MolecularAnalysisRunStep({
               sort={[{ id: "wellCoordinates", desc: false }]}
             />
           </div>
+
+          {/* Sequencing Quality Control */}
+          <div className="col-12 mt-3">
+            <div className="d-flex align-items-center justify-content-between">
+              <strong>
+                <DinaMessage id="molecularAnalysisRunStep_sequencingQualityControl" />
+              </strong>
+              <Button
+                onClick={() => createNewQualityControl()}
+                className="add-datablock"
+              >
+                <DinaMessage id="addCustomPlaceName" />
+              </Button>
+            </div>
+            {qualityControls.map((qualityControl) => {
+              return <>Quality control!</>;
+            })}
+          </div>
+
+          {/* Attachments */}
           <div className="col-12 mt-3">
             <DinaForm initialValues={{}}>
               {editMode ? (

@@ -9,6 +9,7 @@ import { GenericMolecularAnalysis } from "packages/dina-ui/types/seqdb-api/resou
 import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRunItem";
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 
 export interface UseGenericMolecularAnalysisRunProps {
   molecularAnalysis: GenericMolecularAnalysis;
@@ -80,6 +81,24 @@ export interface UseGenericMolecularAnalysisRunReturn {
   sequencingRunId?: string;
 
   /**
+   * List of quality controls to be displayed. This is also used when they don't exist to be saved
+   * in.
+   */
+  qualityControls: QualityControl[];
+
+  /**
+   * Generates a blank quality control for the user to enter.
+   */
+  createNewQualityControl: () => void;
+
+  /**
+   * Based on the index, delete the quality control.
+   *
+   * @param index Index relative to the qualityControls array.
+   */
+  deleteQualityControl: (index: number) => void;
+
+  /**
    * Displays the current attachments. This is used since the run not might exist yet and can't
    * be saved directly.
    */
@@ -116,6 +135,9 @@ export function useGenericMolecularAnalysisRun({
   // Run Items
   const [sequencingRunItems, setSequencingRunItems] =
     useState<SequencingRunItem[]>();
+
+  // Quality control items
+  const [qualityControls, setQualityControls] = useState<QualityControl[]>([]);
 
   // Sequencing run attachments
   const [attachments, setAttachments] = useState<ResourceIdentifierObject[]>(
@@ -298,6 +320,34 @@ export function useGenericMolecularAnalysisRun({
   useEffect(() => {
     setErrorMessage(undefined);
   }, [editMode]);
+
+  /**
+   * Creates a new quality control object and adds it to the existing quality controls list.
+   */
+  function createNewQualityControl() {
+    setQualityControls([
+      ...qualityControls,
+      {
+        group: "",
+        name: "",
+        qcType: "",
+        type: "quality-control"
+      }
+    ]);
+  }
+
+  /**
+   * Deletes a quality control from the list at the specified index.
+   *
+   * @param {number} index - The index of the quality control to be deleted.
+   */
+  function deleteQualityControl(index: number) {
+    // Create a new array without the item at the specified index
+    const newQualityControls = qualityControls.filter((_, i) => i !== index);
+
+    // Update the state with the new array
+    setQualityControls(newQualityControls);
+  }
 
   async function createNewRun() {
     if (
@@ -492,6 +542,9 @@ export function useGenericMolecularAnalysisRun({
     setSequencingRunName,
     sequencingRunItems,
     attachments,
+    qualityControls,
+    createNewQualityControl,
+    deleteQualityControl,
     setAttachments,
     sequencingRunId: sequencingRun?.id
   };
