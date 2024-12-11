@@ -10,6 +10,8 @@ import { MolecularAnalysisRunItem } from "packages/dina-ui/types/seqdb-api/resou
 import { MolecularAnalysisRun } from "packages/dina-ui/types/seqdb-api/resources/molecular-analysis/MolecularAnalysisRun";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
+import useVocabularyOptions from "../../collection/useVocabularyOptions";
+import { VocabularyOption } from "../../collection/VocabularySelectField";
 
 export interface UseGenericMolecularAnalysisRunProps {
   molecularAnalysis: GenericMolecularAnalysis;
@@ -87,6 +89,11 @@ export interface UseGenericMolecularAnalysisRunReturn {
   qualityControls: QualityControl[];
 
   /**
+   * List of vocabularies options for the quality control type.
+   */
+  qualityControlTypes: VocabularyOption[];
+
+  /**
    * Generates a blank quality control for the user to enter.
    */
   createNewQualityControl: () => void;
@@ -97,6 +104,17 @@ export interface UseGenericMolecularAnalysisRunReturn {
    * @param index Index relative to the qualityControls array.
    */
   deleteQualityControl: (index: number) => void;
+
+  /**
+   * Updates an existing quality control at the specified index with a new quality control object.
+   *
+   * @param {number} index - The index of the quality control to be updated.
+   * @param {QualityControl} newQualityControl - The new quality control object to replace the old one.
+   */
+  updateQualityControl: (
+    index: number,
+    newQualityControl: QualityControl
+  ) => void;
 
   /**
    * Displays the current attachments. This is used since the run not might exist yet and can't
@@ -143,6 +161,11 @@ export function useGenericMolecularAnalysisRun({
   const [attachments, setAttachments] = useState<ResourceIdentifierObject[]>(
     []
   );
+
+  const { loading: loadingVocabularyItems, vocabOptions: qualityControlTypes } =
+    useVocabularyOptions({
+      path: "seqdb-api/vocabulary/qualityControlType"
+    });
 
   // Network Requests, starting with the GenericMolecularAnalysisItem
   useQuery<GenericMolecularAnalysisItem[]>(
@@ -334,6 +357,26 @@ export function useGenericMolecularAnalysisRun({
         type: "quality-control"
       }
     ]);
+  }
+
+  /**
+   * Updates an existing quality control at the specified index with a new quality control object.
+   *
+   * @param {number} index - The index of the quality control to be updated.
+   * @param {QualityControl} newQualityControl - The new quality control object to replace the old one.
+   */
+  function updateQualityControl(
+    index: number,
+    newQualityControl: QualityControl
+  ) {
+    // Create a copy of the existing quality controls array
+    const updatedQualityControls = [...qualityControls];
+
+    // Update the quality control at the specified index with the new one
+    updatedQualityControls[index] = newQualityControl;
+
+    // Update the state with the modified array
+    setQualityControls(updatedQualityControls);
   }
 
   /**
@@ -535,7 +578,7 @@ export function useGenericMolecularAnalysisRun({
   }, [performSave, loading]);
 
   return {
-    loading,
+    loading: loading || loadingVocabularyItems,
     errorMessage,
     multipleRunWarning,
     sequencingRunName,
@@ -543,8 +586,10 @@ export function useGenericMolecularAnalysisRun({
     sequencingRunItems,
     attachments,
     qualityControls,
+    qualityControlTypes,
     createNewQualityControl,
     deleteQualityControl,
+    updateQualityControl,
     setAttachments,
     sequencingRunId: sequencingRun?.id
   };
