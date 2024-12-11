@@ -217,15 +217,17 @@ export function MolecularAnalysisRunStep({
           <div className="col-12 mt-3">
             <div className="card p-3">
               <div className="d-flex align-items-center justify-content-between mb-3">
-                <strong>
+                <h2 className="fieldset-h2-adjustment">
                   <DinaMessage id="molecularAnalysisRunStep_sequencingQualityControl" />
-                </strong>
-                <Button
-                  onClick={() => createNewQualityControl()}
-                  className="add-datablock"
-                >
-                  <DinaMessage id="addCustomPlaceName" />
-                </Button>
+                </h2>
+                {editMode && (
+                  <Button
+                    onClick={() => createNewQualityControl()}
+                    className="add-datablock"
+                  >
+                    <DinaMessage id="addCustomPlaceName" />
+                  </Button>
+                )}
               </div>
               {qualityControls.map((qualityControl, index) => {
                 return (
@@ -237,6 +239,7 @@ export function MolecularAnalysisRunStep({
                           <input
                             className="form-control mt-1"
                             name={`qualityControl-name-${index}`}
+                            data-testid={`qualityControl-name-${index}`}
                             value={qualityControl.name}
                             onChange={(newValue) =>
                               updateQualityControl(index, {

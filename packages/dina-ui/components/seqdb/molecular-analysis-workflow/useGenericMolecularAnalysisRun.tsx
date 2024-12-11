@@ -360,6 +360,19 @@ export function useGenericMolecularAnalysisRun({
   }
 
   /**
+   * Deletes a quality control from the list at the specified index.
+   *
+   * @param {number} index - The index of the quality control to be deleted.
+   */
+  function deleteQualityControl(index: number) {
+    // Create a new array without the item at the specified index
+    const newQualityControls = qualityControls.filter((_, i) => i !== index);
+
+    // Update the state with the new array
+    setQualityControls(newQualityControls);
+  }
+
+  /**
    * Updates an existing quality control at the specified index with a new quality control object.
    *
    * @param {number} index - The index of the quality control to be updated.
@@ -380,16 +393,38 @@ export function useGenericMolecularAnalysisRun({
   }
 
   /**
-   * Deletes a quality control from the list at the specified index.
-   *
-   * @param {number} index - The index of the quality control to be deleted.
+   * Goes through the quality controls array and removes any quality controls that do not contain
+   * a name or a type.
    */
-  function deleteQualityControl(index: number) {
-    // Create a new array without the item at the specified index
-    const newQualityControls = qualityControls.filter((_, i) => i !== index);
+  function removeEmptyQualityControls() {
+    // Filter out blank quality controls (missing name or qcType)
+    const validatedQualityControls = qualityControls.filter(
+      (qualityControl) =>
+        !(qualityControl.name === "" && qualityControl.qcType === "")
+    );
 
-    // Update the state with the new array
-    setQualityControls(newQualityControls);
+    // Update the state with the validated array
+    setQualityControls(validatedQualityControls);
+  }
+
+  /**
+   * Go through the array and if any quality controls only contain a name or a type (both need to
+   * be supplied for it to be considered valid) then return not valid.
+   *
+   * @returns true if valid, false otherwise.
+   */
+  function validateQualityControls(): boolean {
+    const invalidQualityControl = qualityControls.find(
+      (qualityControl) =>
+        (qualityControl.name === "" && qualityControl.qcType !== "") ||
+        (qualityControl.name !== "" && qualityControl.qcType === "")
+    );
+
+    if (invalidQualityControl) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   async function createNewRun() {
@@ -548,6 +583,9 @@ export function useGenericMolecularAnalysisRun({
       setLoading(true);
       setErrorMessage(undefined);
 
+      // Remove empty options from the quality control.
+      removeEmptyQualityControls();
+
       // There must be sequencingRunItems to generate.
       if (!sequencingRunItems || sequencingRunItems.length === 0) {
         setPerformSave(false);
@@ -564,6 +602,16 @@ export function useGenericMolecularAnalysisRun({
         setLoading(false);
         setErrorMessage(
           formatMessage("molecularAnalysisRunStep_invalidRunName")
+        );
+        return;
+      }
+
+      // Ensure quality controls are valid.
+      if (!validateQualityControls()) {
+        setPerformSave(false);
+        setLoading(false);
+        setErrorMessage(
+          "Please ensure all quality controls have both a name and type."
         );
         return;
       }

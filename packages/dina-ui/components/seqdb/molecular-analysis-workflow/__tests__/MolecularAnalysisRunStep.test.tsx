@@ -1,6 +1,10 @@
 import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
 import { noop } from "lodash";
-import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
+import {
+  screen,
+  waitFor,
+  waitForElementToBeRemoved
+} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -18,7 +22,8 @@ import {
   TEST_MOLECULAR_ANALYSIS_RUN,
   TEST_MOLECULAR_ANALYSIS_RUN_ID,
   TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID,
-  TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID
+  TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID,
+  TEST_QUALITY_CONTROL_TYPES
 } from "../__mocks__/MolecularAnalysisMocks";
 import {
   MolecularAnalysisRunStep,
@@ -42,6 +47,9 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 
     case "seqdb-api/molecular-analysis-run/" + TEST_MOLECULAR_ANALYSIS_RUN_ID:
       return { data: TEST_MOLECULAR_ANALYSIS_RUN };
+
+    case "seqdb-api/vocabulary/qualityControlType":
+      return { data: TEST_QUALITY_CONTROL_TYPES };
 
     case "objectstore-api/metadata":
     case "seqdb-api/molecular-analysis-run/" +
@@ -466,6 +474,61 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         }
       ]
     ]);
+  });
+
+  it("Create incomplete quality controls, report error message and remove completely empty quality controls", async () => {
+    const wrapper = mountWithAppContext2(
+      <TestComponent
+        molecularAnalysisId={TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID}
+      />,
+      testCtx
+    );
+
+    // Wait for loading to be finished.
+    await waitForElementToBeRemoved(wrapper.getByText(/loading\.\.\./i));
+
+    // Should not be in edit mode automatically since a run exists already.
+    expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
+
+    // Switch into edit mode:
+    userEvent.click(wrapper.getByRole("button", { name: "Edit" }));
+    expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
+
+    // Create 4 new quality controls.
+    for (let i = 0; i < 4; i++) {
+      userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+    }
+
+    // Quality Control 1 - Both provided.
+    userEvent.type(
+      wrapper.getByTestId("qualityControl-name-0"),
+      "both-provided"
+    );
+    userEvent.click(wrapper.getAllByRole("combobox")[0]);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /reserpine standard/i })
+    );
+
+    // Quality Control 2 - Name only provided.
+    userEvent.type(wrapper.getByTestId("qualityControl-name-1"), "name-only");
+
+    // Quality Control 3 - Type only provided.
+    userEvent.click(wrapper.getAllByRole("combobox")[2]);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /reserpine standard/i })
+    );
+
+    // Save and expect an error message.
+    userEvent.click(wrapper.getByRole("button", { name: /save/i }));
+    await waitFor(() => {
+      expect(wrapper.queryByRole("alert")).toBeInTheDocument();
+    });
+    expect(wrapper.getByRole("alert").textContent).toEqual(
+      "Please ensure all quality controls have both a name and type."
+    );
+
+    // Only 3 should exist, since 4 were created and one was blank and automatically removed.
+    expect(wrapper.getAllByRole("combobox").length).toBe(3);
   });
 
   it("Automatically switch to edit mode and be able to cancel", async () => {
