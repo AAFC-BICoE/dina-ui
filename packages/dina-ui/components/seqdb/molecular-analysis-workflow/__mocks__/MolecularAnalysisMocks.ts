@@ -542,3 +542,58 @@ export const TEST_METADATA: PersistedResource<Metadata> = {
   publiclyReleasable: true,
   group: "aafc"
 };
+
+export const TEST_QUALITY_CONTROL_TYPES: PersistedResource<Vocabulary> = {
+  id: "qualityControlType",
+  type: "vocabulary",
+  vocabularyElements: [
+    {
+      key: "reserpine_standard",
+      name: "reserpine standard",
+      multilingualTitle: {
+        titles: [
+          {
+            lang: "en",
+            title: "Reserpine Standard"
+          },
+          {
+            lang: "fr",
+            title: "Standard Reserpine"
+          }
+        ]
+      }
+    },
+    {
+      key: "acn_blank",
+      name: "acn blank",
+      multilingualTitle: {
+        titles: [
+          {
+            lang: "en",
+            title: "ACN Blank"
+          },
+          {
+            lang: "fr",
+            title: "ACN Blank (fr)"
+          }
+        ]
+      }
+    },
+    {
+      key: "meoh_blank",
+      name: "meoh blank",
+      multilingualTitle: {
+        titles: [
+          {
+            lang: "en",
+            title: "MEOH Blank"
+          },
+          {
+            lang: "fr",
+            title: "MEOH Blank (fr)"
+          }
+        ]
+      }
+    }
+  ]
+};
