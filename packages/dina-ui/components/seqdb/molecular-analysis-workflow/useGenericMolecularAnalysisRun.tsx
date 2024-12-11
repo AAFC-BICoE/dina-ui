@@ -285,6 +285,7 @@ export function useGenericMolecularAnalysisRun({
             setSequencingRun(firstSequencingRun);
             setSequencingRunName(firstSequencingRun.name);
             await findMolecularAnalysisRunAttachments(firstSequencingRun);
+            await findQualityControlRunItems(firstSequencingRun);
           }
         }
 
@@ -303,6 +304,35 @@ export function useGenericMolecularAnalysisRun({
             if (runQuery && (runQuery as any)?.data?.attachments) {
               setAttachments((runQuery as any)?.data?.attachments);
             }
+          }
+        }
+
+        async function findQualityControlRunItems(run: MolecularAnalysisRun) {
+          // Only perform the request if a sequencing run exists.
+          if (run?.id) {
+            const qualityControlQuery = await apiClient.get(
+              `seqdb-api/molecular-analysis-run-item`,
+              {
+                filter: filterBy([], {
+                  extraFilters: [
+                    {
+                      selector: "run.uuid",
+                      comparison: "==",
+                      arguments: run?.id
+                    },
+                    {
+                      selector: "usageType",
+                      comparison: "==",
+                      arguments: "quality-control"
+                    }
+                  ]
+                })("")
+              }
+            );
+
+            // if (qualityControlQuery && (qualityControlQuery as any)?.data?.length > 0) {
+            // Go through each quality control run item and then we do a bulk get query for each quality control.
+            // }
           }
         }
 
@@ -505,6 +535,51 @@ export function useGenericMolecularAnalysisRun({
           }
         }));
       await save(genericMolecularAnalysisItemSaveArgs, {
+        apiBaseUrl: "/seqdb-api"
+      });
+
+      // Create a run item for each quality control linked to the same run that was created.
+      const qualityControlRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+        qualityControls.map(() => ({
+          type: "molecular-analysis-run-item",
+          resource: {
+            type: "molecular-analysis-run-item",
+            usageType: "quality-control",
+            relationships: {
+              run: {
+                data: {
+                  id: savedMolecularAnalysisRun[0].id,
+                  type: "molecular-analysis-run"
+                }
+              }
+            }
+          } as any
+        }));
+      const savedQualityControlRunItem = await save(
+        qualityControlRunItemSaveArgs,
+        { apiBaseUrl: "/seqdb-api" }
+      );
+
+      // Create the quality control entities, and link to the run items above.
+      const qualityControlSaveArgs: SaveArgs<QualityControl>[] =
+        qualityControls.map((item, index) => ({
+          type: "quality-control",
+          resource: {
+            type: "quality-control",
+            group: groupName,
+            name: item.name,
+            qcType: item.qcType,
+            relationships: {
+              molecularAnalysisRunItem: {
+                data: {
+                  id: savedQualityControlRunItem[index].id,
+                  type: "molecular-analysis-run-item"
+                }
+              }
+            }
+          }
+        }));
+      await save(qualityControlSaveArgs, {
         apiBaseUrl: "/seqdb-api"
       });
 

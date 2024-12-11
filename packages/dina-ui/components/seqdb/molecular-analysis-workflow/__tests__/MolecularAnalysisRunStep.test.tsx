@@ -273,6 +273,19 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     // Type a name for the run to be created.
     userEvent.type(wrapper.getByRole("textbox"), "My new run");
 
+    // Add new quality control.
+    userEvent.click(wrapper.getByRole("button", { name: "Add" }));
+
+    // Provide quality control
+    userEvent.type(
+      wrapper.getByTestId("qualityControl-name-0"),
+      "Quality Control Test Name 1"
+    );
+    userEvent.click(wrapper.getAllByRole("combobox")[0]);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /reserpine standard/i })
+    );
+
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
@@ -402,6 +415,56 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
               type: "generic-molecular-analysis-item"
             },
             type: "generic-molecular-analysis-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Quality control run items creation
+      [
+        [
+          {
+            resource: {
+              relationships: {
+                run: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run"
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item",
+              usageType: "quality-control"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Quality control creation
+      [
+        [
+          {
+            resource: {
+              group: "aafc",
+              name: "Quality Control Test Name 1",
+              qcType: "reserpine_standard",
+              relationships: {
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              },
+              type: "quality-control"
+            },
+            type: "quality-control"
           }
         ],
         {
