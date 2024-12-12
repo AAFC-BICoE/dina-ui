@@ -136,6 +136,7 @@ export const TEST_MOLECULAR_ANALYSIS_ITEMS_WITH_RUN: PersistedResource<GenericMo
       molecularAnalysisRunItem: {
         id: "f65ed036-eb92-40d9-af03-d027646e8948",
         type: "molecular-analysis-run-item",
+        name: "Provided run item name",
         usageType: "hrms",
         run: TEST_MOLECULAR_ANALYSIS_RUN
       },

@@ -1,10 +1,15 @@
 import { PcrBatchItem, SeqReaction } from "../../types/seqdb-api";
-import { useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState
+} from "react";
 import {
   BulkGetOptions,
   FieldHeader,
   filterBy,
-  rsql,
   SaveArgs,
   useApiClient,
   useQuery,
@@ -13,7 +18,7 @@ import {
 import { StorageUnitUsage } from "../../types/collection-api/resources/StorageUnitUsage";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { MaterialSampleSummary } from "../../types/collection-api";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { attachGenericMolecularAnalysisItems } from "../seqdb/molecular-analysis-workflow/useGenericMolecularAnalysisRun";
@@ -737,7 +742,14 @@ export function useMolecularAnalysisRunView({
   };
 }
 
-export function getMolecularAnalysisRunColumns(compareByStringAndNumber, type) {
+export function getMolecularAnalysisRunColumns(
+  compareByStringAndNumber,
+  type,
+  setMolecularAnalysisRunItemNames?: Dispatch<
+    SetStateAction<Record<string, string>>
+  >,
+  readOnly?: boolean
+) {
   // Table columns to display for the sequencing run.
   const SEQ_REACTION_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
@@ -887,12 +899,125 @@ export function getMolecularAnalysisRunColumns(compareByStringAndNumber, type) {
           b?.original?.materialSampleSummary?.materialSampleName
         ),
       enableSorting: true
+    },
+    {
+      id: "molecularAnalysisRunItem.name",
+      cell: ({ row: { original } }) => {
+        return readOnly ? (
+          <>{original.molecularAnalysisRunItem?.name}</>
+        ) : (
+          <input
+            type="text"
+            className="w-100 form-control"
+            defaultValue={original.molecularAnalysisRunItem?.name}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setMolecularAnalysisRunItemNames?.(
+                (molecularAnalysisRunItemNames) => {
+                  const molecularAnalysisRunItemNamesMap =
+                    molecularAnalysisRunItemNames;
+                  if (
+                    original?.materialSampleSummary?.id &&
+                    event.target.value
+                  ) {
+                    molecularAnalysisRunItemNamesMap[
+                      original?.materialSampleSummary?.id
+                    ] = event.target.value;
+                  }
+                  return molecularAnalysisRunItemNamesMap;
+                }
+              );
+            }}
+          />
+        );
+      },
+      header: () => <DinaMessage id="molecularAnalysisRunItemName" />,
+      accessorKey: "molecularAnalysisRunItem.name",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleSummary?.materialSampleName,
+          b?.original?.materialSampleSummary?.materialSampleName
+        ),
+      enableSorting: true
+    }
+  ];
+
+  const METAGENOMICS_BATCH_ITEM_COLUMNS: ColumnDef<SequencingRunItem>[] = [
+    {
+      id: "wellCoordinates",
+      cell: ({ row }) => {
+        return (
+          <>
+            {!row.original?.storageUnitUsage ||
+            row.original?.storageUnitUsage?.wellRow === null ||
+            row.original?.storageUnitUsage?.wellColumn === null
+              ? ""
+              : `${row.original.storageUnitUsage?.wellRow}${row.original.storageUnitUsage?.wellColumn}`}
+          </>
+        );
+      },
+      header: () => <FieldHeader name={"wellCoordinates"} />,
+      accessorKey: "wellCoordinates",
+      sortingFn: (a: any, b: any): number => {
+        const aString =
+          !a.original?.storageUnitUsage ||
+          a.original?.storageUnitUsage?.wellRow === null ||
+          a.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${a.original.storageUnitUsage?.wellRow}${a.original.storageUnitUsage?.wellColumn}`;
+        const bString =
+          !b.original?.storageUnitUsage ||
+          b.original?.storageUnitUsage?.wellRow === null ||
+          b.original?.storageUnitUsage?.wellColumn === null
+            ? ""
+            : `${b.original.storageUnitUsage?.wellRow}${b.original.storageUnitUsage?.wellColumn}`;
+        return compareByStringAndNumber(aString, bString);
+      }
+    },
+    {
+      id: "tubeNumber",
+      cell: ({ row: { original } }) =>
+        original?.storageUnitUsage?.cellNumber === undefined ? (
+          <></>
+        ) : (
+          <>{original.storageUnitUsage?.cellNumber}</>
+        ),
+      header: () => <FieldHeader name={"tubeNumber"} />,
+      accessorKey: "tubeNumber",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.storageUnitUsage?.cellNumber?.toString(),
+          b?.original?.storageUnitUsage?.cellNumber?.toString()
+        )
+    },
+    {
+      id: "materialSampleName",
+      cell: ({ row: { original } }) => {
+        const materialSampleName =
+          original?.materialSampleSummary?.materialSampleName;
+        return (
+          <>
+            <Link
+              href={`/collection/material-sample/view?id=${original.materialSampleId}`}
+            >
+              <a>{materialSampleName || original.materialSampleId}</a>
+            </Link>
+          </>
+        );
+      },
+      header: () => <FieldHeader name="materialSampleName" />,
+      accessorKey: "materialSampleSummary.materialSampleName",
+      sortingFn: (a: any, b: any): number =>
+        compareByStringAndNumber(
+          a?.original?.materialSampleSummary?.materialSampleName,
+          b?.original?.materialSampleSummary?.materialSampleName
+        ),
+      enableSorting: true
     }
   ];
   const MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP = {
     "seq-reaction": SEQ_REACTION_COLUMNS,
     "generic-molecular-analysis-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS,
-    "metagenomics-batch-item": GENERIC_MOLECULAR_ANALYSIS_COLUMNS
+    "metagenomics-batch-item": METAGENOMICS_BATCH_ITEM_COLUMNS
   };
   return MOLECULAR_ANALYSIS_RUN_COLUMNS_MAP[type];
 }

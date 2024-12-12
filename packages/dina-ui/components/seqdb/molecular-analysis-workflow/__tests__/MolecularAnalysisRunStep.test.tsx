@@ -192,9 +192,18 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.getByRole("cell", { name: "A1" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
 
+    // Ensure the run item names are shown:
+    expect(wrapper.getAllByRole("textbox")[1]).toHaveDisplayValue(
+      "Provided run item name"
+    );
+
     // Ensure quality controls are being displayed:
-    expect(wrapper.getAllByRole("textbox")[1]).toHaveDisplayValue("test1");
-    expect(wrapper.getAllByRole("textbox")[2]).toHaveDisplayValue("test2");
+    expect(
+      wrapper.container.querySelector('input[name="qualityControl-name-0"]')
+    ).toHaveDisplayValue("test1");
+    expect(
+      wrapper.container.querySelector('input[name="qualityControl-name-1"]')
+    ).toHaveDisplayValue("test2");
     expect(wrapper.getByText(/reserpine standard/i)).toBeInTheDocument();
     expect(wrapper.getByText(/acn blank/i)).toBeInTheDocument();
 
@@ -278,7 +287,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     });
 
     // Expect the Sequencing run to be empty since no run exists yet.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("");
+    const sequencingRunNameInput = wrapper.container.querySelector(
+      'input[name="sequencingRunName"]'
+    );
+    expect(sequencingRunNameInput).toHaveDisplayValue("");
 
     // Try saving with no sequencing run name, it should report an error.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
@@ -292,7 +304,11 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ).toBeInTheDocument();
 
     // Type a name for the run to be created.
-    userEvent.type(wrapper.getByRole("textbox"), "My new run");
+    userEvent.type(sequencingRunNameInput!, "My new run");
+
+    // Enter in names for the run items:
+    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
 
     // Add new quality control.
     userEvent.click(wrapper.getByRole("button", { name: "Add" }));
@@ -340,6 +356,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         [
           {
             resource: {
+              name: "Run item name 1",
               relationships: {
                 run: {
                   data: {
@@ -355,6 +372,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
           },
           {
             resource: {
+              name: "Run item name 2",
               relationships: {
                 run: {
                   data: {
@@ -517,10 +535,14 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.clear(wrapper.getAllByRole("textbox")[0]);
     userEvent.type(wrapper.getAllByRole("textbox")[0], "Updated run name");
 
-    // Edit Quality Control 1
+    // Update the two run names.
     userEvent.clear(wrapper.getAllByRole("textbox")[1]);
+    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+
+    // Edit Quality Control 1
+    userEvent.clear(wrapper.getAllByRole("textbox")[3]);
     userEvent.type(
-      wrapper.getAllByRole("textbox")[1],
+      wrapper.getAllByRole("textbox")[3],
       "Updated Quality Control"
     );
 
@@ -531,7 +553,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Add new Quality Control
     userEvent.click(wrapper.getByRole("button", { name: /add/i }));
-    userEvent.type(wrapper.getAllByRole("textbox")[2], "New Quality Control");
+    userEvent.type(wrapper.getAllByRole("textbox")[4], "New Quality Control");
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
@@ -550,10 +572,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
     expect(wrapper.queryByText(/edit mode: false/i)).toBeInTheDocument();
 
-    // Name should have not changed from edit mode true to false.
-    expect(wrapper.queryByText(/updated run name/i)).toBeInTheDocument();
-
-    // Expect the network requests
+    // Expect the network request to only contain the update of the run.
     expect(mockSave.mock.calls).toEqual([
       // Updating the run
       [
@@ -575,6 +594,23 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
               type: "molecular-analysis-run"
             },
             type: "molecular-analysis-run"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Update the run item names
+      [
+        [
+          {
+            resource: {
+              id: "f65ed036-eb92-40d9-af03-d027646e8948",
+              name: "Run item name 1",
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
           }
         ],
         {
