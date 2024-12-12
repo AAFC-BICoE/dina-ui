@@ -622,10 +622,12 @@ export function useMolecularAnalysisRunView({
         }
 
         async function fetchGenericMolecularAnalysisItems() {
-          const fetchPaths = molecularAnalysisRunItems.map(
-            (molecularAnalysisRunItem) =>
-              `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
-          );
+          const fetchPaths = molecularAnalysisRunItems
+            .filter((runItem) => runItem.usageType !== "quality-control")
+            .map(
+              (molecularAnalysisRunItem) =>
+                `seqdb-api/generic-molecular-analysis-item?include=storageUnitUsage,materialSample,&filter[rsql]=molecularAnalysisRunItem.uuid==${molecularAnalysisRunItem.id}`
+            );
           const genericMolecularAnalysisItems: PersistedResource<GenericMolecularAnalysisItem>[] =
             [];
           for (const path of fetchPaths) {
@@ -654,10 +656,13 @@ export function useMolecularAnalysisRunView({
           return metagenomicsBatchItems;
         }
 
-        const usageType = molecularAnalysisRunItems?.[0].usageType;
+        const usageType = molecularAnalysisRunItems.filter(
+          (runItem) => runItem.usageType !== "quality-control"
+        )?.[0].usageType;
         setColumns(
           getMolecularAnalysisRunColumns(compareByStringAndNumber, usageType)
         );
+
         if (usageType === "seq-reaction") {
           const seqReactions = await fetchSeqReactions();
 
