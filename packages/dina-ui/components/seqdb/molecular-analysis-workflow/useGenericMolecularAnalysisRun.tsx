@@ -310,7 +310,7 @@ export function useGenericMolecularAnalysisRun({
         async function findQualityControlRunItems(run: MolecularAnalysisRun) {
           // Only perform the request if a sequencing run exists.
           if (run?.id) {
-            const qualityControlQuery = await apiClient.get(
+            const qualityControlItemQuery = await apiClient.get(
               `seqdb-api/molecular-analysis-run-item`,
               {
                 filter: filterBy([], {
@@ -330,9 +330,42 @@ export function useGenericMolecularAnalysisRun({
               }
             );
 
-            // if (qualityControlQuery && (qualityControlQuery as any)?.data?.length > 0) {
-            // Go through each quality control run item and then we do a bulk get query for each quality control.
-            // }
+            if (
+              qualityControlItemQuery &&
+              (qualityControlItemQuery as any)?.data?.length > 0
+            ) {
+              const newQualityControls: QualityControl[] = [];
+
+              // Go through each quality control run item and then we do a query for each quality control.
+              const qualityControlRunItems = (qualityControlItemQuery as any)
+                ?.data;
+              for (const item of qualityControlRunItems) {
+                const qualityControlQuery = await apiClient.get<QualityControl>(
+                  `seqdb-api/quality-control`,
+                  {
+                    filter: filterBy([], {
+                      extraFilters: [
+                        {
+                          selector: "molecularAnalysisRunItem.uuid",
+                          comparison: "==",
+                          arguments: item?.id
+                        }
+                      ]
+                    })("")
+                  }
+                );
+
+                const qualityControlFound = qualityControlQuery
+                  ?.data?.[0] as QualityControl;
+                if (qualityControlFound) {
+                  newQualityControls.push({
+                    ...qualityControlFound
+                  });
+                }
+              }
+
+              setQualityControls(newQualityControls);
+            }
           }
         }
 

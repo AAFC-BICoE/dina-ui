@@ -23,6 +23,9 @@ import {
   TEST_MOLECULAR_ANALYSIS_RUN_ID,
   TEST_MOLECULAR_ANALYSIS_WITH_RUN_ID,
   TEST_MOLECULAR_ANALYSIS_WITHOUT_RUN_ID,
+  TEST_QUALITY_CONTROL_1,
+  TEST_QUALITY_CONTROL_2,
+  TEST_QUALITY_CONTROL_RUN_ITEMS,
   TEST_QUALITY_CONTROL_TYPES
 } from "../__mocks__/MolecularAnalysisMocks";
 import {
@@ -47,6 +50,22 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 
     case "seqdb-api/molecular-analysis-run/" + TEST_MOLECULAR_ANALYSIS_RUN_ID:
       return { data: TEST_MOLECULAR_ANALYSIS_RUN };
+
+    case "seqdb-api/molecular-analysis-run-item":
+      switch (params.filter.rsql) {
+        case "run.uuid==" +
+          TEST_MOLECULAR_ANALYSIS_RUN_ID +
+          ";usageType==quality-control":
+          return { data: TEST_QUALITY_CONTROL_RUN_ITEMS };
+      }
+
+    case "seqdb-api/quality-control":
+      switch (params.filter.rsql) {
+        case "molecularAnalysisRunItem.uuid==2a3b15ce-6781-466b-bc1e-49e35af3df58":
+          return { data: TEST_QUALITY_CONTROL_1 };
+        case "molecularAnalysisRunItem.uuid==e9e39b72-ece7-454b-893a-2fc2d075e7b7":
+          return { data: TEST_QUALITY_CONTROL_2 };
+      }
 
     case "seqdb-api/vocabulary/qualityControlType":
       return { data: TEST_QUALITY_CONTROL_TYPES };
@@ -153,7 +172,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByRole("alert")).not.toBeInTheDocument();
 
     // Run name should be in the textbox.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+    expect(wrapper.getAllByRole("textbox")[0]).toHaveDisplayValue("run-name-1");
 
     // Ensure Primary IDs are rendered in the table with links:
     expect(
@@ -176,6 +195,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     // Ensure Well Coordinates is rendered:
     expect(wrapper.getByRole("cell", { name: "A1" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
+
+    // Ensure quality controls are being displayed:
+    expect(wrapper.getAllByRole("textbox")[1]).toHaveDisplayValue("test1");
+    expect(wrapper.getAllByRole("textbox")[2]).toHaveDisplayValue("test2");
+    expect(wrapper.getByText(/reserpine standard/i)).toBeInTheDocument();
+    expect(wrapper.getByText(/acn blank/i)).toBeInTheDocument();
 
     // Ensure attachment appears.
     expect(
@@ -213,7 +238,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     ).toBeInTheDocument();
 
     // Run name should be in the textbox for the first run found.
-    expect(wrapper.getByRole("textbox")).toHaveDisplayValue("run-name-1");
+    expect(wrapper.getAllByRole("textbox")[0]).toHaveDisplayValue("run-name-1");
 
     // Set edit mode should not be triggered in this test.
     expect(mockSetEditMode).toBeCalledTimes(0);
@@ -493,8 +518,8 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.queryByText(/edit mode: true/i)).toBeInTheDocument();
 
     // Change the sequencing run name to something different.
-    userEvent.clear(wrapper.getByRole("textbox"));
-    userEvent.type(wrapper.getByRole("textbox"), "Updated run name");
+    userEvent.clear(wrapper.getAllByRole("textbox")[0]);
+    userEvent.type(wrapper.getAllByRole("textbox")[0], "Updated run name");
 
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));

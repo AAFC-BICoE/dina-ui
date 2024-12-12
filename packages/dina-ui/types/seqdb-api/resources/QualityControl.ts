@@ -6,6 +6,8 @@ export interface QualityControlAttributes {
   group: string;
   name: string;
   qcType: string;
+  createdOn?: string;
+  createdBy?: string;
 }
 
 export interface QualityControlRelationships {
