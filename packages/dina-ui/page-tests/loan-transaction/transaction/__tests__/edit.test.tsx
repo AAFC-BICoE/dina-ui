@@ -7,7 +7,7 @@ import TransactionEditPage, {
 } from "../../../../pages/loan-transaction/transaction/edit";
 import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { Transaction } from "../../../../types/loan-transaction-api";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 

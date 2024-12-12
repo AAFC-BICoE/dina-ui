@@ -3,13 +3,23 @@ import { RolesPerGroupEditor } from "../../../pages/dina-user/edit";
 import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import Select from "react-select";
 import { SUPER_USER, USER, GUEST } from "common-ui/types/DinaRoles";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
+// Not perfect - all rendered groups take test-group label
 const mockGet = jest.fn<any, any>(async (path) => {
   if (path === "user-api/group") {
-    return { data: [] };
+    return {
+      data: [
+        {
+          id: "test-group",
+          name: "test-group",
+          type: "group",
+          labels: { en: "test-group" }
+        }
+      ]
+    };
   }
 });
 
@@ -52,11 +62,11 @@ describe("User edit page", () => {
       }
     );
 
-    // Renders the rows:
+    // Renders the rows except for test-group:
     expect(wrapper.getByRole("cell", { name: /cnc/i })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: /aafc/i })).toBeInTheDocument();
     expect(
-      wrapper.queryByRole("cell", { name: /test group/i })
+      wrapper.queryByRole("cell", { name: /test-group/i })
     ).not.toBeInTheDocument();
 
     // The logged in user must be super_user to edit a group's row:
@@ -79,21 +89,19 @@ describe("User edit page", () => {
     expect(wrapper.getAllByRole("combobox", { name: / /i })).toHaveLength(2);
 
     // Add new group + roles:
-    // unable to find test group
     userEvent.click(wrapper.getAllByRole("combobox", { name: / /i })[1]);
     await new Promise(setImmediate);
-    userEvent.click(wrapper.getByRole("option", { name: /test-group/i }));
 
+    userEvent.click(wrapper.getByRole("option", { name: /test-group/i }));
     await new Promise(setImmediate);
 
-    // expect(wrapper.find("tr.test-group-row").exists()).toEqual(true);
-    expect(
-      wrapper.getByRole("cell", { name: /test-group/i })
-    ).toBeInTheDocument();
-
-    wrapper.find("tr.test-group-row .role-select Select").prop<any>("onChange")(
-      [{ value: "role1" }, { value: "role2" }]
+    // Select Role for test-group
+    userEvent.click(
+      wrapper.getAllByRole("combobox", { name: /select\.\.\./i })[1]
     );
+    await new Promise(setImmediate);
+
+    userEvent.click(wrapper.getByRole("option", { name: /super/i }));
 
     // Remove a group: (cnc)
     userEvent.click(
@@ -112,7 +120,7 @@ describe("User edit page", () => {
           rolesPerGroup: {
             aafc: [USER],
             // Only one role at a time is allowed for now:
-            "test-group": ["role2"]
+            "test-group": [SUPER_USER]
           }
         }
       ]
