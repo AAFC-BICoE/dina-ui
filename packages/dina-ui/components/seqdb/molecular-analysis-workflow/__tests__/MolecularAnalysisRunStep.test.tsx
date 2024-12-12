@@ -197,8 +197,12 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
 
     // Ensure quality controls are being displayed:
-    expect(wrapper.getAllByRole("textbox")[1]).toHaveDisplayValue("test1");
-    expect(wrapper.getAllByRole("textbox")[2]).toHaveDisplayValue("test2");
+    expect(
+      wrapper.container.querySelector('input[name="qualityControl-name-0"]')
+    ).toHaveDisplayValue("test1");
+    expect(
+      wrapper.container.querySelector('input[name="qualityControl-name-1"]')
+    ).toHaveDisplayValue("test2");
     expect(wrapper.getByText(/reserpine standard/i)).toBeInTheDocument();
     expect(wrapper.getByText(/acn blank/i)).toBeInTheDocument();
 
