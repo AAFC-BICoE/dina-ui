@@ -12,6 +12,7 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { QualityControl } from "packages/dina-ui/types/seqdb-api/resources/QualityControl";
 import useVocabularyOptions from "../../collection/useVocabularyOptions";
 import { VocabularyOption } from "../../collection/VocabularySelectField";
+import { isEqual } from "lodash";
 
 export interface UseGenericMolecularAnalysisRunProps {
   molecularAnalysis: GenericMolecularAnalysis;
@@ -156,6 +157,9 @@ export function useGenericMolecularAnalysisRun({
 
   // Quality control items
   const [qualityControls, setQualityControls] = useState<QualityControl[]>([]);
+  const [loadedQualityControls, setLoadedQualityControls] = useState<
+    QualityControl[]
+  >([]);
 
   // Sequencing run attachments
   const [attachments, setAttachments] = useState<ResourceIdentifierObject[]>(
@@ -351,7 +355,8 @@ export function useGenericMolecularAnalysisRun({
                           arguments: item?.id
                         }
                       ]
-                    })("")
+                    })(""),
+                    include: "molecularAnalysisRunItem"
                   }
                 );
 
@@ -365,6 +370,7 @@ export function useGenericMolecularAnalysisRun({
               }
 
               setQualityControls(newQualityControls);
+              setLoadedQualityControls(newQualityControls);
             }
           }
         }
@@ -612,7 +618,7 @@ export function useGenericMolecularAnalysisRun({
             }
           }
         }));
-      await save(qualityControlSaveArgs, {
+      const savedQualityControls = await save(qualityControlSaveArgs, {
         apiBaseUrl: "/seqdb-api"
       });
 
@@ -626,6 +632,10 @@ export function useGenericMolecularAnalysisRun({
           ] as MolecularAnalysisRunItem
         }))
       );
+
+      // Update the quality controls state.
+      setQualityControls(savedQualityControls as QualityControl[]);
+      setLoadedQualityControls(savedQualityControls as QualityControl[]);
 
       // Go back to view mode once completed.
       setPerformSave(false);
@@ -672,6 +682,118 @@ export function useGenericMolecularAnalysisRun({
       await save(molecularAnalysisRunSaveArg, {
         apiBaseUrl: "/seqdb-api"
       });
+
+      // Check if the quality controls loaded in match the current one, if it's different then we
+      // need to update the quality controls.
+      if (!isEqual(qualityControls, loadedQualityControls)) {
+        // Create new items for anything with no id...
+        const qualityControlsWithoutId = qualityControls.filter(
+          (qc) => !qc.id && qc.name && qc.type
+        );
+        for (let i = 0; i < qualityControlsWithoutId.length; i++) {
+          // Create a run item for each quality control linked to the same run that was created.
+          const qualityControlRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
+            qualityControlsWithoutId.map(() => ({
+              type: "molecular-analysis-run-item",
+              resource: {
+                type: "molecular-analysis-run-item",
+                usageType: "quality-control",
+                relationships: {
+                  run: {
+                    data: {
+                      id: sequencingRun.id,
+                      type: "molecular-analysis-run"
+                    }
+                  }
+                }
+              } as any
+            }));
+          const savedQualityControlRunItem = await save(
+            qualityControlRunItemSaveArgs,
+            { apiBaseUrl: "/seqdb-api" }
+          );
+
+          // Create the quality control entities, and link to the run items above.
+          const qualityControlSaveArgs: SaveArgs<QualityControl>[] =
+            qualityControlsWithoutId.map((item, index) => ({
+              type: "quality-control",
+              resource: {
+                type: "quality-control",
+                group: sequencingRun.group,
+                name: item.name,
+                qcType: item.qcType,
+                relationships: {
+                  molecularAnalysisRunItem: {
+                    data: {
+                      id: savedQualityControlRunItem[index].id,
+                      type: "molecular-analysis-run-item"
+                    }
+                  }
+                }
+              }
+            }));
+          const savedQualityControls = await save(qualityControlSaveArgs, {
+            apiBaseUrl: "/seqdb-api"
+          });
+
+          // Need to figure out a way to attach the savedQualityControls ids to the blank ids in the
+          // quality controls...
+        }
+
+        // Update existing quality control entities.
+        const qualityControlsWithId = qualityControls.filter(
+          (qc) => qc.id && qc.name && qc.type
+        );
+        for (let i = 0; i < qualityControlsWithId.length; i++) {
+          // Update quality control entity.
+          const qualityControlUpdateArgs: SaveArgs<QualityControl>[] =
+            qualityControlsWithId.map((item) => ({
+              type: "quality-control",
+              id: item.id,
+              resource: {
+                id: item.id,
+                type: "quality-control",
+                group: sequencingRun.group,
+                name: item.name,
+                qcType: item.qcType
+              }
+            }));
+          await save(qualityControlUpdateArgs, {
+            apiBaseUrl: "/seqdb-api"
+          });
+        }
+
+        // Delete quality controls that no longer exist in the qualityControls but exist in the loadedQualityControls.
+        const deletedQualityControls = loadedQualityControls.filter(
+          (loadedQc) => !qualityControls.some((qc) => qc.id === loadedQc.id)
+        );
+        for (let i = 0; i < deletedQualityControls.length; i++) {
+          // Delete quality control.
+          await save(
+            deletedQualityControls.map((item) => ({
+              delete: {
+                id: item?.id ?? "",
+                type: "quality-control"
+              }
+            })),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+
+          // Delete run items.
+          await save(
+            deletedQualityControls.map((item) => ({
+              delete: {
+                id: item?.molecularAnalysisRunItem?.id ?? "",
+                type: "molecular-analysis-run-item"
+              }
+            })),
+            { apiBaseUrl: "/seqdb-api" }
+          );
+        }
+
+        // Reset the loaded quality controls with the current.
+        setLoadedQualityControls(qualityControls);
+      }
 
       // Go back to view mode once completed.
       setPerformSave(false);

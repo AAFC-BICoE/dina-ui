@@ -74,6 +74,7 @@ export const TEST_MOLECULAR_ANALYSIS_RUN: PersistedResource<MolecularAnalysisRun
     id: TEST_MOLECULAR_ANALYSIS_RUN_ID,
     type: "molecular-analysis-run",
     name: "run-name-1",
+    group: "aafc",
     attachments: [
       {
         id: "7f3eccfa-3bc1-412f-9385-bb00e2319ac6",
@@ -600,30 +601,6 @@ export const TEST_QUALITY_CONTROL_TYPES: PersistedResource<Vocabulary> = {
   ]
 };
 
-export const TEST_QUALITY_CONTROL_1: PersistedResource<QualityControl>[] = [
-  {
-    id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
-    type: "quality-control",
-    createdBy: "dina-admin",
-    createdOn: "2024-12-11T20:52:48.562429Z",
-    group: "aafc",
-    name: "test1",
-    qcType: "reserpine_standard"
-  }
-];
-
-export const TEST_QUALITY_CONTROL_2: PersistedResource<QualityControl>[] = [
-  {
-    id: "0193b77e-eb77-7a28-9a0f-a18549bf7df8",
-    type: "quality-control",
-    createdBy: "dina-admin",
-    createdOn: "2024-12-11T20:52:48.562429Z",
-    group: "aafc",
-    name: "test2",
-    qcType: "acn_blank"
-  }
-];
-
 export const TEST_QUALITY_CONTROL_RUN_ITEMS: PersistedResource<MolecularAnalysisRunItem>[] =
   [
     {
@@ -641,3 +618,29 @@ export const TEST_QUALITY_CONTROL_RUN_ITEMS: PersistedResource<MolecularAnalysis
       usageType: "quality-control"
     }
   ];
+
+export const TEST_QUALITY_CONTROL_1: PersistedResource<QualityControl>[] = [
+  {
+    id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
+    type: "quality-control",
+    createdBy: "dina-admin",
+    createdOn: "2024-12-11T20:52:48.562429Z",
+    group: "aafc",
+    name: "test1",
+    qcType: "reserpine_standard",
+    molecularAnalysisRunItem: TEST_QUALITY_CONTROL_RUN_ITEMS[0]
+  }
+];
+
+export const TEST_QUALITY_CONTROL_2: PersistedResource<QualityControl>[] = [
+  {
+    id: "0193b77e-eb77-7a28-9a0f-a18549bf7df8",
+    type: "quality-control",
+    createdBy: "dina-admin",
+    createdOn: "2024-12-11T20:52:48.562429Z",
+    group: "aafc",
+    name: "test2",
+    qcType: "acn_blank",
+    molecularAnalysisRunItem: TEST_QUALITY_CONTROL_RUN_ITEMS[1]
+  }
+];

@@ -114,7 +114,7 @@ const mockBulkGet = jest.fn(async (paths) => {
 const mockSave = jest.fn((ops) =>
   ops.map((op) => ({
     ...op.resource,
-    id: op.resource.id ?? "123"
+    id: op?.resource?.id ?? "123"
   }))
 );
 
@@ -521,6 +521,29 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.clear(wrapper.getAllByRole("textbox")[0]);
     userEvent.type(wrapper.getAllByRole("textbox")[0], "Updated run name");
 
+    // Edit Quality Control 1
+    userEvent.clear(wrapper.getAllByRole("textbox")[1]);
+    userEvent.type(
+      wrapper.getAllByRole("textbox")[1],
+      "Updated Quality Control"
+    );
+
+    // Delete Quality Control 2
+    expect(wrapper.queryByText(/acn blank/i)).toBeInTheDocument();
+    userEvent.click(wrapper.getByTestId("delete-quality-control-1"));
+    expect(wrapper.queryByText(/acn blank/i)).not.toBeInTheDocument();
+
+    // Add new Quality Control
+    userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+    userEvent.type(wrapper.getAllByRole("textbox")[2], "New Quality Control");
+    userEvent.click(wrapper.getAllByRole("combobox")[1]);
+    userEvent.click(
+      wrapper.getByRole("option", { name: /reserpine standard/i })
+    );
+
+    // Add blank quality control, should not be saved.
+    userEvent.click(wrapper.getByRole("button", { name: /add/i }));
+
     // Click the save button.
     userEvent.click(wrapper.getByRole("button", { name: /save/i }));
 
@@ -534,8 +557,9 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     // Name should have not changed from edit mode true to false.
     expect(wrapper.queryByText(/updated run name/i)).toBeInTheDocument();
 
-    // Expect the network request to only contain the update of the run.
+    // Expect the network requests
     expect(mockSave.mock.calls).toEqual([
+      // Updating the run
       [
         [
           {
@@ -555,6 +579,106 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
               type: "molecular-analysis-run"
             },
             type: "molecular-analysis-run"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Create the brand new quality control run item.
+      [
+        [
+          {
+            resource: {
+              relationships: {
+                run: {
+                  data: {
+                    id: "5fee24e2-2ab1-4511-a6e6-4f8ef237f6c4",
+                    type: "molecular-analysis-run"
+                  }
+                }
+              },
+              type: "molecular-analysis-run-item",
+              usageType: "quality-control"
+            },
+            type: "molecular-analysis-run-item"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Create the new quality control attached to the run item above.
+      [
+        [
+          {
+            resource: {
+              group: "aafc",
+              name: "New Quality Control",
+              qcType: "reserpine_standard",
+              relationships: {
+                molecularAnalysisRunItem: {
+                  data: {
+                    id: "123",
+                    type: "molecular-analysis-run-item"
+                  }
+                }
+              },
+              type: "quality-control"
+            },
+            type: "quality-control"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Update the existing quality control.
+      [
+        [
+          {
+            id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
+            resource: {
+              group: "aafc",
+              id: "0193b77e-eb54-77c0-84d1-ba64dba0c5e2",
+              name: "Updated Quality Control",
+              qcType: "reserpine_standard",
+              type: "quality-control"
+            },
+            type: "quality-control"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Now for the deleted quality control, first delete the quality control:
+      [
+        [
+          {
+            delete: {
+              id: "0193b77e-eb77-7a28-9a0f-a18549bf7df8",
+              type: "quality-control"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Delete the run item that was attached to the quality control.
+      [
+        [
+          {
+            delete: {
+              id: "e9e39b72-ece7-454b-893a-2fc2d075e7b7",
+              type: "molecular-analysis-run-item"
+            }
           }
         ],
         {

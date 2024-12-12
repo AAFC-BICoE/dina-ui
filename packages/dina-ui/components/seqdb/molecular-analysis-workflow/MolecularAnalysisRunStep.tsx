@@ -294,6 +294,7 @@ export function MolecularAnalysisRunStep({
                             onClick={() => deleteQualityControl(index)}
                             variant="danger"
                             className="delete-datablock w-100 mt-4"
+                            data-testid={`delete-quality-control-${index}`}
                           >
                             <FaTrash />
                           </Button>
