@@ -908,7 +908,7 @@ export function getMolecularAnalysisRunColumns(
         ) : (
           <input
             type="text"
-            className="w-100"
+            className="w-100 form-control"
             defaultValue={original.molecularAnalysisRunItem?.name}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setMolecularAnalysisRunItemNames?.(
