@@ -732,12 +732,9 @@ export function useGenericMolecularAnalysisRun({
                 }
               }
             }));
-          const savedQualityControls = await save(qualityControlSaveArgs, {
+          await save(qualityControlSaveArgs, {
             apiBaseUrl: "/seqdb-api"
           });
-
-          // Need to figure out a way to attach the savedQualityControls ids to the blank ids in the
-          // quality controls...
         }
 
         // Update existing quality control entities.

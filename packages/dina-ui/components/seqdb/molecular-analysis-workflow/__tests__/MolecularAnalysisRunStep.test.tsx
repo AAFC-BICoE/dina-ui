@@ -1,10 +1,6 @@
 import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
 import { noop } from "lodash";
-import {
-  screen,
-  waitFor,
-  waitForElementToBeRemoved
-} from "@testing-library/react";
+import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
