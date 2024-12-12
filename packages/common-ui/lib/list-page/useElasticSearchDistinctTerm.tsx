@@ -87,34 +87,12 @@ export function useElasticSearchDistinctTerm({
       // If it's an attribute, no need to use nested filters.
       if (isFieldArray) {
         builder.aggregation(
-          "nested",
-          { path: fieldName },
-          NEST_AGGREGATION_NAME,
-          (includeAgg) =>
-            includeAgg.aggregation(
-              "filter",
-              {
-                bool: {
-                  filter: [
-                    wildcardQuery(
-                      fieldName!,
-                      inputValue,
-                      keywordMultiFieldSupport
-                    )
-                  ]
-                }
-              },
-              FILTER_AGGREGATION_NAME,
-              (agg) =>
-                agg.aggregation(
-                  "terms",
-                  fieldName + (keywordMultiFieldSupport ? ".keyword" : ""),
-                  {
-                    size: TOTAL_SUGGESTIONS
-                  },
-                  AGGREGATION_NAME
-                )
-            )
+          "terms",
+          fieldName + (keywordMultiFieldSupport ? ".keyword" : ""),
+          {
+            size: TOTAL_SUGGESTIONS,
+            include: `.*${inputValue}.*`
+          }
         );
       } else {
         builder.aggregation(
