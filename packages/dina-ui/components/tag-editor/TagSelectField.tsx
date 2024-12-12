@@ -3,6 +3,7 @@ import {
   FieldWrapperProps,
   Tooltip,
   filterBy,
+  rsql,
   useAccount,
   useQuery
 } from "common-ui";
@@ -15,6 +16,7 @@ import CreatableSelect from "react-select/creatable";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { useFormikContext } from "formik";
+import { useElasticSearchDistinctTerm } from "packages/common-ui/lib/list-page/useElasticSearchDistinctTerm";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
@@ -104,22 +106,6 @@ function TagSelect({
 
   const typeName = last(resourcePath?.split("/"));
 
-  const filter = filterBy(
-    [tagsFieldName],
-    !isAdmin
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: groupSelectorName,
-              comparison: "=in=",
-              arguments: groupNames || []
-            }
-          ]
-        }
-      : undefined
-  );
-
   const { loading, response } = useQuery<KitsuResource[]>(
     {
       path: resourcePath ?? "",
@@ -127,12 +113,31 @@ function TagSelect({
       fields: typeName ? { [typeName]: tagsFieldName } : undefined,
       filter: {
         tags: { NEQ: "null" },
-        ...filter("")
+        ...(!isAdmin &&
+          filterBy([tagsFieldName], {
+            extraFilters: [
+              // Restrict the list to just the user's groups:
+              {
+                selector: groupSelectorName,
+                comparison: "=in=",
+                arguments: groupNames || []
+              }
+            ]
+          }))
       },
       page: { limit: 100 }
     },
     { disabled: !resourcePath }
   );
+
+  const suggestions = useElasticSearchDistinctTerm({
+    fieldName: `data.attributes.${tagsFieldName}`,
+    indexName: "dina_object_store_index",
+    keywordMultiFieldSupport: true,
+    isFieldArray: true,
+    inputValue,
+    groupNames
+  });
 
   const previousTagsOptions = useMemo(
     () =>
