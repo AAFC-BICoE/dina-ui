@@ -750,8 +750,6 @@ export function getMolecularAnalysisRunColumns(
   >,
   readOnly?: boolean
 ) {
-  // const formik = useDinaFormContext();
-  // console.log(formik);
   // Table columns to display for the sequencing run.
   const SEQ_REACTION_COLUMNS: ColumnDef<SequencingRunItem>[] = [
     {
