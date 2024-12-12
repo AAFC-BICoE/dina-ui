@@ -1,10 +1,6 @@
 import { mountWithAppContext2 } from "../../../../../dina-ui/test-util/mock-app-context";
 import { noop } from "lodash";
-import {
-  waitFor,
-  waitForElementToBeRemoved,
-  screen
-} from "@testing-library/react";
+import { waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { useState, useEffect } from "react";
@@ -196,6 +192,11 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     expect(wrapper.getByRole("cell", { name: "A1" })).toBeInTheDocument();
     expect(wrapper.getByRole("cell", { name: "A2" })).toBeInTheDocument();
 
+    // Ensure the run item names are shown:
+    expect(wrapper.getAllByRole("textbox")[1]).toHaveDisplayValue(
+      "Provided run item name"
+    );
+
     // Ensure quality controls are being displayed:
     expect(
       wrapper.container.querySelector('input[name="qualityControl-name-0"]')
@@ -305,6 +306,10 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     // Type a name for the run to be created.
     userEvent.type(sequencingRunNameInput!, "My new run");
 
+    // Enter in names for the run items:
+    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+    userEvent.type(wrapper.getAllByRole("textbox")[2], "Run item name 2");
+
     // Add new quality control.
     userEvent.click(wrapper.getByRole("button", { name: "Add" }));
 
@@ -351,6 +356,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
         [
           {
             resource: {
+              name: "Run item name 1",
               relationships: {
                 run: {
                   data: {
@@ -366,6 +372,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
           },
           {
             resource: {
+              name: "Run item name 2",
               relationships: {
                 run: {
                   data: {
@@ -528,10 +535,14 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
     userEvent.clear(wrapper.getAllByRole("textbox")[0]);
     userEvent.type(wrapper.getAllByRole("textbox")[0], "Updated run name");
 
-    // Edit Quality Control 1
+    // Update the two run names.
     userEvent.clear(wrapper.getAllByRole("textbox")[1]);
+    userEvent.type(wrapper.getAllByRole("textbox")[1], "Run item name 1");
+
+    // Edit Quality Control 1
+    userEvent.clear(wrapper.getAllByRole("textbox")[3]);
     userEvent.type(
-      wrapper.getAllByRole("textbox")[1],
+      wrapper.getAllByRole("textbox")[3],
       "Updated Quality Control"
     );
 
@@ -542,7 +553,7 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
 
     // Add new Quality Control
     userEvent.click(wrapper.getByRole("button", { name: /add/i }));
-    userEvent.type(wrapper.getAllByRole("textbox")[2], "New Quality Control");
+    userEvent.type(wrapper.getAllByRole("textbox")[4], "New Quality Control");
     userEvent.click(wrapper.getAllByRole("combobox")[1]);
     userEvent.click(
       wrapper.getByRole("option", { name: /reserpine standard/i })
@@ -583,6 +594,23 @@ describe("Molecular Analysis Workflow - Step 4 - Molecular Analysis Run Step", (
               type: "molecular-analysis-run"
             },
             type: "molecular-analysis-run"
+          }
+        ],
+        {
+          apiBaseUrl: "/seqdb-api"
+        }
+      ],
+
+      // Update the run item names
+      [
+        [
+          {
+            resource: {
+              id: "f65ed036-eb92-40d9-af03-d027646e8948",
+              name: "Run item name 1",
+              type: "molecular-analysis-run-item"
+            },
+            type: "molecular-analysis-run-item"
           }
         ],
         {
