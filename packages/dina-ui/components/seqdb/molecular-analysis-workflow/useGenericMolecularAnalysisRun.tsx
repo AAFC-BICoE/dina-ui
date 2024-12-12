@@ -289,7 +289,7 @@ export function useGenericMolecularAnalysisRun({
             setSequencingRun(firstSequencingRun);
             setSequencingRunName(firstSequencingRun.name);
             await findMolecularAnalysisRunAttachments(firstSequencingRun);
-            await findQualityControlRunItems(firstSequencingRun);
+            await retrieveQualityControls(firstSequencingRun);
           }
         }
 
@@ -307,70 +307,6 @@ export function useGenericMolecularAnalysisRun({
 
             if (runQuery && (runQuery as any)?.data?.attachments) {
               setAttachments((runQuery as any)?.data?.attachments);
-            }
-          }
-        }
-
-        async function findQualityControlRunItems(run: MolecularAnalysisRun) {
-          // Only perform the request if a sequencing run exists.
-          if (run?.id) {
-            const qualityControlItemQuery = await apiClient.get(
-              `seqdb-api/molecular-analysis-run-item`,
-              {
-                filter: filterBy([], {
-                  extraFilters: [
-                    {
-                      selector: "run.uuid",
-                      comparison: "==",
-                      arguments: run?.id
-                    },
-                    {
-                      selector: "usageType",
-                      comparison: "==",
-                      arguments: "quality-control"
-                    }
-                  ]
-                })("")
-              }
-            );
-
-            if (
-              qualityControlItemQuery &&
-              (qualityControlItemQuery as any)?.data?.length > 0
-            ) {
-              const newQualityControls: QualityControl[] = [];
-
-              // Go through each quality control run item and then we do a query for each quality control.
-              const qualityControlRunItems = (qualityControlItemQuery as any)
-                ?.data;
-              for (const item of qualityControlRunItems) {
-                const qualityControlQuery = await apiClient.get<QualityControl>(
-                  `seqdb-api/quality-control`,
-                  {
-                    filter: filterBy([], {
-                      extraFilters: [
-                        {
-                          selector: "molecularAnalysisRunItem.uuid",
-                          comparison: "==",
-                          arguments: item?.id
-                        }
-                      ]
-                    })(""),
-                    include: "molecularAnalysisRunItem"
-                  }
-                );
-
-                const qualityControlFound = qualityControlQuery
-                  ?.data?.[0] as QualityControl;
-                if (qualityControlFound) {
-                  newQualityControls.push({
-                    ...qualityControlFound
-                  });
-                }
-              }
-
-              setQualityControls(newQualityControls);
-              setLoadedQualityControls(newQualityControls);
             }
           }
         }
@@ -493,6 +429,69 @@ export function useGenericMolecularAnalysisRun({
       return false;
     } else {
       return true;
+    }
+  }
+
+  async function retrieveQualityControls(run: MolecularAnalysisRun) {
+    // Only perform the request if a sequencing run exists.
+    if (run?.id) {
+      const qualityControlItemQuery = await apiClient.get(
+        `seqdb-api/molecular-analysis-run-item`,
+        {
+          filter: filterBy([], {
+            extraFilters: [
+              {
+                selector: "run.uuid",
+                comparison: "==",
+                arguments: run?.id
+              },
+              {
+                selector: "usageType",
+                comparison: "==",
+                arguments: "quality-control"
+              }
+            ]
+          })("")
+        }
+      );
+
+      if (
+        qualityControlItemQuery &&
+        (qualityControlItemQuery as any)?.data?.length > 0
+      ) {
+        const newQualityControls: QualityControl[] = [];
+
+        // Go through each quality control run item and then we do a query for each quality control.
+        const qualityControlRunItems = (qualityControlItemQuery as any)?.data;
+        for (const item of qualityControlRunItems) {
+          const qualityControlQuery = await apiClient.get<QualityControl>(
+            `seqdb-api/quality-control`,
+            {
+              filter: filterBy([], {
+                extraFilters: [
+                  {
+                    selector: "molecularAnalysisRunItem.uuid",
+                    comparison: "==",
+                    arguments: item?.id
+                  }
+                ]
+              })(""),
+              include: "molecularAnalysisRunItem"
+            }
+          );
+
+          const qualityControlFound = qualityControlQuery
+            ?.data?.[0] as QualityControl;
+          if (qualityControlFound) {
+            newQualityControls.push({
+              ...qualityControlFound
+            });
+          }
+        }
+
+        setQualityControls(newQualityControls);
+        setLoadedQualityControls(newQualityControls);
+      }
     }
   }
 
@@ -690,7 +689,7 @@ export function useGenericMolecularAnalysisRun({
         const qualityControlsWithoutId = qualityControls.filter(
           (qc) => !qc.id && qc.name && qc.type
         );
-        for (let i = 0; i < qualityControlsWithoutId.length; i++) {
+        if (qualityControlsWithoutId.length > 0) {
           // Create a run item for each quality control linked to the same run that was created.
           const qualityControlRunItemSaveArgs: SaveArgs<MolecularAnalysisRunItem>[] =
             qualityControlsWithoutId.map(() => ({
@@ -738,13 +737,23 @@ export function useGenericMolecularAnalysisRun({
         }
 
         // Update existing quality control entities.
-        const qualityControlsWithId = qualityControls.filter(
-          (qc) => qc.id && qc.name && qc.type
-        );
-        for (let i = 0; i < qualityControlsWithId.length; i++) {
+        const updatedQualityControls = qualityControls.filter((qc) => {
+          const matchingLoadedQc = loadedQualityControls.find(
+            (loadedQc) => loadedQc.id === qc.id
+          );
+          return (
+            qc.id &&
+            qc.name &&
+            qc.type &&
+            matchingLoadedQc &&
+            (qc.name !== matchingLoadedQc.name ||
+              qc.type !== matchingLoadedQc.type)
+          );
+        });
+        if (updatedQualityControls.length > 0) {
           // Update quality control entity.
           const qualityControlUpdateArgs: SaveArgs<QualityControl>[] =
-            qualityControlsWithId.map((item) => ({
+            updatedQualityControls.map((item) => ({
               type: "quality-control",
               id: item.id,
               resource: {
@@ -764,7 +773,7 @@ export function useGenericMolecularAnalysisRun({
         const deletedQualityControls = loadedQualityControls.filter(
           (loadedQc) => !qualityControls.some((qc) => qc.id === loadedQc.id)
         );
-        for (let i = 0; i < deletedQualityControls.length; i++) {
+        if (deletedQualityControls.length > 0) {
           // Delete quality control.
           await save(
             deletedQualityControls.map((item) => ({
@@ -788,8 +797,8 @@ export function useGenericMolecularAnalysisRun({
           );
         }
 
-        // Reset the loaded quality controls with the current.
-        setLoadedQualityControls(qualityControls);
+        // Reload the quality controls...
+        await retrieveQualityControls(sequencingRun);
       }
 
       // Go back to view mode once completed.
