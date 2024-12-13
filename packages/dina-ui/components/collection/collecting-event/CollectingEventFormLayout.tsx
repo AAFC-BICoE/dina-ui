@@ -602,7 +602,10 @@ export function CollectingEventFormLayout({
         sectionName="general-section"
       >
         <NotPubliclyReleasableWarning />
-        <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
+        <TagsAndRestrictionsSection
+          resourcePath="collection-api/collecting-event"
+          indexName="dina_material_sample_index"
+        />
       </DinaFormSection>
       <div className="row mb-3">
         <div className="col-md-12">

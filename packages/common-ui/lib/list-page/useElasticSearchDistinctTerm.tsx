@@ -1,8 +1,7 @@
 import Bodybuilder from "bodybuilder";
-import { castArray } from "lodash";
+import { castArray, pick } from "lodash";
 import { useEffect, useState } from "react";
 import { useApiClient, useQueryBuilderContext } from "..";
-import { wildcardQuery } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 const TOTAL_SUGGESTIONS: number = 100;
 const FILTER_AGGREGATION_NAME: string = "included_type_filter";
 const AGGREGATION_NAME: string = "term_aggregation";
@@ -23,7 +22,11 @@ interface QuerySuggestionFieldProps {
   /** User input used to query against */
   inputValue?: string;
 
+  /** Group to be queried to only show the users most used values. */
   groupNames?: string[];
+
+  /** Number of suggestions */
+  size?: number;
 }
 export function useElasticSearchDistinctTerm({
   fieldName,
@@ -32,7 +35,8 @@ export function useElasticSearchDistinctTerm({
   keywordMultiFieldSupport,
   isFieldArray = false,
   inputValue,
-  groupNames
+  groupNames,
+  size
 }: QuerySuggestionFieldProps) {
   const { apiClient } = useApiClient();
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -90,9 +94,10 @@ export function useElasticSearchDistinctTerm({
           "terms",
           fieldName + (keywordMultiFieldSupport ? ".keyword" : ""),
           {
-            size: TOTAL_SUGGESTIONS,
+            size: size ?? TOTAL_SUGGESTIONS,
             include: `.*${inputValue}.*`
-          }
+          },
+          AGGREGATION_NAME
         );
       } else {
         builder.aggregation(

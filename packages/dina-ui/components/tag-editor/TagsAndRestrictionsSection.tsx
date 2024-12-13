@@ -15,12 +15,14 @@ export interface TagsAndRestrictionsSection {
   resourcePath?: string;
   tagsFieldName?: string;
   groupSelectorName?: string;
+  indexName?: string;
 }
 
 export function TagsAndRestrictionsSection({
   resourcePath,
   groupSelectorName = "group",
-  tagsFieldName = "tags"
+  tagsFieldName = "tags",
+  indexName
 }: TagsAndRestrictionsSection) {
   const { readOnly, initialValues } = useDinaFormContext();
 
@@ -45,6 +47,7 @@ export function TagsAndRestrictionsSection({
     <div className="row">
       <DinaFormSection horizontal="flex">
         <TagSelectField
+          indexName={indexName}
           resourcePath={resourcePath}
           className="tags mb-3"
           name={tagsFieldName}
