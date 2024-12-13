@@ -1,5 +1,7 @@
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../../test-util/mock-app-context";
 import { StorageUnitTypeForm } from "../../../../pages/collection/storage-unit-type/edit";
+import { fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
@@ -28,22 +30,23 @@ describe("Storage Unit Type form.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new Storage Type", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <StorageUnitTypeForm onSaved={mockOnSaved} />,
       { apiContext }
     );
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "test-storage-type" } });
+    // Change Name field value
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: { value: "test-storage-type" }
+    });
 
-    wrapper.find("form").simulate("submit");
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected result
     expect(mockSave).lastCalledWith(
       [
         {
@@ -64,7 +67,7 @@ describe("Storage Unit Type form.", () => {
   });
 
   it("Lets you edit a Storage Type", async () => {
-    const wrapper = mountWithAppContext(
+    const wrapper = mountWithAppContext2(
       <StorageUnitTypeForm
         onSaved={mockOnSaved}
         storageUnitType={{
@@ -79,17 +82,18 @@ describe("Storage Unit Type form.", () => {
       { apiContext }
     );
     await new Promise(setImmediate);
-    wrapper.update();
 
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "edited-name" } });
+    // Change Name field value
+    fireEvent.change(wrapper.getByRole("textbox", { name: /name/i }), {
+      target: { value: "edited-name" }
+    });
 
-    wrapper.find("form").simulate("submit");
+    // Submit form
+    fireEvent.submit(wrapper.container.querySelector("form")!);
 
     await new Promise(setImmediate);
-    wrapper.update();
 
+    // Test expected result
     expect(mockSave).lastCalledWith(
       [
         {
