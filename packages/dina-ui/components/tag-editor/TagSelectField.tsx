@@ -128,6 +128,21 @@ function TagSelect({
     });
     tagOptions.current = suggestions.map((tag) => toOption(tag));
   } else {
+    const filter = filterBy(
+      [tagsFieldName],
+      !isAdmin
+        ? {
+            extraFilters: [
+              // Restrict the list to just the user's groups:
+              {
+                selector: groupSelectorName,
+                comparison: "=in=",
+                arguments: groupNames || []
+              }
+            ]
+          }
+        : undefined
+    );
     const { loading } = useQuery<KitsuResource[]>(
       {
         path: resourcePath ?? "",
@@ -135,17 +150,7 @@ function TagSelect({
         fields: typeName ? { [typeName]: tagsFieldName } : undefined,
         filter: {
           tags: { NEQ: "null" },
-          ...(!isAdmin &&
-            filterBy([tagsFieldName], {
-              extraFilters: [
-                // Restrict the list to just the user's groups:
-                {
-                  selector: groupSelectorName,
-                  comparison: "=in=",
-                  arguments: groupNames || []
-                }
-              ]
-            }))
+          ...filter("")
         },
         page: { limit: 100 }
       },
