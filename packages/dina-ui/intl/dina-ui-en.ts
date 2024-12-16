@@ -1027,6 +1027,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "This molecular analysis workflow should only have one associated run. Please verify and correct it.",
   molecularAnalysisRunStep_sequencingRun: "Sequencing Run:",
   molecularAnalysisRunStep_sequencingRunContent: "Sequencing Run Content:",
+  molecularAnalysisRunStep_sequencingQualityControl:
+    "Sequencing Quality Control:",
   molecularAnalysisRunStep_missingSequencingRunID:
     "Unexpected error occurred. Sequencing Run ID should be set at this point.",
   molecularAnalysisRunStep_missingSequenceReactions:
@@ -1157,5 +1159,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Changing the storage unit type will clear the existing storage coordinates stored.",
   changingTheStorageUnitTypeWillDeleteWarningButtonText: "Proceed",
   seqdbManagedAttributeTitle: "Sequencing",
-  genericMolecularAnalysis: "Generic Molecular Analysis"
+  genericMolecularAnalysis: "Generic Molecular Analysis",
+  molecularAnalysisRunItemName: "Run Item Name"
 };

@@ -1,8 +1,9 @@
 import { SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext2 } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/objectstore-api";
 import { DinaUser } from "../../../types/user-api/resources/DinaUser";
+import "@testing-library/jest-dom";
 
 /** Test dina user with all fields defined. */
 const TEST_DINAUSER: DinaUser = {
@@ -54,28 +55,27 @@ const apiContext: any = {
 
 describe("Dina user who am i page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(<DinaUserDetailsPage />, {
+    const wrapper = mountWithAppContext2(<DinaUserDetailsPage />, {
       apiContext
     });
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    // expect(wrapper.find(".spinner-border").exists()).toEqual(true);
+    expect(wrapper.getByText(/loading\.\.\./i)).toBeInTheDocument();
   });
 
   it("Render the dina user details", async () => {
-    const wrapper = mountWithAppContext(<DinaUserDetailsPage />, {
+    const wrapper = mountWithAppContext2(<DinaUserDetailsPage />, {
       apiContext
     });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
-    wrapper.update();
 
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    // expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+    expect(wrapper.queryByText(/loading\.\.\./i)).not.toBeInTheDocument();
 
     // The dina username should be rendered in a FieldView.
-    expect(wrapper.find(".username-field-header").exists()).toEqual(true);
-    expect(wrapper.find(".username-field .field-view").text()).toEqual(
-      "cnc-cm"
-    );
+    expect(wrapper.getByRole("heading", { name: /user/i })).toBeInTheDocument();
+    expect(wrapper.getByText(/cnc\-cm/i)).toBeInTheDocument();
   });
 });
